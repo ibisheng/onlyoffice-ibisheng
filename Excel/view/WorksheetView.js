@@ -453,8 +453,6 @@
 			// Массив ячеек для текущей формулы
 			this.arrActiveFormulaRanges = [];
 			this.arrActiveChartsRanges = [];
-			// Массив видимых hyperlink-ов
-			this.visibleHyperlinks = [];
 			//------------------------
 			
 			this.collaborativeEditing = collaborativeEditing;
@@ -1174,8 +1172,6 @@
 				this.visibleRange.c2 = 0;
 				this._calcVisibleColumns();
 				this._updateVisibleColsCount(/*skipScrolReinit*/true);
-
-				this._updateHyperlinksCache();
 			},
 
 			/**
@@ -1502,55 +1498,6 @@
 					}
 					break;
 				} while (1);
-			},
-
-			// Обновляем cache hyperlinks
-			_updateHyperlinksCache: function () {
-				// ToDo можно обновлять не весь cache гиперлинков, а только часть
-				var t = this;
-				var vr = t.visibleRange;
-				var range = t.model.getRange3(vr.r1, vr.c1, vr.r2, vr.c2);
-				var hyperlinks = range.getHyperlinks ();
-				this.visibleHyperlinks = [];
-				if (null === hyperlinks)
-					return;
-				for (var i = 0; i < hyperlinks.length; ++i) {
-					// Гиперлинк
-					var oHyperlink = new asc_CHyperlink();
-					// Range для гиперссылки
-					var hyperlinkTmp = hyperlinks[i].hyperlink;
-					var hyperlinkRange = hyperlinkTmp.Ref.getBBox0();
-					oHyperlink.asc_setHyperlinkRange (hyperlinkRange);
-					oHyperlink.asc_setHyperlinkCol (hyperlinks[i].col);
-					oHyperlink.asc_setHyperlinkRow (hyperlinks[i].row);
-					// Тип гиперссылки
-					var type = (null !== hyperlinkTmp.Hyperlink) ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
-					oHyperlink.asc_setType (type);
-					if (c_oAscHyperlinkType.RangeLink === type) {
-						// // ToDo переделать это место (парсить должны в момент открытия и добавления ссылки)
-						var result = parserHelp.parse3DRef (hyperlinkTmp.Location);
-						if (null !== result) {
-							oHyperlink.asc_setSheet (result.sheet);
-							oHyperlink.asc_setRange (result.range);
-						}
-					}
-					oHyperlink.asc_setLocation (hyperlinkTmp.Location);
-					oHyperlink.asc_setTooltip (hyperlinkTmp.Tooltip);
-					oHyperlink.asc_setHyperlinkUrl (hyperlinkTmp.Hyperlink);
-					// Добавляем гиперссылку в кеш
-					this.visibleHyperlinks[i] = oHyperlink;
-				}
-			},
-
-			// Получаем индекс гиперлинка по ячейке
-			_getHyperlinkIndex: function (c, r) {
-				for (var i = this.visibleHyperlinks.length - 1; i >= 0; --i) {
-					var col = this.visibleHyperlinks[i].asc_getHyperlinkCol();
-					var row = this.visibleHyperlinks[i].asc_getHyperlinkRow();
-					if (col === c && row === r)
-						return i;
-				}
-				return null;
 			},
 
 			// ----- Drawing for print -----
@@ -4853,7 +4800,6 @@
 				if (reinitScrollY)
 					this._trigger("reinitializeScrollY");
 
-				this._updateHyperlinksCache();
 				this.cellCommentator.updateCommentPosition();
 				this.drawDepCells();
 				this._drawGraphic();
@@ -4920,7 +4866,6 @@
 					this._trigger("reinitializeScrollX");
 												
 				this.cellCommentator.updateCommentPosition();
-				this._updateHyperlinksCache();
 				this.drawDepCells();
 				this._drawGraphic();
 				this.objectRender.showDrawingObjects(true);
@@ -5240,16 +5185,16 @@
 						}
 
 						// Проверим, может мы в гиперлинке
-						var indexHyperlink = this._getHyperlinkIndex(c.col, r.row);
+						var oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
 						var cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
 							row: (r ? r.row : -1), userId: userId,
 							lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop,
 							userIdAllProps: userIdAllProps, lockAllPosLeft: lockAllPosLeft,
 							lockAllPosTop: lockAllPosTop, userIdAllSheet: userIdAllSheet,
 							commentIndexes: indexes, commentCoords: coords};
-						if (null != indexHyperlink) {
+						if (null !== oHyperlink) {
 							return {cursor: kCurHyperlink, target: "hyperlink",
-								hyperlink: this.visibleHyperlinks[indexHyperlink], cellCursor: cellCursor,
+								hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
 								userId: userId, lockRangePosLeft: lockRangePosLeft,
 								lockRangePosTop: lockRangePosTop, userIdAllProps: userIdAllProps,
 								userIdAllSheet: userIdAllSheet, lockAllPosLeft: lockAllPosLeft,
@@ -5799,36 +5744,17 @@
 				var ar = this.activeRange.clone();
 				var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
 				var hyperlink = range.getHyperlink ();
-				if (null != hyperlink) {
+				if (null !== hyperlink) {
 					// Гиперлинк
-					var oHyperlink = new asc_CHyperlink();
-					// Range для гиперссылки
-					var hyperlinkRange = hyperlink.Ref.getBBox0();
-					oHyperlink.asc_setHyperlinkRange (hyperlinkRange);
-					// Тип гиперссылки
-					var type = (null !== hyperlink.Hyperlink) ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
-					oHyperlink.asc_setType (type);
-					if (c_oAscHyperlinkType.RangeLink === type) {
-						// ToDo переделать это место (парсить должны в момент открытия и добавления ссылки)
-						var result = parserHelp.parse3DRef (hyperlink.Location);
-						if (null !== result) {
-							oHyperlink.asc_setSheet (result.sheet);
-							oHyperlink.asc_setRange (result.range);
-						}
-					}
-					oHyperlink.asc_setLocation (hyperlink.Location);
-					oHyperlink.asc_setTooltip (hyperlink.Tooltip);
-					oHyperlink.asc_setHyperlinkUrl (hyperlink.Hyperlink);
-
+					var oHyperlink = new asc_CHyperlink(hyperlink);
+					oHyperlink.asc_setText (cell_info.text);
 					cell_info.hyperlink = oHyperlink;
-					cell_info.hyperlink.asc_setText (cell_info.text);
 				} else
 					cell_info.hyperlink = null;
 
 				cell_info.flags.merge = null !== range.hasMerged();
 
-				if(bExt)
-				{
+				if (bExt) {
 					cell_info.innertext = c.getValue();
 					cell_info.numFormat = c.getNumFormatStr();
 				}
@@ -6601,11 +6527,9 @@
 					var applyFillHandleCallback = function (res) {
 						if (res) {
 							// Автозаполняем ячейки
-							t.model.onStartTriggerAction();
 							range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex);
 							// Вызываем функцию пересчета для заголовков форматированной таблицы
 							t.autoFilters._renameTableColumn(t, arn);
-							t.model.onEndTriggerAction();
 						}
 
 						// Сбрасываем параметры автозаполнения
@@ -6988,7 +6912,6 @@
 					}
 
 					selectionRange = arn.clone();
-					t.model.onStartTriggerAction();
 					History.Create_NewPoint();
 					History.StartTransaction();
 
@@ -7119,7 +7042,6 @@
 								if (!selectData) {
 									bIsUpdate = false;
 									History.EndTransaction();
-									t.model.onEndTriggerAction();
 									return;
 								}
 								t.expandColsOnScroll();
@@ -7153,7 +7075,6 @@
 
 								History.EndTransaction();
 								History.SetSelection(selectionRange);
-								t.model.onEndTriggerAction();
 							};
 
 							var pasteNoLocal = function () {
@@ -7235,39 +7156,22 @@
 							isLocal ? pasteLocal() : pasteNoLocal();
 							return;
 						case "hyperlink":
-							if (val) {
-								var type = (c_oAscHyperlinkType.RangeLink !== val.asc_getType()) ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
-								var location = null;
-								if (c_oAscHyperlinkType.RangeLink === type) {
+							if (val && val.hyperlinkModel) {
+								if (c_oAscHyperlinkType.RangeLink === val.asc_getType()) {
 									var hyperlinkRangeTmp = t.model.getRange2(val.asc_getRange ());
 									if (null === hyperlinkRangeTmp) {
 										bIsUpdate = false;
 										break;
 									}
-									var hyperlinkRangeBBox0 = hyperlinkRangeTmp.getBBox0();
-									var hyperlinkRange = t._getCellTitle(hyperlinkRangeBBox0.c1, hyperlinkRangeBBox0.r1);
-									if (hyperlinkRangeBBox0.c1 !== hyperlinkRangeBBox0.c2 || hyperlinkRangeBBox0.r1 !== hyperlinkRangeBBox0.r2)
-										hyperlinkRange += ":" + t._getCellTitle(hyperlinkRangeBBox0.c2, hyperlinkRangeBBox0.r2);
-									// Проверка имени листа на наличие пробелов (если в имени листа есть пробелы, то оно берется в одинарные кавычки)
-									var hyperlinkSheet = val.asc_getSheet();
-									if (hyperlinkSheet.indexOf(" "))
-										hyperlinkSheet = "'" + hyperlinkSheet + "'";
-									location = hyperlinkSheet + "!" + hyperlinkRange;
 								}
-								var newHyperlink = new Hyperlink();
-								newHyperlink.Hyperlink = val.asc_getHyperlinkUrl();
-								newHyperlink.Location = location;
-								newHyperlink.Ref = range;
-								newHyperlink.Tooltip = val.asc_getTooltip();
-								range.setHyperlink(newHyperlink);
+								val.hyperlinkModel.Ref = range;
+								range.setHyperlink(val.hyperlinkModel);
 								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
 								mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
 								c = mc ? mc.c1 : arn.startCol;
 								r = mc ? mc.r1 : arn.startRow;
 								if (null !== val.asc_getText()) {
-									t.model.getRange3(r, c, r, c)
-										.setValue(val.asc_getText());
-
+									t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
 									// Вызываем функцию пересчета для заголовков форматированной таблицы
 									t.autoFilters._renameTableColumn(t, arn);
 								}
@@ -7290,7 +7194,6 @@
 
 					History.EndTransaction();
 					History.SetSelection(selectionRange);
-					t.model.onEndTriggerAction();
 				};
 				if ("paste" === prop) {
 					// Для past свой диапазон
@@ -7533,7 +7436,7 @@
 									{
 										var newHyperlink = new Hyperlink();
 										if(values[r][c][0].hyperLink.search('#') === 0)
-											newHyperlink.Location = link.replace('#','');
+											newHyperlink.setLocation(link.replace('#',''));
 										else
 											newHyperlink.Hyperlink = link;
 										newHyperlink.Ref = range;
@@ -8186,12 +8089,10 @@
 						switch (val) {
 							case c_oAscInsertOptions.InsertCellsAndShiftRight:
 								functionModelAction = function () {
-									t.model.onStartTriggerAction();
 									if (range.addCellsShiftRight()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									}
-									t.model.onEndTriggerAction();
 								};
 
 								if(bUndoRedo)
@@ -8202,12 +8103,10 @@
 								return;
 							case c_oAscInsertOptions.InsertCellsAndShiftDown:
 								functionModelAction = function () {
-									t.model.onStartTriggerAction();
 									if (range.addCellsShiftBottom()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 									}
-									t.model.onEndTriggerAction();
 								};
 
 								if(bUndoRedo)
@@ -8219,9 +8118,7 @@
 							case c_oAscInsertOptions.InsertColumns:
 								functionModelAction = function () {
 									fullRecalc = true;
-									t.model.onStartTriggerAction();
 									t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
-									t.model.onEndTriggerAction();
 									t.autoFilters.insertColumn(t, prop, _updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
@@ -8236,9 +8133,7 @@
 							case c_oAscInsertOptions.InsertRows:
 								functionModelAction = function () {
 									fullRecalc = true;
-									t.model.onStartTriggerAction();
 									t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
-									t.model.onEndTriggerAction();
 									t.autoFilters.insertRows(t, prop,_updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
@@ -8803,7 +8698,6 @@
 
 			_replaceCellsText: function (aReplaceCells, valueForSearching, options) {
 				var oSelectionHistory = this.activeRange.clone();
-				this.model.onStartTriggerAction();
 				History.Create_NewPoint();
 				History.SetSelection(oSelectionHistory);
 				History.StartTransaction();
@@ -8818,7 +8712,6 @@
 				var t = this;
 				if (options.indexInArray >= aReplaceCells.length) {
 					History.EndTransaction();
-					t.model.onEndTriggerAction();
 					if (options.isReplaceAll) {
 						// Завершаем медленную операцию
 						t._trigger("slowOperation", false);
@@ -8983,7 +8876,6 @@
 				t.isFormulaEditMode = false;
 
 				if (!isNotHistory) {
-					t.model.onStartTriggerAction();
 					History.Create_NewPoint();
 					History.SetSelection(oCellEdit);
 					History.StartTransaction();
@@ -8999,7 +8891,6 @@
 					if(!ret) {
 						t.isFormulaEditMode = oldMode;
 						History.EndTransaction();
-						t.model.onEndTriggerAction();
 						return false;
 					}
 					isFormula = c.isFormula();
@@ -9029,7 +8920,6 @@
 
 				if (!isNotHistory) {
 					History.EndTransaction();
-					t.model.onEndTriggerAction();
 				}
 
 				// если вернуть false, то редактор не закроется

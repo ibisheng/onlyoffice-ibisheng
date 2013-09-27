@@ -238,9 +238,6 @@
 				this.model.handlers.add("deleteCell", function (wsId, val, range) {
 					self.getWorksheetById(wsId).changeWorksheet("delCell", {val: val, range: range});
 				});
-				this.model.handlers.add("updateHyperlinksCache", function (wsId) {
-					self.getWorksheetById(wsId)._updateHyperlinksCache();
-				});
 				this.model.handlers.add("showWorksheet", function (wsId) {
 					self.showWorksheetById(wsId);
 					var ws = self.getWorksheetById(wsId);
@@ -514,22 +511,19 @@
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
-						var oRangeHyperlink = ws.model.getCell3(ct.hyperlink.row, ct.hyperlink.col);
-						var hyp = oRangeHyperlink.getHyperlink();
-						if(null != hyp && false == hyp.getVisited())
-						{
-							hyp.setVisited(true);
-							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkRange, isLockDraw: false, canChangeColWidth: false});
+						if (ct.hyperlink.hyperlinkModel.getVisited()) {
+							ct.hyperlink.hyperlinkModel.setVisited(true);
+							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});
 						}
-						var t = this;
-						if (c_oAscHyperlinkType.WebLink === ct.hyperlink.asc_getType()) {
-							// Это ссылка на Url. Отправляем не сразу, т.к. хочется dblClick обработать...
-							t.handlers.trigger("asc_onHyperlinkClick", ct.hyperlink.asc_getHyperlinkUrl());
-						}
-						else if (c_oAscHyperlinkType.RangeLink === ct.hyperlink.asc_getType()) {
-							// ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
-							t.handlers.trigger("asc_onHideComment");
-							t.Api._asc_setWorksheetRange(ct.hyperlink);
+						switch (ct.hyperlink.asc_getType()) {
+							case c_oAscHyperlinkType.WebLink:
+								this.handlers.trigger("asc_onHyperlinkClick", ct.hyperlink.asc_getHyperlinkUrl());
+								break;
+							case c_oAscHyperlinkType.RangeLink:
+								// ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
+								this.handlers.trigger("asc_onHideComment");
+								this.Api._asc_setWorksheetRange(ct.hyperlink);
+								break;
 						}
 					}
 				}
@@ -594,7 +588,7 @@
 							ct.cursor = ct.cellCursor.cursor;
 						}
 						arrMouseMoveObjects.push(asc_CMM({type: c_oAscMouseMoveType.Hyperlink, x: x, y: y,
-							hyperlink: ct.hyperlink.asc_clone()}));
+							hyperlink: ct.hyperlink}));
 					}
 
 					/* Проверяем, может мы на никаком объекте (такая схема оказалась приемлимой

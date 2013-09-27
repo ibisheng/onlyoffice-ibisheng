@@ -365,23 +365,14 @@ CHistory.prototype =
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
-		var aStartTriggerAction = new Object();
         // Откатываем все действия в обратном порядке (относительно их выполенения)
         for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
         {
             var Item = Point.Items[Index];
-			if(null != Item.SheetId && null == aStartTriggerAction[Item.SheetId])
-			{
-				var ws = this.workbook.getWorksheetById(Item.SheetId);
-				ws.onStartTriggerAction();
-				aStartTriggerAction[Item.SheetId] = ws;
-			}
             Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				isReInit = true;
         }
-		for(var i in aStartTriggerAction)
-			aStartTriggerAction[i].onEndTriggerAction();
 		var oSelectRange = null;
 		if(null != Point.SelectRange)
 			oSelectRange = Point.SelectRange;
@@ -434,12 +425,6 @@ CHistory.prototype =
 		this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
-		if(null != sheetid && null == oRedoObjectParam.aStartTriggerAction[sheetid])
-		{
-			var ws = this.workbook.getWorksheetById(sheetid);
-			ws.onStartTriggerAction();
-			oRedoObjectParam.aStartTriggerAction[sheetid] = ws;
-		}
 		Class.Redo( Type, Data, sheetid );
 		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
 			oRedoObjectParam.bIsReInit = true;
@@ -450,12 +435,6 @@ CHistory.prototype =
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-			if(null != Item.SheetId && null == oRedoObjectParam.aStartTriggerAction[Item.SheetId])
-			{
-				var ws = this.workbook.getWorksheetById(Item.SheetId);
-				ws.onStartTriggerAction();
-				oRedoObjectParam.aStartTriggerAction[Item.SheetId] = ws;
-			}
             Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
@@ -472,8 +451,6 @@ CHistory.prototype =
 		}
 		if(null == Point)
 			return;
-		for(var i in oRedoObjectParam.aStartTriggerAction)
-			oRedoObjectParam.aStartTriggerAction[i].onEndTriggerAction();
 		for(var i in Point.Triggers)
 			this.workbook.handlers.trigger.apply(this.workbook.handlers, Point.Triggers[i]);
 		var oSelectRange = null;

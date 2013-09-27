@@ -2194,7 +2194,6 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 				//нужно добавлять в историю только когда обрезается с краев, потому что на undo будет произведена вставка и ячеек, а диапазон не расширится
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), from, data);
 			}
-			oThis.addActionHyperlink(true);
 		}
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
@@ -2202,9 +2201,6 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
-	
-	this.nActionNested = 0;
-	this.bUpdateHyperlinks = false;
 	
 	this.nMaxRowId = 1;
 	this.nMaxColId = 1;
@@ -2438,25 +2434,6 @@ Woorksheet.prototype.initPostOpen = function(){
 		this.sheetViews[0] = new asc.asc_CSheetViewSettings();
 	}
 };
-Woorksheet.prototype.onStartTriggerAction=function(){
-	//начало действия, в конце которого могуть быть вызваны trigger(пока только hyperlink)
-	if(0 == this.nActionNested)
-		this.bUpdateHyperlinks = false;
-	this.nActionNested++;
-};
-Woorksheet.prototype.onEndTriggerAction=function(){
-	if(this.nActionNested > 0)
-		this.nActionNested--;
-	if(0 == this.nActionNested)
-	{
-		if(true == this.bUpdateHyperlinks)
-			this.workbook.handlers.trigger("updateHyperlinksCache", this.Id);
-		this.bUpdateHyperlinks = false;
-	}
-};
-Woorksheet.prototype.addActionHyperlink=function(bVal){
-	this.bUpdateHyperlinks = bVal;
-}
 Woorksheet.prototype._forEachCell=function(fAction){
 	for(var rowInd in this.aGCells){
 		var row = this.aGCells[rowInd];
@@ -3628,7 +3605,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 			elem.data.Ref.setOffset(offset);
 			this.hyperlinkManager.add(elem.bbox, elem.data);
 		}
-		this.addActionHyperlink(true);
 	}
 	//расширяем границы
 	if(oBBoxFrom.r2 > this.nRowsCount)
@@ -4015,8 +3991,9 @@ Woorksheet.prototype.getAllCol = function(){
 	return this.oAllCol;
 }
 Woorksheet.prototype.getHyperlinkByCell = function(row, col){
-	return this.hyperlinkManager.getByCell(row, col);
-}
+	var oHyperlink = this.hyperlinkManager.getByCell(row, col);
+	return oHyperlink ? oHyperlink.data : null;
+};
 Woorksheet.prototype.getMergedByCell = function(row, col){
 	return this.mergeManager.getByCell(row, col);
 }
@@ -7233,7 +7210,6 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 			this.setFont(oHyperlinkFont);
 		}
 		this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val);
-		this.worksheet.addActionHyperlink(true);
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetHyperlink, this.worksheet.getId(), this.bbox.clone(), val.clone());
 		History.EndTransaction();
 	}
@@ -7755,7 +7731,6 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 			var hyp = aSortedHyperlinks[i];
 			this.worksheet.hyperlinkManager.add(hyp.Ref.getBBox0(), hyp);
 		}
-		this.worksheet.addActionHyperlink(true);
 	}
 };
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){

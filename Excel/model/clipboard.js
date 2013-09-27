@@ -1977,19 +1977,19 @@
 				}
 				var hyperlink;
 				if(cell)
-					hyperlink = cell.getHyperlink()
+					hyperlink = cell.getHyperlink();
 				for (res = [], i = 0; i < val.length; ++i) {
 					if(val[i] && val[i].format && val[i].format.skip)
 						continue;
-					if(cell == undefined || (cell != undefined && (hyperlink == null || (hyperlink != null && hyperlink.Location != null))))
+					if(cell == undefined || (cell != undefined && (hyperlink == null || (hyperlink != null && hyperlink.getLocation() != null))))
 						span = doc.createElement("SPAN");
 					else
 					{
 						span = doc.createElement("A");
 						if(hyperlink.Hyperlink != null)
 							span.href = hyperlink.Hyperlink;
-						else if(hyperlink.Location != null)
-							span.href = "#" + hyperlink.Location;
+						else if(hyperlink.getLocation() != null)
+							span.href = "#" + hyperlink.getLocation();
 						if(hyperlink.Tooltip != null)
 							span.title = hyperlink.Tooltip;
 					}

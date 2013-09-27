@@ -482,65 +482,46 @@
 		};
 
 		// Гиперссылка
+		/** @constructor */
 		function asc_CHyperlink (obj) {
-			if ( !(this instanceof asc_CHyperlink) ) {
+			if (!(this instanceof asc_CHyperlink)) {
 				return new asc_CHyperlink(obj);
 			}
-			
-			if (obj) {
-				this.type = obj.type;
-				this.hyperlinkUrl = obj.hyperlinkUrl;
-				this.tooltip = obj.tooltip;
-				this.location = obj.location;
-				this.sheet = obj.sheet;
-				this.range = obj.range;
-				this.hyperlinkRange = obj.hyperlinkRange;
-				this.text = obj.text;
-				this.col = obj.col;
-				this.row = obj.row;
-			}
-			else {
-				this.asc_clear();
-			}
+
+			// Класс Hyperlink из модели
+			this.hyperlinkModel = null != obj ? obj : new Hyperlink();
+			// Используется только для выдачи наружу и выставлении обратно
+			this.text = null;
 
 			return this;
 		}
 		asc_CHyperlink.prototype = {
 			constructor: asc_CHyperlink,
-			asc_getType: function () { return this.type; },
-			asc_getHyperlinkUrl: function () { return this.hyperlinkUrl; },
-			asc_getTooltip: function () { return this.tooltip; },
-			asc_getLocation: function () { return this.location; },
-			asc_getSheet: function () { return this.sheet; },
-			asc_getRange: function () { return this.range; },
-			asc_getHyperlinkRange: function () { return this.hyperlinkRange; },
+			asc_getType: function () { return this.hyperlinkModel.getHyperlinkType(); },
+			asc_getHyperlinkUrl: function () { return this.hyperlinkModel.Hyperlink; },
+			asc_getTooltip: function () { return this.hyperlinkModel.Tooltip; },
+			asc_getLocation: function () { return this.hyperlinkModel.getLocation(); },
+			asc_getSheet: function () { return this.hyperlinkModel.LocationSheet; },
+			asc_getRange: function () { return this.hyperlinkModel.LocationRange; },
 			asc_getText: function () { return this.text; },
-			asc_getHyperlinkCol: function () {return this.col;},
-			asc_getHyperlinkRow: function () {return this.row;},
-			asc_setType: function (val) { this.type = val; },
-			asc_setHyperlinkUrl: function (val) { this.hyperlinkUrl = val; },
-			asc_setTooltip: function (val) { this.tooltip = val; },
-			asc_setLocation: function (val) { this.location = val; },
-			asc_setSheet: function (val) { this.sheet = val; },
-			asc_setRange: function (val) { this.range = val; },
-			asc_setHyperlinkRange: function (val) { this.hyperlinkRange = val; },
-			asc_setText: function (val) { this.text = val; },
-			asc_setHyperlinkCol: function (val) {this.col = val;},
-			asc_setHyperlinkRow: function (val) {this.row = val;},
 
-			asc_clear: function () {
-				this.type = null;
-				this.hyperlinkUrl = null;
-				this.tooltip = null;
-				this.location = null;
-				this.sheet = null;
-				this.range = null;
-				this.hyperlinkRange = null;
-				this.text = null;
+			asc_setType: function (val) {
+				// В принципе эта функция избыточна
+				switch (val) {
+					case c_oAscHyperlinkType.WebLink:
+						this.hyperlinkModel.setLocation(null);
+						break;
+					case c_oAscHyperlinkType.RangeLink:
+						this.hyperlinkModel.Hyperlink = null;
+						break;
+				}
 			},
-			asc_clone: function () {
-				return new asc_CHyperlink(this);
-			}
+			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val; },
+			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
+			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
+			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
+			asc_setText: function (val) { this.text = val; }
 		};
 
 		function asc_CPageMargins (obj) {
@@ -756,7 +737,6 @@
 			}
 
 			this.bIsOn = false;
-			this.aStartTriggerAction = {};
 			this.bIsReInit = false;
 		}
 
@@ -1020,7 +1000,6 @@
 		prot["asc_getLocation"] = prot.asc_getLocation;
 		prot["asc_getSheet"] = prot.asc_getSheet;
 		prot["asc_getRange"] = prot.asc_getRange;
-		prot["asc_getHyperlinkRange"] = prot.asc_getHyperlinkRange;
 		prot["asc_getText"] = prot.asc_getText;
 		prot["asc_setType"] = prot.asc_setType;
 		prot["asc_setHyperlinkUrl"] = prot.asc_setHyperlinkUrl;
@@ -1028,11 +1007,7 @@
 		prot["asc_setLocation"] = prot.asc_setLocation;
 		prot["asc_setSheet"] = prot.asc_setSheet;
 		prot["asc_setRange"] = prot.asc_setRange;
-		prot["asc_setHyperlinkRange"] = prot.asc_setHyperlinkRange;
 		prot["asc_setText"] = prot.asc_setText;
-		prot["asc_clear"] = prot.asc_clear;
-		prot["asc_clone"] = prot.asc_clone;
-
 
 		window["Asc"]["asc_CPageMargins"] = window["Asc"].asc_CPageMargins = asc_CPageMargins;
 		prot = asc_CPageMargins.prototype;

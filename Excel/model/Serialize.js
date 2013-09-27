@@ -2597,25 +2597,20 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(elem.data);});
         }
     };
-    this.WriteHyperlink = function(oHyperlink)
-    {
-        if(null != oHyperlink.Ref)
-        {
+    this.WriteHyperlink = function (oHyperlink) {
+        if (null != oHyperlink.Ref) {
             this.memory.WriteByte(c_oSerHyperlinkTypes.Ref);
             this.memory.WriteString2(oHyperlink.Ref.getName());
         }
-        if(null != oHyperlink.Hyperlink)
-        {
+        if (null != oHyperlink.Hyperlink) {
             this.memory.WriteByte(c_oSerHyperlinkTypes.Hyperlink);
             this.memory.WriteString2(oHyperlink.Hyperlink);
         }
-        if(null != oHyperlink.Location)
-        {
+        if (null !== oHyperlink.getLocation()) {
             this.memory.WriteByte(c_oSerHyperlinkTypes.Location);
-            this.memory.WriteString2(oHyperlink.Location);
+            this.memory.WriteString2(oHyperlink.getLocation());
         }
-        if(null != oHyperlink.Tooltip)
-        {
+        if (null != oHyperlink.Tooltip) {
             this.memory.WriteByte(c_oSerHyperlinkTypes.Tooltip);
             this.memory.WriteString2(oHyperlink.Tooltip);
         }
@@ -5340,7 +5335,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         else if ( c_oSerHyperlinkTypes.Hyperlink == type )
             oHyperlink.Hyperlink = this.stream.GetString2LE(length);
         else if ( c_oSerHyperlinkTypes.Location == type )
-            oHyperlink.Location = this.stream.GetString2LE(length);
+            oHyperlink.setLocation(this.stream.GetString2LE(length));
         else if ( c_oSerHyperlinkTypes.Tooltip == type )
             oHyperlink.Tooltip = this.stream.GetString2LE(length);
         else

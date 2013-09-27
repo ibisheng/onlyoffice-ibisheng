@@ -1791,8 +1791,7 @@ StyleManager.prototype =
     }
 };
 /** @constructor */
-function Hyperlink()
-{
+function Hyperlink () {
 	this.Properties = {
 		Ref: 0,
 		Location: 1,
@@ -1800,63 +1799,98 @@ function Hyperlink()
 		Tooltip: 3
 	};
     this.Ref = null;
-    this.Location = null;
     this.Hyperlink = null;
     this.Tooltip = null;
+	// Составные части Location
+	this.Location = null;
+	this.LocationSheet = null;
+	this.LocationRange = null;
+	this.bUpdateLocation = false;
 	
 	this.bVisited = false;
-};
-Hyperlink.prototype =
-{
-	clone : function()
-	{
+}
+Hyperlink.prototype = {
+	clone : function () {
 		var oNewHyp = new Hyperlink();
-		if(null != this.Ref)
+		if (null !== this.Ref)
 			oNewHyp.Ref = this.Ref.clone();
-		if(null != this.Location)
-			oNewHyp.Location = this.Location;
-		if(null != this.Hyperlink)
+		if (null !== this.getLocation())
+			oNewHyp.Location = this.getLocation();
+		if (null !== this.LocationSheet)
+			oNewHyp.LocationSheet = this.LocationSheet;
+		if (null !== this.LocationRange)
+			oNewHyp.LocationRange = this.LocationRange;
+		if (null !== this.Hyperlink)
 			oNewHyp.Hyperlink = this.Hyperlink;
-		if(null != this.Tooltip)
+		if (null !== this.Tooltip)
 			oNewHyp.Tooltip = this.Tooltip;
 		return oNewHyp;
 	},
-	isEqual : function(obj)
-	{
-		var bRes = (this.Location == obj.Location && this.Hyperlink == obj.Hyperlink && this.Tooltip == obj.Tooltip);
-		if(bRes)
-		{
+	isEqual : function (obj) {
+		var bRes = (this.getLocation() == obj.getLocation() && this.Hyperlink == obj.Hyperlink && this.Tooltip == obj.Tooltip);
+		if (bRes) {
 			var oBBoxRef = this.Ref.getBBox0();
 			var oBBoxObj = obj.Ref.getBBox0();
 			bRes = (oBBoxRef.r1 == oBBoxObj.r1 && oBBoxRef.c1 == oBBoxObj.c1 && oBBoxRef.r2 == oBBoxObj.r2 && oBBoxRef.c2 == oBBoxObj.c2);
 		}
 		return bRes;
 	},
-	isValid : function()
-	{
-		return null != this.Ref && (null != this.Location || null != this.Hyperlink);
+	isValid : function () {
+		return null != this.Ref && (null != this.getLocation() || null != this.Hyperlink);
 	},
-	setVisited : function(bVisited)
-	{
+	setLocationSheet : function (LocationSheet) {
+		this.LocationSheet = LocationSheet;
+		this.bUpdateLocation = true;
+	},
+	setLocationRange : function (LocationRange) {
+		this.LocationRange = LocationRange;
+		this.bUpdateLocation = true;
+	},
+	setLocation : function (Location) {
+		this.bUpdateLocation = false;
+		this.Location = Location;
+		this.LocationSheet = this.LocationRange = null;
+
+		if (null != this.Location) {
+			var result = parserHelp.parse3DRef(this.Location);
+			if (null !== result) {
+				this.LocationSheet = result.sheet;
+				this.LocationRange = result.range;
+			}
+		}
+	},
+	getLocation : function () {
+		if (this.bUpdateLocation)
+			this._updateLocation();
+		return this.Location;
+	},
+	_updateLocation : function () {
+		this.bUpdateLocation = false;
+		if (null === this.LocationSheet || null === this.LocationRange)
+			this.Location = null;
+		else {
+			this.Location = (false == rx_test_ws_name.test(this.LocationSheet)) ? "'" + this.LocationSheet + "'" : this.LocationSheet;
+			this.Location += "!" + this.LocationRange;
+		}
+	},
+	setVisited : function (bVisited) {
 		this.bVisited = bVisited;
 		this.Ref.cleanCache();
 	},
-	getVisited : function(bVisited)
-	{
+	getVisited : function () {
 		return this.bVisited;
 	},
-	getType : function()
-	{
+	getHyperlinkType : function () {
+		return null !== this.Hyperlink ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
+	},
+	getType : function () {
 		return UndoRedoDataTypes.Hyperlink;
 	},
-	getProperties : function()
-	{
+	getProperties : function () {
 		return this.Properties;
 	},
-	getProperty : function(nType)
-	{
-		switch(nType)
-		{
+	getProperty : function (nType) {
+		switch (nType) {
 			case this.Properties.Ref:
 				var sRes = this.Ref.worksheet.getName();
 				if(false == rx_test_ws_name.test(sRes))
@@ -1864,32 +1898,29 @@ Hyperlink.prototype =
 				sRes += "!" + this.Ref.getName();
 				return sRes;
 				break;
-			case this.Properties.Location: return this.Location;break;
+			case this.Properties.Location: return this.getLocation();break;
 			case this.Properties.Hyperlink: return this.Hyperlink;break;
 			case this.Properties.Tooltip: return this.Tooltip;break;
 		}
 	},
-	setProperty : function(nType, value)
-	{
-		switch(nType)
-		{
+	setProperty : function (nType, value) {
+		switch (nType) {
 			case this.Properties.Ref:
 				//todo обработать нули
 				var oRefParsed = parserHelp.parse3DRef(value);
 				if (null !== oRefParsed) {
 					// Получаем sheet по имени
-					ws = window["Asc"]["editor"].wbModel.getWorksheetByName (oRefParsed.sheet);
+					var ws = window["Asc"]["editor"].wbModel.getWorksheetByName (oRefParsed.sheet);
 					if (ws)
 						this.Ref = ws.getRange2(oRefParsed.range);
 				}
 			break;
-			case this.Properties.Location: this.Location = value;break;
+			case this.Properties.Location: this.setLocation(value);break;
 			case this.Properties.Hyperlink: this.Hyperlink = value;break;
 			case this.Properties.Tooltip: this.Tooltip = value;break;
 		}
 	},
-	applyCollaborative : function(nSheetId, collaborativeEditing)
-	{
+	applyCollaborative : function (nSheetId, collaborativeEditing) {
 		var bbox = this.Ref.getBBox0();
 		var OffsetFirst = {offsetCol:0, offsetRow:0};
 		var OffsetLast = {offsetCol:0, offsetRow:0};

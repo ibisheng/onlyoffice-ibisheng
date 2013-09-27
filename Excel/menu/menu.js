@@ -400,7 +400,6 @@
 
 	var api = new Asc.spreadsheet_api("wb-widget", "cv1");
 	//api.asc_setViewerMode(true);
-	var oTmpHyperlinkObj = null;
 	var aDialogNames = [];
 	var bIsUpdateChartProperties = false;
 	var bIsReopenDialog = false;
@@ -867,7 +866,7 @@
 			case "td_add_hyperlink":
 			{
 				var oCellInfo = api.asc_getCellInfo();
-				oTmpHyperlinkObj = oCellInfo.asc_getHyperlink();
+				var oTmpHyperlinkObj = oCellInfo.asc_getHyperlink();
 
 				var oHyperText = $("#addHyperlink_text");
 				var oSelect = $("#addHyperlink_she");
@@ -879,17 +878,18 @@
 					toggleHyperlinkDialog(true);
 					$("#addHyperlink_url").val("");
 					$("#addHyperlink_ran").val("A1");
-				}
-				else {
+				} else {
 					oHyperText.val(oTmpHyperlinkObj.asc_getText());
-					if (c_oAscHyperlinkType.WebLink === oTmpHyperlinkObj.asc_getType()) {
-						toggleHyperlinkDialog(true);
-						$("#addHyperlink_url").val(oTmpHyperlinkObj.asc_getHyperlinkUrl());
-					}
-					else if (c_oAscHyperlinkType.RangeLink === oTmpHyperlinkObj.asc_getType()) {
-						toggleHyperlinkDialog(false);
-						oSelect.val(oTmpHyperlinkObj.asc_getSheet());
-						$("#addHyperlink_ran").val(oTmpHyperlinkObj.asc_getRange());
+					switch (oTmpHyperlinkObj.asc_getType()) {
+						case c_oAscHyperlinkType.WebLink:
+							toggleHyperlinkDialog(true);
+							$("#addHyperlink_url").val(oTmpHyperlinkObj.asc_getHyperlinkUrl());
+							break;
+						case c_oAscHyperlinkType.RangeLink:
+							toggleHyperlinkDialog(false);
+							oSelect.val(oTmpHyperlinkObj.asc_getSheet());
+							$("#addHyperlink_ran").val(oTmpHyperlinkObj.asc_getRange());
+							break;
 					}
 				}
 				api.asc_enableKeyEvents(false);
@@ -897,7 +897,7 @@
 				break;
 			}
 			case "td_auto_filter":{
-				api.asc_addAutoFilter()
+				api.asc_addAutoFilter();
 				break;
 			}
 			case "td_auto_filter_local":{
@@ -1542,6 +1542,7 @@
 		var sUrl = $("#addHyperlink_url").val();
 		var sSheet = $("#addHyperlink_she").val();
 		var sRange = $("#addHyperlink_ran").val();
+		var oTmpHyperlinkObj = null;
 
 		var bHyp = false;
 		if(  document.getElementById('selectTypeLink').selectedIndex == 0)
@@ -1555,23 +1556,17 @@
 			$("#addHyperlink_err").text( "Error: Empty url" )
 			;$("#addHyperlink_err").hide();
 			$("#addHyperlink_err").show("slow");
-		}
-		else
-		{
+		} else {
 			$("#addHyperlink_err").hide();
 			$("#dialogAddHyperlink").dialog("close");
 
-			oTmpHyperlinkObj.asc_clear();
+			oTmpHyperlinkObj = new Asc.asc_CHyperlink();
 			oTmpHyperlinkObj.asc_setText (sText);
-			if( true == bHyp )
-			{
-				oTmpHyperlinkObj.asc_setType (c_oAscHyperlinkType.WebLink);
-				if( 0 != sUrl.indexOf("http://") )
+			if (true == bHyp) {
+				if (0 != sUrl.indexOf("http://"))
 					sUrl = "http://" + sUrl;
 				oTmpHyperlinkObj.asc_setHyperlinkUrl(sUrl);
-			}
-			else {
-				oTmpHyperlinkObj.asc_setType (c_oAscHyperlinkType.RangeLink);
+			} else {
 				oTmpHyperlinkObj.asc_setSheet(sSheet);
 				oTmpHyperlinkObj.asc_setRange(sRange);
 			}
