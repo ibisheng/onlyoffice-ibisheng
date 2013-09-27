@@ -2572,9 +2572,6 @@
 							}
 						}
 
-						if (isMerged || mergedCellsStage &&
-							row !== range.r1 && row !== range.r2&& col !== range.c1 && col !== range.c2) {continue;}
-
 						var x1 = this.cols[col].left - offsetX;
 						var x2 = x1 + this.cols[col].width - this.width_1px;
 						//
@@ -2594,6 +2591,9 @@
 						var rbNext = this._getActiveBorder(col, row + 1, kcbidRight);
 						var tbNext = this._getActiveBorder(col + 1, row, kcbidTop);
 						var bbNext = this._getActiveBorder(col + 1, row, kcbidBottom);
+
+						if (isMerged || mergedCellsStage &&
+							row !== range.r1 && row !== range.r2&& col !== range.c1 && col !== range.c2) {continue;}
 
 						var hasDD = dd.w > 0 && dd.s !== kcbNone;
 						var hasDU = du.w > 0 && du.s !== kcbNone;
