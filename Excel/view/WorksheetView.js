@@ -2562,6 +2562,9 @@
 							if (mc) {
 								if ((col === mc.c1 || isFirstCol) && (row === mc.r1 || isFirstRow)) {
 									mc = mc.intersectionSimple(this.visibleRange);
+									if (null === mc) {
+										break;
+									}
 									this._drawCellsBorders(drawingCtx, mc, true, leftFieldInPt, topFieldInPt);
 								}
 								isMerged = true;
