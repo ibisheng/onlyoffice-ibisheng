@@ -2020,7 +2020,7 @@ CDocument.prototype =
                     }
 
 
-                    Last.CopyPr( Next );
+                    Next.CopyPr( Last );
                     Last.Concat( Next );
 
                     this.Internal_Content_Remove(Next.Index, 1);
