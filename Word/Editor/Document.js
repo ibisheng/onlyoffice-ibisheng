@@ -232,6 +232,8 @@ function CDocumentRecalcInfo()
     this.WidowControlReset         = false;  //
 
     this.KeepNextParagraph         = null;    // Параграф, который надо пересчитать из-за того, что следующий начался с новой страницы
+
+    this.FrameRecalc               = false;  // Пересчитываем ли рамку
 }
 
 CDocumentRecalcInfo.prototype =
@@ -314,6 +316,12 @@ CDocumentRecalcInfo.prototype =
     Reset_WidowControl : function()
     {
         this.WidowControlReset = true;
+    },
+
+
+    Set_FrameRecalc  : function(Value)
+    {
+        this.FrameRecalc = Value;
     }
 };
 
@@ -940,12 +948,16 @@ CDocument.prototype =
                     if ( undefined === Frame_YLimit )
                         Frame_YLimit = Page_Height;
 
+
                     for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
                     {
                         var TempElement = this.Content[TempIndex];
                         // Получим параметры расположения рамки
                         TempElement.Set_DocumentIndex( TempIndex );
-                        TempElement.Reset( 0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex );
+
+                        if ( Index != TempIndex || true != this.RecalcInfo.FrameRecalc )
+                            TempElement.Reset( 0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex );
+
                         TempElement.Recalculate_Page( PageIndex );
 
                         FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
@@ -1105,26 +1117,36 @@ CDocument.prototype =
                     var FrameBounds = this.Content[Index].Get_FrameBounds(FrameX, FrameY, FrameW, FrameH);
                     var FrameX2 = FrameBounds.X, FrameY2 = FrameBounds.Y, FrameW2 = FrameBounds.W, FrameH2 = FrameBounds.H;
 
-                    for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
+                    if ( (FrameY2 + FrameH2 > YLimit || Y > YLimit - 0.001 ) && Index != StartIndex )
                     {
-                        var TempElement = this.Content[TempIndex];
-                        TempElement.Shift( 0, FrameX, FrameY );
-                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, FrameX2, FrameY2, FrameW2, FrameH2, PageIndex );
+                        this.RecalcInfo.Set_FrameRecalc(true);
+                        this.Content[Index].Start_FromNewPage();
+                        RecalcResult = recalcresult_NextPage;
                     }
-
-                    var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
-                    var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
-
-                    this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
-
-                    Index += FlowCount - 1;
-
-                    if ( FrameY >= Y )
-                        RecalcResult = recalcresult_NextElement;
                     else
                     {
-                        this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
-                        RecalcResult = recalcresult_CurPage;
+                        this.RecalcInfo.Set_FrameRecalc(false);
+                        for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
+                        {
+                            var TempElement = this.Content[TempIndex];
+                            TempElement.Shift( TempElement.Pages.length - 1, FrameX, FrameY );
+                            TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, FrameX2, FrameY2, FrameW2, FrameH2, PageIndex );
+                        }
+
+                        var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
+                        var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
+
+                        this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
+
+                        Index += FlowCount - 1;
+
+                        if ( FrameY >= Y )
+                            RecalcResult = recalcresult_NextElement;
+                        else
+                        {
+                            this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
+                            RecalcResult = recalcresult_CurPage;
+                        }
                     }
                 }
                 else if ( true === this.RecalcInfo.Check_FlowObject(Element) )

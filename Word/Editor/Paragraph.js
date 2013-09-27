@@ -916,7 +916,7 @@ Paragraph.prototype =
 
         // Смещаемся в начало параграфа на первой странице или в начало страницы, если страница не первая
         var X, Y, XLimit, YLimit, _X, _XLimit;
-        if ( 0 === CurPage )
+        if ( 0 === CurPage || undefined != this.Get_FramePr() )
         {
             X       = this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
             Y       = this.Y;
@@ -1889,16 +1889,6 @@ Paragraph.prototype =
                                 Item.WidthVisible = NewX - X;
 
                                 X = NewX;
-
-                                //this.Lines[CurLine].Words++;
-                                //this.Lines[CurLine].Ranges[CurRange].Words++;
-
-                                // Пробелы перед первым словом в строке не считаем
-                                //if ( this.Lines[CurLine].Words > 1 )
-                                //    this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                //if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
-                                //    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
                             }
                         }
 
