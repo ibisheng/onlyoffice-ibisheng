@@ -289,9 +289,9 @@ DrawingObjectsController.prototype =
     },
 	
 	canAddHyperlink: function() {
-        if(this.State.textObject)
+        if(this.curState.textObject)
         {
-            return this.State.textObject.textBody.content.Hyperlink_CanAdd();
+            return this.curState.textObject.txBody.content.Hyperlink_CanAdd();
         }
         return false;
 	},
