@@ -146,12 +146,28 @@ function DependencyGraph(wb) {
 		if( this.nodeExist(n) )
 			return nodes[n.nodeId];
 	}
-	
+
+    this.getNode2 = function(sheetId, cellId){
+        var n = new Vertex( sheetId, cellId );
+        var exist = nodes[n.nodeId] !== undefined, res = [];
+        if ( exist ) {
+            res.push( nodes[n.nodeId] )
+        }
+        else {
+            for ( var id in areaNodes ) {
+                if ( areaNodes[id].containCell( n ) ) {
+                    res.push( areaNodes[id] )
+                }
+            }
+        }
+        return res.length > 0 ? res : null;
+    }
+
 	this.getNodeByNodeId = function(nodeId){
 		if( nodes[nodeId] )
 			return nodes[nodeId];
 	}
-	
+
 	this.getNodeBySheetId = function(sheetId){
 		var arr = [];
 		for(var id in nodes){
@@ -3239,17 +3255,20 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 			
 			this.helperRebuildFormulas(cell,cell.getName(),cell.getName());
 
-            var node = this.workbook.dependencyFormulas.getNodeByNodeId( getVertexId( this.Id, cell.getName() ) )
+            var node = this.workbook.dependencyFormulas.getNode2( this.Id, cell.getName() );
             if ( node ) {
-                node = node.getSlaveEdges();
-                if ( node ) {
-                    for ( var id in node ) {
-                        if ( node[id].cell && node[id].cell.sFormula ){
-                            History.Add(g_oUndoRedoWorksheet,
-                                        historyitem_Worksheet_RemoveCellFormula,
-                                        node[id].sheetId,
-                                        new Asc.Range(node[id].cell.oId.getCol0(), node[id].cell.oId.getRow0(), node[id].cell.oId.getCol0(), node[id].cell.oId.getRow0()),
-                                        new UndoRedoData_CellSimpleData(node[id].cell.oId.getRow0(), node[id].cell.oId.getCol0(), null, null, node[id].cell.sFormula));
+                for ( var i = 0; i < node.length; i++ ) {
+                    var n = node[i].getSlaveEdges();
+                    if ( n ) {
+                        for ( var id in n ) {
+                            if ( n[id].cell && n[id].cell.sFormula ) {
+                                History.Add( g_oUndoRedoWorksheet,
+                                    historyitem_Worksheet_RemoveCellFormula,
+                                    n[id].sheetId,
+                                    new Asc.Range( n[id].cell.oId.getCol0(), n[id].cell.oId.getRow0(), n[id].cell.oId.getCol0(), n[id].cell.oId.getRow0() ),
+                                    new UndoRedoData_CellSimpleData( n[id].cell.oId.getRow0(), n[id].cell.oId.getCol0(), null, null, n[id].cell.sFormula )
+                                );
+                            }
                         }
                     }
                 }
