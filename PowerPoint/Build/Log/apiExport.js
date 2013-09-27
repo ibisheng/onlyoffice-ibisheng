@@ -242,6 +242,7 @@ prop:canUnGroup
 prop:AddImageUrl
 prop:AddImageUrlAction
 prop:ImgApply
+prop:ChartApply
 prop:set_Size
 prop:set_ConstProportions
 prop:set_WrapStyle
@@ -718,6 +719,61 @@ prop:get_ChartProperties
 prop:put_ChartProperties
 prop:get_ShapeProperties
 prop:put_ShapeProperties
+---
+var:CAscChartProp
+prop:get_ChangeLevel
+prop:put_ChangeLevel
+prop:get_CanBeFlow
+prop:get_Width
+prop:put_Width
+prop:get_Height
+prop:put_Height
+prop:get_WrappingStyle
+prop:put_WrappingStyle
+prop:get_Paddings
+prop:put_Paddings
+prop:get_AllowOverlap
+prop:put_AllowOverlap
+prop:get_Position
+prop:put_Position
+prop:get_PositionH
+prop:put_PositionH
+prop:get_PositionV
+prop:put_PositionV
+prop:get_Value_X
+prop:get_Value_Y
+prop:get_ImageUrl
+prop:put_ImageUrl
+prop:get_Group
+prop:put_Group
+prop:asc_getFromGroup
+prop:asc_putFromGroup
+prop:get_isChartProps
+prop:put_isChartPross
+prop:get_SeveralCharts
+prop:put_SeveralCharts
+prop:get_SeveralChartTypes
+prop:put_SeveralChartTypes
+prop:get_SeveralChartStyles
+prop:put_SeveralChartStyles
+prop:get_VerticalTextAlign
+prop:put_VerticalTextAlign
+prop:get_OriginSize
+prop:get_Locked
+prop:get_ChartProperties
+prop:put_ChartProperties
+prop:get_ShapeProperties
+prop:put_ShapeProperties
+prop:asc_getType
+prop:asc_getSubType
+prop:asc_getStyleId
+prop:asc_getHeight
+prop:asc_getWidth
+prop:asc_setType
+prop:asc_setSubType
+prop:asc_setStyleId
+prop:asc_setHeight
+prop:asc_setWidth
 ---
 var:CHeaderProp
 prop:get_Type
@@ -1314,6 +1370,7 @@ asc_docs_api.prototype['canUnGroup'] = asc_docs_api.prototype.canUnGroup;
 asc_docs_api.prototype['AddImageUrl'] = asc_docs_api.prototype.AddImageUrl;
 asc_docs_api.prototype['AddImageUrlAction'] = asc_docs_api.prototype.AddImageUrlAction;
 asc_docs_api.prototype['ImgApply'] = asc_docs_api.prototype.ImgApply;
+asc_docs_api.prototype['ChartApply'] = asc_docs_api.prototype.ChartApply;
 asc_docs_api.prototype['set_Size'] = asc_docs_api.prototype.set_Size;
 asc_docs_api.prototype['set_ConstProportions'] = asc_docs_api.prototype.set_ConstProportions;
 asc_docs_api.prototype['set_WrapStyle'] = asc_docs_api.prototype.set_WrapStyle;
@@ -1750,6 +1807,60 @@ CImgProperty.prototype['get_ChartProperties'] = CImgProperty.prototype.get_Chart
 CImgProperty.prototype['put_ChartProperties'] = CImgProperty.prototype.put_ChartProperties;
 CImgProperty.prototype['get_ShapeProperties'] = CImgProperty.prototype.get_ShapeProperties;
 CImgProperty.prototype['put_ShapeProperties'] = CImgProperty.prototype.put_ShapeProperties;
+window['CAscChartProp'] = CAscChartProp;
+CAscChartProp.prototype['get_ChangeLevel'] = CAscChartProp.prototype.get_ChangeLevel;
+CAscChartProp.prototype['put_ChangeLevel'] = CAscChartProp.prototype.put_ChangeLevel;
+CAscChartProp.prototype['get_CanBeFlow'] = CAscChartProp.prototype.get_CanBeFlow;
+CAscChartProp.prototype['get_Width'] = CAscChartProp.prototype.get_Width;
+CAscChartProp.prototype['put_Width'] = CAscChartProp.prototype.put_Width;
+CAscChartProp.prototype['get_Height'] = CAscChartProp.prototype.get_Height;
+CAscChartProp.prototype['put_Height'] = CAscChartProp.prototype.put_Height;
+CAscChartProp.prototype['get_WrappingStyle'] = CAscChartProp.prototype.get_WrappingStyle;
+CAscChartProp.prototype['put_WrappingStyle'] = CAscChartProp.prototype.put_WrappingStyle;
+CAscChartProp.prototype['get_Paddings'] = CAscChartProp.prototype.get_Paddings;
+CAscChartProp.prototype['put_Paddings'] = CAscChartProp.prototype.put_Paddings;
+CAscChartProp.prototype['get_AllowOverlap'] = CAscChartProp.prototype.get_AllowOverlap;
+CAscChartProp.prototype['put_AllowOverlap'] = CAscChartProp.prototype.put_AllowOverlap;
+CAscChartProp.prototype['get_Position'] = CAscChartProp.prototype.get_Position;
+CAscChartProp.prototype['put_Position'] = CAscChartProp.prototype.put_Position;
+CAscChartProp.prototype['get_PositionH'] = CAscChartProp.prototype.get_PositionH;
+CAscChartProp.prototype['put_PositionH'] = CAscChartProp.prototype.put_PositionH;
+CAscChartProp.prototype['get_PositionV'] = CAscChartProp.prototype.get_PositionV;
+CAscChartProp.prototype['put_PositionV'] = CAscChartProp.prototype.put_PositionV;
+CAscChartProp.prototype['get_Value_X'] = CAscChartProp.prototype.get_Value_X;
+CAscChartProp.prototype['get_Value_Y'] = CAscChartProp.prototype.get_Value_Y;
+CAscChartProp.prototype['get_ImageUrl'] = CAscChartProp.prototype.get_ImageUrl;
+CAscChartProp.prototype['put_ImageUrl'] = CAscChartProp.prototype.put_ImageUrl;
+CAscChartProp.prototype['get_Group'] = CAscChartProp.prototype.get_Group;
+CAscChartProp.prototype['put_Group'] = CAscChartProp.prototype.put_Group;
+CAscChartProp.prototype['asc_getFromGroup'] = CAscChartProp.prototype.asc_getFromGroup;
+CAscChartProp.prototype['asc_putFromGroup'] = CAscChartProp.prototype.asc_putFromGroup;
+CAscChartProp.prototype['get_isChartProps'] = CAscChartProp.prototype.get_isChartProps;
+CAscChartProp.prototype['put_isChartPross'] = CAscChartProp.prototype.put_isChartPross;
+CAscChartProp.prototype['get_SeveralCharts'] = CAscChartProp.prototype.get_SeveralCharts;
+CAscChartProp.prototype['put_SeveralCharts'] = CAscChartProp.prototype.put_SeveralCharts;
+CAscChartProp.prototype['get_SeveralChartTypes'] = CAscChartProp.prototype.get_SeveralChartTypes;
+CAscChartProp.prototype['put_SeveralChartTypes'] = CAscChartProp.prototype.put_SeveralChartTypes;
+CAscChartProp.prototype['get_SeveralChartStyles'] = CAscChartProp.prototype.get_SeveralChartStyles;
+CAscChartProp.prototype['put_SeveralChartStyles'] = CAscChartProp.prototype.put_SeveralChartStyles;
+CAscChartProp.prototype['get_VerticalTextAlign'] = CAscChartProp.prototype.get_VerticalTextAlign;
+CAscChartProp.prototype['put_VerticalTextAlign'] = CAscChartProp.prototype.put_VerticalTextAlign;
+CAscChartProp.prototype['get_OriginSize'] = CAscChartProp.prototype.get_OriginSize;
+CAscChartProp.prototype['get_Locked'] = CAscChartProp.prototype.get_Locked;
+CAscChartProp.prototype['get_ChartProperties'] = CAscChartProp.prototype.get_ChartProperties;
+CAscChartProp.prototype['put_ChartProperties'] = CAscChartProp.prototype.put_ChartProperties;
+CAscChartProp.prototype['get_ShapeProperties'] = CAscChartProp.prototype.get_ShapeProperties;
+CAscChartProp.prototype['put_ShapeProperties'] = CAscChartProp.prototype.put_ShapeProperties;
+CAscChartProp.prototype['asc_getType'] = CAscChartProp.prototype.asc_getType;
+CAscChartProp.prototype['asc_getSubType'] = CAscChartProp.prototype.asc_getSubType;
+CAscChartProp.prototype['asc_getStyleId'] = CAscChartProp.prototype.asc_getStyleId;
+CAscChartProp.prototype['asc_getHeight'] = CAscChartProp.prototype.asc_getHeight;
+CAscChartProp.prototype['asc_getWidth'] = CAscChartProp.prototype.asc_getWidth;
+CAscChartProp.prototype['asc_setType'] = CAscChartProp.prototype.asc_setType;
+CAscChartProp.prototype['asc_setSubType'] = CAscChartProp.prototype.asc_setSubType;
+CAscChartProp.prototype['asc_setStyleId'] = CAscChartProp.prototype.asc_setStyleId;
+CAscChartProp.prototype['asc_setHeight'] = CAscChartProp.prototype.asc_setHeight;
+CAscChartProp.prototype['asc_setWidth'] = CAscChartProp.prototype.asc_setWidth;
 window['CHeaderProp'] = CHeaderProp;
 CHeaderProp.prototype['get_Type'] = CHeaderProp.prototype.get_Type;
 CHeaderProp.prototype['put_Type'] = CHeaderProp.prototype.put_Type;
