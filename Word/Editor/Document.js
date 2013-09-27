@@ -2236,6 +2236,8 @@ CDocument.prototype =
                     Item.CurPos.RealX = Item.CurPos.X;
                     Item.CurPos.RealY = Item.CurPos.Y;
                 }
+
+                this.Document_UpdateInterfaceState();
             }
 
             // Специальная заглушка для функции TextBox_Put
