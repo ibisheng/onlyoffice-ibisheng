@@ -51,7 +51,7 @@ asc_getSubType:vSa
 l:sc
 selectionIsEmpty:OV
 h:Gd
-w:Yb
+w:Zb
 u:oo
 sbit_strikes:UQ
 orchid:Gfb
@@ -3127,7 +3127,7 @@ TableSumGrid:Ce
 _background:zha
 Index_To_Loc_Format:lfa
 Set_DocumentIndex:xE
-Document_UpdateInterfaceState:Zb
+Document_UpdateInterfaceState:Wb
 UpdateTextPr:PX
 Document_UpdateRulersState:li
 get_MarginTop:RXa
@@ -3360,7 +3360,7 @@ nvPr:Ri
 put_PrIndent:I1a
 Param_Left:jX
 Orientation_old:jIa
-series:Xb
+series:Yb
 band_shoot:Wia
 LockCursorTypeCur:Jfa
 deselect:cc
@@ -6046,7 +6046,7 @@ flipV:Ub
 obj:jk
 fontFilesPath:Aaa
 _text_font:$q
-flipH:Wb
+flipH:Xb
 get_Message:TXa
 put_PositionV:vna
 glyph_matrix:Wya
