@@ -1843,7 +1843,7 @@ Paragraph.prototype =
                             else
                             {
                                 NewX = this.X;
-                                while ( X >= NewX )
+                                while ( X >= NewX - 0.001 )
                                     NewX += Default_Tab_Stop;
                             }
                         }
@@ -1871,6 +1871,17 @@ Paragraph.prototype =
                             if ( NewX > XEnd && ( false === bFirstItemOnLine || RangesCount > 0 ) )
                             {
                                 nWordLen = NewX - X;
+
+                                if ( RangesCount == CurRange )
+                                {
+                                    bNewLine = true;
+                                    Pos--;
+                                }
+                                else
+                                {
+                                    bNewRange = true;
+                                    Pos--;
+                                }
                             }
                             else
                             {
