@@ -5693,6 +5693,7 @@
 				
 				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell, this);
 				cell_info.styleName = c.getStyleName();
+				cell_info.angle = c.getAngle();
 
 				cell_info.flags = new asc_CCellFlag();
 				cell_info.flags.shrinkToFit = c.getShrinkToFit();
