@@ -1941,9 +1941,8 @@
 				var dx = 3;
 				var dy = 2;
 
-				this._drawHeader(/*drawingCtx*/ undefined, "",
-						this.headersLeft, this.headersTop, this.headersWidth, this.headersHeight,
-						kHeaderDefault, true, -1);
+				this._drawHeader(/*drawingCtx*/ undefined, this.headersLeft, this.headersTop,
+					this.headersWidth, this.headersHeight, kHeaderDefault, true, -1);
 				this.drawingCtx
 						.beginPath()
 						.moveTo(x2, y1, -dx-1.5, dy)
@@ -1974,9 +1973,8 @@
 
 				// draw column headers
 				for (var i = start; i <= end; ++i) {
-					this._drawHeader(drawingCtx, this._getColumnTitle(i),
-						this.cols[i].left - offsetX, offsetY, this.cols[i].width, this.headersHeight,
-						style, true, i);
+					this._drawHeader(drawingCtx, this.cols[i].left - offsetX, offsetY,
+						this.cols[i].width, this.headersHeight, style, true, i);
 				}
 			},
 
@@ -1997,16 +1995,14 @@
 
 				// draw row headers
 				for (var i = start; i <= end; ++i) {
-					this._drawHeader(drawingCtx, this._getRowTitle(i),
-						offsetX, this.rows[i].top - offsetY, this.headersWidth, this.rows[i].height,
-						style, false, i);
+					this._drawHeader(drawingCtx, offsetX, this.rows[i].top - offsetY,
+						this.headersWidth, this.rows[i].height, style, false, i);
 				}
 			},
 
 			/**
 			* Рисует заголовок, принимает координаты и размеры в pt
 			* @param {DrawingContext} drawingCtx
-			* @param {String} text  Текст заголовка
 			* @param {Number} x  Координата левого угла в pt
 			* @param {Number} y  Координата левого угла в pt
 			* @param {Number} w  Ширина в pt
@@ -2015,43 +2011,44 @@
 			* @param {Boolean} isColHeader  Тип заголовка: true - колонка, false - строка
 			* @param {Number} index  Индекс столбца/строки или -1
 			*/
-			_drawHeader: function (drawingCtx, text, x, y, w, h, style, isColHeader, index) {
+			_drawHeader: function (drawingCtx, x, y, w, h, style, isColHeader, index) {
 				// Для отрисовки невидимого столбца/строки
 				var isZeroHeader = false;
-				if (isColHeader) {
-					if (w < this.width_1px) {
-						// Это невидимый столбец
-						isZeroHeader = true;
-						// Отрисуем только границу
-						w = this.width_1px;
-						// Возможно мы уже рисовали границу невидимого столбца (для последовательности невидимых)
-						if (0 < index && 0 === this.cols[index - 1].width) {
-							// Мы уже нарисовали border для невидимой границы
-							return;
+				if (-1 !== index) {
+					if (isColHeader) {
+						if (w < this.width_1px) {
+							// Это невидимый столбец
+							isZeroHeader = true;
+							// Отрисуем только границу
+							w = this.width_1px;
+							// Возможно мы уже рисовали границу невидимого столбца (для последовательности невидимых)
+							if (0 < index && 0 === this.cols[index - 1].width) {
+								// Мы уже нарисовали border для невидимой границы
+								return;
+							}
 						}
-					}
-					else if (0 < index && 0 === this.cols[index - 1].width) {
-						// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседнего столбца)
-						w -= this.width_1px;
-						x += this.width_1px;
-					}
-				}
-				else {
-					if (h < this.height_1px) {
-						// Это невидимая строка
-						isZeroHeader = true;
-						// Отрисуем только границу
-						h = this.height_1px;
-						// Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
-						if (0 < index && 0 === this.rows[index - 1].height) {
-							// Мы уже нарисовали border для невидимой границы
-							return;
+						else if (0 < index && 0 === this.cols[index - 1].width) {
+							// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседнего столбца)
+							w -= this.width_1px;
+							x += this.width_1px;
 						}
-					}
-					else if (0 < index && 0 === this.rows[index - 1].height) {
-						// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
-						h -= this.height_1px;
-						y += this.height_1px;
+					} else {
+						if (h < this.height_1px) {
+							// Это невидимая строка
+							isZeroHeader = true;
+							// Отрисуем только границу
+							h = this.height_1px;
+							// Возможно мы уже рисовали границу невидимой строки (для последовательности невидимых)
+							if (0 < index && 0 === this.rows[index - 1].height) {
+								// Мы уже нарисовали border для невидимой границы
+								return;
+							}
+						}
+						else if (0 < index && 0 === this.rows[index - 1].height) {
+							// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
+							h -= this.height_1px;
+							y += this.height_1px;
+						}
 					}
 				}
 
@@ -2085,10 +2082,11 @@
 				ctx.stroke();
 
 				// Для невидимых кроме border-а ничего не рисуем
-				if (isZeroHeader || text.length < 1)
+				if (isZeroHeader || -1 === index)
 					return;
 
 				// draw text
+				var text  = isColHeader ? this._getColumnTitle(index) : this._getRowTitle(index);
 				var sr    = this.stringRender;
 				var tm    = this._roundTextMetrics( sr.measureString(text) );
 				var bl    = y2 - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
