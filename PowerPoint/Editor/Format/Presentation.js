@@ -1587,6 +1587,13 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();
     },
 
+    ChartApply: function(chartProps)
+    {
+        this.Slides[this.CurPage].graphicObjects.chartApply(chartProps);
+        this.Recalculate();
+        this.Document_UpdateInterfaceState();
+    },
+
     changeShapeType : function(shapeType)
     {
 

@@ -184,10 +184,23 @@ CChartAsGroup.prototype =
     },
 
 
-    setDiagram: function(chart)
+    setDiagram: function(chartPr)
     {
-        this.chart = chart;
-        this.recalculate();
+        var chart = chartPr.ChartProperties;
+        if(chart.styleId != null)
+            this.chart.asc_setStyleId(chart.styleId);
+        if(chart.subType != null)
+            this.chart.asc_setSubType(chart.subType);
+        if(chart.type != null)
+            this.chart.asc_setType(chart.type);
+
+        if(chartPr.Width != null && chartPr.Height != null)
+            this.setXfrm(null, null,chartPr.Width,  chartPr.Height, null, null, null);
+        if(chart.type != null)
+            this.chart.asc_setType(chart.type);
+        this.recalcInfo.recalculateTransform = true;
+        this.recalcInfo.recalculateTransformText = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     OnContentReDraw: function()

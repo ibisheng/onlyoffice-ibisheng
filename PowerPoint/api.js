@@ -3076,6 +3076,14 @@ asc_docs_api.prototype.ImgApply = function(obj){
 		this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
 	}
 }
+asc_docs_api.prototype.ChartApply = function(obj)
+{
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        History.Create_NewPoint();
+        this.WordControl.m_oLogicDocument.ChartApply(obj);
+    }
+}
 asc_docs_api.prototype.set_Size = function(width, height){
 
 }
@@ -3114,7 +3122,8 @@ asc_docs_api.prototype.sync_AddImageCallback = function(){
 }
 asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
     var type = imgProp.ChartProperties ? c_oAscTypeSelectElement.Chart : c_oAscTypeSelectElement.Image;
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type, new CImgProperty( imgProp ) );
+    var prop = type === c_oAscTypeSelectElement.Chart ? new CAscChartProp(imgProp) : new CImgProperty( imgProp );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type, prop );
 }
 asc_docs_api.prototype.sync_ImgWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onImgWrapStyleChanged",style);

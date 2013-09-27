@@ -1313,6 +1313,219 @@ CImgProperty.prototype.put_ShapeProperties = function(v)
     this.ShapeProperties = v;
 };
 
+
+
+function CAscChartProp( obj )
+{
+    if( obj )
+    {
+        this.CanBeFlow = (undefined != obj.CanBeFlow) ? obj.CanBeFlow : true;
+
+        this.Width         = (undefined != obj.Width        ) ? obj.Width                          : undefined;
+        this.Height        = (undefined != obj.Height       ) ? obj.Height                         : undefined;
+        this.WrappingStyle = (undefined != obj.WrappingStyle) ? obj.WrappingStyle                  : undefined;
+        this.Paddings      = (undefined != obj.Paddings     ) ? new CPaddings (obj.Paddings)       : undefined;
+        this.Position      = (undefined != obj.Position     ) ? new CPosition (obj.Position)       : undefined;
+        this.AllowOverlap  = (undefined != obj.AllowOverlap ) ? obj.AllowOverlap                   : undefined;
+        this.PositionH     = (undefined != obj.PositionH    ) ? new CImagePositionH(obj.PositionH) : undefined;
+        this.PositionV     = (undefined != obj.PositionV    ) ? new CImagePositionV(obj.PositionV) : undefined;
+
+        this.Internal_Position = (undefined != obj.Internal_Position) ? obj.Internal_Position : null;
+
+        this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
+        this.Locked   = (undefined != obj.Locked) ? obj.Locked : false;
+
+
+        this.ChartProperties = (undefined != obj.ChartProperties) ? obj.ChartProperties : null;
+        this.ShapeProperties = (undefined != obj.ShapeProperties) ? /*CreateAscShapePropFromProp*/(obj.ShapeProperties) : null;
+
+        this.ChangeLevel = (undefined != obj.ChangeLevel) ? obj.ChangeLevel : null;
+        this.Group = (obj.Group != undefined) ? obj.Group : null;
+
+        this.fromGroup = obj.fromGroup != undefined ? obj.fromGroup : null;
+        this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
+        this.severalChartTypes = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
+        this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+        this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
+    }
+    else
+    {
+        this.CanBeFlow = true;
+        this.Width         = undefined;
+        this.Height        = undefined;
+        this.WrappingStyle = undefined;
+        this.Paddings      = undefined;
+        this.Position      = undefined;
+        this.PositionH     = undefined;
+        this.PositionV     = undefined;
+        this.Internal_Position = null;
+        this.ImageUrl = null;
+        this.Locked   = false;
+
+        this.ChartProperties = new asc_CChart();
+        this.ShapeProperties = null;
+        this.ImageProperties = null;
+
+        this.ChangeLevel = null;
+        this.Group = null;
+        this.fromGroup = null;
+        this.severalCharts = false;
+        this.severalChartTypes = undefined;
+        this.severalChartStyles = undefined;
+        this.verticalTextAlign = undefined;
+    }
+}
+CAscChartProp.prototype.get_ChangeLevel = function() { return this.ChangeLevel; };
+CAscChartProp.prototype.put_ChangeLevel = function(v) { this.ChangeLevel = v; };
+
+CAscChartProp.prototype.get_CanBeFlow = function() { return this.CanBeFlow; }
+CAscChartProp.prototype.get_Width = function() { return this.Width; }
+CAscChartProp.prototype.put_Width = function(v) { this.Width = v; }
+CAscChartProp.prototype.get_Height = function() { return this.Height; }
+CAscChartProp.prototype.put_Height = function(v) { this.Height = v; }
+CAscChartProp.prototype.get_WrappingStyle = function() { return this.WrappingStyle; }
+CAscChartProp.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v; }
+// Возвращается объект класса CPaddings
+CAscChartProp.prototype.get_Paddings = function() { return this.Paddings; }
+// Аргумент объект класса CPaddings
+CAscChartProp.prototype.put_Paddings = function(v) { this.Paddings = v; }
+CAscChartProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
+CAscChartProp.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;}
+// Возвращается объект класса CPosition
+CAscChartProp.prototype.get_Position = function() { return this.Position; }
+// Аргумент объект класса CPosition
+CAscChartProp.prototype.put_Position = function(v) { this.Position = v; }
+CAscChartProp.prototype.get_PositionH = function()  { return this.PositionH; }
+CAscChartProp.prototype.put_PositionH = function(v) { this.PositionH = v; }
+CAscChartProp.prototype.get_PositionV = function()  { return this.PositionV; }
+CAscChartProp.prototype.put_PositionV = function(v) { this.PositionV = v; }
+CAscChartProp.prototype.get_Value_X = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; }
+CAscChartProp.prototype.get_Value_Y = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; }
+
+CAscChartProp.prototype.get_ImageUrl = function() { return this.ImageUrl; }
+CAscChartProp.prototype.put_ImageUrl = function(v) { this.ImageUrl = v; }
+CAscChartProp.prototype.get_Group = function() { return this.Group; }
+CAscChartProp.prototype.put_Group = function(v) { this.Group = v; }
+CAscChartProp.prototype.asc_getFromGroup = function() { return this.fromGroup; }
+CAscChartProp.prototype.asc_putFromGroup = function(v) { this.fromGroup = v; }
+
+CAscChartProp.prototype.get_isChartProps = function() { return this.isChartProps; }
+CAscChartProp.prototype.put_isChartPross = function(v) { this.isChartProps = v; }
+
+
+CAscChartProp.prototype.get_SeveralCharts = function() { return this.severalCharts; }
+CAscChartProp.prototype.put_SeveralCharts = function(v) { this.severalCharts = v; }
+CAscChartProp.prototype.get_SeveralChartTypes = function() { return this.severalChartTypes; }
+CAscChartProp.prototype.put_SeveralChartTypes = function(v) { this.severalChartTypes = v; }
+
+CAscChartProp.prototype.get_SeveralChartStyles = function() { return this.severalChartStyles; }
+CAscChartProp.prototype.put_SeveralChartStyles = function(v) { this.severalChartStyles = v; }
+
+CAscChartProp.prototype.get_VerticalTextAlign = function() { return this.verticalTextAlign; };
+CAscChartProp.prototype.put_VerticalTextAlign = function(v) { this.verticalTextAlign = v; };
+
+CAscChartProp.prototype.get_OriginSize = function(api)
+{
+    var _image = api.ImageLoader.map_image_index[_getFullImageSrc(this.ImageUrl)];
+    if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
+    {
+        var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+        var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
+
+        var bIsCorrect = false;
+        if (_image.Image != null)
+        {
+            var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
+            var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+
+            var dKoef = Math.max(__w / _w, __h / _h);
+            if (dKoef > 1)
+            {
+                _w = Math.max(5, __w / dKoef);
+                _h = Math.max(5, __h / dKoef);
+
+                bIsCorrect = true;
+            }
+            else
+            {
+                _w = __w;
+                _h = __h;
+            }
+        }
+
+        return new CImageSize( parseInt(_w), parseInt(_h), bIsCorrect);
+    }
+    return new CImageSize( 50, 50, false );
+}
+CAscChartProp.prototype.get_Locked = function() { return this.Locked; }
+
+CAscChartProp.prototype.get_ChartProperties = function()
+{
+    return this.ChartProperties;
+};
+
+CAscChartProp.prototype.put_ChartProperties = function(v)
+{
+    this.ChartProperties = v;
+};
+
+CAscChartProp.prototype.get_ShapeProperties = function()
+{
+    return this.ShapeProperties;
+};
+
+CAscChartProp.prototype.put_ShapeProperties = function(v)
+{
+    this.ShapeProperties = v;
+};
+
+
+CAscChartProp.prototype.asc_getType = function()
+{
+    return this.ChartProperties.asc_getType();
+};
+CAscChartProp.prototype.asc_getSubType = function()
+{
+    return this.ChartProperties.asc_getSubType();
+};
+
+CAscChartProp.prototype.asc_getStyleId = function()
+{
+    return this.ChartProperties.asc_getStyleId();
+};
+
+CAscChartProp.prototype.asc_getHeight = function()
+{
+    return this.Height;
+}
+CAscChartProp.prototype.asc_getWidth = function()
+{
+    return this.Width;
+}
+
+CAscChartProp.prototype.asc_setType = function(v)
+{
+     this.ChartProperties.asc_setType(v);
+};
+CAscChartProp.prototype.asc_setSubType = function(v)
+{
+     this.ChartProperties.asc_setSubType(v);
+};
+
+CAscChartProp.prototype.asc_setStyleId = function(v)
+{
+     this.ChartProperties.asc_setStyleId(v);
+};
+
+CAscChartProp.prototype.asc_setHeight = function(v)
+{
+     this.Height = v;
+}
+CAscChartProp.prototype.asc_setWidth = function(v)
+{
+     this.Width = v;
+}
+
 function CHeaderProp( obj )
 {
     /*{

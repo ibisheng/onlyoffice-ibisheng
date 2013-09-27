@@ -847,6 +847,8 @@ CGraphicObjects.prototype = {
                     {
                         chart_props = {fromGroup: this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP};
                         chart_props.ChartProperties = charts[i].chart;
+                        chart_props.Width = charts[i].extX;
+                        chart_props.Height = charts[i].extY;
                     }
                     else
                     {
@@ -861,6 +863,11 @@ CGraphicObjects.prototype = {
                         {
                             if(chart_props.ChartProperties.styleId !== charts[i].chart.styleId )
                                 chart_props.severalChartStyles = true;
+                        }
+                        if(chart_props.Width !== charts[i].extX || chart_props.Height !== charts[i].extY)
+                        {
+                            chart_props.Width = null;
+                            chart_props.Height = null;
                         }
                     }
                 }
@@ -1657,6 +1664,29 @@ CGraphicObjects.prototype = {
     imageApply: function(props)
     {
 
+    },
+
+    chartApply: function(properties)
+    {
+        switch(this.State.id)
+        {
+            case STATES_ID_NULL:
+            case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+
+                var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
+                for(var i = 0; i < selectedObjects.length; ++i)
+                {
+                    if(selectedObjects[i].isChart && selectedObjects[i].isChart())
+                    {
+                        selectedObjects[i].setDiagram(properties);
+                    }
+                }
+                break;
+            }
+        }
     },
 
     canGroup: function()
