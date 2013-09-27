@@ -6592,7 +6592,8 @@ CPresentation.prototype =
             case historyitem_Presenattion_RemoveSlide:
             case historyitem_Presenattion_AddSlide:
             {
-                Writer.WriteLong(Data.Pos);
+                var Pos = Data.UseArray ? Data.PosArray[0] : Data.Pos;
+                Writer.WriteLong(Pos);
                 Writer.WriteString2(Data.Id);
                 break;
             }
@@ -6667,7 +6668,6 @@ CPresentation.prototype =
             {
                 var pos = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong());
                 var Id = Reader.GetString2();
-
                 this.Slides.splice(pos, 0, g_oTableId.Get_ById(Id));
                 this.recalcMap[this.Slides[pos].Get_Id()] = this.Slides[pos];
                 CollaborativeEditing.Add_ChangedClass(this);

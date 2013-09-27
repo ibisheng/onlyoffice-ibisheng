@@ -5330,7 +5330,7 @@ function CTextParagraphPr()
     this.bullet = new CBullet();
     this.lvl = null;
     this.pPr = new CParaPr();
-    this.rPr = null;
+    this.rPr = new CTextPr();
 
     this.createDuplicate = function()
     {

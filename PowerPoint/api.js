@@ -924,6 +924,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
     this.ParcedDocument = true;
+    g_oIdCounter.Set_Load(false);
 	if (this.isStartCoAuthoringOnEndLoad) {
 		this.CoAuthoringApi.onStartCoAuthoring(true);
 		this.isStartCoAuthoringOnEndLoad = false;
