@@ -790,27 +790,50 @@
                         rangeToSelect.select ();
                     }
                 }
-                //ждем выполнения paste
-                window.setTimeout( function()
-                {
-                    document.body.style.MozUserSelect = "none";
-                    document.body.style["-khtml-user-select"] = "none";
-                    document.body.style["-o-user-select"] = "none";
-                    document.body.style["user-select"] = "none";
-                    document.body.style["-webkit-user-select"] = "none";
-                    
-                    if(!is_chrome)
-                        t._editorPasteExec(worksheet, pastebin);
+				
+				  //paste
+				var func_timeout = function() {
+
+					if (window.USER_AGENT_SAFARI_MACOS)
+					{
+						if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
+						{
+							window.setTimeout(func_timeout, 10);
+							return;
+						}
+					}
+
+					document.body.style.MozUserSelect = "none";
+					document.body.style["-khtml-user-select"] = "none";
+					document.body.style["-o-user-select"] = "none";
+					document.body.style["user-select"] = "none";
+					document.body.style["-webkit-user-select"] = "none";
+
+					/*if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+							return false;
+						}
+					}*/
+
+					if(!is_chrome)
+						t._editorPasteExec(worksheet, pastebin);
 					else if(is_chrome && !isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
-                    
-                    pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+					
+					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 						
 					if(/MSIE/g.test(navigator.userAgent))
 						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 					
 					if (callback && callback.call) {callback();}
-                }, 0 );
+				};
+
+				var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
+				if($.browser["mozilla"])
+					_interval_time = 10;
+				window.setTimeout( func_timeout, _interval_time );
             },
             
             _editorPasteGetElem: function (worksheet, bClean)
@@ -836,13 +859,12 @@
                     pastebin.setAttribute("contentEditable", true);
                     
                     pastebin.onpaste = function(e){
-						// тут onpaste не обрубаем, так как он в сафари под macos приходить должен
-						if (window.GlobalPasteFlagCounter == 1)
-						{
-							t._bodyPaste(worksheet,e);
-							if (window.GlobalPasteFlag)
-								window.GlobalPasteFlagCounter = 2;
-						}
+						console.log(window.GlobalPasteFlag);
+						if (!window.GlobalPasteFlag)
+							return;
+						
+						t._bodyPaste(worksheet,e);
+						pastebin.onpaste = null;
 					};
                     document.body.appendChild( pastebin );
                 }
@@ -854,13 +876,12 @@
                         pastebin.removeChild(aChildNodes[i]);
                     }
 					 pastebin.onpaste = function(e){
-						// тут onpaste не обрубаем, так как он в сафари под macos приходить должен
-						if (window.GlobalPasteFlagCounter == 1)
-						{
-							t._bodyPaste(worksheet,e);
-							if (window.GlobalPasteFlag)
-								window.GlobalPasteFlagCounter = 2;
-						}
+						console.log(window.GlobalPasteFlag);
+						if (!window.GlobalPasteFlag)
+							return;
+
+						t._bodyPaste(worksheet,e);
+						pastebin.onpaste = null;
 					};
                 }
                 return pastebin;
@@ -2638,6 +2659,7 @@
 
 window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
 window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
+window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
 if (window.USER_AGENT_SAFARI_MACOS)
 {
     // браузеры под мак все определяются как сафари
