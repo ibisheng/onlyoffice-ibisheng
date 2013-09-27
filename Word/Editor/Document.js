@@ -5690,6 +5690,7 @@ CDocument.prototype =
         this.Recalculate();
         this.Document_UpdateSelectionState();
         this.Document_UpdateRulersState();
+        this.Document_UpdateInterfaceState();
     },
 
     Paragraph_IncDecFontSize : function(bIncrease)
