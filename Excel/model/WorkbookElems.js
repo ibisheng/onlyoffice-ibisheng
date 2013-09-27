@@ -3655,9 +3655,9 @@ RangeDataManager.prototype = {
 	{
 		var bboxGet = null;
 		if(bHor)
-			bboxGet = {r1: bbox.r1, c1: bbox.c1, r2: bbox.r2, c2: gc_nMaxCol0};
+			bboxGet = Asc.Range(bbox.c1, bbox.r1, gc_nMaxCol0, bbox.r2);
 		else
-			bboxGet = {r1: bbox.r1, c1: bbox.c1, r2: gc_nMaxRow0, c2: bbox.c2};
+			bboxGet = Asc.Range(bbox.c1, bbox.r1, bbox.c2, gc_nMaxRow0);
 		return {bbox: bboxGet, elems: this.get(bboxGet)};
 	},
 	shift : function(bbox, bAdd, bHor, oGetRes)
@@ -3674,6 +3674,11 @@ RangeDataManager.prototype = {
 				offset = {offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1};
 			else
 				offset = {offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0};
+			if(!bAdd)
+			{
+				offset.offsetRow = -offset.offsetRow;
+				offset.offsetCol = -offset.offsetCol;
+			}
 			for(var i = 0, length = elems.inner.length; i < length; i++)
 			{
 				var elem = elems.inner[i];
@@ -3691,7 +3696,8 @@ RangeDataManager.prototype = {
 				}
 				else
 				{
-					if(!from.containsRange(bbox))
+					var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
+					if(!bboxAsc.containsRange(from))
 					{
 						to = elem.bbox.clone();
 						if(bHor)
