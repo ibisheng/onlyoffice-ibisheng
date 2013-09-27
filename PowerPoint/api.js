@@ -171,6 +171,12 @@ function asc_docs_api(name)
 			};
 		}
 	}
+
+    if (window.editor == undefined)
+    {
+        window.editor = this;
+        window['editor'] = window.editor;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -672,11 +678,6 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 
 asc_docs_api.prototype.Init = function()
 {
-	if (window.editor == undefined)
-	{
-		window.editor = this;
-		window['editor'] = window.editor;
-	}
 	this.WordControl.Init();
 }
 asc_docs_api.prototype.asc_getEditorPermissions = function()

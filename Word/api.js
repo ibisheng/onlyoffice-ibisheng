@@ -662,6 +662,12 @@ function asc_docs_api(name)
 			};
 		}
 	}
+
+    if (window.editor == undefined)
+    {
+        window.editor = this;
+        window['editor'] = window.editor;
+    }
 }
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
@@ -789,11 +795,6 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 
 asc_docs_api.prototype.Init = function()
 {
-	if (window.editor == undefined)
-	{
-		window.editor = this;
-		window['editor'] = window.editor;
-	}
 	this.WordControl.Init();
 }
 asc_docs_api.prototype.asc_getEditorPermissions = function()
@@ -3774,6 +3775,25 @@ asc_docs_api.prototype.sync_EndAddShape = function()
 asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 {
     this.WordControl.DrawingFreeze = bIsFreeze;
+
+    var _elem1 = document.getElementById("id_main");
+    if (_elem1)
+    {
+        var _elem2 = document.getElementById("id_horscrollpanel");
+        var _elem3 = document.getElementById("id_panel_right");
+        if (bIsFreeze)
+        {
+            _elem1.style.display = "none";
+            _elem2.style.display = "none";
+            _elem3.style.display = "none";
+        }
+        else
+        {
+            _elem1.style.display = "block";
+            _elem2.style.display = "block";
+            _elem3.style.display = "block";
+        }
+    }
 }
 
 /*----------------------------------------------------------------*/
