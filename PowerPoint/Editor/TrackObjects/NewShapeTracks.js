@@ -285,6 +285,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom, this.arrowsCount);
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
+        return shape;
         shape.select(this.drawingObjects.graphicObjects);
         drawingObjects.shapeAdd(drawingObjects.cSld.spTree.length, shape);
         this.drawingObjects.graphicObjects.State.resultObject = shape;

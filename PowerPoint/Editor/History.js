@@ -609,24 +609,11 @@ CHistory.prototype =
 
         this.Points[this.Index].Items.push( Item );
 
-        if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) ) ||
-            ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-            ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
-            ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) )
+        if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) ) )
         {
-            var bAdd = ( ( Class instanceof CPresentation        && historyitem_Presenattion_AddSlide  === Data.Type ) ||
-                ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
-                ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
-                ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type )
-                ) ? true : false;
+            var bAdd = ( ( Class instanceof CPresentation && historyitem_Presenattion_AddSlide  === Data.Type )) ? true : false;
 
             var Count = 1;
-
-            if ( ( Class instanceof Paragraph )                                                                ||
-                ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
-                Count = Data.Items.length;
 
             var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );

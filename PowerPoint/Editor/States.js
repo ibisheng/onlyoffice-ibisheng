@@ -2263,23 +2263,25 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
         this.drawingObjectsController.resetSelection();
 
 
-        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddSp) === false)
+        History.Create_NewPoint();
+        var shape = this.drawingObjectsController.arrTrackObjects[0].trackEnd();
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, shape) === false)
         {
-            History.Create_NewPoint();
-            this.drawingObjectsController.trackEnd();
+            this.drawingObjects.shapeAdd(this.drawingObjects.cSld.spTree.length, shape);
             if(this.presetGeom != "textRect")
             {
                 this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
             }
-            else if(isRealObject(this.resultObject))
+            else
             {
-                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, this.resultObject));
+                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, shape));
             }
             this.drawingObjects.presentation.Recalculate();
             this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
         }
         else
         {
+            editor.WordControl.m_oLogicDocument.Document_Undo();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         }
         editor.sync_EndAddShape();

@@ -5913,6 +5913,7 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(changestype_RemoveSlide, null) === false)
         {
             History.Create_NewPoint();
+            var oldLen = this.Slides.length;
             array.sort(function(a, b){return a - b;});
             for(var i = array.length -1; i > - 1; --i)
             {
@@ -5922,7 +5923,14 @@ CPresentation.prototype =
             {
                 this.Slides[i].changeNum(i);
             }
-
+            if(array[array.length-1] != oldLen-1)
+            {
+                this.Set_CurPage(array[array.length-1]+1 - array.length);
+            }
+            else
+            {
+                this.Set_CurPage(this.Slides.length -1);
+            }
             this.Document_UpdateUndoRedoState();
             this.DrawingDocument.OnEndRecalculate();
             this.DrawingDocument.UpdateThumbnailsAttack();
