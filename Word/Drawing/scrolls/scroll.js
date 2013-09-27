@@ -313,6 +313,9 @@ function ScrollObject(elemID,settings,dbg){
     this.canvasW = 1;
     this.canvasH = 1;
 
+    this.ScrollOverType1 = -1;
+    this.ScrollOverType2 = -1;
+
     if (window.devicePixelRatio == 2)
         this.IsRetina = true;
 
@@ -629,10 +632,27 @@ ScrollObject.prototype = {
 		this.context.clearRect(0, 0, this.canvasW, this.canvasH);
 	},
 	_draw : function(){
-		this._clearContent();
+		// очистку не нудно делать - если потом рисовать рект такой же
+		//this._clearContent();
 		
 		this.context.beginPath();
-		this.context.rect(0, 0, this.canvasW, this.canvasH);
+
+        if (this.isVerticalScroll)
+        {
+            var _y = this.ArrowDrawer.Size;
+            var _h = this.canvasH - (_y << 1);
+
+            if (_h > 0)
+                this.context.rect(0, _y, this.canvasW, _h);
+        }
+        else if (this.isHorizontalScroll)
+        {
+            var _x = this.ArrowDrawer.Size;
+            var _w = this.canvasW - (_x << 1);
+
+            if (_w > 0)
+                this.context.rect(_x, 0, _w, this.canvasH);
+        }
 		this.context.fillStyle = this.settings.scrollBackgroundColor;
 		this.context.fill();
 		
@@ -672,6 +692,13 @@ ScrollObject.prototype = {
 	},
 
 	_setDimension : function(h,w){
+
+        if (w == this.canvasW && h == this.canvasH)
+            return;
+
+        this.ScrollOverType1 = -1;
+        this.ScrollOverType2 = -1;
+
         this.canvasW = w;
         this.canvasH = h;
 
@@ -771,24 +798,64 @@ ScrollObject.prototype = {
 				switch(type)
                 {
 				case 0://upArrow mouse hover, downArrow stable
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.OVER, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
+                    if (ScrollOverType.OVER != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.OVER, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.OVER;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
 					break;
 				case 1://upArrow mouse down, downArrow stable
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.ACTIVE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
-					break;
+                    if (ScrollOverType.ACTIVE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.ACTIVE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.ACTIVE;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
+                    break;
 				case 2://upArrow stable, downArrow mouse hover
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.OVER, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.OVER != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.OVER, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.OVER;
+                    }
 					break;
 				case 3://upArrow stable, downArrow mouse down
-					this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.ACTIVE, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.ACTIVE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.ACTIVE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.ACTIVE;
+                    }
 					break;
 				default ://upArrow stable, downArrow stable
-					this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_TOP, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_BOTTOM, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
 					break;
 				}
 			}
@@ -797,24 +864,64 @@ ScrollObject.prototype = {
 				switch(type)
                 {
 				case 0://leftArrow mouse hover, rightArrow stable
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.OVER, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                    if (ScrollOverType.OVER != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.OVER, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.OVER;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
 					break;
 				case 1://leftArrow mouse down, rightArrow stable
-					this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.ACTIVE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                    if (ScrollOverType.ACTIVE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.ACTIVE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.ACTIVE;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
 					break;
 				case 2://leftArrow stable, rightArrow mouse hover
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.OVER, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.OVER != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.OVER, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.OVER;
+                    }
 					break;
 				case 3://leftArrow stable, rightArrow mouse down
-					this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.ACTIVE, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.ACTIVE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.ACTIVE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.ACTIVE;
+                    }
 					break;
 				default ://leftArrow stable, rightArrow stable
-					this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
-                    this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                    if (ScrollOverType.NONE != this.ScrollOverType1)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_LEFT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType1 = ScrollOverType.NONE;
+                    }
+                    if (ScrollOverType.NONE != this.ScrollOverType2)
+                    {
+                        this.ArrowDrawer.drawArrow(ScrollArrowType.ARROW_RIGHT, ScrollOverType.NONE, this.context, w, h);
+                        this.ScrollOverType2 = ScrollOverType.NONE;
+                    }
 					break;
 				}
 			}
