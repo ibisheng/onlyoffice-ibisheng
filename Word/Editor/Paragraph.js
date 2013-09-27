@@ -10765,6 +10765,12 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
+    Set_FrameParaPr : function(Para)
+    {
+        Para.CopyPr( this );
+        this.Set_Spacing( { After : 0 }, false );
+    },
+
     Get_FrameBounds : function(FrameX, FrameY, FrameW, FrameH)
     {
         var X0 = FrameX, Y0 = FrameY, X1 = FrameX + FrameW, Y1 = FrameY + FrameH;

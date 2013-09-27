@@ -1930,6 +1930,7 @@ CDocument.prototype =
 
             var FramePr = new CFramePr();
             FramePr.Init_Default_DropCap( bInText );
+            NewParagraph.Set_FrameParaPr( OldParagraph );
             NewParagraph.Set_FramePr2( FramePr );
             NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD );
 
