@@ -30,7 +30,7 @@ function MasterSlide(presentation, theme)
     this.Height = 190.5;
     this.recalcInfo = {};
     this.DrawingDocument = editor.WordControl.m_oDrawingDocument;
-
+    this.maxId = 1000;
     this.changeProportions = function(kW, kH)
     {
         var _graphic_objects = this.cSld.spTree;

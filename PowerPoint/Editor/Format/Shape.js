@@ -156,6 +156,9 @@ function CShape(parent)
     if(isRealObject(parent))
     {
         this.setParent(parent);
+        var nv_sp_pr = new UniNvPr();
+        nv_sp_pr.cNvPr.id = ++parent.maxId;
+        this.setNvSpPr(nv_sp_pr)
     }
 }
 
@@ -723,6 +726,13 @@ CShape.prototype =
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
         this.nvSpPr = pr;
+        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
+        {
+            if(pr.cNvPr.id > this.parent.maxId)
+            {
+                this.parent.maxId = pr.cNvPr.id+1;
+            }
+        }
     },
 
     setTextBody: function(txBody)

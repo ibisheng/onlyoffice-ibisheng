@@ -5610,7 +5610,7 @@ CTable.prototype =
 
             case historyitem_Table_TableStyle:
             {
-                this.TableStyle = Data.Old;
+                this.styleIndex = Data.Old;
 
                 this.Recalc_CompiledPr();
                 break;
@@ -5905,7 +5905,7 @@ CTable.prototype =
 
             case historyitem_Table_TableStyle:
             {
-                this.TableStyle = Data.New;
+                this.styleIndex = Data.New;
 
                 this.Recalc_CompiledPr();
                 break;
@@ -7021,9 +7021,9 @@ CTable.prototype =
                 // Bool : IsNull
                 //   -> false String : TableStyleId
                 if ( true === Reader.GetBool() )
-                    this.TableStyle = null;
+                    this.styleIndex = null;
                 else
-                    this.TableStyle = Reader.GetString2();
+                    this.styleIndex = Reader.GetString2();
 
                 this.Recalc_CompiledPr();
                 break;
@@ -10510,7 +10510,7 @@ CTable.prototype =
         if ( this.TableStyle != StyleId )
         {
             History.Add( this, { Type : historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
-            this.TableStyle = StyleId;
+            this.styleIndex = StyleId;
 
             // Очищаем все прямое форматирование таблицы
             this.Clear_DirectFormatting(false);

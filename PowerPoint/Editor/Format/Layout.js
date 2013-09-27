@@ -34,7 +34,7 @@ function SlideLayout(slideMaster)
     this.Height = 190.5;
 
     this.Master = null;
-
+    this.maxId = 1000;
     this.changeProportions = function(kW, kH)
     {
         var _graphic_objects = this.cSld.spTree;

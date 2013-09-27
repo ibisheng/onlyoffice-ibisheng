@@ -8,7 +8,7 @@
  */
 function CGraphicFrame(parent)
 {
-    this.parent = parent;
+    //this.parent = parent;
     this.graphicObject = null;
     this.nvGraphicFramePr = null;
     this.spPr = new CSpPr();
@@ -28,6 +28,14 @@ function CGraphicFrame(parent)
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    this.stlesForParagraph = [];
+    if(parent)
+    {
+        this.setParent(parent);
+        var nv_sp_pr = new UniNvPr();
+        nv_sp_pr.cNvPr.id = ++parent.maxId;
+        this.setNvSpPr(nv_sp_pr)
+    }
 
 }
 
@@ -112,6 +120,13 @@ CGraphicFrame.prototype =
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
         this.nvGraphicFramePr = pr;
+        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
+        {
+            if(pr.cNvPr.id > this.parent.maxId)
+            {
+                this.parent.maxId = pr.cNvPr.id+1;
+            }
+        }
     },
 
     paragraphFormatPaste: function(CopyTextPr, CopyParaPr, Bool)
@@ -263,6 +278,7 @@ CGraphicFrame.prototype =
 
     recalcAllColors: function()
     {
+        this.stlesForParagraph = [];
         this.graphicObject.Recalc_CompiledPr();
     },
 
@@ -273,6 +289,7 @@ CGraphicFrame.prototype =
             recalculateTransform: true,
             recalculateSizes: true
         };
+        this.stlesForParagraph = [];
         this.graphicObject.Recalc_CompiledPr();
     },
 
@@ -850,6 +867,9 @@ CGraphicFrame.prototype =
             level  = 0;
         }
 
+        if(this.stlesForParagraph[level])
+            return this.stlesForParagraph[level];
+
         var Styles = new CStyles();
 
         var theme = null, layout = null, master = null, presentation;
@@ -1219,6 +1239,7 @@ CGraphicFrame.prototype =
             ++Styles.Id;
         }
 
+        this.stlesForParagraph[level] = Styles;
         return Styles;
     },
 

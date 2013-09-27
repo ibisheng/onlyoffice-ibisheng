@@ -2939,7 +2939,6 @@ function CDrawingDocument()
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);
 
-           // table.Recalc_CompiledPr();
             table.Recalculate_Page(0);
             table.Draw(0, graphics);
 

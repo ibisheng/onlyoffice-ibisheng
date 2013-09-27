@@ -366,6 +366,7 @@ function CPresentation(DrawingDocument)
     this.slideSizeLock = new PropLocker(this.Id);
 
     this.CommentAuthors = {};
+    this.createDefaultTableStyles();
 }
 
 var selected_None              = -1;
@@ -421,6 +422,138 @@ function CSelectedElementsInfo()
 
 CPresentation.prototype =
 {
+    createDefaultTableStyles: function()
+    {
+        var count = 0;
+
+        // Стандартные стили таблиц
+        var Style_Table_Lined = new CStyle("Lined", null, null, styletype_Table );
+        Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        this.globalTableStyles[count] = Style_Table_Lined;
+
+        count++;
+
+        var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", null, null, styletype_Table );
+        Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        this.globalTableStyles[count] = Style_Table_Lined_Accent1;
+
+        count++;
+
+        var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", null, null, styletype_Table);
+        Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        this.globalTableStyles[count]= Style_Table_Lined_Accent2;
+
+        count++;
+
+        var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", null, null, styletype_Table );
+        Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        this.globalTableStyles[count] = Style_Table_Lined_Accent3;
+
+        count++;
+
+        var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", null, null, styletype_Table );
+        Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        this.globalTableStyles[count] = Style_Table_Lined_Accent4;
+
+        count++;
+
+        var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", null, null, styletype_Table );
+        Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        this.globalTableStyles[count] = Style_Table_Lined_Accent5;
+
+        count++;
+
+        var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", null, null, styletype_Table );
+        Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
+        this.globalTableStyles[count] = Style_Table_Lined_Accent6;
+
+        count++;
+
+        var Style_Table_Bordered = new CStyle("Bordered", null, null, styletype_Table );
+        Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
+        this.globalTableStyles[count] = Style_Table_Bordered;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_1;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_2;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_3;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_4;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_5;
+
+        count++;
+
+        var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", null, null, styletype_Table );
+        Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
+        this.globalTableStyles[count] = Style_Table_Bordered_Accent_6;
+
+        count++;
+
+        var Style_Table_BorderedLined = new CStyle("Bordered & Lined", null, null, styletype_Table );
+        Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent1;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent2;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent3;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent4;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent5;
+
+        count++;
+
+        var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", null, null, styletype_Table );
+        Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
+        this.globalTableStyles[count] = Style_Table_BorderedLined_Accent6;
+
+
+
+    },
     // Проводим начальные действия, исходя из Документа
     Init : function()
     {
@@ -6849,58 +6982,19 @@ CPresentation.prototype =
             elements.CurPreset = preset;
             switch (preset)
             {
+                case "spline":
+                {
+                    elements.changeCurrentState(new SplineBezierState(elements, this.Slides[this.CurPage]));
+                    break;
+                }
                 case "polyline1":
                 {
-                    elements.ChangeState(new PolyLineAddState());
+                    elements.changeCurrentState(new PolyLineAddState(elements, this.Slides[this.CurPage]));
                     break;
                 }
                 case "polyline2":
                 {
-                    elements.ChangeState(new AddPolyLine2State());
-                    break;
-                }
-
-                case "spline":
-                {
-                    elements.ChangeState(new SplineBezierState());
-                    break;
-                }
-                case "lineWithArrow":
-                {
-                    elements.ChangeState(new StateAddArrows(true, false));
-                    elements.CurPreset = "line";
-                    break;
-                }
-                case "lineWithTwoArrows":
-                {
-                    elements.ChangeState(new StateAddArrows(true, true));
-                    elements.CurPreset = "line";
-                    break;
-                }
-
-                case "bentConnector5WithArrow":
-                {
-                    elements.ChangeState(new StateAddArrows(true, false));
-                    elements.CurPreset = "bentConnector5";
-                    break;
-                }
-                case "bentConnector5WithTwoArrows":
-                {
-                    elements.ChangeState(new StateAddArrows(true, true));
-                    elements.CurPreset = "bentConnector5";
-                    break;
-                }
-
-                case "curvedConnector3WithArrow":
-                {
-                    elements.ChangeState(new StateAddArrows(true, false));
-                    elements.CurPreset = "curvedConnector3";
-                    break;
-                }
-                case "curvedConnector3WithTwoArrows":
-                {
-                    elements.ChangeState(new StateAddArrows(true, true));
-                    elements.CurPreset = "curvedConnector3";
+                    elements.changeCurrentState(new AddPolyLine2State(elements, this.Slides[this.CurPage]));
                     break;
                 }
 

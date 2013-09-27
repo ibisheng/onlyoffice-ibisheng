@@ -324,7 +324,7 @@ CColorModifiers.prototype =
         var duplicate = new CColorModifiers();
         for(var  i=0; i< this.Mods.length; ++i)
         {
-            duplicate.Mods[i] = clone(this.Mods[i]);
+            duplicate.Mods[i] = this.Mods[i].createDuplicate();
         }
         return duplicate;
     },
@@ -2763,7 +2763,10 @@ function CreateDefaultShapeStyle()
     style.lnRef.idx = 2;
     style.lnRef.Color.color = new CSchemeColor();
     style.lnRef.Color.color.id = g_clr_accent1;
-    style.lnRef.Color.Mods.Mods.push({name: "shade", val:50000});
+    var mod = new CColorMod();
+    mod.name = "shade";
+    mod.val = 50000;
+    style.lnRef.Color.Mods.Mods.push(mod);
 
     style.fillRef = new StyleRef();
     style.fillRef.idx = 1;
@@ -5892,7 +5895,10 @@ function CreateDefaultTextRectStyle()
     style.lnRef.idx = 0;
     style.lnRef.Color.color = new CSchemeColor();
     style.lnRef.Color.color.id = g_clr_accent1;
-    style.lnRef.Color.Mods.Mods.push({name: "shade", val:50000});
+    var mod = new CColorMod();
+    mod.name = "shade";
+    mod.val = 50000;
+    style.lnRef.Color.Mods.Mods.push(mod);
 
     style.fillRef = new StyleRef();
     style.fillRef.idx = 0;

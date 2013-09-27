@@ -44,7 +44,7 @@ function Slide(presentation, slideLayout, slideNum)
 
     this.comments = [];
     this.writecomments = [];
-
+    this.maxId = 1000;
     //this.show = true;
     //this.showMasterPhAnim = false;
     //this.showMasterSp = false;

@@ -1,72 +1,42 @@
-function PolyLine (slide)
+function PolyLine (drawingObjects)
 {
-    this.slide = slide;
+    this.drawingObjects = drawingObjects;
     this.arrPoint = [];
-
-
     this.Matrix = new CMatrixL();
     this.TransformMatrix = new CMatrixL();
 
-    this.parent = slide;
     this.style  = CreateDefaultShapeStyle();
 
-    this.calculateLine = function()
+
+    var _calculated_line;
+
+    var theme = drawingObjects.Layout.Master.Theme;
+    var slide = drawingObjects;
+    var layout = drawingObjects.Layout;
+    var masterSlide  = drawingObjects.Layout.Master;
+    var RGBA = {R: 0, G: 0, B: 0, A: 255};
+    if(isRealObject(theme) && typeof theme.getLnStyle === "function"
+        && isRealObject(this.style) && isRealObject(this.style.lnRef) && isRealNumber(this.style.lnRef.idx)
+        && isRealObject(this.style.lnRef.Color) && typeof  this.style.lnRef.Color.Calculate === "function")
     {
-        if(this.parent == null )
-        {
-            return;
-        }
-        var slide = null, layout = null, master = null, theme = null;
-        switch(this.parent.kind)
-        {
-            case SLIDE_KIND :
-            {
-                slide = this.parent;
-                layout = slide.Layout;
-                if(layout)
-                {
-                    master = layout.Master;
-                }
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                layout = this.parent;
-                master = layout.Master;
-                break;
-            }
-            case MASTER_KIND :
-            {
-                master = this.parent;
-                break;
-            }
-        }
+        _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
+        this.style.lnRef.Color.Calculate(theme, slide, layout, masterSlide, RGBA);
+        RGBA = this.style.lnRef.Color.RGBA;
+    }
+    else
+    {
+        _calculated_line = new CLn();
+    }
 
-        if(master)
-            theme = master.Theme;
+    if(isRealObject(_calculated_line.Fill))
+    {
+        _calculated_line.Fill.calculate(theme, slide, layout, masterSlide, RGBA) ;
+    }
 
-        var pen = null;
-        var  RGBA = {R:0, G: 0, B:0, A:255};
-        if(theme && this.style!=null && this.style.lnRef!=null)
-        {
-            pen = theme.getLnStyle(this.style.lnRef.idx);
-            this.style.lnRef.Color.Calculate(theme, slide, layout, master);
-            RGBA = this.style.lnRef.Color.RGBA;
-        }
-        else
-        {
-            pen = new CLn();
-        }
+    this.pen = _calculated_line;
 
-        if(pen.Fill!=null)
-        {
-            pen.Fill.calculate(theme, slide,layout, master, RGBA) ;
-        }
+    this.polylineForDrawer = new PolylineForDrawer(this);
 
-        this.pen = pen;
-    };
-
-    this.calculateLine();
     this.Draw = function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -78,6 +48,8 @@ function PolyLine (slide)
     };
     this.draw = function(g)
     {
+        this.polylineForDrawer.Draw(g);
+        return;
         if(this.arrPoint.length < 2)
         {
             return;
@@ -89,7 +61,39 @@ function PolyLine (slide)
         }
         g.ds();
     };
-    this.createShape =  function(parent)
+
+    this.getLeftTopPoint = function()
+    {
+        if(this.arrPoint.length  < 1)
+            return {x: 0, y: 0};
+        var xMax = this.arrPoint[0].x, yMax = this.arrPoint[0].y, xMin = xMax, yMin = yMax;
+        var i;
+        for( i = 1; i<this.arrPoint.length; ++i)
+        {
+            if(this.arrPoint[i].x > xMax)
+            {
+                xMax = this.arrPoint[i].x;
+            }
+            if(this.arrPoint[i].y > yMax)
+            {
+                yMax = this.arrPoint[i].y;
+            }
+
+            if(this.arrPoint[i].x < xMin)
+            {
+                xMin = this.arrPoint[i].x;
+            }
+
+            if(this.arrPoint[i].y < yMin)
+            {
+                yMin = this.arrPoint[i].y;
+            }
+        }
+
+        return {x: xMin, y: yMin};
+    };
+
+    this.createShape =  function(document)
     {
         var xMax = this.arrPoint[0].x, yMax = this.arrPoint[0].y, xMin = xMax, yMin = yMax;
         var i;
@@ -99,7 +103,7 @@ function PolyLine (slide)
         {
             var dx = this.arrPoint[0].x - this.arrPoint[this.arrPoint.length-1].x;
             var dy = this.arrPoint[0].y - this.arrPoint[this.arrPoint.length-1].y;
-            if(Math.sqrt(dx*dx +dy*dy) < this.parent.elementsManipulator.DrawingDocument.GetMMPerDot(3))
+            if(Math.sqrt(dx*dx +dy*dy) < this.drawingObjects.convertMetric(3, 0, 3))
             {
                 bClosed = true;
             }
@@ -127,12 +131,16 @@ function PolyLine (slide)
             }
         }
 
-        var shape = new CShape(parent);
-        shape.spPr.xfrm.offX = xMin;
-        shape.spPr.xfrm.offY = yMin;
-        shape.spPr.xfrm.extX = xMax-xMin;
-        shape.spPr.xfrm.extY = yMax-yMin;
-        var geometry = new Geometry();
+
+
+
+        var shape = new CShape(null, this.drawingObjects);
+
+        shape.setPosition(xMin, yMin);
+        shape.setExtents(xMax-xMin, yMax-yMin);
+        shape.setStyle(CreateDefaultShapeStyle());
+        var geometry = new CGeometry();
+
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
         geometry.AddRect("l", "t", "r", "b");
         geometry.AddPathCommand(1, (this.arrPoint[0].x - xMin) + "", (this.arrPoint[0].y - yMin) + "");
@@ -144,19 +152,43 @@ function PolyLine (slide)
         {
             geometry.AddPathCommand(6);
         }
-        shape.txBody = new CTextBody(shape);
-        shape.txBody.bodyPr = new CBodyPr();
-        shape.txBody.bodyPr.setDefault();
-        shape.txBody.bodyPr.anchor = 1;//center
-        shape.style  = CreateDefaultShapeStyle();
-        shape.txBody.content = new CDocumentContent(shape, parent.elementsManipulator.DrawingDocument,0, 0, 0, 0, 0, 0);
-        shape.txBody.content.Content[0].Set_Align( 2, false );
-        shape.spPr.Geometry = geometry;
-        shape.geometry = shape.spPr.Geometry;
-        shape.nvSpPr = new UniNvPr();
-        shape.nvSpPr.cNvPr.id = ++parent.maxId;
-        shape.calculate2();
-        parent.elementsManipulator.PolyLine = null;
-        return shape;
+        geometry.Init( xMax-xMin, yMax-yMin);
+        shape.spPr.geometry = geometry;
+        shape.recalculate();
+
+        this.drawingObjects.addGraphicObject(shape);
     }
+}
+
+function PolylineForDrawer(polyline)
+{
+    this.polyline = polyline;
+    this.pen = polyline.pen;
+    this.brush = polyline.brush;
+    this.TransformMatrix = polyline.TransformMatrix;
+    this.Matrix = polyline.Matrix;
+
+    this.Draw = function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.Matrix);
+
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this);
+    };
+    this.draw = function(g)
+    {
+        g._e();
+        if(this.polyline.arrPoint.length < 2)
+        {
+            return;
+        }
+        g._m(this.polyline.arrPoint[0].x, this.polyline.arrPoint[0].y);
+        for(var i = 1; i < this.polyline.arrPoint.length; ++i)
+        {
+            g._l(this.polyline.arrPoint[i].x, this.polyline.arrPoint[i].y);
+        }
+        g.ds();
+    };
 }

@@ -51,6 +51,10 @@ function CGroupShape(parent)
     if(isRealObject(parent))
     {
         this.setParent(parent);
+
+        var nv_sp_pr = new UniNvPr();
+        nv_sp_pr.cNvPr.id = ++parent.maxId;
+        this.setNvSpPr(nv_sp_pr)
     }
 }
 
@@ -1361,6 +1365,13 @@ CGroupShape.prototype =
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
         this.nvGrpSpPr = pr;
+        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
+        {
+            if(pr.cNvPr.id > this.parent.maxId)
+            {
+                this.parent.maxId = pr.cNvPr.id+1;
+            }
+        }
     },
 
 

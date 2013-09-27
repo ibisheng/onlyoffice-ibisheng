@@ -14,7 +14,7 @@ function SplineCommandLineTo(x, y)
     this.id = 1;
     this.x = x;
     this.y = y;
-    this.changePoint = function(x, y)
+    this.changeLastPoint = function(x, y)
     {
         this.x = x;
         this.y = y;
@@ -40,128 +40,44 @@ function SplineCommandBezier(x1, y1, x2, y2, x3, y3)
     }
 }
 
-function Spline(slide)
+function Spline(drawingObjects)
 {
-    this.calculateLine = function()
-    {
-        if(this.parent == null )
-        {
-            return;
-        }
-        var slide = null, layout = null, master = null, theme = null;
-        switch(this.parent.kind)
-        {
-            case SLIDE_KIND :
-            {
-                slide = this.parent;
-                layout = slide.Layout;
-                if(layout)
-                {
-                    master = layout.Master;
-                }
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                layout = this.parent;
-                master = layout.Master;
-                break;
-            }
-            case MASTER_KIND :
-            {
-                master = this.parent;
-                break;
-            }
-        }
 
-        if(master)
-            theme = master.Theme;
-
-        var pen = null;
-        var  RGBA = {R:0, G: 0, B:0, A:255};
-        if(theme && this.style!=null && this.style.lnRef!=null)
-        {
-            pen = theme.getLnStyle(this.style.lnRef.idx);
-            this.style.lnRef.Color.Calculate(theme, slide, layout, master);
-            RGBA = this.style.lnRef.Color.RGBA;
-        }
-        else
-        {
-            pen = new CLn();
-        }
-
-        if(pen.Fill!=null)
-        {
-            pen.Fill.calculate(theme, slide,layout, master, RGBA) ;
-        }
-
-        this.pen = pen;
-    };
     this.path = [];
 
-    this.Matrix = new CMatrixL();
-    this.TransformMatrix = new CMatrixL();
+    this.drawingObjects = drawingObjects;
 
-    this.parent = slide;
+    this.Matrix = new CMatrix();
+    this.TransformMatrix = new CMatrix();
+
     this.style  = CreateDefaultShapeStyle();
-    this.calculateLine();
 
-    this.calculateLine = function()
+    var _calculated_line;
+    var theme = drawingObjects.Layout.Master.Theme;
+    var slide = drawingObjects;
+    var layout = drawingObjects.Layout;
+    var masterSlide  = drawingObjects.Layout.Master;
+    var RGBA = {R: 0, G: 0, B: 0, A: 255};
+    if(isRealObject(theme) && typeof theme.getLnStyle === "function"
+        && isRealObject(this.style) && isRealObject(this.style.lnRef) && isRealNumber(this.style.lnRef.idx)
+        && isRealObject(this.style.lnRef.Color) && typeof  this.style.lnRef.Color.Calculate === "function")
     {
-        var slide = null, layout = null, master = null, theme = null;
-        switch(this.parent.kind)
-        {
-            case SLIDE_KIND :
-            {
-                slide = this.parent;
-                layout = slide.Layout;
-                if(layout)
-                {
-                    master = layout.Master;
-                }
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                layout = this.parent;
-                master = layout.Master;
-                break;
-            }
-            case MASTER_KIND :
-            {
-                master = this.parent;
-                break;
-            }
-        }
+        _calculated_line = theme.getLnStyle(this.style.lnRef.idx);
+        this.style.lnRef.Color.Calculate(theme, slide, layout, masterSlide, RGBA);
+        RGBA = this.style.lnRef.Color.RGBA;
+    }
+    else
+    {
+        _calculated_line = new CLn();
+    }
 
-        if(master)
-            theme = master.Theme;
+    if(isRealObject(_calculated_line.Fill))
+    {
+        _calculated_line.Fill.calculate(theme, slide, layout, masterSlide, RGBA) ;
+    }
 
-        var pen = null;
-        var  RGBA = {R:0, G: 0, B:0, A:255};
-        if(theme && this.style!=null && this.style.lnRef!=null)
-        {
-            pen = theme.getLnStyle(this.style.lnRef.idx);
-            this.style.lnRef.Color.Calculate(theme, slide, layout, master);
-            RGBA = this.style.lnRef.Color.RGBA;
-        }
-        else
-        {
-            pen = new CLn();
-        }
-        if(this.spPr.ln!=null)
-        {
-            pen.merge(this.spPr.ln)
-        }
-
-        if(pen.Fill!=null)
-        {
-            pen.Fill.calculate(theme, slide,layout, master, RGBA) ;
-        }
-
-        this.pen = pen;
-    };
-
+    this.pen = _calculated_line;
+    this.splineForDraw = new SplineForDrawer(this);
     this.Draw = function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -173,7 +89,8 @@ function Spline(slide)
     };
     this.draw = function(g)
     {
-       // g.transform3(this.Matrix);
+        this.splineForDraw.Draw(g);
+        return;
         for(var i = 0; i < this.path.length; ++i)
         {
             var lastX, lastY;
@@ -195,11 +112,6 @@ function Spline(slide)
                 }
                 case 2 :
                 {
-                    /*g._l(this.path[i].x1*100, this.path[i].y1*100);
-                    g._l(this.path[i].x2*100, this.path[i].y2*100);
-                    g._l(this.path[i].x3*100, this.path[i].y3*100);
-
-                    g._m(lastX*100, lastY*100);       */
                     g._c(this.path[i].x1, this.path[i].y1, this.path[i].x2, this.path[i].y2, this.path[i].x3, this.path[i].y3);
                     lastX = this.path[i].x3;
                     lastY = this.path[i].y3;
@@ -210,7 +122,52 @@ function Spline(slide)
         g.ds();
     };
 
-    this.createShape =  function(parent)
+    this.getLeftTopPoint = function()
+    {
+        if(this.path.length < 1)
+            return {x: 0, y: 0};
+
+        var min_x = this.path[0].x;
+        var max_x = min_x;
+        var min_y = this.path[0].y;
+        var max_y = min_y;
+        var last_x = this.path[0].x, last_y = this.path[0].y;
+        for(var index = 1; index < this.path.length; ++index)
+        {
+            var path_command = this.path[index];
+            if(path_command.id === 1)
+            {
+                if(min_x > path_command.x)
+                    min_x = path_command.x;
+                if(max_x < path_command.x)
+                    max_x = path_command.x;
+                if(min_y > path_command.y)
+                    min_y = path_command.y;
+                if(max_y < path_command.y)
+                    max_y = path_command.y;
+            }
+            else
+            {
+                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, APPROXIMATE_EPSILON);
+                for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
+                {
+                    var cur_point = bezier_polygon[point_index];
+                    if(min_x > cur_point.x)
+                        min_x = cur_point.x;
+                    if(max_x < cur_point.x)
+                        max_x = cur_point.x;
+                    if(min_y > cur_point.y)
+                        min_y = cur_point.y;
+                    if(max_y < cur_point.y)
+                        max_y = cur_point.y;
+
+                }
+            }
+        }
+        return {x: min_x, y: min_y};
+    };
+
+    this.createShape =  function(drawingObjects)
     {
         var xMax = this.path[0].x, yMax = this.path[0].y, xMin = xMax, yMin = yMax;
         var i;
@@ -243,98 +200,61 @@ function Spline(slide)
                 this.path[this.path.length-1].y2 = this.path[0].y -vy;
             }
         }
-        for( i = 1; i<this.path.length; ++i)
+
+        var min_x = this.path[0].x;
+        var max_x = min_x;
+        var min_y = this.path[0].y;
+        var max_y = min_y;
+        var last_x = this.path[0].x, last_y = this.path[0].y;
+        for(var index = 1; index < this.path.length; ++index)
         {
-            if(this.path[i].id == 1)
+            var path_command = this.path[index];
+            if(path_command.id === 1)
             {
-                if(this.path[i].x > xMax)
-                {
-                    xMax = this.path[i].x;
-                }
-                if(this.path[i].y > yMax)
-                {
-                    yMax = this.path[i].y;
-                }
+                if(min_x > path_command.x)
+                    min_x = path_command.x;
+                if(max_x < path_command.x)
+                    max_x = path_command.x;
+                if(min_y > path_command.y)
+                    min_y = path_command.y;
+                if(max_y < path_command.y)
+                    max_y = path_command.y;
 
-                if(this.path[i].x < xMin)
-                {
-                    xMin = this.path[i].x;
-                }
-
-                if(this.path[i].y < yMin)
-                {
-                    yMin = this.path[i].y;
-                }
+                last_x = path_command.x;
+                last_y = path_command.y;
             }
             else
             {
-                if(this.path[i].x1 > xMax)
+                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, APPROXIMATE_EPSILON);
+                for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                 {
-                    xMax = this.path[i].x1;
-                }
-                if(this.path[i].y1 > yMax)
-                {
-                    yMax = this.path[i].y1;
-                }
+                    var cur_point = bezier_polygon[point_index];
+                    if(min_x > cur_point.x)
+                        min_x = cur_point.x;
+                    if(max_x < cur_point.x)
+                        max_x = cur_point.x;
+                    if(min_y > cur_point.y)
+                        min_y = cur_point.y;
+                    if(max_y < cur_point.y)
+                        max_y = cur_point.y;
 
-                if(this.path[i].x1 < xMin)
-                {
-                    xMin = this.path[i].x1;
-                }
-
-                if(this.path[i].y1 < yMin)
-                {
-                    yMin = this.path[i].y1;
-                }
-
-
-                if(this.path[i].x2 > xMax)
-                {
-                    xMax = this.path[i].x2;
-                }
-                if(this.path[i].y2 > yMax)
-                {
-                    yMax = this.path[i].y2;
-                }
-
-                if(this.path[i].x2 < xMin)
-                {
-                    xMin = this.path[i].x2;
-                }
-
-                if(this.path[i].y2 < yMin)
-                {
-                    yMin = this.path[i].y2;
-                }
-
-
-                if(this.path[i].x3 > xMax)
-                {
-                    xMax = this.path[i].x3;
-                }
-                if(this.path[i].y3 > yMax)
-                {
-                    yMax = this.path[i].y3;
-                }
-
-                if(this.path[i].x3 < xMin)
-                {
-                    xMin = this.path[i].x3;
-                }
-
-                if(this.path[i].y3 < yMin)
-                {
-                    yMin = this.path[i].y3;
+                    last_x = path_command.x3;
+                    last_y = path_command.y3;
                 }
             }
         }
 
-        var shape = new CShape(parent);
-        shape.spPr.xfrm.offX = xMin;
-        shape.spPr.xfrm.offY = yMin;
-        shape.spPr.xfrm.extX = xMax-xMin;
-        shape.spPr.xfrm.extY = yMax-yMin;
-        var geometry = new Geometry();
+        xMin = min_x;
+        xMax = max_x;
+        yMin = min_y;
+        yMax = max_y;
+        var shape = new CShape(null, this.drawingObjects);
+
+        shape.setPosition(xMin, yMin);
+        shape.setExtents(xMax-xMin, yMax-yMin);
+        shape.setStyle(CreateDefaultShapeStyle());
+
+        var geometry = new CGeometry();
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
         geometry.AddRect("l", "t", "r", "b");
         for(i = 0;  i< this.path.length; ++i)
@@ -362,19 +282,67 @@ function Spline(slide)
         {
             geometry.AddPathCommand(6);
         }
-        shape.txBody = new CTextBody(shape);
-        shape.txBody.bodyPr = new CBodyPr();
-        shape.txBody.bodyPr.setDefault();
-        shape.txBody.bodyPr.anchor = 1;//center
-        shape.style  = CreateDefaultShapeStyle();
-        shape.txBody.content = new CDocumentContent(shape, parent.elementsManipulator.DrawingDocument,0, 0, 0, 0, 0, 0);
-        shape.txBody.content.Content[0].Set_Align( 2, false );
-        shape.spPr.Geometry = geometry;
-        shape.nvSpPr = new UniNvPr();
-        shape.nvSpPr.cNvPr.id = ++parent.maxId;
-        shape.geometry = shape.spPr.Geometry;
-        shape.calculate2();
-        parent.elementsManipulator.Spline = new Spline();
-        return shape;
+        geometry.Init( xMax-xMin, yMax-yMin);
+        shape.spPr.geometry = geometry;
+        shape.recalculate();
+        this.drawingObjects.addGraphicObject(shape);
+    };
+
+    this.addPathCommand = function(pathCommand)
+    {
+        this.path.push(pathCommand);
+    }
+}
+
+function SplineForDrawer(spline)
+{
+    this.spline = spline;
+    this.pen = spline.pen;
+    this.brush = spline.brush;
+    this.TransformMatrix = spline.TransformMatrix;
+    this.Matrix = spline.Matrix;
+
+    this.Draw = function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.Matrix);
+
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this);
+    };
+
+    this.draw = function(g)
+    {
+        g._e();
+        for(var i = 0; i < this.spline.path.length; ++i)
+        {
+            var lastX, lastY;
+            switch (this.spline.path[i].id )
+            {
+                case 0 :
+                {
+                    g._m(this.spline.path[i].x, this.spline.path[i].y);
+                    lastX = this.spline.path[i].x;
+                    lastY = this.spline.path[i].y;
+                    break;
+                }
+                case 1 :
+                {
+                    g._l(this.spline.path[i].x, this.spline.path[i].y);
+                    lastX = this.spline.path[i].x;
+                    lastY = this.spline.path[i].y;
+                    break;
+                }
+                case 2 :
+                {
+                    g._c(this.spline.path[i].x1, this.spline.path[i].y1, this.spline.path[i].x2, this.spline.path[i].y2, this.spline.path[i].x3, this.spline.path[i].y3);
+                    lastX = this.spline.path[i].x3;
+                    lastY = this.spline.path[i].y3;
+                    break;
+                }
+            }
+        }
+        g.ds();
     }
 }

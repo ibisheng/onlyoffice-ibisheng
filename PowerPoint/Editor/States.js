@@ -4193,7 +4193,7 @@ function PolyLineAddState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.addTrackObject(polyline);
         this.drawingObjects.OnUpdateOverlay();
 
-        var _min_distance = this.drawingObjects.convertMetric(1, 0, 3);
+        var _min_distance = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
         this.drawingObjectsController.changeCurrentState(new PolyLineAddState2(this.drawingObjectsController, this.drawingObjects, _min_distance, polyline));
     };
 
@@ -4391,7 +4391,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     this.id = STATES_ID_ADD_PPOLY_LINE23;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
-    this.minDistance = this.drawingObjects.convertMetric(1, 0, 3);
+    this.minDistance  = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
     this.polyline = polyline;
     this.onMouseDown = function(e, x, y)
     {
