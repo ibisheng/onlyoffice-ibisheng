@@ -3827,8 +3827,15 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(null, this.drawingObjects);
-           
+            var sp = this.spline.createShape(null, this.drawingObjects);
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
@@ -3882,8 +3889,15 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
-           
+            var sp = this.spline.createShape(this.drawingObjects);
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
@@ -3971,8 +3985,15 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
-           
+            var sp = this.spline.createShape(this.drawingObjects);
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
@@ -4079,8 +4100,15 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
-           
+            var sp = this.spline.createShape(this.drawingObjects);
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
@@ -4257,7 +4285,15 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
     {
         if(this.polyline.arrPoint.length > 1)
         {
-            this.polyline.createShape();
+            var sp = this.polyline.createShape();
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
         }
 
         this.drawingObjectsController.clearTrackObjects();
@@ -4398,7 +4434,15 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
         this.polyline.arrPoint.push({x: x, y: y});
         if(e.ClickCount > 1)
         {
-            this.polyline.createShape();
+            var sp = this.polyline.createShape();
+            var p = editor.WordControl.m_oLogicDocument;
+            if(p.Document_Is_SelectionLocked(changestype_AddShape, sp) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, sp);
+                p.Recalculate();
+            }
+
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));

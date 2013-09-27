@@ -3348,6 +3348,16 @@ CShape.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
+    setGeometry: function(geometry)
+    {
+        var old_geometry = this.spPr.geometry;
+        var new_geometry = geometry;
+        this.spPr.geometry = geometry;
+        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
+        this.recalcInfo.recalculateGeometry = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
     changeFill : function(unifill)
     {
 

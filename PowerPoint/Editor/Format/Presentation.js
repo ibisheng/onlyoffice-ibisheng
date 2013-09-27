@@ -6400,6 +6400,20 @@ CPresentation.prototype =
             }
         }
 
+        if(CheckType === changestype_AddShape)
+        {
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                return true;
+            var check_obj =
+            {
+                "type": c_oAscLockTypeElemPresentation.Object,
+                "slideId": slide_id,
+                "objId": AdditionalData.Get_Id(),
+                "guid": AdditionalData.Get_Id()
+            };
+            AdditionalData.Lock.Check(check_obj);
+        }
+
         if(CheckType === changestype_AddSp || CheckType === changestype_AddComment)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
