@@ -1076,12 +1076,16 @@ CImageShape.prototype =
     {
         History.Add(this, {Type:historyitem_SetBlipFill, oldPr: this.blipFill, newPr:blipFill});
         this.blipFill = blipFill;
+        this.recalcInfo.recalculateBrush = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     setGroup: function(group)
     {
         History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
         this.group = group;
+        this.recalcInfo.recalculateTransform = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     setParent: function(parent)
@@ -1139,21 +1143,25 @@ CImageShape.prototype =
             case historyitem_SetSetSpPr:
             {
                 this.spPr = data.oldPr;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetSetStyle:
             {
                 this.style = data.oldPr;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetBlipFill:
             {
                 this.blipFill = data.oldPr;
+                this.recalcInfo.recalculateBrush = true;
                 break;
             }
             case historyitem_SetSpGroup:
             {
                 this.group = data.oldPr;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetShapeParent:
@@ -1215,22 +1223,26 @@ CImageShape.prototype =
             case historyitem_SetSetSpPr:
             {
                 this.spPr = data.newPr;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetSetStyle:
             {
                 this.style = data.newPr;
+                this.recalcAll();
                 break;
             }
 
             case historyitem_SetBlipFill:
             {
                 this.blipFill = data.newPr;
+                this.recalcInfo.recalculateBrush = true;
                 break;
             }
             case historyitem_SetSpGroup:
             {
                 this.group = data.newPr;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetShapeParent:
@@ -1395,6 +1407,7 @@ CImageShape.prototype =
                     {
                         this.spPr.Read_FromBinary2(r);
                     }
+                    this.recalcAll();
                     break;
                 }
                 case historyitem_SetSetStyle:
@@ -1408,6 +1421,7 @@ CImageShape.prototype =
                     {
                         this.style = null;
                     }
+                    this.recalcAll();
                     break;
                 }
 
@@ -1422,6 +1436,7 @@ CImageShape.prototype =
                     {
                         this.blipFill = null;
                     }
+                    this.recalcAll();
                     break;
                 }
                 case historyitem_SetSpGroup:
@@ -1434,6 +1449,7 @@ CImageShape.prototype =
                     {
                         this.group = null;
                     }
+                    this.recalcAll();
                     break;
                 }
 

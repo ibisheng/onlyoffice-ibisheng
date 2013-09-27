@@ -1644,6 +1644,77 @@ CGraphicObjects.prototype = {
                             this.State.textObject.setVerticalAlign(properties.verticalTextAlign);
                     }
                 }
+                if(isRealNumber(properties.w) && isRealNumber(properties.h))
+                {
+                    for(var i = 0; i < selectedObjects.length; ++i)
+                    {
+
+                        if(this.State.group)
+                        {
+                            this.State.group.normalize();
+                        }
+                        if(selectedObjects[i].setXfrm)
+                        {
+                            selectedObjects[i].setXfrm(null, null, properties.w, properties.h, null, null, null);
+                        }
+                        if(this.State.group)
+                        {
+                            this.State.group.updateCoordinatesAfterInternalResize();
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        editor.WordControl.m_oLogicDocument.Recalculate();
+    },
+
+    setImageProps: function(properties)
+    {
+        switch(this.State.id)
+        {
+            case STATES_ID_NULL:
+            case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+
+                var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
+                for(var i = 0; i < selectedObjects.length; ++i)
+                {
+
+                    if(properties.type != undefined && properties.type != -1 && typeof selectedObjects[i].changePresetGeom === "function")
+                    {
+                        selectedObjects[i].changePresetGeom(properties.type);
+                    }
+                    if(properties.fill && typeof selectedObjects[i].changeFill === "function")
+                    {
+                        selectedObjects[i].changeFill(properties.fill);
+                    }
+                    if(properties.stroke && typeof selectedObjects[i].changeLine === "function")
+                    {
+                        selectedObjects[i].changeLine(properties.stroke);
+                    }
+                    if(properties.paddings && typeof selectedObjects[i].setPaddings === "function")
+                    {
+                        selectedObjects[i].setPaddings(properties.paddings);
+                    }
+                }
+                if(typeof properties.verticalTextAlign === "number")
+                {
+
+                    if(this.State.id === STATES_ID_TEXT_ADD)
+                    {
+                        if(typeof this.State.textObject.setVerticalAlign === "function")
+                            this.State.textObject.setVerticalAlign(properties.verticalTextAlign);
+                    }
+
+                    if(this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                    {
+                        if(typeof this.State.setVerticalAlign === "function")
+                            this.State.textObject.setVerticalAlign(properties.verticalTextAlign);
+                    }
+                }
                 if(this.State.id !==STATES_ID_GROUP && this.State.id !==STATES_ID_TEXT_ADD_IN_GROUP && isRealNumber(properties.w) && isRealNumber(properties.h))
                 {
                     for(var i = 0; i < selectedObjects.length; ++i)
@@ -1661,9 +1732,74 @@ CGraphicObjects.prototype = {
         editor.WordControl.m_oLogicDocument.Recalculate();
     },
 
-    imageApply: function(props)
+    imageApply: function(properties)
     {
+        switch(this.State.id)
+        {
+            case STATES_ID_NULL:
+            case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
 
+                var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
+
+                if(isRealNumber(properties.Width) && isRealNumber(properties.Height))
+                {
+                    if(this.State.group)
+                    {
+                        this.State.group.normalize();
+                    }
+                    for(var i = 0; i < selectedObjects.length; ++i)
+                    {
+
+                        if(selectedObjects[i].isImage && selectedObjects[i].isImage() && selectedObjects[i].setXfrm)
+                        {
+                            selectedObjects[i].setXfrm(null, null, properties.Width, properties.Height, null, null, null);
+                        }
+                    }
+                    if(this.State.group)
+                    {
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                    }
+                }
+
+                var pos = properties.Position;
+                if( pos && isRealNumber(pos.X) && isRealNumber(pos.X))
+                {
+                    if(this.State.group)
+                    {
+                        this.State.group.normalize();
+                    }
+                    for(var i = 0; i < selectedObjects.length; ++i)
+                    {
+
+                        if(selectedObjects[i].isImage && selectedObjects[i].isImage() && selectedObjects[i].setXfrm)
+                        {
+                            selectedObjects[i].setXfrm( pos.X, pos.Y, null, null, null, null, null);
+                        }
+                    }
+                    if(this.State.group)
+                    {
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                    }
+                }
+                if(typeof properties.ImageUrl === "string")
+                {
+                    for(var i = 0; i < selectedObjects.length; ++i)
+                    {
+
+                        if(selectedObjects[i].isImage && selectedObjects[i].isImage() && selectedObjects[i].setBlipFill)
+                        {
+                            var b_f = selectedObjects[i].blipFill.createDuplicate();
+                            b_f.fill.RasterImageId = properties.ImageUrl
+                            selectedObjects[i].setBlipFill(b_f);
+                        }
+                    }
+                }
+                break;
+            }
+        }
     },
 
     chartApply: function(properties)
@@ -1677,6 +1813,10 @@ CGraphicObjects.prototype = {
             {
 
                 var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
+                if(this.State.group)
+                {
+                    this.State.group.normalize();
+                }
                 for(var i = 0; i < selectedObjects.length; ++i)
                 {
                     if(selectedObjects[i].isChart && selectedObjects[i].isChart())

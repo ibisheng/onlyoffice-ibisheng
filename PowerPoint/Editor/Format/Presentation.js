@@ -1575,7 +1575,7 @@ CPresentation.prototype =
 
     Set_ImageProps : function(Props)
     {
-        this.Slides[this.CurPage].graphicObjects.setImageProps(Props);
+        this.Slides[this.CurPage].graphicObjects.imageApply(Props);
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     },

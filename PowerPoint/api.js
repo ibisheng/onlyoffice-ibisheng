@@ -3029,7 +3029,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
 	}
 
 
-	if( undefined != obj.Position && null != obj.Paddings )
+	if( undefined != obj.Position )
 	{
 		ImagePr.Position =
 		{
