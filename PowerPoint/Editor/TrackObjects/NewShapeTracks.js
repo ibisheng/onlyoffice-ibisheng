@@ -16,10 +16,9 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.y = null;
     this.extX = null;
     this.extY = null;
-
+    this.arrowsCount = 0;
     this.transform = new CMatrix();
-    var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
-    geometry.Init(5, 5);
+
 
     var theme = drawingObjects.Layout.Master.Theme;
 
@@ -65,6 +64,22 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         pen.merge(ln);
         brush.merge(fill);
     }
+    if(presetGeom.indexOf("WithArrow") > -1)
+    {
+        presetGeom = presetGeom.substr(0, presetGeom.length - 9);
+        this.presetGeom = presetGeom;
+        this.arrowsCount = 1;
+
+    }
+    if(presetGeom.indexOf("WithTwoArrows") > -1)
+    {
+        presetGeom = presetGeom.substr(0, presetGeom.length - 13);
+        this.presetGeom = presetGeom;
+        this.arrowsCount = 2;
+    }
+
+    var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
+    geometry.Init(5, 5);
 
     pen.Fill.calculate(theme, drawingObjects, drawingObjects.Layout, drawingObjects.Layout.Master, RGBA);
     brush.calculate(theme, drawingObjects, drawingObjects.Layout, drawingObjects.Layout.Master, RGBA);
@@ -267,7 +282,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         var shape = new CShape(null, this.drawingObjects);
         shape.setParent(drawingObjects);
         if(this.presetGeom !== "textRect")
-            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
+            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom, this.arrowsCount);
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
         shape.select(this.drawingObjects.graphicObjects);

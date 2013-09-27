@@ -19,7 +19,7 @@ function PolyLine (drawingObjects)
         && isRealObject(this.style) && isRealObject(this.style.lnRef) && isRealNumber(this.style.lnRef.idx)
         && isRealObject(this.style.lnRef.Color) && typeof  this.style.lnRef.Color.Calculate === "function")
     {
-        _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
+        _calculated_line = theme.getLnStyle(this.style.lnRef.idx);
         this.style.lnRef.Color.Calculate(theme, slide, layout, masterSlide, RGBA);
         RGBA = this.style.lnRef.Color.RGBA;
     }
@@ -103,7 +103,8 @@ function PolyLine (drawingObjects)
         {
             var dx = this.arrPoint[0].x - this.arrPoint[this.arrPoint.length-1].x;
             var dy = this.arrPoint[0].y - this.arrPoint[this.arrPoint.length-1].y;
-            if(Math.sqrt(dx*dx +dy*dy) < this.drawingObjects.convertMetric(3, 0, 3))
+            var dd = editor.WordControl.m_oDrawingDocument;
+            if(Math.sqrt(dx*dx +dy*dy) < dd.GetMMPerDot(3))
             {
                 bClosed = true;
             }
@@ -134,12 +135,12 @@ function PolyLine (drawingObjects)
 
 
 
-        var shape = new CShape(null, this.drawingObjects);
+        var shape = new CShape(this.drawingObjects);
 
-        shape.setPosition(xMin, yMin);
+        shape.setOffset(xMin, yMin);
         shape.setExtents(xMax-xMin, yMax-yMin);
         shape.setStyle(CreateDefaultShapeStyle());
-        var geometry = new CGeometry();
+        var geometry = new Geometry();
 
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
         geometry.AddRect("l", "t", "r", "b");
@@ -152,11 +153,8 @@ function PolyLine (drawingObjects)
         {
             geometry.AddPathCommand(6);
         }
-        geometry.Init( xMax-xMin, yMax-yMin);
-        shape.spPr.geometry = geometry;
-        shape.recalculate();
-
-        this.drawingObjects.addGraphicObject(shape);
+        shape.setGeometry(geometry);
+        return shape;
     }
 }
 

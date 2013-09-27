@@ -223,11 +223,37 @@ CShape.prototype =
     },
 
 
-    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
+    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom, arrowsCount)
     {
         this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
         this.setPresetGeometry(presetGeom);
         this.setDefaultStyle();
+        if(arrowsCount === 1 || arrowsCount === 2)
+        {
+            switch (arrowsCount)
+            {
+                case 1:
+                {
+                    var ln = new CLn();
+                    ln.tailEnd = new EndArrow();
+                    ln.tailEnd.type = LineEndType.Arrow;
+                    ln.tailEnd.len = LineEndSize.Mid;
+                    break;
+                }
+                case 2:
+                {
+                    var ln = new CLn();
+                    ln.tailEnd = new EndArrow();
+                    ln.tailEnd.type = LineEndType.Arrow;
+                    ln.tailEnd.len = LineEndSize.Mid;
+                    ln.headEnd = new EndArrow();
+                    ln.headEnd.type = LineEndType.Arrow;
+                    ln.headEnd.len = LineEndSize.Mid;
+                    break;
+                }
+            }
+            this.setLine(ln);
+        }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -3389,6 +3415,19 @@ CShape.prototype =
         var new_line = this.spPr.ln.createDuplicate();
 
 
+        History.Add(this, {Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line});
+
+        this.recalcInfo.recalculateLine = true;
+        this.recalcInfo.recalculatePen = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
+
+    setLine: function(line)
+    {
+        var old_line = this.spPr.ln;
+        var new_line = line;
+        this.spPr.ln = line;
         History.Add(this, {Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line});
 
         this.recalcInfo.recalculateLine = true;

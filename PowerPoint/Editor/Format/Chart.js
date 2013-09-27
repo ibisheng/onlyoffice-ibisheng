@@ -59,6 +59,9 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
 CChartAsGroup.prototype =
 {
 
+    getAllFonts: function()
+    {},
+
     getSearchResults: function()
     {
         return null;
