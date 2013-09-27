@@ -1420,7 +1420,8 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.startActionOn = false;
 	this.aCollaborativeActions = new Array();
 	this.bCollaborativeChanges = false;
-	this.bUndoRedoChanges = false;
+	this.bUndoChanges = false;
+	this.bRedoChanges = false;
 	this.aCollaborativeChangeElements = new Array();
 };
 Workbook.prototype.initGlobalObjects=function(){
@@ -2186,30 +2187,21 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 		if(null != from)
 		{	
 			from = from.clone();
-			if(null == to)
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Unmerge, oThis.getId(), from, new UndoRedoData_BBox(from));
-			else
-			{
+			if(null != to)
 				to = to.clone();
-				//todo
-				//нужно добавлять в историю только когда обрезается с краев, потому что на undo будет произведена вставка и ячеек, а диапазон не расширится
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), from, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
-			}
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), from, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
 		}
 	});
 	this.hyperlinkManager = new RangeDataManager(true, function(data, from, to){
 		if(null != from)
 		{
 			from = from.clone();
-			if(null == to)
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveHyperlink, oThis.getId(), from, data);
-			else
+			if(null != to)
 			{
-				data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
 				to = to.clone();
-				//нужно добавлять в историю только когда обрезается с краев, потому что на undo будет произведена вставка и ячеек, а диапазон не расширится
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), from, data);
+				data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
 			}
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), from, new UndoRedoData_FromToHyperlink(from, to, data));
 		}
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
@@ -2704,7 +2696,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 			this._moveCellVer(nIndex, j - 0, count);
         delete this.aGCells[nIndex];
 	}
-    if(null != oPrevRow && false == this.workbook.bUndoRedoChanges)
+    if(null != oPrevRow && false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
     {
         for(var i = 0; i < count; ++i)
         {
@@ -2844,7 +2836,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	for(var i = 0; i < count; ++i)
     {
         var oNewCol = null;
-        if(null != oPrevCol && false == this.workbook.bUndoRedoChanges)
+        if(null != oPrevCol && false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
         {
            oNewCol = oPrevCol.clone();
 		   oNewCol.hd = null;
@@ -7302,8 +7294,11 @@ Range.prototype._shiftLeftRight=function(bLeft){
 		else
 			this.worksheet._insertColsBefore(oBBox.c1, nWidth);
 	}
-	mergeManager.shift(this.bbox, !bLeft, true, oShiftGet);
-	this.worksheet.hyperlinkManager.shift(this.bbox, !bLeft, true);
+	if(false == this.worksheet.workbook.bUndoChanges)
+	{
+		mergeManager.shift(this.bbox, !bLeft, true, oShiftGet);
+		this.worksheet.hyperlinkManager.shift(this.bbox, !bLeft, true);
+	}
 	History.EndTransaction();
 	return true;
 };
@@ -7350,8 +7345,11 @@ Range.prototype._shiftUpDown=function(bUp){
 		else
 			this.worksheet._insertRowsBefore(oBBox.r1, nHeight);
 	}
-	mergeManager.shift(this.bbox, !bUp, false, oShiftGet);
-	this.worksheet.hyperlinkManager.shift(this.bbox, !bUp, false);
+	if(false == this.worksheet.workbook.bUndoChanges)
+	{
+		mergeManager.shift(this.bbox, !bUp, false, oShiftGet);
+		this.worksheet.hyperlinkManager.shift(this.bbox, !bUp, false);
+	}
 	History.EndTransaction();
 	return true;
 };

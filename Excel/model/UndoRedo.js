@@ -295,7 +295,7 @@ var UndoRedoDataTypes = new function() {
 	this.CellData = 4;
 	this.FromTo = 5;
 	this.FromToRowCol = 6;
-	this.FromToCell = 7;
+	this.FromToHyperlink = 7;
 	this.IndexSimpleProp = 8;
 	this.ColProp = 9;
 	this.RowProp = 10;
@@ -369,7 +369,7 @@ var UndoRedoDataTypes = new function() {
 			case this.CellSimpleData: return new UndoRedoData_CellSimpleData();break;
 			case this.FromTo: return new UndoRedoData_FromTo();break;
 			case this.FromToRowCol: return new UndoRedoData_FromToRowCol();break;
-			case this.FromToCell: return new UndoRedoData_FromToCell();break;
+			case this.FromToHyperlink: return new UndoRedoData_FromToHyperlink();break;
 			case this.IndexSimpleProp: return new UndoRedoData_IndexSimpleProp();break;
 			case this.ColProp: return new UndoRedoData_ColProp();break;
 			case this.RowProp: return new UndoRedoData_RowProp();break;
@@ -643,19 +643,20 @@ UndoRedoData_FromTo.prototype = {
 	}
 };
 
-function UndoRedoData_FromToCell(oBBoxFrom, oBBoxTo, arr){
+function UndoRedoData_FromToHyperlink(oBBoxFrom, oBBoxTo, hyperlink){
 	this.Properties = {
 		from: 0,
-		to: 1
+		to: 1,
+		hyperlink: 2
 	};
 	this.from = new UndoRedoData_BBox(oBBoxFrom);
 	this.to = new UndoRedoData_BBox(oBBoxTo);
-	this.arr = arr;
+	this.hyperlink = hyperlink;
 }
-UndoRedoData_FromToCell.prototype = {
+UndoRedoData_FromToHyperlink.prototype = {
 	getType : function()
 	{
-		return UndoRedoDataTypes.FromToCell;
+		return UndoRedoDataTypes.FromToHyperlink;
 	},
 	getProperties : function()
 	{
@@ -667,6 +668,7 @@ UndoRedoData_FromToCell.prototype = {
 		{
 			case this.Properties.from: return this.from;break;
 			case this.Properties.to: return this.to;break;
+			case this.Properties.hyperlink: return this.hyperlink;break;
 		}
 	},
 	setProperty : function(nType, value)
@@ -675,6 +677,7 @@ UndoRedoData_FromToCell.prototype = {
 		{
 			case this.Properties.from: this.from = value;break;
 			case this.Properties.to: this.to = value;break;
+			case this.Properties.hyperlink: this.hyperlink = value;break;
 		}
 	},
 	applyCollaborative : function(nSheetId, collaborativeEditing)
@@ -3288,6 +3291,33 @@ UndoRedoWoorksheet.prototype = {
 				ws._getCell(Data.nRow, Data.nCol);
 		} else if (historyitem_Worksheet_SetViewSettings === Type) {
 			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
+		}
+		else if(historyitem_Worksheet_ChangeMerge === Type){
+			if(bUndo)
+			{
+				var data = 1;
+				if(null != Data.to)
+				{
+					//todo сделать через get/remove
+					var elem = new RangeDataManagerElem(Data.to, data);
+					ws.mergeManager.remove(elem.bbox, elem, false);
+				}
+				ws.mergeManager.add(Data.from, data);
+			}
+		}
+		else if(historyitem_Worksheet_ChangeHyperlink === Type){
+			if(bUndo)
+			{
+				var data = Data.hyperlink;
+				if(null != Data.to)
+				{
+					//todo сделать через get/remove
+					var elem = new RangeDataManagerElem(Data.to, data);
+					ws.hyperlinkManager.remove(elem.bbox, elem, false);
+				}
+				data.Ref = ws.getRange3(Data.from.r1, Data.from.c1, Data.from.r2, Data.from.c2);
+				ws.hyperlinkManager.add(Data.from, data);
+			}
 		}
 	}
 };

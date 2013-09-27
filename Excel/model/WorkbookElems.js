@@ -3665,6 +3665,7 @@ RangeDataManager.prototype = {
 		this.nStopRecalculate++;
 		if(null == oGetRes)
 			oGetRes = this.shiftGet(bbox, bHor);
+		var aToChange = [];
 		var elems = oGetRes.elems;
 		//сдвигаем inner
 		if(elems.inner.length > 0)
@@ -3678,11 +3679,6 @@ RangeDataManager.prototype = {
 			{
 				offset.offsetRow = -offset.offsetRow;
 				offset.offsetCol = -offset.offsetCol;
-			}
-			for(var i = 0, length = elems.inner.length; i < length; i++)
-			{
-				var elem = elems.inner[i];
-				this.remove(elem.bbox, elem, false);
 			}
 			for(var i = 0, length = elems.inner.length; i < length; i++)
 			{
@@ -3713,10 +3709,7 @@ RangeDataManager.prototype = {
 						to.setOffset(offset);
 					}
 				}
-				if(null != to)
-					this.add(to, elem.data);
-				if(null != this.fChange)
-					this.fChange.call(this, elem.data, from, to);
+				aToChange.push({elem: elem, to: to});
 			}
 		}
 		//меняем outer
@@ -3764,14 +3757,26 @@ RangeDataManager.prototype = {
 					}
 				}
 				if(null != to)
-				{
-					if(null != this.fChange)
-						this.fChange.call(this, elem.data, from, to);
-					elem.bbox = to;
-					delete this.oElements[this._getBBoxIndex(from)];
-					this.oElements[this._getBBoxIndex(to)] = elem;
-				}
+					aToChange.push({elem: elem, to: to});
 			}
+		}
+		//сначала удаляем все чтобы не было конфликтов
+		for(var i = 0, length = aToChange.length; i < length; ++i)
+		{
+			var item = aToChange[i];
+			var elem = item.elem;
+			var from = elem.bbox;
+			var to = item.to;
+			if(null != this.fChange)
+				this.fChange.call(this, elem.data, from, to);
+			this.remove(elem.bbox, elem, false);
+		}
+		//добавляем измененные ячейки
+		for(var i = 0, length = aToChange.length; i < length; ++i)
+		{
+			var item = aToChange[i];
+			if(null != item.to)
+				this.add(item.to, item.elem.data);
 		}
 		this.nStopRecalculate--;
 		this._recalculate();

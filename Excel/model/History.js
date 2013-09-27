@@ -359,7 +359,7 @@ CHistory.prototype =
 		lockDraw(this.workbook);
 		
 		this.workbook.handlers.trigger("lockDraw");
-		this.workbook.bUndoRedoChanges = true;
+		this.workbook.bUndoChanges = true;
 
 		var isReInit = false;
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
@@ -391,7 +391,7 @@ CHistory.prototype =
 		
 		this._sendCanUndoRedo();
 
-		this.workbook.bUndoRedoChanges = false;
+		this.workbook.bUndoChanges = false;
 		if (isReInit)
 			this.workbook.handlers.trigger("reInit");
 		this.workbook.handlers.trigger("drawWS");
@@ -411,7 +411,7 @@ CHistory.prototype =
         lockDraw(this.workbook);
 		
 		this.workbook.handlers.trigger("lockDraw");
-		this.workbook.bUndoRedoChanges = true;
+		this.workbook.bRedoChanges = true;
 	},
 	RedoAdd : function(oRedoObjectParam, Class, Type, sheetid, range, Data, LocalChange)
 	{
@@ -469,7 +469,7 @@ CHistory.prototype =
 		
 		this._sendCanUndoRedo();
 
-		this.workbook.bUndoRedoChanges = false;
+		this.workbook.bRedoChanges = false;
 		if (oRedoObjectParam.bIsReInit)
 			this.workbook.handlers.trigger("reInit");
 		this.workbook.handlers.trigger("drawWS");
