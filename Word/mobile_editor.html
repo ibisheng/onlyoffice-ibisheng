@@ -216,6 +216,7 @@
 			
 			var isViewMode = "true" == getURLParameter("isViewMode");
 			editor.SetViewMode(isViewMode);
+			editor.SetReaderModeOnly();
             editor.zoomFitToWidth();
 			
 			editor.LoadDocument(c_DocInfo);

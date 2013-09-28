@@ -543,6 +543,9 @@ function asc_docs_api(name)
 	
 	// Chart
 	this.chartTranslate = new asc_CChartTranslate();
+
+    // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
+    this.isOnlyReaderMode = false;
 	
     /**************************************/
 
@@ -923,6 +926,11 @@ asc_docs_api.prototype.ChangeReaderMode = function()
 {
     return this.WordControl.ChangeReaderMode();
 }
+asc_docs_api.prototype.SetReaderModeOnly = function()
+{
+    this.isOnlyReaderMode = true;
+    this.ImageLoader.bIsAsyncLoadDocumentImages = false;
+}
 
 asc_docs_api.prototype.IncreaseReaderFontSize = function()
 {
@@ -1024,7 +1032,10 @@ asc_docs_api.prototype.GetCopyPasteDivId = function()
 asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 {
     this.DocumentReaderMode = new CDocumentReaderMode();
+    var _old = copyPasteUseBinery;
+    copyPasteUseBinery = false;
     Editor_Copy(this);
+    copyPasteUseBinery = _old;
     this.DocumentReaderMode = null;
     return document.getElementById("SelectId").innerHTML;
 }
@@ -6057,8 +6068,15 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 Document.DrawingObjects.calculateAfterOpen();
                 Document.DrawingObjects.calculateAfterChangeTheme();
 
-                Document.Recalculate();
-                this.WordControl.m_oDrawingDocument.TargetStart();
+                if (!this.isOnlyReaderMode)
+                {
+                    Document.Recalculate();
+                    this.WordControl.m_oDrawingDocument.TargetStart();
+                }
+                else
+                {
+                    this.ChangeReaderMode();
+                }
             }
         }
     }

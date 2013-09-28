@@ -1948,7 +1948,7 @@ function CEditorPage(api)
 
         this.ReaderModeDivWrapper.id = "wrapper_reader_id";
         this.ReaderModeDivWrapper.innerHTML = "<div id=\"reader_id\" style=\"width:100%;display:block;z-index:9;font-family:arial;font-size:" +
-            this.ReaderFontSizes[this.ReaderFontSizeCur] + "pt;position:absolute;resize:none;padding-left:5%;padding-right:5%;padding-top:10%;padding-bottom:10%;background-color:#FFFFFF;\">" +
+            this.ReaderFontSizes[this.ReaderFontSizeCur] + "pt;position:absolute;resize:none;-webkit-box-sizing:border-box;box-sizing:border-box;padding-left:5%;padding-right:5%;padding-top:10%;padding-bottom:10%;background-color:#FFFFFF;\">" +
             this.m_oApi.ContentToHTML(true) + "</div>";
 
         this.m_oMainView.HtmlElement.appendChild(this.ReaderModeDivWrapper);
@@ -3258,7 +3258,9 @@ function CEditorPage(api)
     {
         this.CalculateDocumentSize();
         //setInterval(this.onTimerScroll, this.m_nTimerScrollInterval);
-        this.StartMainTimer();
+
+        if (!this.m_oApi.isOnlyReaderMode)
+            this.StartMainTimer();
 
         this.m_oHorRuler.CreateBackground(this.m_oDrawingDocument.m_arrPages[0]);
         this.m_oVerRuler.CreateBackground(this.m_oDrawingDocument.m_arrPages[0]);
@@ -3364,7 +3366,7 @@ function CEditorPage(api)
     {
         var oWordControl = oThis;
 
-        if (!oWordControl.m_oApi.bInit_word_control)
+        if (!oWordControl.m_oApi.bInit_word_control || oWordControl.m_oApi.isOnlyReaderMode)
             return;
 
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
