@@ -287,7 +287,7 @@ CColorModifiers.prototype =
         var count = Reader.GetLong();
         for(var i = 0; i < count; ++i)
         {
-            var cur_mod = {};
+            var cur_mod = new CColorMod();
             cur_mod.name = Reader.GetString2();
             cur_mod.val = Reader.GetLong();
             this.Mods.push(cur_mod);

@@ -683,14 +683,8 @@ CPresentation.prototype =
     Get_PageContentStartPos : function (PageIndex)
     {
         var Y = Y_Top_Field;
-        var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
-        if ( YHeader >= 0 && YHeader > Y )
-            Y = YHeader;
 
         var YLimit = Y_Bottom_Field;
-        var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
-        if ( YFooter >= 0 &&  YFooter < YLimit )
-            YLimit = YFooter;
 
         return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
     },
@@ -4709,7 +4703,7 @@ CPresentation.prototype =
             if(_elements.State.id === STATES_ID_NULL)
             {
                 var _selected_count = 0;
-                var _shapes = _elements.cSld.spTree;
+                var _shapes = this.Slides[this.CurPage].cSld.spTree;
                 var _shapes_count = _shapes.length;
                 var _shape_index;
                 var _check_split_table = null;

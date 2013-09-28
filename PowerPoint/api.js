@@ -445,8 +445,8 @@ asc_docs_api.prototype._coAuthoringInit = function () {
 		// TODO: эвент о пришедших изменениях с сервера (но еще не сохраненных)
 
 		// т.е. если bSendEvent не задан, то посылаем  сообщение
-		if (true === bAddChanges && false !== bSendEvent)
-			t.syncCollaborativeChanges();
+		/*if (true === bAddChanges && false !== bSendEvent)
+			t.syncCollaborativeChanges();*/
     };
     this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
         t.CoAuthoringApi.onSaveChanges(e,false);
@@ -775,7 +775,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
     else
     {
-        documentUrl =  "document/";
+        documentUrl =  "document2/";
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id

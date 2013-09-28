@@ -1628,7 +1628,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
             this.textObject.addTextFlag = false;
             if(this.textObject instanceof CGraphicFrame)
             {
-                this.textObject.graphicObject.Selection_Remove();
+               // this.textObject.graphicObject.Selection_Remove();
             }
             this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
 
@@ -1642,6 +1642,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
             this.textObject.selectionSetEnd(e, x, y);
             this.drawingObjectsController.updateSelectionState();
             this.drawingObjectsController.slide.OnUpdateOverlay();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
     };
 

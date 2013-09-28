@@ -1912,7 +1912,7 @@ CGraphicObjects.prototype = {
             grouped_objects[i].setOffset(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);
             grouped_objects[i].setGroup(group);
         }
-       // group.setNvSpPr(new UniNvPr());
+        //group.setNvSpPr(new UniNvPr());
         group.recalcAll();
         group.select(this);
         this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, group);
