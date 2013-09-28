@@ -775,7 +775,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
     else
     {
-        documentUrl =  "document2/";
+        documentUrl =  "document/";
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
