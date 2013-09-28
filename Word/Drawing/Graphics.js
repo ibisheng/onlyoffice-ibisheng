@@ -1862,7 +1862,7 @@ CGraphics.prototype =
 
     DrawLockObjectRect : function(lock_type, x, y, w, h)
     {
-        if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode)
+        if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode || this.IsThumbnail)
             return;
 
         if (lock_type == locktype_Mine)

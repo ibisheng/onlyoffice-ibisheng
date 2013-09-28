@@ -2062,6 +2062,10 @@ CSlideBoundsChecker.prototype =
         this.Bounds.CheckPoint(_x3, _y3);
         this.Bounds.CheckPoint(_x4, _y4);
     },
+    drawHorLine2 : function(align, y, x, r, penW)
+    {
+        return this.drawHorLine(align, y, x, r, penW);
+    },
     drawVerLine : function(align, x, y, b, penW)
     {
         var _x1 = this.m_oFullTransform.TransformPointX(x-penW,y);
