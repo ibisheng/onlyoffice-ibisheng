@@ -1560,7 +1560,7 @@ CGraphicObjects.prototype = {
         {
             return this.State.textObject.Hyperlink_Check(bCheck);
         }
-        return  false;
+        return  bCheck === false ? null : false;
     },
 
 
