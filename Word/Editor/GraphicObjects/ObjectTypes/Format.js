@@ -1468,6 +1468,17 @@ CGradFill.prototype =
         {
             this.colors[i].Write_ToBinary2(Writer);
         }
+        Writer.WriteBool(isRealObject(this.lin));
+        if(isRealObject(this.lin))
+        {
+            this.lin.Write_ToBinary2(Writer);
+        }
+
+        Writer.WriteBool(isRealObject(this.path));
+        if(isRealObject(this.path))
+        {
+            this.path.Write_ToBinary2(Writer);
+        }
     },
 
     Read_FromBinary2 : function(Reader)
@@ -1477,6 +1488,18 @@ CGradFill.prototype =
         {
             this.colors[i] = new CGs();
             this.colors[i].Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.lin = new GradLin();
+            this.lin.Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.path = new GradPath();
+            this.path.Read_FromBinary2(Reader);
         }
     },
 

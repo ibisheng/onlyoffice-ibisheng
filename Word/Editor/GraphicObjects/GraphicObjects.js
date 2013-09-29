@@ -52,7 +52,7 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
 
 CGraphicObjects.prototype =
 {
-    calculateAfterOpen: function()
+    calculateAfterOpen: function(bAddHistory)
     {
         if(this.arrForCalculateAfterOpen)
         {
@@ -79,6 +79,13 @@ CGraphicObjects.prototype =
                         {
                             rel_points[j].x *= kw;
                             rel_points[j].y *= kh;
+                        }
+                    }
+                    if(bAddHistory)
+                    {
+                        if(obj instanceof WordShape || obj instanceof WordImage)
+                        {
+                            History.Add(obj, {Type: historyitem_CalculateAfterCopyInGroup});
                         }
                     }
                 }

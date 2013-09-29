@@ -57,6 +57,11 @@ CChartAsGroup.prototype =
 		return this.chart;
 	},
 
+    hitToTextRect: function()
+    {
+        return false;
+    },
+
     calculateAfterChangeTheme: function()
     {
         this.recalculate();

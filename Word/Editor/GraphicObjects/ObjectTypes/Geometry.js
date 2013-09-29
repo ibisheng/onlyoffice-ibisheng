@@ -806,35 +806,7 @@ CGeometry.prototype=
             this.ahXYLstInfo.push(o);
         }
 
-        for(index = 0; index < ah_xy_count; ++index)
-        {
-            o = {};
-            if(r.GetBool())
-                o.gdRefX = r.GetString2();
 
-            if(r.GetBool())
-                o.gdRefY = r.GetString2();
-
-            if(r.GetBool())
-                o.minX = r.GetLong();
-
-
-            if(r.GetBool())
-                o.maxX = r.GetLong();
-
-            if(r.GetBool())
-                o.minY = r.GetLong();
-
-            if(r.GetBool())
-                o.maxY = r.GetLong();
-
-            if(r.GetBool())
-                o.posX = r.GetLong();
-
-            if(r.GetBool())
-                o.posY = r.GetLong();
-            this.ahXYLst.push(o);
-        }
 
         var ah_polar_count = Reader.GetLong();
         for(index = 0; index < ah_polar_count; ++index)
@@ -865,36 +837,6 @@ CGeometry.prototype=
             if(r.GetBool())
                 o.posY = r.GetString2();
             this.ahPolarLstInfo.push(o);
-        }
-
-        for(index = 0; index < ah_polar_count; ++index)
-        {
-            o = {};
-            if(r.GetBool())
-                o.gdRefR = r.GetString2();
-
-            if(r.GetBool())
-                o.gdRefAng = r.GetString2();
-
-            if(r.GetBool())
-                o.minR = r.GetLong();
-
-
-            if(r.GetBool())
-                o.maxR = r.GetLong();
-
-            if(r.GetBool())
-                o.minAng = r.GetLong();
-
-            if(r.GetBool())
-                o.maxAng = r.GetLong();
-
-            if(r.GetBool())
-                o.posX = r.GetLong();
-
-            if(r.GetBool())
-                o.posY = r.GetLong();
-            this.ahPolarLst.push(o);
         }
 
         var path_count = Reader.GetLong();

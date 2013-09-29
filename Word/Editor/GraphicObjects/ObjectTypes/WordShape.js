@@ -5621,6 +5621,7 @@ WordShape.prototype =
             if(content.Content.length > 0 && docUrl === documentUrl && userId === editor.User.id)
                 this.setTextBoxContent(content.Copy(this));
         }
+        History.Add(this, {Type:historyitem_CalculateAfterCopyInGroup});
     },
 
     setSpPr: function(spPr)
