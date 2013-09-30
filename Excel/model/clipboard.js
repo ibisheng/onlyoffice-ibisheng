@@ -2603,9 +2603,9 @@
 						var positionY = null;
 						
 						if(ws.cols && firstRange && firstRange.c1 != undefined && ws.cols[firstRange.c1].left != undefined)
-							positionX = ws.cols[firstRange.c1].left;
+							positionX = ws.cols[firstRange.c1].left - ws.getCellLeft(0, 1);
 						if(ws.rows && firstRange && firstRange.r1 != undefined && ws.rows[firstRange.r1].top != undefined)
-							positionY = ws.rows[firstRange.r1].top
+							positionY = ws.rows[firstRange.r1].top - ws.getCellTop(0, 1);
 						
 						var Drawing;
 						switch(first_string)

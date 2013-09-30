@@ -212,10 +212,11 @@
 					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
 					"updateSelectionName":		function () {self._onUpdateSelectionName.apply(self, arguments);},
 					
-					// Shapes
+					// Shapes					
 					"graphicObjectMouseDown":				function () {self._onGraphicObjectMouseDown.apply(self, arguments);},
 					"graphicObjectMouseMove":				function () {self._onGraphicObjectMouseMove.apply(self, arguments);},
 					"graphicObjectMouseUp":					function () {self._onGraphicObjectMouseUp.apply(self, arguments);},
+					"graphicObjectMouseUpEx":				function () {self._onGraphicObjectMouseUpEx.apply(self, arguments);},
 					"graphicObjectWindowKeyDown":			function () {return self._onGraphicObjectWindowKeyDown.apply(self, arguments);},
 					"graphicObjectWindowKeyPress":			function () {return self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
 					"getGraphicsInfo":						function () {return self._onGetGraphicsInfo.apply(self, arguments);},
@@ -258,6 +259,9 @@
 				});
 				this.model.handlers.add("drawWS", function () {
 					self.drawWS.apply(self, arguments);
+				});
+				this.model.handlers.add("showDrawingObjects", function () {
+					self.onShowDrawingObjects.apply(self, arguments);
 				});
 				this.model.handlers.add("lockDraw", function () {
 					self.lockDraw.apply(self, arguments);
@@ -709,6 +713,11 @@
 			_onGraphicObjectMouseUp: function (e, x, y) {
 				var ws = this.getWorksheet();
 				ws.objectRender.graphicObjectMouseUp(e, x, y);
+			},
+			
+			_onGraphicObjectMouseUpEx: function (e, x, y) {
+				//var ws = this.getWorksheet();
+				//ws.objectRender.coordsManager.calculateCell(x, y);
 			},
 			
 			_onGraphicObjectWindowKeyDown: function (e) {
@@ -1494,6 +1503,10 @@
 			drawWS: function(){
 				this._lockDraw = false;
 				this.getWorksheet().draw(this._lockDraw);
+			},
+			onShowDrawingObjects: function (clearCanvas) {
+				var ws = this.getWorksheet();
+				ws.objectRender.showDrawingObjects(clearCanvas);
 			},
 			
 			lockDraw: function(){

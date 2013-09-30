@@ -362,6 +362,7 @@ CHistory.prototype =
 		this.workbook.bUndoChanges = true;
 
 		var isReInit = false;
+		var isRedrawAll = true;
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
@@ -372,6 +373,8 @@ CHistory.prototype =
             Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				isReInit = true;
+			if (g_oUndoRedoGraphicObjects === Item.Class)
+				isRedrawAll = false;
         }
 		var oSelectRange = null;
 		if(null != Point.SelectRange)
@@ -394,7 +397,10 @@ CHistory.prototype =
 		this.workbook.bUndoChanges = false;
 		if (isReInit)
 			this.workbook.handlers.trigger("reInit");
-		this.workbook.handlers.trigger("drawWS");
+		if (isRedrawAll)
+			this.workbook.handlers.trigger("drawWS");
+		else
+			this.workbook.handlers.trigger("showDrawingObjects", true);
 		
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 		buildRecalc(this.workbook);

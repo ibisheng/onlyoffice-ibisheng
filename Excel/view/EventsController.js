@@ -1241,6 +1241,7 @@
 			
 				// Shapes
 				var coord = this._getCoordinates(event);
+				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
 				if ( this.isGraphicObjectMode ) {
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
