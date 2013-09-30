@@ -72,7 +72,7 @@ CCircumflex.prototype.fixSize = function(mesure, bIncl)
     this.size = {width: width, height: height};
 
 }
-CCircumflex.prototype.draw = function()
+CCircumflex.prototype.draw = function(pGraphics)
 {
     var x = this.pos.x,
         y = this.pos.y;
@@ -148,29 +148,29 @@ CCircumflex.prototype.draw = function()
         YY[i] = y + (a + b*YY[i])*alpha;
     }
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(penW*1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._l(XX[2], YY[2]);
-    MathControl.pGraph._l(XX[3], YY[3]);
-    MathControl.pGraph._l(XX[4], YY[4]);
-    MathControl.pGraph._l(XX[5], YY[5]);
-    MathControl.pGraph._l(XX[6], YY[6]);
-    MathControl.pGraph._l(XX[7], YY[7]);
-    MathControl.pGraph._l(XX[8], YY[8]);
-    MathControl.pGraph._l(XX[9], YY[9]);
-    MathControl.pGraph._l(XX[10], YY[10]);
-    MathControl.pGraph._l(XX[11], YY[11]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[1], YY[1]);
+    pGraphics._l(XX[2], YY[2]);
+    pGraphics._l(XX[3], YY[3]);
+    pGraphics._l(XX[4], YY[4]);
+    pGraphics._l(XX[5], YY[5]);
+    pGraphics._l(XX[6], YY[6]);
+    pGraphics._l(XX[7], YY[7]);
+    pGraphics._l(XX[8], YY[8]);
+    pGraphics._l(XX[9], YY[9]);
+    pGraphics._l(XX[10], YY[10]);
+    pGraphics._l(XX[11], YY[11]);
 
-    MathControl.pGraph.df();
+    pGraphics.df();
 
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.SetIntegerGrid(intGrid);
 
 }
 CCircumflex.prototype.setTxtPrp = function(txtPrp)
@@ -198,7 +198,7 @@ CLine.prototype.fixSize = function(measure)
 
     this.size = {width: width, height: height}
 }
-CLine.prototype.draw = function()
+CLine.prototype.draw = function(pGraphics)
 {
     var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
@@ -215,12 +215,12 @@ CLine.prototype.draw = function()
         x2 = x1 + this.size.width,
         y2 = y1;
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x1, y1);
-    MathControl.pGraph._l(x2, y2);
-    MathControl.pGraph.ds();
+    pGraphics.p_width(penW*1000);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics._s();
+    pGraphics._m(x1, y1);
+    pGraphics._l(x2, y2);
+    pGraphics.ds();
 
 }
 CLine.prototype.setPosition = function(pos)
@@ -255,7 +255,7 @@ CDoubleLine.prototype.setTxtPrp = function(txtPrp)
 {
     this.txtPrp = txtPrp;
 }
-CDoubleLine.prototype.draw = function()
+CDoubleLine.prototype.draw = function(pGraphics)
 {
     var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
@@ -272,14 +272,14 @@ CDoubleLine.prototype.draw = function()
         x4 = x2,
         y4 = y3;
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x1, y1);
-    MathControl.pGraph._l(x2, y2);
-    MathControl.pGraph._m(x3, y3);
-    MathControl.pGraph._l(x4, y4);
-    MathControl.pGraph.ds();
+    pGraphics.p_width(penW*1000);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics._s();
+    pGraphics._m(x1, y1);
+    pGraphics._l(x2, y2);
+    pGraphics._m(x3, y3);
+    pGraphics._l(x4, y4);
+    pGraphics.ds();
 
 }
 
@@ -295,7 +295,7 @@ CTilde.prototype.fixSize = function()
 
     this.size = {width: width, height: height};
 }
-CTilde.prototype.draw = function()
+CTilde.prototype.draw = function(pGraphics)
 {
     var X = new Array(),
         Y = new Array();
@@ -352,32 +352,32 @@ CTilde.prototype.draw = function()
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     penW *= 96/25.4;
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(penW*1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
-    MathControl.pGraph._l(XX[13], YY[13]);
-    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
-    MathControl.pGraph._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
-    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
-    MathControl.pGraph._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21] );
-    MathControl.pGraph._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
-    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
-    MathControl.pGraph._l(XX[26], YY[26]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    pGraphics._l(XX[13], YY[13]);
+    pGraphics._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
+    pGraphics._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
+    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
+    pGraphics._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21] );
+    pGraphics._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
+    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
+    pGraphics._l(XX[26], YY[26]);
 
-    MathControl.pGraph.df();
+    pGraphics.df();
 
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.SetIntegerGrid(intGrid);
 }
 CTilde.prototype.setPosition = function(pos)
 {
@@ -409,7 +409,7 @@ CBreve.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CBreve.prototype.draw = function()
+CBreve.prototype.draw = function(pGraphics)
 {
     var X = new Array(),
         Y = new Array();
@@ -474,30 +474,30 @@ CBreve.prototype.draw = function()
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     penW *= 96/25.4;
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(penW*1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
-    MathControl.pGraph._l(XX[9], YY[9]);
-    MathControl.pGraph._c(XX[9], YY[9], XX[10], YY[10], XX[11], YY[11] );
-    MathControl.pGraph._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13] );
-    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
-    MathControl.pGraph._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
-    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
-    MathControl.pGraph._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21] );
-    MathControl.pGraph._l(XX[22], YY[22]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    pGraphics._l(XX[9], YY[9]);
+    pGraphics._c(XX[9], YY[9], XX[10], YY[10], XX[11], YY[11] );
+    pGraphics._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13] );
+    pGraphics._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
+    pGraphics._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
+    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
+    pGraphics._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21] );
+    pGraphics._l(XX[22], YY[22]);
 
-    MathControl.pGraph.df();
+    pGraphics.df();
 
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.SetIntegerGrid(intGrid);
 
 }
 CBreve.prototype.setTxtPrp = function(txtPrp)
@@ -585,9 +585,9 @@ CSign.prototype.fixSize = function(bIncline)
 
     this.size = {width: width, height: height};
 }
-CSign.prototype.draw = function()
+CSign.prototype.draw = function(pGraphics)
 {
-    this.sign.draw();
+    this.sign.draw(pGraphics);
 }
 CSign.prototype.setTxtPrp = function(txtPrp)
 {

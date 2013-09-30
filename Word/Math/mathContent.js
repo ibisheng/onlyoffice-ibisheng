@@ -5777,11 +5777,11 @@ CMathContent.prototype =
 
         this.recalculateSize();
     },
-    draw: function()
+    draw: function(pGraphics)
     {
         if( !(this.plhHide && this.IsTarget()) )
             for(var i=1; i < this.content.length;i++)
-                this.content[i].value.draw();
+                this.content[i].value.draw(pGraphics);
     },
     update_widthContent: function()
     {
@@ -6626,24 +6626,24 @@ CMathComposition.prototype =
         this.TxtPrp.Italic = true;
         this.TxtPrp.Bold = false;
     },
-    Draw: function(context)
+    Draw: function(pGraphics)
     {
         if(this.Root.content.length > 1)
         {
             var w_Box = this.Root.size.width;
             var h_Box = this.Root.size.height;
 
-            context.p_color(224, 238, 224, 255); // "p_color" for stroke
+            pGraphics.p_color(224, 238, 224, 255); // "p_color" for stroke
             // "b_color1" for fill
             //context.b_color1(224, 238, 230, 255);
 
-            context.drawHorLine(0, this.pos.y, this.pos.x, this.pos.x + w_Box, 0.2);
-            context.drawHorLine(0, this.pos.y + h_Box, this.pos.x, this.pos.x + w_Box, 0.2);
-            context.drawVerLine(0,this.pos.x, this.pos.y, this.pos.y + h_Box, 0.2 );
-            context.drawVerLine(0,this.pos.x + w_Box, this.pos.y, this.pos.y + h_Box, 0.2 );
+            pGraphics.drawHorLine(0, this.pos.y, this.pos.x, this.pos.x + w_Box, 0.2);
+            pGraphics.drawHorLine(0, this.pos.y + h_Box, this.pos.x, this.pos.x + w_Box, 0.2);
+            pGraphics.drawVerLine(0,this.pos.x, this.pos.y, this.pos.y + h_Box, 0.2 );
+            pGraphics.drawVerLine(0,this.pos.x + w_Box, this.pos.y, this.pos.y + h_Box, 0.2 );
         }
 
-        this.Root.draw();
+        this.Root.draw(pGraphics);
     },
     Draw_2: function()
     {
@@ -6830,7 +6830,7 @@ CMathComposition.prototype =
 
         this.ShowCursor();
     },
-    CreateEquation: function(indef)
+    CreateEquation2: function(indef)
     {
         if(TEST)
         {
@@ -7071,6 +7071,18 @@ CMathComposition.prototype =
 
     //test
     // из MathControl
+    IsRect: function(x, y)
+    {
+        var size = this.Root.size;
+        return ( x > 0 && x < size.width && y > 0 && y < size.height);
+    },
+    GetCoordComp: function(x, y)
+    {
+        var _x = x - this.pos.x;
+        var _y = y - this.pos.y;
+
+        return {x: _x, y: _y};
+    },
     OnKeyDown: function(e)
     {
         //стрелка вверх
@@ -7159,7 +7171,7 @@ CMathComposition.prototype =
         if(code>=0x0020 )
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
-            this..AddLetter(code);
+            this.AddLetter(code);
 
             return true;
         }
@@ -7180,6 +7192,17 @@ CMathComposition.prototype =
         if( this.IsRect(coord.x, coord.y) )
             this.MouseMove(coord.x, coord.y);
     },
+    OnMouseUp: function()
+    {
+        this.MouseUp();
+    },
+    CreateEquation: function(indef)
+    {
+        this.CreateEquation2(indef);
+        this.RecalculateReverse();
+        this.UpdatePosition();
+    }
+
 }
 
 function CEmpty()

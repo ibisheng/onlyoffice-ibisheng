@@ -1327,7 +1327,8 @@ CDocument.prototype =
         {
             this.Document_UpdateRulersState();
             //**
-            MathControl.UpdateCursor();
+            //MathControl.UpdateCursor();
+            MathComposition.UpdateCursor();
             //this.RecalculateCurPos();
             //**
             //this.RecalculateCurPos();
@@ -1458,7 +1459,9 @@ CDocument.prototype =
             nPageIndex = this.CurPage;
 
         if(nPageIndex === 0)
-            MathControl.Draw(pGraphics);
+            MathComposition.Draw(pGraphics);
+            //MathControl.Draw(pGraphics);
+
 
         //DrawUnion();
         //SetHeigthBracket(pGraphics);
@@ -6756,7 +6759,8 @@ CDocument.prototype =
     //**
     Selection_Draw_Page: function()
     {
-        MathControl.DrawSelect2();
+        //MathControl.DrawSelect2();
+        MathComposition.DrawSelect2();
     },
     //**
 
@@ -8556,31 +8560,35 @@ CDocument.prototype =
     //**
     OnKeyDown : function(e)
     {
-        var flag = MathControl.OnKeyDown(e);
-        this.Document_UpdateInterfaceState();
+        //var flag = MathControl.OnKeyDown(e);
+        var flag = MathComposition.OnKeyDown(e);
+        this.Document_UpdateInterfaceState(); // для Undo/Redo
         return flag;
 
     },
     OnKeyPress : function(e)
     {
-        var flag = MathControl.OnKeyPress(e);
-        this.Document_UpdateInterfaceState();
+        //var flag = MathControl.OnKeyPress(e);
+        var flag = MathComposition.OnKeyPress(e);
+        this.Document_UpdateInterfaceState(); // для Undo/Redo
         return flag;
     },
     OnMouseDown : function(e, X, Y, PageIndex)
     {
-        MathControl.OnMouseDown(X, Y);
-
+        //MathControl.OnMouseDown(X, Y);
+        MathComposition.OnMouseDown(X, Y);
 
     },
     OnMouseUp : function(e, X, Y, PageIndex)
     {
-        MathControl.OnMouseUp();
+        //MathControl.OnMouseUp();
+        MathComposition.OnMouseUp();
     },
     OnMouseMove : function(e, X, Y, PageIndex)
     {
 
-        MathControl.OnMouseMove(X, Y);
+        //MathControl.OnMouseMove(X, Y);
+        MathComposition.OnMouseMove(X, Y);
     },
     //**
 
@@ -10063,11 +10071,13 @@ CDocument.prototype =
     //**
     Get_SelectionState : function()
     {
-        return MathControl.Get_SelectionState();
+        //return MathControl.Get_SelectionState();
+        return MathComposition.Get_SelectionState();
     },
     Set_SelectionState : function(State)
     {
-        MathControl.Set_SelectionState(State);
+        //MathControl.Set_SelectionState(State);
+        MathComposition.Set_SelectionState(State);
     },
     //**
 

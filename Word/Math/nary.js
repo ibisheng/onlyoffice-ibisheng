@@ -403,7 +403,7 @@ function CNaryOperator(flip)
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
-CNaryOperator.prototype.draw = function()
+CNaryOperator.prototype.draw = function(pGraphics)
 {
     var coord = this.getCoord();
 
@@ -435,19 +435,19 @@ CNaryOperator.prototype.draw = function()
         YY[i] = this.pos.y + (a*Y[i]*alpha + b);
     }
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(1000);
+    pGraphics.p_width(1000);
 
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics._s();
 
-    this.drawPath(XX,YY);
+    this.drawPath(pGraphics, XX,YY);
 
-    MathControl.pGraph.df();
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.df();
+    pGraphics.SetIntegerGrid(intGrid);
 
 }
 CNaryOperator.prototype.IsJustDraw = function()
@@ -490,34 +490,34 @@ function CSigma()
     CNaryOperator.call(this);
 }
 extend(CSigma, CNaryOperator);
-CSigma.prototype.drawPath = function(XX, YY)
+CSigma.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._l(XX[2], YY[2]);
-    MathControl.pGraph._l(XX[3], YY[3]);
-    MathControl.pGraph._l(XX[4], YY[4]);
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
-    MathControl.pGraph._l(XX[15], YY[15]);
-    MathControl.pGraph._l(XX[16], YY[16]);
-    MathControl.pGraph._l(XX[17], YY[17]);
-    MathControl.pGraph._l(XX[18], YY[18]);
-    MathControl.pGraph._l(XX[19], YY[19]);
-    MathControl.pGraph._l(XX[20], YY[20]);
-    MathControl.pGraph._l(XX[21], YY[21]);
-    MathControl.pGraph._l(XX[22], YY[22]);
-    MathControl.pGraph._l(XX[23], YY[23]);
-    MathControl.pGraph._l(XX[24], YY[24]);
-    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
-    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
-    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
-    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
-    MathControl.pGraph._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
-    MathControl.pGraph._l(XX[35], YY[35]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[1], YY[1]);
+    pGraphics._l(XX[2], YY[2]);
+    pGraphics._l(XX[3], YY[3]);
+    pGraphics._l(XX[4], YY[4]);
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
+    pGraphics._l(XX[15], YY[15]);
+    pGraphics._l(XX[16], YY[16]);
+    pGraphics._l(XX[17], YY[17]);
+    pGraphics._l(XX[18], YY[18]);
+    pGraphics._l(XX[19], YY[19]);
+    pGraphics._l(XX[20], YY[20]);
+    pGraphics._l(XX[21], YY[21]);
+    pGraphics._l(XX[22], YY[22]);
+    pGraphics._l(XX[23], YY[23]);
+    pGraphics._l(XX[24], YY[24]);
+    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
+    pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
+    pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
+    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
+    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
+    pGraphics._l(XX[35], YY[35]);
 
 }
 CSigma.prototype.getCoord = function()
@@ -689,47 +689,47 @@ function CProduct(bFlip)
     CNaryOperator.call(this, bFlip);
 }
 extend(CProduct, CNaryOperator);
-CProduct.prototype.drawPath = function(XX, YY)
+CProduct.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
-    MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
-    MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
-    MathControl.pGraph._l(XX[10], YY[10]);
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
-    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
-    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
-    MathControl.pGraph._l(XX[19], YY[19]);
-    MathControl.pGraph._l(XX[20], YY[20]);
-    MathControl.pGraph._l(XX[21], YY[21]);
-    MathControl.pGraph._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
-    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
-    MathControl.pGraph._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
-    MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
-    MathControl.pGraph._l(XX[30], YY[30]);
-    MathControl.pGraph._l(XX[31], YY[31]);
-    MathControl.pGraph._l(XX[32], YY[32]);
-    MathControl.pGraph._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
-    MathControl.pGraph._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
-    MathControl.pGraph._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] );
-    MathControl.pGraph._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
-    MathControl.pGraph._l(XX[41], YY[41]);
-    MathControl.pGraph._l(XX[42], YY[42]);
-    MathControl.pGraph._l(XX[43], YY[43]);
-    MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
-    MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[47], YY[47] );
-    MathControl.pGraph._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
-    MathControl.pGraph._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
-    MathControl.pGraph._l(XX[52], YY[52]);
-    MathControl.pGraph._c(XX[52], YY[52], XX[53], YY[53], XX[54], YY[54] );
-    MathControl.pGraph._c(XX[54], YY[54], XX[55], YY[55], XX[56], YY[56] );
-    MathControl.pGraph._c(XX[56], YY[56], XX[57], YY[57], XX[58], YY[58] );
-    MathControl.pGraph._c(XX[58], YY[58], XX[59], YY[59], XX[60], YY[60] );
-    MathControl.pGraph._l(XX[61], YY[61]);
-    MathControl.pGraph._l(XX[62], YY[62]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[1], YY[1]);
+    pGraphics._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
+    pGraphics._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
+    pGraphics._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
+    pGraphics._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
+    pGraphics._l(XX[10], YY[10]);
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
+    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
+    pGraphics._l(XX[19], YY[19]);
+    pGraphics._l(XX[20], YY[20]);
+    pGraphics._l(XX[21], YY[21]);
+    pGraphics._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
+    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
+    pGraphics._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
+    pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
+    pGraphics._l(XX[30], YY[30]);
+    pGraphics._l(XX[31], YY[31]);
+    pGraphics._l(XX[32], YY[32]);
+    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
+    pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
+    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] );
+    pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
+    pGraphics._l(XX[41], YY[41]);
+    pGraphics._l(XX[42], YY[42]);
+    pGraphics._l(XX[43], YY[43]);
+    pGraphics._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
+    pGraphics._c(XX[45], YY[45], XX[46], YY[46], XX[47], YY[47] );
+    pGraphics._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
+    pGraphics._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
+    pGraphics._l(XX[52], YY[52]);
+    pGraphics._c(XX[52], YY[52], XX[53], YY[53], XX[54], YY[54] );
+    pGraphics._c(XX[54], YY[54], XX[55], YY[55], XX[56], YY[56] );
+    pGraphics._c(XX[56], YY[56], XX[57], YY[57], XX[58], YY[58] );
+    pGraphics._c(XX[58], YY[58], XX[59], YY[59], XX[60], YY[60] );
+    pGraphics._l(XX[61], YY[61]);
+    pGraphics._l(XX[62], YY[62]);
 
 }
 CProduct.prototype.getCoord = function()
@@ -852,23 +852,23 @@ function CUnion(bFlip)
     CNaryOperator.call(this, bFlip);
 }
 extend(CUnion, CNaryOperator);
-CUnion.prototype.drawPath = function(XX, YY)
+CUnion.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
-    MathControl.pGraph._l(XX[5], YY[5]);
-    MathControl.pGraph._l(XX[6], YY[6]);
-    MathControl.pGraph._l(XX[7], YY[7]);
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9]);
-    MathControl.pGraph._c(XX[9], YY[9], XX[10], YY[10], XX[11], YY[11]);
-    MathControl.pGraph._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13]);
-    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15]);
-    MathControl.pGraph._l(XX[16], YY[16]);
-    MathControl.pGraph._l(XX[17], YY[17]);
-    MathControl.pGraph._l(XX[18], YY[18]);
-    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20]);
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
+    pGraphics._l(XX[5], YY[5]);
+    pGraphics._l(XX[6], YY[6]);
+    pGraphics._l(XX[7], YY[7]);
+    pGraphics._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9]);
+    pGraphics._c(XX[9], YY[9], XX[10], YY[10], XX[11], YY[11]);
+    pGraphics._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13]);
+    pGraphics._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15]);
+    pGraphics._l(XX[16], YY[16]);
+    pGraphics._l(XX[17], YY[17]);
+    pGraphics._l(XX[18], YY[18]);
+    pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20]);
+    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22]);
 }
 CUnion.prototype.getCoord = function()
 {
@@ -920,16 +920,16 @@ function CLogicalOr(bFlip)
     CNaryOperator.call(this, bFlip);
 }
 extend(CLogicalOr, CNaryOperator);
-CLogicalOr.prototype.drawPath = function(XX, YY)
+CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._l(XX[2], YY[2]);
-    MathControl.pGraph._l(XX[3], YY[3]);
-    MathControl.pGraph._l(XX[4], YY[4]);
-    MathControl.pGraph._l(XX[5], YY[5]);
-    MathControl.pGraph._l(XX[6], YY[6]);
-    MathControl.pGraph._l(XX[7], YY[7]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[1], YY[1]);
+    pGraphics._l(XX[2], YY[2]);
+    pGraphics._l(XX[3], YY[3]);
+    pGraphics._l(XX[4], YY[4]);
+    pGraphics._l(XX[5], YY[5]);
+    pGraphics._l(XX[6], YY[6]);
+    pGraphics._l(XX[7], YY[7]);
 
 }
 CLogicalOr.prototype.old_getCoord = function()
@@ -1214,39 +1214,39 @@ CIntegral.prototype.old_getCoord = function()
 
     return {X: X, Y: Y};
 }
-CIntegral.prototype.drawPath = function(XX, YY)
+CIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
-    MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
-    MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
-    MathControl.pGraph._l(XX[10], YY[10]);
-    MathControl.pGraph._l(XX[11], YY[11]);
-    MathControl.pGraph._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13] );
-    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
-    MathControl.pGraph._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
-    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
-    MathControl.pGraph._l(XX[20], YY[20]);
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[1], YY[1]);
+    pGraphics._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
+    pGraphics._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
+    pGraphics._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
+    pGraphics._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
+    pGraphics._l(XX[10], YY[10]);
+    pGraphics._l(XX[11], YY[11]);
+    pGraphics._c(XX[11], YY[11], XX[12], YY[12], XX[13], YY[13] );
+    pGraphics._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
+    pGraphics._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
+    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
+    pGraphics._l(XX[20], YY[20]);
 
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
+    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
 
-    MathControl.pGraph._l(XX[22], YY[22]);
-    MathControl.pGraph._l(XX[23], YY[23]);
-    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
-    MathControl.pGraph._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
-    MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
-    MathControl.pGraph._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31] );
-    MathControl.pGraph._l(XX[32], YY[32]);
-    MathControl.pGraph._l(XX[33], YY[33]);
-    MathControl.pGraph._c(XX[33], YY[33], XX[34], YY[34], XX[35], YY[35] );
-    MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
-    MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
-    MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
-    MathControl.pGraph._l(XX[42], YY[42]);
+    pGraphics._l(XX[22], YY[22]);
+    pGraphics._l(XX[23], YY[23]);
+    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
+    pGraphics._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
+    pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
+    pGraphics._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31] );
+    pGraphics._l(XX[32], YY[32]);
+    pGraphics._l(XX[33], YY[33]);
+    pGraphics._c(XX[33], YY[33], XX[34], YY[34], XX[35], YY[35] );
+    pGraphics._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
+    pGraphics._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
+    pGraphics._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
+    pGraphics._l(XX[42], YY[42]);
 
-    MathControl.pGraph._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] );
+    pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] );
 
 }
 CIntegral.prototype.old_drawPath = function(XX, YY)
@@ -1299,7 +1299,7 @@ function CDoubleIntegral()
     CIntegral.call(this);
 }
 extend(CDoubleIntegral, CIntegral);
-CDoubleIntegral.prototype.drawPath = function(XX, YY)
+CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
 
@@ -1313,11 +1313,11 @@ CDoubleIntegral.prototype.drawPath = function(XX, YY)
         YY2[i] = YY[i];
     }
 
-    CDoubleIntegral.superclass.drawPath.call(this, XX, YY);
-    MathControl.pGraph.df();
+    CDoubleIntegral.superclass.drawPath.call(this, pGraphics, XX, YY);
+    pGraphics.df();
 
-    MathControl.pGraph._s();
-    CDoubleIntegral.superclass.drawPath.call(this, XX2, YY2);
+    pGraphics._s();
+    CDoubleIntegral.superclass.drawPath.call(this, pGraphics, XX2, YY2);
 }
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -1339,7 +1339,7 @@ function CTripleIntegral()
     CIntegral.call(this);
 }
 extend(CTripleIntegral, CIntegral);
-CTripleIntegral.prototype.drawPath = function(XX, YY)
+CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 {
     // XX[9] - ширина
 
@@ -1359,15 +1359,15 @@ CTripleIntegral.prototype.drawPath = function(XX, YY)
         YY3[i] = YY[i];
     }
 
-    CTripleIntegral.superclass.drawPath.call(this, XX, YY);
-    MathControl.pGraph.df();
+    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX, YY);
+    pGraphics.df();
 
-    MathControl.pGraph._s();
-    CTripleIntegral.superclass.drawPath.call(this, XX2, YY2);
-    MathControl.pGraph.df();
+    pGraphics._s();
+    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX2, YY2);
+    pGraphics.df();
 
-    MathControl.pGraph._s();
-    CTripleIntegral.superclass.drawPath.call(this, XX3, YY3);
+    pGraphics._s();
+    CTripleIntegral.superclass.drawPath.call(this, pGraphics, XX3, YY3);
 }
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
@@ -1669,28 +1669,28 @@ CCircle.prototype.getCoord = function()
     return {X: X, Y: Y, W: W, H: H};
     
 }
-CCircle.prototype.drawPath = function(XX, YY)
+CCircle.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6]);
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8]);
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10]);
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12]);
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14]);
-    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16]);
+    pGraphics._s();
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6]);
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8]);
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10]);
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12]);
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14]);
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16]);
 
-    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19]); 
-    MathControl.pGraph._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21]); 
-    MathControl.pGraph._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23]); 
-    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25]); 
-    MathControl.pGraph._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27]); 
-    MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29]); 
-    MathControl.pGraph._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31]); 
-    MathControl.pGraph._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33]);
-    MathControl.pGraph.ds();
+    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19]); 
+    pGraphics._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21]); 
+    pGraphics._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23]); 
+    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25]); 
+    pGraphics._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27]); 
+    pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29]); 
+    pGraphics._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31]); 
+    pGraphics._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33]);
+    pGraphics.ds();
 
 }
 
@@ -2037,33 +2037,33 @@ CSurface.prototype.getCoord = function()
 
     return {X: X, Y: Y, W: W, H: H};
 }
-CSurface.prototype.drawPath = function(XX, YY)
+CSurface.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
-    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
-    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
-    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
-    MathControl.pGraph._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] );
-    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
-    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
-    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
-    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
-    MathControl.pGraph._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
-    MathControl.pGraph._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
-    MathControl.pGraph._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
-    MathControl.pGraph._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
-    MathControl.pGraph._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
-    MathControl.pGraph.ds();
+    pGraphics._s();
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._l(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
+    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
+    pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
+    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
+    pGraphics._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] );
+    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
+    pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
+    pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
+    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
+    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
+    pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
+    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
+    pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
+    pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
+    pGraphics.ds();
 }
 
 function CVolume()
@@ -2164,36 +2164,36 @@ CVolume.prototype.getCoord = function()
 
     return {X: X, Y: Y, W : W, H : H};
 }
-CVolume.prototype.drawPath = function(XX, YY)
+CVolume.prototype.drawPath = function(pGraphics, XX, YY)
 {
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] ); 
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] ); 
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] ); 
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
-    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
-    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
-    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] ); 
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] ); 
-    MathControl.pGraph._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] ); 
-    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
-    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] ); 
-    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] ); 
-    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
-    MathControl.pGraph._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] ); 
-    MathControl.pGraph._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] ); 
-    MathControl.pGraph._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
-    MathControl.pGraph._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] ); 
-    MathControl.pGraph._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] ); 
-    MathControl.pGraph._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] ); 
-    MathControl.pGraph._c(XX[44], YY[44], XX[45], YY[45], XX[46], YY[46] ); 
-    MathControl.pGraph._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] ); 
-    MathControl.pGraph._c(XX[48], YY[48], XX[49], YY[49], XX[50], YY[50] );
-    MathControl.pGraph.ds();
+    pGraphics._s();
+    pGraphics._m(XX[0], YY[0]);
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] ); 
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] ); 
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] ); 
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
+    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
+    pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] ); 
+    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] ); 
+    pGraphics._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] ); 
+    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
+    pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] ); 
+    pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] ); 
+    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
+    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] ); 
+    pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] ); 
+    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
+    pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] ); 
+    pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] ); 
+    pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] ); 
+    pGraphics._c(XX[44], YY[44], XX[45], YY[45], XX[46], YY[46] ); 
+    pGraphics._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] ); 
+    pGraphics._c(XX[48], YY[48], XX[49], YY[49], XX[50], YY[50] );
+    pGraphics.ds();
 }
 
 function _old_CContourIntegral()
@@ -2794,7 +2794,7 @@ function CContourIntegral()
     CNaryOperator.call(this);
 }
 extend(CContourIntegral, CNaryOperator);
-CContourIntegral.prototype.draw = function()
+CContourIntegral.prototype.draw = function(pGraphics)
 {
     var circle = new CCircle();
     var coord = circle.getCoord();
@@ -2833,24 +2833,24 @@ CContourIntegral.prototype.draw = function()
     }
 
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(750);
+    pGraphics.p_width(750);
 
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
 
-    circle.drawPath(X, Y);
+    circle.drawPath(pGraphics, X, Y);
 
-    MathControl.pGraph.p_width(1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    integr.drawPath(XX, YY);
+    integr.drawPath(pGraphics, XX, YY);
 
-    MathControl.pGraph.df();
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.df();
+    pGraphics.SetIntegerGrid(intGrid);
 
 
 }
@@ -3296,7 +3296,7 @@ function CSurfaceIntegral()
     CNaryOperator.call(this);
 }
 extend(CSurfaceIntegral, CNaryOperator);
-CSurfaceIntegral.prototype.draw = function()
+CSurfaceIntegral.prototype.draw = function(pGraphics)
 {
     var surf = new CSurface();
     var coord = surf.getCoord();
@@ -3338,25 +3338,25 @@ CSurfaceIntegral.prototype.draw = function()
     }
 
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(750);
+    pGraphics.p_width(750);
 
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
 
-    surf.drawPath(X, Y);
+    surf.drawPath(pGraphics, X, Y);
 
-    MathControl.pGraph.p_width(1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    integr.drawPath(XX, YY);
+    integr.drawPath(pGraphics, XX, YY);
 
-    MathControl.pGraph.df();
+    pGraphics.df();
 
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.SetIntegerGrid(intGrid);
 
 }
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
@@ -3871,7 +3871,7 @@ function CVolumeIntegral()
     CNaryOperator.call(this);
 }
 extend(CVolumeIntegral, CNaryOperator);
-CVolumeIntegral.prototype.draw = function()
+CVolumeIntegral.prototype.draw = function(pGraphics)
 {
     var volume = new CVolume();
     var coord = volume.getCoord();
@@ -3913,25 +3913,25 @@ CVolumeIntegral.prototype.draw = function()
     }
 
 
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
+    var intGrid = pGraphics.GetIntegerGrid();
+    pGraphics.SetIntegerGrid(false);
 
-    MathControl.pGraph.p_width(750);
+    pGraphics.p_width(750);
 
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
 
-    volume.drawPath(X, Y);
+    volume.drawPath(pGraphics, X, Y);
 
-    MathControl.pGraph.p_width(1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
+    pGraphics.p_width(1000);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
 
-    integr.drawPath(XX, YY);
+    integr.drawPath(pGraphics, XX, YY);
 
-    MathControl.pGraph.df();
+    pGraphics.df();
 
-    MathControl.pGraph.SetIntegerGrid(intGrid);
+    pGraphics.SetIntegerGrid(intGrid);
 
 }
 CVolumeIntegral.prototype.calculateSizeGlyph = function()

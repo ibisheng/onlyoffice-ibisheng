@@ -7,7 +7,7 @@ function CSignRadical()
     this.sizeTick = null;
     this.widthSlash = null;
 }
-CSignRadical.prototype.draw = function()
+CSignRadical.prototype.draw = function(pGraphics)
 {
     var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
@@ -51,29 +51,29 @@ CSignRadical.prototype.draw = function()
     var y5 = this.pos.y,
         y6 = this.pos.y;
 
-    MathControl.pGraph.p_width(penW*0.8*1000);
+    pGraphics.p_width(penW*0.8*1000);
 
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
 
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x1, y1);
-    MathControl.pGraph._l(x2, y2);
-    MathControl.pGraph.ds();
+    pGraphics._s();
+    pGraphics._m(x1, y1);
+    pGraphics._l(x2, y2);
+    pGraphics.ds();
 
 
-    MathControl.pGraph.p_width(1.7*penW*1000);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x3, y3);
-    MathControl.pGraph._l(x4, y4);
-    MathControl.pGraph.ds();
+    pGraphics.p_width(1.7*penW*1000);
+    pGraphics._s();
+    pGraphics._m(x3, y3);
+    pGraphics._l(x4, y4);
+    pGraphics.ds();
 
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x4, y4);
-    MathControl.pGraph._l(x5, y5);
-    MathControl.pGraph._l(x6,y6);
-    MathControl.pGraph.ds();
+    pGraphics.p_width(penW*1000);
+    pGraphics._s();
+    pGraphics._m(x4, y4);
+    pGraphics._l(x5, y5);
+    pGraphics._l(x6,y6);
+    pGraphics.ds();
 
 }
 CSignRadical.prototype.recalculateSize = function()
@@ -395,10 +395,10 @@ CRadical.prototype.findDisposition = function(mCoord)
 
     return disposition;
 }
-CRadical.prototype.draw = function()
+CRadical.prototype.draw = function(pGraphics)
 {
-    this.signRadical.draw();
-    old_CDegreeRadical.superclass.draw.call(this);
+    this.signRadical.draw(pGraphics);
+    CRadical.superclass.draw.call(this, pGraphics);
 }
 CRadical.prototype.getBase = function()
 {
@@ -591,10 +591,10 @@ old_CDegreeRadical.prototype.setPosition = function(pos)
 
     this.elements[0][1].setPosition({x: x3, y: y3});
 }
-old_CDegreeRadical.prototype.draw = function()
+old_CDegreeRadical.prototype.draw = function(pGraphics)
 {
     this.signRadical.draw();
-    old_CDegreeRadical.superclass.draw.call(this);
+    old_CDegreeRadical.superclass.draw.call(this, pGraphics);
 }
 old_CDegreeRadical.prototype.findDisposition = function(mCoord)
 {

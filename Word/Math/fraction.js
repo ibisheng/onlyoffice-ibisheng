@@ -62,16 +62,16 @@ CFraction.prototype.getCenter = function()
 
     return center;
 }
-CFraction.prototype.draw = function()
+CFraction.prototype.draw = function(pGraphics)
 {
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
-        this.drawBarFraction();
+        this.drawBarFraction(pGraphics);
     else if(this.type == SKEWED_FRACTION)
-        this.drawSkewedFraction();
+        this.drawSkewedFraction(pGraphics);
     else if(this.type == LINEAR_FRACTION)
-        this.drawLinearFraction();
+        this.drawLinearFraction(pGraphics);
 }
-CFraction.prototype.drawBarFraction = function()
+CFraction.prototype.drawBarFraction = function(pGraphics)
 {
     var penW = this.getTxtPrp().FontSize* this.reduct* 25.4/96 * 0.08;
 
@@ -81,14 +81,14 @@ CFraction.prototype.drawBarFraction = function()
 
     if( !this.bHideBar )
     {
-        MathControl.pGraph.p_color(0,0,0, 255);
-        MathControl.pGraph.b_color1(0,0,0, 255);
-        MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.b_color1(0,0,0, 255);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CFraction.superclass.draw.call(this);
+    CFraction.superclass.draw.call(this, pGraphics);
 }
-CFraction.prototype.drawSkewedFraction = function()
+CFraction.prototype.drawSkewedFraction = function(pGraphics)
 {
     var fontSize = this.getTxtPrp().FontSize;
     var penW = fontSize/12.5*g_dKoef_pix_to_mm;
@@ -165,18 +165,18 @@ CFraction.prototype.drawSkewedFraction = function()
 
     }
 
-    MathControl.pGraph.p_width(penW*1000);
+    pGraphics.p_width(penW*1000);
 
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(xx1, yy1);
-    MathControl.pGraph._l(xx2, yy2);
-    MathControl.pGraph.ds();
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
+    pGraphics._s();
+    pGraphics._m(xx1, yy1);
+    pGraphics._l(xx2, yy2);
+    pGraphics.ds();
 
-    CFraction.superclass.draw.call(this);
+    CFraction.superclass.draw.call(this, pGraphics);
 }
-CFraction.prototype.drawLinearFraction = function()
+CFraction.prototype.drawLinearFraction = function(pGraphics)
 {
     var first = this.elements[0][0].size,
         sec = this.elements[0][1].size;
@@ -194,17 +194,17 @@ CFraction.prototype.drawLinearFraction = function()
 
     var penW = this.getTxtPrp().FontSize/12.5*g_dKoef_pix_to_mm;
 
-    MathControl.pGraph.p_width(penW*1000);
+    pGraphics.p_width(penW*1000);
 
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph.b_color1(0,0,0, 255);
+    pGraphics.p_color(0,0,0, 255);
+    pGraphics.b_color1(0,0,0, 255);
 
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x1, y1);
-    MathControl.pGraph._l(x2, y2);
-    MathControl.pGraph.ds();
+    pGraphics._s();
+    pGraphics._m(x1, y1);
+    pGraphics._l(x2, y2);
+    pGraphics.ds();
 
-    CFraction.superclass.draw.call(this);
+    CFraction.superclass.draw.call(this, pGraphics);
 }
 CFraction.prototype.getNumerator = function()
 {

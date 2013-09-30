@@ -1266,7 +1266,8 @@ function Set_Container(dimension, path, index)
                     {
                         document.getElementById("Container").style.display = "none";
                         // AddMathComponent -> CreateEquation
-                        MathControl.CreateEquation(index + _i*column + _j);
+                        //MathControl.CreateEquation(index + _i*column + _j);
+                        MathComposition.CreateEquation(index + _i*column + _j);
                         editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
                             Left   : X_Left_Field,
                             Right  : X_Right_Field,

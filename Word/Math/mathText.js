@@ -259,14 +259,14 @@ CMathText.prototype =
         MathControl.pGraph.FillTextCode(xx, yy , this.getCode());
 
     },
-    draw: function()
+    draw: function(pGraphics)
     {
         var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
         txtPrp.Italic = false;
 
-        MathControl.pGraph.b_color1(0,0,0,255);
-        MathControl.pGraph.SetFont(txtPrp);
+        pGraphics.b_color1(0,0,0,255);
+        pGraphics.SetFont(txtPrp);
 
         var X = this.pos.x ,
             Y = this.pos.y;
@@ -304,8 +304,8 @@ CMathText.prototype =
          var y = (Y - x*shy - ty*shx)/sy;*/
 
 
-        MathControl.pGraph.transform(sx, shy, shx, sy, 0, 0);
-        MathControl.pGraph.FillTextCode(xx, yy , this.getCode());
+        pGraphics.transform(sx, shy, shx, sy, 0, 0);
+        pGraphics.FillTextCode(xx, yy , this.getCode());
 
     },
     setPosition: function( pos )

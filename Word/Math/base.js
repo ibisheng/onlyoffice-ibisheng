@@ -777,11 +777,11 @@ CMathBase.prototype =
             h += Heights[i];
         }
     },
-    draw: function()
+    draw: function(pGraphics)
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].draw();
+                this.elements[i][j].draw(pGraphics);
     },
     remove: function(order)
     {

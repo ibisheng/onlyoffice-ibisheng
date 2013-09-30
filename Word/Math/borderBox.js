@@ -61,9 +61,9 @@ CBorderBox.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, center: center};
 }
-CBorderBox.prototype.draw = function()
+CBorderBox.prototype.draw = function(pGraphics)
 {
-    this.elements[0][0].draw();
+    this.elements[0][0].draw(pGraphics);
 
     var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 ;
 
@@ -74,8 +74,8 @@ CBorderBox.prototype.draw = function()
          x2 = this.pos.x + this.size.width - 25.4/96,
          y1 = y2 = this.pos.y;
 
-         MathControl.pGraph.p_color(0,0,0, 255);
-         MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+         pGraphics.p_color(0,0,0, 255);
+         pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
     if(this.bBot)
@@ -84,8 +84,8 @@ CBorderBox.prototype.draw = function()
             x2 = this.pos.x + this.size.width - 25.4/96,
             y1 = y2 = this.pos.y + this.size.height - penW;
 
-            MathControl.pGraph.p_color(0,0,0, 255);
-            MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+            pGraphics.p_color(0,0,0, 255);
+            pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
     if(this.bLeft)
@@ -94,8 +94,8 @@ CBorderBox.prototype.draw = function()
             y1 = this.pos.y,
             y2 = this.pos.y + this.size.height - 25.4/96;
 
-        MathControl.pGraph.p_color(0,0,0, 255);
-        MathControl.pGraph.drawVerLine(0, x1, y1, y2, penW);
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
     if(this.bRight)
@@ -104,8 +104,8 @@ CBorderBox.prototype.draw = function()
             y1 = this.pos.y,
             y2 = this.pos.y + this.size.height - 25.4/96 ;
 
-        MathControl.pGraph.p_color(0,0,0, 255);
-        MathControl.pGraph.drawVerLine(0, x1, y1, y2, penW);
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
     if(this.bLDiag)
@@ -119,18 +119,18 @@ CBorderBox.prototype.draw = function()
             x6 = x1, y6 = y1 + pW,
             x7 = x1, y7 = y1;
 
-        MathControl.pGraph.p_width(1000);
-        MathControl.pGraph.b_color1(0,0,0, 255);
+        pGraphics.p_width(1000);
+        pGraphics.b_color1(0,0,0, 255);
 
-        MathControl.pGraph._s();
-        MathControl.pGraph._m(x1, y1);
-        MathControl.pGraph._l(x2, y2);
-        MathControl.pGraph._l(x3, y3);
-        MathControl.pGraph._l(x4, y4);
-        MathControl.pGraph._l(x5, y5);
-        MathControl.pGraph._l(x6, y6);
-        MathControl.pGraph._l(x7, y7);
-        MathControl.pGraph.df();
+        pGraphics._s();
+        pGraphics._m(x1, y1);
+        pGraphics._l(x2, y2);
+        pGraphics._l(x3, y3);
+        pGraphics._l(x4, y4);
+        pGraphics._l(x5, y5);
+        pGraphics._l(x6, y6);
+        pGraphics._l(x7, y7);
+        pGraphics.df();
 
     }
     if(this.bRDiag)
@@ -144,18 +144,18 @@ CBorderBox.prototype.draw = function()
             x6 = x5, y6 = y5 - pW,
             x7 = x1, y7 = y1;
 
-        MathControl.pGraph.p_width(1000);
-        MathControl.pGraph.b_color1(0,0,0, 255);
+        pGraphics.p_width(1000);
+        pGraphics.b_color1(0,0,0, 255);
 
-        MathControl.pGraph._s();
-        MathControl.pGraph._m(x1, y1);
-        MathControl.pGraph._l(x2, y2);
-        MathControl.pGraph._l(x3, y3);
-        MathControl.pGraph._l(x4, y4);
-        MathControl.pGraph._l(x5, y5);
-        MathControl.pGraph._l(x6, y6);
-        MathControl.pGraph._l(x7, y7);
-        MathControl.pGraph.df();
+        pGraphics._s();
+        pGraphics._m(x1, y1);
+        pGraphics._l(x2, y2);
+        pGraphics._l(x3, y3);
+        pGraphics._l(x4, y4);
+        pGraphics._l(x5, y5);
+        pGraphics._l(x6, y6);
+        pGraphics._l(x7, y7);
+        pGraphics.df();
 
     }
 
