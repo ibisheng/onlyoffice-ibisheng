@@ -630,10 +630,10 @@ cFormulaFunction.DateAndTime = {
             if(val < 0)
                 return this.setCA( new cError( cErrorType.not_numeric ) ,true);
             if(!g_bDate1904){
-                if( val == 60 )
-                    return this.setCA( new cNumber( 2 ) ,true,0);
+                if ( val == 60 )
+                    return this.setCA( new cNumber( 2 ), true, 0 );
                 else
-                    return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
+                    return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst - 1 ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
             }
             else
                 return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
