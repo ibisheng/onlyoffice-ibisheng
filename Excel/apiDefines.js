@@ -181,24 +181,24 @@ var c_oAscDrawDepOptions = {
 
 // selection type
 var c_oAscSelectionType = {
-	RangeCells:	1,
-	RangeCol:   2,
-	RangeRow:	3,
-	RangeMax:	4,
-	RangeImage: 5,
-	RangeChart: 6,
-	RangeShape: 7,
-	RangeShapeText: 8
+	RangeCells:		1,
+	RangeCol:		2,
+	RangeRow:		3,
+	RangeMax:		4,
+	RangeImage:		5,
+	RangeChart:		6,
+	RangeShape:		7,
+	RangeShapeText:	8
 };
 
 var c_oAscLegendMarkerType = {
-	Line: 0,
-	Square: 1
-}
+	Line:	0,
+	Square:	1
+};
 
 var c_oAscHyperlinkType = {
-	WebLink: 1,
-	RangeLink: 2
+	WebLink:	1,
+	RangeLink:	2
 };
 
 var c_oAscMouseMoveType = {

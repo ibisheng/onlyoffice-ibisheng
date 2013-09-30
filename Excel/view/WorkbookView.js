@@ -210,6 +210,7 @@
 					"autoFiltersClick":			function () {self._onAutoFiltersClick.apply(self, arguments);},
 					"commentCellClick":			function () {self._onCommentCellClick.apply(self, arguments);},
 					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
+					"updateSelectionName":		function () {self._onUpdateSelectionName.apply(self, arguments);},
 					
 					// Shapes
 					"graphicObjectMouseDown":				function () {self._onGraphicObjectMouseDown.apply(self, arguments);},
@@ -687,6 +688,11 @@
 				var comments = ws.cellCommentator.getCommentsXY(x, y);
 				if (comments.length)
 					ws.cellCommentator.asc_showComment(comments[0].asc_getId());
+			},
+
+			_onUpdateSelectionName: function () {
+				var ws = this.getWorksheet();
+				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 			},
 			
 			// Shapes

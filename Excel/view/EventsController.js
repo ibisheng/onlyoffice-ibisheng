@@ -958,6 +958,10 @@
 				if (t.lastKeyCode === 18 && event.which === 18) {
 					return false;
 				}
+				// При отпускании shift нужно переслать информацию о выделении
+				if (16 === event.which) {
+					this.handlers.trigger("updateSelectionName");
+				}
 
 				return true;
 			},
