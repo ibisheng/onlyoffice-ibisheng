@@ -198,7 +198,7 @@ JSCompiler_StaticMethods_getRange2:Ie
 EUnderline$underlineDoubleAccounting:QI
 T1_Face_Done:Ev
 JSCompiler_StaticMethods_createCellOnRowColCross:GP
-asc_CFillBlip:Ug
+asc_CFillBlip:Vg
 PS_Conv_ToInt:lm
 c_oAscFillBlipType$TILE:W3
 c_oSerXfsTypes$ApplyAlignment:zC
@@ -613,7 +613,7 @@ c_oSerFormat$Version:EB
 CTableStyle:$K
 cErrorType$unsupported_function:nA
 FT_Module_Class:vl
-c_oAscFill$FILL_TYPE_BLIP:Tg
+c_oAscFill$FILL_TYPE_BLIP:Ug
 c_oAscAsyncAction$Save:g9
 ft_glyphslot_done:zl
 c_oSer_ConditionalFormattingIconSet$CFVO:$H
@@ -1436,7 +1436,7 @@ JSCompiler_StaticMethods_DrawBorders:A0
 JSCompiler_StaticMethods_Set_FontSize:B3
 para_Text:Lh
 c_oSer_ConditionalFormattingRuleColorScale$Color:UH
-c_oAscError$ID$UplImageUrl:Rg
+c_oAscError$ID$UplImageUrl:Sg
 JSCompiler_StaticMethods_Set_RangeStartPos:s6
 JSCompiler_StaticMethods_resetSelectionState2:W0
 isRealObject:M
@@ -1581,7 +1581,7 @@ c_oSerXfsTypes$ApplyBorder:AC
 sfnt_service_ps_name:Jp
 phType_clipArt:GU
 JSCompiler_StaticMethods_setTheme:sL
-JSCompiler_StaticMethods_Create_NewPoint:Vg
+JSCompiler_StaticMethods_Create_NewPoint:Rg
 afm_parser_read_int:xm
 historyitem_Worksheet_ShiftCellsTop:eQ
 FILL_TYPE_NOFILL:NT
@@ -1945,7 +1945,7 @@ Ins_SHZ:cs
 c_oSerTableTypes$CalcChain:NB
 c_oAscChartType$bar:Wd
 fonthint_Default:H4
-FT_GlyphLoader_Adjust_Points:lk
+FT_GlyphLoader_Adjust_Points:fk
 JSCompiler_StaticMethods_DeserializeData:dO
 FORMULA_TYPE_PLUS_DIV:GX
 STATES_ID_MOVE:A1
@@ -2252,7 +2252,7 @@ FT_CreateVectorArray:Wj
 JSCompiler_StaticMethods_handleEvents:TS
 JSCompiler_StaticMethods_moveCol:lB
 JSCompiler_StaticMethods_Internal_CompileParaPr:S6
-asc_CShapeFill:Sg
+asc_CShapeFill:Tg
 ParaCommentStart:wi
 FT_Outline_New_Internal:Fj
 CellValueType$String:ma
@@ -2759,7 +2759,7 @@ c_oSerWorksheetPropTypes$Name:SD
 L 116:Qg
 ParaNewLine:mi
 L 117:xe
-L 114:kk
+L 114:lk
 L 115:gv
 c_Date1900Const:tA
 JSCompiler_StaticMethods_addMasterEdge:aN
@@ -2802,7 +2802,7 @@ ShapeForResizeInGroup:Q7
 ret$$inline_647:Hn
 ChangeAdjInGroupState:G2
 L 111:xh
-L 110:jk
+L 110:kk
 L 113:tf
 bIsSupportOriginalFormatFonts:jx
 L 112:yh
@@ -3060,7 +3060,7 @@ L 23:U
 L 22:X
 L 25:W
 L 24:ca
-L 50:gk
+L 50:hk
 tt_size_reset:wt
 recalcresult_PrevPage:A6
 LineEndType$None:nU
@@ -3089,7 +3089,7 @@ c_oAscCellEditorState$editEnd:wS
 FontStyle$FontStyleRegular:Rw
 GX_BlendRec:Hs
 rgCols:Ab
-L 49:fk
+L 49:gk
 c_oSerHyperlinkTypes$Tooltip:eE
 L 48:Db
 L 45:Wb
@@ -3224,7 +3224,7 @@ ETableStyleType$tablestyletypeFirstRowStripe:AJ
 TT_Face:Fs
 L 73:En
 JSCompiler_StaticMethods__moveCellVer:WO
-L 74:hk
+L 74:ik
 L 75:Zg
 Int64:pj
 L 76:Fn
@@ -3307,7 +3307,7 @@ c_oEditorId$Speadsheet:ga
 c_oSer_BasicChartType$Series:t_
 CellValueType$Number:la
 L 83:Kf
-L 82:ik
+L 82:jk
 c_oSerPropLenType$Byte:cK
 L 81:ie
 CGeometry:iV
