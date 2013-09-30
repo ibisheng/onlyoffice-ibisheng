@@ -2634,6 +2634,8 @@ FormatParser.prototype =
 						sFormat = "m/d/yyyy h:mm:ss AM/PM";
 					else if(true == bDate)
 						sFormat = "m/d/yyyy";
+					else if(dValue > 1)
+						sFormat = "[hh]:mm:ss";
 					else
 						sFormat = "h:mm:ss AM/PM";
 					res = {format: sFormat, value: dValue, bDateTime: true};
