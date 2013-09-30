@@ -462,7 +462,7 @@ CFont.prototype.asc_getFontType = function() { return this.type; }
 
 var DocumentPageSize = new function() {
     this.oSizes = [{name:"US Letter", w_mm: 215.9, h_mm: 279.4, w_tw: 12240, h_tw: 15840},
-        {name:"US Letter", w_mm: 215.9, h_mm: 355.6, w_tw: 12240, h_tw: 20160},
+        {name:"US Legal", w_mm: 215.9, h_mm: 355.6, w_tw: 12240, h_tw: 20160},
         {name:"A4", w_mm: 210, h_mm: 297, w_tw: 11907, h_tw: 16839},
         {name:"A5", w_mm: 148.1, h_mm: 209.9, w_tw: 8391, h_tw: 11907},
         {name:"B5", w_mm: 176, h_mm: 250.1, w_tw: 9979, h_tw: 14175},
