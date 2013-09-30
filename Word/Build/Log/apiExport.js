@@ -181,6 +181,7 @@ prop:SetFontsPath
 prop:SetTextBoxInputMode
 prop:GetTextBoxInputMode
 prop:ChangeReaderMode
+prop:SetReaderModeOnly
 prop:IncreaseReaderFontSize
 prop:DecreaseReaderFontSize
 prop:CreateCSS
@@ -1248,6 +1249,7 @@ asc_docs_api.prototype['SetFontsPath'] = asc_docs_api.prototype.SetFontsPath;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;
 asc_docs_api.prototype['GetTextBoxInputMode'] = asc_docs_api.prototype.GetTextBoxInputMode;
 asc_docs_api.prototype['ChangeReaderMode'] = asc_docs_api.prototype.ChangeReaderMode;
+asc_docs_api.prototype['SetReaderModeOnly'] = asc_docs_api.prototype.SetReaderModeOnly;
 asc_docs_api.prototype['IncreaseReaderFontSize'] = asc_docs_api.prototype.IncreaseReaderFontSize;
 asc_docs_api.prototype['DecreaseReaderFontSize'] = asc_docs_api.prototype.DecreaseReaderFontSize;
 asc_docs_api.prototype['CreateCSS'] = asc_docs_api.prototype.CreateCSS;
