@@ -96,7 +96,7 @@
                 "../PowerPoint/Editor/Format/Table.js",
                 "../Word/Editor/Common.js",
                 "../Word/Editor/Sections.js",
-                "../Word/Drawing/scrolls/scroll.js",
+                "../Common/scroll.js",
                 "../PowerPoint/Editor/History.js",
                 "../PowerPoint/Editor/Format/Paragraph.js",
                 "../PowerPoint/Editor/FlowObjects.js",

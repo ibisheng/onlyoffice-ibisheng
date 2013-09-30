@@ -1,4 +1,4 @@
-body { margin: 0; padding: 0; vertical-align:top; overflow:hidden;-moz-user-select: none; -khtml-user-select: none; user-select: none;}
+body { margin: 0; padding: 0; vertical-align:top; overflow:hidden;-moz-user-select: none; -khtml-user-select: none; user-select: none;-webkit-user-select: none;}
 div, table, tbody, tr, th, td, form {
 	margin:0;
 	padding:0;

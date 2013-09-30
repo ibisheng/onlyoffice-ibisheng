@@ -71,7 +71,7 @@
                 "../Excel/view/HandlerList.js",
                 "../Excel/view/EventsController.js",
                 "../Excel/view/WorkbookView.js",
-                "../Excel/view/scroll.js",
+                "../Common/scroll.js",
                 "../Word/Editor/SerializeCommon.js",
                 "../Excel/model/DrawingObjects/Format/Format.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",

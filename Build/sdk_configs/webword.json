@@ -127,7 +127,7 @@
                 "../Word/Drawing/Rulers.js",
                 "../Word/Drawing/HtmlPage.js",
                 "../Word/Drawing/documentrenderer.js",
-                "../Word/Drawing/scrolls/scroll.js",
+                "../Common/scroll.js",
                 "../Word/Editor/SerializeCommon.js",
                 "../Word/apiDefines.js",
                 "../Word/api-all.js",
