@@ -3407,9 +3407,9 @@ PasteProcessor.prototype =
                             for(var i = 0; i < slide_count; ++i)
                             {
                                 arr_layouts_id[i] = stream.GetString2();
-                                var long = stream.GetULong();
+                                var table_style_ids_len = stream.GetULong();
                                 var table_style_ids = [];
-                                for(var j = 0; j < long; ++j)
+                                for(var j = 0; j < table_style_ids_len; ++j)
                                 {
                                     if(stream.GetBool())
                                         table_style_ids.push(stream.GetULong());
