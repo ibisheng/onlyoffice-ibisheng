@@ -124,6 +124,14 @@ CMathContent.prototype =
         for(var i = 0; i < this.content.length; i++)
             this.content[i].value.setTxtPrp(txtPrp);
     },
+    setCtrPrp: function(txtPrp)
+    {
+        this.TxtPrp = new CMathTextPrp();
+        this.TxtPrp.Merge(txtPrp);
+
+        for(var i=0; i < this.content.length; i++)
+            this.content[i].value.setCtrPrp(txtPrp);
+    },
     changeTxtPrp: function(txtPrp)
     {
         var start, end;
@@ -310,7 +318,7 @@ CMathContent.prototype =
         }
 
         var symb = new CMathText();
-        symb.relate(this);
+        //symb.relate(this);
         symb.add(code);
         var runPrp = this.getRunPrp(this.CurPos);
         symb.setTxtPrp( runPrp );
@@ -469,7 +477,7 @@ CMathContent.prototype =
 
         if( mathElem !== null )
         {
-            mathElem.relate(this);
+            //mathElem.relate(this);
             //mathElem.setReduct(this.reduct);
             var runPrp = this.getRunPrp(this.CurPos);
             mathElem.setTxtPrp( runPrp );
@@ -493,6 +501,7 @@ CMathContent.prototype =
 
         var tmp = this.content.splice(0, this.CurPos + 1);
         tmp.push(elem);
+        element.relate(this);
 
         tmp = tmp.concat( this.content.splice(0, this.content.length) );
         this.content.length = 0;
@@ -7086,8 +7095,10 @@ function CEmpty()
 
     this.IsHighElement =  function() { return false; };
     this.setTxtPrp = function(txtPrp) { this.TxtPrp.Merge(txtPrp); };
+    this.setCtrPrp = function(txtPrp) {};
     this.getRunPrp = function() {return this.TxtPrp; };
     this.setOwnTPrp = function() {};
+    this.relate     = function() {};
 
 }
 
