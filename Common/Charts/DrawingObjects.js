@@ -3136,8 +3136,8 @@ function DrawingObjects() {
 		var coords = _this.getBoundsCheckerCoords(checker);
 		if ( coords ) {
 		
-			//overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())), mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
-			//drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())) , mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
+			overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())), mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
+			drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())) , mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
 			
 			var r_ = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
 			worksheet._drawGrid( drawingCtx, r_);
