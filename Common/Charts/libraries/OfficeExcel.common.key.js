@@ -149,11 +149,16 @@
 		{
 			widthAllKey = 0;
 			var widthEveryElemKey = [];
+			var widthKey;
 			for(var l = 0; l < key.length; l++)
 			{
 				var props1 = getMaxPropertiesText(drwContext,font,key[l]);
-				widthAllKey += props1.width + (3)*scale + sizeLine;
-				widthEveryElemKey[l] = props1.width + (3)*scale + sizeLine;
+				if(bar._otherProps._key_max_width)
+					widthKey = bar._otherProps._key_max_width;
+				else
+					widthKey = props1.width;
+				widthAllKey += widthKey + (3)*scale + sizeLine;
+				widthEveryElemKey[l] = widthKey + (3)*scale + sizeLine;
 			}
 		}
 		
