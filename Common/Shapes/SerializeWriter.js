@@ -1910,6 +1910,35 @@ function CBinaryFileWriter()
         oThis.EndRecord();
     }
 
+    this.CorrectUniColorAlpha = function(color, trans)
+    {
+        // делаем прозрачность
+        var mods = color.Mods.Mods;
+        var _len = mods.length;
+
+        if (trans != null)
+        {
+            var nIndex = -1;
+            for (var i = 0; i < _len; i++)
+            {
+                if (mods[i].name == "alpha")
+                {
+                    nIndex = i;
+                    break;
+                }
+            }
+            if (-1 != nIndex)
+            {
+                --_len;
+                mods.splice(nIndex, 1);
+            }
+
+            mods[_len] = new CColorMod();
+            mods[_len].name = "alpha";
+            mods[_len].val = (trans * 100000 / 255) >> 0;
+        }
+    }
+
     this.WriteUniFill = function(unifill)
     {
         if (undefined === unifill || null == unifill)
@@ -1948,6 +1977,9 @@ function CBinaryFileWriter()
                     oThis._WriteInt1(0, fill.colors[i].pos);
                     oThis.WriteUChar(g_nodeAttributeEnd);
 
+                    // делаем прозрачность
+                    oThis.CorrectUniColorAlpha(fill.colors[i].color, trans);
+
                     oThis.WriteRecord1(0, fill.colors[i].color, oThis.WriteUniColor);
 
                     oThis.EndRecord();
@@ -1982,6 +2014,9 @@ function CBinaryFileWriter()
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteLimit2(0, fill.ftype);
                 oThis.WriteUChar(g_nodeAttributeEnd);
+
+                oThis.CorrectUniColorAlpha(fill.fgClr, trans);
+                oThis.CorrectUniColorAlpha(fill.bgClr, trans);
 
                 oThis.WriteRecord1(0, fill.fgClr, oThis.WriteUniColor);
                 oThis.WriteRecord1(1, fill.bgClr, oThis.WriteUniColor);
@@ -2087,34 +2122,7 @@ function CBinaryFileWriter()
             {
                 oThis.StartRecord(FILL_TYPE_SOLID);
 
-                var mods = fill.color.Mods.Mods;
-                var _len = mods.length;
-
-                if (trans != null)
-                {
-                    var nIndex = -1;
-                    for (var i = 0; i < _len; i++)
-                    {
-                        if (mods[i].name == "alpha")
-                        {
-                            nIndex = i;
-                            break;
-                        }
-                    }
-                    if (-1 != nIndex)
-                    {
-                        --_len;
-                        mods.splice(nIndex, 1);
-                    }
-                }
-
-                if (null != trans)
-                {
-                    mods[_len] = new CColorMod();
-                    mods[_len].name = "alpha";
-                    mods[_len].val = (trans * 100000 / 255) >> 0;
-                }
-
+                oThis.CorrectUniColorAlpha(fill.color, trans);
                 oThis.WriteRecord1(0, fill.color, oThis.WriteUniColor);
                 oThis.EndRecord();
                 break;

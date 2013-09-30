@@ -976,8 +976,13 @@ CUniColor.prototype =
         return _ret;
     },
 
-    getCSSColor : function()
+    getCSSColor : function(transparent)
     {
+        if (transparent != null)
+        {
+            var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + ",1)";
+            return _css;
+        }
         var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + "," + (this.RGBA.A / 255) + ")";
         return _css;
     }

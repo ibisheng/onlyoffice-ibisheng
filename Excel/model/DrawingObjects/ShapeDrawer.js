@@ -937,7 +937,10 @@ CShapeDrawer.prototype =
                 var _fc = _fill.fgClr.RGBA;
                 var _bc = _fill.bgClr.RGBA;
 
-                var _test_pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+                var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
+                var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
+
+                var _test_pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
                 var patt = _ctx.createPattern(_test_pattern.Canvas, "repeat");
 
                 _ctx.save();
@@ -961,7 +964,10 @@ CShapeDrawer.prototype =
                 if (_is_ctx === true)
                 {
                     var _old_global_alpha = _ctx.globalAlpha;
-                    _ctx.globalAlpha = this.UniFill.transparent / 255;
+
+                    if (null != this.UniFill.transparent)
+                        _ctx.globalAlpha = this.UniFill.transparent / 255;
+
                     _ctx.fillStyle = patt;
                     _ctx.fill();
                     _ctx.globalAlpha = _old_global_alpha;
@@ -1011,7 +1017,7 @@ CShapeDrawer.prototype =
 
                 for (var i = 0; i < _fill.colors.length; i++)
                 {
-                    gradObj.addColorStop(_fill.colors[i].pos / 100000, _fill.colors[i].color.getCSSColor());
+                    gradObj.addColorStop(_fill.colors[i].pos / 100000, _fill.colors[i].color.getCSSColor(this.UniFill.transparent));
                 }
 
                 _ctx.fillStyle = gradObj;
@@ -1290,7 +1296,10 @@ CShapeDrawer.prototype =
                         var _fc = _fill.fgClr.RGBA;
                         var _bc = _fill.bgClr.RGBA;
 
-                        var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+                        var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
+                        var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
+
+                        var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
 
                         var _url64 = "";
                         try
@@ -1303,7 +1312,11 @@ CShapeDrawer.prototype =
                         }
 
                         this.Graphics.put_brushTexture(_url64, 1);
-                        this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+
+                        if (null != this.UniFill.transparent)
+                            this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+                        else
+                            this.Graphics.put_BrushTextureAlpha(255);
 
                         bIsPattern = true;
                     }
@@ -1327,7 +1340,7 @@ CShapeDrawer.prototype =
                             points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
                         }
 
-                        this.Graphics.put_BrushGradient(_fill, points);
+                        this.Graphics.put_BrushGradient(_fill, points, this.UniFill.transparent);
                     }
                     else
                     {
@@ -1669,6 +1682,10 @@ CShapeDrawer.prototype =
         }
         // никогда сюда не зайдем
         return points;
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
     }
 };
 

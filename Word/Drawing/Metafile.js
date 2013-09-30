@@ -901,7 +901,7 @@ CMetafile.prototype =
         this.Memory.WriteByte(write);
     },
 
-    put_BrushGradient : function(gradFill, points)
+    put_BrushGradient : function(gradFill, points, transparent)
     {
         this.BrushType = MetaBrushType.Gradient;
 
@@ -952,7 +952,11 @@ CMetafile.prototype =
             this.Memory.WriteByte(_colors[i].color.RGBA.R);
             this.Memory.WriteByte(_colors[i].color.RGBA.G);
             this.Memory.WriteByte(_colors[i].color.RGBA.B);
-            this.Memory.WriteByte(_colors[i].color.RGBA.A);
+
+            if (null == transparent)
+                this.Memory.WriteByte(_colors[i].color.RGBA.A);
+            else
+                this.Memory.WriteByte(transparent);
         }
 
         this.Memory.WriteByte(g_nodeAttributeEnd);
@@ -1871,10 +1875,10 @@ CDocumentRenderer.prototype =
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].put_BrushTextureAlpha(alpha);
     },
-    put_BrushGradient : function(gradFill, points)
+    put_BrushGradient : function(gradFill, points, transparent)
     {
         if (0 != this.m_lPagesCount)
-            this.m_arrayPages[this.m_lPagesCount - 1].put_BrushGradient(gradFill, points);
+            this.m_arrayPages[this.m_lPagesCount - 1].put_BrushGradient(gradFill, points, transparent);
     },
 
     // функции клиппирования

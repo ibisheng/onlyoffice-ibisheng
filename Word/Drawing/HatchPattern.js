@@ -665,8 +665,8 @@ function CHatchBrush()
     this.Ctx    = null;
     this.Data   = null;
 
-    this.fgClr = { R : -1, G : -1, B : -1 };
-    this.bgClr = { R : -1, G : -1, B : -1 };
+    this.fgClr = { R : -1, G : -1, B : -1, A : 255 };
+    this.bgClr = { R : -1, G : -1, B : -1, A : 255 };
 }
 CHatchBrush.prototype =
 {
@@ -685,21 +685,24 @@ CHatchBrush.prototype =
         this.Data = this.Ctx.createImageData(HATCH_TX_SIZE, HATCH_TX_SIZE);
     },
 
-    CheckColors : function(r,g,b,br,bg,bb)
+    CheckColors : function(r,g,b,a,br,bg,bb,ba)
     {
         if (null == this.Canvas)
             return;
 
-        if (this.fgClr.R == r && this.fgClr.G == g && this.fgClr.B == b && this.bgClr.R == br && this.bgClr.G == bg && this.bgClr.B == bb)
+        if (this.fgClr.R == r && this.fgClr.G == g && this.fgClr.B == b && this.fgClr.A == a &&
+            this.bgClr.R == br && this.bgClr.G == bg && this.bgClr.B == bb && this.bgClr.A == ba)
             return;
 
         this.fgClr.R = r;
         this.fgClr.G = g;
         this.fgClr.B = b;
+        this.fgClr.A = a;
 
         this.bgClr.R = br;
         this.bgClr.G = bg;
         this.bgClr.B = bb;
+        this.bgClr.A = ba;
 
         var _len = HATCH_TX_SIZE * HATCH_TX_SIZE;
         var _src_data_offset = global_hatch_offsets[this.Name] * _len;
@@ -714,14 +717,14 @@ CHatchBrush.prototype =
                 _dst_data[_ind++] = r;
                 _dst_data[_ind++] = g;
                 _dst_data[_ind++] = b;
-                _dst_data[_ind++] = 255;
+                _dst_data[_ind++] = a;
             }
             else
             {
                 _dst_data[_ind++] = br;
                 _dst_data[_ind++] = bg;
                 _dst_data[_ind++] = bb;
-                _dst_data[_ind++] = 255;
+                _dst_data[_ind++] = ba;
             }
         }
 
@@ -729,18 +732,18 @@ CHatchBrush.prototype =
     }
 };
 
-function GetHatchBrush(name, r, g, b, br, bg, bb)
+function GetHatchBrush(name, r, g, b, a, br, bg, bb, ba)
 {
     var _brush = global_hatch_brushes[name];
     if (_brush !== undefined)
     {
-        _brush.CheckColors(r, g, b, br, bg, bb);
+        _brush.CheckColors(r, g, b, a, br, bg, bb, ba);
         return _brush;
     }
 
     _brush = new CHatchBrush();
     _brush.Create(name);
-    _brush.CheckColors(r, g, b, br, bg, bb);
+    _brush.CheckColors(r, g, b, a, br, bg, bb, ba);
     global_hatch_brushes[name] = _brush;
     return _brush;
 }
