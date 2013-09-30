@@ -7067,7 +7067,119 @@ CMathComposition.prototype =
         this.UpdatePosition();
         //this.SelectContent.drawSelect();
         this.CheckTarget();
-    }
+    },
+
+    //test
+    // из MathControl
+    OnKeyDown: function(e)
+    {
+        //стрелка вверх
+        if(e.KeyCode==38)
+        {
+            this.Cursor_MoveUp();
+
+            return true;
+        }
+        //стрелка вниз
+        else if(e.KeyCode==40)
+        {
+            this.Cursor_MoveDown();
+
+            return true;
+        }
+        //стрелка влево
+        if(e.KeyCode==37)
+        {
+            this.Cursor_MoveLeft();
+
+            return true;
+        }
+        //стрелка вправо
+        else if(e.KeyCode==39)
+        {
+            this.Cursor_MoveRight();
+
+            return true;
+        }
+        //backspace
+        else if(e.KeyCode==8)
+        {
+            try
+            {
+                if(this.Remove(1))
+                {
+                    //this.UpdatePosition();
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
+
+                }
+            }
+            catch(e)
+            {
+
+            }
+
+            return true;
+        }
+        //delete
+        else if ( e.KeyCode == 46)
+        {
+            if(this.Remove(-1))
+            {
+                //this.UpdatePosition();
+                editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
+
+            }
+        }
+
+        return false;
+    },
+    OnKeyPress: function(e)
+    {
+        var code = e.CharCode;
+
+        //
+        /*if(code == 42)
+         code = 8727;
+         else if(code == 45)
+         code = 8722;
+
+         else if(code == 37)
+         code = 0x222B;
+
+         else if(code==94)
+         code = 0x2211;
+
+         if(code == 0x0068)
+         code = 0x210E;*/
+        /*else if(code > 0x0040 && code < 0x005B)
+         code = code + 0x1D3F3;
+         else if(code > 0x0060 && code < 0x007b)
+         code = code + 0x1D3ED;*/
+
+        if(code>=0x0020 )
+        {
+            editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
+            this..AddLetter(code);
+
+            return true;
+        }
+
+        return false;
+    },
+    OnMouseDown: function(x,y)
+    {
+        var coord = this.GetCoordComp(x,y);
+
+        if( this.IsRect(coord.x, coord.y) )
+            this.MouseDown(coord.x, coord.y);
+    },
+    OnMouseMove: function(x,y)
+    {
+        var coord = this.GetCoordComp(x,y);
+
+        if( this.IsRect(coord.x, coord.y) )
+            this.MouseMove(coord.x, coord.y);
+    },
 }
 
 function CEmpty()

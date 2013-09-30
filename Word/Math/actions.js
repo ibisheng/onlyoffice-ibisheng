@@ -1167,6 +1167,10 @@ function Create_Structures()
     }
 
 }
+
+var MathComposition = new CMathComposition();
+MathComposition.SetPosition({x: 27.5 - 6, y: 25.3 });
+
 function MathRecalculate()
 {
     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
