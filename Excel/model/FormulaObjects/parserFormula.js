@@ -791,7 +791,7 @@ function cBaseOperator( name, priority, argumentCount ) {
         def:-1, //подразумевается формат первой ячейки входящей в формулу.
         noneFormat:-2
     };
-    this.numFormat = this.formatType.noneFormat;
+    this.numFormat = this.formatType.def;
 }
 cBaseOperator.prototype = {
     constructor:cBaseOperator,
