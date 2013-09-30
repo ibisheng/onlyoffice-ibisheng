@@ -1147,7 +1147,8 @@
 				t.hasFocus = true;
 				if (!t.isCellEditMode) {
 					if (event.shiftKey) {
-						t._changeSelection(event, /*isSelectMode*/false);
+						t.isSelectMode = true;
+						t._changeSelection(event, /*isSelectMode*/true);
 						return;
 					}
 					if (t.targetInfo){
@@ -1185,7 +1186,8 @@
 						if (!t.handlers.trigger("stopCellEditing")) {return;}
 					} else {
 						if (event.shiftKey) {
-							t._changeSelection(event, /*isSelectMode*/false);
+							t.isSelectMode = true;
+							t._changeSelection(event, /*isSelectMode*/true);
 							return;
 						} else {
 							if (t.isFormulaEditMode) {

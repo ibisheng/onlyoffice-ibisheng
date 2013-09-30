@@ -61,6 +61,7 @@
 			this.Api					= Api;
 			this.collaborativeEditing	= collaborativeEditing;
 			this.lastSendInfoRange		= null;
+			this.canUpdateAfterShiftUp	= false;	// Нужно ли обновлять информацию после отпускания Shift
 
 			//----- declaration -----
 			this.canvas = undefined;
@@ -488,6 +489,10 @@
 				var d = isStartPoint ?
 						ws.changeSelectionStartPoint(dc, dr, isCoord, isSelectMode):
 						ws.changeSelectionEndPoint(dc, dr, isCoord, isSelectMode);
+				if (!isCoord && !isStartPoint && !isSelectMode) {
+					// Выделение с зажатым shift
+					this.canUpdateAfterShiftUp = true;
+				}
 				if ($.isFunction(callback)) {callback(d);}
 			},
 
@@ -695,8 +700,11 @@
 			},
 
 			_onUpdateSelectionName: function () {
-				var ws = this.getWorksheet();
-				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
+				if (this.canUpdateAfterShiftUp) {
+					this.canUpdateAfterShiftUp = false;
+					var ws = this.getWorksheet();
+					this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
+				}
 			},
 			
 			// Shapes
