@@ -722,6 +722,10 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 			//+ высота легенды
 			if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
 			{
+				for(var i = 0; i < bar._otherProps._key.length; i++)
+				{					
+					bar._otherProps._key[i] = cutLabels((0.9*chartCanvas.width - widthLine), bar._otherProps._key[i]);
+				}
 				var font = getFontProperties("key");
 				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
 				//длинные подписи, или их большое количество разделяем на несколько строк
