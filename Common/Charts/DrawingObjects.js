@@ -3089,27 +3089,13 @@ function DrawingObjects() {
 			coords.w = checker.Bounds.max_x - checker.Bounds.min_x;
 			coords.h = checker.Bounds.max_y - checker.Bounds.min_y;
 			
-			// Top left
-			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.getY())), true);
-			coords.r1 = foundRow ? foundRow.row : 0;
+			var cellFrom = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x) + scrollOffset.getX(), mmToPx(checker.Bounds.min_y) + scrollOffset.getY() );
+			var cellTo = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x) + scrollOffset.getX(), mmToPx(checker.Bounds.max_y) + scrollOffset.getY() );
 			
-			var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.getX())), true);
-			coords.c1 = foundCol ? foundCol.col : 0;
-			
-			// Right bottom
-			foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.getY())), true);
-			while ( !foundRow ) {
-				worksheet.expandRowsOnScroll(true);
-				foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.getY())), true);
-			}
-			coords.r2 = foundRow.row;
-			
-			foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.getX())), true);
-			while ( !foundCol ) {
-				worksheet.expandColsOnScroll(true);
-				foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.getX())), true);
-			}
-			coords.c2 = foundCol.col;
+			coords.c1 = cellFrom.col;
+			coords.r1 = cellFrom.row;
+			coords.c2 = cellTo.col;
+			coords.r2 = cellTo.row;
 			
 			return coords;
 		}
@@ -3150,8 +3136,8 @@ function DrawingObjects() {
 		var coords = _this.getBoundsCheckerCoords(checker);
 		if ( coords ) {
 		
-			overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())), mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
-			drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())) , mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
+			//overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())), mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
+			//drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())) , mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
 			
 			var r_ = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
 			worksheet._drawGrid( drawingCtx, r_);
@@ -4936,21 +4922,25 @@ function CoordsManager(ws, bLog) {
 		var topHeaderHeight = fvr ? worksheet.getCellTop(fvr, 1) - worksheet.getCellTop(0, 1) : 0;		
 		var leftHeaderWidth = fvc ? worksheet.getCellLeft(fvc, 1) - worksheet.getCellLeft(0, 1) : 0;
 		
+		var delta = 0;
 		var col = worksheet._findColUnderCursor( x_pt - leftHeaderWidth, true );
 		while (col == null) {
 			worksheet.expandColsOnScroll(true);
 			worksheet._trigger("reinitializeScrollX");
-			col = worksheet._findColUnderCursor( x_pt, true );
+			col = worksheet._findColUnderCursor( x_pt - leftHeaderWidth + delta, true );
+			delta++;
 		}
 		cell.col = col.col;
 		cell.colOff = Math.max(0, _x - worksheet.getCellLeft(cell.col, 0));
 		cell.colOffMm = worksheet.objectRender.convertMetric(cell.colOff, 0, 3);
 
+		delta = 0;
 		var row = worksheet._findRowUnderCursor( y_pt - topHeaderHeight, true );
 		while (row == null) {
 			worksheet.expandRowsOnScroll(true);
 			worksheet._trigger("reinitializeScrollY");
-			row = worksheet._findRowUnderCursor( y_pt, true );
+			row = worksheet._findRowUnderCursor( y_pt - topHeaderHeight + delta, true );
+			delta++;
 		}
 		cell.row = row.row;
 		cell.rowOff = Math.max(0, _y - worksheet.getCellTop(cell.row, 0));
