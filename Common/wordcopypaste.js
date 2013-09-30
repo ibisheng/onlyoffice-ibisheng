@@ -1923,6 +1923,15 @@ CopyProcessor.prototype =
                     sp_tree[i].graphicObject.styleIndex = -1;
                 }
             }
+            this.oPresentationWriter.WriteULong(table_styles_ids.length);
+            for(var i = 0; i < table_styles_ids.length; ++i)
+            {
+                this.oPresentationWriter.WriteBool(isRealNumber(table_styles_ids[i]) && table_styles_ids[i] > -1)
+                if(isRealNumber(table_styles_ids[i]) && table_styles_ids[i] > -1)
+                {
+                    this.oPresentationWriter.WriteULong(table_styles_ids[i]);
+                }
+            }
             this.oPresentationWriter.WriteSlide(slide);
 
             var  j = 0;
@@ -3398,7 +3407,26 @@ PasteProcessor.prototype =
                             for(var i = 0; i < slide_count; ++i)
                             {
                                 arr_layouts_id[i] = stream.GetString2();
+                                var long = stream.GetULong();
+                                var table_style_ids = [];
+                                for(var j = 0; j < long; ++j)
+                                {
+                                    if(stream.GetBool())
+                                        table_style_ids.push(stream.GetULong());
+                                    else
+                                        table_style_ids.push(-1);
+                                }
                                 arr_slides[i] = loader.ReadSlide(0);
+                                var sp_tree = arr_slides[i].cSld.spTree;
+                                var t = 0;
+                                for(var s = 0; s < sp_tree.length; ++s)
+                                {
+                                    if(sp_tree[s] instanceof CGraphicFrame)
+                                    {
+                                        sp_tree[s].graphicObject.setStyleIndex(table_style_ids[t]);
+                                        ++t;
+                                    }
+                                }
                             }
 
                             var arr_layouts = [];
