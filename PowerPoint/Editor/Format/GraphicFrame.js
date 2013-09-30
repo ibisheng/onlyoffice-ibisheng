@@ -333,6 +333,9 @@ CGraphicFrame.prototype =
         return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
     },
 
+    changeSize: function(kw, kh)
+    {},
+
     getTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)

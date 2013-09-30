@@ -4720,34 +4720,19 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
     {
         History.TurnOff();
     }
-    var _new_layout = arr_layouts[pos];
-    if(!_new_layout.calculated)
+    if(slide !== null && typeof slide === "object")
     {
-        _new_layout.elementsManipulator = new AutoShapesContainer(editor.WordControl.m_oLogicDocument, 0);
+        var _new_layout = slide.Layout;
         var _arr_shapes = _new_layout.cSld.spTree;
         var _shape_index;
-        /*if(Math.abs(presentation.Width - 254) > 1 || Math.abs(presentation.Width - 190.5) > 1)
-        {
-            var kx = presentation.Width/254;
-            var ky = presentation.Height/190.5;
-            for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-            {
-                _arr_shapes[_shape_index].resizeToFormat(kx, ky);
-            }
-        }    */
         for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
         {
-            _arr_shapes[_shape_index].setParent(_new_layout);
-            _arr_shapes[_shape_index].setContainer(_new_layout.elementsManipulator);
-            _arr_shapes[_shape_index].calculate();
+            _arr_shapes[_shape_index].recalculate();
         }
-        _new_layout.calculated = true;
+        slide.recalcAll();
+        slide.recalculate();
+        presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
     }
-
-    /*slide.prepareToChangeTheme(_new_layout);
-    slide.Layout = _new_layout;  */
-    slide.calculate2();
-    presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
 
     if(_history_is_on)
     {

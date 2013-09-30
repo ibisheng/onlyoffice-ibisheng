@@ -1472,6 +1472,11 @@ CPresentation.prototype =
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection)
     {
+        if(editor.WordControl.Thumbnails.FocusObjType === FOCUS_OBJECT_THUMBNAILS)
+        {
+            this.deleteSlides(editor.WordControl.Thumbnails.GetSelectedArray());
+            return;
+        }
         if ( "undefined" === typeof(bRemoveOnlySelection) )
             bRemoveOnlySelection = false;
 
@@ -6181,191 +6186,56 @@ CPresentation.prototype =
         this.slideMasters.push(themeInfo.Master);
         this.slideLayouts = this.slideLayouts.concat(themeInfo.Layouts);
 
+
         var _new_master = themeInfo.Master;
         _new_master.presentation = this;
 
-
-        if(!_new_master.calculated)
-        {
-            _new_master.elementsManipulator = new AutoShapesContainer(this, 0);
-            _new_master.elementsManipulator.ArrGlyph = _new_master.cSld.spTree;
-            var _shape_index;
-            var _arr_shapes = _new_master.cSld.spTree;
-            /* if(Math.abs(this.Width - 254) > 1 || Math.abs(this.Height - 190.5) > 1)
-             {
-             var kx = this.Width/254;
-             var ky = this.Height/190.5;
-             for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-             {
-             _arr_shapes[_shape_index].resizeToFormat(kx, ky);
-             }
-             }  */
-            for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-            {
-
-                _arr_shapes[_shape_index].setParent(_new_master);
-                _arr_shapes[_shape_index].setContainer(_new_master.elementsManipulator);
-                _arr_shapes[_shape_index].calculate();
-
-            }
-            _new_master.calculated = true;
-
-            var _layouts = _new_master.sldLayoutLst;
-            var _layout_index;
-            var _layout_count = _layouts.length;
-            var _cur_layout;
-            for(_layout_index = 0; _layout_index < _layout_count; ++_layout_index)
-            {
-                _cur_layout = _layouts[_layout_index];
-                _cur_layout.elementsManipulator = new AutoShapesContainer(this, 0);
-                _cur_layout.elementsManipulator.ArrGlyph = _cur_layout.cSld.spTree;
-                if(!_cur_layout.calculated)
-                {
-                    _arr_shapes = _cur_layout.cSld.spTree;
-                    for(_shape_index = 0; _shape_index < _arr_shapes.length; ++_shape_index)
-                    {
-                        _arr_shapes[_shape_index].setParent(_cur_layout);
-                        _arr_shapes[_shape_index].setContainer(_cur_layout.elementsManipulator);
-                        _arr_shapes[_shape_index].calculate();
-                    }
-                    _cur_layout.calculated = true;
-                }
-
-            }
-        }
 
 
         var _master_width = _new_master.Width;
         var _master_height = _new_master.Height;
         if(Math.abs(_master_height - this.Height) > 1 || Math.abs(_master_width - this.Width) > 1)
         {
-            _new_master.setSize(this.Width, this.Height);
+            //   _new_master.setSize(this.Width, this.Height);
         }
 
-
+        _new_master.recalculate();
         var _arr_slides = this.Slides;
-        var _current_slide = _arr_slides[this.CurPage];
+        var _slides_array = [];
+        for(var _index = 0; _index < arrInd.length; ++_index)
+        {
+            _slides_array.push(this.Slides[arrInd[_index]]);
+        }
+        var _current_slide = this.Slides[this.CurPage];
         var _presentation = this;
 
-        var _slides_array = [];
-        for(var _index = 0; _index < this.Slides.length; ++_index)
-        {
-            _slides_array.push(this.Slides[_index]);
-        }
+        var _slide_index;
 
-        var _arr_old_layouts = [];
-        var _index_number;
-        for(_index_number = 0; _index_number < arrInd.length; ++_index_number)
-        {
-            _arr_old_layouts[_index_number] = _arr_slides[arrInd[_index_number]].Layout;
-        }
+        // History.Create_NewPoint();
 
         var _arr_new_layouts = [];
         var _new_layout;
-        History.Create_NewPoint();
-        for(_index_number = 0; _index_number < arrInd.length; ++_index_number)
+        for(_slide_index = 0; _slide_index < _slides_array.length; ++_slide_index)
         {
-            if(_arr_slides[arrInd[_index_number]].Layout.calculatedType == null)
+            if(_slides_array[_slide_index].Layout.calculatedType == null)
             {
-                _arr_slides[arrInd[_index_number]].Layout.calculateType();
+                _slides_array[_slide_index].Layout.calculateType();
             }
-            _new_layout = _new_master.getMatchingLayout(_arr_slides[arrInd[_index_number]].Layout.type, _arr_slides[arrInd[_index_number]].Layout.matchingName, _arr_slides[arrInd[_index_number]].Layout.cSld.name, true);//.type, _arr_slides[arrInd[_index_number]].Layout.matchingName, _arr_slides[arrInd[_index_number]].Layout.cSld.name);
+            _new_layout = _new_master.getMatchingLayout(_slides_array[_slide_index].Layout.type, _slides_array[_slide_index].Layout.matchingName, _slides_array[_slide_index].Layout.cSld.name, true);//.type, _arr_slides[_slide_index].Layout.matchingName, _arr_slides[_slide_index].Layout.cSld.name);
             if(_new_layout === null)
             {
                 _new_layout = _new_master.sldLayoutLst[0];
             }
             _arr_new_layouts.push(_new_layout);
-            _arr_slides[arrInd[_index_number]].prepareToChangeTheme(_new_layout);
-            _arr_slides[arrInd[_index_number]].Layout = _new_layout;
+
+            _slides_array[_slide_index].setLayout(_new_layout);
         }
-        var _start_index_pos;
-        for(_index_number = 0; _index_number < arrInd.length; ++_index_number)
-        {
-            if(arrInd[_index_number] == this.CurPage)
-            {
-                _start_index_pos = _index_number;
-                break;
-            }
-        }
-        if(_index_number == arrInd.length)
-        {
-            _start_index_pos = 0;
-        }
-
-        var _history_obj = {};
-        _history_obj.Type = history_undo_redo_const;
-        _history_obj.oldLayouts = _arr_old_layouts;
-        _history_obj.newLayouts = _arr_new_layouts;
-        _history_obj.startIndexPos = _start_index_pos;
-        _history_obj.arrInd = arrInd;
-        _history_obj.slidesArray = _slides_array;
-        _history_obj.undo_function = function(data)
-        {
-            if(this.startChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.startChangeThemeTimeOutId);
-            }
-            if(this.backChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.backChangeThemeTimeOutId);
-            }
-            if(this.forwardChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.forwardChangeThemeTimeOutId);
-            }
-
-            var _new_master = data.oldLayouts[0].Master;
-            var _master_width = _new_master.Width;
-            var _master_height = _new_master.Height;
-            if(Math.abs(_master_height - this.Height) > 1 || Math.abs(_master_width - this.Width) > 1)
-            {
-                _new_master.setSize(this.Width, this.Height);
-            }
-            var _presentation = this;
-            for(var i = 0; i < data.arrInd.length; ++i)
-            {
-                data.slidesArray[arrInd[i]].prepareToChangeTheme2();
-                data.slidesArray[arrInd[i]].Layout =  data.oldLayouts[i];
-            }
-
-            this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(data.slidesArray[data.arrInd[data.startIndexPos]], _presentation, data.arrInd,  data.startIndexPos, _history_obj.oldLayouts, 0, data.slidesArray)}, 30);
-        };
-        _history_obj.redo_function = function(data)
-        {
-            if(this.startChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.startChangeThemeTimeOutId);
-            }
-            if(this.backChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.backChangeThemeTimeOutId);
-            }
-            if(this.forwardChangeThemeTimeOutId != null)
-            {
-                clearTimeout(this.forwardChangeThemeTimeOutId);
-            }
-            var _new_master = data.newLayouts[0].Master;
-            var _master_width = _new_master.Width;
-            var _master_height = _new_master.Height;
-            if(Math.abs(_master_height - this.Height) > 1 || Math.abs(_master_width - this.Width) > 1)
-            {
-                _new_master.setSize(this.Width, this.Height);
-            }
-            var _presentation = this;
-            for(var i = 0; i < data.arrInd.length; ++i)
-            {
-                data.slidesArray[arrInd[i]].prepareToChangeTheme2();
-                data.slidesArray[arrInd[i]].Layout =  data.newLayouts[i];
-            }
-
-            this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(data.slidesArray[data.arrInd[data.startIndexPos]], _presentation, data.arrInd,  data.startIndexPos, _history_obj.newLayouts, 0, data.slidesArray)}, 30);
-        };
-
-        History.Add(this, _history_obj);
 
         this.resetStateCurSlide();
 
-        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_slides_array[arrInd[_start_index_pos]], _presentation, arrInd,  _start_index_pos, _arr_new_layouts, 0, _slides_array)}, 30);
+        var start = this.CurPage;
+        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_current_slide, _presentation, arrInd, start, _arr_new_layouts,0, _slides_array)}, 30);
+
 
         this.Document_UpdateUndoRedoState();
     },

@@ -814,7 +814,11 @@ CGraphicObjects.prototype = {
                 {
                     editor.sync_TblPropCallback(tables[0].graphicObject.Get_Props());
                     this.slide.presentation.DrawingDocument.CheckTableStyles(tables[0].graphicObject.Get_TableLook(), tables[0]);
-                    var _cur_paragraph_para_pr = tables[0].getParagraphParaPr();
+                }
+                for(var i = 0; i < tables.length; ++i)
+                {
+
+                    var _cur_paragraph_para_pr = tables[i].getParagraphParaPr();
                     if(_cur_paragraph_para_pr != null)
                     {
                         if(para_props === null)

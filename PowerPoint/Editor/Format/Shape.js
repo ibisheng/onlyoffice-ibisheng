@@ -3695,7 +3695,6 @@ CShape.prototype =
         if(this.txBody)
         {
             this.txBody.content.Set_SelectionState(s, s.length-1);
-            this.txBody.content.RecalculateCurPos();
         }
     },
 
