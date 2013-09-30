@@ -9,13 +9,13 @@
     <link rel="icon" href="resources/img/favicon.ico" type="image/x-icon" />
 
     <link rel="stylesheet" type="text/css" href="../../../3rdparty/extjs/resources/css/ext-all.css">
-    <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/header.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/load-mask.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/chat-panel.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/jquery.jscrollpane.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/asc.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/participantspanel.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchfield.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchdialog.css">
 
@@ -55,6 +55,7 @@
             min-width:240px;
             vertical-align:top;
             background-image:url('./resources/img/loading-logo.gif');
+            background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
             background-repeat:no-repeat;
         }
 
@@ -88,6 +89,7 @@
     <script type="text/javascript" src="../../../3rdparty/jquery/mousewheel/jquery.mousewheel.js"></script>
     <script type="text/javascript" src="../../../3rdparty/jquery/jscrollpane/jquery.jscrollpane.js"></script>
     <script type="text/javascript" src="../../../3rdparty/sockjs/sockjs-0.3.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script> 
     <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
 
     <!-- Application -->
@@ -97,6 +99,7 @@
     <script type="text/javascript" src="../../common/Gateway.js"></script>
     <script type="text/javascript" src="../../common/IrregularStack.js"></script>
     <script type="text/javascript" src="../../common/main/loader.js"></script>
+    <script type="text/javascript" src="../../common/main/lib/component/util/MetricSettings.js"></script>
     <script type="text/javascript" src="app.js"></script>
     <script type="text/javascript" src="../../common/locale.js"></script>
     
@@ -270,11 +273,11 @@
 
     <script type="text/javascript">
         var isBrowserSupported = function() {
-            return !((Ext.isIE6 || Ext.isIE7 || Ext.isIE8) ||
-                    (Ext.isSafari2 || Ext.isSafari3 || Ext.isSafari4) ||
-                    (Ext.isGecko && Ext.firefoxVersion < 4.0) ||
-                    (Ext.isChrome && Ext.chromeVersion < 7.0) ||
-                    (Ext.isOpera && Ext.operaVersion < 10.5));
+            return !((Ext.ieVersion != 0 && Ext.ieVersion < 9.0) ||
+                    (Ext.safariVersion != 0 && Ext.safariVersion < 5.0) ||
+                    (Ext.firefoxVersion != 0 && Ext.firefoxVersion < 4.0) ||
+                    (Ext.chromeVersion != 0 && Ext.chromeVersion < 7.0) ||
+                    (Ext.operaVersion != 0 && Ext.operaVersion < 10.5));
         };
 
         if (!isBrowserSupported()){
@@ -297,7 +300,7 @@
                 '../../common/main/resources/css/themecolorpalette.css',
                 '../../common/main/resources/css/grouped-data-view.css', '../../common/main/resources/css/multislider-gradient.css',
                 'resources/css/dimension-picker.css', 'resources/css/toolbar.css', '../../common/main/resources/css/dataview-combo.css',
-                'resources/css/right-panels.css', 'resources/css/advanced-settings-dialog.css'];
+                'resources/css/right-panels.css', 'resources/css/advanced-settings-dialog.css', '../../common/main/resources/css/synchronize-tip.css'];
         };
     </script>
 
