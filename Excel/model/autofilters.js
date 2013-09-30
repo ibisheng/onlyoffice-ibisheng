@@ -12,6 +12,7 @@
 		 */
 		var prot;
 		var turnOnProcessingSpecSymbols = true;
+		var startRedo = false;
 
 		function AutoFiltersOptionsElements (val, visible) {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
@@ -425,8 +426,8 @@
 										{
 											var range = ws.model.getCell(cell);
 											strNum = range.getValue();
-											if(!isTurnOffHistory)
-												range.setNumFormat("@");
+											//if(!isTurnOffHistory)
+												//range.setNumFormat("@");
 										}
 										tableColumns[j] = 
 										{
@@ -467,7 +468,7 @@
 									//устанавливаем стиль для таблицы
 									if(!isAll)
 									{
-										t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1]);
+										t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1], null, true);
 										var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 										var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 										var arn = 
@@ -777,7 +778,7 @@
 						//устанавливаем стиль для таблицы
 						if(!isAll)
 						{
-							t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1]);
+							t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1], null,true);
 							var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 							var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 							var arn = 
@@ -1141,7 +1142,7 @@
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
 				{
-					this._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[openFilter],true);
+					this._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[openFilter],null, true);
 					var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 					var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 					var arn = 
@@ -1737,6 +1738,7 @@
 			},*/
 			// Redo
 			Redo: function (type, data) {
+				startRedo = true;
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
@@ -1759,6 +1761,7 @@
 						this._moveAutoFilters(data.worksheet, data.moveTo, data.moveFrom);
 						break;
 				}
+				startRedo = false;
 				History.TurnOn();
 			},
 			
@@ -1825,7 +1828,7 @@
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = data;
 								var splitRange = data.Ref.split(':');
-								this._setColorStyleTable(splitRange[0],splitRange[1],ws,data);
+								this._setColorStyleTable(splitRange[0],splitRange[1],ws,data, null,true);
 								this._addButtonAF({result: data.result,isVis: true},ws);
 							}
 							else
@@ -3168,7 +3171,7 @@
 				var oRange = ws.getRange2(sRef);
 				oRange.setTableStyle(null);
 			},
-			_setColorStyleTable: function(id,idNext,ws,options, isOpenFilter)
+			_setColorStyleTable: function(id,idNext,ws,options, isOpenFilter, isSetVal)
 			{
 				var firstCellAddress = new CellAddress(id);
 				var endCellAddress = new CellAddress(idNext);
@@ -3193,8 +3196,11 @@
 							var range = ws.model.getCell3(bbox.r1, i);
 							var num = i - bbox.c1;
 							var tableColumn = options.TableColumns[num];
-							if(null != tableColumn && null != tableColumn.Name)
+							if(null != tableColumn && null != tableColumn.Name && !startRedo && isSetVal)
+							{
 								range.setValue(tableColumn.Name);
+								range.setNumFormat("@");
+							}
 						}
 					}
 					//заполняем стили
@@ -5401,8 +5407,8 @@
 							s = -1;
 						};
 					};
-					if(!isTurnOffHistory)
-						cell.setNumFormat("@");
+					//if(!isTurnOffHistory)
+						//cell.setNumFormat("@");
 					tableColumns[col1 - range.c1] = {
 						Name: valNew
 					};
