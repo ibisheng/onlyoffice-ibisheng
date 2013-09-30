@@ -83,8 +83,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			this.asyncMethodCallback = undefined;
 
-			this.ScriptLoader = window.g_script_loader;
-
 			// Тип состояния на данный момент (сохранение, открытие или никакое)
 			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 			// Переменная отвечает, загрузились ли фонты
@@ -122,7 +120,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			// Shapes
 			this.isStartAddShape = false;
-			this.addShapePreset = "";
 			this.ImageLoader = window.g_image_loader;
 			this.ImageLoader.put_Api(this);
 			this.shapeElementId = null;
@@ -1076,7 +1073,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 					
 					this.handlers.trigger("asc_onInitStandartTextures", arr);
-				}				
+				}
 			},
 
 			asc_unregisterCallback: function (name, callback) {
@@ -2264,7 +2261,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Shapes
 			asc_startAddShape: function(sPreset) {
 				this.isStartAddShape = true;
-				this.addShapePreset = sPreset;
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.startTrackNewShape(sPreset);
 			},

@@ -69,7 +69,7 @@
 			this.wsActive = -1;
 			this.wsViews = [];
 			this.cellEditor = undefined;
-			this.fontRenderingMode = c_oAscFontRenderingModeType.hintingAndSubpixeling;
+			this.fontRenderingMode = null;
 
 			this._lockDraw = false;
 
