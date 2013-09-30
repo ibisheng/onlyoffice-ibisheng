@@ -2833,7 +2833,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteShape(spTree[i]);
                 }
-                else if(spTree[i] instanceof CImage2)
+                else if(spTree[i] instanceof CImageShape)
                 {
                     oThis.WriteImage(spTree[i]);
                 }

@@ -3451,6 +3451,7 @@ function DrawingObjects() {
 					var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
 					
 					// CImage
+                    History.Create_NewPoint();
 					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
 					drawingObject.graphicObject.initDefault( pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y), _image.src );
 					drawingObject.graphicObject.select(_this.controller);
