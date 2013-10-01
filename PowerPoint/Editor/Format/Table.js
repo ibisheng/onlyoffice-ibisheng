@@ -6591,8 +6591,9 @@ CTable.prototype =
                 }
                 else
                 {
-                    this.styleIndex = null;
+                    this.styleIndex = -1;
                 }
+                this.Recalc_CompiledPr();
                 break;
             }
             case historyitem_Table_DocNext:
@@ -10124,6 +10125,8 @@ CTable.prototype =
         {
             this.Content[i].Recalc_CompiledPr();
         }
+        if(this.Parent)
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Parent.Id] = this.Parent;
     },
 
     // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
@@ -10509,7 +10512,7 @@ CTable.prototype =
     {
         if ( this.TableStyle != StyleId )
         {
-            History.Add( this, { Type : historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
+            History.Add( this, { Type : historyitem_Table_SetStyleIndex, oldPr : this.styleIndex, newPr : StyleId } );
             this.styleIndex = StyleId;
 
             // Очищаем все прямое форматирование таблицы

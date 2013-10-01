@@ -1279,7 +1279,6 @@ CGraphicFrame.prototype =
     paragraphAdd: function(paraItem, bRecalculate)
     {
         this.graphicObject.Paragraph_Add(paraItem, false);
-        this.graphicObject.RecalculateCurPos();
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1288,7 +1287,6 @@ CGraphicFrame.prototype =
     remove: function(Count, bOnlyText, bRemoveOnlySelection)
     {
         this.graphicObject.Remove(Count, bOnlyText, bRemoveOnlySelection);
-        this.graphicObject.RecalculateCurPos();
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1297,7 +1295,6 @@ CGraphicFrame.prototype =
     addNewParagraph: function()
     {
         this.graphicObject.Add_NewParagraph(false);
-        this.graphicObject.RecalculateCurPos();
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1308,7 +1305,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphAlign(val);
-            this.graphicObject.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransform = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1333,7 +1329,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphSpacing(val);
-            this.graphicObject.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1358,7 +1353,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphNumbering(val);
-            this.graphicObject.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1384,7 +1378,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphIndent(val);
-            this.graphicObject.RecalculateCurPos();
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
@@ -1407,7 +1400,6 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Paragraph_IncDecFontSize(val);
-            this.graphicObject.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;

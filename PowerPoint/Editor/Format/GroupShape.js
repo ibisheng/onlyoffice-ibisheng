@@ -258,6 +258,20 @@ CGroupShape.prototype =
     {
         for(var i = 0; i < this.spTree.length; ++i)
             this.spTree[i].draw(graphics);
+
+
+        if(locktype_None != this.Lock.Get_Type())
+        {
+            graphics.transform3(this.transform);
+
+            graphics.SetIntegerGrid(false);
+
+            if(locktype_None != this.Lock.Get_Type())
+                graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+
+            graphics.reset();
+            graphics.SetIntegerGrid(true);
+        }
     },
 
     getArrGraphicObjects: function()

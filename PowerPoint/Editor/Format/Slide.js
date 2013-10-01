@@ -45,6 +45,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.comments = [];
     this.writecomments = [];
     this.maxId = 1000;
+
+    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
     //this.show = true;
     //this.showMasterPhAnim = false;
     //this.showMasterSp = false;
@@ -1231,7 +1233,7 @@ Slide.prototype =
         {
             if(spTree[i].selected)
             {
-                History.Add(this, {Type: historyitem_RemoveFromSpTree, index: i, id: spTree[i].Get_Id()});
+                History.Add(this, {Type: historyitem_RemoveFromSpTree, Pos: i, id: spTree[i].Get_Id()});
                 var obj = spTree.splice(i, 1)[0];
                 if(obj.isPlaceholder() && !(obj.isEmptyPlaceholder && obj.isEmptyPlaceholder()))
                 {
@@ -1252,7 +1254,7 @@ Slide.prototype =
 
     shapeAdd: function(pos, item)
     {
-        History.Add(this, {Type: historyitem_ShapeAdd, pos: pos, item: item});
+        History.Add(this, {Type: historyitem_ShapeAdd, Pos: pos, item: item});
         this.cSld.spTree.splice(pos, 0, item);
     },
 
@@ -1477,16 +1479,32 @@ Slide.prototype =
         {
             if(sp_tree[i].Get_Id() === id)
             {
-                History.Add(this, {Type: historyitem_RemoveFromSpTree, index: i, id: sp_tree[i].Get_Id()});
+                History.Add(this, {Type: historyitem_RemoveFromSpTree, Pos: i, id: sp_tree[i].Get_Id()});
                 sp_tree.splice(i, 1);
                 return;
             }
         }
     },
 
+    Clear_ContentChanges : function()
+    {
+        this.m_oContentChanges.Clear();
+    },
+
+    Add_ContentChanges : function(Changes)
+    {
+        this.m_oContentChanges.Add( Changes );
+    },
+
+    Refresh_ContentChanges : function()
+    {
+        this.m_oContentChanges.Refresh();
+    },
+
+
     addToSpTreeToPos: function(pos, obj)
     {
-        History.Add(this, {Type: historyitem_AddToSlideSpTree, objectId: obj.Get_Id(), pos:pos});
+        History.Add(this, {Type: historyitem_AddToSlideSpTree, objectId: obj.Get_Id(), Pos:pos});
         this.cSld.spTree.splice(pos, 0, obj);
         editor.WordControl.m_oLogicDocument.recalcMap[obj.Id] = obj;
 
@@ -1544,12 +1562,12 @@ Slide.prototype =
 
             case historyitem_RemoveFromSpTree:
             {
-                this.cSld.spTree.splice(data.index, 0, g_oTableId.Get_ById(data.id));
+                this.cSld.spTree.splice(data.Pos, 0, g_oTableId.Get_ById(data.id));
                 break;
             }
             case historyitem_AddToSlideSpTree:
             {
-                this.cSld.spTree.splice(data.pos, 1);
+                this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
             case historyitem_AddSlideLocks:
@@ -1588,7 +1606,7 @@ Slide.prototype =
             }
             case historyitem_ShapeAdd:
             {
-                this.cSld.spTree.splice(data.pos, 1);
+                this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
             case historyitem_SetCSldName:
@@ -1646,12 +1664,12 @@ Slide.prototype =
             }
             case historyitem_RemoveFromSpTree:
             {
-                this.cSld.spTree.splice(data.index, 1);
+                this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
             case historyitem_AddToSlideSpTree:
             {
-                this.cSld.spTree.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
+                this.cSld.spTree.splice(data.Pos, 0, g_oTableId.Get_ById(data.objectId));
                 break;
             }
             case historyitem_AddSlideLocks:
@@ -1689,7 +1707,7 @@ Slide.prototype =
             }
             case historyitem_ShapeAdd:
             {
-                this.cSld.spTree.splice(data.pos, 0, data.item);
+                this.cSld.spTree.splice(data.Pos, 0, data.item);
                 break;
             }
 
@@ -1756,12 +1774,14 @@ Slide.prototype =
             }
             case historyitem_RemoveFromSpTree:
             {
-                w.WriteLong(data.index);
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                w.WriteLong(Pos);
                 break;
             }
             case historyitem_AddToSlideSpTree:
             {
-                w.WriteLong(data.pos);
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                w.WriteLong(Pos);
                 w.WriteString2(data.objectId);
                 break;
             }
@@ -1806,7 +1826,8 @@ Slide.prototype =
             }
             case historyitem_ShapeAdd:
             {
-                w.WriteLong(data.pos);
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                w.WriteLong(Pos);
                 w.WriteString2(data.item.Get_Id());
                 break;
             }
@@ -1875,12 +1896,14 @@ Slide.prototype =
             }
             case historyitem_RemoveFromSpTree:
             {
-                this.cSld.spTree.splice(r.GetLong(), 1);
+                var pos = this.m_oContentChanges.Check( contentchanges_Remove, r.GetLong());
+                this.cSld.spTree.splice(pos, 1);
                 break;
             }
             case historyitem_AddToSlideSpTree:
             {
-                var pos = r.GetLong();
+                var pos = this.m_oContentChanges.Check( contentchanges_Add, r.GetLong());
+
                 var id = r.GetString2();
                 this.cSld.spTree.splice(pos, 0,  g_oTableId.Get_ById(id));
                 break;
@@ -1937,7 +1960,7 @@ Slide.prototype =
 
             case historyitem_ShapeAdd:
             {
-                var pos = r.GetLong();
+                var pos = this.m_oContentChanges.Check( contentchanges_Add, r.GetLong());
                 var item  = g_oTableId.Get_ById(r.GetString2());
                 this.cSld.spTree.splice(pos, 0, item);
                 break;

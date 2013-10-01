@@ -609,9 +609,11 @@ CHistory.prototype =
 
         this.Points[this.Index].Items.push( Item );
 
-        if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) ) )
+        if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) )
+            || (Class instanceof Slide && ( historyitem_RemoveFromSpTree === Data.Type || historyitem_AddToSlideSpTree === Data.Type || historyitem_ShapeAdd === Data.Type)))
         {
-            var bAdd = ( ( Class instanceof CPresentation && historyitem_Presenattion_AddSlide  === Data.Type )) ? true : false;
+            var bAdd = ( ( Class instanceof CPresentation && historyitem_Presenattion_AddSlide  === Data.Type )
+                ||(Class instanceof Slide && ( historyitem_AddToSlideSpTree === Data.Type || historyitem_ShapeAdd === Data.Type))) ? true : false;
 
             var Count = 1;
 

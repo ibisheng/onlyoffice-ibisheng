@@ -1860,15 +1860,13 @@ CGraphicObjects.prototype = {
     Add_FlowImage: function(W, H, Img)
     {
         var image = new CImageShape(this.slide);
-        image.blipFill = new CUniFill();
-        image.blipFill.fill = new CBlipFill();
-        image.blipFill.fill.RasterImageId = Img;
-        image.spPr.geometry = CreateGeometry("rect");
+        var blipFill = new CUniFill();
+        blipFill.fill = new CBlipFill();
+        blipFill.fill.RasterImageId = Img;
+        image.setBlipFill(blipFill);
+        image.setGeometry( CreateGeometry("rect"));
         image.spPr.geometry.Init(5, 5);
-        image.spPr.xfrm.offX = (this.slide.presentation.Width - W)/2;
-        image.spPr.xfrm.offY = (this.slide.presentation.Height - H)/2;
-        image.spPr.xfrm.extX = W;
-        image.spPr.xfrm.extY = H;
+        image.setXfrm((this.slide.presentation.Width - W)/2, (this.slide.presentation.Height - H)/2, W, H, null, null, null);
         this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, image);
         editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
     },

@@ -1000,7 +1000,11 @@ CChartAsGroup.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
-
+        if(locktype_None != this.Lock.Get_Type())
+        {
+            if(locktype_None != this.Lock.Get_Type())
+                graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+        }
         graphics.reset();
         graphics.SetIntegerGrid(true);
         if(this.chartTitle)

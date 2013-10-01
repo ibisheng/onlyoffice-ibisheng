@@ -668,8 +668,6 @@ CImageShape.prototype =
         History.Add(this, {Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
         this.spPr.xfrm.offX = offX;
         this.spPr.xfrm.offY = offY;
-        this.spPr.xfrm.extX = this.extX;
-        this.spPr.xfrm.extY = this.extY;
         this.recalcInfo.recalculateTransform = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -804,6 +802,16 @@ CImageShape.prototype =
         }
     },
 
+    setGeometry: function(geometry)
+    {
+        var old_geometry = this.spPr.geometry;
+        var new_geometry = geometry;
+        this.spPr.geometry = geometry;
+        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
+        this.recalcInfo.recalculateGeometry = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
     draw: function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -811,6 +819,11 @@ CImageShape.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
+        if(locktype_None != this.Lock.Get_Type())
+        {
+            if(locktype_None != this.Lock.Get_Type())
+                graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+        }
         graphics.reset();
         graphics.SetIntegerGrid(true);
     },
@@ -1110,6 +1123,20 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SetShapeSetGeometry:
+            {
+                if(isRealObject(data.oldGeometry))
+                {
+                    this.spPr.geometry = data.oldGeometry.createDuplicate();
+                    this.spPr.geometry.Init(5, 5);
+                }
+                else
+                {
+                    this.spPr.geometry = null;
+                }
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.oldRot;
@@ -1192,6 +1219,20 @@ CImageShape.prototype =
 
         switch(data.Type)
         {
+            case historyitem_SetShapeSetGeometry:
+            {
+                if(isRealObject(data.newGeometry))
+                {
+                    this.spPr.geometry = data.newGeometry.createDuplicate();
+                    this.spPr.geometry.Init(5, 5);
+                }
+                else
+                {
+                    this.spPr.geometry = null;
+                }
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.newRot;
@@ -1273,6 +1314,15 @@ CImageShape.prototype =
         var bool;
         switch(data.Type)
         {
+            case historyitem_SetShapeSetGeometry:
+            {
+                w.WriteBool(isRealObject(data.newGeometry));
+                if(isRealObject(data.newGeometry))
+                {
+                    data.newGeometry.Write_ToBinary2(w);
+                }
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 w.WriteDouble(data.newRot);
@@ -1363,6 +1413,21 @@ CImageShape.prototype =
         {
             switch(r.GetLong())
             {
+                case historyitem_SetShapeSetGeometry:
+                {
+                    if(r.GetBool())
+                    {
+                        this.spPr.geometry = new Geometry();
+                        this.spPr.geometry.Read_FromBinary2(r);
+                        this.spPr.geometry.Init(5, 5);
+                    }
+                    else
+                    {
+                        this.spPr.geometry = null;
+                    }
+                    this.recalcInfo.recalculateGeometry = true;
+                    break;
+                }
                 case historyitem_SetShapeRot:
                 {
                     this.spPr.xfrm.rot = r.GetDouble();
@@ -1443,6 +1508,8 @@ CImageShape.prototype =
                     {
                         this.blipFill = new CUniFill();
                         this.blipFill.Read_FromBinary2(r);
+                        if(this.blipFill && this.blipFill.fill && typeof this.blipFill.fill.RasterImageId === "string")
+                            CollaborativeEditing.Add_NewImage(this.blipFill.fill.RasterImageId);
                     }
                     else
                     {
@@ -1480,18 +1547,16 @@ CImageShape.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_Shape);
+        w.WriteLong(historyitem_type_Image);
         w.WriteString2(this.Id);
     },
 
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
-        CollaborativeEditing.Add_LinkData(this, {parent: r.GetString2()});
     },
 
     Load_LinkData: function(linkData)
     {
-        this.parent = g_oTableId.Get_ById(linkData.parent);
     }
 };
