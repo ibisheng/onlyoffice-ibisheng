@@ -3066,7 +3066,7 @@ function DrawingObjects() {
 			boundsChecker.CorrectBounds();
 			
 			// Коррекция для селекта при блокировке
-			var delta = 0;
+			var delta = 4;
 			boundsChecker.Bounds.min_x -= delta;
 			boundsChecker.Bounds.min_y -= delta;
 			boundsChecker.Bounds.max_x += delta;
