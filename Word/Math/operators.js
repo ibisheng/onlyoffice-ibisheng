@@ -3840,9 +3840,9 @@ CSeparator.prototype.setPosition = function(pos)
 
 function CDelimiter()
 {
-    this.begOper = null;
-    this.endOper = null;
-    this.sepOper = null;
+    this.begOper = new COperator (-1);
+    this.endOper = new COperator (-1);
+    this.sepOper = new COperator (-1);
     this.shape   = null;
 
     CSubMathBase.call(this);
@@ -4338,6 +4338,13 @@ CDelimiter.prototype.getGlyph = function(chr, type, location)
 
     return operator;
 }
+CDelimiter.prototype.setTxtPrp = function(txtPrp)
+{
+    this.begOper.setTxtPrp(txtPrp);
+    this.sepOper.setTxtPrp(txtPrp);
+    this.endOper.setTxtPrp(txtPrp);
+    CDelimiter.superclass.setTxtPrp.call(this, txtPrp);
+}
 
 
 /*function GetGlyph_GrChr(chr, location)
@@ -4578,7 +4585,7 @@ CCharacter.prototype.setOperator = function(operator)
 {
     this.operator = operator;
     var tPrp = this.getTxtPrp();
-    this.operator.setTxtPrp(tPrp);
+    //this.operator.setTxtPrp(tPrp);
 
     this.setDimension(1, 1);
     this.setContent();
@@ -4681,6 +4688,13 @@ CCharacter.prototype.findDisposition = function(pos)
 CCharacter.prototype.getBase = function()
 {
     return this.elements[0][0];
+}
+CCharacter.prototype.setTxtPrp = function(txtPrp)
+{
+    if(this.operator !== null && typeof(this.operator) !== "undefined")
+        this.operator.setTxtPrp(txtPrp);
+
+    CCharacter.superclass.setTxtPrp.call(this, txtPrp);
 }
 
 

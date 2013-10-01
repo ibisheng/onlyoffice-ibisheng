@@ -1042,12 +1042,3 @@ CAccent.prototype.getCenter = function()
 
     return center;
 }
-CAccent.prototype.setTxtPrp = function(txtPrp)
-{
-    //this.operator.setTxtPrp(txtPrp);
-    if(this.operator !== null && typeof(this.operator) !== "undefined")
-        this.operator.setTxtPrp(txtPrp);
-
-    CAccent.superclass.setTxtPrp.call(this, txtPrp);
-    //this.elements[0][0].setTxtPrp(txtPrp);
-}

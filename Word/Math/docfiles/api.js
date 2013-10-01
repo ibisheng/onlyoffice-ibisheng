@@ -2827,7 +2827,8 @@ asc_docs_api.prototype.put_TextPrFontSize = function(size)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { FontSize : Math.min(size, 100) } ) );
         //**
-        MathControl.SetTxtPrp( { FontSize : Math.min(size, 100) } );
+        //MathControl.SetTxtPrp( { FontSize : Math.min(size, 100) } );
+        MathComposition.SetTxtPrp( { FontSize : Math.min(size, 100) } );
         //**
     }
 }
@@ -2838,7 +2839,8 @@ asc_docs_api.prototype.put_TextPrBold = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
         //**
-        MathControl.SetTxtPrp( { Bold : value } );
+        //MathControl.SetTxtPrp( { Bold : value } );
+        MathComposition.SetTxtPrp( { Bold : value } );
         //**
     }
 }
@@ -2849,7 +2851,8 @@ asc_docs_api.prototype.put_TextPrItalic = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
         //**
-        MathControl.SetTxtPrp( { Italic : value } );
+        //MathControl.SetTxtPrp( { Italic : value } );
+        MathComposition.SetTxtPrp( { Italic : value } );
         //**
     }
 }
