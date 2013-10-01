@@ -2503,14 +2503,14 @@ function DrawingObjects() {
 				var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
 				
 				_t.from.col = fromCell.col;
-				_t.from.colOff = fromCell.colOffMm;
+				_t.from.colOff = fromCell.colOff;
 				_t.from.row = fromCell.row;
-				_t.from.rowOff = fromCell.rowOffMm;
+				_t.from.rowOff = fromCell.rowOff;
 				
 				_t.to.col = toCell.col;
-				_t.to.colOff = toCell.colOffMm;
+				_t.to.colOff = toCell.colOff;
 				_t.to.row = toCell.row;
-				_t.to.rowOff = toCell.rowOffMm;
+				_t.to.rowOff = toCell.rowOff;
 			}
 		}
 		
@@ -2542,9 +2542,9 @@ function DrawingObjects() {
 						var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
 
 						_t.to.col = cellTo.col;
-						_t.to.colOff = cellTo.colOffMm;
+						_t.to.colOff = cellTo.colOff;
 						_t.to.row = cellTo.row;
-						_t.to.rowOff = cellTo.rowOffMm;
+						_t.to.rowOff = cellTo.rowOff;
 					}
 					break;
 
@@ -2557,15 +2557,15 @@ function DrawingObjects() {
 							
 						var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
 						_t.from.col = cellFrom.col;
-						_t.from.colOff = cellFrom.colOffMm;
+						_t.from.colOff = cellFrom.colOff;
 						_t.from.row = cellFrom.row;
-						_t.from.rowOff = cellFrom.rowOffMm;
+						_t.from.rowOff = cellFrom.rowOff;
 
 						var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
 						_t.to.col = cellTo.col;
-						_t.to.colOff = cellTo.colOffMm;
+						_t.to.colOff = cellTo.colOff;
 						_t.to.row = cellTo.row;
-						_t.to.rowOff = cellTo.rowOffMm;
+						_t.to.rowOff = cellTo.rowOff;
 					}
 					break;
 			}
@@ -3066,7 +3066,7 @@ function DrawingObjects() {
 			boundsChecker.CorrectBounds();
 			
 			// Коррекция для селекта при блокировке
-			var delta = 6;
+			var delta = 0;
 			boundsChecker.Bounds.min_x -= delta;
 			boundsChecker.Bounds.min_y -= delta;
 			boundsChecker.Bounds.max_x += delta;
@@ -3079,18 +3079,19 @@ function DrawingObjects() {
 	_this.getBoundsCheckerCoords = function(checker) {
 		
 		if ( checker ) {
-			var coords = { c1: 0, r1: 0, c2: 0, r2: 0, min_x: 0, min_y: 0, max_x: 0, max_y: 0, w: 0, h: 0 };
+			var coords = { x: 0, y: 0, w: 0, h: 0, 
+						  c1: 0, r1: 0, c2: 0, r2: 0 };
 			
-			coords.min_x = checker.Bounds.min_x;
-			coords.min_y = checker.Bounds.min_y;
-			coords.max_x = checker.Bounds.max_x;
-			coords.max_y = checker.Bounds.max_y;
+			var cellFrom = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
+			var cellTo = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
 			
-			coords.w = checker.Bounds.max_x - checker.Bounds.min_x;
-			coords.h = checker.Bounds.max_y - checker.Bounds.min_y;
+			var coordsFrom = _this.coordsManager.calculateCoords(cellFrom);
+			var coordsTo = _this.coordsManager.calculateCoords(cellTo);
 			
-			var cellFrom = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x) + scrollOffset.getX(), mmToPx(checker.Bounds.min_y) + scrollOffset.getY() );
-			var cellTo = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x) + scrollOffset.getX(), mmToPx(checker.Bounds.max_y) + scrollOffset.getY() );
+			coords.x = coordsFrom.x;
+			coords.y = coordsFrom.y;
+			coords.w = coordsTo.x - coordsFrom.x;
+			coords.h = coordsTo.y - coordsFrom.y;
 			
 			coords.c1 = cellFrom.col;
 			coords.r1 = cellFrom.row;
@@ -3136,8 +3137,13 @@ function DrawingObjects() {
 		var coords = _this.getBoundsCheckerCoords(checker);
 		if ( coords ) {
 		
-			overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())), mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
-			drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.getX())) , mmToPt(coords.min_y + pxToMm(scrollOffset.getY())), mmToPt(coords.w), mmToPt(coords.h) );
+			/*overlayCtx.beginPath();
+			overlayCtx.setStrokeStyle("#ff0000");
+			overlayCtx.rect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
+			overlayCtx.stroke();*/
+		
+			//overlayCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
+			//drawingCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()) , pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			
 			var r_ = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
 			worksheet._drawGrid( drawingCtx, r_);
@@ -3414,9 +3420,9 @@ function DrawingObjects() {
 				
 				var cellTo = _this.coordsManager.calculateCell(realLeftOffset + width, realTopOffset + height);
 				object.to.col = cellTo.col;
-				object.to.colOff = cellTo.colOffMm;
+				object.to.colOff = cellTo.colOff;
 				object.to.row = cellTo.row;
-				object.to.rowOff = cellTo.rowOffMm;
+				object.to.rowOff = cellTo.rowOff;
 				
 				worksheet._trigger("reinitializeScroll");
 			}
@@ -3451,7 +3457,7 @@ function DrawingObjects() {
 					var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
 					
 					// CImage
-                    History.Create_NewPoint();
+					History.Create_NewPoint();
 					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
 					drawingObject.graphicObject.initDefault( pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y), _image.src );
 					drawingObject.graphicObject.select(_this.controller);
@@ -4686,9 +4692,9 @@ function DrawingObjects() {
 			var coords = _this.coordsManager.calculateCoords(drawingObject.from);
 			var cellTo = _this.coordsManager.calculateCell(coords.x + drawingObject.size.width, coords.y + drawingObject.size.height);
 			drawingObject.to.col = cellTo.col;
-			drawingObject.to.colOff = cellTo.colOffMm;
+			drawingObject.to.colOff = cellTo.colOff;
 			drawingObject.to.row = cellTo.row;
-			drawingObject.to.rowOff = cellTo.rowOffMm;
+			drawingObject.to.rowOff = cellTo.rowOff;
 			
 			// Update graphic object
 			drawingObject.graphicObject.setPosition( pxToMm(coords.x), pxToMm(coords.y) );
@@ -4910,9 +4916,8 @@ function CoordsManager(ws, bLog) {
 		var _x = x + worksheet.getCellLeft(0, 0);
 		var _y = y + worksheet.getCellTop(0, 0);
 	
-		var cell = { col: 0, colOff: 0, colOffMm: 0,
-					 row: 0, rowOff: 0, rowOffMm: 0,
-					 result: true };
+		var cell = { col: 0, colOff: 0, colOffPx: 0,
+					 row: 0, rowOff: 0, rowOffPx: 0 };
 	
 		var x_pt = worksheet.objectRender.convertMetric(_x, 0, 1);
 		var y_pt = worksheet.objectRender.convertMetric(_y, 0, 1);
@@ -4932,8 +4937,8 @@ function CoordsManager(ws, bLog) {
 			delta++;
 		}
 		cell.col = col.col;
-		cell.colOff = Math.max(0, _x - worksheet.getCellLeft(cell.col, 0));
-		cell.colOffMm = worksheet.objectRender.convertMetric(cell.colOff, 0, 3);
+		cell.colOffPx = Math.max(0, _x - worksheet.getCellLeft(cell.col, 0));
+		cell.colOff = worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
 
 		delta = 0;
 		var row = worksheet._findRowUnderCursor( y_pt - topHeaderHeight, true );
@@ -4944,24 +4949,28 @@ function CoordsManager(ws, bLog) {
 			delta++;
 		}
 		cell.row = row.row;
-		cell.rowOff = Math.max(0, _y - worksheet.getCellTop(cell.row, 0));
-		cell.rowOffMm = worksheet.objectRender.convertMetric(cell.rowOff, 0, 3);
+		cell.rowOffPx = Math.max(0, _y - worksheet.getCellTop(cell.row, 0));
+		cell.rowOff = worksheet.objectRender.convertMetric(cell.rowOffPx, 0, 3);
 		
 		return cell;
 	}
 	
 	_t.calculateCoords = function(cell) {
 		
-		var coords = { x: 0, y: 0, x_visible: 0, y_visible: 0, result: true };
+		var coords = { x: 0, y: 0 };
 		
 		if ( cell ) {
 			var fvc = worksheet.getFirstVisibleCol();
 			var fvr = worksheet.getFirstVisibleRow();
+			
 			var topHeaderHeight = fvr ? worksheet.getCellTop(fvr, 0) - worksheet.getCellTop(0, 0) : worksheet.getCellTop(0, 0);
 			var leftHeaderWidth = fvc ? worksheet.getCellLeft(fvc, 0) - worksheet.getCellLeft(0, 0) : worksheet.getCellLeft(0, 0);
 		
-			coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - topHeaderHeight;
-			coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - leftHeaderWidth;
+			// coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - topHeaderHeight;
+			// coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - leftHeaderWidth;
+			
+			coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
+			coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
 		}
 		
 		return coords;
