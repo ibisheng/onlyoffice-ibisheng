@@ -90,6 +90,7 @@
     <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script> 
     <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
 
+    <!-- application -->
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/editorscommon.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/downloaderfiles.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/docscoapicommon.js"></script>
@@ -220,51 +221,19 @@
 	<script type="text/javascript" src="../../../../OfficeWeb/Excel/graphics/DrawingContextWord.js"></script>
 	
     <script type="text/javascript" src="../../api/documents/api.js"></script>
-
     <script type="text/javascript" src="../../common/Analytics.js"></script>
     <script type="text/javascript" src="../../common/Gateway.js"></script>
     <script type="text/javascript" src="../../common/IrregularStack.js"></script>
     <script type="text/javascript" src="../../common/main/loader.js"></script>
     <script type="text/javascript" src="../../common/main/lib/component/util/MetricSettings.js"></script>
     <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="restrictions.js"></script>
+    <script type="text/javascript" src="environment.js"></script>
     <script type="text/javascript" src="../../common/locale.js"></script>
 
-    <!-- SDK -->
-
-    <script type="text/javascript">
-        var isBrowserSupported = function() {
-            return !((Ext.ieVersion != 0 && Ext.ieVersion < 9.0) ||
-                    (Ext.safariVersion != 0 && Ext.safariVersion < 5.0) ||
-                    (Ext.firefoxVersion != 0 && Ext.firefoxVersion < 4.0) ||
-                    (Ext.chromeVersion != 0 && Ext.chromeVersion < 7.0) ||
-                    (Ext.operaVersion != 0 && Ext.operaVersion < 10.5));
-        };
-
-        if (!isBrowserSupported()){
-            document.write(
-                '<div class="application-error-panel">' +
-                    '<div class="application-error-message-block">' +
-                        '<div class="application-error-message-inner">' +
-                            '<div class="application-error-message-title">' + 'Your browser is not supported.' + '</div>' +
-                            '<div class="application-error-message-text">' + 'Sorry, Document Editor is currently only supported in the latest versions of the Chrome, Firefox, Safari or Internet Explorer web browsers.' + '</div>' +
-                        '</div>' +
-                     '</div>' +
-                    '<div class="application-error-message-auxiliary"></div>' +
-                '</div>'
-            );
-        }
-
-        var getEditorStylesheets = function() {
-            return ['../../common/main/resources/css/dataview-picker.css', '../../common/main/resources/css/hsb-colorpicker.css',
-                    '../../common/main/resources/css/comments-panel.css', '../../common/main/resources/css/comments-popover.css',
-                    '../../common/main/resources/css/themecolorpalette.css',
-                    '../../common/main/resources/css/grouped-data-view.css', '../../common/main/resources/css/multislider-gradient.css',
-                    'resources/css/toolbar.css', 'resources/css/dimension-picker.css', '../../common/main/resources/css/dataview-combo.css',
-                    'resources/css/table-border-styler.css', 'resources/css/right-panels.css',
-                    'resources/css/advanced-settings-dialog.css', '../../common/main/resources/css/synchronize-tip.css'];
-        };
-
-    </script>
+    <!-- sdk -->
+    <!--<script type="text/javascript" src="../../../sdk/Common/docscoapisettings.js"></script>-->
+    <!--<script type="text/javascript" src="../../../sdk/Word/sdk-all.js"></script>-->
 
 </body>
 </html>
