@@ -5977,6 +5977,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
             this.pasteImageMap = null;
             this.pasteCallback();
             window.GlobalPasteFlag = false;
+            window.GlobalPasteFlagCounter = 0;
             this.pasteCallback = null;
         }
         else if (this.isSaveFonts_Images)
@@ -6213,6 +6214,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
         // там при LongActions теряется фокус и вставляются пробелы
         this.pasteCallback();
         window.GlobalPasteFlag = false;
+        window.GlobalPasteFlagCounter = 0;
         this.pasteCallback = null;
         return;
     }
