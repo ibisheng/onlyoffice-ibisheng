@@ -3632,7 +3632,7 @@ RangeDataManager.prototype = {
 					this._removeExecElem(this.oRows, i, elemToDelete);
 			}
 			else if(c_oRangeType.All == nRangeType)
-				this._removeExecElem(this.oAll, null, elemToDelete);
+				this.oAll = this._removeExecElem(this.oAll, null, elemToDelete);
 			if(false != bTriggerEvent)
 				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
 			delete this.oElements[this._getBBoxIndex(elemToDelete.bbox)];
