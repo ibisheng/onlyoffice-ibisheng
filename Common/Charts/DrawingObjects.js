@@ -3079,19 +3079,10 @@ function DrawingObjects() {
 	_this.getBoundsCheckerCoords = function(checker) {
 		
 		if ( checker ) {
-			var coords = { x: 0, y: 0, w: 0, h: 0, 
-						  c1: 0, r1: 0, c2: 0, r2: 0 };
+			var coords = { c1: 0, r1: 0, c2: 0, r2: 0 };
 			
 			var cellFrom = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
 			var cellTo = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
-			
-			var coordsFrom = _this.coordsManager.calculateCoords(cellFrom);
-			var coordsTo = _this.coordsManager.calculateCoords(cellTo);
-			
-			coords.x = coordsFrom.x;
-			coords.y = coordsFrom.y;
-			coords.w = coordsTo.x - coordsFrom.x;
-			coords.h = coordsTo.y - coordsFrom.y;
 			
 			coords.c1 = cellFrom.col;
 			coords.r1 = cellFrom.row;
@@ -3137,20 +3128,16 @@ function DrawingObjects() {
 		var coords = _this.getBoundsCheckerCoords(checker);
 		if ( coords ) {
 		
-			/*overlayCtx.beginPath();
-			overlayCtx.setStrokeStyle("#ff0000");
-			overlayCtx.rect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
-			overlayCtx.stroke();*/
-		
 			//overlayCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			//drawingCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()) , pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			
 			var range = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
 			var r_ = range.intersection(worksheet.visibleRange);
-			
-			worksheet._drawGrid( drawingCtx, r_);
-			worksheet._drawCells(r_);
-			worksheet._drawCellsBorders(undefined, r_);
+			if ( r_ ) {
+				worksheet._drawGrid( drawingCtx, r_);
+				worksheet._drawCells(r_);
+				worksheet._drawCellsBorders(undefined, r_);
+			}
 		}
 	}
 
@@ -4915,27 +4902,24 @@ function CoordsManager(ws, bLog) {
 	
 	_t.calculateCell = function(x, y) {
 	
-		var _x = x + worksheet.getCellLeft(0, 0);
-		var _y = y + worksheet.getCellTop(0, 0);
-	
 		var cell = { col: 0, colOff: 0, colOffPx: 0,
 					 row: 0, rowOff: 0, rowOffPx: 0 };
 	
-		var x_pt = worksheet.objectRender.convertMetric(_x, 0, 1);
-		var y_pt = worksheet.objectRender.convertMetric(_y, 0, 1);
+		var _x = x + worksheet.getCellLeft(0, 0);
+		var _y = y + worksheet.getCellTop(0, 0);
+	
+		var xPt = worksheet.objectRender.convertMetric(_x, 0, 1);
+		var yPt = worksheet.objectRender.convertMetric(_y, 0, 1);
 		
-		var fvc = worksheet.getFirstVisibleCol();
-		var fvr = worksheet.getFirstVisibleRow();
-		
-		var topHeaderHeight = fvr ? worksheet.getCellTop(fvr, 1) - worksheet.getCellTop(0, 1) : 0;		
-		var leftHeaderWidth = fvc ? worksheet.getCellLeft(fvc, 1) - worksheet.getCellLeft(0, 1) : 0;
+		var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
+		var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 		
 		var delta = 0;
-		var col = worksheet._findColUnderCursor( x_pt - leftHeaderWidth, true );
+		var col = worksheet._findColUnderCursor( xPt - offsetX, true );
 		while (col == null) {
 			worksheet.expandColsOnScroll(true);
 			worksheet._trigger("reinitializeScrollX");
-			col = worksheet._findColUnderCursor( x_pt - leftHeaderWidth + delta, true );
+			col = worksheet._findColUnderCursor( xPt - offsetX + delta, true );
 			delta++;
 		}
 		cell.col = col.col;
@@ -4943,11 +4927,11 @@ function CoordsManager(ws, bLog) {
 		cell.colOff = worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
 
 		delta = 0;
-		var row = worksheet._findRowUnderCursor( y_pt - topHeaderHeight, true );
+		var row = worksheet._findRowUnderCursor( yPt - offsetY, true );
 		while (row == null) {
 			worksheet.expandRowsOnScroll(true);
 			worksheet._trigger("reinitializeScrollY");
-			row = worksheet._findRowUnderCursor( y_pt - topHeaderHeight + delta, true );
+			row = worksheet._findRowUnderCursor( yPt - offsetY + delta, true );
 			delta++;
 		}
 		cell.row = row.row;
@@ -4962,19 +4946,9 @@ function CoordsManager(ws, bLog) {
 		var coords = { x: 0, y: 0 };
 		
 		if ( cell ) {
-			var fvc = worksheet.getFirstVisibleCol();
-			var fvr = worksheet.getFirstVisibleRow();
-			
-			var topHeaderHeight = fvr ? worksheet.getCellTop(fvr, 0) - worksheet.getCellTop(0, 0) : worksheet.getCellTop(0, 0);
-			var leftHeaderWidth = fvc ? worksheet.getCellLeft(fvc, 0) - worksheet.getCellLeft(0, 0) : worksheet.getCellLeft(0, 0);
-		
-			// coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - topHeaderHeight;
-			// coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - leftHeaderWidth;
-			
 			coords.y = worksheet.getCellTop(cell.row, 0) + worksheet.objectRender.convertMetric(cell.rowOff, 3, 0) - worksheet.getCellTop(0, 0);
 			coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
 		}
-		
 		return coords;
 	}
 }
