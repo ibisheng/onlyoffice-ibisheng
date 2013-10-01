@@ -1273,6 +1273,8 @@ CImageShape.prototype =
     {
         this.group = group;
         this.drawingObjects = drawingObjects;
+
+        this.setBlipFill(new CUniFill());
         this.blipFill.Read_FromBinary2(r);
         var dx = 0, dy = 0;
         if(r.GetBool())

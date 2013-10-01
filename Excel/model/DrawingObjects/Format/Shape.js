@@ -1876,7 +1876,7 @@ CShape.prototype =
 		}
         graphics.reset();
         graphics.SetIntegerGrid(true);
-        if ( this.txBody )
+        if ( this.txBody  && !(graphics.ClearMode === true))
         {
             var clip_rect = this.clipRect;
             if(!this.txBody.bodyPr.upright)
