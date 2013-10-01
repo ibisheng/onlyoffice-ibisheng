@@ -377,16 +377,16 @@ Paragraph.prototype =
         var LinesCount = this.Lines.length;
         for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
         {
-            if ( this.Lines[CurLine].StartPos >= Pos )
+            if ( this.Lines[CurLine].StartPos > Pos )
                 this.Lines[CurLine].StartPos++;
 
-            if ( this.Lines[CurLine].EndPos + 1 >= Pos )
+            if ( this.Lines[CurLine].EndPos + 1 > Pos )
                 this.Lines[CurLine].EndPos++;
 
             var RangesCount = this.Lines[CurLine].Ranges.length;
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                if ( this.Lines[CurLine].Ranges[CurRange].StartPos >= Pos )
+                if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
                     this.Lines[CurLine].Ranges[CurRange].StartPos++;
             }
         }
