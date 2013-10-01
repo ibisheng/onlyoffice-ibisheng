@@ -1678,9 +1678,30 @@ function CBinaryFileWriter()
         oThis._WriteBool2(1, rPr.Bold);
         oThis._WriteBool2(7, rPr.Italic);
 
-        if (undefined !== rPr.Strikeout && null != rPr.Strikeout)
+        var _cap = null;
+        if (rPr.Caps === true)
+            _cap = 0;
+        else if (rPr.SmallCaps === true)
+            _cap = 1;
+        else if (rPr.Caps === false && rPr.SmallCaps === false)
+            _cap = 2;
+
+        if (null != _cap)
         {
-            oThis._WriteUChar1(16, (rPr.Strikeout === true) ? 2 : 1);
+            oThis._WriteUChar1(4, _cap);
+        }
+
+        var _strike = null;
+        if (rPr.DStrikeout === true)
+            _strike = 0;
+        else if (rPr.Strikeout === true)
+            _strike = 2;
+        else if (rPr.DStrikeout === false && rPr.Strikeout === false)
+            _strike = 1;
+
+        if (null != _strike)
+        {
+            oThis._WriteUChar1(16, _strike);
         }
 
         if (undefined !== rPr.Underline && null != rPr.Underline)

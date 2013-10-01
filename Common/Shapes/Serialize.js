@@ -5499,7 +5499,22 @@ function BinaryPPTYLoader()
                 }
                 case 4:
                 {
-                    s.Skip2(1); // cap
+                    var _cap = s.GetUChar();
+                    if (_cap == 0)
+                    {
+                        rPr.Caps = true;
+                        rPr.SmallCaps = false;
+                    }
+                    else if (_cap == 1)
+                    {
+                        rPr.Caps = false;
+                        rPr.SmallCaps = true;
+                    }
+                    else if (_cap == 2)
+                    {
+                        rPr.SmallCaps = false;
+                        rPr.Caps = false;
+                    }
                     break;
                 }
                 case 5:
@@ -5559,7 +5574,22 @@ function BinaryPPTYLoader()
                 }
                 case 16:
                 {
-                    rPr.Strikeout = (s.GetUChar() != 1);
+                    var _strike = s.GetUChar();
+                    if (0 == _strike)
+                    {
+                        rPr.Strikeout = false;
+                        rPr.DStrikeout = true;
+                    }
+                    else if (2 == _strike)
+                    {
+                        rPr.Strikeout = true;
+                        rPr.DStrikeout = false;
+                    }
+                    else
+                    {
+                        rPr.Strikeout = false;
+                        rPr.DStrikeout = false;
+                    }
                     break;
                 }
                 case 17:
