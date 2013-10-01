@@ -1069,7 +1069,8 @@
 				var h = t.canvas.innerHeight();
 				var y = - t.textRender.calcLineOffset(t.topLineIndex);
 				var cur = t.textRender.calcCharOffset(t.cursorPos);
-				var curLeft = asc_round((kRightAlign !== t.textFlags.textAlign && cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
+				var charsCount = t.textRender.getCharsCount();
+				var curLeft = asc_round(((kRightAlign !== t.textFlags.textAlign || t.cursorPos !== charsCount) && cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
 				var curTop  = asc_round(((cur !== null ? cur.top : 0) + y) * t.ky);
 				var curHeight = asc_round((cur !== null ? cur.height : t.options.font.FontSize) * 1.275 * t.ky);
 				var i, dy;
