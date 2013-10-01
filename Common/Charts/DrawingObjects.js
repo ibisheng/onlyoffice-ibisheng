@@ -3145,7 +3145,9 @@ function DrawingObjects() {
 			//overlayCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			//drawingCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()) , pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			
-			var r_ = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
+			var range = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
+			var r_ = range.intersection(worksheet.visibleRange);
+			
 			worksheet._drawGrid( drawingCtx, r_);
 			worksheet._drawCells(r_);
 			worksheet._drawCellsBorders(undefined, r_);
