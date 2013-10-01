@@ -320,8 +320,8 @@ CMathContent.prototype =
         var symb = new CMathText();
         //symb.relate(this);
         symb.add(code);
-        var runPrp = this.getRunPrp(this.CurPos);
-        symb.setTxtPrp( runPrp );
+        //var runPrp = this.getRunPrp(this.CurPos);
+        //symb.setTxtPrp( runPrp );
 
         // txt properties
 
@@ -479,14 +479,14 @@ CMathContent.prototype =
         {
             //mathElem.relate(this);
             //mathElem.setReduct(this.reduct);
-            var runPrp = this.getRunPrp(this.CurPos);
-            mathElem.setTxtPrp( runPrp );
+            //var runPrp = this.getRunPrp(this.CurPos);
+            //mathElem.setTxtPrp( runPrp );
             //mathElem.setRunPrp( runPrp );
 
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
             this.addElementToContent( mathElem, new dist(l_gap, r_gap, 0, 0) );
             var empty = new CEmpty();
-            empty.setTxtPrp(runPrp);
+            //empty.setTxtPrp(runPrp);
             this.addElementToContent(empty);
 
             this.rInterval.endPos += 2;
@@ -502,6 +502,9 @@ CMathContent.prototype =
         var tmp = this.content.splice(0, this.CurPos + 1);
         tmp.push(elem);
         element.relate(this);
+		
+		var runPrp = this.getRunPrp(this.CurPos);
+        element.setTxtPrp( runPrp );
 
         tmp = tmp.concat( this.content.splice(0, this.content.length) );
         this.content.length = 0;

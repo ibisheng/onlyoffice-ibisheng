@@ -1451,7 +1451,8 @@ CDocument.prototype =
     Draw : function(nPageIndex, pGraphics)
     {
 
-
+		MathComposition.RecalculateComposition();
+		
         if ( "undefined" == typeof(pGraphics) )
             pGraphics = Canvas;
 
