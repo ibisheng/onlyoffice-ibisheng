@@ -2930,9 +2930,12 @@ CTable.prototype =
 
         if ( 0 === PageIndex )
         {
+            // TODO: Внутри функции Internal_Recalculate_Borders происходит персчет метрик каждой ячейки, это надо бы
+            //       вынести в отдельную функцию. Из-за этого функцию Internal_Recalculate_Header приходится запускать позже.
+
             this.Internal_RecalculateGrid();
-            this.Internal_Recalculate_Header();
             this.Internal_Recalculate_Borders();
+            this.Internal_Recalculate_Header();
             this.Internal_Recalculate_Position_1();
 
             // TODO: Пока оставим эту заглушку на случай загрузки плохих таблиц. В будущем надо будет
