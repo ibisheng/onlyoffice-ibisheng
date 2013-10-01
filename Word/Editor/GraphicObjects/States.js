@@ -1813,7 +1813,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
 
             editor.asc_fireCallback("asc_canGroup", graphicObjects.canGroup());
             editor.asc_fireCallback("asc_canUnGroup", graphicObjects.canUnGroup());
-            return;
+            return true;
         }
         else
         {
@@ -1833,7 +1833,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
 
             editor.asc_fireCallback("asc_canGroup", graphicObjects.canGroup());
             editor.asc_fireCallback("asc_canUnGroup", graphicObjects.canUnGroup());
-            return;
+            return true;
         }
     }
     return false;
