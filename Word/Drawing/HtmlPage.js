@@ -2414,7 +2414,7 @@ function CEditorPage(api)
             }
 
             if (this.m_oScrollHor_)
-                this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);//unbind("scrollhorizontal")
+                this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
             else {
                 this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
 				this.m_oScrollHor_.onLockMouse = function(evt){
@@ -2431,7 +2431,7 @@ function CEditorPage(api)
             }
 
             if (this.m_oScrollVer_){
-                this.m_oScrollVer_.Repos(settings);//unbind("scrollvertical")
+                this.m_oScrollVer_.Repos(settings);
             }
             else {
                 this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",

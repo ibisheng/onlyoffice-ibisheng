@@ -476,6 +476,7 @@ ScrollObject.prototype = {
         if ( this.isHorizontalScroll ) {
             this.scrollToX( this.scrollHCurrentX );
         }
+        this._draw();
         this._drawArrow();
     },
     Reinit:function ( settings, pos ) {
@@ -553,17 +554,23 @@ ScrollObject.prototype = {
         return null;
     },
     _scrollH:function ( that, evt, pos, isTop, isBottom ) {
-        if ( !this.isHorizontalScroll ) {
+        if (!this.isHorizontalScroll) {
             return;
         }
+        if( that.scrollHCurrentX !== pos){
+            that.scrollHCurrentX = pos;
+            evt.scrollD  = evt.scrollPositionX = that.scrollHCurrentX;
+            evt.maxScrollX = that.maxScrollX;
 
-        that.scrollHCurrentX = pos;
-        evt.scrollD = that.scrollHCurrentX;
-        evt.maxScrollX = that.maxScrollX;
+            that._draw();
+            that._drawArrow();
+            that.handleEvents("onscrollhorizontal", evt);
+        }
+        else if(that.scrollHCurrentX === pos && pos > 0 && !this.reinit && !this.moveble && !this.lock){
+            evt.pos = pos;
+            that.handleEvents("onscrollHEnd",evt);
+        }
 
-        that._draw();
-        that._drawArrow();
-        that.handleEvents( "onscrollhorizontal", evt );
     },
     scrollByY:function ( delta ) {
         if ( !this.isVerticalScroll ) {
@@ -685,7 +692,7 @@ ScrollObject.prototype = {
         this.context.clearRect( 0, 0, this.canvasW, this.canvasH );
     },
     _draw:function () {
-        // очистку не нудно делать - если потом рисовать рект такой же
+        // очистку не нужно делать - если потом рисовать рект такой же
         //this._clearContent();
 
         this.context.beginPath();
