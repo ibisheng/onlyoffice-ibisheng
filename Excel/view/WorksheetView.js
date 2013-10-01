@@ -1842,7 +1842,7 @@
 					this._drawSelection();
 				}
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjectsEx(true);
 				
 				return this;
 			},

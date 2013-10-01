@@ -2526,7 +2526,7 @@ function DrawingObjects() {
 			var checker = _this.getBoundsChecker(_t);
 			var coords = _this.getBoundsCheckerCoords(checker);
 			if ( coords ) {
-				if ( (fvr > coords.r2 + 1) || (lvr < coords.r1 - 1) || (fvc > coords.c2 + 1) || (lvc < coords.c1 - 1) )
+				if ( (fvr > coords.to.row + 1) || (lvr < coords.from.rom - 1) || (fvc > coords.to.col + 1) || (lvc < coords.from.col - 1) )
 					result = false;
 			}
 
@@ -3079,16 +3079,10 @@ function DrawingObjects() {
 	_this.getBoundsCheckerCoords = function(checker) {
 		
 		if ( checker ) {
-			var coords = { c1: 0, r1: 0, c2: 0, r2: 0 };
+			var coords = { from: null, to: null };
 			
-			var cellFrom = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
-			var cellTo = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
-			
-			coords.c1 = cellFrom.col;
-			coords.r1 = cellFrom.row;
-			coords.c2 = cellTo.col;
-			coords.r2 = cellTo.row;
-			
+			coords.from = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.min_x), mmToPx(checker.Bounds.min_y) );
+			coords.to = _this.coordsManager.calculateCell( mmToPx(checker.Bounds.max_x), mmToPx(checker.Bounds.max_y) );
 			return coords;
 		}
 		return null;
@@ -3127,13 +3121,29 @@ function DrawingObjects() {
 	
 		var coords = _this.getBoundsCheckerCoords(checker);
 		if ( coords ) {
-		
-			//overlayCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()), pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
-			//drawingCtx.clearRect( pxToPt(coords.x + scrollOffset.getX()) , pxToPt(coords.y + scrollOffset.getY()), pxToPt(coords.w), pxToPt(coords.h) );
 			
-			var range = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
-			var r_ = range.intersection(worksheet.visibleRange);
+			var range = asc_Range( coords.from.col, coords.from.row, coords.to.col, coords.to.row );
+			var r_ = range.intersection(worksheet.visibleRange);			
+			
 			if ( r_ ) {
+				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
+				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+				
+				var x1 = worksheet.cols[r_.c1].left - offsetX + /*cell offset*/ + ( (worksheet.visibleRange.c1 < r_.c1) ? mmToPt(coords.from.colOff) : 0 );
+				var y1 = worksheet.rows[r_.r1].top - offsetY + /*cell offset*/ + ( (worksheet.visibleRange.r1 < r_.r1) ? mmToPt(coords.from.rowOff) : 0 );
+				var x2 = worksheet.cols[r_.c2].left - offsetX + /*cell offset*/ + ( (worksheet.visibleRange.c2 > r_.c2) ? mmToPt(coords.to.colOff) : 0 );
+				var y2 = worksheet.rows[r_.r2].top - offsetY + /*cell offset*/ + ( (worksheet.visibleRange.r2 > r_.r2) ? mmToPt(coords.to.rowOff) : 0 );
+				var w = x2 - x1;
+				var h = y2 - y1;
+				
+				/*overlayCtx.beginPath();
+				overlayCtx.setStrokeStyle("#ff0000");
+				overlayCtx.rect( x1, y1, w, h );
+				overlayCtx.stroke();*/
+				
+				overlayCtx.clearRect( x1, y1, w, h );
+				drawingCtx.clearRect( x1, y1, w, h );
+						
 				worksheet._drawGrid( drawingCtx, r_);
 				worksheet._drawCells(r_);
 				worksheet._drawCellsBorders(undefined, r_);
@@ -3358,7 +3368,7 @@ function DrawingObjects() {
 				var checker = _this.getBoundsChecker(aObjects[i]);
 				var coords = _this.getBoundsCheckerCoords(checker);
 				if ( coords ) {
-					if ( (coords.c1 < fvc) || (coords.r1 < fvr) ) {
+					if ( (coords.from.col < fvc) || (coords.from.row < fvr) ) {
 						bRedraw = true;
 						break;
 					}
