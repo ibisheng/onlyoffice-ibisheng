@@ -3545,6 +3545,8 @@ CShape.prototype =
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitInPath(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
+        else
+            return this.hitInBoundingRect(x, y);
         return false;
     },
 
