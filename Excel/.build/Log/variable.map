@@ -464,7 +464,7 @@ TGlyphBitmap:ww
 Round_To_Double_Grid:Cr
 UndoRedoDataShapeRecalc:TQ
 CStyle:HY
-CLASS_TYPE_CHART_TITLE:n4
+CLASS_TYPE_CHART_TITLE:m4
 JSCompiler_StaticMethods_Update_Position:Z5
 EVisibleType$visibleHidden:$I
 JSCompiler_StaticMethods_SerializeDataInner:KQ
@@ -2184,7 +2184,7 @@ TT_DefRecord:Uq
 JSCompiler_StaticMethods_getUniqueSheetNameFrom:WN
 cff_argument_counts:Eu
 cff_sid_to_glyph_name:ou
-CTableRowPr:x4
+CTableRowPr:w4
 c_oAscLockTypeElem$Range:Mz
 c_oAscHyperlinkType$RangeLink:Cy
 Binary_CalcChainTableReader:pL
