@@ -2288,7 +2288,53 @@ Woorksheet.prototype.clone=function(sNewId){
 	for(var i in this.aGCells)
 		oNewWs.aGCells[i] = this.aGCells[i].clone();
 	if(null != this.Drawings)
-		oNewWs.Drawings = this.Drawings.concat();
+    {
+
+        oNewWs.Drawings = [];
+        var w = new CMemory();
+        for(var i = 0; i < this.Drawings.length; ++i)
+        {
+            this.Drawings[i].graphicObject.writeToBinaryForCopyPaste(w);
+        }
+        var binary = w.pos + ";" + w.GetBase64Memory();
+        var stream = CreateBinaryReader(binary, 0, binary.length);
+        var drawingObjects = new DrawingObjects();
+        for(var i = 0; i < this.Drawings.length; ++i)
+        {
+            var obj = null;
+            switch(stream.GetLong())
+            {
+                case CLASS_TYPE_SHAPE:
+                {
+                    obj = new CShape(null, null, null);
+                    break;
+                }
+                case CLASS_TYPE_IMAGE:
+                {
+                    obj = new CImageShape(null, null);
+                    break;
+                }
+                case CLASS_TYPE_GROUP:
+                {
+                    obj = new CGroupShape(null, null);
+                    break;
+                }
+                case CLASS_TYPE_CHART:
+                {
+                    obj = new CChartAsGroup(null, null);
+                    break;
+                }
+            }
+            if(isRealObject(obj))
+            {
+                var drawingObject = drawingObjects.createDrawingObject();
+                obj.readFromBinaryForCopyPaste2(stream, null, null, null, null);
+                drawingObject.graphicObject = obj;
+                oNewWs.Drawings.push(drawingObject);
+            }
+        }
+        //oNewWs.Drawings = this.Drawings.concat();
+    }
 	if(null != this.aComments) {
 		for (var i = 0; i < this.aComments.length; i++) {
 			var comment = new asc_CCommentData(this.aComments[i]);

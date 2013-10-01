@@ -1660,6 +1660,32 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+    readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
+    {
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        if(r.GetBool())
+        {
+            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.chartTitle.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.vAxisTitle.readFromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.hAxisTitle.readFromBinary(r);
+        }
+        this.chart.Read_FromBinary2(r, false);
+        this.spPr.Read_FromBinary2(r);
+        if(isRealNumber(x) && isRealNumber(y))
+            this.spPr.xfrm.setPosition(x, y);
+    },
+
 
     getBase64Image: function()
     {

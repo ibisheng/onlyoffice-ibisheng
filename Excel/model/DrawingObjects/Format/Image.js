@@ -194,26 +194,26 @@ CImageShape.prototype =
 
     setPosition: function(x, y)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setPosition(x, y, model_id);
     },
 
 
     setExtents: function(extX, extY)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;//this.drawingObjects.getWorksheet().model = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setRotate(rot, model_id);
     },
 
@@ -1266,6 +1266,28 @@ CImageShape.prototype =
             this.recalculateTransform();
             this.calculateContent();
             this.calculateTransformTextMatrix();
+        }
+    },
+
+    readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
+    {
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        this.blipFill.Read_FromBinary2(r);
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
+        this.spPr.Read_FromBinary2(r);
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x + dx, y + dy);
+        }
+
+        if(!isRealObject(group))
+        {
         }
     }
 };

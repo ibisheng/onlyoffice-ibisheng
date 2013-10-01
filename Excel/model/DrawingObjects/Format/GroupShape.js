@@ -183,37 +183,37 @@ CGroupShape.prototype =
 
     setPosition: function(x, y)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setPosition(x, y, model_id);
     },
 
     setExtents: function(extX, extY)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setRotate(rot, model_id);
     },
 
     setChildExtents: function(chExtX, chExtY)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setChildExtents(chExtX, chExtY, model_id);
     },
 
     setChildOffsets: function(chOffX, chOffY)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setChildOffsets(chOffX, chOffY, model_id);
     },
 
@@ -1737,6 +1737,55 @@ CGroupShape.prototype =
         if(!isRealObject(group))
         {
             this.recalculate();
+        }
+    },
+
+    readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
+    {
+
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        this.spPr.Read_FromBinary2(r);
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x + dx, y + dy);
+        }
+        var l = r.GetLong();
+        for(var i = 0; i < l;++i)
+        {
+            switch (r.GetLong())
+            {
+                case CLASS_TYPE_SHAPE:
+                {
+                    this.spTree[i] = new CShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+
+                case CLASS_TYPE_IMAGE:
+                {
+                    this.spTree[i] = new CImageShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+
+                case CLASS_TYPE_GROUP:
+                {
+                    this.spTree[i] = new CGroupShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+            }
+        }
+
+        if(!isRealObject(group))
+        {
         }
     }
 

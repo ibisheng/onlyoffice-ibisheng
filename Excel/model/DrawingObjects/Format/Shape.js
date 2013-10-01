@@ -1009,7 +1009,7 @@ CShape.prototype =
 	
     setPosition: function(x, y)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setPosition(x, y, model_id);
     },
 
@@ -1034,19 +1034,19 @@ CShape.prototype =
 
     setExtents: function(extX, extY)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        var model_id;// = this.drawingObjects.getWorksheet().model.getId();
         this.spPr.xfrm.setRotate(rot, model_id);
     },
 
@@ -1091,7 +1091,7 @@ CShape.prototype =
         if(this.spPr.geometry)
         {
             var geometry = this.spPr.geometry;
-            var model_id = this.drawingObjects.getWorksheet().model.getId();
+            var model_id ;//= this.drawingObjects.getWorksheet().model.getId();
             geometry.setGuideValue(ref1, value1, model_id);
             geometry.setGuideValue(ref2, value2, model_id);
             geometry.Recalculate(this.extX, this.extY);
@@ -3056,6 +3056,121 @@ CShape.prototype =
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
+    },
+
+    readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
+    {
+        this.group = group;
+        this.setDrawingObjects(drawingObjects);
+
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+
+        var Reader = r;
+
+
+        var offX, offY, extX, extY, flipH, flipV, rot;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            this.setPresetGeometry(geometry.preset);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            this.setUniLine(ln);
+        }
+
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x + dx, y + dy);
+        }
+        if(r.GetBool())
+        {
+            var style = new CShapeStyle();
+            style.Read_FromBinary2(r);
+            this.setStyleBinary(style);
+        }
+        if(r.GetBool())
+        {
+            this.txBody = new CTextBody(this);
+            this.txBody.readFromBinaryForCopyPaste(r, drawingObjects.drawingDocument);
+        }
+
     },
 
     setStyleBinary: function(style)
