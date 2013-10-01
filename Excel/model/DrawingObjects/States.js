@@ -4601,6 +4601,13 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_NULL:
             {
+				// Если открыт iframe, то нельзя удалить диаграмму
+				if ( drawingObjectsController.selectedObjects.length == 1 )
+				{
+					if ( (drawingObjectsController.selectedObjects[0] instanceof CChartAsGroup) && (drawingObjectsController.selectedObjects[0].chart.bChartEditor) )
+						break;
+				}
+				
                 drawingObjectsController.drawingObjects.objectLocker.reset();
                 for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
                 {
