@@ -7208,7 +7208,7 @@ CMathComposition.prototype =
     },
     RecalculateComposition: function()
     {
-        //this.Root.setTxtPrp(this.TxtPrp);
+        this.Root.setTxtPrp(this.TxtPrp);
         this.Root.Resize();
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
