@@ -1800,17 +1800,18 @@ CopyProcessor.prototype =
                                 this.oPresentationWriter.WriteDouble(presentation.Width);
                                 this.oPresentationWriter.WriteDouble(presentation.Height);
                                 this.oPresentationWriter.WriteULong(graphicObjects.selectedObjects.length);
-                                for(var i = 0; i < graphicObjects.selectedObjects.length; ++i)
+                                var selected_objects = graphicObjects.State.id === STATES_ID_GROUP ? graphicObjects.State.group.selectedObjects : graphicObjects.selectedObjects;
+                                for(var i = 0; i < selected_objects.length; ++i)
                                 {
-                                    if(!(graphicObjects.selectedObjects[i] instanceof CGraphicFrame))
+                                    if(!(selected_objects[i] instanceof CGraphicFrame))
                                     {
                                         this.oPresentationWriter.WriteBool(true);
-                                        this.CopyGraphicObject(this.ElemToSelect, graphicObjects.selectedObjects[i]);
+                                        this.CopyGraphicObject(this.ElemToSelect, selected_objects[i]);
                                     }
                                     else
                                     {
                                         this.oPresentationWriter.WriteBool(false);
-                                        this.CopyPresentationTableFull(this.ElemToSelect, graphicObjects.selectedObjects[i]);
+                                        this.CopyPresentationTableFull(this.ElemToSelect, selected_objects[i]);
                                     }
                                 }
 
@@ -2213,6 +2214,10 @@ CopyProcessor.prototype =
             else if(oGraphicObj instanceof CGroupShape)
             {
                 this.oPresentationWriter.WriteGroupShape(oGraphicObj);
+            }
+            else if(oGraphicObj instanceof CChartAsGroup)
+            {
+                this.oPresentationWriter.WriteChart(oGraphicObj);
             }
         }
     }
@@ -2931,7 +2936,7 @@ PasteProcessor.prototype =
         var nNewContentLength = aNewContent.length;
         //����� ���� �� Document.Add_NewParagraph
         var Item = oDoc.Content[oDoc.CurPos.ContentPos];
-
+        oDoc.Remove(1, true, true);
         if( type_Paragraph == Item.GetType() )
         {
             if(true != this.bInBlock && 1 == nNewContentLength && type_Paragraph == aNewContent[0].GetType())
@@ -3552,7 +3557,7 @@ PasteProcessor.prototype =
                                     History.Create_NewPoint();
                                     for(var i = 0; i < arr_slides.length; ++i)
                                     {
-                                        presentation.insertSlide(presentation.CurPage + i, arr_slides[i]);
+                                        presentation.insertSlide(presentation.CurPage + i+1, arr_slides[i]);
                                     }
                                     presentation.Recalculate();
                                     node.blur();
