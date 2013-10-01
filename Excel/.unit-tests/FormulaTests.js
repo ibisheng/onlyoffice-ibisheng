@@ -173,6 +173,25 @@
         strictEqual( oParser.calculate().getValue(), "#VALUE!" );
     } )
 
+    test( "Test: \"String+Number\"", function () {
+        oParser = new parserFormula( "1+\"099\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 100 );
+
+        ws.getRange2( "A1469" ).setValue( "'099" );
+        ws.getRange2( "A1470" ).setValue( "\"099\"" );
+
+        oParser = new parserFormula( "1+A1469", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 100 );
+
+
+        oParser = new parserFormula( "1+A1470", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    } )
+
     test( "Test: \"POWER(2,8)\"", function () {
         oParser = new parserFormula( "POWER(2,8)", "A1", ws );
         ok( oParser.parse() );
@@ -294,10 +313,22 @@
         strictEqual( oParser.calculate().getValue(), 20 );
     } )
 
-    test( "Test: MONTH", function () {
+    test( "Test: MONTH #1", function () {
         oParser = new parserFormula( "MONTH(2013)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 7 );
+    } )
+
+    test( "Test: MONTH #2", function () {
+        oParser = new parserFormula( "MONTH(DATE(2013,2,2))", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+    } )
+
+    test( "Test: MONTH #3", function () {
+        oParser = new parserFormula( "MONTH(NOW())", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), new Date().getUTCMonth()+1 );
     } )
 
     test( "Test: \"10-3\"", function () {

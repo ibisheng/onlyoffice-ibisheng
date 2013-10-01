@@ -1241,6 +1241,13 @@ cString.prototype.tocBool = function () {
 cString.prototype.tocString = function () {
     return this;
 };
+cString.prototype.tryConvert = function () {
+    var res = checkTypeCell(""+this.value);
+    if( res instanceof cEmpty )
+        return this;
+    else
+        return res;
+};
 
 /** @constructor */
 function cBool( val ) {
@@ -1391,7 +1398,7 @@ cArea.prototype.getValue = function () {
                     _val.push( new cError( _cell.getValueWithoutFormat() ) );
                     break;
                 case CellValueType.String:
-                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                     break;
                 default:
                     if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
@@ -1422,7 +1429,7 @@ cArea.prototype.getValue2 = function ( cell ) {
                         _val.push( new cError( _cell.getValueWithoutFormat() ) );
                         break;
                     case CellValueType.String:
-                        _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                         break;
                     default:
                         if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
@@ -1585,27 +1592,16 @@ cRef.prototype.getValue = function () {
         {
             var v = this.range.getValueWithoutFormat();
             if ( v == "" )
-                return new cEmpty( "" + v )
+                return new cEmpty()
             else
                 return new cNumber( "" + v );
         }
-        case CellValueType.String:
-            return new cString( "" + this.range.getValueWithoutFormat() );
         case CellValueType.Bool:
             return new cBool( "" + this.range.getValueWithoutFormat() )
         case CellValueType.Error:
             return new cError( "" + this.range.getValueWithoutFormat() )
         default:
-            var _val = "" + this.range.getValueWithoutFormat();
-            if ( _val == "" || _val == null )
-                return new cEmpty();
-            else if ( parserHelp.isNumber( _val ) )
-                return new cNumber( parserHelp.operand_str )
-            else if ( parserHelp.isBoolean( _val ) )
-                return new cBool( parserHelp.operand_str )
-            else if ( parserHelp.isError( _val ) )
-                return new cError( parserHelp.operand_str )
-            else return new cString( _val );
+            return checkTypeCell( "" + this.range.getValueWithoutFormat() )
     }
 };
 cRef.prototype.tocNumber = function () {
@@ -1700,7 +1696,7 @@ cArea3D.prototype.getValue = function () {
                     _val.push( new cError( _cell.getValueWithoutFormat() ) );
                     break;
                 case CellValueType.String:
-                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                     break;
                 default:
                     if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
@@ -1745,7 +1741,7 @@ cArea3D.prototype.getValue2 = function ( cell ) {
                     _val.push( new cError( _cell.getValueWithoutFormat() ) );
                     break;
                 case CellValueType.String:
-                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
+                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                     break;
                 default:
                     if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
@@ -1990,16 +1986,7 @@ cRef3D.prototype.getValue = function () {
         case CellValueType.Error:
             return new cError( "" + _r.getValueWithoutFormat() )
         default:
-            var _val = "" + _r.getValueWithoutFormat();
-            if ( _val == "" || _val == null )
-                return new cEmpty();
-            else if ( parserHelp.isNumber( _val ) )
-                return new cNumber( parserHelp.operand_str )
-            else if ( parserHelp.isBoolean( _val ) )
-                return new cBool( parserHelp.operand_str )
-            else if ( parserHelp.isError( _val ) )
-                return new cError( parserHelp.operand_str )
-            else return new cString( _val );
+            return checkTypeCell( "" + _r.getValueWithoutFormat() )
     }
 };
 cRef3D.prototype.tocBool = function () {
