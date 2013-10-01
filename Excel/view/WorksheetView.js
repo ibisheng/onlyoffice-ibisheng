@@ -458,7 +458,7 @@
 			this.collaborativeEditing = collaborativeEditing;
 			
 			// Auto filters
-			this.autoFilters = new asc_AF();
+			this.autoFilters = new asc_AF(this);
 			this.cellCommentator = new asc_CCellCommentator(this);
 
 			this._init();
@@ -7078,7 +7078,21 @@
 								unLockDraw(t.model.workbook);
 								arn = selectData[0];
 								selectionRange = arn.clone(true);
-
+								
+								//добавляем автофильтры и форматированные таблицы
+								if(isLocal && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
+								{
+									var aFilters = val.lStorage.autoFilters;
+									var range;
+									for(var aF = 0; aF < aFilters.length; aF++)
+									{
+										range = {r1: aFilters[aF].range.r1 + selectionRange.r1, c1:  aFilters[aF].range.c1 + selectionRange.c1, r2:  aFilters[aF].range.r2 + selectionRange.r1, c2:  aFilters[aF].range.c2 + selectionRange.c1}
+										t.autoFilters.addAutoFilter(t, aFilters[aF].style, range, null, null, true);
+										if(!aFilters[aF].autoFilter)
+											t.autoFilters.addAutoFilter(t, null, range, null, null, true);
+									}
+								};
+								
 								// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
 								arn.c1 = 0;
 								arn.c2 = gc_nMaxCol0;

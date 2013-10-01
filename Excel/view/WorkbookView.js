@@ -1325,7 +1325,7 @@
 				var t = this, ws, v;
 				if (!t.controller.isCellEditMode && !window.USER_AGENT_SAFARI_MACOS) {
 					ws = t.getWorksheet();
-					t.clipboard.copyRange(ws.getSelectedRange(), ws);
+					t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
 					ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
 				} else if(!window.USER_AGENT_SAFARI_MACOS){
 					v = t.cellEditor.cutSelection();
@@ -1337,7 +1337,7 @@
 				var t = this, ws, v;
 				if (!t.controller.isCellEditMode) {
 					ws = t.getWorksheet();
-					var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws);
+					var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws, true);
 					if(result)
 						ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
 					return result;

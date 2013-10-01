@@ -231,8 +231,9 @@
 		};
 		
 		/** @constructor */
-		function AutoFilters() {
+		function AutoFilters(currentSheet) {
 			if ( !(this instanceof AutoFilters) ) {return new AutoFilters();}
+			this.worksheet = currentSheet;
 			return this;
 		}
 
@@ -279,7 +280,7 @@
 				var splitRange;
 				if(!addFormatTableOptionsObj)
 					addNameColumn = true;
-				else
+				else if(typeof addFormatTableOptionsObj == 'object')
 				{
 					ref = addFormatTableOptionsObj.asc_getRange();
                     addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
@@ -287,6 +288,9 @@
 					if(newRange)
 						activeCells = newRange;
 				}
+				else if(addFormatTableOptionsObj)
+					addNameColumn = false;
+				
 				//callback
 				var onAddAutoFiltersCallback = function(success)
 				{

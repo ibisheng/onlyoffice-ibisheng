@@ -262,10 +262,10 @@
 				}
 			},
 
-			copyRange: function (range, worksheet) {
+			copyRange: function (range, worksheet, isCut) {
 				var t = this;
 				t._cleanElement();
-				var text = t._makeTableNode(range, worksheet);
+				var text = t._makeTableNode(range, worksheet, isCut);
 				if(text == false)
 					return;
 				//исключения для opera в случае копирования пустой html
@@ -292,7 +292,7 @@
 			},
 			
 
-			copyRangeButton: function (range, worksheet) {
+			copyRangeButton: function (range, worksheet, isCut) {
 				if(/MSIE/g.test(navigator.userAgent))
 				{
 					this._cleanElement();
@@ -338,7 +338,7 @@
 				else if(activateLocalStorage)
 				{
 					var t = this;
-					var  table = t._makeTableNode(range,worksheet);
+					var  table = t._makeTableNode(range, worksheet, isCut);
 					t.copyText = t._getTextFromTable(table);
 					return true;
 				}
@@ -859,7 +859,6 @@
                     pastebin.setAttribute("contentEditable", true);
                     
                     pastebin.onpaste = function(e){
-						console.log(window.GlobalPasteFlag);
 						if (!window.GlobalPasteFlag)
 							return;
 						
@@ -876,7 +875,6 @@
                         pastebin.removeChild(aChildNodes[i]);
                     }
 					 pastebin.onpaste = function(e){
-						console.log(window.GlobalPasteFlag);
 						if (!window.GlobalPasteFlag)
 							return;
 
@@ -2071,7 +2069,7 @@
 				}
 			},
 			
-			_makeTableNode: function (range, worksheet) {
+			_makeTableNode: function (range, worksheet, isCut) {
 				var fn = range.worksheet.workbook.getDefaultFont();
 				var fs = range.worksheet.workbook.getDefaultSize();
 				var bbox = range.getBBox0();
@@ -2158,7 +2156,7 @@
 							nLoc++;
 							isImage = true;
 						
-						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox.r1,bbox.c1, image.from.row, image.from.col);
+						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox, image.from.row, image.from.col, worksheet, isCut);
 					}
 
 				}
@@ -2182,7 +2180,7 @@
 								else
 									localStText += textRange;
 								//добавляем ноды
-								t._addLocalStorage(false,false,currentRange,bbox.r1,bbox.c1,row,col);
+								t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut);
 							}
 						}
 						t.lStorageText = localStText;
@@ -2268,14 +2266,15 @@
 				return table;
 			},
 			
-			_addLocalStorage : function (isImage,isChart,cell,numRow,numCol,trueRow,trueCol) {
+			_addLocalStorage : function (isImage,isChart,cell,activeRange,trueRow,trueCol, worksheet, isCut) {
 				var t = this;
+				var numRow = activeRange.r1;
+				var numCol = activeRange.c1;
 				if(isChart)
 				{
 					t.lStorage = [];
 					t.lStorage[0] = {};
 					t.lStorage[0].isChart = isChart;
-					//t.lStorage[trueRow][trueCol] = isChart;
 				}
 				else if(!isImage)
 				{
@@ -2305,7 +2304,37 @@
 					}
 					if(cell.getQuotePrefix() && t.lStorage[row][col] && t.lStorage[row][col].value2 && t.lStorage[row][col].value2[0])
 						t.lStorage[row][col].value2[0].text = "'" + t.lStorage[row][col].value2[0].text;
-					
+					//проверка на наличие автофильтров
+					if(!t.lStorage.autoFilters)
+					{
+						var autoFiltersObj = worksheet.autoFilters;
+						var findFilter = autoFiltersObj._searchFiltersInRange(activeRange, worksheet.model);
+						if(findFilter && !findFilter[0].TableStyleInfo)
+						{
+							findFilter.splice(0, 1);
+						}
+						if(findFilter)
+						{
+							var ref;
+							var style;
+							var range;
+							var tempRange;
+							t.lStorage.autoFilters = [];
+							for(var i = 0; i < findFilter.length; i++)
+							{
+								ref = findFilter[i].Ref;
+								tempRange = autoFiltersObj._refToRange(ref);
+								range = {r1: tempRange.r1 - activeRange.r1, c1: tempRange.c1 -  activeRange.c1, r2: tempRange.r2 - activeRange.r1, c2: tempRange.c2 -  activeRange.c1};
+								style = findFilter[i].TableStyleInfo ? findFilter[i].TableStyleInfo.Name : null;
+								t.lStorage.autoFilters[i] = 
+								{
+									style: style,
+									range: range,
+									autoFilter: findFilter[i].AutoFilter ? true : false
+								}
+							}
+						}
+					}
 				}
 			},
 
