@@ -3176,25 +3176,32 @@
 			cleanSelection: function () {
 				var ctx = this.overlayCtx;
 				var arn = this.activeRange.clone(true);
+				var arnIntersection = arn.intersectionSimple(this.visibleRange);
 				var width = ctx.getWidth();
 				var height = ctx.getHeight();
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var x1 = this.cols[arn.c1].left - offsetX - this.width_2px;
-				var x2 = this.cols[arn.c2].left + this.cols[arn.c2].width - offsetX + this.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */this.width_2px;
-				var y1 = this.rows[arn.r1].top - offsetY - this.height_2px;
-				var y2 = this.rows[arn.r2].top + this.rows[arn.r2].height - offsetY + this.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */this.height_2px;
+				var x1 = Number.MAX_VALUE;
+				var x2 = -Number.MAX_VALUE;
+				var y1 = Number.MAX_VALUE;
+				var y2 = -Number.MAX_VALUE;
 				var i;
 
-				this._activateOverlayCtx();
-				this._cleanColumnHeaders(arn.c1, arn.c2);
-				this._cleanRowHeades(arn.r1, arn.r2);
-				this._deactivateOverlayCtx();
+				if (arnIntersection) {
+					x1 = this.cols[arnIntersection.c1].left - offsetX - this.width_2px;
+					x2 = this.cols[arnIntersection.c2].left + this.cols[arnIntersection.c2].width - offsetX + this.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */this.width_2px;
+					y1 = this.rows[arnIntersection.r1].top - offsetY - this.height_2px;
+					y2 = this.rows[arnIntersection.r2].top + this.rows[arnIntersection.r2].height - offsetY + this.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */this.height_2px;
+
+					this._activateOverlayCtx();
+					this._cleanColumnHeaders(arn.c1, arn.c2);
+					this._cleanRowHeades(arn.r1, arn.r2);
+					this._deactivateOverlayCtx();
+				}
 
 				// Если есть активное автозаполнения, то нужно его тоже очистить
 				if (this.activeFillHandle !== null) {
 					var activeFillClone = this.activeFillHandle.clone(true);
-					activeFillClone.normalize();
 
 					// Координаты для автозаполнения
 					var xFH1 = this.cols[activeFillClone.c1].left - offsetX - this.width_2px;
@@ -3342,12 +3349,15 @@
 					y2 = Math.max(y2, yCopyAr2);
 				}
 
-				ctx.save()
-						.beginPath()
-						.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
-						.clip()
-						.clearRect(x1, y1, x2 - x1, y2 - y1)
-						.restore();
+				if (!(Number.MAX_VALUE === x1 && -Number.MAX_VALUE === x2 &&
+					Number.MAX_VALUE === y1 && -Number.MAX_VALUE === y2)) {
+					ctx.save()
+							.beginPath()
+							.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
+							.clip()
+							.clearRect(x1, y1, x2 - x1, y2 - y1)
+							.restore();
+				}
 				return this;
 			},
 
@@ -4654,14 +4664,14 @@
 			},
 
 			_isColDrawnPartially: function (col, leftCol) {
-				if (col <= leftCol)
+				if (col <= leftCol || col >= this.nColsCount)
 					return false;
 				var c = this.cols;
 				return c[col].left + c[col].width - c[leftCol].left + this.cellsLeft > this.drawingCtx.getWidth();
 			},
 
 			_isRowDrawnPartially: function (row, topRow) {
-				if (row <= topRow)
+				if (row <= topRow || row >= this.nRowsCount)
 					return false;
 				var r = this.rows;
 				return r[row].top + r[row].height - r[topRow].top + this.cellsTop > this.drawingCtx.getHeight();
@@ -4975,7 +4985,7 @@
 			},
 
 			getCursorTypeFromXY: function (x, y, isViewerMode) {
-				var c, r, f, i, offsetX, offsetY;
+				var c, r, f, i, offsetX, offsetY, arNorm, arIntersection;
 				var left, top, right, bottom;
 				var sheetId = this.model.getId();
 				var userId = undefined;
@@ -5009,10 +5019,10 @@
 
 				x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 				y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
-					
+
+				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 				if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 					var arr = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
 						targetArr = this.isFormulaEditMode ? 0 : -1;
 					for (i in arr) {
@@ -5076,24 +5086,26 @@
 						return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
 					}
 
-					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 					var xWithOffset = x + offsetX;
 					var yWithOffset = y + offsetY;
 					
 					// Навели на выделение
-					left = this.cols[this.activeRange.c1].left;
-					right = this.cols[this.activeRange.c2].left + this.cols[this.activeRange.c2].width;
-					top = this.rows[this.activeRange.r1].top;
-					bottom = this.rows[this.activeRange.r2].top + this.rows[this.activeRange.r2].height;
-					if (!isViewerMode && ((((xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
-						(xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
-						yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
-						(((yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
-						(yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
-						xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px))) {
-						// Мы навели на границу выделения
-						return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
+					arNorm = this.activeRange.clone(true);
+					arIntersection = arNorm.intersectionSimple(this.visibleRange);
+					if (arIntersection) {
+						left = arNorm.c1 === arIntersection.c1 ? this.cols[arNorm.c1].left : null;
+						right = arNorm.c2 === arIntersection.c2 ? this.cols[arNorm.c2].left + this.cols[arNorm.c2].width : null;
+						top = arNorm.r1 === arIntersection.r1 ? this.rows[arNorm.r1].top : null;
+						bottom = arNorm.r2 === arIntersection.r2 ? this.rows[arNorm.r2].top + this.rows[arNorm.r2].height : null;
+						if (!isViewerMode && ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
+							(null !== right && xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
+							null !== top && null !== bottom && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
+							(((null !== top && yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
+							(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
+							null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px))) {
+							// Мы навели на границу выделения
+							return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
+						}
 					}
 
 					if (x < this.cellsLeft && y < this.cellsTop) {
@@ -5242,22 +5254,18 @@
 				var t = this;
 
 				var ar = fixedRange ? fixedRange : ((this.isFormulaEditMode) ?
-					t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1].clone(true) : t.activeRange);
+					t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1] : t.activeRange);
 
 				if (!ar) { return; }
 
 				if (ar.type && ar.type !== c_oAscSelectionType.RangeCells) { return; }
 
 				var res = this.model.expandRangeByMerged(ar.clone(true));
-				if (ar.c1 !== res.c1 && ar.c1 !== res.c2) {
-					ar.c1 = ar.c1 <= ar.c2 ? res.c1 : Math.min(res.c2, this.nColsCount - 1);
-				}
-				ar.c2 = ar.c1 === res.c1 ? Math.min(res.c2, this.nColsCount - 1) : (res.c1);
 
-				if (ar.r1 !== res.r1 && ar.r1 !== res.r2) {
-					ar.r1 = ar.r1 <= ar.r2 ? res.r1 : Math.min(res.r2, this.nRowsCount - 1);
-				}
-				ar.r2 = ar.r1 === res.r1 ? Math.min(res.r2, this.nRowsCount - 1) : res.r1;
+				if (ar.c1 !== res.c1 && ar.c1 !== res.c2) {ar.c1 = ar.c1 <= ar.c2 ? res.c1 : res.c2;}
+				ar.c2 = ar.c1 === res.c1 ? res.c2 : (res.c1);
+				if (ar.r1 !== res.r1 && ar.r1 !== res.r2) {ar.r1 = ar.r1 <= ar.r2 ? res.r1 : res.r2;}
+				ar.r2 = ar.r1 === res.r1 ? res.r2 : res.r1;
 			},
 
 			_fixSelectionOfHiddenCells: function (dc, dr, range) {
@@ -5288,7 +5296,7 @@
 						c1 = c2 = findVisibleCol(ar.c1, dc);
 					}
 				} else {
-					if (t.cols[ar.c2].width < t.width_1px) {
+					if (t.nColsCount > ar.c2 && t.cols[ar.c2].width < t.width_1px) {
 						// Проверка для одновременно замерженных и скрытых ячеек (A1:C1 merge, B:C hidden)
 						for (mc = null, i = arn.r1; i <= arn.r2; ++i) {
 							mc = t._getMergedCellsRange(ar.c2, i);
@@ -5304,7 +5312,7 @@
 						r1 = r2 = findVisibleRow(ar.r1, dr);
 					}
 				} else {
-					if (t.rows[ar.r2].height < t.height_1px) {
+					if (t.nRowsCount > ar.r2 && t.rows[ar.r2].height < t.height_1px) {
 						//Проверка для одновременно замерженных и скрытых ячеек (A1:A3 merge, 2:3 hidden)
 						for (mc = null, i = arn.c1; i <= arn.c2; ++i) {
 							mc = t._getMergedCellsRange(i, ar.r2);
