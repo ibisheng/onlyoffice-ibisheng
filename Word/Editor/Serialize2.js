@@ -2153,15 +2153,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			if( bUseSelection && ParaStart == i && para_TextPr != item.Type)
 			{
 				//ищем предыдущие TextPr
-				for ( var j = ParaStart - 1; j >= 0; --j )
-				{
-					var oCurElem = Content[j];
-					if(para_TextPr == oCurElem.Type)
-					{
-						this.oCur_rPr = oCurElem.Value;
-						break;
-					}
-				}
+				var oFindObj = par.Internal_FindBackward(ParaStart, [para_TextPr]);
+				if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+					this.oCur_rPr = par.Content[oFindObj.LetterPos].Value;
 			}
             switch ( item.Type )
             {
@@ -2272,6 +2266,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 		}
 		if(bUseSelection && ParaEnd < Content.length - 1)
 		{
+			this.oCur_rPr = null;
 			this.WriteRun(function(){
                     oThis.memory.WriteByte(c_oSerRunType._LastRun);
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);

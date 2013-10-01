@@ -2827,7 +2827,12 @@ PasteProcessor.prototype =
                 var nContentLength = oInsertPar.Content.length;
                 if(nContentLength > 2)
                 {
-                    var TextPr = Item.Internal_CalculateTextPr(Item.CurPos.ContentPos);
+					var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [para_TextPr]);
+                    var TextPr = null;
+					if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+						TextPr = Item.Content[oFindObj.LetterPos].Copy();
+					else
+						TextPr = new ParaTextPr();
 					var nContentPos = Item.CurPos.ContentPos;
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
@@ -2838,7 +2843,7 @@ PasteProcessor.prototype =
 							nContentPos++;
 						}
                     }
-                    Item.Internal_Content_Add(nContentPos, new ParaTextPr(TextPr));
+                    Item.Internal_Content_Add(nContentPos, TextPr);
                 }
 				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
 				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
@@ -2936,7 +2941,12 @@ PasteProcessor.prototype =
                 var nContentLength = oInsertPar.Content.length;
                 if(nContentLength > 2)
                 {
-                    var TextPr = Item.Internal_CalculateTextPr(Item.CurPos.ContentPos);
+                    var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [para_TextPr]);
+                    var TextPr = null;
+					if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+						TextPr = Item.Content[oFindObj.LetterPos].Copy();
+					else
+						TextPr = new ParaTextPr();
                     var nContentPos = Item.CurPos.ContentPos;
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
@@ -2947,7 +2957,7 @@ PasteProcessor.prototype =
                             nContentPos++;
                         }
                     }
-                    Item.Internal_Content_Add(nContentPos, new ParaTextPr(TextPr));
+                    Item.Internal_Content_Add(nContentPos, TextPr);
                 }
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
