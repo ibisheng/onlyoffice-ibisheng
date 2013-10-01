@@ -3352,6 +3352,7 @@ function DrawingObjects() {
 		function updateHeaders() {
 			worksheet._drawColumnHeaders();
 			worksheet._drawRowHeaders();
+			worksheet._drawCorner();
 			
 			// cols header on overlay
 			overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
@@ -4914,7 +4915,7 @@ function CoordsManager(ws, bLog) {
 	
 		var cell = { col: 0, colOff: 0, colOffPx: 0,
 					 row: 0, rowOff: 0, rowOffPx: 0 };
-	
+
 		var _x = x + worksheet.getCellLeft(0, 0);
 		var _y = y + worksheet.getCellTop(0, 0);
 	

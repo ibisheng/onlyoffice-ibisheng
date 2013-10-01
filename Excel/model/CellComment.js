@@ -8,6 +8,8 @@
 // CommentCoords
 //-----------------------------------------------------------------------------------
 
+//{ ASC Classes
+
 function asc_CCommentCoords(obj) {
 
 	var _this = this;
@@ -442,6 +444,8 @@ prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
 prot["asc_getReply"] = prot.asc_getReply;
 
 prot["asc_addReply"] = prot.asc_addReply;
+
+//}
 
 //-----------------------------------------------------------------------------------
 // CompositeCommentData

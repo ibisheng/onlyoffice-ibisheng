@@ -1940,6 +1940,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var t = this;
 				var copyWorksheet = function (res) {
 					if (res) {
+						t.wb._initCommentsToSave();
 						t.wbModel.copyWorksheet(i, where, newName);
 						t.wb.copyWorksheet(i, where);
 						// Делаем активным скопированный
