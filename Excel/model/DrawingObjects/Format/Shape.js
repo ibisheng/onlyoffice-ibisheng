@@ -729,6 +729,16 @@ CShape.prototype =
         }
     },
 
+    applyAllSpacing: function(val)
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Set_ParagraphSpacing(val);
+            this.txBody.content.Set_ApplyToAll(false);
+        }
+    },
+
 
     initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
     {

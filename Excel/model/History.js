@@ -178,6 +178,8 @@ var historyitem_AutoShapes_RightInset = 67;
 var historyitem_AutoShapes_LeftInset = 68;
 var historyitem_AutoShapes_BottomInset = 68;
 var historyitem_AutoShapes_Set_AutoShapeStyle = 69;
+var historyitem_AutoShapes_Set_ImageBlipFill = 70;
+
 
 
 

@@ -244,6 +244,11 @@ CTableId.prototype =
                         Class = new CGs();
                         break;
                     }
+                    case CLASS_TYPE_BLIP_FILL:
+                    {
+                        Class = new CBlipFill();
+                        break;
+                    }
                 }
 
                 if(isRealObject(Class))

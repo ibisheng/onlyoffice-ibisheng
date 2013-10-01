@@ -54,6 +54,20 @@ function CGroupShape(drawingBase, drawingObjects)
 CGroupShape.prototype =
 {
 
+    applyAllSpacing: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+
+        }
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Set_ParagraphSpacing(val);
+            this.txBody.content.Set_ApplyToAll(false);
+        }
+    },
+
     getAllFonts: function(AllFonts)
     {
        for(var i = 0;  i< this.spTree.length; ++i)

@@ -39,8 +39,7 @@ function CImageShape(drawingBase, drawingObjects)
     this.drawingBase = drawingBase;
     this.drawingObjects = drawingObjects;
 
-    this.blipFill = new CUniFill();
-    this.blipFill.fill = new CBlipFill();
+
     this.spPr = new CSpPr();
     this.nvSpPr = null;
     this.style = null;
@@ -74,12 +73,30 @@ function CImageShape(drawingBase, drawingObjects)
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(isRealObject(drawingObjects))
+        this.setDrawingObjects(drawingObjects);
+    if(isRealObject(drawingObjects))
+    {
+        var blip_fill = new CUniFill();
+        blip_fill.setFill(new CBlipFill());
+        this.setBlipFill(blip_fill);
+    }
 }
 
 CImageShape.prototype =
 {
     getAllFonts: function(AllFonts)
     {
+    },
+
+    setDrawingObjects: function(drawingObjects)
+    {
+        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
+        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.drawingObjects = drawingObjects;
+
     },
 
     getObjectType: function()
@@ -143,13 +160,20 @@ CImageShape.prototype =
         this.setImageId(imageId);
         this.setPresetGeometry("rect");
         this.recalculate();
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
+
 
     setXfrmObject: function(xfrm)
     {
+        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
+        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.spPr.xfrm = xfrm;
     },
-
     setDrawingBase: function(drawingBase)
     {
         this.drawingBase = drawingBase;
@@ -157,9 +181,16 @@ CImageShape.prototype =
 
     setPresetGeometry: function(preset)
     {
+        var oldId = isRealObject(this.spPr.geometry) ? this.spPr.geometry.Get_Id() : null;
         this.spPr.geometry = CreateGeometry(preset);
+        var newId = this.spPr.geometry.Get_Id();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetPresetGeometry, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+
         this.spPr.geometry.Init(5, 5);
     },
+
+
 
     setPosition: function(x, y)
     {
@@ -198,14 +229,17 @@ CImageShape.prototype =
 
 	setRasterImage: function(img, canvas)
     {
-        this.blipFill = new CUniFill();
-        this.blipFill.fill = new CBlipFill();
-        this.blipFill.fill.RasterImageId = img;
+        /*this.blipFill = new CUniFill();
+        this.blipFill.fill = new CBlipFill();*/
+        this.blipFill.fill.setRasterImageId(img);
         if(isRealObject(canvas))
             this.blipFill.fill.canvas = canvas;
      //   this.spPr.Fill = new CUniFill();
         this.spPr.Fill = this.blipFill;
         this.brush = this.spPr.Fill;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
     },
 	
     updateDrawingBaseCoordinates: function()
@@ -216,7 +250,7 @@ CImageShape.prototype =
 
     setImageId: function(imageId)
     {
-        this.blipFill.fill.RasterImageId = imageId;
+        this.setRasterImage(imageId);
     },
 
 	setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bAfterOpen)
@@ -352,6 +386,11 @@ CImageShape.prototype =
         {
             aImagesSync.push(getFullImageSrc(this.brush.fill.RasterImageId));
         }
+        if(this.drawingObjects)
+        {
+            this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
+        }
+
     },
 
     recalculateTransform: function()
@@ -1054,6 +1093,22 @@ CImageShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_Set_ImageBlipFill:
+            {
+                this.blipFill = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
             case historyitem_AutoShapes_RecalculateTransformUndo:
             {
                 this.recalculateTransform();
@@ -1071,6 +1126,19 @@ CImageShape.prototype =
                 this.drawingObjects.addGraphicObject(this, data.oldValue);
                 break;
             }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.oldValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
         }
     },
 
@@ -1078,6 +1146,43 @@ CImageShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_Set_ImageBlipFill:
+            {
+                this.blipFill = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateAfterInit:
+            {
+                this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                this.recalculateBrush();
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.newValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
             case historyitem_AutoShapes_RecalculateTransformRedo:
             {
                 this.recalculateTransform();
@@ -1115,7 +1220,12 @@ CImageShape.prototype =
     },
     setBlipFill: function(blipFill)
     {
+        var oldValue = this.blipFill ? this.blipFill.Get_Id() : null;
+        var newValue = blipFill ? blipFill.Get_Id() : null;
         this.blipFill = blipFill;
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_ImageBlipFill, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
     },
 
     writeToBinaryForCopyPaste: function(w)

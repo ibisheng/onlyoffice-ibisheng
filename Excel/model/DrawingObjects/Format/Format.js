@@ -1473,7 +1473,7 @@ CBlipFill.prototype =
 
     getObjectType: function()
     {
-        return CLASS_TYPE_SOLID_FILL;
+        return CLASS_TYPE_BLIP_FILL;
     },
 
     setRasterImageId: function(rasterImageId)

@@ -1211,10 +1211,62 @@ DrawingObjectsController.prototype =
 	putPrLineSpacing: function(type, value)
 	{
 	},
-	
+
+    putPrLineSpacingCallback: function(type, value)
+    {
+        switch (this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                var spacing = new CParaSpacing();
+                var _type;
+                switch(type)
+                {
+                    case 0:
+                    {
+                        _type = linerule_AtLeast;
+                        break;
+                    }
+                    case 1:
+                    {
+                        _type = linerule_Auto;
+                        break;
+                    }
+                    case 2:
+                    {
+                        _type = linerule_Exact;
+                        break;
+                    }
+                }
+                var spacing = new CParaSpacing();
+                spacing.LineRule = _type;
+                spacing.Line = value;
+                this.curState.textObject.txBody.content.Set_ParagraphSpacing(spacing);
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props) === false)
+                {
+                    for(var i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        if(typeof this.selectedObjects[i].applyAllSpacing === "function")
+                        {
+                            this.selectedObjects[i].applyAllSpacing(val);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    },
+
 	putLineSpacingBeforeAfter: function(type, value)
 	{
 	},
+
+
 	
 	setGraphicObjectProps: function(props)
 	{

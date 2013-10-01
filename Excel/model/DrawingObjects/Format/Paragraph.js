@@ -8297,6 +8297,14 @@ Paragraph.prototype =
             Pr.TextPr.FontFamily = {Name: font_name, Index: -1};
         }
 
+        if(Pr.TextPr.FontFamily && Pr.TextPr.FontFamily.Name)
+        {
+            Pr.TextPr.RFonts.Ascii = {Name:Pr.TextPr.FontFamily.Name, Index: -1};
+            Pr.TextPr.RFonts.CS = {Name:Pr.TextPr.FontFamily.Name, Index: -1};
+            Pr.TextPr.RFonts.EastAsia = {Name:Pr.TextPr.FontFamily.Name, Index: -1};
+            Pr.TextPr.RFonts.HAnsi = {Name:Pr.TextPr.FontFamily.Name, Index: -1};
+        }
+
         // Если в стиле была задана нумерация сохраним это в специальном поле
         if ( undefined != Pr.ParaPr.NumPr )
             Pr.ParaPr.StyleNumPr = Pr.ParaPr.NumPr.Copy();
@@ -8642,37 +8650,49 @@ Paragraph.prototype =
 
         if ( ( undefined != Spacing.Line || true === bDeleteUndefined ) && this.Pr.Spacing.Line !== Spacing.Line )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_Line, New : Spacing.Line, Old : ( undefined != this.Pr.Spacing.Line ? this.Pr.Spacing.Line : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_Spacing_Line, New : Spacing.Line, Old : ( undefined != this.Pr.Spacing.Line ? this.Pr.Spacing.Line : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_Line, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.Line ? this.Pr.Spacing.Line : undefined ), Spacing.Line)));
+
             this.Pr.Spacing.Line = Spacing.Line;
         }
 
         if ( ( undefined != Spacing.LineRule || true === bDeleteUndefined ) && this.Pr.Spacing.LineRule !== Spacing.LineRule )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_LineRule, New : Spacing.LineRule, Old : ( undefined != this.Pr.Spacing.LineRule ? this.Pr.Spacing.LineRule : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Spacing_LineRule, New : Spacing.LineRule, Old : ( undefined != this.Pr.Spacing.LineRule ? this.Pr.Spacing.LineRule : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_LineRule, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.LineRule ? this.Pr.Spacing.LineRule : undefined ), Spacing.LineRule)));
+
             this.Pr.Spacing.LineRule = Spacing.LineRule;
         }
 
         if ( ( undefined != Spacing.Before || true === bDeleteUndefined ) && this.Pr.Spacing.Before !== Spacing.Before )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_Before, New : Spacing.Before, Old : ( undefined != this.Pr.Spacing.Before ? this.Pr.Spacing.Before : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_Spacing_Before, New : Spacing.Before, Old : ( undefined != this.Pr.Spacing.Before ? this.Pr.Spacing.Before : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_Before, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.Before ? this.Pr.Spacing.Before : undefined ), Spacing.Before)));
+
             this.Pr.Spacing.Before = Spacing.Before;
         }
 
         if ( ( undefined != Spacing.After || true === bDeleteUndefined ) && this.Pr.Spacing.After !== Spacing.After )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_After, New : Spacing.After, Old : ( undefined != this.Pr.Spacing.After ? this.Pr.Spacing.After : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_Spacing_After, New : Spacing.After, Old : ( undefined != this.Pr.Spacing.After ? this.Pr.Spacing.After : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_After, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.After ? this.Pr.Spacing.After : undefined ), Spacing.After)));
+
             this.Pr.Spacing.After = Spacing.After;
         }
 
         if ( ( undefined != Spacing.AfterAutoSpacing || true === bDeleteUndefined ) && this.Pr.Spacing.AfterAutoSpacing !== Spacing.AfterAutoSpacing )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_AfterAutoSpacing, New : Spacing.AfterAutoSpacing, Old : ( undefined != this.Pr.Spacing.AfterAutoSpacing ? this.Pr.Spacing.AfterAutoSpacing : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Spacing_AfterAutoSpacing, New : Spacing.AfterAutoSpacing, Old : ( undefined != this.Pr.Spacing.AfterAutoSpacing ? this.Pr.Spacing.AfterAutoSpacing : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_AfterAutoSpacing, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.AfterAutoSpacing ? this.Pr.Spacing.AfterAutoSpacing : undefined ), Spacing.AfterAutoSpacing)));
+
             this.Pr.Spacing.AfterAutoSpacing = Spacing.AfterAutoSpacing;
         }
 
         if ( ( undefined != Spacing.BeforeAutoSpacing || true === bDeleteUndefined ) && this.Pr.Spacing.BeforeAutoSpacing !== Spacing.BeforeAutoSpacing )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_BeforeAutoSpacing, New : Spacing.BeforeAutoSpacing, Old : ( undefined != this.Pr.Spacing.BeforeAutoSpacing ? this.Pr.Spacing.BeforeAutoSpacing : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Spacing_BeforeAutoSpacing, New : Spacing.BeforeAutoSpacing, Old : ( undefined != this.Pr.Spacing.BeforeAutoSpacing ? this.Pr.Spacing.BeforeAutoSpacing : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Spacing_BeforeAutoSpacing, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.Spacing.BeforeAutoSpacing ? this.Pr.Spacing.BeforeAutoSpacing : undefined ), Spacing.BeforeAutoSpacing)));
+
             this.Pr.Spacing.BeforeAutoSpacing = Spacing.BeforeAutoSpacing;
         }
 

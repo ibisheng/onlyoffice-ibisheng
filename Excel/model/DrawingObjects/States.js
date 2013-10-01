@@ -208,7 +208,6 @@ function NullState(drawingObjectsController, drawingObjects)
                 {
                     if(cur_drawing.hitInWorkArea(x, y))
                     {
-
                         if(!e.shiftKey && !e.ctrlKey)
                         {
 
