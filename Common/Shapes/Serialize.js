@@ -1799,7 +1799,9 @@ function BinaryPPTYLoader()
                                     {
                                         case 0:
                                         {
-                                            uni_fill.fill.srcRect = this.ReadRect(false);
+                                            var _srcRect = this.ReadRect(false);
+                                            if (_srcRect != null)
+                                                uni_fill.fill.srcRect = _srcRect;
                                             break;
                                         }
                                         default:
