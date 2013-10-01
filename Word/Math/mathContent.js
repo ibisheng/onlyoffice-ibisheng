@@ -6848,6 +6848,7 @@ CMathComposition.prototype =
             var Pos = this.SelectContent.CurPos + 1;
 
         var items = this.SelectContent.createEquation(indef);
+        //this.Root.setTxtPrp(this.TxtPrp);
 
         ///
         this.RecalculateReverse();
