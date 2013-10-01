@@ -293,6 +293,54 @@ CGraphicFrame.prototype =
         this.graphicObject.Recalc_CompiledPr();
     },
 
+    Hyperlink_CanAdd: function(bCheck)
+    {
+        if(this.graphicObject)
+            return this.graphicObject.Hyperlink_CanAdd(bCheck);
+        return false;
+    },
+
+    Hyperlink_Check: function(bCheck)
+    {
+        if(this.graphicObject)
+            return this.graphicObject.Hyperlink_Check(bCheck);
+        return false;
+    },
+
+
+    Hyperlink_Add : function(HyperProps)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Hyperlink_Add(HyperProps);
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransform = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+    Hyperlink_Modify : function(HyperProps)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Hyperlink_Modify(HyperProps);
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransform = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+    Hyperlink_Remove : function()
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Hyperlink_Remove();
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransform = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
     getTransformMatrix: function()
     {
         return this.transform;

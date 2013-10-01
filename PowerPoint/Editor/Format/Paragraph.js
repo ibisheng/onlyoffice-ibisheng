@@ -12022,6 +12022,17 @@ Paragraph.prototype =
                             if ( null != Comment )
                                 Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
                         }
+                        else if(Element instanceof ParaTextPr)
+                        {
+                            var Item = Element;
+                            if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
+                            {
+                                if(this.Parent.Parent instanceof CTextBody)
+                                {
+                                    this.Parent.Parent.textPropsForRecalc.push(Item);
+                                }
+                            }
+                        }
 
                         // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
                         this.Content.splice( Pos, 0, new ParaCollaborativeChangesEnd() );
