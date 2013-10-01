@@ -3645,6 +3645,7 @@ function DrawingObjects() {
 				}
 			}
 			worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
+			_this.showDrawingObjectsEx(false);
 			History.TurnOn();
 		}
 	}
