@@ -7201,6 +7201,12 @@ CMathComposition.prototype =
         this.CreateEquation2(indef);
         this.RecalculateReverse();
         this.UpdatePosition();
+    },
+    RecalculateComposition: function()
+    {
+        this.Root.Resize();
+        this.Root.setPosition(this.pos);
+        this.UpdateCursor();
     }
 
 }
