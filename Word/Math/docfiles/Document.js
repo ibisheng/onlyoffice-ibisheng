@@ -659,6 +659,10 @@ CDocument.prototype =
     {
         //var StartTime = new Date().getTime();
 
+        //**
+        MathComposition.RecalculateComposition();
+        //**
+
         if ( true === this.TurnOffRecalc )
             return;
 
@@ -1450,8 +1454,6 @@ CDocument.prototype =
     //**
     Draw : function(nPageIndex, pGraphics)
     {
-
-		MathComposition.RecalculateComposition();
 		
         if ( "undefined" == typeof(pGraphics) )
             pGraphics = Canvas;

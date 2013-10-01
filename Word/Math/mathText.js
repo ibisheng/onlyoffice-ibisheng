@@ -193,8 +193,8 @@ CMathText.prototype =
 
         g_oTextMeasurer.SetFont( txtPrp );
 
-        //var letter = this.getCode();
-		var letter = this.value;
+        var letter = this.getCode();
+		//var letter = this.value;
         var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
         var _width = metricsTxt.Width;
 
@@ -310,8 +310,8 @@ CMathText.prototype =
 
 
         pGraphics.transform(sx, shy, shx, sy, 0, 0);
-        //pGraphics.FillTextCode(xx, yy , this.getCode());
-		pGraphics.FillTextCode(xx, yy , this.value);
+        pGraphics.FillTextCode(xx, yy , this.getCode());
+		//pGraphics.FillTextCode(xx, yy , this.value);
 
     },
     setPosition: function( pos )

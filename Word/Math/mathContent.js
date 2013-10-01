@@ -6615,7 +6615,7 @@ CMathComposition.prototype =
         this.Root.g_mContext = gps;
         //this.Root.setComposition(this);
         this.SetDefaultPrp();
-        this.Root.setTxtPrp(this.TxtPrp, true);
+        this.Root.setTxtPrp(this.TxtPrp);
 
         this.CurrentContent = this.Root;
         this.SelectContent  = this.Root;
@@ -7207,6 +7207,7 @@ CMathComposition.prototype =
     },
     RecalculateComposition: function()
     {
+        this.Root.setTxtPrp(this.TxtPrp);
         this.Root.Resize();
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
