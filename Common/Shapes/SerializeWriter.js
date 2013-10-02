@@ -896,6 +896,8 @@ function CBinaryFileWriter()
                     this._WriteInt1(7, _comment.WriteParentCommentId);
                 }
 
+                this._WriteString1(8, _comment.AdditionalData);
+
                 this.WriteUChar(g_nodeAttributeEnd);
 
                 this.EndRecord();

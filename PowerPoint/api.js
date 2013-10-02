@@ -899,8 +899,6 @@ asc_docs_api.prototype.InitEditor = function()
 {
     this.WordControl.m_oLogicDocument   = new CPresentation(this.WordControl.m_oDrawingDocument);
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
-
-    this.sync_InitStandartTextures();
 }
 
 asc_docs_api.prototype.SetInterfaceDrawImagePlaceShape = function(div_id)
@@ -1003,32 +1001,6 @@ asc_docs_api.prototype.asc_registerCallback = function(name, callback) {
 	if (!_callbacks.hasOwnProperty(name))
 		_callbacks[name] = []
 	_callbacks[name].push(callback);
-
-    if ("asc_onInitEditorShapes" == name)
-    {
-        this.asc_fireCallback("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
-    }
-    else if ("asc_onInitEditorFonts" == name)
-    {
-        if (this._gui_fonts != null)
-        {
-            this.asc_fireCallback("asc_onInitEditorFonts", this._gui_fonts);
-            this._gui_fonts = null;
-        }
-    }
-    else if ("asc_onInitEditorThemes" == name)
-    {
-        if (this._gui_editor_themes != null || this._gui_document_themes)
-        {
-            this.asc_fireCallback("asc_onInitEditorThemes", this._gui_editor_themes, this._gui_document_themes);
-            this._gui_editor_themes = null;
-            this._gui_document_themes = null;
-        }
-    }
-    else if ("asc_onInitStandartTextures" == name)
-    {
-        this.sync_InitStandartTextures();
-    }
 }
 
 asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
@@ -1072,6 +1044,37 @@ asc_docs_api.prototype.get_TextProps = function()
 	// return { ParaPr: ParaPr, TextPr : TextPr };
 	return new CParagraphAndTextProp (ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
 }
+
+// -------
+// тут методы, замены евентов
+asc_docs_api.prototype.get_PropertyEditorShapes = function()
+{
+    var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
+    return ret;
+}
+asc_docs_api.prototype.get_PropertyEditorFonts = function()
+{
+    return this._gui_fonts;
+}
+asc_docs_api.prototype.get_PropertyStandartTextures = function()
+{
+    var _count = g_oUserTexturePresets.length;
+    var arr = new Array(_count);
+    for (var i = 0; i < _count; ++i)
+    {
+        arr[i] = new CAscTexture();
+        arr[i].Id = i;
+        arr[i].Image = g_oUserTexturePresets[i];
+    }
+    return arr;
+}
+asc_docs_api.prototype.get_PropertyEditorThemes = function()
+{
+    var ret = [this._gui_editor_themes, this._gui_document_themes];
+    return ret;
+}
+
+// -------
 
 // -------
 asc_docs_api.prototype.get_ContentCount = function()
@@ -1655,19 +1658,10 @@ asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
 
 asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
     this._gui_fonts = gui_fonts;
-    var ret = this.asc_fireCallback("asc_onInitEditorFonts",gui_fonts);
-    if (ret)
-        this._gui_fonts = null;
 }
 asc_docs_api.prototype.sync_InitEditorThemes = function(gui_editor_themes, gui_document_themes){
     this._gui_editor_themes = gui_editor_themes;
     this._gui_document_themes = gui_document_themes;
-    var ret = this.asc_fireCallback("asc_onInitEditorThemes", gui_editor_themes, gui_document_themes);
-    if (ret)
-    {
-        this._gui_editor_themes = null;
-        this._gui_document_themes = null;
-    }
 }
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
     this.asc_fireCallback("asc_onInitTableTemplates",styles);
@@ -2173,20 +2167,6 @@ asc_docs_api.prototype.put_LineEndStyle = function(_style)
 asc_docs_api.prototype.put_LineEndSize = function(_size)
 {
     this.WordControl.m_oLogicDocument.putLineEndSize(_size);
-}
-
-asc_docs_api.prototype.sync_InitStandartTextures = function()
-{
-    var _count = g_oUserTexturePresets.length;
-    var arr = new Array(_count);
-    for (var i = 0; i < _count; ++i)
-    {
-        arr[i] = new CAscTexture();
-        arr[i].Id = i;
-        arr[i].Image = g_oUserTexturePresets[i];
-    }
-
-    this.asc_fireCallback("asc_onInitStandartTextures", arr);
 }
 
 asc_docs_api.prototype.put_TextColor2 = function(r, g, b)
@@ -3135,6 +3115,30 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
 }
 asc_docs_api.prototype.sync_ImgWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onImgWrapStyleChanged",style);
+}
+
+asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
+{
+    this.WordControl.DrawingFreeze = bIsFreeze;
+
+    var _elem1 = document.getElementById("id_main");
+    if (_elem1)
+    {
+        var _elem2 = document.getElementById("id_horscrollpanel");
+        var _elem3 = document.getElementById("id_panel_right");
+        if (bIsFreeze)
+        {
+            _elem1.style.display = "none";
+            _elem2.style.display = "none";
+            _elem3.style.display = "none";
+        }
+        else
+        {
+            _elem1.style.display = "block";
+            _elem2.style.display = "block";
+            _elem3.style.display = "block";
+        }
+    }
 }
 
 /*----------------------------------------------------------------*/

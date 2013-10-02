@@ -171,6 +171,8 @@ function CEditorPage(api)
     this.bIsUseKeyPress = true;
     this.bIsEventPaste = false;
 
+    this.DrawingFreeze = false;
+
     this.m_bIsIE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
 
     // сплиттеры (для табнейлов и для заметок)
@@ -2803,7 +2805,7 @@ function CEditorPage(api)
             this.m_oDrawingDocument.SendThemeColorScheme();
         }
 
-        this.m_oDrawingDocument.CheckGuiControlColors();
+        this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);
     }
 
     this.GoToPage = function(lPageNum)

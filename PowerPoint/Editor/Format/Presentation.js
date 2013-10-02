@@ -7037,6 +7037,8 @@ CPresentation.prototype =
         this.CommentAuthors = {};
         var _AuthorId = 0;
         var _slidesCount = this.Slides.length;
+
+        var _uniIdSplitter = ";__teamlab__;";
         for (var _sldIdx = 0; _sldIdx < _slidesCount; _sldIdx++)
         {
             this.Slides[_sldIdx].writecomments = [];
@@ -7049,11 +7051,12 @@ CPresentation.prototype =
                 var _data = _comments[i].Data;
                 var _commId = 0;
 
-                var _author = this.CommentAuthors[_data.m_sUserName];
+                var _autID = _data.m_sUserId + _uniIdSplitter + _data.m_sUserName;
+                var _author = this.CommentAuthors[_autID];
                 if (!_author)
                 {
-                    this.CommentAuthors[_data.m_sUserName] = new CCommentAuthor();
-                    _author = this.CommentAuthors[_data.m_sUserName];
+                    this.CommentAuthors[_autID] = new CCommentAuthor();
+                    _author = this.CommentAuthors[_autID];
                     _author.Name = _data.m_sUserName;
                     _author.Calculate();
 
@@ -7083,11 +7086,12 @@ CPresentation.prototype =
                 {
                     var _data2 = _comments2[j];
 
-                    var _author2 = this.CommentAuthors[_data2.m_sUserName];
+                    var _autID2 = _data2.m_sUserId + _uniIdSplitter + _data2.m_sUserName;
+                    var _author2 = this.CommentAuthors[_autID2];
                     if (!_author2)
                     {
-                        this.CommentAuthors[_data2.m_sUserName] = new CCommentAuthor();
-                        _author2 = this.CommentAuthors[_data2.m_sUserName];
+                        this.CommentAuthors[_autID2] = new CCommentAuthor();
+                        _author2 = this.CommentAuthors[_autID2];
                         _author2.Name = _data2.m_sUserName;
                         _anchor2.Calculate();
 

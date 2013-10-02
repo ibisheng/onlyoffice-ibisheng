@@ -15,6 +15,8 @@ function CWriteCommentData()
     this.WriteTime = "";
     this.WriteText = "";
 
+    this.AdditionalData = "";
+
     this.x = 0;
     this.y = 0;
 }
@@ -60,12 +62,82 @@ CWriteCommentData.prototype =
     {
         var d = new Date(this.Data.m_sTime - 0);
         this.WriteTime = this.DateToISO8601(d);
+
+        this.CalculateAdditionalData();
     },
 
     Calculate2 : function()
     {
         var _time = this.Iso8601ToDate(this.WriteTime);
         this.WriteTime = _time;
+    },
+
+    CalculateAdditionalData : function()
+    {
+        if (null == this.Data)
+            this.AdditionalData = "";
+        else
+        {
+            this.AdditionalData = "teamlab_data:";
+            this.AdditionalData += ("0;" + this.Data.m_sUserId.length + ";" + this.Data.m_sUserId + ";" );
+            this.AdditionalData += ("1;" + this.Data.m_sUserName.length + ";" + this.Data.m_sUserName + ";" );
+            this.AdditionalData += ("2;1;" + (this.Data.m_bSolved ? "1;" : "0;"));
+        }
+    },
+
+    ReadNextInteger : function(_parsed)
+    {
+        var _len = _parsed.data.length;
+        var _found = -1;
+
+        var _Found = ";".charCodeAt(0);
+        for (var i = _parsed.pos; i < _len; i++)
+        {
+            if (_Found == _parsed.data.charCodeAt(i))
+            {
+                _found = i;
+                break;
+            }
+        }
+
+        if (-1 == _found)
+            return -1;
+
+        var _ret = parseInt(_parsed.data.substr(_parsed.pos, _found - _parsed.pos));
+        if (isNaN(_ret))
+            return -1;
+
+        _parsed.pos = _found + 1;
+        return _ret;
+    },
+
+    ParceAdditionalData : function(_comment_data)
+    {
+        if (this.AdditionalData.indexOf("teamlab_data:") != 0)
+            return;
+
+        var _parsed = { data : this.AdditionalData, pos : "teamlab_data:".length };
+
+        while (true)
+        {
+            var _attr = this.ReadNextInteger(_parsed);
+            if (-1 == _attr)
+                break;
+
+            var _len = this.ReadNextInteger(_parsed);
+            if (-1 == _len)
+                break;
+
+            var _value = _parsed.data.substr(_parsed.pos, _len);
+            _parsed.pos += (_len + 1);
+
+            if (0 == _attr)
+                _comment_data.m_sUserId = _value;
+            else if (1 == _attr)
+                _comment_data.m_sUserName = _value;
+            else if (2 == _attr)
+                _comment_data.m_bSolved = ("1" == _value) ? true : false;
+        }
     }
 };
 

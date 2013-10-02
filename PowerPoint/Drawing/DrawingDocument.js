@@ -2388,7 +2388,7 @@ function CDrawingDocument()
         this.m_oWordControl.Thumbnails.RecalculateAll();
     }
 
-    this.CheckGuiControlColors = function()
+    this.CheckGuiControlColors = function(bIsAttack)
     {
         // потом реализовать проверку на то, что нужно ли посылать
         if (-1 == this.SlideCurrent)
@@ -2438,7 +2438,7 @@ function CDrawingDocument()
             bIsSend = true;
         }
 
-        if (bIsSend)
+        if (bIsSend || (bIsAttack === true))
         {
             for (var i = 0; i < _count; ++i)
             {

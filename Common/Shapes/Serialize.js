@@ -2612,6 +2612,8 @@ function BinaryPPTYLoader()
                                             case 7:
                                                 _comment.WriteParentCommentId = s.GetLong();
                                                 break;
+                                            case 8:
+                                                _comment.AdditionalData = s.GetString2();
                                             default:
                                                 break;
                                         }
