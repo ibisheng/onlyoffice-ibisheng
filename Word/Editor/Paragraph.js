@@ -7175,8 +7175,11 @@ Paragraph.prototype =
             this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
             this.Set_ContentPos( Pos + 1, false, -1 );
 
-            // Выставляем настройки для символа параграфа
-            this.TextPr.Apply_TextPr( TextPr );
+            if ( true === this.IsEmpty() && undefined === this.Numbering_Get() )
+            {
+                // Выставляем настройки для символа параграфа
+                this.TextPr.Apply_TextPr( TextPr );
+            }
         }
         else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
         {
