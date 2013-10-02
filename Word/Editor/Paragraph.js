@@ -8031,7 +8031,7 @@ Paragraph.prototype =
     Selection_SetEnd : function(X,Y,PageNum, MouseEvent, bTableBorder)
     {
         var PagesCount = this.Pages.length;
-        if ( null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
+        if ( false === editor.isViewMode && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
             return this.Parent.Extend_ToPos( X, Y );
 
         this.CurPos.RealX = X;
@@ -8046,7 +8046,7 @@ Paragraph.prototype =
             {
                 if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
                 {
-                    if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
+                    if ( false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
                     {
                         History.Create_NewPoint();
                         History.Set_Additional_ExtendDocumentToPos();
