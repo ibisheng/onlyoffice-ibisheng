@@ -1030,7 +1030,7 @@
 				this._initConstValues();
 				this._initWorksheetDefaultWidth();
 				this._initCellsArea(true);
-				this.autoFilters.addFiltersAfterOpen(this);
+				this.autoFilters.addFiltersAfterOpen();
 				this._initConditionalFormatting();
 				this._cleanCellsTextMetricsCache();
 				this._prepareCellTextMetricsCache(this.visibleRange);
@@ -3169,7 +3169,7 @@
 			},
 
 			_drawGraphic: function() {
-				this.autoFilters.drawAutoF(this);
+				this.autoFilters.drawAutoF();
 				this.cellCommentator.drawCommentCells();
 			},
 			
@@ -5013,7 +5013,7 @@
 						userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 				}
 					
-				var autoFilterCursor = this.autoFilters.isButtonAFClick(x, y, this);
+				var autoFilterCursor = this.autoFilters.isButtonAFClick(x, y);
 				if (autoFilterCursor)
 					return {cursor: autoFilterCursor, target: "aFilterObject", col: -1, row: -1};
 
@@ -5702,7 +5702,7 @@
 					cell_info.valign = c.getAlignVertical().toLowerCase();
 				}
 				
-				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell, this);
+				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell);
 				cell_info.styleName = c.getStyleName();
 				cell_info.angle = c.getAngle();
 
@@ -6545,7 +6545,7 @@
 							// Автозаполняем ячейки
 							range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex);
 							// Вызываем функцию пересчета для заголовков форматированной таблицы
-							t.autoFilters._renameTableColumn(t, arn);
+							t.autoFilters._renameTableColumn(arn);
 						}
 
 						// Сбрасываем параметры автозаполнения
@@ -6830,7 +6830,7 @@
 						History.SetSelection(arnFrom.clone());
 						History.SetSelectionRedo(arnTo.clone());
 						History.StartTransaction();
-						t.autoFilters._preMoveAutoFilters(t, arnFrom);
+						t.autoFilters._preMoveAutoFilters(arnFrom);
 						t.model._moveRange(arnFrom, arnTo, copyRange);
 						t._updateCellsRange(arnTo);
 						t.cleanSelection();
@@ -6839,11 +6839,11 @@
 						t.activeRange.startCol = t.activeRange.c1;
 						t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 						t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
-						t.autoFilters._moveAutoFilters(t, arnTo, arnFrom);
+						t.autoFilters._moveAutoFilters(arnTo, arnFrom);
 						// Вызываем функцию пересчета для заголовков форматированной таблицы
-						t.autoFilters._renameTableColumn(t, arnFrom);
-						t.autoFilters._renameTableColumn(t, arnTo);
-						t.autoFilters.reDrawFilter(t, arnFrom);
+						t.autoFilters._renameTableColumn(arnFrom);
+						t.autoFilters._renameTableColumn(arnTo);
+						t.autoFilters.reDrawFilter(arnFrom);
 						History.EndTransaction();
 					}
 					
@@ -7009,9 +7009,9 @@
 								range.cleanFormat();
 
 							// Если нужно удалить автофильтры - удаляем
-							t.autoFilters.isEmptyAutoFilters(t, arn);
+							t.autoFilters.isEmptyAutoFilters(arn);
 							// Вызываем функцию пересчета для заголовков форматированной таблицы
-							t.autoFilters._renameTableColumn(t, arn);
+							t.autoFilters._renameTableColumn(arn);
 							//удаляем выделенные графичекие объекты
 							t.objectRender.controller.deleteSelectedObjects();
 
@@ -7087,9 +7087,9 @@
 									for(var aF = 0; aF < aFilters.length; aF++)
 									{
 										range = {r1: aFilters[aF].range.r1 + selectionRange.r1, c1:  aFilters[aF].range.c1 + selectionRange.c1, r2:  aFilters[aF].range.r2 + selectionRange.r1, c2:  aFilters[aF].range.c2 + selectionRange.c1}
-										t.autoFilters.addAutoFilter(t, aFilters[aF].style, range, null, null, true);
+										t.autoFilters.addAutoFilter(aFilters[aF].style, range, null, null, true);
 										if(!aFilters[aF].autoFilter)
-											t.autoFilters.addAutoFilter(t, null, range, null, null, true);
+											t.autoFilters.addAutoFilter(null, range, null, null, true);
 									}
 								};
 								
@@ -7203,7 +7203,7 @@
 								if (null !== val.asc_getText()) {
 									t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
 									// Вызываем функцию пересчета для заголовков форматированной таблицы
-									t.autoFilters._renameTableColumn(t, arn);
+									t.autoFilters._renameTableColumn(arn);
 								}
 								break;
 							} else {
@@ -8037,14 +8037,14 @@
 					case "insColBefore":
 						functionModelAction = function () {
 							fullRecalc = true;
-							t.autoFilters.insertColumn(t, prop, val, arn);
+							t.autoFilters.insertColumn(prop, val, arn);
 							t.model.insertColsBefore(arn.c1, val);
 						};
 						return this._isLockedCells (new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
 					case "insColAfter":
 						functionModelAction = function () {
 							fullRecalc = true;
-							t.autoFilters.insertColumn(t, prop, val, arn);
+							t.autoFilters.insertColumn(prop, val, arn);
 							t.model.insertColsAfter(arn.c2, val);
 						};
 						return this._isLockedCells (new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
@@ -8149,7 +8149,7 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
-									t.autoFilters.insertColumn(t, prop, _updateRangeIns, arn);
+									t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
@@ -8164,7 +8164,7 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
-									t.autoFilters.insertRows(t, prop,_updateRangeIns, arn);
+									t.autoFilters.insertRows(prop,_updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
@@ -8223,7 +8223,7 @@
 									History.Create_NewPoint();
 									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
-									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
+									t.autoFilters.insertColumn(prop,_updateRangeDel, arn);
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 									History.EndTransaction();
 
@@ -8243,7 +8243,7 @@
 									History.Create_NewPoint();
 									History.SetSelection(new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2));
 									History.StartTransaction();
-									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
+									t.autoFilters.insertRows(prop,_updateRangeDel, arn);
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
 									History.EndTransaction();
 
@@ -8440,7 +8440,7 @@
 							}
 							width = Math.max(width, tm.width);
 						} else {
-							filterButton = t.autoFilters.getSizeButton(t, {c1: col, r1: row});
+							filterButton = t.autoFilters.getSizeButton({c1: col, r1: row});
 							if (null !== filterButton && CellValueType.String === ct.cellType)
 								width = Math.max(width, ct.metrics.width + filterButton.width);
 							else
@@ -8927,7 +8927,7 @@
 				} else {
 					c.setValue2(val);
 					// Вызываем функцию пересчета для заголовков форматированной таблицы
-					t.autoFilters._renameTableColumn(t, oCellEdit);
+					t.autoFilters._renameTableColumn(oCellEdit);
 				}
 
 				if (!isFormula) {
@@ -9291,7 +9291,7 @@
 					if (false === isSuccess)
 						return;
 					
-					return t.autoFilters.addAutoFilter(t, lTable, ar, undefined, false, addFormatTableOptionsObj);
+					return t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
@@ -9303,7 +9303,7 @@
 					if (false === isSuccess)
 						return;
 					
-					t.autoFilters.applyAutoFilter(type, autoFilterObject, ar, t);
+					t.autoFilters.applyAutoFilter(type, autoFilterObject, ar);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
@@ -9315,7 +9315,7 @@
 					if (false === isSuccess)
 						return;
 
-					return t.autoFilters.sortColFilter(type, cellId, t, ar);
+					return t.autoFilters.sortColFilter(type, cellId, ar);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
@@ -9324,7 +9324,7 @@
 			{
 				var ar = this.activeRange.clone(true);
 				var t = this;
-				var result = t.autoFilters.getAddFormatTableOptions(t, ar);
+				var result = t.autoFilters.getAddFormatTableOptions(ar);
 				return result;
 			},
 

@@ -241,27 +241,28 @@
 
 			constructor: AutoFilters,
 			
-			applyAutoFilter: function (type, autoFiltersObject, ar, ws) {
+			applyAutoFilter: function (type, autoFiltersObject, ar) {
 				History.Create_NewPoint();
 				History.SetSelection(new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2));
 				History.StartTransaction();
 				switch (type) {
 					case 'mainFilter':
-						this._applyMainFilter(ar, ws, autoFiltersObject);
+						this._applyMainFilter(ar, autoFiltersObject);
 						break;
 					case 'digitalFilter':
-						this._applyDigitalFilter(ar, ws, autoFiltersObject);
+						this._applyDigitalFilter(ar, autoFiltersObject);
 						break;
 				}
 				History.EndTransaction();
 			},
 			
 			//добавляем кнопки или удаляем (вызывается из меню при нажатии на кнопку добавления фильтра)
-			addAutoFilter: function (ws, lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj) {
-				var bIsActiveSheet = this._isActiveSheet(ws);
+			addAutoFilter: function (lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj) {
+				var ws = this.worksheet;
+				var bIsActiveSheet = this._isActiveSheet();
 				var bIsOpenFilter = undefined !== openFilter;
 				var activeCells = Asc.clone(ar);
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				var paramsForCallBack;
 				var paramsForCallBackAdd;
 				var filterChange;
@@ -312,7 +313,7 @@
 									var cloneFilterOld = Asc.clone(filterChange);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
-									t._setColorStyleTable(splitRange[0],splitRange[1],ws,filterChange);
+									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
 									startCell = t._idToRange(splitRange[0]);
 									endCell = t._idToRange(splitRange[1]);
 									rangeFilter =  new Asc.Range(startCell.c1, startCell.r1, endCell.c1, endCell.r1);
@@ -321,7 +322,7 @@
 										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 									}
 									// Смена стиля
-									t._addHistoryObj(ws, cloneFilterOld, historyitem_AutoFilter_Add,
+									t._addHistoryObj(cloneFilterOld, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
 									History.EndTransaction();
 									if(isTurnOffHistory)
@@ -365,7 +366,7 @@
 											isReDrawFilter = Asc.clone(aWs.TableParts[apocal.num]);
 										}	
 									}
-									t._addHistoryObj(ws, changesElemHistory, historyitem_AutoFilter_Add,
+									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
 									//открываем скрытые строки
 									var isHidden;
@@ -382,10 +383,10 @@
 									}	
 
 									if (bIsActiveSheet)
-										t._addButtonAF(newRes, ws, bIsOpenFilter);
+										t._addButtonAF(newRes, bIsOpenFilter);
 									//перерисовываем форматированную таблиц
 									if(isReDrawFilter && isReDrawFilter.TableColumns && isReDrawFilter.result)
-										t._reDrawCurrentFilter(ws,null, null, isReDrawFilter);
+										t._reDrawCurrentFilter(null, null, isReDrawFilter);
 									if(!apocal.changeAllFOnTable)
 									{
 										if(isInsert && bIsActiveSheet && !bIsOpenFilter)
@@ -472,7 +473,7 @@
 									//устанавливаем стиль для таблицы
 									if(!isAll)
 									{
-										t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1], null, true);
+										t._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[aWs.TableParts.length - 1], null, true);
 										var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 										var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 										var arn = 
@@ -500,12 +501,12 @@
 									changesElemHistory.refTable = result[0].id + ':' + result[result.length -1].idNext;
 									if(addNameColumn)
 										changesElemHistory.addColumn = true;
-									t._addHistoryObj(ws, changesElemHistory, historyitem_AutoFilter_Add,
+									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 											{activeCells: cloneAC, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
 									
 									if(isInsertButton){
 										if (bIsActiveSheet)
-											t._addButtonAF(newRes, ws, bIsOpenFilter);
+											t._addButtonAF(newRes, bIsOpenFilter);
 									}
 									else if(!t.allButtonAF)
 										t.allButtonAF = [];
@@ -535,11 +536,11 @@
 									changesElemHistory = Asc.clone(filterChange);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
-									t._setColorStyleTable(splitRange[0],splitRange[1],ws,filterChange);
+									t._setColorStyleTable(splitRange[0], splitRange[1], filterChange);
 									startCell = t._idToRange(splitRange[0]);
 									endCell = t._idToRange(splitRange[1]);
 									rangeFilter =  new Asc.Range(startCell.c1, startCell.r1, endCell.c1, endCell.r1);
-									t._addHistoryObj(ws, changesElemHistory, historyitem_AutoFilter_Add,
+									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
 									if (bIsActiveSheet && !bIsOpenFilter) {
 										// ToDo нужно обновлять не весь видимый диапазон, а только диапазон фильтра
@@ -574,11 +575,11 @@
 							}
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
-								t._addHistoryObj(ws, changesElemHistory, historyitem_AutoFilter_Add,
+								t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 								{activeCells: activeCells, lTable: lTable});
 
 								if (bIsActiveSheet)
-									t._addButtonAF(newRes, ws, bIsOpenFilter);
+									t._addButtonAF(newRes, bIsOpenFilter);
 								
 								if(ref)
 								{
@@ -634,7 +635,7 @@
 									}
 									else
 									{
-										tableColumns = t._generateColumnNameWithoutTitle(ws, mainAdjacentCells, isTurnOffHistory);
+										tableColumns = t._generateColumnNameWithoutTitle(mainAdjacentCells, isTurnOffHistory);
 									}
 									if(addNameColumn && !isTurnOffHistory)
 										mainAdjacentCells.r2 = mainAdjacentCells.r2 + 1;
@@ -673,7 +674,7 @@
 									}
 									else
 									{
-										tableColumns = t._generateColumnNameWithoutTitle(ws, activeCells, isTurnOffHistory);
+										tableColumns = t._generateColumnNameWithoutTitle(activeCells, isTurnOffHistory);
 									}
 									if(addNameColumn && !isTurnOffHistory)
 										activeCells.r2 = activeCells.r2 + 1;
@@ -782,7 +783,7 @@
 						//устанавливаем стиль для таблицы
 						if(!isAll)
 						{
-							t._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[aWs.TableParts.length - 1], null,true);
+							t._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[aWs.TableParts.length - 1], null,true);
 							var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 							var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 							var arn = 
@@ -813,14 +814,14 @@
 						};
 						if(addNameColumn && addFormatTableOptionsObj)
 							addFormatTableOptionsObj.range = ref;
-						t._addHistoryObj(ws, ref, historyitem_AutoFilter_Add,
+						t._addHistoryObj(ref, historyitem_AutoFilter_Add,
 								{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
 						
 						if(isInsertButton){
 							if (bIsActiveSheet)
-								t._addButtonAF(newRes, ws, bIsOpenFilter);
+								t._addButtonAF(newRes, bIsOpenFilter);
 							else
-								t._addButtonAF(newRes, ws, true);
+								t._addButtonAF(newRes, true);
 						}
 						else if(!t.allButtonAF)
 							t.allButtonAF = [];
@@ -860,7 +861,7 @@
 				{
 					//находимся вне зоны локального фильтра, тогда отменяем общий фильтр
 					//фунция определяющая в каком фильтре находится
-					var apocal = this._searchFilters(activeCells,isAll,ws,aWs);
+					var apocal = this._searchFilters(activeCells,isAll,aWs);
 					//удаляем фильтр от этих ячеек]
 					var changesElemHistory = null;
 					if(apocal == 'error')
@@ -1084,7 +1085,7 @@
 				{
 					var mainCell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1, 0)).getCells();
 					var val = mainCell[0].getValue();
-					var mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
+					var mainAdjacentCells = this._getAdjacentCellsAF(activeCells, aWs);
 					rangeShift = ws.model.getRange(new CellAddress(mainAdjacentCells.r1, mainAdjacentCells.c1, 0), new CellAddress(mainAdjacentCells.r1, mainAdjacentCells.c2, 0));
 					var rowAdd = 0;
 					//в случае таблице меняем контент и добавляем строку с названиями
@@ -1146,7 +1147,7 @@
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
 				{
-					this._setColorStyleTable(result[0].id,result[result.length -1].idNext,ws,aWs.TableParts[openFilter],null, true);
+					this._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[openFilter], null, true);
 					var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 					var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 					var arn = 
@@ -1192,7 +1193,7 @@
 					};
 					if(isInsertButton){
 						if (bIsActiveSheet)
-							this._addButtonAF(newRes, ws, bIsOpenFilter);
+							this._addButtonAF(newRes, bIsOpenFilter);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
@@ -1202,10 +1203,11 @@
 				}
 			},
 			//попал ли курсор на кнопку фильтра
-			isButtonAFClick: function(x,y,ws)
+			isButtonAFClick: function(x,y)
 			{
 				if(!this.allButtonAF)
 					return false;
+				var ws = this.worksheet;
 				var buttons =  this.allButtonAF;
 				var kof = 96 / 72;
 				var zoom = ws.getZoom();
@@ -1224,10 +1226,11 @@
 				}
 			},
 			//клик по кнопке конкретного фильтра
-			autoFocusClick: function(x,y,ws)
+			autoFocusClick: function(x,y)
 			{
 				if(!this.allButtonAF)
 					return;
+				var ws = this.worksheet;
 				var buttons =  this.allButtonAF;
 				var kof = 96 / 72;
 				var zoom = ws.getZoom();
@@ -1241,15 +1244,16 @@
 					var height2 = (buttons[i].y + height)*kof;
 					if(x >= width1 && x <= width2 && y >= height1 && y <= height2 && height1 >= ws.rows[0].top && width1 >= ws.cols[0].left)
 					{
-						this._showAutoFilterDialog(buttons[i],kof,ws);
+						this._showAutoFilterDialog(buttons[i],kof);
 						return;
 					}
 				}
 			},
 			
 			//перерисовка и отрисовка кнопок(draw:)
-			drawAutoF: function(ws){
+			drawAutoF: function(){
 				var buttons = this.allButtonAF;
+				var ws = this.worksheet;
 				if(buttons)
 				{
 					var activeButtonFilter = [];
@@ -1285,12 +1289,12 @@
 						
 						//проверяем , применен ли фильтр
 						var activeCells = this._idToRange(buttons[i].id);
-						var indexFilter = this._findArrayFromAllFilter3(activeCells,ws,buttons[i].id);
+						var indexFilter = this._findArrayFromAllFilter3(activeCells,buttons[i].id);
 						if(indexFilter != undefined && indexFilter.toString().search(":") > -1)
 						{
 							newButtons[l] = buttons[i];
 							l++;
-							var aWs  = this._getCurrentWS(ws);
+							var aWs  = this._getCurrentWS();
 							var filtersOp = indexFilter.split(':');
 							var currentFilter;
 							var curFilForSort;
@@ -1336,7 +1340,7 @@
 							
 							//добавляем какие именно строки скрыты этим фильтром
 							//применяем к заданному диапазону фильтр и смотрим какие строки им скрыты
-							var hiddenRowsObj = this._getHiddenRows(buttons[i].id,buttons[i].idNext,filters,ws);
+							var hiddenRowsObj = this._getHiddenRows(buttons[i].id,buttons[i].idNext,filters);
 							buttons[i].hiddenRows = hiddenRowsObj;
 							//изменяем result у объекта автофильтра
 							if(curFilForSort.result)
@@ -1374,7 +1378,7 @@
 								col: col
 							};
 							if(buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top)
-								this._drawButton(x1,y1,ws,filOptions)
+								this._drawButton(x1,y1,filOptions)
 						}
 					}
 					this.allButtonAF = newButtons;
@@ -1389,7 +1393,7 @@
 				}
 			},
 			//при вставке пользователем колонки изменяем фильтры
-			insertColumn: function(ws, type, val, ar)
+			insertColumn: function(type, val, ar)
 			{
 				var activeCells;
                 if(typeof val == 'object')
@@ -1412,10 +1416,10 @@
 				else if(type == 'delCell')
 					val = activeCells.c1 - activeCells.c2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(ws,colInsert,val,'insCol');
+				this._changeFiltersAfterColumn(colInsert,val,'insCol');
 			},
 			//при вставке пользователем строки изменяем фильтры
-			insertRows: function(ws, type, val, ar)
+			insertRows: function(type, val, ar)
 			{
                 var activeCells;
                 if(typeof val == 'object')
@@ -1438,11 +1442,12 @@
 				else if(type == 'delCell')
 					val = activeCells.r1 - activeCells.r2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(ws,colInsert,val,'insRow');
+				this._changeFiltersAfterColumn(colInsert,val,'insRow');
 			},
 			//применяем сортировку из меню фильтра
-			sortColFilter: function(type, cellId, ws, ar, isTurnOffHistory) {
-				var aWs = this._getCurrentWS(ws);
+			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
+				var aWs = this._getCurrentWS();
+				var ws = this.worksheet;;
 				var currentFilter;
 				var curCell;
 				var sortRange;
@@ -1478,8 +1483,8 @@
 						var sortCol = curCell.c1;
 						sortRange.sort(type,sortCol);
 						if(currentFilter.TableStyleInfo)
-							t._setColorStyleTable(currentFilter.Ref.split(":")[0],currentFilter.Ref.split(":")[1],ws,currentFilter);
-						t._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_Sort,
+							t._setColorStyleTable(currentFilter.Ref.split(":")[0], currentFilter.Ref.split(":")[1], currentFilter);
+						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
 							{activeCells: activeCells, type: type, cellId: cellId});
 						History.EndTransaction();
 						History.SetSelection(selectionRange);
@@ -1503,7 +1508,7 @@
 						History.StartTransaction();
 						sortRange.sort(type,sortCol);
 						if(currentFilter.TableStyleInfo)
-							t._setColorStyleTable(currentFilter.Ref.split(":")[0],currentFilter.Ref.split(":")[1],ws,currentFilter);
+							t._setColorStyleTable(currentFilter.Ref.split(":")[0], currentFilter.Ref.split(":")[1], currentFilter);
 						History.EndTransaction();
 						History.SetSelection(selectionRange);
 						ws._cleanCache(selectionRange);
@@ -1524,7 +1529,7 @@
 					var activeRange = ar;
 					if(cellId)
 						activeRange = t._idToRange(cellId);
-					var filter = t._searchFilters(activeRange,null,ws,aWs);
+					var filter = t._searchFilters(activeRange,null,aWs);
 					if(type == 'ascending')
 						type = true;
 					else
@@ -1595,7 +1600,7 @@
 					}
 				}
 				activeCells = t._idToRange(cellId);
-				var indexFilter = t._findArrayFromAllFilter3(activeCells,ws,cellId);
+				var indexFilter = t._findArrayFromAllFilter3(activeCells,cellId);
 				var filtersOp = indexFilter.split(':');
 				if(filtersOp[0] == 'all')
 				{
@@ -1623,7 +1628,7 @@
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ws, ar, turnOnHistory)
+			isEmptyAutoFilters: function(ar, turnOnHistory)
 			{
 				if(turnOnHistory)
 				{
@@ -1631,7 +1636,7 @@
 					History.Create_NewPoint();
 				}
 				History.StartTransaction();
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				var activeCells = ar;
 				if(aWs.AutoFilter)
 				{
@@ -1645,7 +1650,7 @@
 						//открываем скрытые строки
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
 						//заносим в историю
-						this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
 					}
 				}
 				if(aWs.TableParts)
@@ -1665,7 +1670,7 @@
 							//открываем скрытые строки
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 							//заносим в историю
-							this._addHistoryObj(ws, oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
 						}
 						else
 						{
@@ -1729,40 +1734,29 @@
 				return result;
 			},
 
-			// Undo
-			/*Undo: function (ws, wsv, type, data) {
-				switch (type) {
-					case historyitem_AutoFilter_Add:
-						this._removeTableByName(ws, data.name);
-						break;
-				}
-
-				wsv.changeWorksheet("update");
-				wsv.isChanged = true;
-			},*/
 			// Redo
 			Redo: function (type, data) {
 				startRedo = true;
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.worksheet, data.lTable, data.activeCells, /*openFilter*/undefined, true, data.addFormatTableOptionsObj);
+						this.addAutoFilter(data.lTable, data.activeCells, /*openFilter*/undefined, true, data.addFormatTableOptionsObj);
 						break;
 					case historyitem_AutoFilter_Sort:
-						this.sortColFilter(data.type, data.cellId, data.worksheet, data.activeCells, true);
+						this.sortColFilter(data.type, data.cellId, data.activeCells, true);
 						break;
 					case historyitem_AutoFilter_Empty:
-						this.isEmptyAutoFilters(data.worksheet, data.activeCells);
+						this.isEmptyAutoFilters(data.activeCells);
 						break;
 					case historyitem_AutoFilter_ApplyDF:
-						this._applyDigitalFilter(data.activeCells, data.worksheet, data.autoFiltersObject);
+						this._applyDigitalFilter(data.activeCells, data.autoFiltersObject);
 						break;
 					case historyitem_AutoFilter_ApplyMF:
-						this._applyMainFilter(data.activeCells, data.worksheet, data.autoFiltersObject,
+						this._applyMainFilter(data.activeCells, data.autoFiltersObject,
 							/*customFilter*/undefined, /*array*/undefined);
 						break;
 					case historyitem_AutoFilter_Move:
-						this._moveAutoFilters(data.worksheet, data.moveTo, data.moveFrom);
+						this._moveAutoFilters(data.moveTo, data.moveFrom);
 						break;
 				}
 				startRedo = false;
@@ -1772,7 +1766,7 @@
 			// Undo
 			Undo: function (type, data) {
 				var ws  = data.worksheet;
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				data = data.undo;
 				var cloneData = Asc.clone(data);
 				if(!cloneData)
@@ -1799,7 +1793,7 @@
 						var isEn = false;
 						if(aWs.AutoFilter && aWs.AutoFilter.Ref == cloneData.Ref)
 						{
-							this._reDrawCurrentFilter(ws,cloneData.FilterColumns, cloneData.result);
+							this._reDrawCurrentFilter(cloneData.FilterColumns, cloneData.result);
 							aWs.AutoFilter = cloneData;
 							isEn = true;
 						}
@@ -1811,14 +1805,14 @@
 								{
 									var cloneResult = Asc.clone(cloneData.result);
 									if(!aWs.TableParts[l].AutoFilter && cloneData.AutoFilter)
-										this._addButtonAF({result: cloneResult,isVis: true},ws);
+										this._addButtonAF({result: cloneResult,isVis: true});
 									else if(aWs.TableParts[l].AutoFilter && !cloneData.AutoFilter)
-										this._addButtonAF({result: aWs.TableParts[l].result,isVis: false},ws);
+										this._addButtonAF({result: aWs.TableParts[l].result,isVis: false});
 									aWs.TableParts[l] = cloneData;
 									if(cloneData.AutoFilter && cloneData.AutoFilter.FilterColumns)
-										this._reDrawCurrentFilter(ws,cloneData.AutoFilter.FilterColumns, cloneData.result, aWs.TableParts[l]);
+										this._reDrawCurrentFilter(cloneData.AutoFilter.FilterColumns, cloneData.result, aWs.TableParts[l]);
 									else
-										this._reDrawCurrentFilter(ws,null, cloneData.result, aWs.TableParts[l]);
+										this._reDrawCurrentFilter(null, cloneData.result, aWs.TableParts[l]);
 									isEn = true;
 									break;
 								}	
@@ -1832,13 +1826,13 @@
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = data;
 								var splitRange = data.Ref.split(':');
-								this._setColorStyleTable(splitRange[0],splitRange[1],ws,data, null,true);
-								this._addButtonAF({result: data.result,isVis: true},ws);
+								this._setColorStyleTable(splitRange[0], splitRange[1], data, null, true);
+								this._addButtonAF({result: data.result,isVis: true});
 							}
 							else
 							{
 								aWs.AutoFilter = data;
-								this._addButtonAF({result: data.result,isVis: true},ws);
+								this._addButtonAF({result: data.result,isVis: true});
 							}
 						}
 					}
@@ -1869,8 +1863,9 @@
 				ws.isChanged = true;
 			},
 			
-			getSizeButton: function(ws,range)
+			getSizeButton: function(range)
 			{
+				var ws = this.worksheet;
 				var result = null;
 				if(this.allButtonAF)
 				{
@@ -1901,9 +1896,9 @@
 				return result;
 			},
 			
-			reDrawFilter: function(ws,range)
+			reDrawFilter: function(range)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				if(tableParts)
 				{
@@ -1924,15 +1919,15 @@
 							};
 							//проверяем, попадает хотя бы одна ячейка из диапазона в область фильтра
 							if(this._rangeHitInAnRange(range,tableRange))
-								this._setColorStyleTable(ref[0],ref[1],ws,currentFilter);
+								this._setColorStyleTable(ref[0], ref[1], currentFilter);
 						}
 					}
 				}
 			},
 			
-			searchRangeInTableParts: function(range,ws)
+			searchRangeInTableParts: function(range)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				var tableRange;
 				if(aWs.TableParts)
 				{
@@ -1958,9 +1953,10 @@
 				return false;
 			},
 			
-			getAddFormatTableOptions: function(ws,activeCells)
+			getAddFormatTableOptions: function(activeCells)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var objOptions = new AddFormatTableOptions();
 				/*var isMAddFilter = this._searchFilters(activeCells,false,ws,aWs);
 				if(isMAddFilter == "error")
@@ -1978,7 +1974,7 @@
 					}
 				}
 				return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет*/
-				var alreadyAddFilter = this._searchFilters(activeCells,false,ws,aWs);
+				var alreadyAddFilter = this._searchFilters(activeCells,false,aWs);
 				//в случае если меняем стиль фильтра
 				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
 					return false;
@@ -1987,12 +1983,12 @@
 				if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
 					mainAdjacentCells = alreadyAddFilter.range;
 				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
-					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
+					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,aWs);
 				else//выделено > 1 ячейки
 					mainAdjacentCells = Asc.clone(activeCells);
 					
 				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
-				var isTitle = this._isAddNameColumn(ws, mainAdjacentCells);
+				var isTitle = this._isAddNameColumn(mainAdjacentCells);
 				objOptions.asc_setIsTitle(isTitle);
 				var firstCellId = this._rangeToId(mainAdjacentCells); 
 				var endCellId = this._rangeToId({r1: mainAdjacentCells.r2, c1: mainAdjacentCells.c2, r2: mainAdjacentCells.r2, c2: mainAdjacentCells.c2}); 
@@ -2004,13 +2000,13 @@
 			},
 			
 			//при закрытии диалогового окна числового фильтра
-			_applyDigitalFilter: function(ar, ws, autoFiltersObject) {
-				//var numFil = this._searchInAllFilters(conFilter.id);
-				var aWs = this._getCurrentWS(ws);
+			_applyDigitalFilter: function(ar, autoFiltersObject) {
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var conFilter = autoFiltersObject;
 				var activeCells = this._idToRange(conFilter.cellId);
 
-				var indexFilter = this._findArrayFromAllFilter3(activeCells,ws,conFilter.cellId);
+				var indexFilter = this._findArrayFromAllFilter3(activeCells,conFilter.cellId);
 				var filtersOp = indexFilter.split(':');
                 var currentFilter;
 				if(filtersOp[0] == 'all')
@@ -2060,27 +2056,28 @@
 					var val = cell.getValue();
 					var type = cell.getType();
 					var valWithFormat = cell.getValueWithFormat();
-					arrayFil[n] = this._getLogical(conFilter,ws,{type: type, val: val, valWithFormat: valWithFormat});
-					var isHidden = this._isHiddenAnotherFilter(conFilter.cellId,i,ws,currentFilter.Ref);
+					arrayFil[n] = this._getLogical(conFilter,{type: type, val: val, valWithFormat: valWithFormat});
+					var isHidden = this._isHiddenAnotherFilter(conFilter.cellId,i,currentFilter.Ref);
 					if(isHidden != undefined)
 						arrayFil[n] = isHidden;
 					n++;
 				}
 				var oldFilter = Asc.clone(currentFilter);
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
-				this._addCustomFilters(filtersOp,ws,aWs,conFilter,isMerged);
+				this._addCustomFilters(filtersOp,aWs,conFilter,isMerged);
 				
-				this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_ApplyDF,
+				this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyDF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
 
 				arrayFil.cellId = conFilter.cellId;
-				this._applyMainFilter(ar, ws, autoFiltersObject, true, arrayFil);
+				this._applyMainFilter(ar, autoFiltersObject, true, arrayFil);
 			},
 			
 			//закрываем меню фильтра и применяем сам фильтр
-			_applyMainFilter: function(ar, ws, autoFiltersObject, customFilter, array) {
+			_applyMainFilter: function(ar, autoFiltersObject, customFilter, array) {
 				var activeCells;
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var cellId;
 				var isArray = true;
 				if(!array)
@@ -2115,7 +2112,7 @@
 				};
 				
 				//**получаем нужный фильтр**
-				var indexFilter = this._findArrayFromAllFilter3(newAcCells,ws,cellId);
+				var indexFilter = this._findArrayFromAllFilter3(newAcCells,cellId);
 				var filtersOp = indexFilter.split(':');
 				
 				var currentFilter;
@@ -2187,7 +2184,7 @@
 					for(var m = 0; m < lengthRows; m++)
 					{
 						var val = ws.model._getCell(activeCells.r1 + m + 1,activeCells.c1).getValue();
-						var anotherFilterHidden = this._isHiddenAnotherFilter2(curCellId,activeCells.r1 + m + 1,ws,ref);
+						var anotherFilterHidden = this._isHiddenAnotherFilter2(curCellId,activeCells.r1 + m + 1,ref);
 						if(anotherFilterHidden == 'hidden')
 							newArray[m] = 'hidden';
 						else
@@ -2377,21 +2374,22 @@
 					}
 				}
 				if(!customFilter)
-					this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_ApplyMF,
+					this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
 						{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				// ToDo - здесь вызывается и _updateCellsRange в _reDrawFilters, и делается changeWorksheet
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-				this._reDrawFilters(ws);
+				this._reDrawFilters();
 				//ws.changeWorksheet("update");
 				//ws.isChanged = true;
-				this.drawAutoF(ws);
+				this.drawAutoF();
 			},
 			
-			_getAutoFilterArray: function(cell,ws) {
+			_getAutoFilterArray: function(cell) {
 				var nextCell;
 				var activeCells;
 				var curId = cell.id;
 				var nextId = cell.idNext;
+				var ws = this.worksheet;
 				cell = ws.model.getCell(new CellAddress(curId)).getCells();
 				activeCells = 
 				{
@@ -2401,16 +2399,17 @@
 					r2: ws.model.getCell(new CellAddress(nextId)).first.row - 1
 				};
 				//проверяем какому фильтру принадлежит
-				var indexFilter = this._findArrayFromAllFilter3(activeCells,ws,curId);
+				var indexFilter = this._findArrayFromAllFilter3(activeCells,curId);
 				//получаем массив скрытых и открытых ячеек
-				var result = this._getArrayOpenCells(indexFilter,ws,curId);
+				var result = this._getArrayOpenCells(indexFilter,curId);
 				
 				return result;
 			},
 			
 			//функция поиска среди смежных ячеек 
-			_getAdjacentCellsAF: function(ar,ws,aWs) 
+			_getAdjacentCellsAF: function(ar,aWs) 
 			{
+				var ws = this.worksheet;
 				var cell = ws.model.getCell( new CellAddress(ar.r1, ar.c1, 0)).getCells();
 				var cloneActiveRange = Asc.clone(ar);
 				var isEnd = true;
@@ -2532,13 +2531,14 @@
 
 			},
 			
-			_showAutoFilterDialog: function(cell,kF,ws) {
-				var elements = this._getAutoFilterArray(cell,ws);
+			_showAutoFilterDialog: function(cell,kF) {
+				var ws = this.worksheet;
+				var elements = this._getAutoFilterArray(cell);
 				//сортируем для массива
 				elements = this._sortArrayMinMax(elements);
 				//получаем значение числового фильтра
-				var indexFilter = this._findArrayFromAllFilter3(this._idToRange(cell.id),ws,cell.id);
-				var aWs  = this._getCurrentWS(ws);
+				var indexFilter = this._findArrayFromAllFilter3(this._idToRange(cell.id),cell.id);
+				var aWs  = this._getCurrentWS();
 				var filtersOp = indexFilter.split(':');
 				var currentFilter;
 				var filter;
@@ -2617,8 +2617,9 @@
 				ws._trigger("setAutoFiltersDialog", autoFilterObject);
 			},
 			//отрисовка кнопки фильтра
-			_drawButton: function(x1,y1,ws,options)
+			_drawButton: function(x1,y1,options)
 			{
+				var ws = this.worksheet;
 				var isSet = options.isSetFilter;
 				var height = 11;
 				var width = 11;
@@ -2671,13 +2672,14 @@
 					.strokeRect(x1 + diffX, y1 + diffY, width, height);
 						
 				if(isSet)
-					this._drawFilterMark(x1 + diffX + (width/2)*index,y1 + 8*index + diffY,ws,index);
+					this._drawFilterMark(x1 + diffX + (width/2)*index,y1 + 8*index + diffY,index);
 				else
-					this._drawFilterDreieck(Math.floor(x1 + diffX + 4*index) + 0.5,Math.floor(y1 + 4.5*index + diffY) + 0.5,ws,index);
+					this._drawFilterDreieck(Math.floor(x1 + diffX + 4*index) + 0.5,Math.floor(y1 + 4.5*index + diffY) + 0.5,index);
 			},
 			
-			_drawFilterMark: function(x,y,ws,index)
+			_drawFilterMark: function(x,y,index)
 			{
+				var ws = this.worksheet;
 				var shift = 0.5;
 				var size = 4*index;
 				ws.drawingCtx
@@ -2692,8 +2694,9 @@
 				.fill();
 			},
 			
-			_drawFilterDreieck: function(x,y,ws,index)
+			_drawFilterDreieck: function(x,y,index)
 			{
+				var ws = this.worksheet;
 				var size = 4*index;
 				var shift = 0.5;
 				ws.drawingCtx
@@ -2707,7 +2710,7 @@
 			},
 
 			//удовлетворяет ли данное значение примененному числовому фильтру
-			_getLogical: function(conFilter,ws,options)
+			_getLogical: function(conFilter,options)
 			{
 				var val = options.val;
 				var type = options.type;
@@ -2885,8 +2888,9 @@
 				return false;
 			},
 			
-			_searchFilters: function(activeCells,isAll,ws,aWs)
+			_searchFilters: function(activeCells,isAll,aWs)
 			{
+				var ws = this.worksheet;
 				var allF =[];
 				
 				if(aWs.AutoFilter)
@@ -3037,9 +3041,10 @@
 					
 			},
 			
-			_findArrayFromAllFilter3: function(range,ws,id)
+			_findArrayFromAllFilter3: function(range,id)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var index = undefined;
 				if(aWs.AutoFilter)
 				{
@@ -3107,10 +3112,11 @@
 				}
 			},
 			
-			_addButtonAF: function(arr, ws, bIsOpenFilter)
+			_addButtonAF: function(arr, bIsOpenFilter)
 			{
 				if(arr.result)
 				{
+					var ws = this.worksheet;
 					if(!this.allButtonAF)
 						this.allButtonAF = [];
 					if(arr.isVis)
@@ -3170,13 +3176,14 @@
 				}
 				
 			},
-			_cleanStyleTable : function(ws, sRef)
+			_cleanStyleTable : function(aWs, sRef)
 			{
-				var oRange = ws.getRange2(sRef);
+				var oRange = aWs.getRange2(sRef);
 				oRange.setTableStyle(null);
 			},
-			_setColorStyleTable: function(id,idNext,ws,options, isOpenFilter, isSetVal)
+			_setColorStyleTable: function(id, idNext, options, isOpenFilter, isSetVal)
 			{
+				var ws = this.worksheet;
 				var firstCellAddress = new CellAddress(id);
 				var endCellAddress = new CellAddress(idNext);
 				var bbox = {r1: firstCellAddress.getRow0(), c1: firstCellAddress.getCol0(), r2: endCellAddress.getRow0(), c2: endCellAddress.getCol0()};
@@ -3257,36 +3264,39 @@
 				}
 			},
 			// ToDo нужно переделать
-			_getCurrentWS : function(ws) {
+			_getCurrentWS : function() {
+				var ws = this.worksheet;
 				return ws.model;
 			},
 			// Проверка на активный sheet
-			_isActiveSheet: function (ws) {
+			_isActiveSheet: function () {
+				var ws = this.worksheet;
 				return ws.model.getIndex() === ws.model.workbook.getActive();
 			},
 			
-			addFiltersAfterOpen: function(ws)
+			addFiltersAfterOpen: function()
 			{
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				if(aWs && (aWs.AutoFilter || aWs.TableParts))
 				{
 					if(aWs.AutoFilter)
-						this.addAutoFilter(ws,false,null,'all');
+						this.addAutoFilter(false,null,'all');
 					var tableParts = aWs.TableParts; 
 					if(tableParts)
 					{
 						for(var numTP = 0; numTP < tableParts.length; numTP++)
 						{
-							this.addAutoFilter(ws,true,null,numTP);
+							this.addAutoFilter(true,null,numTP);
 						}
 					}
 					
 				}
 			},
 			
-			_getArrayOpenCells : function(index,ws,buttonId)
+			_getArrayOpenCells : function(index,buttonId)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var currentFilter;
 				var numFilter;
 				var curIndex = index.split(':');
@@ -3540,12 +3550,12 @@
 									};
 									if(!isNaN(parseFloat(val2)))
 										val2 = parseFloat(val2);
-									if(!this._getLogical(filterCust,ws,{val: val2, type: type, valWithFormat: val}))
+									if(!this._getLogical(filterCust,{val: val2, type: type, valWithFormat: val}))
 									{
 										result[nC].visible = 'hidden';
 									}
 								}
-								this._isHiddenAnotherFilter(curFilter.ColId,nRow,ws);
+								this._isHiddenAnotherFilter(curFilter.ColId,nRow);
 								if(nC >= 1000)
 								{
 									break;
@@ -3586,7 +3596,7 @@
 										val2 = parseFloat(val2);
 									top10Arr[nC] = val2;
 								}
-								this._isHiddenAnotherFilter(curFilter.ColId,nRow,ws);
+								this._isHiddenAnotherFilter(curFilter.ColId,nRow);
 								if(this._findCloneElement2(result,nC))
 								{
 									result.splice(nC,1);
@@ -3791,7 +3801,7 @@
 				return cell.getID();
 			},
 			
-			_addCustomFilters: function(index, ws, aWs, valFilter, isMerged)
+			_addCustomFilters: function(index, aWs, valFilter, isMerged)
 			{
 				var parIndex = index;
 				var curFilter;
@@ -3899,10 +3909,11 @@
 				return false;
 			},
 			
-			_getHiddenRows: function(id,idNext,filter,ws)
+			_getHiddenRows: function(id,idNext,filter)
 			{
-				var startCell = this._idToRange(id,ws);
-				var endCell   = this._idToRange(idNext,ws);
+				var ws = this.worksheet;
+				var startCell = this._idToRange(id);
+				var endCell   = this._idToRange(idNext);
 				var result = [];
 				if(filter && filter.CustomFiltersObj)
 				{
@@ -3934,7 +3945,7 @@
 						var valWithFormat = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValueWithFormat();
 						if(!isNaN(parseFloat(val)))
 							val = parseFloat(val);
-						if(!this._getLogical(filterCust,ws,{val: val, type: type, valWithFormat: valWithFormat}))
+						if(!this._getLogical(filterCust,{val: val, type: type, valWithFormat: valWithFormat}))
 							result[m] = true;
 					}
 				}
@@ -3998,7 +4009,7 @@
 				return result;
 			},
 			
-			_isHiddenAnotherFilter: function(cellId,row,ws,customFil)
+			_isHiddenAnotherFilter: function(cellId,row,customFil)
 			{
 				var buttons = this.allButtonAF;
 				var isCurrenCell = false;
@@ -4037,7 +4048,7 @@
 				return undefined;
 			},
 			
-			_isHiddenAnotherFilter2: function(cellId,row,ws,ref,customFil)
+			_isHiddenAnotherFilter2: function(cellId,row,ref,customFil)
 			{
 				var buttons = this.allButtonAF;
 				var isCurrenCell = false;
@@ -4077,10 +4088,10 @@
 			},
 			
 			//change filters after insert column
-			_changeFiltersAfterColumn: function(ws,col,val,type)
+			_changeFiltersAfterColumn: function(col,val,type)
 			{
 				History.TurnOff();
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				if(aWs.AutoFilter)
 				{
 					var ref = aWs.AutoFilter.Ref.split(':');
@@ -4091,7 +4102,7 @@
 						col:col
 					};
 					//внутри данного фильтра располагается колонка(колонки)
-					this._changeFilterAfterInsertColumn(ws,options,type);
+					this._changeFilterAfterInsertColumn(options,type);
 				}
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
@@ -4106,15 +4117,15 @@
 							index: lT
 						};
 						//внутри данного фильтра располагается колонка
-						this._changeFilterAfterInsertColumn(ws,options,type);
+						this._changeFilterAfterInsertColumn(options,type);
 					}
 				}
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-				this._reDrawFilters(ws);
+				this._reDrawFilters();
 				History.TurnOn();
 			},
 			
-			_changeFilterAfterInsertColumn: function(ws,options,type)
+			_changeFilterAfterInsertColumn: function(options,type)
 			{
 				var ref = options.ref, val = options.val, col = options.col, index = options.index;
 				//var aWs = this._getCurrentWS(ws);
@@ -4142,23 +4153,23 @@
 				//определяем диапазоны добавляемых(удаляемых) ячеек (val < 0 - удаление колонок) 
 				if(startRangeCell < colStart && endRangeCell > colEnd)
 				{
-					this._editFilterAfterInsertColumn(ws,range,val,col,type);
+					this._editFilterAfterInsertColumn(range,val,col,type);
 				}
 				else if(startRangeCell <= colStart && endRangeCell >= colEnd)
 				{
 					if(val < 0)
-						this._editFilterAfterInsertColumn(ws,range,val,col,type);
+						this._editFilterAfterInsertColumn(range,val,col,type);
 					else
 					{
 						if(startRangeCell < colStart)
-							this._editFilterAfterInsertColumn(ws,range,val,col,type);
+							this._editFilterAfterInsertColumn(range,val,col,type);
 						else
-							this._editFilterAfterInsertColumn(ws,range,val,undefined,type);
+							this._editFilterAfterInsertColumn(range,val,undefined,type);
 					}
 				}
 				else if((colEnd <= startRangeCell && val > 0) || (colEnd < startRangeCell && val < 0))
 				{
-					this._editFilterAfterInsertColumn(ws,range,val,undefined,type);
+					this._editFilterAfterInsertColumn(range,val,undefined,type);
 				}
 				else if((colStart < startRangeCell && colEnd > startRangeCell && colEnd <= endRangeCell) || (colEnd <= startRangeCell && val < 0))
 				{
@@ -4166,12 +4177,12 @@
 					{
 						var valNew = startRangeCell - colEnd - 1;
 						var val2 = colStart - startRangeCell;
-						this._editFilterAfterInsertColumn(ws,range,valNew,startRangeCell,type);
-						this._editFilterAfterInsertColumn(ws,range,val2,undefined,type);
+						this._editFilterAfterInsertColumn(range,valNew,startRangeCell,type);
+						this._editFilterAfterInsertColumn(range,val2,undefined,type);
 					}
 					else
 					{
-						this._editFilterAfterInsertColumn(ws,range,val,undefined,type);
+						this._editFilterAfterInsertColumn(range,val,undefined,type);
 					}
 				}
 				else if((colStart >= startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
@@ -4180,7 +4191,7 @@
 						valNew = colStart - endRangeCell - 1;
 					else
 						valNew = val;
-					this._editFilterAfterInsertColumn(ws,range,valNew,colStart,type);
+					this._editFilterAfterInsertColumn(range,valNew,colStart,type);
 				}
 				else if(colStart < startRangeCell && colEnd > endRangeCell)
 				{
@@ -4188,17 +4199,18 @@
 					{
 						var valNew = startRangeCell - endRangeCell - 1;
 						var colNew = startRangeCell;
-						this._editFilterAfterInsertColumn(ws,range,valNew,colNew,type);
+						this._editFilterAfterInsertColumn(range,valNew,colNew,type);
 					}
 					else
-						this._editFilterAfterInsertColumn(ws,range,val,undefined,type);
+						this._editFilterAfterInsertColumn(range,val,undefined,type);
 				}
 			},
 			
 			//change current filter after insert column
-			_editFilterAfterInsertColumn: function(ws,cRange,val,col,type)
+			_editFilterAfterInsertColumn: function(cRange,val,col,type)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var filter;
 				var filterColums;
 				if(cRange.index == 'all')
@@ -4242,7 +4254,7 @@
 							r2: endCell.r1,
 							c2: endCell.c1
 						}
-						this.isEmptyAutoFilters(ws, activeRange, true);
+						this.isEmptyAutoFilters(activeRange, true);
 						return;
 					}
 				}
@@ -4363,14 +4375,14 @@
 									};
 									newResult[n].hiddenRows = [];
 									var num = 1;
-									this._changeContentButton(newResult[n],num,'add',inFilter,ws);
+									this._changeContentButton(newResult[n],num,'add',inFilter);
 									//changeNum[insCol - 1] = n;
 									n++;
 								}
 								
 								if(val < 0)//удаляем кнопки в случае удаления ячеек
 								{
-									this._changeContentButton(curFilter,Math.abs(val),'del',inFilter,ws);
+									this._changeContentButton(curFilter,Math.abs(val),'del',inFilter);
 									//убираем примененный фильтр
 									if(filterColums)
 									{
@@ -4540,8 +4552,9 @@
 				}
 			},
 			
-			_changeContentButton: function(array,val,type,inFilter,ws)
+			_changeContentButton: function(array,val,type,inFilter)
 			{
+				var ws = this.worksheet;
 				var buttons = this.allButtonAF;
 				if(type == 'add')
 				{
@@ -4586,10 +4599,10 @@
 							if(id == buttons[but].id)
 							{
 								var cells = this._idToRange(buttons[but].id);
-								var indexFilter = this._findArrayFromAllFilter3(cells,ws,buttons[but].id);
+								var indexFilter = this._findArrayFromAllFilter3(cells,buttons[but].id);
 								if(indexFilter)
 								{
-									var result = this._getArrayOpenCells(indexFilter,ws,buttons[but].id);
+									var result = this._getArrayOpenCells(indexFilter,buttons[but].id);
 									for(var rez = 0; rez < result.length;rez++)
 									{
 										var isHidden = ws.model._getRow(rez + cells.r1 + 1).hd;
@@ -4606,17 +4619,18 @@
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-			_reDrawFilters: function(ws, turnOffHistory)
+			_reDrawFilters: function(turnOffHistory)
 			{
 				if(turnOffHistory)
 					History.TurnOff();
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
 					for(var tP = 0; tP < aWs.TableParts.length; tP++)
 					{
 						var ref = aWs.TableParts[tP].Ref.split(':');
-						this._setColorStyleTable(ref[0],ref[1],ws,aWs.TableParts[tP])
+						this._setColorStyleTable(ref[0], ref[1], aWs.TableParts[tP])
 					}
 				}
 				ws._updateCellsRange(ws.visibleRange, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
@@ -4721,7 +4735,7 @@
 
 			},
 			
-			_drawSmallIconTable: function(canvas,style,ws,tableParts)
+			_drawSmallIconTable: function(canvas,style,tableParts)
 			{
 				//for test
 				/*if(!document.getElementById('drawIcon'))
@@ -4739,6 +4753,7 @@
 				else 
 					return
 				var canvas = document.getElementById('drawIcon');*/
+				var ws = this.worksheet;
 				var ctx = canvas.getContext('2d');
 				if(style == undefined)
 					style = 'TableStyleLight1';
@@ -5202,7 +5217,8 @@
 				return newObj;
 			},
 
-			_removeTableByName: function (ws, name) {
+			_removeTableByName: function (name) {
+				var ws = this.worksheet;
 				if (undefined === name) {
 					// Удаляем общий фильтр
 					delete ws.AutoFilter;
@@ -5221,7 +5237,8 @@
 				}
 			},
 			
-			_addHistoryObj: function (ws, oldObj, type, redoObject) {
+			_addHistoryObj: function (oldObj, type, redoObject) {
+				var ws = this.worksheet;
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
 
@@ -5237,10 +5254,11 @@
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
 			},
 			
-			_isAddNameColumn: function(ws,range)
+			_isAddNameColumn: function(range)
 			{
 				//если в трёх первых строчках любых столбцов содержится текстовые данные
 				var result = false;
+				var ws = this.worksheet;
 				if(range.r1 != range.r2)
 				{
 					for(var col = range.c1; col <= range.c2; col++)
@@ -5264,8 +5282,9 @@
 				return result;
 			},
 			
-			_reDrawCurrentFilter: function(ws,fColumns, result, tableParts)
+			_reDrawCurrentFilter: function(fColumns, result, tableParts)
 			{
+				var ws = this.worksheet;
 				if(result && result[0])
 				{
 					var startRow = this._idToRange(result[0].id).r1;
@@ -5308,9 +5327,9 @@
 				//перерисовываем таблицу со стилем 
 				if(tableParts)
 				{
-					var aWs = this._getCurrentWS(ws);
+					var aWs = this._getCurrentWS();
 					var ref = tableParts.Ref.split(':');
-					this._setColorStyleTable(ref[0], ref[1], ws, tableParts)
+					this._setColorStyleTable(ref[0], ref[1], tableParts)
 				}		
 			},
 			
@@ -5386,8 +5405,9 @@
 				}
 			},
 			
-			_generateColumnNameWithoutTitle: function(ws, range, isTurnOffHistory)
+			_generateColumnNameWithoutTitle: function(range, isTurnOffHistory)
 			{
+				var ws = this.worksheet;
 				var tableColumns = [];
 				var cell;
 				var val;
@@ -5420,9 +5440,10 @@
 				return tableColumns;
 			},
 			
-			_renameTableColumn: function(ws, range)
+			_renameTableColumn: function(range)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				var val;
 				var cell;
 				var generateName;
@@ -5459,10 +5480,11 @@
 				}
 			},
 			
-			_moveAutoFilters: function(ws, arnTo, arnFrom, data)
+			_moveAutoFilters: function(arnTo, arnFrom, data)
 			{
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
-				var aWs = this._getCurrentWS(ws);
+				var ws = this.worksheet;
+				var aWs = this._getCurrentWS();
 				if(arnTo == null && arnFrom == null && data)
 				{
 					arnTo = data.moveFrom ? data.moveFrom : null;
@@ -5521,10 +5543,10 @@
 							}
 						}
 						if(!data)
-							this._addHistoryObj(ws, oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
-					this._reDrawFilters(ws);
-					this.drawAutoF(ws);
+					this._reDrawFilters();
+					this.drawAutoF();
 				}
 			},
 			
@@ -5959,22 +5981,23 @@
 				return result;
 			},
 			
-			_preMoveAutoFilters: function(ws, arnFrom)
+			_preMoveAutoFilters: function(arnFrom)
 			{
-				var aWs = this._getCurrentWS(ws);
+				var aWs = this._getCurrentWS();
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
 				if(findFilters)
 				{
 					for(var i = 0; i < findFilters.length; i++)
 					{
-						this._openHiddenRows(ws,findFilters[i]);
+						this._openHiddenRows(findFilters[i]);
 					}
 				}
-				this._reDrawFilters(ws);
+				this._reDrawFilters();
 			},
 			//открываем строки скрытые данным фильтром
-			_openHiddenRows: function(ws, filter)
+			_openHiddenRows: function(filter)
 			{
+				var ws = this.worksheet;
 				if(filter && this.allButtonAF)
 				{
 					var buttons = this.allButtonAF;

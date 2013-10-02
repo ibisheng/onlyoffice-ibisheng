@@ -689,7 +689,7 @@
 			
 			_onAutoFiltersClick: function (x, y) {
 				var ws = this.getWorksheet();
-				ws.autoFilters.autoFocusClick(x,y,ws);
+				ws.autoFilters.autoFocusClick(x,y);
 			},
 			
 			_onCommentCellClick: function (x, y) {
