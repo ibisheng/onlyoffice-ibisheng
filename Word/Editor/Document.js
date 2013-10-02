@@ -7554,7 +7554,8 @@ CDocument.prototype =
                 else
                 {
                     var Paragraph = SelectedInfo.Get_Paragraph();
-                    if ( null != Paragraph && ( true === Paragraph.Cursor_IsStart() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || true != Paragraph.IsEmpty() ) )
+                    var ParaPr    = Paragraph.Get_CompiledPr2(false).ParaPr;
+                    if ( null != Paragraph && ( true === Paragraph.Cursor_IsStart() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ) )
                     {
                         if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Properties } ) )
                         {
