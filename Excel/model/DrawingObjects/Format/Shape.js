@@ -2642,7 +2642,6 @@ CShape.prototype =
     {
         switch (type)
         {
-
             case historyitem_AutoShapes_RecalculateAfterParagraphAddUndo:
             {
                 if(isRealObject(this.txBody))
@@ -2757,6 +2756,7 @@ CShape.prototype =
                 break;
             }
         }
+		this.drawingObjects.sendGraphicObjectProps();
     },
 
     Redo: function(type, data)
@@ -2884,6 +2884,7 @@ CShape.prototype =
                 break;
             }
         }
+		this.drawingObjects.sendGraphicObjectProps();
     },
 
     setNvSpPr: function(pr)
