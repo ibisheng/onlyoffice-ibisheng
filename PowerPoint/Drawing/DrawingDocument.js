@@ -2445,14 +2445,14 @@ function CDrawingDocument()
                 this.GuiControlColorsMap[i] = arr_colors[i];
             }
 
-            this.SendControlColors();
+            this.SendControlColors(bIsAttack);
         }
     }
 
-    this.SendControlColors = function()
+    this.SendControlColors = function(bIsAttack)
     {
         var standart_colors = null;
-        if (!this.IsSendStandartColors)
+        if (!this.IsSendStandartColors || (bIsAttack === true))
         {
             var _c_s = g_oStandartColors.length;
             standart_colors = new Array(_c_s);

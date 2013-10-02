@@ -2614,6 +2614,7 @@ function BinaryPPTYLoader()
                                                 break;
                                             case 8:
                                                 _comment.AdditionalData = s.GetString2();
+                                                break;
                                             default:
                                                 break;
                                         }
