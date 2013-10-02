@@ -351,6 +351,8 @@ prop:SetDrawingFreeze
 prop:change_PageOrient
 prop:get_DocumentOrientation
 prop:change_DocSize
+prop:get_DocumentWidth
+prop:get_DocumentHeight
 prop:put_AddPageBreak
 prop:Update_ParaInd
 prop:Internal_Update_Ind_FirstLine
@@ -1419,6 +1421,8 @@ asc_docs_api.prototype['SetDrawingFreeze'] = asc_docs_api.prototype.SetDrawingFr
 asc_docs_api.prototype['change_PageOrient'] = asc_docs_api.prototype.change_PageOrient;
 asc_docs_api.prototype['get_DocumentOrientation'] = asc_docs_api.prototype.get_DocumentOrientation;
 asc_docs_api.prototype['change_DocSize'] = asc_docs_api.prototype.change_DocSize;
+asc_docs_api.prototype['get_DocumentWidth'] = asc_docs_api.prototype.get_DocumentWidth;
+asc_docs_api.prototype['get_DocumentHeight'] = asc_docs_api.prototype.get_DocumentHeight;
 asc_docs_api.prototype['put_AddPageBreak'] = asc_docs_api.prototype.put_AddPageBreak;
 asc_docs_api.prototype['Update_ParaInd'] = asc_docs_api.prototype.Update_ParaInd;
 asc_docs_api.prototype['Internal_Update_Ind_FirstLine'] = asc_docs_api.prototype.Internal_Update_Ind_FirstLine;
