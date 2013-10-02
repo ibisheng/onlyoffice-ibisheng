@@ -2287,7 +2287,7 @@ Woorksheet.prototype.clone=function(sNewId){
 		oNewWs.oAllCol = this.oAllCol.clone();
 	for(var i in this.aGCells)
 		oNewWs.aGCells[i] = this.aGCells[i].clone();
-	if(null != this.Drawings)
+	if(null != this.Drawings && this.Drawings.length > 0)
     {
 
         oNewWs.Drawings = [];
