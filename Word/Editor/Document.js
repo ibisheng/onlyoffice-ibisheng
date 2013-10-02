@@ -4302,7 +4302,6 @@ CDocument.prototype =
                                 {
                                     NumId  = this.Numbering.Create_AbstractNum();
                                     AbstractNum = this.Numbering.Get_AbstractNum( NumId );
-                                    AbstractNum.Create_Default_Numbered();
                                     ChangeLvl = 0;
                                 }
                                 else if ( true === bDiffId || true != this.Numbering.Check_Format( PrevId, PrevLvl, numbering_numfmt_Decimal ) )
@@ -4683,6 +4682,7 @@ CDocument.prototype =
                                 {
                                     var NumId = this.Numbering.Create_AbstractNum();
                                     AbstractNum = this.Numbering.Get_AbstractNum( NumId );
+                                    AbstractNum.Create_Default_Numbered();
                                     ChangeLvl = 0;
                                 }
 
