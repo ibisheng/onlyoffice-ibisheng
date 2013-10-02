@@ -331,10 +331,10 @@ CChartAsGroup.prototype =
             this.chartTitle.drawingObjects = this.drawingObjects;
             if(this.chartTitle.isEmpty())
             {
-                var title_str = "Chart Title";
+                /*var title_str = "Chart Title";
                 this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
                 for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);*/
             }
             else
             {
@@ -599,9 +599,9 @@ CChartAsGroup.prototype =
                 this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
 
 
-            this.chart.xAxis.bDefaultTitle = false;
-            this.chart.xAxis.bShow = false;
-            this.chart.xAxis.title = "";
+            //this.chart.xAxis.bDefaultTitle = false;
+            //this.chart.xAxis.bShow = false;
+            //this.chart.xAxis.title = "";
         }
 
         if(isRealObject(this.chart.yAxis) && this.chart.yAxis.bShow)
@@ -617,9 +617,9 @@ CChartAsGroup.prototype =
                 this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
 
 
-            this.chart.yAxis.bDefaultTitle = false;
-            this.chart.yAxis.bShow = false;
-            this.chart.yAxis.title = "";
+            //this.chart.yAxis.bDefaultTitle = false;
+            //this.chart.yAxis.bShow = false;
+            //this.chart.yAxis.title = "";
         }
 
         this.init();

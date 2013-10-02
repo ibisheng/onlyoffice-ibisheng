@@ -2339,22 +2339,13 @@ function DrawingObjects() {
 	// Scroll offset
 	//-----------------------------------------------------------------------------------
 	
-	var ScrollOffset = function(x, y) {
-		this.rawX = x;
-		this.rawY = y;
-		
-		this.setScroll = function(x, y) {
-			this.rawX -= x;
-			this.rawY -= y;
-		}
+	var ScrollOffset = function() {
 		
 		this.getX = function() {
-			//return this.rawX + worksheet.getCellLeft(0, 0);
 			return -ptToPx((worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
 		}
 		
 		this.getY = function() {
-			//return this.rawY + worksheet.getCellTop(0, 0);
 			return -ptToPx((worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
 		}
 	}
@@ -2378,7 +2369,7 @@ function DrawingObjects() {
 	
 	var trackOverlay = null;
 	var autoShapeTrack = null;
-	var scrollOffset = new ScrollOffset(0, 0);
+	var scrollOffset = new ScrollOffset();
 	
 	var aObjects = null;
 	var aBoundsCheckers = [];
@@ -4266,11 +4257,10 @@ function DrawingObjects() {
 		}
 	}
 	
-	_this.setScrollOffset = function(x_px, y_px) {
+	_this.setScrollOffset = function() {
 		
 		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
-		
-			scrollOffset.setScroll(x_px, y_px);
+			
 			var x = scrollOffset.getX();
 			var y = scrollOffset.getY();
 
@@ -4507,7 +4497,12 @@ function DrawingObjects() {
 
         var chart = this.controller.getAscChartObject();
 		if ( !chart ) {
-			chart = new asc_CChart();			
+			
+			chart = new asc_CChart();
+			chart.header.title = api.chartTranslate.title;
+			chart.xAxis.title = api.chartTranslate.xAxis;
+			chart.yAxis.title = api.chartTranslate.yAxis;
+			
 			chart.range.interval = function() {
 				var result = "";
 				if (worksheet) {
