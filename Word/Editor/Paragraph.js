@@ -7532,6 +7532,16 @@ Paragraph.prototype =
                     TempDx = Item.WidthVisible;
 
                     break;
+
+                case para_TextPr:
+                case para_CommentEnd:
+                case para_CommentStart:
+                case para_CollaborativeChangesEnd:
+                case para_CollaborativeChangesStart:
+
+                    bCheck = true;
+                    TempDx = 0;
+                    break;
             }
 
             if ( bCheck )
