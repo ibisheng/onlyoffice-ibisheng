@@ -1364,7 +1364,7 @@ TRANSLATE_HANDLE_FLIP_V:P7
 c_oAscCanChangeColWidth$none:cz
 JSCompiler_StaticMethods_clearPreTrackObjects:l1
 historyitem_Cell_SetStyle:CP
-JSCompiler_StaticMethods_getRectHeight:x4
+JSCompiler_StaticMethods_getRectHeight:w4
 BinaryWorkbookTableWriter:nK
 JSCompiler_StaticMethods_getThemeColor:QK
 ChartTextAdd:v2
@@ -2294,7 +2294,7 @@ JSCompiler_StaticMethods_Internal_GetEndPos:dZ
 CLn:DU
 FT_ENCODING_APPLE_ROMAN:Dw
 ReadObjectLong:JT
-CLASS_TYPE_TEXT_PR:n4
+CLASS_TYPE_TEXT_PR:m4
 ScrollOverType$ACTIVE:LS
 CLASS_TYPE_XFRM:nV
 nSldLtTTitle:GV
