@@ -2822,7 +2822,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var t = this;
 					this.autoSaveTimeOutId = setTimeout(function () {
 						t.autoSaveTimeOutId = null;
-						if (t.asc_isDocumentModified()) {
+						if (t.asc_getViewerMode()) {
+							/*
+								1) При загрузке файла на просмотре при совместном редактировании загрузится
+									файл уже с последними изменениями.
+								2) Далее при срабатывании автосохранения должны накатываться новые изменения
+									(это надо делать) при этом файл отсылаться не должен, т.к. изменений во вьювере нет.
+								3) Если пользователь отключил автосохранение, то изменения к нему приходить не
+									будут, поскольку это его решение.
+							*/
+							// Принимаем чужие изменения
+							t.collaborativeEditing.applyChanges();
+							t.autoSaveInit();
+						} else if (t.asc_isDocumentModified()) {
 							// Если мы редактируем ячейку, то запустим автосохранение чуть позднее
 							if (t.asc_getCellEditMode())
 								t.autoSaveInit(t.autoSaveGapAsk);
