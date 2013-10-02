@@ -46,6 +46,10 @@ prop:asc_unregisterCallback
 prop:asc_fireCallback
 prop:asc_checkNeedCallback
 prop:get_TextProps
+prop:get_PropertyEditorShapes
+prop:get_PropertyEditorFonts
+prop:get_PropertyStandartTextures
+prop:get_PropertyEditorThemes
 prop:get_ContentCount
 prop:select_Element
 prop:UpdateTextPr
@@ -157,7 +161,6 @@ prop:put_LineBeginStyle
 prop:put_LineBeginSize
 prop:put_LineEndStyle
 prop:put_LineEndSize
-prop:sync_InitStandartTextures
 prop:put_TextColor2
 prop:put_TextColor
 prop:put_ParagraphShade
@@ -253,6 +256,7 @@ prop:get_OriginalSizeImage
 prop:sync_AddImageCallback
 prop:sync_ImgPropCallback
 prop:sync_ImgWrapStyleChangedCallback
+prop:SetDrawingFreeze
 prop:zoomIn
 prop:zoomOut
 prop:zoomFitToPage
@@ -1174,6 +1178,10 @@ asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_un
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
+asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
+asc_docs_api.prototype['get_PropertyEditorFonts'] = asc_docs_api.prototype.get_PropertyEditorFonts;
+asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
+asc_docs_api.prototype['get_PropertyEditorThemes'] = asc_docs_api.prototype.get_PropertyEditorThemes;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
 asc_docs_api.prototype['select_Element'] = asc_docs_api.prototype.select_Element;
 asc_docs_api.prototype['UpdateTextPr'] = asc_docs_api.prototype.UpdateTextPr;
@@ -1285,7 +1293,6 @@ asc_docs_api.prototype['put_LineBeginStyle'] = asc_docs_api.prototype.put_LineBe
 asc_docs_api.prototype['put_LineBeginSize'] = asc_docs_api.prototype.put_LineBeginSize;
 asc_docs_api.prototype['put_LineEndStyle'] = asc_docs_api.prototype.put_LineEndStyle;
 asc_docs_api.prototype['put_LineEndSize'] = asc_docs_api.prototype.put_LineEndSize;
-asc_docs_api.prototype['sync_InitStandartTextures'] = asc_docs_api.prototype.sync_InitStandartTextures;
 asc_docs_api.prototype['put_TextColor2'] = asc_docs_api.prototype.put_TextColor2;
 asc_docs_api.prototype['put_TextColor'] = asc_docs_api.prototype.put_TextColor;
 asc_docs_api.prototype['put_ParagraphShade'] = asc_docs_api.prototype.put_ParagraphShade;
@@ -1381,6 +1388,7 @@ asc_docs_api.prototype['get_OriginalSizeImage'] = asc_docs_api.prototype.get_Ori
 asc_docs_api.prototype['sync_AddImageCallback'] = asc_docs_api.prototype.sync_AddImageCallback;
 asc_docs_api.prototype['sync_ImgPropCallback'] = asc_docs_api.prototype.sync_ImgPropCallback;
 asc_docs_api.prototype['sync_ImgWrapStyleChangedCallback'] = asc_docs_api.prototype.sync_ImgWrapStyleChangedCallback;
+asc_docs_api.prototype['SetDrawingFreeze'] = asc_docs_api.prototype.SetDrawingFreeze;
 asc_docs_api.prototype['zoomIn'] = asc_docs_api.prototype.zoomIn;
 asc_docs_api.prototype['zoomOut'] = asc_docs_api.prototype.zoomOut;
 asc_docs_api.prototype['zoomFitToPage'] = asc_docs_api.prototype.zoomFitToPage;
