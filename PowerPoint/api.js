@@ -326,8 +326,6 @@ asc_docs_api.prototype._coAuthoringInit = function () {
                         CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
                     }
                 }
-
-                // TODO: эвент о пришедших lock-ах
             }
 		}
     };
@@ -422,7 +420,6 @@ asc_docs_api.prototype._coAuthoringInit = function () {
             {
                 CollaborativeEditing.Remove_NeedLock(Id);
             }
-            // TODO: эвент о снятии lock-ов другими пользователями
         }
     };
     this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
@@ -442,7 +439,6 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         // т.е. если bSendEvent не задан, то посылаем  сообщение
         if ( Count > 0 && false != bSendEvent )
             editor.sync_CollaborativeChanges();
-		// TODO: эвент о пришедших изменениях с сервера (но еще не сохраненных)
 
 		// т.е. если bSendEvent не задан, то посылаем  сообщение
 		/*if (true === bAddChanges && false !== bSendEvent)
@@ -451,7 +447,6 @@ asc_docs_api.prototype._coAuthoringInit = function () {
     this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
         t.CoAuthoringApi.onSaveChanges(e,false);
         CollaborativeEditing.Apply_Changes();
-        // TODO: Загружаем изменения от других пользователей при открытии
     };
     this.CoAuthoringApi.onSetIndexUser			= function (e) {
         g_oIdCounter.Set_UserId("" + e);
@@ -555,7 +550,19 @@ asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
 		var t = this;
 		this.autoSaveTimeOutId = setTimeout(function () {
 			t.autoSaveTimeOutId = null;
-			if (t.isDocumentModified())
+			if (t.isViewMode) {
+				/*
+				 1) При загрузке файла на просмотре при совместном редактировании загрузится
+				 файл уже с последними изменениями.
+				 2) Далее при срабатывании автосохранения должны накатываться новые изменения
+				 (это надо делать) при этом файл отсылаться не должен, т.к. изменений во вьювере нет.
+				 3) Если пользователь отключил автосохранение, то изменения к нему приходить не
+				 будут, поскольку это его решение.
+				 */
+				// Принимаем чужие изменения
+				CollaborativeEditing.Apply_Changes();
+				t.autoSaveInit();
+			} else if (t.isDocumentModified())
 				t.asc_Save(/*isAutoSave*/true);
 			else
 				t.autoSaveInit();
@@ -1676,7 +1683,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 			t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 		}
 
-		// Принимаем чужие изменения (ToDo)
+		// Принимаем чужие изменения
 		CollaborativeEditing.Apply_Changes();
 
 		// Сохраняем файл на сервер

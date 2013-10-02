@@ -1526,7 +1526,19 @@ asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
 		var t = this;
 		this.autoSaveTimeOutId = setTimeout(function () {
 			t.autoSaveTimeOutId = null;
-			if (t.isDocumentModified())
+			if (t.isViewMode) {
+				/*
+				 1) При загрузке файла на просмотре при совместном редактировании загрузится
+				 файл уже с последними изменениями.
+				 2) Далее при срабатывании автосохранения должны накатываться новые изменения
+				 (это надо делать) при этом файл отсылаться не должен, т.к. изменений во вьювере нет.
+				 3) Если пользователь отключил автосохранение, то изменения к нему приходить не
+				 будут, поскольку это его решение.
+				 */
+				// Принимаем чужие изменения
+				CollaborativeEditing.Apply_Changes();
+				t.autoSaveInit();
+			} else if (t.isDocumentModified())
 				t.asc_Save(/*isAutoSave*/true);
 			else
 				t.autoSaveInit();
