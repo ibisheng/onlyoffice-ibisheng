@@ -201,6 +201,12 @@ prop:asc_registerCallback
 prop:asc_unregisterCallback
 prop:asc_fireCallback
 prop:asc_checkNeedCallback
+prop:get_PropertyEditorShapes
+prop:get_PropertyEditorFonts
+prop:get_PropertyStandartTextures
+prop:get_PropertyEditorStyles
+prop:get_PropertyThemeColors
+prop:get_PropertyThemeColorSchemes
 prop:_coAuthoringInit
 prop:asc_coAuthoringChatSendMessage
 prop:asc_coAuthoringChatGetMessages
@@ -219,7 +225,6 @@ prop:get_ContentCount
 prop:select_Element
 prop:UpdateTextPr
 prop:UpdateParagraphProp
-prop:sync_InitStandartTextures
 prop:asc_Print
 prop:Undo
 prop:Redo
@@ -1271,6 +1276,12 @@ asc_docs_api.prototype['asc_registerCallback'] = asc_docs_api.prototype.asc_regi
 asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_unregisterCallback;
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
+asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
+asc_docs_api.prototype['get_PropertyEditorFonts'] = asc_docs_api.prototype.get_PropertyEditorFonts;
+asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
+asc_docs_api.prototype['get_PropertyEditorStyles'] = asc_docs_api.prototype.get_PropertyEditorStyles;
+asc_docs_api.prototype['get_PropertyThemeColors'] = asc_docs_api.prototype.get_PropertyThemeColors;
+asc_docs_api.prototype['get_PropertyThemeColorSchemes'] = asc_docs_api.prototype.get_PropertyThemeColorSchemes;
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
@@ -1289,7 +1300,6 @@ asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentC
 asc_docs_api.prototype['select_Element'] = asc_docs_api.prototype.select_Element;
 asc_docs_api.prototype['UpdateTextPr'] = asc_docs_api.prototype.UpdateTextPr;
 asc_docs_api.prototype['UpdateParagraphProp'] = asc_docs_api.prototype.UpdateParagraphProp;
-asc_docs_api.prototype['sync_InitStandartTextures'] = asc_docs_api.prototype.sync_InitStandartTextures;
 asc_docs_api.prototype['asc_Print'] = asc_docs_api.prototype.asc_Print;
 asc_docs_api.prototype['Undo'] = asc_docs_api.prototype.Undo;
 asc_docs_api.prototype['Redo'] = asc_docs_api.prototype.Redo;
