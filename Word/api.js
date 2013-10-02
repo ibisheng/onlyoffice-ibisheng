@@ -1178,47 +1178,6 @@ asc_docs_api.prototype.asc_registerCallback = function(name, callback) {
 	if (!_callbacks.hasOwnProperty(name))
 		_callbacks[name] = [];
 	_callbacks[name].push(callback);
-
-    if ("asc_onInitEditorFonts" == name)
-    {
-        if (this._gui_fonts != null)
-        {
-            this.asc_fireCallback("asc_onInitEditorFonts", this._gui_fonts);
-            this._gui_fonts = null;
-        }
-    }
-    else if ("asc_onInitEditorStyles" == name)
-    {
-        if (this._gui_styles != null)
-        {
-            this.asc_fireCallback("asc_onInitEditorStyles", this._gui_styles);
-            this._gui_styles = null;
-        }
-    }
-    else if ("asc_onInitEditorShapes" == name)
-    {
-        this.asc_fireCallback("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
-    }
-    else if ("asc_onInitStandartTextures" == name)
-    {
-        this.sync_InitStandartTextures();
-    }
-    else if ("asc_onSendThemeColors" == name)
-    {
-        if (this._gui_control_colors != null)
-        {
-            this.asc_fireCallback("asc_onSendThemeColors",this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
-            this._gui_control_colors = null;
-        }
-    }
-    else if ("asc_onSendThemeColorSchemes" == name)
-    {
-        if (this._gui_color_schemes != null)
-        {
-            this.asc_fireCallback("asc_onSendThemeColorSchemes", this._gui_color_schemes);
-            this._gui_color_schemes = null;
-        }
-    }
 }
 
 asc_docs_api.prototype.asc_unregisterCallback = function(name, callback) {
@@ -1251,6 +1210,43 @@ asc_docs_api.prototype.asc_checkNeedCallback = function(name) {
     }
     return false;
 }
+
+// тут методы, замены евентов
+asc_docs_api.prototype.get_PropertyEditorShapes = function()
+{
+    var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
+    return ret;
+}
+asc_docs_api.prototype.get_PropertyEditorFonts = function()
+{
+    return this._gui_fonts;
+}
+asc_docs_api.prototype.get_PropertyStandartTextures = function()
+{
+    var _count = g_oUserTexturePresets.length;
+    var arr = new Array(_count);
+    for (var i = 0; i < _count; ++i)
+    {
+        arr[i] = new CAscTexture();
+        arr[i].Id = i;
+        arr[i].Image = g_oUserTexturePresets[i];
+    }
+    return arr;
+}
+asc_docs_api.prototype.get_PropertyEditorStyles = function()
+{
+    return this._gui_styles;
+}
+asc_docs_api.prototype.get_PropertyThemeColors = function()
+{
+    var _ret = [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
+    return _ret;
+}
+asc_docs_api.prototype.get_PropertyThemeColorSchemes = function()
+{
+    return this._gui_color_schemes;
+}
+// -------
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////CoAuthoring and Chat api//////////////////////////////
@@ -2400,19 +2396,6 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 	this.sync_PrPropCallback(ParaPr);
 }
 
-asc_docs_api.prototype.sync_InitStandartTextures = function()
-{
-    var _count = g_oUserTexturePresets.length;
-    var arr = new Array(_count);
-    for (var i = 0; i < _count; ++i)
-    {
-        arr[i] = new CAscTexture();
-        arr[i].Id = i;
-        arr[i].Image = g_oUserTexturePresets[i];
-    }
-
-    this.asc_fireCallback("asc_onInitStandartTextures", arr);
-}
 /*----------------------------------------------------------------*/
 /*functions for working with clipboard, document*/
 /*TODO: Print,Undo,Redo,Copy,Cut,Paste,Share,Save,DownloadAs,ReturnToDocuments(вернуться на предыдущую страницу) & callbacks for these functions*/
@@ -3253,15 +3236,9 @@ asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
 }
 asc_docs_api.prototype.sync_InitEditorFonts = function(gui_fonts){
     this._gui_fonts = gui_fonts;
-    var ret = this.asc_fireCallback("asc_onInitEditorFonts",gui_fonts);
-    if (ret)
-        this._gui_fonts = null;
 }
 asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
     this._gui_styles = styles_painter;
-    var ret = this.asc_fireCallback("asc_onInitEditorStyles",styles_painter);
-    if (ret)
-        this._gui_styles = null;
 }
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles, is_retina_enabled){
     this.asc_fireCallback("asc_onInitTableTemplates",styles, is_retina_enabled);
@@ -5821,16 +5798,10 @@ asc_docs_api.prototype.CreateFontsCharMap = function()
 asc_docs_api.prototype.sync_SendThemeColors = function(colors,standart_colors)
 {
     this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
-    var ret = this.asc_fireCallback("asc_onSendThemeColors",colors,standart_colors);
-    if (ret)
-        this._gui_control_colors = null;
 }
 asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
 {
     this._gui_color_schemes = param;
-    var ret = this.asc_fireCallback("asc_onSendThemeColorSchemes",param);
-    if (ret)
-        this._gui_color_schemes = null;
 }
 
 asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
