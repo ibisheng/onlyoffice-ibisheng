@@ -20,14 +20,13 @@
 			this.onDisconnect = options.onDisconnect;
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
-			this.onUserStateChanged = options.onUserStateChanged;
 			this.onSetIndexUser = options.onSetIndexUser;
 			this.onSaveChanges = options.onSaveChanges;
 			this.onStartCoAuthoring = options.onStartCoAuthoring;
 		}
 	};
 
-	CDocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, editorType) {
+	CDocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e) {t.callback_OnAuthParticipantsChanged(e);};
@@ -39,13 +38,12 @@
 			this._CoAuthoringApi.onDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);};
 			this._CoAuthoringApi.onFirstLoadChanges = function (e) {t.callback_OnFirstLoadChanges(e);};
 			this._CoAuthoringApi.onConnectionStateChanged = function (e) {t.callback_OnConnectionStateChanged(e);};
-			this._CoAuthoringApi.onUserStateChanged = function (e) {t.callback_OnUserStateChanged(e);};
 			this._CoAuthoringApi.onSetIndexUser = function (e) {t.callback_OnSetIndexUser(e);};
 			this._CoAuthoringApi.onSaveChanges = function (e) {t.callback_OnSaveChanges(e);};
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 
-			this._CoAuthoringApi.init(user, docid, isviewermode, token, serverHost, serverPath, callback, editorType);
+			this._CoAuthoringApi.init(user, docid, token, serverHost, serverPath, callback, editorType);
 			this._onlineWork = true;
 		}
 		else {
@@ -139,12 +137,6 @@
 			this._CoAuthoringApi.disconnect();
 		}
 	};
-	
-	CDocsCoApi.prototype.set_isViewerMode = function (isViewerMode) {
-		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.set_isViewerMode(isViewerMode);
-		}
-	};
 
 	CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function (e) {
 		if (this.onAuthParticipantsChanged)
@@ -196,11 +188,6 @@
 		if (this.onConnectionStateChanged)
 			return this.onConnectionStateChanged (e);
 	};
-	
-	CDocsCoApi.prototype.callback_OnUserStateChanged = function (e) {
-		if (this.onUserStateChanged)
-			return this.onUserStateChanged (e);
-	};
 
 	CDocsCoApi.prototype.callback_OnSetIndexUser = function (e) {
 		if (this.onSetIndexUser)
@@ -237,7 +224,6 @@
 			this.onConnect = options.onConnect;
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
-			this.onUserStateChanged = options.onUserStateChanged;
 		}
         this._state = 0;
         this._participants = [];
@@ -417,15 +403,6 @@
 		// Отключаемся сами
 		this.isCloseCoAuthoring = true;
         return this.sockjs.close();
-    };
-	
-	DocsCoApi.prototype.set_isViewerMode = function (isViewerMode) {
-		// Выставляем режим редактирования
-		isViewerMode = !!isViewerMode;
-		if (this._isviewermode != isViewerMode) {
-			this._isviewermode = isViewerMode;
-			this._send({"type": "setisviewermode", "isviewermode": this._isviewermode});
-		}
     };
 
     DocsCoApi.prototype.getMessages = function () {
@@ -640,17 +617,14 @@
 	DocsCoApi.prototype._onParticipantsChanged = function (participants, isStartEvent) {
 		this._participants = [];
 		if (participants) {
-			var tmpUser, isViewerMode, countEditUsers = (!this._isviewermode) ? 1 : 0;
+			var tmpUser, countEditUsers = 1;
 			for (var i = 0; i < participants.length; ++i) {
-				isViewerMode = participants[i]["isviewermode"];
 				tmpUser = new asc_user ();
 				tmpUser.asc_setId (participants[i]["id"]);
 				tmpUser.asc_setUserName (participants[i]["username"]);
-				tmpUser.asc_setIsViewerMode (isViewerMode);
 				this._participants.push (tmpUser);
-				// Считаем только число пользователей, которые редактируют
-				if (!isViewerMode)
-					++countEditUsers;
+				// Считаем число всех пользователей (и тех кто просматривает тоже)
+				++countEditUsers;
 			}
 			
 			if (isStartEvent) {
@@ -677,17 +651,6 @@
 			userStateChanged.asc_setUserName(data["username"]);
 			userStateChanged.asc_setState(data["state"]);
 			this.onConnectionStateChanged(userStateChanged);
-		}
-	};
-
-	DocsCoApi.prototype._onUserStateChanged = function (data) {
-		var userStateChanged = null;
-		if (undefined != data["isviewermode"] && this.onUserStateChanged) {
-			userStateChanged = new asc_user();
-			userStateChanged.asc_setId(data["id"]);
-			userStateChanged.asc_setUserName(data["username"]);
-			userStateChanged.asc_setIsViewerMode(data["isviewermode"]);
-			this.onUserStateChanged(userStateChanged);
 		}
 	};
 
@@ -724,7 +687,6 @@
                 {
                     "type":"auth",
                     "docid":docsCoApi._docid,
-					"isviewermode":docsCoApi._isviewermode,
                     "token":docsCoApi._token,
                     "user":docsCoApi._user.asc_getId(),
 					"username":docsCoApi._user.asc_getUserName(),
@@ -777,10 +739,9 @@
     }
 
 
-    DocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, editorType) {
+    DocsCoApi.prototype.init = function (user, docid, token, serverHost, serverPath, callback, editorType) {
         this._user = user;
         this._docid = docid;
-		this._isviewermode = isviewermode;
         this._token = token;
         this._initCallback = callback;
         this.ownedLockBlocks=[];
@@ -858,9 +819,6 @@
             },
 			"connectstate":function (data) {
 				docsCoApi._onConnectionStateChanged(data);
-			},
-			"isviewermode":function (data) {
-				docsCoApi._onUserStateChanged(data);
 			},
             "savechanges":function (data) {
                 docsCoApi._onSaveChanges(data);

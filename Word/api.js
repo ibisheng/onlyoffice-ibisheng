@@ -1313,7 +1313,6 @@ asc_docs_api.prototype._coAuthoringInit = function()
     };
     this.CoAuthoringApi.onMessage               	= function (e) { t.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
 	this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
-	this.CoAuthoringApi.onUserStateChanged			= function (e) { t.asc_fireCallback( "asc_onUserStateChanged", e ); };
 	this.CoAuthoringApi.onLocksAcquired				= function (e)
     {
         if ( 2 != e["state"] )
@@ -1448,7 +1447,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		}
 	};
 
-    this.CoAuthoringApi.init (editor.User, documentId, this.isViewMode, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+    this.CoAuthoringApi.init (editor.User, documentId, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
     }, c_oEditorId.Word);
 
     // ToDo init other callbacks

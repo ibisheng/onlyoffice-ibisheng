@@ -1275,7 +1275,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.handlers.trigger("asc_onAuthParticipantsChanged", e ); };
 				this.CoAuthoringApi.onMessage               	= function (e) { t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e ); };
 				this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.handlers.trigger("asc_onConnectionStateChanged", e ); };
-				this.CoAuthoringApi.onUserStateChanged			= function (e) { t.handlers.trigger("asc_onUserStateChanged", e ); };
 				this.CoAuthoringApi.onLocksAcquired				= function (e) {
 					if ( 2 != e["state"] )
 					{
@@ -1434,7 +1433,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				};
 
-				this.CoAuthoringApi.init (t.User, t.documentId, this.asc_getViewerMode(), 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+				this.CoAuthoringApi.init (t.User, t.documentId, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
 				}, c_oEditorId.Speadsheet);
 			},
 
