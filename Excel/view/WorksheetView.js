@@ -7086,10 +7086,12 @@
 									var range;
 									for(var aF = 0; aF < aFilters.length; aF++)
 									{
-										range = {r1: aFilters[aF].range.r1 + selectionRange.r1, c1:  aFilters[aF].range.c1 + selectionRange.c1, r2:  aFilters[aF].range.r2 + selectionRange.r1, c2:  aFilters[aF].range.c2 + selectionRange.c1}
-										t.autoFilters.addAutoFilter(aFilters[aF].style, range, null, null, true);
+										range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
+										if(aFilters[aF].style)
+											range.cleanFormat();
+										t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, null, null, true);
 										if(!aFilters[aF].autoFilter)
-											t.autoFilters.addAutoFilter(null, range, null, null, true);
+											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
 									}
 								};
 								
