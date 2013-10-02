@@ -285,6 +285,16 @@ CAbstractNum.prototype =
 
             History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
         }
+
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+        var AllParagraphs = LogicDocument.Get_AllParagraphs_ByNumbering( { NumId : this.Id, Lvl : undefined } );
+
+        var Count = AllParagraphs.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Para = AllParagraphs[Index];
+            Para.CompiledPr.NeedRecalc = true;
+        }
     },
 
     Get_LvlByStyle : function(StyleId)

@@ -226,7 +226,7 @@ Paragraph.prototype =
     {
         var _NumPr = this.Numbering_Get();
 
-        if ( undefined != _NumPr && _NumPr.NumId === NumPr.NumId && _NumPr.Lvl === NumPr.Lvl )
+        if ( undefined != _NumPr && _NumPr.NumId === NumPr.NumId && ( _NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl ) )
             ParaArray.push( this );
 
         var Count = this.Content.length;
@@ -5613,7 +5613,56 @@ Paragraph.prototype =
 
         if ( undefined != NumPr )
         {
-            this.Numbering_IndDec_Level( !bShift );
+            if ( true != this.Selection.Use )
+            {
+                var NumId   = NumPr.NumId;
+                var Lvl     = NumPr.Lvl;
+                var NumInfo = this.Parent.Internal_GetNumInfo( this.Id, NumPr );
+
+                if ( 0 === Lvl && NumInfo[Lvl] <= 1 )
+                {
+                    var Numbering   = this.Parent.Get_Numbering();
+                    var AbstractNum = Numbering.Get_AbstractNum(NumId);
+
+                    var NumLvl = AbstractNum.Lvl[Lvl];
+                    var NumParaPr = NumLvl.ParaPr;
+
+                    var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+
+                    if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
+                    {
+                        var NewX = ParaPr.Ind.Left;
+                        if ( true != bShift )
+                            NewX += Default_Tab_Stop;
+                        else
+                        {
+                            NewX -= Default_Tab_Stop;
+
+                            if ( NewX < 0 )
+                                NewX = 0;
+
+                            if ( ParaPr.Ind.FirstLine < 0 && NewX + ParaPr.Ind.FirstLine < 0 )
+                                NewX = -ParaPr.Ind.FirstLine;
+                        }
+
+                        AbstractNum.Change_LeftInd( NewX );
+
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+
+                        // При добавлении списка в параграф, удаляем все собственные сдвиги
+                        this.Pr.Ind.FirstLine = undefined;
+                        this.Pr.Ind.Left      = undefined;
+
+                        // Надо пересчитать конечный стиль
+                        this.CompiledPr.NeedRecalc = true;
+                    }
+                }
+                else
+                    this.Numbering_IndDec_Level( !bShift );
+            }
+            else
+                this.Numbering_IndDec_Level( !bShift );
         }
         else if ( true === this.Is_SelectionUse() )
         {

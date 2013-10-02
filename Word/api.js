@@ -843,7 +843,6 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
 
 	this.asc_setDocInfo(c_DocInfo);
-	
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
 	if(this.DocInfo){
@@ -3856,6 +3855,17 @@ asc_docs_api.prototype.change_DocSize = function(width,height)
             this.WordControl.m_oLogicDocument.Set_DocumentPageSize(height, width);
     }
 }
+
+asc_docs_api.prototype.get_DocumentWidth = function()
+{
+    return Page_Width;
+}
+
+asc_docs_api.prototype.get_DocumentHeight = function()
+{
+    return Page_Height;
+}
+
 asc_docs_api.prototype.put_AddPageBreak = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
