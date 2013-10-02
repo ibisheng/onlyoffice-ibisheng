@@ -108,7 +108,7 @@ c_oSerRowTypes$CustomHeight:pE
 STATES_ID_SPLINE_BEZIER2:T1
 STATES_ID_SPLINE_BEZIER3:U1
 JSCompiler_StaticMethods__moveRecalcGraph:cP
-c_oSerWorksheetsTypes$ConditionalFormatting:OD
+c_oSerWorksheetsTypes$ConditionalFormatting:PD
 JSCompiler_StaticMethods_createWorksheet:LN
 c_oSer_TableColumns$TableColumn:IF
 EFontScheme$fontschemeMajor:YJ
@@ -1043,7 +1043,7 @@ g_oIdCounter:We
 asc_CCommentData:qO
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V:Q7
 tt_size_done_bytecode:br
-CLASS_TYPE_DOCUMENT_CONTENT:l4
+CLASS_TYPE_DOCUMENT_CONTENT:m4
 c_oAscAsyncActionType$BlockInteraction:Og
 FT_Matrix:bk
 STATES_ID_PRE_ROTATE:z1
@@ -1364,7 +1364,7 @@ TRANSLATE_HANDLE_FLIP_V:P7
 c_oAscCanChangeColWidth$none:cz
 JSCompiler_StaticMethods_clearPreTrackObjects:l1
 historyitem_Cell_SetStyle:CP
-JSCompiler_StaticMethods_getRectHeight:w4
+JSCompiler_StaticMethods_getRectHeight:x4
 BinaryWorkbookTableWriter:nK
 JSCompiler_StaticMethods_getThemeColor:QK
 ChartTextAdd:v2
@@ -1524,7 +1524,7 @@ DrawLineEnd:s8
 JSCompiler_StaticMethods_setAdjustmentValue:g4
 tt_face_load_bdf_props:Ln
 dublicate_matrix:fl
-c_oSer_ConditionalFormattingRule$DataBar:QH
+c_oSer_ConditionalFormattingRule$DataBar:RH
 ChartPreviewManager:Td
 STATES_ID_TEXT_ADD:Lg
 AFM_StreamRec:qm
@@ -1682,7 +1682,7 @@ border_None:KZ
 JSCompiler_StaticMethods_Check_Hyperlink2:N6
 c_oAscServerError$VKey:lb
 t1_cmap_std_char_next:Hm
-c_oSer_SheetView$ShowRowColHeaders:jI
+c_oSer_SheetView$ShowRowColHeaders:kI
 JSCompiler_StaticMethods__compileSetHeaderBorder:BL
 JSCompiler_StaticMethods_Can_Redo:MQ
 L 0:a
@@ -2235,7 +2235,7 @@ TT_Goto_CodeRange:fr
 c_oAscCellAnchorType$cellanchorOneCell:ya
 Base64Encode:cy
 historyitem_RowCol_SetStyle:ZL
-JSCompiler_StaticMethods_Add_NewParagraph:v4
+JSCompiler_StaticMethods_Add_NewParagraph:w4
 JSCompiler_StaticMethods_Set_AllowOverlap:W5
 g_clr_MIN:pV
 CGrState_State:ay
@@ -2294,7 +2294,7 @@ JSCompiler_StaticMethods_Internal_GetEndPos:dZ
 CLn:DU
 FT_ENCODING_APPLE_ROMAN:Dw
 ReadObjectLong:JT
-CLASS_TYPE_TEXT_PR:m4
+CLASS_TYPE_TEXT_PR:n4
 ScrollOverType$ACTIVE:LS
 CLASS_TYPE_XFRM:nV
 nSldLtTTitle:GV
@@ -3161,8 +3161,8 @@ L 19:L
 T1_Driver:bw
 L 17:J
 L 18:K
-L 15:H
-L 16:I
+L 15:I
+L 16:H
 historyitem_Worksheet_Hide:FO
 c_oAscChartLegend$bottom:va
 EChartBasicTypes$chartbasicBar3DChart:e0
