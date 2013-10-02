@@ -1250,7 +1250,7 @@ JSCompiler_StaticMethods_Remove_Comment:tD
 FT_CreateVectorArray:gm
 rx_ref3D_non_quoted:jh
 check_MouseUpEvent:cS
-JSCompiler_StaticMethods_handleEvents:yV
+JSCompiler_StaticMethods_handleEvents:zV
 c_oAscHAnchor$Text:IS
 CTableAnchorPosition:HS
 skip_spaces:Uo
@@ -1541,7 +1541,7 @@ JSCompiler_StaticMethods_Row_Remove:HU
 cff_operator_seac:Jw
 CFontFile:ey
 tt_face_free_ps_names:mq
-COverlay:d0
+COverlay:e0
 c_oSer_FramePrType$HRule:DO
 c_oSer_ChartSeriesNumCacheType$NumCacheVal:II
 _ph_summ__two_obj_and_two_tx:N1
@@ -1965,7 +1965,7 @@ c_oSerImageType2$BehindDoc:RM
 t1_service_glyph_dict:Hx
 CClipManager:SR
 changestype_Document_SectPr:vA
-FORMULA_TYPE_SAT2:z_
+FORMULA_TYPE_SAT2:A_
 c_oSerWrapTopBottom$EffectExtent:IN
 CSearchResult:T2
 c_oAscYAlign$Center:PS
@@ -2013,14 +2013,14 @@ c_oSerTableTypes$Numbering:BJ
 g_memory:yh
 T1_FontRec:jo
 cff_isoadobe_charset:Qv
-JSCompiler_StaticMethods__scrollH:xV
+JSCompiler_StaticMethods__scrollH:yV
 FT_Lookup_Renderer:$x
 JSCompiler_StaticMethods_Update_CellInfo:wU
 CParaSpellCheckerElement:lD
 CTablePropLook:U0
 SplineForDrawer:fZ
 c_oAscSlideTransitionTypes$Wipe:Ji
-JSCompiler_StaticMethods__scrollV:wV
+JSCompiler_StaticMethods__scrollV:xV
 JSCompiler_StaticMethods_setSelectionState:UD
 create_t1_field:vp
 ChartRender:FQ
