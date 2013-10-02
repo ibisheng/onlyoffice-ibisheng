@@ -2670,6 +2670,7 @@
 						else
 							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender);
 						Drawing.drawingObjects = ws.objectRender;
+						Drawing.select(ws.objectRender.controller);
 						Drawing.addToDrawingObjects();
 					}
 				}
