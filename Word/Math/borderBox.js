@@ -10,6 +10,9 @@ function CBorderBox()
     this.bLDiag = false;
     this.bRDiag = false;
 
+    this.bHor = false;
+    this.bVert = false;
+
     CMathBase.call(this);
 }
 extend(CBorderBox, CMathBase);
@@ -31,6 +34,12 @@ CBorderBox.prototype.init = function(props)
 
         if(props.strikeTLBR === true || props.strikeTLBR === 1)
             this.bRDiag = true;
+
+        if(props.strikeH === true || props.strikeH === 1)
+            this.bHor = true;
+
+        if(props.strikeV === true || props.strikeV === 1)
+            this.bVert = true;
     }
     
     this.setDimension(1, 1);
@@ -72,7 +81,7 @@ CBorderBox.prototype.draw = function(pGraphics)
 
         var x1 = this.pos.x,
          x2 = this.pos.x + this.size.width - 25.4/96,
-         y1 = y2 = this.pos.y;
+         y1 = this.pos.y;
 
          pGraphics.p_color(0,0,0, 255);
          pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -82,7 +91,7 @@ CBorderBox.prototype.draw = function(pGraphics)
     {
         var x1 = this.pos.x,
             x2 = this.pos.x + this.size.width - 25.4/96,
-            y1 = y2 = this.pos.y + this.size.height - penW;
+            y1 = this.pos.y + this.size.height - penW;
 
             pGraphics.p_color(0,0,0, 255);
             pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -133,10 +142,11 @@ CBorderBox.prototype.draw = function(pGraphics)
         pGraphics.df();
 
     }
+
     if(this.bRDiag)
     {
         var pW = penW*0.8;
-        var x1 = this.pos.x + this.size.width - pW - 25.4/96, y1 = this.pos.y,
+        var x1 = this.pos.x + this.size.width/2 - pW - 25.4/96, y1 = this.pos.y,
             x2 = x1 + pW, y2 = y1,
             x3 = x2, y3 = y2 + pW,
             x4 = this.pos.x + pW, y4 = this.pos.y + this.size.height - 25.4/96,
@@ -157,6 +167,26 @@ CBorderBox.prototype.draw = function(pGraphics)
         pGraphics._l(x7, y7);
         pGraphics.df();
 
+    }
+
+    if(this.bHor)
+    {
+        var x1 = this.pos.x,
+            x2 = this.pos.x + this.size.width - 25.4/96,
+            y1 = this.pos.y + this.size.height/2 - penW/2;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawHorLine(0, y1, x1, x2, penW);
+    }
+
+    if(this.bVert)
+    {
+        var x1 = this.pos.x + this.size.width/2 - penW/2,
+            y1 = this.pos.y,
+            y2 = this.pos.y + this.size.height - 25.4/96;
+
+        pGraphics.p_color(0,0,0, 255);
+        pGraphics.drawVerLine(0, x1, y1, y2, penW);
     }
 
 }
@@ -225,7 +255,7 @@ CBorderBox.prototype.findDisposition = function(mCoord)
     return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 
 }
-CBorderBox.prototype.getElement = function()
+CBorderBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }

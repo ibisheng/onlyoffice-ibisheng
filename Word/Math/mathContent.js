@@ -4319,7 +4319,7 @@ CMathContent.prototype =
                     var borderBox = this.addMComponent(MATH_BORDER_BOX);
                     borderBox.init(props);
 
-                    var arg = borderBox.getElement();
+                    var arg = borderBox.getBase();
 
                     var degrA = arg.addMComponent(MATH_DEGREE);
                     var props = {type:   DEGREE_SUPERSCRIPT};
@@ -7247,5 +7247,3 @@ function CEmpty()
     this.relate     = function() {};
 
 }
-
-
