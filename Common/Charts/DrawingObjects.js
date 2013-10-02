@@ -2349,11 +2349,13 @@ function DrawingObjects() {
 		}
 		
 		this.getX = function() {
-			return this.rawX + worksheet.getCellLeft(0, 0);
+			//return this.rawX + worksheet.getCellLeft(0, 0);
+			return -ptToPx((worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
 		}
 		
 		this.getY = function() {
-			return this.rawY + worksheet.getCellTop(0, 0);
+			//return this.rawY + worksheet.getCellTop(0, 0);
+			return -ptToPx((worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
 		}
 	}
 
