@@ -3124,8 +3124,8 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
     var _elem1 = document.getElementById("id_main");
     if (_elem1)
     {
-        var _elem2 = document.getElementById("id_horscrollpanel");
-        var _elem3 = document.getElementById("id_panel_right");
+        var _elem2 = document.getElementById("id_panel_thumbnails");
+        var _elem3 = document.getElementById("id_panel_notes");
         if (bIsFreeze)
         {
             _elem1.style.display = "none";
@@ -3139,6 +3139,9 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
             _elem3.style.display = "block";
         }
     }
+
+    if (!bIsFreeze)
+        this.WordControl.OnScroll();
 }
 
 /*----------------------------------------------------------------*/

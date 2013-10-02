@@ -3815,6 +3815,9 @@ asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
             _elem3.style.display = "block";
         }
     }
+
+    if (!bIsFreeze)
+        this.WordControl.OnScroll();
 }
 
 /*----------------------------------------------------------------*/
