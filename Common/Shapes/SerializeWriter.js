@@ -2053,8 +2053,13 @@ function CBinaryFileWriter()
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
-
-                var sFindString = editor.DocumentUrl + "media/";
+				
+				var api_sheet = window["Asc"]["editor"];
+                var sFindString;
+				if(api_sheet)
+					sFindString = api_sheet.wbModel.sUrlPath + "media/";
+				else
+					sFindString = editor.DocumentUrl + "media/";
                 var _src = fill.RasterImageId;
                 if(0 == _src.indexOf(sFindString))
                     _src = _src.substring(sFindString.length);

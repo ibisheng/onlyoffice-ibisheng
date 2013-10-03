@@ -2128,13 +2128,12 @@ function BinaryWorkbookTableWriter(memory, wb)
 			this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(LocalSheetId);});
     };
 };
-function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet)
+function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet)
 {
     this.memory = memory;
     this.bs = new BinaryCommonWriter(this.memory);
     this.wb = wb;
     this.oSharedStrings = oSharedStrings;
-    this.oDrawings = oDrawings;
 	this.aDxfs = aDxfs;
 	this.aXfs = aXfs;
 	this.aFonts = aFonts;
@@ -2657,18 +2656,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 			var oBinaryChartWriter = new BinaryChartWriter(this.memory);
 			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.graphicObject);});
 		}
-		else if (oDrawing.isImage())
-		{
-			var imageUrl = oDrawing.graphicObject.getImageUrl();
-            if ( (null != imageUrl) && ("" != imageUrl)) {
-
-                if (window['scriptBridge']) {
-                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(imageUrl.replace(/^.*(\\|\/|\:)/, ''));});
-                } else {
-                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(imageUrl);});
-                }
-            }
-		}
+		else
+			this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
     };
     this.WriteFromTo = function(oFromTo)
     {
@@ -2710,25 +2699,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.memory.WriteByte(c_oSer_DrawingPosType.Y);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble2(oPos.Y);
-        }
-    };
-    this.WritePic = function(oPic)
-    {
-		var oThis = this;
-        if(null != oPic && "" != oPic)
-        {
-			var sSrc = oPic;
-			var sLocalUrl = this.wb.sUrlPath + "media/";
-			if(0 == sSrc.indexOf(sLocalUrl))
-				sSrc = sSrc.substring(sLocalUrl.length);
-            var nIndex = this.oDrawings.items[sSrc];
-            if(null == nIndex)
-            {
-                nIndex = this.oDrawings.length;
-                this.oDrawings.items[sSrc] = nIndex;
-                this.oDrawings.length++;
-            }
-            this.bs.WriteItem(c_oSer_DrawingType.PicSrc, function(){oThis.memory.WriteLong(nIndex);});
         }
     };
     this.WriteSheetData = function(ws)
@@ -3309,12 +3279,11 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 	}
 };
 /** @constructor */
-function BinaryOtherTableWriter(memory, wb, oDrawings)
+function BinaryOtherTableWriter(memory, wb)
 {
     this.memory = memory;
 	this.wb = wb;
     this.bs = new BinaryCommonWriter(this.memory);
-    this.oDrawings = oDrawings;
     this.Write = function()
     {
         var oThis = this;
@@ -3323,38 +3292,8 @@ function BinaryOtherTableWriter(memory, wb, oDrawings)
     this.WriteOtherContent = function()
     {
         var oThis = this;
-        //borders
-        this.bs.WriteItem(c_oSer_OtherType.Media, function(){oThis.WriteMedia();});
 		this.bs.WriteItem(c_oSer_OtherType.Theme, function(){window.global_pptx_content_writer.WriteTheme(oThis.memory, oThis.wb.theme);});
     };
-    this.WriteMedia = function()
-    {
-        var oThis = this;
-        var aDrawings = new Array(this.oDrawings.length);
-        for(var src in this.oDrawings.items)
-        {
-            var nIndex = this.oDrawings.items[src];
-            aDrawings[nIndex] = src;
-        }
-        
-        for(var i = 0, length = aDrawings.length; i < length; ++i)
-        {
-            var src = aDrawings[i];
-            this.bs.WriteItem(c_oSer_OtherType.MediaItem, function(){oThis.WriteMediaItem(src, i);});
-        }
-    };
-    this.WriteMediaItem = function(src, index)
-    {
-        var oThis = this;
-        if(null != src)
-        {
-            this.memory.WriteByte(c_oSer_OtherType.MediaSrc);
-            this.memory.WriteString2(src);
-        }
-        if(null != index)
-            this.bs.WriteItem(c_oSer_OtherType.MediaId, function(){oThis.memory.WriteLong(index);});
-    };
-
 };
 /** @constructor */
 function BinaryFileWriter(wb)
@@ -3367,7 +3306,9 @@ function BinaryFileWriter(wb)
     this.Write = function(idWorksheet)
     {
 		//если idWorksheet не null, то надо серализовать только его.
+		window.global_pptx_content_writer._Start();
         this.WriteMainTable(idWorksheet);
+		window.global_pptx_content_writer._End();
         return this.WriteFileHeader(this.Memory.GetCurPosition()) + this.Memory.GetBase64Memory();
     }
     this.WriteFileHeader = function(nDataSize)
@@ -3385,7 +3326,6 @@ function BinaryFileWriter(wb)
         //Write mtLen 
         this.Memory.WriteByte(0);
 		var oSharedStrings = {index: 0, strings: new Object()};
-        var oDrawings = {length: 0, items: new Object()};
         //Write SharedStrings
         var nSharedStringsPos = this.ReserveTable(c_oSerTableTypes.SharedStrings);
         //Write Styles
@@ -3399,10 +3339,10 @@ function BinaryFileWriter(wb)
 		var aBorders = new Array();
 		var aNums = new Array();
 		var aDxfs = new Array();
-		var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, oDrawings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet);
+		var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet);
         this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
         //OtherTable
-        this.WriteTable(c_oSerTableTypes.Other, new BinaryOtherTableWriter(this.Memory, this.wb, oDrawings));
+        this.WriteTable(c_oSerTableTypes.Other, new BinaryOtherTableWriter(this.Memory, this.wb));
         //Write SharedStrings
         this.WriteReserved(new BinarySharedStringsTableWriter(this.Memory, oSharedStrings), nSharedStringsPos);
 		//Write Styles

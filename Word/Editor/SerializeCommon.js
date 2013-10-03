@@ -717,15 +717,15 @@ function CPPTXContentWriter()
         this.BinaryFileWriter.StartRecord(0);
         this.BinaryFileWriter.StartRecord(1);
 
-        if (grObject instanceof WordShape)
+        if ((undefined !== window.WordShape && grObject instanceof WordShape) || (undefined !== window.CShape && grObject instanceof CShape))
         {
             this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap);
         }
-        else if (grObject instanceof WordImage)
+		else if ((undefined !== window.WordImage && grObject instanceof WordImage) || (undefined !== window.CImageShape && grObject instanceof CImageShape))
         {
             this.WriteImage(grObject);
         }
-        else if (grObject instanceof WordGroupShapes)
+		else if ((undefined !== window.WordGroupShapes && grObject instanceof WordGroupShapes) || (undefined !== window.CGroupShape && grObject instanceof CGroupShape))
         {
             this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap);
         }
@@ -909,18 +909,19 @@ function CPPTXContentWriter()
             for (var i = 0; i < _len; i++)
             {
                 _writer.StartRecord(0);
-
-                if (spTree[i] instanceof WordShape)
+				
+				var elem = spTree[i];
+                if ((undefined !== window.WordShape && elem instanceof WordShape) || (undefined !== window.CShape && elem instanceof CShape))
                 {
-                    this.WriteShape(spTree[i], Document, oMapCommentId, oNumIdMap);
+                    this.WriteShape(elem, Document, oMapCommentId, oNumIdMap);
                 }
-                else if(spTree[i] instanceof WordImage)
+                else if ((undefined !== window.WordImage && elem instanceof WordImage) || (undefined !== window.CImageShape && elem instanceof CImageShape))
                 {
-                    this.WriteImage(spTree[i]);
+                    this.WriteImage(elem);
                 }
-                else if (spTree[i] instanceof WordGroupShapes)
+                else if ((undefined !== window.WordGroupShapes && elem instanceof WordGroupShapes) || (undefined !== window.CGroupShape && elem instanceof CGroupShape))
                 {
-                    this.WriteGroup(spTree[i], Document, oMapCommentId, oNumIdMap);
+                    this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap);
                 }
 
                 _writer.EndRecord(0);
