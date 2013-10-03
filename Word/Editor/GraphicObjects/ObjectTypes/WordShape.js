@@ -1867,21 +1867,27 @@ WordShape.prototype =
             return;
         var _l, _t, _r, _b;
 
+        var body_pr = this.bodyPr;
+        var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
+        var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
+        var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
+        var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
+
         var _body_pr = this.bodyPr;
         if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
         {
             var _rect = this.spPr.geometry.rect;
-            _l = _rect.l + _body_pr.lIns;
-            _t = _rect.t + _body_pr.tIns;
-            _r = _rect.r - _body_pr.rIns;
-            _b = _rect.b - _body_pr.bIns;
+            _l = _rect.l + l_ins;
+            _t = _rect.t + t_ins;
+            _r = _rect.r - r_ins;
+            _b = _rect.b - b_ins;
         }
         else
         {
-            _l = _body_pr.lIns;
-            _t = _body_pr.tIns;
-            _r = this.absExtX - _body_pr.rIns;
-            _b = this.absExtY - _body_pr.bIns;
+            _l = l_ins;
+            _t = t_ins;
+            _r = this.absExtX - r_ins;
+            _b = this.absExtY - b_ins;
         }
 
         if(_body_pr.upright === false)
