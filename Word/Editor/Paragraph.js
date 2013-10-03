@@ -8696,7 +8696,7 @@ Paragraph.prototype =
 
                     if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
                     {
-                        AbstractNum.Change_LeftInd( LeftX + NumParaPr.Ind.Left );
+                        AbstractNum.Change_LeftInd( X + NumParaPr.Ind.Left );
 
                         History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
                         History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
