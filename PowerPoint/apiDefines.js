@@ -114,7 +114,7 @@ var c_oAscError = {
 		UplImageFileCount: 		-11,
 		NoSupportClipdoard:		-12,
 		CoAuthoringDisconnect:	-18,
-		ConvertationMS_OFFCRYPTO:-19,
+		ConvertationPassword:	-19,
 		VKeyEncrypt: 			-20,
 		KeyExpire: 				-21,
 		UserCountExceed: 		-22
