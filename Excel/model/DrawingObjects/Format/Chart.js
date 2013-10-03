@@ -329,15 +329,15 @@ CChartAsGroup.prototype =
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
             this.chartTitle.drawingObjects = this.drawingObjects;
-            if(this.chartTitle.isEmpty())
-            {
+            /*if(this.chartTitle.isEmpty())
+            { */
                 /*var title_str = "Chart Title";
                 this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
                 for(var i in title_str)
                     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);*/
-            }
+            /*}
             else
-            {
+            {    */
                 var content = this.chartTitle.txBody.content;
                 content.setParent(this.chartTitle.txBody);
                 content.setDrawingDocument(this.drawingObjects.drawingDocument);
@@ -347,7 +347,7 @@ CChartAsGroup.prototype =
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
                 }
-            }
+         //   }
             this.chart.header.title = this.chartTitle.txBody.content.getTextString();
         }
 
