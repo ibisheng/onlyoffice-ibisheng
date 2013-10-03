@@ -402,15 +402,18 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onKeyPress = function(e)
     {
-        var selected_objects = this.drawingObjectsController.selectedObjects;
-        if(selected_objects.length === 1 && selected_objects[0].isShape())
+        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
-            if(isRealNumber(e.charCode))
+            var selected_objects = this.drawingObjectsController.selectedObjects;
+            if(selected_objects.length === 1 && selected_objects[0].isShape())
             {
-                selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
-                this.drawingObjects.showDrawingObjects(true);
-                this.drawingObjects.OnUpdateOverlay();
+                if(isRealNumber(e.charCode))
+                {
+                    selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                    this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
+                    this.drawingObjects.showDrawingObjects(true);
+                    this.drawingObjects.OnUpdateOverlay();
+                }
             }
         }
 
@@ -1341,8 +1344,11 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onKeyPress = function(e)
     {
-        this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-        this.drawingObjects.showDrawingObjects(true);
+        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        {
+            this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+            this.drawingObjects.showDrawingObjects(true);
+        }
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1398,29 +1404,32 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onKeyPress = function(e)
     {
-        //var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
-        this.drawingObjects.objectLocker.reset();
-        this.drawingObjects.objectLocker.addObjectId(this.textObject.Get_Id());
-
-        var drawingObjects = this.drawingObjects;
-        var text_object = this.textObject;
-        var callback = function(bLock)
+        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
-            if(bLock)
-            {
-                History.Create_NewPoint();
-                text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                drawingObjects.showDrawingObjects(true);
-                text_object.updateSelectionState(drawingObjects.drawingDocument);
-            }
-        };
+            //var worksheet = this.drawingObjects.getWorksheet();
+            //worksheet.collaborativeEditing.onStartCheckLock();
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(this.textObject.Get_Id());
 
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
-        this.drawingObjects.objectLocker.checkObjects(callback);
-       // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-       // this.drawingObjects.showDrawingObjects(true);
-       // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            var drawingObjects = this.drawingObjects;
+            var text_object = this.textObject;
+            var callback = function(bLock)
+            {
+                if(bLock)
+                {
+                    History.Create_NewPoint();
+                    text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                    drawingObjects.showDrawingObjects(true);
+                    text_object.updateSelectionState(drawingObjects.drawingDocument);
+                }
+            };
+
+            //worksheet.collaborativeEditing.onEndCheckLock(callback);
+            this.drawingObjects.objectLocker.checkObjects(callback);
+           // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+           // this.drawingObjects.showDrawingObjects(true);
+           // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
     };
 
     this.drawSelection = function(drawingDocument)
@@ -2724,18 +2733,20 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onKeyPress = function(e)
     {
-        var selected_objects = this.group.selectedObjects;
-        if(selected_objects.length === 1 && selected_objects[0].isShape())
+        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
-            if(isRealNumber(e.charCode))
+            var selected_objects = this.group.selectedObjects;
+            if(selected_objects.length === 1 && selected_objects[0].isShape())
             {
-                selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, selected_objects[0]));
-                this.drawingObjects.showDrawingObjects(true);
-                this.drawingObjects.OnUpdateOverlay();
+                if(isRealNumber(e.charCode))
+                {
+                    selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                    this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, selected_objects[0]));
+                    this.drawingObjects.showDrawingObjects(true);
+                    this.drawingObjects.OnUpdateOverlay();
+                }
             }
         }
-
     };
 
     this.drawSelection = function(drawingDocument)
@@ -2923,36 +2934,39 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
 
     this.onKeyPress = function(e)
     {
-        var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
-
-        if(!isViewMode)
+        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
-            this.drawingObjects.objectLocker.reset();
-            this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
+            var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
 
-            var drawingObjects = this.drawingObjects;
-            var text_object = this.textObject;
-            var callback = function(bLock)
+            if(!isViewMode)
             {
-                if(bLock)
-                {
-                    History.Create_NewPoint();
-                    text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(true);
-                    text_object.updateSelectionState(drawingObjects.drawingDocument);
-                }
-            };
+                this.drawingObjects.objectLocker.reset();
+                this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
 
-            //worksheet.collaborativeEditing.onEndCheckLock(callback);
-            this.drawingObjects.objectLocker.checkObjects(callback);
+                var drawingObjects = this.drawingObjects;
+                var text_object = this.textObject;
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                        drawingObjects.showDrawingObjects(true);
+                        text_object.updateSelectionState(drawingObjects.drawingDocument);
+                    }
+                };
+
+                //worksheet.collaborativeEditing.onEndCheckLock(callback);
+                this.drawingObjects.objectLocker.checkObjects(callback);
+            }
+            // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+            // this.drawingObjects.showDrawingObjects(true);
+            // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+           //this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+           //this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+           //this.drawingObjects.showDrawingObjects(true);
+           //this.drawingObjects.OnUpdateOverlay();
         }
-        // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-        // this.drawingObjects.showDrawingObjects(true);
-        // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
-       //this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-       //this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
-       //this.drawingObjects.showDrawingObjects(true);
-       //this.drawingObjects.OnUpdateOverlay();
     };
 
     this.isPointInDrawingObjects = function(x, y)
