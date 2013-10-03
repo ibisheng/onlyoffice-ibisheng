@@ -4995,7 +4995,7 @@ Paragraph.prototype =
         }
         else if ( false === Pr.ParaPr.Brd.First )
         {
-            var bDraw = true;
+            var bDraw = false;
             var Size = 0;
             var Y    = 0;
             if ( 1 === CurPage && true === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Top.Value )
