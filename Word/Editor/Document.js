@@ -9952,42 +9952,54 @@ CDocument.prototype =
         DocState.CurComment = this.Comments.Get_CurrentId();
 
         var State = null;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            State = this.HdrFtr.Get_SelectionState();
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-            State = this.DrawingObjects.getSelectionState();
-        else //if ( docpostype_Content === this.CurPos.Type )
+        if ( true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type )
         {
-            if ( true === this.Selection.Use )
+            DocState.CurPos.Type     = docpostype_Content;
+            DocState.Selection.Start = false;
+            DocState.Selection.Use   = false;
+
+            this.Content[DocState.CurPos.ContentPos].Selection_Remove();
+            State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
+        }
+        else
+        {
+            // Работаем с колонтитулом
+            if ( docpostype_HdrFtr === this.CurPos.Type )
+                State = this.HdrFtr.Get_SelectionState();
+            else if ( docpostype_DrawingObjects == this.CurPos.Type )
+                State = this.DrawingObjects.getSelectionState();
+            else //if ( docpostype_Content === this.CurPos.Type )
             {
-                // Выделение нумерации
-                if ( selectionflag_Numbering == this.Selection.Flag )
-                    State = new Array();
-                else
+                if ( true === this.Selection.Use )
                 {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if ( StartPos > EndPos )
+                    // Выделение нумерации
+                    if ( selectionflag_Numbering == this.Selection.Flag )
+                        State = new Array();
+                    else
                     {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
+                        var StartPos = this.Selection.StartPos;
+                        var EndPos   = this.Selection.EndPos;
+                        if ( StartPos > EndPos )
+                        {
+                            var Temp = StartPos;
+                            StartPos = EndPos;
+                            EndPos   = Temp;
+                        }
+
+                        State = new Array();
+
+                        var TempState = new Array();
+                        for ( var Index = StartPos; Index <= EndPos; Index++ )
+                        {
+                            TempState.push( this.Content[Index].Get_SelectionState() );
+                        }
+
+                        State.push( TempState );
                     }
-
-                    State = new Array();
-
-                    var TempState = new Array();
-                    for ( var Index = StartPos; Index <= EndPos; Index++ )
-                    {
-                        TempState.push( this.Content[Index].Get_SelectionState() );
-                    }
-
-                    State.push( TempState );
                 }
+                else
+                    State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
             }
-            else
-                State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
         }
 
         State.push( DocState );
