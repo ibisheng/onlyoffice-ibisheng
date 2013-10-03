@@ -794,6 +794,9 @@ asc_CChart.prototype = {
 	
 	Undo: function(type, data) {
 		
+		var api = window["Asc"]["editor"];
+		var ws = api.wb.getWorksheet();
+		
 		switch (type) {
 		
 			// type, subType, styleId
@@ -821,8 +824,8 @@ asc_CChart.prototype = {
 			// range
 			case historyitem_Chart_RangeInterval:
 				this.range.interval = data.oldValue;
-				if ( this.worksheet ) {
-					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
+				if ( ws ) {
+					this.range.intervalObject = convertFormula( this.range.interval, ws );
 					this.rebuildSeries();
 				}
 				break;
@@ -893,13 +896,16 @@ asc_CChart.prototype = {
 				break;
 			
 		}
-		if ( this.worksheet ) {
-			this.worksheet.objectRender.rebuildChartGraphicObjects();
-			this.worksheet.objectRender.showDrawingObjects(false);
+		if ( ws ) {
+			ws.objectRender.rebuildChartGraphicObjects();
+			ws.objectRender.showDrawingObjects(false);
 		}
 	},
 	
 	Redo: function(type, data) {
+	
+		var api = window["Asc"]["editor"];
+		var ws = api.wb.getWorksheet();
 		
 		// type, subType, styleId
 		switch (type) {
@@ -927,8 +933,8 @@ asc_CChart.prototype = {
 			// range
 			case historyitem_Chart_RangeInterval:
 				this.range.interval = data.newValue;
-				if ( this.worksheet ) {
-					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
+				if ( ws ) {
+					this.range.intervalObject = convertFormula( this.range.interval, ws );
 					this.rebuildSeries();
 				}
 				break;
@@ -998,9 +1004,9 @@ asc_CChart.prototype = {
 				this.legend.bOverlay = data.newValue;
 				break;
 		}
-		if ( this.worksheet ) {
-			this.worksheet.objectRender.rebuildChartGraphicObjects();
-			this.worksheet.objectRender.showDrawingObjects(false);
+		if ( ws ) {
+			ws.objectRender.rebuildChartGraphicObjects();
+			ws.objectRender.showDrawingObjects(false);
 		}
 	}
 }
@@ -3277,12 +3283,12 @@ function DrawingObjects() {
 					if ( !drawingObject.flags.anchorUpdated )
 						drawingObject.updateAnchorPosition();
 					
-					// Shape render
+					// Shape render (drawForPrint)
 					if ( drawingObject.isGraphicObject() ) {
 						if ( printOptions ) {
 						
-							var left = worksheet.getCellLeft(printOptions.pageRange.c1, 3) - worksheet.getCellLeft(0, 3);
-							var top = worksheet.getCellTop(printOptions.pageRange.r1, 3) - worksheet.getCellTop(0, 3);
+							var left = worksheet.getCellLeft(printOptions.pageRange.c1, 3) - 2 * worksheet.getCellLeft(0, 3) - ptToMm(printOptions.margin.left);
+							var top = worksheet.getCellTop(printOptions.pageRange.r1, 3) - 2 * worksheet.getCellTop(0, 3) - ptToMm(printOptions.margin.left);
 						
 							var tx = drawingObject.graphicObject.transform.tx;
 							var ty = drawingObject.graphicObject.transform.ty;
@@ -4000,14 +4006,21 @@ function DrawingObjects() {
 						
 			function editChart(drawingObject) {
 				
+				var _interval = drawingObject.graphicObject.chart.range.interval;
+				
 				drawingObject.graphicObject.chart.range.intervalObject = worksheet._getRange(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2);
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
-				drawingObject.graphicObject.chart.rebuildSeries();
-				
+				drawingObject.graphicObject.chart.rebuildSeries();				
 				drawingObject.graphicObject.recalculate();
-				_this.editChartDrawingObject(drawingObject.graphicObject.chart);
+				
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, drawingObject.graphicObject.chart.range.interval)));
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 			}
 			
+			var bRedraw = false;
+			History.Create_NewPoint();
+			History.StartTransaction();
 			for (var i = 0; i < aObjects.length; i++) {
 								
 				var drawingObject = aObjects[i];
@@ -4016,13 +4029,18 @@ function DrawingObjects() {
 					if ( oBBoxFrom.isEqual(bbox) ) {
 						if ( bResize && drawingObject.graphicObject.selected ) {
 							editChart(drawingObject);
-							return;
+							bRedraw = true;
+							break;
 						}
 						else
 							editChart(drawingObject);
 					}
 				}
 			}
+			History.EndTransaction();
+			
+			if ( bRedraw )
+				_this.showDrawingObjects(true);
 		}
 	}
 
@@ -4828,6 +4846,11 @@ function DrawingObjects() {
 
 	function ptToPx(val) {
 		var tmp = val * ascCvtRatio(1, 0);
+		return tmp;
+	}
+	
+	function ptToMm(val) {
+		var tmp = val * ascCvtRatio(1, 3);
 		return tmp;
 	}
 

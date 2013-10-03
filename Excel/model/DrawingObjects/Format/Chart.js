@@ -1596,7 +1596,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
-        this.chart.Read_FromBinary2(r);
+        this.chart.Read_FromBinary2(r, false);
         this.spPr.Read_FromBinary2(r);
         var chartLeft =this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
