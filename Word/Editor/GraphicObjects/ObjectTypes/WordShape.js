@@ -76,11 +76,12 @@ WordShape.prototype =
     calculateAfterOpen10: function()
     {
         var xfrm = this.spPr.xfrm;
-        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, false);
         if(this.spPr.geometry)
         {
             this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
         }
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, false);
+
         this.calculateTransformMatrix();
         this.calculateFill();
         this.calculateLine();
@@ -1020,12 +1021,12 @@ WordShape.prototype =
         this.transformText.Reset();
         var _text_transform = this.transformText;
         var _shape_transform = this.transform;
-        var _body_pr = this.bodyPr;
+        var _body_pr = this.getBodyPr();
         var _content_height = this.textBoxContent.Get_SummaryHeight();
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
-        var body_pr = this.bodyPr;
+        var body_pr = this.getBodyPr();
         var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
         var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
         var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
@@ -1373,7 +1374,7 @@ WordShape.prototype =
             }
             global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width*0.5,  _transformed_text_yc - content_height2*0.5);
 
-            var body_pr = this.bodyPr;
+            var body_pr = this.getBodyPr();;
             var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
             var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
             var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
@@ -1861,19 +1862,30 @@ WordShape.prototype =
         return null;
     },
 
+    getBodyPr: function()
+    {
+        var bodyPr = new CBodyPr();
+        bodyPr.setDefault();
+        if(isRealObject(this.bodyPr))
+        {
+            bodyPr.merge(this.bodyPr);
+        }
+        return bodyPr;
+    },
+
     calculateContent: function()
     {
         if(this.textBoxContent === null || this.textBoxContent.Parent !== this)
             return;
         var _l, _t, _r, _b;
 
-        var body_pr = this.bodyPr;
+        var body_pr = this.getBodyPr();
         var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
         var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
         var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
         var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 1.27;
 
-        var _body_pr = this.bodyPr;
+        var _body_pr = this.getBodyPr();
         if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
         {
             var _rect = this.spPr.geometry.rect;
