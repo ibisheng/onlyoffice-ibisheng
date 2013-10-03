@@ -8247,7 +8247,7 @@ Paragraph.prototype =
                 var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
                 var Pos, Item;
 
-                if ( this.Numbering.Pos === this.Lines[CurLine].Ranges[CurRange].StartPos || ( this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos && this.Numbering.Pos <= StartPos ) )
+                if ( this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos )
                     StartX += this.Numbering.WidthVisible;
 
                 for ( Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++ )
