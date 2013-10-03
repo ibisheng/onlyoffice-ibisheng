@@ -7141,9 +7141,9 @@
 														var positionY = null;
 															
 														if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
-															positionX = t.cols[val.addImages[im].curCell.col].left - ws.getCellLeft(0, 1);
+															positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
 														if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
-															positionY = t.rows[val.addImages[im].curCell.row].top - ws.getCellTop(0, 1);
+															positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
 															
 														var Drawing;
 														switch(first_string) {
