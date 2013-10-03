@@ -3342,9 +3342,16 @@ Paragraph.prototype =
 
             if ( Pos === ItemNum )
             {
+                // Если так случилось, что у нас заданная позиция идет до позиции с нумерацией, к которой привязана нумерация,
+                // тогда добавляем ширину нумерации.
+
+                var _X = X;
+                if ( ItemNum < this.Numbering.Pos )
+                    _X += this.Numbering.WidthVisible;
+
                 if ( true === UpdateCurPos)
                 {
-                    this.CurPos.X        = X;
+                    this.CurPos.X        = _X;
                     this.CurPos.Y        = Y;
                     this.CurPos.PagesPos = CurPage;
 
@@ -3376,7 +3383,7 @@ Paragraph.prototype =
                         }
 
                         var Page_Abs = this.Get_StartPage_Absolute() + CurPage;
-                        this.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
+                        this.DrawingDocument.UpdateTarget( _X, TargetY, Page_Abs );
                     }
                 }
 
@@ -3405,10 +3412,10 @@ Paragraph.prototype =
                         }
                     }
 
-                    return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+                    return { X : _X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
                 }
                 else
-                    return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+                    return { X : _X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
             }
 
             switch( Item.Type )
@@ -7483,6 +7490,12 @@ Paragraph.prototype =
                 }
 
                 CurX += this.Numbering.WidthVisible;
+
+                if ( -1 != DiffPos )
+                {
+                    DiffX   = Math.abs( X - CurX );
+                    DiffPos = ItemNum;
+                }
             }
 
             switch( Item.Type )
@@ -7538,6 +7551,8 @@ Paragraph.prototype =
                 case para_CommentStart:
                 case para_CollaborativeChangesEnd:
                 case para_CollaborativeChangesStart:
+                case para_HyperlinkEnd:
+                case para_HyperlinkStart:
 
                     bCheck = true;
                     TempDx = 0;
@@ -7546,7 +7561,7 @@ Paragraph.prototype =
 
             if ( bCheck )
             {
-                if ( Math.abs( X - CurX ) < DiffX )
+                if ( Math.abs( X - CurX ) < DiffX + 0.001 )
                 {
                     DiffX = Math.abs( X - CurX );
                     DiffPos = ItemNum;
