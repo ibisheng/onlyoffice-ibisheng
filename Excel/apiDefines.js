@@ -26,6 +26,7 @@
 		CannotMoveRange:        -16,
 		UplImageUrl: 			-17,
 		CoAuthoringDisconnect:	-18,
+		ConvertationMS_OFFCRYPTO:-19,
 		
 		
 		VKeyEncrypt:			-20,

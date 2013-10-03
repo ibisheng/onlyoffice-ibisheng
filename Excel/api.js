@@ -3109,7 +3109,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
 				case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
 				case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
-				case c_oAscServerError.ConvertMS_OFFCRYPTO :
+				case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationMS_OFFCRYPTO;break;
 				case c_oAscServerError.ConvertUnknownFormat :
 				case c_oAscServerError.ConvertReadFile :
 				case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
