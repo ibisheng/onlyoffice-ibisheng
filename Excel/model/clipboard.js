@@ -1969,6 +1969,9 @@
 						rangeToSelect.select();
 					}
 				}
+				
+				var time_interval = 200;
+				
 				// ждем выполнения copy
 				window.setTimeout(
 						function() {
@@ -1982,7 +1985,7 @@
 							// for paste event
 							if (callback && callback.call) {callback();}
 						},
-						0);
+						time_interval);
 			},
 
 			_makeNodesFromCellValue: function (val, defFN, defFS,isQPrefix,isFormat,cell) {
@@ -2689,6 +2692,7 @@
 
 window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
 window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
+window.USER_AGENT_WEBKIT = (navigator.userAgent.toLowerCase().indexOf('webkit') > -1) ? true : false;
 window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
 if (window.USER_AGENT_SAFARI_MACOS)
 {
