@@ -1147,7 +1147,7 @@
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
 				{
-					this._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[openFilter], null, true);
+					this._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[openFilter]);
 					var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
 					var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
 					var arn = 
@@ -3202,10 +3202,10 @@
 					//заполняем названия столбцов
 					if(true != isOpenFilter && headerRowCount > 0 && options.TableColumns)
 					{
-						for(var i = bbox.c1; i <= bbox.c2; i++)
+						for(var ncol = bbox.c1; ncol <= bbox.c2; ncol++)
 						{
-							var range = ws.model.getCell3(bbox.r1, i);
-							var num = i - bbox.c1;
+							var range = ws.model.getCell3(bbox.r1, ncol);
+							var num = ncol - bbox.c1;
 							var tableColumn = options.TableColumns[num];
 							if(null != tableColumn && null != tableColumn.Name && !startRedo && isSetVal)
 							{
