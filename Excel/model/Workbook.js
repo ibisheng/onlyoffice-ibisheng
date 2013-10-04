@@ -746,7 +746,7 @@ function DependencyGraph(wb) {
 	}
 
 	this.drawDep = function(cellId,se){
-		
+		// ToDo неиспользуемая функция, реализовать после выпуска
 		if( !cellId )
 			return;
 		var _wsV = this.wb.oApi.wb.getWorksheet(),
@@ -763,7 +763,7 @@ function DependencyGraph(wb) {
 
 				var fvr = _this.getFirstVisibleRow();
 				var fvc = _this.getFirstVisibleCol();
-				var mergedRange = _this._getMergedCellsRange(col, row);
+				var mergedRange = _wsVM.getMergedByCell(row, col);
 
 				if (mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2)) {
 
@@ -790,7 +790,7 @@ function DependencyGraph(wb) {
 					metrics.result = true;
 				}
 		
-				return metrics
+				return metrics;
 			}
 		
 		if( !node )
