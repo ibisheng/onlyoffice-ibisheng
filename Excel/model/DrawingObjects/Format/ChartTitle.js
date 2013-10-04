@@ -835,11 +835,15 @@ CChartTitle.prototype =
 
     draw: function(graphics)
     {
-        graphics.SetIntegerGrid(false);
-        graphics.transform3(this.transformText);
-        this.txBody.draw(graphics);
-        graphics.reset();
-        graphics.SetIntegerGrid(true);
+
+        if(!(graphics.ClearMode === true))
+        {
+            graphics.SetIntegerGrid(false);
+            graphics.transform3(this.transformText);
+            this.txBody.draw(graphics);
+            graphics.reset();
+            graphics.SetIntegerGrid(true);
+        }
 
        /* graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform);
