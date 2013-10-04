@@ -13271,7 +13271,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                this.Next = g_oTableId.Get_ById( Reader.GetString2() );
+                //this.Next = g_oTableId.Get_ById( Reader.GetString2() );
 
                 break;
             }
@@ -13279,7 +13279,7 @@ Paragraph.prototype =
             {
                 // String : Id элемента
 
-                this.Prev = g_oTableId.Get_ById( Reader.GetString2() );
+                //this.Prev = g_oTableId.Get_ById( Reader.GetString2() );
 
                 break;
             }

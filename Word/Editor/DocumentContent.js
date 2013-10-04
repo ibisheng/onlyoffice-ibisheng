@@ -7694,7 +7694,22 @@ CDocumentContent.prototype =
                     var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
                     if ( null != Element )
+                    {
+                        if ( Pos > 0 )
+                        {
+                            this.Content[Pos - 1].Next = Element;
+                            Element.Prev = this.Content[Pos - 1];
+                        }
+
+                        if ( Pos <= this.Content.length - 1 )
+                        {
+                            this.Content[Pos].Prev = Element;
+                            Element.Next = this.Content[Pos];
+                        }
+
+
                         this.Content.splice( Pos, 0, Element );
+                    }
                 }
 
                 break;
@@ -7716,6 +7731,23 @@ CDocumentContent.prototype =
                         continue;
 
                     this.Content.splice( Pos, 1 );
+
+                    if ( Pos > 0 )
+                    {
+                        if ( Pos <= this.Content.length - 1 )
+                        {
+                            this.Content[Pos - 1].Next = this.Content[Pos];
+                            this.Content[Pos].Prev     = this.Content[Pos - 1];
+                        }
+                        else
+                        {
+                            this.Content[Pos - 1].Next = null;
+                        }
+                    }
+                    else if ( Pos <= this.Content.length - 1 )
+                    {
+                        this.Content[Pos].Prev = null;
+                    }
                 }
 
                 break;
