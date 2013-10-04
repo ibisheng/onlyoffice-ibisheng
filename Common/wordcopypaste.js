@@ -3445,7 +3445,12 @@ PasteProcessor.prototype =
                             }
 
                             var arr_layouts = [];
-                            var master = presentation.Slides[presentation.CurPage].Layout.Master;
+
+                            var master;
+                            if(presentation.Slides[presentation.CurPage])
+                                master = presentation.Slides[presentation.CurPage].Layout.Master;
+                            else
+                                master = presentation.slideMasters[0];
                             if(editor.DocumentUrl !== p_url)
                             {
                                 var layouts_count = stream.GetULong();
