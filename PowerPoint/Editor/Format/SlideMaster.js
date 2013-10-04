@@ -451,7 +451,6 @@ MasterSlide.prototype =
     {},
     Undo: function(data)
     {
-        return;
         switch(data.Type)
         {
             case historyitem_SetMasterTheme:
@@ -572,7 +571,6 @@ MasterSlide.prototype =
 
     Redo: function(data)
     {
-        return;
         switch(data.Type)
         {
 

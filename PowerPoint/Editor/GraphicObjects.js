@@ -980,7 +980,7 @@ CGraphicObjects.prototype = {
             }
         }
 
-       // editor.sync_VerticalTextAlign(this.getVerticalAlign());
+        editor.sync_VerticalTextAlign(this.getVerticalAlign());
     },
 
 

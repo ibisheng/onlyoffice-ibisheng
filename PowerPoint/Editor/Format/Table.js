@@ -10510,7 +10510,7 @@ CTable.prototype =
 
     Set_TableStyle : function(StyleId)
     {
-        if ( this.TableStyle != StyleId )
+        if ( this.styleIndex != StyleId )
         {
             History.Add( this, { Type : historyitem_Table_SetStyleIndex, oldPr : this.styleIndex, newPr : StyleId } );
             this.styleIndex = StyleId;

@@ -585,7 +585,6 @@ SlideLayout.prototype =
 
     Undo: function(data)
     {
-        return;
         switch(data.Type)
         {
             case historyitem_SetLayoutMaster:
@@ -703,7 +702,6 @@ SlideLayout.prototype =
 
     Redo: function(data)
     {
-        return;
         switch(data.Type)
         {
             case historyitem_SetLayoutMaster:

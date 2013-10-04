@@ -2157,8 +2157,7 @@ CGraphicFrame.prototype =
 
     Undo: function(data)
     {
-        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
-            return;
+
         switch(data.Type)
         {
 
@@ -2283,8 +2282,6 @@ CGraphicFrame.prototype =
 
     Redo: function(data)
     {
-        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
-            return;
         switch(data.Type)
         {
 
