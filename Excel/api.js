@@ -2086,10 +2086,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_drawDepCells:function(se){
+				/* ToDo
 				if( se != c_oAscDrawDepOptions.Clear )
 					this.wb.getWorksheet().prepareDepCells(se);
 				else
-					this.wb.getWorksheet().cleanDepCells();
+					this.wb.getWorksheet().cleanDepCells();*/
 			},
 			
 			// Потеряем ли мы что-то при merge ячеек

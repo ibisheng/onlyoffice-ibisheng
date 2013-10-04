@@ -1142,7 +1142,7 @@
 						if (i == activeIndex) {
 							item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
 							item.draw();
-							item.drawDepCells();
+							//ToDo item.drawDepCells();
 						}
 					}
 				}

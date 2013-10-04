@@ -4816,7 +4816,7 @@
 					this._trigger("reinitializeScrollY");
 
 				this.cellCommentator.updateCommentPosition();
-				this.drawDepCells();
+				//ToDo this.drawDepCells();
 				this._drawGraphic();
 				this.objectRender.showDrawingObjects(false);
 				return this;
@@ -4881,7 +4881,7 @@
 					this._trigger("reinitializeScrollX");
 												
 				this.cellCommentator.updateCommentPosition();
-				this.drawDepCells();
+				//ToDo this.drawDepCells();
 				this._drawGraphic();
 				this.objectRender.showDrawingObjects(false);
 				return this;
@@ -5900,9 +5900,10 @@
 				if ( drawingInfo && drawingInfo.isGraphicObject ) {
 					// отправляем евент для получения свойств картинки, шейпа или группы
 					this._trigger("selectionChanged", this.getSelectionInfo());
+				} else {
+					this._drawSelection();
+					//ToDo this.drawDepCells();
 				}
-				else
-					this.drawDepCells();
 				
 				return ret;
 			},
@@ -6007,7 +6008,7 @@
 					if (!isCoord)
 						this._fixSelectionOfHiddenCells(ar.c2 - arOld.c2 >= 0 ? +1 : -1, ar.r2 - arOld.r2 >= 0 ? +1 : -1);
 					this._drawSelection();
-					this.drawDepCells();
+					//ToDo this.drawDepCells();
 				}
 
 				ret = this._calcActiveRangeOffset();
@@ -6828,7 +6829,7 @@
 					t.cleanSelection();
 					
 					if (true === isSuccess && !arnFrom.isEqual(arnTo) && can) {
-						t.cleanDepCells();
+						//ToDo t.cleanDepCells();
 						History.Create_NewPoint();
 						History.SetSelection(arnFrom.clone());
 						History.SetSelectionRedo(arnTo.clone());
