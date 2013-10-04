@@ -1807,6 +1807,8 @@ Paragraph.prototype =
                         this.Lines[CurLine].Ranges[CurRange].TabPos = Pos;
 
                         var PageStart = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
+                        if ( undefined != this.Get_FramePr() )
+                            PageStart.X = 0;
 
                         // Если у данного параграфа есть табы, тогда ищем среди них
                         var TabsCount = ParaPr.Tabs.Get_Count();
@@ -11114,7 +11116,7 @@ Paragraph.prototype =
     {
         // Если есть выделение, тогда мы проверяем элементы, идущие до конца выделения, если есть что-то кроме текста
         // тогда мы добавляем в буквицу только первый текстовый элемент, иначе добавляем все от начала параграфа и до
-        // конца выделения.
+        // конца выделения, кроме этого в буквицу добавляем все табы идущие в начале.
 
         var Count      = this.Content.length;
         var EndPos     = this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
@@ -11129,7 +11131,7 @@ Paragraph.prototype =
             for (var Pos = 0; Pos < EndPos; Pos++ )
             {
                 var Type = this.Content[Pos].Type;
-                if ( para_Text != Type && para_TextPr != Type )
+                if ( para_Text != Type && para_TextPr != Type && para_Tab != Type )
                 {
                     bSelection = false;
                     break;
@@ -11143,46 +11145,28 @@ Paragraph.prototype =
         if ( false === bSelection )
         {
             var Pos = 0;
-            var PTextPr = null;
-
             for (; Pos < Count; Pos++ )
             {
                 var Type = this.Content[Pos].Type;
-                if ( para_TextPr === Type )
-                    PTextPr = this.Content[Pos];
                 if ( para_Text === Type )
                     break;
             }
 
-            if ( Pos >= Count )
-                return null;
-
-            var TextPr = this.Internal_CalculateTextPr(Pos);
-
-            var DropCap = this.Content[Pos];
-            this.Internal_Content_Remove( Pos );
-
-            if ( null != PTextPr )
-                this.Internal_Content_Add( 0, PTextPr );
-
-            NewParagraph.Internal_Content_Add( 0, DropCap );
-            return TextPr;
+            EndPos = Pos + 1;
         }
-        else
+
+        for ( var Pos = 0; Pos < EndPos; Pos++ )
         {
-            for ( var Pos = 0; Pos < EndPos; Pos++ )
-            {
-                NewParagraph.Internal_Content_Add(Pos, this.Content[Pos]);
-            }
-
-            var TextPr = this.Internal_CalculateTextPr(EndPos);
-            this.Internal_Content_Remove2( 0, EndPos );
-
-            if ( null != LastTextPr )
-                this.Internal_Content_Add( 0, new ParaTextPr(LastTextPr.Value) );
-
-            return TextPr;
+            NewParagraph.Internal_Content_Add(Pos, this.Content[Pos]);
         }
+
+        var TextPr = this.Internal_CalculateTextPr(EndPos);
+        this.Internal_Content_Remove2( 0, EndPos );
+
+        if ( null != LastTextPr )
+            this.Internal_Content_Add( 0, new ParaTextPr(LastTextPr.Value) );
+
+        return TextPr;
     },
 
     Update_DropCapByLines : function(TextPr, Count, LineH, LineTA, LineTD)
