@@ -1307,18 +1307,7 @@ asc_CCellCommentator.prototype = {
 
 				var rangeOffset = 0;
 				var extraOffset = 1;
-				var activeRange = _this.worksheet.activeRange;
-				var mergedRange = _this.worksheet._getMergedCellsRange(comment.asc_getCol(), comment.asc_getRow());
-				if (mergedRange && (mergedRange.c1 == activeRange.c1) && (mergedRange.r1 == activeRange.r1)
-										&& ((mergedRange.c2 == activeRange.c2) && (mergedRange.r2 == activeRange.r2))) {
-					//rangeOffset = 1;
-					//extraOffset = 2;
-				}
-				else if ((activeRange.c1 == comment.asc_getCol()) && (activeRange.r1 == comment.asc_getRow())) {
-					//rangeOffset = 1;
-					//extraOffset = 2;
-				}
-
+								
 				var x = _this.pxToPt(metrics.left + rangeOffset);
 				var y = _this.pxToPt(metrics.top + rangeOffset);
 				var w = _this.pxToPt(metrics.width - extraOffset - rangeOffset);
