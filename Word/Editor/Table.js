@@ -419,8 +419,9 @@ CTablePage.prototype =
 
 function CTableRecalcInfo()
 {
-    this.TableGrid    = true;
-    this.TableBorders = true;
+    this.TableGridOpen = true;
+    this.TableGrid     = true;
+    this.TableBorders  = true;
 
     this.CellsToRecalc = new Object();
     this.CellsAll      = true;
@@ -11814,6 +11815,8 @@ CTable.prototype =
         //if ( true != this.RecalcInfo.TableGrid )
         //    return;
 
+        this.Internal_Recalculate_Grid_Open();
+
         //---------------------------------------------------------------------------
         // 1 часть пересчета ширины таблицы : Рассчитываем фиксированную ширину
         //---------------------------------------------------------------------------
@@ -12298,6 +12301,60 @@ CTable.prototype =
         }
 
         this.RecalcInfo.TableGrid = false;
+    },
+
+    Internal_Recalculate_Grid_Open : function()
+    {
+        if ( true != this.RecalcInfo.TableGridOpen )
+            return;
+
+        var RowGrid = new Array();
+        var GridCount = 0;
+        for ( var Index = 0; Index < this.Content.length; Index++ )
+        {
+            var Row = this.Content[Index];
+            Row.Set_Index( Index );
+
+            // Смотрим на ширину пропущенных колонок сетки в начале строки
+            var BeforeInfo = Row.Get_Before();
+            var CurGridCol = BeforeInfo.GridBefore;
+
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
+            {
+                var Cell = Row.Get_Cell( CellIndex );
+                var GridSpan = Cell.Get_GridSpan();
+                CurGridCol += GridSpan;
+            }
+
+            // Смотрим на ширину пропущенных колонок сетки в конце строки
+            var AfterInfo = Row.Get_After();
+            CurGridCol += AfterInfo.GridAfter;
+
+            if ( GridCount < CurGridCol )
+                GridCount = CurGridCol;
+
+            RowGrid[Index] = CurGridCol;
+        }
+
+        for ( var Index = 0; Index < this.Content.length; Index++ )
+        {
+            var Row = this.Content[Index];
+            var AfterInfo = Row.Get_After();
+
+            if ( RowGrid[Index] < GridCount )
+            {
+                Row.Set_After( AfterInfo.GridAfter + GridCount - RowGrid[Index],  AfterInfo.WAfter );
+            }
+        }
+
+        if ( this.TableGrid.length != GridCount )
+        {
+            for (var Index = 0; Index < GridCount; Index++ )
+                this.TableGrid[Index] = 20;
+        }
+
+        this.RecalcInfo.TableGridOpen = false;
     },
 
     Internal_Recalculate_1 : function()
