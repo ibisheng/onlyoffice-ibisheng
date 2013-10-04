@@ -688,7 +688,7 @@ function asc_CCellCommentator(currentSheet) {
 
 			// Get cell metrics
 			var commentCell = _this.aComments[i];
-			var mergedRange = _this.worksheet._getMergedCellsRange(commentCell.nCol, commentCell.nRow);
+			var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
 			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
 			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
 
@@ -737,7 +737,7 @@ function asc_CCellCommentator(currentSheet) {
 
 		var fvr = _this.worksheet.getFirstVisibleRow();
 		var fvc = _this.worksheet.getFirstVisibleCol();
-		var mergedRange = _this.worksheet._getMergedCellsRange(col, row);
+		var mergedRange = _this.worksheet.model.getMergedByCell(row, col);
 
 		if (mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2)) {
 
@@ -1122,7 +1122,7 @@ function asc_CCellCommentator(currentSheet) {
 			coords.nCol = comment.nCol;
 			coords.nRow = comment.nRow;
 
-			var mergedRange = _this.worksheet._getMergedCellsRange(comment.nCol, comment.nRow);
+			var mergedRange = _this.worksheet.model.getMergedByCell(comment.nRow, comment.nCol);
 
 			coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
 			if ( !_this.worksheet.cols[coords.nLeft] ) {
@@ -1520,29 +1520,32 @@ asc_CCellCommentator.prototype = {
 		var comments = [];
 		var _this = this;
 		var _col = col, _row = row, mergedRange = null;
+		var length = _this.aComments.length;
 
 		if (!this.bShow)
 			return comments;
 
-		if (null == _col || null == _row) {
-			var selectedCell = _this.worksheet.getSelectedRange();
-			var oFirst = selectedCell.getFirst();
-			_col = oFirst.col - 1;
-			_row = oFirst.row - 1;
-		} else
-			mergedRange = _this.worksheet._getMergedCellsRange(col, row);
+		if (0 < length) {
+			if (null == _col || null == _row) {
+				var selectedCell = _this.worksheet.getSelectedRange();
+				var oFirst = selectedCell.getFirst();
+				_col = oFirst.col - 1;
+				_row = oFirst.row - 1;
+			} else
+				mergedRange = _this.worksheet.model.getMergedByCell(row, col);
 
-		for (var i = 0; i < _this.aComments.length; i++) {
-			var commentCell = _this.aComments[i];
-			
-			if ( !commentCell.asc_getDocumentFlag() && !commentCell.asc_getSolved() && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
-				if ( !mergedRange ) {
-					if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
-						comments.push(commentCell);
-				}
-				else {
-					if ( (commentCell.nCol >= mergedRange.c1) && (commentCell.nRow >= mergedRange.r1) && (commentCell.nCol <= mergedRange.c2) && (commentCell.nRow <= mergedRange.r2) )
-						comments.push(commentCell);
+			for (var i = 0; i < length; i++) {
+				var commentCell = _this.aComments[i];
+
+				if ( !commentCell.asc_getDocumentFlag() && !commentCell.asc_getSolved() && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
+					if ( !mergedRange ) {
+						if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
+							comments.push(commentCell);
+					}
+					else {
+						if ( (commentCell.nCol >= mergedRange.c1) && (commentCell.nRow >= mergedRange.r1) && (commentCell.nCol <= mergedRange.c2) && (commentCell.nRow <= mergedRange.r2) )
+							comments.push(commentCell);
+					}
 				}
 			}
 		}
