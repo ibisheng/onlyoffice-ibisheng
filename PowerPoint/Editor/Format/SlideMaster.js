@@ -332,13 +332,20 @@ function MasterSlide(presentation, theme)
 
     this.recalculate = function()
     {
-        var _shapes = this.cSld.spTree;
-        var _shape_index;
-        var _shape_count = _shapes.length;
-        for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+        try
         {
-            if(!_shapes[_shape_index].isPlaceholder())
-                _shapes[_shape_index].recalculate();
+            var _shapes = this.cSld.spTree;
+            var _shape_index;
+            var _shape_count = _shapes.length;
+            for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+            {
+                if(!_shapes[_shape_index].isPlaceholder())
+                    _shapes[_shape_index].recalculate();
+            }
+        }
+        catch(e)
+        {
+
         }
     };
 
@@ -444,11 +451,12 @@ MasterSlide.prototype =
     {},
     Undo: function(data)
     {
+        return;
         switch(data.Type)
         {
             case historyitem_SetMasterTheme:
             {
-                this.Theme = data.oldPr;
+                //this.Theme = data.oldPr;
                 break;
             }
             case historyitem_SetTxStyles:
@@ -485,7 +493,7 @@ MasterSlide.prototype =
 
             case historyitem_AddLayout:
             {
-                this.sldLayoutLst.splice(data.pos, 1);
+                //this.sldLayoutLst.splice(data.pos, 1);
                 break;
             }
             case historyitem_AddSlideLocks:
@@ -564,11 +572,13 @@ MasterSlide.prototype =
 
     Redo: function(data)
     {
+        return;
         switch(data.Type)
         {
+
             case historyitem_SetMasterTheme:
             {
-                this.Theme = data.newPr;
+                //this.Theme = data.newPr;
                 break;
             }
             case historyitem_SetTxStyles:
@@ -601,7 +611,7 @@ MasterSlide.prototype =
             }
             case historyitem_AddLayout:
             {
-                this.sldLayoutLst.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
+                //this.sldLayoutLst.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
                 break;
             }
             case historyitem_AddSlideLocks:

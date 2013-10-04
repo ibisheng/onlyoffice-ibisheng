@@ -1090,6 +1090,7 @@ CChartAsGroup.prototype =
         {
             this.vAxisTitle.deselect();
         }
+        return this;
     },
 
     getPageIndex: function()

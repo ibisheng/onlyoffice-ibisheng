@@ -24,10 +24,27 @@ CGraphicObjects.prototype = {
 
     resetSelectionState: function()
     {
+        if(isRealObject(this.State.group))
+        {
+            var selected_objects = this.State.group.selectedObjects;
+            var count = selected_objects.length;
+            while(count > 0)
+            {
+                var old_gr = this.State.group.selectedObjects[0].group;
+                this.State.group.selectedObjects[0].group = this.State.group;
+                var sp = this.State.group.selectedObjects[0].deselect();
+                sp.group = old_gr;
+                --count;
+            }
+        }
         var count = this.selectedObjects.length;
         while(count > 0)
         {
-            this.selectedObjects[0].deselect(this);
+
+            var old_gr = this.selectedObjects[0].group;
+            this.selectedObjects[0].group = null;
+            var obj = this.selectedObjects[0].deselect(this);
+            obj.group = old_gr;
             --count;
         }
         this.changeCurrentState(new NullState(this, this.slide));
@@ -1873,7 +1890,6 @@ CGraphicObjects.prototype = {
 
     groupShapes: function(drawingBase)
     {
-        History.Create_NewPoint();
         var sp_tree = this.slide.cSld.spTree;
         var grouped_objects = [];
         for(var i =0; i < sp_tree.length; ++i)
@@ -2492,6 +2508,86 @@ CGraphicObjects.prototype = {
                 }
                 break;
             }
+            case STATES_ID_GROUP:
+            {
+                var state = this.State;
+                var group = state.group;
+                var selected_objects = [];
+                for(var i = 0; i < group.selectedObjects.length; ++i)
+                {
+                    selected_objects.push(group.selectedObjects[i]);
+                }
+                group.resetSelection();
+                var groups = [];
+                for(i = 0; i < selected_objects.length; ++i)
+                {
+                    var parent_group = selected_objects[i].group;
+                    parent_group.removeFromSpTree(selected_objects[i].Get_Id());
+                    for(var j = 0; j < groups.length; ++j)
+                    {
+                        if(groups[i] === parent_group)
+                            break;
+                    }
+                    if(j === groups.length)
+                        groups.push(parent_group);
+                }
+                groups.sort(CompareGroups);
+                for(i  = 0; i < groups.length; ++i)
+                {
+                    var parent_group = groups[i];
+                    if(parent_group !== group)
+                    {
+                        if(parent_group.spTree.length === 0)
+                        {
+                            parent_group.group.removeFromSpTree(parent_group.Get_Id());
+                        }
+                        if(parent_group.spTree.length === 1)
+                        {
+                            var sp = parent_group.spTree[0];
+                            sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                            sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                            sp.setOffset(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
+                            parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
+                        }
+                    }
+                    else
+                    {
+                        switch (parent_group.spTree.length)
+                        {
+                            case 0:
+                            {
+                                this.slide.removeFromSpTreeById(parent_group.Get_Id());
+                                break;
+                            }
+                            case 1:
+                            {
+                                this.resetSelectionState();
+                                var sp = parent_group.spTree[0];
+                                sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                    sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                sp.setOffset(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
+                                sp.setGroup(null);
+                                var pos = this.slide.removeFromSpTreeById(parent_group.Get_Id());
+                                this.slide.addToSpTreeToPos(pos, sp);
+                                sp.select(this);
+                                break;
+                            }
+                            default:
+                            {
+                                this.resetSelectionState();
+                                parent_group.normalize();
+                                parent_group.updateCoordinatesAfterInternalResize();
+                                parent_group.select(this);
+                                parent_group.recalculate();
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
 
         }
     },
@@ -2514,6 +2610,17 @@ CGraphicObjects.prototype = {
                 s.group = this.State.group;
                 s.textObject = this.State.textObject;
                 s.textSelectionState = this.State.textObject.getTextSelectionState();
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                s.id = STATES_ID_GROUP;
+                s.group = this.State.group;
+                s.selectedObjects = [];
+                for(var i = 0; i < this.State.group.selectedObjects.length; ++i)
+                {
+                    s.selectedObjects.push(this.State.group.selectedObjects[i]);
+                }
                 break;
             }
             default :
@@ -2553,6 +2660,16 @@ CGraphicObjects.prototype = {
 
                 break;
             }
+            case STATES_ID_GROUP:
+            {
+                s.group.select(this);
+                for(var i = 0; i< s.selectedObjects.length; ++i)
+                {
+                    s.selectedObjects[i].select(s.group);
+                }
+                this.changeCurrentState(new GroupState(this, this.slide, s.group));
+                break;
+            }
             default :
             {
                 for(var i = 0; i < s.selectedObjects.length; ++i)
@@ -2562,7 +2679,7 @@ CGraphicObjects.prototype = {
                 break;
             }
         }
-        this.updateSelectionState()
+       // this.updateSelectionState()
     },
 
     recalculateCurPos: function()

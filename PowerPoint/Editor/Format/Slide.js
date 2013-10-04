@@ -1226,6 +1226,7 @@ Slide.prototype =
         this.cSld.spTree.push(item);
     },
 
+
     removeSelectedObjects: function()
     {
         var spTree = this.cSld.spTree;
@@ -1359,83 +1360,28 @@ Slide.prototype =
 
     bringForward : function()
     {
-        var _elements = this;
-        if(_elements.State.id === 20)
+        var state = this.graphicObjects.State;
+        var sp_tree = this.cSld.spTree;
+        switch(state.id)
         {
-            while(_elements.State.id === 20)
+            case STATES_ID_NULL:
             {
-                _elements = _elements.group;
+                for(var i = sp_tree.length - 1;i > -1; --i)
+                {
+                    var sp = sp_tree[i];
+                    if(sp.selected && i < sp_tree.length - 1 && !sp_tree[i+1].selected)
+                    {
+                        this.removeFromSpTreeById(sp.Get_Id());
+                        this.addToSpTreeToPos(i+1, sp);
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
             }
         }
-        if(_elements.State.id === 0)
-        {
-            var _shapes = _elements.ArrGlyph;
-            var _shape_index;
-            var _shape;
-            for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
-            {
-                if(_shapes[_shape_index].selected)
-                {
-                    break;
-                }
-            }
-            if(_shape_index < _shapes.length)
-            {
-                History.Create_NewPoint();
-                var _old_array = [];
-                var _new_array = [];
-                for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
-                {
-                    _old_array.push(_shapes[_shape_index]);
-                }
-                for(var i = _shapes.length-1; i > -1; --i)
-                {
-                    if(_shapes[i].selected && i < _shapes.length-1)
-                    {
-                        if(!_shapes[i+1].selected)
-                        {
-                            var t1 = _shapes[i+1];
-                            var t2 = _shapes[i];
-                            _shapes[i+1] = t2;
-                            _shapes[i] = t1;
-                            ++i;
-                        }
-                    }
-                }
-                for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
-                {
-                    _new_array.push(_shapes[_shape_index]);
-                }
-                _elements.ArrGlyph = _new_array;
-                if(_elements instanceof AutoShapesContainer)
-                {
-                    _elements.Document.Slides[_elements.SlideNum].cSld.spTree = _elements.ArrGlyph;
-                }
-                var historyObj = {};
-                historyObj.elements = _elements;
-                historyObj.oldArray = _old_array;
-                historyObj.newArray = _new_array;
-                historyObj.undo_function = function(data)
-                {
-                    data.elements.ArrGlyph = data.oldArray;
-                    if(data.elements instanceof AutoShapesContainer)
-                    {
-                        data.elements.Document.Slides[data.elements.SlideNum].cSld.spTree = data.elements.ArrGlyph;
-                    }
-                };
-                historyObj.redo_function = function(data)
-                {
-                    data.elements.ArrGlyph = data.newArray;
-                    if(data.elements instanceof AutoShapesContainer)
-                    {
-                        data.elements.Document.Slides[data.elements.SlideNum].cSld.spTree = data.elements.ArrGlyph;
-                    }
-                };
-                History.Add(this, historyObj);
-            }
-        }
-
-        this.Document.Document_UpdateUndoRedoState();
     },
 
     sendToBack : function()
@@ -1469,7 +1415,28 @@ Slide.prototype =
 
     bringBackward : function()
     {
-
+        var state = this.graphicObjects.State;
+        var sp_tree = this.cSld.spTree;
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                for(var i = 0;i < sp_tree.length; ++i)
+                {
+                    var sp = sp_tree[i];
+                    if(sp.selected && i > 0 && !sp_tree[i-1].selected)
+                    {
+                        this.removeFromSpTreeById(sp.Get_Id());
+                        this.addToSpTreeToPos(i-1, sp);
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+        }
     },
 
     removeFromSpTreeById: function(id)
@@ -1481,9 +1448,10 @@ Slide.prototype =
             {
                 History.Add(this, {Type: historyitem_RemoveFromSpTree, Pos: i, id: sp_tree[i].Get_Id()});
                 sp_tree.splice(i, 1);
-                return;
+                return i;
             }
         }
+        return null;
     },
 
     Clear_ContentChanges : function()
@@ -1921,6 +1889,12 @@ Slide.prototype =
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary2(r);
+                var bg = this.cSld.Bg;
+                if(bg.bgPr && bg.bgPr.Fill && bg.bgPr.Fill.fill instanceof CBlipFill
+                    && typeof  bg.bgPr.Fill.fill.RasterImageId === "string")
+                {
+                    CollaborativeEditing.Add_NewImage(bg.bgPr.Fill.fill.RasterImageId);
+                }
                 this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 

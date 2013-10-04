@@ -323,6 +323,9 @@ var historyitem_AddToGroupSpTree = 16;
 var historyitem_SetSpGroup = 17;
 var historyitem_SetSpParent = 18;
 var historyitem_SetGraphicObject = 19;
+var historyitem_RemoveFromSpTreeGroup = 20;
+var historyitem_AutoShapes_SwapGraphicObjects = 21;
+
 
 
 

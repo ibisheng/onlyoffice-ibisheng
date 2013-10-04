@@ -319,8 +319,13 @@ function NullState(drawingObjectsController, drawingObjects)
                     {
                         this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
-                        if(!cur_drawing.isTableBorder(x, y)
-                            || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                        if(!(e.Button === g_mouse_button_right)&&(!cur_drawing.isTableBorder(x, y)
+                            || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
+                        {
+                            cur_drawing.selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        }
+                        else if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
                         {
                             cur_drawing.selectionSetStart(e, x, y);
                             this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
@@ -2268,6 +2273,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
         var shape = this.drawingObjectsController.arrTrackObjects[0].trackEnd();
         if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, shape) === false)
         {
+            shape.select(this.drawingObjectsController);
             this.drawingObjects.shapeAdd(this.drawingObjects.cSld.spTree.length, shape);
             if(this.presetGeom != "textRect")
             {

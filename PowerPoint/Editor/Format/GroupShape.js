@@ -1119,6 +1119,7 @@ CGroupShape.prototype =
                 break;
             }
         }
+        return this;
     },
 
     getParentObjects: function()
@@ -1408,10 +1409,44 @@ CGroupShape.prototype =
         this.spTree.splice(pos, 0, item);
     },
 
+
+    removeFromSpTree: function(id)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].Get_Id() === id)
+            {
+                History.Add(this,{Type:historyitem_RemoveFromSpTreeGroup, pos: i, item:this.spTree[i]});
+                this.spTree.splice(i, 1);
+            }
+        }
+    },
+
+    swapGraphicObject: function(idRemove, idAdd)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].Get_Id() === idRemove)
+            {
+                this.spTree.splice(i, 1)[0].setGroup(null);
+                var sp = g_oTableId.Get_ById(idAdd);
+                sp.setGroup(this);
+                this.spTree.splice(i, 0, sp);
+                History.Add(this, {Type:historyitem_AutoShapes_SwapGraphicObjects, pos: i, idRemove: idRemove, idAdd: idAdd});
+                break;
+            }
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SwapGraphicObjects:
+            {
+                this.spTree.splice(data.pos, 1, g_oTableId.Get_ById(data.idRemove));
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.oldRot;
@@ -1476,6 +1511,11 @@ CGroupShape.prototype =
                 this.spTree.splice(data.pos, 1);
                 break;
             }
+            case historyitem_RemoveFromSpTreeGroup:
+            {
+                this.spTree.splice(data.pos, 0, data.item);
+                break;
+            }
             case historyitem_SetSpGroup:
             {
                 this.group = data.oldPr;
@@ -1496,6 +1536,11 @@ CGroupShape.prototype =
 
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SwapGraphicObjects:
+            {
+                this.spTree.splice(data.pos, 1, g_oTableId.Get_ById(data.idAdd));
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.newRot;
@@ -1562,6 +1607,12 @@ CGroupShape.prototype =
                 this.spTree.splice(data.pos, 0, data.item);
                 break;
             }
+
+            case historyitem_RemoveFromSpTreeGroup:
+            {
+                this.spTree.splice(data.pos, 1);
+                break;
+            }
             case historyitem_SetSpGroup:
             {
                 this.group = data.newPr;
@@ -1590,6 +1641,12 @@ CGroupShape.prototype =
         var bool;
         switch(data.Type)
         {
+            case historyitem_AutoShapes_SwapGraphicObjects:
+            {
+                w.WriteLong(data.pos);
+                w.WriteString2(data.idAdd);
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 w.WriteDouble(data.newRot);
@@ -1653,6 +1710,11 @@ CGroupShape.prototype =
                 w.WriteString2(data.item.Get_Id());
                 break;
             }
+            case historyitem_RemoveFromSpTreeGroup:
+            {
+                w.WriteLong(data.pos);
+                break;
+            }
             case historyitem_SetSpGroup:
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -1681,6 +1743,13 @@ CGroupShape.prototype =
         {
             switch(r.GetLong())
             {
+                case historyitem_AutoShapes_SwapGraphicObjects:
+                {
+                    var pos = r.GetLong();
+                    var sp_id = r.GetString2();
+                    this.spTree.splice(pos, 1, g_oTableId.Get_ById(sp_id));
+                    break;
+                }
                 case historyitem_SetShapeRot:
                 {
                     this.spPr.xfrm.rot = r.GetDouble();
@@ -1767,6 +1836,12 @@ CGroupShape.prototype =
                     var item  = g_oTableId.Get_ById(r.GetString2());
                     this.spTree.splice(pos, 0, item);
                     this.recalcAll();
+                    break;
+                }
+                case historyitem_RemoveFromSpTreeGroup:
+                {
+                    var pos = r.GetLong();
+                    this.spTree.splice(pos, 1);
                     break;
                 }
                 case historyitem_SetSpGroup:

@@ -861,6 +861,7 @@ CImageShape.prototype =
                 break;
             }
         }
+        return this;
     },
 
     getMainGroup: function()

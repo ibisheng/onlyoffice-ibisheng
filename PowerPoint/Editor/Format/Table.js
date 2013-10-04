@@ -13134,6 +13134,7 @@ CTable.prototype =
     Internal_Recalculate_1 : function()
     {
         this.Parent.OnContentRecalculate();
+        return;
         return editor.WordControl.m_oLogicDocument.Recalculate();
         if ( true === this.TurnOffRecalc )
             return;
@@ -20787,7 +20788,7 @@ CTableCell.prototype =
             this.Set_Margins( undefined );
         else
         {
-            var Margins_new = ( null === OtherPr.TableCellMar ? null :
+            var Margins_new = ( (null === OtherPr.TableCellMar || (!OtherPr.TableCellMar.Top || !OtherPr.TableCellMar.Left || !OtherPr.TableCellMar.Bottom || !OtherPr.TableCellMar.Right)) ? null :
             {
                 Top :
                 {

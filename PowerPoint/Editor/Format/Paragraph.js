@@ -356,9 +356,14 @@ Paragraph.prototype =
     {
         if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
         {
-            if(this.Parent.Parent instanceof CTextBody)
+            if(this.Parent &&this.Parent.Parent instanceof CTextBody)
             {
                 this.Parent.Parent.textPropsForRecalc.push(Item);
+            }
+
+            if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+            {
+                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
             }
         }
         if ( true === Item.Is_RealContent() )
@@ -7008,9 +7013,13 @@ Paragraph.prototype =
                 var Item = this.Content[Pos];
                 if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
                 {
-                    if(this.Parent.Parent instanceof CTextBody)
+                    if(this.Parent && this.Parent.Parent instanceof CTextBody)
                     {
                         this.Parent.Parent.textPropsForRecalc.push(Item);
+                    }
+                    if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                    {
+                        this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                     }
                 }
             }
@@ -12027,9 +12036,14 @@ Paragraph.prototype =
                             var Item = Element;
                             if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
                             {
-                                if(this.Parent.Parent instanceof CTextBody)
+                                if(this.Parent && this.Parent.Parent instanceof CTextBody)
                                 {
                                     this.Parent.Parent.textPropsForRecalc.push(Item);
+                                }
+
+                                if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                                {
+                                    this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                                 }
                             }
                         }

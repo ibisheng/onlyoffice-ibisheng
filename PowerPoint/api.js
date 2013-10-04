@@ -785,7 +785,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "safsfsdfsdfsdfsdf3";
+        documentId = "safsfsdfsdfsdasdasdasdfsdf3";
         this.OfflineAppDocumentStartLoad();
 
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
@@ -2749,8 +2749,12 @@ asc_docs_api.prototype.set_SpacingBetweenCells = function(isOn,spacing){// c_oAs
 */
 asc_docs_api.prototype.tblApply = function(obj)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Set_TableProps(obj);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Set_TableProps(obj);
+    }
 }
 /*callbacks*/
 asc_docs_api.prototype.sync_AddTableCallback = function(){
@@ -3858,7 +3862,9 @@ asc_docs_api.prototype.DublicateSlide = function()
     var copy_processor = new CopyProcessor(editor, div);
     copy_processor.Start();
     var oPasteProcessor = new PasteProcessor(this, true, true, false);
+    History.Create_NewPoint();
     oPasteProcessor.Start(copy_processor.ElemToSelect);
+    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 }
 
 asc_docs_api.prototype.SelectAllSlides = function(layoutType)

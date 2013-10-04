@@ -7720,7 +7720,8 @@ CDocumentContent.prototype =
         {
             var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
             this.Content[Pos].Hyperlink_Add( HyperProps );
-            this.Recalculate();
+
+            this.Content[Pos].RecalcInfo.Set_Type_0(pararecalc_0_All);
         }
     },
 
@@ -7735,7 +7736,7 @@ CDocumentContent.prototype =
         {
             var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
             if ( true === this.Content[Pos].Hyperlink_Modify( HyperProps ) )
-                this.Recalculate();
+                this.Content[Pos].RecalcInfo.Set_Type_0(pararecalc_0_All);
         }
     },
 
@@ -7750,6 +7751,7 @@ CDocumentContent.prototype =
         {
             var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
             this.Content[Pos].Hyperlink_Remove();
+            this.Content[Pos].RecalcInfo.Set_Type_0(pararecalc_0_All);
         }
     },
 

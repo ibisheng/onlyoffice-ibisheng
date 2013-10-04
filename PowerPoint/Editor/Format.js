@@ -3538,6 +3538,7 @@ function CTheme()
 
     this.Undo = function(data)
     {
+        return;
         switch(data.Type)
         {
             case historyitem_ChangeColorScheme:
@@ -3561,6 +3562,7 @@ function CTheme()
 
     this.Redo = function(data)
     {
+        return;
         switch(data.Type)
         {
             case historyitem_ChangeColorScheme:

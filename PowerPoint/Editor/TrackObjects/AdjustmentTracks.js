@@ -315,8 +315,5 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
     this.trackEnd = function()
     {
         this.originalShape.setAdjustmentValue(this.refR, this.geometry.gdLst[this.adjastment.gdRefR], this.refAng, this.geometry.gdLst[this.adjastment.gdRefAng]);
-        this.originalShape.recalculateGeometry();
-        this.originalShape.calculateContent();
-        this.originalShape.calculateTransformTextMatrix();
     };
 }

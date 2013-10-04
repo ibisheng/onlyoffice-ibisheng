@@ -589,7 +589,7 @@ SlideLayout.prototype =
         {
             case historyitem_SetLayoutMaster:
             {
-                this.Master = data.oldPr;
+               // this.Master = data.oldPr;
                 break;
             }
             case historyitem_SetLayoutType:
@@ -706,7 +706,7 @@ SlideLayout.prototype =
         {
             case historyitem_SetLayoutMaster:
             {
-                this.Master = data.newPr;
+                //this.Master = data.newPr;
                 break;
             }
             case historyitem_SetLayoutType:

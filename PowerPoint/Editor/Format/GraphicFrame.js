@@ -25,6 +25,7 @@ function CGraphicFrame(parent)
     this.extY = null;
     this.transform = new CMatrix();
 
+    this.textPropsForRecalc = [];
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -202,6 +203,32 @@ CGraphicFrame.prototype =
             this.graphicObject.X = 0;
             this.graphicObject.Y = 0;
             this.graphicObject.PageNum = 0;
+
+            var parent_object = this.getParentObjects();
+            for(var i = 0; i < this.textPropsForRecalc.length; ++i)
+            {
+                var props = this.textPropsForRecalc[i].Value;
+                if(props && props.FontFamily && typeof props.FontFamily.Name === "string" && isThemeFont(props.FontFamily.Name))
+                {
+                    props.FontFamily.themeFont = props.FontFamily.Name;
+                    props.FontFamily.Name = getFontInfo(props.FontFamily.Name)(parent_object.theme.themeElements.fontScheme);
+                }
+                var TextPr = props;
+                var parents = parent_object;
+                if(isRealObject(TextPr) && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill) && TextPr.unifill.fill.type === FILL_TYPE_SOLID && isRealObject(TextPr.unifill.fill.color))
+                {
+                    TextPr.unifill.fill.color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
+                    TextPr.Color = new CDocumentColor(TextPr.unifill.fill.color.RGBA.R, TextPr.unifill.fill.color.RGBA.G, TextPr.unifill.fill.color.RGBA.B);
+                }
+                if(isRealObject(props.FontFamily) && typeof props.FontFamily.Name === "string")
+                {
+                    TextPr.RFonts.Ascii = {Name : TextPr.FontFamily.Name, Index: -1};
+                    TextPr.RFonts.CS = {Name : TextPr.FontFamily.Name, Index: -1};
+                    TextPr.RFonts.HAnsi = {Name : TextPr.FontFamily.Name, Index: -1};
+                }
+            }
+            this.textPropsForRecalc.length = 0;
+
             this.graphicObject.Recalculate_Page(0);
         }
 
@@ -350,6 +377,22 @@ CGraphicFrame.prototype =
             this.recalcInfo.recalculateTransform = false;
         }
         return this.transform;
+    },
+
+    OnContentReDraw: function()
+    {},
+
+    applyAllTextProps: function(textPr)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Set_ApplyToAll(true);
+            this.graphicObject.Paragraph_Add(textPr);
+            this.graphicObject.Set_ApplyToAll(false);
+            this.recalcInfo.recalculateSizes = true;
+            this.recalcInfo.recalculateTransform = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
     },
 
     getRectBounds: function()
@@ -867,8 +910,9 @@ CGraphicFrame.prototype =
                 break;
             }
         }
-        if(this.graphicObject)
-            this.graphicObject.Selection_Remove();
+        /*if(this.graphicObject)
+            this.graphicObject.Selection_Remove();   */
+        return this;
     },
 
     draw: function(graphics)
