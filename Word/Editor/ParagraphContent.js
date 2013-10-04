@@ -1583,7 +1583,7 @@ ParaTextPr.prototype =
             {
                 // Bool : undefined ?
                 // false -> CRFonts
-                if ( undefined != Data.Old )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool( false );
                     Data.New.Write_ToBinary( Writer );
@@ -1598,7 +1598,7 @@ ParaTextPr.prototype =
             {
                 // Bool : undefined ?
                 // false -> CLang
-                if ( undefined != Data.Old )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool( false );
                     Data.New.Write_ToBinary( Writer );
@@ -1617,10 +1617,10 @@ ParaTextPr.prototype =
                 // Bool : undefined?
                 // false -> String
 
-                if ( undefined != Data.Old )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool( false );
-                    Writer.WriteString2( Data.Old.Name );
+                    Writer.WriteString2( Data.New.Name );
                 }
                 else
                     Writer.WriteBool( true );
@@ -1633,10 +1633,10 @@ ParaTextPr.prototype =
                 // Bool : undefined?
                 // false -> Long
 
-                if ( undefined != Data.Old )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool( false );
-                    Writer.WriteLong( Data.Old );
+                    Writer.WriteLong( Data.New );
                 }
                 else
                     Writer.WriteBool( true );
@@ -1650,10 +1650,10 @@ ParaTextPr.prototype =
             {
                 // Bool : undefined ?
                 // false -> Long
-                if ( undefined != Data.Old )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool( false );
-                    Writer.WriteLong( Data.Old );
+                    Writer.WriteLong( Data.New );
                 }
                 else
                     Writer.WriteBool( true );
