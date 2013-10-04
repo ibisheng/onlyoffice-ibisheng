@@ -515,9 +515,8 @@
 					if (ar.c1 === ar.c2 && ar.r1 === ar.r2)
 						isHyperlinkClick = true;
 					else {
-						var mergedRange = ws._getMergedCellsRange(ar.c1, ar.r1);
-						if (mergedRange && mergedRange.c1 === ar.c1 && mergedRange.c2 === ar.c2 &&
-							mergedRange.r1 === ar.r1 && mergedRange.r2 === ar.r2)
+						var mergedRange = this.model.getMergedByCell(ar.r1, ar.c1);
+						if (mergedRange && ar.isEqual(mergedRange))
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
