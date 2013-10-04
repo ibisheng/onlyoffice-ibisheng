@@ -24,6 +24,9 @@ function CThemeLoader()
     this.CurrentLoadThemeIndex = -1;
     this.ThemesUrl = "";
 
+    this.IsReloadBinaryThemeEditor = true;
+    this.IsReloadBinaryThemeEditorNow = false;
+
     var oThis = this;
 
     this.StartLoadTheme = function(indexTheme)
@@ -52,6 +55,14 @@ function CThemeLoader()
         // применяется тема из стандартных.
         if (null != theme_load_info)
         {
+            if (indexTheme >= 0 && this.IsReloadBinaryThemeEditor)
+            {
+                // мега схема. нужно переоткрыть бинарник, чтобы все открылось с историей
+                this.IsReloadBinaryThemeEditorNow = true;
+                this._callback_theme_load();
+                return;
+            }
+
             this.Api.EndLoadTheme(theme_load_info);
             return;
         }
@@ -101,6 +112,13 @@ function CThemeLoader()
             pres.slideLayouts = new Array();
 
             _loader.Load(g_th, pres);
+
+            if (oThis.IsReloadBinaryThemeEditorNow)
+            {
+                oThis.asyncImagesEndLoaded();
+                oThis.IsReloadBinaryThemeEditorNow = false;
+                return;
+            }
 
             // теперь объект this.themes_info_editor[this.CurrentLoadThemeIndex]
             oThis.Api.FontLoader.ThemeLoader = oThis;
