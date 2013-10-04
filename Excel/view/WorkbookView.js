@@ -521,7 +521,7 @@
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
-						if (ct.hyperlink.hyperlinkModel.getVisited()) {
+						if (false === ct.hyperlink.hyperlinkModel.getVisited()) {
 							ct.hyperlink.hyperlinkModel.setVisited(true);
 							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});
 						}
