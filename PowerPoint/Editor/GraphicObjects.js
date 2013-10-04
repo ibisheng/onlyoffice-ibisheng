@@ -1435,7 +1435,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
-                if(this.State.textObject && this.State.textObject)
+                if(this.State.textObject && this.State.textObject && this.State.textObject instanceof CShape)
                 {
                     if(this.State.textObject.txBody && this.State.textObject.txBody.compiledBodyPr && typeof (this.State.textObject.txBody.compiledBodyPr.anchor) == "number")
                     {
@@ -1444,11 +1444,11 @@ CGraphicObjects.prototype = {
                 }
                 return null;
             }
-            case STATES_ID_NULL:
+            default :
             {
                 var _result_align = null;
                 var _cur_align;
-                var _shapes = this.selectedObjects;
+                var _shapes = this.State.group ? this.State.group.selectedObjects : this.selectedObjects;
                 var _shape_index;
                 var _shape;
                 for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
