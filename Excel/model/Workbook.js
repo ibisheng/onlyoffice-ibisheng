@@ -4052,8 +4052,9 @@ Woorksheet.prototype.getHyperlinkByCell = function(row, col){
 	return oHyperlink ? oHyperlink.data : null;
 };
 Woorksheet.prototype.getMergedByCell = function(row, col){
-	return this.mergeManager.getByCell(row, col);
-}
+	var oMergeInfo = this.mergeManager.getByCell(row, col);
+	return oMergeInfo ? oMergeInfo.bbox : null;
+};
 Woorksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aMerged){
 	for(var i = 0, length = aMerged.all.length; i < length; i++)
 	{
