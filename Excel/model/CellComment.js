@@ -676,11 +676,13 @@ function asc_CCellCommentator(currentSheet) {
 
 		var fvr = _this.worksheet.getFirstVisibleRow();
 		var fvc = _this.worksheet.getFirstVisibleCol();
+		var lvr = _this.worksheet.getLastVisibleRow();
+		var lvc = _this.worksheet.getLastVisibleCol();
 
 		var drawCells = []; 	// Associative array
 		function getCellId(col, row) { return (col + "_" + row) };
 
-		_this.calcCommentsCoords();
+		//_this.calcCommentsCoords();
 
 		for (var i = 0; i < _this.aComments.length; i++) {
 
@@ -690,7 +692,7 @@ function asc_CCellCommentator(currentSheet) {
 			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
 			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
 
-			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved() || (drawCol < fvc) || (drawRow < fvr))
+			if ( commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved() || (drawCol < fvc) || (drawRow < fvr) || (drawCol > lvc) || (drawRow > lvr) )
 				continue;
 
 			var cellId = getCellId(commentCell.nCol, commentCell.nRow);
@@ -1069,14 +1071,16 @@ function asc_CCellCommentator(currentSheet) {
 			_this.overlayCtx.setFont(outputFont);
 
 			// Title
-			coords.dHeightPX += _this.ptToPx(_this.getTextMetrics(comment.sUserName, 1).height);
-			var userWidth = _this.ptToPx(_this.getTextMetrics(comment.sUserName, 1).width);
+			var txtMetrics = _this.getTextMetrics(comment.sUserName, 1);
+			coords.dHeightPX += _this.ptToPx(txtMetrics.height);
+			var userWidth = _this.ptToPx(txtMetrics.width);
 
 			if (coords.dWidthPX < userWidth)
 				coords.dWidthPX = userWidth;
 
-			coords.dHeightPX += _this.ptToPx(_this.getTextMetrics(comment.sTime, 1).height);
-			var timeWidth = _this.ptToPx(_this.getTextMetrics(comment.sTime, 1).width);
+			txtMetrics = _this.getTextMetrics(comment.sTime, 1);
+			coords.dHeightPX += _this.ptToPx(txtMetrics.height);
+			var timeWidth = _this.ptToPx(txtMetrics.width);
 
 			if (coords.dWidthPX < timeWidth)
 				coords.dWidthPX = timeWidth;
@@ -1089,9 +1093,10 @@ function asc_CCellCommentator(currentSheet) {
 			// Comment text
 			var commentSpl = comment.sText.split('\n');
 			for (var i = 0; i < commentSpl.length; i++) {
-				coords.dHeightPX += _this.ptToPx(_this.getTextMetrics(commentSpl[i], 1).height);
-
-				var lineWidth = _this.ptToPx(_this.getTextMetrics(commentSpl[i], 1).width);
+			
+				txtMetrics = _this.getTextMetrics(commentSpl[i], 1);
+				coords.dHeightPX += _this.ptToPx(txtMetrics.height);
+				var lineWidth = _this.ptToPx(txtMetrics.width);
 				if (coords.dWidthPX < lineWidth)
 					coords.dWidthPX = lineWidth;
 			}
