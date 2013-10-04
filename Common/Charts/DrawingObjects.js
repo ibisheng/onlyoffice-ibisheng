@@ -2985,6 +2985,7 @@ function DrawingObjects() {
 		
 		_this.resizeCanvas();
 		_this.restoreScrollOffset();
+		_this.rebuildChartGraphicObjects();
 	}
 	
 	_this.resizeCanvas = function() {

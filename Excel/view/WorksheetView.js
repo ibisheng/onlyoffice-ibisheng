@@ -1838,11 +1838,11 @@
 				this._drawCellsBorders(/*drawingCtx*/undefined);
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
+				this._drawGraphic();
+				this.objectRender.showDrawingObjectsEx(true);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
-				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
 				
 				return this;
 			},
@@ -4815,7 +4815,7 @@
 				this.cellCommentator.updateCommentPosition();
 				this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjects(false);
 				return this;
 			},
 
@@ -4880,7 +4880,7 @@
 				this.cellCommentator.updateCommentPosition();
 				this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjects(false);
 				return this;
 			},
 			
