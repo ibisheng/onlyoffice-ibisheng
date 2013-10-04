@@ -2934,7 +2934,6 @@ function DrawingObjects() {
             {
                 if (drDoc.m_bIsSelection )
                 {
-
                     overlay.m_oControl.HtmlElement.style.display = "block";
 
                     if (null == overlay.m_oContext)
@@ -3351,14 +3350,17 @@ function DrawingObjects() {
 		var fvc = worksheet.getFirstVisibleCol();
 		
 		function updateHeaders() {
-			worksheet._drawColumnHeaders();
-			worksheet._drawRowHeaders();
-			worksheet._drawCorner();
-			
 			// cols header on overlay
 			overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
 			// rows header on overlay
 			overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
+			
+			worksheet._drawColumnHeaders();
+			worksheet._drawRowHeaders();
+			worksheet._drawCorner();
+			
+			if ( !_this.selectedGraphicObjectsExists() )
+				worksheet._drawActiveHeaders();
 		}
 		
 		if ( bForce )
@@ -3379,8 +3381,6 @@ function DrawingObjects() {
 			if ( bRedraw )
 				updateHeaders();
 		}
-		if ( !_this.selectedGraphicObjectsExists() )
-			worksheet._drawActiveHeaders();
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -4248,6 +4248,15 @@ function DrawingObjects() {
 		var left = worksheet.getCellLeft(0, 3);
 		var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3);
 		var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3);
+		var fvc = worksheet.getFirstVisibleCol();
+		var fvr = worksheet.getFirstVisibleRow();
+		
+		// Перемещение объекта при наличии скрола
+		/*if ( (fvc > 0) && (x < (worksheet.getCellLeft(fvc, 3) - left)) ||
+			 (fvr > 0) && (y < (worksheet.getCellTop(fvr, 3) - top)) )
+		{
+			_this.drawWorksheetHeaders(true);
+		}*/
 		
 		// выход за границу слева или сверху
 		if ( y < 0 ) {
