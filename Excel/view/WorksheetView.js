@@ -684,10 +684,13 @@
 			// Проверяет, есть ли числовые значения в диапазоне
 			_hasNumberValueInActiveRange: function() {
 				var cell, cellType, isNumberFormat;
-				var mergedRange = this._getMergedCellsRange(this.activeRange.c1, this.activeRange.r1);
 				var result = null;
-
-				if (this._rangeIsSingleCell(this.activeRange) || mergedRange && mergedRange.isEqual(this.activeRange)) {
+				if (this._rangeIsSingleCell(this.activeRange)) {
+					// Для одной ячейки не стоит ничего делать
+					return result;
+				}
+				var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
+				if (mergedRange && mergedRange.isEqual(this.activeRange)) {
 					// Для одной ячейки не стоит ничего делать
 					return result;
 				}
