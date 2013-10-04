@@ -1006,7 +1006,19 @@ Slide.prototype =
     },
 
     getAllImages: function(images)
-    {},
+    {
+        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
+        {
+            images[_getFullImageSrc(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
+        }
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof this.cSld.spTree[i].getAllImages === "function")
+            {
+                this.cSld.spTree[i].getAllImages(images);
+            }
+        }
+    },
 
     changeSize: function(kw, kh)
     {

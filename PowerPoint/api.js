@@ -4066,6 +4066,7 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     obj.paddings = pr.paddings;
     obj.w = pr.w;
     obj.h = pr.h;
+    obj.verticalTextAlign = pr.verticalTextAlign;
     if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);

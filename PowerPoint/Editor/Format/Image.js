@@ -1120,6 +1120,14 @@ CImageShape.prototype =
         this.parent = parent;
     },
 
+    getAllImages: function(images)
+    {
+        if(this.blipFill && this.blipFill.fill instanceof  CBlipFill && typeof this.blipFill.fill.RasterImageId === "string")
+        {
+            images[_getFullImageSrc(this.blipFill.fill.RasterImageId)] = true;
+        }
+    },
+
     Undo: function(data)
     {
 

@@ -60,6 +60,18 @@ function CGroupShape(parent)
 
 CGroupShape.prototype =
 {
+
+    getAllImages: function(images)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].getAllImages === "function")
+            {
+                this.spTree[i].getAllImages(images);
+            }
+        }
+    },
+
     getSearchResults : function(str, num)
     {
         var commonSearchResults = [];
