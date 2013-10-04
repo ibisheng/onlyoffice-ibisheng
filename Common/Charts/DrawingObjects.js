@@ -3070,8 +3070,8 @@ function DrawingObjects() {
 			
 			// Коррекция для селекта при блокировке
 			var delta = 4;
-			boundsChecker.Bounds.min_x -= delta;
-			boundsChecker.Bounds.min_y -= delta;
+			boundsChecker.Bounds.min_x = Math.max(0, boundsChecker.Bounds.min_x - delta);
+			boundsChecker.Bounds.min_y = Math.max(0, boundsChecker.Bounds.min_y - delta);
 			boundsChecker.Bounds.max_x += delta;
 			boundsChecker.Bounds.max_y += delta;
 			return boundsChecker;
@@ -4212,6 +4212,8 @@ function DrawingObjects() {
 		
 		var top = worksheet.getCellTop(0, 3);
 		var left = worksheet.getCellLeft(0, 3);
+		var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3);
+		var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3);
 		
 		// выход за границу слева или сверху
 		if ( y < 0 ) {
@@ -4224,7 +4226,7 @@ function DrawingObjects() {
 		}
 		
 		// выход за границу справа
-		if ( x + w > left ) {
+		if ( x + w > right ) {
 			var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
 			while ( foundCol == null ) {
 				worksheet.expandColsOnScroll(true);
@@ -4233,7 +4235,7 @@ function DrawingObjects() {
 			}
 		}
 		// выход за границу снизу
-		if ( y + h > top ) {
+		if ( y + h > bottom ) {
 			var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
 			while ( foundRow == null ) {
 				worksheet.expandRowsOnScroll(true);

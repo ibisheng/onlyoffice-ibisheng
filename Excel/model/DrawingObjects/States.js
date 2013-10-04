@@ -5117,7 +5117,14 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         {
                             var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
                             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX - 3, xfrm.offY);
+							
+							var x = xfrm.offX - 3;
+							var y = xfrm.offY;
+							var offset = drawingObjectsController.drawingObjects.checkGraphicObjectPosition(x, y, xfrm.extX, xfrm.extY);
+							x += offset.x;
+							y += offset.y;
+							
+                            drawingObjectsController.selectedObjects[i].setPosition(x, y);
                             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
                             drawingObjectsController.selectedObjects[i].recalculateTransform();
                             drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
@@ -5198,7 +5205,14 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         {
                             var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
                             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY - 3);
+							
+							var x = xfrm.offX;
+							var y = xfrm.offY - 3;
+							var offset = drawingObjectsController.drawingObjects.checkGraphicObjectPosition(x, y, xfrm.extX, xfrm.extY);
+							x += offset.x;
+							y += offset.y;
+							
+                            drawingObjectsController.selectedObjects[i].setPosition(x, y);
                             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
                             drawingObjectsController.selectedObjects[i].recalculateTransform();
                             drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
