@@ -4539,8 +4539,10 @@ CDocumentShd.prototype =
     Set_FromObject : function(Shd)
     {
         this.Value = Shd.Value;
-        if ( shd_Nil != Shd.Value )
+        if ( shd_Nil != Shd.Value && undefined != Shd.Color )
             this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b );
+        else if ( undefined === Shd.Color )
+            this.Color = undefined;
     },
 
     Write_ToBinary : function(Writer)

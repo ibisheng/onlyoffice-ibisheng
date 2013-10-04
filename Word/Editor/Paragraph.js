@@ -9346,7 +9346,7 @@ Paragraph.prototype =
             this.Set_KeepNext( undefined );
             this.Set_PageBreakBefore( undefined );
             this.Set_Spacing( new CParaSpacing(), true );
-            this.Set_Shd( new CDocumentShd(), true );
+            this.Set_Shd( undefined, true );
             this.Set_WidowControl( undefined );
             this.Set_Tabs( new CParaTabs() );
             this.Set_Border( undefined, historyitem_Paragraph_Borders_Between );
@@ -9561,22 +9561,33 @@ Paragraph.prototype =
 
     Set_Shd : function(_Shd, bDeleteUndefined)
     {
-        var Shd = new CDocumentShd();
-        Shd.Set_FromObject( _Shd );
-
-        if ( undefined === this.Pr.Shd )
-            this.Pr.Shd = new CDocumentShd();
-
-        if ( ( undefined != Shd.Value || true === bDeleteUndefined ) && this.Pr.Shd.Value !== Shd.Value )
+        if ( undefined === _Shd )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Shd_Value, New : Shd.Value, Old : ( undefined != this.Pr.Shd.Value ? this.Pr.Shd.Value : undefined ) } );
-            this.Pr.Shd.Value = Shd.Value;
+            if ( undefined != this.Pr.Shd )
+            {
+                History.Add( this, { Type : historyitem_Paragraph_Shd, New : undefined, Old : this.Pr.Shd } );
+                this.Pr.Shd = undefined;
+            }
         }
-
-        if ( undefined != Shd.Color || true === bDeleteUndefined )
+        else
         {
-            History.Add( this, { Type : historyitem_Paragraph_Shd_Color, New : Shd.Color, Old : ( undefined != this.Pr.Shd.Color ? this.Pr.Shd.Color : undefined ) } );
-            this.Pr.Shd.Color = Shd.Color;
+            var Shd = new CDocumentShd();
+            Shd.Set_FromObject( _Shd );
+
+            if ( undefined === this.Pr.Shd )
+                this.Pr.Shd = new CDocumentShd();
+
+            if ( ( undefined != Shd.Value || true === bDeleteUndefined ) && this.Pr.Shd.Value !== Shd.Value )
+            {
+                History.Add( this, { Type : historyitem_Paragraph_Shd_Value, New : Shd.Value, Old : ( undefined != this.Pr.Shd.Value ? this.Pr.Shd.Value : undefined ) } );
+                this.Pr.Shd.Value = Shd.Value;
+            }
+
+            if ( undefined != Shd.Color || true === bDeleteUndefined )
+            {
+                History.Add( this, { Type : historyitem_Paragraph_Shd_Color, New : Shd.Color, Old : ( undefined != this.Pr.Shd.Color ? this.Pr.Shd.Color : undefined ) } );
+                this.Pr.Shd.Color = Shd.Color;
+            }
         }
 
         // Надо пересчитать конечный стиль
@@ -11627,6 +11638,15 @@ Paragraph.prototype =
                 break;
             }
 
+            case historyitem_Paragraph_Shd:
+            {
+                this.Pr.Shd = Data.Old;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
+
             case historyitem_Paragraph_WidowControl:
             {
                 this.Pr.WidowControl = Data.Old;
@@ -11979,6 +11999,16 @@ Paragraph.prototype =
                 break;
             }
 
+            case historyitem_Paragraph_Shd:
+            {
+                this.Pr.Shd = Data.New;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
+
+
             case historyitem_Paragraph_WidowControl:
             {
                 this.Pr.WidowControl = Data.New;
@@ -12239,6 +12269,7 @@ Paragraph.prototype =
             }
             case historyitem_Paragraph_Shd_Value:
             case historyitem_Paragraph_Shd_Color:
+            case historyitem_Paragraph_Shd:
             case historyitem_Paragraph_DocNext:
             case historyitem_Paragraph_DocPrev:
             {
@@ -12582,6 +12613,26 @@ Paragraph.prototype =
 
                 break;
             }
+
+            case historyitem_Paragraph_Shd:
+            {
+                // Bool : IsUndefined
+
+                // Если false
+                // Variable : Shd (CDocumentShd)
+
+                var New = Data.New;
+                if ( undefined != New )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary(Writer);
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
 
             case historyitem_Paragraph_Tabs:
             {
@@ -13107,6 +13158,25 @@ Paragraph.prototype =
                 }
                 else if ( undefined != this.Pr.Shd )
                     this.Pr.Shd.Color = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
+
+            case historyitem_Paragraph_Shd:
+            {
+                // Bool : IsUndefined
+                // Если false
+                // Byte : Value
+
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.Shd = new CDocumentShd();
+                    this.Pr.Shd.Read_FromBinary( Reader );
+                }
+                else
+                    this.Pr.Shd = undefined;
 
                 this.CompiledPr.NeedRecalc = true;
 

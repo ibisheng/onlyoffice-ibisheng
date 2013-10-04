@@ -49,6 +49,7 @@ var historyitem_Paragraph_Pr                        = 31; // Изменяем с
 var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
 var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
 var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
+var historyitem_Paragraph_Shd                       = 35; // Изменяем настройки заливки целиком
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
