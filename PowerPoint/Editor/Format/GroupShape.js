@@ -1440,6 +1440,8 @@ CGroupShape.prototype =
 
     Undo: function(data)
     {
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_AutoShapes_SwapGraphicObjects:
@@ -1533,7 +1535,8 @@ CGroupShape.prototype =
 
     Redo: function(data)
     {
-
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_AutoShapes_SwapGraphicObjects:

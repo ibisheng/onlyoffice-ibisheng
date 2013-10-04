@@ -3722,6 +3722,8 @@ CShape.prototype =
 
     Undo: function(data)
     {
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_SetShapeRot:
@@ -3853,7 +3855,8 @@ CShape.prototype =
 
     Redo: function(data)
     {
-
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_SetShapeRot:

@@ -1122,6 +1122,8 @@ CImageShape.prototype =
 
     Undo: function(data)
     {
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_SetShapeSetGeometry:
@@ -1217,7 +1219,8 @@ CImageShape.prototype =
 
     Redo: function(data)
     {
-
+        if(this.parent instanceof MasterSlide || this.parent instanceof SlideLayout)
+            return;
         switch(data.Type)
         {
             case historyitem_SetShapeSetGeometry:

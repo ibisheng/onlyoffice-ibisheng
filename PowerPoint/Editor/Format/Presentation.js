@@ -367,6 +367,7 @@ function CPresentation(DrawingDocument)
 
     this.CommentAuthors = {};
     this.createDefaultTableStyles();
+    this.bGoToPage = false;
 }
 
 var selected_None              = -1;
@@ -721,6 +722,14 @@ CPresentation.prototype =
             this.DrawingDocument.m_oWordControl.GoToPage(this.Slides.length - 1);
 
             //this.Set_CurPage(this.Slides.length - 1);
+        }
+        else
+        {
+            if(this.bGoToPage)
+            {
+                this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
+                this.bGoToPage = false;
+            }
         }
         if(this.Slides[this.CurPage])
             this.Slides[this.CurPage].graphicObjects.updateSelectionState();
@@ -5288,6 +5297,8 @@ CPresentation.prototype =
         //this.DrawingDocument.m_oWordControl.GoToPage(State.CurPage);
         if(State.CurPage > -1)
             this.Slides[this.CurPage].graphicObjects.setSelectionState(State.slideSelection);
+
+        this.bGoToPage = true;
         return ;
         if ( docpostype_DrawingObjects === this.CurPos.Type )
             this.DrawingObjects.resetSelection();
