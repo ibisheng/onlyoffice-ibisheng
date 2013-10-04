@@ -9489,14 +9489,35 @@ Paragraph.prototype =
 
     Clear_TextFormatting : function()
     {
+        var Styles = this.Parent.Get_Styles();
+        var DefHyper = Styles.Get_Default_Hyperlink();
         // TODO: Сделать, чтобы данная функция работала по выделению
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
             var Item = this.Content[Index];
             if ( para_TextPr === Item.Type )
             {
-                this.Internal_Content_Remove( Index );
-                Index--;
+                Item.Set_Bold( undefined );
+                Item.Set_Italic( undefined );
+                Item.Set_Strikeout( undefined );
+                Item.Set_Underline( undefined );
+                Item.Set_FontFamily( undefined );
+                Item.Set_FontSize( undefined );
+                Item.Set_Color( undefined );
+                Item.Set_VertAlign( undefined );
+                Item.Set_HighLight( undefined );
+                Item.Set_Spacing( undefined );
+                Item.Set_DStrikeout( undefined );
+                Item.Set_Caps( undefined );
+                Item.Set_SmallCaps( undefined );
+                Item.Set_Position( undefined );
+                Item.Set_RFonts2( undefined );
+                Item.Set_Lang( undefined );
+
+                if ( undefined === Item.Value.RStyle || Item.Value.RStyle != DefHyper )
+                {
+                    Item.Set_RStyle( undefined );
+                }
             }
         }
     },
