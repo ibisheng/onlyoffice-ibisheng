@@ -644,10 +644,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_setViewerMode: function (isViewerMode) {
-				// Для совместного редактирования важен переход из режима просмотра в режим редактирования
-				if (true === this.ServerIdWaitComplete && true === this.FontLoadWaitComplete) {
-					this.CoAuthoringApi.set_isViewerMode(!!isViewerMode);
-				}
 				if (this.controller.setViewerMode) {
 					this.controller.setViewerMode(isViewerMode);
 					if (false === isViewerMode) {

@@ -1436,7 +1436,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		if (isDisconnectAtAll) {
 			// Посылаем наверх эвент об отключении от сервера
 			t.asc_fireCallback("asc_onСoAuthoringDisconnect");
-			t.SetViewMode(true, true);
+			t.SetViewMode(true);
 			if (!isCloseCoAuthoring){
 				t.sync_ErrorCallback(c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
 			}
@@ -5949,7 +5949,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         this.WordControl.InitControl();
 
         if (this.isViewMode)
-            this.SetViewMode(true, /*isNotSendOnCoAuthoringServer*/ true);
+            this.SetViewMode(true);
 
         //this.asyncServerIdStartLoaded();
         return;
@@ -6097,7 +6097,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     this.WordControl.InitControl();
 
     if (this.isViewMode)
-        this.SetViewMode(true, /*isNotSendOnCoAuthoringServer*/ true);
+        this.SetViewMode(true);
 		
 	if (undefined != window['qtDocBridge'])
     {
@@ -6485,11 +6485,8 @@ asc_docs_api.prototype.GetSectionInfo = function()
     return obj;
 }
 
-asc_docs_api.prototype.SetViewMode = function( isViewMode, isNotSendOnCoAuthoringServer )
+asc_docs_api.prototype.SetViewMode = function( isViewMode )
 {
-	if (!isNotSendOnCoAuthoringServer && this.ServerIdWaitComplete && this.ServerImagesWaitComplete)
-		this.CoAuthoringApi.set_isViewerMode (isViewMode);
-		
     if (isViewMode)
     {
         this.isViewMode = true;
