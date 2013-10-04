@@ -656,6 +656,18 @@ Paragraph.prototype =
         this.SpellChecker.Update_OnRemove( this, Pos, Count );
     },
 
+    Internal_Check_EmptyHyperlink : function(Pos)
+    {
+        var Start = this.Internal_FindBackward( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_HyperlinkStart ] );
+        var End   = this.Internal_FindForward ( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_HyperlinkEnd, para_End ] );
+
+        if ( true === Start.Found && para_HyperlinkStart === Start.Type && true === End.Found && para_HyperlinkEnd === End.Type )
+        {
+            this.Internal_Content_Remove( End.LetterPos );
+            this.Internal_Content_Remove( Start.LetterPos );
+        }
+    },
+
     Clear_ContentChanges : function()
     {
         this.m_oContentChanges.Clear();
@@ -5236,16 +5248,26 @@ Paragraph.prototype =
 
                 this.Set_ContentPos( StartPos, true, -1 );
 
-                if ( null != Hyper_end && Hyper_start != Hyper_end )
+                if ( Hyper_start != Hyper_end )
                 {
-                    this.Internal_Content_Add( StartPos, Hyper_end );
-                    this.Set_ContentPos( this.CurPos.ContentPos + 1 );
-                }
+                    if ( null != Hyper_end )
+                    {
+                        this.Internal_Content_Add( StartPos, Hyper_end );
+                        this.Set_ContentPos( this.CurPos.ContentPos + 1 );
+                    }
 
-                if ( null != Hyper_start && Hyper_start != Hyper_end )
+                    if ( null != Hyper_start )
+                    {
+                        this.Internal_Content_Add( StartPos, new ParaHyperlinkEnd() );
+                        this.Set_ContentPos( this.CurPos.ContentPos + 1 );
+                    }
+                }
+                else
                 {
+                    // TODO: Пока селект реализован так, что тут начало гиперссылки не попадает в выделение, а конец попадает.
+                    //       Поэтому добавляем конец гиперссылки, и потом проверяем пустая ли она.
                     this.Internal_Content_Add( StartPos, new ParaHyperlinkEnd() );
-                    this.Set_ContentPos( this.CurPos.ContentPos + 1 );
+                    this.Internal_Check_EmptyHyperlink( StartPos );
                 }
             }
 
@@ -5259,6 +5281,8 @@ Paragraph.prototype =
 
         for ( var Index = 0; Index < absCount; Index++ )
         {
+            var OldPos = this.CurPos.ContentPos;
+
             if ( nCount < 0 )
             {
                 if ( false === this.Internal_RemoveBackward(bOnlyText) )
@@ -5269,6 +5293,8 @@ Paragraph.prototype =
                 if ( false === this.Internal_RemoveForward(bOnlyText) )
                     return false;
             }
+
+            this.Internal_Check_EmptyHyperlink( OldPos );
         }
 
         return true;
