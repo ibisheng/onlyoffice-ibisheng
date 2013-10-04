@@ -2753,10 +2753,7 @@ function DrawingObjects() {
                     drawingObject.graphicObject.chartTitle.drawingObjects = _this;
 					
                 drawingObject.graphicObject.chart.worksheet = worksheet;
-				
-				if ( drawingObject.graphicObject.chart.series.length && !drawingObject.graphicObject.chart.series[0].Val.NumCache.length ) {
-					drawingObject.graphicObject.chart.rebuildSeries();
-				}
+				drawingObject.graphicObject.chart.rebuildSeries();
 				
                 drawingObject.graphicObject.init();
                 aObjects.push( drawingObject );
@@ -4318,6 +4315,8 @@ function DrawingObjects() {
 		autoShapeTrack.Graphics.m_oCoordTransform.tx = x;
 		autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
 		autoShapeTrack.Graphics.CalculateFullTransform();
+		
+		//_this.showDrawingObjects(true);
 	}
 	
 	_this.convertMetric = function(val, from, to) {
