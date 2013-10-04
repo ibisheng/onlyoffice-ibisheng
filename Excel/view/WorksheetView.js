@@ -8127,6 +8127,7 @@
 									if (range.addCellsShiftRight()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
+										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
 								};
 
@@ -8141,6 +8142,7 @@
 									if (range.addCellsShiftBottom()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
+										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
 								};
 
@@ -8199,6 +8201,7 @@
 									if (range.deleteCellsShiftLeft()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
+										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
 								};
 
@@ -8213,6 +8216,7 @@
 									if (range.deleteCellsShiftUp()) {
 										fullRecalc = true;
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
+										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
 								};
 
