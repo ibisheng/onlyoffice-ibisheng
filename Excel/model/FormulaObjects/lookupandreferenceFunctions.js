@@ -260,11 +260,11 @@ cFormulaFunction.LookupAndReference = {
                             if ( arg0 instanceof cString ) {
                                 if ( cvType instanceof cString ){
                                     if( valueForSearching.localeCompare( cvType.getValue() ) == 0 ){
-                                        resC = r;
+                                        resC = c;
                                         found = true;
                                     }
                                     else if( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ){
-                                        resC = r;
+                                        resC = c;
                                     }
                                 }
                             }
