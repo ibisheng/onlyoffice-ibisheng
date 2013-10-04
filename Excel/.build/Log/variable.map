@@ -1424,7 +1424,7 @@ cff_encoding_load:su
 JSCompiler_StaticMethods_AddHandlePolar:LX
 c_oSerFormulaTypes$Text:OE
 nSldLtTClipArtAndVertTx:PV
-c_oSer_ConditionalFormattingRule$Percent:OH
+c_oSer_ConditionalFormattingRule$Percent:NH
 CSrcRect:YT
 CControl:c8
 historyitem_Chart_xAxisIsDefaultTitle:mf
