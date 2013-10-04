@@ -527,60 +527,67 @@ function asc_CCellCommentator(currentSheet) {
 	_this.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
 	
 		var _this = this;
-		var c1, r1, c2, r2, lockInfo;
+		var lockInfo;
 
-		var sheetId = _this.worksheet.model.getId();
-		var mergedRange = _this.worksheet._getMergedCellsRange(oComment.asc_getCol(), oComment.asc_getRow());
+		var model = _this.worksheet.model;
+		var sheetId = model.getId();
 
-		c1 = mergedRange ? mergedRange.c1 : oComment.asc_getCol();
-		r1 = mergedRange ? mergedRange.r1 : oComment.asc_getRow();
-		c2 = mergedRange ? mergedRange.c2 : oComment.asc_getCol();
-		r2 = mergedRange ? mergedRange.r2 : oComment.asc_getRow();
+		var objectGuid = oComment.asc_getId();
+		if (objectGuid) {
 
-		{
-			var objectGuid = oComment.asc_getId();
-			if (objectGuid) {
-			
-				if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-					// Запрещено совместное редактирование
-					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-					return;
-				}
-
-				if ( lockByDefault )
-					_this.worksheet.collaborativeEditing.onStartCheckLock();
-				
-				// Комментарий к документу блокируем как Range
-				if ( !oComment.asc_getDocumentFlag() )
-					lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc_CCollaborativeRange(c1, r1, c2, r2));
-				else
-					lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
-
-				if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
-					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-					callbackFunc = undefined;
-				}
-				if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-					// Редактируем сами
-					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-					return;
-				}
-				else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-					// Уже ячейку кто-то редактирует
-					if ($.isFunction(callbackFunc)) { callbackFunc(false); }
-					return;
-				}
-				
-				// Блокируем
-				if ( lockByDefault ) {
-					_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
-					_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
-				}
-				else if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
+				// Запрещено совместное редактирование
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				return;
 			}
+
+			if ( lockByDefault )
+				_this.worksheet.collaborativeEditing.onStartCheckLock();
+
+			// Комментарий к документу блокируем как Range
+			if ( !oComment.asc_getDocumentFlag() ) {
+				var c = oComment.asc_getCol();
+				var r = oComment.asc_getRow();
+				var c1, r1, c2, r2;
+				var mergedRange = model.getMergedByCell(r, c);
+				if (mergedRange) {
+					c1 = mergedRange.c1;
+					r1 = mergedRange.r1;
+					c2 = mergedRange.c2;
+					r2 = mergedRange.r2;
+				} else {
+					c1 = c2 = c;
+					r1 = r2 = r;
+				}
+
+				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc_CCollaborativeRange(c1, r1, c2, r2));
+			} else
+				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
+
+			if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				callbackFunc = undefined;
+			}
+			if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				// Редактируем сами
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				return;
+			}
+			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+				// Уже ячейку кто-то редактирует
+				if ($.isFunction(callbackFunc)) { callbackFunc(false); }
+				return;
+			}
+
+			// Блокируем
+			if ( lockByDefault ) {
+				_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
+				_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
+			}
+			else if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 		}
-	}
+	};
 	
 	_this.callLockComments = function(range) {
 		
