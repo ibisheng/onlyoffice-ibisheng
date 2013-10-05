@@ -5629,21 +5629,6 @@ Paragraph.prototype =
                             _old_font_size = _text_pr_value.FontSize;
                             _text_pr_value.FontSize += 4;
                             _new_font_size = _text_pr_value.FontSize;
-
-                            /*_history_obj = {};
-                             _history_obj.Type = history_undo_redo_const;
-                             _history_obj.textPr = _text_pr_value;
-                             _history_obj.oldFontSize = _old_font_size;
-                             _history_obj.newFontSize = _new_font_size;
-                             _history_obj.undo_function = function(data)
-                             {
-                             data.textPr.FontSize = data.oldFontSize;
-                             };
-                             _history_obj.redo_function = function(data)
-                             {
-                             data.textPr.FontSize = data.newFontSize;
-                             };
-                             History.Add(this, _history_obj);    */
                         }
                     }
                 }
@@ -11480,6 +11465,8 @@ Paragraph.prototype =
             case historyitem_Paragraph_PresentationPr_Level:
             {
                 this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+                this.Recalc_CompiledPr();
+                this.Recalc_CompileParaPr();
                 bNeedRecalc = true;
                 break;
             }
