@@ -1053,7 +1053,46 @@ CShape.prototype =
     setPresetGeometry: function(presetGeom)
     {
         var oldId = isRealObject(this.spPr.geometry) ? this.spPr.geometry.Get_Id() : null;
-        this.spPr.geometry = CreateGeometry(presetGeom);
+        switch(presetGeom)
+        {
+            case "textRect":
+            {
+                this.spPr.geometry = CreateGeometry("rect");
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+
+                this.setStyleBinary(CreateDefaultTextRectStyle());
+                var uni_fill = new CUniFill();
+                uni_fill.setFill(new CSolidFill());
+                uni_fill.fill.setColor(new CUniColor());
+                uni_fill.fill.color.setColor(new CSchemeColor());
+                uni_fill.fill.color.color.setColorId(12);
+                this.setUniFill(uni_fill);
+
+                var ln = new CLn();
+                ln.setW(6350);
+                ln.setFill(new CUniFill());
+                ln.Fill.setFill(new CSolidFill());
+                ln.Fill.fill.setColor(new CUniColor());
+                ln.Fill.fill.color.setColor(new CPrstColor());
+                ln.Fill.fill.color.color.setColorId("black");
+                this.setUniLine(ln);
+                this.recalculateBrush();
+                this.recalculatePen();
+                if(!isRealObject(this.txBody))
+                {
+                    this.addTextBody(new CTextBody(this));
+                    this.txBody.calculateContent();
+                    this.calculateTransformTextMatrix();
+                }
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                break;
+            }
+            default:
+            {
+                this.spPr.geometry = CreateGeometry(presetGeom);
+                break;
+            }
+        }
         var newId = this.spPr.geometry.Get_Id();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetPresetGeometry, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
