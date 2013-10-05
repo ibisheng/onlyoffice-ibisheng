@@ -4847,7 +4847,11 @@ function _getFullImageSrc(src)
     if (0 == src.indexOf("theme"))
         return editor.ThemeLoader.ThemesUrl + src;
     if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-		return editor.DocumentUrl + "media/" + src;
+    {
+        if (0 == src.indexOf(editor.DocumentUrl))
+            return src;
+        return editor.DocumentUrl + "media/" + src;
+    }
 	else
 		return src;
 };
