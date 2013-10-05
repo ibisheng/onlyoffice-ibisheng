@@ -1781,12 +1781,16 @@ CPresentation.prototype =
 
     Get_Paragraph_TextPr_Copy : function()
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_TextPr().Copy();
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject)
+            return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_TextPr().Copy();
+        return null;
     },
 
     Get_Paragraph_ParaPr_Copy : function()
     {
-        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_ParaPr().Copy();
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject)
+            return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_ParaPr().Copy();
+        return null;
     },
 
     Get_AllParagraphs_ByNumbering : function(NumPr)
