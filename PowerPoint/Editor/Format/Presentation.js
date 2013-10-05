@@ -5157,9 +5157,9 @@ CPresentation.prototype =
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
             //this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-            editor.asc_hideComments();
+            //this.Document_UpdateSelectionState();
+            //this.Document_UpdateInterfaceState();
+            //editor.asc_hideComments();
         }
        /* else if (this.CurPage < this.Slides.length)
         {
