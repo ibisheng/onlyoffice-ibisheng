@@ -3707,7 +3707,7 @@ ParaDrawing.prototype =
 
             if(this.GraphicObj.isShape() || this.GraphicObj.isImage())
             {
-                this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, false, false);
+                this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
                 this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
                 this.GraphicObj.calculateAfterResize();
             }
