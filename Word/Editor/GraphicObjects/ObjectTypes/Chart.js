@@ -36,6 +36,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
 
     this.transform = new CMatrix();
     this.invertTransform = new CMatrix();
+    this.ownTransform = new CMatrix();
     this.group = null;
     this.pageIndex = -1;
 
@@ -429,7 +430,7 @@ CChartAsGroup.prototype =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-
+        this.ownTransform = this.transform.CreateDublicate();
         if(isRealObject(this.chartTitle))
         {
             this.chartTitle.recalculateTransform();

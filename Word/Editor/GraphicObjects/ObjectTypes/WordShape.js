@@ -5550,6 +5550,27 @@ WordShape.prototype =
             {
                 arr_graphic_objects[i].GraphicObj.recalculate();
                 global_MatrixTransformer.MultiplyAppend(arr_graphic_objects[i].getTransformMatrix(), this.transformText);
+                if(arr_graphic_objects[i] instanceof CChartAsGroup)
+                {
+                    var obj = arr_graphic_objects[i];
+                    if(isRealObject(obj.chartTitle))
+                    {
+                        global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transform, this.transformText);
+                        global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transformText, this.transformText);
+                    }
+
+                    if(isRealObject(obj.hAxisTitle))
+                    {
+                        global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transform, this.transformText);
+                        global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transformText, this.transformText);
+                    }
+
+                    if(isRealObject(obj.vAxisTitle))
+                    {
+                        global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transform, this.transformText);
+                        global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transformText, this.transformText);
+                    }
+                }
                 arr_graphic_objects[i].updateCursorTypes();
             }
         }

@@ -6235,14 +6235,15 @@ ParaDrawing.prototype =
         var bounds_checker = new  CSlideBoundsChecker();
         bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
         var temp_transform = this.GraphicObj.transform;
-        if(this.GraphicObj instanceof  WordImage)
+        if(this.GraphicObj instanceof  WordImage || this.GraphicObj instanceof CChartAsGroup)
         {
            this.GraphicObj.transform = this.GraphicObj.ownTransform;
         }
         bounds_checker.transform3(this.GraphicObj.transform);
         bounds_checker.rect(0,0, this.GraphicObj.absExtX, this.GraphicObj.absExtY);
 
-        this.draw(bounds_checker);
+        if(!(this.GraphicObj instanceof CChartAsGroup))
+            this.draw(bounds_checker);
         this.GraphicObj.transform = temp_transform;
 
         bounds_checker.CorrectBounds();
