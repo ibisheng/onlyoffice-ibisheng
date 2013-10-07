@@ -3067,11 +3067,18 @@ parserFormula.prototype = {
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var ref = this.outStack[i];
+
             if ( ref instanceof cName ) {
                 ref = ref.toRef( this.ws.getId() );
                 if ( ref instanceof cError )
                     continue;
             }
+
+            if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) && ref.isValid() &&
+                this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction && this.outStack[i + 1].name == "ROWS" ) {
+                continue;
+            }
+
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
                 var nFrom = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb ),
@@ -3569,21 +3576,18 @@ function rtl_math_erf( x ) {
     return fErf;
 }
 
-function rtl_math_erfc( x )
-{
+function rtl_math_erfc( x ) {
     if ( x == 0.0 )
         return 1.0;
 
     var bNegative = false;
-    if ( x < 0.0 )
-    {
+    if ( x < 0.0 ) {
         x = Math.abs( x );
         bNegative = true;
     }
 
     var fErfc = 0.0;
-    if ( x >= 0.65 )
-    {
+    if ( x >= 0.65 ) {
         if ( x < 6.0 )
             fErfc = lcl_Erfc0600( x );
         else
@@ -3598,7 +3602,6 @@ function rtl_math_erfc( x )
     return fErfc;
 }
 
-function integralPhi( x )
-{ // Using gauss(x)+0.5 has severe cancellation errors for x<-4
-    return 0.5 * rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
+function integralPhi( x ) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
+    return 0.5 * rtl_math_erfc( -x * 0.7071067811865475 ); // * 1/sqrt(2)
 }
