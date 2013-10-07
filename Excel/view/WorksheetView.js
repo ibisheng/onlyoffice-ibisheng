@@ -2881,7 +2881,7 @@
 					var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyOfActiveRange;
 					cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
 					// Получаем активную ячейку в выделении
-					cr = range.intersection(cr !== undefined ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
+					cr = range.intersection(null !== cr ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
 					if (cr !== null) {
 						ctx.save().beginPath().rect(lRect, tRect, rRect - lRect, bRect - tRect).clip();
 						var _l = this.cols[cr.c1].left - offsetX - this.width_1px,
