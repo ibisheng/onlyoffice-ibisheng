@@ -3338,11 +3338,12 @@ function DrawingObjects() {
 			
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			var coords = _this.getBoundsCheckerCoords(boundsChecker);
-			
-			if ( coords.to.col >= metrics.maxCol )
-				metrics.maxCol = coords.to.col + 1; // учитываем colOff
-			if ( coords.to.row >= metrics.maxRow )
-				metrics.maxRow = coords.to.row + 1; // учитываем rowOff
+			if ( coords ) {
+				if ( coords.to.col >= metrics.maxCol )
+					metrics.maxCol = coords.to.col + 1; // учитываем colOff
+				if ( coords.to.row >= metrics.maxRow )
+					metrics.maxRow = coords.to.row + 1; // учитываем rowOff
+			}
 		}
 		return metrics;
 	}
