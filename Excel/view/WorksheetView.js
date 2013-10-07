@@ -3916,7 +3916,7 @@
 			},
 
 			_isMergedCells: function (range) {
-				return range.isEqual( this._getMergedCellsRange(range.c1, range.r1) );
+				return range.isEqual(this.model.getMergedByCell(range.c1, range.r1));
 			},
 
 			// Обновляем массив мерженных индексов для новых строк
