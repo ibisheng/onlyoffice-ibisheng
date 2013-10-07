@@ -903,6 +903,12 @@ Paragraph.prototype =
                     Item.TextPr = EndTextPr;
                     g_oTextMeasurer.SetTextPr( EndTextPr );
                     Item.Measure( g_oTextMeasurer, bEndCell );
+                    
+                    TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
+                    TextHeight  = g_oTextMeasurer.GetHeight();
+                    TextAscent  = TextHeight - TextDescent;
+                    TextAscent2 = g_oTextMeasurer.GetAscender();
+
                     g_oTextMeasurer.SetTextPr( CurTextPr );
 
                     break;
@@ -2054,6 +2060,13 @@ Paragraph.prototype =
                 // текста, на котором закончилась данная строка.
                 if ( true === bEmptyLine || LineAscent < 0.001 )
                 {
+                    if ( true === bEnd )
+                    {
+                        TextAscent  = Item.TextAscent;
+                        TextDescent = Item.TextDescent;
+                        TextAscent2 = Item.TextAscent2;
+                    }
+
                     if ( LineTextAscent < TextAscent )
                         LineTextAscent = TextAscent;
 
@@ -9329,7 +9342,7 @@ Paragraph.prototype =
 
     Style_Get : function()
     {
-        if ( undefined != typeof(this.Pr.PStyle) )
+        if ( undefined != this.Pr.PStyle )
             return this.Pr.PStyle;
 
         return undefined;
