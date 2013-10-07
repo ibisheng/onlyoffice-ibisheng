@@ -98,12 +98,12 @@ var c_oAscAlignType = {
 };
 
 var c_oAscCsvDelimiter = {
-	None:0,
-	Tab:1,
-	Semicolon:2,
-	Сolon:3,
-	Comma:4,
-	Space:5
+	None		: 0,
+	Tab			: 1,
+	Semicolon	: 2,
+	Сolon		: 3,
+	Comma		: 4,
+	Space		: 5
 };
 
 var c_oAscAdvancedOptionsID = {

@@ -7036,7 +7036,7 @@
 							canChangeColWidth = c_oAscCanChangeColWidth.numbers;
 							break;
 						case "changeFontSize":
-							mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
+							mc = t.getMergedByCell(arn.startRow, arn.startCol);
 							c = mc ? mc.c1 : arn.startCol;
 							r = mc ? mc.r1 : arn.startRow;
 							cell = t._getVisibleCell(c, r);
@@ -7205,7 +7205,7 @@
 								val.hyperlinkModel.Ref = range;
 								range.setHyperlink(val.hyperlinkModel);
 								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-								mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
+								mc = t.getMergedByCell(arn.startRow, arn.startCol);
 								c = mc ? mc.c1 : arn.startCol;
 								r = mc ? mc.r1 : arn.startRow;
 								if (null !== val.asc_getText()) {
