@@ -209,7 +209,7 @@ cFormulaFunction.Statistical = {
         r.setArgumentsMin( 2 );
         r.setArgumentsMax( 3 );
         r.Calculate = function ( arg ) {
-            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching, regexpSearch;
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching;
             if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ) {
                 return this.value = new cError( cErrorType.wrong_value_type );
             }
@@ -670,7 +670,7 @@ cFormulaFunction.Statistical = {
         r.setArgumentsMin( 2 );
         r.setArgumentsMax( 2 );
         r.Calculate = function ( arg ) {
-            var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching, regexpSearch;
+            var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
             if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ) {
                 return this.value = new cError( cErrorType.wrong_value_type );
             }
@@ -729,7 +729,7 @@ cFormulaFunction.Statistical = {
             }
 
             arg1 = arg1.toString();
-            var operators = new RegExp( "^ *[<=> ]+ *" ), searchOperators = new RegExp( "^ *[*?]" ), search, oper, val,
+            var operators = new RegExp( "^ *[<=> ]+ *" ), search, oper, val,
                 match = arg1.match( operators );
 
             if ( match ) {
@@ -741,10 +741,14 @@ cFormulaFunction.Statistical = {
             }
             valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
             if ( arg0 instanceof cArea ) {
-                val = arg0.getValue();
+                arg0.foreach2(function(_val){
+//                    _val
+                    _count += matching( _val, valueForSearching, oper );
+                })
+                /*val = arg0.getValue();
                 for ( var i = 0; i < val.length; i++ ) {
                     _count += matching( val[i], valueForSearching, oper );
-                }
+                }*/
             }
             else if ( arg0 instanceof cArea3D ) {
                 val = arg0.getValue();
@@ -2464,12 +2468,13 @@ cFormulaFunction.Statistical = {
             var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
             function normdist( x, mue, sigma, kum ){
-                if ( sigma <= 0 || x < 0 || x > 1)
+                if ( sigma <= 0 )
                     return new cError( cErrorType.not_numeric );
-                else if ( kum == false )
-                    return new cNumber( phi( (x - mue) / sigma ) / sigma );
+
+                if ( kum )
+                    return new cNumber( integralPhi((x-mue)/sigma) );
                 else
-                    return new cNumber( 0.5 + gauss( (x - mue) / sigma ) );
+                    return new cNumber( phi( (x - mue) / sigma ) / sigma );
 
             }
 

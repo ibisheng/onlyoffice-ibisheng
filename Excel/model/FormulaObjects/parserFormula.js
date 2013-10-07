@@ -1195,7 +1195,7 @@ function cNumber( val ) {
 }
 extend( cNumber, cBaseType );
 cNumber.prototype.getValue = function () {
-    return this.value.toFixed( cExcelSignificantDigits ) - 0;
+    return this.value//.toFixed( cExcelSignificantDigits ) - 0;
 };
 cNumber.prototype.tocString = function () {
     return new cString( "" + this.value );
@@ -1510,26 +1510,30 @@ cArea.prototype.foreach2 = function ( action ) {
     if ( r ) {
         r._foreach2( function ( _cell ) {
             var val;
-            switch ( _cell.getType() ) {
-                case CellValueType.Number:
-                    _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
-                    break;
-                case CellValueType.Bool:
-                    val = new cBool( _cell.getValueWithoutFormat() );
-                    break;
-                case CellValueType.Error:
-                    val = new cError( _cell.getValueWithoutFormat() );
-                    break;
-                case CellValueType.String:
-                    val = new cString( _cell.getValueWithoutFormat() );
-                    break;
-                default:
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                        val = new cNumber( _cell.getValueWithoutFormat() )
-                    }
-                    else
-                        val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+            if ( _cell ) {
+                switch ( _cell.getType() ) {
+                    case CellValueType.Number:
+                        _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                        break;
+                    case CellValueType.Bool:
+                        val = new cBool( _cell.getValueWithoutFormat() );
+                        break;
+                    case CellValueType.Error:
+                        val = new cError( _cell.getValueWithoutFormat() );
+                        break;
+                    case CellValueType.String:
+                        val = new cString( _cell.getValueWithoutFormat() );
+                        break;
+                    default:
+                        if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                            val = new cNumber( _cell.getValueWithoutFormat() )
+                        }
+                        else
+                            val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                }
             }
+            else
+                val = new cEmpty()
             action(val);
         } );
     }
@@ -1915,26 +1919,30 @@ cArea3D.prototype.foreach2 = function ( action ) {
             if ( _r[i] )
                 _r[i]._foreach2( function ( _cell ) {
                     var val;
-                    switch ( _cell.getType() ) {
-                        case CellValueType.Number:
-                            _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
-                            break;
-                        case CellValueType.Bool:
-                            val = new cBool( _cell.getValueWithoutFormat() );
-                            break;
-                        case CellValueType.Error:
-                            val = new cError( _cell.getValueWithoutFormat() );
-                            break;
-                        case CellValueType.String:
-                            val = new cString( _cell.getValueWithoutFormat() );
-                            break;
-                        default:
-                            if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                                val = new cNumber( _cell.getValueWithoutFormat() )
-                            }
-                            else
-                                val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                    if(_cell){
+                        switch ( _cell.getType() ) {
+                            case CellValueType.Number:
+                                _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                                break;
+                            case CellValueType.Bool:
+                                val = new cBool( _cell.getValueWithoutFormat() );
+                                break;
+                            case CellValueType.Error:
+                                val = new cError( _cell.getValueWithoutFormat() );
+                                break;
+                            case CellValueType.String:
+                                val = new cString( _cell.getValueWithoutFormat() );
+                                break;
+                            default:
+                                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                                    val = new cNumber( _cell.getValueWithoutFormat() )
+                                }
+                                else
+                                    val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                        }
                     }
+                    else
+                        val = new cEmpty()
                     action(val);
                 } );
         }
@@ -3084,7 +3092,7 @@ parserFormula.prototype = {
 }
 
 function parseNum( str ) {
-    if ( str.indexOf( "x" ) > -1 )//исключаем запись числа в 16-ричной форме из числа.
+    if ( str.indexOf( "x" ) > -1 || str == "" )//исключаем запись числа в 16-ричной форме из числа.
         return false;
     return !isNaN( str );
 }
@@ -3423,4 +3431,174 @@ function getLogGamma( fZ ) {
     if ( fZ >= 0.5 )
         return Math.log( lcl_GetGammaHelper( fZ + 1 ) / fZ );
     return lcl_GetLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
+}
+
+function lcl_Erf0065( x ) {
+    var pn = [
+            1.12837916709551256,
+            1.35894887627277916E-1,
+            4.03259488531795274E-2,
+            1.20339380863079457E-3,
+            6.49254556481904354E-5
+        ],
+        qn = [
+            1.00000000000000000,
+            4.53767041780002545E-1,
+            8.69936222615385890E-2,
+            8.49717371168693357E-3,
+            3.64915280629351082E-4
+        ];
+    var fPSum = 0.0, fQSum = 0.0, fXPow = 1.0, fVal;
+    for ( var i = 0; i <= 4; ++i ) {
+        fPSum += pn[i] * fXPow;
+        fQSum += qn[i] * fXPow;
+        fXPow *= x * x;
+    }
+    return fVal = x * fPSum / fQSum;
+}
+
+/** Approximation algorithm for erfc for 0.65 < x < 6.0. */
+function lcl_Erfc0600( x ) {
+    var fPSum = 0.0,
+        fQSum = 0.0,
+        fXPow = 1.0, pn, qn,
+        fVal;
+
+    if ( x < 2.2 ) {
+        var pn22 = [
+                9.99999992049799098E-1,
+                1.33154163936765307,
+                8.78115804155881782E-1,
+                3.31899559578213215E-1,
+                7.14193832506776067E-2,
+                7.06940843763253131E-3
+            ],
+            qn22 = [
+                1.00000000000000000,
+                2.45992070144245533,
+                2.65383972869775752,
+                1.61876655543871376,
+                5.94651311286481502E-1,
+                1.26579413030177940E-1,
+                1.25304936549413393E-2
+            ];
+        pn = pn22;
+        qn = qn22;
+    }
+    else /* if ( x < 6.0 )  this is true, but the compiler does not know */
+    {
+        var pn60 = [
+                9.99921140009714409E-1,
+                1.62356584489366647,
+                1.26739901455873222,
+                5.81528574177741135E-1,
+                1.57289620742838702E-1,
+                2.25716982919217555E-2
+            ],
+            qn60 = [
+                1.00000000000000000,
+                2.75143870676376208,
+                3.37367334657284535,
+                2.38574194785344389,
+                1.05074004614827206,
+                2.78788439273628983E-1,
+                4.00072964526861362E-2
+            ];
+        pn = pn60;
+        qn = qn60;
+    }
+
+    for ( var i = 0; i < 6; ++i ) {
+        fPSum += pn[i] * fXPow;
+        fQSum += qn[i] * fXPow;
+        fXPow *= x;
+    }
+    fQSum += qn[6] * fXPow;
+    return fVal = Math.exp( -1.0 * x * x ) * fPSum / fQSum;
+}
+
+/** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all
+ x > 6.0). */
+function lcl_Erfc2654( x ) {
+    var pn = [
+            5.64189583547756078E-1,
+            8.80253746105525775,
+            3.84683103716117320E1,
+            4.77209965874436377E1,
+            8.08040729052301677
+        ],
+        qn = [
+            1.00000000000000000,
+            1.61020914205869003E1,
+            7.54843505665954743E1,
+            1.12123870801026015E2,
+            3.73997570145040850E1
+        ];
+
+    var fPSum = 0.0, fQSum = 0.0, fXPow = 1.0, fVal;
+
+    for ( var i = 0; i <= 4; ++i ) {
+        fPSum += pn[i] * fXPow;
+        fQSum += qn[i] * fXPow;
+        fXPow /= x * x;
+    }
+    return fVal = Math.exp( -1.0 * x * x ) * fPSum / (x * fQSum);
+}
+
+function rtl_math_erf( x ) {
+    if ( x == 0.0 )
+        return 0.0;
+
+    var bNegative = false;
+    if ( x < 0.0 ) {
+        x = Math.abs( x );
+        bNegative = true;
+    }
+
+    var fErf = 1.0;
+    if ( x < 1.0e-10 )
+        fErf = parceFloat( x * 1.1283791670955125738961589031215452 );
+    else if ( x < 0.65 )
+        fErf = lcl_Erf0065( x );
+    else
+        fErf = 1.0 - rtl_math_erfc( x );
+
+    if ( bNegative )
+        fErf *= -1.0;
+
+    return fErf;
+}
+
+function rtl_math_erfc( x )
+{
+    if ( x == 0.0 )
+        return 1.0;
+
+    var bNegative = false;
+    if ( x < 0.0 )
+    {
+        x = Math.abs( x );
+        bNegative = true;
+    }
+
+    var fErfc = 0.0;
+    if ( x >= 0.65 )
+    {
+        if ( x < 6.0 )
+            fErfc = lcl_Erfc0600( x );
+        else
+            fErfc = lcl_Erfc2654( x );
+    }
+    else
+        fErfc = 1.0 - rtl_math_erf( x );
+
+    if ( bNegative )
+        fErfc = 2.0 - fErfc;
+
+    return fErfc;
+}
+
+function integralPhi( x )
+{ // Using gauss(x)+0.5 has severe cancellation errors for x<-4
+    return 0.5 * rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
 }
