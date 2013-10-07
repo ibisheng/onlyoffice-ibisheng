@@ -3810,7 +3810,7 @@
 			_calcMaxWidth: function (col, row, range) {
 				if (null === range) {return this.cols[col].innerWidth;}
 
-				width = this.cols[range.c1].innerWidth;
+				var width = this.cols[range.c1].innerWidth;
 				for (var c = range.c1 + 1; c <= range.c2 && c < this.nColsCount; ++c) {
 					width += this.cols[c].width;
 				}
