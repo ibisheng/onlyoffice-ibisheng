@@ -4029,7 +4029,7 @@
 				var mc;
 
 				if (!cb.l || !cb.r || !cb.t || !cb.b || !cb.dd || !cb.du) {
-					mc = this._getMergedCellsRange(col, row);
+					mc = this.model.getMergedByCell(row, col);
 					var b = self._getVisibleCell(col, row).getBorder();
 					if (!cb.l) {cb.l = !mc || col === mc.c1 ? makeBorder(b, kcbidLeft) : new CellBorder();}
 					if (!cb.r) {cb.r = !mc || col === mc.c2 ? makeBorder(b, kcbidRight) : new CellBorder();}
@@ -4327,7 +4327,7 @@
 
 					var fvr = _this.getFirstVisibleRow();
 					var fvc = _this.getFirstVisibleCol();
-					var mergedRange = _this._getMergedCellsRange(col, row);
+					var mergedRange = _this.model.getMergedByCell(row, col);
 
 					if (mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2)) {
 
@@ -4452,7 +4452,7 @@
 			
 			prepareDepCells: function(se){
 				var activeCell = this.activeRange,
-					mc = this._getMergedCellsRange(activeCell.startCol, activeCell.startRow),
+					mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol),
 					c1 = mc ? mc.c1 : activeCell.startCol,
 					r1 = mc ? mc.r1 : activeCell.startRow,
 					c = this._getVisibleCell(c1, r1),
