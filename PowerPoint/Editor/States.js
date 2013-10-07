@@ -2802,22 +2802,22 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                     var arr_graphic_objects = this.group.getArrGraphicObjects();
                     for(i = arr_graphic_objects.length - 1; i > -1; --i)
                     {
-                        var cur_drawing = arr_graphic_objects[i];
-                        var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                        var hit_in_path = cur_drawing.hitInPath(x, y);
-                        var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                        var cur_grouped_object = arr_graphic_objects[i];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            var is_selected = cur_drawing.selected;
+                            var is_selected = cur_grouped_object.selected;
                             if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                                 this.group.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
+                            cur_grouped_object.select(this.drawingObjectsController);
                             this.drawingObjects.OnUpdateOverlay();
                             for(var j = 0; j < group_selected_objects.length; ++j)
                             {
                                 this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
                             }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects,this.group,  x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected));
+                            this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects,this.group,  x, y, e.ShiftKey, e.ctrl, cur_grouped_object, is_selected));
                             this.drawingObjects.OnUpdateOverlay();
                             return;
                         }
@@ -2825,11 +2825,11 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                         {
                             this.drawingObjectsController.resetSelection();
                             this.group.select(this.drawingObjectsController);
-                            cur_drawing.select(this.group);
-                            cur_drawing.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
+                            cur_grouped_object.select(this.group);
+                            cur_grouped_object.selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_grouped_object));
                             if(e.ClickCount < 2)
-                                cur_drawing.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                                cur_grouped_object.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                             return;
                         }
                     }
@@ -2864,9 +2864,9 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             cur_drawing.select(this.drawingObjectsController);
                             cur_grouped_object.select(this.group);
                             cur_grouped_object.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
+                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_grouped_object));
                             if(e.ClickCount < 2)
-                                cur_drawing.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                                cur_grouped_object.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                             return;
                         }
                     }

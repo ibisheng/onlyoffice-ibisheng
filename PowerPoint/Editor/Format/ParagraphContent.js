@@ -915,6 +915,11 @@ ParaTextPr.prototype =
 
                 break;
             }
+            case historyitem_TextPr_Unifill:
+            {
+                this.Value.unifill = Data.Old;
+                break;
+            }
         }
     },
 
@@ -1108,6 +1113,11 @@ ParaTextPr.prototype =
                 else
                     this.Value.Lang = new CLang();
 
+                break;
+            }
+            case historyitem_TextPr_Unifill:
+            {
+                this.Value.unifill = Data.New;
                 break;
             }
         }
@@ -1381,6 +1391,15 @@ ParaTextPr.prototype =
                 else
                     Writer.WriteBool( true );
 
+                break;
+            }
+            case historyitem_TextPr_Unifill:
+            {
+                Writer.WriteBool(isRealObject(Data.New))
+                if(isRealObject(Data.New))
+                {
+                    Data.New.Write_ToBinary2(Writer);
+                }
                 break;
             }
         }
@@ -1674,9 +1693,23 @@ ParaTextPr.prototype =
 
                 break;
             }
+            case historyitem_TextPr_Unifill:
+            {
+                if(Reader.GetBool())
+                {
+                    this.Value.unifill = new CUniFill();
+                    this.Value.unifill.Read_FromBinary2(Reader);
+                }
+                else
+                {
+                    this.Value.unifill = undefined;
+                }
+                break;
+            }
         }
     }
 };
+
 
 // Класс окончание параграфа ParaEnd
 function ParaEnd()

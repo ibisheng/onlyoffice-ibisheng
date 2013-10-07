@@ -17,6 +17,7 @@
 //
 // Графическая часть:
 
+var tableSpacingMinValue = 0.02;//0.02мм
 var Page_Width     = 210;
 var Page_Height    = 297;
 

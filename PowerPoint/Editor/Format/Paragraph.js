@@ -7060,6 +7060,18 @@ Paragraph.prototype =
                 if ( this.Content[Pos].Type == para_TextPr )
                 {
                     this.Content[Pos].Apply_TextPr( TextPr );
+                    var Item = this.Content[Pos];
+                    if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
+                    {
+                        if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                        {
+                            this.Parent.Parent.textPropsForRecalc.push(Item);
+                        }
+                        if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                        {
+                            this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
+                        }
+                    }
                 }
             }
 
@@ -10661,6 +10673,24 @@ Paragraph.prototype =
 
                 this.Content.splice( StartPos, EndPos - StartPos + 1 );
 
+                for ( var Pos = 0; Pos < this.Content.length; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                    {
+                        var Item = this.Content[Pos];
+                        if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
+                        {
+                            if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                            {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                            {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
+                            }
+                        }
+                    }
+                }
                 break;
             }
 
@@ -11023,6 +11053,24 @@ Paragraph.prototype =
 
                 this.Content = Array_start.concat( Data.Items, Array_end );
 
+                for ( var Pos = 0; Pos < this.Content.length; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                    {
+                        var Item = this.Content[Pos];
+                        if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
+                        {
+                            if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                            {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                            {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
+                            }
+                        }
+                    }
+                }
                 break;
 
             }
@@ -11454,6 +11502,24 @@ Paragraph.prototype =
                         break;
                 }
 
+                for ( var Pos = 0; Pos < this.Content.length; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                    {
+                        var Item = this.Content[Pos];
+                        if(isRealObject(Item.Value) && isRealObject(Item.Value.unifill))
+                        {
+                            if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                            {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if(this.Parent && this.Parent.Parent instanceof  CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                            {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
+                            }
+                        }
+                    }
+                }
                 this.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 bNeedRecalc = true;
                 break;

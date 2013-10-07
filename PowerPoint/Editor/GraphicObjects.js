@@ -734,9 +734,9 @@ CGraphicObjects.prototype = {
                     var cur_group = groups[i];
                     var arr_by_types = cur_group.getArraysByTypes();
                     var images = arr_by_types.images;
-                    for(var i = 0; i < images.length; ++i)
+                    for(var j = 0; j < images.length; ++j)
                     {
-                        var _cur_image_prop = images[i].getImageProps();
+                        var _cur_image_prop = images[j].getImageProps();
                         if(_cur_image_prop !== null)
                         {
                             if(image_props === null)
@@ -751,9 +751,9 @@ CGraphicObjects.prototype = {
                     }
 
                     var shapes = arr_by_types.shapes;
-                    for(var i = 0; i < shapes.length; ++i)
+                    for(var j = 0; j < shapes.length; ++j)
                     {
-                        var _current_object = shapes[i];
+                        var _current_object = shapes[j];
                         var _cur_shape_prop =
                         {
                             type: _current_object.getPresetGeom(),
@@ -1038,9 +1038,9 @@ CGraphicObjects.prototype = {
 
 
                     var shapes = arr_by_types.shapes;
-                    for(var i = 0; i < shapes.length; ++i)
+                    for(var j = 0; j < shapes.length; ++j)
                     {
-                        var _current_object = shapes[i];
+                        var _current_object = shapes[j];
 
 
                         var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
@@ -1172,9 +1172,9 @@ CGraphicObjects.prototype = {
 
 
                     var shapes = arr_by_types.shapes;
-                    for(var i = 0; i < shapes.length; ++i)
+                    for(var j = 0; j < shapes.length; ++j)
                     {
-                        var _current_object = shapes[i];
+                        var _current_object = shapes[j];
 
 
                         var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
