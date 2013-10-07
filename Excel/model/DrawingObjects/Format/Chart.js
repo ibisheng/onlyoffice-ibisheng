@@ -8,7 +8,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    //this.chart = new asc_CChart();
+    this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
