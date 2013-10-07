@@ -3382,6 +3382,7 @@ function BinaryFileReader(doc, openParams)
 		fParseStyle(this.oReadResult.tableStyles, this.Document.Styles.Style, oStyleTypes.table);
 		fParseStyle(this.oReadResult.lvlStyles, this.Document.Styles.Style, oStyleTypes.lvl);
 		var stDefault = this.Document.Styles.Default;
+		var styles = this.Document.Styles.Style;
 		var nStId = styles.length;
         if(null == stDefault.Numbering)
         {
