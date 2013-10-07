@@ -7080,7 +7080,7 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
     if ( bDraw !== this.isCoMarksDraw )
     {
         this.isCoMarksDraw = bDraw;
-        this.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
-        this.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+        this.WordControl.m_oDrawingDocument.ClearCachePages();
+        this.WordControl.m_oDrawingDocument.FirePaint();
     }
 }
