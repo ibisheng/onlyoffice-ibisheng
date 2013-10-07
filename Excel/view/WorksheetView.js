@@ -8877,7 +8877,7 @@
 				return val.length > 0 && val[0].text.length > 1 && val[0].text.charAt(0) === "=" ? true : false;
 			},
 
-			getActiveCellLock: function (x, y, isCoord) {
+			getActiveCell: function (x, y, isCoord) {
 				var t = this;
 				var col, row;
 				if (isCoord) {
@@ -8889,15 +8889,12 @@
 					col = col.col;
 					row = row.row;
 				} else {
-					//col = this.model._getCol(t.activeRange.startCol).getId();
-					//row = this.model._getRow(t.activeRange.startRow).getId();
-
 					col = t.activeRange.startCol;
 					row = t.activeRange.startRow;
 				}
 
 				// Проверим замерженность
-				var mergedRange = this._getMergedCellsRange(col, row);
+				var mergedRange = this.model.getMergedByCell(row, col);
 				return mergedRange ? mergedRange : asc_Range(col, row, col, row);
 			},
 

@@ -793,7 +793,7 @@
 					return false;
 
 				var ws = t.getWorksheet();
-				var activeCellRange = ws.getActiveCellLock (x, y, isCoord);
+				var activeCellRange = ws.getActiveCell(x, y, isCoord);
 				var arn = ws.activeRange.clone(true);
 				arn.startCol = ws.activeRange.startCol;
 				arn.startRow = ws.activeRange.startRow;
@@ -1255,7 +1255,7 @@
 						}
 					}
 
-					var activeCellRange = ws.getActiveCellLock (0, 0, /*isCoord*/false);
+					var activeCellRange = ws.getActiveCell(0, 0, /*isCoord*/false);
 
 					if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
 						// Запрещено совместное редактирование
