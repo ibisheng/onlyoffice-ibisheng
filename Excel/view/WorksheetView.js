@@ -2885,7 +2885,7 @@
 							.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
 					var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyOfActiveRange;
-					cr = this._getMergedCellsRange(firstCell.startCol, firstCell.startRow);
+					cr = this.model.getMergedByCell(firstCell.startRow, firstCell.startCol);
 					// Получаем активную ячейку в выделении
 					cr = range.intersection(cr !== undefined ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
 					if (cr !== null) {
@@ -8576,7 +8576,7 @@
 					var ct = undefined;
 					do {
 						do {
-							mc = self._getMergedCellsRange(c, r);
+							mc = self.model.getMergedByCell(r, c);
 							if (mc) {excluded.push(mc);}
 							if (options.scanByRows) {
 								c += mc ? (options.scanForward ? mc.c2 + 1 - c : mc.c1 - 1 - c) : inc;
@@ -8594,7 +8594,7 @@
 
 				for (ct = findNextCell(); ct; ct = findNextCell()) {
 					// Не пользуемся RegExp, чтобы не возиться со спец.символами
-					mc = this._getMergedCellsRange(c, r);
+					mc = this.model.getMergedByCell(r, c);
 					if (mc)
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 					else
@@ -8604,7 +8604,7 @@
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
 						if (true !== options.isWholeCell || options.text.length === cellText.length)
-							return (options.isNotSelect) ? new asc_Range(c, r, c, r) : this._setActiveCell(c, r);
+							return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
 					}
 				}
 
@@ -8647,7 +8647,7 @@
 				}
 				for (ct = findNextCell(); ct; ct = findNextCell()) {
 					// Не пользуемся RegExp, чтобы не возиться со спец.символами
-					mc = this._getMergedCellsRange(c, r);
+					mc = this.model.getMergedByCell(r, c);
 					if (mc)
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 					else
@@ -8657,7 +8657,7 @@
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
 						if (true !== options.isWholeCell || options.text.length === cellText.length)
-							return (options.isNotSelect) ? new asc_Range(c, r, c, r) : this._setActiveCell(c, r);
+							return (options.isNotSelect) ? (mc ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(c, r, c, r)) : this._setActiveCell(c, r);
 					}
 				}
 				return undefined;
@@ -8707,7 +8707,7 @@
 						ar.startRow = findResult.r1;
 					}
 				} else {
-					var mc = t._getMergedCellsRange(ar.startCol, ar.startRow);
+					var mc = t.model.getMergedByCell(ar.startRow, ar.startCol);
 					var c1 = mc ? mc.c1 : ar.startCol;
 					var r1 = mc ? mc.r1 : ar.startRow;
 					var c = t._getVisibleCell(c1, r1);
@@ -8727,7 +8727,7 @@
 						return;
 					}
 
-					aReplaceCells.push(new asc_Range(ar.startCol, ar.startRow, ar.startCol, ar.startRow));
+					aReplaceCells.push(new asc_Range(c1, r1, c1, r1));
 				}
 
 				if (0 > aReplaceCells.length) {
@@ -8768,18 +8768,15 @@
 					if (false !== isSuccess) {
 						++options.countReplace;
 
-						var mc = t._getMergedCellsRange(cell.c1, cell.r1);
-						var c1 = mc ? mc.c1 : cell.c1;
-						var r1 = mc ? mc.r1 : cell.r1;
-						var c = t._getVisibleCell(c1, r1);
+						var c = t._getVisibleCell(cell.c1, cell.r1);
 
 						if (c === undefined) {
-							asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
+							asc_debug("log", "Unknown cell's info: col = " + cell.c1 + ", row = " + cell.r1);
 						} else {
 							var cellValue = c.getValueForEdit();
 							cellValue = cellValue.replace(valueForSearching, options.replaceWith);
 
-							var oCellEdit = new asc_Range(c1, r1, c1, r1);
+							var oCellEdit = new asc_Range(cell.c1, cell.r1, cell.c1, cell.r1);
 							var v, newValue;
 							// get first fragment and change its text
 							v = c.getValueForEdit2().slice(0, 1);
