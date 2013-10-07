@@ -4736,6 +4736,7 @@
 				if (start === vr.r1) {return this;}
 
 				this.cleanSelection();
+				this.cellCommentator.cleanSelectedComment();
 
 				var ctx = this.drawingCtx;
 				var ctxW   = ctx.getWidth();
@@ -4818,7 +4819,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
 
@@ -4838,6 +4839,7 @@
 				if (start === vr.c1) {return this;}
 
 				this.cleanSelection();
+				this.cellCommentator.cleanSelectedComment();
 
 				var ctx = this.drawingCtx;
 				var ctxW    = ctx.getWidth();
@@ -4883,7 +4885,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
 			

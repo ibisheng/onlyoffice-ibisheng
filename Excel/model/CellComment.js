@@ -715,7 +715,7 @@ function asc_CCellCommentator(currentSheet) {
 			drawCells[cellId] = cellId;
 		}
 		if (_this.lastSelectedId)
-			_this.asc_selectComment(_this.lastSelectedId);
+			_this.asc_selectComment(_this.lastSelectedId, false);
 	}
 
 	_this.getTextMetrics = function(text, units) {
@@ -957,12 +957,11 @@ function asc_CCellCommentator(currentSheet) {
 		
 		function updateCommentsList(aComments) {
 			if ( aComments.length ) {
+			
 				History.StartTransaction();
-				
 				for (var i = 0; i < aComments.length; i++) {
 					_this.asc_changeComment(aComments[i].asc_getId(), aComments[i]);
 				}
-				
 				History.EndTransaction();
 				_this.drawCommentCells();
 			}
@@ -1198,11 +1197,19 @@ function asc_CCellCommentator(currentSheet) {
 		_this.calcCommentsCoords(true);
 	}
 
-	_this.restoreRange = function(range) {
-		if ( range ) {
-			worksheet._drawGrid( drawingCtx, range);
-			worksheet._drawCells(range);
-			worksheet._drawCellsBorders(undefined, range);
+	_this.cleanSelectedComment = function() {
+		if ( _this.lastSelectedId ) {
+			var comment = _this.asc_findComment(_this.lastSelectedId);
+			if ( comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() ) {
+				var metrics = _this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
+				if (metrics.result) {
+					var x = _this.pxToPt(metrics.left);
+					var y = _this.pxToPt(metrics.top);
+					var w = _this.pxToPt(metrics.width);
+					var h = _this.pxToPt(metrics.height);
+					_this.overlayCtx.clearRect(x, y, w, h);
+				}
+			}
 		}
 	}
 	
@@ -1294,7 +1301,7 @@ asc_CCellCommentator.prototype = {
 			_this.lastSelectedId = null;
 	},
 
-	asc_selectComment: function(id) {
+	asc_selectComment: function(id, bMove) {
 
 		var _this = this;
 		_this.lastSelectedId = null;
@@ -1302,7 +1309,25 @@ asc_CCellCommentator.prototype = {
 
 		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
 			_this.lastSelectedId = id;
-			var metrics = _this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
+			
+			var col = comment.asc_getCol();
+			var row = comment.asc_getRow();
+			var vr = _this.worksheet.visibleRange;
+			
+			if ( bMove ) {
+				if ( (row < vr.r1) || (row > vr.r2) ) {
+					var offset = row - vr.r1 - ( vr.r2 - vr.r1 ) / 2;
+					_this.worksheet.scrollVertical(offset);
+					_this.worksheet._trigger("reinitializeScrollY");
+				}
+				if ( (col < vr.c1) || (col > vr.c2) ) {
+					var offset = col - vr.c1 - ( vr.c2 - vr.c1 ) / 2;
+					_this.worksheet.scrollHorizontal(offset);
+					_this.worksheet._trigger("reinitializeScrollX");
+				}
+			}
+			
+			var metrics = _this.getCellMetrics(col, row);
 			if (metrics.result) {
 
 				var rangeOffset = 0;

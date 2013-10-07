@@ -2205,7 +2205,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_selectComment: function(id) {
 				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.asc_selectComment(id);
+				ws.cellCommentator.asc_selectComment(id, /*bMove*/true);
 			},
 			
 			asc_showComment: function(id, bNew) {
