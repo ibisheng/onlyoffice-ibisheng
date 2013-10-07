@@ -705,7 +705,13 @@ cFormulaFunction.DateAndTime = {
             var holidays = [];
 
             if( arg2 ){
-                if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+                if( arg2 instanceof cRef ){
+                    var a = arg2.getValue();
+                    if( a instanceof cNumber && a.getValue() >= 0 ){
+                        holidays.push(a);
+                    }
+                }
+                else if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
                     var arr = arg2.getValue();
                     for(var i = 0; i < arr.length; i++){
                         if( arr[i] instanceof cNumber && arr[i].getValue() >= 0 ){
@@ -739,11 +745,11 @@ cFormulaFunction.DateAndTime = {
                 return true;
             }
 
-            dif = ( val1 - val0 ) / c_msPerDay;
+            dif = ( val1 - val0 + c_msPerDay ) / c_msPerDay;
             for(var i = 0; i < Math.abs(dif); i++ ){
                 var date = new Date( val0 );
                 date.setDate(val0.getDate()+i) ;
-                if( date.getDay() != 5 && date.getDay() != 6 && includeInHolidays(date) )
+                if( date.getDay() != 6 && date.getDay() != 0 && includeInHolidays(date) )
                     count++;
             }
             return this.value = new cNumber( (dif<0?-1:1)*count );
