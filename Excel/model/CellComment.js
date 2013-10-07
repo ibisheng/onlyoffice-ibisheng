@@ -1316,12 +1316,12 @@ asc_CCellCommentator.prototype = {
 			
 			if ( bMove ) {
 				if ( (row < vr.r1) || (row > vr.r2) ) {
-					var offset = row - vr.r1 - ( vr.r2 - vr.r1 ) / 2;
+					var offset = row - vr.r1 - Math.round(( vr.r2 - vr.r1 ) / 2);
 					_this.worksheet.scrollVertical(offset);
 					_this.worksheet._trigger("reinitializeScrollY");
 				}
 				if ( (col < vr.c1) || (col > vr.c2) ) {
-					var offset = col - vr.c1 - ( vr.c2 - vr.c1 ) / 2;
+					var offset = col - vr.c1 - Math.round(( vr.c2 - vr.c1 ) / 2);
 					_this.worksheet.scrollHorizontal(offset);
 					_this.worksheet._trigger("reinitializeScrollX");
 				}
