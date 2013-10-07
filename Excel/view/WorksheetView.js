@@ -3195,12 +3195,12 @@
 					x2 = this.cols[arnIntersection.c2].left + this.cols[arnIntersection.c2].width - offsetX + this.width_1px + /* Это ширина "квадрата" для автофильтра от границы ячейки */this.width_2px;
 					y1 = this.rows[arnIntersection.r1].top - offsetY - this.height_2px;
 					y2 = this.rows[arnIntersection.r2].top + this.rows[arnIntersection.r2].height - offsetY + this.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */this.height_2px;
-
-					this._activateOverlayCtx();
-					this._cleanColumnHeaders(arn.c1, arn.c2);
-					this._cleanRowHeades(arn.r1, arn.r2);
-					this._deactivateOverlayCtx();
 				}
+
+				this._activateOverlayCtx();
+				this._cleanColumnHeaders(arn.c1, arn.c2);
+				this._cleanRowHeades(arn.r1, arn.r2);
+				this._deactivateOverlayCtx();
 
 				// Если есть активное автозаполнения, то нужно его тоже очистить
 				if (this.activeFillHandle !== null) {
