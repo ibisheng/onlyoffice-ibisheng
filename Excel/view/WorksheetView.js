@@ -3718,7 +3718,7 @@
 				var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
 				var ha   = c.getAlignHorizontalByValue().toLowerCase();
 				var va   = c.getAlignVertical().toLowerCase();
-				var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, fl.isMerged) : undefined;
+				var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, range) : undefined;
 				var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
 				var cto  = (fl.isMerged || fl.wrapText) ?
 						{
@@ -3807,10 +3807,9 @@
 				return col;
 			},
 
-			_calcMaxWidth: function (col, row, isMerged) {
-				if (!isMerged) {return this.cols[col].innerWidth;}
+			_calcMaxWidth: function (col, row, range) {
+				if (null === range) {return this.cols[col].innerWidth;}
 
-				var range = this._getMergedCellsRange(col, row),
 				width = this.cols[range.c1].innerWidth;
 				for (var c = range.c1 + 1; c <= range.c2 && c < this.nColsCount; ++c) {
 					width += this.cols[c].width;
