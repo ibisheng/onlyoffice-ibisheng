@@ -578,7 +578,7 @@ m_oApi:Qd
 WheelDelta:M9a
 pathLst:Lk
 minRealY:nca
-height_mm:Vj
+height_mm:Wj
 minRealX:mca
 LoadChar:g8a
 tblApply:A5a
@@ -1186,7 +1186,7 @@ isAbsL:QU
 VMerge:qn
 Format:sj
 scrollerMinWidth:cCa
-RotateRadAppend:fk
+RotateRadAppend:gk
 MaxTopBorder:yG
 verRulerMouseUp:YDa
 W2:xta
@@ -1425,7 +1425,7 @@ control_len:QT
 m_nMinX:qN
 psnames:lu
 FirstRow:vl
-array_sum:hk
+array_sum:ik
 ReadLegendLayout:vJa
 asc_getIndex:SRa
 getBBox0:DWa
@@ -1679,7 +1679,7 @@ lvl6pPr:Leb
 load_charmap_stub:yeb
 InstallUserMousemoveListener:uG
 bit_test:Eab
-recalculate:ck
+recalculate:dk
 maxComponentElements:qAa
 WriteFileHeader:fNa
 achVendID:e3
@@ -2747,7 +2747,7 @@ Get_SelfChanges:Q7a
 bAddNewStyles:OUa
 m_bMixedSelection:Lba
 SetTargetColor:ALa
-CreateDublicate:dk
+CreateDublicate:ek
 PIXEL_HINTING_Rules:xIa
 Shift:Xq
 asc_hideComments:ZSa
@@ -3350,7 +3350,7 @@ WriteTableContent:jOa
 private_len:qx
 ctCommandDouble2:obb
 ctCommandDouble1:nbb
-blipFill:ik
+blipFill:Tj
 force_bold_threshold:sya
 deleteImage:fWa
 ROUND_NONPIXEL_Y_MOVES_Rules:JIa
@@ -3434,7 +3434,7 @@ CheckDestroyReader:Dpa
 get_Space:KYa
 DownPointOriginal:fE
 get_FontSize:zXa
-layout:ak
+layout:bk
 globalCoordCount:$ya
 TrackTablePos:UB
 is_offset_one:Cla
@@ -3533,7 +3533,7 @@ ctPathCommandCurveTo:Qxa
 destroy:Oja
 _background_grid_autofit_numhlines:Mu
 ymax:aEa
-TableRowPr:gk
+TableRowPr:hk
 numType:vV
 asc_getUnderline:PSa
 nIndex:xma
@@ -3655,7 +3655,7 @@ getChartPreviews:FWa
 LockFont:HHa
 TextHeight:Zga
 ctFontXML:Ebb
-FireCustomEvent:Xj
+FireCustomEvent:Yj
 sync_UpdateZoom:y5a
 bit_depth:cja
 band_size:QJ
@@ -4045,7 +4045,7 @@ CanAddDropCap:WR
 Parent:C
 ReadSlide:P8
 newPos:sV
-b_color1:$j
+b_color1:ak
 glyph:Aj
 put_SmallCaps:m2a
 _key_text_bold:kva
@@ -4620,7 +4620,7 @@ SendThemeColorScheme:hLa
 put_BrushTextureAlpha:r6
 SetMobileVersion:uLa
 bTimePeriod:Twa
-sids:Wj
+sids:Xj
 _serverHost:pQa
 handleRotate:Fh
 asc_findText:$Qa
@@ -4895,7 +4895,7 @@ DocumentType:S0
 Company:Spa
 IsSelection:l8
 asyncImagesDocumentStartLoaded:JUa
-calculateAfterResize:Tj
+calculateAfterResize:Uj
 ReadGeomCxn:eJa
 transform_delta:f0
 SetTextPr:Vq
@@ -5009,7 +5009,7 @@ user:Y5a
 setGraphicObject:shb
 TableRulersRectOffset:rJ
 store:joa
-GetChar:Zj
+GetChar:$j
 ReadTabs:iKa
 columns:dF
 axisHeight:Mwa
@@ -5057,7 +5057,7 @@ Add_NewDC:hpa
 Redraw:Kt
 asc_complete:cC
 CurRange:nA
-MultiplyAppend:ek
+MultiplyAppend:fk
 WriteUniFill:Rx
 get_Size:JYa
 asc_getReply:$va
@@ -5106,7 +5106,7 @@ index_format:LU
 CurrentLoadThemeIndex:Dea
 num_groups:M5
 codeSize:PP
-FixEventObject:Yj
+FixEventObject:Zj
 m_aCurrentDraw:BQ
 SetFont:cs
 raster_memory:bda
@@ -6532,7 +6532,7 @@ _background_barcolor1:kY
 hitInPath:LH
 X_max:iP
 put_VKey:a3a
-newRot:bk
+newRot:ck
 Clear_CollaborativeMarks:FW
 wrappingType:Bn
 WaitMouseDown:iha
@@ -6575,7 +6575,7 @@ old_Line:r0a
 font_type:uWa
 change_Hyperlink:nVa
 default_design_vector:eWa
-gindex:Uj
+gindex:Vj
 goto_table:Kl
 bRecalcDocContent:xab
 original:Vg
