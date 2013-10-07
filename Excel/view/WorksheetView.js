@@ -5645,7 +5645,7 @@
 			getSelectionInfo: function (bExt) {
 				var c_opt = this.settings.cells;
 				var activeCell = this.activeRange;
-				var mc = this._getMergedCellsRange(activeCell.startCol, activeCell.startRow);
+				var mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol);
 				var c1 = mc ? mc.c1 : activeCell.startCol;
 				var r1 = mc ? mc.r1 : activeCell.startRow;
 				var c = this._getVisibleCell(c1, r1);
