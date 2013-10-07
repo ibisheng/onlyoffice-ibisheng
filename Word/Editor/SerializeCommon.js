@@ -826,8 +826,16 @@ function CPPTXContentWriter()
             image.spPr.Geometry = CreateGeometry("rect");
         }
 
-        var _unifill = new CUniFill();
-        _unifill.fill = image.blipFill;
+        var _unifill = null;
+        if (image.blipFill instanceof CUniFill)
+        {
+            _unifill = image.blipFill;
+        }
+        else
+        {
+            _unifill = new CUniFill();
+            _unifill.fill = image.blipFill;
+        }
 
         _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);
         _writer.WriteRecord1(2, image.spPr, _writer.WriteSpPr);
