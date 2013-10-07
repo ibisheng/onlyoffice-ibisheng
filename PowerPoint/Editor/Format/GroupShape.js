@@ -638,6 +638,33 @@ CGroupShape.prototype =
         return this.transform;
     },
 
+    getHierarchy: function()
+    {
+        this.compiledHierarchy = [];
+        var hierarchy = this.compiledHierarchy;
+        if(this.isPlaceholder())
+        {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind)
+            {
+                case SLIDE_KIND:
+                {
+                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
+                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                    break;
+                }
+
+                case LAYOUT_KIND:
+                {
+                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                    break;
+                }
+            }
+        }
+        return this.compiledHierarchy;
+    },
+
     getCompiledFill: function()
     {
         this.compiledFill = null;
