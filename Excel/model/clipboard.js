@@ -761,6 +761,7 @@
             _editorPaste: function (worksheet,callback) {
                 var t = this;
 				window.GlobalPasteFlagCounter = 1;
+				isTruePaste = false;
                 var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                 document.body.style.MozUserSelect = "text";
                 delete document.body.style["-khtml-user-select"];
@@ -817,9 +818,7 @@
 						}
 					}*/
 
-					if(!is_chrome)
-						t._editorPasteExec(worksheet, pastebin);
-					else if(is_chrome && !isTruePaste)
+					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
 					
 					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
@@ -1026,7 +1025,7 @@
                     }
                     if(null != sHtml)
                     {
-                       t._addHtmlToIframe(worksheet,sHtml,isText);
+                       t._addHtmlToIframe(worksheet,sHtml,isText,e);
                     }
 					else
 					{
@@ -1054,9 +1053,10 @@
                 }
             },
 			
-			_addHtmlToIframe: function(worksheet,sHtml,isText)
+			_addHtmlToIframe: function(worksheet,sHtml,isText,e)
 			{
 				var t = this;
+				var bExist = false;
 				//Записываем html в IFrame
 				var ifr = document.getElementById("pasteFrame");
 				if (!ifr) 
@@ -1081,15 +1081,23 @@
 					frameWindow.document.write(sHtml);
 					frameWindow.document.close();
 					var bodyFrame = frameWindow.document.body;
-					isTruePaste = false;
 					if(bodyFrame && bodyFrame != null)
 					{
 						t._editorPasteExec(worksheet, frameWindow.document.body,isText);
-						isTruePaste = true;
+						bExist = true;
 					}
-					bExist = true;
+					ifr.style.display  = ELEMENT_DISPAY_STYLE;
 				}
-				ifr.style.display  = ELEMENT_DISPAY_STYLE;
+				if(bExist)
+				{
+					isTruePaste = true;
+					if (e.preventDefault)
+					{
+						e.stopPropagation();
+						e.preventDefault();
+					}
+					return false;
+				}
 			},
 			_copyPasteCorrectString: function (str)
 			{
