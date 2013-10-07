@@ -1437,28 +1437,28 @@ cFormulaFunction.Mathematic = {
                 else return B[N - 1][N - 1];
             }
 
-            function MatrixCofactor( i, j, A ) {        //Алгебраическое дополнение матрицы
-                var N = A.length, sign = ((i + j) % 2 == 0) ? 1 : -1;
+            function MatrixCofactor( i, j, __A ) {        //Алгебраическое дополнение матрицы
+                var N = __A.length, sign = ((i + j) % 2 == 0) ? 1 : -1;
 
                 for ( var m = 0; m < N; m++ ) {
-                    for ( var n = j + 1; n < N; n++ ) A[m][n - 1] = A[m][n];
-                    A[m].length--;
+                    for ( var n = j + 1; n < N; n++ ) __A[m][n - 1] = __A[m][n];
+                    __A[m].length--;
                 }
-                for ( var k = (i + 1); k < N; k++ ) A[k - 1] = A[k];
-                A.length--;
+                for ( var k = (i + 1); k < N; k++ ) __A[k - 1] = __A[k];
+                __A.length--;
 
-                return sign * Determinant( A );
+                return sign * Determinant( __A );
             }
 
-            function AdjugateMatrix( A ) {             //Союзная (присоединённая) матрица к A. (матрица adj(A), составленная из алгебраических дополнений A).
-                var N = A.length, B = [], adjA = [];
+            function AdjugateMatrix( _A ) {             //Союзная (присоединённая) матрица к A. (матрица adj(A), составленная из алгебраических дополнений A).
+                var N = _A.length, B = [], adjA = [];
 
                 for ( var i = 0; i < N; i++ ) {
                     adjA[i] = [];
                     for ( var j = 0; j < N; j++ ) {
                         for ( var m = 0; m < N; m++ ) {
                             B[m] = [];
-                            for ( var n = 0; n < N; n++ ) B[m][n] = A[m][n];
+                            for ( var n = 0; n < N; n++ ) B[m][n] = _A[m][n];
                         }
                         adjA[i][j] = MatrixCofactor( j, i, B );
                     }
@@ -1484,10 +1484,10 @@ cFormulaFunction.Mathematic = {
 
                 if ( detA != 0 ) {
                     invertA = AdjugateMatrix( A );
-                    datA = 1 / detA;
+                    var datA = 1 / detA;
                     for ( var i = 0; i < invertA.length; i++ ) {
                         for ( var j = 0; j < invertA[i].length; j++ ) {
-                            invertA[i][j] = new cNumber( detA * invertA[i][j] );
+                            invertA[i][j] = new cNumber( datA * invertA[i][j] );
                         }
                     }
                     res = new cArray();
