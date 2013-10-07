@@ -1770,7 +1770,7 @@
                         // Рисуем строку для печати
 						var mergedCells = {};
 						$.extend (mergedCells,
-							this._drawRowBG(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, false),
+							this._drawRowBG(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, null),
 							this._drawRowText(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt));
 
                         if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
@@ -1778,8 +1778,8 @@
                         // draw merged cells at last stage to fix cells background issue
 						for (var i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
 							var mc = mergedCells[i];
-							this._drawRowBG(drawingCtx, mc.row, mc.col, mc.col, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
-							this._drawCellText(drawingCtx, mc.col, mc.row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
+							this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, mc);
+							this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
 
                             if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
                         }
@@ -2197,26 +2197,27 @@
 						.clip();
 				for (var row = range.r1; row <= range.r2; ++row) {
 					$.extend( mergedCells,
-					          this._drawRowBG(/*drawingCtx*/undefined, row, range.c1, range.c2, offsetX, offsetY, false),
+					          this._drawRowBG(/*drawingCtx*/undefined, row, range.c1, range.c2, offsetX, offsetY, null),
 					          this._drawRowText(/*drawingCtx*/undefined, row, range.c1, range.c2, offsetX, offsetY) );
 				}
 				// draw merged cells at last stage to fix cells background issue
 				for (i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
 					mc = mergedCells[i];
-					this._drawRowBG(/*drawingCtx*/undefined, mc.row, mc.col, mc.col, offsetX, offsetY, true);
-					this._drawCellText(/*drawingCtx*/undefined, mc.col, mc.row, range.c1, range.c2, offsetX, offsetY, true);
+					this._drawRowBG(/*drawingCtx*/undefined, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
+					this._drawCellText(/*drawingCtx*/undefined, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
 				}
 				// restore canvas' original clipping range
 				ctx.restore();
 			},
 
 			/** Рисует фон ячеек в строке */
-			_drawRowBG: function (drawingCtx, row, colStart, colEnd, offsetX, offsetY, drawMergedCells) {
-				if (this.rows[row].height < this.height_1px && true !== drawMergedCells) {return {};}
+			_drawRowBG: function (drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell) {
+				if (this.rows[row].height < this.height_1px && null === oMergedCell) {return {};}
 
 				for (var mergedCells = {}, col = colStart; col <= colEnd; ++col) {
-					if (this.cols[col].width < this.width_1px && true !== drawMergedCells) {continue;}
+					if (this.cols[col].width < this.width_1px && null === oMergedCell) {continue;}
 
+					// ToDo подумать, может стоит не брать ячейку из модели (а брать из кеш-а)
 					var c = this._getVisibleCell(col, row);
 					if (!c) {continue;}
 
@@ -2224,26 +2225,23 @@
 					var bg = c.getFill();
 					if(null != bg)
 						bg = bg.getRgb();
-					var fl = this._getCellFlags(c);
-					var range = fl.isMerged ? this._getMergedCellsRange(col, row) : undefined;
+					var mc = null;
 					var mwidth = 0, mheight = 0;
 
-					if (fl.isMerged && !drawMergedCells) {
-						if (this._getCellTextCache(col, row, true) === undefined) {
-							if (!range) {
-								// Мы еще не закешировали замерженную ячейку, добавим и возьмем снова
-								this._addMergedCellsRange (col, row);
-								range = this._getMergedCellsRange(col, row);
-							}
-							mergedCells[range.r1 + "_" + range.c1] = {col: range.c1, row: range.r1};
+					if (null === oMergedCell) {
+						mc = this.model.getMergedByCell(row, col);
+						if (null !== mc) {
+							mergedCells[mc.r1 + "_" + mc.c1] = {c1: mc.c1, r1: mc.r1, c2: mc.c2, r2: mc.r2};
+							col = mc.c2;
+							continue;
 						}
-						continue;
-					}
+					} else
+						mc = oMergedCell;
 
-					if (fl.isMerged) {
-						if (col !== range.c1 || row !== range.r1) {continue;}
-						for (var i = range.c1 + 1; i <= range.c2 && i < this.nColsCount; ++i) {mwidth += this.cols[i].width;}
-						for (var j = range.r1 + 1; j <= range.r2 && j < this.nRowsCount; ++j) {mheight += this.rows[j].height;}
+					if (null !== mc) {
+						if (col !== mc.c1 || row !== mc.r1) {continue;}
+						for (var i = mc.c1 + 1; i <= mc.c2 && i < this.nColsCount; ++i) {mwidth += this.cols[i].width;}
+						for (var j = mc.r1 + 1; j <= mc.r2 && j < this.nRowsCount; ++j) {mheight += this.rows[j].height;}
 					} else {
 						if (bg === null) {
 							if (col === colEnd && col < this.cols.length - 1 && row < this.rows.length - 1) {
