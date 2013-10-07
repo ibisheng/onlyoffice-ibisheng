@@ -6045,11 +6045,10 @@
 			changeSelectionActivePoint: function (dc, dr) {
 				var ret;
 				var ar = this.activeRange;
-				var arMerge = this._getMergedCellsRange (ar.c1, ar.r1);
+				var mc = this.model.getMergedByCell (ar.r1, ar.c1);
 
 				// Если в выделенной области только одна ячейка, то просто сдвигаемся
-				if (ar.c1 === ar.c2 && ar.r1 === ar.r2 ||
-				    arMerge && ar.c1 === arMerge.c1 && ar.r1 === arMerge.r1 && ar.c2 === arMerge.c2 && ar.r2 === arMerge.r2)
+				if (ar.c1 === ar.c2 && ar.r1 === ar.r2 || mc && ar.isEqual(mc))
 					return this.changeSelectionStartPoint(dc, dr, /*isCoord*/false, /*isSelectMode*/false);
 
 				// Очищаем выделение
@@ -7036,7 +7035,7 @@
 							canChangeColWidth = c_oAscCanChangeColWidth.numbers;
 							break;
 						case "changeFontSize":
-							mc = t.getMergedByCell(arn.startRow, arn.startCol);
+							mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
 							c = mc ? mc.c1 : arn.startCol;
 							r = mc ? mc.r1 : arn.startRow;
 							cell = t._getVisibleCell(c, r);
@@ -7205,7 +7204,7 @@
 								val.hyperlinkModel.Ref = range;
 								range.setHyperlink(val.hyperlinkModel);
 								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-								mc = t.getMergedByCell(arn.startRow, arn.startCol);
+								mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
 								c = mc ? mc.c1 : arn.startCol;
 								r = mc ? mc.r1 : arn.startRow;
 								if (null !== val.asc_getText()) {
