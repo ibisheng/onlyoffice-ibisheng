@@ -9309,17 +9309,17 @@ Paragraph.prototype =
             if ( undefined != ParaPr.Shd )
                 this.Set_Shd( ParaPr.Shd, false );
 
-            // StyleId
-            if ( undefined != ParaPr.PStyle )
-                this.Style_Add( ParaPr.PStyle, true );
-            else
-                this.Style_Remove();
-
             // NumPr
             if ( undefined != ParaPr.NumPr )
                 this.Numbering_Set( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
             else
                 this.Numbering_Remove();
+
+            // StyleId
+            if ( undefined != ParaPr.PStyle )
+                this.Style_Add( ParaPr.PStyle, true );
+            else
+                this.Style_Remove();
 
             // Brd
             if ( undefined != ParaPr.Brd )
