@@ -379,16 +379,26 @@ CImageShape.prototype =
 
     recalculateBrush: function(aImagesSync)
     {
-        this.brush = new CUniFill();
+        var b_is_on  = History.Is_On();
+        if(b_is_on)
+        {
+            History.TurnOff();
+        }
+        this.brush = this.blipFill.createDuplicate();
+        /*this.brush = new CUniFill();
         this.brush.fill = new CBlipFill();
-        this.brush.fill.RasterImageId = getFullImageSrc(this.blipFill.fill.RasterImageId);
+        this.brush.fill.RasterImageId = getFullImageSrc(this.blipFill.fill.RasterImageId);      */
+        if(b_is_on)
+        {
+            History.TurnOn();
+        }
         if(Array.isArray(aImagesSync))
         {
             aImagesSync.push(getFullImageSrc(this.brush.fill.RasterImageId));
         }
         if(this.drawingObjects)
         {
-            this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
+            this.drawingObjects.loadImageRedraw(getFullImageSrc(this.brush.fill.RasterImageId));
         }
 
     },

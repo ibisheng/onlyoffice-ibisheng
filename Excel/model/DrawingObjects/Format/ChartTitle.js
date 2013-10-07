@@ -22,16 +22,6 @@ function CChartTitle(chartGroup, type)
     this.extX = null;
     this.extY = null;
 
-  /*  this.pen = new CLn();
-    this.pen.w = 90000;
-    this.pen.Fill = new CUniFill();
-    this.pen.Fill.fill = new CSolidFill();
-    this.pen.Fill.fill.color.color = new CRGBColor();
-
-    this.brush = new CUniFill();
-    this.brush.fill = new CSolidFill();
-    this.brush.fill.color.color = new CRGBColor();  */
-
     this.brush = null;
     this.pen = null;
     this.spPr.geometry = CreateGeometry("rect");

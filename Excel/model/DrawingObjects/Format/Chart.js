@@ -8,7 +8,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    this.chart = new asc_CChart();
+    //this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -39,6 +39,11 @@ function CChartAsGroup(drawingBase, drawingObjects)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(isRealObject(drawingObjects))
+    {
+        this.setDrawingObjects(drawingObjects);
+        this.setAscChart(new asc_CChart());
+    }
 }
 
 
@@ -47,6 +52,13 @@ CChartAsGroup.prototype =
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_AS_GROUP;
+    },
+
+    setAscChart: function(chart)
+    {
+        var old_id = isRealObject(this.chart) ? this.chart.Get_Id() : null;
+        var new_id = isRealObject(chart) ? chart.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_AscChart, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(old_id, new_id)), null);
     },
 
     Get_Id: function()
@@ -831,6 +843,8 @@ CChartAsGroup.prototype =
         return [];
     },
 
+
+
     select: function(drawingObjectsController)
     {
         this.selected = true;
@@ -1506,6 +1520,11 @@ CChartAsGroup.prototype =
                 this.drawingObjects.addGraphicObject(this, data.oldValue);
                 break;
             }
+            case historyitem_AutoShapes_Set_AscChart:
+            {
+                this.chart = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
         }
     },
 
@@ -1526,6 +1545,12 @@ CChartAsGroup.prototype =
 			case historyitem_AutoShapes_DeleteDrawingBase:
             {
                 this.drawingObjects.deleteDrawingBase(this.Id);
+                break;
+            }
+
+            case historyitem_AutoShapes_Set_AscChart:
+            {
+                this.chart = g_oTableId.Get_ById(data.newValue);
                 break;
             }
         }
