@@ -266,16 +266,10 @@
 			}
 
 			this.rows = {};
-			this.mergedCells = {
-				index: {},
-				ranges: []
-			};
 			this.sectors = [];
 
 			this.reset = function () {
 				this.rows = {};
-				this.mergedCells.index = {};
-				this.mergedCells.ranges = [];
 				this.sectors = [];
 			};
 
@@ -314,20 +308,6 @@
 			//         0 : true, 1 : true
 			//       }
 			//     }
-			//   },
-			//
-			//   mergedCells : {
-			//     index : {
-			//       "row-col" : Number
-			//     },
-			//     ranges: [
-			//       {
-			//         c1 : Number,
-			//         r1 : Number,
-			//         c2 : Number,
-			//         r2 : Number
-			//       }
-			//     ]
 			//   },
 			//
 			//   sectors: [
@@ -2294,7 +2274,7 @@
 				for (var col = colStart; col <= colEnd; ++col) {
 					if (this.cols[col].width < this.width_1px) {continue;}
 					mc = this._drawCellText(drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, false);
-					if (mc !== null) {mergedCells[mc.index] = {col: mc.col, row: mc.row};}
+					if (mc !== null) {mergedCells[mc.index] = {c1: mc.c1, r1: mc.r1, c2: mc.c2, r2: mc.r2};}
 					// check if long text overlaps this cell
 					i = this._findSourceOfCellText(col, row);
 						if (i >= 0) {
@@ -2333,8 +2313,8 @@
                 var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
 
                 if (isMerged) {
-                    range = this._getMergedCellsRange(col, row);
-                    if (!drawMergedCells) {return {col: range.c1, row: range.r1, index: range.r1 + "_" + range.c1};}
+                    range = ct.mc;
+                    if (!drawMergedCells) {return {c1: range.c1, r1: range.r1, c2: range.c2, r2: range.r2, index: range.r1 + "_" + range.c1};}
                     if (col !== range.c1 || row !== range.r1) {return null;}
                 }
 
@@ -2553,7 +2533,8 @@
 						var isFirstCol = col === range.c1;
 
 						if (!mergedCellsStage) {
-							mc = this._getMergedCellsRange(col, row);
+							// ToDo возможно можно оптимизировать
+							mc = this.model.getMergedByCell(row, col);
 							if (mc) {
 								if ((col === mc.c1 || isFirstCol) && (row === mc.r1 || isFirstRow)) {
 									mc = mc.intersectionSimple(this.visibleRange);
@@ -3412,16 +3393,7 @@
 			// --- Cache ---
 
 			_cleanCache: function (range) {
-				var t = this, r, c, row, id, rid;
-
-				function deleteIndex(range) {
-					for (var r = range.r1; r <= range.r2 && r < t.rows.length; ++r) {
-						for (var c = range.c1; c <= range.c2 && c < t.cols.length; ++c) {
-							var id = t._getMergedCellIndex(c, r);
-							delete t.cache.mergedCells.index[id];
-						}
-					}
-				}
+				var t = this, r, c, row;
 
 				if (range === undefined) {range = t.activeRange.clone(true);}
 
@@ -3433,12 +3405,6 @@
 							if (row.columnsWithText[c]) {delete row.columnsWithText[c];}
 							if (row.erasedLB[c]) {delete row.erasedLB[c];}
 							if (row.erasedRB[c-1]) {delete row.erasedRB[c-1];}
-						}
-						id = t._getMergedCellIndex(c, r);
-						rid = t.cache.mergedCells.index[id];
-						if (rid !== undefined) {
-							deleteIndex(t.cache.mergedCells.ranges[rid]);
-							delete t.cache.mergedCells.ranges[rid];
 						}
 					}
 					if (row !== undefined) {
@@ -3561,8 +3527,9 @@
 				if (c && c.text) {
 					return c.text;
 				} else if (!dontLookupMergedCells) {
-					var range = this._getMergedCellsRange(col, row);
-					return range !== undefined ? this._getCellTextCache(range.c1, range.r1, true) : undefined;
+					// ToDo проверить это условие, возможно оно избыточно
+					var range = this.model.getMergedByCell(row, col);
+					return null !== range ? this._getCellTextCache(range.c1, range.r1, true) : undefined;
 				}
 				return undefined;
 			},
@@ -3645,25 +3612,19 @@
 				}
 
 				// Range для замерженной ячейки
-				var range = null;
+				var mc = this.model.getMergedByCell(row, col);
 				var fl = this._getCellFlags(c);
 				var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
 				var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
-				if (fl.isMerged) {
-					range = this._getMergedCellsRange(col, row);
-					if (range === undefined) { // got uncached merged cells, redirect it
-						range = this._fetchMergedCellsRange(col, row);
-						this._addCellTextToCache(range.c1, range.r1, canChangeColWidth);
-						return col;
-					}
-					if (col !== range.c1 || row !== range.r1) {return range.c2;} // skip other merged cell from range
-					if (range.c1 !== range.c2)
+				if (null !== mc) {
+					if (col !== mc.c1 || row !== mc.r1) {return mc.c2;} // skip other merged cell from range
+					if (mc.c1 !== mc.c2)
 						fMergedColumns = true;
-					if (range.r1 !== range.r2)
+					if (mc.r1 !== mc.r2)
 						fMergedRows = true;
 				}
 
-				if (this._isCellEmpty(c)) {return col;}
+				if (this._isCellEmpty(c)) {return mc ? mc.c2 : col;}
 
 				var dDigitsCount = 0;
 				var colWidth = 0;
@@ -3689,7 +3650,7 @@
 					// Обновленная ячейка
 					dDigitsCount = this.cols[col].charCount;
 					colWidth = this.cols[col].innerWidth;
-				} else if (null === range) {
+				} else if (null === mc) {
 					// Обычная ячейка
 					dDigitsCount = this.cols[col].charCount;
 					colWidth = this.cols[col].innerWidth;
@@ -3707,7 +3668,7 @@
 					}
 				} else {
 					// Замерженная ячейка, нужна сумма столбцов
-					for (var i = range.c1; i <= range.c2 && i < this.nColsCount; ++i) {
+					for (var i = mc.c1; i <= mc.c2 && i < this.nColsCount; ++i) {
 						colWidth += this.cols[i].width;
 					}
 					colWidth -= pad;
@@ -3718,7 +3679,7 @@
 				var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
 				var ha   = c.getAlignHorizontalByValue().toLowerCase();
 				var va   = c.getAlignVertical().toLowerCase();
-				var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, range) : undefined;
+				var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
 				var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
 				var cto  = (fl.isMerged || fl.wrapText) ?
 						{
@@ -3747,19 +3708,20 @@
                 }
 
                 this._fetchCellCache(col, row).text = {
-					state   : this.stringRender.getInternalState(),
-					flags   : fl,
-					color   : (oFontColor || this.settings.cells.defaultState.color),
-					metrics : tm,
-					cellW   : cto.maxWidth,
-					cellHA  : ha,
-					cellVA  : va,
-					sideL   : cto.leftSide,
-					sideR   : cto.rightSide,
-					cellType: cellType,
-					isFormula: c.getFormula().length > 0,
-					angle     : c.getAngle(),
-                    textBound : textBound
+					state		: this.stringRender.getInternalState(),
+					flags		: fl,
+					color		: (oFontColor || this.settings.cells.defaultState.color),
+					metrics		: tm,
+					cellW		: cto.maxWidth,
+					cellHA		: ha,
+					cellVA		: va,
+					sideL		: cto.leftSide,
+					sideR		: cto.rightSide,
+					cellType	: cellType,
+					isFormula	: c.getFormula().length > 0,
+					angle		: c.getAngle(),
+                    textBound	: textBound,
+					mc			: mc
 				};
 
 				this._fetchCellCacheText(col, row).hasText = true;
@@ -3804,14 +3766,14 @@
                     }
                 }
 
-				return col;
+				return mc ? mc.c2 : col;
 			},
 
-			_calcMaxWidth: function (col, row, range) {
-				if (null === range) {return this.cols[col].innerWidth;}
+			_calcMaxWidth: function (col, row, mc) {
+				if (null === mc) {return this.cols[col].innerWidth;}
 
-				var width = this.cols[range.c1].innerWidth;
-				for (var c = range.c1 + 1; c <= range.c2 && c < this.nColsCount; ++c) {
+				var width = this.cols[mc.c1].innerWidth;
+				for (var c = mc.c1 + 1; c <= mc.c2 && c < this.nColsCount; ++c) {
 					width += this.cols[c].width;
 				}
 				return width;
@@ -3881,69 +3843,9 @@
 
 			// ----- Merged cells cache -----
 
-			_getMergedCellIndex: function (col, row) {
-				return row + "-" + col;
-			},
-
-			_getMergedCellsRange: function (col, row) {
-				var index = this._getMergedCellIndex(col, row);
-				var rangeId = this.cache.mergedCells.index[index];
-				return rangeId !== undefined ? this.cache.mergedCells.ranges[rangeId] : undefined;
-			},
-
-			_fetchMergedCellsRange: function (col, row) {
-				var index, rangeId, mc = this._getMergedCellsRange(col, row);
-				if (mc) {return mc;}
-
-				this._addMergedCellsRange(col, row);
-				index = this._getMergedCellIndex(col, row);
-				rangeId = this.cache.mergedCells.index[index];
-				if (rangeId === undefined) {
-					throw "Error: can not get merged cell range (col=" + col + ", row=" + row + ")";
-				}
-				return this.cache.mergedCells.ranges[rangeId];
-			},
-
-			_addMergedCellsRange: function (col, row) {
-				var range = this._getCell(col, row).hasMerged(), rangeId, c, r;
-				this.cache.mergedCells.ranges.push( asc_Range(range.c1, range.r1, range.c2, range.r2) );
-				rangeId = this.cache.mergedCells.ranges.length - 1;
-				for (r = range.r1; r <= range.r2 && r < this.nRowsCount; ++r) {
-					for (c = range.c1; c <= range.c2 && c < this.nColsCount; ++c) {
-						this.cache.mergedCells.index[ this._getMergedCellIndex(c, r) ] = rangeId;
-					}
-				}
-			},
-
 			_isMergedCells: function (range) {
-				return range.isEqual(this.model.getMergedByCell(range.c1, range.r1));
+				return range.isEqual(this.model.getMergedByCell(range.r1, range.c1));
 			},
-
-			// Обновляем массив мерженных индексов для новых строк
-			_updateMergedCellsRange: function (updateRange) {
-				for (var key in this.cache.mergedCells.ranges) {
-					var tmpRange = this.cache.mergedCells.ranges[key];
-					var bIsUpdate = false;
-					var _r = tmpRange.r1, _c = tmpRange.c1;
-					if (tmpRange.c1 < updateRange.c1 && tmpRange.c2 > updateRange.c2) {
-						bIsUpdate = true;
-						_c = updateRange.c1;
-					}
-					if (tmpRange.r1 < updateRange.r1 && tmpRange.r2 > updateRange.r2) {
-						bIsUpdate = true;
-						_r = updateRange.r1;
-					}
-
-					if (bIsUpdate) {
-						for (var r = _r; r <= tmpRange.r2 && r < this.nRowsCount; ++r) {
-							for (var c = _c; c <= tmpRange.c2 && c < this.nColsCount; ++c) {
-								this.cache.mergedCells.index[ this._getMergedCellIndex(c, r) ] = key;
-							}
-						}
-					}
-				}
-			},
-
 
 			// ----- Cell borders cache -----
 
@@ -4642,12 +4544,10 @@
 
 				if (newCol >= t.cols.length && newCol <= gc_nMaxCol0) {
 					t.nColsCount = newCol + 1;
-					t._updateMergedCellsRange(asc_Range(t.cols.length - 1, 0, t.nColsCount - 1, t.nRowsCount));
 					t._calcColumnWidths(/*fullRecalc*/2);
 				}
 				if (newRow >= t.rows.length && newRow <= gc_nMaxRow0) {
 					t.nRowsCount = newRow + 1;
-					t._updateMergedCellsRange(asc_Range(0, t.rows.length - 1, t.nColsCount, t.nRowsCount - 1));
 					t._calcRowHeights(/*fullRecalc*/2);
 				}
 
@@ -8341,9 +8241,6 @@
 					bIsMaxCols = true;
 				}
 
-				// Проверяем замерженность всего или какой-либо строки
-				this._updateMergedCellsRange(asc_Range (nLastCols, 0, this.nColsCount - 1, this.nRowsCount));
-
 				t._calcColumnWidths(/*fullRecalc*/2);
 				return (nLastCols !== this.nColsCount || bIsMaxCols);
 			},
@@ -8380,9 +8277,6 @@
 					bIsMaxRows = true;
 				}
 
-				// Проверяем замерженность всего или какого-либо столбца
-				this._updateMergedCellsRange(asc_Range (0, nLastRows, this.nColsCount, this.nRowsCount - 1));
-
 				t._calcRowHeights(/*fullRecalc*/2);
 				return (nLastRows !== this.nRowsCount || bIsMaxRows);
 			},
@@ -8395,7 +8289,7 @@
 						return;
 
 					var width = null;
-					var row, ct, c, fl, str, maxW, tm, range;
+					var row, ct, c, fl, str, maxW, tm, mc;
 					var oldWidth;
 					var lastHeight = null;
 					var filterButton = null;
@@ -8404,12 +8298,9 @@
 						ct = t._getCellTextCache(col, row);
 						if (ct === undefined) {continue;}
 						if (ct.flags.isMerged) {
-							range = t._getMergedCellsRange(col, row);
-							if (range === undefined) { // got uncached merged cells, redirect it
-								range = t._fetchMergedCellsRange(col, row);
-							}
+							mc = ct.mc;
 							// Для замерженных ячеек (с 2-мя или более колонками) оптимизировать не нужно
-							if (range.c1 !== range.c2)
+							if (mc.c1 !== mc.c2)
 								continue;
 						}
 
@@ -8481,18 +8372,15 @@
 						return;
 
 					var height = t.defaultRowHeight;
-					var col, ct;
+					var col, ct, mc;
 
 					for (col = 0; col < t.rows.length; ++col) {
 						ct = t._getCellTextCache(col, row);
 						if (ct === undefined) {continue;}
 						if (ct.flags.isMerged) {
-							range = t._getMergedCellsRange(col, row);
-							if (range === undefined) { // got uncached merged cells, redirect it
-								range = t._fetchMergedCellsRange(col, row);
-							}
+							mc = ct.mc;
 							// Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
-							if (range.r1 !== range.r2)
+							if (mc.r1 !== mc.r2)
 								continue;
 						}
 
@@ -9023,12 +8911,13 @@
 					row = ar.startRow;
 				}
 
+				// Возможно стоит заменить на ячейку из кеша
 				c = t._getVisibleCell(col, row);
 				if (!c) {throw "Can not get cell data (col=" + col + ", row=" + row + ")";}
 
 				fl = t._getCellFlags(c);
 				if (fl.isMerged) {
-					mc = t._getMergedCellsRange(col, row);
+					mc = t.model.getMergedByCell(row, col);
 					c = t._getVisibleCell(mc.c1, mc.r1);
 					if (!c) {throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";}
 					fl = t._getCellFlags(c);
@@ -9157,10 +9046,7 @@
 						if (!ct.flags.isMerged) {
 							bUpdateRowHeight = true;
 						} else {
-							mergedRange = t._getMergedCellsRange(c, r);
-							if (undefined === mergedRange) { // got uncached merged cells, redirect it
-								mergedRange = t._fetchMergedCellsRange(c, r);
-							}
+							mergedRange = ct.mc;
 							// Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
 							bUpdateRowHeight = mergedRange.r1 === mergedRange.r2;
 						}
