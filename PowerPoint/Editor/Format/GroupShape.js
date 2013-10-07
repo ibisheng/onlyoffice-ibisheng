@@ -640,7 +640,44 @@ CGroupShape.prototype =
 
     getCompiledFill: function()
     {
-        return null;
+        this.compiledFill = null;
+        if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill))
+        {
+            this.compiledFill = this.spPr.Fill.createDuplicate();
+        }
+        else if(isRealObject(this.group))
+        {
+            var group_compiled_fill = this.group.getCompiledFill();
+            if(isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill))
+            {
+                this.compiledFill = group_compiled_fill.createDuplicate();
+            }
+            else
+            {
+                var hierarchy = this.getHierarchy();
+                for(var i = 0; i < hierarchy.length; ++i)
+                {
+                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill))
+                    {
+                        this.compiledFill = hierarchy[i].spPr.Fill.createDuplicate();
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            var hierarchy = this.getHierarchy();
+            for(var i = 0; i < hierarchy.length; ++i)
+            {
+                if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill))
+                {
+                    this.compiledFill = hierarchy[i].spPr.Fill.createDuplicate();
+                    break;
+                }
+            }
+        }
+        return this.compiledFill;
     },
 
 
