@@ -2419,6 +2419,8 @@ Woorksheet.prototype.init=function(){
 	}
 };
 Woorksheet.prototype.initPostOpen = function(){
+	this.mergeManager.startRecalculate();
+	this.hyperlinkManager.startRecalculate();
 	//chart
 	if(null != this.Drawings)
 	{

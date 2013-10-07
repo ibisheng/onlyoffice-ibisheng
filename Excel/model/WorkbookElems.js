@@ -3640,15 +3640,14 @@ RangeDataManager.prototype = {
 		}
 		else
 		{
-			this.nStopRecalculate++;
+			this.stopRecalculate();
 			var aElems = this.get(bbox);
 			for(var i = 0, length = aElems.all.length; i < length; ++i)
 			{
 				var elem = aElems.all[i];
 				this.remove(elem.bbox, elem, bTriggerEvent);
 			}
-			this.nStopRecalculate--;
-			this._recalculate();
+			this.startRecalculate();
 		}
 	},
 	shiftGet : function(bbox, bHor)
@@ -3662,7 +3661,7 @@ RangeDataManager.prototype = {
 	},
 	shift : function(bbox, bAdd, bHor, oGetRes)
 	{
-		this.nStopRecalculate++;
+		this.stopRecalculate();
 		if(null == oGetRes)
 			oGetRes = this.shiftGet(bbox, bHor);
 		var aToChange = [];
@@ -3778,8 +3777,7 @@ RangeDataManager.prototype = {
 			if(null != item.to)
 				this.add(item.to, item.elem.data);
 		}
-		this.nStopRecalculate--;
-		this._recalculate();
+		this.startRecalculate();
 	},
 	getAll : function()
 	{
@@ -3788,6 +3786,19 @@ RangeDataManager.prototype = {
 	setDependenceManager : function(oDependenceManager)
 	{
 		this.oDependenceManager = oDependenceManager;
+	},
+	stopRecalculate : function()
+	{
+		this.nStopRecalculate++;
+	},
+	startRecalculate : function()
+	{
+		this.nStopRecalculate--;
+		if(this.nStopRecalculate <= 0)
+		{
+			this.nStopRecalculate = 0;
+			this._recalculate();
+		}
 	},
 	_getBBoxIndex : function(bbox)
 	{
