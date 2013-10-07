@@ -2245,11 +2245,12 @@ function DecodeGeneralFormat_Raw(val, nValType, dDigitsCount)
 	{
 		bContinue = false;
 		var nRealExp = gc_nMaxDigCount + parts.exponent;//nRealExp == 0, при 0,123
+		var nRealExpAbs = Math.abs(nRealExp);
 		var nExpMinDigitsCount;//число знаков в формате 'E+00'
-		if(Math.abs(nRealExp) < 100)
+		if(nRealExpAbs < 100)
 			nExpMinDigitsCount = 4;
 		else
-			nExpMinDigitsCount = 2 + nRealExp.toString().length;
+			nExpMinDigitsCount = 2 + nRealExpAbs.toString().length;
 		
 		var suffix = "";
 		if (nRealExp > 0)
