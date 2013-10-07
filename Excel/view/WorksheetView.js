@@ -5442,25 +5442,25 @@
 					}
 
 					// Обработка движения active point через merged cells
-					var mergedCells = this._getMergedCellsRange(ar.startCol, ar.startRow);
+					var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
 
-					if (mergedCells) {
-						if (dc > 0 && (ar.startCol > mergedCells.c1 || ar.startRow !== mergedCells.r1)) {
+					if (mc) {
+						if (dc > 0 && (ar.startCol > mc.c1 || ar.startRow !== mc.r1)) {
 							// Движение слева направо
-							ar.startCol = mergedCells.c2 + 1;
+							ar.startCol = mc.c2 + 1;
 							done = false;
-						} else if (dc < 0 && (ar.startCol < mergedCells.c2 || ar.startRow !== mergedCells.r1)) {
+						} else if (dc < 0 && (ar.startCol < mc.c2 || ar.startRow !== mc.r1)) {
 							// Движение справа налево
-							ar.startCol = mergedCells.c1 - 1;
+							ar.startCol = mc.c1 - 1;
 							done = false;
 						}
-						if (dr > 0 && (ar.startRow > mergedCells.r1 || ar.startCol !== mergedCells.c1)) {
+						if (dr > 0 && (ar.startRow > mc.r1 || ar.startCol !== mc.c1)) {
 							// Движение сверху вниз
-							ar.startRow = mergedCells.r2 + 1;
+							ar.startRow = mc.r2 + 1;
 							done = false;
-						} else if (dr < 0 && (ar.startRow < mergedCells.r2 || ar.startCol !== mergedCells.c1)) {
+						} else if (dr < 0 && (ar.startRow < mc.r2 || ar.startCol !== mc.c1)) {
 							// Движение снизу вверх
-							ar.startRow = mergedCells.r1 - 1;
+							ar.startRow = mc.r1 - 1;
 							done = false;
 						}
 					}
@@ -5492,7 +5492,7 @@
 
 			_calcSelectionEndPointByOffset: function (dc, dr) {
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-				var mc = this._getMergedCellsRange(ar.c2, ar.r2);
+				var mc = this.model.getMergedByCell(ar.r2, ar.c2);
 				var c  = mc ? ( dc <= 0 ? mc.c1 : mc.c2 ) : ar.c2;
 				var r  = mc ? ( dr <= 0 ? mc.r1 : mc.r2 ) : ar.r2;
 				var p  = this._calcCellPosition(c, r, dc, dr);
@@ -5623,10 +5623,10 @@
 			},
 
 			getSelectionName: function (bRangeText) {
-				var activeCell = this.activeRange;
-				var mc = this._getMergedCellsRange(activeCell.startCol, activeCell.startRow);
-				var c1 = mc ? mc.c1 : activeCell.startCol;
-				var r1 = mc ? mc.r1 : activeCell.startRow;
+				var ar = this.activeRange;
+				var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
+				var c1 = mc ? mc.c1 : ar.startCol;
+				var r1 = mc ? mc.r1 : ar.startRow;
 
 				var selectionSize = !bRangeText ? "" : (function (r) {
 					var rc = Math.abs(r.r2 - r.r1) + 1;
@@ -5638,7 +5638,7 @@
 						case c_oAscSelectionType.RangeMax: return gc_nMaxRow + "R x " + gc_nMaxCol + "C";
 					}
 					return "";
-				})(activeCell);
+				})(ar);
 
 				var cellName =  this._getColumnTitle(c1) + this._getRowTitle(r1);
 				return selectionSize || cellName;
