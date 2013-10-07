@@ -5279,7 +5279,6 @@
 				if (dc === undefined) {dc = +1;}
 				if (dr === undefined) {dr = +1;}
 
-
 				function findVisibleCol(from, dc, flag) {
 					var to = dc < 0 ? -1 : t.cols.length, c;
 					for (c = from; c !== to; c += dc) {
@@ -5304,7 +5303,7 @@
 					if (t.nColsCount > ar.c2 && t.cols[ar.c2].width < t.width_1px) {
 						// Проверка для одновременно замерженных и скрытых ячеек (A1:C1 merge, B:C hidden)
 						for (mc = null, i = arn.r1; i <= arn.r2; ++i) {
-							mc = t._getMergedCellsRange(ar.c2, i);
+							mc = t.model.getMergedByCell(i, ar.c2);
 							if (mc) {break;}
 						}
 						if (!mc) {c2 = findVisibleCol(ar.c2, dc);}
@@ -5320,7 +5319,7 @@
 					if (t.nRowsCount > ar.r2 && t.rows[ar.r2].height < t.height_1px) {
 						//Проверка для одновременно замерженных и скрытых ячеек (A1:A3 merge, 2:3 hidden)
 						for (mc = null, i = arn.c1; i <= arn.c2; ++i) {
-							mc = t._getMergedCellsRange(i, ar.r2);
+							mc = t.model.getMergedByCell(ar.r2, i);
 							if (mc) {break;}
 						}
 						if (!mc) {r2 = findVisibleRow(ar.r2, dr);}
@@ -5396,7 +5395,7 @@
 
 			_moveActiveCellToOffset: function (dc, dr) {
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-				var mc = this._getMergedCellsRange(ar.startCol, ar.startRow);
+				var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
 				var c  = mc ? ( dc < 0 ? mc.c1 : dc > 0 ? Math.min(mc.c2, this.nColsCount - 1 - dc) : ar.startCol) : ar.startCol;
 				var r  = mc ? ( dr < 0 ? mc.r1 : dr > 0 ? Math.min(mc.r2, this.nRowsCount - 1 - dr) : ar.startRow ) : ar.startRow;
 				var p  = this._calcCellPosition(c, r, dc, dr);
