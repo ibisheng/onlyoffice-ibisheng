@@ -3247,13 +3247,7 @@ function DrawingObjects() {
 		/*********** Print Options ***************
 		printOptions : {
 			ctx,
-			margin : {
-				left: 0,	// pt
-				right: 0,	// pt
-				top: 0,		// pt
-				button: 0	// pt
-			},
-			pageRange		// c1, r1, c2, r2
+			printPagesData
 		}
 		*****************************************/
 				
@@ -3284,8 +3278,12 @@ function DrawingObjects() {
 					if ( drawingObject.isGraphicObject() ) {
 						if ( printOptions ) {
 						
-							var left = worksheet.getCellLeft(printOptions.pageRange.c1, 3) - 2 * worksheet.getCellLeft(0, 3) - ptToMm(printOptions.margin.left);
-							var top = worksheet.getCellTop(printOptions.pageRange.r1, 3) - 2 * worksheet.getCellTop(0, 3) - ptToMm(printOptions.margin.left);
+							var range = printOptions.printPagesData.pageRange;
+							var printPagesData = printOptions.printPagesData;
+							var offsetCols = printPagesData.startOffsetPt;
+							
+							var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - ptToMm(printPagesData.leftFieldInPt);
+							var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - ptToMm(printPagesData.topFieldInPt);
 						
 							var tx = drawingObject.graphicObject.transform.tx;
 							var ty = drawingObject.graphicObject.transform.ty;
@@ -3294,6 +3292,8 @@ function DrawingObjects() {
 							drawingObject.graphicObject.transform.ty -= top;
 							
 							drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
+							worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
+							worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
 							
 							// Restore
 							drawingObject.graphicObject.transform.tx = tx;
@@ -3335,10 +3335,14 @@ function DrawingObjects() {
 		}
 
 		for (var i = 0; i < aObjects.length; i++) {
-			if (aObjects[i].to.col >= metrics.maxCol)
-				metrics.maxCol = aObjects[i].to.col + 1; // учитываем colOff
-			if (aObjects[i].to.row >= metrics.maxRow)
-				metrics.maxRow = aObjects[i].to.row + 1; // учитываем rowOff
+			
+			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			var coords = _this.getBoundsCheckerCoords(boundsChecker);
+			
+			if ( coords.to.col >= metrics.maxCol )
+				metrics.maxCol = coords.to.col + 1; // учитываем colOff
+			if ( coords.to.row >= metrics.maxRow )
+				metrics.maxRow = coords.to.row + 1; // учитываем rowOff
 		}
 		return metrics;
 	}

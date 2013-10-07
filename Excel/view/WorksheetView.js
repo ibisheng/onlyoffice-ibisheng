@@ -1810,13 +1810,7 @@
 
 					var drawingPrintOptions = {
 						ctx: drawingCtx,
-						margin: {
-							left: printPagesData.leftFieldInPt - this.cellsLeft,
-							top: printPagesData.topFieldInPt - this.cellsTop,
-							right: printPagesData.rightFieldInPt,
-							bottom: printPagesData.bottomFieldInPt
-						},
-						pageRange: printPagesData.pageRange
+						printPagesData: printPagesData
 					};
 					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange.clone(true);
