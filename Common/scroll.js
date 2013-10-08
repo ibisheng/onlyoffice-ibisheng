@@ -489,12 +489,12 @@ ScrollObject.prototype = {
             this.canvas.parentNode.firstElementChild.clientWidth - (settings.screenH || this.canvas.parentNode.offsetWidth) :
             0;
 
-        this.isVerticalScroll = this.canvas.parentNode.firstElementChild.clientHeight / this.canvas.height > 1 || this.isVerticalScroll;
-        this.isHorizontalScroll = this.canvas.parentNode.firstElementChild.clientWidth / this.canvas.width > 1 || this.isHorizontalScroll;
+        this.isVerticalScroll = this.canvas.parentNode.firstElementChild.clientHeight / this.canvasH > 1 || this.isVerticalScroll;
+        this.isHorizontalScroll = this.canvas.parentNode.firstElementChild.clientWidth / this.canvasW > 1 || this.isHorizontalScroll;
         this._setScrollerHW();
 
-        this.paneHeight = this.canvas.height - this.arrowPosition * 2;
-        this.paneWidth = this.canvas.width - this.arrowPosition * 2;
+        this.paneHeight = this.canvasH - this.arrowPosition * 2;
+        this.paneWidth = this.canvasW - this.arrowPosition * 2;
         this.RecalcScroller();
         this.reinit = true;
         if ( this.isVerticalScroll ) {
