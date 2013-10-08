@@ -2411,13 +2411,17 @@ WordShape.prototype =
         }
         historyData.old_geometryPreset = isRealObject(this.spPr.geometry) ? this.spPr.geometry.preset : null;
         historyData.new_geometryPreset = _final_preset;
+        historyData.oldGeometry = this.spPr.geometry;
 
 
-        History.Add(this, historyData);
+
 
         this.spPr.geometry = CreateGeometry(_final_preset);
         this.spPr.geometry.Init(100, 100);
+        historyData.newGeometry = this.spPr.geometry;
         this.calculateAfterResize();
+        History.Add(this, historyData);
+
     },
 
 
@@ -4226,8 +4230,12 @@ WordShape.prototype =
                     this.spPr.ln = data.oldLine;
                     this.calculateLine();
                 }
-                this.spPr.geometry = CreateGeometry(data.old_geometryPreset);
-                this.spPr.geometry.Init(100, 100);
+                if(typeof data.old_geometryPreset === "string")
+                    this.spPr.geometry = CreateGeometry(data.old_geometryPreset);
+                else
+                    this.spPr.geometry = data.oldGeometry;
+                if(this.spPr.geometry)
+                    this.spPr.geometry.Init(100, 100);
                 this.calculateAfterResize();
                 break;
             }
