@@ -9410,6 +9410,7 @@ Paragraph.prototype =
 
     Style_Add : function(Id, bDoNotDeleteProps)
     {
+        return;
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
         var Id_old = this.Pr.PStyle;

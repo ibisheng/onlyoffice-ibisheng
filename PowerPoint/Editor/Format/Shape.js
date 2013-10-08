@@ -370,7 +370,7 @@ CShape.prototype =
         uni_fill.fill.color = (new CUniColor());
         uni_fill.fill.color.color = (new CSchemeColor());
         uni_fill.fill.color.color.id = (12);
-        this.setUniFill(uni_fill);
+        this.setFill(uni_fill);
 
         var ln = new CLn();
         ln.w = (6350);
@@ -379,8 +379,8 @@ CShape.prototype =
         ln.Fill.fill.color  = (new CUniColor());
         ln.Fill.fill.color.color = (new CPrstColor());
         ln.Fill.fill.color.color.id = ("black");
-        this.setUniLine(ln);
-        this.addTextBody(new CTextBody(this));
+        this.setLine(ln);
+        this.setTextBody(new CTextBody(this));
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -3425,6 +3425,14 @@ CShape.prototype =
         this.recalcInfo.recalculateBrush = true;
         this.recalcInfo.recalculateTransparent = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+    setFill: function(fill)
+    {
+        var old_fill = this.spPr.Fill;
+        this.spPr.Fill = fill;
+
+        var new_fill = this.spPr.Fill.createDuplicate();
+        History.Add(this, {Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill});
     },
 
     changeLine : function(line)
