@@ -1192,8 +1192,10 @@
 						Ref: result[0].id + ':' + result[result.length -1].idNext
 					};
 					if(isInsertButton){
-						if (bIsActiveSheet)
+						//if (bIsActiveSheet)
+							//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
 							this._addButtonAF(newRes, bIsOpenFilter);
+							this.drawAutoF(true);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
@@ -1251,7 +1253,7 @@
 			},
 			
 			//перерисовка и отрисовка кнопок(draw:)
-			drawAutoF: function(){
+			drawAutoF: function(isNotDraw){
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
 				if(buttons)
@@ -1377,7 +1379,7 @@
 								row: row,
 								col: col
 							};
-							if(buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top)
+							if(buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top && !isNotDraw)
 								this._drawButton(x1,y1,filOptions)
 						}
 					}
