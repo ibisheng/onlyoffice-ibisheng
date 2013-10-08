@@ -1681,6 +1681,8 @@ function CPresentationBullet()
                 oColor.b = FirstTextPr.Color.b;
             }
 
+            var old_b_color = {r: Context.m_oBrush.Color1.R, g: Context.m_oBrush.Color1.G, b: Context.m_oBrush.Color1.B};
+            var old_pen_color = {r: Context.m_oPen.Color.R, g: Context.m_oPen.Color.G, b: Context.m_oPen.Color.B};
             Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
             Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
 
@@ -1701,6 +1703,8 @@ function CPresentationBullet()
 
             Context.SetFont( OldFont );
             g_oTextMeasurer.SetFont( OldFont2 );
+            Context.p_color( old_pen_color.r, old_pen_color.g, old_pen_color.b, 255 );
+            Context.b_color1( old_b_color.r, old_b_color.g, old_b_color.b, 255 );
         }
         else
         {
