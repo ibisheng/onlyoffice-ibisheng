@@ -413,7 +413,7 @@ var UndoRedoDataTypes = new function() {
             case this.GOShapeRecalcTransform: return new UndoRedoDataShapeRecalc(); break;
             case this.GOAddAdjustment: return new UndoRedoDataAddAdjustment(); break;
             case this.GOAddGuide: return new UndoRedoDataAddGuide(); break;
-            case this.GOAddCnx: return new UndoRedoDataAddGuide(); break;
+            case this.GOAddCnx: return new UndoRedoDataAddCnx(); break;
             case this.GOHandleXY: return new UndoRedoDataAddHandleXY(); break;
             case this.GOHandlePolar: return new UndoRedoDataAddHandlePolar(); break;
             case this.GOAddPathCommand: return new UndoRedoDataAddPathCommand(); break;

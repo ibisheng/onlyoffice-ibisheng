@@ -249,6 +249,11 @@ CTableId.prototype =
                         Class = new CBlipFill();
                         break;
                     }
+                    case CLASS_TYPE_GRAD_LIN:
+                    {
+                        Class = new GradLin();
+                        break;
+                    }
                 }
 
                 if(isRealObject(Class))

@@ -1442,9 +1442,9 @@ CGeometry.prototype=
                     {
                         name: data.name,
                         formula: data.formula,
-                        x: data.x,
-                        y: data.y,
-                        z: data.z,
+                        x: data.x != null ? data.x : undefined,
+                        y: data.y != null ? data.y : undefined,
+                        z: data.z != null ? data.z : undefined,
                         isAdj: false
                     });
                 break;

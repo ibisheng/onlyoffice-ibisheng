@@ -1987,6 +1987,7 @@ GradLin.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
+
         Writer.WriteLong(this.angle);
         Writer.WriteBool(this.scale);
     },
