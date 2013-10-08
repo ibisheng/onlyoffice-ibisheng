@@ -1523,7 +1523,6 @@ Workbook.prototype.init=function(){
 		thas.handlers.trigger("cleanCellCache", ws.getId(), new Asc.Range( 0, 0, ws.getColsCount()-1, ws.getRowsCount()-1 ), c_oAscCanChangeColWidth.numbers);
 		thas.startActionOn = false;
 		thas.handlers.trigger("asc_onEndAction",c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc);
-        console.log("timeCount " + timeCount);
 	}
 	
 	if( nR.length > 0 ){
@@ -3931,6 +3930,10 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 				__cell.oValue.number = res.value ? 1 : 0;
 				break;
 			case cElementType.error:
+				__cell.oValue.type = CellValueType.Error;
+				__cell.oValue.text = res.getValue().toString();
+				break;
+            case cElementType.name:
 				__cell.oValue.type = CellValueType.Error;
 				__cell.oValue.text = res.getValue().toString();
 				break;
