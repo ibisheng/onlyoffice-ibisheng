@@ -448,8 +448,12 @@ cFormulaFunction.LookupAndReference = {
                 parseReference();
             }
 
-            if ( found_operand )
+            if ( found_operand ){
+                if( found_operand instanceof cName )
+                    found_operand = found_operand.toRef()
                 return this.value = found_operand;
+            }
+
 
             return this.value = new cError( cErrorType.bad_reference );
 

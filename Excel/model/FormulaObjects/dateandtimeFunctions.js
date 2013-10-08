@@ -745,7 +745,8 @@ cFormulaFunction.DateAndTime = {
                 return true;
             }
 
-            dif = ( val1 - val0 + c_msPerDay ) / c_msPerDay;
+            dif = ( val1 - val0 )
+            dif = ( dif + (dif >= 0 ? c_msPerDay : 0 ) ) / c_msPerDay;
             for(var i = 0; i < Math.abs(dif); i++ ){
                 var date = new Date( val0 );
                 date.setDate(val0.getDate()+i) ;
