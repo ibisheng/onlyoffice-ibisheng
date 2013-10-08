@@ -3336,14 +3336,20 @@ function DrawingObjects() {
 
 		for (var i = 0; i < aObjects.length; i++) {
 			
-			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			/*var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			var coords = _this.getBoundsCheckerCoords(boundsChecker);
 			if ( coords ) {
 				if ( coords.to.col >= metrics.maxCol )
 					metrics.maxCol = coords.to.col + 1; // учитываем colOff
 				if ( coords.to.row >= metrics.maxRow )
 					metrics.maxRow = coords.to.row + 1; // учитываем rowOff
-			}
+			}*/
+			
+			var drawingObject = aObjects[i];
+			if ( drawingObject.to.col >= metrics.maxCol )
+				metrics.maxCol = drawingObject.to.col + 1; // учитываем colOff
+			if ( drawingObject.to.row >= metrics.maxRow )
+				metrics.maxRow = drawingObject.to.row + 1; // учитываем rowOff
 		}
 		return metrics;
 	}
