@@ -1404,7 +1404,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onKeyPress = function(e)
     {
-        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        if(!(e.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
             //var worksheet = this.drawingObjects.getWorksheet();
             //worksheet.collaborativeEditing.onStartCheckLock();
