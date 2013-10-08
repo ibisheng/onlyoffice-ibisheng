@@ -2796,7 +2796,7 @@ CAnchorPosition.prototype =
                         }
                     }
                     else
-                        this.CalcX = this.Left_Margin + Value;
+                        this.CalcX = Value;
 
                     break;
                 }

@@ -903,7 +903,7 @@ Paragraph.prototype =
                     Item.TextPr = EndTextPr;
                     g_oTextMeasurer.SetTextPr( EndTextPr );
                     Item.Measure( g_oTextMeasurer, bEndCell );
-                    
+
                     TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
                     TextHeight  = g_oTextMeasurer.GetHeight();
                     TextAscent  = TextHeight - TextDescent;
