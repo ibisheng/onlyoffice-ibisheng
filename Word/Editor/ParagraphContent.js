@@ -3202,7 +3202,7 @@ CAnchorPosition.prototype =
             case c_oAscRelativeFromH.LeftMargin:
             case c_oAscRelativeFromH.OutsideMargin:
             {
-                Value = this.CalcX - this.Left_Margin;
+                Value = this.CalcX;
 
                 break;
             }
