@@ -6,33 +6,33 @@
  * To change this template use File | Settings | File Templates.
  */
 cFormulaFunction.Cube = {
-    'groupName' : "Cube",
-        'CUBEKPIMEMBER' : function(){
-        var r = new cBaseFunction("CUBEKPIMEMBER");
+    'groupName':"Cube",
+    'CUBEKPIMEMBER':function () {
+        var r = new cBaseFunction( "CUBEKPIMEMBER" );
         return r;
     },
-    'CUBEMEMBER' : function(){
-        var r = new cBaseFunction("CUBEMEMBER");
+    'CUBEMEMBER':function () {
+        var r = new cBaseFunction( "CUBEMEMBER" );
         return r;
     },
-    'CUBEMEMBERPROPERTY' : function(){
-        var r = new cBaseFunction("CUBEMEMBERPROPERTY");
+    'CUBEMEMBERPROPERTY':function () {
+        var r = new cBaseFunction( "CUBEMEMBERPROPERTY" );
         return r;
     },
-    'CUBERANKEDMEMBER' : function(){
-        var r = new cBaseFunction("CUBERANKEDMEMBER");
+    'CUBERANKEDMEMBER':function () {
+        var r = new cBaseFunction( "CUBERANKEDMEMBER" );
         return r;
     },
-    'CUBESET' : function(){
-        var r = new cBaseFunction("CUBESET");
+    'CUBESET':function () {
+        var r = new cBaseFunction( "CUBESET" );
         return r;
     },
-    'CUBESETCOUNT' : function(){
-        var r = new cBaseFunction("CUBESETCOUNT");
+    'CUBESETCOUNT':function () {
+        var r = new cBaseFunction( "CUBESETCOUNT" );
         return r;
     },
-    'CUBEVALUE' : function(){
-        var r = new cBaseFunction("CUBEVALUE");
+    'CUBEVALUE':function () {
+        var r = new cBaseFunction( "CUBEVALUE" );
         return r;
     }
 }

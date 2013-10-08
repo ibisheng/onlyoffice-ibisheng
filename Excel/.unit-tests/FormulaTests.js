@@ -1,7 +1,11 @@
 ﻿$( function () {
 
     function toFixed( n ) {
-        return n.toFixed( cExcelSignificantDigits ) - 0;
+        return n//.toFixed( cExcelSignificantDigits ) - 0;
+    }
+
+    function difBetween( a, b ) {
+        return Math.abs( a - b ) < dif
     }
 
     var ver = 2;
@@ -46,46 +50,70 @@
         strictEqual( oParser.calculate().getValue(), 6 );
     } )
 
-    test( "Test: \"1+3\"", function () {
+    test( "Test: \"Arithmetical operations\"", function () {
         oParser = new parserFormula( '1+3', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 4 );
-    } )
 
-    test( "Test: \"(1+2)*4+3\"", function () {
         oParser = new parserFormula( '(1+2)*4+3', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), (1 + 2) * 4 + 3 );
-    } )
 
-    test( "Test: \"2^52\"", function () {
         oParser = new parserFormula( '2^52', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), Math.pow( 2, 52 ) );
-    } )
 
-    test( "Test: \"-10\"", function () {
         oParser = new parserFormula( '-10', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -10 );
-    } )
 
-    test( "Test: \"-10*2\"", function () {
         oParser = new parserFormula( '-10*2', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), -20 );
-    } )
 
-    test( "Test: \"-10+10\"", function () {
         oParser = new parserFormula( '-10+10', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 0 );
-    } )
 
-    test( "Test: \"12%\"", function () {
         oParser = new parserFormula( '12%', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 0.12 );
+
+        oParser = new parserFormula( "2<>\"3\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "TRUE", "2<>\"3\"" )
+
+        oParser = new parserFormula( "2=\"3\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "FALSE", "2=\"3\"" );
+
+        oParser = new parserFormula( "2>\"3\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "FALSE", "2>\"3\"" );
+
+        oParser = new parserFormula( "\"f\">\"3\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "TRUE" );
+
+        oParser = new parserFormula( "\"f\"<\"3\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( "FALSE", oParser.calculate().getValue(), "FALSE" );
+
+        oParser = new parserFormula( "FALSE>=FALSE", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "TRUE" );
+
+        oParser = new parserFormula( "\"TRUE\"&\"TRUE\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "TRUETRUE" );
+
+        oParser = new parserFormula( "10*\"\"", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+        oParser = new parserFormula( "-TRUE", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -1 );
     } )
 
     test( "Test: \"SIN have wrong arguments count\"", function () {
@@ -93,16 +121,16 @@
         ok( !oParser.parse() );
     } )
 
-    test( "Test: \"sin(3.1415926)\"", function () {
+    test( "Test: \"SIN(3.1415926)\"", function () {
         oParser = new parserFormula( 'SIN(3.1415926)', "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), parseFloat( Math.sin( 3.1415926 ).toFixed( 15 ) ) );
+        strictEqual( oParser.calculate().getValue(), Math.sin( 3.1415926 ) );
     } )
 
     test( "Test: \"COS(PI()/2)\"", function () {
         oParser = new parserFormula( 'COS(PI()/2)', "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), parseFloat( Math.cos( Math.PI / 2 ).toFixed( 15 ) ) );
+        strictEqual( oParser.calculate().getValue(), Math.cos( Math.PI / 2 ) );
     } )
 
     test( "Test: \"SUM(1,2,3)\"", function () {
@@ -111,66 +139,10 @@
         strictEqual( oParser.calculate().getValue(), 1 + 2 + 3 );
     } )
 
-    test( "Test: \"-\"12\"+2\"", function () {
-        oParser = new parserFormula( "-\"12\"+2", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -10 );
-    } )
-
-    test( "Test: \"-TRUE\"", function () {
-        oParser = new parserFormula( "-TRUE", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -1 );
-    } )
-
     test( "Test: \"\"s\"&5\"", function () {
         oParser = new parserFormula( "\"s\"&5", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "s5" );
-    } )
-
-    test( "Test: \"2<>\"3\"\"", function () {
-        oParser = new parserFormula( "2<>\"3\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "TRUE", "2<>\"3\"" )
-    } )
-
-    test( "Test: \"2=\"3\"\" & \"2>\"3\"\"", function () {
-        oParser = new parserFormula( "2=\"3\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "FALSE", "2=\"3\"" );
-
-        oParser = new parserFormula( "2>\"3\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "FALSE", "2>\"3\"" );
-    } )
-
-    test( "Test: \"\"f\">\"3\"\" & \"\"f\">\"3\"\"", function () {
-        oParser = new parserFormula( "\"f\">\"3\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "TRUE" );
-
-        oParser = new parserFormula( "\"f\"<\"3\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( "FALSE", oParser.calculate().getValue(), "FALSE" );
-    } )
-
-    test( "Test: \"FALSE>=FALSE\"", function () {
-        oParser = new parserFormula( "FALSE>=FALSE", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "TRUE" );
-    } )
-
-    test( "Test: \"\"TRUE\"&\"TRUE\"\"", function () {
-        oParser = new parserFormula( "\"TRUE\"&\"TRUE\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "TRUETRUE" );
-    } )
-
-    test( "Test: \"10*\"\"\"", function () {
-        oParser = new parserFormula( "10*\"\"", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
     } )
 
     test( "Test: \"String+Number\"", function () {
@@ -259,22 +231,38 @@
         strictEqual( oParser.calculate().getValue(), 3 );
     } )
 
-    test( "Test: \"MROUND(10;3)\"", function () {
+    test( "Test: \"MROUND\"", function () {
+        var multiple;//должен равняться значению второго аргумента
+        function mroundHelper( num ) {
+            var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - cExcelSignificantDigits + 1 );
+            var nolpiat = 0.5 * (num > 0 ? 1 : num < 0 ? -1 : 0) * multiplier;
+            var y = (num + nolpiat) / multiplier;
+            y = y / Math.abs( y ) * Math.floor( Math.abs( y ) )
+            var x = y * multiplier / multiple
+
+            // var x = number / multiple;
+            var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+            x = x + nolpiat;
+            x = x | x;
+
+            return x * multiple;
+        }
+
+
         oParser = new parserFormula( "MROUND(10;3)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 9 );
-    } )
+        multiple = 3;
+        strictEqual( oParser.calculate().getValue(), mroundHelper( 10 + 3 / 2 ) );
 
-    test( "Test: \"MROUND(-10;-3)\"", function () {
         oParser = new parserFormula( "MROUND(-10;-3)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -9 );
-    } )
+        multiple = -3;
+        strictEqual( oParser.calculate().getValue(), mroundHelper( -10 + -3 / 2 ) );
 
-    test( "Test: \"MROUND(1.3;0.2)\"", function () {
         oParser = new parserFormula( "MROUND(1.3;0.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1.4 );
+        multiple = 0.2;
+        strictEqual( oParser.calculate().getValue(), mroundHelper( 1.3 + 0.2 / 2 ) );
     } )
 
     test( "Test: \"T(\"HELLO\")\"", function () {
@@ -328,7 +316,7 @@
     test( "Test: MONTH #3", function () {
         oParser = new parserFormula( "MONTH(NOW())", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), new Date().getUTCMonth()+1 );
+        strictEqual( oParser.calculate().getValue(), new Date().getUTCMonth() + 1 );
     } )
 
     test( "Test: \"10-3\"", function () {
@@ -597,7 +585,7 @@
 
         oParser = new parserFormula( "DOLLAR(-1234.567,4)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "$-1,234.5670" );
+        strictEqual( oParser.calculate().getValue(), "($1,234.5670)" );
 
     } )
 
@@ -625,7 +613,7 @@
 
         oParser = new parserFormula( "VALUE(\"16:48:00\")-VALUE(\"12:17:12\")", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.188055555555556 );
+        strictEqual( oParser.calculate().getValue(), g_oFormatParser.parse( "16:48:00" ).value - g_oFormatParser.parse( "12:17:12" ).value );
 
     } )
 
@@ -759,13 +747,23 @@
 
     test( "Test: \"PV\"", function () {
 
+        function pv( rate, nper, pmt, fv, type ) {
+            if ( rate != 0 ) {
+                return -1 * ( fv + pmt * (1 + rate * type) * ( (Math.pow( (1 + rate), nper ) - 1) / rate ) ) / Math.pow( 1 + rate, nper )
+            }
+            else {
+                return -1 * ( fv + pmt * nper );
+            }
+
+        }
+
         oParser = new parserFormula( "PV(0.08/12,12*20,500,,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -59777.14585118638 );
+        strictEqual( oParser.calculate().getValue(), pv( 0.08 / 12, 12 * 20, 500, 0, 0 ) );
 
         oParser = new parserFormula( "PV(0,12*20,500,,0)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -120000 );
+        strictEqual( oParser.calculate().getValue(), pv( 0, 12 * 20, 500, 0, 0 ) );
 
     } )
 
@@ -1185,7 +1183,7 @@
 
         oParser = new parserFormula( "SINH(1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), ((Math.E - 1 / Math.E) / 2).toFixed( cExcelSignificantDigits ) - 0 );
+        strictEqual( oParser.calculate().getValue(), ((Math.E - 1 / Math.E) / 2) );
     } )
 
     test( "Test: \"COSH\"", function () {
@@ -1196,7 +1194,7 @@
 
         oParser = new parserFormula( "COSH(1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), ((Math.E + 1 / Math.E) / 2).toFixed( cExcelSignificantDigits ) - 0 );
+        strictEqual( oParser.calculate().getValue(), ((Math.E + 1 / Math.E) / 2) );
     } )
 
     test( "Test: \"TANH\"", function () {
@@ -1207,7 +1205,7 @@
 
         oParser = new parserFormula( "TANH(1)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), ((Math.E * Math.E - 1) / (Math.E * Math.E + 1)).toFixed( cExcelSignificantDigits ) - 0 );
+        strictEqual( difBetween( oParser.calculate().getValue(), ((Math.E * Math.E - 1) / (Math.E * Math.E + 1)) ), true );
     } )
 
     test( "Test: \"COMBIN\"", function () {
@@ -1496,7 +1494,7 @@
 
         oParser = new parserFormula( "AVEDEV(-3.5,1.4,6.9,-4.5,-0.3)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3.32 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 3.32 ), true );
 
     } )
 
@@ -1584,11 +1582,11 @@
 
         oParser = new parserFormula( "CONFIDENCE(0.4,5,12)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1.214775614397568 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 1.214775614397568 ), true );
 
         oParser = new parserFormula( "CONFIDENCE(0.75,9,7)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1.083909233527114 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 1.083909233527114 ), true );
 
     } )
 
@@ -1596,11 +1594,11 @@
 
         oParser = new parserFormula( "CORREL({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,\"f\"})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -0.988112020032211 );
+        strictEqual( difBetween( oParser.calculate().getValue(), -0.988112020032211 ), true );
 
         oParser = new parserFormula( "CORREL({1;2;3},{4;5;\"E\"})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 1 ), true );
 
         oParser = new parserFormula( "CORREL({1,2},{1,\"e\"})", "A1", ws );
         ok( oParser.parse() );
@@ -1705,11 +1703,11 @@
 
         oParser = new parserFormula( "COVAR({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,6.7})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -1.3753740625 );
+        strictEqual( difBetween( oParser.calculate().getValue(), -1.3753740625 ), true );
 
         oParser = new parserFormula( "COVAR({1,2};{4,5})", "B1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.25 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 0.25 ), true );
 
     } )
 
@@ -1755,19 +1753,19 @@
 
         oParser = new parserFormula( "DEVSQ(5.6,8.2,9.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 6.906666666666665 ), true );
 
         oParser = new parserFormula( "DEVSQ({5.6,8.2,9.2})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 6.906666666666665 ), true );
 
         oParser = new parserFormula( "DEVSQ(5.6,8.2,\"9.2\")", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3.379999999999999 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 3.379999999999999 ), true );
 
         oParser = new parserFormula( "DEVSQ(Лист2!A1:A3)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 6.906666666666665 ), true );
 
     } )
 
@@ -1775,11 +1773,11 @@
 
         oParser = new parserFormula( "EXPONDIST(0.2,10,FALSE)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 1.353352832366127 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 1.353352832366127 ), true );
 
         oParser = new parserFormula( "EXPONDIST(2.3,1.5,TRUE)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0.968254363621932 );
+        strictEqual( difBetween( oParser.calculate().getValue(), 0.968254363621932 ), true );
 
     } )
 
@@ -2148,7 +2146,7 @@
     test( "Test: \"NORMDIST\"", function () {
 
         function normdist( x, mue, sigma, kum ) {
-            if ( sigma <= 0 || x < 0 || x > 1 )
+            if ( sigma <= 0 )
                 return "#NUM!";
             else if ( kum == false )
                 return toFixed( phi( (x - mue) / sigma ) / sigma );
@@ -2168,6 +2166,10 @@
         oParser = new parserFormula( "NORMDIST(42,40,-1.5,TRUE)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), normdist( 42, 40, -1.5, true ) );
+
+        oParser = new parserFormula( "NORMDIST(1,40,-1.5,TRUE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normdist( 1, 40, -1.5, true ) );
 
     } )
 
@@ -2747,7 +2749,7 @@
             for ( var i = 0; i < arguments.length; i++ ) {
                 res += (arguments[i] - average) * (arguments[i] - average);
             }
-            return toFixed(Math.sqrt( res / (arguments.length - 1) ));
+            return toFixed( Math.sqrt( res / (arguments.length - 1) ) );
         }
 
         oParser = new parserFormula( "STDEV(123,134,143,173,112,109)", "A2", ws );
@@ -2777,7 +2779,6 @@
         ws.getRange2( "E405" ).setValue( "109" );
 
 
-
         function stdeva() {
             var average = 0, res = 0;
             for ( var i = 0; i < arguments.length; i++ ) {
@@ -2787,7 +2788,7 @@
             for ( var i = 0; i < arguments.length; i++ ) {
                 res += (arguments[i] - average) * (arguments[i] - average);
             }
-            return toFixed(Math.sqrt( res / (arguments.length - 1) ) );
+            return toFixed( Math.sqrt( res / (arguments.length - 1) ) );
         }
 
         oParser = new parserFormula( "STDEVA(123,134,143,173,112,109)", "A2", ws );

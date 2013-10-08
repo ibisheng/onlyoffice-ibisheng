@@ -283,18 +283,18 @@ cFormulaFunction.Statistical = {
             }
             valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
             if ( arg0 instanceof cArea ) {
-                val = arg0.getValue();
-                for ( var i = 0; i < val.length; i++ ) {
-                    if ( matching( val[i], valueForSearching, oper ) ) {
-                        var r = arg0.getRange(), ws = arg0.getWS(),
-                            r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
-                        r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                        if ( r.getValue() instanceof cNumber ) {
-                            _sum += r.getValue().getValue();
+                var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c1 = arg2.getRange().first.getCol0(), i = 0;
+                arg0.foreach2(function(c){
+                    if ( matching( c, valueForSearching, oper ) ) {
+                        var r1 = r + i,
+                            r2 = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
+                        if ( r2.getValue() instanceof cNumber ) {
+                            _sum += r2.getValue().getValue();
                             _count++;
                         }
                     }
-                }
+                    i++;
+                })
             }
             else {
                 val = arg0.getValue();
@@ -742,13 +742,8 @@ cFormulaFunction.Statistical = {
             valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
             if ( arg0 instanceof cArea ) {
                 arg0.foreach2(function(_val){
-//                    _val
                     _count += matching( _val, valueForSearching, oper );
                 })
-                /*val = arg0.getValue();
-                for ( var i = 0; i < val.length; i++ ) {
-                    _count += matching( val[i], valueForSearching, oper );
-                }*/
             }
             else if ( arg0 instanceof cArea3D ) {
                 val = arg0.getValue();
