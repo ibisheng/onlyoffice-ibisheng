@@ -745,7 +745,7 @@ Document_Recalculate_Page:jV
 WRAPPING_TYPE_THROUGH:jJ
 JSCompiler_StaticMethods_Set_DocumentMargin:iW
 reColor:C8
-TYPE_TRACK_GROUP_PASSIVE:gF
+TYPE_TRACK_GROUP_PASSIVE:hF
 Load_SBit_Range_Codes:kv
 ParaPageNum:MO
 X_Left_Field:eJ
@@ -1615,7 +1615,7 @@ CBinaryFileWriter:ta
 ParaDrawing:Hb
 g_nCurFileVersion:GX
 CHyperlinkProperty:VT
-EndArrow:kj
+EndArrow:ej
 TT_HoriHeader:Ur
 JSCompiler_StaticMethods_HorLine:c4
 JSCompiler_StaticMethods_Set_TableFirstCol:BQ
@@ -2381,7 +2381,7 @@ JSCompiler_StaticMethods_Internal_Content_Remove2:dT
 c_oSerWrapSquare$DistL:E0
 CAscThemeInfo:ui
 FT_SFNT_INTERFACE_GET:Uw
-c_oAscServerError$StorageGetInfo:pg
+c_oAscServerError$StorageGetInfo:ng
 WordGroupShapes:yF
 c_oSerWrapSquare$DistR:G0
 psaux_interface:Bu
@@ -2711,7 +2711,7 @@ TRaster:gx
 cff_index_init:OA
 L 124:fu
 c_oSer_CommentsType$UserId:k1
-L 123:wD
+L 123:xD
 L 122:vD
 L 121:vn
 L 120:SP
@@ -2764,7 +2764,7 @@ ShapeForResizeInGroup:mL
 JSCompiler_StaticMethods_Set_UnhideWhenUsed:IQ
 L 111:Kk
 L 110:Ei
-L 113:jj
+L 113:kj
 L 112:Vp
 bIsSupportOriginalFormatFonts:PD
 L 103:gh
@@ -2774,7 +2774,7 @@ L 105:Jk
 historyitem_AddToSpTree:iL
 L 106:rf
 L 107:to
-L 108:ij
+L 108:jj
 L 109:Di
 FT_Service_PsFontNameRec:Rp
 vertalign_SubScript:xc
@@ -3188,8 +3188,8 @@ L 75:Gk
 JSCompiler_StaticMethods_rebuildSeries:kp
 L 76:Bi
 _ph_summ__sec_head:oN
-L 77:fj
-L 78:gj
+L 77:gj
+L 78:hj
 t1_args_count:lu
 L 79:ie
 CHorRulerRepaintChecker:N5
@@ -3205,11 +3205,11 @@ c_oSerExtent$Cx:x0
 c_oSerExtent$Cy:y0
 L 70:Dm
 FT_PEEK_USHORT:lq
-L 72:ej
+L 72:fj
 L 71:Zd
 L 64:Vc
 L 65:ae
-L 62:ng
+L 62:og
 c_oSer_SettingsType$ClrSchemeMapping:u1
 L 63:De
 CUniFill:yi
@@ -3236,7 +3236,7 @@ STATES_ID_PRE_RESIZE:gH
 c_oSerImageType2$WrapSquare:n0
 ParaPresentationNumbering:QO
 SPH_ScaleRule:Jx
-L 92:hj
+L 92:ij
 L 91:Fm
 L 94:bf
 nSldLtTObjTx:zM
@@ -3247,7 +3247,7 @@ CFontFileLoader:S
 L 90:Vf
 tt_name_entry_ascii_from_utf16:Jw
 Editor_Copy_GetElem:na
-L 88:og
+L 88:pg
 L 89:dh
 L 86:qo
 CHART_TITLE_TYPE_V_AXIS:nO
