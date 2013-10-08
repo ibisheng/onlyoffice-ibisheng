@@ -6966,7 +6966,7 @@ CPresentation.prototype =
                         this.CommentAuthors[_autID2] = new CCommentAuthor();
                         _author2 = this.CommentAuthors[_autID2];
                         _author2.Name = _data2.m_sUserName;
-                        _anchor2.Calculate();
+                        _author2.Calculate();
 
                         _AuthorId++;
                         _author2.Id = _AuthorId;
