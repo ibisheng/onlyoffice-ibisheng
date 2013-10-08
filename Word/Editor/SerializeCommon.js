@@ -717,15 +717,15 @@ function CPPTXContentWriter()
         this.BinaryFileWriter.StartRecord(0);
         this.BinaryFileWriter.StartRecord(1);
 
-        if ((undefined !== window.WordShape && grObject instanceof WordShape) || (undefined !== window.CShape && grObject instanceof CShape))
+        if (("undefined" !== typeof(WordShape) && grObject instanceof WordShape) || ("undefined" !== typeof(CShape) && grObject instanceof CShape))
         {
             this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap);
         }
-		else if ((undefined !== window.WordImage && grObject instanceof WordImage) || (undefined !== window.CImageShape && grObject instanceof CImageShape))
+		else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
         {
             this.WriteImage(grObject);
         }
-		else if ((undefined !== window.WordGroupShapes && grObject instanceof WordGroupShapes) || (undefined !== window.CGroupShape && grObject instanceof CGroupShape))
+		else if (("undefined" !== typeof(WordGroupShapes) && grObject instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && grObject instanceof CGroupShape))
         {
             this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap);
         }
