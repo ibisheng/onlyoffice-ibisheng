@@ -2204,6 +2204,9 @@ function Row(worksheet)
 };
 Row.prototype =
 {
+	getCells : function () {
+		return this.c;
+	},
 	getId : function()
 	{
 		return this.id;

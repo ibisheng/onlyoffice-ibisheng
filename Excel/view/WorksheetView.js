@@ -3488,11 +3488,21 @@
 				if (range === undefined) {
 					range = asc_Range(0, 0, this.cols.length - 1, this.rows.length - 1);
 				}
+				var rowModel, rowCells, cellColl;
 				for (var row = range.r1; row <= range.r2; ++row) {
 					if (this.height_1px > this.rows[row].height) {continue;}
-					for (var col = range.c1; col <= range.c2; ++col) {
-						if (this.width_1px > this.cols[col].width) {continue;}
-						col = this._addCellTextToCache(col, row);
+					// Теперь получаем только не пустые ячейки для строки
+					rowModel = this.model._getRowNoEmpty(row);
+					if (null === rowModel)
+						continue;
+					rowCells = rowModel.getCells();
+					for (cellColl in rowCells) {
+						if (!rowCells.hasOwnProperty(cellColl))
+							continue;
+						cellColl = cellColl - 0;
+						if (this.width_1px > this.cols[cellColl].width) {continue;}
+
+						this._addCellTextToCache(cellColl, row);
 					}
 				}
 				this.isChanged = false;
