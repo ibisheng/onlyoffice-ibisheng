@@ -459,8 +459,8 @@ CTableRecalcInfo.prototype =
 
     Reset : function(bCellsAll)
     {
-        this.TableGrid     = false;
-        this.TableBorders  = false;
+        this.TableGrid     = true;
+        this.TableBorders  = true;
         this.CellsAll      = bCellsAll;
         this.CellsToRecalc = new Object();
     }
