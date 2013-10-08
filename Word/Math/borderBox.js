@@ -30,10 +30,10 @@ CBorderBox.prototype.init = function(props)
             this.bBot = false;
 
         if(props.strikeBLTR === true || props.strikeBLTR === 1)
-            this.bLDiag = true;
+            this.bRDiag = true;
 
         if(props.strikeTLBR === true || props.strikeTLBR === 1)
-            this.bRDiag = true;
+            this.bLDiag = true;
 
         if(props.strikeH === true || props.strikeH === 1)
             this.bHor = true;
@@ -146,7 +146,7 @@ CBorderBox.prototype.draw = function(pGraphics)
     if(this.bRDiag)
     {
         var pW = penW*0.8;
-        var x1 = this.pos.x + this.size.width/2 - pW - 25.4/96, y1 = this.pos.y,
+        var x1 = this.pos.x + this.size.width - pW - 25.4/96, y1 = this.pos.y,
             x2 = x1 + pW, y2 = y1,
             x3 = x2, y3 = y2 + pW,
             x4 = this.pos.x + pW, y4 = this.pos.y + this.size.height - 25.4/96,
