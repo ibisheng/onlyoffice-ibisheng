@@ -3786,6 +3786,7 @@ CShape.prototype =
                 {
                     this.spPr.Fill = null;
                 }
+
                 this.recalcInfo.recalculateFill = true;
                 this.recalcInfo.recalculateBrush = true;
                 this.recalcInfo.recalculateTransparent = true;
@@ -4172,6 +4173,11 @@ CShape.prototype =
                     {
                         this.spPr.Fill = new CUniFill();
                         this.spPr.Fill.Read_FromBinary2(r);
+                    }
+                    if(this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
+                        && typeof  this.spPr.Fill.fill.RasterImageId === "string")
+                    {
+                        CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
                     }
                     this.recalcInfo.recalculateFill = true;
                     this.recalcInfo.recalculateBrush = true;
