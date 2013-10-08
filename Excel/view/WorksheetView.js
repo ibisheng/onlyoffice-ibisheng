@@ -4613,13 +4613,12 @@
 
 			scrollVertical: function (delta, editor) {
 				var vr = this.visibleRange;
-				var reinitScrollY = false;
 				var start = this._calcCellPosition(vr.c1, vr.r1, 0, delta).row;
 				var fixStartRow = asc_Range(vr.c1, start, vr.c2, start);
 				fixStartRow.startCol = vr.c1;
 				fixStartRow.startRow = start;
 				this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
-				reinitScrollY = start !== fixStartRow.r1;
+				var reinitScrollY = start !== fixStartRow.r1;
 				if (reinitScrollY && 0 > delta) // Для скролла вверх обычный сдвиг + дорисовка
 					delta += fixStartRow.r1 - start;
 				start = fixStartRow.r1;
@@ -4716,13 +4715,12 @@
 
 			scrollHorizontal: function (delta, editor) {
 				var vr = this.visibleRange;
-				var reinitScrollX = false;
 				var start = this._calcCellPosition(vr.c1, vr.r1, delta, 0).col;
-				var fixStartCol = asc_Range(start, vr.r1, start, vr.r1);
+				var fixStartCol = asc_Range(start, vr.r1, start, vr.r2);
 				fixStartCol.startCol = start;
 				fixStartCol.startRow = vr.r1;
-				this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartCol);
-				reinitScrollX = start !== fixStartCol.c1;
+				this._fixSelectionOfHiddenCells(delta >= 0 ? +1 : -1, 0, fixStartCol);
+				var reinitScrollX = start !== fixStartCol.c1;
 				if (reinitScrollX && 0 > delta) // Для скролла влево обычный сдвиг + дорисовка
 					delta += fixStartCol.c1 - start;
 				start = fixStartCol.c1;
