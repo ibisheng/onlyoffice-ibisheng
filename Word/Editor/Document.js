@@ -5704,8 +5704,20 @@ CDocument.prototype =
             {
                 var Element = this.Content[this.CurPos.ContentPos];
 
-                if ( type_Paragraph != Element.GetType() || undefined === Element.Get_FramePr() )
+                if ( type_Paragraph != Element.GetType() )
                     return;
+
+                // Возможно, предыдущий элемент является буквицей
+                if ( undefined === Element.Get_FramePr()  )
+                {
+                    var PrevElement = Element.Get_DocumentPrev();
+
+                    if ( type_Paragraph != PrevElement.GetType() || undefined === PrevElement.Get_FramePr() || undefined === PrevElement.Get_FramePr().DropCap )
+                        return;
+
+                    Element = PrevElement;
+                }
+
 
                 var FrameParas = Element.Internal_Get_FrameParagraphs();
                 var FrameCount = FrameParas.length;
