@@ -2504,6 +2504,7 @@ CGraphicObjects.prototype = {
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
+                    History.Create_NewPoint();
                     this.State.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
                     this.State.textObject.recalculate();
                     this.updateSelectionState();
@@ -2514,84 +2515,89 @@ CGraphicObjects.prototype = {
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
+                    History.Create_NewPoint();
                     this.slide.removeSelectedObjects();
                 }
                 break;
             }
             case STATES_ID_GROUP:
             {
-                var state = this.State;
-                var group = state.group;
-                var selected_objects = [];
-                for(var i = 0; i < group.selectedObjects.length; ++i)
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
-                    selected_objects.push(group.selectedObjects[i]);
-                }
-                group.resetSelection();
-                var groups = [];
-                for(i = 0; i < selected_objects.length; ++i)
-                {
-                    var parent_group = selected_objects[i].group;
-                    parent_group.removeFromSpTree(selected_objects[i].Get_Id());
-                    for(var j = 0; j < groups.length; ++j)
+                    History.Create_NewPoint();
+                    var state = this.State;
+                    var group = state.group;
+                    var selected_objects = [];
+                    for(var i = 0; i < group.selectedObjects.length; ++i)
                     {
-                        if(groups[i] === parent_group)
-                            break;
+                        selected_objects.push(group.selectedObjects[i]);
                     }
-                    if(j === groups.length)
-                        groups.push(parent_group);
-                }
-                groups.sort(CompareGroups);
-                for(i  = 0; i < groups.length; ++i)
-                {
-                    var parent_group = groups[i];
-                    if(parent_group !== group)
+                    group.resetSelection();
+                    var groups = [];
+                    for(i = 0; i < selected_objects.length; ++i)
                     {
-                        if(parent_group.spTree.length === 0)
+                        var parent_group = selected_objects[i].group;
+                        parent_group.removeFromSpTree(selected_objects[i].Get_Id());
+                        for(var j = 0; j < groups.length; ++j)
                         {
-                            parent_group.group.removeFromSpTree(parent_group.Get_Id());
-                        }
-                        if(parent_group.spTree.length === 1)
-                        {
-                            var sp = parent_group.spTree[0];
-                            sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
-                            sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
-                                sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                            sp.setOffset(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
-                            parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
-                        }
-                    }
-                    else
-                    {
-                        switch (parent_group.spTree.length)
-                        {
-                            case 0:
-                            {
-                                this.slide.removeFromSpTreeById(parent_group.Get_Id());
+                            if(groups[i] === parent_group)
                                 break;
-                            }
-                            case 1:
+                        }
+                        if(j === groups.length)
+                            groups.push(parent_group);
+                    }
+                    groups.sort(CompareGroups);
+                    for(i  = 0; i < groups.length; ++i)
+                    {
+                        var parent_group = groups[i];
+                        if(parent_group !== group)
+                        {
+                            if(parent_group.spTree.length === 0)
                             {
-                                this.resetSelectionState();
+                                parent_group.group.removeFromSpTree(parent_group.Get_Id());
+                            }
+                            if(parent_group.spTree.length === 1)
+                            {
                                 var sp = parent_group.spTree[0];
                                 sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
                                 sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
                                     sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                                sp.setOffset(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
-                                sp.setGroup(null);
-                                var pos = this.slide.removeFromSpTreeById(parent_group.Get_Id());
-                                this.slide.addToSpTreeToPos(pos, sp);
-                                sp.select(this);
-                                break;
+                                sp.setOffset(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
+                                parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
                             }
-                            default:
+                        }
+                        else
+                        {
+                            switch (parent_group.spTree.length)
                             {
-                                this.resetSelectionState();
-                                parent_group.normalize();
-                                parent_group.updateCoordinatesAfterInternalResize();
-                                parent_group.select(this);
-                                parent_group.recalculate();
-                                break;
+                                case 0:
+                                {
+                                    this.slide.removeFromSpTreeById(parent_group.Get_Id());
+                                    break;
+                                }
+                                case 1:
+                                {
+                                    this.resetSelectionState();
+                                    var sp = parent_group.spTree[0];
+                                    sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                    sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                        sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                    sp.setOffset(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
+                                    sp.setGroup(null);
+                                    var pos = this.slide.removeFromSpTreeById(parent_group.Get_Id());
+                                    this.slide.addToSpTreeToPos(pos, sp);
+                                    sp.select(this);
+                                    break;
+                                }
+                                default:
+                                {
+                                    this.resetSelectionState();
+                                    parent_group.normalize();
+                                    parent_group.updateCoordinatesAfterInternalResize();
+                                    parent_group.select(this);
+                                    parent_group.recalculate();
+                                    break;
+                                }
                             }
                         }
                     }

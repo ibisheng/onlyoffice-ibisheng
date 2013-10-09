@@ -3472,7 +3472,7 @@ CPresentation.prototype =
         {
             if ( true != e.ShiftKey )
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Delete) )
+                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
                     this.Create_NewHistoryPoint();
                     this.Remove( 1, true );
@@ -3481,7 +3481,7 @@ CPresentation.prototype =
             }
             else // Shift + Delete (аналогично Ctrl + X)
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
                     this.Create_NewHistoryPoint();
                     Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
