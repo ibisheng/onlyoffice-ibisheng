@@ -10882,6 +10882,7 @@ Paragraph.prototype =
     {
         Para.CopyPr( this );
         this.Set_Spacing( { After : 0 }, false );
+        this.Numbering_Remove();
     },
 
     Get_FrameBounds : function(FrameX, FrameY, FrameW, FrameH)
