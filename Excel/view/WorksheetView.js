@@ -8024,8 +8024,13 @@
 						switch (val) {
 							case c_oAscInsertOptions.InsertCellsAndShiftRight:
 								functionModelAction = function () {
+									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
+									if(!isCheckChangeAutoFilter)
+										return;
 									if (range.addCellsShiftRight()) {
 										fullRecalc = true;
+										if(isCheckChangeAutoFilter == 'changeAutoFilter')
+											t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
@@ -8039,8 +8044,13 @@
 								return;
 							case c_oAscInsertOptions.InsertCellsAndShiftDown:
 								functionModelAction = function () {
+									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
+									if(!isCheckChangeAutoFilter)
+										return;
 									if (range.addCellsShiftBottom()) {
 										fullRecalc = true;
+										if(isCheckChangeAutoFilter == 'changeAutoFilter')
+											t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
@@ -8097,12 +8107,23 @@
 						range = t.model.getRange3(_updateRangeDel.r1, _updateRangeDel.c1, _updateRangeDel.r2, _updateRangeDel.c2);
 						switch (val) {
 							case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
+								if(!isCheckChangeAutoFilter)
+									return;
+								
 								functionModelAction = function () {
+									History.Create_NewPoint();
+									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
+									History.StartTransaction();
+									//t.autoFilters.isEmptyAutoFilters(arn);
 									if (range.deleteCellsShiftLeft()) {
 										fullRecalc = true;
+										if(isCheckChangeAutoFilter == 'changeAutoFilter')
+											t.autoFilters.insertColumn(prop, _updateRangeDel, arn);
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
+									History.EndTransaction();
 								};
 
 								if(bUndoRedo)
@@ -8112,12 +8133,23 @@
 										gc_nMaxCol0, _updateRangeDel.r2), null, onChangeWorksheetCallback);
 								return;
 							case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
+								if(!isCheckChangeAutoFilter)
+									return;
+							
 								functionModelAction = function () {
-									if (range.deleteCellsShiftUp()) {
-										fullRecalc = true;
-										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
-										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
-									}
+										History.Create_NewPoint();
+										History.SetSelection(new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1, _updateRangeDel.c2, _updateRangeDel.r2));
+										History.StartTransaction();
+										//t.autoFilters.isEmptyAutoFilters(arn);
+										if (range.deleteCellsShiftUp()) {
+											fullRecalc = true;
+											if(isCheckChangeAutoFilter == 'changeAutoFilter')
+												t.autoFilters.insertRows(prop, _updateRangeDel, _updateRangeDel);
+											t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
+											t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
+										}
+										History.EndTransaction();
 								};
 
 								if(bUndoRedo)
@@ -8132,8 +8164,8 @@
 									History.Create_NewPoint();
 									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
-									t.autoFilters.insertColumn(prop,_updateRangeDel, arn);
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
+									t.autoFilters.insertColumn(prop,_updateRangeDel, arn);
 									History.EndTransaction();
 
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
@@ -8152,8 +8184,8 @@
 									History.Create_NewPoint();
 									History.SetSelection(new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2));
 									History.StartTransaction();
-									t.autoFilters.insertRows(prop,_updateRangeDel, arn);
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
+									t.autoFilters.insertRows(prop,_updateRangeDel, arn);
 									History.EndTransaction();
 
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);

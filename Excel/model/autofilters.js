@@ -2012,6 +2012,151 @@
 				this.AddFormatTableOptions = objOptions;
 				return objOptions;
 			},
+			//если селект затрагивает часть хотя бы одной форматированной таблицы(для случая insert(delete) cells)
+			isActiveCellsCrossHalfFTable: function(activeCells, val, prop)
+			{
+				var InsertCellsAndShiftDown = (val == c_oAscInsertOptions.InsertCellsAndShiftDown && prop == 'insCell') ? true : false;
+				var InsertCellsAndShiftRight = (val == c_oAscInsertOptions.InsertCellsAndShiftRight && prop == 'insCell') ? true : false;
+				var DeleteCellsAndShiftLeft = (val == c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell') ? true : false;;
+				var DeleteCellsAndShiftTop = (val == c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell') ? true : false;;
+				
+				var ws = this.woksheet;
+				var aWs = this._getCurrentWS();
+				var tableParts = aWs.TableParts;
+				var autoFilter = aWs.AutoFilter;
+				var result = true;
+				//проверка на то, что захвачен кусок форматированной таблицы
+				if(tableParts)//при удалении в MS Excel ошибка может возникать только в случае форматированных таблиц
+				{
+					var tableRange;
+					var isExp;
+					for(var i = 0; i < tableParts.length; i++ )
+					{
+						tableRange = this._refToRange(tableParts[i].Ref);
+						isExp = false;
+						//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
+						if(this._rangeHitInAnRange(activeCells, tableRange))
+						{
+							//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
+							if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
+							{	
+								result = 'changeAutoFilter';
+							}
+							else
+							{
+								if(InsertCellsAndShiftDown)
+								{
+									if(activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2 && activeCells.r1 <= tableRange.r1)
+										isExp = true;
+								}
+								else if(InsertCellsAndShiftRight)
+								{
+									if(activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2 && activeCells.c1 <= tableRange.c1)
+										isExp = true;
+								}
+								if(!isExp)
+									return false;
+							}
+						}
+						else
+						{
+							//проверка на то, что хотим сдвинуть часть отфильтрованного диапазона
+							if(DeleteCellsAndShiftLeft)
+							{
+								//если данный фильтр находится справа
+								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+									return false;
+							}
+							else if(DeleteCellsAndShiftTop)
+							{
+								//если данный фильтр находится внизу
+								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+									return false;
+								
+							}
+							else if(InsertCellsAndShiftRight)
+							{
+								//если данный фильтр находится справа
+								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+									return false;
+							}
+							else
+							{
+								//если данный фильтр находится внизу
+								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+									return false;
+							}
+						}
+						
+						//если сдвигаем данный фильтр
+						if(DeleteCellsAndShiftLeft && tableRange.c1 > activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
+						{
+							result = 'changeAutoFilter';
+						}
+						else if(DeleteCellsAndShiftTop && tableRange.r1 > activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
+						{
+							result = 'changeAutoFilter';
+						}
+						else if(InsertCellsAndShiftRight && tableRange.c1 >= activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
+						{
+							result = 'changeAutoFilter';
+						}
+						else if(InsertCellsAndShiftDown && tableRange.r1 >= activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
+						{
+							result = 'changeAutoFilter';
+						}
+					}
+				}
+				
+				//при вставке ошибка в MS Excel может возникать как в случае автофильтров, так и в случае форматированных таблиц
+				if((InsertCellsAndShiftRight || InsertCellsAndShiftDown) && autoFilter)
+				{
+					tableRange = this._refToRange(autoFilter.Ref);
+					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
+					if(this._rangeHitInAnRange(activeCells, tableRange))
+					{
+						//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
+						if(!(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2))
+							return false;
+					}
+					else
+					{
+						//проверка на то, что хотим сдвинуть часть отфильтрованного диапазона
+						if(InsertCellsAndShiftRight)
+						{
+							//если данный фильтр находится справа
+							if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+								return false;
+						}
+						else
+						{
+							//если данный фильтр находится внизу
+							if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+								return false;
+							
+						}
+					}
+					
+					//если сдвигаем данный фильтр
+					if(DeleteCellsAndShiftLeft && tableRange.c1 > activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
+					{
+						result = 'changeAutoFilter';
+					}
+					else if(DeleteCellsAndShiftTop && tableRange.r1 > activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
+					{
+						result = 'changeAutoFilter';
+					}
+					else if(InsertCellsAndShiftRight && tableRange.c1 >= activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
+					{
+						result = 'changeAutoFilter';
+					}
+					else if(InsertCellsAndShiftDown && tableRange.r1 >= activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
+					{
+						result = 'changeAutoFilter';
+					}
+				}
+				return result;
+			},
 			
 			//при закрытии диалогового окна числового фильтра
 			_applyDigitalFilter: function(ar, autoFiltersObject) {
@@ -6031,23 +6176,6 @@
 						}
 					}
 				}
-			},
-			
-			_isEmptyRange: function(activeCells)
-			{
-				var ws = this.worksheet;
-				for(var n = activeCells.r1; n <= activeCells.r2; n++)
-				{
-					for(var k = activeCells.c1; k <= activeCells.c2; k++)
-					{
-						cell = ws.model._getCell(n,k);
-						if(cell.getValueWithoutFormat() != '')
-						{
-							return false;	
-						}
-					}
-				}
-				return true;
 			}
 		};
 
