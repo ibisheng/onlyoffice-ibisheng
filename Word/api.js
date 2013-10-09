@@ -611,6 +611,9 @@ function asc_docs_api(name)
     this.IsLongActionCurrent = false;
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
+	
+	this.isTrackingEnable = false;
+	this.TrackingInterval = 300 * 1000;
 
 	var oThis = this;
 	if(window.addEventListener)
@@ -831,7 +834,17 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
-		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);	
+		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
+		
+		if(undefined != oSettings['isTrackingEnable'] &&
+			null != oSettings['isTrackingEnable'])
+			this.isTrackingEnable = oSettings['isTrackingEnable'];
+			
+		if(undefined != oSettings['TrackingInterval'] &&
+			null != oSettings['TrackingInterval'])
+			this.TrackingInterval = oSettings['TrackingInterval'] * 10;
+			
+		_StartTracking();
 	}
 }
 asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
@@ -6632,6 +6645,24 @@ asc_docs_api.prototype.asc_setCoAuthoringEnable = function (isCoAuthoringEnable)
 	this.isCoAuthoringEnable = !!isCoAuthoringEnable;
 }
 
+asc_docs_api.prototype._StartTracking = function () 
+{
+	var t = editor;
+	if(t.isTrackingEnable)
+	{
+		var rData = {
+			"docId": t.DocInfo.get_Id(), 
+			"clientId": t.DocInfo.get_UserId(),
+			"isAlive": 1
+		};
+			
+		sendTrack( t, function(){
+				setTimeout(t._StartTracking, t.TrackingInterval);
+			},
+			JSON.stringify(rData) );
+	}
+}
+
 var cCharDelimiter = String.fromCharCode(5);
 
 function getURLParameter(name) {
@@ -6807,6 +6838,23 @@ function sendCommand(editor, fCallback, rdata){
 	})
 
 	};
+function sendTrack(editor, fCallback, rdata){
+	asc_ajax({
+        type: 'POST',
+        url: g_sTrackingServiceLocalUrl,
+        data: rdata,
+        error: function(jqXHR, textStatus, errorThrown){
+				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+				if(fCallback)
+					fCallback();
+            },
+        success: function(msg){
+			var incomeObject = JSON.parse(msg);
+			if(fCallback)
+				fCallback(editor, incomeObject);			
+		}
+	})
+};
 function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 {
 	var sData;
