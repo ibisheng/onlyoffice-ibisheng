@@ -1949,6 +1949,11 @@ CGraphicObjects.prototype = {
             }
         }
 
+        if(this.State.group)
+        {
+            this.State.group.resetSelection();
+        }
+        var arr_ungrouped_objects = [];
         var drawing_bases = this.slide.cSld.spTree;
         for(i = 0; i < ungrouped_objects.length; ++i)
         {
@@ -1969,10 +1974,15 @@ CGraphicObjects.prototype = {
             {
                 ungrouped_sp_tree[j].recalcAll();
                 this.slide.addToSpTreeToPos(start_position + j, ungrouped_sp_tree[j]);
+                arr_ungrouped_objects.push(ungrouped_sp_tree[j]);
             }
         }
         this.slide.removeSelectedObjects();
         this.resetSelectionState();
+        for(var i = 0;  i< arr_ungrouped_objects.length; ++i)
+        {
+            arr_ungrouped_objects[i].select(this);
+        }
     },
 
     startSearchText : function(str, scanForward) //
