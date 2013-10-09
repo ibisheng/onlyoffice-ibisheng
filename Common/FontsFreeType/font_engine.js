@@ -19014,8 +19014,8 @@ function CreateIntArray(size)
 function CreateUIntArray(size)
 {
     var arr = null;
-    if (typeof(UInt32Array) != 'undefined' && !window.opera)
-        arr = new UInt32Array(size);
+    if (typeof(Uint32Array) != 'undefined' && !window.opera)
+        arr = new Uint32Array(size);
     else
         arr = new Array(size);
     for (var i=0;i<size;i++)
