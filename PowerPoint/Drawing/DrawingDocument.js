@@ -2287,6 +2287,8 @@ function CDrawingDocument()
     this.GetVisibleMMHeight = function()
     {
         var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        if (this.m_oWordControl.bIsRetinaSupport)
+            pixHeigth >>= 1;
         var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
         return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;

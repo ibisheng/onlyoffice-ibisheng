@@ -2905,10 +2905,19 @@ function CDrawingDocument()
             return;
 
         // �������, ����� �� ������ �� ������
+
+        var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
+        var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        if (this.m_oWordControl.bIsRetinaSupport)
+        {
+            _ww >>= 1;
+            _hh >>= 1;
+        }
+
         var boxX = 0;
         var boxY = 0;
-        var boxR = this.m_oWordControl.m_oEditor.HtmlElement.width - 2;
-        var boxB = this.m_oWordControl.m_oEditor.HtmlElement.height - targetSize;
+        var boxR = _ww - 2;
+        var boxB = _hh - targetSize;
 
         /*
         if (true == this.m_oWordControl.m_bIsRuler)
@@ -2923,30 +2932,22 @@ function CDrawingDocument()
         var nValueScrollHor = 0;
         if (pos.X < boxX)
         {
-            //nValueScrollHor = boxX - pos.X;
-            //nValueScrollHor = pos.X;
             nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(__x - 5, pageIndex);
         }
         if (pos.X > boxR)
         {
-            //nValueScrollHor = boxR - pos.X;
-            //nValueScrollHor = pos.X + this.m_oWordControl.m_oEditor.HtmlElement.width;
-            var _mem = __x + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.width * 100 / this.m_oWordControl.m_nZoomValue;
+            var _mem = __x + 5 - g_dKoef_pix_to_mm * _ww * 100 / this.m_oWordControl.m_nZoomValue;
             nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(_mem, pageIndex);
         }
 
         var nValueScrollVer = 0;
         if (pos.Y < boxY)
         {
-            //nValueScrollVer = boxY - pos.Y;
-            //nValueScrollVer = pos.Y;
             nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(__y - 5, pageIndex);
         }
         if (pos.Y > boxB)
         {
-            //nValueScrollVer = boxB - pos.Y;
-            //nValueScrollHor = pos.Y + this.m_oWordControl.m_oEditor.HtmlElement.height;
-            var _mem = __y + targetSize + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.height * 100 / this.m_oWordControl.m_nZoomValue;
+            var _mem = __y + targetSize + 5 - g_dKoef_pix_to_mm * _hh * 100 / this.m_oWordControl.m_nZoomValue;
             nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem, pageIndex);
         }
 
@@ -2977,14 +2978,14 @@ function CDrawingDocument()
         {
             isNeedScroll = true;
             this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - this.m_oWordControl.m_oEditor.HtmlElement.width);
+            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - _ww);
             this.m_oWordControl.m_oScrollHorApi.scrollToX(parseInt(temp), false);
         }
         if (0 != nValueScrollVer)
         {
             isNeedScroll = true;
             this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - this.m_oWordControl.m_oEditor.HtmlElement.height);
+            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - _hh);
             this.m_oWordControl.m_oScrollVerApi.scrollToY(parseInt(temp), false);
         }
 
@@ -3028,11 +3029,19 @@ function CDrawingDocument()
         if (true == pos.Error && (false == bIsPageChanged))
             return;
 
+        var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
+        var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        if (this.m_oWordControl.bIsRetinaSupport)
+        {
+            _ww >>= 1;
+            _hh >>= 1;
+        }
+
         // �������, ����� �� ������ �� ������
         var boxX = 0;
         var boxY = 0;
-        var boxR = this.m_oWordControl.m_oEditor.HtmlElement.width;
-        var boxB = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        var boxR = _ww;
+        var boxB = _hh;
 
         /*
         if (true == this.m_oWordControl.m_bIsRuler)
@@ -3047,30 +3056,22 @@ function CDrawingDocument()
         var nValueScrollHor = 0;
         if (pos.X < boxX)
         {
-            //nValueScrollHor = boxX - pos.X;
-            //nValueScrollHor = pos.X;
             nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(x - 5, pageIndex);
         }
         if (pos.X > boxR)
         {
-            //nValueScrollHor = boxR - pos.X;
-            //nValueScrollHor = pos.X + this.m_oWordControl.m_oEditor.HtmlElement.width;
-            var _mem = x + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.width * 100 / this.m_oWordControl.m_nZoomValue;
+            var _mem = x + 5 - g_dKoef_pix_to_mm * _ww * 100 / this.m_oWordControl.m_nZoomValue;
             nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(_mem, pageIndex);
         }
 
         var nValueScrollVer = 0;
         if (pos.Y < boxY)
         {
-            //nValueScrollVer = boxY - pos.Y;
-            //nValueScrollVer = pos.Y;
             nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(y - 5, pageIndex);
         }
         if (pos.Y > boxB)
         {
-            //nValueScrollVer = boxB - pos.Y;
-            //nValueScrollHor = pos.Y + this.m_oWordControl.m_oEditor.HtmlElement.height;
-            var _mem = y + this.m_dTargetSize + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.height * 100 / this.m_oWordControl.m_nZoomValue;
+            var _mem = y + this.m_dTargetSize + 5 - g_dKoef_pix_to_mm * _hh * 100 / this.m_oWordControl.m_nZoomValue;
             nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem, pageIndex);
         }
 
@@ -3078,13 +3079,13 @@ function CDrawingDocument()
         if (0 != nValueScrollHor)
         {
             isNeedScroll = true;
-            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - this.m_oWordControl.m_oEditor.HtmlElement.width);
+            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - _ww);
             this.m_oWordControl.m_oScrollHorApi.scrollToX(parseInt(temp), false);
         }
         if (0 != nValueScrollVer)
         {
             isNeedScroll = true;
-            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - this.m_oWordControl.m_oEditor.HtmlElement.height);
+            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - _hh);
             this.m_oWordControl.m_oScrollVerApi.scrollToY(parseInt(temp), false);
         }
 
@@ -4318,6 +4319,8 @@ function CDrawingDocument()
     this.GetVisibleMMHeight = function()
     {
         var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        if (this.m_oWordControl.bIsRetinaSupport)
+            pixHeigth >>= 1;
         var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
         return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
