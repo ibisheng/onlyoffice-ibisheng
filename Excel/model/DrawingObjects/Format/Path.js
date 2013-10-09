@@ -250,7 +250,7 @@ Path.prototype = {
     {
         var oldValue = this.fill;
         var newValue = fill;
-        this.stroke = fill;
+        this.fill = fill;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_PathFill, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
     },
