@@ -683,6 +683,12 @@
 							}
 							if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
 							{
+								//при добавлении общего фильтра проверка на пустой диапазон
+								if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells))
+								{
+									//TODO add alert error
+									return;
+								};
 								result = [];
 								//в случае если добавляем фильтр общий, то откидываем пустую строку или столбец в конце
 								var isEndRowEmpty = true;
@@ -757,6 +763,12 @@
 							}
 							else if(paramsForCallBackAdd == "addTableFilterManyCells" || paramsForCallBackAdd == "addAutoFilterManyCells")
 							{	
+								//при добавлении общего фильтра проверка на пустой диапазон
+								if(paramsForCallBackAdd == "addAutoFilterManyCells" && t._isEmptyRange(activeCells))
+								{
+									//TODO add alert error
+									return;
+								};
 								var n = 0;
 								result = [];
 								for(col = activeCells.c1; col <= activeCells.c2; col++)
@@ -6019,6 +6031,23 @@
 						}
 					}
 				}
+			},
+			
+			_isEmptyRange: function(activeCells)
+			{
+				var ws = this.worksheet;
+				for(var n = activeCells.r1; n <= activeCells.r2; n++)
+				{
+					for(var k = activeCells.c1; k <= activeCells.c2; k++)
+					{
+						cell = ws.model._getCell(n,k);
+						if(cell.getValueWithoutFormat() != '')
+						{
+							return false;	
+						}
+					}
+				}
+				return true;
 			}
 		};
 
