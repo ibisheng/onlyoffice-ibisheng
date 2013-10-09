@@ -545,6 +545,7 @@ prop:OfflineAppDocumentStartLoad
 prop:OfflineAppDocumentEndLoad
 prop:SetDrawImagePlaceParagraph
 prop:asc_setCoAuthoringEnable
+prop:_StartTracking
 prop:asc_getChartObject
 prop:asc_addChartDrawingObject
 prop:asc_editChartDrawingObject
@@ -921,6 +922,8 @@ var:spellCheck
 var:_onSpellCheck_Callback2
 ---
 var:sendCommand
+---
+var:sendTrack
 ---
 var:_downloadAs
 ---
@@ -1620,6 +1623,7 @@ asc_docs_api.prototype['OfflineAppDocumentStartLoad'] = asc_docs_api.prototype.O
 asc_docs_api.prototype['OfflineAppDocumentEndLoad'] = asc_docs_api.prototype.OfflineAppDocumentEndLoad;
 asc_docs_api.prototype['SetDrawImagePlaceParagraph'] = asc_docs_api.prototype.SetDrawImagePlaceParagraph;
 asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
+asc_docs_api.prototype['_StartTracking'] = asc_docs_api.prototype._StartTracking;
 asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;
 asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc_addChartDrawingObject;
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
@@ -1963,6 +1967,7 @@ window['getURLParameter'] = getURLParameter;
 window['spellCheck'] = spellCheck;
 window['_onSpellCheck_Callback2'] = _onSpellCheck_Callback2;
 window['sendCommand'] = sendCommand;
+window['sendTrack'] = sendTrack;
 window['_downloadAs'] = _downloadAs;
 window['_addImageUrl2'] = _addImageUrl2;
 window['_isDocumentModified2'] = _isDocumentModified2;
