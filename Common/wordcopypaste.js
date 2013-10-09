@@ -2186,6 +2186,16 @@ CopyProcessor.prototype =
                 selectEnd = selectStart;
                 selectStart = Temp;
             }
+            for(var i = 0;  i < selectStart; ++i)
+            {
+                var content = Item.Content;
+                if(content instanceof ParaText)
+                    break;
+            }
+            if(i == selectStart)
+            {
+                selectStart = 0;
+            }
             this.oPresentationWriter.StartRecord(0);
             this.oPresentationWriter.WriteParagraph(Item, selectStart, selectEnd);
             this.oPresentationWriter.EndRecord();
