@@ -985,7 +985,7 @@ CShape.prototype =
         {
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
             {
-                if(_content_height < _text_rect_height)
+                if(/*_content_height < _text_rect_height*/true)
                 {
                     switch (_body_pr.anchor)
                     {
@@ -1047,7 +1047,7 @@ CShape.prototype =
             }
             else
             {
-                if(_content_height < _text_rect_width)
+                if(/*_content_height < _text_rect_width*/true)
                 {
                     switch (_body_pr.anchor)
                     {
@@ -1172,7 +1172,7 @@ CShape.prototype =
                 }
             }
 
-            if(_content_height < content_height2)
+            if(/*_content_height < content_height2*/true)
             {
                 switch (_body_pr.anchor)
                 {
@@ -1344,7 +1344,7 @@ CShape.prototype =
         {
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
             {
-                if(_content_height < _text_rect_height)
+                if(/*_content_height < _text_rect_height*/true)
                 {
                     switch (_body_pr.anchor)
                     {
@@ -1406,7 +1406,7 @@ CShape.prototype =
             }
             else
             {
-                if(_content_height < _text_rect_width)
+                if(/*_content_height < _text_rect_width*/true)
                 {
                     switch (_body_pr.anchor)
                     {
@@ -1531,7 +1531,7 @@ CShape.prototype =
                 }
             }
 
-            if(_content_height < content_height2)
+            if(/*_content_height < content_height2*/true)
             {
                 switch (_body_pr.anchor)
                 {
