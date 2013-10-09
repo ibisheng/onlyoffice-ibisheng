@@ -1043,7 +1043,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				 */
 				if (null !== this.guiFonts && "asc_onInitEditorFonts" === name) {
 					this.handlers.trigger("asc_onInitEditorFonts", this.guiFonts);
-					this.guiFonts = null;
+					//this.guiFonts = null;
 				} else if (null !== this.guiStyles && "asc_onInitEditorStyles" === name) {
 					this.handlers.trigger("asc_onInitEditorStyles", this.guiStyles);
 					this.guiStyles = null;
@@ -1055,7 +1055,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this._gui_control_colors = null;
 				} else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
 					this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
-					this._gui_color_schemes = null;
+					//this._gui_color_schemes = null;
 				} else if ("asc_onInitEditorShapes" === name) {
 					this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
 				} else if ("asc_onInitStandartTextures" === name) {
@@ -1094,10 +1094,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				 проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
 				 Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
 				 */
-				if (false === this.handlers.trigger("asc_onInitEditorFonts", gui_fonts))
+				//if (false === this.handlers.trigger("asc_onInitEditorFonts", gui_fonts))
 					this.guiFonts = gui_fonts;
-				else
-					this.guiFonts = null;
+				//else
+				//	this.guiFonts = null;
 			},
 
 			asyncFontsDocumentStartLoaded: function () {
@@ -1713,6 +1713,37 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.collaborativeEditing.onStartCheckLock();
 				this.collaborativeEditing.addCheckLock(lockInfo);
 				this.collaborativeEditing.onEndCheckLock(callback);
+			},
+
+			// Toolbar interface
+
+			asc_getEditorFonts: function () {
+				var _tmp = this.guiFonts;
+				this.guiFonts = null;
+				return _tmp;
+			},
+
+			asc_getThemeColorSchemes: function () {
+				var _tmp = this._gui_color_schemes;
+				this._gui_color_schemes = null;
+				return _tmp;
+			},
+
+			asc_getEditorShapes: function () {
+				return [g_oAutoShapesGroups, g_oAutoShapesTypes];
+			},
+
+			asc_getStandartTextures: function () {
+				var _count = g_oUserTexturePresets.length;
+				var arr = new Array(_count);
+				for (var i = 0; i < _count; ++i) {
+					arr[i] = new asc_CTexture();
+					arr[i].Id = i;
+					arr[i].Image = g_oUserTexturePresets[i];
+					this.ImageLoader.LoadImage(g_oUserTexturePresets[i], 1);
+				}
+
+				return arr;
 			},
 			
 			// Workbook interface
@@ -2677,8 +2708,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_SendThemeColorSchemes : function (param) {
 				this._gui_color_schemes = param;
 				var ret = this.handlers.trigger("asc_onSendThemeColorSchemes", param);
-				if (ret)
-					this._gui_color_schemes = null;
+				//if (ret)
+				//	this._gui_color_schemes = null;
 			},
 			asc_ChangeColorScheme : function (index_scheme) {
 				var t = this;
@@ -3172,6 +3203,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
 
 		prot["asc_getController"] = prot.asc_getController;
+
+		// Toolbar interface
+
+		prot["asc_getEditorFonts"] = prot.asc_getEditorFonts;
+		prot["asc_getThemeColorSchemes"] = prot.asc_getThemeColorSchemes;
+		prot["asc_getEditorShapes"] = prot.asc_getEditorShapes;
+		prot["asc_getStandartTextures"] = prot.asc_getStandartTextures;
 
 		// Workbook interface
 
