@@ -1839,6 +1839,7 @@ CopyProcessor.prototype =
                         this.oPresentationWriter.WriteULong(selected_slides.length);
                         var layouts_map = {};
                         var layout_count = 0;
+                        editor.WordControl.m_oLogicDocument.CalculateComments();
                         for(var i = 0; i < selected_slides.length; ++i)
                         {
                             this.CopySlide(this.ElemToSelect, editor.WordControl.m_oLogicDocument.Slides[selected_slides[i]]);
@@ -3460,6 +3461,10 @@ PasteProcessor.prototype =
                                                     image_map[sNewSrc] = sNewSrc;
                                                     imageElem.SetUrl(sNewSrc);
                                                 }
+                                                else
+                                                {
+                                                    image_map[imageElem.Url] = imageElem.Url;
+                                                }
                                             }
                                         }
                                     }
@@ -3468,7 +3473,10 @@ PasteProcessor.prototype =
                             }
                             else
                             {
-                                this.api.pre_Paste(fonts, images, paste_callback);
+                                var im_arr = [];
+                                for(var key  in images)
+                                    im_arr.push(key);
+                                this.api.pre_Paste(fonts, im_arr, paste_callback);
                             }
                             return;
                         }
@@ -3661,14 +3669,11 @@ PasteProcessor.prototype =
                                     {
                                         var oFromTo = JSON.parse(incomeObject.data);
 
-                                        var arr_images =[];
                                         var image_map = {};
                                         for(var i = 0, length = objects.arrImages.length; i < length; ++i)
                                         {
                                             var sFrom = objects.arrImages[i].Url;
                                             var sTo = oFromTo[sFrom];
-                                            if(sTo)
-                                                arr_images.push(sTo);
                                         }
                                         for(var i = 0, length = objects.arrImages.length; i < length; ++i)
                                         {
@@ -3681,6 +3686,10 @@ PasteProcessor.prototype =
                                                     image_map[sNewSrc] = sNewSrc;
                                                     imageElem.SetUrl(sNewSrc);
                                                 }
+                                                else
+                                                {
+                                                    image_map[imageElem.Url] = imageElem.Url;
+                                                }
                                             }
                                         }
                                     }
@@ -3689,7 +3698,10 @@ PasteProcessor.prototype =
                             }
                             else
                             {
-                                this.api.pre_Paste(fonts, images, paste_callback);
+                                var im_arr = [];
+                                for(var key  in images)
+                                    im_arr.push(key);
+                                this.api.pre_Paste(fonts, im_arr, paste_callback);
                             }
                             return;
                         }
@@ -3750,7 +3762,9 @@ PasteProcessor.prototype =
                                 }, JSON.stringify(rData) );
                             }
                             else
-                                this.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
+                            {
+                                this.api.pre_Paste(fonts, [], paste_callback);
+                            }
                             return;
                         }
                     }
@@ -3762,13 +3776,48 @@ PasteProcessor.prototype =
                 function(){
                      oThis.aContent = new Array();
                      //�� ����� ���������� �������� ��� ������� ��������� �������
-                     oThis._Execute(node, {}, true, true, false);
+                     var arrShapes = [], arrImages = [], arrTables = [];
+                    var presentation = editor.WordControl.m_oLogicDocument;
+                    var shape = new CShape(presentation.Slides[presentation.CurPage]);
+                    shape.setTextBody(new CTextBody(shape));
+                    var dd = presentation.DrawingDocument;
+                    arrShapes.push(shape);
+                    shape.setXfrm(dd.GetMMPerDot(node["offsetLeft"]), dd.GetMMPerDot(node["offsetTop"]), null, null, null, null, null);
+                     var ret = oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
 
-
-                     oThis._AddNextPrevToContent(oThis.oDocument);
+                    for(var i = 0; i < arrShapes.length; ++i)
+                    {
+                        shape = arrShapes[i];
+                        var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
+                        var h = shape.txBody.getRectHeight(2000, w);
+                        shape.setXfrm(null, null, w, h, null, null, null);
+                    }
+                     //oThis._AddNextPrevToContent(oThis.oDocument);
                      if(false == oThis.bNested)
                      {
-                         oThis.InsertInDocument();
+                         var slide = presentation.Slides[presentation.CurPage];
+                         if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                         {
+                             History.Create_NewPoint();
+                             for(var i = 0; i < arrShapes.length; ++i)
+                             {
+                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrShapes[i]);
+                                 presentation.recalcMap[arrShapes[i].Get_Id()] = arrShapes[i];
+                             }
+                             for(var i = 0; i < arrImages.length; ++i)
+                             {
+                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrImages[i]);
+                                 presentation.recalcMap[arrImages[i].Get_Id()] = arrImages[i];
+                             }
+                             for(var i = 0; i < arrTables.length; ++i)
+                             {
+                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrTables[i]);
+                                 arrTables[i].recalcAll();
+                                 presentation.recalcMap[arrTables[i].Get_Id()] = arrTables[i];
+                             }
+                             presentation.Recalculate();
+                         }
+                         //oThis.InsertInDocument();
                      }
 
                      node.blur();
@@ -4112,7 +4161,7 @@ PasteProcessor.prototype =
     {
         var oVal = parseFloat(value);
         var oType;
-        if(NaN != oVal)
+        if(!isNaN(oVal))
         {
             if(-1 != value.indexOf("%"))
             {
@@ -5887,6 +5936,808 @@ PasteProcessor.prototype =
             this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
         }
         return bAddParagraph;
+    },
+
+    _ExecutePresentation : function(node, pPr, bRoot, bAddParagraph, bInBlock, arrShapes, arrImages, arrTables)
+    {
+        //bAddParagraph ���� �������� �� ������� _Decide_AddParagraph, ��������� �������� ��� ���.
+        //bAddParagraph ������������ � true, ����� ���������� ������� ������� � �� ��������� �������� ��������
+        var arr_shapes = [];
+        var arr_images = [];
+        var arr_tables = [];
+        var oDocument = this.oDocument;
+        var bRootHasBlock = false;//���� root ���� ������� �������, �� ���� ��� child ������� �����������
+        //��� Root node �� ������� ����� � �� ��������� �����
+        var presentation = editor.WordControl.m_oLogicDocument;
+
+        var shape = arrShapes[arrShapes.length - 1];
+
+        this.aContent = shape.txBody.content.Content;
+        if(true == bRoot)
+        {
+            //���� ������� ��������� ���, �� �������� ����
+            var bExist = false;
+            for(var i = 0, length = node.childNodes.length; i < length; i++)
+            {
+                var child = node.childNodes[i];
+                var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
+                if(true == bIsBlockChild)
+                {
+                    bRootHasBlock = true;
+                    bExist = true;
+                    break;
+                }
+            }
+            if(false == bExist && true == this.bIgnoreNoBlockText)
+                this.bIgnoreNoBlockText = false;
+        }
+        else
+        {
+            if(Node.TEXT_NODE == node.nodeType)
+            {
+                if(false == this.bIgnoreNoBlockText || true == bInBlock)
+                {
+                    var value = node.nodeValue;
+                    if(!value)
+                        value = "";
+                    //������� � ����� �������� \r|\t|\n, � �������� ������ �������� �� �� �������
+                    //������ ���(�������� ������ chrome ��� ������� ��������� ������ � ������� \n)
+                    value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
+                    value = value.replace(/(\r|\t|\n)/g, ' ');
+                    if(value.length > 0)
+                    {
+                        this.oDocument = shape.txBody.content;
+                        shape.txBody.content.Add_NewParagraph();
+                       // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
+
+                        //��������� ������� ����� ���� �� ���������
+                        //this._commit_rPr(node.parentNode);
+
+
+                        var rPr = this._read_rPr(node.parentNode);
+                        var Item = new ParaTextPr( rPr);
+                        shape.paragraphAdd(Item);
+                        for(var i = 0, length = value.length; i < length; i++)
+                        {
+                            var Char = value.charAt(i);
+                            var Code = value.charCodeAt(i);
+                            var Item;
+                            if(32 == Code || 160 == Code) //160 - nbsp
+                                Item = new ParaSpace();
+                            else
+                                Item = new ParaText( value[i] );
+                            shape.paragraphAdd(Item);
+                        }
+
+                    }
+                }
+                return;
+            }
+            var sNodeName = node.nodeName.toLowerCase();
+            if("table" == sNodeName)
+            {
+                this._StartExecuteTablePresentation(node, pPr, arrShapes, arrImages, arrTables);
+                return;
+            }
+
+            //�������� �� html �������� ���������(�� ��� ������ �������� �� getComputedStyle)
+            var style = node.getAttribute("style");
+            if(style)
+                this._parseCss(style, pPr);
+
+            if("h1" == sNodeName)
+                pPr.hLevel = 0;
+            else if("h2" == sNodeName)
+                pPr.hLevel = 1;
+            else if("h3" == sNodeName)
+                pPr.hLevel = 2;
+            else if("h4" == sNodeName)
+                pPr.hLevel = 3;
+            else if("h5" == sNodeName)
+                pPr.hLevel = 4;
+            else if("h6" == sNodeName)
+                pPr.hLevel = 5;
+
+            if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
+            {
+                pPr.bNum = true;
+                if(g_bIsDocumentCopyPaste)
+                {
+                    if("ul" == sNodeName)
+                        pPr.numType = numbering_numfmt_Bullet;
+                    else if("ol" == sNodeName)
+                        pPr.numType = numbering_numfmt_Decimal;
+                }
+                else
+                {
+                    if("ul" == sNodeName)
+                        pPr.numType = numbering_presentationnumfrmt_Char;
+                    else if("ol" == sNodeName)
+                        pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
+                }
+            }
+
+            if("img" == sNodeName)
+            {
+
+                //bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
+
+                var nWidth = parseInt(node.getAttribute("width"));
+                var nHeight = parseInt(node.getAttribute("height"));
+                if(!nWidth || !nHeight)
+                {
+                    var defaultView = node.ownerDocument.defaultView;
+                    var computedStyle = defaultView.getComputedStyle( node, null );
+                    if ( computedStyle )
+                    {
+                        nWidth = parseInt(computedStyle.getPropertyValue("width"));
+                        nHeight = parseInt(computedStyle.getPropertyValue("height"));
+                    }
+                }
+                var sSrc = node.getAttribute("src");
+                if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
+                    ||  nWidth === 0 ||  nHeight === 0)
+                {
+                    var img_prop = new CImgProperty();
+                    img_prop.put_ImageUrl(sSrc);
+                    var or_sz = img_prop.get_OriginSize(editor);
+                    nWidth = or_sz.Width / g_dKoef_pix_to_mm;
+                    nHeight = or_sz.Height / g_dKoef_pix_to_mm;
+                }
+                else
+                {
+                    nWidth *= g_dKoef_pix_to_mm;
+                    nHeight *= g_dKoef_pix_to_mm;
+                }
+                if(nWidth && nHeight && sSrc)
+                {
+                    var sSrc = this.oImages[sSrc];
+                    if(sSrc)
+                    {
+                        var image = new CImageShape(presentation.Slides[presentation.CurPage]);
+                        var blipFill = new CUniFill();
+                        blipFill.fill = new CBlipFill();
+                        blipFill.fill.RasterImageId = sSrc;
+                        image.setBlipFill(blipFill);
+                        image.setGeometry( CreateGeometry("rect"));
+                        image.spPr.geometry.Init(5, 5);
+                        image.setXfrm(node["offsetLeft"], node["offsetTop"], nWidth, nHeight, null, null, null);
+                        arrImages.push(image);
+                    }
+                }
+                return bAddParagraph;
+
+            }
+
+            //��������� linebreak, ���� �� �� ��������� ������� �������� � �� ����� ��� ������� �������
+            if("br" == sNodeName || "always" == node.style.pageBreakBefore)
+            {
+                if("always" == node.style.pageBreakBefore)
+                {
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
+                }
+                else
+                {
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
+                }
+            }
+
+            //�������� �� tab
+            if("span" == sNodeName)
+            {
+                var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
+                if(nTabCount > 0)
+                {
+                    var rPr = this._read_rPr(node);
+                    var Item = new ParaText( rPr);
+                    shape.paragraphAdd(Item);
+                    for(var i = 0; i < nTabCount; i++)
+                        shape.paragraphAdd( new ParaTab() );
+                    return;
+                }
+            }
+        }
+        //���������� �������� ��� childNodes
+        for(var i = 0, length = node.childNodes.length; i < length; i++)
+        {
+            var child = node.childNodes[i];
+            var nodeType = child.nodeType;
+            //��� ����������� �� word ����� ����������� ����������� �� �������
+            //����������� ����������, ������ ������ ������
+            if(Node.COMMENT_NODE == nodeType)
+            {
+                var value = child.nodeValue;
+                var bSkip = false;
+                if(value)
+                {
+                    if(-1 != value.indexOf("supportLists"))
+                    {
+                        //todo ���������� ��� ������
+                        pPr.bNum = true;
+                        bSkip = true;
+                    }
+                    if(-1 != value.indexOf("supportLineBreakNewLine"))
+                        bSkip = true;
+                }
+                if(true == bSkip)
+                {
+                    //���������� ��� �� �������������� �����������
+                    var j = i + 1;
+                    for(; j < length; j++)
+                    {
+                        var tempNode = node.childNodes[j];
+                        var tempNodeType = tempNode.nodeType;
+                        if(Node.COMMENT_NODE == tempNodeType)
+                        {
+                            var tempvalue = tempNode.nodeValue;
+                            if(tempvalue && -1 != tempvalue.indexOf("endif"))
+                                break;
+                        }
+                    }
+                    i = j;
+                    continue;
+                }
+            }
+
+            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+                continue;
+            //�������� ������� ��������� ������ �� \t,\n,\r
+            if( Node.TEXT_NODE == child.nodeType)
+            {
+                var value = child.nodeValue;
+                if(!value)
+                    continue;
+                value = value.replace(/(\r|\t|\n)/g, '');
+                if("" == value)
+                    continue;
+            }
+            var sChildNodeName = child.nodeName.toLowerCase();
+            var bIsBlockChild = this._IsBlockElem(sChildNodeName);
+            if(bRoot)
+                this.bInBlock = false;
+            if(bIsBlockChild)
+            {
+                bAddParagraph = true;
+                this.bInBlock = true;
+            }
+
+            var bHyperlink = false;
+            if("a" == sChildNodeName)
+            {
+                var href = child.href;
+                if(null != href)
+                {
+                    var sDecoded;
+                    //decodeURI ����� �������� malformed exception, ������ ��� ��� ���� � utf8, � ��������� ����� ����� ���������� url � ����� ���������(�������� windows-1251)
+                    try
+                    {
+                        sDecoded = decodeURI(href);
+                    }
+                    catch(e) { sDecoded = href; }
+                    href = sDecoded;
+                    bHyperlink = true;
+                    var title = child.getAttribute("title");
+
+                    this.oDocument = shape.txBody.content;
+                   // bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
+                    var oHyperlink = new ParaHyperlinkStart();
+                    oHyperlink.Set_Value( href );
+                    if(null != title)
+                        oHyperlink.Set_ToolTip(title);
+                    shape.paragraphAdd( oHyperlink );
+                }
+            }
+
+            bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
+            if(bIsBlockChild)
+                bAddParagraph = true;
+            if("a" == sChildNodeName && true == bHyperlink)
+                shape.paragraphAdd( new ParaHyperlinkEnd() );
+        }
+        if(bRoot)
+        {
+            //this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+        }
+        return;
+    },
+
+    _StartExecuteTablePresentation : function(node, pPr, arrShapes, arrImages, arrTables)
+    {
+        var oDocument = this.oDocument;
+        var defaultView = node.ownerDocument.defaultView;
+        var tableNode = node;
+        //���� ���� ���� tbody
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            if("tbody" == node.childNodes[i].nodeName.toLowerCase())
+            {
+                node = node.childNodes[i];
+                break;
+            }
+        }
+        //��������� �����. � ������� �� ����� ���� ����� ��������� �� ����������� ���������� �����.
+        var nRowCount = 0;
+        var nMinColCount = 0;
+        var nMaxColCount = 0;
+        var aColsCountByRow = new Array();
+        var oRowSums = new Object();
+        oRowSums[0] = 0;
+        var dMaxSum = 0;
+        var nCurColWidth = 0;
+        var nCurSum = 0;
+        var oRowSpans = new Object();
+        var fParseSpans = function()
+        {
+            var spans = oRowSpans[nCurColWidth];
+            while(null != spans && spans.row > 0)
+            {
+                spans.row--;
+                nCurColWidth += spans.col;
+                nCurSum += spans.width;
+                spans = oRowSpans[nCurColWidth];
+            }
+        };
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            var tr = node.childNodes[i];
+            if("tr" == tr.nodeName.toLowerCase())
+            {
+                nCurSum = 0;
+                nCurColWidth = 0;
+                var nMinRowSpanCount = null;//����������� rowspan ����� ������
+                for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
+                {
+                    var tc = tr.childNodes[j];
+                    var tcName = tc.nodeName.toLowerCase();
+                    if("td" == tcName || "th" == tcName)
+                    {
+                        fParseSpans();
+
+                        var dWidth = null;
+                        var computedStyle = defaultView.getComputedStyle( tc, null );
+                        if ( computedStyle )
+                        {
+                            var computedWidth = computedStyle.getPropertyValue( "width" );
+                            if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
+                                dWidth = computedWidth;
+                        }
+                        if(null == dWidth)
+                            dWidth = tc.clientWidth * g_dKoef_pix_to_mm;
+
+                        var nColSpan = tc.getAttribute("colspan");
+                        if(null != nColSpan)
+                            nColSpan = nColSpan - 0;
+                        else
+                            nColSpan = 1;
+                        var nCurRowSpan = tc.getAttribute("rowspan");
+                        if(null != nCurRowSpan)
+                        {
+                            nCurRowSpan = nCurRowSpan - 0;
+                            if(null == nMinRowSpanCount)
+                                nMinRowSpanCount = nCurRowSpan;
+                            else if(nMinRowSpanCount > nCurRowSpan)
+                                nMinRowSpanCount = nCurRowSpan;
+                            if(nCurRowSpan > 1)
+                                oRowSpans[nCurColWidth] = {row: nCurRowSpan - 1, col: nColSpan, width: dWidth};
+                        }
+                        else
+                            nMinRowSpanCount = 0;
+
+                        nCurSum += dWidth;
+                        if(null == oRowSums[nCurColWidth + nColSpan])
+                            oRowSums[nCurColWidth + nColSpan] = nCurSum;
+                        nCurColWidth += nColSpan;
+                    }
+                }
+                fParseSpans();
+                //������� ������ rowspan
+                if(nMinRowSpanCount > 1)
+                {
+                    for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
+                    {
+                        var tc = tr.childNodes[j];
+                        var tcName = tc.nodeName.toLowerCase();
+                        if("td" == tcName || "th" == tcName)
+                        {
+                            var nCurRowSpan = tc.getAttribute("rowspan");
+                            if(null != nCurRowSpan)
+                                tc.setAttribute("rowspan", nCurRowSpan - nMinRowSpanCount);
+                        }
+                    }
+                }
+                if(dMaxSum < nCurSum)
+                    dMaxSum = nCurSum;
+                //������� ������ tr
+                if(0 == nCurColWidth)
+                {
+                    node.removeChild(tr);
+                    length--;
+                    i--;
+                }
+                else
+                {
+                    if(0 == nMinColCount || nMinColCount > nCurColWidth)
+                        nMinColCount = nCurColWidth;
+                    if(nMaxColCount < nCurColWidth)
+                        nMaxColCount = nCurColWidth;
+                    nRowCount++;
+                    aColsCountByRow.push(nCurColWidth);
+                }
+            }
+        }
+        if(nMaxColCount != nMinColCount)
+        {
+            for(var i = 0, length = aColsCountByRow.length; i < length; ++i)
+                aColsCountByRow[i] = nMaxColCount - aColsCountByRow[i];
+        }
+        if(nRowCount > 0 && nMaxColCount > 0)
+        {
+            var bUseScaleKoef = this.bUseScaleKoef;
+            var dScaleKoef = this.dScaleKoef;
+            if(dMaxSum * dScaleKoef > this.dMaxWidth)
+            {
+                dScaleKoef = dScaleKoef * this.dMaxWidth / dMaxSum;
+                bUseScaleKoef = true;
+            }
+            //������ Grid
+            var aGrid = new Array();
+            var nPrevIndex = null;
+            var nPrevVal = 0;
+            for(var i in oRowSums)
+            {
+                var nCurIndex = i - 0;
+                var nCurVal = oRowSums[i];
+                var nCurWidth = nCurVal - nPrevVal;
+                if(bUseScaleKoef)
+                    nCurWidth *= dScaleKoef;
+                if(null != nPrevIndex)
+                {
+                    var nDif = nCurIndex - nPrevIndex;
+                    if(1 == nDif)
+                        aGrid.push(nCurWidth);
+                    else
+                    {
+                        var nPartVal = nCurWidth / nDif;
+                        for(var i = 0; i < nDif; ++i)
+                            aGrid.push(nPartVal);
+                    }
+                }
+                nPrevVal = nCurVal;
+                nPrevIndex = nCurIndex;
+            }
+            var CurPage = 0;
+            var presentation = editor.WordControl.m_oLogicDocument;
+            var graphicFrame = new CGraphicFrame(presentation.Slides[presentation.CurPage]);
+
+            var table = new CTable(presentation.DrawingDocument, graphicFrame, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, aGrid);
+            table.Set_TableStyle(0);
+            var dd = editor.WordControl.m_oDrawingDocument;
+            graphicFrame.setGraphicObject(table);
+            arrTables.push(graphicFrame);
+            graphicFrame.setXfrm(dd.GetMMPerDot(node["offsetLeft"]), dd.GetMMPerDot(node["offsetTop"]), dd.GetMMPerDot(node["offsetWidth"]), dd.GetMMPerDot(node["offsetHeight"]), null, null, null);
+
+            //считаем aSumGrid
+            var aSumGrid = new Array();
+            aSumGrid[-1] = 0;
+            var nSum = 0;
+            for(var i = 0, length = aGrid.length; i < length; ++i)
+            {
+                nSum += aGrid[i];
+                aSumGrid[i] = nSum;
+            }
+            //�������� content
+             this._ExecuteTablePresentation(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
+            table.Cursor_MoveToStartPos();
+            return;
+        }
+    },
+
+    _ExecuteTablePresentation : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables)
+    {
+        //из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
+        table.Set_TableLayout(tbllayout_Fixed);
+        //Pr
+        var Pr = table.Pr;
+        var defaultView = tableNode.ownerDocument.defaultView;
+        //align ������� � parent tableNode
+        var sTableAlign = null;
+        if(null != tableNode.align)
+            sTableAlign = tableNode.align
+        else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
+        {
+            computedStyleParent = defaultView.getComputedStyle(tableNode.parentNode, null);
+            if(null != computedStyleParent)
+            {
+                //����� ��������� -webkit-right
+                sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
+            }
+        }
+        if(null != sTableAlign)
+        {
+            if(-1 != sTableAlign.indexOf('center'))
+                table.Set_TableAlign(align_Center);
+            else if(-1 != sTableAlign.indexOf('right'))
+                table.Set_TableAlign(align_Right);
+        }
+        var spacing = null;
+        table.Set_TableBorder_InsideH(new CDocumentBorder());
+        table.Set_TableBorder_InsideV(new CDocumentBorder());
+
+        var style = tableNode.getAttribute("style");
+        if(style)
+        {
+            var tblPrMso = new Object();
+            this._parseCss(style, tblPrMso);
+            var spacing = tblPrMso["mso-cellspacing"];
+            if(null != spacing && null != (spacing = this._ValueToMm(spacing)))
+                ;
+            var padding = tblPrMso["mso-padding-alt"];
+            if(null != padding)
+            {
+                padding = trimString(padding);
+                var aMargins = padding.split(" ");
+                if(4 == aMargins.length)
+                {
+                    var top = aMargins[0];
+                    if(null != top && null != (top = this._ValueToMm(top)))
+                        ;
+                    else
+                        top = Pr.TableCellMar.Top.W;
+                    var right = aMargins[1];
+                    if(null != right && null != (right = this._ValueToMm(right)))
+                        ;
+                    else
+                        right = Pr.TableCellMar.Right.W;
+                    var bottom = aMargins[2];
+                    if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+                        ;
+                    else
+                        bottom = Pr.TableCellMar.Bottom.W;
+                    var left = aMargins[3];
+                    if(null != left && null != (left = this._ValueToMm(left)))
+                        ;
+                    else
+                        left = Pr.TableCellMar.Left.W;
+                    table.Set_TableCellMar(left, top, right, bottom);
+                }
+            }
+            var insideh = tblPrMso["mso-border-insideh"];
+            if(null != insideh)
+                table.Set_TableBorder_InsideH(this._ExecuteParagraphBorder(insideh));
+            var insidev = tblPrMso["mso-border-insidev"];
+            if(null != insidev)
+                table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
+        }
+        var computedStyle = defaultView.getComputedStyle(tableNode, null);
+        if(computedStyle)
+        {
+            if(align_Left == table.Get_TableAlign())
+            {
+                var margin_left = computedStyle.getPropertyValue( "margin-left" );
+                //todo возможно надо еще учесть ширину таблицы
+                if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+                    table.Set_TableInd(margin_left);
+            }
+            background_color = computedStyle.getPropertyValue( "background-color" );
+            if(null != background_color && (background_color = this._ParseColor(background_color)))
+                table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
+            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
+            if(null != oLeftBorder)
+                table.Set_TableBorder_Left(oLeftBorder);
+            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
+            if(null != oTopBorder)
+                table.Set_TableBorder_Top(oTopBorder);
+            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
+            if(null != oRightBorder)
+                table.Set_TableBorder_Right(oRightBorder);
+            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
+            if(null != oBottomBorder)
+                table.Set_TableBorder_Bottom(oBottomBorder);
+
+            if(null == spacing)
+            {
+                spacing = computedStyle.getPropertyValue( "padding" );
+                if(!spacing)
+                    spacing = tableNode.style.padding;
+                if(!spacing)
+                    spacing = null;
+                if(spacing && null != (spacing = this._ValueToMm(spacing)))
+                    ;
+            }
+        }
+
+        //content
+        var oRowSpans = new Object();
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            var tr = node.childNodes[i];
+            if("tr" == tr.nodeName.toLowerCase())
+            {
+                var row = table.Internal_Add_Row(table.Content.length, 0);
+                this._ExecuteTableRowPresentation(tr, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
+            }
+        }
+    },
+    _ExecuteTableRowPresentation : function(node, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables)
+    {
+        var oThis = this;
+        var table = row.Table;
+        if(null != spacing && spacing >= tableSpacingMinValue)
+            row.Set_CellSpacing(spacing);
+        if(node.style.height)
+        {
+            var height = node.style.height;
+            if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
+                row.Set_Height(height, heightrule_AtLeast);
+        }
+        var bBefore = false;
+        var bAfter = false;
+        var style = node.getAttribute("style");
+        if(null != style)
+        {
+            var tcPr = new Object();
+            this._parseCss(style, tcPr);
+            var margin_left = tcPr["mso-row-margin-left"];
+            if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
+                bBefore = true;
+            var margin_right = tcPr["mso-row-margin-right"];
+            if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
+                bAfter = true;
+        }
+
+        //content
+        var nCellIndex = 0;
+        var nCellIndexSpan = 0;
+        var fParseSpans = function()
+        {
+            var spans = oRowSpans[nCellIndexSpan];
+            while(null != spans)
+            {
+                var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
+                oCurCell.Set_VMerge(vmerge_Continue);
+                if(spans.col > 1)
+                    oCurCell.Set_GridSpan(spans.col);
+                spans.row--;
+                if(spans.row <= 0)
+                    delete oRowSpans[nCellIndexSpan];
+                nCellIndexSpan += spans.col;
+                spans = oRowSpans[nCellIndexSpan];
+            }
+        };
+        var oBeforeCell = null;
+        var oAfterCell = null;
+        if(bBefore || bAfter)
+        {
+            for(var i = 0, length = node.childNodes.length; i < length; ++i)
+            {
+                var tc = node.childNodes[i];
+                var tcName = tc.nodeName.toLowerCase();
+                if("td" == tcName || "th" == tcName)
+                {
+                    if(bBefore && null != oBeforeCell)
+                        oBeforeCell = tc;
+                    else if(bAfter)
+                        oAfterCell = tc;
+                }
+            }
+        }
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            //����� ����� ���� ��� ��� ����� ����������� td, ������ ��� ����������� ���������� ������ ����������� � dom
+            fParseSpans();
+
+            var tc = node.childNodes[i];
+            var tcName = tc.nodeName.toLowerCase();
+            if("td" == tcName || "th" == tcName)
+            {
+                var nColSpan = tc.getAttribute("colspan");
+                if(null != nColSpan)
+                    nColSpan = nColSpan - 0;
+                else
+                    nColSpan = 1;
+                if(tc == oBeforeCell)
+                    row.Set_Before(nColSpan);
+                else if(tc == oAfterCell)
+                    row.Set_After(nColSpan);
+                else
+                {
+                    var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
+                    if(nColSpan > 1)
+                        oCurCell.Set_GridSpan(nColSpan);
+                    var width = aSumGrid[nCellIndexSpan + nColSpan - 1] - aSumGrid[nCellIndexSpan - 1];
+                    oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, width));
+                    var nRowSpan = tc.getAttribute("rowspan");
+                    if(null != nRowSpan)
+                        nRowSpan = nRowSpan - 0;
+                    else
+                        nRowSpan = 1;
+                    if(nRowSpan > 1)
+                        oRowSpans[nCellIndexSpan] = {row: nRowSpan - 1, col: nColSpan};
+                    this._ExecuteTableCellPresentation(tc, oCurCell, bUseScaleKoef, dScaleKoef, spacing, arrShapes, arrImages, arrTables);
+                }
+                nCellIndexSpan+=nColSpan;
+            }
+        }
+        fParseSpans();
+    },
+    _ExecuteTableCellPresentation : function(node, cell, bUseScaleKoef, dScaleKoef, spacing, arrShapes, arrImages, arrTables)
+    {
+        //Pr
+        var Pr = cell.Pr;
+        var bAddIfNull = false;
+        if(null != spacing)
+            bAddIfNull = true;
+        var defaultView = node.ownerDocument.defaultView;
+        var computedStyle = defaultView.getComputedStyle(node, null);
+        if(null != computedStyle)
+        {
+            background_color = computedStyle.getPropertyValue( "background-color" );
+            if(null != background_color && (background_color = this._ParseColor(background_color)))
+            {
+                var Shd = new CDocumentShd();
+                Shd.Value = shd_Clear;
+                Shd.Color = background_color;
+                cell.Set_Shd(Shd);
+            }
+            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 3);
+            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 0);
+            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 1);
+            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 2);
+
+            var top = computedStyle.getPropertyValue( "padding-top" );
+            if(null != top && null != (top = this._ValueToMm(top)))
+                cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
+            var right = computedStyle.getPropertyValue( "padding-right" );
+            if(null != right && null != (right = this._ValueToMm(right)))
+                cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
+            var bottom = computedStyle.getPropertyValue( "padding-bottom" );
+            if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+                cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
+            var left = computedStyle.getPropertyValue( "padding-left" );
+            if(null != left && null != (left = this._ValueToMm(left)))
+                cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
+        }
+
+        var arrShapes2 = [], arrImages2 = [], arrTables2 = [];
+        var presentation = editor.WordControl.m_oLogicDocument;
+        var shape = new CShape(presentation.Slides[presentation.CurPage]);
+        var dd = presentation.DrawingDocument;
+        shape.setTextBody(new CTextBody(shape));
+        shape.setXfrm(dd.GetMMPerDot(node["offsetLeft"]), dd.GetMMPerDot(node["offsetTop"]), dd.GetMMPerDot(node["offsetWidth"]), dd.GetMMPerDot(node["offsetHeight"]), null, null, null);
+        arrShapes2.push(shape);
+        this._ExecutePresentation(node, {}, true, true, false, arrShapes2, arrImages2, arrTables);
+        if(arrShapes2.length > 0)
+        {
+            var first_shape = arrShapes2[0];
+            var content = first_shape.txBody.content;
+
+            //��������� ����� ���������
+            for(var i = 0, length = content.Content.length; i < length; ++i)
+                cell.Content.Internal_Content_Add(i + 1, content.Content[i]);
+            //������� ��������, ������� ��������� � ������� �� ���������
+            cell.Content.Internal_Content_Remove(0, 1);
+            arrShapes2.splice(0, 1);
+        }
+        for(var i = 0;  i< arrShapes2.length; ++i)
+        {
+            arrShapes.push(arrShapes2[i]);
+        }
+        for(var i = 0;  i< arrImages2.length; ++i)
+        {
+            arrImages.push(arrImages2[i]);
+        }
+        for(var i = 0;  i< arrTables2.length; ++i)
+        {
+            arrTables.push(arrTables2[i]);
+        }
     }
 };
 
