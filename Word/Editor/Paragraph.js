@@ -2726,7 +2726,7 @@ Paragraph.prototype =
                             this.Pages[CurPage].Set_EndLine( CurLine );
 
                             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
-                                this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
+                                this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos + 1 );
                         }
                     }
                 }
