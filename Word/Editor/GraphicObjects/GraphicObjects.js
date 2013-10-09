@@ -6402,6 +6402,8 @@ CGraphicObjects.prototype =
                 editor.chartPreviewManager.init();
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
                 this.calculateAfterChangeTheme();
+
+                editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
                 break;
             }
         }
@@ -6426,6 +6428,8 @@ CGraphicObjects.prototype =
                 editor.chartPreviewManager.init();
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
                 this.calculateAfterChangeTheme();
+                editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
+
                 break;
             }
         }
@@ -6515,6 +6519,7 @@ CGraphicObjects.prototype =
                 editor.chartPreviewManager.init();
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
                 this.calculateAfterChangeTheme();
+                editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
                 break;
             }
         }

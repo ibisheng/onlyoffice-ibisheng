@@ -5903,12 +5903,13 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
             History.TurnOn();
         }
         this.asc_fireCallback("asc_onUpdateChartStyles");
-
         _changer.calculateAfterChangeTheme();
 
         // TODO:
         this.WordControl.m_oDrawingDocument.ClearCachePages();
         this.WordControl.OnScroll();
+
+        this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
     }
 
 }
