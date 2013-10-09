@@ -1848,7 +1848,7 @@ CGraphics.prototype =
         ctx.lineWidth = 1;
 
         var w_dot = 2;
-        var w_dist = 1;
+        var w_dist = 2;
 
         var eps = 5;
 
