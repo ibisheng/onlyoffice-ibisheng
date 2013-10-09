@@ -34,7 +34,7 @@ CNary.prototype.init = function(props)
     var signChr, sign;
 
     if(typeof(props.chr) === "string")
-        signChr = props.chr.charcodeAt(0);
+        signChr = props.chr.charCodeAt(0);
 
     if(signChr == 0x222B || props.signType == NARY_INTEGRAL)
         sign = new CIntegral();
