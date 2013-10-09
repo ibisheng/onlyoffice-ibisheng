@@ -1967,7 +1967,7 @@ CGraphics.prototype =
 
     DrawEmptyTableLine : function(x1,y1,x2,y2)
     {
-        if (!editor.isShowTableEmptyLine)
+        if (!editor.isShowTableEmptyLine || editor.isViewMode)
             return;
 
         var _x1 = this.m_oFullTransform.TransformPointX(x1,y1);

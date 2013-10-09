@@ -41,7 +41,7 @@ function CPdfPrinter(sUrlPath)
     this.DocumentRenderer = new CDocumentRenderer();
     this.DocumentRenderer.VectorMemoryForPrint = new CMemory();
 
-    this.font = new window["Asc"].FontProperties("Arial", 11);
+    this.font = new window["Asc"].FontProperties("Arial", -1);
 	this.asc_round = window["Asc"].round;
     this.Transform = new CMatrix();
     this.InvertTransform = new CMatrix();

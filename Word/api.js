@@ -6496,7 +6496,7 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
     {
         this.isViewMode = true;
         this.ShowParaMarks = false;
-        this.isShowTableEmptyLine = false;
+        //this.isShowTableEmptyLine = false;
         //this.WordControl.m_bIsRuler = true;
         this.WordControl.m_oDrawingDocument.ClearCachePages();
         this.WordControl.HideRulers();
