@@ -6702,6 +6702,12 @@ function BinaryPPTYLoader()
                                     {
                                         par.Internal_Content_Add( EndPos++, new ParaTab());
                                     }
+									else if (_text[j] == '\n')
+									{
+										par.Internal_Content_Add( EndPos++, new ParaNewLine( break_Line ));
+									}
+									else if (_text[j] == '\r')
+										;
                                     else if (_text[j] != ' ')
                                     {
                                         par.Internal_Content_Add( EndPos++, new ParaText(_text[j]));
