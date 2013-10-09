@@ -2757,6 +2757,7 @@ CPresentation.prototype =
     Select_All : function()
     {
         this.Slides[this.CurPage].graphicObjects.Select_All();
+        this.Document_UpdateInterfaceState();
         return;
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
