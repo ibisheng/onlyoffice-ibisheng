@@ -389,10 +389,10 @@ cFormulaFunction.LookupAndReference = {
     },
     'INDIRECT':function () {
         var r = new cBaseFunction( "INDIRECT" );
-        r.setArgumentsMin( 0 );
-        r.setArgumentsMax( 1 );
+        r.setArgumentsMin( 1 );
+        r.setArgumentsMax( 2 );
         r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tocString(), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
+            var arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] : new cBool( true ), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos:0 }, ref, found_operand;
 
             function parseReference() {
                 if ( (ref = parserHelp.is3DRef.call( o, o.Formula, o.pCurrPos ))[0] ) {
@@ -450,7 +450,24 @@ cFormulaFunction.LookupAndReference = {
 
             if ( found_operand ){
                 if( found_operand instanceof cName )
-                    found_operand = found_operand.toRef()
+                    found_operand = found_operand.toRef();
+
+                var cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
+
+                if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
+                    var nFrom = new Vertex( wsId, cellName.replace( /\$/g, "" ), this.wb ),
+                        nTo = new Vertex( found_operand.getWsId(), found_operand._cells.replace( /\$/g, "" ), this.wb );
+
+                    found_operand.setNode(nTo);
+
+                    wb.dependencyFormulas.addEdge2( nFrom, nTo );
+                }
+                else if ( found_operand instanceof cArea3D && found_operand.isValid() ) {
+                    var wsR = found_operand.wsRange();
+                    for ( var j = 0; j < wsR.length; j++ )
+                        wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, found_operand._cells.replace( /\$/g, "" ) );
+                }
+
                 return this.value = found_operand;
             }
 

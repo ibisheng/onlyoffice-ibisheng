@@ -3060,7 +3060,7 @@ parserFormula.prototype = {
 
     buildDependencies:function () {
 
-        var node = new Vertex( this.ws.Id, this.cellId, this.wb );
+        var node = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb );
 
         this.wb.dependencyFormulas.addNode2( node );
         this.wb.dependencyFormulas.addN( this.ws.Id, this.cellId );
@@ -3083,9 +3083,9 @@ parserFormula.prototype = {
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
                 var nFrom = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb ),
                     nTo = new Vertex( ref.getWsId(), ref._cells.replace( /\$/g, "" ), this.wb );
+
                 ref.setNode(nTo);
 
-//                this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( /\$/g, "" ), ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
                 this.wb.dependencyFormulas.addEdge2( nFrom, nTo );
             }
             else if ( ref instanceof cArea3D && ref.isValid() ) {
