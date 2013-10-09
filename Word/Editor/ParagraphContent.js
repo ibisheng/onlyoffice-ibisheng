@@ -3786,7 +3786,7 @@ ParaDrawing.prototype =
 
     Measure : function(Context)
     {
-        if(this.bNeedUpdateWH)
+        if(this.bNeedUpdateWH || (!this.W || !this.H))
             this.updateWidthHeight();
         this.Width        = this.W;
         this.Height       = this.H;
