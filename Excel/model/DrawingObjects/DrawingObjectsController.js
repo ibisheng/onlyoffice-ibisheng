@@ -22,9 +22,7 @@ DrawingObjectsController.prototype =
 {
     getAllFontNames: function()
     {
-
     },
-
 
     setCellFontName: function (fontName) {
         this.checkSelectedObjectsAndCallback(this.setCellFontNameCallBack, [fontName]);

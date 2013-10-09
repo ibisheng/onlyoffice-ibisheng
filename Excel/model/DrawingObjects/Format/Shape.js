@@ -740,13 +740,32 @@ CShape.prototype =
     },
 
 
-    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
+    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom, tailEnd, headEnd)
     {
         this.setXfrmObject(new CXfrm());
         this.setPosition(x, y);
         this.setExtents(extX, extY);
         this.setFlips(flipH, flipV);
         this.setPresetGeometry(presetGeom);
+        if(tailEnd || headEnd)
+        {
+            var ln = new CLn();
+            if(tailEnd)
+            {
+                var tailEnd = new EndArrow();
+                tailEnd.type = LineEndType.Arrow;
+                tailEnd.len = LineEndSize.Mid;
+                ln.setTailEnd(tailEnd);
+            }
+            if(headEnd)
+            {
+                var headEnd = new EndArrow();
+                headEnd.type = LineEndType.Arrow;
+                headEnd.len = LineEndSize.Mid;
+                ln.setHeadEnd(headEnd);
+            }
+            this.setUniLine(ln);
+        }
         this.setDefaultStyle();
         this.recalculate();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,

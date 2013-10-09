@@ -3122,6 +3122,52 @@ CLn.prototype =
         this.w = w;
     },
 
+    setTailEnd: function(end)
+    {
+        var old_value = null;
+        if(this.tailEnd)
+        {
+            var w = new CMemory();
+            this.tailEnd.Write_ToBinary2(w);
+            old_value = w.pos + ";" + w.GetBase64Memory();
+        }
+        var new_value = null;
+        if(end)
+        {
+            var w = new CMemory();
+            end.Write_ToBinary2(w);
+            new_value = w.pos + ";" + w.GetBase64Memory();
+        }
+
+        this.tailEnd = end;
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetTailEnd, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(old_value, new_value)));
+    },
+
+    setHeadEnd: function(end)
+    {
+        var old_value = null;
+        if(this.tailEnd)
+        {
+            var w = new CMemory();
+            this.headEnd.Write_ToBinary2(w);
+            old_value = w.pos + ";" + w.GetBase64Memory();
+        }
+        var new_value = null;
+        if(end)
+        {
+            var w = new CMemory();
+            end.Write_ToBinary2(w);
+            new_value = w.pos + ";" + w.GetBase64Memory();
+        }
+
+        this.headEnd = end;
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetTailEnd, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(old_value, new_value)));
+    },
+
     getObjectType: function()
     {
         return CLASS_TYPE_LINE;
@@ -3146,6 +3192,34 @@ CLn.prototype =
                 this.w = data.oldValue;
                 break;
             }
+            case historyitem_AutoShapes_SetTailEnd:
+            {
+                if(typeof  data.oldValue === "string")
+                {
+                    this.tailEnd = new EndArrow();
+                    var r = CreateBinaryReader(data.oldValue, 0, data.oldValue.length);
+                    this.tailEnd.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.tailEnd = null;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetHeadEnd:
+            {
+                if(typeof  data.oldValue === "string")
+                {
+                    this.headEnd = new EndArrow();
+                    var r = CreateBinaryReader(data.oldValue, 0, data.oldValue.length);
+                    this.headEnd.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.headEnd = null;
+                }
+                break;
+            }
         }
     },
 
@@ -3161,6 +3235,34 @@ CLn.prototype =
             case historyitem_AutoShapes_SetLineWidth:
             {
                 this.w = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_SetTailEnd:
+            {
+                if(typeof  data.newValue === "string")
+                {
+                    this.tailEnd = new EndArrow();
+                    var r = CreateBinaryReader(data.newValue, 0, data.newValue.length);
+                    this.tailEnd.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.tailEnd = null;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetHeadEnd:
+            {
+                if(typeof  data.newValue === "string")
+                {
+                    this.headEnd = new EndArrow();
+                    var r = CreateBinaryReader(data.newValue, 0, data.newValue.length);
+                    this.headEnd.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.headEnd = null;
+                }
                 break;
             }
         }

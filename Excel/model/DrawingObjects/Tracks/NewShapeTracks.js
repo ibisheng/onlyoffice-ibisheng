@@ -11,6 +11,8 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.presetGeom = presetGeom;
     this.startX = startX;
     this.startY = startY;
+    this.headEnd = false;
+    this.tailEnd = false;
 
     this.x = null;
     this.y = null;
@@ -18,8 +20,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.extY = null;
 
     this.transform = new CMatrix();
-    var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
-    geometry.Init(5, 5);
+
 
     var theme = drawingObjects.getWorkbook().theme;
     var color_map = GenerateDefaultColorMap().color_map;
@@ -41,38 +42,115 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
     }
 
-
-
     var pen = theme.getLnStyle(style.lnRef.idx);
     style.lnRef.Color.Calculate(theme, color_map, {R: 0 , G: 0, B: 0, A: 255});
     RGBA = style.lnRef.Color.RGBA;
 
+    var final_preset = presetGeom;
+
+    var sPreset = presetGeom;
+    switch(sPreset)
+    {
+        case "lineWithArrow":
+        {
+            final_preset = "line";
+            this.tailEnd = true;
+            break;
+        }
+        case "lineWithTwoArrows":
+        {
+            final_preset = "line";
+            this.tailEnd = true;
+            this.headEnd = true;
+            break;
+        }
+        case "bentConnector5WithArrow":
+        {
+            final_preset = "bentConnector5";
+            this.tailEnd = true;
+            break;
+        }
+        case "bentConnector5WithTwoArrows":
+        {
+            final_preset = "bentConnector5";
+            this.tailEnd = true;
+            this.headEnd = true;
+            break;
+        }
+        case "curvedConnector3WithArrow":
+        {
+            final_preset = "curvedConnector3";
+            this.tailEnd = true;
+            break;
+        }
+        case "curvedConnector3WithTwoArrows":
+        {
+            final_preset = "curvedConnector3";
+            this.tailEnd = true;
+            this.headEnd = true;
+            break;
+        }
+        case "textRect":
+        {
+            final_preset = "rect";
+            break;
+        }
+        default  :
+        {
+            final_preset = sPreset;
+            break;
+        }
+    }
     if(presetGeom === "textRect")
     {
-        var ln, fill;
-        ln = new CLn();
-        ln.w = 6350;
-        ln.Fill = new CUniFill();
-        ln.Fill.fill = new CSolidFill();
-        ln.Fill.fill.color = new CUniColor();
-        ln.Fill.fill.color.color  = new CPrstColor();
-        ln.Fill.fill.color.color.id = "black";
+        if(presetGeom === "textRect")
+        {
+            var ln, fill;
+            ln = new CLn();
+            ln.w = 6350;
+            ln.Fill = new CUniFill();
+            ln.Fill.fill = new CSolidFill();
+            ln.Fill.fill.color = new CUniColor();
+            ln.Fill.fill.color.color  = new CPrstColor();
+            ln.Fill.fill.color.color.id = "black";
 
-        fill = new CUniFill();
-        fill.fill = new CSolidFill();
-        fill.fill.color = new CUniColor();
-        fill.fill.color.color  = new CSchemeColor();
-        fill.fill.color.color.id = 12;
+            fill = new CUniFill();
+            fill.fill = new CSolidFill();
+            fill.fill.color = new CUniColor();
+            fill.fill.color.color  = new CSchemeColor();
+            fill.fill.color.color.id = 12;
+            pen.merge(ln);
+            brush.merge(fill);
+        }
+    }
+    else if(this.tailEnd || this.headEnd)
+    {
+        var ln;
+        ln = new CLn();
+        if(this.tailEnd)
+        {
+            ln.tailEnd = new EndArrow();
+            ln.tailEnd.type = LineEndType.Arrow;
+            ln.tailEnd.len = LineEndSize.Mid;
+        }
+        if(this.headEnd)
+        {
+            ln.headEnd = new EndArrow();
+            ln.headEnd.type = LineEndType.Arrow;
+            ln.headEnd.len = LineEndSize.Mid;
+        }
         pen.merge(ln);
-        brush.merge(fill);
     }
 
     pen.Fill.calculate(theme, color_map, RGBA) ;
     brush.calculate(theme, color_map, RGBA) ;
+    this.finalPreset = final_preset;
 
-
+    var geometry = CreateGeometry(final_preset);
+    geometry.Init(5, 5);
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
 
+    this.lineFlag = CheckLinePreset(final_preset);
     this.track = function(e, x, y)
     {
         var real_dist_x = x - this.startX;
@@ -267,11 +345,16 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     {
         var shape = new CShape(null, this.drawingObjects);
         if(this.presetGeom !== "textRect")
-            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
+            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.finalPreset, this.tailEnd, this.headEnd);
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
         shape.select(this.drawingObjects.controller);
         shape.addToDrawingObjects();
         this.drawingObjects.controller.curState.resultObject = shape;
     };
+}
+
+function CheckLinePreset(preset)
+{
+    return preset === "line";
 }

@@ -180,6 +180,14 @@ var historyitem_AutoShapes_BottomInset = 68;
 var historyitem_AutoShapes_Set_AutoShapeStyle = 69;
 var historyitem_AutoShapes_Set_ImageBlipFill = 70;
 var historyitem_AutoShapes_Set_AscChart  = 71;
+var historyitem_AutoShapes_Set_PathStroke  = 72;
+var historyitem_AutoShapes_Set_PathFill  = 73;
+var historyitem_AutoShapes_Set_PathWH  = 74;
+var historyitem_AutoShapes_SetTailEnd = 75;
+var historyitem_AutoShapes_SetHeadEnd = 76;
+
+
+
 
 
 

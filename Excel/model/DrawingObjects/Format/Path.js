@@ -13,22 +13,6 @@ var cToDeg = 1/cToRad;
 
 function Path(extrusionOk, fill, stroke, w, h)
 {
-    if(stroke!=undefined)
-        this.stroke = stroke;
-    else
-        this.stroke = true;
-
-    this.extrusionOk = extrusionOk||false;
-    this.fill = fill||'norm';
-
-    this.pathW = w;
-    this.pathH = h;
-
-    if(this.pathW!=undefined)
-    {
-        this.divPW = 1/w;
-        this.divPH = 1/h;
-    }
 
     this.ArrPathCommandInfo = new Array();
     this.ArrPathCommand = new Array();
@@ -50,6 +34,19 @@ function Path(extrusionOk, fill, stroke, w, h)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+
+    var stroke2;
+    if(stroke!=undefined)
+        stroke2 = stroke;
+    else
+        stroke2 = true;
+    this.setStroke(stroke2);
+
+    this.extrusionOk = extrusionOk||false;
+    this.setFill(fill||'norm');
+
+    this.setWH(w, h);
+
 }
 
 Path.prototype = {
@@ -57,6 +54,11 @@ Path.prototype = {
     getObjectType: function()
     {
         return CLASS_TYPE_PATH;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
     },
 
     Write_ToBinary2: function(writer)
@@ -233,6 +235,42 @@ Path.prototype = {
         {
             this.ArrPathCommand[index] = ReadObjectLong(Reader);
         }
+    },
+
+    setStroke: function(stroke)
+    {
+        var oldValue = this.stroke;
+        var newValue = stroke;
+        this.stroke = stroke;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_PathStroke, null, null,
+        new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+    },
+
+    setFill: function(fill)
+    {
+        var oldValue = this.fill;
+        var newValue = fill;
+        this.stroke = fill;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_PathFill, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+    },
+
+    setWH: function(w, h)
+    {
+        var oldValue1 = this.pathW;
+        var oldValue2 = this.pathH;
+        var newValue1 = w;
+        var newValue2 = h;
+        this.pathW = w;
+        this.pathH = h;
+        if(this.pathW != undefined)
+        {
+            this.divPW = 1/w;
+            this.divPH = 1/h;
+        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_PathWH, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(oldValue1, oldValue2, newValue1, newValue2)));
+        UndoRedoDataGOPairProps
     },
 
     moveTo: function(x, y)
@@ -1062,6 +1100,7 @@ Path.prototype = {
             case historyitem_AutoShapes_Add_PathCubicBezTo:
             {
                 this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
+                break;
             }
         }
     },
@@ -1091,6 +1130,27 @@ Path.prototype = {
             case historyitem_AutoShapes_Add_PathClose:
             {
                 this.ArrPathCommandInfo.push({id: close});
+                break;
+            }
+            case historyitem_AutoShapes_Set_PathStroke:
+            {
+                this.stroke = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_Set_PathFill:
+            {
+                this.fill = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_Set_PathWH:
+            {
+                this.pathW = data.newValue1;
+                this.pathH = data.newValue2;
+                if(this.pathW != undefined)
+                {
+                    this.divPW = 1/this.pathW;
+                    this.divPH = 1/this.pathH;
+                }
                 break;
             }
         }
