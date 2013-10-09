@@ -1348,7 +1348,8 @@ CPresentation.prototype =
             _table.Set_Inline(true);
             _table.setStyleIndex(0);
             _graphic_frame.setGraphicObject(_table);
-            _graphic_frame.selected = true;
+            this.Slides[this.CurPage].graphicObjects.resetSelectionState();
+            _graphic_frame.select(this.Slides[this.CurPage].graphicObjects);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
             editor.WordControl.m_oLogicDocument.recalcMap[_graphic_frame.Id] = _graphic_frame;
 
