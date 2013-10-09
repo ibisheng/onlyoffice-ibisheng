@@ -759,38 +759,41 @@ function CBinaryFileWriter()
         this.WriteUChar(g_nodeAttributeEnd);
         this.EndRecord();
 
-        var _countAuthors = 0;
-        for (var i in presentation.CommentAuthors)
-            ++_countAuthors;
-
-        if (_countAuthors > 0)
+        if (!this.IsUseFullUrl)
         {
-            this.StartRecord(6);
-            this.StartRecord(0);
-
-            this.WriteULong(_countAuthors);
-
+            var _countAuthors = 0;
             for (var i in presentation.CommentAuthors)
-            {
-                var _author = presentation.CommentAuthors[i];
+                ++_countAuthors;
 
+            if (_countAuthors > 0)
+            {
+                this.StartRecord(6);
                 this.StartRecord(0);
 
-                this.WriteUChar(g_nodeAttributeStart);
+                this.WriteULong(_countAuthors);
 
-                this._WriteInt1(0, _author.Id);
-                this._WriteInt1(1, _author.LastId);
-                this._WriteInt1(2, _author.Id - 1);
-                this._WriteString1(3, _author.Name);
-                this._WriteString1(4, _author.Initials);
+                for (var i in presentation.CommentAuthors)
+                {
+                    var _author = presentation.CommentAuthors[i];
 
-                this.WriteUChar(g_nodeAttributeEnd);
+                    this.StartRecord(0);
+
+                    this.WriteUChar(g_nodeAttributeStart);
+
+                    this._WriteInt1(0, _author.Id);
+                    this._WriteInt1(1, _author.LastId);
+                    this._WriteInt1(2, _author.Id - 1);
+                    this._WriteString1(3, _author.Name);
+                    this._WriteString1(4, _author.Initials);
+
+                    this.WriteUChar(g_nodeAttributeEnd);
+
+                    this.EndRecord();
+                }
 
                 this.EndRecord();
+                this.EndRecord();
             }
-
-            this.EndRecord();
-            this.EndRecord();
         }
 
         this.EndRecord();
@@ -865,8 +868,12 @@ function CBinaryFileWriter()
         this.WriteRecord1(2, _slide.timing, this.WriteSlideTransition);
 
         var _countComments = 0;
-        for (var i in _slide.writecomments)
-            ++_countComments;
+
+        if (!this.IsUseFullUrl)
+        {
+            for (var i in _slide.writecomments)
+                ++_countComments;
+        }
 
         if (_countComments > 0)
         {
