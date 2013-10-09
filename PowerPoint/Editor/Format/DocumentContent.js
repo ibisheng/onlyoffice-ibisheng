@@ -940,7 +940,7 @@ CDocumentContent.prototype =
                         _bullet.m_nType = numbering_presentationnumfrmt_Char;
                         _bullet.m_sChar = _final_bullet.bulletType.Char[0];
 
-                        _cur_paragraph.Add_PresentationNumbering(_bullet);
+                        _cur_paragraph.Add_PresentationNumbering(_bullet, true);
                         break;
                     }
 
@@ -948,12 +948,12 @@ CDocumentContent.prototype =
                     {
                         _bullet.m_nType = g_NumberingArr[_final_bullet.bulletType.AutoNumType];
                         _bullet.m_nStartAt = _final_bullet.bulletType.startAt;
-                        _cur_paragraph.Add_PresentationNumbering(_bullet);
+                        _cur_paragraph.Add_PresentationNumbering(_bullet, true);
                         break;
                     }
                     case BULLET_TYPE_BULLET_NONE :
                     {
-                        _cur_paragraph.Remove_PresentationNumbering();
+                        _cur_paragraph.Remove_PresentationNumbering(true);
                         break;
                     }
                     case BULLET_TYPE_BULLET_BLIP :
@@ -961,7 +961,7 @@ CDocumentContent.prototype =
                         _bullet.m_nType = numbering_presentationnumfrmt_Char;
                         _bullet.m_sChar = "•";
 
-                        _cur_paragraph.Add_PresentationNumbering(_bullet);
+                        _cur_paragraph.Add_PresentationNumbering(_bullet, true);
                         break;
                     }
                 }
@@ -1231,7 +1231,7 @@ CDocumentContent.prototype =
                         _bullet.m_nType = numbering_presentationnumfrmt_Char;
                         _bullet.m_sChar = "•";
 
-                        _cur_paragraph.Add_PresentationNumbering(_bullet);
+                        _cur_paragraph.Add_PresentationNumbering(_bullet, true);
                         break;
                     }
                 }

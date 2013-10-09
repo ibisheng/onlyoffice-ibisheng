@@ -1145,7 +1145,7 @@ CGraphicFrame.prototype =
                     case phType_body :
                     case phType_subTitle :
                     case phType_obj :
-                    case null :
+                    //case null :
                     {
                         if(master.txStyles.bodyStyle && master.txStyles.bodyStyle.levels[level])
                         {
