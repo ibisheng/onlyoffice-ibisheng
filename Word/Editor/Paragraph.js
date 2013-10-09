@@ -9900,6 +9900,8 @@ Paragraph.prototype =
         var RelH = Drawing.PositionH.RelativeFrom;
         var RelV = Drawing.PositionV.RelativeFrom;
 
+        var ContentPos = 0;
+
         if ( c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
         {
             var CurLine = Result.Internal.Line;
@@ -9910,8 +9912,10 @@ Paragraph.prototype =
             }
 
             var StartLinesPos = this.Lines[CurLine].StartPos;
+            var EndLinesPos   = this.Lines[CurLine].EndPos;
             var CurRange = this.Internal_Get_ParaPos_By_Pos( StartLinesPos).Range;
             Result.X = this.Lines[CurLine].Ranges[CurRange].X - 3.8;
+            ContentPos = Math.min( StartLinesPos + 1, EndLinesPos );
         }
 
         if ( c_oAscRelativeFromV.Line != RelV )
@@ -9932,7 +9936,7 @@ Paragraph.prototype =
         }
         else
         {
-            Result.ContentPos = 0;
+            Result.ContentPos = ContentPos;
         }
     },
 
