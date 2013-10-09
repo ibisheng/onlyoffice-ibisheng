@@ -5328,12 +5328,15 @@ asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, b
 
 asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
 {
-    editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
+    if (editor.WordControl.m_oLogicDocument)
+        editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
 }
 
 asc_docs_api.prototype.asc_getDefaultLanguage = function()
 {
-    return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
+    if (editor.WordControl.m_oLogicDocument)
+        return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
+    return null;
 }
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
@@ -5798,6 +5801,7 @@ asc_docs_api.prototype.CreateFontsCharMap = function()
 asc_docs_api.prototype.sync_SendThemeColors = function(colors,standart_colors)
 {
     this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
+    this.asc_fireCallback("asc_onSendThemeColors",colors,standart_colors);
 }
 asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
 {

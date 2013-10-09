@@ -811,6 +811,10 @@ function CEditorPage(api)
 
             return true;
         }
+        else
+        {
+            this.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, 1);
+        }
         return false;
     }
     this.zoom_FitToPage = function()
@@ -843,6 +847,10 @@ function CEditorPage(api)
             this.m_nZoomValue = _new_value;
             this.zoom_Fire(2, _old_val);
             return true;
+        }
+        else
+        {
+            this.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, 2);
         }
         return false;
     }
