@@ -441,6 +441,6 @@ var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
 var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";
 var c_oAscCoAuthoringLockTablePropertiesBorderColor	= "rgba(255,144,0,1)";
 var c_oAscCoAuthoringDottedWidth					= 2;
-var c_oAscCoAuthoringDottedDistance					= 1;
+var c_oAscCoAuthoringDottedDistance					= 2;
 
 var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);

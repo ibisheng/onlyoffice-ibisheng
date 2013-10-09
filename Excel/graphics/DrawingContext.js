@@ -1007,6 +1007,46 @@ DrawingContext.prototype = {
 		this.ctx.lineTo(r.x + (dx !== undefined ? dx : 0), r.y + (dy !== undefined ? dy : 0));
 		return this;
 	},
+	dashLineCleverHor : function (x1, y, x2, w_dot, w_dist) {
+		var _x1 = this._mct.transformPointX(x1, y);
+		var _y  = this._mct.transformPointY(x1, y);
+		var _x2 = this._mct.transformPointX(x2, y);
+		var ctx = this.ctx;
+
+		_x1 = (_x1 >> 0) + 0.5;
+		_y  = (_y  >> 0) + 0.5;
+		_x2 = (_x2 >> 0) + 0.5;
+
+		for (; _x1 < _x2; _x1 += w_dist) {
+			ctx.moveTo(_x1, _y);
+			_x1 += w_dot;
+
+			if (_x1 > _x2)
+				_x1 = _x2;
+
+			ctx.lineTo(_x1, _y);
+		}
+	},
+	dashLineCleverVer : function (x, y1, y2, w_dot, w_dist) {
+		var _y1 = this._mct.transformPointY(x, y1);
+		var _x  = this._mct.transformPointX(x, y1);
+		var _y2 = this._mct.transformPointY(x, y2);
+		var ctx = this.ctx;
+
+		_y1 = (_y1 >> 0) + 0.5;
+		_x  = (_x  >> 0) + 0.5;
+		_y2 = (_y2 >> 0) + 0.5;
+
+		for (; _y1 < _y2; _y1 += w_dist) {
+			ctx.moveTo(_x, _y1);
+			_y1 += w_dot;
+
+			if (_y1 > _y2)
+				_y1 = _y2;
+
+			ctx.lineTo(_x, _y1);
+		}
+	},
 
 	dashLine: function (x1, y1, x2, y2, w_dot, w_dist) {
 		var len = Math.sqrt ((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));

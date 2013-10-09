@@ -3016,7 +3016,7 @@
 					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 
-				ctx.setLineWidth(2);
+				ctx.setLineWidth(1);
 
 				var oSelectRangeIntersection = oSelectRange.intersection(this.visibleRange);
 				if (oSelectRangeIntersection) {
@@ -3032,10 +3032,10 @@
 					var ySelectRange1 = this.rows[oSelectRangeIntersection.r1].top - offsetY;
 					var ySelectRange2 = this.rows[oSelectRangeIntersection.r2].top + this.rows[oSelectRangeIntersection.r2].height - offsetY;
 
-					if (drawTopSideSelectRange)		{ctx.dashLine(xSelectRange1, ySelectRange1, xSelectRange2, ySelectRange1, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawBottomSideSelectRange)	{ctx.dashLine(xSelectRange1, ySelectRange2, xSelectRange2, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawLeftSideSelectRange)	{ctx.dashLine(xSelectRange1, ySelectRange1, xSelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawRightSideSelectRange)	{ctx.dashLine(xSelectRange2, ySelectRange1, xSelectRange2, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawTopSideSelectRange)		{ctx.dashLineCleverHor(xSelectRange1, ySelectRange1, xSelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawBottomSideSelectRange)	{ctx.dashLineCleverHor(xSelectRange1, ySelectRange2, xSelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawLeftSideSelectRange)	{ctx.dashLineCleverVer(xSelectRange1, ySelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawRightSideSelectRange)	{ctx.dashLineCleverVer(xSelectRange2, ySelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
 
 					ctx.closePath().stroke().fill();
 				}
@@ -3057,7 +3057,7 @@
 				if (c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
 					var styleColor = (c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
 						c_oAscCoAuthoringLockTablePropertiesBorderColor : c_oAscCoAuthoringOtherBorderColor;
-					ctx.setStrokeStyle(styleColor).setLineWidth(2).beginPath();
+					ctx.setStrokeStyle(styleColor).setLineWidth(1).beginPath();
 
 					var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 					var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
@@ -3076,10 +3076,10 @@
 						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
 						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
 
-						if (drawTopSideFormula)		{ctx.dashLine(xFormula1, yFormula1, xFormula2, yFormula1, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawBottomSideFormula)	{ctx.dashLine(xFormula1, yFormula2, xFormula2, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawLeftSideFormula)	{ctx.dashLine(xFormula1, yFormula1, xFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawRightSideFormula)	{ctx.dashLine(xFormula2, yFormula1, xFormula2, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawTopSideFormula)		{ctx.dashLineCleverHor(xFormula1, yFormula1, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawBottomSideFormula)	{ctx.dashLineCleverHor(xFormula1, yFormula2, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawLeftSideFormula)	{ctx.dashLineCleverVer(xFormula1, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawRightSideFormula)	{ctx.dashLineCleverVer(xFormula2, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
 					}
 
 					ctx.stroke();
@@ -3115,7 +3115,7 @@
 					.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
 					.clip();
 
-				ctx.setStrokeStyle(styleColor).setLineWidth(2).beginPath();
+				ctx.setStrokeStyle(styleColor).setLineWidth(1).beginPath();
 
 				for (i = 0; i < arrayCells.length; ++i) {
 					var arFormulaTmp = asc_Range (arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
@@ -3133,10 +3133,10 @@
 						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
 						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
 
-						if (drawTopSideFormula)		{ctx.dashLine(xFormula1, yFormula1, xFormula2, yFormula1, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawBottomSideFormula)	{ctx.dashLine(xFormula1, yFormula2, xFormula2, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawLeftSideFormula)	{ctx.dashLine(xFormula1, yFormula1, xFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawRightSideFormula)	{ctx.dashLine(xFormula2, yFormula1, xFormula2, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawTopSideFormula)		{ctx.dashLineCleverHor(xFormula1, yFormula1, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawBottomSideFormula)	{ctx.dashLineCleverHor(xFormula1, yFormula2, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawLeftSideFormula)	{ctx.dashLineCleverVer(xFormula1, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+						if (drawRightSideFormula)	{ctx.dashLineCleverVer(xFormula2, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
 					}
 				}
 
