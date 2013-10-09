@@ -3379,8 +3379,166 @@ CShape.prototype =
 
     changePresetGeom : function(sPreset)
     {
-        var _final_preset = sPreset;
+        var _final_preset;
+        var _old_line;
+        var _new_line;
 
+
+        if(this.spPr.ln == null)
+        {
+            _old_line = null;
+        }
+        else
+        {
+            _old_line = this.spPr.ln.createDuplicate();
+        }
+        switch(sPreset)
+        {
+            case "lineWithArrow":
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "lineWithTwoArrows":
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "bentConnector5WithArrow":
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "bentConnector5WithTwoArrows":
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "curvedConnector3WithArrow":
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "curvedConnector3WithTwoArrows":
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            default  :
+            {
+                _final_preset = sPreset;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = null;
+
+                _new_line.headEnd = null;
+                break;
+            }
+        }
         var old_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if(_final_preset!=null)
         {
@@ -3392,6 +3550,7 @@ CShape.prototype =
             this.spPr.geometry = null;
         }
         var new_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
+        this.setLine(_new_line);
         History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
         this.recalcInfo.recalculateGeometry = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
