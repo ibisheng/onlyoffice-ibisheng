@@ -203,6 +203,7 @@
 				}
 
 				t.element.id = COPY_ELEMENT_ID;
+				t.element.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 				t.element.style.position = "absolute";
 				// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 				// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
@@ -843,6 +844,7 @@
                 if(!pastebin){
                     pastebin = document.createElement("div");
                     pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
+					pastebin.setAttribute( 'class', COPYPASTE_ELEMENT_CLASS );
                     pastebin.style.position = 'absolute';
                     pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
@@ -2714,6 +2716,7 @@ window.GlobalPasteFlagCounter = 0;
 var COPY_ELEMENT_ID = "clipboard-helper";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
+var COPYPASTE_ELEMENT_CLASS = "sdk-element";
 var kElementTextId = "clipboard-helper-text";
 var isNeedEmptyAfterCut = false;
 
@@ -2749,7 +2752,7 @@ function Editor_CopyPaste_Create(api)
 {
     var ElemToSelect = document.createElement("div");
     ElemToSelect.id = COPY_ELEMENT_ID;
-    ElemToSelect.style.position = "absolute";
+    ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 
     ElemToSelect.style.left = '0px';
     ElemToSelect.style.top = '-100px';
