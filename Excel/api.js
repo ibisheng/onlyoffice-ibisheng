@@ -1649,10 +1649,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Cбросим флаги модификации
 					History.Save();
 
-					// Пересылаем свои изменения
-					this.collaborativeEditing.sendChanges();
-					// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-					this.wb._onWSSelectionChanged(/*info*/null);
+					// Пересылаем, только если началось совместное редактирование, чтобы не отключилось undo
+					if (this.collaborativeEditing.getCollaborativeEditing()) {
+						// Пересылаем свои изменения
+						this.collaborativeEditing.sendChanges();
+						// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+						this.wb._onWSSelectionChanged(/*info*/null);
+					}
 
 					// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
 					// Но сохранять до прихода ответа от сервера не сможет
