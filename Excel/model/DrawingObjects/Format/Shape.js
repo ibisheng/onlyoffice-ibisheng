@@ -367,8 +367,12 @@ CShape.prototype =
     setCellVertAlign: function (align) {
         if(isRealObject(this.txBody))
         {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             this.txBody.setVerticalAlign(align);
             this.calculateTransformTextMatrix();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
     },
 
