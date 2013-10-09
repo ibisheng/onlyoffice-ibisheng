@@ -1792,7 +1792,7 @@
 						ctx: drawingCtx,
 						printPagesData: printPagesData
 					};
-					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
+					this.objectRender.showDrawingObjects(false, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange.clone(true);
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
@@ -1816,7 +1816,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjectsEx(true);
+				this.objectRender.showDrawingObjects(true);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}

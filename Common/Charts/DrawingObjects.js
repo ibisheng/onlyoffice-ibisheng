@@ -52,6 +52,10 @@ function getFullImageSrc(src) {
 		return src;
 };
 
+function getCurrentTime() {
+	var currDate = new Date();
+	return currDate.getTime();
+}
 
 //{ ASC Classes
 
@@ -2391,23 +2395,8 @@ function DrawingObjects() {
 	_this.asyncImageEndLoaded = null;
 	_this.asyncImagesDocumentEndLoaded = null;
 	
-	var wsCellCache = { cols: null, rows: null, isInit: false };
-	
-	// Task timer
-	var aDrawTasks = [];
-	var drawTaskTimerId = null;
-	
-	function drawTaskFunction() {
-	
-		var taskLen = aDrawTasks.length;
-		if ( taskLen ) {
-		
-			//console.log("Task count = " + taskLen);
-			
-			_this.showDrawingObjectsEx(aDrawTasks[taskLen - 1].params[0], aDrawTasks[taskLen - 1].params[1]);
-			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
-		}
-	}
+	var wsCellCache = { cols: null, rows: null, isInit: false };	
+	var lastDrawTime = getCurrentTime();
 	
 	//-----------------------------------------------------------------------------------
 	// Create drawing
@@ -2692,8 +2681,6 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.init = function(currentSheet) {
-	
-		var taskTimerId = setInterval(drawTaskFunction, 5);
 
 		userId = api.User.asc_getId();
 		documentId = api.documentId;
@@ -3140,10 +3127,8 @@ function DrawingObjects() {
 				overlayCtx.setStrokeStyle("#ff0000");
 				overlayCtx.rect( x1, y1, w, h );
 				overlayCtx.stroke();*/
-				
-				overlayCtx.clearRect( x1, y1, w, h );
+								
 				drawingCtx.clearRect( x1, y1, w, h );
-						
 				worksheet._drawGrid( drawingCtx, r_);
 				worksheet._drawCells(r_);
 				worksheet._drawCellsBorders(undefined, r_);
@@ -3230,19 +3215,8 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	// Drawing objects
 	//-----------------------------------------------------------------------------------
-
-	_this.showDrawingObjects = function(clearCanvas, printOptions) {
-		
-		var currDate = new Date();
-		var currTime = currDate.getTime();
-		if ( aDrawTasks.length ) {
-			if ( currTime - aDrawTasks[aDrawTasks.length - 1].time < 40 )
-				return;
-		}
-		aDrawTasks.push( { time: currTime, params: [clearCanvas, printOptions] } );
-	}
 	
-	_this.showDrawingObjectsEx = function(clearCanvas, printOptions) {
+	_this.showDrawingObjects = function(clearCanvas, printOptions) {
 
 		/*********** Print Options ***************
 		printOptions : {
@@ -3251,8 +3225,13 @@ function DrawingObjects() {
 		}
 		*****************************************/
 				
+		var currentTime = getCurrentTime();
+		if ( currentTime - lastDrawTime < 20 ) {
+			//console.log("Skip showDrawingObjects");
+			return;
+		}
+				
 		if ( drawingCtx ) {
-			
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
 
@@ -3305,7 +3284,6 @@ function DrawingObjects() {
 				}
 			}
 		}
-		
 		if ( !printOptions ) {
 		
 			if ( aObjects.length ) {
@@ -3320,7 +3298,9 @@ function DrawingObjects() {
 			}
 				
 			_this.drawWorksheetHeaders();
-		}		
+		}
+		
+		lastDrawTime = getCurrentTime();
 	}
 
 	_this.getDrawingAreaMetrics = function() {
@@ -3657,7 +3637,7 @@ function DrawingObjects() {
 				}
 			}
 			worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
-			_this.showDrawingObjectsEx(false);
+			_this.showDrawingObjects(false);
 			History.TurnOn();
 		}
 	}
