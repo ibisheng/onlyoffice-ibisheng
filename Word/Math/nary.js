@@ -30,33 +30,37 @@ CNary.prototype.init = function(props)
 
     this.setDimension(1, 2);
 
-    var sign = null;
+    
+    var signChr, sign;
 
-    if(props.sign == 0x222B || props.signType == NARY_INTEGRAL)
+    if(typeof(props.chr) === "string")
+        signChr = props.chr.charcodeAt(0);
+
+    if(signChr == 0x222B || props.signType == NARY_INTEGRAL)
         sign = new CIntegral();
-    else if(props.sign == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
+    else if(signChr == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
         sign = new CDoubleIntegral();
-    else if(props.sign == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
+    else if(signChr == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
         sign = new CTripleIntegral();
-    else if(props.sign == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
+    else if(signChr == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
         sign = new CContourIntegral();
-    else if(props.sign == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
+    else if(signChr == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
         sign = new CSurfaceIntegral();
-    else if(props.sign == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
+    else if(signChr == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
         sign = new CVolumeIntegral();
-    else if(props.sign ==0x2211 || props.signType == NARY_SIGMA)
+    else if(signChr ==0x2211 || props.signType == NARY_SIGMA)
         sign = new CSigma();
-    else if(props.sign == 0x220F || props.signType == NARY_PRODUCT)
+    else if(signChr == 0x220F || props.signType == NARY_PRODUCT)
         sign = new CProduct();
-    else if(props.sign ==0x2210 || props.signType == NARY_COPRODUCT)
+    else if(signChr ==0x2210 || props.signType == NARY_COPRODUCT)
         sign = new CProduct(-1);
-    else if(props.sign == 0x22C3 || props.signType == NARY_UNION)
+    else if(signChr == 0x22C3 || props.signType == NARY_UNION)
         sign = new CUnion();
-    else if(props.sign == 0x22C2 || props.signType == NARY_INTERSECTION)
+    else if(signChr == 0x22C2 || props.signType == NARY_INTERSECTION)
         sign = new CUnion(-1);
-    else if(props.sign == 0x22C1 || props.signType == NARY_LOGICAL_OR)
+    else if(signChr == 0x22C1 || props.signType == NARY_LOGICAL_OR)
         sign  = new CLogicalOr();
-    else if(props.sign == 0x22C0 || props.signType == NARY_LOGICAL_AND)
+    else if(signChr == 0x22C0 || props.signType == NARY_LOGICAL_AND)
         sign  = new CLogicalOr(-1);
     else
         sign = new CIntegral();
