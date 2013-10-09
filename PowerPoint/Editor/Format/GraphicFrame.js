@@ -16,7 +16,9 @@ function CGraphicFrame(parent)
     this.recalcInfo =
     {
         recalculateTransform: true,
-        recalculateSizes: true
+        recalculateSizes: true,
+        recalculateNumbering: true,
+        recalculateShapeHierarchy: true
 };
 
     this.x = null;
@@ -24,7 +26,7 @@ function CGraphicFrame(parent)
     this.extX = null;
     this.extY = null;
     this.transform = new CMatrix();
-
+    this.compiledHierarchy = [];
     this.textPropsForRecalc = [];
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
@@ -196,10 +198,55 @@ CGraphicFrame.prototype =
     {
         return this.Id;
     },
+
+    getHierarchy: function()
+    {
+        if(this.recalcInfo.recalculateShapeHierarchy)
+        {
+            this.compiledHierarchy.length = 0;
+            var hierarchy = this.compiledHierarchy;
+            if(this.isPlaceholder())
+            {
+                var ph_type = this.getPlaceholderType();
+                var ph_index = this.getPlaceholderIndex();
+                switch (this.parent.kind)
+                {
+                    case SLIDE_KIND:
+                    {
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                        break;
+                    }
+
+                    case LAYOUT_KIND:
+                    {
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                        break;
+                    }
+                }
+            }
+            this.recalcInfo.recalculateShapeHierarchy = true;
+        }
+        return this.compiledHierarchy;
+    },
     recalculate: function()
     {
         if(isRealObject(this.graphicObject))
         {
+            if(this.recalcInfo.recalculateNumbering)
+            {
+                var rows = this.graphicObject.Content;
+                for(var i = 0; i < rows.length; ++i)
+                {
+                    var row = rows[i];
+                    var cells = row.Content;
+                    for(var j = 0;  j< cells.length; ++j )
+                    {
+                        var cell = cells[j];
+                        cell.Content.RecalculateNumbering();
+                    }
+                }
+            }
             this.graphicObject.X = 0;
             this.graphicObject.Y = 0;
             this.graphicObject.PageNum = 0;
@@ -305,6 +352,7 @@ CGraphicFrame.prototype =
 
     recalcAllColors: function()
     {
+        this.recalcInfo.recalculateNumbering = true;
         this.stlesForParagraph = [];
         this.graphicObject.Recalc_CompiledPr();
     },
@@ -314,7 +362,9 @@ CGraphicFrame.prototype =
         this.recalcInfo =
         {
             recalculateTransform: true,
-            recalculateSizes: true
+            recalculateSizes: true,
+            recalculateNumbering: true,
+            recalculateShapeHierarchy: true
         };
         this.stlesForParagraph = [];
         this.graphicObject.Recalc_CompiledPr();
@@ -1352,6 +1402,7 @@ CGraphicFrame.prototype =
         return null;
     },
 
+
     getPhIndex: function()
     {
         if(this.isPlaceholder())
@@ -1359,6 +1410,16 @@ CGraphicFrame.prototype =
             return this.nvGraphicFramePr.nvPr.ph.idx;
         }
         return null;
+    },
+
+    getPlaceholderType: function()
+    {
+        return this.getPhType();
+    },
+
+    getPlaceholderIndex: function()
+    {
+        return this.getPhIndex();
     },
 
     setParent: function(parent)

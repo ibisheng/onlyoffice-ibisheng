@@ -8968,7 +8968,7 @@ Paragraph.prototype =
 // Функции для работы с нумерацией параграфов в презентациях
 //-----------------------------------------------------------------------------------
     // Добавляем нумерацию к данному параграфу
-    Add_PresentationNumbering : function(_Bullet)
+    Add_PresentationNumbering : function(_Bullet, flag)
     {
         var Bullet = _Bullet.Copy();
         this.Numbering.Type = para_PresentationNumbering;
@@ -8978,7 +8978,7 @@ Paragraph.prototype =
         var NewType = Bullet.Get_Type();
         this.PresentationPr.Bullet = Bullet;
 
-        if ( OldType != NewType )
+        if ( OldType != NewType  && !(flag === true))
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
             var LeftInd = Math.min( ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
@@ -9004,9 +9004,9 @@ Paragraph.prototype =
     },
 
     // Удаляем нумерацию
-    Remove_PresentationNumbering : function()
+    Remove_PresentationNumbering : function(flag)
     {
-        this.Add_PresentationNumbering( new CPresentationBullet() );
+        this.Add_PresentationNumbering( new CPresentationBullet() , flag);
     },
 
     Set_PresentationLevel : function(Level)
