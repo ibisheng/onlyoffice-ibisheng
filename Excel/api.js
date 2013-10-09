@@ -151,7 +151,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var element = document.getElementById(this.HtmlElementName);
 				if(null != element)
 				{
-					element.ondragover = function(e) {
+					element["ondragover"] = function(e) {
 						e.preventDefault();
 						if(CanDropFiles(e))
 							e.dataTransfer.dropEffect = 'copy';
@@ -159,7 +159,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							e.dataTransfer.dropEffect = 'none';
 						return false;
 					};
-					element.ondrop = function(e) {
+					element["ondrop"] = function(e) {
 						e.preventDefault();
 						var files = e.dataTransfer.files;
 						var nError = ValidateUploadImage(files);

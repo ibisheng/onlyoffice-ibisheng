@@ -622,7 +622,7 @@ function asc_docs_api(name)
 		var element = document.getElementById(this.HtmlElementName);
 		if(null != element)
 		{
-			element.ondragover = function(e) {
+			element["ondragover"] = function(e) {
 				e.preventDefault();
 				if(CanDropFiles(e))
 					e.dataTransfer.dropEffect = 'copy';
@@ -630,7 +630,7 @@ function asc_docs_api(name)
 					e.dataTransfer.dropEffect = 'none';
 				return false;
 			};
-			element.ondrop = function(e) {
+			element["ondrop"] = function(e) {
 				e.preventDefault();
 				var files = e.dataTransfer.files;
 				var nError = ValidateUploadImage(files);
