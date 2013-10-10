@@ -4431,12 +4431,12 @@ function DrawingObjects() {
             var _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1) 
             
 			if (null != _img) {
-                objectProperties.ImageUrl = _img.src;
+                //objectProperties.ImageUrl = _img.src;
                 _this.controller.setGraphicObjectProps( objectProperties );
             }
             else {
                 _this.asyncImageEndLoaded = function(_image) {
-                    objectProperties.ImageUrl = _image.src;
+                    //objectProperties.ImageUrl = _image.src;
                     _this.controller.setGraphicObjectProps( objectProperties );
                 }
             }
@@ -4446,12 +4446,12 @@ function DrawingObjects() {
 					
             var _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);            
 			if ( null != _img ) {
-                objectProperties.ImageUrl = _img.src;
+                //objectProperties.ImageUrl = _img.src;
                 _this.controller.setGraphicObjectProps( objectProperties );
             }
             else {
                 _this.asyncImageEndLoaded = function(_image) {
-                    objectProperties.ImageUrl = _image.src;
+                    //objectProperties.ImageUrl = _image.src;
                     _this.controller.setGraphicObjectProps( objectProperties );
                 }
             }
