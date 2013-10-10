@@ -377,7 +377,7 @@
 										isHidden = ws.model._getRow(i).hd;
 										if(isHidden)
 										{
-											ws.model._getRow(i).hd = false;
+											ws.model.setRowHidden(/*bHidden*/false, i, i);
 											isInsert = true;
 										}	
 									}	
@@ -2404,7 +2404,7 @@
 					if(array[i] == false || array[i] == 'hidden')
 					{
 						if(!ws.model._getRow(row).hd)
-							ws.model.setRowHeight(0,row,row);
+							ws.model.setRowHidden(/*bHidden*/true, row, row);
 					}
 					else if(array[i] == true)
 					{
@@ -2412,7 +2412,7 @@
 						var alreadyHidden = false;
 						
 						if(isHidden)
-							ws.model._getRow(row).hd = false;
+							ws.model.setRowHidden(/*bHidden*/false, row, row);
 					}
 				}
 				
@@ -4766,7 +4766,7 @@
 									{
 										var isHidden = ws.model._getRow(rez + cells.r1 + 1).hd;
 										if(result[rez].visible == false && isHidden)
-											ws.model._getRow(rez + cells.r1 + 1).hd = false;
+											ws.model.setRowHidden(/*bHidden*/false, rez + cells.r1 + 1, rez + cells.r1 + 1);
 									}
 								}
 								buttons.splice(but,1);
@@ -5452,7 +5452,7 @@
 					{
 						//все открываем
 						if(ws.model._getRow(row).hd)
-							ws.model._getRow(row).hd = false;
+							ws.model.setRowHidden(/*bHidden*/false, row, row);
 					}
 				}
 				if(fColumns){
@@ -5475,7 +5475,7 @@
 							{
 								if(arrHiddens[row] != undefined && arrHiddens[row] == true && !ws.model._getRow(row).hd)
 								{
-									ws.model.setRowHeight(0,row,row);
+									ws.model.setRowHidden(true, row, row);
 								}
 							}
 							
