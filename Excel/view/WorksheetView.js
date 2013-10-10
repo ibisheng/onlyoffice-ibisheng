@@ -2522,14 +2522,14 @@
 
 				for (var row = range.r1; row <= range.r2 && row < this.nRowsCount; ++row) {
 					if (this.rows[row].height < this.height_1px) {continue;}
-					var isFirstRow = row === range.r1,
-					isLastRow  = row === range.r2,
-					y1 = this.rows[row].top - offsetY,
-					y2 = y1 + this.rows[row].height - this.height_1px,
-					mc = undefined;
+					var isFirstRow = row === range.r1;
+					var isLastRow  = row === range.r2;
+					var y1 = this.rows[row].top - offsetY;
+					var y2 = y1 + this.rows[row].height - this.height_1px;
+					var mc = null;
 
-					for (var isMerged = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
-						if (this.cols[col].width < this.width_1px) {continue;}
+					for (var isMerged = false, hasHideCol = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
+						if (this.cols[col].width < this.width_1px) {hasHideCol = true; continue;}
 						var isFirstCol = col === range.c1;
 
 						if (!mergedCellsStage) {
@@ -2557,13 +2557,13 @@
 						var dd = this._getActiveBorder(col, row, kcbidDiagonalDown);
 						var du = this._getActiveBorder(col, row, kcbidDiagonalUp);
 						//
-						var lb     = isFirstCol ? this._getActiveBorder(col, row, kcbidLeft) : rb;
-						var lbPrev = isFirstCol ? this._getActiveBorder(col, row - 1, kcbidLeft) : rbPrev;
-						var lbNext = isFirstCol ? this._getActiveBorder(col, row + 1, kcbidLeft) : rbNext;
-						var tbPrev = isFirstCol ? this._getActiveBorder(col - 1, row, kcbidTop) : tb;
-						var bbPrev = isFirstCol ? this._getActiveBorder(col - 1, row, kcbidBottom) : bb;
-						var tb     = isFirstCol ? this._getActiveBorder(col, row, kcbidTop) : tbNext;
-						var bb     = isFirstCol ? this._getActiveBorder(col, row, kcbidBottom) : bbNext;
+						var lb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidLeft) : rb;
+						var lbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row - 1, kcbidLeft) : rbPrev;
+						var lbNext = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row + 1, kcbidLeft) : rbNext;
+						var tbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col - 1, row, kcbidTop) : tb;
+						var bbPrev = (isFirstCol || hasHideCol) ? this._getActiveBorder(col - 1, row, kcbidBottom) : bb;
+						var tb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidTop) : tbNext;
+						var bb     = (isFirstCol || hasHideCol) ? this._getActiveBorder(col, row, kcbidBottom) : bbNext;
 						//
 						var rb     = this._getActiveBorder(col, row, kcbidRight);
 						var rbPrev = this._getActiveBorder(col, row - 1, kcbidRight);
