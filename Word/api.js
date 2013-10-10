@@ -838,13 +838,13 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		
 		if(undefined != oSettings['isTrackingEnable'] &&
 			null != oSettings['isTrackingEnable'])
-			this.isTrackingEnable = oSettings['isTrackingEnable'];
+			editor.isTrackingEnable = oSettings['isTrackingEnable'];
 			
 		if(undefined != oSettings['TrackingInterval'] &&
 			null != oSettings['TrackingInterval'])
-			this.TrackingInterval = oSettings['TrackingInterval'] * 10;
+			editor.TrackingInterval = oSettings['TrackingInterval'] * 10;
 			
-		_StartTracking();
+		editor._StartTracking();
 	}
 }
 asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
