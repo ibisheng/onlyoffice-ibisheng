@@ -1102,6 +1102,7 @@ CGraphicObjects.prototype =
         }
 
         var ret = new CChartAsGroup();
+        ret.setAscChart(new asc_CChart());
 		ret.chart.initDefault();
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;

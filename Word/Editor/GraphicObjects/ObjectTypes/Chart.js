@@ -11,7 +11,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    this.chart = new asc_CChart();
+   // this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -57,6 +57,11 @@ CChartAsGroup.prototype =
 	{
 		return this.chart;
 	},
+
+    setAscChart: function(chart)
+    {
+        this.chart = chart;
+    },
 
     hitToTextRect: function()
     {
@@ -1945,6 +1950,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
+        this.setAscChart(new asc_CChart());
         this.chart.Read_FromBinary2(r);
         this.spPr.Read_FromBinary2(r);
         if(isRealObject(this.parent))
