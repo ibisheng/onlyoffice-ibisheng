@@ -8,7 +8,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    this.chart = new asc_CChart();
+    //this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -59,6 +59,7 @@ CChartAsGroup.prototype =
         var old_id = isRealObject(this.chart) ? this.chart.Get_Id() : null;
         var new_id = isRealObject(chart) ? chart.Get_Id() : null;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_AscChart, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(old_id, new_id)), null);
+        this.chart = chart;
     },
 
     Get_Id: function()
@@ -78,7 +79,6 @@ CChartAsGroup.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.drawingObjects = drawingObjects;
-
     },
 
     getBoundsInGroup: function()
@@ -480,6 +480,22 @@ CChartAsGroup.prototype =
 			if ( this.chart.header.title != chart.header.title ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.title, chart.header.title)));
 				this.chart.header.title = chart.header.title;
+                if(typeof  this.chart.header.title === "string")
+                {
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = chart.header.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addTitle(chart_title);
+                }
+                else
+                {
+                    this.addTitle(null);
+                }
 			}
 			
 			if ( this.chart.header.subTitle != chart.header.subTitle ) {
@@ -496,6 +512,22 @@ CChartAsGroup.prototype =
 			if ( this.chart.xAxis.title != chart.xAxis.title ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.title, chart.xAxis.title)));
 				this.chart.xAxis.title = chart.xAxis.title;
+                if(typeof  this.chart.xAxis.title === "string")
+                {
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = this.chart.xAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addXAxis(chart_title);
+                }
+                else
+                {
+                    this.addXAxis(null);
+                }
 			}
 			
 			if ( this.chart.xAxis.bDefaultTitle != chart.xAxis.bDefaultTitle ) {
@@ -517,6 +549,22 @@ CChartAsGroup.prototype =
 			if ( this.chart.yAxis.title != chart.yAxis.title ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.title, chart.yAxis.title)));
 				this.chart.yAxis.title = chart.yAxis.title;
+                if(typeof  this.chart.yAxis.title === "string")
+                {
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = this.chart.yAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addYAxis(chart_title);
+                }
+                else
+                {
+                    this.addYAxis(null);
+                }
 			}
 			
 			if ( this.chart.yAxis.bDefaultTitle != chart.yAxis.bDefaultTitle ) {
@@ -556,6 +604,32 @@ CChartAsGroup.prototype =
 		else
 			this.chart = chart;
     },
+
+    addXAxis: function(title)
+    {
+        var oldValue = isRealObject(this.hAxisTitle) ? this.hAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.hAxisTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddXAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
+
+    addYAxis: function(title)
+    {
+        var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.vAxisTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddYAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
+
+    addTitle: function(title)
+    {
+        var oldValue = isRealObject(this.chartTitle) ? this.chartTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.chartTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddTitle, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
+
+
 
     deleteDrawingBase: function()
     {
@@ -1525,6 +1599,21 @@ CChartAsGroup.prototype =
                 this.chart = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
         }
     },
 
@@ -1551,6 +1640,21 @@ CChartAsGroup.prototype =
             case historyitem_AutoShapes_Set_AscChart:
             {
                 this.chart = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.newValue);
                 break;
             }
         }
@@ -1622,6 +1726,55 @@ CChartAsGroup.prototype =
             this.hAxisTitle.readFromBinary(r);
         }
         this.chart.Read_FromBinary2(r, false);
+        if(typeof  this.chart.header.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.header.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addTitle(chart_title);
+        }
+        else
+        {
+            this.addTitle(null);
+        }
+        if(typeof  this.chart.xAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.xAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addXAxis(chart_title);
+        }
+        else
+        {
+            this.addXAxis(null);
+        }
+
+        if(typeof  this.chart.yAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.yAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addYAxis(chart_title);
+        }
+        else
+        {
+            this.addYAxis(null);
+        }
         this.spPr.Read_FromBinary2(r);
         var chartLeft =this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);

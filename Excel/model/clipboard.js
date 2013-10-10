@@ -2670,6 +2670,7 @@
 							case "TeamLabChart":
 							{
 								Drawing = new CChartAsGroup();
+                                Drawing.setAscChart(new asc_CChart());
 								break;
 							}
 							default :

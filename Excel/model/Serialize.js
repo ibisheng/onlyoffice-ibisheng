@@ -5549,6 +5549,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
 			var oNewGraphicObject = new CChartAsGroup();
+            oNewGraphicObject.setAscChart(new asc_CChart());
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oNewGraphicObject.chart,  oNewGraphicObject);
 			res = oBinary_ChartReader.Read(length);
 			if(null != oNewGraphicObject.chart.range.interval && oNewGraphicObject.chart.range.interval.length > 0)
