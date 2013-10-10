@@ -1885,8 +1885,11 @@ CGraphicObjects.prototype = {
         image.setGeometry( CreateGeometry("rect"));
         image.spPr.geometry.Init(5, 5);
         image.setXfrm((this.slide.presentation.Width - W)/2, (this.slide.presentation.Height - H)/2, W, H, null, null, null);
-        this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, image);
-        editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, image) === false)
+        {
+            this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, image);
+            editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
+        }
     },
 
     groupShapes: function(drawingBase)
@@ -2357,8 +2360,11 @@ CGraphicObjects.prototype = {
     {
         var chart = new CChartAsGroup(this.slide);
         chart.initFromBinary(binary);
-        this.slide.addToSpTreeToPos(this.slide.cSld.spTree, chart);
-        editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, chart) === false)
+        {
+            this.slide.addToSpTreeToPos(this.slide.cSld.spTree, chart);
+            editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
+        }
     },
 
     editChart: function(binary)

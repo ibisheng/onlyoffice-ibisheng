@@ -614,8 +614,39 @@ CTextBody.prototype =
 
     readFromBinary: function(r,  drawingDocument)
     {
-        this.bodyPr.Read_FromBinary2(r);
-        readFromBinaryDocContent(this.content, r);
+        var bodyPr = new CBodyPr();
+        bodyPr.Read_FromBinary2(r);
+        if(isRealObject(this.parent) && this.parent.setBodyPr)
+        {
+            this.parent.setBodyPr(bodyPr);
+        }
+        //this.bodyPr.Read_FromBinary2(r);
+
+        var is_on = History.Is_On();
+        if(is_on)
+        {
+            History.TurnOff();
+        }
+        var dc= new CDocumentContent(this, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, false);
+        readFromBinaryDocContent(dc, r);
+
+        if(is_on)
+        {
+            History.TurnOn();
+        }
+        for(var i = 0; i < dc.Content.length; ++i)
+        {
+            if(i > 0)
+            {
+                this.content.Add_NewParagraph()
+            }
+            var par = dc.Content[i];
+            for(var i = 0; i < par.Content.length; ++i)
+            {
+                if(par.Content[i].Copy)
+                    this.content.Paragraph_Add(par.Content[i].Copy());
+            }
+        }
     },
 
     Undo: function(data)

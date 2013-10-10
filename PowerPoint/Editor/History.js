@@ -325,6 +325,18 @@ var historyitem_SetSpParent = 18;
 var historyitem_SetGraphicObject = 19;
 var historyitem_RemoveFromSpTreeGroup = 20;
 var historyitem_AutoShapes_SwapGraphicObjects = 21;
+var historyitem_AutoShapes_AddChart = 22;
+var historyitem_AutoShapes_SetChartTitleType = 23;
+var historyitem_AutoShapes_SetChartGroup = 24;
+var historyitem_AutoShapes_AddXAxis = 25;
+var historyitem_AutoShapes_AddYAxis = 26;
+var historyitem_AutoShapes_AddTitle = 27;
+var historyitem_AutoShapes_SetChartTitleOverlay = 28;
+var historyitem_AutoShapes_SetChartTitleTxBody = 29;
+
+
+
+
 
 
 
@@ -431,6 +443,7 @@ var historyitem_type_TextBody      	  = 32;
 var historyitem_type_GraphicFrame  	  = 33;
 var historyitem_type_Theme  	      = 34;
 var historyitem_type_SlideMaster      = 35;
+
 
 
 

@@ -45,6 +45,8 @@ function CTableId()
 
     this.Add = function(Class, Id)
     {
+        if(Class instanceof asc_CChart)
+            return;
         if ( false === this.m_bTurnOff )
         {
             Class.Id = Id;
@@ -149,7 +151,7 @@ function CTableId()
             case historyitem_type_Shape            : Element = new CShape(); break;
             case historyitem_type_Image            : Element = new CImageShape(); break;
             case historyitem_type_GroupShapes      : Element = new CGroupShape(); break;
-			case historyitem_type_Chart		       : Element = new CChartData(true); break;
+			case historyitem_type_Chart		       : Element = new CChartAsGroup(); break;
             case historyitem_type_Slide		       : Element = new Slide(); break;
             case historyitem_type_PropLocker       : Element = new PropLocker(); break;
             case historyitem_type_Layout           : Element = new SlideLayout(); break;
@@ -157,6 +159,7 @@ function CTableId()
             case historyitem_type_GraphicFrame     : Element = new CGraphicFrame(); break;
             case historyitem_type_SlideMaster      : Element = new MasterSlide(); break;
             case historyitem_type_Theme            : Element = new CTheme(); break;
+            case historyitem_type_ChartTitle       : Element = new CChartTitle();
          }
 
         Element.Read_FromBinary2(Reader);

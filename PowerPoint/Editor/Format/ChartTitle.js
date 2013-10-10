@@ -9,13 +9,12 @@ function CChartTitle(chartGroup, type)
     this.layout = null;
     this.overlay = false;
     this.spPr = new CSpPr();
-    this.chartGroup = chartGroup;
-    this.drawingObjects = chartGroup.drawingObjects;
-    this.type = type;
+    //this.chartGroup = chartGroup;
+    //this.drawingObjects = chartGroup.drawingObjects;
+    //this.type = type;
 
     this.txPr = null;
     this.isDefaultText = false;
-    this.txBody = new CTextBody(this);
 
     this.x = null;
     this.y = null;
@@ -42,10 +41,21 @@ function CChartTitle(chartGroup, type)
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(isRealObject(chartGroup))
+    {
+        this.setChartGroup(chartGroup);
+        this.addTextBody(new CTextBody(this));
+    }
+    if(isRealNumber(type))
+    {
+        this.setType(type);
+    }
 }
 
 CChartTitle.prototype =
 {
+
+
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_TITLE;
@@ -56,13 +66,19 @@ CChartTitle.prototype =
         return this.Id;
     },
 
-    Write_ToBinary2: function(w)
+    setType: function(type)
     {
-
+        History.Add(this, {Type:historyitem_AutoShapes_SetChartTitleType, oldPr : this.type, newPr: type});
+        this.type = type;
     },
 
-    Read_FromBinary2: function(r)
-    {},
+    setChartGroup: function(chartGroup)
+    {
+        var oldPr = this.chartGroup ;
+        var newPr = chartGroup ;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartGroup, oldPr: oldPr, newPr: newPr});
+        this.chartGroup = chartGroup;
+    },
 
     getTitleType: function()
     {
@@ -192,6 +208,9 @@ CChartTitle.prototype =
 
     addTextBody: function(txBody)
     {
+        var oldPr = this.txBody ;
+        var newPr = txBody ;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartTitleTxBody, oldPr: oldPr, newPr: newPr});
         this.txBody = txBody;
     },
 
@@ -969,7 +988,7 @@ CChartTitle.prototype =
     {
         w.WriteBool(isRealObject(this.layout));
         if(isRealObject(this.layout))
-            this.layout.writeToBinary(w);
+            this.layout.Write_ToBinary2(w);
         w.WriteBool(this.overlay);
         this.spPr.Write_ToBinary2(w);
         w.WriteBool(isRealObject(this.txPr));
@@ -985,8 +1004,9 @@ CChartTitle.prototype =
     {
         if(r.GetBool())
         {
-            this.layout = new CChartLayout();
-            this.layout.readFromBinary(r);
+            var layout = new CChartLayout();
+            layout.Read_FromBinary2(r);
+            this.setLayout(layout);
         }
         this.overlay = r.GetBool();
         this.spPr.Read_FromBinary2(r);
@@ -998,7 +1018,7 @@ CChartTitle.prototype =
 
         if(r.GetBool())
         {
-            this.txBody = new CTextBody(this);
+            //this.txBody = new CTextBody(this);
             this.txBody.readFromBinary(r);
         }
 
@@ -1012,6 +1032,13 @@ CChartTitle.prototype =
         var new_body_pr = this.txBody.bodyPr.createDuplicate();
         History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
         this.txBody.recalcInfo.recalculateBodyPr = true;
+    },
+
+    setOverlay: function(overlay)
+    {
+        var _overlay = overlay === true;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartTitleOverlay, oldPr: this.overlay === true, newPr: _overlay});
+        this.overlay = _overlay;
     },
 
     Undo: function(data)
@@ -1036,6 +1063,26 @@ CChartTitle.prototype =
                 this.txBody.recalcInfo.recalculateBodyPr = true;
                 this.recalcInfo.recalculateContent = true;
                 this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                this.chartGroup = data.oldPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type = data.oldPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                this.overlay = data.oldPr
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                this.txBody = data.oldPr;
                 break;
             }
         }
@@ -1066,12 +1113,43 @@ CChartTitle.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 break;
             }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                this.chartGroup = data.newPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type = data.newPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                this.overlay = data.newPr
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                this.txBody = data.newPr;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
     },
 
     Refresh_RecalcData: function()
     {},
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_ChartTitle);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
 
     Save_Changes: function(data, w)
     {
@@ -1093,6 +1171,39 @@ CChartTitle.prototype =
                 data.newBodyPr.Write_ToBinary2(w);
                 break;
             }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                w.WriteBool(isRealNumber(data.newPr));
+                is(isRealNumber(data.newPr));
+                {
+                    w.WriteLong(data.newPr);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                w.WriteBool(data.newPr);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
+                break;
+            }
         }
     },
 
@@ -1100,7 +1211,7 @@ CChartTitle.prototype =
     Load_Changes: function(r)
     {
 
-        if(r.GetLong() === historyitem_type_Shape)
+        if(r.GetLong() === historyitem_type_ChartTitle)
         {
             switch(r.GetLong())
             {
@@ -1124,6 +1235,48 @@ CChartTitle.prototype =
                     this.txBody.recalcInfo.recalculateBodyPr = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartGroup:
+                {
+                    if(r.GetBool())
+                    {
+                        this.chartGroup = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.chartGroup = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartTitleType:
+                {
+                    if(r.GetBool())
+                    {
+                        this.type = r.GetLong();
+                    }
+                    else
+                    {
+                        this.type = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartTitleOverlay:
+                {
+                    this.overlay = r.GetBool();
+                    break;
+                }
+
+                case historyitem_AutoShapes_SetChartTitleTxBody:
+                {
+                    if(r.GetBool())
+                    {
+                        this.txBody = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.txBody = null;
+                    }
                     break;
                 }
 

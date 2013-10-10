@@ -67,6 +67,7 @@ CChartAsGroup.prototype =
     {
         return null;
     },
+
     asc_getChart: function()
     {
         return this.chart;
@@ -74,6 +75,7 @@ CChartAsGroup.prototype =
 
     setAscChart: function(chart)
     {
+        History.Add(this, {Type:historyitem_AutoShapes_AddChart, oldPr: this.chart, newPr: chart});
         this.chart = chart;
     },
 
@@ -997,6 +999,31 @@ CChartAsGroup.prototype =
     {
         this.vAxisTitle = yAxisTitle;
     },
+
+    addXAxis: function(title)
+    {
+        var oldValue = isRealObject(this.hAxisTitle) ? this.hAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.hAxisTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddXAxis, oldPr: oldValue, newPr: newValue});
+    },
+
+    addYAxis: function(title)
+    {
+        var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.vAxisTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddYAxis, oldPr: oldValue, newPr: newValue});
+    },
+
+    addTitle: function(title)
+    {
+        var oldValue = isRealObject(this.chartTitle) ? this.chartTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.chartTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddTitle, oldPr: oldValue, newPr: newValue});
+    },
+
 
 
     draw: function(graphics, pageIndex)
@@ -2164,23 +2191,26 @@ CChartAsGroup.prototype =
         var r = CreateBinaryReader(binary, 0, binary.length);
         if(r.GetBool())
         {
-            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.readFromBinary(r);
         }
 
         if(r.GetBool())
         {
-            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.readFromBinary(r);
         }
         if(r.GetBool())
         {
-            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.readFromBinary(r);
         }
-        this.setAscChart(new asc_CChart());
-        this.chart.Read_FromBinary2(r, true);
-        this.spPr.Read_FromBinary2(r);
+        var chart = new asc_CChart();
+        chart.Read_FromBinary2(r, true);
+        this.setAscChart(chart);
+        var spPr = new CSpPr();
+        spPr.Read_FromBinary2(r);
+        this.setSpPr(spPr);
         this.init();
         this.recalculate();
     },
@@ -2206,6 +2236,13 @@ CChartAsGroup.prototype =
     {
         History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
         this.group = group;
+    },
+
+
+    setSpPr: function(spPr)
+    {
+        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        this.spPr = spPr;
     },
 
 
@@ -2311,6 +2348,31 @@ CChartAsGroup.prototype =
             case historyitem_SetShapeParent:
             {
                 this.parent = data.Old;
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                this.chart = data.oldPr;
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.oldPr;
                 break;
             }
         }
@@ -2420,6 +2482,31 @@ CChartAsGroup.prototype =
                 this.parent = data.New;
                 break;
             }
+            case historyitem_AutoShapes_AddChart:
+            {
+                this.chart = data.newPr;
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
@@ -2504,6 +2591,33 @@ CChartAsGroup.prototype =
                 if(isRealObject(data.New))
                 {
                     w.WriteString2(data.New.Id);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            case historyitem_AutoShapes_AddYAxis:
+            case historyitem_AutoShapes_AddTitle:
+            {
+                w.WriteBool(typeof data.newPr === "string");
+                if(typeof data.newPr === "string")
+                    w.WriteString2(data.newPr);
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
                 }
                 break;
             }
@@ -2621,9 +2735,73 @@ CChartAsGroup.prototype =
                     }
                     break;
                 }
+                case historyitem_AutoShapes_AddChart:
+                {
+                    if(r.GetBool())
+                    {
+                        this.chart = new asc_CChart();
+                        r.GetLong();
+                        this.chart.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.chart = null;
+                    }
+                    break;
+                }
 
+                case historyitem_AutoShapes_AddXAxis:
+                {
+                    if(r.GetBool())
+                    {
+                        this.hAxisTitle = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.hAxisTitle = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_AddYAxis:
+                {
+                    if(r.GetBool())
+                    {
+                        this.vAxisTitle = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.vAxisTitle = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_AddTitle:
+                {
+                    if(r.GetBool())
+                    {
+                        this.chartTitle = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.chartTitle = null;
+                    }
+                    break;
+                }
+                case historyitem_SetSetSpPr:
+                {
+
+                    this.spPr = new CSpPr();
+                    if(r.GetBool())
+                    {
+                        this.spPr.Read_FromBinary2(r);
+                    }
+                    break;
+                }
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+        if(!this.parent)
+        {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
         }
     },
 
