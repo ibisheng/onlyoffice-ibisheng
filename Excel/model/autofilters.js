@@ -6176,6 +6176,23 @@
 						}
 					}
 				}
+			},
+			
+			_isEmptyRange: function(activeCells)
+			{
+				var ws = this.worksheet;
+				for(var n = activeCells.r1; n <= activeCells.r2; n++)
+				{
+					for(var k = activeCells.c1; k <= activeCells.c2; k++)
+					{
+						cell = ws.model._getCell(n,k);
+						if(cell.getValueWithoutFormat() != '')
+						{
+							return false;	
+						}
+					}
+				}
+				return true;
 			}
 		};
 
