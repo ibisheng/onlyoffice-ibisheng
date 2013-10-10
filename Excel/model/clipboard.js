@@ -2783,18 +2783,22 @@ function Editor_CopyPaste_Create(api)
     };
 
     ElemToSelect["onbeforecopy"] = function(e){
-		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+		if(!api.isCellEdited)
+			api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
     };
 	
 	ElemToSelect["onbeforecut"] = function(e){
-		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
-		if(isNeedEmptyAfterCut)
+		if(!api.isCellEdited)
 		{
-			isNeedEmptyAfterCut = false;
-			api.wb.getWorksheet().setSelectionInfo("empty", c_oAscCleanOptions.All);
+			api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+			if(isNeedEmptyAfterCut)
+			{
+				isNeedEmptyAfterCut = false;
+				api.wb.getWorksheet().setSelectionInfo("empty", c_oAscCleanOptions.All);
+			}
+			else
+				isNeedEmptyAfterCut = true;		
 		}
-		else
-			isNeedEmptyAfterCut = true;		
     };
 
     document.body.appendChild( ElemToSelect );
@@ -2813,6 +2817,7 @@ function Editor_CopyPaste_Create(api)
 	elementText.style.zIndex = -1000;
 	elementText.style.display = ELEMENT_DISPAY_STYLE;
 	elementText.setAttribute("contentEditable", true);
+	elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
 	
 	 elementText["onbeforecopy"] = function(e){
 		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
