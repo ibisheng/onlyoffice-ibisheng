@@ -4395,7 +4395,7 @@ ParaDrawing.prototype =
     Add_ToDocument : function(NearPos, bRecalculate)
     {
         this.Parent = NearPos.Paragraph;
-        NearPos.Paragraph.Internal_Content_Add( NearPos.ContentPos, this );
+        NearPos.Paragraph.Internal_Content_Add( Math.min( NearPos.ContentPos, NearPos.Paragraph.Content.length - 2 ), this );
 
         if ( false != bRecalculate )
             editor.WordControl.m_oLogicDocument.Recalculate();
