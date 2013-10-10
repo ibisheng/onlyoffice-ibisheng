@@ -717,9 +717,13 @@ function CPPTXContentWriter()
         this.BinaryFileWriter.StartRecord(0);
         this.BinaryFileWriter.StartRecord(1);
 
-        if (("undefined" !== typeof(WordShape) && grObject instanceof WordShape) || ("undefined" !== typeof(CShape) && grObject instanceof CShape))
+        if ("undefined" !== typeof(WordShape) && grObject instanceof WordShape)
         {
             this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap);
+        }
+        else if ("undefined" !== typeof(CShape) && grObject instanceof CShape)
+        {
+            this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap);
         }
 		else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
         {
@@ -740,6 +744,12 @@ function CPPTXContentWriter()
         this.BinaryFileWriter.pos = oldPos;
 
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+    }
+
+    this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap)
+    {
+        var _writer = this.BinaryFileWriter;
+        _writer.WriteShape(shape);
     }
 
     this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap)

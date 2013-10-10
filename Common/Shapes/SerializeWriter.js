@@ -2494,7 +2494,7 @@ function CBinaryFileWriter()
             }
         }
 
-        oThis.WriteRecord1(0, shape.nvSpPr, oThis.WriteUniNvPr);
+        oThis.WriteRecord2(0, shape.nvSpPr, oThis.WriteUniNvPr);
         oThis.WriteRecord1(1, shape.spPr, oThis.WriteSpPr);
         oThis.WriteRecord2(2, shape.style, oThis.WriteShapeStyle);
         oThis.WriteRecord2(3, shape.txBody, oThis.WriteTxBody);
