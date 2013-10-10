@@ -842,7 +842,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 			
 		if(undefined != oSettings['TrackingInterval'] &&
 			null != oSettings['TrackingInterval'])
-			editor.TrackingInterval = oSettings['TrackingInterval'] * 10;
+			editor.TrackingInterval = oSettings['TrackingInterval'] * 1000;
 			
 		editor._StartTracking();
 	}
