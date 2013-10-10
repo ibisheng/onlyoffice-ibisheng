@@ -58,7 +58,7 @@ tblwidth_Mm:ic
 asc_CParagraphBorders:Op
 __gray_convert_glyph:xx
 SignType$Positive:Ch
-GenerateDefaultTheme:Ji
+GenerateDefaultTheme:Ei
 c_oSerPosHV$Align:K0
 JSCompiler_StaticMethods_Internal_Check_EmptyHyperlink:PT
 tt_face_free_name:fv
@@ -107,7 +107,7 @@ JSCompiler_alias_FALSE:u
 JSCompiler_StaticMethods__ExecuteTableRowPresentation:Dd
 STATES_ID_SPLINE_BEZIER4:CH
 c_oAscError$ID$FileVKey:x8
-ps_unicodes_init:Zs
+ps_unicodes_init:$s
 STATES_ID_SPLINE_BEZIER5:DH
 STATES_ID_SPLINE_BEZIER2:AH
 STATES_ID_SPLINE_BEZIER3:BH
@@ -115,12 +115,12 @@ historyitem_AddHdr:cH
 JSCompiler_StaticMethods_recalculateAfterInternalResize:DI
 recalcresult2_End:pK
 SpellCheck_CallBack:m5
+_parser_funcs$$inline_820:Mu
 monthShort:Gh
 MobileTouchMode$Cursor:j7
 tt_cmap14_ensure:ow
 cff_decoder_parse_charstrings:PB
 JSCompiler_StaticMethods__Execute:Qc
-_parser_funcs$$inline_819:Mu
 c_oAscAlignH$Outside:tS
 Write_CVT_Stretched:sz
 EChartAxPos$chartaxposLeft:nn
@@ -155,7 +155,7 @@ parserHelper:hh
 JSCompiler_StaticMethods_Set_TableW:VW
 tt_face_load_font_dir:Zu
 FT_PEEK_USHORT_LE:wq
-EChartBasicTypes$chartbasicRadarChart:En
+EChartBasicTypes$chartbasicRadarChart:Dn
 c_oSerBordersType$insideV:Kl
 JSCompiler_StaticMethods_Internal_CompareBorders:aX
 c_oAscFillGradType$GRAD_LINEAR:Q8
@@ -165,7 +165,7 @@ Current_Ppem:fz
 JSCompiler_StaticMethods_Get_AllTableStyles:bR
 JSCompiler_set:z
 CBulletSize:hk
-FT_CMap_ClassRec:Cs
+FT_CMap_ClassRec:Ds
 NvPr:YL
 historyitem_type_DocumentContent:sP
 OverlayObject:lJ
@@ -209,7 +209,7 @@ align_Justify:Ua
 JSCompiler_StaticMethods_Set_CellSpacing:Hd
 StartTrackTextRect:hI
 DRAWING_ARRAY_TYPE_WRAPPING:kG
-ft_qsort:Ws
+ft_qsort:Xs
 CGrState_Pen:f6
 JSCompiler_StaticMethods_Remove_FromDocument:MF
 PS_Conv_Strtol:xt
@@ -230,12 +230,12 @@ JSCompiler_StaticMethods_Send:xV
 JSCompiler_StaticMethods_Document_Undo:TP
 sfnt_done_face:ax
 gray_render_scanline:tx
-ps_get_standard_strings:ct
+ps_get_standard_strings:dt
 JSCompiler_StaticMethods_isRect:CJ
 JSCompiler_StaticMethods_getRow0:Zl
 JSCompiler_StaticMethods_Set_Borders:pf
 JSCompiler_StaticMethods_Is_NBSP:YR
-T1_EncodingRec:mt
+T1_EncodingRec:nt
 afm_key_table:Gt
 FT_New_Size:WC
 nVertTThorz:$n
@@ -254,7 +254,7 @@ PreResizeState:NH
 PS_Table_FuncsRec:yu
 historyitem_type_TableRow:oP
 dublicate_bbox:ks
-X_Right_Margin:pb
+X_Right_Margin:ob
 tt_cmap6_char_next:Wv
 historyitem_SetRasterImage2:dL
 tt_cmap12_char_next:fw
@@ -294,7 +294,7 @@ CPresentationBullet:Kf
 cff_font_load:kB
 ft_var_readpackedpoints:Gz
 CalculateGuideLst:eO
-FT_Outline_Check:Is
+FT_Outline_Check:Js
 JSCompiler_StaticMethods_getRadius:no
 Ins_SxVTL:ly
 CTheme:Fj
@@ -411,13 +411,13 @@ TT_Set_CodeRange:ey
 JSCompiler_StaticMethods_getNormalPoint:$5
 c_oSer_OMathArgNodesType$FName:v3
 cff_size_select:tB
-FT_GlyphSlot:xs
+FT_GlyphSlot:ys
 CParagraphProp:Q6
 GetMinSnapDistanceX:nI
 c_oSer_ChartSeriesDataLabelsType$ShowVal:en
 GetMinSnapDistanceY:oI
 JSCompiler_StaticMethods_GetCoordinates:Ho
-ft_extra_glyph_names:Ys
+ft_extra_glyph_names:Zs
 PARRUN_TYPE_FLD:wk
 FONT_TYPE_ADDITIONAL:bE
 JSCompiler_StaticMethods_Is_Empty:GO
@@ -450,16 +450,16 @@ ps_parser_to_token:gu
 sfnt_services:Rw
 JSCompiler_StaticMethods_Is_InnerTable:jW
 JSCompiler_StaticMethods_Create_Default_Numbered:aV
-JSCompiler_StaticMethods_Numbering_Add:If
+JSCompiler_StaticMethods_Numbering_Add:Gf
 c_oAscColor$COLOR_TYPE_SCHEME:K8
 type_Paragraph:dc
-_decoder_funcs$$inline_821:Ou
+_decoder_funcs$$inline_822:Ou
 tt_size_init:kA
 c_oAscHAnchor$PageInternal:AW
 CAscColorScheme:P6
 TT_NameTableRec:Qr
 FORMULA_TYPE_MULT_DIV:NN
-_cmap_classes$$inline_823:Pu
+_cmap_classes$$inline_824:Pu
 Ins_MDAP:Uy
 c_oSer_ChartSeriesNumCacheType$NumCache:hn
 tab_Clear:pR
@@ -553,8 +553,8 @@ TT_BDFRec:Zr
 FORMULA_TYPE_MAX:VN
 getMaxPropertiesText:qo
 c_oAscServerError$TaskResult:wg
-ps_unicodes_char_index:$s
-compare_uni_maps:Vs
+ps_unicodes_char_index:at
+compare_uni_maps:Ws
 c_oSer_ClrSchemeMappingType$Bg1:M1
 cff_expertsubset_charset:UA
 c_oSer_ClrSchemeMappingType$Bg2:N1
@@ -586,7 +586,7 @@ c_oSer_FramePrType$VAnchor:Y1
 _ph_summ__title_only:AN
 WRAPPING_TYPE_NONE:uG
 JSCompiler_StaticMethods_Col_Add:eW
-c_oAscServerError$ConvertUnknownFormat:Ig
+c_oAscServerError$ConvertUnknownFormat:Gg
 c_oAscRelativeFromH$Page:BS
 JSCompiler_StaticMethods_Set_DrawingType:vG
 global_SubpixHintingHacks:zz
@@ -609,10 +609,10 @@ c_oSerFormat$Version:OX
 JSCompiler_StaticMethods_Internal_Get_FrameParagraphs:KT
 Common_CopyObj:Ie
 CAbstractNum:yP
-FT_Module_Class:Hs
+FT_Module_Class:Is
 c_oAscFill$FILL_TYPE_BLIP:L8
 c_oAscAsyncAction$Save:m8
-ft_glyphslot_done:Ls
+ft_glyphslot_done:Ms
 generateColors:Po
 EChartLegendPos$chartlegendposRightTop:un
 JSCompiler_StaticMethods_GetNewMargin:T4
@@ -631,7 +631,7 @@ m_bands:yx
 c_oSerProp_rPrType$BoldCs:f_
 JSCompiler_StaticMethods_Set_Italic:$R
 COLOR_TYPE_SRGB:Xi
-c_oAscServerError$Unknown:tg
+c_oAscServerError$Unknown:rg
 StartTrackNewShape:aI
 c_oSerWrapPolygon$ALineTo:c1
 tt_cmap0_char_index:Iv
@@ -696,13 +696,13 @@ t1_cmap_std_done:Qt
 FT_GlyphLoadCur:tr
 Editor_Paste:Dc
 JSCompiler_StaticMethods__addToFormat:ri
-FontStyle$FontStyleBold:OD
+FontStyle$FontStyleBold:LD
 c_oSerNumTypes$lvl_Start:tY
 c_oSerImageType$Padding:e0
 para_CollaborativeChangesStart:NR
 STATES_ID_ROTATE:wH
 JSCompiler_StaticMethods_Internal_MoveCursorBackward:RT
-Editor_CopyPaste_Create:Zf
+Editor_CopyPaste_Create:Xf
 FORMULA_TYPE_MOD:WN
 contentchanges_Add:ZP
 JSCompiler_StaticMethods_DrawInlineMoveCursor:ZE
@@ -749,7 +749,7 @@ cd16:GL
 JSCompiler_StaticMethods_Set_SmallCaps:kS
 JSCompiler_StaticMethods_GetMax:so
 cd13:HL
-t1_standard_encoding:Qs
+t1_standard_encoding:Rs
 CTrackHandleObject:MH
 JSCompiler_StaticMethods_Set_TableCellMar:Wd
 JSCompiler_StaticMethods_VertLine:L5
@@ -794,7 +794,7 @@ c_oSerImageType2$BSimplePos:q0
 cff_slot_done:vB
 FT_CFF_SERVICE_GET_CMAP_INFO_GET:XB
 historyitem_AddGraphicObject:kL
-__FT_CharmapRec:Bs
+__FT_CharmapRec:Cs
 PreChangeWrapContourAddPoint:MI
 c_oSerRunType$fldstart:T_
 c_oSer_OMathBottomNodesType$StrikeBLTR:A2
@@ -824,7 +824,7 @@ HF:Aj
 tt_face_load_sbit_stub:Iw
 CreateParaDrawingFromBinary:Oe
 historyitem_SetStyle:SK
-FT_Open_Args:ys
+FT_Open_Args:zs
 c_oSerImageType$Height:a0
 c_oSerFormat$Signature:PX
 JSCompiler_StaticMethods_Check_Format:yf
@@ -902,7 +902,7 @@ CreateIntArray:Yp
 check_KeyboardEvent:Y6
 JSCompiler_StaticMethods__MarginToStyle:rb
 PS_FontExtraRec:ot
-CopyPasteCorrectString:mc
+CopyPasteCorrectString:lc
 Default_Tab_Stop:Rp
 LibraryHintingParams:Qx
 tt_face_free_sbit_stub:Jw
@@ -932,7 +932,7 @@ JSCompiler_StaticMethods_ReadAfter:Y4
 JSCompiler_StaticMethods_addFooter:LE
 getNumberParts:Th
 c_oAscRelativeFromH$LeftMargin:yS
-JSCompiler_StaticMethods__ValueToMmType:gf
+JSCompiler_StaticMethods__ValueToMmType:ef
 recalcresult_NextElement:yT
 CBoundsController:N5
 Spline:QI
@@ -962,7 +962,7 @@ TT_Load_Glyph_Header:Tz
 CPen:q5
 c_oSer_ChartLegendType$LegendEntry:mm
 tt_driver_done:gA
-FT_Slot_Internal:Fs
+FT_Slot_Internal:Gs
 FileStream:Tc
 JSCompiler_StaticMethods_Create_AbstractNum:zf
 c_oAscServerError$UploadExtension:Og
@@ -1018,7 +1018,7 @@ c_oSer_OMathContentType$BarPr:O2
 documentOrigin:ua
 c_oSer_ChartType$SpPr:gm
 c_oSer_ChartSeriesType$xVal:Wm
-find_unicode_charmap:Js
+find_unicode_charmap:Ks
 STATES_ID_CHART:AF
 changeRgbColor:Qo
 JSCompiler_StaticMethods_Get_FramePr:rT
@@ -1067,7 +1067,7 @@ FT_MulFix:Oq
 vertalign_Baseline:df
 c_oAscRelativeFromV$BottomMargin:DS
 c_oSer_OMathBottomNodesType$ArgSz:h2
-t1_expert_encoding:Rs
+t1_expert_encoding:Ss
 tt_size_ready_bytecode:by
 MobileTouchMode$TableRuler:l7
 STATES_ID_START_ADD_NEW_SHAPE:tH
@@ -1115,7 +1115,7 @@ c_oSerHdrFtrTypes$Footer:aY
 historyitem_UpadteSpTreeBefore:pL
 numFormat_AmPm:zh
 CDrawingDocument:y6
-ps_unicodes_char_next:at
+ps_unicodes_char_next:bt
 search_HdrFtr_All:nV
 JSCompiler_StaticMethods_Internal_GetStartPos:ZG
 ParaEnd:QO
@@ -1172,7 +1172,7 @@ EGlyphState$glyphstateNormal:mD
 AFM_KernPairRec:qt
 CChartTitle:Xn
 g_nodeAttributeStart:vi
-FT_Size:ws
+FT_Size:xs
 JSCompiler_StaticMethods_generateUniColors:$o
 CreateFontData2:yE
 t1_allocate_blend:EC
@@ -1188,7 +1188,7 @@ FT_GlyphLoader_Prepare:zr
 FT_Smooth_Renderer_Class:Ax
 c_oSerProp_pPrType$Ind_FirstLine:mZ
 c_oAscXAlign$Right:jb
-FT_Size_Metrics:vs
+FT_Size_Metrics:ws
 g_dKoef_mm_to_twips:yQ
 c_oSer_OMathBottomNodesType$SubHide:F2
 bIsIE:s5
@@ -1240,7 +1240,7 @@ c_oSer_FramePrType$Y:d2
 JSCompiler_StaticMethods_setTextBoxContent:XK
 c_oSerEffectExtent$Top:E0
 CreateAscShapePropFromProp:aH
-PS_FontInfoRec:gt
+PS_FontInfoRec:ht
 para_CommentEnd:OO
 c_oSerProp_rPrType$Italic:NZ
 c_oSerProp_pPrType$numPr_lvl:EZ
@@ -1325,13 +1325,13 @@ c_oSerDocTableType$tblGrid_Item:C_
 c_oSer_ChartPlotAreaType$ValAx:Bm
 JSCompiler_StaticMethods_Interface_Update_HdrFtrPr:RV
 c_oSer_OMathBottomNodesType$StrikeH:B2
-JSCompiler_StaticMethods_parse3DRef:oh
+JSCompiler_StaticMethods_parse3DRef:jh
 c_oSer_ChartLegendLayoutType$WMode:vm
 t1_service_ps_info:OC
 c_oSer_OMathBottomNodesType$Pos:w2
 JSCompiler_StaticMethods_Repos:E7
 JSCompiler_StaticMethods_getProps:RE
-xhrSupported$$inline_1397:$D
+xhrSupported$$inline_1398:$D
 nSldLtTTxAndClipArt:VM
 c_oSer_OMathBottomNodesType$StrikeV:D2
 FT_Outline_Transform:cr
@@ -1360,7 +1360,7 @@ _ph_summ__obj:tN
 JSCompiler_StaticMethods_CopyPresentationTableFull:Mb
 TT_SizeRec:Az
 JSCompiler_StaticMethods__CommitText:hi
-FT_CMapRec:zs
+FT_CMapRec:As
 c_oAscServerError$UploadCountFiles:Pg
 t1_builder_add_point:qu
 JSCompiler_StaticMethods__GetTargetDocument:Jc
@@ -1536,7 +1536,7 @@ RULER_OBJECT_TYPE_FOOTER:N6
 c_oSerNumTypes$AbstractNum:iY
 CBgPr:Cj
 documentVKey:b9
-FT_Module:Gs
+FT_Module:Hs
 c_oSerPoint2D$Y:f1
 c_oSerPoint2D$X:e1
 ps_parser_load_field:ku
@@ -1546,7 +1546,7 @@ JSCompiler_StaticMethods_Read_RowPr:P4
 PARRUN_TYPE_RUN:vk
 JSCompiler_StaticMethods_Row_Remove2:QV
 CSeekTableEntry:Vk
-c_oAscServerError$ConvertTimeout:Jg
+c_oAscServerError$ConvertTimeout:Hg
 NumFormatCache:si
 CGlyphString:WD
 CAscStroke:c$
@@ -1564,7 +1564,7 @@ c_oSer_OMathBottomNodesType$HideTop:q2
 JSCompiler_StaticMethods_Internal_Is_NullBorders:MT
 JSCompiler_StaticMethods_setTableProps:qG
 Y_Top_Margin:hH
-parserHelp:ph
+parserHelp:kh
 c_oSer_ChartSeriesNumCacheType$NumCacheItem:mn
 trimString:Hc
 c_oAscDropCap$None:W8
@@ -1587,7 +1587,7 @@ CFF_Driver:cC
 sfnt_open_font:Ww
 FT_Request_Metrics:rA
 c_oSer_ChartSeriesType$TxRef:Xm
-CreateUIntArray:lt
+CreateUIntArray:mt
 global_keyboardEvent:gU
 CFontFilesCache:ID
 c_oSerProp_pPrType$pBdr:IZ
@@ -1599,7 +1599,7 @@ FT_Glyph_Class:px
 tt_size_run_prep:iy
 JSCompiler_StaticMethods_Numbering_Remove:Jf
 tt_face_load_hmtx:lv
-c_oAscServerError$ConvertReadFile:Kg
+c_oAscServerError$ConvertReadFile:Ig
 numbering_numfmt_UpperLetter:Ea
 JSCompiler_StaticMethods_Create_Table_BorderedAndLined:FQ
 ScrollArrowType$ARROW_LEFT:R7
@@ -1612,7 +1612,7 @@ FILL_TYPE_PATT:ij
 historyitem_AddHdrFtrGrObjects:GE
 CTextStyles:zj
 CDocInfo:d9
-ret$$inline_825:Qu
+ret$$inline_826:Qu
 FT_OutlineGlyphRec:mr
 ComparisonByZIndex:tG
 phType_chart:$L
@@ -1635,7 +1635,7 @@ nSldLtTTxAndObj:XM
 c_oAscError$ID$ConvertationPassword:B8
 Ins_MIRP:pz
 CCore:Ci
-CreateNullArray:kt
+CreateNullArray:lt
 c_oSer_ChartSeriesType$Val:Tm
 JSCompiler_StaticMethods_AddRect2:yF
 CFontInfo:jE
@@ -1723,7 +1723,7 @@ L 0:a
 JSCompiler_StaticMethods_AddAdj:Kj
 GX_FVar_Head:Fz
 L 1:b
-c_oSer_BasicChartType$Grouping:Om
+c_oSer_BasicChartType$Grouping:Lm
 X_Left_Margin:mb
 L 2:c
 CHeaderFooter:wP
@@ -1895,7 +1895,7 @@ MoveInGroup:FI
 FT_Select_Size:XC
 c_oSerProp_rPrType$Rtl:j_
 phType_hdr:fM
-PS_DesignMapRec:it
+PS_DesignMapRec:jt
 JSCompiler_StaticMethods_calculateAbsToRel:KI
 BinaryOtherTableWriter:m4
 ComparisonByZIndexSimple:VE
@@ -1995,12 +1995,12 @@ STATES_ID_MOVE:sH
 c_oAscError$ID$VKeyEncrypt:C8
 ShapeTrackForMoveInGroup:HK
 JSCompiler_StaticMethods_Internal_FindBackward:Zc
-ps_unicode_value:Us
+ps_unicode_value:Vs
 Ins_SHC:Zy
 c_oSerWrapThroughTight$WrapText:W0
 c_oSerPaddingType$left:Pl
 c_oAscTableSelectionType$Column:pX
-ft_synthesize_vertical_metrics:Ms
+ft_synthesize_vertical_metrics:Ns
 Binary_rPrReader:L4
 hsvToRgb:No
 historyitem_type_GrObjects:SF
@@ -2089,7 +2089,7 @@ c_oSerImageType2$Hidden:n0
 WRAP_HIT_TYPE_POINT:II
 c_oSerRunType$pagebreak:O_
 ChartStyleManager:Xo
-ft_standard_glyph_names:Ns
+ft_standard_glyph_names:Os
 phType_ftr:eM
 tt_get_metrics_incr_overrides:Qz
 c_oSerProp_rPrType$LangEA:m_
@@ -2136,7 +2136,7 @@ c_oSer_OMathContentType$Bar:N2
 hdrftr_First:OE
 tt_cmap2_char_next:Mv
 CFF_IndexRec:zA
-create_psnames_module:et
+create_psnames_module:ft
 c_oSerConstants$ReadOk:nl
 JSCompiler_StaticMethods_parseSeriesHeaders:wp
 PolyLineAddState2:$I
@@ -2151,7 +2151,7 @@ ParaText:Sb
 JSCompiler_StaticMethods_getNewGroupPos:sG
 cff_parser_run:QA
 changestype_Drawing_Props:Vc
-FormatObjScientific:bi
+FormatObjScientific:Vh
 JSCompiler_StaticMethods_Check_Hyperlink:cU
 JSCompiler_StaticMethods_Set_RFonts2:lS
 JSCompiler_StaticMethods_setCanvas:eo
@@ -2166,8 +2166,8 @@ CBodyPr:bk
 c_oSerNumTypes$lvl_PStyle:BY
 ParaNewLineRendered:RO
 historyitem_SetSizes:xK
-ft_mac_names:Os
-ft_get_adobe_glyph_index:Ts
+ft_mac_names:Ps
+ft_get_adobe_glyph_index:Us
 _weight_title:mN
 tt_face_load_hdmx:dA
 JSCompiler_StaticMethods_Get_FrameAnchorPara:lU
@@ -2217,7 +2217,7 @@ CorrectUniColor:X9
 CCollaborativeChanges:EP
 _ph_summ_chart_and_tx:pN
 c_oSer_OMathContentType$SSubSupPr:o3
-ft_glyphslot_free_bitmap:Ks
+ft_glyphslot_free_bitmap:Ls
 JSCompiler_StaticMethods__ExecuteTableRow:Ze
 CPrstColor:Ui
 JSCompiler_StaticMethods_CommitSpan:hb
@@ -2305,7 +2305,7 @@ JSCompiler_StaticMethods__checkCoord:Xl
 c_oSerImageType2$DistB:j0
 c_oSerProp_pPrType$Ind:jZ
 c_oSerImageType2$DistL:k0
-JSCompiler_StaticMethods_Set_Lvl_Numbered_6:Hf
+JSCompiler_StaticMethods_Set_Lvl_Numbered_6:Ff
 c_oSerImageType2$DistT:m0
 JSCompiler_StaticMethods_Set_Lvl_Numbered_5:Cf
 JSCompiler_StaticMethods_Set_Lvl_Numbered_8:Ef
@@ -2363,7 +2363,7 @@ JSCompiler_StaticMethods_Internal_FindForward:FT
 JSCompiler_StaticMethods_setZIndex2:WE
 c_oAscRelativeFromV$Line:LS
 g_sTrackingServiceLocalUrl:og
-create_cmap_class_rec:Ds
+create_cmap_class_rec:Es
 g_sMainServiceLocalUrl:lg
 c_oSer_pgSzType$Orientation:i1
 MobileTouchMode$Select:h7
@@ -2484,7 +2484,7 @@ NullStateHeaderFooter:IH
 FontScheme:sM
 JSCompiler_StaticMethods_calculateRelToAbs:EJ
 c_oSerProp_rPrType$FontSize:UZ
-_builder_funcs$$inline_820:Nu
+_builder_funcs$$inline_821:Nu
 c_oSer_OMathContentType$SSup:p3
 g_anchor_left:q7
 tt_face_get_name:Sw
@@ -2565,7 +2565,7 @@ ParaCollaborativeChangesStart:hT
 cff_cmap_encoding_class_rec:mB
 EChartBarDerection$chartbardirectionBar:Hn
 CParagraphSpacing:q9
-ps_get_macintosh_name:bt
+ps_get_macintosh_name:ct
 numbering_presentationnumfrmt_AlphaUcParenR:Oa
 WRAPPING_TYPE_SQUARE:rJ
 CParaPr:bF
@@ -2616,11 +2616,11 @@ T1_Driver_Class:TC
 c_oSerWrapTopBottom$DistB:Z0
 cff_driver_done:CB
 fontstyle_mask_bold:hE
-FT_Face_Internal:Es
+FT_Face_Internal:Fs
 ChartState:YH
 compare_kern_pairs:fC
 tt_cmap14_get_nondef_chars:Bw
-__FT_CMapRec:As
+__FT_CMapRec:Bs
 MIN_ANGLE:AL
 JSCompiler_StaticMethods_Internal_Recalculate_CurPos:IT
 c_oSer_CommentsType$Solved:y1
@@ -2635,11 +2635,11 @@ c_oSer_ChartLegendType$Overlay:km
 JSCompiler_StaticMethods_CheckRectT:I5
 JSCompiler_StaticMethods_Internal_CheckMerge:LX
 MATRIX_ORDER_APPEND:WG
-PS_BlendRec:jt
+PS_BlendRec:kt
 asc_CParagraphTabs:Qp
-FormatObjDecimalFrac:ci
+FormatObjDecimalFrac:Wh
 JSCompiler_StaticMethods__Commit_Br:Ve
-JSCompiler_StaticMethods_Clear_Formatting:sU
+JSCompiler_StaticMethods_Clear_Formatting:rU
 moveTo:gl
 afm_tokenize:Jt
 selectionflag_Numbering:IP
@@ -2653,7 +2653,7 @@ STATES_ID_SPLINE_BEZIER:yH
 tt_load_sbit_metrics:Cv
 c_oSerConstants$ErrorStream:pl
 _strncmp_data:Fq
-_isxdigit:ft
+_isxdigit:gt
 JSCompiler_StaticMethods_setRasterImage:$K
 CAscThemes:e$
 _weight_ctrTitle:fN
@@ -2691,7 +2691,7 @@ EChartBarGrouping$chartbargroupingStacked:Ln
 c_oAscServerError$UploadContentLength:Ng
 ETblStyleOverrideType$tblstyleoverridetypeFirstRow:G3
 c_oAscServerError$VKeyUserCountExceed:Tg
-ft_extra_glyph_unicodes:Xs
+ft_extra_glyph_unicodes:Ys
 FT_CMap_New:Zw
 EChartBasicTypes$chartbasicBarChart:vn
 gray_render_line:hx
@@ -2709,9 +2709,9 @@ hdrftr_Header:IE
 FT_MM_Var:Fr
 c_oMainTables$App:Ak
 JSCompiler_StaticMethods_Document_AddHdrFtr:oW
+_files$$inline_1407:U
 c_oSerHdrFtrTypes$HdrFtr_Content:eY
 c_oSerImageType$Width:$_
-_files$$inline_1406:U
 JSCompiler_StaticMethods_DrawEvents:wo
 JSCompiler_StaticMethods_Internal_Get_NumberingTextPr:DU
 CSpan:M7
@@ -2778,7 +2778,7 @@ JSCompiler_StaticMethods_ReadBefore:X4
 CPaddings:Dp
 c_oSer_CommentsType$Text:w1
 historyitem_type_FlowObjects:jP
-ft_adobe_glyph_list:Ss
+ft_adobe_glyph_list:Ts
 phType_sldNum:jM
 c_oSerProp_rPrType$SmallCaps:c_
 STATES_ID_PRE_RESIZE_IN_GROUP:lF
@@ -2790,9 +2790,9 @@ TRaster:qx
 cff_index_init:ZA
 L 124:mu
 c_oSer_CommentsType$UserId:u1
-L 123:MD
-L 122:LD
-L 121:Dn
+L 123:ND
+L 122:MD
+L 121:En
 L 120:eQ
 JSCompiler_StaticMethods_AddRoundRect:G5
 JSCompiler_StaticMethods__BordersToStyle:$a
@@ -2812,7 +2812,7 @@ CParaLineRange:GU
 DecodeBase64:xE
 recalcresult2_NextPage:oK
 _fakeHeaders:G9
-L 125:ND
+L 125:OD
 JSCompiler_StaticMethods_Internal_CheckPunctuationBreak:n5
 c_oSer_ClrSchemeMappingType$FollowedHyperlink:O1
 c_oSer_OMathContentType$Box:R2
@@ -2825,15 +2825,15 @@ FT_Glyph_Get_CBox:cD
 TT_CMap14Rec:mw
 g_tabtype_left:xl
 c_oSerTableTypes$Document:VX
-ft_sid_names:Ps
+ft_sid_names:Qs
 Sort_Ranges_X0:BR
 historyitem_TableId_Reset:cP
 historyitem_type_Comment:zP
 T1_Decoder_ZoneRec:Gu
-L 102:ai
+L 102:ci
 L 101:dk
 JSCompiler_StaticMethods_Set_BasedOn:XQ
-L 100:Gi
+L 100:Hi
 historyitem_UpdateWrapSizes:DJ
 CColorModifiers:JL
 tblwidth_Auto:zQ
@@ -2844,19 +2844,19 @@ heightrule_Exact:AQ
 ShapeForResizeInGroup:wL
 JSCompiler_StaticMethods_Set_UnhideWhenUsed:SQ
 L 111:Qk
-L 110:Ii
+L 110:Ji
 L 113:oj
 L 112:eq
 bIsSupportOriginalFormatFonts:ZD
-L 103:nh
+L 103:ph
 CAutoshapeTrack:O5
 L 104:Bo
 L 105:Pk
 historyitem_AddToSpTree:sL
-L 106:tf
+L 106:uf
 L 107:Co
 L 108:nj
-L 109:Hi
+L 109:Ii
 FT_Service_PsFontNameRec:aq
 vertalign_SubScript:yc
 TT_MulFix14:My
@@ -2874,7 +2874,7 @@ PolyLine:ZI
 JSCompiler_StaticMethods_Set_Tabs:xf
 fontstyle_mask_bolditalic:iE
 historyitem_ChangePresetGeom:wK
-_infos$$inline_1407:oE
+_infos$$inline_1408:oE
 JSCompiler_StaticMethods_RGBToCSS:Za
 c_oSer_ChartCatAxType$MajorGridlines:Em
 c_oSerProp_pPrType$contextualSpacing:iZ
@@ -2976,7 +2976,7 @@ LineEndSize$Small:VL
 g_mouse_button_left:bW
 c_oSerShdType$Color:Ol
 _global_layout_summs_array:HN
-pscmaps_interface:dt
+pscmaps_interface:et
 c_oSerOtherTableTypes$ImageMap:CY
 hdrftr_Footer:KE
 c_oSerProp_rPrType$Caps:b_
@@ -2996,7 +2996,7 @@ c_oSerWrapThroughTight$DistL:U0
 Binary_ChartReader:Qj
 CompareUniFill:gL
 JSCompiler_StaticMethods_endCommand:m6
-CParaTabs:uf
+CParaTabs:rf
 c_oAscYAlign$Outside:LV
 c_oSerWrapThroughTight$DistR:V0
 JSCompiler_StaticMethods_Internal_MoveCursorForward:ST
@@ -3055,23 +3055,23 @@ JSCompiler_StaticMethods_Create_NewHistoryPoint:$f
 ParaHyperlinkEnd:Je
 historyitem_AddNewPoint:GJ
 pararecalc_0_None:EU
-L 39:ef
+L 39:ff
 L 38:Bd
 historyitem_SetTextBoxContent:UK
 L 37:Ad
 locktype_None:OP
-PS_PrivateRec:ht
+PS_PrivateRec:it
 L 32:lb
 L 31:Wa
 cff_standard_encoding:VA
 L 30:Da
 JSCompiler_StaticMethods__ExecutePresentation:sd
-L 36:lc
+L 36:mc
 L 35:cb
 L 34:Na
 FT_Data:qs
 L 33:Ga
-g_oLcidIdToNameMap:x4
+g_oLcidIdToNameMap:v4
 FT_Service_PsInfoRec:dq
 historyitem_RemoveFtr:fH
 CHistory:rQ
@@ -3104,7 +3104,7 @@ recalcresult_PrevPage:GT
 LineEndType$None:PL
 JSCompiler_StaticMethods_Clear_Additional:uQ
 rx_array:gh
-CParagraphAndTextProp:A9
+CParagraphAndTextProp:z9
 JSCompiler_StaticMethods_Set_CellInfo:dX
 CDocOpenProgress:c9
 c_oSerProp_pPrType$PageBreakBefore:qZ
@@ -3114,13 +3114,13 @@ TRACK_CIRCLE_RADIUS:AK
 T1_Loader:DC
 L 59:Wc
 nSldLtTClipArtAndTx:AM
-L 58:kh
+L 58:mh
 L 57:De
 L 56:te
-L 55:jh
-L 54:Yh
+L 55:lh
+L 54:$h
 L 53:je
-L 52:Ff
+L 52:Hf
 L 51:qd
 FT_TT_SERVICES_GET:cA
 Binary_tblPrReader:N4
@@ -3132,21 +3132,21 @@ FontStyle$FontStyleRegular:KD
 Binary_tblPrWriter:n4
 GX_BlendRec:Dz
 rgCols:$g
-L 49:Xh
-L 48:Wh
+L 49:Zh
+L 48:Yh
 JSCompiler_StaticMethods_Set_TextPr:ZQ
 L 45:Gb
-L 44:rf
+L 44:sf
 L 47:ie
 L 46:yb
-L 41:Vh
+L 41:Xh
 TT_Post_NamesRec:Yr
 ft_bitmap_glyph_init:Rq
 JSCompiler_StaticMethods__read_rPr:re
 L 40:$d
 L 43:he
 HSLToRGB:D5
-L 42:Gg
+L 42:Jg
 changestype_Paragraph_Content:GF
 nbsp_string:PR
 tt_face_load_cmap:gv
@@ -3243,7 +3243,7 @@ RotateState:lI
 locktype_Other2:YP
 locktype_Other3:MP
 JSCompiler_StaticMethods_AddChar:gT
-JSCompiler_StaticMethods_Internal_CopyLvl:RU
+JSCompiler_StaticMethods_Internal_CopyLvl:QU
 Ins_DELTAC:kz
 FontStyle$FontStyleBoldItalic:QD
 CFontsCharMap:c5
@@ -3263,13 +3263,13 @@ JSCompiler_StaticMethods_Set_Before:Ld
 TT_Face:Bz
 CTrackNewObject2:dI
 BinarySettingsTableWriter:g4
-L 73:Ei
-L 74:Mm
+L 73:Fi
+L 74:Nm
 JSCompiler_StaticMethods__draw:i8
 Int64:Iq
 L 75:Mk
 JSCompiler_StaticMethods_rebuildSeries:up
-L 76:Fi
+L 76:Gi
 _ph_summ__sec_head:yN
 L 77:kj
 L 78:lj
@@ -3286,23 +3286,23 @@ JSCompiler_StaticMethods_Stop:zV
 JSCompiler_StaticMethods_updateCharts:XE
 c_oSerExtent$Cx:H0
 c_oSerExtent$Cy:I0
-L 70:Lm
+L 70:Mm
 FT_PEEK_USHORT:vq
 L 72:jj
 L 71:ae
 L 64:Xc
 L 65:ce
-L 62:rg
+L 62:sg
 c_oSer_SettingsType$ClrSchemeMapping:E1
 CUniFill:xe
 L 63:Ee
 BULLET_TYPE_TYPEFACE_BUFONT:kk
 L 68:ck
-L 69:sf
+L 69:tf
 c_oSerProp_rPrType$LangBidi:l_
 Ins_MSIRP:az
 L 66:Yc
-L 67:Gf
+L 67:If
 JSCompiler_StaticMethods_getSrc:zb
 FontProperties:fo
 JSCompiler_StaticMethods_Internal_UpdateParagraphState:j5
@@ -3310,10 +3310,10 @@ L 61:vd
 L 60:Re
 c_oSer_ColorType$Auto:Ul
 L 99:Ok
-L 95:Hg
-L 96:mh
+L 95:Kg
+L 96:oh
 JSCompiler_StaticMethods_Set_TableBorder_Top:de
-L 97:$h
+L 97:bi
 L 98:Ao
 c_oSer_ChartCatAxType$Title:Dm
 STATES_ID_PRE_RESIZE:qH
@@ -3323,21 +3323,21 @@ ParaPresentationNumbering:$O
 SPH_ScaleRule:Tx
 L 92:mj
 c_oSer_OMathBottomNodesType$Chr:j2
-L 91:Nm
-L 94:ff
+L 91:Om
+L 94:gf
 nSldLtTObjTx:JM
 L 93:Nk
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:RP
 FT_RoundFix:Hq
 CFontFileLoader:T
-L 90:Yf
+L 90:Zf
 tt_name_entry_ascii_from_utf16:Tw
 Editor_Copy_GetElem:na
-L 88:sg
-L 89:lh
+L 88:tg
+L 89:nh
 L 86:zo
 CHART_TITLE_TYPE_V_AXIS:xO
-L 87:Zh
+L 87:ai
 L 84:le
 CFlowParagraph:MR
 L 85:me
@@ -3348,11 +3348,11 @@ c_oSerParType$Run:x_
 c_oSerRunType$tab:M_
 c_oEditorId$Speadsheet:da
 c_oSer_BasicChartType$Series:Qm
-L 83:ob
+L 83:pb
 L 82:Mc
 c_oSerPropLenType$Byte:rl
 L 81:Se
 CGeometry:NJ
 tt_cmap2_get_subheader:Kv
-L 80:Xf
+L 80:Yf
 JSCompiler_StaticMethods_GoTo_Text:$E
