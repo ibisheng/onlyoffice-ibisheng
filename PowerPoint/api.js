@@ -4092,6 +4092,10 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
     }
+    else
+    {
+        this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(null);
+    }
 
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)
@@ -4151,6 +4155,8 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     {
         obj.Background = new CAscFill();
         obj.Background.type = c_oAscFill.FILL_TYPE_NOFILL;
+
+        this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(null);
     }
     else
     {
@@ -4159,6 +4165,10 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
         if (bgFill != null && bgFill.fill != null && bgFill.fill.type == FILL_TYPE_BLIP)
         {
             this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bgFill.fill.RasterImageId);
+        }
+        else
+        {
+            this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(null);
         }
     }
 

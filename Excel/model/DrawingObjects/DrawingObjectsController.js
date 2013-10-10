@@ -1111,8 +1111,16 @@ DrawingObjectsController.prototype =
                 {
                     this.drawingObjects.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
                 }
+                else
+                {
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
+                }
 				shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
 				shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
+            }
+            else
+            {
+                this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
             }
             
             ret.push(shape_props);

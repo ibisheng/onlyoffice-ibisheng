@@ -573,8 +573,16 @@ CGraphicObjects.prototype =
                 {
                     this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
                 }
+                else
+                {
+                    this.drawingDocument.DrawImageTextureFillShape(null);
+                }
 
                 shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);
+            }
+            else
+            {
+                this.drawingDocument.DrawImageTextureFillShape(null);
             }
 
             if(shape_props.ChartProperties)
