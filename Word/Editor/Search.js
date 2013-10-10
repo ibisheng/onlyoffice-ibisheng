@@ -116,7 +116,7 @@ CDocumentSearch.prototype =
                 for ( var Pos = EndPos - 1; Pos >= StartPos; Pos-- )
                 {
                     var ItemType = Para.Content[Pos].Type;
-                    if ( para_TextPr != ItemType )
+                    if ( para_TextPr != ItemType && para_CollaborativeChangesStart != ItemType && para_CollaborativeChangesEnd != ItemType && para_CommentStart != ItemType && para_CommentEnd != ItemType && para_HyperlinkStart != ItemType && para_HyperlinkEnd != ItemType )
                         Para.Internal_Content_Remove(Pos);
                 }
 
@@ -759,7 +759,7 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
     for ( var Pos = 0; Pos < this.Content.length; Pos++ )
     {
         var Item = this.Content[Pos];
-        if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type )
+        if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type || para_CommentStart === Item.Type || para_CommentEnd === Item.Type || para_CollaborativeChangesStart === Item.Type || para_CollaborativeChangesEnd === Item.Type || para_HyperlinkStart === Item.Type || para_HyperlinkEnd === Item.Type )
             continue;
 
         if ( para_Drawing === Item.Type )
@@ -779,9 +779,14 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
                 // Проверяем
                 for ( var Index = 1; Index < Str.length; Index++ )
                 {
+                    var _TempType = this.Content[Pos2].Type;
+
                     // Пропускаем записи TextPr
-                    while ( Pos2 < this.Content.length && ( para_TextPr === this.Content[Pos2].Type ) )
+                    while ( Pos2 < this.Content.length && ( para_Numbering === _TempType || para_PresentationNumbering === _TempType || para_TextPr === _TempType || para_CommentStart === _TempType || para_CommentEnd === _TempType || para_CollaborativeChangesStart === _TempType || para_CollaborativeChangesEnd === _TempType || para_HyperlinkStart === _TempType || para_HyperlinkEnd === _TempType ) )
+                    {
                         Pos2++;
+                        _TempType = this.Content[Pos2].Type;
+                    }
 
                     if ( ( Pos2 >= this.Content.length ) || (" " === Str[Index] && para_Space != this.Content[Pos2].Type) || ( " " != Str[Index] && ( ( para_Text != this.Content[Pos2].Type ) || ( para_Text === this.Content[Pos2].Type && !(  ( true != bMatchCase && (this.Content[Pos2].Value).toLowerCase() === Str[Index].toLowerCase() ) || ( true === bMatchCase && this.Content[Pos2].Value === Str[Index] ) ) ) ) ) )
                     {
