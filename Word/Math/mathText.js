@@ -45,17 +45,21 @@ CMathTextPrp.prototype =
 
 function CMathText()
 {
+    this.typeObj = MATH_TEXT;
     this.pos = null;
     this.size = null;
     this.value = null;
 
     this.bJDraw = false;
-    this.SUBCONTENT = false;
-    this.empty = false;
-    this.Parent = null;
+    this.bMText  = false;
 
-    this.TxtPrp = new CMathTextPrp();
-    this.OwnTPrp = new CMathTextPrp();
+
+    /*this.SUBCONTENT = false;
+    this.empty = false;*/
+    //this.Parent = null;
+
+    /*this.TxtPrp = new CMathTextPrp();
+    this.OwnTPrp = new CMathTextPrp();*/
 
     //this.sizeSymbol = null; // размер символа без учета трансформации
 
@@ -82,7 +86,7 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if( this.getTxtPrp().Italic )
+        if( this.bMText )
         {
             if(code == 0x0068) // h
                 code = 0x210E;
@@ -135,9 +139,10 @@ CMathText.prototype =
     },
     fillPlaceholders: function()
     {
+        this.typeObj = MATH_PLACEHOLDER;
         this.value = StartTextElement;
     },
-    old_getTxtPrp: function()
+    /*old_getTxtPrp: function()
     {
         var txtPrp = this.Parent.getTxtPrp();
         txtPrp.Merge(this.textPrp);
@@ -148,8 +153,8 @@ CMathText.prototype =
         //txtPrp.Italic = false; // всегда отправляем "false"!!
 
         return txtPrp;
-    },
-    setTxtPrp: function(txtPrp)
+    },*/
+    /*setTxtPrp: function(txtPrp)
     {
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
@@ -157,12 +162,13 @@ CMathText.prototype =
     setOwnTPrp: function(txtPrp)
     {
         this.OwnTPrp.Merge(txtPrp);
-    },
+    },*/
     setLIterator: function(bIterator)
     {
         this.bIterator = bIterator; // символы другие , чуть толще
     },
-    getRunPrp: function()
+
+    /*getRunPrp: function()
     {
         return this.TxtPrp;
     },
@@ -177,7 +183,8 @@ CMathText.prototype =
     getOwnTPrp: function()
     {
         return this.textPrp;
-    },
+    },*/
+
     // ascent = Symbol.Ascent // = Placeholder.Ascent (= Placeholder.Height)
     // descent = FontAscent - Placeholder.Height (FontAscent = FontHeight - FontDescent)
 
@@ -187,14 +194,14 @@ CMathText.prototype =
     // gap = FontHeight - FontDescent - Placeholder.Height + FontDescent
     recalculateSize: function()
     {
-        var txtPrp = new CMathTextPrp();
+        /*var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
         txtPrp.Italic = false;
 
-        g_oTextMeasurer.SetFont( txtPrp );
+        g_oTextMeasurer.SetFont( txtPrp );*/
 
         var letter = this.getCode();
-		//var letter = this.value;
+
         var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
         var _width = metricsTxt.Width;
 
@@ -266,12 +273,12 @@ CMathText.prototype =
     },
     draw: function(pGraphics)
     {
-        var txtPrp = new CMathTextPrp();
+        /*var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
-        txtPrp.Italic = false;
+        txtPrp.Italic = false;*/
 
-        pGraphics.b_color1(0,0,0,255);
-        pGraphics.SetFont(txtPrp);
+        //pGraphics.b_color1(0,0,0,255);
+        //pGraphics.SetFont(txtPrp);
 
         var X = this.pos.x ,
             Y = this.pos.y;
@@ -314,7 +321,7 @@ CMathText.prototype =
 		//pGraphics.FillTextCode(xx, yy , this.value);
 
     },
-    setPosition: function( pos )
+    setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x, y: pos.y };
@@ -380,6 +387,10 @@ CMathText.prototype =
     setJustDraw: function(bJustDraw)
     {
         this.bJDraw = bJustDraw;
+    },
+    setMText: function(flag)
+    {
+        this.bMText = flag;
     }
 
     /*draw2: function()

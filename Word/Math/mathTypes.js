@@ -116,7 +116,7 @@ var BASEJC_BOTTOM               =  2;
 
 var MATH_TEXT                   =  0;
 var MATH_RUN_PRP                =  1;
-var MATH_OBJS                   =  2;
+var MATH_COMP                   =  2;
 var MATH_EMPTY                  =  3;
 var MATH_PLACEHOLDER            =  4;
 

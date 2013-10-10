@@ -1,5 +1,6 @@
 function CMathBase()
 {
+    this.typeObj = MATH_COMP;
     // {align: {height: alpha, width: betta}}  alpha & betta коэффициенты в интервале от 0 до 1, либо CENTER
 
     CENTER = -1;
@@ -18,15 +19,19 @@ function CMathBase()
 
     this.Parent = null;
     this.Composition = null; // ссылка на общую формулу
+    /*this.TxtPrp = new CMathTextPrp();
+    this.OwnTPrp = new CMathTextPrp();*/
 
-    this.TxtPrp = new CMathTextPrp();
-    this.OwnTPrp = new CMathTextPrp();
+    this.CtrPrp =
+    {
+        RunPrp:     null
+    };
 
     //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
     //this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
 
-    //todo
-    //переделать
+    // todo
+    // убрать !!!
     this.bMObjs = false;
 
     this.elements = null;
@@ -42,7 +47,6 @@ function CMathBase()
 
     return this;
 }
-
 CMathBase.prototype =
 {
     setContent: function()
@@ -55,10 +59,11 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
             {
                 this.elements[i][j] = new CMathContent();
+                this.elements[i][j].setComposition(this.Composition);
                 this.elements[i][j].relate(this);
                 /*if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setComposition(this.Composition);*/
-                this.elements[i][j].setTxtPrp(this.TxtPrp);
+                //this.elements[i][j].setTxtPrp(this.TxtPrp);
                 //this.elements[i][j].setReduct(this.reduct);
                 //this.elements[i][j].setRunPrp(this.RunPrp);
             }
@@ -79,14 +84,36 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
 
     },
-    old_getTxtPrp: function()
+    setCtrPrp: function(props)
+    {
+        this.CtrPrp.RunPrp = props.RunPrp; // only runPrp for paragraph
+    },
+    getCtrPrp: function()
+    {
+        var ctrPrp = new CTextPr();
+        ctrPrp.Merge(this.CtrPrp.RunPrp);
+        return ctrPrp;
+    },
+    getPrpToControlLetter: function()
+    {
+        var rPrp = new CTextPr();
+        rPrp.Merge(DEFAULT_RUN_PRP);
+        this.getCtrPrp();
+        ctrPrp.Merge( this.Composition.GetFirstPrp() );
+
+        return ctrPrp;
+    },
+    setComposition: function(composition)
+    {
+        this.Composition = composition;
+    },
+    /*old_getTxtPrp: function()
     {
         var txtPrp = new CMathTextPrp();
         Common_CopyObj2(txtPrp, this.Composition.TxtPrp);
 
         txtPrp.Merge(this.textPrp);
 
-        //txtPrp.FontSize *= this.reduct;
 
         return txtPrp;
     },
@@ -96,14 +123,10 @@ CMathBase.prototype =
         txtPrp.Merge(this.TxtPrp);
         txtPrp.Merge(this.OwnTPrp);
 
-        /*if( typeof(txtPrp.FontSize) !== "undefined" )
-            txtPrp.FontSize *= this.reduct;*/
-
         return txtPrp ;
     },
     setTxtPrp: function(txtPrp)
     {
-        //this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
 
         var tPrp = this.getTxtPrp();
@@ -138,6 +161,16 @@ CMathBase.prototype =
         this.RunPrp.Merge(txtPrp);
         this.setTxtPrp(txtPrp);
     },
+    old_setReduct: function(coeff)
+    {
+        this.reduct = this.reduct*coeff;
+        for(var i=0; i < this.nRow; i++)
+        for(var j = 0; j < this.nCol; j++)
+        {
+            if(! this.elements[i][j].IsJustDraw() )
+            this.elements[i][j].setReduct(coeff);
+        }
+     },*/
     fillPlaceholders: function()
     {
          for(var i=0; i < this.nRow; i++)
@@ -145,24 +178,14 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                  this.elements[i][j].fillPlaceholders();
     },
-    old_setReduct: function(coeff)
-    {
-        this.reduct = this.reduct*coeff;
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-            {
-                if(! this.elements[i][j].IsJustDraw() )
-                    this.elements[i][j].setReduct(coeff);
-            }
-    },
     setReduct: function(coeff)
     {
         this.reduct = this.reduct*coeff;
     },
-    getReduct: function()
+    /*getReduct: function()
     {
         return this.reduct;
-    },
+    },*/
     addMCToContent: function()
     {
         if(arguments.length == this.nRow*this.nCol)
@@ -175,17 +198,17 @@ CMathBase.prototype =
                 {
                     this.elements[i][j] = arguments[j + i*this.nCol];
                     this.elements[i][j].relate(this);
+                    this.elements[i][j].setComposition(this.Composition);
                     /*if( !this.elements[i][j].IsJustDraw())
                         this.elements[i][j].setComposition(this.Composition);*/
-                    this.elements[i][j].setTxtPrp(this.getTxtPrp());
+                    //this.elements[i][j].setTxtPrp(this.getTxtPrp());
                     this.elements[i][j].bMObjs = true;
                 }
             }
         }
         else
         {
-            this.init();
-            this.fillPlaceholders();
+            this.setContent();
         }
     },
     relate: function(parent)
@@ -915,38 +938,5 @@ CMathBase.prototype =
 
         var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
         return content;
-    },
-    old_setTxtPrp: function(txtPrp)
-    {
-        for(var i=0; i < this.nRow; i++)
-            for(var j = 0; j < this.nCol; j++)
-                if(!this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].setTxtPrp(txtPrp);
-    },
-    old_getRealPosition: function(type)
-    {
-        var pos = this.elements[this.CurPos_X][this.CurPos_Y].getRealPosition(type);
-
-        var align = this.align(this.CurPos_X, this.CurPos_Y);
-        pos.X += align.x;
-        pos.Y += align.y;
-
-        var WH = this.getWidthsHeights();
-
-        for(var j = 0; j < this.CurPos_X; j++)
-            pos.Y += WH.heights[j];
-
-        for(var i = 0; i < this.CurPos_Y; i++)
-            pos.X += WH.widths[i];
-
-        var txtW = this.TxtPrp.FontSize*g_dKoef_pt_to_mm*0.01;
-
-        if(this.CurPos_X > 0)
-            pos.Y += txtW;
-
-        if(this.CurPos_Y > 0)
-            pos.X += txtW;
-
-        return pos;
     }
 }
