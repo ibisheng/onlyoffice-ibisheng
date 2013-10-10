@@ -288,6 +288,12 @@ CGrState.prototype =
                             var _r = _c[j].Rect;
                             //this.Parent.AddClipRect(_r.x, _r.y, _r.w, _r.h);
 
+                            var _restoreDumpedVectors = null;
+                            if (this.Parent.private_removeVectors !== undefined)
+                            {
+                                _restoreDumpedVectors = this.Parent.private_removeVectors();
+                            }
+
                             this.Parent.StartClipPath();
 
                             this.Parent._s();
@@ -298,6 +304,9 @@ CGrState.prototype =
                             this.Parent._l(_r.x, _r.y);
 
                             this.Parent.EndClipPath();
+
+                            if (null != _restoreDumpedVectors)
+                                this.Parent.private_restoreVectors(_restoreDumpedVectors);
                         }
                     }
                 }
@@ -2032,5 +2041,29 @@ CDocumentRenderer.prototype =
     DrawPresentationComment : function(type, x, y, w, h)
     {
 
+    },
+
+    private_removeVectors : function()
+    {
+        var _ret = this.VectorMemoryForPrint;
+
+        if (_ret != null)
+        {
+            this.VectorMemoryForPrint = null;
+            if (0 != this.m_lPagesCount)
+                this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = null;
+        }
+
+        return _ret;
+    },
+
+    private_restoreVectors : function(_vectors)
+    {
+        if (null != _vectors)
+        {
+            this.VectorMemoryForPrint = _vectors;
+            if (0 != this.m_lPagesCount)
+                this.m_arrayPages[this.m_lPagesCount - 1].VectorMemoryForPrint = _vectors;
+        }
     }
 };
