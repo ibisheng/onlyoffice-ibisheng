@@ -1,15 +1,15 @@
 
 var CLASS_TYPE_CHART_DATA = 9999;
-function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
+function CChartAsGroup(parent)
 {
     this.document = document;
-    this.group = isRealObject(group) ? group : null;
+    this.group = null;
 
     this.chartTitle = null;
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    this.chart = new asc_CChart();
+    //this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -52,6 +52,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     if(isRealObject(parent))
     {
         this.setParent(parent);
+        this.setAscChart(new asc_CChart());
     }
 }
 
@@ -69,6 +70,11 @@ CChartAsGroup.prototype =
     asc_getChart: function()
     {
         return this.chart;
+    },
+
+    setAscChart: function(chart)
+    {
+        this.chart = chart;
     },
 
 
@@ -1468,14 +1474,19 @@ CChartAsGroup.prototype =
             {
                 var title_str = "Y Axis";
                 this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+                var body_pr = new CBodyPr();
+                body_pr.vert = nVertTTvert270;
+                this.vAxisTitle.setBodyPr(body_pr);
 
                 for(var i in title_str)
                     this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
             }
             else
             {
-                this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+                var body_pr = new CBodyPr();
+                body_pr.merge(this.vAxisTitle.txBody.bodyPr);
+                body_pr.vert = nVertTTvert270;
+                this.vAxisTitle.setBodyPr(body_pr);
                 var content = this.vAxisTitle.txBody.content;
                 content.Parent = this.vAxisTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oDrawingDocument;
@@ -2167,7 +2178,8 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
-        this.chart.Read_FromBinary2(r);
+        this.setAscChart(new asc_CChart());
+        this.chart.Read_FromBinary2(r, true);
         this.spPr.Read_FromBinary2(r);
         this.init();
         this.recalculate();

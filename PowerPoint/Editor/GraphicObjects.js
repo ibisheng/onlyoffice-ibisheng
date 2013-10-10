@@ -1551,6 +1551,7 @@ CGraphicObjects.prototype = {
         }
 
         var ret = new CChartAsGroup();
+        ret.setAscChart(new asc_CChart());
         var options = {};
         options.slide =  this.slide;
         options.layout = this.slide.Layout;
@@ -1561,8 +1562,8 @@ CGraphicObjects.prototype = {
         ret.chart.initDefault();
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;
-        ret.spPr.xfrm.extX = this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
-        ret.spPr.xfrm.extY = 0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
+        ret.spPr.xfrm.extX = editor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);//this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
+        ret.spPr.xfrm.extY = editor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);//0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
         return ret;
     },
 

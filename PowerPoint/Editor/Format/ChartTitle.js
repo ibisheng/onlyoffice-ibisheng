@@ -56,6 +56,14 @@ CChartTitle.prototype =
         return this.Id;
     },
 
+    Write_ToBinary2: function(w)
+    {
+
+    },
+
+    Read_FromBinary2: function(r)
+    {},
+
     getTitleType: function()
     {
         if(this === this.chartGroup.chartTitle)

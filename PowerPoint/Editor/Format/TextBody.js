@@ -216,6 +216,11 @@ CTextBody.prototype =
         }
     },
 
+    isEmpty: function()
+    {
+        return this.content.Is_Empty();
+    },
+
     calculateContent: function()
     {
         var parent_object = this.shape.getParentObjects();
