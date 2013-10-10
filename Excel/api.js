@@ -145,6 +145,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Использовать ли обрезанные шрифты
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 			
+			this.isTrackingEnable = false;
+			this.TrackingInterval = 300 * 1000;
+			
 			var oThis = this;
 			if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
 				//var element = document.body;
@@ -862,7 +865,37 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					},
 					dataType: "text"});
 			},
+			
+			_asc_sendTrack: function (callback, rdata) {
+				var oThis = this;
+				asc_ajax({
+					type: 'POST',
+					url: g_sTrackingServiceLocalUrl,
+					data: rdata,
+					error: function(jqXHR, textStatus, errorThrown){
+						var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+						if(callback)
+							callback(result);
+					},
+					success: function(msg){
+						var result;
+						if(!msg || msg.length < 1){
+							result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+							if(callback)
+								callback(result);
+							return;
+						}
+						else{
+							var incomeObject = JSON.parse(msg);
 
+							if(callback)
+								callback(incomeObject);
+						}
+					},
+					dataType: "text"});
+			},
+			
+			
 			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
 				if ( this.chartEditor ) {
 				} else if (!this.documentId || !this.documentUrl) {
@@ -1181,7 +1214,40 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					
 					var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 					
-					this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);	
+					this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
+												
+					if(undefined != oSettings['isTrackingEnable'] &&
+						null != oSettings['isTrackingEnable'])
+						this.isTrackingEnable = oSettings['isTrackingEnable'];
+			
+					if(undefined != oSettings['TrackingInterval'] &&
+						null != oSettings['TrackingInterval'])
+						this.TrackingInterval = oSettings['TrackingInterval'] * 1000;
+			
+					this._startTracking();
+				}
+			},
+
+			//Посылаем трек, и инициализируем таймер для его последующей отправки.
+			_startTracking: function() {
+				var oThis = this;
+				
+				if(oThis.isTrackingEnable){
+					var rData = {
+						"docId": oThis.DocInfo.Id, 
+						"clientId": oThis.DocInfo.UserId,
+						"isAlive": 1
+					};
+					
+					var _OnTrackingTimer = function(){
+						oThis._startTracking();
+					};
+			
+					var _OnSendTrack = function(){
+						setTimeout(_OnTrackingTimer, oThis.TrackingInterval);
+					};
+						
+					oThis._asc_sendTrack(_OnSendTrack, JSON.stringify(rData));
 				}
 			},
 
