@@ -3411,6 +3411,23 @@ Paragraph.prototype =
 
                         var Page_Abs = this.Get_StartPage_Absolute() + CurPage;
                         this.DrawingDocument.UpdateTarget( _X, TargetY, Page_Abs );
+
+                        // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
+                        //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
+                        //       такой вариант будет смотреться плохо.
+                        if ( undefined != this.Get_FramePr() )
+                        {
+                            var __Y0 = TargetY, __Y1 = TargetY + Height;
+                            var ___Y0 = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                            var ___Y1 = this.Pages[CurPage].Y + this.Lines[CurLine].Bottom;
+
+                            var __Y0 = Math.max( __Y0, ___Y0 );
+                            var __Y1 = Math.min( __Y1, ___Y1 );
+
+                            this.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                            this.DrawingDocument.UpdateTarget( _X, __Y0, Page_Abs );
+                        }
+
                     }
                 }
 
