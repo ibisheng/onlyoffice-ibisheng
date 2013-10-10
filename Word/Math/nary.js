@@ -13,24 +13,34 @@
 
 function CNary()
 {
+    this.supHide = false;
+    this.subHide = false;
+    this.limLoc = NARY_SubSup;
     CSubMathBase.call(this);
 }
 extend(CNary, CSubMathBase);
 CNary.prototype.init = function(props)
 {
-    if(props.limLoc == "undOvr" || props.limLocType == NARY_UndOvr)
-        this.limLoc = 0;
-    else if(props.limLoc === "subSup"|| props.limLocType == NARY_SubSup)
-        this.limLoc = 1;
-    else
-        this.limLoc = 1;
+    /*if(props.limLoc == "undOvr" || props.limLocType == NARY_UndOvr)
+     this.limLoc = 0;
+     else if(props.limLoc === "subSup"|| props.limLocType == NARY_SubSup)
+     this.limLoc = 1;
+     else
+     this.limLoc = 1;*/
 
-    this.supHide = (props.supHide === "1" || props.supHide === true) ? true : false;
-    this.subHide = (props.subHide === "1" || props.subHide === true) ? true : false;
+    if(props.limLoc == NARY_UndOvr)
+        this.limLoc = NARY_UndOvr;
+    else if(props.limLoc  == NARY_SubSup)
+        this.limLoc = NARY_SubSup;
+
+    if(props.supHide === true || props.supHide === 1)
+        this.supHide = true;
+
+    if(props.subHide === true || props.subHide === 1)
+        this.subHide = true;
 
     this.setDimension(1, 2);
 
-    
     var signChr, sign;
 
     if(typeof(props.chr) === "string")
