@@ -686,7 +686,7 @@
 								//при добавлении общего фильтра проверка на пустой диапазон
 								if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells))
 								{
-									//TODO add alert error
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 									return;
 								};
 								result = [];
@@ -753,7 +753,7 @@
 									}
 									else
 									{
-										ws._trigger ("onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 										History.EndTransaction();
 										return false;
 									}
@@ -766,7 +766,7 @@
 								//при добавлении общего фильтра проверка на пустой диапазон
 								if(paramsForCallBackAdd == "addAutoFilterManyCells" && t._isEmptyRange(activeCells))
 								{
-									//TODO add alert error
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 									return;
 								};
 								var n = 0;
@@ -878,7 +878,7 @@
 					var changesElemHistory = null;
 					if(apocal == 'error')
 					{
-						ws._trigger ("onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
+						ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					else if(apocal && apocal.changeStyle)
