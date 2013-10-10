@@ -2848,7 +2848,11 @@ function CBinaryFileWriter()
 
         group.spPr.WriteXfrm = group.spPr.xfrm;
 
+        var _old_ph = group.nvGrpSpPr.nvPr.ph;
+        group.nvGrpSpPr.nvPr.ph = null;
         oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
+        group.nvGrpSpPr.nvPr.ph = _old_ph;
+
         oThis.WriteRecord1(1, group.spPr, oThis.WriteGrpSpPr);
 
         group.spPr.WriteXfrm = null;
