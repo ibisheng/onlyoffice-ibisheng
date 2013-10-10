@@ -5144,6 +5144,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 1 );
 
                 this.Internal_ReIndexing(Data.Pos);
+                this.Recalc_CompliedPr2();
 
                 break;
             }
@@ -5155,6 +5156,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 0, Data.Item.RowsInfo );
 
                 this.Internal_ReIndexing(Data.Pos);
+                this.Recalc_CompliedPr2();
 
                 break;
             }
@@ -5214,7 +5216,7 @@ CTable.prototype =
                 else
                     this.Pr.TableStyleColBandSize = Data.Old;
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -5225,7 +5227,7 @@ CTable.prototype =
                 else
                     this.Pr.TableStyleRowBandSize = Data.Old;
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -9523,6 +9525,25 @@ CTable.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
+    Recalc_CompliedPr2 : function()
+    {
+        this.Recalc_CompiledPr();
+
+        var RowsCount = this.Content.length;
+        for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            Row.Recalc_CompiledPr();
+
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            {
+                var Cell = Row.Get_Cell( CurCell );
+                Cell.Recalc_CompiledPr();
+            }
+        }
+    },
+
     // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
     Get_CompiledPr : function(bCopy)
     {
@@ -11028,6 +11049,7 @@ CTable.prototype =
             }
         }
 
+        this.Recalc_CompliedPr2();
         this.Internal_Recalculate_1();
     },
 
@@ -11132,6 +11154,8 @@ CTable.prototype =
         this.Markup.Internal.RowIndex  = CurRow;
         this.Markup.Internal.CellIndex = 0;
         this.Markup.Internal.PageNum   = PageNum;
+
+        this.Recalc_CompliedPr2();
 
         this.Internal_Recalculate_1();
 
