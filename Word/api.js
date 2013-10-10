@@ -620,7 +620,7 @@ function asc_docs_api(name)
 		window.addEventListener("message", function(){
 			oThis.OnHandleMessage.apply(oThis, arguments);
 		}, false);
-	if (window.FileReader !== undefined && window.FormData !== undefined) {
+	if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
 		//var element = document.body;
 		var element = document.getElementById(this.HtmlElementName);
 		if(null != element)

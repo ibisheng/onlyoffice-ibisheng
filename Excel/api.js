@@ -146,7 +146,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 			
 			var oThis = this;
-			if (window.FileReader !== undefined && window.FormData !== undefined) {
+			if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
 				//var element = document.body;
 				var element = document.getElementById(this.HtmlElementName);
 				if(null != element)
