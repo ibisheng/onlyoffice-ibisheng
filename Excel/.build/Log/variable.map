@@ -1756,7 +1756,7 @@ CCellStyles:VL
 FT_ENCODING_NONE:Hw
 tt_face_load_maxp:co
 T1_Set_MM_Design:Vv
-JSCompiler_StaticMethods_setRowHeight:Gh
+JSCompiler_StaticMethods_setRowHeight:Ch
 c_oSer_CalcChainType$Array:jF
 tt_face_free_charmap_stub:Pp
 Binary_TableReader:QK
@@ -1996,7 +1996,7 @@ c_oAscServerError$VKeyKeyExpire:ob
 styletype_Numbering:J4
 SplineBezierState33:b3
 DrawScatterChart:ve
-JSCompiler_StaticMethods_setColWidth:Fh
+JSCompiler_StaticMethods_setColWidth:Bh
 JSCompiler_StaticMethods_Set_Ind:$6
 CHist_Clip:fy
 T1_GlyphSlot_Done:Kv
@@ -2190,7 +2190,7 @@ GenerateDefaultColorMap:we
 c_oAscCoAuthoringDottedDistance:TR
 CalculateCnxLst:nY
 gray_hline:Aq
-para_Tab:fi
+para_Tab:bi
 JSCompiler_StaticMethods_Get_Default_ParaList:S4
 c_oSer_DrawingType$Pic:wL
 TT_DefRecord:br
@@ -2739,7 +2739,7 @@ g_oUndoRedoCol:gM
 JSCompiler_StaticMethods_RedoPrepare:mO
 L 150:Eg
 JSCompiler_StaticMethods_RedoEnd:sO
-L 151:Gi
+L 151:Hi
 L 152:as
 L 153:bs
 JSCompiler_StaticMethods_buildDependency:UN
@@ -2808,7 +2808,7 @@ ft_sid_names:Ll
 T1_Decoder_ZoneRec:Dn
 L 102:Te
 L 101:Se
-L 100:ei
+L 100:fi
 c_oAscAsyncAction$Recalc:DN
 CColorModifiers:KT
 normalizeRotate:i1
@@ -2817,22 +2817,22 @@ Binary_StylesTableReader:ZK
 ShapeForResizeInGroup:g8
 ret$$inline_648:Pn
 ChangeAdjInGroupState:W2
-L 111:Dh
+L 111:Fh
 L 110:qk
 L 113:zf
 bIsSupportOriginalFormatFonts:rx
-L 112:Eh
+L 112:Gh
 L 103:Jc
 L 104:pd
 CAutoshapeTrack:Bg
-L 105:Bh
+L 105:Dh
 L 106:cg
 CLegendEntryGroup:Z7
-L 107:Ch
+L 107:Eh
 OpenColor:XK
-L 108:hh
+L 108:ih
 Col:rL
-L 109:ih
+L 109:jh
 cErrorType$division_by_zero:pA
 FT_Service_PsFontNameRec:Mi
 vertalign_SubScript:bS
@@ -3112,7 +3112,7 @@ L 48:Eb
 L 45:Vb
 L 44:Db
 L 47:tb
-L 46:bi
+L 46:ci
 L 41:Cb
 L 40:bc
 ft_bitmap_glyph_init:Gj
@@ -3243,12 +3243,12 @@ TT_Face:Ns
 L 73:Mn
 JSCompiler_StaticMethods__moveCellVer:lP
 L 74:ok
-L 75:eh
+L 75:gh
 Int64:xj
 L 76:Nn
 JSCompiler_StaticMethods_rebuildSeries:ff
 _ph_summ__sec_head:SW
-L 77:gh
+L 77:hh
 L 78:Re
 t1_args_count:pn
 L 79:nb
@@ -3277,7 +3277,7 @@ L 69:sg
 Ins_MSIRP:ls
 L 66:gc
 L 67:$a
-c_oAscInsertOptions$InsertRows:jh
+c_oAscInsertOptions$InsertRows:eh
 JSCompiler_StaticMethods_addSlaveEdge:mN
 JSCompiler_StaticMethods_Internal_Get_ClearPos:x6
 RotateTrackGroup:x3
@@ -3294,7 +3294,7 @@ L 98:Rf
 c_oSer_ChartCatAxType$Title:z_
 c_oSerWorksheetColTypes$Width:kE
 STATES_ID_PRE_RESIZE:L1
-ParaPresentationNumbering:Hi
+ParaPresentationNumbering:Gi
 SPH_ScaleRule:Yq
 EHorizontalAlignment$horizontalalignmentCenter:mJ
 JSCompiler_StaticMethods_setFgColor:tU
@@ -3313,7 +3313,7 @@ c_oSerStylesTypes$Border:aC
 L 88:xf
 JSCompiler_StaticMethods_deleteAllSlaveEdges:oN
 L 89:Xd
-L 86:di
+L 86:ei
 CHART_TITLE_TYPE_V_AXIS:h1
 L 87:Jd
 L 84:Zc
@@ -3330,5 +3330,5 @@ c_oSerPropLenType$Byte:mK
 L 81:ne
 CGeometry:wV
 tt_cmap2_get_subheader:Ko
-L 80:ci
+L 80:di
 JSCompiler_StaticMethods_getStyleNameByXfId:YL
