@@ -545,7 +545,7 @@ CSign.prototype.setSign = function(props)
     }
     else
     {
-        this.type = MATH_TEXT;
+        this.type = ACCENT_TEXT;
         this.sign.add(sign.code);
     }
 }

@@ -17,8 +17,8 @@ function CGlyphOperator()
 
     this.penW = 1; // px
 
-    this.TxtPrp = new CMathTextPrp();
-    this.bGlyph = true;
+    //this.TxtPrp = new CMathTextPrp();
+    //this.bGlyph = true;
 
 }
 CGlyphOperator.prototype.init = function(props)
@@ -3850,9 +3850,9 @@ function CDelimiter()
 extend(CDelimiter, CSubMathBase);
 CDelimiter.prototype.init = function(props)
 {
-    if(props.grow == "1" || props.grow == true)
+    if(props.grow == true || props.grow == 1)
         this.grow = true;
-    else if(props.grow == "0" || props.grow == false)
+    else if(props.grow == false || props.grow == 0)
         this.grow = false;
     else
         this.grow = true;
@@ -3871,9 +3871,9 @@ CDelimiter.prototype.init = function(props)
     this.sepOper.setTxtPrp(tPrp);
     this.endOper.setTxtPrp(tPrp);
 
-    if(props.shape == "match" || props.shapeType == DELIMITER_SHAPE_MATH)
+    if(props.shape == DELIMITER_SHAPE_MATH)
         this.shape = DELIMITER_SHAPE_MATH;
-    else if(props.shape == "centered" || props.shapeType == DELIMITER_SHAPE_CENTERED)
+    else if(props.shape == DELIMITER_SHAPE_CENTERED)
         this.shape = DELIMITER_SHAPE_CENTERED;
     else
         this.shape = DELIMITER_SHAPE_CENTERED;
@@ -4708,14 +4708,14 @@ function CGroupCharacter()
 extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
-    if(props.vertJust === "top" || props.justif == VJUST_TOP)
+    if(props.vertJust === VJUST_TOP)
         this.vertJust = VJUST_TOP;
-    else if(props.vertJust === "bottom"|| props.justif == VJUST_BOT)
+    else if(props.vertJust === VJUST_BOT)
         this.vertJust = VJUST_BOT;
 
-    if(props.pos === "top" || props.location === LOCATION_TOP)
+    if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
         this.loc = LOCATION_TOP;
-    else if(props.pos === "bot" || props.location === LOCATION_BOT)
+    else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
         this.loc = LOCATION_BOT;
 
     var type = props.chrType;
@@ -4727,7 +4727,6 @@ CGroupCharacter.prototype.init = function(props)
         this.setReduct(DEGR_REDUCT);
 
     this.setOperator( new COperator(glyph) );
-
 }
 CGroupCharacter.prototype.getCenter = function()
 {

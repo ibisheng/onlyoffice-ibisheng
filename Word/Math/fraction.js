@@ -7,7 +7,7 @@ function CFraction()
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
-    if( typeof(props.type) !== "undefined" || props.type !== null )
+    if( typeof(props.type) !== "undefined" && props.type !== null )
         this.type = props.type;
     else
         this.type = BAR_FRACTION;

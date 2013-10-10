@@ -20,7 +20,7 @@ function CMathMatrix()
     };
 
     this.plcHide = false;
-    this.baseJc = 0;
+    this.baseJc = BASEJC_CENTER;
     this.gaps =
     {
         row: new Array(),
@@ -40,7 +40,7 @@ CMathMatrix.prototype.init = function(props)
     this.setDimension(props.row, props.column);
     this.setContent();
 
-    if(typeof(props.baseJc) !== "undefined" && props.baseJc !== null)
+    /*if(typeof(props.baseJc) !== "undefined" && props.baseJc !== null)
     {
         if(props.baseJc === "center")
             this.baseJc = MATRIX_CENTER;
@@ -48,7 +48,14 @@ CMathMatrix.prototype.init = function(props)
             this.baseJc = MATRIX_TOP;
         else if(props.baseJc === "bottom")
             this.baseJc = MATRIX_BOTTOM;
-    }
+    }*/
+
+    if(props.baseJc === BASEJC_CENTER)
+        this.baseJc = BASEJC_CENTER;
+    else if(props.baseJc === BASEJC_TOP)
+        this.baseJc = BASEJC_TOP;
+    else if(props.baseJc === BASEJC_BOTTOM)
+        this.baseJc = BASEJC_BOTTOM;
 
     this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
     this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
@@ -184,12 +191,12 @@ CMathMatrix.prototype.recalculateSize = function()
 
     var center = 0;
 
-    if(this.baseJc == 1)
+    if(this.baseJc == BASEJC_TOP)
     {
         for(var j = 0; j < this.nCol; j++)
             center = this.elements[0][j].size.center > center ? this.elements[0][j].size.center : center;
     }
-    else if(this.baseJc == 2)
+    else if(this.baseJc == BASEJC_BOTTOM)
     {
         var descent = 0,
             currDsc;
@@ -358,6 +365,7 @@ CMathMatrix.prototype.addRow = function()
     {
         this.elements[this.nRow-1][j] = new CMathContent();
         this.elements[this.nRow-1][j].relate(this);
+        this.elements[this.nRow-1][j].setComposition(this.Composition);
         this.elements[this.nRow-1][j].setReduct(this.reduct);
         //this.elements[this.nRow-1][j].setComposition(this.Composition);
     }
@@ -460,6 +468,38 @@ function CEqArray()
 extend(CEqArray, CMathMatrix);
 CEqArray.prototype.init = function(props)
 {
+    var Pr =
+    {
+        column:     1,
+        row:        props.row,
+        baseJc:     BASEJC_CENTER,
+        rSpRule:    0,
+        rSp:        0,
+        maxDist:    0,
+        objDist:    0
+
+    }; // default
+
+
+    if(props.rSpRule !== "undefined" && props.rSpRule !== null)
+        Pr.rSpRule = props.rSpRule;
+
+    if(props.rSp !== "undefined" && props.rSp !== null)
+        Pr.rSp = props.rSp;
+
+    if(props.baseJc !== "undefined" && props.baseJc !== null)
+        Pr.baseJc = props.baseJc;
+
+    if(props.maxDist !== "undefined" && props.maxDist !== null)
+        Pr.maxDist = props.maxDist;
+
+    if(props.objDist !== "undefined" && props.objDist !== null)
+        Pr.objDist = props.objDist;
+    
+    CEqArray.superclass.init.call(this, Pr);
+}
+CEqArray.prototype.old_init = function(props)
+{
     var prps =
     {
         column:     1,
@@ -471,4 +511,8 @@ CEqArray.prototype.init = function(props)
     };
 
     CEqArray.superclass.init.call(this, prps);
+}
+CEqArray.prototype.getElement = function(num)
+{
+    return this.elements[num][y];
 }

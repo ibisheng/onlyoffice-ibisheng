@@ -108,9 +108,15 @@ var ACCENT_ARROW_RIGHT          = 15;
 var ACCENT_ARROW_LR             = 16;
 var ACCENT_HALF_ARROW_LEFT      = 17;
 var ACCENT_HALF_ARROW_RIGHT     = 18;
-var MATH_TEXT                   = 19;
+var ACCENT_TEXT                 = 19;
 
+var BASEJC_CENTER               =  0;
+var BASEJC_TOP                  =  1;
+var BASEJC_BOTTOM               =  2;
 
-var MATRIX_CENTER               =  0;
-var MATRIX_TOP                  =  1;
-var MATRIX_BOTTOM               =  2;
+var MATH_TEXT                   =  0;
+var MATH_RUN_PRP                =  1;
+var MATH_OBJS                   =  2;
+var MATH_EMPTY                  =  3;
+var MATH_PLACEHOLDER            =  4;
+

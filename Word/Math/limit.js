@@ -2,12 +2,12 @@
 //var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tan", "ctg", "cosh", "sinh", "tanh", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
 //var Diff = ["dx","dy","dθ"];
 
-function CLogarithm()
+function old_CLogarithm()
 {
     CSubMathBase.call(this,1,2);
 }
-extend(CLogarithm, CSubMathBase);
-CLogarithm.prototype.setContent = function()
+extend(old_CLogarithm, CSubMathBase);
+old_CLogarithm.prototype.setContent = function()
 {
     var oBase = new CMathContent();
     var GParams = Common_CopyObj(this.params);
@@ -31,17 +31,17 @@ CLogarithm.prototype.setContent = function()
     oArg.relate(this);
     oArg.fillPlaceholders();
 
-    CLogarithm.superclass.setContent.call(this, oFunc, oArg);
+    old_CLogarithm.superclass.setContent.call(this, oFunc, oArg);
 }
-CLogarithm.prototype.getFunction = function()
+old_CLogarithm.prototype.getFunction = function()
 {
     return this.elements[0][0].getBase();
 }
-CLogarithm.prototype.getBase = function()
+old_CLogarithm.prototype.getBase = function()
 {
     return this.elements[0][0].getIterator();
 }
-CLogarithm.prototype.getArgument = function()
+old_CLogarithm.prototype.getArgument = function()
 {
     return this.elements[0][1];
 }
@@ -57,7 +57,6 @@ CLimit.prototype.init = function(props)
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();
-
     oBase.setOwnTPrp({Italic: false});
 
     var oIter = new CMathContent();

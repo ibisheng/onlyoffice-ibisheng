@@ -41,7 +41,7 @@ CBorderBox.prototype.init = function(props)
         if(props.strikeV === true || props.strikeV === 1)
             this.bVert = true;
     }
-    
+
     this.setDimension(1, 1);
     this.setContent();
 }
@@ -272,17 +272,14 @@ function CBox()
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
 {
-    if( typeof(props) !== "undefined" && (props !== null) )
-    {
-        if(props.opEmu === true || props.opEmu === 1)
-            this.opEmu = true;
+    if(props.opEmu === true || props.opEmu === 1)
+        this.opEmu = true;
 
-        if(props.diff === true || props.diff === 1)
-            this.diff = true;
+    if(props.diff === true || props.diff === 1)
+        this.diff = true;
 
-        if(props.noBreak === true || props.noBreak === 1)
-            this.noBreak = true;
-    }
+    if(props.noBreak === true || props.noBreak === 1)
+        this.noBreak = true;
 
     this.setDimension(1, 1);
     this.setContent();
@@ -300,9 +297,9 @@ function CBar()
 extend(CBar, CCharacter);
 CBar.prototype.init = function(props)
 {
-    if(props.pos === "top" || props.location === LOCATION_TOP)
+    if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
         this.loc = LOCATION_TOP;
-    else if(props.pos === "bot" || props.location === LOCATION_BOT)
+    else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
         this.loc = LOCATION_BOT;
 
     var glyph = new COperatorLine();
