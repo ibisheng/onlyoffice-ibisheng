@@ -583,7 +583,7 @@ Round_Super:Lr
 g_oDefaultNumAbs:uK
 JSCompiler_StaticMethods_getValueWithFormat:xz
 numbering_presentationnumfrmt_RomanLcPeriod:q5
-c_oSer_ConditionalFormattingRule$Text:XH
+c_oSer_ConditionalFormattingRule$Text:WH
 c_oSer_SortState$ConditionRef:cG
 CLASS_TYPE_GROUP:AO
 CFF_PrivateRec:Ot
