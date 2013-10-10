@@ -5975,6 +5975,7 @@ CPresentation.prototype =
                 this.DrawingDocument.OnRecalculatePage(_array[i], this.Slides[_array[i]]);
             }
             this.DrawingDocument.OnEndRecalculate();
+            this.Document_UpdateInterfaceState();
         }
     },
 
