@@ -11168,6 +11168,8 @@ Paragraph.prototype =
                 var Type = this.Content[Pos].Type;
                 if ( para_Text === Type )
                     break;
+                else if ( para_TextPr === Type )
+                    LastTextPr = this.Content[Pos];
             }
 
             EndPos = Pos + 1;
