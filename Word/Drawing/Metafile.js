@@ -894,6 +894,18 @@ CMetafile.prototype =
             if (0 == _src.indexOf(_search))
                 _src = _src.substring(_search.length);
         }
+        else
+        {
+            if (!window.editor)
+            {
+                var _api = window["Asc"]["editor"];
+                var _mask = g_sResourceServiceLocalUrl + _api.documentId + "/";
+                if (0 == src.indexOf(_mask))
+                {
+                    _src = src.substring(_mask.length);
+                }
+            }
+        }
 
         this.Memory.WriteString(_src);
         this.Memory.WriteByte(CommandType.ctBrushTextureMode);
