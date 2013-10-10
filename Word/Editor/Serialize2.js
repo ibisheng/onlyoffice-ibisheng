@@ -589,7 +589,8 @@ var c_oSer_OMathContentType = {
 	SSup: 49,
 	SSupPr: 50,
 	MText: 51,
-	Count: 52
+	Column: 52,
+	Row: 53
 };
 var c_oSer_OMathArgNodesType = {		
 	Deg: 0,
@@ -5600,6 +5601,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             });
 			oElem.addElementToContent(oDelimiter);
         }	
+		else if (c_oSer_OMathContentType.EqArr === type)
+        {			
+			var oEqArr = new CEqArray();
+            res = this.bcr.Read1(length, function(t, l){				
+                return oThis.ReadMathEqArr(t,l,oEqArr);
+            });
+			oElem.addElementToContent(oEqArr);
+        }
 		else if (c_oSer_OMathContentType.Fraction === type)
         {			
 			var oFraction = new CFraction();
@@ -5615,6 +5624,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadMathFunc(t,l,oFunc);
             });
 			oElem.addElementToContent(oFunc);
+        }
+		else if (c_oSer_OMathContentType.GroupChr === type)
+        {			
+			var oGroupChr = new CGroupCharacter();
+            res = this.bcr.Read1(length, function(t, l){				
+                return oThis.ReadMathGroupChr(t,l,oGroupChr);
+            });
+			oElem.addElementToContent(oGroupChr);
         }
 		else if (c_oSer_OMathContentType.LimLow === type)
         {			
@@ -5762,6 +5779,28 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             });		
         }
         else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathBaseJc = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			var baseJc = this.stream.GetUChar(length);
+			switch (baseJc)
+			{
+				case 0:	props.baseJc = "bottom"; break;
+				case 1:	props.baseJc = "center"; break;
+				case 2:	props.baseJc = "inline"; break;
+				case 3:	props.baseJc = "inside"; break;
+				case 4:	props.baseJc = "outside"; break;
+				case 5:	props.baseJc = "top"; break;
+				default: props.baseJc = "top";
+			}
+        }
+		else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
@@ -5982,18 +6021,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSer_OMathArgNodesType.Element === type)
         {			
-			var lCount = oDelimiter.count;
-			var oElem = oDelimiter.getBase(lCount);
+			var lColumn = oDelimiter.column;
+			var oElem = oDelimiter.getBase(lColumn);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });		
-			oDelimiter.count++;			
+			oDelimiter.column++;			
         }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathLong = function(type, length, props)
+	this.ReadMathColumn = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
 		
@@ -6002,14 +6041,23 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 
         return res;
     };
+	this.ReadMathRow = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+		
+		if(c_oSer_OMathBottomNodesValType.Val == type)
+            props.row = this.stream.GetULongLE();
+
+        return res;
+    };
 	this.ReadMathDelimiterPr = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-		if (c_oSer_OMathContentType.Count === type)
+		if (c_oSer_OMathContentType.Column === type)
         {
 			res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadMathLong(t,l,props);
+                return oThis.ReadMathColumn(t,l,props);
             });	
         }
 		else if (c_oSer_OMathBottomNodesType.BegChr === type)
@@ -6063,6 +6111,82 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
+    };	
+	this.ReadMathEqArr = function(type, length, oEqArr)
+    {		
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;		
+		
+		 if (c_oSer_OMathContentType.EqArrPr === type)
+        {
+			var props = new Object();	
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathEqArrPr(t,l,props);
+            });	
+			oEqArr.init(props);
+        }
+		else if (c_oSer_OMathArgNodesType.Element === type)
+        {			
+			var lRow = oEqArr.row;
+			var oElem = oEqArr.getElement(lRow);
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathArg(t,l,oElem);
+            });		
+			oEqArr.row++;
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathEqArrPr = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathContentType.Row === type)
+        {
+			res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathRow(t,l,props);
+            });	
+        }
+		else if (c_oSer_OMathBottomNodesType.BaseJc === type)
+        {
+			res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathBaseJc(t,l,props);
+            });	
+        }		
+		else if (c_oSer_OMathContentType.CtrlPr === type)
+        {
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathCtrlPr(t,l,props);
+            });	           	
+        }
+		else if (c_oSer_OMathBottomNodesType.MaxDist === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathMaxDist(t,l,props);
+            });			
+        }
+		else if (c_oSer_OMathBottomNodesType.ObjDist === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathObjDist(t,l,props);
+            });			
+        }
+		else if (c_oSer_OMathBottomNodesType.RSp === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathRSp(t,l,props);
+            });			
+        }
+		else if (c_oSer_OMathBottomNodesType.RSpRule === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathRSpRule(t,l,props);
+            });			
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
     };
 	this.ReadMathEndChr = function(type, length, props)
     {
@@ -6073,6 +6197,62 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			props.endChr = this.stream.GetString2LE(length);
         }
 		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathGroupChr = function(type, length, oGroupChr)
+    {		
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;		
+		
+		 if (c_oSer_OMathContentType.GroupChrPr === type)
+        {
+			var props = new Object();	
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathGroupChrPr(t,l,props);
+            });	
+			oGroupChr.init(props);
+        }
+		else if (c_oSer_OMathArgNodesType.Element === type)
+        {			
+			var oElem = oGroupChr.getArgument(lRow);
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathArg(t,l,oElem);
+            });		
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathGroupChrPr = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesType.Chr === type)
+        {
+			res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathChr(t,l,props);
+            });	
+        }	
+		else if (c_oSer_OMathContentType.CtrlPr === type)
+        {
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathCtrlPr(t,l,props);
+            });	           	
+        }
+		else if (c_oSer_OMathBottomNodesType.Pos === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathPos(t,l,props);
+            });			
+        }
+		else if (c_oSer_OMathBottomNodesType.VertJc === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathVertJc(t,l,props);
+            });			
+        }
+        else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
@@ -6352,6 +6532,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadMathMaxDist = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			props.maxDist = this.stream.GetBool();
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
 	this.ReadMathMRun = function(type, length, oElem)
     {
         var res = c_oSerConstants.ReadOk;
@@ -6530,6 +6722,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadMathObjDist = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			props.objDist = this.stream.GetBool();
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
 	this.ReadMathOMathPara = function(type, length, oOMathPara)
     {
         var res = c_oSerConstants.ReadOk;
@@ -6586,6 +6790,33 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
+	this.ReadMathRSp = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+		
+		if(c_oSer_OMathBottomNodesValType.Val == type)
+            props.rSp = this.stream.GetULongLE();
+
+        return res;
+    };
+	this.ReadMathRSpRule = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			var rSpRule = this.stream.GetUChar(length);
+			switch (rSpRule)
+			{
+				case 0:	props.rSpRule = "centered"; break;
+				case 1:	props.rSpRule = "match"; break;
+				default: props.rSpRule = "centered";
+			}
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
 	this.ReadMathScr = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
@@ -6626,13 +6857,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var oThis = this;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
-			props.shape
-			var pos = this.stream.GetUChar(length);
-			switch (pos)
+			var shp = this.stream.GetUChar(length);
+			switch (shp)
 			{
-				case 0:	props.shape = "centered"; break;
-				case 1:	props.shape = "match"; break;
-				default: props.shape = "centered";
+				case 0:	props.shp = "centered"; break;
+				case 1:	props.shp = "match"; break;
+				default: props.shp = "centered";
 			}
         }
 		else
@@ -6945,6 +7175,24 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				case 2:	props.type = NO_BAR_FRACTION; break;
 				case 3:	props.type = SKEWED_FRACTION; break;
 				default: props.type = BAR_FRACTION;
+			}
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathVertJc = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			var vertJc = this.stream.GetUChar(length);
+			switch (vertJc)
+			{
+				case 0:	props.vertJc = "bot"; break;
+				case 1:	props.vertJc = "top"; break;
+				default: props.vertJc = "bot";
 			}
         }
 		else
