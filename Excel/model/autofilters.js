@@ -4703,15 +4703,16 @@
 									{
 										for(var s = 0; s < val; s++)
 										{
-											var range2 = this._idToRange(newResult[l].id);
+											var range2 = this._idToRange(newResult[0].id);
 											if(s != 0)
 												l = l + 1;
-											var newNameColumn = this._generateColumnName(filter.TableColumns, startCell - 1);
+											var tempArray = newTableColumn.concat(filter.TableColumns);
+											var newNameColumn = this._generateColumnName(tempArray, startCell - 1);
 											newTableColumn[l] = 
 											{	
 												Name: newNameColumn
 											};
-											ws.model.getCell(new CellAddress(range2.r1,range2.c1 + s,0)).setValue(newNameColumn);
+											ws.model.getCell(new CellAddress(range2.r1,range2.c1 + l,0)).setValue(newNameColumn);
 										}
 									}
 									else
