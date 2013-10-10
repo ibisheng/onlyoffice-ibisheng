@@ -1257,6 +1257,7 @@ CPresentation.prototype =
     {
         this.Slides[this.CurPage].graphicObjects.Add_FlowImage(W, H, Img);
         this.Recalculate();
+        editor.sync_EndAddShape();
     },
 
     addChart: function(binary)
