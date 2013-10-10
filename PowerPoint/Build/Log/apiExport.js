@@ -402,6 +402,7 @@ prop:asc_addChartDrawingObject
 prop:asc_editChartDrawingObject
 prop:asc_getChartPreviews
 prop:sync_closeChartEditor
+prop:_StartTracking
 prop:sync_ContextMenuCallback
 ---
 var:CChatMessage
@@ -447,6 +448,8 @@ prop:get_Y
 var:getURLParameter
 ---
 var:sendCommand
+---
+var:sendTrack
 ---
 var:_downloadAs
 ---
@@ -1537,6 +1540,7 @@ asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
 asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
 asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
+asc_docs_api.prototype['_StartTracking'] = asc_docs_api.prototype._StartTracking;
 asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync_ContextMenuCallback;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
@@ -1576,6 +1580,7 @@ CContextMenuData.prototype['get_X'] = CContextMenuData.prototype.get_X;
 CContextMenuData.prototype['get_Y'] = CContextMenuData.prototype.get_Y;
 window['getURLParameter'] = getURLParameter;
 window['sendCommand'] = sendCommand;
+window['sendTrack'] = sendTrack;
 window['_downloadAs'] = _downloadAs;
 window['_getFullImageSrc'] = _getFullImageSrc;
 window['_mapAscServerErrorToAscError'] = _mapAscServerErrorToAscError;
