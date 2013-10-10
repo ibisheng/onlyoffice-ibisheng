@@ -2020,7 +2020,7 @@
 				var DeleteCellsAndShiftLeft = (val == c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell') ? true : false;;
 				var DeleteCellsAndShiftTop = (val == c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell') ? true : false;;
 				
-				var ws = this.woksheet;
+				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				var autoFilter = aWs.AutoFilter;
@@ -2055,7 +2055,10 @@
 										isExp = true;
 								}
 								if(!isExp)
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
+								}
 							}
 						}
 						else
@@ -2065,26 +2068,38 @@
 							{
 								//если данный фильтр находится справа
 								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
+								}
 							}
 							else if(DeleteCellsAndShiftTop)
 							{
 								//если данный фильтр находится внизу
 								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
+								}
 								
 							}
 							else if(InsertCellsAndShiftRight)
 							{
 								//если данный фильтр находится справа
 								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
+								}
 							}
 							else
 							{
 								//если данный фильтр находится внизу
 								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
+								}
 							}
 						}
 						
@@ -2117,7 +2132,10 @@
 					{
 						//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
 						if(!(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2))
+						{
+							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
 							return false;
+						}	
 					}
 					else
 					{
@@ -2126,13 +2144,19 @@
 						{
 							//если данный фильтр находится справа
 							if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+							{
+								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
 								return false;
+							}	
 						}
 						else
 						{
 							//если данный фильтр находится внизу
 							if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+							{
+								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
 								return false;
+							}	
 							
 						}
 					}

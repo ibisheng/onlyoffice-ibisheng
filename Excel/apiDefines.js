@@ -43,7 +43,9 @@
 		FrmlWrongArgumentRange:		-36,
 		FrmlOperandExpected:		-37,
 		
-		AutoFilterDataRangeError:   -38
+		AutoFilterDataRangeError:           -38,
+		AutoFilterChangeFormatTableError:   -39,
+		AutoFilterChangeError:              -40
 	}
 };
 var c_oAscConfirm = {
