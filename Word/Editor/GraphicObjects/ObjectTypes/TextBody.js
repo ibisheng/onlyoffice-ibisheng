@@ -21,6 +21,8 @@ function CTextBody(shape)
     this.contentHeight = 0;
 
     this.styles = [];
+    this.recalcInfo =
+    {};
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
     if(isRealObject(shape))
