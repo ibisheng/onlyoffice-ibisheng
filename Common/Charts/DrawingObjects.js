@@ -2396,7 +2396,22 @@ function DrawingObjects() {
 	_this.asyncImagesDocumentEndLoaded = null;
 	
 	var wsCellCache = { cols: null, rows: null, isInit: false };	
-	var lastDrawTime = getCurrentTime();
+	
+	// Task timer
+	var aDrawTasks = [];
+	var drawTaskTimerId = null;
+	
+	function drawTaskFunction() {
+	
+		var taskLen = aDrawTasks.length;
+		if ( taskLen ) {
+		
+			//console.log("Task count = " + taskLen);
+			
+			_this.showDrawingObjectsEx(aDrawTasks[taskLen - 1].params[0], aDrawTasks[taskLen - 1].params[1]);
+			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
+		}
+	}
 	
 	//-----------------------------------------------------------------------------------
 	// Create drawing
@@ -2682,6 +2697,8 @@ function DrawingObjects() {
 	
 	_this.init = function(currentSheet) {
 
+		var taskTimerId = setInterval(drawTaskFunction, 5);
+	
 		userId = api.User.asc_getId();
 		documentId = api.documentId;
 		worksheet = currentSheet;
@@ -3217,6 +3234,17 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.showDrawingObjects = function(clearCanvas, printOptions) {
+	
+		var currDate = new Date();
+		var currTime = currDate.getTime();
+		if ( aDrawTasks.length ) {
+			if ( currTime - aDrawTasks[aDrawTasks.length - 1].time < 40 )
+				return;
+		}
+		aDrawTasks.push( { time: currTime, params: [clearCanvas, printOptions] } );
+	}
+	
+	_this.showDrawingObjectsEx = function(clearCanvas, printOptions) {
 
 		/*********** Print Options ***************
 		printOptions : {
@@ -3224,13 +3252,7 @@ function DrawingObjects() {
 			printPagesData
 		}
 		*****************************************/
-				
-		var currentTime = getCurrentTime();
-		if ( currentTime - lastDrawTime < 20 ) {
-			//console.log("Skip showDrawingObjects");
-			return;
-		}
-				
+		
 		if ( drawingCtx ) {
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
@@ -3299,8 +3321,6 @@ function DrawingObjects() {
 				
 			_this.drawWorksheetHeaders();
 		}
-		
-		lastDrawTime = getCurrentTime();
 	}
 
 	_this.getDrawingAreaMetrics = function() {
