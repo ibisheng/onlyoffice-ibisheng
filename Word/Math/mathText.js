@@ -16,6 +16,8 @@ function CMathTextPrp()
     this.FontSize   = undefined;
     this.Bold       = undefined;
     this.Italic     = undefined;
+    this.RFonts     = {};
+    this.Lang       = {};
 }
 CMathTextPrp.prototype =
 {
@@ -321,12 +323,16 @@ CMathText.prototype =
 		//pGraphics.FillTextCode(xx, yy , this.value);
 
     },
-    setPosition: function(pos)
+    old_setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x, y: pos.y };
         else                                    // for symbol only drawing
             this.pos = {x: pos.x , y: pos.y + this.size.center};
+    },
+    setPosition: function(pos)
+    {
+        this.pos = {x: pos.x , y: pos.y};
     },
     setCoeffTransform: function(sx, shx, shy, sy)
     {

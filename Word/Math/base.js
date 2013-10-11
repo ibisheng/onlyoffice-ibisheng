@@ -24,7 +24,7 @@ function CMathBase()
 
     this.CtrPrp =
     {
-        RunPrp:     null
+        RunPrp:     new CTextPr()
     };
 
     //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
@@ -59,8 +59,8 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
             {
                 this.elements[i][j] = new CMathContent();
-                this.elements[i][j].setComposition(this.Composition);
                 this.elements[i][j].relate(this);
+                this.elements[i][j].setComposition(this.Composition);
                 /*if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setComposition(this.Composition);*/
                 //this.elements[i][j].setTxtPrp(this.TxtPrp);
@@ -84,28 +84,37 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
 
     },
-    setCtrPrp: function(props)
+    setCtrPrp: function(runPrp)
     {
-        this.CtrPrp.RunPrp = props.RunPrp; // only runPrp for paragraph
+        this.CtrPrp.RunPrp = runPrp; // only runPrp for paragraph
     },
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
+        ctrPrp.Merge(DEFAULT_RUN_PRP);
         ctrPrp.Merge(this.CtrPrp.RunPrp);
         return ctrPrp;
     },
     getPrpToControlLetter: function()
     {
         var rPrp = new CTextPr();
-        rPrp.Merge(DEFAULT_RUN_PRP);
-        this.getCtrPrp();
-        ctrPrp.Merge( this.Composition.GetFirstPrp() );
+        //rPrp.Merge(DEFAULT_RUN_PRP);
+        rPrp.Merge( this.getCtrPrp() );
+        rPrp.Merge( this.Composition.GetFirstPrp() );
 
-        return ctrPrp;
+        return rPrp;
     },
     setComposition: function(composition)
     {
         this.Composition = composition;
+    },
+    setReferenceComp: function(Comp)
+    {
+        this.Composition = Comp;
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].setReferenceComp(Comp);
     },
     /*old_getTxtPrp: function()
     {
@@ -211,6 +220,7 @@ CMathBase.prototype =
             this.setContent();
         }
     },
+
     relate: function(parent)
     {
         this.Parent = parent;

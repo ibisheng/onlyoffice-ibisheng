@@ -19,7 +19,9 @@ var  DEFAULT_RUN_PRP =
     FontFamily:     {Name  : "Cambria Math", Index : -1 },
     FontSize:       11,
     Italic:         true,
-    Bold:           false
+    Bold:           false,
+    RFonts:         {},
+    Lang:           {}
 };
 var StartTextElement = 0x2B1A; // Cambria Math
 
@@ -108,7 +110,7 @@ function CMathContent()
 
     //this.TxtPrp = new CMathTextPrp();
     //this.OwnTPrp = new CMathTextPrp();
-    //this.Composition = null; // ссылка на общую формулу
+    this.Composition = null; // ссылка на общую формулу
 
     this.reduct     =   1;      // индефикатор для степени (уменьшение размера шрифта)
     this.rInterval =
@@ -452,9 +454,9 @@ CMathContent.prototype =
 
             var ctrPrp = new CTextPr();
 
-            if(this.CurPоs > 1) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
+            if(this.CurPos > 1) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
             {
-
+                ctrPrp = this.getCurrRunPrp();
             }
             else if(!this.bRoot && this.content.length == 1)
             {
@@ -470,6 +472,8 @@ CMathContent.prototype =
             }
 
             mathElem.setCtrPrp(ctrPrp);
+            mathElem.setComposition(this.Composition);
+
 
             this.addToContent(mathElem);
             var empty = new CEmpty();
@@ -497,7 +501,11 @@ CMathContent.prototype =
     {
         var elem = new mathElem(obj);
         if(obj.typeObj === MATH_COMP)
+        {
             obj.relate(this);
+            //obj.setReferenceComp(this.Composition);
+            obj.setComposition(this.Composition);
+        }
 
         /*var runPrp = this.getRunPrp(this.CurPos);
          element.setTxtPrp( runPrp );*/
@@ -543,20 +551,28 @@ CMathContent.prototype =
     {
         var runPrp = new CTextPr();
 
-        if(this.content.lenght > 0)
+        if(this.content.length > 1)
         {
-            for(var i = this.CurPos; i > 0; i--)
+            if( this.IsPlaceholder())
             {
-                var obj = this.content[i].value;
-                if(obj.typeObj == MATH_RUN_PRP)
+                runPrp.Merge(this.Parent.getCtrPrp());
+            }
+            else
+            {
+                for(var i = this.CurPos; i > 0; i--)
                 {
-                    runPrp.Merge(obj.getRunPrp());
-                    break;
-                }
-                else if(obj.typeObj == MATH_COMP)
-                {
-                    runPrp.Merge(obj.getCtrPrp());
-                    break;
+                    var obj = this.content[i].value;
+
+                    if(obj.typeObj == MATH_RUN_PRP)
+                    {
+                        runPrp.Merge(obj.getRunPrp());
+                        break;
+                    }
+                    else if(obj.typeObj == MATH_COMP)
+                    {
+                        runPrp.Merge(obj.getCtrPrp());
+                        break;
+                    }
                 }
             }
         }
@@ -2473,7 +2489,7 @@ CMathContent.prototype =
                 {
                     chrType:        BRACKET_CURLY_TOP,
                     location:       LOCATION_TOP,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 delim.init(props);
                 delim.fillPlaceholders();
@@ -2483,7 +2499,7 @@ CMathContent.prototype =
                 var props =
                 {
                     location:       LOCATION_BOT,
-                    vertJust:       VJUST_TOP
+                    vertJc:       VJUST_TOP
                 };
                 delim.init(props);
                 delim.fillPlaceholders();
@@ -2504,7 +2520,7 @@ CMathContent.prototype =
                 {
                     chrType:        BRACKET_CURLY_TOP,
                     location:       LOCATION_TOP,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 grCh.init(props2);
                 grCh.fillPlaceholders();
@@ -2525,7 +2541,7 @@ CMathContent.prototype =
                 {
                     chrType:        BRACKET_CURLY_BOTTOM,
                     location:       LOCATION_BOT,
-                    vertJust:       VJUST_TOP
+                    vertJc:       VJUST_TOP
                 };
                 grCh.init(props2);
                 grCh.fillPlaceholders();
@@ -2906,7 +2922,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_LEFT,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -2923,7 +2939,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -2967,7 +2983,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_LEFT_ARROW,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -2984,7 +3000,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_RIGHT_ARROW,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3018,7 +3034,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_LR,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3052,7 +3068,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_ARROW_LR,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3069,7 +3085,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 var base = arrow.getBase();
@@ -3087,7 +3103,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJust:       VJUST_BOT
+                    vertJc:       VJUST_BOT
                 };
                 arrow.init(props);
                 var base = arrow.getBase();
@@ -4065,7 +4081,6 @@ CMathContent.prototype =
             width += oSize.width + gps.left + gps.right;
             if(type == MATH_COMP)
             {
-                width += oSize.width + gps.left + gps.right;
                 ascent = ascent > oSize.center ? ascent : oSize.center;
                 descent =  descent < ( oSize.height - oSize.center + gps.bottom) ? (oSize.height - oSize.center + gps.bottom ) : descent;
             }
@@ -4160,11 +4175,30 @@ CMathContent.prototype =
                 {
                     pGraphics.b_color1(0,0,0,255);
 
-                    var rPrp = this.content[i].value.getRunPrp();
+                    var rPrp = new CMathTextPrp();
+                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge( this.content[i].value.getRunPrp() );
+
                     var ital = rPrp.Italic;
                     rPrp.Italic = false;
                     pGraphics.SetFont(rPrp);
                     rPrp.Italic = ital;
+                }
+                else if(this.content[i].value.typeObj == MATH_PLACEHOLDER)
+                {
+                    pGraphics.b_color1(0,0,0,255);
+
+                    var ctrPrp = this.Parent.getCtrPrp();
+
+                    var rPrp = new CMathTextPrp();
+                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(ctrPrp);
+                    //var ital = rPrp.Italic;
+                    rPrp.Italic = false;
+                    pGraphics.SetFont(rPrp);
+                    //rPrp.Italic = ital;
+
+                    this.content[i].value.draw(pGraphics);
                 }
                 else
                     this.content[i].value.draw(pGraphics);
@@ -4466,7 +4500,7 @@ CMathContent.prototype =
 
         var items = null;
 
-        if(!bSelect && bMEDirect)
+        if(!bSelect && bMEDirect)   // если курсор после мат. объекта
         {
             this.setStart_Selection(this.CurPos);
             this.setEnd_Selection( this.CurPos-2 );
@@ -4515,6 +4549,21 @@ CMathContent.prototype =
             /*var Content_start = this.content.slice(0, start);
             var Content_end   = this.content.slice(end, this.content.length);
             this.content = Content_start.concat(Content_end);*/
+
+            if(this.content[start-1].value.typeObj === MATH_RUN_PRP)
+            {
+                if(end === this.content.length )
+                    start--;
+                else
+                    for(var i = start; i < end; i++)
+                    {
+                        if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                        {
+                            start--;
+                            break;
+                        }
+                    }
+            }
 
             items = this.content.splice(start, end - start);
 
@@ -4635,15 +4684,16 @@ CMathContent.prototype =
         //g_oTextMeasurer.SetFont ( txtPrp );
         //var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();
 
-        var rPrp = this.getCurrRunPrp();
+        /*var rPrp = this.getCurrRunPrp();
         g_oTextMeasurer.SetFont ( rPrp );
-        //var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();
+        var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();*/
+        //var baseLine = 0;
         var baseLine = 0;
 
         for(var i=1; i < this.content.length;i++)
         {
             var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left, y: this.pos.y + max_cent };
-            if( ! this.content[i].value.SUBCONTENT )
+            if( this.content[i].value.typeObj !== MATH_COMP )
                 t.y += baseLine;
 
             this.content[i].value.setPosition(t);
@@ -4961,8 +5011,8 @@ CMathContent.prototype =
             }
             else if(this.content[1].value.typeObj === MATH_COMP)
             {
-                var runPrp = this.content[1].value.getRunPrp();
-                txtPrp.Merge(runPrp);
+                var ctrPrp = this.content[1].value.getCtrPrp();
+                txtPrp.Merge(ctrPrp);
             }
         }
 
@@ -4971,6 +5021,15 @@ CMathContent.prototype =
     IsEmpty:    function()
     {
         return this.content.length == 1;
+    },
+    setReferenceComp: function(Comp)
+    {
+        this.Composition = Comp;
+        for(var i = 0; i < this.content.length; i++)
+        {
+            if(this.content[i].value.type == MATH_COMP)
+                this.contetn[i].value.setReferenceComp(Comp);
+        }
     }
 }
 //todo
@@ -4991,7 +5050,7 @@ function CMathComposition()
         Italic:         true,
         Bold:           false,
         RFonts:         {},
-        Lang:          {}
+        Lang:           {}
     };
 
     this.Init();
@@ -5620,9 +5679,14 @@ CMathComposition.prototype =
     RecalculateComposition: function()
     {
         //this.Root.setTxtPrp(this.TxtPrp);
+        this.SetReferenceComposition();
         this.Root.Resize();
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
+    },
+    SetReferenceComposition: function()
+    {
+        this.Root.setReferenceComp(this);
     }
 
 }
