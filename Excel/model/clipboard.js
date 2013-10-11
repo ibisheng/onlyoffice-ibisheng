@@ -2026,8 +2026,8 @@
 							span.title = hyperlink.Tooltip;
 					}
 					if( val[i].sFormula ){
-						span.textContent = "="+val[i].sFormula;
-						$(span).addClass("cellFrom_"+val[i].sId);
+						span.textContent = val[i].text;
+						$(span).addClass("cellFrom_"+val[i].sId + "textFormula_" + "=" + val[i].sFormula);
 					}
 					else{
 						span.textContent = val[i].text;
@@ -2491,12 +2491,20 @@
 						var va = style.verticalAlign.toLowerCase();
 						var prefix = "";
 						
-						var cL = null ,cellFrom = null;
+						var cL = null ,cellFrom = null, splitCL, text;
 						if( parent.getAttribute("class") != null ){
 							cL = parent.getAttribute("class").split(" ");
 							for (var i = 0; i < cL.length; i++){
 								if(cL[i].indexOf("cellFrom_") > -1){
-									cellFrom = cL[i].replace("cellFrom_","");
+									
+									splitCL = cL[i].split('textFormula_');
+									if(splitCL && splitCL[0] && splitCL[1])
+									{
+										cellFrom = splitCL[0].replace("cellFrom_","");
+										text = splitCL[1];
+									}
+									else
+										cellFrom = cL[i].replace("cellFrom_","");
 									break;
 								}
 								else if(cL[i].indexOf("qPrefix") > -1)
@@ -2506,7 +2514,8 @@
 								}
 							}
 						}
-						var text = elem.textContent.replace('\t','');
+						if(!text)
+							text = elem.textContent.replace('\t','');
 						if(elem.nodeName.toLowerCase() == 'br')
 							text = '\n';
 						var colorText = style.getPropertyValue("color"); 
