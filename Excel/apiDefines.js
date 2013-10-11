@@ -52,25 +52,20 @@ var c_oAscConfirm = {
 	ConfirmReplaceRange : 0
 };
 var c_oAscFileType = {
-	INNER:		0x0101,
-	XLSX:		0x0101,
-	XLS:		0x0102,
-	ODS:		0x0103,
-	CSV:		0x0104,
-	HTML:		0x0803,
-	PDFPRINT:	0x0201,
-	ZIP:		0x0803,
-	XLSY:		0x1002
-};
-var c_oAscZoomType = {
-	Current :0,
-	FitWidth:1,
-	FitPage :2
+	INNER		: 0x0101,
+	XLSX		: 0x0101,
+	XLS			: 0x0102,
+	ODS			: 0x0103,
+	CSV			: 0x0104,
+	HTML		: 0x0803,
+	PDFPRINT	: 0x0201,
+	ZIP			: 0x0803,
+	XLSY		: 0x1002
 };
 
 var c_oAscAsyncActionType = {
-	Information : 0,
-	BlockInteraction : 1
+	Information			: 0,
+	BlockInteraction	: 1
 };
 
 var c_oAscAsyncAction = {
@@ -89,14 +84,14 @@ var c_oAscAsyncAction = {
 };
 
 var c_oAscAlignType = {
-	NONE: "none",
-	LEFT:"left",
-	CENTER:"center",
-	RIGHT:"right",
-	JUSTIFY:"justify",
-	TOP:"top",
-	MIDDLE:"center",
-	BOTTOM:"bottom"
+	NONE		: "none",
+	LEFT		: "left",
+	CENTER		: "center",
+	RIGHT		: "right",
+	JUSTIFY		: "justify",
+	TOP			: "top",
+	MIDDLE		: "center",
+	BOTTOM		: "bottom"
 };
 
 var c_oAscCsvDelimiter = {
@@ -109,7 +104,7 @@ var c_oAscCsvDelimiter = {
 };
 
 var c_oAscAdvancedOptionsID = {
-	CSV:0
+	CSV	: 0
 };
 
 var c_oAscAdvancedOptionsAction = {
@@ -119,29 +114,29 @@ var c_oAscAdvancedOptionsAction = {
 };
 
 var c_oAscMergeOptions = {
-	Unmerge:     0,
-	Merge:       1,
-	MergeCenter: 2,
-	MergeAcross: 3
+	Unmerge		: 0,
+	Merge		: 1,
+	MergeCenter	: 2,
+	MergeAcross	: 3
 };
 
 var c_oAscSortOptions = {
-	Ascending:  1,
-	Descending: 2
+	Ascending	: 1,
+	Descending	: 2
 };
 
 var c_oAscInsertOptions = {
 	InsertCellsAndShiftRight: 1,
-	InsertCellsAndShiftDown:  2,
-	InsertColumns:            3,
-	InsertRows:               4
+	InsertCellsAndShiftDown	: 2,
+	InsertColumns			: 3,
+	InsertRows				: 4
 };
 
 var c_oAscDeleteOptions = {
-	DeleteCellsAndShiftLeft: 1,
-	DeleteCellsAndShiftTop:  2,
-	DeleteColumns:           3,
-	DeleteRows:              4
+	DeleteCellsAndShiftLeft	: 1,
+	DeleteCellsAndShiftTop	: 2,
+	DeleteColumns			: 3,
+	DeleteRows				: 4
 };
 
 var c_oAscFormatOptions = {
@@ -159,92 +154,110 @@ var c_oAscFormatOptions = {
 };
 
 var c_oAscBorderOptions = {
-	Top:    0,
-	Right:  1,
-	Bottom: 2,
-	Left:   3,
-	DiagD:  4,
-	DiagU:  5,
-	InnerV: 6,
-	InnerH: 7
+	Top		: 0,
+	Right	: 1,
+	Bottom	: 2,
+	Left	: 3,
+	DiagD	: 4,
+	DiagU	: 5,
+	InnerV	: 6,
+	InnerH	: 7
+};
+
+// Располагаются в порядке значимости для отрисовки
+var c_oAscBorderStyles = {
+	None				: 0,
+	Double				: 1,
+	Hair				: 2,
+	DashDotDot			: 3,
+	DashDot				: 4,
+	Dotted				: 5,
+	Dashed				: 6,
+	Thin				: 7,
+	MediumDashDotDot	: 8,
+	SlantDashDot		: 9,
+	MediumDashDot		: 10,
+	MediumDashed		: 11,
+	Medium				: 12,
+	Thick				: 13
 };
 
 var c_oAscCleanOptions = {
-	All:     0,
-	Text:    1,
-	Format:  2,
-	Formula: 4
+	All		: 0,
+	Text	: 1,
+	Format	: 2,
+	Formula	: 4
 };
 
 var c_oAscDrawDepOptions = {
-	Master:     0,
-	Slave:    1,
-	Clear:  2
+	Master	: 0,
+	Slave	: 1,
+	Clear	: 2
 };
 
 // selection type
 var c_oAscSelectionType = {
-	RangeCells:		1,
-	RangeCol:		2,
-	RangeRow:		3,
-	RangeMax:		4,
-	RangeImage:		5,
-	RangeChart:		6,
-	RangeShape:		7,
-	RangeShapeText:	8
+	RangeCells		: 1,
+	RangeCol		: 2,
+	RangeRow		: 3,
+	RangeMax		: 4,
+	RangeImage		: 5,
+	RangeChart		: 6,
+	RangeShape		: 7,
+	RangeShapeText	: 8
 };
 
 var c_oAscLegendMarkerType = {
-	Line:	0,
-	Square:	1
+	Line	: 0,
+	Square	: 1
 };
 
 var c_oAscHyperlinkType = {
-	WebLink:	1,
-	RangeLink:	2
+	WebLink		: 1,
+	RangeLink	: 2
 };
 
 var c_oAscMouseMoveType = {
-	None:			0,
-	Hyperlink:		1,
-	Comment:		2,
-	LockedObject:	3
+	None			: 0,
+	Hyperlink		: 1,
+	Comment			: 2,
+	LockedObject	: 3
 };
 
 var c_oAscMouseMoveLockedObjectType = {
-	None:				-1,
-	Range:				0,
-	TableProperties:	1,
-	Sheet:				2
+	None			: -1,
+	Range			: 0,
+	TableProperties	: 1,
+	Sheet			: 2
 };
 
 var c_oAscColor = {
-    COLOR_TYPE_SRGB   : 1,
-    COLOR_TYPE_PRST   : 2,
-    COLOR_TYPE_SCHEME : 3
+    COLOR_TYPE_SRGB		: 1,
+    COLOR_TYPE_PRST		: 2,
+    COLOR_TYPE_SCHEME	: 3
 };
  
  // PageOrientation
 var c_oAscPageOrientation = {
-	PagePortrait: 1,
-	PageLandscape: 2
+	PagePortrait	: 1,
+	PageLandscape	: 2
 };
 
 // Print default options (in mm)
 var c_oAscPrintDefaultSettings = {
 	// Размеры страницы при печати
-	PageWidth: 210,
-	PageHeight: 297,
-	PageOrientation: c_oAscPageOrientation.PagePortrait,
+	PageWidth		: 210,
+	PageHeight		: 297,
+	PageOrientation	: c_oAscPageOrientation.PagePortrait,
 
 	// Поля для страницы при печати
-	PageLeftField: 17.8,
-	PageRightField: 17.8,
-	PageTopField: 19.1,
-	PageBottomField: 19.1,
+	PageLeftField	: 17.8,
+	PageRightField	: 17.8,
+	PageTopField	: 19.1,
+	PageBottomField	: 19.1,
 
-	PageGridLines: 0,
-	PageHeadings: 0
+	PageGridLines	: 0,
+	PageHeadings	: 0
 };
 
 /**
@@ -252,42 +265,42 @@ var c_oAscPrintDefaultSettings = {
  * @const
  */
 var c_oAscLockTypes = {
-	kLockTypeNone:		1, // никто не залочил данный объект
-	kLockTypeMine:		2, // данный объект залочен текущим пользователем
-	kLockTypeOther:		3, // данный объект залочен другим(не текущим) пользователем
-	kLockTypeOther2:	4, // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
-	kLockTypeOther3:	5  // данный объект был залочен (обновления пришли) и снова стал залочен
+	kLockTypeNone	: 1, // никто не залочил данный объект
+	kLockTypeMine	: 2, // данный объект залочен текущим пользователем
+	kLockTypeOther	: 3, // данный объект залочен другим(не текущим) пользователем
+	kLockTypeOther2	: 4, // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
+	kLockTypeOther3	: 5  // данный объект был залочен (обновления пришли) и снова стал залочен
 };
 
 var c_oAscLockTypeElem = {
-	Range:	1,
-	Object:	2,
-	Sheet:	3
+	Range	: 1,
+	Object	: 2,
+	Sheet	: 3
 };
 
 var c_oAscLockTypeElemSubType = {
-	DeleteColumns:		1,
-	InsertColumns:		2,
-	DeleteRows:			3,
-	InsertRows:			4,
-	ChangeProperties:	5
+	DeleteColumns		: 1,
+	InsertColumns		: 2,
+	DeleteRows			: 3,
+	InsertRows			: 4,
+	ChangeProperties	: 5
 };
 
 var c_oAscRecalcIndexTypes = {
-	RecalcIndexAdd:		1,
-	RecalcIndexRemove:	2
+	RecalcIndexAdd		: 1,
+	RecalcIndexRemove	: 2
 };
 
 // Тип печати
 var c_oAscPrintType = {
-	ActiveSheets:	0,	// Активные листы
-	EntireWorkbook:	1,	// Всю книгу
-	Selection:		2	// Выделенный фрагмент
+	ActiveSheets	: 0,	// Активные листы
+	EntireWorkbook	: 1,	// Всю книгу
+	Selection		: 2		// Выделенный фрагмент
 };
 // Тип печати
 var c_oAscLayoutPageType = {
-	FitToWidth:		0,	// На всю ширину
-	ActualSize:		1	// По реальным размерам
+	FitToWidth		: 0,	// На всю ширину
+	ActualSize		: 1		// По реальным размерам
 };
 
  var c_oAscCustomAutoFilter = {
