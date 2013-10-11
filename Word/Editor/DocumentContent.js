@@ -3219,7 +3219,7 @@ CDocumentContent.prototype =
             return false;
         
         var Item = this.Content[0];
-        return Item.Cursor_IsStart( bOnlyPara );
+        return Item.Cursor_IsStart();
     },
 
     Get_CurPosXY : function()
@@ -6153,8 +6153,8 @@ CDocumentContent.prototype =
         this.CurPage = PageIndex - this.StartPage;
 
         // Сначала проверим, не попали ли мы в один из "плавающих" объектов
-        var bInText      = (null === this.Is_InText(X, Y, this.CurPage)      ? false : true);
-        var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
+        var bInText      = (null === this.Is_InText(X, Y, this.CurPage + this.Get_StartPage_Absolute())      ? false : true);
+        var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage + this.Get_StartPage_Absolute()) ? false : true);
         var nInDrawing   = this.LogicDocument.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage + this.Get_StartPage_Absolute(), this );
 
         if ( this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ) )
@@ -6209,7 +6209,7 @@ CDocumentContent.prototype =
 
             var bTableBorder = false;
             if ( type_Table == Item.GetType() )
-                bTableBorder = ( null != Item.Is_TableBorder( X, Y, this.CurPage ) ? true : false );
+                bTableBorder = ( null != Item.Is_TableBorder( X, Y, this.CurPage + this.Get_StartPage_Absolute() ) ? true : false );
 
             // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
             if ( !(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon) )

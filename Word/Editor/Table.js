@@ -3085,7 +3085,7 @@ CTable.prototype =
         // Возможно, на данной странице строку, с которой началось разбиение на странице,
         // не надо рисовать. (Если начальная и конечная строки совпадают, тогда это 2
         // или более страница данной строки)
-        if ( (Row_start != Row_last || ( 0 === Row_start && 0 === Row_last ) ) && false === this.RowsInfo[Row_last].FirstPage )
+        if ( (Row_start != Row_last || ( 0 === Row_start && 0 === Row_last && 0 === PNum ) ) && false === this.RowsInfo[Row_last].FirstPage )
             Row_last--;
 
         if ( Row_last < Row_start )
