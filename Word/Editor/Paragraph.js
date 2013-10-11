@@ -4985,10 +4985,11 @@ Paragraph.prototype =
 
             // Рисуем подчеркивание орфографии
             pGraphics.p_color( 255, 0, 0, 255 );
+            var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
             Element = aSpelling.Get_Next();
             while ( null != Element )
             {
-                pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, Element.w);
+                pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
                 Element = aSpelling.Get_Next();
             }
         }
