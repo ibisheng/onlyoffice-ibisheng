@@ -3220,7 +3220,18 @@ function CThumbnailsManager()
 
         var pos = oThis.ConvertCoords(global_mouseEvent.X, global_mouseEvent.Y, true, true);
         if (pos.Page == -1)
+        {
+            if (global_mouseEvent.Button == 2)
+            {
+                var _data = new CContextMenuData();
+                _data.Type = c_oAscContextMenuTypes.Thumbnails;
+                _data.X_abs = global_mouseEvent.X;
+                _data.Y_abs = global_mouseEvent.Y;
+                _data.IsSlideSelect = false;
+                oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
+            }
             return false;
+        }
 
         if (global_keyboardEvent.CtrlKey)
         {
@@ -4267,7 +4278,8 @@ function CThumbnailsManager()
                 }
                 break;
             }
-            case 46:
+            case 46:    // delete
+            case 8:     // backspace
             {
                 var _delete_array = this.GetSelectedArray();
 

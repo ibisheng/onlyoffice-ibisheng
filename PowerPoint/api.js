@@ -4735,11 +4735,13 @@ function CContextMenuData()
     this.Type  = c_oAscContextMenuTypes.Main;
     this.X_abs = 0;
     this.Y_abs = 0;
+    this.IsSlideSelect = true;
 }
 
 CContextMenuData.prototype.get_Type  = function()  { return this.Type; }
 CContextMenuData.prototype.get_X = function()  { return this.X_abs; }
 CContextMenuData.prototype.get_Y = function()  { return this.Y_abs; }
+CContextMenuData.prototype.get_IsSlideSelect = function()  { return this.IsSlideSelect; }
 
 asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 {
