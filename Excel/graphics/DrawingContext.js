@@ -999,14 +999,40 @@ DrawingContext.prototype = {
 	moveTo: function (x, y, dx, dy) {
 		var r = this._calcRect(x, y);
 		this.ctx.moveTo(r.x + (dx !== undefined ? dx : 0), r.y + (dy !== undefined ? dy : 0));
+		//console.log("moveTo: (" + r.x + ", " + r.y + ")" + " (" + dx + ", " + dy + ")");
 		return this;
 	},
 
 	lineTo: function (x, y, dx, dy) {
 		var r = this._calcRect(x, y);
 		this.ctx.lineTo(r.x + (dx !== undefined ? dx : 0), r.y + (dy !== undefined ? dy : 0));
+		//console.log("lineTo: (" + r.x + ", " + r.y + ")" + " (" + dx + ", " + dy + ")");
 		return this;
 	},
+
+	lineDiag : function (x1, y1, x2, y2) {
+		var r1 = this._calcRect(x1, y1);
+		var r2 = this._calcRect(x2, y2);
+		this.ctx.moveTo(r1.x + 0.5, r1.y + 0.5);
+		this.ctx.lineTo(r2.x + 0.5, r2.y + 0.5);
+		return this;
+	},
+
+	lineHor : function (x1, y, x2) {
+		var r1 = this._calcRect(x1, y);
+		var r2 = this._calcRect(x2, y);
+		this.ctx.moveTo(r1.x, r1.y + 0.5);
+		this.ctx.lineTo(r2.x, r2.y + 0.5);
+		return this;
+	},
+	lineVer : function (x, y1, y2) {
+		var r1 = this._calcRect(x, y1);
+		var r2 = this._calcRect(x, y2);
+		this.ctx.moveTo(r1.x + 0.5, r1.y);
+		this.ctx.lineTo(r2.x + 0.5, r2.y);
+		return this;
+	},
+
 	dashLineCleverHor : function (x1, y, x2, w_dot, w_dist) {
 		var _x1 = this._mct.transformPointX(x1, y);
 		var _y  = this._mct.transformPointY(x1, y);

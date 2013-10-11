@@ -3146,7 +3146,7 @@ function DrawingObjects() {
 				overlayCtx.stroke();*/
 								
 				drawingCtx.clearRect( x1, y1, w, h );
-				worksheet._drawGrid( drawingCtx, r_);
+				worksheet._drawGrid(undefined, r_);
 				worksheet._drawCells(r_);
 				worksheet._drawCellsBorders(undefined, r_);
 			}

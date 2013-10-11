@@ -2003,8 +2003,7 @@
 								// Мы уже нарисовали border для невидимой границы
 								return;
 							}
-						}
-						else if (0 < index && 0 === this.cols[index - 1].width) {
+						} else if (0 < index && 0 === this.cols[index - 1].width) {
 							// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседнего столбца)
 							w -= this.width_1px;
 							x += this.width_1px;
@@ -2020,8 +2019,7 @@
 								// Мы уже нарисовали border для невидимой границы
 								return;
 							}
-						}
-						else if (0 < index && 0 === this.rows[index - 1].height) {
+						} else if (0 < index && 0 === this.rows[index - 1].height) {
 							// Мы уже нарисовали border для невидимой границы (поэтому нужно чуть меньше рисовать для соседней строки)
 							h -= this.height_1px;
 							y += this.height_1px;
@@ -2044,17 +2042,17 @@
 				ctx.setStrokeStyle(st.border)
 						.setLineWidth(1)
 						.beginPath();
-				if (/*style !== kHeaderDefault &&*/ !isColHeader) {
-					ctx.moveTo(x, y, 0, -0.5)
-							.lineTo(x2, y, 1, -0.5);
+				if (style !== kHeaderDefault && !isColHeader) {
+					// Select row (top border)
+					ctx.lineHor(x, y - this.height_1px, x2 + this.width_1px);
 				}
-				ctx.moveTo(x2, y, 0.5, 0)
-						.lineTo(x2, y2, 0.5, 0)
-						.moveTo(x2, y2, 1, 0.5)
-						.lineTo(x, y2, 0, 0.5);
-				if (/*style !== kHeaderDefault &&*/ isColHeader) {
-					ctx.moveTo(x, y2, -0.5, 1)
-							.lineTo(x, y, -0.5, 0);
+				// Right border
+				ctx.lineVer(x2, y, y2);
+				// Bottom border
+				ctx.lineHor(x, y2, x2 + this.width_1px);
+				if (style !== kHeaderDefault && isColHeader) {
+					// Select col (left border)
+					ctx.lineVer(x - this.width_1px, y, y2 + this.height_1px);
 				}
 				ctx.stroke();
 
@@ -2139,23 +2137,23 @@
 				ctx.setFillStyle(this.settings.cells.defaultState.background)
 						.fillRect(x1, y1, x2 - x1, y2 - y1)
 						.setStrokeStyle(this.settings.cells.defaultState.border)
-						.setLineWidth(1);
+						.setLineWidth(1).beginPath();
 
 				var w, h;
-				if (true === this.model.sheetViews[0].asc_getShowGridLines()) {
-					for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
-						w = this.cols[i].width;
-						x += w;
-						if (w >= this.width_1px)
-							ctx.beginPath().moveTo(x, y1, -0.5, 0).lineTo(x, y2, -0.5, 0).stroke();
-					}
-					for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
-						h = this.rows[j].height;
-						y += h;
-						if (h >= this.height_1px)
-							ctx.beginPath().moveTo(x1, y, 0, -0.5).lineTo(x2, y, 0, -0.5).stroke();
-					}
+				for (var i = range.c1, x = x1 - this.width_1px; i <= range.c2 && x <= x2; ++i) {
+					w = this.cols[i].width;
+					x += w;
+					if (w >= this.width_1px)
+						ctx.lineVer(x, y1, y2);
 				}
+				for (var j = range.r1, y = y1 - this.height_1px; j <= range.r2 && y <= y2; ++j) {
+					h = this.rows[j].height;
+					y += h;
+					if (h >= this.height_1px)
+						ctx.lineHor(x1, y, x2);
+				}
+
+				ctx.stroke();
 			},
 
 			/** Рисует ячейки таблицы */
@@ -2512,6 +2510,20 @@
 					}
 				}
 
+				function drawDiag(border, x1, y1, x2, y2) {
+					if (border.s !== kcbNone && !border.isErased) {
+						if (bc !== border.c) {
+							bc = border.c;
+							color = asc_n2css(bc);
+							ctx.setStrokeStyle(color);
+						}
+						ctx.setLineWidth(border.w)
+							.beginPath()
+							.lineDiag(x1, y1, x2, y2)
+							.stroke();
+					}
+				}
+
 				// set clipping rect to cells area
 				if (!drawingCtx) {
 					ctx.save()
@@ -2577,6 +2589,7 @@
 						var hasDD = dd.w > 0 && dd.s !== kcbNone;
 						var hasDU = du.w > 0 && du.s !== kcbNone;
 						if ( (hasDD || hasDU) && (!mergedCellsStage || row === range.r1 && col === range.c1) ) {
+							// ToDo bug merge cells
 							ctx.save()
 									.beginPath()
 									.rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
@@ -2586,15 +2599,11 @@
 									.clip();
 							if (hasDD) {
 								// draw diagonal line l,t - r,b
-								drawBorderLine(dd, x1, y1, x2, y2,
-								               function (point) {return point === 1 ? -0.5 : 0.5;},
-								               function (point) {return point === 1 ? -0.5 : 0.5;});
+								drawDiag(dd, x1 - this.width_1px, y1 - this.height_1px, x2, y2);
 							}
 							if (hasDU) {
 								// draw diagonal line l,b - r,t
-								drawBorderLine(du, x1, y2, x2, y1,
-								               function (point) {return point === 1 ? -0.5 : 0.5;},
-								               function (point) {return point === 1 ? 0.5 : -0.5;});
+								drawDiag(du, x1 - this.width_1px, y2, x2, y1 - this.height_1px);
 							}
 							ctx.restore();
 							// canvas context has just been restored, so destroy border color cache
