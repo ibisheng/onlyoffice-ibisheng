@@ -2908,6 +2908,9 @@ function DrawingObjects() {
         overlay.Clear();
         this.drawingDocument.Overlay = overlay;
 		
+		// Clip
+		_this.clipGraphicsCanvas(shapeOverlayCtx);
+		
 		var bFullClear = (_this.controller.curState.id != STATES_ID_TEXT_ADD) && (_this.controller.curState.id != STATES_ID_TEXT_ADD_IN_GROUP);
 
 		if ( bFullClear )
@@ -2978,6 +2981,9 @@ function DrawingObjects() {
         }
 		_this.drawWorksheetHeaders();
 
+		// Restore
+		_this.restoreGraphicsCanvas(shapeOverlayCtx);
+		
         return true;
     };
 
@@ -3262,6 +3268,9 @@ function DrawingObjects() {
 				worksheet._drawGraphic();
 				worksheet.model.Drawings = aObjects;
 				
+				// Clip
+				_this.clipGraphicsCanvas(shapeCtx);
+				
 				for (var i = 0; i < aObjects.length; i++) {
 
 					var index = i;
@@ -3300,10 +3309,13 @@ function DrawingObjects() {
 							drawingObject.graphicObject.transform.tx = tx;
 							drawingObject.graphicObject.transform.ty = ty;
 						}
-						else
+						else {
 							drawingObject.graphicObject.draw( shapeCtx );
+						}
 					}
 				}
+				// Restore
+				_this.restoreGraphicsCanvas(shapeOverlayCtx);
 			}
 		}
 		if ( !printOptions ) {
@@ -3355,7 +3367,10 @@ function DrawingObjects() {
 	}
 
 	_this.drawWorksheetHeaders = function(bForce) {
-	
+		
+		// TODO Отказаться от перерисовки хидеров
+		return;
+		
 		// Проверяем выход за видимую область
 		var fvr = worksheet.getFirstVisibleRow();
 		var fvc = worksheet.getFirstVisibleCol();
@@ -3392,6 +3407,25 @@ function DrawingObjects() {
 			if ( bRedraw )
 				updateHeaders();
 		}
+	}
+	
+	_this.clipGraphicsCanvas = function(canvas) {
+		if ( canvas instanceof CGraphics ) {
+			var x = worksheet.getCellLeft(0, 0);
+			var y = worksheet.getCellTop(0, 0);
+			var w = shapeCtx.m_lWidthPix - x;
+			var h = shapeCtx.m_lHeightPix - y;				
+			
+			canvas.m_oContext.save();
+			canvas.m_oContext.beginPath();
+			canvas.m_oContext.rect(x, y, w, h);
+			canvas.m_oContext.clip();
+		}
+	}
+	
+	_this.restoreGraphicsCanvas = function(canvas) {
+		if ( canvas instanceof CGraphics )
+			canvas.m_oContext.restore();
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -4341,6 +4375,8 @@ function DrawingObjects() {
 			
 			var x = scrollOffset.getX();
 			var y = scrollOffset.getY();
+			
+			//console.log("X: " + x + ", Y: " + y);
 
 			shapeCtx.m_oCoordTransform.tx = x;
 			shapeCtx.m_oCoordTransform.ty = y;

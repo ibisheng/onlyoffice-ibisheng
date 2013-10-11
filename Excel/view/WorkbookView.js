@@ -1016,7 +1016,7 @@
 				if (isResized)
 					ws.objectRender.resizeCanvas();
 					
-				ws.objectRender.restoreScrollOffset();
+				ws.objectRender.setScrollOffset();
 				ws.draw();
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());

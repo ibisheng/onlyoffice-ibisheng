@@ -1792,7 +1792,7 @@
 						ctx: drawingCtx,
 						printPagesData: printPagesData
 					};
-					this.objectRender.showDrawingObjects(false, drawingPrintOptions);
+					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange.clone(true);
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
