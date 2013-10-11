@@ -2996,22 +2996,6 @@ function BinaryCommentsTableWriter(memory, doc, oMapCommentId)
 		}
 		if(null != comment.m_sUserName && "" != comment.m_sUserName)
 		{
-			var sInitials = "";
-			var aElems = comment.m_sUserName.split(" ");
-			for(var i = 0, length; i < aElems.length; ++i)
-			{
-				var elem = aElems[i];
-				if(elem && elem.length > 0)
-				{
-					sInitials += elem[0];
-				}
-			}
-			if("" != sInitials)
-			{
-				sInitials.toUpperCase();
-				this.memory.WriteByte(c_oSer_CommentsType.Initials);
-				this.memory.WriteString2(sInitials);
-			}
 			this.memory.WriteByte(c_oSer_CommentsType.UserName);
 			this.memory.WriteString2(comment.m_sUserName);
 		}
@@ -3026,11 +3010,6 @@ function BinaryCommentsTableWriter(memory, doc, oMapCommentId)
 			
 			this.memory.WriteByte(c_oSer_CommentsType.Date);
 			this.memory.WriteString2(this.DateToISO8601(oDate));
-		}
-		if(null != comment.m_sQuoteText)
-		{
-			this.memory.WriteByte(c_oSer_CommentsType.QuoteText);
-			this.memory.WriteString2(comment.m_sQuoteText);
 		}
 		if(null != comment.m_bSolved)
 		{
@@ -3590,16 +3569,12 @@ function BinaryFileReader(doc, openParams)
 			var oCommentObj = new CCommentData();
 			if(null != comment.UserName)
 				oCommentObj.m_sUserName = comment.UserName;
-			else if(null != comment.Initials)
-				oCommentObj.m_sUserName = comment.Initials;
 			if(null != comment.UserId)
 				oCommentObj.m_sUserId = comment.UserId;
 			if(null != comment.Date)
 				oCommentObj.m_sTime = comment.Date;
 			if(null != comment.Text)
 				oCommentObj.m_sText = comment.Text;
-			if(null != comment.QuoteText)
-				oCommentObj.m_sQuoteText = comment.QuoteText;
 			if(null != comment.Solved)
 				oCommentObj.m_bSolved = comment.Solved;
 			if(null != comment.Replies)
@@ -3621,7 +3596,7 @@ function BinaryFileReader(doc, openParams)
 		for(var i in this.oReadResult.oCommentsPlaces)
 		{
 			var item = this.oReadResult.oCommentsPlaces[i];
-			if(null != item.Ref || (null != item.Start && null != item.End))
+			if((null != item.Start && null != item.End) || (null != item.Ref && null == item.Start && null == item.End))
 			{
 				var oStart = null;
 				var oEnd = null;
@@ -3642,6 +3617,8 @@ function BinaryFileReader(doc, openParams)
 					var oCommentObj = oCommentsNewId[nId];
 					if(oCommentObj)
 					{
+						if(null != item.QuoteText)
+							oCommentObj.Data.m_sQuoteText = item.QuoteText;
 						var fInsert = function(bStart, bRef, oCommentPosition)
 						{
 							var index = 0;
@@ -5233,6 +5210,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
     this.bAllowFlow = bAllowFlow;
     this.lastPar = null;
 	this.oComments = oComments;
+	this.nCurCommentsCount = 0;
+	this.oCurComments = [];//вспомогательный массив  для заполнения QuotedText
     this.Reset = function()
     {
         this.lastPar = null;
@@ -5446,6 +5425,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					item.Start = oCommon;
 				else
 					this.oComments[oCommon.Id] = {Start: oCommon};
+				if(null == this.oCurComments[oCommon.Id])
+				{
+					this.nCurCommentsCount++;
+					this.oCurComments[oCommon.Id] = "";
+				}
 			}
         }
 		else if (c_oSerParType.CommentEnd === type)
@@ -5460,10 +5444,19 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			{
 				oCommon.oParent = paragraph;
 				var item = this.oComments[oCommon.Id];
-				if(item)
-					item.End = oCommon;
-				else
-					this.oComments[oCommon.Id] = {End: oCommon};
+				if(!item)
+				{
+					item = {};
+					this.oComments[oCommon.Id] = item;
+				}
+				item.End = oCommon;
+				var sQuoteText = this.oCurComments[oCommon.Id];
+				if(null != sQuoteText)
+				{
+					item.QuoteText = sQuoteText;
+					this.nCurCommentsCount--;
+					delete this.oCurComments[oCommon.Id];
+				}
 			}
         }
 		else if ( c_oSer_OMathContentType.OMathPara == type )
@@ -7240,6 +7233,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				if(this.openParams.charCount >= g_nErrorCharCount)
 					throw new Error(g_sErrorCharCountMessage);
 			}
+			if(this.nCurCommentsCount > 0)
+			{
+				for(var i in this.oCurComments)
+					this.oCurComments[i] += text;
+			}
             for (var i = 0, length = text.length; i < length; ++i)
             {
                 if (text[i] != ' ')
@@ -8174,8 +8172,6 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 		var oThis = this;
 		if ( c_oSer_CommentsType.Id === type )
 			oNewImage.Id = this.stream.GetULongLE();
-		else if ( c_oSer_CommentsType.Initials === type )
-			oNewImage.Initials = this.stream.GetString2LE(length);
         else if ( c_oSer_CommentsType.UserName === type )
             oNewImage.UserName = this.stream.GetString2LE(length);
 		else if ( c_oSer_CommentsType.UserId === type )
@@ -8188,8 +8184,6 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 		}
 		else if ( c_oSer_CommentsType.Text === type )
 			oNewImage.Text = this.stream.GetString2LE(length);
-		else if ( c_oSer_CommentsType.QuoteText === type )
-			oNewImage.QuoteText = this.stream.GetString2LE(length);
 		else if ( c_oSer_CommentsType.Solved === type )
 			oNewImage.Solved = (this.stream.GetUChar() != 0);
 		else if ( c_oSer_CommentsType.Replies === type )
