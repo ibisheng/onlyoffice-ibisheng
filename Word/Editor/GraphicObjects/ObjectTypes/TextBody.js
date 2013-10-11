@@ -690,7 +690,7 @@ CTextBody.prototype =
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }
-    },
+    }
 
 };
 
