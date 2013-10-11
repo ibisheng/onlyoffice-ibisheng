@@ -2441,7 +2441,7 @@ CGraphicObjects.prototype = {
         }
     },
 
-    Cursor_MoveLeft : function(AddToSelect, Word)
+    Cursor_MoveLeft : function(AddToSelect/*shift*/, Word/*ctrl*/)
     {
         switch (this.State.id)
         {
@@ -2449,6 +2449,73 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 this.State.textObject.Cursor_MoveLeft(AddToSelect, Word);
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(Word)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var new_x = selected_objects[i].x - shift;
+                            var new_y = selected_objects[i].y;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.State.group.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(Word)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        var invert_group_transform = global_MatrixTransformer.Invert(this.State.group.transform);
+                        this.State.group.normalize();
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var rel_transform = selected_objects[i].transform.CreateDublicate();
+                            global_MatrixTransformer.MultiplyAppend(rel_transform, invert_group_transform);
+                            rel_transform.tx = 0;
+                            rel_transform.ty = 0;
+                            var dx = rel_transform.TransformPointX(-shift, 0);
+                            var dy = rel_transform.TransformPointY(-shift, 0);
+                            var new_x = selected_objects[i].x + dx;
+                            var new_y = selected_objects[i].y + dy;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
                 break;
             }
         }
@@ -2464,6 +2531,73 @@ CGraphicObjects.prototype = {
                 this.State.textObject.Cursor_MoveRight(AddToSelect, Word);
                 break;
             }
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(Word)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var new_x = selected_objects[i].x + shift;
+                            var new_y = selected_objects[i].y;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.State.group.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(Word)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        var invert_group_transform = global_MatrixTransformer.Invert(this.State.group.transform);
+                        this.State.group.normalize();
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var rel_transform = selected_objects[i].transform.CreateDublicate();
+                            global_MatrixTransformer.MultiplyAppend(rel_transform, invert_group_transform);
+                            rel_transform.tx = 0;
+                            rel_transform.ty = 0;
+                            var dx = rel_transform.TransformPointX(shift, 0);
+                            var dy = rel_transform.TransformPointY(shift, 0);
+                            var new_x = selected_objects[i].x + dx;
+                            var new_y = selected_objects[i].y + dy;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
         }
     },
 
@@ -2477,6 +2611,73 @@ CGraphicObjects.prototype = {
                 this.State.textObject.Cursor_MoveUp(AddToSelect);
                 break;
             }
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(global_mouseEvent.CtrlKey)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var new_x = selected_objects[i].x;
+                            var new_y = selected_objects[i].y - shift;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.State.group.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(global_mouseEvent.CtrlKey)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        var invert_group_transform = global_MatrixTransformer.Invert(this.State.group.transform);
+                        this.State.group.normalize();
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var rel_transform = selected_objects[i].transform.CreateDublicate();
+                            global_MatrixTransformer.MultiplyAppend(rel_transform, invert_group_transform);
+                            rel_transform.tx = 0;
+                            rel_transform.ty = 0;
+                            var dx = rel_transform.TransformPointX(0, -shift);
+                            var dy = rel_transform.TransformPointY(0, -shift);
+                            var new_x = selected_objects[i].x + dx;
+                            var new_y = selected_objects[i].y + dy;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
         }
     },
 
@@ -2488,6 +2689,74 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 this.State.textObject.Cursor_MoveDown(AddToSelect);
+                break;
+            }
+
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(global_mouseEvent.CtrlKey)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var new_x = selected_objects[i].x;
+                            var new_y = selected_objects[i].y + shift;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    var selected_objects = this.State.group.selectedObjects;
+                    if(selected_objects.length > 0)
+                    {
+                        History.Create_NewPoint();
+                        var shift;
+                        if(global_mouseEvent.CtrlKey)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                        }
+                        else if(!AddToSelect)
+                        {
+                            shift = editor.WordControl.m_oDrawingDocument.GetMMPerDot(5);
+                        }
+                        var invert_group_transform = global_MatrixTransformer.Invert(this.State.group.transform);
+                        this.State.group.normalize();
+                        for(var i = 0; i < selected_objects.length; ++i)
+                        {
+                            var rel_transform = selected_objects[i].transform.CreateDublicate();
+                            global_MatrixTransformer.MultiplyAppend(rel_transform, invert_group_transform);
+                            rel_transform.tx = 0;
+                            rel_transform.ty = 0;
+                            var dx = rel_transform.TransformPointX(0, shift);
+                            var dy = rel_transform.TransformPointY(0, shift);
+                            var new_x = selected_objects[i].x + dx;
+                            var new_y = selected_objects[i].y + dy;
+                            selected_objects[i].setXfrm(new_x, new_y);
+                        }
+                        this.State.group.updateCoordinatesAfterInternalResize();
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+                    }
+                }
                 break;
             }
         }
