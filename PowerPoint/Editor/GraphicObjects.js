@@ -938,8 +938,32 @@ CGraphicObjects.prototype = {
             }
             else
             {
-                //editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
-                //editor.UpdateParagraphProp(_empty_para_pr);
+                var _empty_para_pr =
+                {
+                    Ind               : { Left : UnknownValue, Right : UnknownValue, FirstLine : UnknownValue },
+                    Jc                : UnknownValue,
+                    Spacing           : { Line : UnknownValue, LineRule : UnknownValue, Before : UnknownValue, After : UnknownValue, AfterAutoSpacing : UnknownValue, BeforeAutoSpacing : UnknownValue },
+                    PageBreakBefore   : UnknownValue,
+                    KeepLines         : UnknownValue,
+                    ContextualSpacing : UnknownValue,
+                    Shd               : UnknownValue,
+                    StyleId           : -1,
+                    NumPr             : null,
+                    Brd               :
+                    {
+                        Between : null,
+                        Bottom  : null,
+                        Left    : null,
+                        Right   : null
+                    },
+                    ListType:
+                    {
+                        Type: -1,
+                        SubType: -1
+                    }
+                };
+                editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
+                editor.UpdateParagraphProp(_empty_para_pr);
             }
 
             if(text_props != null)
@@ -960,7 +984,19 @@ CGraphicObjects.prototype = {
             }
             else
             {
-                //   editor.UpdateTextPr(_empty_text_pr);
+                var _empty_text_pr =
+                {
+                    Bold       : false,
+                    Italic     : false,
+                    Underline  : false,
+                    Strikeout  : false,
+                    FontSize   : "",
+                    FontFamily : {Index : 0, Name : ""},
+                    VertAlign  : vertalign_Baseline,
+                    Color      : { r : 0, g : 0, b : 0},
+                    HighLight  : highlight_None
+                };
+                editor.UpdateTextPr(_empty_text_pr);
             }
 
             if(image_props !== null)

@@ -5821,7 +5821,7 @@ CDocumentContent.prototype =
 
     Get_Paragraph_ParaPr : function()
     {
-        var Result_ParaPr = new CParaPr();
+       /* var Result_ParaPr = new CParaPr();
 
         if ( true === this.ApplyToAll )
         {
@@ -5950,7 +5950,660 @@ CDocumentContent.prototype =
             }
 
             return Result_ParaPr;
+        } */
+        var Result_ParaPr = new CParaPr();
+
+        if ( true === this.ApplyToAll )
+        {
+            var StartStyleId, StartPr, NumPr, Pr;
+            if ( type_Paragraph == this.Content[0].GetType() )
+            {
+                StartPr      = this.Content[0].Get_CompiledPr2().ParaPr;
+                Pr           = StartPr.Copy();
+                _bullet = this.Content[0].PresentationPr.Bullet;
+
+                if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                {
+                    _list_type = {Type : -1, SubType : -1};
+                }
+                else
+                {
+                    if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                    {
+                        _list_type = {};
+                        _list_type.Type = 0;
+                        switch (_bullet.m_sChar)
+                        {
+                            case "•":
+                            {
+                                _list_type.SubType = 1;
+                                break;
+                            }
+                            case  "o":
+                            {
+                                _list_type.SubType = 2;
+                                break;
+                            }
+                            case  "§":
+                            {
+                                _list_type.SubType = 3;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x0076 ):
+                            {
+                                _list_type.SubType = 4;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00D8 ):
+                            {
+                                _list_type.SubType = 5;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00FC ):
+                            {
+                                _list_type.SubType = 6;
+                                break;
+                            }
+                            case String.fromCharCode( 119 ):
+                            {
+                                _list_type.SubType = 7;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _list_type = {};
+                        var _type = _bullet.m_nType - 100;
+                        if(!isNaN(_type) &&  _type >=1 && _type < 9)
+                        {
+                            _list_type.Type = 1;
+                            _list_type.SubType = _type;
+                        }
+                        else
+                        {
+                            _list_type.Type = -1;
+                            _list_type.SubType = -1;
+                        }
+                    }
+                }
+            }
+            for ( var Index = 1; Index < this.Content.length; Index++ )
+            {
+                var Item = this.Content[Index];
+
+                var TempPr;
+                if ( type_Paragraph == Item.GetType() )
+                {
+                    TempPr         = Item.Get_CompiledPr2(false).ParaPr.Copy();
+                    if(_list_type === null)
+                    {
+                        _bullet = Item.PresentationPr.Bullet;
+
+                        if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                        {
+                            _list_type = {Type : -1, SubType : -1};
+                        }
+                        else
+                        {
+                            if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                            {
+                                _list_type = {};
+                                _list_type.Type = 0;
+                                switch (_bullet.m_sChar)
+                                {
+                                    case "•":
+                                    {
+                                        _list_type.SubType = 1;
+                                        break;
+                                    }
+                                    case  "o":
+                                    {
+                                        _list_type.SubType = 2;
+                                        break;
+                                    }
+                                    case  "§":
+                                    {
+                                        _list_type.SubType = 3;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x0076 ):
+                                    {
+                                        _list_type.SubType = 4;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x00D8 ):
+                                    {
+                                        _list_type.SubType = 5;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x00FC ):
+                                    {
+                                        _list_type.SubType = 6;
+                                        break;
+                                    }
+                                    case String.fromCharCode( 119 ):
+                                    {
+                                        _list_type.SubType = 7;
+                                        break;
+                                    }
+                                    default :
+                                    {
+                                        _list_type.SubType = -1;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                _list_type = {};
+                                var _type = _bullet.m_nType - 99;
+                                if(!isNaN(_type) &&  _type >=1 && _type < 9)
+                                {
+                                    _list_type.Type = 1;
+                                    _list_type.SubType = _type;
+                                }
+                                else
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                            }
+                        }
+                    }
+                    else if(_list_type.Type != -1)
+                    {
+                        _bullet = Item.PresentationPr.Bullet;
+
+                        if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                        {
+                            _list_type = {Type : -1, SubType : -1};
+                        }
+                        else
+                        {
+                            if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                            {
+                                if(_list_type.Type != 0)
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                                else if(_list_type.SubType != -1)
+                                {
+                                    var _sub_type;
+                                    switch (_bullet.m_sChar)
+                                    {
+                                        case "•":
+                                        {
+                                            _sub_type = 1;
+                                            break;
+                                        }
+                                        case  "o":
+                                        {
+                                            _sub_type = 2;
+                                            break;
+                                        }
+                                        case  "§":
+                                        {
+                                            _sub_type = 3;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x0076 ):
+                                        {
+                                            _sub_type = 4;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x00D8 ):
+                                        {
+                                            _sub_type = 5;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x00FC ):
+                                        {
+                                            _sub_type = 6;
+                                            break;
+                                        }
+                                        case String.fromCharCode( 119 ):
+                                        {
+                                            _list_type.SubType = 7;
+                                            break;
+                                        }
+                                        default :
+                                        {
+                                            _list_type.SubType = -1;
+                                            break;
+                                        }
+
+                                            if(_sub_type != _list_type.SubType)
+                                            {
+                                                _list_type.SubType = -1;
+                                            }
+                                    }
+                                }
+                            }
+                            else if(_list_type.SubType != -1)
+                            {
+                                if(_list_type.Type != 1)
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                                else
+                                {
+
+                                }
+                                _type = _bullet.m_nType - 99;
+                                if(_list_type.SubType != _type)
+                                {
+                                    _list_type.SubType = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Pr =  Pr.Compare(TempPr);
+            }
+
+            if ( Pr.Ind.Left == UnknownValue )
+                Pr.Ind.Left = StartPr.Ind.Left;
+
+            if ( Pr.Ind.Right == UnknownValue )
+                Pr.Ind.Right = StartPr.Ind.Right;
+
+            if ( Pr.Ind.FirstLine == UnknownValue )
+                Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+
+            Result_ParaPr.Ind               = Pr.Ind;
+            Result_ParaPr.Jc                = Pr.Jc;
+            Result_ParaPr.Spacing           = Pr.Spacing;
+            Result_ParaPr.PageBreakBefore   = Pr.PageBreakBefore;
+            Result_ParaPr.KeepLines         = Pr.KeepLines;
+            Result_ParaPr.ContextualSpacing = Pr.ContextualSpacing;
+            Result_ParaPr.Shd               = Pr.Shd;
+            Result_ParaPr.Brd               = Pr.Brd;
+            Result_ParaPr.StyleId           = Pr.StyleId;
+            Result_ParaPr.NumPr             = Pr.NumPr;
+            Result_ParaPr.ListType             = _list_type;
+
+            return Result_ParaPr;
         }
+
+        if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( EndPos < StartPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos   = Temp;
+            }
+
+            var StartStyleId, StartPr, NumPr, Pr;
+            var _list_type = null;
+            var _bullet;
+            if ( type_Paragraph == this.Content[StartPos].GetType() )
+            {
+                StartPr      = this.Content[StartPos].Get_CompiledPr2().ParaPr;
+                Pr           = StartPr.Copy();
+
+                _bullet = this.Content[StartPos].PresentationPr.Bullet;
+
+                if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                {
+                    _list_type = {Type : -1, SubType : -1};
+                }
+                else
+                {
+                    if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                    {
+                        _list_type = {};
+                        _list_type.Type = 0;
+                        switch (_bullet.m_sChar)
+                        {
+                            case "•":
+                            {
+                                _list_type.SubType = 1;
+                                break;
+                            }
+                            case  "o":
+                            {
+                                _list_type.SubType = 2;
+                                break;
+                            }
+                            case  "§":
+                            {
+                                _list_type.SubType = 3;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x0076 ):
+                            {
+                                _list_type.SubType = 4;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00D8 ):
+                            {
+                                _list_type.SubType = 5;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00FC ):
+                            {
+                                _list_type.SubType = 6;
+                                break;
+                            }
+                            case String.fromCharCode( 119 ):
+                            {
+                                _list_type.SubType = 7;
+                                break;
+                            }
+                            default :
+                            {
+                                _list_type.SubType = -1;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _list_type = {};
+                        var _type = _bullet.m_nType - 99;
+                        if(!isNaN(_type) &&  _type >=1 && _type < 9)
+                        {
+                            _list_type.Type = 1;
+                            _list_type.SubType = _type;
+                        }
+                        else
+                        {
+                            _list_type.Type = -1;
+                            _list_type.SubType = -1;
+                        }
+                    }
+                }
+            }
+
+            Pr.StyleId = StartStyleId;
+
+            var _cur_list_type;
+            for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+            {
+                var Item = this.Content[Index];
+
+                var TempPr;
+                if ( type_Paragraph == Item.GetType() )
+                {
+                    TempPr         = Item.Get_CompiledPr2(false).ParaPr.Copy();
+
+                    if(_list_type === null)
+                    {
+                        _bullet = Item.PresentationPr.Bullet;
+
+                        if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                        {
+                            _list_type = {Type : -1, SubType : -1};
+                        }
+                        else
+                        {
+                            if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                            {
+                                _list_type = {};
+                                _list_type.Type = 0;
+                                switch (_bullet.m_sChar)
+                                {
+                                    case "•":
+                                    {
+                                        _list_type.SubType = 1;
+                                        break;
+                                    }
+                                    case  "o":
+                                    {
+                                        _list_type.SubType = 2;
+                                        break;
+                                    }
+                                    case  "§":
+                                    {
+                                        _list_type.SubType = 3;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x0076 ):
+                                    {
+                                        _list_type.SubType = 4;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x00D8 ):
+                                    {
+                                        _list_type.SubType = 5;
+                                        break;
+                                    }
+                                    case  String.fromCharCode( 0x00FC ):
+                                    {
+                                        _list_type.SubType = 6;
+                                        break;
+                                    }
+                                    case String.fromCharCode( 119 ):
+                                    {
+                                        _list_type.SubType = 7;
+                                        break;
+                                    }
+                                    default :
+                                    {
+                                        _list_type.SubType = -1;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                _list_type = {};
+                                var _type = _bullet.m_nType - 99;
+                                if(!isNaN(_type) &&  _type >=1 && _type < 9)
+                                {
+                                    _list_type.Type = 1;
+                                    _list_type.SubType = _type;
+                                }
+                                else
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                            }
+                        }
+                    }
+                    else if(_list_type.Type != -1)
+                    {
+                        _bullet = Item.PresentationPr.Bullet;
+
+                        if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                        {
+                            _list_type = {Type : -1, SubType : -1};
+                        }
+                        else
+                        {
+                            if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                            {
+                                if(_list_type.Type != 0)
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                                else if(_list_type.SubType != -1)
+                                {
+                                    var _sub_type;
+                                    switch (_bullet.m_sChar)
+                                    {
+                                        case "•":
+                                        {
+                                            _sub_type = 1;
+                                            break;
+                                        }
+                                        case  "o":
+                                        {
+                                            _sub_type = 2;
+                                            break;
+                                        }
+                                        case  "§":
+                                        {
+                                            _sub_type = 3;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x0076 ):
+                                        {
+                                            _sub_type = 4;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x00D8 ):
+                                        {
+                                            _sub_type = 5;
+                                            break;
+                                        }
+                                        case  String.fromCharCode( 0x00FC ):
+                                        {
+                                            _sub_type = 6;
+                                            break;
+                                        }
+                                        case String.fromCharCode( 119 ):
+                                        {
+                                            _list_type.SubType = 7;
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            _sub_type = -1;
+                                            break;
+                                        }
+
+                                            if(_sub_type != _list_type.SubType)
+                                            {
+                                                _list_type.SubType = -1;
+                                            }
+                                    }
+                                }
+                            }
+                            else if(_list_type.SubType != -1)
+                            {
+                                if(_list_type.Type != 1)
+                                {
+                                    _list_type = {Type : -1, SubType : -1};
+                                }
+                                else
+                                {
+
+                                }
+                                _type = _bullet.m_nType - 99;
+                                if(_list_type.SubType != _type)
+                                {
+                                    _list_type.SubType = -1;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                Pr = Pr.Compare(TempPr);
+            }
+
+            if ( Pr.Ind.Left == UnknownValue )
+                Pr.Ind.Left = StartPr.Ind.Left;
+
+            if ( Pr.Ind.Right == UnknownValue )
+                Pr.Ind.Right = StartPr.Ind.Right;
+
+            if ( Pr.Ind.FirstLine == UnknownValue )
+                Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+
+            Result_ParaPr.Ind               = Pr.Ind;
+            Result_ParaPr.Jc                = Pr.Jc;
+            Result_ParaPr.Spacing           = Pr.Spacing;
+            Result_ParaPr.PageBreakBefore   = Pr.PageBreakBefore;
+            Result_ParaPr.KeepLines         = Pr.KeepLines;
+            Result_ParaPr.ContextualSpacing = Pr.ContextualSpacing;
+            Result_ParaPr.Shd               = Pr.Shd;
+            Result_ParaPr.Brd               = Pr.Brd;
+            Result_ParaPr.StyleId           = Pr.StyleId;
+            Result_ParaPr.ListType             = _list_type;
+        }
+        else
+        {
+            var Item = this.Content[this.CurPos.ContentPos];
+            if ( type_Paragraph == Item.GetType() )
+            {
+                var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
+
+                Result_ParaPr = ParaPr.Copy();
+
+                _bullet = Item.PresentationPr.Bullet;
+
+                if(_bullet.m_nType == numbering_presentationnumfrmt_None)
+                {
+                    _list_type = {Type : -1, SubType : -1};
+                }
+                else
+                {
+                    if(_bullet.m_nType == numbering_presentationnumfrmt_Char)
+                    {
+                        _list_type = {};
+                        _list_type.Type = 0;
+                        switch (_bullet.m_sChar)
+                        {
+                            case "•":
+                            {
+                                _list_type.SubType = 1;
+                                break;
+                            }
+                            case  "o":
+                            {
+                                _list_type.SubType = 2;
+                                break;
+                            }
+                            case  "§":
+                            {
+                                _list_type.SubType = 3;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x0076 ):
+                            {
+                                _list_type.SubType = 4;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00D8 ):
+                            {
+                                _list_type.SubType = 5;
+                                break;
+                            }
+                            case  String.fromCharCode( 0x00FC ):
+                            {
+                                _list_type.SubType = 6;
+                                break;
+                            }
+                            case String.fromCharCode( 119 ):
+                            {
+                                _list_type.SubType = 7;
+                                break;
+                            }
+                            default :
+                            {
+                                _list_type.SubType = -1;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _list_type = {};
+                        var _type = _bullet.m_nType - 99;
+                        if(!isNaN(_type) &&  _type >=1 && _type < 9)
+                        {
+                            _list_type.Type = 1;
+                            _list_type.SubType = _type;
+                        }
+                        else
+                        {
+                            _list_type.Type = -1;
+                            _list_type.SubType = -1;
+                        }
+                    }
+                }
+                Result_ParaPr.ListType = _list_type;
+            }
+        }
+
+
+        return Result_ParaPr;
     },
 
     Get_Paragraph_TextPr : function()

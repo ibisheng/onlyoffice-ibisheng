@@ -106,10 +106,6 @@ CChartTitle.prototype =
         return isRealObject(this.txBody) ? this.txBody.isEmpty() : true;
     },
 
-    setType: function(type)
-    {
-        this.type = type;
-    },
 
     Get_Styles: function()
     {
@@ -1183,7 +1179,7 @@ CChartTitle.prototype =
             case historyitem_AutoShapes_SetChartTitleType:
             {
                 w.WriteBool(isRealNumber(data.newPr));
-                is(isRealNumber(data.newPr));
+                if(isRealNumber(data.newPr));
                 {
                     w.WriteLong(data.newPr);
                 }
