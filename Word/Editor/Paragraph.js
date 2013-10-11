@@ -13785,8 +13785,6 @@ Paragraph.prototype =
         this.Selection.StartPos = EndPos;
         this.Selection.EndPos   = EndPos;
         this.Set_ContentPos( EndPos );
-
-        this.Document_SetThisElementCurrent();
     },
 
     Ignore_MisspelledWord : function(WordId)

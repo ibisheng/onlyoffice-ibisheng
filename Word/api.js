@@ -5323,6 +5323,7 @@ asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProp
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         Paragraph.Replace_MisspelledWord( Word, ElemId );
         this.WordControl.m_oLogicDocument.Recalculate();
+        Paragraph.Document_SetThisElementCurrent();
     }
 }
 
