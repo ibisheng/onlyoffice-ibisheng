@@ -2335,7 +2335,7 @@ CGraphicFrame.prototype =
         }
 
 
-        if(isRealObject(this.graphicObject))
+        if(isRealObject(this.parent))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
@@ -2452,7 +2452,7 @@ CGraphicFrame.prototype =
             }
         }
 
-        if(isRealObject(this.graphicObject))
+        if(isRealObject(this.parent))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
