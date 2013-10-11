@@ -11839,6 +11839,9 @@ CTable.prototype =
         //if ( true != this.RecalcInfo.TableGrid )
         //    return;
 
+        if ( this.Content.length <= 0 )
+            return;
+
         this.Internal_Recalculate_Grid_Open();
 
         //---------------------------------------------------------------------------
