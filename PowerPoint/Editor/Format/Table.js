@@ -3039,7 +3039,7 @@ CTable.prototype =
 
         // Копируем настройки
         Table.Set_Pr( this.Pr.Copy() );
-        Table.Set_TableStyle( this.TableStyle );
+        Table.Set_TableStyle( this.styleIndex );
         Table.Set_TableLook( this.TableLook.Copy() );
 
         Table.Rows = this.Rows;
@@ -10219,7 +10219,12 @@ CTable.prototype =
 
         // Считываем свойства для текущего стиля
         var Pr = Styles.Get_Pr( StyleId, styles_Table, null );
-
+        if(!this.Parent || !this.Parent.Parent)
+        {
+            if(this.Pr !== null && typeof this.Pr === "object")
+                Pr.TablePr.Merge(this.Pr);
+            return Pr;
+        }
         var _theme = null, _master = null, _layout = null, _slide = null;
         switch (this.Parent.parent.kind)
         {

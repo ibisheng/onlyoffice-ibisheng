@@ -61,6 +61,26 @@ function CGroupShape(parent)
 CGroupShape.prototype =
 {
 
+    copy: function(sp)
+    {
+        if(!sp)
+            sp = new CGroupShape();
+        sp.setSpPr(this.spPr.createDuplicate());
+        if(this.nvGrpSpPr)
+        {
+            sp.setNvSpPr(this.nvGrpSpPr.createDuplicate());
+        }
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].copy)
+            {
+                sp.addToSpTree(sp.spTree.length, this.spTree[i].copy())
+                sp.spTree[sp.spTree.length - 1].setGroup(sp);
+            }
+        }
+        return sp;
+    },
+
     getAllImages: function(images)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -166,6 +186,13 @@ CGroupShape.prototype =
     {
         History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});
         this.parent = parent;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setParent)
+            {
+                this.spTree[i].setParent(parent);
+            }
+        }
     },
 
     isSimpleObject: function()

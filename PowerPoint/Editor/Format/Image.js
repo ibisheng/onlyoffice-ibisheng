@@ -64,6 +64,19 @@ function CImageShape(parent)
 CImageShape.prototype =
 {
 
+    copy: function(sp)
+    {
+        if(!sp)
+            sp = new CImageShape();
+        if(this.blipFill)
+            sp.setBlipFill(this.blipFill.createDuplicate());
+        sp.setSpPr(this.spPr.createDuplicate());
+        if(this.nvPicPr)
+        {
+            sp.setNvSpPr(this.nvPicPr.createDuplicate());
+        }
+        return sp;
+    },
 
     getImageUrl: function()
     {

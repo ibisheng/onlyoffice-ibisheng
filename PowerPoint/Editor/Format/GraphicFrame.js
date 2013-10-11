@@ -49,6 +49,26 @@ CGraphicFrame.prototype =
         return this.graphicObject.CurCell ? this.graphicObject.CurCell.Content : null;
     },
 
+    setSpPr: function(spPr)
+    {
+        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        this.spPr = spPr;
+    },
+
+    copy: function(sp)
+    {
+        if(!sp)
+            sp = new CGraphicFrame();
+        sp.setSpPr(this.spPr.createDuplicate());
+        if(this.nvGraphicFramePr)
+        {
+            sp.setNvSpPr(this.nvGraphicFramePr.createDuplicate());
+        }
+        var table = this.graphicObject.Copy(sp);
+        sp.setGraphicObject(table);
+        return sp;
+    },
+
     isSimpleObject: function()
     {
         return true;
@@ -1651,6 +1671,8 @@ CGraphicFrame.prototype =
 
         var Styles = new CStyles();
 
+        if(!this.parent)
+            return Styles;
         var theme = null, layout = null, master = null, presentation;
 
         switch(this.parent.kind)
@@ -2221,7 +2243,11 @@ CGraphicFrame.prototype =
 
         switch(data.Type)
         {
-
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
             case historyitem_SetSetNvSpPr:
             {
                 this.nvGraphicFramePr = data.oldPr;
@@ -2335,7 +2361,7 @@ CGraphicFrame.prototype =
         }
 
 
-        if(isRealObject(this.parent))
+        if(isRealObject(this.parent) && isRealObject(this.graphicObject))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
@@ -2345,7 +2371,11 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
-
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
             case historyitem_SetSetNvSpPr:
             {
                 this.nvGraphicFramePr = data.newPr;
@@ -2452,7 +2482,7 @@ CGraphicFrame.prototype =
             }
         }
 
-        if(isRealObject(this.parent))
+        if(isRealObject(this.parent) && isRealObject(this.graphicObject))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
@@ -2465,6 +2495,15 @@ CGraphicFrame.prototype =
         var bool;
         switch(data.Type)
         {
+            case historyitem_SetSetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
             case historyitem_SetSetNvSpPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -2568,6 +2607,16 @@ CGraphicFrame.prototype =
         {
             switch(r.GetLong())
             {
+                case historyitem_SetSetSpPr:
+                {
+
+                    this.spPr = new CSpPr();
+                    if(r.GetBool())
+                    {
+                        this.spPr.Read_FromBinary2(r);
+                    }
+                    break;
+                }
                 case historyitem_SetSetNvSpPr:
                 {
                     if(r.GetBool())
@@ -2701,6 +2750,10 @@ CGraphicFrame.prototype =
 
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+            if(isRealObject(this.parent) && isRealObject(this.graphicObject))
+                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+            else
+                delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
         }
     },
 

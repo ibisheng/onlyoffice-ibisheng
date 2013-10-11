@@ -1637,7 +1637,10 @@ CShape.prototype =
             sp = new CShape();
         sp.setSpPr(this.spPr.createDuplicate());
         sp.setStyle(this.style);
-        sp.setNvSpPr(this.nvSpPr);
+        if(this.nvSpPr)
+        {
+            sp.setNvSpPr(this.nvSpPr.createDuplicate());
+        }
         if(isRealObject(this.txBody))
         {
             var txBody = new CTextBody(sp);
