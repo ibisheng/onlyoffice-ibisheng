@@ -444,6 +444,7 @@ var:CContextMenuData
 prop:get_Type
 prop:get_X
 prop:get_Y
+prop:get_IsSlideSelect
 ---
 var:getURLParameter
 ---
@@ -1578,6 +1579,7 @@ window['CContextMenuData'] = CContextMenuData;
 CContextMenuData.prototype['get_Type'] = CContextMenuData.prototype.get_Type;
 CContextMenuData.prototype['get_X'] = CContextMenuData.prototype.get_X;
 CContextMenuData.prototype['get_Y'] = CContextMenuData.prototype.get_Y;
+CContextMenuData.prototype['get_IsSlideSelect'] = CContextMenuData.prototype.get_IsSlideSelect;
 window['getURLParameter'] = getURLParameter;
 window['sendCommand'] = sendCommand;
 window['sendTrack'] = sendTrack;
