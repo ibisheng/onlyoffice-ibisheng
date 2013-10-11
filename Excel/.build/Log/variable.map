@@ -808,7 +808,7 @@ c_oAscAdvancedOptionsAction$Save:w9
 JSCompiler_StaticMethods_getMainGroup:v3
 nSldLtTMediaAndTx:YV
 JSCompiler_StaticMethods_Get_Paragraph_TextPr:j4
-JSCompiler_get:B
+JSCompiler_get:C
 JSCompiler_StaticMethods_DrawSegment:P0
 historyitem_Cell_Fontname:xP
 c_oSer_ConditionalFormattingDataBar$CFVO:fI
@@ -911,7 +911,7 @@ EBorderStyle$borderstyleThin:YI
 EVerticalAlignment$verticalalignmentDistributed:wJ
 c_oSer_Top10$FilterVal:NG
 c_oMainTables$Themes:zZ
-bar:C
+bar:D
 JSCompiler_StaticMethods_setBlipFill:nT
 Binary_WorkbookTableReader:kL
 cff_slot_init:Fu
@@ -1458,7 +1458,7 @@ CPdfPrinter:Rz
 DecodeBase64Char:Ay
 c_oSerFillTypes$PatternFillBgColor:eD
 c_oSer_DrawingFromToType$Row:XE
-JSCompiler_alias_VOID:q
+JSCompiler_alias_VOID:p
 CNoFill:uU
 JSCompiler_StaticMethods_getWorksheetByName:He
 c_oSer_Dxf$Font:UG
@@ -1483,7 +1483,7 @@ JSCompiler_StaticMethods_updateCoordinatesAfterInternalResize:V2
 HitInLine:KY
 _ph_summ__tx:YW
 asc_CTextFontFamily:wg
-JSCompiler_alias_THROW:ba
+JSCompiler_alias_THROW:ca
 TT_Gasp:Ok
 CGroupShape:Kg
 FT_UnitVector:Zq
@@ -1707,7 +1707,7 @@ ParaEmpty:yi
 L 9:t
 JSCompiler_StaticMethods_Set_DocumentPrev:m7
 L 8:s
-L 7:p
+L 7:q
 L 6:m
 L 5:h
 L 4:g
@@ -3076,7 +3076,7 @@ L 20:Q
 L 23:R
 L 22:aa
 L 25:W
-L 24:ca
+L 24:ba
 L 50:nk
 tt_size_reset:Et
 recalcresult_PrevPage:O6
@@ -3165,15 +3165,15 @@ L 13:F
 L 14:G
 temp1:zj
 c_oSerFontTypes$Strike:jD
-L 11:D
+L 11:B
 temp2:Bj
 L 12:E
 t1_lookup_glyph_by_stdcharcode:qn
 L 10:z
 L 19:L
 T1_Driver:hw
-L 17:K
-L 18:J
+L 17:J
+L 18:K
 L 15:I
 L 16:H
 historyitem_Worksheet_Hide:QO
