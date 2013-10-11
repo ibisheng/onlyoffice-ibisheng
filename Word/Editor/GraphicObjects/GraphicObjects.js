@@ -1110,7 +1110,9 @@ CGraphicObjects.prototype =
         }
 
         var ret = new CChartAsGroup();
+        g_oTableId.m_bTurnOff = true;
         ret.setAscChart(new asc_CChart());
+        g_oTableId.m_bTurnOff = false;
 		ret.chart.initDefault();
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;

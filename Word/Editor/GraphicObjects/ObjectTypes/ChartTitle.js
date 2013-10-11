@@ -9,9 +9,9 @@ function CChartTitle(chartGroup, type)
     this.layout = null;
     this.overlay = false;
     this.spPr = new CSpPr();
-    this.chartGroup = chartGroup;
-    this.drawingObjects = chartGroup.drawingObjects;
-    this.type = type;
+    //this.chartGroup = chartGroup;
+    //this.drawingObjects = chartGroup.drawingObjects;
+    //this.type = type;
 
     this.txPr = null;
     this.isDefaultText = false;
@@ -41,8 +41,17 @@ function CChartTitle(chartGroup, type)
     };
 
     this.selected = false;
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+    if(isRealObject(chartGroup))
+    {
+        this.setChartGroup(chartGroup);
+        this.addTextBody(new CTextBody(this));
+    }
+    if(isRealNumber(type))
+    {
+        this.setType(type);
+    }
 }
 
 CChartTitle.prototype =
@@ -50,6 +59,14 @@ CChartTitle.prototype =
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_TITLE;
+    },
+
+    setChartGroup: function(chartGroup)
+    {
+        var oldPr = this.chartGroup ;
+        var newPr = chartGroup ;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartGroup, oldPr: oldPr, newPr: newPr});
+        this.chartGroup = chartGroup;
     },
 
     getAllFonts: function(AllFonts)
@@ -82,6 +99,7 @@ CChartTitle.prototype =
 
     setType: function(type)
     {
+        History.Add(this, {Type:historyitem_AutoShapes_SetChartTitleType, oldPr : this.type, newPr: type});
         this.type = type;
     },
 
@@ -203,6 +221,9 @@ CChartTitle.prototype =
 
     addTextBody: function(txBody)
     {
+        var oldPr = this.txBody ;
+        var newPr = txBody ;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartTitleTxBody, oldPr: oldPr, newPr: newPr});
         this.txBody = txBody;
     },
 
@@ -863,9 +884,12 @@ CChartTitle.prototype =
 
     setLayout: function(layout)
     {
+
+        var oldLayout = this.layout ? this.layout.createDuplicate() : null;
+        var newLayout = layout ? layout.createDuplicate() : null;
+        History.Add(this, {Type: historyitem_SetCahrtLayout, oldLayout: oldLayout, newLayout: newLayout});
         this.layout = layout;
     },
-
 
 
     hit: function(x, y)
@@ -945,8 +969,9 @@ CChartTitle.prototype =
     {
         if(r.GetBool())
         {
-            this.layout = new CChartLayout();
-            this.layout.readFromBinary(r);
+            var layout = new CChartLayout();
+            layout.Read_FromBinary2(r);
+            this.setLayout(layout);
         }
         this.overlay = r.GetBool();
         this.spPr.Read_FromBinary2(r);
@@ -958,10 +983,267 @@ CChartTitle.prototype =
 
         if(r.GetBool())
         {
-            this.txBody = new CTextBody(this);
+            //this.txBody = new CTextBody(this);
             this.txBody.readFromBinary(r);
         }
 
+    },
+
+    setBodyPr: function(bodyPr)
+    {
+        var old_body_pr = this.txBody.bodyPr;
+        this.txBody.bodyPr = bodyPr;
+        var new_body_pr = this.txBody.bodyPr.createDuplicate();
+        History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+        this.txBody.recalcInfo.recalculateBodyPr = true;
+    },
+
+    setOverlay: function(overlay)
+    {
+        var _overlay = overlay === true;
+        History.Add(this, {Type: historyitem_AutoShapes_SetChartTitleOverlay, oldPr: this.overlay === true, newPr: _overlay});
+        this.overlay = _overlay;
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                if(isRealObject(data.oldLayout))
+                {
+                    this.layout = data.oldLayout.createDuplicate();
+                }
+                else
+                {
+                    this.layout = null;
+                }
+                break;
+            }
+            case historyitem_SetShapeBodyPr:
+            {
+                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                this.chartGroup = data.oldPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type = data.oldPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                this.overlay = data.oldPr
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                this.txBody = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                if(isRealObject(data.newLayout))
+                {
+                    this.layout = data.newLayout.createDuplicate();
+                }
+                else
+                {
+                    this.layout = null;
+                }
+                break;
+            }
+            case historyitem_SetShapeBodyPr:
+            {
+                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                this.chartGroup = data.newPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type = data.newPr;
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                this.overlay = data.newPr
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                this.txBody = data.newPr;
+                break;
+            }
+        }
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_ChartTitle);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_ChartTitle);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                w.WriteBool(isRealObject(data.newLayout));
+                if(isRealObject(data.newLayout))
+                {
+                    data.newLayout.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_SetShapeBodyPr:
+            {
+                data.newBodyPr.Write_ToBinary2(w);
+                break;
+            }
+            case historyitem_AutoShapes_SetChartGroup:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                w.WriteBool(isRealNumber(data.newPr));
+                if(isRealNumber(data.newPr));
+                {
+                    w.WriteLong(data.newPr);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleOverlay:
+            {
+                w.WriteBool(data.newPr);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetChartTitleTxBody:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
+                break;
+            }
+        }
+    },
+
+
+    Load_Changes: function(r)
+    {
+
+        if(r.GetLong() === historyitem_type_ChartTitle)
+        {
+            switch(r.GetLong())
+            {
+                case historyitem_SetCahrtLayout:
+                {
+                    if(r.GetBool())
+                    {
+                        this.layout = new CChartLayout();
+                        this.layout.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.layout = null;
+                    }
+                    break;
+                }
+                case historyitem_SetShapeBodyPr:
+                {
+                    this.txBody.bodyPr = new CBodyPr();
+                    this.txBody.bodyPr.Read_FromBinary2(r);
+                    this.txBody.recalcInfo.recalculateBodyPr = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartGroup:
+                {
+                    if(r.GetBool())
+                    {
+                        this.chartGroup = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.chartGroup = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartTitleType:
+                {
+                    if(r.GetBool())
+                    {
+                        this.type = r.GetLong();
+                    }
+                    else
+                    {
+                        this.type = null;
+                    }
+                    break;
+                }
+                case historyitem_AutoShapes_SetChartTitleOverlay:
+                {
+                    this.overlay = r.GetBool();
+                    break;
+                }
+
+                case historyitem_AutoShapes_SetChartTitleTxBody:
+                {
+                    if(r.GetBool())
+                    {
+                        this.txBody = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.txBody = null;
+                    }
+                    break;
+                }
+
+            }
+        }
     },
 
     OnContentReDraw: function()

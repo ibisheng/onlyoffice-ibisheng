@@ -747,9 +747,18 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 		{
 			if ( this.SelectedObjectsStack[i].Value.ChartProperties )
 			{
+                var is_on = History.Is_On();
+                if(is_on)
+                {
+                    History.TurnOff();
+                }
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
 				this.asc_fireCallback("asc_onUpdateChartStyles");
+                if(is_on)
+                {
+                    History.TurnOn();
+                }
 				break;
 			}
 		}

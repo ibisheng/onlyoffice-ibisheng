@@ -5432,6 +5432,7 @@ ParaDrawing.prototype =
         this.document = editor.WordControl.m_oLogicDocument;
         this.graphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
         this.mainGraphicObjects = editor.WordControl.m_oLogicDocument.DrawingObjects;
+        this.graphicObjects.objectsMap["_" + this.Get_Id()] = this;
         g_oTableId.Add(this, this.Id);
     },
 

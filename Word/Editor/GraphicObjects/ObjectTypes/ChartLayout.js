@@ -52,6 +52,100 @@ CChartLayout.prototype =
         this.isManual = isManual;
     },
 
+    createDuplicate: function()
+    {
+        var ret = new CChartLayout();
+
+        this.isManual = false;
+
+        ret.layoutTarget = this.layoutTarget;
+        ret.xMode = this.xMode;
+        ret.yMode = this.yMode;
+        ret.wMode = this.wMode;
+        ret.hMode = this.hMode;
+
+        ret.x = this.x;
+        ret.y = this.y;
+        ret.w = this.w;
+        ret.h = this.h;
+        return ret;
+    },
+
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteBool(isRealNumber(this.layoutTarget));
+        if(isRealNumber(this.layoutTarget))
+            w.WriteLong(this.layoutTarget);
+
+        w.WriteBool(isRealNumber(this.xMode));
+        if(isRealNumber(this.xMode))
+            w.WriteLong(this.xMode);
+
+        w.WriteBool(isRealNumber(this.yMode));
+        if(isRealNumber(this.yMode))
+            w.WriteLong(this.yMode);
+
+
+        w.WriteBool(isRealNumber(this.wMode));
+        if(isRealNumber(this.wMode))
+            w.WriteLong(this.wMode);
+
+        w.WriteBool(isRealNumber(this.hMode));
+        if(isRealNumber(this.hMode))
+            w.WriteLong(this.hMode);
+
+        w.WriteBool(isRealNumber(this.x));
+        if(isRealNumber(this.x))
+            w.WriteLong(this.x);
+
+        w.WriteBool(isRealNumber(this.y));
+        if(isRealNumber(this.y))
+            w.WriteLong(this.y);
+
+        w.WriteBool(isRealNumber(this.w));
+        if(isRealNumber(this.w))
+            w.WriteLong(this.w);
+
+        w.WriteBool(isRealNumber(this.h));
+        if(isRealNumber(this.h))
+            w.WriteLong(this.h);
+    },
+
+
+    Read_FromBinary2: function(r)
+    {
+        if(r.GetBool())
+            (this.layoutTarget) = r.GetLong();
+
+        if(r.GetBool())
+            (this.xMode) = r.GetLong();
+
+        if(r.GetBool())
+            (this.yMode) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.wMode) = r.GetLong();
+
+        if(r.GetBool())
+            (this.hMode) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.x) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.y) = r.GetLong();
+
+        if(r.GetBool())
+            (this.w) = r.GetLong();
+
+        if(r.GetBool())
+            (this.h) = r.GetLong();
+    },
+
     Undo: function(type, data)
     {
         switch(type)

@@ -58,8 +58,10 @@ CChartAsGroup.prototype =
 		return this.chart;
 	},
 
+
     setAscChart: function(chart)
     {
+        History.Add(this, {Type:historyitem_AutoShapes_AddChart, oldPr: this.chart, newPr: chart});
         this.chart = chart;
     },
 
@@ -935,7 +937,7 @@ CChartAsGroup.prototype =
             }
             else
             {
-                this.chartTitle.y = this.drawingDocument.GetMMPerDot(7);
+                this.chartTitle.y = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
             }
 
             this.chartTitle.recalculateTransform();
@@ -962,10 +964,10 @@ CChartAsGroup.prototype =
 
         }
         var lInd, tInd, rInd, bInd;
-        tInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
-        lInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
+        tInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
+        lInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
         rInd = 0;
-        bInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
+        bInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
         if(isRealObject(this.vAxisTitle))
         {
             if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
@@ -978,7 +980,7 @@ CChartAsGroup.prototype =
             }
             else
             {
-                this.vAxisTitle.x = this.drawingDocument.GetMMPerDot(7);
+                this.vAxisTitle.x = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
             }
 
             if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
@@ -1012,9 +1014,9 @@ CChartAsGroup.prototype =
             }
             else
             {
-                this.hAxisTitle.x = ((this.absExtX - rInd) - (lInd + this.drawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + this.drawingDocument.GetMMPerDot(25);
-                if(this.hAxisTitle.x < lInd + this.drawingDocument.GetMMPerDot(25))
-                    this.hAxisTitle.x = lInd + this.drawingDocument.GetMMPerDot(25);
+                this.hAxisTitle.x = ((this.absExtX - rInd) - (lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                if(this.hAxisTitle.x < lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25))
+                    this.hAxisTitle.x = lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
             }
 
             if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
@@ -1040,8 +1042,8 @@ CChartAsGroup.prototype =
             if(!this.chartTitle.overlay)
             {
                 title_margin = {
-                    w: this.drawingDocument.GetDotsPerMM(this.chartTitle.extX),
-                    h: 7+this.drawingDocument.GetDotsPerMM(this.chartTitle.extY)
+                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extX),
+                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extY)
                 }
             }
         }
@@ -1051,8 +1053,8 @@ CChartAsGroup.prototype =
             if(!this.hAxisTitle.overlay)
             {
                 xAxisTitle = {
-                    w: this.drawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
-                    h: 7+this.drawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
+                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
+                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
                 }
             }
         }
@@ -1062,8 +1064,8 @@ CChartAsGroup.prototype =
             if(!this.vAxisTitle.overlay)
             {
                 yAxisTitle = {
-                    w:  7 + this.drawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
-                    h: this.drawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
+                    w:  7 + editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
+                    h: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
                 }
             }
         }
@@ -1082,7 +1084,7 @@ CChartAsGroup.prototype =
             this.drawingObjects.intervalToIntervalObject(this.chart);           */
         if(!(updateImage === false))
         {
-            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, null, this.drawingDocument.GetDotsPerMM(this.absExtX), this.drawingDocument.GetDotsPerMM(this.absExtY));
+            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
             this.brush.fill.RasterImageId = "";
             //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
         }
@@ -1246,7 +1248,7 @@ CChartAsGroup.prototype =
     {
         var _radius;
         if(!(typeof radius === "number"))
-            _radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+            _radius = editor.WordControl.m_oDrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
         else
         {
             _radius = radius;
@@ -1775,11 +1777,7 @@ CChartAsGroup.prototype =
 
 
 
-    Save_Changes: function()
-    {},
 
-    Load_Changes: function()
-    {},
 
     Refresh_RecalcData: function()
     {},
@@ -1791,6 +1789,14 @@ CChartAsGroup.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SetParent:
+            {
+                if(data.oldParent == null)
+                    this.parent = null;
+                else
+                    this.parent = g_oTableId.Get_ById(data.oldParent);
+                break;
+            }
             case historyitem_SetSizes:
             {
                 this.spPr.xfrm.extX = data.oldW;
@@ -1814,6 +1820,209 @@ CChartAsGroup.prototype =
                 }
 
                 this.calculateAfterResize();
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.oldPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                this.chart = data.oldPr;
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+        }
+    },
+
+    Save_Changes: function(data, w)
+    {
+        var writer = w;
+        w.WriteLong(historyitem_type_Chart);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_SetParent:
+            {
+                writer.WriteBool(data.newParent != null);
+                if(data.newParent != null)
+                {
+                    writer.WriteString2(data.newParent);
+                }
+                break;
+            }
+            case historyitem_SetSizes:
+            {
+                writer.WriteDouble(data.newPosX);
+                writer.WriteDouble(data.newPosY);
+                writer.WriteDouble(data.newW);
+                writer.WriteDouble(data.newH);
+                writer.WriteBool(data.newFlipH);
+                writer.WriteBool(data.newFlipV);
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            case historyitem_AutoShapes_AddYAxis:
+            case historyitem_AutoShapes_AddTitle:
+            {
+                w.WriteBool(typeof data.newPr === "string");
+                if(typeof data.newPr === "string")
+                    w.WriteString2(data.newPr);
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+        }
+    },
+
+    Load_Changes: function(reader)
+    {
+        var ClassType = reader.GetLong();
+        if ( historyitem_type_Chart != ClassType )
+            return;
+        var r = reader;
+        var type = reader.GetLong();
+        switch(type)
+        {
+            case historyitem_SetParent:
+            {
+                if(reader.GetBool())
+                {
+                    this.parent = g_oTableId.Get_ById(reader.GetString2());
+                }
+                else
+                {
+                    this.parent = null;
+                }
+                break;
+            }
+            case historyitem_SetSizes:
+            {
+                var posX = reader.GetDouble();
+                var posY = reader.GetDouble();
+                var extX = reader.GetDouble();
+                var extY = reader.GetDouble();
+                var flipH = reader.GetBool();
+                var flipV = reader.GetBool();
+                this.spPr.xfrm.extX = extX;
+                this.spPr.xfrm.extY = extY;
+                this.spPr.xfrm.flipH = flipH;
+                this.spPr.xfrm.flipV = flipV;
+                this.absExtX = extX;
+                this.absExtY = extY;
+                this.absFlipH = flipH;
+                this.absFlipV = flipV;
+                this.absOffsetX = posX;
+                this.absOffsetY = posY;
+                if(this.parent)
+                {
+                    this.parent.absOffsetX = posX;
+                    this.parent.absOffsetY = posY;
+                    this.parent.absExtX = extX;
+                    this.parent.absExtY = extY;
+                    this.parent.absFlipH = flipH;
+                    this.parent.absFlipV = flipV;
+                }
+
+                this.calculateAfterResize();
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                if(r.GetBool())
+                {
+                    this.hAxisTitle = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.hAxisTitle = null;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                if(r.GetBool())
+                {
+                    this.vAxisTitle = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.vAxisTitle = null;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                if(r.GetBool())
+                {
+                    this.chartTitle = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.chartTitle = null;
+                }
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+
+                this.spPr = new CSpPr();
+                if(r.GetBool())
+                {
+                    this.spPr.Read_FromBinary2(r);
+                }
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                if(r.GetBool())
+                {
+                    this.chart = new asc_CChart();
+                    r.GetLong();
+                    this.chart.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.chart = null;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateAfterResize:
+            {
+                this.recalculatePosExt();
+                this.init();
+                this.recalculate();
                 break;
             }
         }
@@ -1846,6 +2055,39 @@ CChartAsGroup.prototype =
                 }
 
                 this.calculateAfterResize();
+                break;
+            }
+            case historyitem_AutoShapes_AddXAxis:
+            {
+                this.hAxisTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                this.vAxisTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddTitle:
+            {
+                this.chartTitle = g_oTableId.Get_ById(data.newPr);
+                break;
+            }
+            case historyitem_AutoShapes_AddChart:
+            {
+                this.chart = data.newPr;
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_SetParent:
+            {
+                if(data.newParent == null)
+                    this.parent = null;
+                else
+                    this.parent = g_oTableId.Get_ById(data.newParent);
                 break;
             }
         }
@@ -1906,21 +2148,26 @@ CChartAsGroup.prototype =
     {
         if(r.GetBool())
         {
-            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.readFromBinary(r);
         }
 
         if(r.GetBool())
         {
-            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.readFromBinary(r);
         }
         if(r.GetBool())
         {
-            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.readFromBinary(r);
         }
-        this.chart.Read_FromBinary2(r);
+        g_oTableId.m_bTurnOff = true;
+        var chart = new asc_CChart();
+        g_oTableId.m_bTurnOff = false;
+
+        chart.Read_FromBinary2(r, true);
+        this.setAscChart(chart);
         this.spPr.Read_FromBinary2(r);
         if(isRealObject(this.parent))
         {
@@ -1930,10 +2177,42 @@ CChartAsGroup.prototype =
         this.init();
     },
 
+    addXAxis: function(title)
+    {
+        var oldValue = isRealObject(this.hAxisTitle) ? this.hAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.hAxisTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddXAxis, oldPr: oldValue, newPr: newValue});
+    },
+
+    addYAxis: function(title)
+    {
+        var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.vAxisTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddYAxis, oldPr: oldValue, newPr: newValue});
+    },
+
+    addTitle: function(title)
+    {
+        var oldValue = isRealObject(this.chartTitle) ? this.chartTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.chartTitle = title;
+        History.Add(this, {Type: historyitem_AutoShapes_AddTitle, oldPr: oldValue, newPr: newValue});
+    },
+
+
+    setSpPr: function(spPr)
+    {
+        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        this.spPr = spPr;
+    },
+
+
     setChartBinary: function(binary)
     {
         // Приводим бинарник к внутренней структуре
-        var r = CreateBinaryReader(binary, 0, binary.length);
+        /*var r = CreateBinaryReader(binary, 0, binary.length);
         if(r.GetBool())
         {
             this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
@@ -1959,7 +2238,45 @@ CChartAsGroup.prototype =
             this.parent.Extent.H = this.spPr.xfrm.extY;
         }
         this.init();
+        this.recalculate();  */
+
+        var r = CreateBinaryReader(binary, 0, binary.length);
+        if(r.GetBool())
+        {
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
+            this.chartTitle.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
+            this.vAxisTitle.readFromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
+            this.hAxisTitle.readFromBinary(r);
+        }
+
+
+        g_oTableId.m_bTurnOff = true;
+        var chart = new asc_CChart();
+        g_oTableId.m_bTurnOff = false;
+
+
+        chart.Read_FromBinary2(r, true);
+        this.setAscChart(chart);
+        var spPr = new CSpPr();
+        spPr.Read_FromBinary2(r);
+        this.setSpPr(spPr);
+        if(isRealObject(this.parent))
+        {
+            this.parent.setExtent(this.spPr.xfrm.extX, this.spPr.xfrm.extY);
+        }
+        this.init();
         this.recalculate();
+        History.Add(this, {Type: historyitem_AutoShapes_RecalculateAfterResize});
+
     },
 
     copy: function(parent, group)
@@ -1995,11 +2312,16 @@ CChartAsGroup.prototype =
         this.parent = paraDrawing;
     },
 
-    Write_ToBinary2: function()
-    {},
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_Chart);
+        w.WriteString2(this.Id);
+    },
 
-    Read_FromBinary2: function()
-    {}
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    }
 
 };
 

@@ -149,11 +149,12 @@ function CTableId()
             case historyitem_type_Shape            : Element = new WordShape(); break;
             case historyitem_type_Image            : Element = new WordImage(); break;
             case historyitem_type_GroupShapes      : Element = new WordGroupShapes(); break;
-			case historyitem_type_Chart		       : Element = new CChartData(true); break;
+			case historyitem_type_Chart		       : Element = new CChartAsGroup(); break;
             case historyitem_type_WrapPolygon      : Element = new CWrapPolygon(); break;
             case historyitem_type_HdrFtrGrObjects  : Element = new HeaderFooterGraphicObjects(); break;
             case historyitem_type_Style            : Element = new CStyle(); break;
             case historyitem_type_TextBody         : Element = new CTextBody(); break;
+            case historyitem_type_ChartTitle       : Element = new CChartTitle(); break;
         }
 
         Element.Read_FromBinary2(Reader);

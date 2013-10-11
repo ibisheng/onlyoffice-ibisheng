@@ -21,8 +21,8 @@ function CTextBody(shape)
     this.contentHeight = 0;
 
     this.styles = [];
-    //this.Id = g_oIdCounter.Get_NewId();
-    //g_oTableId.Add(this, this.Id);
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
     if(isRealObject(shape))
     {
         this.setShape(shape);
@@ -32,6 +32,21 @@ function CTextBody(shape)
 }
 CTextBody.prototype =
 {
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_TextBody);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
 
     Is_TopDocument: function()
     {
@@ -548,25 +563,15 @@ CTextBody.prototype =
         switch(data.Type)
         {
             case historyitem_SetShape:
-            {
-                w.WriteBool(typeof  data.newPr === "string");
-                if(typeof  data.newPr === "string")
-                {
-                    w.WriteString2(data.newPr)
-                }
-                break;
-            }
-
             case historyitem_SetDocContent:
             {
-                w.WriteBool(typeof  data.newPr === "string");
-                if(typeof  data.newPr === "string")
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
                 {
-                    w.WriteString2(data.newPr)
+                    w.WriteString2(data.newPr.Get_Id())
                 }
                 break;
             }
-
             case historyitem_SetLstStyle:
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -593,6 +598,10 @@ CTextBody.prototype =
                     {
                         this.shape = g_oTableId.Get_ById(r.GetString2());
                     }
+                    else
+                    {
+                        this.shape = null;
+                    }
                     break;
                 }
 
@@ -601,6 +610,10 @@ CTextBody.prototype =
                     if(r.GetBool())
                     {
                         this.content = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.content = null;
                     }
                     break;
                 }
@@ -643,9 +656,40 @@ CTextBody.prototype =
 
     readFromBinary: function(r,  drawingDocument)
     {
-        this.bodyPr.Read_FromBinary2(r);
-        readFromBinaryDocContent(this.content, r);
-    }
+        var bodyPr = new CBodyPr();
+        bodyPr.Read_FromBinary2(r);
+        if(isRealObject(this.parent) && this.parent.setBodyPr)
+        {
+            this.parent.setBodyPr(bodyPr);
+        }
+
+        var is_on = History.Is_On();
+        if(is_on)
+        {
+            History.TurnOff();
+        }
+        var dc= new CDocumentContent(this, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, false);
+        readFromBinaryDocContent(dc, r);
+
+        if(is_on)
+        {
+            History.TurnOn();
+        }
+        for(var i = 0; i < dc.Content.length; ++i)
+        {
+            if(i > 0)
+            {
+                this.content.Add_NewParagraph()
+            }
+            var par = dc.Content[i];
+            for(var i = 0; i < par.Content.length; ++i)
+            {
+                if(par.Content[i].Copy)
+                    this.content.Paragraph_Add(par.Content[i].Copy());
+            }
+        }
+    },
+
 };
 
 

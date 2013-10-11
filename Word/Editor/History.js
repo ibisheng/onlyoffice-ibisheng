@@ -255,6 +255,19 @@ var historyitem_CalculateAfterCopyInGroup = 33;
 var historyitem_SetVerticalShapeAlign = 34;
 var historyitem_SetParent = 35;
 var historyitem_SetBlipFill = 36;
+var historyitem_AutoShapes_AddXAxis = 37;
+var historyitem_AutoShapes_AddYAxis = 38;
+var historyitem_AutoShapes_AddTitle = 39;
+var historyitem_AutoShapes_AddChart = 40;
+var historyitem_SetShapeBodyPr = 41;
+var historyitem_AutoShapes_SetChartTitleOverlay = 42;
+var historyitem_SetCahrtLayout = 43;
+var historyitem_AutoShapes_SetChartGroup = 44;
+var historyitem_AutoShapes_SetChartTitleType = 45;
+var historyitem_SetSetSpPr = 46;
+var historyitem_AutoShapes_SetChartTitleTxBody = 47;
+var historyitem_AutoShapes_RecalculateAfterResize = 48;
+
 
 //Типы изменений в классе GraphicObjects
 var historyitem_AddHdrFtrGrObjects = 0;
@@ -359,6 +372,7 @@ var historyitem_type_ChartGroup       = 28;
 var historyitem_type_Style            = 29;
 var historyitem_type_Styles           = 30;
 var historyitem_type_TextBody         = 31;
+var historyitem_type_ChartTitle       = 32;
 
 
 //Типы изменений в классе CChartAsGroup
