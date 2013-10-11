@@ -3248,13 +3248,13 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			this.memory.WriteByte(c_oSer_CommentData.UserName);
 			this.memory.WriteString2(sUserName);
 		}
-		var sQuoteText = null;
+		var sQuoteText = oCommentData.asc_getQuoteText();
 		if(null != sQuoteText)
 		{
 			this.memory.WriteByte(c_oSer_CommentData.QuoteText);
 			this.memory.WriteString2(sQuoteText);
 		}
-		var bSolved = null;
+		var bSolved = oCommentData.asc_getSolved();
 		if(null != bSolved)
 			this.bs.WriteItem( c_oSer_CommentData.Solved, function(){oThis.memory.WriteBool(bSolved);});
 		var bDocumentFlag = oCommentData.asc_getDocumentFlag();
@@ -5720,6 +5720,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         if ( c_oSer_Comments.CommentData === type )
         {
             var oCommentData = new Asc.asc_CCommentData();
+			oCommentData.asc_putDocumentFlag(false);
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentData(t,l,oCommentData);
                 });
@@ -5746,9 +5747,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if ( c_oSer_CommentData.UserName == type )
 			oCommentData.asc_putUserName(this.stream.GetString2LE(length));
 		else if ( c_oSer_CommentData.QuoteText == type )
-		{
-			var sQuoteText = this.stream.GetString2LE(length);
-		}
+			oCommentData.asc_putQuoteText(this.stream.GetString2LE(length));
 		else if ( c_oSer_CommentData.Replies == type )
 		{
 			res = this.bcr.Read1(length, function(t,l){
@@ -5756,9 +5755,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 				});
 		}
 		else if ( c_oSer_CommentData.Solved == type )
-		{
-			var bSolved = this.stream.GetBool();
-		}
+			oCommentData.asc_putSolved(this.stream.GetBool());
 		else if ( c_oSer_CommentData.Document == type )
 			oCommentData.asc_putDocumentFlag(this.stream.GetBool());
 		else
@@ -6028,6 +6025,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         if ( c_oSer_CommentData.Reply === type )
         {
             var oReplyData = new Asc.asc_CCommentData();
+			oReplyData.asc_putDocumentFlag(false);
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCommentData(t,l,oReplyData);
                 });
