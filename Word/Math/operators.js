@@ -3844,6 +3844,7 @@ function CDelimiter()
     this.endOper = new COperator (-1);
     this.sepOper = new COperator (-1);
     this.shape = DELIMITER_SHAPE_CENTERED;
+    this.grow = true;
 
     CSubMathBase.call(this);
 }
@@ -3854,8 +3855,6 @@ CDelimiter.prototype.init = function(props)
         this.grow = true;
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
-    else
-        this.grow = true;
 
     var begGlyph = this.getGlyph(props.begChr, props.begChrType, LOCATION_LEFT);
     this.begOper = new COperator (begGlyph);
@@ -4707,9 +4706,9 @@ function CGroupCharacter()
 extend(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.init = function(props)
 {
-    if(props.vertJust === VJUST_TOP)
+    if(props.vertJc === VJUST_TOP)
         this.vertJust = VJUST_TOP;
-    else if(props.vertJust === VJUST_BOT)
+    else if(props.vertJc === VJUST_BOT)
         this.vertJust = VJUST_BOT;
 
     if(props.pos === LOCATION_TOP || props.location === LOCATION_TOP)
