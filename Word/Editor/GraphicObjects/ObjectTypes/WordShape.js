@@ -1098,7 +1098,7 @@ WordShape.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if(_body_pr.upright ===  false)
+        if(!_body_pr.upright)
         {
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
             {
@@ -1902,7 +1902,7 @@ WordShape.prototype =
             _b = this.absExtY - b_ins;
         }
 
-        if(_body_pr.upright === false)
+        if(!_body_pr.upright)
         {
             var _content_width;
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
@@ -2859,7 +2859,7 @@ WordShape.prototype =
                 _r = this.absExtX;
                 _b = this.absExtY;
             }
-            if(this.bodyPr.upright === false)
+            if(!this.bodyPr.upright)
             {
                 var invert_text_transform = global_MatrixTransformer.Invert(this.transform);
                 var transformed_x = invert_text_transform.TransformPointX(x, y);
