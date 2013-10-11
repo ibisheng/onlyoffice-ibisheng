@@ -621,7 +621,8 @@ CShapeDrawer.prototype =
             return;
 
         var bIsPatt = false;
-        if (this.UniFill != null && this.UniFill.fill != null && this.UniFill.fill.type == FILL_TYPE_PATT)
+        if (this.UniFill != null && this.UniFill.fill != null &&
+            ((this.UniFill.fill.type == FILL_TYPE_PATT) || (this.UniFill.fill.type == FILL_TYPE_GRAD)))
         {
             bIsPatt = true;
         }
