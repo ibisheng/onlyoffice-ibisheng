@@ -1236,7 +1236,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var rData = {
 						"docId": oThis.DocInfo.Id, 
 						"clientId": oThis.DocInfo.UserId,
-						"isAlive": 1
+						"isAlive": oThis.asc_isDocumentModified()
 					};
 					
 					var _OnTrackingTimer = function(){
