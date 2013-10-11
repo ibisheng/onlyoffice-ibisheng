@@ -11063,8 +11063,7 @@ Paragraph.prototype =
                 if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
                 {
                     NewFramePr.Lines = this.Update_DropCapByHeight( H );
-                    NewFramePr.HRule = linerule_Exact;
-                    NewFramePr.H     = H;
+                    NewFramePr.HRule = linerule_Auto;
                 }
                 else
                 {
