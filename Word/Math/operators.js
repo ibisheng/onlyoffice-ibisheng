@@ -3843,7 +3843,7 @@ function CDelimiter()
     this.begOper = new COperator (-1);
     this.endOper = new COperator (-1);
     this.sepOper = new COperator (-1);
-    this.shape   = null;
+    this.shape = DELIMITER_SHAPE_CENTERED;
 
     CSubMathBase.call(this);
 }
@@ -3871,12 +3871,11 @@ CDelimiter.prototype.init = function(props)
     this.sepOper.setTxtPrp(tPrp);
     this.endOper.setTxtPrp(tPrp);
 
-    if(props.shape == DELIMITER_SHAPE_MATH)
+    if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)
         this.shape = DELIMITER_SHAPE_MATH;
-    else if(props.shape == DELIMITER_SHAPE_CENTERED)
+    else if(props.shape == DELIMITER_SHAPE_CENTERED || props.shp == DELIMITER_SHAPE_CENTERED)
         this.shape = DELIMITER_SHAPE_CENTERED;
-    else
-        this.shape = DELIMITER_SHAPE_CENTERED;
+
 
     this.setDimension(1, props.column);
     this.setContent();
