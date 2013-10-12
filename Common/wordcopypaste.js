@@ -3841,26 +3841,50 @@ PasteProcessor.prototype =
                      if(false == oThis.bNested)
                      {
                          var slide = presentation.Slides[presentation.CurPage];
-                         var check_objectcs = arrShapes.concat(arrImages).concat(arrTables);
-                         if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, check_objectcs) === false)
+                         if(slide.graphicObjects.State.id === STATES_ID_TEXT_ADD || slide.graphicObjects.State.id === STATES_ID_TEXT_ADD_IN_GROUP
+                             && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
                          {
-                             for(var i = 0; i < arrShapes.length; ++i)
+                             if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                              {
-                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrShapes[i]);
-                                 presentation.recalcMap[arrShapes[i].Get_Id()] = arrShapes[i];
+                                 var content;
+                                 var textObject = slide.graphicObjects.State.textObject;
+
+                                 if(textObject instanceof CShape)
+                                 {
+                                    content = textObject.txBody.content;
+                                 }
+                                 else
+                                 {
+                                    content = textObject.graphicObject.CurCell.Content;
+                                 }
+                                 presentation.recalcMap[textObject.Get_Id()] = textObject;
+                                 oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
+                                 presentation.Recalculate();
                              }
-                             for(var i = 0; i < arrImages.length; ++i)
+                         }
+                         else
+                         {
+                             var check_objectcs = arrShapes.concat(arrImages).concat(arrTables);
+                             if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, check_objectcs) === false)
                              {
-                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrImages[i]);
-                                 presentation.recalcMap[arrImages[i].Get_Id()] = arrImages[i];
+                                 for(var i = 0; i < arrShapes.length; ++i)
+                                 {
+                                     slide.addToSpTreeToPos(slide.cSld.spTree.length, arrShapes[i]);
+                                     presentation.recalcMap[arrShapes[i].Get_Id()] = arrShapes[i];
+                                 }
+                                 for(var i = 0; i < arrImages.length; ++i)
+                                 {
+                                     slide.addToSpTreeToPos(slide.cSld.spTree.length, arrImages[i]);
+                                     presentation.recalcMap[arrImages[i].Get_Id()] = arrImages[i];
+                                 }
+                                 for(var i = 0; i < arrTables.length; ++i)
+                                 {
+                                     slide.addToSpTreeToPos(slide.cSld.spTree.length, arrTables[i]);
+                                     arrTables[i].recalcAll();
+                                     presentation.recalcMap[arrTables[i].Get_Id()] = arrTables[i];
+                                 }
+                                 presentation.Recalculate();
                              }
-                             for(var i = 0; i < arrTables.length; ++i)
-                             {
-                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arrTables[i]);
-                                 arrTables[i].recalcAll();
-                                 presentation.recalcMap[arrTables[i].Get_Id()] = arrTables[i];
-                             }
-                             presentation.Recalculate();
                          }
                          //oThis.InsertInDocument();
                      }
