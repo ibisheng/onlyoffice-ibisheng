@@ -1628,7 +1628,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     {
         this.nullState.onMouseDown(e, x, y);
 
-        if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP)
+        if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.textObject !== this.textObject/*|| this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP*/)
         {
             this.textObject.addTextFlag = false;
             if(this.textObject instanceof CGraphicFrame)
