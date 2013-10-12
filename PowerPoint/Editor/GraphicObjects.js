@@ -2847,6 +2847,12 @@ CGraphicObjects.prototype = {
                     {
                         selected_objects.push(group.selectedObjects[i]);
                     }
+                    if(selected_objects.length === group.arrGraphicObjects.length)
+                    {
+                        this.slide.removeSelectedObjects();
+                        break;
+                    }
+
                     group.resetSelection();
                     var groups = [];
                     for(i = 0; i < selected_objects.length; ++i)
