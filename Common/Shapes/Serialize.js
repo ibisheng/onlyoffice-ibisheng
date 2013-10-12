@@ -1912,6 +1912,12 @@ function BinaryPPTYLoader()
                                 s.Skip2(_len);
                             }
                         }
+
+                        if (null != uni_fill.fill.lin && null != uni_fill.fill.path)
+                        {
+                            // ms office не открывает такие файлы.
+                            uni_fill.fill.path = null;
+                        }
                     }
 
                     break;
