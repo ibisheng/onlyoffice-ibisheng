@@ -3897,8 +3897,8 @@ CPresentation.prototype =
         {
             //this.Create_NewHistoryPoint();
 
-            this.DrawingDocument.TargetStart();
-            this.DrawingDocument.TargetShow();
+           //this.DrawingDocument.TargetStart();
+           //this.DrawingDocument.TargetShow();
             this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ) );
         }
         bRetValue = true;
