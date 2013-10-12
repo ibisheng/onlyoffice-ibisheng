@@ -309,7 +309,10 @@ CGraphicObjects.prototype = {
                             {
                                 cur_drawing.sendMouseData();
 
-                                grouped_objects[j].txBody.updateCursorType(x, y, e);
+                                if(grouped_objects[j].txBody)
+                                    grouped_objects[j].txBody.updateCursorType(x, y, e);
+                                else
+                                    grouped_objects[j].updateCursorType(x, y, e);
                                 return;
                             }
                         }

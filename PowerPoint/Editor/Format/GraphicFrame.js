@@ -133,6 +133,11 @@ CGraphicFrame.prototype =
         }
         return [];
     },
+
+    hitInPath: function()
+    {
+        return false;
+    },
     setGraphicObject: function(graphicObject)
     {
         History.Add(this, {Type: historyitem_SetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
@@ -649,6 +654,11 @@ CGraphicFrame.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+    },
+
+    hitInTextRect: function(x, y)
+    {
+        return this.hitInInnerArea(x, y);
     },
 
     getInvertTransform: function()

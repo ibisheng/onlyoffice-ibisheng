@@ -443,11 +443,21 @@ CGroupShape.prototype =
 
     canRotate: function()
     {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i] instanceof CGraphicFrame)
+                return false
+        }
         return true;
     },
 
     canResize: function()
     {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i] instanceof CGraphicFrame)
+                return false
+        }
         return true;//TODO
     },
 
@@ -458,6 +468,7 @@ CGroupShape.prototype =
 
     canGroup: function()
     {
+
         return true;//TODO
     },
 
