@@ -223,6 +223,9 @@ CTextBody.prototype =
 
     calculateContent: function()
     {
+
+
+
         var parent_object = this.shape.getParentObjects();
         for(var i = 0; i < this.textPropsForRecalc.length; ++i)
         {
@@ -252,7 +255,102 @@ CTextBody.prototype =
             this.content.RecalculateNumbering();
             this.bRecalculateNumbering = false;
         }
+
         this.content.Set_StartPage(/*isRealNumber(this.shape.parent.num) ? this.shape.parent.num : */0);
+
+        if(this.bodyPr.textFit !== null && typeof this.bodyPr.textFit === "object")
+        {
+            if(this.bodyPr.textFit.type === text_fit_NormAuto)
+            {
+                var text_fit = this.bodyPr.textFit;
+                var font_scale, spacing_scale;
+                if(!isNaN(text_fit.fontScale) && typeof text_fit.fontScale === "number")
+                    font_scale = text_fit.fontScale/100000;
+                if(!isNaN(text_fit.lnSpcReduction) && typeof text_fit.lnSpcReduction === "number")
+                    spacing_scale = text_fit.lnSpcReduction/100000;
+
+                if(!isNaN(font_scale) && typeof font_scale === "number"
+                    || !isNaN(spacing_scale) && typeof spacing_scale === "number")
+                {
+                    var pars = this.content.Content;
+                    for(var index = 0; index < pars.length; ++index)
+                    {
+                        var parg = pars[index];
+                        if(!isNaN(spacing_scale) && typeof spacing_scale === "number")
+                        {
+                            var spacing = parg.Pr.Spacing;
+                            var spacing2 = parg.Get_CompiledPr(false).ParaPr;
+                            parg.Recalc_CompiledPr();
+                            var spc = (spacing2.Line*spacing_scale);
+                            if(!isNaN(spc) && typeof spc === "number")
+                                spacing.Line = spc;
+
+                            spc = (spacing2.Before*spacing_scale);
+                            if(!isNaN(spc) && typeof spc === "number")
+                                spacing.Before = spc;
+
+                            spc = (spacing2.After*spacing_scale);
+                            if(!isNaN(spc) && typeof spc === "number")
+                                spacing.After = spc;
+                        }
+
+                        if(!isNaN(font_scale) && typeof font_scale === "number")
+                        {
+                            var par_font_size = parg.Get_CompiledPr(false).TextPr.FontSize;
+                            parg.Recalc_CompiledPr();
+                            for(var r = 0; r < parg.Content.length; ++r)
+                            {
+                                var item = parg.Content[r];
+                                if(item.Type === para_TextPr)
+                                {
+                                    var value = item.Value;
+                                    if(!isNaN(value.FontSize) && typeof value.FontSize === "number")
+                                    {
+                                        value.FontSize = (value.FontSize*font_scale) >> 0;
+                                    }
+                                }
+                            }
+                            var result_par_text_pr_font_size = (par_font_size*font_scale) >> 0;
+                            if(!isNaN(result_par_text_pr_font_size) && typeof result_par_text_pr_font_size === "number")
+                            {
+                                var b_insert_text_pr = false, pos = -1;
+                                for(var p = 0; p < parg.Content.length; ++p)
+                                {
+                                    if(parg.Content[p].Type === para_TextPr)
+                                    {
+                                        if(!(!isNaN(parg.Content[p].Value.FontSize) && typeof parg.Content[p].Value.FontSize === "number"))
+                                            parg.Content[p].Value.FontSize = result_par_text_pr_font_size;
+                                        break;
+                                    }
+                                    if(parg.Content[p].Type === para_Text)
+                                    {
+                                        b_insert_text_pr = true;
+                                        pos = p;
+                                        break;
+                                    }
+                                }
+                                if(b_insert_text_pr)
+                                {
+                                    var history_is_on = History.Is_On();
+                                    if(history_is_on)
+                                        History.TurnOff();
+                                    parg.Internal_Content_Add(p, new ParaTextPr({FontSize: result_par_text_pr_font_size}));
+                                    if(history_is_on)
+                                        History.TurnOn();
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            this.bodyPr.textFit = null;
+            this.calculateContent();
+            return;
+        }
+        this.bodyPr.normAutofit = false;
+
         var _l, _t, _r, _b;
 
         var _body_pr = this.getBodyPr();
@@ -329,6 +427,9 @@ CTextBody.prototype =
         this.content.Reset(0, 0, _content_width, 20000);
         this.content.Recalculate_Page(0, true);
         this.contentHeight = this.getSummaryHeight();
+
+
+
 
         if(this.recalcInfo.recalculateContent2)
         {
@@ -431,6 +532,8 @@ CTextBody.prototype =
             }
             this.recalcInfo.recalculateContent2 = false;
         }
+
+
     },
 
     copy: function(txBody)

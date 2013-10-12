@@ -5816,9 +5816,13 @@ CPresentation.prototype =
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
-                    var sp = new CShape(new_slide);
-                    layout.cSld.spTree[i].copy2(sp);
-                    new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
+                    var _ph_type = layout.cSld.spTree[i].getPhType();
+                    if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
+                    {
+                        var sp = new CShape(new_slide);
+                        layout.cSld.spTree[i].copy2(sp);
+                        new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
+                    }
                 }
             }
             new_slide.setSlideNum(this.CurPage + 1);
@@ -5961,12 +5965,17 @@ CPresentation.prototype =
                 {
                     if(layout.cSld.spTree[j].isPlaceholder())
                     {
-                        var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex());
-                        if(matching_shape == null && layout.cSld.spTree[j].copy2)
+
+                        var _ph_type = layout.cSld.spTree[j].getPhType();
+                        if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                         {
-                            var sp = new CShape(slide);
-                            layout.cSld.spTree[j].copy2(sp);
-                            slide.addToSpTreeToPos(slide.cSld.spTree.length, sp)
+                            var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex());
+                            if(matching_shape == null && layout.cSld.spTree[j].copy2)
+                            {
+                                var sp = new CShape(slide);
+                                layout.cSld.spTree[j].copy2(sp);
+                                slide.addToSpTreeToPos(slide.cSld.spTree.length, sp)
+                            }
                         }
                     }
                 }
