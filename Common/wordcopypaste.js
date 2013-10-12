@@ -3347,6 +3347,12 @@ PasteProcessor.prototype =
                             {
                                 if(false == oThis.bNested)
                                 {
+                                    var b_add_slide = false;
+                                    if(presentation.Slides.length === 0)
+                                    {
+                                        presentation.addNextSlide();
+                                        b_add_slide = true;
+                                    }
                                     var slide = presentation.Slides[presentation.CurPage];
                                     switch(slide.graphicObjects.State.id)
                                     {
@@ -3355,7 +3361,6 @@ PasteProcessor.prototype =
                                         {
                                             if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                                             {
-                                                History.Create_NewPoint();
                                                 oThis.insertInPlace2(slide.graphicObjects.State.textObject.txBody.content, shape.txBody.content.Content);
                                                 slide.graphicObjects.State.textObject.txBody.bRecalculateNumbering = true;
                                                 var content = slide.graphicObjects.State.textObject.txBody.content.Content;
@@ -3372,8 +3377,12 @@ PasteProcessor.prototype =
                                         }
                                         default :
                                         {
-                                            if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                                            if(presentation.Document_Is_SelectionLocked(changestype_AddShape, shape) === false)
                                             {
+                                                if(b_add_slide)
+                                                {
+                                                    shape.setParent(presentation.Slides[0]);
+                                                }
                                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, shape);
                                                 var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                                                 var h = shape.txBody.getRectHeight(2000, w);
@@ -3412,12 +3421,21 @@ PasteProcessor.prototype =
                             {
                                 if(false == oThis.bNested)
                                 {
-                                    var slide = presentation.Slides[presentation.CurPage];
-                                    if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                                    var b_add_slide = false;
+                                    if(presentation.Slides.length === 0)
                                     {
-                                        History.Create_NewPoint();
+                                        presentation.addNextSlide();
+                                        b_add_slide = true;
+                                    }
+                                    var slide = presentation.Slides[presentation.CurPage];
+                                    if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, arr_shapes) === false)
+                                    {
                                         for(var i = 0; i < arr_shapes.length; ++i)
                                         {
+                                            if(b_add_slide)
+                                            {
+                                                arr_shapes[i].setParent(presentation.Slides[0]);
+                                            }
                                             arr_shapes[i].changeSize(kw, kh);
                                             slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
                                         }
@@ -3642,8 +3660,6 @@ PasteProcessor.prototype =
                             {
                                 if(false == oThis.bNested)
                                 {
-                                    var slide = presentation.Slides[presentation.CurPage];
-                                    History.Create_NewPoint();
                                     for(var i = 0; i < arr_slides.length; ++i)
                                     {
                                         presentation.insertSlide(presentation.CurPage + i+1, arr_slides[i]);
@@ -3734,17 +3750,30 @@ PasteProcessor.prototype =
                             {
                                 if(false == oThis.bNested)
                                 {
-                                    var slide = presentation.Slides[presentation.CurPage];
-                                    if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                                    var b_add_slide = false;
+
+                                    if(presentation.Slids.length === 0)
                                     {
-                                        History.Create_NewPoint();
-                                        for(var i = 0; i < arr_shapes.length; ++i)
-                                        {
-                                            arr_shapes[i].changeSize(kw, kh);
-                                            slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
-                                        }
+                                        presentation.addNextSlide();
+                                        b_add_slide = true;
                                     }
-                                    presentation.Recalculate();
+                                    if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, arr_shapes) === false)
+                                    {
+                                        var slide = presentation.Slides[presentation.CurPage];
+                                        if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                                        {
+                                            for(var i = 0; i < arr_shapes.length; ++i)
+                                            {
+                                                if(b_add_slide)
+                                                {
+                                                    arr_shapes[i].setParent(presentation.Slides[0]);
+                                                }
+                                                arr_shapes[i].changeSize(kw, kh);
+                                                slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
+                                            }
+                                        }
+                                        presentation.Recalculate();
+                                    }
                                     node.blur();
                                     node.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
@@ -3788,6 +3817,12 @@ PasteProcessor.prototype =
                      //�� ����� ���������� �������� ��� ������� ��������� �������
                      var arrShapes = [], arrImages = [], arrTables = [];
                     var presentation = editor.WordControl.m_oLogicDocument;
+                    var b_add_slide = false;
+                    if(presentation.Slides.length === 0)
+                    {
+                        presentation.addNextSlide();
+                        b_add_slide = true;
+                    }
                     var shape = new CShape(presentation.Slides[presentation.CurPage]);
                     shape.setTextBody(new CTextBody(shape));
                     var dd = presentation.DrawingDocument;
@@ -3806,9 +3841,9 @@ PasteProcessor.prototype =
                      if(false == oThis.bNested)
                      {
                          var slide = presentation.Slides[presentation.CurPage];
-                         if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                         var check_objectcs = arrShapes.concat(arrImages).concat(arrTables);
+                         if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, check_objectcs) === false)
                          {
-                             History.Create_NewPoint();
                              for(var i = 0; i < arrShapes.length; ++i)
                              {
                                  slide.addToSpTreeToPos(slide.cSld.spTree.length, arrShapes[i]);
