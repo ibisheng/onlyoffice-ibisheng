@@ -5914,7 +5914,7 @@ CPresentation.prototype =
 
     deleteSlides: function(array)
     {
-        if(this.Document_Is_SelectionLocked(changestype_RemoveSlide, null) === false)
+        if(array.length > 0 && this.Document_Is_SelectionLocked(changestype_RemoveSlide, null) === false)
         {
             History.Create_NewPoint();
             var oldLen = this.Slides.length;
@@ -6261,6 +6261,8 @@ CPresentation.prototype =
     {
         if ( true === CollaborativeEditing.Get_GlobalLock() )
             return true;
+        if(this.Slides.length === 0)
+            return false;
 
         var cur_slide = this.Slides[this.CurPage];
         var slide_id = cur_slide.deleteLock.Get_Id();
