@@ -6290,6 +6290,22 @@ CPresentation.prototype =
             };
             AdditionalData.Lock.Check(check_obj);
         }
+        if(CheckType === changestype_AddShapes)
+        {
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                return true;
+            for(var i = 0; i < AdditionalData.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": AdditionalData[i].Get_Id(),
+                    "guid": AdditionalData[i].Get_Id()
+                };
+                AdditionalData[i].Lock.Check(check_obj);
+            }
+        }
 
         if(CheckType === changestype_AddSp || CheckType === changestype_AddComment)
         {

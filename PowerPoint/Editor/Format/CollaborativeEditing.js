@@ -1125,6 +1125,8 @@ var changestype_AddSp                = 69;
 var changestype_AddComment           = 70;
 var changestype_Layout               = 71;
 var changestype_AddShape             = 72;
+var changestype_AddShapes            = 73;
+
 
 
 
