@@ -2025,7 +2025,7 @@ CGraphicObjects.prototype = {
         }
     },
 
-    startSearchText : function(str, scanForward) //
+    startSearchText : function(str, scanForward, bNullState) //
     {
         if(typeof(str) != "string")
             return null;
@@ -2038,9 +2038,9 @@ CGraphicObjects.prototype = {
         var _arr_sel_states = null;
         var NumSelected = this.selectedObjects.length;
         var ArrGlyph = this.slide.cSld.spTree;
-        if(this.State.id == STATES_ID_NULL)
+        if(this.State.id == STATES_ID_NULL || bNullState === true)
         {
-            if(NumSelected == 0 || NumSelected == ArrGlyph.length)
+            if(NumSelected == 0 || NumSelected == ArrGlyph.length || bNullState)
             {
                 if(scanForward == true)
                 {

@@ -1191,9 +1191,9 @@ CPresentation.prototype =
                     return true;
                 }
             }
-            for(slide_num = 0; slide_num < this.CurPage; ++slide_num)
+            for(slide_num = 0; slide_num <= this.CurPage; ++slide_num)
             {
-                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward, true);
                 if(search_select_data != null)
                 {
                     this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
@@ -1216,9 +1216,9 @@ CPresentation.prototype =
                     return true;
                 }
             }
-            for(slide_num = this.Slides.length - 1; slide_num > this.CurPage; --slide_num)
+            for(slide_num = this.Slides.length - 1; slide_num >= this.CurPage; --slide_num)
             {
-                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward, true);
                 if(search_select_data != null)
                 {
                     this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
@@ -1228,6 +1228,7 @@ CPresentation.prototype =
                 }
             }
         }
+
         return false;
     },
 
