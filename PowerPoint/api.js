@@ -3631,6 +3631,27 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     }
 }
 
+asc_docs_api.prototype.asc_getComments = function()
+{
+    var comms = [];
+    if (null == this.WordControl.m_oLogicDocument)
+        return comms;
+
+    var _slides = this.WordControl.m_oLogicDocument.Slides;
+    var _slidesCount = _slides.length;
+    for (var i = 0; i < _slidesCount; i++)
+    {
+        var _comments = _slides[i].comments;
+        var _commentsCount = _comments.length;
+
+        for (var j = 0; j < _commentsCount; j++)
+        {
+            comms.push(_comments[j]);
+        }
+    }
+    return comms;
+}
+
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
 {
     var bIsScroll = false;
