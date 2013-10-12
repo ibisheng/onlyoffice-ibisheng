@@ -1046,23 +1046,49 @@ CGraphics.prototype =
             var _y = y;
             var _r = x+w;
             var _b = y+h;
-            if (this.m_bIntegerGrid)
-            {
-                _x = this.m_oFullTransform.TransformPointX(x,y);
-                _y = this.m_oFullTransform.TransformPointY(x,y);
-                _r = this.m_oFullTransform.TransformPointX(x+w,y+h);
-                _b = this.m_oFullTransform.TransformPointY(x+w,y+h);
-            }
 
             var ctx = this.m_oContext;
             var old_p = ctx.lineWidth;
+
+            var bIsNoIntGrid = false;
+
+            if (this.m_bIntegerGrid)
+            {
+                _x = (this.m_oFullTransform.TransformPointX(x,y) >> 0) + 0.5;
+                _y = (this.m_oFullTransform.TransformPointY(x,y) >> 0) + 0.5;
+                _r = (this.m_oFullTransform.TransformPointX(x+w,y+h) >> 0) + 0.5;
+                _b = (this.m_oFullTransform.TransformPointY(x+w,y+h) >> 0) + 0.5;
+
+                ctx.lineWidth = 1;
+            }
+            else
+            {
+                if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+                {
+                    bIsNoIntGrid = true;
+
+                    this.SetIntegerGrid(true);
+                    _x = (this.m_oFullTransform.TransformPointX(x,y) >> 0) + 0.5;
+                    _y = (this.m_oFullTransform.TransformPointY(x,y) >> 0) + 0.5;
+                    _r = (this.m_oFullTransform.TransformPointX(x+w,y+h) >> 0) + 0.5;
+                    _b = (this.m_oFullTransform.TransformPointY(x+w,y+h) >> 0) + 0.5;
+
+                    ctx.lineWidth = 1;
+                }
+                else
+                {
+                    ctx.lineWidth = 1 / this.m_oCoordTransform.sx;
+                }
+            }
+
+            //ctx.strokeStyle = "#FF0000";
+            ctx.strokeStyle = "#F98C76";
 
             ctx.beginPath();
             ctx.moveTo(_x,_y);
             ctx.lineTo(_r,_b);
             ctx.moveTo(_r,_y);
             ctx.lineTo(_x,_b);
-            ctx.strokeStyle = "#FF0000";
             ctx.stroke();
 
             ctx.beginPath();
@@ -1072,10 +1098,11 @@ CGraphics.prototype =
             ctx.lineTo(_x,_b);
             ctx.closePath();
 
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "#000000";
             ctx.stroke();
             ctx.beginPath();
+
+            if (bIsNoIntGrid)
+                this.SetIntegerGrid(false);
 
             ctx.lineWidth = old_p;
             ctx.strokeStyle = "rgba(" + this.m_oPen.Color.R + "," + this.m_oPen.Color.G + "," +

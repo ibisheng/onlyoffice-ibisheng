@@ -2882,6 +2882,8 @@ function CEditorPage(api)
             this.m_oApi.sync_currentPageCallback(drDoc.SlideCurrent);
         }
 
+        this.m_oLogicDocument.Document_UpdateSelectionState();
+
         this.Thumbnails.LockMainObjType = false;
     }
 

@@ -84,7 +84,7 @@ function CTrackPolarAdjObject(originalShape, adjIndex, pageIndex)
         overlay.transform3(this.originalShape.transform);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape( this.objectForOverlay, overlay);
+        shape_drawer.fromShape2( this.objectForOverlay, overlay, this.geometry );
         shape_drawer.draw(this.geometry);
     };
 
@@ -272,7 +272,7 @@ function CTrackXYAdjObject(originalShape, adjIndex, pageIndex)
         overlay.transform3(this.originalShape.transform);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
     };
 
@@ -810,7 +810,7 @@ function CTrackNewObject2(presetGeom, pen, brush, startX, startY, pageIndex)
 
         this.objectForOverlay.updateTransform(this.absExtX, this.absExtY, this.transformMatrix);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
     };
 
@@ -880,7 +880,7 @@ function MoveTrackInGroup(original)
         overlay.transform3(this.transform);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
     };
 
@@ -1140,7 +1140,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
         overlay.SaveGrState();
         overlay.SetIntegerGrid(false);
         overlay.transform3(this.TransformMatrix, false);
-        this.shapeDrawer.fromShape(this, overlay);
+        this.shapeDrawer.fromShape2(this, overlay, this.geometry);
         this.shapeDrawer.draw(this.geometry);
         overlay.RestoreGrState();
     };

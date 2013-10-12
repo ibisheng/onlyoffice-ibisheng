@@ -1918,7 +1918,7 @@ CShape.prototype =
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this, graphics, this.spPr.geometry);
+        shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
 		
 		if(graphics instanceof CGraphics)

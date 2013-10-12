@@ -108,7 +108,7 @@ function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY, bChart)
         overlay.transform3(this.transformMatrix);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.originalShape.spPr.geometry);
         shape_drawer.draw(this.originalShape.spPr.geometry);
         overlay.reset();
     };
@@ -836,7 +836,7 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex, bChart)
 
         this.objectForOverlay.updateTransform(this.resizedExtX, this.resizedExtY, this.transformMatrix);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
     };
 
@@ -1182,7 +1182,7 @@ function NewTrackShape(originalShape, startPosX, startPosY, lineFlag, pageShapes
 
         this.objectForOverlay.updateTransform(this.extX, this.extY, this.transformMatrix);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
         overlay.reset();
     }
@@ -1337,7 +1337,7 @@ function RotateTrackShape(originalShape, pageIndex)
         overlay.transform3(this.transformMatrix);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.originalShape.spPr.geometry);
         overlay.reset();
     };
@@ -1391,7 +1391,7 @@ function ShapeForDrawOnOverlayInGroup(originalShape)
 
         this.objectForOverlay.updateTransform(this.originalShape.absExtX, this.originalShape.absExtY, this.fullTransform);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.originalShape.spPr.geometry);
         overlay.reset();
     };
@@ -1501,7 +1501,7 @@ function ShapeForTrackInResizeGroup(originalShape)
     {
         overlay.transform3(this.transformMatrix);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
         overlay.reset();
     };
@@ -1595,7 +1595,7 @@ function ShapeTrackForMoveInGroup(originalShape, majorOffsetX, majorOffsetY)
         overlay.SetCurrentPage(this.originalShape.pageIndex);
         overlay.transform3(this.fullTransform);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
         overlay.reset();
     };
@@ -2118,7 +2118,7 @@ function ShapeForResizeInGroup2(originalShape, numberHandle)
 
         this.objectForOverlay.updateTransform(this.resizedExtX, this.resizedExtY, this.transformMatrix);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
     };
 
@@ -2416,7 +2416,7 @@ function ShapeForRotateInGroup(originalShape)
         overlay.transform3(this.transformMatrix);
 
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.original.spPr.geometry);
         shape_drawer.draw(this.original.spPr.geometry);
         overlay.reset();
     };

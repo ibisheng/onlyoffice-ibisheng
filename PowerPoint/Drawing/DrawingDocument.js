@@ -4645,6 +4645,22 @@ function CThumbnailsManager()
                 }
                 break;
             }
+            case 83: // S
+            {
+                if(global_keyboardEvent.CtrlKey)
+                {
+                    this.m_oWordControl.m_oApi.asc_Print();
+                }
+                break;
+            }
+            case 80: // P
+            {
+                if(global_keyboardEvent.CtrlKey)
+                {
+                    this.m_oWordControl.m_oApi.asc_Save();
+                }
+                break;
+            }
 
             default:
                 break;
