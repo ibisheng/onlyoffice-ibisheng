@@ -2947,11 +2947,12 @@ PasteProcessor.prototype =
     {
         var nNewContentLength = aNewContent.length;
         //����� ���� �� Document.Add_NewParagraph
-        var Item = oDoc.Content[oDoc.CurPos.ContentPos];
+
         oDoc.Remove(1, true, true);
+        var Item = oDoc.Content[oDoc.CurPos.ContentPos];
         if( type_Paragraph == Item.GetType() )
         {
-            if(true != this.bInBlock && 1 == nNewContentLength && type_Paragraph == aNewContent[0].GetType())
+            if(/*true != this.bInBlock &&*/ 1 == nNewContentLength && type_Paragraph == aNewContent[0].GetType() && Item.CurPos.ContentPos != 1)
             {
                 //������� ������ � ��������
                 var oInsertPar = aNewContent[0];
