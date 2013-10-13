@@ -2832,10 +2832,32 @@ CGraphicObjects.prototype = {
             }
             case STATES_ID_NULL:
             {
-                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                if(this.selectedObjects.length > 0)
                 {
-                    History.Create_NewPoint();
-                    this.slide.removeSelectedObjects();
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                    {
+                        History.Create_NewPoint();
+                        this.slide.removeSelectedObjects();
+                    }
+                }
+                else
+                {
+                    if(this.slide.slideComments)
+                    {
+                        var comments = this.slide.slideComments.comments;
+                        for(var i = 0; i < comments.length; ++i)
+                        {
+                            if(comments[i].selected)
+                            {
+                                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, comments[i].Id ) )
+                                {
+                                    editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                                    editor.WordControl.m_oLogicDocument.Remove_Comment(comments[i].Id, true);
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
                 break;
             }

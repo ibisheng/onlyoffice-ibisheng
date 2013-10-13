@@ -908,6 +908,7 @@ function Slide(presentation, slideLayout, slideNum)
 
     if(presentation)
     {
+        this.setSlideComments(new SlideComments());
         this.setLocks(new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id));
     }
 
@@ -924,34 +925,33 @@ function Slide(presentation, slideLayout, slideNum)
 Slide.prototype =
 {
 
+    setSlideComments: function(comments)
+    {
+        History.Add(this, {Type:historyitem_SetSlideComments, oldPr: this.slideComments, newPr: comments});
+        this.slideComments = comments;
+    },
+
     addComment: function(comment)
     {
-        History.Add(this, {Type: historyitem_AddComment, objectId: comment.Get_Id(), pos:this.comments.length});
-        this.comments.splice(this.comments.length, 0, comment);
+        if(isRealObject(this.slideComments))
+        {
+            this.slideComments.addComment(comment);
+        }
     },
 
     changeComment: function(id, commentData)
     {
-        for(var i = 0; i < this.comments.length; ++i)
+        if(isRealObject(this.slideComments))
         {
-            if(this.comments[i].Get_Id() === id)
-            {
-                this.comments[i].Set_Data(commentData);
-                return;
-            }
+            this.slideComments.changeComment(id, commentData);
         }
     },
 
     removeComment: function(id)
     {
-        for(var i = 0; i < this.comments.length; ++i)
+        if(isRealObject(this.slideComments))
         {
-            if(this.comments[i].Get_Id() === id)
-            {
-                History.Add(this, {Type: historyitem_RemoveComment, index: i, id: id});
-                this.comments.splice(i, 1);
-                return;
-            }
+            this.slideComments.removeComment(id);
         }
     },
 
@@ -1186,9 +1186,13 @@ Slide.prototype =
         {
             this.cSld.spTree[i].draw(graphics);
         }
-        for(var i=0; i < this.comments.length; ++i)
+        if(this.slideComments)
         {
-            this.comments[i].draw(graphics);
+            var comments = this.slideComments.comments;
+            for(var i=0; i < comments.length; ++i)
+            {
+                comments[i].draw(graphics);
+            }
         }
     },
 
@@ -1540,6 +1544,12 @@ Slide.prototype =
                 break;
             }
 
+            case historyitem_SetSlideComments:
+            {
+                this.slideComments = data.oldPr;
+                break;
+            }
+
             case historyitem_RemoveFromSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 0, g_oTableId.Get_ById(data.id));
@@ -1640,6 +1650,12 @@ Slide.prototype =
             {
                 this.comments.splice(data.index, 1);
                 editor.sync_RemoveComment(data.id);
+                break;
+            }
+
+            case historyitem_SetSlideComments:
+            {
+                this.slideComments = data.newPr;
                 break;
             }
             case historyitem_RemoveFromSpTree:
@@ -1750,6 +1766,16 @@ Slide.prototype =
             case historyitem_RemoveComment:
             {
                 w.WriteLong(data.index);
+                break;
+            }
+
+            case historyitem_SetSlideComments:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
                 break;
             }
             case historyitem_RemoveFromSpTree:
@@ -1872,6 +1898,18 @@ Slide.prototype =
 
                 var comment = this.comments.splice(r.GetLong(), 1)[0];
                 editor.sync_RemoveComment(comment.Id);
+                break;
+            }
+            case historyitem_SetSlideComments:
+            {
+                if(r.GetBool())
+                {
+                    this.slideComments = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.slideComments = null;
+                }
                 break;
             }
             case historyitem_RemoveFromSpTree:
@@ -2188,4 +2226,169 @@ PropLocker.prototype = {
     Refresh_RecalcData: function()
     {}
 
+};
+
+
+function SlideComments()
+{
+    this.comments = [];
+    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+}
+
+SlideComments.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Clear_ContentChanges : function()
+    {
+        this.m_oContentChanges.Clear();
+    },
+
+    Add_ContentChanges : function(Changes)
+    {
+        this.m_oContentChanges.Add( Changes );
+    },
+
+    Refresh_ContentChanges : function()
+    {
+        this.m_oContentChanges.Refresh();
+    },
+
+
+    addComment: function(comment)
+    {
+        History.Add(this, {Type: historyitem_AddComment, objectId: comment.Get_Id(), Pos:this.comments.length});
+        this.comments.splice(this.comments.length, 0, comment);
+    },
+
+    changeComment: function(id, commentData)
+    {
+        for(var i = 0; i < this.comments.length; ++i)
+        {
+            if(this.comments[i].Get_Id() === id)
+            {
+                this.comments[i].Set_Data(commentData);
+                return;
+            }
+        }
+    },
+
+    removeComment: function(id)
+    {
+        for(var i = 0; i < this.comments.length; ++i)
+        {
+            if(this.comments[i].Get_Id() === id)
+            {
+                History.Add(this, {Type: historyitem_RemoveComment, Pos: i, id: id});
+                this.comments.splice(i, 1);
+                return;
+            }
+        }
+    },
+
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_SlideComments);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+
+            case historyitem_AddComment:
+            {
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                w.WriteLong(Pos);
+                w.WriteString2(data.objectId);
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+                var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
+                w.WriteLong(Pos);
+                break;
+            }
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_AddComment:
+            {
+                var pos = r.GetLong();
+                var id = r.GetString2();
+                var pos2 = this.m_oContentChanges.Check( contentchanges_Add, pos);
+                this.comments.splice(pos2, 0,  g_oTableId.Get_ById(id));
+                editor.sync_AddComment( id, this.comments[pos].Data);
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+                var pos = r.GetLong();
+                var pos2 = this.m_oContentChanges.Check( contentchanges_Remove, pos);
+
+                var comment = this.comments.splice(pos, 1)[0];
+                editor.sync_RemoveComment(comment.Id);
+                break;
+            }
+        }
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_AddComment:
+            {
+                this.comments.splice(data.Pos, 1);
+                editor.sync_RemoveComment( data.objectId );
+
+                break;
+            }
+
+            case historyitem_RemoveComment:
+            {
+                this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.id));
+                editor.sync_AddComment( this.comments[data.index].Get_Id(), this.comments[data.index].Data);
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_AddComment:
+            {
+                this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.objectId));
+                editor.sync_AddComment( data.objectId, this.comments[data.pos].Data);
+
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+                this.comments.splice(data.Pos, 1);
+                editor.sync_RemoveComment(data.id);
+                break;
+            }
+        }
+    }
 };

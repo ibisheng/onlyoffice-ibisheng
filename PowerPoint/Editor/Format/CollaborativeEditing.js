@@ -159,7 +159,8 @@ function CTableId()
             case historyitem_type_GraphicFrame     : Element = new CGraphicFrame(); break;
             case historyitem_type_SlideMaster      : Element = new MasterSlide(); break;
             case historyitem_type_Theme            : Element = new CTheme(); break;
-            case historyitem_type_ChartTitle       : Element = new CChartTitle();
+            case historyitem_type_ChartTitle       : Element = new CChartTitle(); break;
+            case historyitem_type_SlideComments    : Element = new SlideComments(); break;
          }
 
         Element.Read_FromBinary2(Reader);
@@ -679,6 +680,10 @@ function CCollaborativeEditing()
                             editor.asc_fireCallback("asc_onUnLockDocumentProps");
                         }
                     }
+                }
+                if(Class instanceof CComment)
+                {
+                    editor.sync_UnLockComment(Class.Get_Id());
                 }
             }
             else if ( locktype_Other3 === CurLockType )

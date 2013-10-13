@@ -1326,7 +1326,7 @@ CPresentation.prototype =
 
     Add_FlowTable : function(Cols, Rows)
     {
-        if(this.Document_Is_SelectionLocked(changestype_AddSp) === false)
+        if(this.Document_Is_SelectionLocked(changestype_AddShape) === false)
         {
             var X = 0;
             var Y = 0;
@@ -6290,7 +6290,7 @@ CPresentation.prototype =
             }
         }
 
-        if(CheckType === changestype_AddShape)
+        if(CheckType === changestype_AddShape || CheckType === changestype_AddComment)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
@@ -6320,36 +6320,58 @@ CPresentation.prototype =
             }
         }
 
-        if(CheckType === changestype_AddSp || CheckType === changestype_AddComment)
-        {
-            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
-                return true;
-            /*var generated_id = "new_object" + (new Date().getTime()) + editor.User.id;
-            var check_obj =
-            {
-                "type": c_oAscLockTypeElemPresentation.Object,
-                "slideId": slide_id,
-                "objId": generated_id,
-                "guid": generated_id
-            };
-            CollaborativeEditing.Add_CheckLock( check_obj );*/
-        }
+
 
         if(CheckType === changestype_MoveComment)
         {
-            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
-                return true;
-            if(isRealObject(AdditionalData))
+            var comment = g_oTableId.Get_ById(AdditionalData);
+            if(isRealObject(comment))
             {
-                var check_obj =
+                var slides = this.Slides;
+                var check_slide = null;
+                for(var i = 0; i < slides.length; ++i)
                 {
-                    "type": c_oAscLockTypeElemPresentation.Object,
-                    "slideId": slide_id,
-                    "objId": AdditionalData.Get_Id(),
-                    "guid": AdditionalData.Get_Id()
-                };
-                AdditionalData.Lock.Check(check_obj);
+                    if(slides[i].slideComments)
+                    {
+                        var comments = slides[i].slideComments.comments;
+                        for(var j = 0; j < comments.length; ++j)
+                        {
+                            if(comments[j] === comment)
+                            {
+                                check_slide = slides[i];
+                                break;
+                            }
+                        }
+                        if(j < comments.length)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if(isRealObject(check_slide))
+                {
+                    if(check_slide.deleteLock.Lock.Type !== locktype_Mine && check_slide.deleteLock.Lock.Type !== locktype_None)
+                        return true;
+                    var check_obj =
+                    {
+                        "type": c_oAscLockTypeElemPresentation.Object,
+                        "slideId": slide_id,
+                        "objId": comment.Get_Id(),
+                        "guid": comment.Get_Id()
+                    };
+                    comment.Lock.Check(check_obj);
+                }
+                else
+                {
+                    return true;
+                }
             }
+            else
+            {
+                return true;
+            }
+
+
         }
 
         if(CheckType === changestype_SlideBg)
@@ -6759,16 +6781,16 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(CommentData)
     {
-        if(this.Document_Is_SelectionLocked(changestype_AddComment) === false)
+        History.Create_NewPoint();
+        var Comment = new CComment( this.Comments, CommentData );
+        Comment.selected = true;
+        Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
+        if(this.Document_Is_SelectionLocked(changestype_AddComment, Comment) === false)
         {
-            History.Create_NewPoint();
-            for(var i = this.Slides[this.CurPage].comments.length - 1; i > -1; --i)
+            for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
             {
-                this.Slides[this.CurPage].comments[i].selected = false;
+                this.Slides[this.CurPage].slideComments.comments[i].selected = false;
             }
-            var Comment = new CComment( this.Comments, CommentData );
-            Comment.selected = true;
-            Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
             this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
             this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
             this.Slides[this.CurPage].addComment(Comment);
@@ -6777,15 +6799,54 @@ CPresentation.prototype =
             this.DrawingDocument.OnEndRecalculate();
             return Comment;
         }
+        else
+        {
+            this.Document_Undo();
+        }
     },
 
     Change_Comment : function(Id, CommentData)
     {
-        if(this.Document_Is_SelectionLocked(changestype_MoveComment) === false)
+        if(this.Document_Is_SelectionLocked(changestype_MoveComment, Id) === false)
         {
             History.Create_NewPoint();
-            this.Slides[this.CurPage].changeComment( Id, CommentData );
-            this.Recalculate()
+            var comment = g_oTableId.Get_ById(Id);
+            if(isRealObject(comment))
+            {
+                var slides = this.Slides;
+                var check_slide = null;
+                var slide_num = null;
+                for(var i = 0; i < slides.length; ++i)
+                {
+                    if(slides[i].slideComments)
+                    {
+                        var comments = slides[i].slideComments.comments;
+                        for(var j = 0; j < comments.length; ++j)
+                        {
+                            if(comments[j] === comment)
+                            {
+                                check_slide = slides[i];
+                                slide_num = i;
+                                break;
+                            }
+                        }
+                        if(j < comments.length)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if(isRealObject(check_slide))
+                {
+                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    this.Slides[this.CurPage].changeComment( Id, CommentData );
+                    this.Recalculate()
+                }
+                else
+                {
+                    return true;
+                }
+            }
         }
 
     },
@@ -6797,7 +6858,7 @@ CPresentation.prototype =
 
         for(var i = 0; i < this.Slides.length; ++i)
         {
-            var comments =   this.Slides[i].comments;
+            var comments =   this.Slides[i].slideComments.comments;
             for(var j = 0; j < comments.length; ++j)
             {
                 if(comments[j].Id === Id)
@@ -6831,7 +6892,7 @@ CPresentation.prototype =
 
         for(var i = 0; i < this.Slides.length; ++i)
         {
-            var comments =   this.Slides[i].comments;
+            var comments =   this.Slides[i].slideComments.comments;
             for(var j = 0; j < comments.length; ++j)
             {
                 if(comments[j].Id === Id)
@@ -6954,7 +7015,7 @@ CPresentation.prototype =
         {
             this.Slides[_sldIdx].writecomments = [];
 
-            var _comments = this.Slides[_sldIdx].comments;
+            var _comments = this.Slides[_sldIdx].slideComments.comments;
             var _commentsCount = _comments.length;
 
             for (var i = 0; i < _commentsCount; i++)

@@ -57,16 +57,16 @@ function NullState(drawingObjectsController, drawingObjects)
     this.onMouseDown = function(e, x, y)
     {
         this.drawingObjectsController.hideComment();
-        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
+        for(var i = drawingObjects.slideComments.comments.length - 1; i > -1; --i)
         {
-            drawingObjects.comments[i].selected = false;
+            drawingObjects.slideComments.comments[i].selected = false;
         }
-        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
+        for(var i = drawingObjects.slideComments.comments.length - 1; i > -1; --i)
         {
-            if(drawingObjects.comments[i].hit(x, y))
+            if(drawingObjects.slideComments.comments[i].hit(x, y))
             {
-                drawingObjects.comments[i].selected = true;
-                this.drawingObjectsController.addPreTrackObject(new MoveComment(drawingObjects.comments[i]));
+                drawingObjects.slideComments.comments[i].selected = true;
+                this.drawingObjectsController.addPreTrackObject(new MoveComment(drawingObjects.slideComments.comments[i]));
                 this.drawingObjectsController.changeCurrentState(new PreMoveCommentState(this.drawingObjectsController, this.drawingObjects, x, y));
                 editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
                 editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
@@ -948,7 +948,7 @@ function MoveCommentState(drawingObjectsController, drawingObjects, startX, star
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props, this.drawingObjectsController.arrTrackObjects[0].comment) === false)
+        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_MoveComment, this.drawingObjectsController.arrTrackObjects[0].comment.Get_Id()) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();

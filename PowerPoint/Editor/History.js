@@ -236,6 +236,8 @@ var historyitem_SetLayoutMatchingName = 18;
 var historyitem_SetLayoutMaster = 19;
 var historyitem_SetLayoutType = 20;
 var historyitem_SetMasterTheme = 21;
+var historyitem_SetSlideComments = 22
+
 
 
 
@@ -443,6 +445,8 @@ var historyitem_type_TextBody      	  = 32;
 var historyitem_type_GraphicFrame  	  = 33;
 var historyitem_type_Theme  	      = 34;
 var historyitem_type_SlideMaster      = 35;
+var historyitem_type_SlideComments    = 36;
+
 
 
 
@@ -626,9 +630,10 @@ CHistory.prototype =
         this.Points[this.Index].Items.push( Item );
 
         if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) )
-            || (Class instanceof Slide && ( historyitem_RemoveFromSpTree === Data.Type || historyitem_AddToSlideSpTree === Data.Type || historyitem_ShapeAdd === Data.Type)))
+            || (Class instanceof Slide && ( historyitem_RemoveFromSpTree === Data.Type || historyitem_AddToSlideSpTree === Data.Type || historyitem_ShapeAdd === Data.Type))
+            || Class instanceof SlideComments)
         {
-            var bAdd = ( ( Class instanceof CPresentation && historyitem_Presenattion_AddSlide  === Data.Type )
+            var bAdd = ( ( Class instanceof CPresentation && historyitem_Presenattion_AddSlide  === Data.Type ) || ( Class instanceof SlideComments && historyitem_AddComment  === Data.Type )
                 ||(Class instanceof Slide && ( historyitem_AddToSlideSpTree === Data.Type || historyitem_ShapeAdd === Data.Type))) ? true : false;
 
             var Count = 1;

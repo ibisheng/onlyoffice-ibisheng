@@ -305,6 +305,10 @@ asc_docs_api.prototype._coAuthoringInit = function () {
                              }
                          }
                      }
+                    if(Class instanceof CComment)
+                    {
+                        editor.sync_LockComment(Class.Get_Id(), e["user"]);
+                    }
 
                     // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
                     //       заданным Id. Если нет, тогда и не надо обновлять состояние.
@@ -3392,7 +3396,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Comment, Id : Id } ) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
@@ -3404,7 +3408,7 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Comment, Id : Id } ) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
     {
         var CommentData = new CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);
@@ -3691,12 +3695,15 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     var _slidesCount = _slides.length;
     for (var i = 0; i < _slidesCount; i++)
     {
-        var _comments = _slides[i].comments;
-        var _commentsCount = _comments.length;
-
-        for (var j = 0; j < _commentsCount; j++)
+        var slideComments = _slides[i].slideComments;
+        if(slideComments)
         {
-            this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data );
+            var _comments = slideComments.comments;
+            var _commentsCount = _comments.length;
+            for (var j = 0; j < _commentsCount; j++)
+            {
+                this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data );
+            }
         }
     }
 
