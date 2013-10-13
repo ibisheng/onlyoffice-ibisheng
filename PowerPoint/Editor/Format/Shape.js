@@ -3544,7 +3544,23 @@ CShape.prototype =
             this.spPr.geometry = null;
         }
         var new_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
-        this.setLine(_new_line);
+        if((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill))
+        {
+            var new_line2 = new CLn();
+            new_line2.Fill = new CUniFill();
+            new_line2.Fill.fill = new CSolidFill();
+            new_line2.Fill.fill.color = new CUniColor();
+            new_line2.Fill.fill.color.color = new CSchemeColor();
+            new_line2.Fill.fill.color.color.id = 0;
+            if(isRealObject(_new_line))
+            {
+                new_line2.merge(_new_line);
+            }
+            this.setLine(new_line2);
+        }
+        else
+            this.setLine(_new_line);
+
         History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
         this.recalcInfo.recalculateGeometry = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
