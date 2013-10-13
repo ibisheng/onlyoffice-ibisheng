@@ -2527,10 +2527,12 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
             {
                 if(t_o[i].originalObject.copy)
                 {
+                    t_o[i].originalObject.deselect(this.drawingObjectsController);
                     var copy = t_o[i].originalObject.copy();
                     copy.setParent(this.drawingObjects);
                     copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
                     this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, copy);
+                    copy.select(this.drawingObjectsController);
                 }
             }
 
@@ -3392,13 +3394,47 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
 
         if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
-            History.Create_NewPoint();
-            this.drawingObjectsController.trackEnd();
-            this.group.normalize();
-            this.group.updateCoordinatesAfterInternalResize();
+            if(!e.CtrlKey)
+            {
+                History.Create_NewPoint();
+                this.group.normalize();
+                this.drawingObjectsController.trackEnd();
+                this.group.updateCoordinatesAfterInternalResize();
+            }
+            else
+            {
+                History.Create_NewPoint();
+                var t_o = this.drawingObjectsController.arrTrackObjects;
+                this.group.normalize();
+                for(var i = 0; i < t_o.length; ++i)
+                {
+                    if(t_o[i].originalObject.copy)
+                    {
+                        t_o[i].originalObject.deselect(this.drawingObjectsController)
+                        var copy = t_o[i].originalObject.copy();
+                        copy.setParent(this.drawingObjects);
+                        copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
+                        copy.setGroup(t_o[i].originalObject.group);
+                        t_o[i].originalObject.group.addToSpTree(t_o[i].originalObject.group.spTree.length, copy);
+                        copy.select(this.drawingObjectsController);
+                    }
+                }
+                this.group.updateCoordinatesAfterInternalResize();
+                this.group.recalcAll();
+                editor.WordControl.m_oLogicDocument.recalcMap[this.group.Get_Id()] = this.group;
+                this.drawingObjects.presentation.Recalculate();
+                this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                this.drawingObjects.presentation.DrawingDocument.OnEndRecalculate();
+            }
             this.drawingObjects.presentation.Recalculate();
             this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
         }
+
+
+
+
+
+
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
@@ -3486,32 +3522,13 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
     this.onMouseUp = function(e, x, y)
     {
-
-
-        var worksheet = this.drawingObjects.getWorksheet();
-        this.drawingObjects.objectLocker.reset();
-        this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
-        var track_objects2 = [];
-        for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
+        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
-            track_objects2.push(this.drawingObjectsController.arrTrackObjects[i]);
+            History.Create_NewPoint();
+            this.drawingObjectsController.trackEnd();
+            this.drawingObjects.presentation.Recalculate();
+            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
         }
-
-        var drawingObjects = this.drawingObjects;
-        var group = this.group;
-        var callback = function(bLock)
-        {
-            if(bLock)
-            {
-                History.Create_NewPoint();
-                for(var i = 0; i < track_objects2.length; ++i)
-                    track_objects2[i].trackEnd();
-                group.recalculateTransform();
-                drawingObjects.showDrawingObjects(true);
-            }
-        };
-        this.drawingObjects.objectLocker.checkObjects(callback);
-
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
