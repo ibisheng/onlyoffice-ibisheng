@@ -2024,6 +2024,13 @@ CGraphicObjects.prototype = {
                 arr_ungrouped_objects.push(ungrouped_sp_tree[j]);
             }
         }
+        for(var i = 0;  i < this.slide.cSld.spTree.length; ++i)
+        {
+            if(this.slide.cSld.spTree[i].selected && !(this.slide.cSld.spTree[i] instanceof CGroupShape))
+            {
+                this.slide.cSld.spTree[i].deselect(this);
+            }
+        }
         this.slide.removeSelectedObjects();
         this.resetSelectionState();
         for(var i = 0;  i< arr_ungrouped_objects.length; ++i)
