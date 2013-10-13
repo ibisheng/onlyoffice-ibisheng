@@ -6762,12 +6762,17 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(changestype_AddComment) === false)
         {
             History.Create_NewPoint();
+            for(var i = this.Slides[this.CurPage].comments.length - 1; i > -1; --i)
+            {
+                this.Slides[this.CurPage].comments[i].selected = false;
+            }
             var Comment = new CComment( this.Comments, CommentData );
             Comment.selected = true;
             Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
             this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
             this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
             this.Slides[this.CurPage].addComment(Comment);
+
             this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             this.DrawingDocument.OnEndRecalculate();
             return Comment;

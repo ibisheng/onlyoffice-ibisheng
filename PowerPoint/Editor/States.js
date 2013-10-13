@@ -59,6 +59,10 @@ function NullState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.hideComment();
         for(var i = drawingObjects.comments.length - 1; i > -1; --i)
         {
+            drawingObjects.comments[i].selected = false;
+        }
+        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
+        {
             if(drawingObjects.comments[i].hit(x, y))
             {
                 drawingObjects.comments[i].selected = true;
@@ -68,10 +72,6 @@ function NullState(drawingObjectsController, drawingObjects)
                 editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
                 return;
             }
-        }
-        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
-        {
-            drawingObjects.comments[i].selected = false;
         }
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1)
