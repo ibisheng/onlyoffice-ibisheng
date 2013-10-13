@@ -1800,8 +1800,9 @@ CopyProcessor.prototype =
                                 this.oPresentationWriter.WriteString2(editor.DocumentUrl);
                                 this.oPresentationWriter.WriteDouble(presentation.Width);
                                 this.oPresentationWriter.WriteDouble(presentation.Height);
-                                this.oPresentationWriter.WriteULong(graphicObjects.selectedObjects.length);
                                 var selected_objects = graphicObjects.State.id === STATES_ID_GROUP ? graphicObjects.State.group.selectedObjects : graphicObjects.selectedObjects;
+                                this.oPresentationWriter.WriteULong(selected_objects.length);
+
                                 for(var i = 0; i < selected_objects.length; ++i)
                                 {
                                     if(!(selected_objects[i] instanceof CGraphicFrame))
@@ -1889,7 +1890,7 @@ CopyProcessor.prototype =
 				$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
 			}
             if(this.ElemToSelect.children[0])
-                $(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+                $(this.ElemToSelect.children[0]).addClass("pptData;" + sBase64);
         }
 		this.oBinaryFileWriter.CopyEnd();
 		if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
@@ -3316,9 +3317,9 @@ PasteProcessor.prototype =
                 if( classNode != null ){
                     cL = classNode.split(" ");
                     for (var i = 0; i < cL.length; i++){
-                        if(cL[i].indexOf("docData;") > -1)
+                        if(cL[i].indexOf("pptData;") > -1)
                         {
-                            base64 = cL[i].split('docData;')[1];
+                            base64 = cL[i].split('pptData;')[1];
                         }
                     }
                 }
