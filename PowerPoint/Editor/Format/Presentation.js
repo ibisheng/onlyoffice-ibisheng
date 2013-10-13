@@ -5812,7 +5812,7 @@ CPresentation.prototype =
             var cur_slide = this.Slides[this.CurPage];
             var  new_slide, layout;
 
-            layout = isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout;
+            layout = isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout.Master.getMatchingLayout(cur_slide.Layout.type, cur_slide.Layout.matchingName, cur_slide.Layout.cSld.name);
             new_slide = new Slide(this, layout, this.CurPage + 1);
             for(var i = 0; i < layout.cSld.spTree.length; ++i)
             {
