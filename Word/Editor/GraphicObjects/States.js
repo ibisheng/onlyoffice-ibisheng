@@ -9374,6 +9374,7 @@ function RotateInGroup(graphicObjects, group, majorObject)
         {
             tracks[i].track(angle, e.ShiftKey);
         }
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
     };
 
     this.OnMouseUp = function(e, x, y, pageIndex)

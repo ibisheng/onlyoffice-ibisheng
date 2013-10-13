@@ -900,7 +900,7 @@ function MoveTrackInGroup(original)
         var t = this.transform;
         t.Reset();
         var xfrm = this.original.spPr.xfrm;
-        global_MatrixTransformer.TranslateAppend(t, -xfrm.absExtX*0.5, -xfrm.absExtY*0.5);
+        global_MatrixTransformer.TranslateAppend(t, -xfrm.extX*0.5, -xfrm.extY*0.5);
         if(xfrm.flipH == null ? false : xfrm.flipH)
         {
             global_MatrixTransformer.ScaleAppend(t, -1, 1);
@@ -910,7 +910,7 @@ function MoveTrackInGroup(original)
             global_MatrixTransformer.ScaleAppend(t, 1, -1);
         }
         global_MatrixTransformer.RotateRadAppend(t, xfrm.rot == null ? 0 : -xfrm.rot);
-        global_MatrixTransformer.TranslateAppend(t, this.x + xfrm.absExtX*0.5, this.y + xfrm.absExtY*0.5);
+        global_MatrixTransformer.TranslateAppend(t, this.x + xfrm.extX*0.5, this.y + xfrm.extY*0.5);
         global_MatrixTransformer.MultiplyAppend(t, this.original.group.transform);
     };
 
