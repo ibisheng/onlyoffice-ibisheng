@@ -642,18 +642,14 @@ CChartTitle.prototype =
                 var rect = this.spPr.geometry.rect;
                 this.clipRect = {x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t};
             }
-            else
-            {
-                this.clipRect = {x: 0, y: 0, w: this.absExtX, h: this.absExtY};
-            }
         }
         else
         {
             var _full_rotate = this.getFullRotate();
             var _full_flip = this.getFullFlip();
 
-            var _hc = this.absExtX*0.5;
-            var _vc = this.absExtY*0.5;
+            var _hc = this.extX*0.5;
+            var _vc = this.extY*0.5;
             var _transformed_shape_xc = this.transform.TransformPointX(_hc, _vc);
             var _transformed_shape_yc = this.transform.TransformPointY(_hc, _vc);
 

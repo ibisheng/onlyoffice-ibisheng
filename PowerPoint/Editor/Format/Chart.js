@@ -222,46 +222,6 @@ CChartAsGroup.prototype =
         }
     },
 
-    setSizes: function(posX, posY, w, h, flipH, flipV)
-    {
-        var data = {};
-        data.Type = historyitem_SetSizes;
-        data.oldW = this.extX;
-        data.oldH = this.extY;
-        data.newW = w;
-        data.newH = h;
-        data.oldFlipH = this.absFlipH;
-        data.oldFlipV = this.absFlipV;
-        data.newFlipH = flipH;
-        data.newFlipV = flipV;
-        data.oldPosX = this.x;
-        data.oldPosY = this.y;
-        data.newPosX = posX;
-        data.newPosY = posY;
-
-        History.Add(this, data);
-
-        this.spPr.xfrm.extX = w;
-        this.spPr.xfrm.extY = h;
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
-        this.extX = w;
-        this.extY = h;
-        this.absFlipH = flipH;
-        this.absFlipV = flipV;
-        this.x = posX;
-        this.y = posY;
-        if(this.parent)
-        {
-            this.parent.absOffsetX = posX;
-            this.parent.absOffsetY = posY;
-            this.parent.absExtX = w;
-            this.parent.absExtY = h;
-            this.parent.flipH = flipH;
-            this.parent.flipV = flipV;
-        }
-        this.calculateAfterResize();
-    },
 
     calculateAfterResize: function()
     {

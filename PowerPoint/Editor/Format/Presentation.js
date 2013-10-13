@@ -5165,6 +5165,7 @@ CPresentation.prototype =
             {
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
+            editor.asc_hideComments();
             //this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
             //this.Document_UpdateSelectionState();
             //this.Document_UpdateInterfaceState();

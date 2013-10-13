@@ -47,6 +47,10 @@ CGraphicObjects.prototype = {
             obj.group = old_gr;
             --count;
         }
+        for(var i = 0;  i< this.slide.comments.length; ++i)
+        {
+            this.slide.comments[i].selected = false;
+        }
         this.changeCurrentState(new NullState(this, this.slide));
     },
 

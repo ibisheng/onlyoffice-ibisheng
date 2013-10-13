@@ -1024,6 +1024,26 @@ CImageShape.prototype =
         return {hit:false};
     },
 
+    getPlaceholderType: function()
+    {
+        return this.isPlaceholder() ? this.nvPicPr.nvPr.ph.type : null;
+    },
+
+    getPlaceholderIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvPicPr.nvPr.ph.idx : null;
+    },
+
+    getPhType: function()
+    {
+        return this.isPlaceholder() ? this.nvPicPr.nvPr.ph.type : null;
+    },
+
+    getPhIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvPicPr.nvPr.ph.idx : null;
+    },
+
 
     hitInBoundingRect: function(x, y)
     {
