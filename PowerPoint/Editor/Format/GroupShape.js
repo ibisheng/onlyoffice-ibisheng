@@ -1049,10 +1049,11 @@ CGroupShape.prototype =
             var vc = sp.spPr.xfrm.extY*0.5;
             var xc = sp.transform.TransformPointX(hc, vc);
             var yc = sp.transform.TransformPointY(hc, vc);
+
+            sp.setRotate(normalizeRotate(sp.getFullRotate()));
             sp.setGroup(null);
             sp.setOffset(xc - hc, yc - vc);
             sp.setFlips(full_flip_h, full_flip_v);
-            sp.setRotate(normalizeRotate(sp.getFullRotate()));
             ret.push(sp);
         }
         return ret;
