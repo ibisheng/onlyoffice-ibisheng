@@ -6670,7 +6670,7 @@ asc_docs_api.prototype._StartTracking = function ()
 		var rData = {
 			"docId": t.DocInfo.get_Id(), 
 			"clientId": t.DocInfo.get_UserId(),
-			"isAlive": t.isDocumentModified()
+			"isAlive": t.isDocumentModified()? 1: 0
 		};
 			
 		sendTrack( t, function(){
