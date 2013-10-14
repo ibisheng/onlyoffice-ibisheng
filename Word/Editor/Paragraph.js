@@ -6102,14 +6102,18 @@ Paragraph.prototype =
                 if ( LeftMargin >= 0 )
                 {
                     LeftMargin = 12.5 * parseInt(10 * LeftMargin / 125);
-                    LeftMargin_new = ( (LeftMargin - (10 * LeftMargin) % 125) / 12.5 + 1) * 12.5;
+                    LeftMargin_new = ( (LeftMargin - (10 * LeftMargin) % 125 / 10) / 12.5 + 1) * 12.5;
                 }
 
                 if ( LeftMargin_new < 0 )
                     LeftMargin_new = 12.5;
             }
             else
-                LeftMargin_new = Math.max( ( (LeftMargin - (10 * LeftMargin) % 125) / 12.5 - 1) * 12.5, 0 );
+            {
+                var TempValue = (125 - (10 * LeftMargin) % 125);
+                TempValue = ( 125 === TempValue ? 0 : TempValue );
+                LeftMargin_new = Math.max( ( (LeftMargin + TempValue / 10) / 12.5 - 1 ) * 12.5, 0 );
+            }
 
             this.Set_Ind( { Left : LeftMargin_new }, false );
         }
