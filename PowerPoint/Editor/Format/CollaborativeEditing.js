@@ -602,8 +602,12 @@ function CCollaborativeEditing()
 		editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var DocState = LogicDocument.Get_SelectionState2();
+        //var DocState = LogicDocument.Get_SelectionState2();
 
+        if(LogicDocument.Slides[LogicDocument.CurPage])
+        {
+            LogicDocument.Slides[LogicDocument.CurPage].graphicObjects.resetSelectionState();
+        }
         this.Clear_NewImages();
 
         this.Apply_OtherChanges();
@@ -611,7 +615,7 @@ function CCollaborativeEditing()
         // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые били залочены
         this.Lock_NeedLock();
 
-        LogicDocument.Set_SelectionState2( DocState );
+        //LogicDocument.Set_SelectionState2( DocState );
 
         this.OnStart_Load_Objects();
     };

@@ -3474,9 +3474,9 @@ CPresentation.prototype =
         {
             if ( true != e.ShiftKey )
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
+                //if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
-                    this.Create_NewHistoryPoint();
+                    //this.Create_NewHistoryPoint();
                     this.Remove( 1, true );
                 }
                 bRetValue = true;
@@ -6148,6 +6148,18 @@ CPresentation.prototype =
         {
             _cur_slide =_slides[_slide_index];
             _cur_theme = _cur_slide.Layout.Master.Theme;
+
+            if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
+            {
+                _old_color_scheme = _cur_theme.themeElements.clrScheme;
+                _cur_theme.changeColorScheme(colorScheme.createDuplicate());
+            }
+        }
+        for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
+        {
+            _cur_slide =_slides[_slide_index];
+            _cur_theme = _cur_slide.Layout.Master.Theme;
+
             if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
             {
                 _old_color_scheme = _cur_theme.themeElements.clrScheme;
