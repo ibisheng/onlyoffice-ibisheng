@@ -775,6 +775,8 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		
 		//+высота названия диаграммы
 		top += chart.margins.title.h;
+		if(chart.margins.title.h)
+			top += 7;
 		
 		//+ высота легенды
 		var positionKey = chart.margins.key.position;
@@ -1698,7 +1700,7 @@ function drawChart(chart, arrValues, width, height, options) {
 	}
 	else
 		bar._otherProps._background_image_color = defaultColor;
-
+	bar.margins = chart.margins;
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 
@@ -2428,16 +2430,25 @@ function calculatePosiitionObjects(type)
 				{
 					return 7*scale + heigthTextKey + bar._chartTitle._marginTopTitle;
 				}
-				else if(typeof(bar._chartTitle._text) == 'string' && ((bar._chartTitle._text != '' && (bar._chartTitle._text != undefined)) || (bar._chartTitle._visibleTitle != "" && bar._chartTitle._visibleTitle != undefined)))
+				else if(typeof(bar._chartTitle._text) == 'string' && ((bar._chartTitle._text != '' && (bar._chartTitle._text != undefined)) || (bar._chartTitle._visibleTitle != "" && bar._chartTitle._visibleTitle != undefined) || (bar.margins && bar.margins.title)))
 				{
-					var font = getFontProperties("title");
-					var text = bar._chartTitle._text;
-					if(bar._chartTitle._visibleTitle != "")
-						text = bar._chartTitle._visibleTitle;
-					var axisTitleProp = getMaxPropertiesText(context,font, text);
-					var hpos = (bar.canvas.width)/2 - axisTitleProp.width/2;
-					var heigthText = (context.getHeightText()/0.75)*scale;
-					return 7*scale + heigthTextKey + 7*scale + heigthText;
+					if(bar.margins && bar.margins.title)
+					{
+						var heigthText = bar.margins.title.h;
+						return 7*scale + heigthTextKey + 7*scale + heigthText;
+					}
+					else
+					{
+						var font = getFontProperties("title");
+						var text = bar._chartTitle._text;
+						if(bar._chartTitle._visibleTitle != "")
+							text = bar._chartTitle._visibleTitle;
+						var axisTitleProp = getMaxPropertiesText(context,font, text);
+						var hpos = (bar.canvas.width)/2 - axisTitleProp.width/2;
+						var heigthText = (context.getHeightText()/0.75)*scale;
+						return 7*scale + heigthTextKey + 7*scale + heigthText;
+					}
+					
 				}
 				else
 				{
