@@ -1981,6 +1981,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.sheetsChanged();
 			},
 
+            setStartPointHistory: function(){History.Create_NewPoint(); History.StartTransaction()},
+            setEndPointHistory: function(){History.EndTransaction()},
+
 			// Удаление листа
 			asc_deleteWorksheet: function () {
 				// Проверка глобального лока

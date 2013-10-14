@@ -587,6 +587,8 @@ function asc_docs_api(name)
 
     this.SelectedObjectsStack = new Array();
 
+    this.noCreatePoint = false;
+
     this.OpenDocumentProgress = new CDocOpenProgress();
     this._lastConvertProgress = 0;
 
@@ -2709,6 +2711,8 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
         this.asc_fireCallback("asc_onCanRedo", bCanRedo);
 }
 
+asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true; History.Create_NewPoint();};
+asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false; };
 
 function CDocInfoProp(obj)
 {
@@ -4945,7 +4949,8 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties, AdditionalData) )
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        if(!this.noCreatePoint)
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
         {
             var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1)
