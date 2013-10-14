@@ -20364,7 +20364,7 @@ CTableCell.prototype =
 
                     if (CellPr.Shd.fillRef.Color.color != null)
                     {
-                        if (_calculated_unifill.fill != null && (_calculated_unifill.fill.type == FILL_TYPE_SOLID || _calculated_unifill.fill.type == FILL_TYPE_GRAD))
+                        if (_calculated_unifill.fill != null && (_calculated_unifill.fill.type == FILL_TYPE_SOLID))
                         {
                             _calculated_unifill.fill.color = CellPr.Shd.fillRef.Color.createDuplicate();
                         }

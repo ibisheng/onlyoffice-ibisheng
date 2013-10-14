@@ -203,36 +203,13 @@ Paragraph.prototype =
             brush.merge(this.rPr.unifill);
             brush.calculate(theme, slide, layout, master, RGBA);
 
-            if(brush.fill && brush.fill.color && brush.fill.color.RGBA)
-            {
-                this.rPr.Color =
-                {
-                    r:brush.fill.color.RGBA.R,
-                    g:brush.fill.color.RGBA.G,
-                    b:brush.fill.color.RGBA.B,
-                    A:brush.fill.color.RGBA.A
-                }
-            }
-            else if(brush.fill instanceof  CGradFill)
-            {
-                this.rPr.Color =
-                {
-                    r:brush.fill.colors[0].color.RGBA.R,
-                    g:brush.fill.colors[0].color.RGBA.G,
-                    b:brush.fill.colors[0].color.RGBA.B,
-                    A:brush.fill.colors[0].color.RGBA.A
-                }
-            }
-            else
-            {
-                this.rPr.Color =
-                {
-                    r:0,
-                    g:0,
-                    b:0,
-                    A:255
-                }
-            }
+            var _rgba = brush.getRGBAColor();
+            this.rPr.Color = {
+                r:_rgba.R,
+                g:_rgba.G,
+                b:_rgba.B,
+                A:_rgba.A
+            };
         }
         else
         {
@@ -296,37 +273,14 @@ Paragraph.prototype =
 
                     brush.merge(this.Content[i].Value.unifill);
                     brush.calculate(theme, slide, layout, master, RGBA);
-                    if(brush.fill && brush.fill.color && brush.fill.color.RGBA)
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:brush.fill.color.RGBA.R,
-                            g:brush.fill.color.RGBA.G,
-                            b:brush.fill.color.RGBA.B,
-                            A:brush.fill.color.RGBA.A
-                        }
-                    }
-                    else if(brush.fill instanceof  CGradFill)
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:brush.fill.colors[0].color.RGBA.R,
-                            g:brush.fill.colors[0].color.RGBA.G,
-                            b:brush.fill.colors[0].color.RGBA.B,
-                            A:brush.fill.colors[0].color.RGBA.A
-                        }
-                    }
 
-                    else
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:0,
-                            g:0,
-                            b:0,
-                            A:255
-                        }
-                    }
+                    var _rgba = brush.getRGBAColor();
+                    this.Content[i].Value.Color = {
+                        r:_rgba.R,
+                        g:_rgba.G,
+                        b:_rgba.B,
+                        A:_rgba.A
+                    };
                 }
                 else
                 {
@@ -417,265 +371,6 @@ Paragraph.prototype =
         }
       //  this.Recalculate();
     },
-
-
-
-    calculateTextTheme2 : function(theme, slide, layout, master, fontRef)
-    {
-       /* if(this.CompiledPr.Pr && this.CompiledPr.Pr.TextPr && this.CompiledPr.Pr.TextPr.unifill)
-        {
-            var brush = null;
-            var RGBA = {R:0, G:0, B:0, A:255};
-            if (theme && this.Parent.parent && this.Parent.parent.style!=null && fontRef!=null)
-            {
-                brush = theme.getFillStyle(fontRef.idx);
-                fontRef.Color.Calculate(theme, slide, layout, master);
-                RGBA = fontRef.Color.RGBA;
-
-                if (fontRef.Color.color != null)
-                {
-                    if (brush.fill != null && brush.fill.type == FILL_TYPE_SOLID)
-                    {
-                        brush.fill.color = fontRef.Color.createDuplicate();
-                    }
-                }
-            }
-            else
-            {
-                brush = new CUniFill();
-            }
-
-            brush.merge(this.CompiledPr.Pr.TextPr.unifill);
-            brush.calculate(theme, slide, layout, master, RGBA);
-            this.CompiledPr.Pr.TextPr.Color = {
-                r:brush.fill.color.RGBA.R,
-                g:brush.fill.color.RGBA.G,
-                b:brush.fill.color.RGBA.B,
-                A:brush.fill.color.RGBA.A
-            };
-        }*/
-
-        if(this.CompiledPr.Pr && this.CompiledPr.Pr.TextPr && this.CompiledPr.Pr.TextPr.FontFamily && this.CompiledPr.Pr.TextPr.FontFamily.Name !== undefined)
-        {
-            this.CompiledPr.Pr.TextPr.FontFamily.Index = -1;
-            this.CompiledPr.Pr.TextPr.FontFamily.Name = getFontInfo(this.CompiledPr.Pr.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
-        }
-
-        if(this.rPr.unifill && this.rPr.unifill.fill)
-        {
-            var brush = null;
-            var RGBA = {R:0, G:0, B:0, A:255};
-            if (theme && this.Parent.parent && this.Parent.parent.style!=null && fontRef!=null)
-            {
-                brush = theme.getFillStyle(fontRef.idx);
-                fontRef.Color.Calculate(theme, slide, layout, master);
-                RGBA = fontRef.Color.RGBA;
-
-                if (fontRef.Color.color != null)
-                {
-                    if (brush.fill != null && brush.fill.type == FILL_TYPE_SOLID)
-                    {
-                        brush.fill.color = fontRef.Color.createDuplicate();
-                    }
-                }
-            }
-            else
-            {
-                brush = new CUniFill();
-            }
-
-            brush.merge(this.rPr.unifill);
-            brush.calculate(theme, slide, layout, master, RGBA);
-            this.rPr.Color = {
-                r:brush.fill.color.RGBA.R,
-                g:brush.fill.color.RGBA.G,
-                b:brush.fill.color.RGBA.B,
-                A:brush.fill.color.RGBA.A
-            };
-        }
-        else
-        {
-            delete this.rPr.Color;
-        }
-
-        if(this.rPr.FontFamily && this.rPr.FontFamily.Name !== undefined)
-        {
-            if(this.rPr.FontFamily.themeFont == undefined)
-            {
-                this.rPr.FontFamily.Index = -1;
-                this.rPr.FontFamily.themeFont = this.rPr.FontFamily.Name;
-                this.rPr.FontFamily.Name = getFontInfo(this.rPr.FontFamily.Name)(theme.themeElements.fontScheme);
-            }
-            else
-            {
-                this.rPr.FontFamily.Index = -1;
-                this.rPr.FontFamily.Name = getFontInfo(this.rPr.FontFamily.themeFont)(theme.themeElements.fontScheme);
-            }
-        }
-
-        if(this.TextPr && this.TextPr.Value && this.TextPr.Value.FontFamily)
-        {
-            if(this.TextPr.Value.FontFamily.themeFont == undefined)
-            {
-                this.TextPr.Value.FontFamily.Index = -1;
-                this.TextPr.Value.FontFamily.themeFont = this.TextPr.Value.FontFamily.Name;
-                this.TextPr.Value.FontFamily.Name = getFontInfo(this.TextPr.Value.FontFamily.Name)(theme.themeElements.fontScheme);
-            }
-            else
-            {
-                this.TextPr.Value.FontFamily.Index = -1;
-                this.TextPr.Value.FontFamily.Name = getFontInfo(this.TextPr.Value.FontFamily.themeFont)(theme.themeElements.fontScheme);
-            }
-        }
-        for(var i = 0 ; i<this.Content.length; ++i)
-        {
-            if(this.Content[i].Type == para_TextPr)
-            {
-                if(this.Content[i].Value.unifill && this.Content[i].Value.unifill.fill)
-                {
-                    var brush = null;
-                    var RGBA = {R:0, G:0, B:0, A:255};
-                    if (theme && this.style!=null && fontRef!=null)
-                    {
-                        brush = theme.getFillStyle(fontRef.idx);
-                        fontRef.Color.Calculate(theme, slide, layout, master);
-                        RGBA = fontRef.Color.RGBA;
-
-                        if (fontRef.Color.color != null)
-                        {
-                            if (brush.fill != null && brush.fill.type == FILL_TYPE_SOLID)
-                            {
-                                brush.fill.color = fontRef.Color.createDuplicate();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        brush = new CUniFill();
-                    }
-
-                    brush.merge(this.Content[i].Value.unifill);
-                    brush.calculate(theme, slide, layout, master, RGBA);
-                    if(brush.fill && brush.fill.color && brush.fill.color.RGBA)
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:brush.fill.color.RGBA.R,
-                            g:brush.fill.color.RGBA.G,
-                            b:brush.fill.color.RGBA.B,
-                            A:brush.fill.color.RGBA.A
-                        }
-                    }
-                    else if(brush.fill && brush.fill.colors && brush.fill.colors.color && brush.fill.colors.color.RGBA)
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:brush.fill.colors.color.RGBA.R,
-                            g:brush.fill.colors.color.RGBA.G,
-                            b:brush.fill.colors.color.RGBA.B,
-                            A:brush.fill.colors.color.RGBA.A
-                        }
-                    }
-                    else
-                    {
-                        this.Content[i].Value.Color =
-                        {
-                            r:0,
-                            g:0,
-                            b:0,
-                            A:0
-                        }
-                    }
-                }
-                else
-                {
-                    delete this.Content[i].Value.Color;
-                }
-
-                if(this.Content[i].Value.FontFamily && this.Content[i].Value.FontFamily.Name !== undefined)
-                {
-                    if(this.Content[i].Value.FontFamily.themeFont == undefined)
-                    {
-                        this.Content[i].Value.FontFamily.Index = -1;
-                        this.Content[i].Value.FontFamily.themeFont = this.Content[i].Value.FontFamily.Name;
-                        this.Content[i].Value.FontFamily.Name = getFontInfo(this.Content[i].Value.FontFamily.Name)(theme.themeElements.fontScheme);
-                    }
-                    else
-                    {
-                        this.Content[i].Value.FontFamily.Index = -1;
-                        this.Content[i].Value.FontFamily.Name = getFontInfo(this.Content[i].Value.FontFamily.themeFont)(theme.themeElements.fontScheme);
-                    }
-                }
-            }
-        }
-
-        if(this.compiledBullet != null)
-        {
-            var _final_bullet = this.compiledBullet;
-            if(_final_bullet.bulletColor && (_final_bullet.bulletColor.type == BULLET_TYPE_COLOR_CLR) )
-            {
-                var _unicolor = _final_bullet.bulletColor.UniColor;
-                if(_unicolor != null)
-                {
-                    var _unifill = new CUniFill();
-                    _unifill.fill = new CSolidFill();
-                    _unifill.fill.color = _unicolor;
-                    var RGBA = null;
-                    var _rgb_color = null;
-                    if(_unicolor.type == COLOR_TYPE_SCHEME && _unicolor.id == phClr)
-                    {
-                        if(fontRef && fontRef.Color)
-                        {
-                            fontRef.Color.Calculate(theme, slide, layout, master);
-                            RGBA = fontRef.Color.RGBA;
-                            _rgb_color = {r: RGBA.R, g : RGBA.G, b : RGBA.B};
-                        }
-                    }
-                    else
-                    {
-                        _unifill.calculate(theme, slide, layout, master, {R:0, G:0, B:0, A:255});
-                        if(_unifill.fill.color && _unifill.fill.color.RGBA)
-                        {
-                            RGBA = _unifill.fill.color.RGBA;
-                            _rgb_color = {r: RGBA.R, g : RGBA.G, b : RGBA.B};
-                        }
-                    }
-                    if(_rgb_color !== null)
-                    {
-                        if(this.PresentationPr.Bullet && this.PresentationPr.Bullet.m_oColor)
-                        {
-                            this.PresentationPr.Bullet.m_oColor = {r: _rgb_color.r, g: _rgb_color.g, b: _rgb_color.b };
-                        }
-                    }
-                }
-            }
-        }
-
-        var unifillHiperlink = new CUniFill();
-        unifillHiperlink.merge(this.folHlinkColor.unifill);
-        unifillHiperlink.calculate(theme, slide, layout, master, RGBA);
-        if(unifillHiperlink.fill && unifillHiperlink.fill.color && unifillHiperlink.fill.color.RGBA)
-        {
-            this.folHlinkColor.Color =
-            {
-                r:unifillHiperlink.fill.color.RGBA.R,
-                g:unifillHiperlink.fill.color.RGBA.G,
-                b:unifillHiperlink.fill.color.RGBA.B,
-                A:unifillHiperlink.fill.color.RGBA.A
-            }
-        }
-        else
-        {
-            this.folHlinkColor.Color =
-            {
-                r:128,
-                g:0,
-                b:151,
-                A: 0
-            }
-        }
-    },
-
 
     GetType : function()
     {
@@ -7547,25 +7242,14 @@ Paragraph.prototype =
 
                 brush.merge(Pr.TextPr.unifill);
                 brush.calculate(theme, slide, layout, master, RGBA);
-                if( brush.fill && brush.fill.type === FILL_TYPE_SOLID && brush.fill.color && brush.fill.color.RGBA)
-                {
 
-                    Pr.TextPr.Color = {
-                        r:brush.fill.color.RGBA.R,
-                        g:brush.fill.color.RGBA.G,
-                        b:brush.fill.color.RGBA.B,
-                        A:brush.fill.color.RGBA.A
-                    };
-                }
-                else if( brush.fill && brush.fill.type === FILL_TYPE_GRAD && brush.fill.colors &&  brush.fill.colors[0] && brush.fill.colors[0].color && brush.fill.colors[0].color.RGBA)
-                {
-                    Pr.TextPr.Color = {
-                        r:brush.fill.colors[0].color.RGBA.R,
-                        g:brush.fill.colors[0].color.RGBA.G,
-                        b:brush.fill.colors[0].color.RGBA.B,
-                        A:brush.fill.colors[0].color.RGBA.A
-                    };
-                }
+                var _rgba = brush.getRGBAColor();
+                Pr.TextPr.Color = {
+                    r:_rgba.R,
+                    g:_rgba.G,
+                    b:_rgba.B,
+                    A:_rgba.A
+                };
             }
         }
         return Pr;

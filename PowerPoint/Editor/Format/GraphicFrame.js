@@ -287,10 +287,11 @@ CGraphicFrame.prototype =
                 }
                 var TextPr = props;
                 var parents = parent_object;
-                if(isRealObject(TextPr) && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill) && TextPr.unifill.fill.type === FILL_TYPE_SOLID && isRealObject(TextPr.unifill.fill.color))
+                if(isRealObject(TextPr) && isRealObject(TextPr.unifill))
                 {
-                    TextPr.unifill.fill.color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
-                    TextPr.Color = new CDocumentColor(TextPr.unifill.fill.color.RGBA.R, TextPr.unifill.fill.color.RGBA.G, TextPr.unifill.fill.color.RGBA.B);
+                    TextPr.unifill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
+                    var _rgba = TextPr.unifill.getRGBAColor();
+                    TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
                 }
                 if(isRealObject(props.FontFamily) && typeof props.FontFamily.Name === "string")
                 {
@@ -1130,21 +1131,10 @@ CGraphicFrame.prototype =
                 }
                 if(defaultStyle.TextPr.unifill && defaultStyle.TextPr.unifill.fill)
                 {
-                    if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                    {
-                        defaultStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        defaultStyle.TextPr.Color = new CDocumentColor( defaultStyle.TextPr.unifill.fill.color.RGBA.R, defaultStyle.TextPr.unifill.fill.color.RGBA.G,  defaultStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                    {
+                    defaultStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                    var _rgba =  defaultStyle.TextPr.unifill.getRGBAColor();
 
-                        defaultStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        defaultStyle.TextPr.Color= new CDocumentColor( defaultStyle.TextPr.unifill.fill.color.RGBA.R, defaultStyle.TextPr.unifill.fill.color.RGBA.G,  defaultStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                    {
-                        defaultStyle.TextPr.Color = new CDocumentColor( 0, 0, 0);
-                    }
+                    defaultStyle.TextPr.Color = new CDocumentColor( _rgba.R, _rgba.G, _rgba.B);
                 }
                 if(defaultStyle.TextPr.FontSize != undefined)
                 {
@@ -1221,21 +1211,9 @@ CGraphicFrame.prototype =
 
                 if(masterStyle.TextPr.unifill && masterStyle.TextPr.unifill.fill)
                 {
-                    if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                    {
-                        masterStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        masterStyle.TextPr.Color = new CDocumentColor( masterStyle.TextPr.unifill.fill.color.RGBA.R, masterStyle.TextPr.unifill.fill.color.RGBA.G,  masterStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                    {
-
-                        masterStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        masterStyle.TextPr.Color = new CDocumentColor( masterStyle.TextPr.unifill.fill.color.RGBA.R, masterStyle.TextPr.unifill.fill.color.RGBA.G,  masterStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                    {
-                        masterStyle.TextPr.Color =  new CDocumentColor( 0, 0, 0);
-                    }
+                    masterStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                    var _rgba = masterStyle.TextPr.unifill.getRGBAColor();
+                    masterStyle.TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
                 }
 
                 if(masterStyle.TextPr.FontSize != undefined)
@@ -1263,21 +1241,9 @@ CGraphicFrame.prototype =
 
                     if(masterShapeStyle.TextPr.unifill && masterShapeStyle.TextPr.unifill.fill)
                     {
-                        if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                        {
-                            masterShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            masterShapeStyle.TextPr.Color = new CDocumentColor( masterShapeStyle.TextPr.unifill.fill.color.RGBA.R, masterShapeStyle.TextPr.unifill.fill.color.RGBA.G,  masterShapeStyle.TextPr.unifill.fill.color.RGBA.B);
-                        }
-                        if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                        {
-
-                            masterShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            masterShapeStyle.TextPr.Color = new CDocumentColor( masterShapeStyle.TextPr.unifill.fill.color.RGBA.R, masterShapeStyle.TextPr.unifill.fill.color.RGBA.G,  masterShapeStyle.TextPr.unifill.fill.color.RGBA.B);
-                        }
-                        if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                        {
-                            masterShapeStyle.TextPr.Color = new CDocumentColor(0,0,0);
-                        }
+                        masterShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                        var _rgba = masterShapeStyle.TextPr.unifill.getRGBAColor();
+                        masterShapeStyle.TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
                     }
                 }
             }
@@ -1293,23 +1259,11 @@ CGraphicFrame.prototype =
                 }
 
 
-                if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill && layoutShapeStyle.TextPr.unifill.fill)
+                if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill)
                 {
-                    if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                    {
-                        layoutShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        layoutShapeStyle.TextPr.Color =  new CDocumentColor( layoutShapeStyle.TextPr.unifill.fill.color.RGBA.R, layoutShapeStyle.TextPr.unifill.fill.color.RGBA.G,  layoutShapeStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                    {
-
-                        layoutShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        layoutShapeStyle.TextPr.Color =  new CDocumentColor( layoutShapeStyle.TextPr.unifill.fill.color.RGBA.R, layoutShapeStyle.TextPr.unifill.fill.color.RGBA.G,  layoutShapeStyle.TextPr.unifill.fill.color.RGBA.B);
-                    }
-                    if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                    {
-                        layoutShapeStyle.TextPr.Color =  new CDocumentColor( 0, 0,  0);
-                    }
+                    layoutShapeStyle.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                    var _rgba = layoutShapeStyle.unifill.getRGBAColor();
+                    layoutShapeStyle.TextPr.Color =  new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
                 }
             }
         }
@@ -1327,36 +1281,14 @@ CGraphicFrame.prototype =
 
             if(slideShapeStyle && slideShapeStyle.TextPr && slideShapeStyle.TextPr.unifill && slideShapeStyle.TextPr.unifill.fill)
             {
-                if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                {
-                    slideShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    slideShapeStyle.TextPr.Color = {
-                        r : slideShapeStyle.TextPr.unifill.fill.color.RGBA.R,
-                        g : slideShapeStyle.TextPr.unifill.fill.color.RGBA.G,
-                        b : slideShapeStyle.TextPr.unifill.fill.color.RGBA.B,
-                        a : slideShapeStyle.TextPr.unifill.fill.color.RGBA.A
-                    }
-                }
-                if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                {
-
-                    slideShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    slideShapeStyle.TextPr.Color = {
-                        r : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                        g : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                        b : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                        a : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                    }
-                }
-                if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                {
-                    slideShapeStyle.TextPr.Color = {
-                        r : 0,
-                        g : 0,
-                        b : 0,
-                        a : 0
-                    }
-                }
+                slideShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                var _rgba = slideShapeStyle.TextPr.unifill.getRGBAColor();
+                slideShapeStyle.TextPr.Color = {
+                    r : _rgba.R,
+                    g : _rgba.G,
+                    b : _rgba.B,
+                    a : _rgba.A
+                };
             }
         }
 
@@ -1768,36 +1700,14 @@ CGraphicFrame.prototype =
                     }
                     if(defaultStyle.TextPr.unifill && defaultStyle.TextPr.unifill.fill)
                     {
-                        if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                        {
-                            defaultStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            defaultStyle.TextPr.Color = {
-                                r : defaultStyle.TextPr.unifill.fill.color.RGBA.R,
-                                g : defaultStyle.TextPr.unifill.fill.color.RGBA.G,
-                                b : defaultStyle.TextPr.unifill.fill.color.RGBA.B,
-                                a : defaultStyle.TextPr.unifill.fill.color.RGBA.A
-                            }
-                        }
-                        if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                        {
-
-                            defaultStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            defaultStyle.TextPr.Color = {
-                                r : defaultStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                                g : defaultStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                                b : defaultStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                                a : defaultStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                            }
-                        }
-                        if(defaultStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                        {
-                            defaultStyle.TextPr.Color = {
-                                r : 0,
-                                g : 0,
-                                b : 0,
-                                a : 0
-                            }
-                        }
+                        defaultStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                        var _rgba = defaultStyle.TextPr.unifill.getRGBAColor();
+                        defaultStyle.TextPr.Color = {
+                            r : _rgba.R,
+                            g : _rgba.G,
+                            b : _rgba.B,
+                            a : _rgba.A
+                        };
                     }
                     if(defaultStyle.TextPr.FontSize != undefined)
                     {
@@ -1874,36 +1784,14 @@ CGraphicFrame.prototype =
 
                     if(masterStyle.TextPr.unifill && masterStyle.TextPr.unifill.fill)
                     {
-                        if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                        {
-                            masterStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            masterStyle.TextPr.Color = {
-                                r : masterStyle.TextPr.unifill.fill.color.RGBA.R,
-                                g : masterStyle.TextPr.unifill.fill.color.RGBA.G,
-                                b : masterStyle.TextPr.unifill.fill.color.RGBA.B,
-                                a : masterStyle.TextPr.unifill.fill.color.RGBA.A
-                            }
-                        }
-                        if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                        {
-
-                            masterStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            masterStyle.TextPr.Color = {
-                                r : masterStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                                g : masterStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                                b : masterStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                                a : masterStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                            }
-                        }
-                        if(masterStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                        {
-                            masterStyle.TextPr.Color = {
-                                r : 0,
-                                g : 0,
-                                b : 0,
-                                a : 0
-                            }
-                        }
+                        masterStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                        var _rgba = masterStyle.TextPr.unifill.getRGBAColor();
+                        masterStyle.TextPr.Color = {
+                            r : _rgba.R,
+                            g : _rgba.G,
+                            b : _rgba.B,
+                            a : _rgba.A
+                        };
                     }
 
                     if(masterStyle.TextPr.FontSize != undefined)
@@ -1931,36 +1819,14 @@ CGraphicFrame.prototype =
 
                         if(masterShapeStyle.TextPr.unifill && masterShapeStyle.TextPr.unifill.fill)
                         {
-                            if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                            {
-                                masterShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                                masterShapeStyle.TextPr.Color = {
-                                    r : masterShapeStyle.TextPr.unifill.fill.color.RGBA.R,
-                                    g : masterShapeStyle.TextPr.unifill.fill.color.RGBA.G,
-                                    b : masterShapeStyle.TextPr.unifill.fill.color.RGBA.B,
-                                    a : masterShapeStyle.TextPr.unifill.fill.color.RGBA.A
-                                }
-                            }
-                            if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                            {
-
-                                masterShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                                masterShapeStyle.TextPr.Color = {
-                                    r : masterShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                                    g : masterShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                                    b : masterShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                                    a : masterShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                                }
-                            }
-                            if(masterShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                            {
-                                masterShapeStyle.TextPr.Color = {
-                                    r : 0,
-                                    g : 0,
-                                    b : 0,
-                                    a : 0
-                                }
-                            }
+                            masterShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                            var _rgba = masterShapeStyle.TextPr.unifill.getRGBAColor();
+                            masterShapeStyle.TextPr.Color = {
+                                r : _rgba.R,
+                                g : _rgba.G,
+                                b : _rgba.B,
+                                a : _rgba.A
+                            };
                         }
                     }
                 }
@@ -1978,36 +1844,14 @@ CGraphicFrame.prototype =
 
                     if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill && layoutShapeStyle.TextPr.unifill.fill)
                     {
-                        if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                        {
-                            layoutShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            layoutShapeStyle.TextPr.Color = {
-                                r : layoutShapeStyle.TextPr.unifill.fill.color.RGBA.R,
-                                g : layoutShapeStyle.TextPr.unifill.fill.color.RGBA.G,
-                                b : layoutShapeStyle.TextPr.unifill.fill.color.RGBA.B,
-                                a : layoutShapeStyle.TextPr.unifill.fill.color.RGBA.A
-                            }
-                        }
-                        if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                        {
-
-                            layoutShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                            layoutShapeStyle.TextPr.Color = {
-                                r : layoutShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                                g : layoutShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                                b : layoutShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                                a : layoutShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                            }
-                        }
-                        if(layoutShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                        {
-                            layoutShapeStyle.TextPr.Color = {
-                                r : 0,
-                                g : 0,
-                                b : 0,
-                                a : 0
-                            }
-                        }
+                        layoutShapeStyle.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                        var _rgba = layoutShapeStyle.unifill.getRGBAColor();
+                        layoutShapeStyle.TextPr.Color = {
+                            r : _rgba.R,
+                            g : _rgba.G,
+                            b : _rgba.B,
+                            a : _rgba.A
+                        };
                     }
                 }
             }
@@ -2023,38 +1867,16 @@ CGraphicFrame.prototype =
                     slideShapeStyle.TextPr.FontFamily.Name = getFontInfo(slideShapeStyle.TextPr.FontFamily.Name)(theme.themeElements.fontScheme);
                 }
 
-                if(slideShapeStyle && slideShapeStyle.TextPr && slideShapeStyle.TextPr.unifill && slideShapeStyle.TextPr.unifill.fill)
+                if(slideShapeStyle && slideShapeStyle.TextPr && slideShapeStyle.TextPr.unifill)
                 {
-                    if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_SOLID)
-                    {
-                        slideShapeStyle.TextPr.unifill.fill.color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        slideShapeStyle.TextPr.Color = {
-                            r : slideShapeStyle.TextPr.unifill.fill.color.RGBA.R,
-                            g : slideShapeStyle.TextPr.unifill.fill.color.RGBA.G,
-                            b : slideShapeStyle.TextPr.unifill.fill.color.RGBA.B,
-                            a : slideShapeStyle.TextPr.unifill.fill.color.RGBA.A
-                        }
-                    }
-                    if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_GRAD)
-                    {
-
-                        slideShapeStyle.TextPr.unifill.fill.colors[0].color.Calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                        slideShapeStyle.TextPr.Color = {
-                            r : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.R,
-                            g : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.G,
-                            b : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.B,
-                            a : slideShapeStyle.TextPr.unifill.fill.colors[0].color.RGBA.A
-                        }
-                    }
-                    if(slideShapeStyle.TextPr.unifill.fill.type == FILL_TYPE_NOFILL)
-                    {
-                        slideShapeStyle.TextPr.Color = {
-                            r : 0,
-                            g : 0,
-                            b : 0,
-                            a : 0
-                        }
-                    }
+                    slideShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                    var _rgba = slideShapeStyle.TextPr.unifill.getRGBAColor();
+                    slideShapeStyle.TextPr.Color = {
+                        r : _rgba.R,
+                        g : _rgba.G,
+                        b : _rgba.B,
+                        a : _rgba.A
+                    };
                 }
             }
 

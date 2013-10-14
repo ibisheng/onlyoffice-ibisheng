@@ -1770,6 +1770,44 @@ CUniFill.prototype =
         }
     },
 
+    getRGBAColor : function()
+    {
+        if (this.fill)
+        {
+            if (this.fill.type == FILL_TYPE_SOLID)
+            {
+                return this.fill.color.RGBA;
+            }
+            if (this.fill.type == FILL_TYPE_GRAD)
+            {
+                var RGBA = {R:0, G:0, B:0, A:255};
+                var _colors = this.fill.colors;
+                var _len = _colors.length;
+
+                if (0 == _len)
+                    return RGBA;
+
+                for (var i = 0; i < _len; i++)
+                {
+                    RGBA.R += _colors[i].color.RGBA.R;
+                    RGBA.G += _colors[i].color.RGBA.G;
+                    RGBA.B += _colors[i].color.RGBA.B;
+                }
+
+                RGBA.R = (RGBA.R / _len) >> 0;
+                RGBA.G = (RGBA.G / _len) >> 0;
+                RGBA.B = (RGBA.B / _len) >> 0;
+
+                return RGBA;
+            }
+            if (this.fill.type = FILL_TYPE_PATT)
+            {
+                return this.fill.fgClr.RGBA;
+            }
+        }
+        return {R:0, G:0, B:0, A:255};
+    },
+
     createDuplicate : function()
     {
         var duplicate = new CUniFill();

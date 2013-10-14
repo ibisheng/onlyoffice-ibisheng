@@ -237,10 +237,11 @@ CTextBody.prototype =
             }
             var TextPr = props;
             var parents = parent_object;
-            if(isRealObject(TextPr) && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill) && TextPr.unifill.fill.type === FILL_TYPE_SOLID && isRealObject(TextPr.unifill.fill.color))
+            if(isRealObject(TextPr) && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
             {
-                TextPr.unifill.fill.color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
-                TextPr.Color = new CDocumentColor(TextPr.unifill.fill.color.RGBA.R, TextPr.unifill.fill.color.RGBA.G, TextPr.unifill.fill.color.RGBA.B);
+                TextPr.unifill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
+                var _rgba = TextPr.unifill.getRGBAColor();
+                TextPr.Color = new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
             }
             if(isRealObject(props.FontFamily) && typeof props.FontFamily.Name === "string")
             {

@@ -33,7 +33,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     if (style.fillRef.Color.color != null)
     {
-        if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID || brush.fill.type == FILL_TYPE_GRAD))
+        if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID))
         {
             brush.fill.color = style.fillRef.Color.createDuplicate();
         }

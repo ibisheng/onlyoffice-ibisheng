@@ -6852,10 +6852,7 @@ function GetRGBColorFromUniFillAndRef(unifill, fontRef, theme, master, layout, s
         }
         _calculated_unifill.merge(unifill);
         _calculated_unifill.calculate(theme, slide, layout, master, RGBA);
-        if(_calculated_unifill.fill && _calculated_unifill.fill.color && _calculated_unifill.fill.color.RGBA)
-        {
-            return _calculated_unifill.fill.color.RGBA;
-        }
+        return _calculated_unifill.getRGBAColor();
     }
     return null;
 }
