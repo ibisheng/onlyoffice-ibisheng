@@ -299,6 +299,7 @@ prop:GenerateStyles
 prop:asyncFontsDocumentEndLoaded
 prop:asyncImagesDocumentStartLoaded
 prop:asyncImagesDocumentEndLoaded
+prop:asc_getComments
 prop:OpenDocumentEndCallback
 prop:asyncFontStartLoaded
 prop:asyncFontEndLoaded
@@ -1438,6 +1439,7 @@ asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
 asc_docs_api.prototype['asyncImagesDocumentStartLoaded'] = asc_docs_api.prototype.asyncImagesDocumentStartLoaded;
 asc_docs_api.prototype['asyncImagesDocumentEndLoaded'] = asc_docs_api.prototype.asyncImagesDocumentEndLoaded;
+asc_docs_api.prototype['asc_getComments'] = asc_docs_api.prototype.asc_getComments;
 asc_docs_api.prototype['OpenDocumentEndCallback'] = asc_docs_api.prototype.OpenDocumentEndCallback;
 asc_docs_api.prototype['asyncFontStartLoaded'] = asc_docs_api.prototype.asyncFontStartLoaded;
 asc_docs_api.prototype['asyncFontEndLoaded'] = asc_docs_api.prototype.asyncFontEndLoaded;
