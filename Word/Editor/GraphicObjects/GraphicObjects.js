@@ -1297,6 +1297,20 @@ CGraphicObjects.prototype =
                         this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
                 }
             }
+            if(isRealObject(props.paddings))
+            {
+                if(this.curState.id === STATES_ID_TEXT_ADD)
+                {
+                    if(typeof this.curState.textObject.GraphicObj.setPaddings === "function")
+                        this.curState.textObject.GraphicObj.setPaddings(props.paddings);
+                }
+
+                if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                {
+                    if(typeof this.curState.textObject.setPaddings === "function")
+                        this.curState.textObject.setPaddings(props.paddings);
+                }
+            }
             if(!(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) && isRealObject(properties))
             {
                 var ArrGlyph = this.selectionInfo.selectionArray;
@@ -1325,6 +1339,10 @@ CGraphicObjects.prototype =
                             if(properties.stroke)
                             {
                                 ArrGlyph[i].GraphicObj.changeLine(properties.stroke);
+                            }
+                            if(isRealObject(properties.paddings))
+                            {
+                                ArrGlyph[i].GraphicObj.setPaddings(properties.paddings);
                             }
                         }
                     }
@@ -1369,6 +1387,10 @@ CGraphicObjects.prototype =
                             if(properties.stroke)
                             {
                                 ArrGlyph[i].changeLine(properties.stroke);
+                            }
+                            if(isRealObject(properties.paddings))
+                            {
+                                ArrGlyph[i].setPaddings(properties.paddings);
                             }
                         }
                         else if(isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)

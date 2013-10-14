@@ -151,6 +151,16 @@ WordGroupShapes.prototype =
     },
 
 
+    setPaddings: function(paddings)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setPaddings)
+            {
+                this.spTree[i].setPaddings(paddings);
+            }
+        }
+    },
 
     setGroup: function(group)
     {

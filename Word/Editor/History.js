@@ -267,6 +267,7 @@ var historyitem_AutoShapes_SetChartTitleType = 45;
 var historyitem_SetSetSpPr = 46;
 var historyitem_AutoShapes_SetChartTitleTxBody = 47;
 var historyitem_AutoShapes_RecalculateAfterResize = 48;
+var historyitem_AutoShapes_SetTextPaddings = 49;
 
 
 //Типы изменений в классе GraphicObjects

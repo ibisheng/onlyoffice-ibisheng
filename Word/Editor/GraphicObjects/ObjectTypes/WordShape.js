@@ -1398,6 +1398,31 @@ WordShape.prototype =
         this.calculateTransformTextMatrix();
     },
 
+    setPaddings: function(paddings)
+    {
+        if(isRealObject(paddings))
+        {
+            var history_obj = {Type:historyitem_AutoShapes_SetTextPaddings};
+            history_obj.oldL = this.bodyPr.lIns;
+            history_obj.oldT = this.bodyPr.tIns;
+            history_obj.oldR = this.bodyPr.rIns;
+            history_obj.oldB = this.bodyPr.bIns;
+
+            history_obj.newL = isRealNumber(paddings.Left) ? paddings.Left : this.bodyPr.lIns;
+            history_obj.newT = isRealNumber(paddings.Top) ? paddings.Top : this.bodyPr.tIns;
+            history_obj.newR = isRealNumber(paddings.Right) ? paddings.Right : this.bodyPr.rIns;
+            history_obj.newB = isRealNumber(paddings.Bottom) ? paddings.Bottom : this.bodyPr.bIns;
+            History.Add(this, history_obj);
+            this.bodyPr.lIns = isRealNumber(paddings.Left) ? paddings.Left : this.bodyPr.lIns
+            this.bodyPr.tIns = isRealNumber(paddings.Top) ? paddings.Top : this.bodyPr.tIns
+            this.bodyPr.rIns = isRealNumber(paddings.Right) ? paddings.Right : this.bodyPr.rIns
+            this.bodyPr.bIns = isRealNumber(paddings.Bottom) ? paddings.Bottom : this.bodyPr.bIns
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+
+    },
+
     canAddComment: function()
     {
         if(isRealObject(this.textBoxContent))
@@ -4275,6 +4300,14 @@ WordShape.prototype =
                 this.bodyPr.anchor = data.oldAlign;
                 break;
             }
+            case historyitem_AutoShapes_SetTextPaddings:
+            {
+                this.bodyPr.lIns = data.oldL;
+                this.bodyPr.tIns = data.oldT;
+                this.bodyPr.rIns = data.oldR;
+                this.bodyPr.bIns = data.oldB;
+                break;
+            }
             case historyitem_SetParent:
             {
                 if(data.oldParent == null)
@@ -4541,6 +4574,14 @@ WordShape.prototype =
             case historyitem_SetVerticalShapeAlign:
             {
                 this.bodyPr.anchor = data.newAlign;
+                break;
+            }
+            case historyitem_AutoShapes_SetTextPaddings:
+            {
+                this.bodyPr.lIns = data.newL;
+                this.bodyPr.tIns = data.newT;
+                this.bodyPr.rIns = data.newR;
+                this.bodyPr.bIns = data.newB;
                 break;
             }
 
@@ -4864,6 +4905,31 @@ WordShape.prototype =
             case historyitem_SetVerticalShapeAlign:
             {
                 writer.WriteLong(data.newAlign);
+                break;
+            }
+            case historyitem_AutoShapes_SetTextPaddings:
+            {
+                var w = writer;
+                w.WriteBool(isRealNumber(data.newL));
+                if(isRealNumber(data.newL))
+                {
+                    w.WriteDouble(data.newL);
+                }
+                w.WriteBool(isRealNumber(data.newT));
+                if(isRealNumber(data.newT))
+                {
+                    w.WriteDouble(data.newT);
+                }
+                w.WriteBool(isRealNumber(data.newR));
+                if(isRealNumber(data.newR))
+                {
+                    w.WriteDouble(data.newR);
+                }
+                w.WriteBool(isRealNumber(data.newB));
+                if(isRealNumber(data.newB))
+                {
+                    w.WriteDouble(data.newB);
+                }
                 break;
             }
             case historyitem_SetParent:
@@ -5375,6 +5441,43 @@ WordShape.prototype =
             case historyitem_SetVerticalShapeAlign:
             {
                 this.bodyPr.anchor = reader.GetLong();
+                break;
+            }
+            case historyitem_AutoShapes_SetTextPaddings:
+            {
+                var r = reader;
+                if(r.GetBool())
+                {
+                    this.bodyPr.lIns = r.GetDouble();
+                }
+                else
+                {
+                    this.bodyPr.lIns = undefined;
+                }
+                if(r.GetBool())
+                {
+                    this.bodyPr.tIns = r.GetDouble();
+                }
+                else
+                {
+                    this.bodyPr.tIns = undefined;
+                }
+                if(r.GetBool())
+                {
+                    this.bodyPr.rIns = r.GetDouble();
+                }
+                else
+                {
+                    this.bodyPr.rIns = undefined;
+                }
+                if(r.GetBool())
+                {
+                    this.bodyPr.bIns = r.GetDouble();
+                }
+                else
+                {
+                    this.bodyPr.bIns = undefined;
+                }
                 break;
             }
             case historyitem_SetParent:
