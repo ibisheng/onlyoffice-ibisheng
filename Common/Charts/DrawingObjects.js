@@ -3302,7 +3302,7 @@ function DrawingObjects() {
 					}
 				}
 				// Restore
-				_this.restoreGraphicsCanvas(shapeOverlayCtx);
+				_this.restoreGraphicsCanvas(shapeCtx);
 			}
 		}
 		if ( !printOptions ) {

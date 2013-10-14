@@ -1816,7 +1816,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjectsEx(false);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}

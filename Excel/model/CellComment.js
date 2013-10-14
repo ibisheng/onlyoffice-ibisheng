@@ -1551,7 +1551,7 @@ asc_CCellCommentator.prototype = {
 			for (var i = 0; i < length; i++) {
 				var commentCell = _this.aComments[i];
 
-				if ( !commentCell.asc_getDocumentFlag() && !commentCell.asc_getSolved() && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
+				if ( !commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ && !commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0) ) {
 					if ( !mergedRange ) {
 						if ( (_col == commentCell.nCol) && (_row == commentCell.nRow) )
 							comments.push(commentCell);
