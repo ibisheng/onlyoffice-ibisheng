@@ -3680,6 +3680,7 @@ CShape.prototype =
         t_y = invert_transform.TransformPointY(x, y);
         var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
 
+        var check_line = CheckObjectLine(this);
         var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
@@ -3687,18 +3688,18 @@ CShape.prototype =
         var hc = this.extX*0.5;
         var dist_x = t_x - hc;
         sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 1;
 
         dist_x = t_x - this.extX;
         sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 2;
 
         var vc = this.extY*0.5;
         var dist_y = t_y - vc;
         sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 3;
 
         dist_y = t_y - this.extY;
@@ -3708,17 +3709,17 @@ CShape.prototype =
 
         dist_x = t_x - hc;
         sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 5;
 
         dist_x = t_x;
         sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 6;
 
         dist_y = t_y - vc;
         sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 7;
 
         var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);;
@@ -3726,7 +3727,7 @@ CShape.prototype =
         sqr_y = dist_y*dist_y;
         dist_x = t_x - hc;
         sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 8;
 
         return -1;
@@ -3774,7 +3775,7 @@ CShape.prototype =
 
         var _hit_context = this.getParentObjects().presentation.DrawingDocument.CanvasHitContext;
 
-        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
+        return !(CheckObjectLine(this))&&(HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||

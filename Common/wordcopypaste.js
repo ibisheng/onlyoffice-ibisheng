@@ -3363,13 +3363,17 @@ PasteProcessor.prototype =
                                         {
                                             if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                                             {
-                                                oThis.insertInPlace2(slide.graphicObjects.State.textObject.txBody.content, shape.txBody.content.Content);
-                                                slide.graphicObjects.State.textObject.txBody.bRecalculateNumbering = true;
-                                                var content = slide.graphicObjects.State.textObject.txBody.content.Content;
-                                                for(var j = 0; j < content.length; ++j)
+                                                var content = (slide.graphicObjects.State.textObject instanceof CShape) ? slide.graphicObjects.State.textObject.txBody.content : slide.graphicObjects.State.textObject.graphicObject.CurCell.Content;
+                                                oThis.insertInPlace2(content, shape.txBody.content.Content);
+                                                if(slide.graphicObjects.State.textObject instanceof CShape)
+                                                    slide.graphicObjects.State.textObject.txBody.bRecalculateNumbering = true;
+                                                else
+                                                    slide.graphicObjects.State.textObject.recalcInfo.recalculateNumbering = true
+                                                var content2 = content.Content;
+                                                for(var j = 0; j < content2.length; ++j)
                                                 {
-                                                    content[j].RecalcInfo.Set_Type_0(pararecalc_0_All);
-                                                    content[j].Set_Parent(slide.graphicObjects.State.textObject.txBody.content);
+                                                    content2[j].RecalcInfo.Set_Type_0(pararecalc_0_All);
+                                                    content2[j].Set_Parent(content);
                                                 }
                                                 slide.graphicObjects.State.textObject.recalcInfo.recalculateContent = true;
                                                 slide.graphicObjects.State.textObject.recalcInfo.recalculateTransformText = true;
@@ -3754,7 +3758,7 @@ PasteProcessor.prototype =
                                 {
                                     var b_add_slide = false;
 
-                                    if(presentation.Slids.length === 0)
+                                    if(presentation.Slides.length === 0)
                                     {
                                         presentation.addNextSlide();
                                         b_add_slide = true;

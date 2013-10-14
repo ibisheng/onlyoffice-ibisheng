@@ -4548,12 +4548,17 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     };
 }
 
+function CheckObjectLine(obj)
+{
+    return (obj instanceof CShape && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
+}
+
 function DrawDefaultSelection(drawingObjectsController, drawingDocument)
 {
     var selected_objects = drawingObjectsController.selectedObjects;
     for(var i = 0; i < selected_objects.length; ++i)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransformMatrix(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false, selected_objects[i].canRotate());
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransformMatrix(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, CheckObjectLine(selected_objects[i]), selected_objects[i].canRotate());
     }
     if(selected_objects.length === 1)
     {

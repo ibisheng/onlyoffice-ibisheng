@@ -4715,6 +4715,7 @@ function redrawSlide(slide, presentation, arr_layouts, direction, arr_slides)
     }
 }
 
+
 function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction, arr_slides)
 {
     var _history_is_on = History.Is_On();
@@ -4793,13 +4794,6 @@ function recalculateSlideAfterChangeThemeColors(slide, presentation, direction, 
     slide.recalcAllColors();
     slide.recalculate();
     presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
-    if(presentation.CurPos.Type === docpostype_FlowObjects)
-    {
-        if(presentation.CurPage === slide.num)
-        {
-            presentation.RecalculateCurPos();
-        }
-    }
 
     if(direction == 0)
     {
