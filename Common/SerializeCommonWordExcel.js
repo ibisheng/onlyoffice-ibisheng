@@ -901,7 +901,11 @@ var EChartBasicTypes =
 	chartbasicScatterChart:  7,
 	chartbasicRadarChart:  8,
 	chartbasicDoughnutChart:  9,
-	chartbasicStockChart:  10
+	chartbasicStockChart:  10,
+	chartbasicArea3DChart:  11,
+	chartbasicPie3DChart:  12,
+	chartbasicSurfaceChart:  13,
+	chartbasicSurface3DChart:  14
 };
 /** @enum */
 var EChartBarDerection =
@@ -1739,12 +1743,16 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			switch(byteType)
 			{
 				case EChartBasicTypes.chartbasicBarChart:
-				case EChartBasicTypes.chartbasicBar3DChart: this.chartType = c_oAscChartType.hbar;break;
+				case EChartBasicTypes.chartbasicBar3DChart:
+				case EChartBasicTypes.chartbasicSurfaceChart:
+				case EChartBasicTypes.chartbasicSurface3DChart: this.chartType = c_oAscChartType.hbar;break;
 				case EChartBasicTypes.chartbasicAreaChart:
+				case EChartBasicTypes.chartbasicArea3DChart:
 				case EChartBasicTypes.chartbasicRadarChart: this.chartType = c_oAscChartType.area;break;
 				case EChartBasicTypes.chartbasicLineChart:
 				case EChartBasicTypes.chartbasicLine3DChart: this.chartType = c_oAscChartType.line;break;
 				case EChartBasicTypes.chartbasicPieChart:
+				case EChartBasicTypes.chartbasicPie3DChart: this.chartType = c_oAscChartType.pie;break;
 				case EChartBasicTypes.chartbasicDoughnutChart: this.chartType = c_oAscChartType.pie;break;
 				case EChartBasicTypes.chartbasicBubbleChart:
 				case EChartBasicTypes.chartbasicScatterChart: this.chartType = c_oAscChartType.scatter;break;
