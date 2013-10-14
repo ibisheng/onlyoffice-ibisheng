@@ -9148,21 +9148,24 @@ Paragraph.prototype =
             else if ( type_Table === NextEl.GetType() )
             {
                 var TableFirstParagraph = NextEl.Get_FirstParagraph();
-                var NextStyle           = TableFirstParagraph.Style_Get();
-                var Next_Before         = TableFirstParagraph.Get_CompiledPr2(false).ParaPr.Spacing.Before;
-                var Next_BeforeAuto     = TableFirstParagraph.Get_CompiledPr2(false).ParaPr.Spacing.BeforeAutoSpacing;
-                var Cur_After           = Pr.ParaPr.Spacing.After;
-                var Cur_AfterAuto       = Pr.ParaPr.Spacing.AfterAutoSpacing;
-                if ( NextStyle === StyleId && true === Pr.ParaPr.ContextualSpacing )
+                if ( null != TableFirstParagraph && undefined != TableFirstParagraph )
                 {
-                    Cur_After   = this.Internal_CalculateAutoSpacing( Cur_After,   Cur_AfterAuto,   this );
-                    Next_Before = this.Internal_CalculateAutoSpacing( Next_Before, Next_BeforeAuto, this );
+                    var NextStyle           = TableFirstParagraph.Style_Get();
+                    var Next_Before         = TableFirstParagraph.Get_CompiledPr2(false).ParaPr.Spacing.Before;
+                    var Next_BeforeAuto     = TableFirstParagraph.Get_CompiledPr2(false).ParaPr.Spacing.BeforeAutoSpacing;
+                    var Cur_After           = Pr.ParaPr.Spacing.After;
+                    var Cur_AfterAuto       = Pr.ParaPr.Spacing.AfterAutoSpacing;
+                    if ( NextStyle === StyleId && true === Pr.ParaPr.ContextualSpacing )
+                    {
+                        Cur_After   = this.Internal_CalculateAutoSpacing( Cur_After,   Cur_AfterAuto,   this );
+                        Next_Before = this.Internal_CalculateAutoSpacing( Next_Before, Next_BeforeAuto, this );
 
-                    Pr.ParaPr.Spacing.After = Math.max( Next_Before, Cur_After ) - Cur_After;
-                }
-                else
-                {
-                    Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Cur_AfterAuto, this );
+                        Pr.ParaPr.Spacing.After = Math.max( Next_Before, Cur_After ) - Cur_After;
+                    }
+                    else
+                    {
+                        Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Cur_AfterAuto, this );
+                    }
                 }
             }
         }

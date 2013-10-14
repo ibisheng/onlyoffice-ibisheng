@@ -2518,6 +2518,9 @@ CTable.prototype =
     // Получаем первый параграф первой ячейки. (Нужно для контроля ContextualSpacing)
     Get_FirstParagraph : function()
     {
+        if ( this.Content.length <= 0 || this.Content[0].Content.length <= 0 )
+            return null;
+
         return this.Content[0].Content[0].Content.Get_FirstParagraph();
     },
 
