@@ -4690,7 +4690,7 @@ CDocumentContent.prototype =
                 if(this.Content[i].GetType() == type_Paragraph)
                 {
                     //_history_obj.arrOldBullets[i] = this.Content[i].bullet;
-                    this.Content[i].bullet = bullet.createDuplicate();
+                    this.Content[i].setPresentationBullet(bullet.createDuplicate());
                     this.Content[i].Add_PresentationNumbering2(_bullet);
                 }
             }
@@ -4747,7 +4747,7 @@ CDocumentContent.prototype =
                 if((content = this.Content[i]).GetType() == type_Paragraph)
                 {
                     //_history_obj.arrOldBullets[i] = content.bullet;
-                    content.bullet = bullet.createDuplicate();
+                    content.setPresentationBullet(bullet.createDuplicate());
                     this.Content[i].Add_PresentationNumbering2(_bullet);
                 }
             }
@@ -4790,7 +4790,7 @@ CDocumentContent.prototype =
             //_history_obj.oldBullet = content.bullet;
             //_history_obj.pos = this.CurPos.ContentPos;
 
-            content.bullet = bullet.createDuplicate();
+            content.setPresentationBullet(bullet.createDuplicate());
             content.Add_PresentationNumbering2(_bullet);
             this.ContentLastChangePos = this.CurPos.ContentPos;
             this.Recalculate();
