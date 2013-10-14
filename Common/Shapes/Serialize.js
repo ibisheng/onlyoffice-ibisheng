@@ -4760,6 +4760,11 @@ function BinaryPPTYLoader()
                     var oBinary_ChartReader = new Binary_ChartReader(_stream, _chart.chart, _chart);
                     oBinary_ChartReader.ReadExternal(_length);
 
+                    if(null == _chart.chart.range.interval || _chart.chart.range.interval.length <= 0)
+                    {
+                        _chart = null;
+                    }
+
                     s.Seek2(_pos + _length);
                     break;
                 }
