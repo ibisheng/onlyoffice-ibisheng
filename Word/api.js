@@ -3106,6 +3106,8 @@ asc_docs_api.prototype.put_TextPrLang = function(value)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Lang : { Val : value } } ) );
 
+        this.WordControl.m_oLogicDocument.Spelling.Check_CurParas();
+
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
     }

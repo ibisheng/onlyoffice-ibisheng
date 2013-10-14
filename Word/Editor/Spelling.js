@@ -82,6 +82,24 @@ CDocumentSpelling.prototype =
     Add_CurPara : function(Id, Para)
     {
         this.CurPara[Id] = Para;
+    },
+
+    Check_CurParas : function()
+    {
+        for ( var Id in this.CheckPara )
+        {
+            var Para = this.CheckPara[Id];
+            Para.Continue_CheckSpelling();
+            delete this.CheckPara[Id];
+        }
+
+        for ( var Id in this.CurPara )
+        {
+            var Para = this.CurPara[Id];
+            delete this.CurPara[Id];
+            Para.SpellChecker.Reset_ElementsWithCurPos();
+            Para.SpellChecker.Check(undefined, true);
+        }
     }
 
 };
@@ -110,10 +128,11 @@ CParaSpellChecker.prototype =
         this.Elements.push( new CParaSpellCheckerElement( StartPos, EndPos, Word, Lang ) );
     },
 
-    Check : function(ParagraphForceRedraw)
+    Check : function(ParagraphForceRedraw, _bForceCheckCur)
     {
+        var bForceCheckCur = ( true != _bForceCheckCur ? false : true )
         var Paragraph = g_oTableId.Get_ById( this.ParaId );
-        var bCurrent = Paragraph.Is_ThisElementCurrent();
+        var bCurrent = ( true === bForceCheckCur ? false : Paragraph.Is_ThisElementCurrent() );
 
         var CurPos = -1;
         if ( true === bCurrent && false === Paragraph.Selection.Use )
