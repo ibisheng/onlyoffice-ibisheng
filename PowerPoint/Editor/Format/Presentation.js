@@ -1326,8 +1326,7 @@ CPresentation.prototype =
 
     Add_FlowTable : function(Cols, Rows)
     {
-        if(this.Document_Is_SelectionLocked(changestype_AddShape) === false)
-        {
+
             var X = 0;
             var Y = 0;
 
@@ -1350,6 +1349,8 @@ CPresentation.prototype =
             _table.Set_Inline(true);
             _table.setStyleIndex(0);
             _graphic_frame.setGraphicObject(_table);
+        if(this.Document_Is_SelectionLocked(changestype_AddShape, _graphic_frame) === false)
+        {
             this.Slides[this.CurPage].graphicObjects.resetSelectionState();
             _graphic_frame.select(this.Slides[this.CurPage].graphicObjects);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
@@ -1361,6 +1362,10 @@ CPresentation.prototype =
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
             this.Document_UpdateSelectionState();
+        }
+        else
+        {
+            this.Document_Undo();
         }
     },
 
@@ -6262,6 +6267,13 @@ CPresentation.prototype =
         this.resetStateCurSlide();
 
         var start = this.CurPage;
+        for(var i = 0;  i< _slides_array.length; ++i)
+        {
+            if(_slides_array[i] == this.Slides[this.CurPage])
+            {
+                start = i;
+            }
+        }
         this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_current_slide, _presentation, arrInd, start, _arr_new_layouts,0, _slides_array)}, 30);
 
 
