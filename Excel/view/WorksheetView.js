@@ -1816,7 +1816,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjects(false);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
@@ -7925,6 +7925,7 @@
 					}
 					t._cleanCellsTextMetricsCache();
 					t._prepareCellTextMetricsCache(t.visibleRange);
+					t.objectRender.setScrollOffset();
 					t.draw();
 
 					t._trigger("reinitializeScroll");

@@ -2979,8 +2979,7 @@ function DrawingObjects() {
             ctx.beginPath();
             ctx.globalAlpha = 1.0;
         }
-		_this.drawWorksheetHeaders();
-
+		
 		// Restore
 		_this.restoreGraphicsCanvas(shapeOverlayCtx);
 		
@@ -2993,7 +2992,7 @@ function DrawingObjects() {
 		_this.zoom.current = factor;
 		
 		_this.resizeCanvas();
-		_this.restoreScrollOffset();
+		_this.setScrollOffset();
 		_this.rebuildChartGraphicObjects();
 	}
 	
@@ -3101,13 +3100,8 @@ function DrawingObjects() {
 	_this.clearDrawingObjects = function() {
 		
 		// Чистим предыдущие области
-		var bHeaders = false;
-		var _top = worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3);
-		var _left = worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3);
 		for (var i = 0; i < aBoundsCheckers.length; i++) {
 			_this.restoreSheetArea(aBoundsCheckers[i]);
-			if ( (_top >= aBoundsCheckers[i].Bounds.min_y) || (_left >= aBoundsCheckers[i].Bounds.min_x) )
-				bHeaders = true;
 		}
 		aBoundsCheckers = [];
 		
@@ -3118,13 +3112,7 @@ function DrawingObjects() {
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			_this.restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
-			
-			if ( (_top >= boundsChecker.Bounds.min_y) || (_left >= boundsChecker.Bounds.min_x) )
-				bHeaders = true;
 		}
-		
-		if ( bHeaders )
-			_this.drawWorksheetHeaders(true);
 	}
 	
 	_this.restoreSheetArea = function(checker) {
@@ -3152,6 +3140,7 @@ function DrawingObjects() {
 				overlayCtx.stroke();*/
 								
 				drawingCtx.clearRect( x1, y1, w, h );
+				drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
 				worksheet._drawGrid(undefined, r_);
 				worksheet._drawCells(r_);
 				worksheet._drawCellsBorders(undefined, r_);
@@ -3231,8 +3220,6 @@ function DrawingObjects() {
 			}
 			shapeOverlayCtx.ClearMode = false;
 		}
-		if ( aObjects.length )
-			_this.drawWorksheetHeaders();
 	}	
 
 	//-----------------------------------------------------------------------------------
@@ -3330,8 +3317,6 @@ function DrawingObjects() {
 				worksheet.cleanSelection();
 				worksheet._drawSelection();
 			}
-				
-			_this.drawWorksheetHeaders();
 		}
 	}
 
@@ -3364,49 +3349,6 @@ function DrawingObjects() {
 				metrics.maxRow = drawingObject.to.row + 1; // учитываем rowOff
 		}
 		return metrics;
-	}
-
-	_this.drawWorksheetHeaders = function(bForce) {
-		
-		// TODO Отказаться от перерисовки хидеров
-		return;
-		
-		// Проверяем выход за видимую область
-		var fvr = worksheet.getFirstVisibleRow();
-		var fvc = worksheet.getFirstVisibleCol();
-		
-		function updateHeaders() {
-			// cols header on overlay
-			overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
-			// rows header on overlay
-			overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
-			
-			worksheet._drawColumnHeaders();
-			worksheet._drawRowHeaders();
-			worksheet._drawCorner();
-			
-			if ( !_this.selectedGraphicObjectsExists() )
-				worksheet._drawActiveHeaders();
-		}
-		
-		if ( bForce )
-			updateHeaders();
-		else {
-			var bRedraw = false;
-			for (var i = 0; i < aObjects.length; i++) {
-				
-				var checker = _this.getBoundsChecker(aObjects[i]);
-				var coords = _this.getBoundsCheckerCoords(checker);
-				if ( coords ) {
-					if ( (coords.from.col < fvc) || (coords.from.row < fvr) ) {
-						bRedraw = true;
-						break;
-					}
-				}
-			}
-			if ( bRedraw )
-				updateHeaders();
-		}
 	}
 	
 	_this.clipGraphicsCanvas = function(canvas) {
@@ -4293,16 +4235,7 @@ function DrawingObjects() {
 		var left = worksheet.getCellLeft(0, 3);
 		var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3);
 		var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3);
-		var fvc = worksheet.getFirstVisibleCol();
-		var fvr = worksheet.getFirstVisibleRow();
-		
-		// Перемещение объекта при наличии скрола
-		/*if ( (fvc > 0) && (x < (worksheet.getCellLeft(fvc, 3) - left)) ||
-			 (fvr > 0) && (y < (worksheet.getCellTop(fvr, 3) - top)) )
-		{
-			_this.drawWorksheetHeaders(true);
-		}*/
-		
+						
 		// выход за границу слева или сверху
 		if ( y < 0 ) {
 			response.result = false;
@@ -4375,8 +4308,6 @@ function DrawingObjects() {
 			
 			var x = scrollOffset.getX();
 			var y = scrollOffset.getY();
-			
-			//console.log("X: " + x + ", Y: " + y);
 
 			shapeCtx.m_oCoordTransform.tx = x;
 			shapeCtx.m_oCoordTransform.ty = y;
@@ -4390,26 +4321,6 @@ function DrawingObjects() {
 			autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
 			autoShapeTrack.Graphics.CalculateFullTransform();
 		}
-	}
-	
-	_this.restoreScrollOffset = function() {
-	
-		var x = scrollOffset.getX();
-		var y = scrollOffset.getY();
-	
-		shapeCtx.m_oCoordTransform.tx = x;
-		shapeCtx.m_oCoordTransform.ty = y;
-		shapeCtx.CalculateFullTransform();
-		
-		shapeOverlayCtx.m_oCoordTransform.tx = x;
-		shapeOverlayCtx.m_oCoordTransform.ty = y;
-		shapeOverlayCtx.CalculateFullTransform();
-		
-		autoShapeTrack.Graphics.m_oCoordTransform.tx = x;
-		autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
-		autoShapeTrack.Graphics.CalculateFullTransform();
-		
-		//_this.showDrawingObjects(true);
 	}
 	
 	_this.convertMetric = function(val, from, to) {
