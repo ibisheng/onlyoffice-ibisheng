@@ -197,6 +197,7 @@ function CAbstractNum(Type)
         CollaborativeEditing.Add_Unlock2( this );
     }
 
+    this.NumStyleLink = undefined;
 
     this.Lvl = new Array();
     for ( var Index = 0; Index < 9; Index++ )
