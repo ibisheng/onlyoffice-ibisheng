@@ -542,9 +542,10 @@ CImageShape.prototype =
             global_MatrixTransformer.ScaleAppend(_transform, 1, -1);
         }
 
-        global_MatrixTransformer.RotateRadAppend(_transform, -this.absRot);
+        if(isRealNumber(this.rot))
+            global_MatrixTransformer.RotateRadAppend(_transform, -this.rot);
 
-        global_MatrixTransformer.TranslateAppend(_transform, this.absOffsetX, this.absOffsetY);
+        global_MatrixTransformer.TranslateAppend(_transform, this.x, this.y);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
 
         if(this.mainGroup !== null)
@@ -563,10 +564,10 @@ CImageShape.prototype =
     {
         var _horizontal_center = this.extX * 0.5;
         var _vertical_enter = this.extY * 0.5;
-        var _sin = Math.sin(this.absRot);
-        var _cos = Math.cos(this.absRot);
-        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
-        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
+        var _sin = Math.sin(isRealNumber(this.rot) ? this.rot : 0);
+        var _cos = Math.cos(isRealNumber(this.rot) ? this.rot : 0);
+        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.x + _horizontal_center;
+        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.y + _vertical_enter;
     },
 	
 	checkLine: function()
@@ -1249,7 +1250,7 @@ CImageShape.prototype =
             w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
         }
         this.spPr.Write_ToBinary2(w);
-        return  "TeamLabImage" + w.pos + ";" + w.GetBase64Memory();
+        return  "TeamLabImageSheets" + w.pos + ";" + w.GetBase64Memory();
 
     },
 

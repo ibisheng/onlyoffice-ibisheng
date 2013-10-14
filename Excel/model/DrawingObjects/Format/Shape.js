@@ -2995,7 +2995,7 @@ CShape.prototype =
         {
             this.txBody.writeToBinaryForCopyPaste(w);
         }
-        return  "TeamLabShape" + w.pos + ";" + w.GetBase64Memory();
+        return  "TeamLabShapeSheets" + w.pos + ";" + w.GetBase64Memory();
     },
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)

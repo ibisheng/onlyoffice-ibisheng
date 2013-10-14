@@ -1807,7 +1807,7 @@ CChartAsGroup.prototype =
 
         this.chart.Write_ToBinary2(w);
         this.spPr.Write_ToBinary2(w);
-        return  "TeamLabChart" + w.pos + ";" + w.GetBase64Memory();
+        return  "TeamLabChartSheets" + w.pos + ";" + w.GetBase64Memory();
     },
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)

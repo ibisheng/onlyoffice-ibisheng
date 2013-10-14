@@ -1670,7 +1670,7 @@ CGroupShape.prototype =
         {
             this.spTree[i].writeToBinaryForCopyPaste(w);
         }
-        return  "TeamLabGroup" + w.pos + ";" + w.GetBase64Memory();
+        return  "TeamLabGroupSheets" + w.pos + ";" + w.GetBase64Memory();
     },
 
 
