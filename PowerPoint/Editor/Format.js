@@ -3538,7 +3538,6 @@ function CTheme()
 
     this.Undo = function(data)
     {
-        return;
         switch(data.Type)
         {
             case historyitem_ChangeColorScheme:
@@ -3558,11 +3557,26 @@ function CTheme()
                 break;
             }
         }
+        var _slides = editor.WordControl.m_oLogicDocument.Slides;
+        var _slide_count = _slides.length;
+        for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
+        {
+            _cur_slide =_slides[_slide_index];
+            _cur_theme = _cur_slide.Layout.Master.Theme;
+            if(_cur_theme === this)
+            {
+                _cur_slide.recalcAllColors();
+                _cur_slide.Layout.recalcAll();
+                _cur_slide.Layout.Master.recalcAll();
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
+            }
+        }
     };
 
     this.Redo = function(data)
     {
-        return;
         switch(data.Type)
         {
             case historyitem_ChangeColorScheme:
@@ -3580,6 +3594,23 @@ function CTheme()
             {
                 this.themeElements.fmtScheme = data.newPr;
                 break;
+            }
+        }
+
+        var _slides = editor.WordControl.m_oLogicDocument.Slides;
+        var _slide_count = _slides.length;
+        for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
+        {
+            _cur_slide =_slides[_slide_index];
+            _cur_theme = _cur_slide.Layout.Master.Theme;
+            if(_cur_theme === this)
+            {
+                _cur_slide.recalcAllColors();
+                _cur_slide.Layout.recalcAll();
+                _cur_slide.Layout.Master.recalcAll();
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
+                editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
             }
         }
     };
@@ -3622,13 +3653,20 @@ function CTheme()
                 {
                     this.themeElements.clrScheme = new ClrScheme();
                     this.themeElements.clrScheme.Read_FromBinary2(r);
-                    var slides = editor.WordControl.m_oLogicDocument.Slides;
-                    for(var  i = 0; i < slides.length; ++i)
+                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
+                    var _slide_count = _slides.length;
+                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
                     {
-                        var slide = slides[i];
-                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        _cur_slide =_slides[_slide_index];
+                        _cur_theme = _cur_slide.Layout.Master.Theme;
+                        if(_cur_theme === this)
                         {
-                            slide.recalcAllColors();
+                            _cur_slide.recalcAllColors();
+                            _cur_slide.Layout.recalcAll();
+                            _cur_slide.Layout.Master.recalcAll();
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
                         }
                     }
                     break;
@@ -3637,13 +3675,20 @@ function CTheme()
                 {
                     this.themeElements.fontScheme = new FontScheme();
                     this.themeElements.fontScheme.Read_FromBinary2(r);
-                    var slides = editor.WordControl.m_oLogicDocument.Slides;
-                    for(var  i = 0; i < slides.length; ++i)
+                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
+                    var _slide_count = _slides.length;
+                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
                     {
-                        var slide = slides[i];
-                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        _cur_slide =_slides[_slide_index];
+                        _cur_theme = _cur_slide.Layout.Master.Theme;
+                        if(_cur_theme === this)
                         {
-                            slide.recalcAllColors();
+                            _cur_slide.recalcAllColors();
+                            _cur_slide.Layout.recalcAll();
+                            _cur_slide.Layout.Master.recalcAll();
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
                         }
                     }
                     break;
@@ -3652,13 +3697,20 @@ function CTheme()
                 {
                     this.themeElements.fmtScheme = new FmtScheme();
                     this.themeElements.fmtScheme.Read_FromBinary2(r);
-                    var slides = editor.WordControl.m_oLogicDocument.Slides;
-                    for(var  i = 0; i < slides.length; ++i)
+                    var _slides = editor.WordControl.m_oLogicDocument.Slides;
+                    var _slide_count = _slides.length;
+                    for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
                     {
-                        var slide = slides[i];
-                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        _cur_slide =_slides[_slide_index];
+                        _cur_theme = _cur_slide.Layout.Master.Theme;
+                        if(_cur_theme === this)
                         {
-                            slide.recalcAllColors();
+                            _cur_slide.recalcAllColors();
+                            _cur_slide.Layout.recalcAll();
+                            _cur_slide.Layout.Master.recalcAll();
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Id] = _cur_slide;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Id] = _cur_slide.Layout;
+                            editor.WordControl.m_oLogicDocument.recalcMap[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
                         }
                     }
                     break;

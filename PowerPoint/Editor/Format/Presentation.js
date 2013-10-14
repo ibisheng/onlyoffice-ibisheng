@@ -6149,26 +6149,29 @@ CPresentation.prototype =
         var _cur_slide;
         var _cur_theme;
         var _old_color_scheme;
+
+        var recalc_map = {};
         for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
             _cur_slide =_slides[_slide_index];
             _cur_theme = _cur_slide.Layout.Master.Theme;
-
+            recalc_map[_cur_slide.Layout.Id] = _cur_slide.Layout;
+            recalc_map[_cur_slide.Layout.Master.Id] = _cur_slide.Layout.Master;
             if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
             {
                 _old_color_scheme = _cur_theme.themeElements.clrScheme;
                 _cur_theme.changeColorScheme(colorScheme.createDuplicate());
             }
         }
-        for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
+        for(var key in recalc_map)
         {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
-
-            if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
+            if(recalc_map[key].recalcAll)
             {
-                _old_color_scheme = _cur_theme.themeElements.clrScheme;
-                _cur_theme.changeColorScheme(colorScheme.createDuplicate());
+                recalc_map[key].recalcAll();
+            }
+            if(recalc_map[key].recalculate)
+            {
+                recalc_map[key].recalculate();
             }
         }
         var _start_slide = this.Slides[this.CurPage];
