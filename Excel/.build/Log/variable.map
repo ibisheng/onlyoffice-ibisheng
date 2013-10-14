@@ -688,7 +688,7 @@ c_oSerFontTypes$Italic:hD
 CAscFillBlip:Q8
 c_oSer_ConditionalFormattingRule$FormulaCF:bI
 CChartLayout:Z7
-maxGammaArgument:GB
+maxGammaArgument:CB
 FontRef:pV
 JSCompiler_StaticMethods__expandRangeByMergedGetOuter:tP
 c_oSerWorksheetsTypes$Comments:XD
@@ -759,7 +759,7 @@ cd16:HT
 JSCompiler_StaticMethods_GetMax:N0
 c_oSerXfsTypes$FontId:SC
 cd13:IT
-gaussinv:EB
+gaussinv:HB
 t1_standard_encoding:Nl
 CLASS_TYPE_UNI_FILL:wU
 tt_cmap4_next:Ro
@@ -1051,7 +1051,7 @@ CLASS_TYPE_DOCUMENT_CONTENT:A4
 c_oAscAsyncActionType$BlockInteraction:Og
 FT_Matrix:ik
 STATES_ID_PRE_ROTATE:N1
-taylor:CB
+taylor:EB
 TRACK_DISTANCE_ROTATE:w3
 c_oSer_ColorObjectType$Type:qF
 g_anchor_top:p8
@@ -1131,7 +1131,7 @@ c_oSerAligmentTypes$Indent:YC
 JSCompiler_StaticMethods_Interface_Update_DrawingPr:P7
 c_oSer_ChartLegendType$Layout:h_
 CTableCellPr:P4
-getLogGamma:KB
+getLogGamma:LB
 PreMoveInternalChartObjectState:D2
 JSCompiler_StaticMethods_setRange:YA
 ImageLoadStatus$Loading:Gx
@@ -1188,7 +1188,7 @@ c_oSer_ConditionalFormatting$SqRef:KH
 historyitem_RowCol_NumFormat:lM
 asc_CFillSolid:L1
 JSCompiler_StaticMethods_Set_Position:R5
-rtl_math_erfc:LB
+rtl_math_erfc:DB
 GX_AVarSegmentRec:Ps
 FT_FACE_FIND_SERVICE:Xi
 Path:tY
@@ -1318,7 +1318,7 @@ c_oSer_CustomFilters$Operator:GG
 tt_face_goto_table:Tn
 _ph_summ__obj:NW
 c_oSerFormulaTypes$Del2:KE
-gauss:DB
+gauss:GB
 c_oSerFormulaTypes$Del1:JE
 JSCompiler_StaticMethods_Show:Ng
 EHorizontalAlignment$horizontalalignmentDistributed:nJ
@@ -1786,7 +1786,7 @@ g_sNewSheetNamePattern:gN
 CParaSpacing:e5
 asc_CChartFont:Uf
 tt_cmap4_char_index:Uo
-lcl_GetGammaHelper:IB
+lcl_GetGammaHelper:JB
 CDocumentPage:O7
 CreateUniColorRGB:Cf
 JSCompiler_StaticMethods_getXfId:ZP
@@ -2033,7 +2033,7 @@ t1_decoder_funcs:In
 ChangeAdjState:S2
 _infos$$inline_1233:ry
 c_oSerDefinedNameTypes$LocalSheetId:ED
-lcl_GetLogGammaHelper:JB
+lcl_GetLogGammaHelper:KB
 cff_index_get_name:nu
 CTextPr:ri
 UndoRedoData_BBox:uO
@@ -2115,7 +2115,7 @@ c_oAscError$ID$CannotMoveRange:eS
 FormatObjScientific:Vc
 g_oDefaultAlignAbs:vK
 c_oAscAsyncAction$LoadImage:Pg
-lcl_getLanczosSum:HB
+lcl_getLanczosSum:IB
 TT_OS2:cl
 para_PageBreakRendered:$h
 c_oAscServerError$TaskQueue:Ka
