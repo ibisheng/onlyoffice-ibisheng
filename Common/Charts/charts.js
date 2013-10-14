@@ -2428,7 +2428,7 @@ function calculatePosiitionObjects(type)
 				{
 					return 7*scale + heigthTextKey + bar._chartTitle._marginTopTitle;
 				}
-				else if(typeof(bar._chartTitle._text) == 'string' && bar._chartTitle._text != '' || bar._chartTitle._visibleTitle != "")
+				else if(typeof(bar._chartTitle._text) == 'string' && ((bar._chartTitle._text != '' && (bar._chartTitle._text != undefined)) || (bar._chartTitle._visibleTitle != "" && bar._chartTitle._visibleTitle != undefined)))
 				{
 					var font = getFontProperties("title");
 					var text = bar._chartTitle._text;
