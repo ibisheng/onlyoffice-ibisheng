@@ -6793,27 +6793,55 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(CommentData)
     {
-        History.Create_NewPoint();
-        var Comment = new CComment( this.Comments, CommentData );
-        Comment.selected = true;
-        Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
-        if(this.Document_Is_SelectionLocked(changestype_AddComment, Comment) === false)
+        if(this.Slides[this.CurPage])
         {
-            for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
-            {
-                this.Slides[this.CurPage].slideComments.comments[i].selected = false;
-            }
-            this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
-            this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
-            this.Slides[this.CurPage].addComment(Comment);
+            History.Create_NewPoint();
+            var Comment = new CComment( this.Comments, CommentData );
+            Comment.selected = true;
 
-            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-            this.DrawingDocument.OnEndRecalculate();
-            return Comment;
-        }
-        else
-        {
-            this.Document_Undo();
+            var positionX, positionY;
+            var slide = this.Slides[this.CurPage];
+            var selected_objects;
+            if(slide.graphicObjects.State.group)
+            {
+                selected_objects = slide.graphicObjects.State.group.selectedObjects;
+            }
+            else
+            {
+                selected_objects = slide.graphicObjects.selectedObjects;
+            }
+            if(selected_objects.length  > 0)
+            {
+                var last_object = selected_objects[selected_objects.length - 1];
+                Comment.setPosition(last_object.x + last_object.extX, last_object.y);
+            }
+            else
+            {
+                Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
+            }
+            var Flags = 0;
+            var dd = editor.WordControl.m_oDrawingDocument;
+            var W = dd.GetCommentWidth(Flags);
+            var  H = dd.GetCommentHeight(Flags);
+            this.Slides[this.CurPage].commentX += W;
+            this.Slides[this.CurPage].commentY += H;
+
+            if(this.Document_Is_SelectionLocked(changestype_AddComment, Comment) === false)
+            {
+                for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
+                {
+                    this.Slides[this.CurPage].slideComments.comments[i].selected = false;
+                }
+                this.Slides[this.CurPage].addComment(Comment);
+
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                this.DrawingDocument.OnEndRecalculate();
+                return Comment;
+            }
+            else
+            {
+                this.Document_Undo();
+            }
         }
     },
 
