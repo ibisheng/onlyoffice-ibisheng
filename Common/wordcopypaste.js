@@ -1720,7 +1720,7 @@ CopyProcessor.prototype =
 								var sBase64 = this.oBinaryFileWriter.GetResult();
 								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
 								{
-									$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+									$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
 								}
 								if(this.ElemToSelect.children[0])
@@ -4105,9 +4105,14 @@ PasteProcessor.prototype =
                         History.TurnOff();
 
                     var sub;
-                    if(typeof binary_shape === "string")
-                        sub = binary_shape.substr(0, 12);
-                    if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+					var checkSheetsData;
+					if(typeof binary_shape === "string")
+					{
+						sub = binary_shape.substr(0, 12);
+						//чтобы не возникало ошибок при copy/paste из word в excel
+						checkSheetsData = binary_shape.substring(12, 18);
+					}
+                    if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup") && checkSheetsData != "Sheets")
                     {
                         var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
                         var first_string = null;
@@ -5712,9 +5717,14 @@ PasteProcessor.prototype =
                             {
                                 var binary_shape = node.getAttribute("alt");
                                 var sub;
+								var checkSheetsData;
                                 if(typeof binary_shape === "string")
-                                    sub = binary_shape.substr(0, 12);
-                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+								{
+									sub = binary_shape.substr(0, 12);
+									//чтобы не возникало ошибок при copy/paste из word в excel
+									checkSheetsData = binary_shape.substring(12, 18);
+								}
+                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup") && checkSheetsData != "Sheets")
                                 {
                                     var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
                                     if(isRealObject(reader))
@@ -5805,9 +5815,14 @@ PasteProcessor.prototype =
                             if(oTargetDocument && oDrawingDocument)
                             {
                                 var sub;
+								var checkSheetsData;
                                 if(typeof binary_shape === "string")
-                                    sub = binary_shape.substr(0, 12);
-                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+								{
+									sub = binary_shape.substr(0, 12);
+									//чтобы не возникало ошибок при copy/paste из word в excel
+									checkSheetsData = binary_shape.substring(12, 18);
+								}
+                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup") && checkSheetsData != 'Sheets')
                                 {
                                     var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
                                     if(isRealObject(reader))

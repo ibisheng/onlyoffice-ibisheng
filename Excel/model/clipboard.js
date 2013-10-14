@@ -2638,10 +2638,10 @@
 					var binary_shape = array[i].image.getAttribute("alt");
 					var sub;
 					if(typeof binary_shape === "string")
-						sub = binary_shape.substr(0, 12);
-					if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+						sub = binary_shape.substr(0, 18);
+					if(typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets"))
 					{
-						var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+						var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
 						reader.GetLong();
 						if(isRealObject(reader))
 							reader.oImages = this.oImages;
@@ -2661,22 +2661,22 @@
 						var Drawing;
 						switch(first_string)
 						{
-							case "TeamLabImage":
+							case "TeamLabImageSheets":
 							{
 								Drawing = new CImageShape();
 								break;
 							}
-							case "TeamLabShape":
+							case "TeamLabShapeSheets":
 							{
 								Drawing = new CShape();
 								break;
 							}
-							case "TeamLabGroup":
+							case "TeamLabGroupSheets":
 							{
 								Drawing = new CGroupShape();
 								break;
 							}
-							case "TeamLabChart":
+							case "TeamLabChartSheets":
 							{
 								Drawing = new CChartAsGroup();
                                 Drawing.setAscChart(new asc_CChart());
