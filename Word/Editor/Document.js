@@ -1240,6 +1240,7 @@ CDocument.prototype =
 
         if ( Index >= Count )
         {
+            this.Internal_CheckCurPage();
             this.DrawingDocument.OnEndRecalculate( true );
             this.DrawingObjects.onEndRecalculateDocument( this.Pages.length );
 
