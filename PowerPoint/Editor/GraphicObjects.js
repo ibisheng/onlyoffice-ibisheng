@@ -135,7 +135,7 @@ CGraphicObjects.prototype = {
                 {
                     if(this.selectedObjects.length === 1)
                     {
-                        if(typeof this.selectedObjects[0].paragraphAdd === "function")
+                        if(!CheckObjectLine(this.selectedObjects[0]) && typeof this.selectedObjects[0].paragraphAdd === "function")
                         {
                             if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                             {

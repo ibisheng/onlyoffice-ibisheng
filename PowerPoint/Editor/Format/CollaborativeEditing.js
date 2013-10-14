@@ -710,7 +710,7 @@ function CCollaborativeEditing()
             if(Class instanceof CShape
                 || Class instanceof CImageShape
                 || Class instanceof CGroupShape
-                )
+                || Class instanceof CGraphicFrame)
             {
                 check_obj =
                 {
