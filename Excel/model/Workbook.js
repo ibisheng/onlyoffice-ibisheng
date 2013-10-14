@@ -4317,6 +4317,12 @@ Cell.prototype.setValue=function(val,callback){
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
 		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+	//todo не должны удаляться ссылки, если сделать merge ее части.
+	if(this.isEmptyTextString())
+	{
+		var cell = this.ws.getCell(this.oId);
+		cell.removeHyperlink();
+	}
 	return ret;
 };
 Cell.prototype.setValue2=function(array){
@@ -4359,6 +4365,12 @@ Cell.prototype.setValue2=function(array){
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
 		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+	//todo не должны удаляться ссылки, если сделать merge ее части.
+	if(this.isEmptyTextString())
+	{
+		var cell = this.ws.getCell(this.oId);
+		cell.removeHyperlink();
+	}
 };
 Cell.prototype.setType=function(type){
 	return this.oValue.type = type;
@@ -5121,11 +5133,6 @@ Range.prototype.setValue2=function(array){
 		// if(cell.isEmpty())
 			// cell.Remove();
 	});
-	var sText = "";
-	for(var i = 0, length = array.length; i < length; i++)
-		sText += array[i].text;
-	if("" == sText)
-		this.removeHyperlink();
 	History.EndTransaction();
 };
 Range.prototype.setCellStyle=function(val){
