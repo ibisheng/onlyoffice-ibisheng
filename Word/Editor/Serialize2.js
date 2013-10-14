@@ -3590,7 +3590,6 @@ function BinaryFileReader(doc, openParams)
 			var oOldComment = this.oReadResult.oComments[i];
 			var oNewComment = new CComment(this.Document.Comments, fInitCommentData(oOldComment))
 			this.Document.Comments.Add(oNewComment);
-			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
 			oCommentsNewId[oOldComment.Id] = oNewComment;
 		}
 		for(var i in this.oReadResult.oCommentsPlaces)
@@ -3659,6 +3658,12 @@ function BinaryFileReader(doc, openParams)
 					}
 				}
 			}
+		}
+		//посылаем событие о добавлении комментариев
+		for(var i in oCommentsNewId)
+		{
+			var oNewComment = oCommentsNewId[i];
+			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
 		}
 		this.Document.Content = this.oReadResult.DocumentContent;
 		if(this.Document.Content.length == 0)
