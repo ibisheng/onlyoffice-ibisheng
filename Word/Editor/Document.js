@@ -8078,7 +8078,7 @@ CDocument.prototype =
                 bRetValue = true;
             }
         }
-        else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
+        else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey && false === e.ShiftKey ) // Ctrl + K - добавление гиперссылки
         {
             if ( true === this.Hyperlink_CanAdd(false) )
                 editor.sync_DialogAddHyperlink();
