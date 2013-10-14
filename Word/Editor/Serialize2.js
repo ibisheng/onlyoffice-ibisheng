@@ -7514,7 +7514,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.Chart === type )
         {
 			var oNewGraphicObj = new CChartAsGroup();
-			var chart = new asc_CChart();;
+			var chart = new asc_CChart();
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart, oNewGraphicObj);
 			oBinary_ChartReader.ReadExternal(length);
 			if(null != chart.range.interval && chart.range.interval.length > 0)
