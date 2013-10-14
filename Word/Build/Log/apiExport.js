@@ -250,6 +250,8 @@ prop:sync_GetDocInfoStopCallback
 prop:sync_GetDocInfoEndCallback
 prop:sync_CanUndoCallback
 prop:sync_CanRedoCallback
+prop:setStartPointHistory
+prop:setEndPointHistory
 prop:sync_CursorLockCallBack
 prop:sync_PrintCallBack
 prop:sync_UndoCallBack
@@ -1328,6 +1330,8 @@ asc_docs_api.prototype['sync_GetDocInfoStopCallback'] = asc_docs_api.prototype.s
 asc_docs_api.prototype['sync_GetDocInfoEndCallback'] = asc_docs_api.prototype.sync_GetDocInfoEndCallback;
 asc_docs_api.prototype['sync_CanUndoCallback'] = asc_docs_api.prototype.sync_CanUndoCallback;
 asc_docs_api.prototype['sync_CanRedoCallback'] = asc_docs_api.prototype.sync_CanRedoCallback;
+asc_docs_api.prototype['setStartPointHistory'] = asc_docs_api.prototype.setStartPointHistory;
+asc_docs_api.prototype['setEndPointHistory'] = asc_docs_api.prototype.setEndPointHistory;
 asc_docs_api.prototype['sync_CursorLockCallBack'] = asc_docs_api.prototype.sync_CursorLockCallBack;
 asc_docs_api.prototype['sync_PrintCallBack'] = asc_docs_api.prototype.sync_PrintCallBack;
 asc_docs_api.prototype['sync_UndoCallBack'] = asc_docs_api.prototype.sync_UndoCallBack;
