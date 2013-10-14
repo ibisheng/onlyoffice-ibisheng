@@ -2303,6 +2303,9 @@ SlideComments.prototype =
         this.Id = r.GetString2();
     },
 
+    Refresh_RecalcData: function()
+    {},
+
     Save_Changes: function(data, w)
     {
         w.WriteLong(data.Type);
