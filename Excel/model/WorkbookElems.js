@@ -1815,7 +1815,7 @@ Hyperlink.prototype = {
 		if (null !== this.Ref)
 			oNewHyp.Ref = this.Ref.clone();
 		if (null !== this.getLocation())
-			oNewHyp.Location = this.getLocation();
+			oNewHyp.setLocation(this.getLocation());
 		if (null !== this.LocationSheet)
 			oNewHyp.LocationSheet = this.LocationSheet;
 		if (null !== this.LocationRange)
@@ -1824,6 +1824,8 @@ Hyperlink.prototype = {
 			oNewHyp.Hyperlink = this.Hyperlink;
 		if (null !== this.Tooltip)
 			oNewHyp.Tooltip = this.Tooltip;
+		if (null !== this.bVisited)
+			oNewHyp.bVisited = this.bVisited;
 		return oNewHyp;
 	},
 	isEqual : function (obj) {

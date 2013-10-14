@@ -2286,6 +2286,24 @@ Woorksheet.prototype.clone=function(sNewId){
 		oNewWs.oAllCol = this.oAllCol.clone();
 	for(var i in this.aGCells)
 		oNewWs.aGCells[i] = this.aGCells[i].clone();
+	var aMerged = this.mergeManager.getAll();
+	oNewWs.mergeManager.stopRecalculate();
+	for(var i in aMerged)
+	{
+		var elem = aMerged[i];
+		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
+		range.mergeOpen();
+	}
+	oNewWs.mergeManager.startRecalculate();
+	var aHyperlinks = this.hyperlinkManager.getAll();
+	oNewWs.hyperlinkManager.stopRecalculate();
+	for(var i in aHyperlinks)
+	{
+		var elem = aHyperlinks[i];
+		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
+		range.setHyperlinkOpen(elem.data);
+	}
+	oNewWs.hyperlinkManager.startRecalculate();
 	if(null != this.Drawings && this.Drawings.length > 0)
     {
 
