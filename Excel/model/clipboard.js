@@ -1922,6 +1922,11 @@
 				var t = this;
 				if(undefined == t.copyText || node == undefined)
 					return false;
+				//если приходят картинки, вставляем извне	
+				if(t.copyText.isImage)
+				{
+					return false;
+				}	
 				if(t.copyText.text && $.browser['opera'] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
 					return true;
 				if($.browser['msie'] && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
