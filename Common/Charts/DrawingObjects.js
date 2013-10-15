@@ -4109,10 +4109,12 @@ function DrawingObjects() {
 				if ( drawingObject.isChart() ) {
 					var bbox = drawingObject.graphicObject.chart.range.intervalObject.getBBox0();
 					if ( oBBoxFrom.isEqual(bbox) ) {
-						if ( bResize && drawingObject.graphicObject.selected ) {
-							editChart(drawingObject);
-							bRedraw = true;
-							break;
+						if ( bResize ) {
+							if ( drawingObject.graphicObject.selected ) {
+								editChart(drawingObject);
+								bRedraw = true;
+								break;
+							}
 						}
 						else
 							editChart(drawingObject);
