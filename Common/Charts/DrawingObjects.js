@@ -3374,10 +3374,10 @@ function DrawingObjects() {
 				else
 					_this.raiseLayerDrawingObjects();
 			}
-			else {
+			/*else {
 				worksheet.cleanSelection();
 				worksheet._drawSelection();
-			}
+			}*/
 		}
 	}
 

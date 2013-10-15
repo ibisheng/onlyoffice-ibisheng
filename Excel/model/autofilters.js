@@ -415,6 +415,7 @@
 									{
 										rangeShift.addCellsShiftBottom();
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
 									//добавляем название колонок
 									for(var col = activeCells.c1; col <= activeCells.c2; col++)
@@ -608,6 +609,7 @@
 									{
 										rangeShift.addCellsShiftBottom();
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
 									if(lTable)
 									{
@@ -647,6 +649,7 @@
 									{
 										rangeShift.addCellsShiftBottom();
 										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+										ws.objectRender.updateDrawingObject(true, 4, rangeShift.bbox);
 									}
 									if(lTable)
 									{
