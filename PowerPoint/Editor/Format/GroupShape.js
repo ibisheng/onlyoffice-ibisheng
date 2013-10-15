@@ -1873,6 +1873,8 @@ CGroupShape.prototype =
                     this.spPr.xfrm.rot = r.GetDouble();
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    this.recalcTransform();
+
                     break;
                 }
                 case historyitem_SetShapeOffset:
@@ -1881,6 +1883,8 @@ CGroupShape.prototype =
                     this.spPr.xfrm.offY = r.GetDouble();
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    this.recalcTransform();
+
                     break;
                 }
 
@@ -1892,6 +1896,8 @@ CGroupShape.prototype =
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateGeometry = true;
+                    this.recalcTransform();
+
 
                     break;
                 }
@@ -1902,6 +1908,8 @@ CGroupShape.prototype =
                     this.spPr.xfrm.chOffY = r.GetDouble();
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    this.recalcTransform();
+
 
                     break;
                 }
@@ -1914,6 +1922,8 @@ CGroupShape.prototype =
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateGeometry = true;
+                    this.recalcTransform();
+
                     break;
                 }
                 case historyitem_SetShapeFlips:
@@ -1923,6 +1933,8 @@ CGroupShape.prototype =
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
+                    this.recalcTransform();
+
                     break;
                 }
                 case historyitem_SetSetNvSpPr:
