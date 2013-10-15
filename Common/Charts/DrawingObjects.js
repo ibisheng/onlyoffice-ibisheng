@@ -3151,10 +3151,10 @@ function DrawingObjects() {
 				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 				
-				var x1 = worksheet.cols[r_.c1].left - offsetX + /*cell offset*/ + ( (worksheet.visibleRange.c1 < r_.c1) ? mmToPt(coords.from.colOff) : 0 );
-				var y1 = worksheet.rows[r_.r1].top - offsetY + /*cell offset*/ + ( (worksheet.visibleRange.r1 < r_.r1) ? mmToPt(coords.from.rowOff) : 0 );
-				var x2 = worksheet.cols[r_.c2].left - offsetX + /*cell offset*/ + ( (worksheet.visibleRange.c2 > r_.c2) ? mmToPt(coords.to.colOff) : 0 );
-				var y2 = worksheet.rows[r_.r2].top - offsetY + /*cell offset*/ + ( (worksheet.visibleRange.r2 > r_.r2) ? mmToPt(coords.to.rowOff) : 0 );
+				var x1 = worksheet.cols[r_.c1].left - offsetX;
+				var y1 = worksheet.rows[r_.r1].top - offsetY;
+				var x2 = worksheet.cols[r_.c2 + 1].left - offsetX;
+				var y2 = worksheet.rows[r_.r2 + 1].top - offsetY;
 				var w = x2 - x1;
 				var h = y2 - y1;
 				
