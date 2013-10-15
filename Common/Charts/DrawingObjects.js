@@ -3305,20 +3305,34 @@ function DrawingObjects() {
 							
 							var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - ptToMm(printPagesData.leftFieldInPt);
 							var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - ptToMm(printPagesData.topFieldInPt);
-						
-							var tx = drawingObject.graphicObject.transform.tx;
-							var ty = drawingObject.graphicObject.transform.ty;
-						
-							drawingObject.graphicObject.transform.tx -= left;
-							drawingObject.graphicObject.transform.ty -= top;
 							
-							drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
+							if ( drawingObject.graphicObject instanceof CGroupShape ) {
+								for ( var n = 0; n < drawingObject.graphicObject.arrGraphicObjects.length; n++ ) {
+									var item = drawingObject.graphicObject.arrGraphicObjects[n];
+									var tx = item.transform.tx;
+									var ty = item.transform.ty;
+									item.transform.tx -= left;
+									item.transform.ty -= top;
+									item.draw( printOptions.ctx.DocumentRenderer );
+									
+									// Restore
+									item.transform.tx = tx;
+									item.transform.ty = ty;
+								}
+							}
+							else {
+								var tx = drawingObject.graphicObject.transform.tx;
+								var ty = drawingObject.graphicObject.transform.ty;
+								drawingObject.graphicObject.transform.tx -= left;
+								drawingObject.graphicObject.transform.ty -= top;
+								drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
+								
+								// Restore
+								drawingObject.graphicObject.transform.tx = tx;
+								drawingObject.graphicObject.transform.ty = ty;
+							}
 							worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
 							worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
-							
-							// Restore
-							drawingObject.graphicObject.transform.tx = tx;
-							drawingObject.graphicObject.transform.ty = ty;
 						}
 						else {
 							drawingObject.graphicObject.draw( shapeCtx );
