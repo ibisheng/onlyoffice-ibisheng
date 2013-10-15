@@ -507,6 +507,7 @@ cElementType$array:pA
 CorrectUniFill:w4
 c_oSerFontTypes$Scheme:oD
 CalculateAhPolarList:pY
+asc_CTextBorder:qg
 COPY_ELEMENT_ID:Qy
 RotateTrackShapeImage:H3
 historyitem_Worksheet_ShiftCellsBottom:oQ
@@ -650,7 +651,6 @@ JSCompiler_StaticMethods_Set_Distance:h6
 pararecalc_0_All:Z6
 CRasterHeapChuck:Uw
 JSCompiler_StaticMethods_Set_Props:s6
-asc_CBorder:qg
 PromoteHelper:xQ
 TextAddState:r1
 XYAdjustmentTrack:u2
