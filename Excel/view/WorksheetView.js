@@ -2772,7 +2772,7 @@
 				l = drawLeftSide ? -this.width_1px : 0;
 				r = drawRightSide ? this.width_1px : 0;
 				t = drawTopSide ? -this.height_1px : 0;
-				b = drawBottomSide ? this.height_1px : 0;
+				b = drawBottomSide ? this.height_2px : 0;
 
 				ctx.setStrokeStyle(opt.activeCellBorderColor)
 						.setLineWidth(3)
