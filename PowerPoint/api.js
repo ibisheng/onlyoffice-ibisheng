@@ -723,8 +723,8 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 
 asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 {				
-	if(null != incomeObject && "getsettings" == incomeObject.type){
-		var oSettings = JSON.parse(incomeObject.data);
+	if(null != incomeObject && "getsettings" == incomeObject["type"]){
+		var oSettings = JSON.parse(incomeObject["data"]);
 		
 		//Set up coauthoring and spellcheker service
 		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
@@ -1309,8 +1309,8 @@ asc_docs_api.prototype.asc_Print = function(){
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);
 	var editor = this;
 	_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
-		if(null != incomeObject && "save" == incomeObject.type)
-			editor.processSavedFile(incomeObject.data, false);
+		if(null != incomeObject && "save" == incomeObject["type"])
+			editor.processSavedFile(incomeObject["data"], false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
 }
 asc_docs_api.prototype.Undo = function(){
@@ -1390,8 +1390,8 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var editor = this;
 	_downloadAs(this, typeFile, function(incomeObject){
-		if(null != incomeObject && "save" == incomeObject.type)
-			editor.processSavedFile(incomeObject.data, false);
+		if(null != incomeObject && "save" == incomeObject["type"])
+			editor.processSavedFile(incomeObject["data"], false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
 }
 asc_docs_api.prototype.Resize = function(){
@@ -1715,8 +1715,8 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		oAdditionalData["savetype"] = "completeall";
 		var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
 		sendCommand(editor, function(incomeObject){
-			if(null != incomeObject && "save" == incomeObject.type)
-				editor.processSavedFile(incomeObject.data, true);
+			if(null != incomeObject && "save" == incomeObject["type"])
+				editor.processSavedFile(incomeObject["data"], true);
 		}, sData);
 
 		// Пересылаем свои изменения (ToDo)
@@ -2893,8 +2893,8 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 		var oThis = this;
 		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		sendCommand(this,  function(incomeObject){
-			if(null != incomeObject && "imgurl" == incomeObject.type)
-				oThis.AddImageUrlAction(incomeObject.data);
+			if(null != incomeObject && "imgurl" == incomeObject["type"])
+				oThis.AddImageUrlAction(incomeObject["data"]);
 			oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		}, JSON.stringify(rData) );
 	}
@@ -4793,9 +4793,9 @@ function sendCommand(editor, fCallback, rdata){
             },
         success: function(msg){
 			var incomeObject = JSON.parse(msg);
-			switch(incomeObject.type){
+			switch(incomeObject["type"]){
                 case "open":
-                    var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject.data;
+                    var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 					asc_ajax({
 						url: sJsonUrl,
 						dataType: "text",
@@ -4832,9 +4832,9 @@ function sendCommand(editor, fCallback, rdata){
 					});
                 break;
                 case "waitopen":
-                    if (incomeObject.data)
+                    if (incomeObject["data"])
                     {
-                        editor._lastConvertProgress = incomeObject.data / 2;
+                        editor._lastConvertProgress = incomeObject["data"] / 2;
                         editor.sync_SendProgress(editor._lastConvertProgress);
                     }
 					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Presentation, "c":"chopen"};
@@ -4845,19 +4845,19 @@ function sendCommand(editor, fCallback, rdata){
 						fCallback(incomeObject);
                 break;
                 case "waitsave":
-					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
+					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject["data"]};
                     setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
                 break;
 				case "savepart":
-					var outputData = JSON.parse(incomeObject.data);
-                    _downloadAs(editor, outputData.format, fCallback, false, outputData.savekey);
+					var outputData = JSON.parse(incomeObject["data"]);
+                    _downloadAs(editor, outputData["format"], fCallback, false, outputData["savekey"]);
                 break;
 				case "getsettings":
 					if(fCallback)
 						fCallback(incomeObject);
 				break;
                 case "err":
-					editor.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(parseInt(incomeObject.data)),c_oAscError.Level.Critical);
+					editor.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(parseInt(incomeObject["data"])),c_oAscError.Level.Critical);
 					if(fCallback)
 						fCallback(incomeObject);
                 break;

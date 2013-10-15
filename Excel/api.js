@@ -519,8 +519,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				// Меняем тип состояния (на сохранение)
 				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
 				this._asc_downloadAs(typeFile, function(incomeObject){
-					if(null != incomeObject && "save" == incomeObject.type)
-						that.asc_processSavedFile(incomeObject.data, false);
+					if(null != incomeObject && "save" == incomeObject["type"])
+						that.asc_processSavedFile(incomeObject["data"], false);
 					// Меняем тип состояния (на никакое)
 					that.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 					that.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -696,8 +696,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, JSON.stringify(v));
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
 							this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
-								if(null != incomeObject && "save" == incomeObject.type)
-									t.asc_processSavedFile(incomeObject.data, false);
+								if(null != incomeObject && "save" == incomeObject["type"])
+									t.asc_processSavedFile(incomeObject["data"], false);
 								// Меняем тип состояния (на никакое)
 								t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 								t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -751,9 +751,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 						else{
 							var incomeObject = JSON.parse(msg);
-							switch( incomeObject.type ){
+							switch( incomeObject["type"] ){
 								case "open":
-									var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject.data;
+									var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject["data"];
 									asc_ajax({
 										url: sJsonUrl,
 										dataType: "text",
@@ -800,7 +800,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 										}
 									}
 									asc_ajax({
-										url: incomeObject.data,
+										url: incomeObject["data"],
 										dataType: "text",
 										success: function(result, textStatus) {
 											var cp = JSON.parse(result);
@@ -828,7 +828,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 											break;
 										}
 									}
-									var cp = JSON.parse(incomeObject.data);
+									var cp = JSON.parse(incomeObject["data"]);
 									oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
 									//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
 									//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
@@ -842,20 +842,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
 									break;
 								case "waitsave":
-									var rData = {"id": oThis.documentId, "vkey": oThis.documentVKey, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject.data};
+									var rData = {"id": oThis.documentId, "vkey": oThis.documentVKey, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject["data"]};
 									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
 									break;
 								case "savepart":
-									var outputData = JSON.parse(incomeObject.data);
-									oThis._asc_downloadAs(outputData.format, callback, false, null, outputData.savekey);
+									var outputData = JSON.parse(incomeObject["data"]);
+									oThis._asc_downloadAs(outputData["format"], callback, false, null, outputData["savekey"]);
 									break;
 								case "getsettings":
 									if(callback)
 										callback(incomeObject);
 									break;									
 								case "err":
-									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject.data)};
-									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
+									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject["data"])};
+									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.Critical);
 									if(callback)
 										callback(result);
 									break;
@@ -943,8 +943,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["innersave"] = true;
 				oAdditionalData["savetype"] = "completeall";
 				this._asc_sendCommand (/*callback*/ function(incomeObject){
-					if(null != incomeObject && "save" == incomeObject.type)
-						that.asc_processSavedFile(incomeObject.data, true);
+					if(null != incomeObject && "save" == incomeObject["type"])
+						that.asc_processSavedFile(incomeObject["data"], true);
 				}, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
 			},
 
@@ -2253,10 +2253,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var oThis = this;
 				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				this._asc_sendCommand( function(incomeObject){
-					if(null != incomeObject && "imgurl" == incomeObject.type)
+					if(null != incomeObject && "imgurl" == incomeObject["type"])
 					{
 						var ws = oThis.wb.getWorksheet();
-						return ws.objectRender.addImageDrawingObject(incomeObject.data, null);
+						return ws.objectRender.addImageDrawingObject(incomeObject["data"], null);
 					}
 					oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				}, JSON.stringify(rData) );
