@@ -3325,7 +3325,30 @@ function DrawingObjects() {
 								var ty = drawingObject.graphicObject.transform.ty;
 								drawingObject.graphicObject.transform.tx -= left;
 								drawingObject.graphicObject.transform.ty -= top;
+								
+								// Save chart transforms
+								var chartTxtAreas = [];
+								var aTxtTransform = [];
+								if ( drawingObject.graphicObject instanceof CChartAsGroup ) {
+									chartTxtAreas = [ drawingObject.graphicObject.chartTitle, drawingObject.graphicObject.vAxisTitle, drawingObject.graphicObject.hAxisTitle ];
+									for ( var n = 0; n < chartTxtAreas.length; n++ ) {
+										var item = chartTxtAreas[n];
+										aTxtTransform.push( { tx: item.transformText.tx, ty: item.transformText.ty } );
+										item.transformText.tx -= left;
+										item.transformText.ty -= top;
+									}
+								}
+								
 								drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
+								
+								// Restore chart transforms
+								if ( drawingObject.graphicObject instanceof CChartAsGroup ) {
+									for ( var n = 0; n < chartTxtAreas.length; n++ ) {
+										var item = chartTxtAreas[n];
+										item.transformText.tx = aTxtTransform[n].tx;
+										item.transformText.ty = aTxtTransform[n].ty;
+									}
+								}
 								
 								// Restore
 								drawingObject.graphicObject.transform.tx = tx;
