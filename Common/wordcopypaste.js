@@ -4045,7 +4045,7 @@ PasteProcessor.prototype =
 					}, JSON.stringify(rData) );
 			}
 			else
-				this.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
+				this.api.pre_Paste(aPrepeareFonts, this.oImages, fCallback);
         }
         else
             fCallback();
