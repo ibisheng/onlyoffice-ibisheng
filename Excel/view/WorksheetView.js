@@ -2985,9 +2985,15 @@
 						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
 						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY - this.height_1px;
 
-						if (drawTopSideFormula)		{ctx.lineHor(xFormula1, yFormula1 - this.height_1px, xFormula2 + this.width_1px);}
-						if (drawBottomSideFormula)	{ctx.lineHor(xFormula1, yFormula2, xFormula2 + this.width_1px);}
-						if (drawLeftSideFormula)	{ctx.lineVer(xFormula1, yFormula1, yFormula2);}
+                        if ( drawTopSideFormula && aFormulaIntersection.r1 != this.visibleRange.r1 ) {
+                            ctx.lineHor( xFormula1 + this.width_1px, yFormula1 - this.height_1px, xFormula2 + this.width_1px );
+                        }
+                        if ( drawBottomSideFormula ) {
+                            ctx.lineHor( xFormula1 + this.width_1px, yFormula2, xFormula2 + this.width_1px );
+                        }
+                        if ( drawLeftSideFormula && aFormulaIntersection.c1 != this.visibleRange.c1 ) {
+                            ctx.lineVer( xFormula1, yFormula1 - this.width_1px * (aFormulaIntersection.r1 != this.visibleRange.r1), yFormula2 + this.width_1px );
+                        }
 						if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
 						
 						if (drawLeftSideFormula && drawTopSideFormula)
