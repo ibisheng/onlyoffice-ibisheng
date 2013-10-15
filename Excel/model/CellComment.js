@@ -1340,8 +1340,7 @@ asc_CCellCommentator.prototype = {
 
 				_this.overlayCtx.ctx.globalAlpha = 0.2;
 				_this.overlayCtx.beginPath();
-				_this.overlayCtx.clearRect(x, y, w, h, .5, .5);
-				_this.overlayCtx.rect(x, y, w, h, .5, .5);
+				_this.overlayCtx.clearRect(x, y, w, h);
 				_this.overlayCtx.setFillStyle(_this.commentFillColor);
 				_this.overlayCtx.fillRect(x, y, w, h);
 				_this.overlayCtx.ctx.globalAlpha = 1;

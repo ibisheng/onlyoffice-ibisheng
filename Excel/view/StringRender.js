@@ -846,7 +846,7 @@
 					var ul = prop.font.Underline;
 					var isSO = so === true;
 					var isUL = ul === true || !( ul === undefined || ul === false || ul.search(/\w/) < 0 || ul.search(/\s*none\s*/i) >= 0 );
-					var fsz, x2, y, lw, dy, i, b, x_, cp;
+					var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
 
 					if (align !== "justify" || dx < 0.000001) {
 						ctx.fillText(self.chars.slice(begin, end), x1, y1 + l.bl + dh, undefined, self.charWidths.slice(begin, end), angle);
@@ -872,17 +872,17 @@
 						ctx.setStrokeStyle(prop.c || textColor)
 						   .setLineWidth(lw)
 						   .beginPath();
+						w_1px = asc_calcnpt(0, ppix, 1/*px*/);
+						h_1px = asc_calcnpt(0, ppiy, 1/*px*/);
+						dy = (lw / 2); dy = dy >> 0;
 						if (isSO) {
+							dy += 1;
 							y = asc_calcnpt(y1 + l.bl - prop.lm.a * 0.275, ppiy);
-							dy = -lw / 2;
-							ctx.moveTo(x1, y, 0, dy)
-							   .lineTo(x2, y, 1, dy);
+							ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px);
 						}
 						if (isUL) {
 							y = asc_calcnpt(y1 + l.bl + prop.lm.d * 0.4, ppiy);
-							dy = +lw / 2;
-							ctx.moveTo(x1, y, 0, dy)
-							   .lineTo(x2, y, 1, dy);
+							ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px);
 						}
 						ctx.stroke();
 					}

@@ -829,23 +829,24 @@ function DependencyGraph(wb) {
 			var dx = tox - fromx;
 			var dy = toy - fromy;
 			var angle = Math.atan2(dy, dx), _a = Math.PI / 18;
+			// ToDo посмотреть на четкость moveTo, lineTo
 			context.save()
 				.setLineWidth(1)
 				.beginPath()
-				.moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy),-0.5,-0.5)
-				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy),-0.5,-0.5)
+				.moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy))
+				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy));
 				// .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
 			context
 				.moveTo(
 					_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)),-0.5,-0.5)
-				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy),-0.5,-0.5)
+					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
+				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy))
 				.lineTo(
 					_cc.pxToPt(tox - headlen * Math.cos(angle + _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle + _a)),-0.5,-0.5)
+					_cc.pxToPt(toy - headlen * Math.sin(angle + _a)))
 				.lineTo(
 					_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)),-0.5,-0.5)
+					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
 				.setStrokeStyle("#0000FF")
 				.setFillStyle("#0000FF")
 				.stroke()
@@ -866,12 +867,13 @@ function DependencyGraph(wb) {
 				
 				if( x1<0 && x2<0 || y1<0 && y2<0)
 					continue;
-				
+
+				// ToDo посмотреть на четкость rect
 				if( m2.apl > 0 && m2.apt >0)
 					ctx.save()
 						.setLineWidth(1)
 						.setStrokeStyle("#0000FF")
-						.rect( _cc.pxToPt(m2.l),_cc.pxToPt(m2.t),_cc.pxToPt(m2.w-1),_cc.pxToPt(m2.h-1), -.5, -.5 )
+						.rect( _cc.pxToPt(m2.l),_cc.pxToPt(m2.t),_cc.pxToPt(m2.w-1),_cc.pxToPt(m2.h-1) )
 						.stroke()
 						.restore();
 				if(y1<0 && x1 != x2)

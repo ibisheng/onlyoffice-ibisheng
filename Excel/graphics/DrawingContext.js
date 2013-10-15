@@ -996,40 +996,40 @@ DrawingContext.prototype = {
 		return this;
 	},
 
-	moveTo: function (x, y, dx, dy) {
+	moveTo: function (x, y) {
 		var r = this._calcRect(x, y);
-		this.ctx.moveTo(r.x + (dx !== undefined ? dx : 0), r.y + (dy !== undefined ? dy : 0));
-		//console.log("moveTo: (" + r.x + ", " + r.y + ")" + " (" + dx + ", " + dy + ")");
+		this.ctx.moveTo(r.x, r.y);
 		return this;
 	},
 
-	lineTo: function (x, y, dx, dy) {
+	lineTo: function (x, y) {
 		var r = this._calcRect(x, y);
-		this.ctx.lineTo(r.x + (dx !== undefined ? dx : 0), r.y + (dy !== undefined ? dy : 0));
-		//console.log("lineTo: (" + r.x + ", " + r.y + ")" + " (" + dx + ", " + dy + ")");
+		this.ctx.lineTo(r.x, r.y);
 		return this;
 	},
 
 	lineDiag : function (x1, y1, x2, y2) {
+		var isEven = 0 !== this.ctx.lineWidth % 2 ? 0.5 : 0;
 		var r1 = this._calcRect(x1, y1);
 		var r2 = this._calcRect(x2, y2);
-		this.ctx.moveTo(r1.x + 0.5, r1.y + 0.5);
-		this.ctx.lineTo(r2.x + 0.5, r2.y + 0.5);
+		this.ctx.moveTo(r1.x + isEven, r1.y + isEven);
+		this.ctx.lineTo(r2.x + isEven, r2.y + isEven);
 		return this;
 	},
-
 	lineHor : function (x1, y, x2) {
+		var isEven = 0 !== this.ctx.lineWidth % 2 ? 0.5 : 0;
 		var r1 = this._calcRect(x1, y);
 		var r2 = this._calcRect(x2, y);
-		this.ctx.moveTo(r1.x, r1.y + 0.5);
-		this.ctx.lineTo(r2.x, r2.y + 0.5);
+		this.ctx.moveTo(r1.x, r1.y + isEven);
+		this.ctx.lineTo(r2.x, r2.y + isEven);
 		return this;
 	},
 	lineVer : function (x, y1, y2) {
+		var isEven = 0 !== this.ctx.lineWidth % 2 ? 0.5 : 0;
 		var r1 = this._calcRect(x, y1);
 		var r2 = this._calcRect(x, y2);
-		this.ctx.moveTo(r1.x + 0.5, r1.y);
-		this.ctx.lineTo(r2.x + 0.5, r2.y);
+		this.ctx.moveTo(r1.x + isEven, r1.y);
+		this.ctx.lineTo(r2.x + isEven, r2.y);
 		return this;
 	},
 
@@ -1151,27 +1151,9 @@ DrawingContext.prototype = {
 		this.dashLine(x3, y3, x1, y1, w_dot, w_dist);
 	},
 
-	rect: function (x, y, w, h, dx, dy) {
+	rect: function (x, y, w, h) {
 		var r = this._calcRect(x, y, w, h);
-		var hasDx = typeof dx !== "undefined";
-		var hasDy = typeof dy !== "undefined";
-		if (hasDx || hasDy) {
-			var x1 = r.x;
-			var x2 = r.x + r.w;
-			var y1 = r.y;
-			var y2 = r.y + r.h;
-			dx = hasDx ? dx : 0;
-			dy = hasDy ? dy : 0;
-			this.ctx.moveTo(x1 + dx, y1 + dy);  // move to start point
-			this.ctx.lineTo(x2, y1 + dy);       // top line
-			this.ctx.lineTo(x2 - dx, y1 + dy);  // move to right top point
-			this.ctx.lineTo(x2 - dx, y2 - dy);  // right line
-			this.ctx.lineTo(x1 + dx, y2 - dy);  // bottom line
-			this.ctx.lineTo(x1 + dx, y1);       // left line
-			this.ctx.lineTo(x1 + dx, y1 + dy);  // close shape
-		} else {
-			this.ctx.rect(r.x, r.y, r.w, r.h);
-		}
+		this.ctx.rect(r.x, r.y, r.w, r.h);
 		return this;
 	},
 

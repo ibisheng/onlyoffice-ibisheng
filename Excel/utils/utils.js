@@ -896,6 +896,7 @@
 
 						bw = t.oBorderUtils.calcBorderWidth(b);
 						if (0 < bw) {
+							// ToDo поправить
 							oGraphics.setLineWidth(bw).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
 						}
 					}
@@ -903,14 +904,10 @@
 
 				// borders
 				var oBorders = oStyle.getBorder();
-				drawBorder(oBorders.l, 0, nOffsetY,
-					0, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.r, this.styleThumbnailWidthPt, nOffsetY,
-					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
-				drawBorder(oBorders.t, 0, nOffsetY,
-					this.styleThumbnailWidthPt, nOffsetY);
-				drawBorder(oBorders.b, 0, nOffsetY + this.styleThumbnailHeightPt,
-					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.l, 0, nOffsetY, 0, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.r, this.styleThumbnailWidthPt, nOffsetY, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.t, 0, nOffsetY, this.styleThumbnailWidthPt, nOffsetY);
+				drawBorder(oBorders.b, 0, nOffsetY + this.styleThumbnailHeightPt, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
 
 				// Draw text
 				var fc = oStyle.getFontColor();

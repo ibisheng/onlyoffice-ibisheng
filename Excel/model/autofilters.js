@@ -2865,14 +2865,15 @@
 				var ws = this.worksheet;
 				var shift = 0.5;
 				var size = 4*index;
+				// ToDo переделать
 				ws.drawingCtx
 				.beginPath()
-				.moveTo(x, y, 0, 0)
-				.lineTo(x,y - size/2, 0, 0)
-				.lineTo(x - 2.5*index,y - size, 0, 0)
-				.lineTo(x + 3*index,y - size, 0, 0)
-				.lineTo(x + shift,y - size/2, 0, 0)
-				.lineTo(x + shift,y, 0, 0)
+				.moveTo(x, y)
+				.lineTo(x,y - size/2)
+				.lineTo(x - 2.5*index,y - size)
+				.lineTo(x + 3*index,y - size)
+				.lineTo(x + shift,y - size/2)
+				.lineTo(x + shift,y)
 				.setFillStyle('#787878')
 				.fill();
 			},
@@ -2882,12 +2883,13 @@
 				var ws = this.worksheet;
 				var size = 4*index;
 				var shift = 0.5;
+				// ToDo переделать
 				ws.drawingCtx
 					.beginPath()
-					.moveTo(x , y , -shift, 0)
-					.lineTo(x + size,y, -shift,0.5)
-					.lineTo(x + size/2,y + size/2 + shift,-shift,0)
-					.lineTo(x , y , -shift, 0)
+					.moveTo(x , y)
+					.lineTo(x + size,y)
+					.lineTo(x + size/2,y + size/2)
+					.lineTo(x , y)
 					.setFillStyle('#787878')
 					.fill();
 			},

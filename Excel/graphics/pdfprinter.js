@@ -299,44 +299,35 @@ CPdfPrinter.prototype =
         return this;
     },
 
-    moveTo : function(x, y, dx, dy)
+    moveTo : function(x, y)
     {
-        if (0 == dx && 0 == dy)
-            this.DocumentRenderer._m(x * vector_koef, y * vector_koef);
-        else
-        {
-            var _x = this.Transform.TransformPointX(x, y);
-            var _y = this.Transform.TransformPointY(x, y);
-
-            _x += (72 * dx / this.dpiX);
-            _y += (72 * dy / this.dpiY);
-
-            var xSrc = this.InvertTransform.TransformPointX(_x, _y);
-            var ySrc = this.InvertTransform.TransformPointY(_x, _y);
-
-            this.DocumentRenderer._m(xSrc * vector_koef, ySrc * vector_koef);
-        }
+        this.DocumentRenderer._m(x * vector_koef, y * vector_koef);
         return this;
     },
-    lineTo : function(x, y, dx, dy)
+    lineTo : function(x, y)
     {
-        if (0 == dx && 0 == dy)
-            this.DocumentRenderer._l(x * vector_koef, y * vector_koef);
-        else
-        {
-            var _x = this.Transform.TransformPointX(x, y);
-            var _y = this.Transform.TransformPointY(x, y);
-
-            _x += (72 * dx / this.dpiX);
-            _y += (72 * dy / this.dpiY);
-
-            var xSrc = this.InvertTransform.TransformPointX(_x, _y);
-            var ySrc = this.InvertTransform.TransformPointY(_x, _y);
-
-            this.DocumentRenderer._l(xSrc * vector_koef, ySrc * vector_koef);
-        }
+        this.DocumentRenderer._l(x * vector_koef, y * vector_koef);
         return this;
     },
+	lineDiag : function (x1, y1, x2, y2)
+	{
+		this.DocumentRenderer._m(x1 * vector_koef, y1 * vector_koef);
+		this.DocumentRenderer._l(x2 * vector_koef, y2 * vector_koef);
+		return this;
+	},
+	lineHor : function (x1, y, x2)
+	{
+		this.DocumentRenderer._m(x1 * vector_koef, y * vector_koef);
+		this.DocumentRenderer._l(x2 * vector_koef, y * vector_koef);
+		return this;
+	},
+	lineVer : function (x, y1, y2)
+	{
+		this.DocumentRenderer._m(x * vector_koef, y1 * vector_koef);
+		this.DocumentRenderer._l(x * vector_koef, y2 * vector_koef);
+		return this;
+	},
+
     rect : function(x, y, w, h)
     {
         if (this.bIsSimpleCommands)

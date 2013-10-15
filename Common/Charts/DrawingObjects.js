@@ -4618,8 +4618,7 @@ function DrawingObjects() {
 					
 					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
-					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(x + w, y, -0.5, -0.5);
+					overlayCtx.lineHor(x, y - worksheet.height_1px, x + w);
 					overlayCtx.stroke();
 				}
 				// Left
@@ -4633,8 +4632,7 @@ function DrawingObjects() {
 					
 					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
-					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(x, y + h, -0.5, -0.5);
+					overlayCtx.lineVer(x - worksheet.width_1px, y, y + h);
 					overlayCtx.stroke();
 				}
 					

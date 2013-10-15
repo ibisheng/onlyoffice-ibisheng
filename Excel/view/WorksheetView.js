@@ -1911,24 +1911,21 @@
 			_drawCorner: function () {
 				if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 					return;
-				var x1 = this.headersLeft + this.headersWidth - this.headersHeight;
 				var x2 = this.headersLeft + this.headersWidth;
-				var y1 = this.headersTop;
+				var x1 = x2 - this.headersHeight;
 				var y2 = this.headersTop + this.headersHeight;
-				var dx = 3;
-				var dy = 2;
+				var y1 = this.headersTop;
+
+				var dx = 4 * this.width_1px;
+				var dy = 4 * this.height_1px;
 
 				this._drawHeader(/*drawingCtx*/ undefined, this.headersLeft, this.headersTop,
 					this.headersWidth, this.headersHeight, kHeaderDefault, true, -1);
-				this.drawingCtx
-						.beginPath()
-						.moveTo(x2, y1, -dx-1.5, dy)
-						.lineTo(x2, y2, -dx-1.5, -dy-1)
-						.lineTo(x2, y2, -dx-1, -dy-1.5)
-						.lineTo(x1, y2, 0, -dy-1.5)
-						.lineTo(x1, y2, 0.5, -dy-1.5)
-						.lineTo(x2, y1, -dx-1.5, dy+0.5)
-						.lineTo(x2, y1, -dx-1.5, dy)
+				this.drawingCtx.beginPath()
+						.moveTo(x2 - dx, y1 + dy)
+						.lineTo(x2 - dx, y2 - dy)
+						.lineTo(x1 + dx, y2 - dy)
+						.lineTo(x2 - dx, y1 + dy)
 						.setFillPattern(this.settings.header.cornerColor)
 						.fill();
 			},
@@ -2489,13 +2486,15 @@
 				if (range === undefined) {
 					range = this.visibleRange;
 				}
+				var t = this;
 				var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
 				var offsetX = (leftFieldInPt) ? leftFieldInPt : this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = (topFieldInPt) ? topFieldInPt : this.rows[this.visibleRange.r1].top - this.cellsTop;
 				var bc    = undefined; // cached border color
 				var color = undefined; // cached border color string
 
-				function drawBorderLine(border, x1, y1, x2, y2, fdx, fdy) {
+				// ToDo в одну функцию
+				function drawBorderHor(border, x1, y, x2) {
 					if (border.s !== kcbNone && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
@@ -2503,10 +2502,23 @@
 							ctx.setStrokeStyle(color);
 						}
 						ctx.setLineWidth(border.w)
-								.beginPath()
-								.moveTo(x1, y1, fdx(1), fdy(1))
-								.lineTo(x2, y2, fdx(2), fdy(2))
-								.stroke();
+							.beginPath()
+							.lineHor(x1, y, x2)
+							.stroke();
+					}
+				}
+
+				function drawBorderVer(border, x1, y1, y2) {
+					if (border.s !== kcbNone && !border.isErased) {
+						if (bc !== border.c) {
+							bc = border.c;
+							color = asc_n2css(bc);
+							ctx.setStrokeStyle(color);
+						}
+						ctx.setLineWidth(border.w)
+							.beginPath()
+							.lineVer(x1, y1, y2)
+							.stroke();
 					}
 				}
 
@@ -2610,77 +2622,56 @@
 							bc = undefined;
 						}
 
-						function drawVerticalBorder(bor, isLeft, tb1, tb2, bb1, bb2, x1, y1, x2, y2) {
+						function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
 							if (bor.w < 1 || bor.isErased) {return;}
 
-							var tbw = this._calcMaxBorderWidth(tb1, tb2); // top border width
-							var bbw = this._calcMaxBorderWidth(bb1, bb2); // bottom border width
+							// ToDo переделать рассчет
+							var tbw = t._calcMaxBorderWidth(tb1, tb2); // top border width
+							var bbw = t._calcMaxBorderWidth(bb1, bb2); // bottom border width
 							var dy1 = tbw > bor.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
 							var dy2 = bbw > bor.w ? -2 : (bbw > 2 ? 1 : 0);
-							drawBorderLine(bor, x1, y1, x2, y2,
-							               function (point){return isLeft ? (bor.w !== 2 ? -0.5 : -1) : (bor.w !== 2 ? 0.5 : 0);},
-							               function (point){return point === 1 ? -1 + dy1 : 1 + dy2;});
+
+							drawBorderVer(bor, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
 						}
 
-						function drawHorizontalBorderCorner(bor, isTop, borOther, vb, isLeft, vbOther, x, y) {
-							if (vbOther.w <= vb.w || vbOther.w < bor.w) {return;}
-
-							var borw = Math.max(bor.w, borOther.w);
-							drawBorderLine(vbOther, x, y, x, y,
-							               function (point){return isLeft ? (vbOther.w !== 2 ? -0.5 : -1) : (vbOther.w !== 2 ? 0.5 : 0);},
-							               function (point){return (point === 1 ? (borw > 1 ? -1 : 0) : (borw < 3 ? 1 : 2)) + (isTop ? -1 : 0);});
-						}
-
-						function drawHorizontalBorder(bor, isTop, borPrev, borNext, drawCorners, lb, lbOther, rb, rbOther, x1, y1, x2, y2) {
+						function drawHorizontalBorder(bor, lb, lbOther, rb, rbOther, x1, y, x2) {
 							if (bor.w > 0) {
+								// ToDo переделать рассчет
 								var lbw = this._calcMaxBorderWidth(lb, lbOther);
 								var rbw = this._calcMaxBorderWidth(rb, rbOther);
 								var dx1 = bor.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
 								var dx2 = bor.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
-								drawBorderLine(bor, x1, y1, x2, y2,
-								               function (point){return point === 1 ? -1 + dx1 : 1 + dx2;},
-								               function (point){return isTop ? (bor.w !== 2 ? -0.5 : -1) : (bor.w !== 2 ? 0.5 : 0);});
-							}
-							if (drawCorners) {
-								if (isFirstCol) {
-									// draw left corner
-									drawHorizontalBorderCorner.call(this, bor, isTop, borPrev, lb, true, lbOther, x1, y1);
-								}
-								// draw right corner
-								drawHorizontalBorderCorner.call(this, bor, isTop, borNext, rb, false, rbOther, x2, y2);
+								drawBorderHor(bor, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
 							}
 						}
 
 						if (isFirstCol) {
 							// draw left border
-							drawVerticalBorder.call(this, lb, true, tb, tbPrev, bb, bbPrev, x1, y1, x1, y2);
+							drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1 - this.width_1px, y1, y2);
 							// Если мы в печати и печатаем первый столбец, то нужно напечатать бордеры
 							if (lb.w >= 1 && false == lb.isErased && drawingCtx && 0 === col) {
 								// Иначе они будут не такой ширины
-								drawVerticalBorder.call(this, lb, false, tb, tbPrev, bb, bbPrev, x1, y1, x1, y2);
+								// ToDo посмотреть что с этим ? в печати будет обрезка
+								drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
 							}
 						}
 						if (!mergedCellsStage || col === range.c2) {
 							// draw right border
-							drawVerticalBorder.call(this, rb, false, tb, tbNext, bb, bbNext, x2, y1, x2, y2);
+							drawVerticalBorder.call(this, rb, tb, tbNext, bb, bbNext, x2, y1, y2);
 						}
 
 						if (isFirstRow) {
 							// draw top border
-							drawHorizontalBorder.call(this, tb, true, tbPrev, tbNext, true, lb, lbPrev, rb, rbPrev, x1, y1, x2, y1);
+							drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1 - this.height_1px, x2);
 							// Если мы в печати и печатаем первую строку, то нужно напечатать бордеры
 							if (tb.w > 0 && drawingCtx && 0 === row) {
-								// Иначе они будут не такой ширины
-								var tmpFirstCol = isFirstCol;
-								isFirstCol = false;
-								drawHorizontalBorder.call(this, tb, false, tbPrev, tbNext, true, lb, lbPrev, rb, rbPrev, x1, y1, x2, y1);
-								//drawHorizontalBorder.call(this, emptyCellBorder, false, emptyCellBorder, tb, true, emptyCellBorder, emptyCellBorder, emptyCellBorder, rb, x1, y1, x2, y1);
-								isFirstCol = tmpFirstCol;
+								// ToDo посмотреть что с этим ? в печати будет обрезка
+								drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 							}
 						}
 						if (!mergedCellsStage || row === range.r2) {
 							// draw bottom border
-							drawHorizontalBorder.call(this, bb, false, bbPrev, bbNext, isLastRow, lb, lbNext, rb, rbNext, x1, y2, x2, y2);
+							drawHorizontalBorder.call(this, bb, lb, lbNext, rb, rbNext, x1, y2, x2);
 						}
 					}
 				}
@@ -2747,15 +2738,15 @@
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 				var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
-				var x1 = (range) ? (this.cols[range.c1].left - offsetX) : 0;
-				var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX) : 0;
+				var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
+				var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px) : 0;
 				var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
-				var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY) : 0;
+				var y2 = (range) ? (this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px) : 0;
 				var drawLeftSide   = (range) ? (range.c1 === arn.c1) : false;
 				var drawRightSide  = (range) ? (range.c2 === arn.c2) : false;
 				var drawTopSide    = (range) ? (range.r1 === arn.r1) : false;
 				var drawBottomSide = (range) ? (range.r2 === arn.r2) : false;
-				var l, t, r, b, cr, offs, offs2;
+				var l, t, r, b, cr;
 				// Размеры "квадрата" автозаполнения
 				var fillHandleWidth = 2 * this.width_2px + this.width_1px;
 				var fillHandleHeight = 2 * this.height_2px + this.height_1px;
@@ -2778,12 +2769,10 @@
 						.clip();
 
 				// draw frame around cells range
-				l = drawLeftSide ? (-2) : 0;
-				r = drawRightSide ? (+1) : 0;
-				t = drawTopSide ? (-2) : 0;
-				b = drawBottomSide ? (+1) : 0;
-				offs = -.5;
-				offs2 = -.5;
+				l = drawLeftSide ? -this.width_1px : 0;
+				r = drawRightSide ? this.width_1px : 0;
+				t = drawTopSide ? -this.height_1px : 0;
+				b = drawBottomSide ? this.height_1px : 0;
 
 				ctx.setStrokeStyle(opt.activeCellBorderColor)
 						.setLineWidth(3)
@@ -2791,10 +2780,10 @@
 
 				if (aFHIntersection) {
 					// Считаем координаты автозаполнения
-					xFH1 = this.cols[aFHIntersection.c1].left - offsetX;
-					xFH2 = this.cols[aFHIntersection.c2].left + this.cols[aFHIntersection.c2].width - offsetX;
+					xFH1 = this.cols[aFHIntersection.c1].left - offsetX - this.width_1px;
+					xFH2 = this.cols[aFHIntersection.c2].left + this.cols[aFHIntersection.c2].width - offsetX - this.width_1px;
 					yFH1 = this.rows[aFHIntersection.r1].top - offsetY;
-					yFH2 = this.rows[aFHIntersection.r2].top + this.rows[aFHIntersection.r2].height - offsetY;
+					yFH2 = this.rows[aFHIntersection.r2].top + this.rows[aFHIntersection.r2].height - offsetY - this.height_1px;
 					drawLeftFillHandle = aFHIntersection.c1 === aFH.c1;
 					drawRightFillHandle = aFHIntersection.c2 === aFH.c2;
 					drawTopFillHandle = aFHIntersection.r1 === aFH.r1;
@@ -2802,10 +2791,10 @@
 
 					// Если мы не в нулевом состоянии, то рисуем обводку автозаполнения (толстой линией)
 					if (aFHIntersection.c1 !== aFHIntersection.c2 || aFHIntersection.r1 !== aFHIntersection.r2 || 2 !== this.fillHandleArea) {
-						if (drawTopFillHandle)    {ctx.moveTo(xFH1, yFH1, l, offs).lineTo(xFH2, yFH1, r, offs);}
-						if (drawBottomFillHandle) {ctx.moveTo(xFH1, yFH2, l, offs2).lineTo(xFH2, yFH2, r, offs2);}
-						if (drawLeftFillHandle)   {ctx.moveTo(xFH1, yFH1, offs, t).lineTo(xFH1, yFH2, offs, b);}
-						if (drawRightFillHandle)  {ctx.moveTo(xFH2, yFH1, offs2, t).lineTo(xFH2, yFH2, offs2, b);}
+						if (drawTopFillHandle)    {ctx.lineHor(xFH1 + l, yFH1 - this.height_1px, xFH2 + this.width_1px + r);}
+						if (drawBottomFillHandle) {ctx.lineHor(xFH1 + l, yFH2, xFH2 + this.width_1px + r);}
+						if (drawLeftFillHandle)   {ctx.lineVer(xFH1, yFH1 + t, yFH2 + b);}
+						if (drawRightFillHandle)  {ctx.lineVer(xFH2, yFH1 + t, yFH2 + b);}
 					}
 
 					// Для некоторых вариантов областей нужно дорисовывать обводку для выделенной области
@@ -2814,33 +2803,33 @@
 							switch(this.fillHandleDirection){
 								case 0:
 									// Горизонтальный
-									if (drawLeftSide)   {ctx.moveTo(x1, y1, offs, t).lineTo(x1, y2, offs, b);}
+									if (drawLeftSide)   {ctx.lineVer(x1, y1 + t, y2 + b);}
 									break;
 								case 1:
 									// Вертикальный
-									if (drawTopSide)    {ctx.moveTo(x1, y1, l, offs).lineTo(x2, y1, r, offs);}
+									if (drawTopSide)    {ctx.lineHor(x1 + l, y1 - this.height_1px, x2 + this.width_1px + r);}
 									break;
 							}
 							break;
 						case 2:
 							// Для внутренней области нужны все обводки
-							if (drawTopSide)    {ctx.moveTo(x1, y1, l, offs).lineTo(x2, y1, r, offs);}
-							if (drawBottomSide) {ctx.moveTo(x1, y2, l, offs2).lineTo(x2, y2, r, offs2);}
-							if (drawLeftSide)   {ctx.moveTo(x1, y1, offs, t).lineTo(x1, y2, offs, b);}
-							if (drawRightSide)  {ctx.moveTo(x2, y1, offs2, t).lineTo(x2, y2, offs2, b);}
+							if (drawTopSide)    {ctx.lineHor(x1 + l, y1 - this.height_1px, x2 + this.width_1px + r);}
+							if (drawBottomSide) {ctx.lineHor(x1 + l, y2, x2 + this.width_1px + r);}
+							if (drawLeftSide)   {ctx.lineVer(x1, y1 + t, y2 + b);}
+							if (drawRightSide)  {ctx.lineVer(x2, y1 + t, y2 + b);}
 							break;
 						case 3:
 							switch(this.fillHandleDirection){
 								case 0:
 									// Горизонтальный
 									if (range && aFH.c2 !== range.c2){
-										if (drawRightSide)  {ctx.moveTo(x2, y1, offs2, t).lineTo(x2, y2, offs2, b);}
+										if (drawRightSide)  {ctx.lineVer(x2, y1 + t, y2 + b);}
 									}
 									break;
 								case 1:
 									// Вертикальный
 									if (range && aFH.r2 !== range.r2){
-										if (drawBottomSide) {ctx.moveTo(x1, y2, l, offs2).lineTo(x2, y2, r, offs2);}
+										if (drawBottomSide) {ctx.lineHor(x1 + l, y2, x2 + this.width_1px + r);}
 									}
 									break;
 							}
@@ -2850,19 +2839,19 @@
 					ctx.stroke();
 				} else {
 					// Автозаполнения нет, просто рисуем обводку
-					if (drawTopSide)    {ctx.moveTo(x1, y1, l, offs).lineTo(x2, y1, r, offs);}
-					if (drawBottomSide) {ctx.moveTo(x1, y2, l, offs2).lineTo(x2 - fillHandleWidth, y2, r, offs2);}
-					if (drawLeftSide)   {ctx.moveTo(x1, y1, offs, t).lineTo(x1, y2, offs, b);}
-					if (drawRightSide)  {ctx.moveTo(x2, y1, offs2, t).lineTo(x2, y2 - fillHandleHeight, offs2, b);}
+					if (drawTopSide)    {ctx.lineHor(x1 + l, y1 - this.height_1px, x2 + this.width_1px + r);}
+					if (drawBottomSide) {ctx.lineHor(x1 + l, y2, x2 + this.width_1px + r - fillHandleWidth);}
+					if (drawLeftSide)   {ctx.lineVer(x1, y1 + t, y2 + b);}
+					if (drawRightSide)  {ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);}
 				}
 				ctx.stroke();
 
 				// draw cells overlay
 				if (range) {
-					var lRect = x1 + (drawLeftSide ? this.width_2px : 0),
-					rRect = x2 - (drawRightSide ? this.width_3px : this.width_1px),
-					tRect = y1 + (drawTopSide ? this.height_2px : 0),
-					bRect = y2 - (drawBottomSide ? this.width_3px : this.height_1px);
+					var lRect = x1 + (drawLeftSide ? this.width_3px : this.width_1px),
+						rRect = x2 - (drawRightSide ? this.width_2px : 0),
+						tRect = y1 + (drawTopSide ? this.height_2px : 0),
+						bRect = y2 - (drawBottomSide ? this.width_2px : 0);
 					ctx.setFillStyle( opt.activeCellBackground )
 							.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
@@ -2895,10 +2884,10 @@
 				if (this.activeFillHandle !== null) {
 					if (2 === this.fillHandleArea && (aFH.c1 !== aFH.c2 || aFH.r1 !== aFH.r2)){
 						// Для внутренней области мы должны "залить" еще и область автозаполнения
-						var lFH = xFH1 + (drawLeftFillHandle ? this.width_2px : 0),
-						rFH = xFH2 - (drawRightFillHandle ? this.width_3px : this.width_1px),
-						tFH = yFH1 + (drawTopFillHandle ? this.height_2px : 0),
-						bFH = yFH2 - (drawBottomFillHandle ? this.width_3px : this.height_1px);
+						var lFH = xFH1 + (drawLeftFillHandle ? this.width_3px : this.width_1px),
+							rFH = xFH2 - (drawRightFillHandle ? this.width_2px : 0),
+							tFH = yFH1 + (drawTopFillHandle ? this.height_2px : 0),
+							bFH = yFH2 - (drawBottomFillHandle ? this.width_2px : 0);
 						ctx.setFillStyle( opt.activeCellBackground )
 							.fillRect(lFH, tFH, rFH - lFH, bFH - tFH);
 					}
@@ -2907,18 +2896,18 @@
 
 					if (aFH.c1 !== aFH.c2 || aFH.r1 !== aFH.r2 || 2 !== this.fillHandleArea) {
 						// Рисуем обводку для области автозаполнения, если мы выделили что-то
-						if (drawTopFillHandle)    {ctx.moveTo(xFH1 + this.width_1px, yFH1, l, offs).lineTo(xFH2 - this.width_1px, yFH1, r, offs);}
-						if (drawBottomFillHandle) {ctx.moveTo(xFH1 + this.width_1px, yFH2, l, offs2).lineTo(xFH2 - this.width_1px, yFH2, r, offs2);}
-						if (drawLeftFillHandle)   {ctx.moveTo(xFH1, yFH1 + this.height_1px, offs, t).lineTo(xFH1, yFH2 - this.height_1px, offs, b);}
-						if (drawRightFillHandle)  {ctx.moveTo(xFH2, yFH1 + this.height_1px, offs2, t).lineTo(xFH2, yFH2 - this.height_1px, offs2, b);}
+						if (drawTopFillHandle)    {ctx.lineHor(xFH1 + l + this.width_1px, yFH1 - this.height_1px, xFH2 + r);}
+						if (drawBottomFillHandle) {ctx.lineHor(xFH1 + l + this.width_1px, yFH2, xFH2 + r);}
+						if (drawLeftFillHandle)   {ctx.lineVer(xFH1, yFH1 + t + this.height_1px, yFH2 + b - this.height_1px);}
+						if (drawRightFillHandle)  {ctx.lineVer(xFH2, yFH1 + t + this.height_1px, yFH2 + b - this.height_1px);}
 					}
 
 					if (2 === this.fillHandleArea){
 						// Если мы внутри, еще рисуем обводку для выделенной области
-						if (drawTopSide)    {ctx.moveTo(x1 + this.width_1px, y1, l, offs).lineTo(x2 - this.width_1px, y1, r, offs);}
-						if (drawBottomSide) {ctx.moveTo(x1 + this.width_1px, y2, l, offs2).lineTo(x2 - this.width_1px, y2, r, offs2);}
-						if (drawLeftSide)   {ctx.moveTo(x1, y1 + this.height_1px, offs, t).lineTo(x1, y2 - this.height_1px, offs, b);}
-						if (drawRightSide)  {ctx.moveTo(x2, y1 + this.height_1px, offs2, t).lineTo(x2, y2 - this.height_1px, offs2, b);}
+						if (drawTopSide)    {ctx.lineHor(x1 + l + this.width_1px, y1 - this.height_1px, x2 + r - this.width_1px);}
+						if (drawBottomSide) {ctx.lineHor(x1 + l + this.width_1px, y2, x2 + r - this.width_1px);}
+						if (drawLeftSide)   {ctx.lineVer(x1, y1 + t + this.height_1px, y2 + b - this.height_1px);}
+						if (drawRightSide)  {ctx.lineVer(x2, y1 + t + this.height_1px, y2 + b - this.height_1px);}
 					}
 
 					ctx.stroke();
@@ -2947,15 +2936,15 @@
 						var drawTopSideMoveRange    = aActiveMoveRangeIntersection.r1 === this.activeMoveRange.r1;
 						var drawBottomSideMoveRange = aActiveMoveRangeIntersection.r2 === this.activeMoveRange.r2;
 
-						var xMoveRange1 = this.cols[aActiveMoveRangeIntersection.c1].left - offsetX;
-						var xMoveRange2 = this.cols[aActiveMoveRangeIntersection.c2].left + this.cols[aActiveMoveRangeIntersection.c2].width - offsetX;
+						var xMoveRange1 = this.cols[aActiveMoveRangeIntersection.c1].left - offsetX - this.width_1px;
+						var xMoveRange2 = this.cols[aActiveMoveRangeIntersection.c2].left + this.cols[aActiveMoveRangeIntersection.c2].width - offsetX - this.width_1px;
 						var yMoveRange1 = this.rows[aActiveMoveRangeIntersection.r1].top - offsetY;
-						var yMoveRange2 = this.rows[aActiveMoveRangeIntersection.r2].top + this.rows[aActiveMoveRangeIntersection.r2].height - offsetY;
+						var yMoveRange2 = this.rows[aActiveMoveRangeIntersection.r2].top + this.rows[aActiveMoveRangeIntersection.r2].height - offsetY - this.height_1px;
 
-						if (drawTopSideMoveRange)    {ctx.moveTo(xMoveRange1, yMoveRange1, -0.5, -0.5).lineTo(xMoveRange2, yMoveRange1, -0.5, -0.5);}
-						if (drawBottomSideMoveRange) {ctx.moveTo(xMoveRange1, yMoveRange2, -0.5, -0.5).lineTo(xMoveRange2, yMoveRange2, -0.5, -0.5);}
-						if (drawLeftSideMoveRange)   {ctx.moveTo(xMoveRange1, yMoveRange1, -0.5, -0.5).lineTo(xMoveRange1, yMoveRange2, -0.5, -0.5);}
-						if (drawRightSideMoveRange)  {ctx.moveTo(xMoveRange2, yMoveRange1, -0.5, -0.5).lineTo(xMoveRange2, yMoveRange2, -0.5, -0.5);}
+						if (drawTopSideMoveRange)    {ctx.lineHor(xMoveRange1, yMoveRange1 - this.height_1px, xMoveRange2 + this.width_1px);}
+						if (drawBottomSideMoveRange) {ctx.lineHor(xMoveRange1, yMoveRange2, xMoveRange2 + this.width_1px);}
+						if (drawLeftSideMoveRange)   {ctx.lineVer(xMoveRange1, yMoveRange1, yMoveRange2);}
+						if (drawRightSideMoveRange)  {ctx.lineVer(xMoveRange2, yMoveRange1, yMoveRange2);}
 					}
 					ctx.stroke();
 				}
@@ -2991,27 +2980,27 @@
 						var drawTopSideFormula    = aFormulaIntersection.r1 === arFormulaTmp.r1;
 						var drawBottomSideFormula = aFormulaIntersection.r2 === arFormulaTmp.r2;
 
-						var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX;
-						var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX;
+						var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX - this.width_1px;
+						var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX - this.width_1px;
 						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
-						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
+						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY - this.height_1px;
 
-						if (drawTopSideFormula)    {ctx.moveTo(xFormula1, yFormula1, -0.5, -0.5).lineTo(xFormula2+0.5, yFormula1, -0.5, -0.5);}
-						if (drawBottomSideFormula) {ctx.moveTo(xFormula1, yFormula2, -0.5, -0.5).lineTo(xFormula2, yFormula2, -0.5, -0.5);}
-						if (drawLeftSideFormula)   {ctx.moveTo(xFormula1, yFormula1, -0.5, -0.5).lineTo(xFormula1, yFormula2, -0.5, -0.5);}
-						if (drawRightSideFormula)  {ctx.moveTo(xFormula2, yFormula1, -0.5, -0.5).lineTo(xFormula2, yFormula2, -0.5, -0.5);}
+						if (drawTopSideFormula)		{ctx.lineHor(xFormula1, yFormula1 - this.height_1px, xFormula2 + this.width_1px);}
+						if (drawBottomSideFormula)	{ctx.lineHor(xFormula1, yFormula2, xFormula2 + this.width_1px);}
+						if (drawLeftSideFormula)	{ctx.lineVer(xFormula1, yFormula1, yFormula2);}
+						if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
 						
-						if( drawLeftSideFormula && drawTopSideFormula )
-							ctx.rect(xFormula1, yFormula1, 2, 2, -0.5, -0.5);
+						if (drawLeftSideFormula && drawTopSideFormula)
+							ctx.fillRect(xFormula1 + this.width_1px, yFormula1, 3, 3);
 							
-						if( drawRightSideFormula && drawTopSideFormula )
-							ctx.rect(xFormula2-3, yFormula1, 1.5, 2, -0.5, -0.5);
+						if (drawRightSideFormula && drawTopSideFormula)
+							ctx.fillRect(xFormula2 - 4 * this.width_1px, yFormula1, 3, 3);
 							
-						if( drawRightSideFormula && drawBottomSideFormula)
-							ctx.rect(xFormula2-3, yFormula2-3, 2, 2, -0.5, -0.5);
+						if (drawRightSideFormula && drawBottomSideFormula)
+							ctx.fillRect(xFormula2 - 4 * this.width_1px, yFormula2 - 4 * this.height_1px, 3, 3);
 							
-						if( drawLeftSideFormula && drawBottomSideFormula)
-							ctx.rect(xFormula1, yFormula2-3, 2, 2, -0.5, -0.5);
+						if (drawLeftSideFormula && drawBottomSideFormula)
+							ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - 4 * this.height_1px, 3, 3);
 						
 						ctx.closePath()
 							.stroke()
@@ -4212,25 +4201,27 @@
 						toy = toy > that.getCellTop(0, 0)? toy: that.getCellTop(0, 0),
 						angle = Math.atan2(dy, dx),
 						_a = Math.PI / 18;
-						
+
+					// ToDo посмотреть на четкость moveTo, lineTo
 					context.save()
 						.setLineWidth(1)
 						.beginPath()
-						.moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy),-0.5,-0.5)
-						.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy),-0.5,-0.5)
+						.lineDiag
+						.moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy))
+						.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy));
 						// .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
 					if( showArrow )
 						context
 							.moveTo(
 								_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-								_cc.pxToPt(toy - headlen * Math.sin(angle - _a)),-0.5,-0.5)
-							.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy),-0.5,-0.5)
+								_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
+							.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy))
 							.lineTo(
 								_cc.pxToPt(tox - headlen * Math.cos(angle + _a)),
-								_cc.pxToPt(toy - headlen * Math.sin(angle + _a)),-0.5,-0.5)
+								_cc.pxToPt(toy - headlen * Math.sin(angle + _a)))
 							.lineTo(
 								_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-								_cc.pxToPt(toy - headlen * Math.sin(angle - _a)),-0.5,-0.5)
+								_cc.pxToPt(toy - headlen * Math.sin(angle - _a)));
 						
 					context
 						.setStrokeStyle("#0000FF")
@@ -4348,7 +4339,8 @@
 						
 						draw_arrow(ctx, x1<this.getCellLeft(0, 0)?this.getCellLeft(0, 0):x1, y1<this.getCellTop(0, 0)?this.getCellTop(0, 0):y1, x2, y2);
 						// draw_arrow(ctx, x1, y1, x2, y2);
-						
+
+						// ToDo посмотреть на четкость rect
 						if( nodeCellMetrics.apl > this.getCellLeft(0, 0) && nodeCellMetrics.apt > this.getCellTop(0, 0) )
 							ctx.save()
 								.beginPath()
@@ -4360,7 +4352,7 @@
 								.closePath()
 								.setLineWidth(1)
 								.setStrokeStyle("#0000FF")
-								.rect( _cc.pxToPt(nodeCellMetrics.l),_cc.pxToPt(nodeCellMetrics.t),_cc.pxToPt(nodeCellMetrics.w-1),_cc.pxToPt(nodeCellMetrics.h-1), -.5, -.5 )
+								.rect( _cc.pxToPt(nodeCellMetrics.l),_cc.pxToPt(nodeCellMetrics.t),_cc.pxToPt(nodeCellMetrics.w-1),_cc.pxToPt(nodeCellMetrics.h-1) )
 								.stroke()
 								.restore();
 					}
