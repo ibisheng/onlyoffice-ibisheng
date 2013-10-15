@@ -51,6 +51,9 @@ function CDocInfo (obj){
 		if (typeof obj.UserName != 'undefined'){
 			this.UserName = obj.UserName;
 		}
+		if (typeof obj.IsNew != 'undefined'){
+			this.IsNew = obj.IsNew;
+		}
         if (obj.OfflineApp === true)
             this.OfflineApp = true;
 	}
@@ -62,6 +65,7 @@ function CDocInfo (obj){
 		this.VKey = null;
         this.UserId = null;
 		this.UserName = null;
+		this.IsNew = null;
 	}
 }
 CDocInfo.prototype.get_Id = function(){return this.Id}
@@ -80,6 +84,8 @@ CDocInfo.prototype.get_UserId = function(){return this.UserId;}
 CDocInfo.prototype.put_UserId = function(v){this.UserId = v;}
 CDocInfo.prototype.get_UserName = function(){return this.UserName;}
 CDocInfo.prototype.put_UserName = function(v){this.UserName = v;}
+CDocInfo.prototype.get_IsNew = function(){return this.IsNew;}
+CDocInfo.prototype.put_IsNew = function(v){this.IsNew = v;}
 
 function CListType(obj)
 {
@@ -910,11 +916,19 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
 
 	if(documentId){
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-		var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"open", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
-		sendCommand( oThis, function(){}, JSON.stringify(rData) );
-
-        this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
+		if(this.DocInfo.get_IsNew())
+		{
+			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"create", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": g_sEmpty_bin};
+			sendCommand( oThis, function(){}, JSON.stringify(rData) );
+			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
+		}
+		else
+		{
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"open", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
+			sendCommand( oThis, function(){}, JSON.stringify(rData) );
+		}
+		this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
 	}
 	else
     {
@@ -1160,6 +1174,16 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	else
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
 
+	//callback
+	editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+	var sizeMM;
+	if(editor.DocumentOrientation)
+		sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
+	else
+		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
+	editor.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
+	editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+							
     this.ParcedDocument = true;
 	if (this.isStartCoAuthoringOnEndLoad) {
 		this.CoAuthoringApi.onStartCoAuthoring(true);
@@ -6640,15 +6664,6 @@ asc_docs_api.prototype.OfflineAppDocumentEndLoad = function()
         editor.OpenDocument(documentUrl, window["editor_bin"]);
     else
         editor.OpenDocument2(documentUrl, window["editor_bin"]);
-    //callback
-    editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-	var sizeMM;
-	if(editor.DocumentOrientation)
-		sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
-	else
-		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
-    editor.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
-    editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
 }
 
 asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
@@ -6782,15 +6797,6 @@ function sendCommand(editor, fCallback, rdata){
 								editor.OpenDocument(url, result);
 							else
 								editor.OpenDocument2(url, result);
-							//callback
-							editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
-							var sizeMM;
-							if(editor.DocumentOrientation)
-								sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
-							else
-								sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
-							editor.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
-							editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
 							if(fCallback)
 								fCallback(incomeObject);
 						},

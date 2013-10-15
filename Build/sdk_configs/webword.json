@@ -133,6 +133,7 @@
                 "../Word/api-all.js",
                 "../Word/merge/api_merge.js",
                 "../Word/Build/Log/apiExport.js",
+				"../Word/document/empty.js",
                 "../Excel/graphics/DrawingContextWord.js"
             ],
             "dst": "../Word/sdk-all.js",
