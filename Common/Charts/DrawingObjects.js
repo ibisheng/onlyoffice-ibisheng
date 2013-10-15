@@ -4152,6 +4152,7 @@ function DrawingObjects() {
 	
 	_this.addGraphicObject = function(graphic, position, lockByDefault) {
 		
+		worksheet.cleanSelection();
 		var drawingObject = _this.createDrawingObject();
 		drawingObject.graphicObject = graphic;
         graphic.setDrawingBase(drawingObject);
