@@ -56,7 +56,7 @@ asc_CParagraphBorders:cH
 __gray_convert_glyph:Ds
 c_oSerPosHV$Align:UN
 tt_face_free_name:kq
-ResizeTrackShapeImageInGroup:d0
+ResizeTrackShapeImageInGroup:c0
 historyitem_type_Layout:mA
 JSCompiler_StaticMethods_Update_TableMarkupFromRuler:dV
 historyitem_Table_RemoveRow:uW
@@ -452,7 +452,7 @@ c_oSerDocTableType$Cell_Content:TM
 t1_cmap_custom_class_rec:Xo
 CLvlText_Text:Bf
 c_oSerNumTypes$Num:JK
-tt_cmap14_variants:Dr
+tt_cmap14_variants:Cr
 c_oSerConstants$ReadUnknown:qH
 Normalize:tt
 _downloadAs:u5
@@ -911,7 +911,7 @@ JSCompiler_StaticMethods_hyperlinkRemove:jD
 c_oSer_OMathBottomNodesType$HideRight:DP
 STATES_ID_TRACK_NEW_SHAPE:LE
 c_oSer_sts$Style_CellPr:kL
-c_oAscHAnchor:A4
+c_oAscHAnchor:z4
 JSCompiler_StaticMethods_private_FillGlyph:z2
 JSCompiler_StaticMethods_AddLineDash:B2
 JSCompiler_StaticMethods_AddEllipse:G2
@@ -1215,7 +1215,7 @@ JSCompiler_StaticMethods_Style_Remove:YY
 tt_cmap14_char_map_nondef_binary:yr
 convertFormula:uG
 _weight_media:d1
-CImageSize:W5
+CImageSize:V5
 rx_ref:eh
 T1_Done_Metrics:ix
 t1_builder_start_point:tp
@@ -1227,7 +1227,7 @@ cff_index_get_pointers:hw
 raster_memory:ks
 c_oSer_ClrSchemeMappingType$T1:YO
 c_oSer_ClrSchemeMappingType$T2:ZO
-LoadFontFile:Ly
+LoadFontFile:Ky
 c_oSer_OMathContentType$SPre:XQ
 c_oAscChartType$scatter:GG
 c_oAscServerError$NoError:qg
@@ -1248,8 +1248,8 @@ nSldLtTTxAndClipArt:r1
 FT_Outline_Transform:Wl
 g_oLcidNameToIdMap:yD
 FT_GlyphLoader:um
-tt_cmap14_char_var_isdefault:Cr
-JSCompiler_StaticMethods_Remove_PresentationNumbering:Of
+tt_cmap14_char_var_isdefault:Br
+JSCompiler_StaticMethods_Remove_PresentationNumbering:Kf
 FT_NEXT_USHORT:ql
 JSCompiler_StaticMethods_Internal_RecalcData_Clear:qY
 c_oAscError$ID$UplImageExt:N4
@@ -1346,7 +1346,7 @@ _strcmp_data:xl
 JSCompiler_StaticMethods_Internal_CheckNullBorder:IV
 cff_get_advances:Yw
 ParaNumbering:tC
-TT_Round_Super_45:Ws
+TT_Round_Super_45:Vs
 tt_cmap10_char_index:dr
 ps_parser_skip_spaces:gp
 g_fonts_streams:My
@@ -1974,7 +1974,7 @@ CRGBColor:Wh
 g_stringBase64:lU
 historyitem_Table_PositionV:yW
 BinaryFileWriter:qa
-pHText:I0
+pHText:H0
 ft_recompute_scaled_metrics:cy
 ResizeTrackChart:C0
 c_oSer_OMathContentType$SSupPr:dR
@@ -3036,7 +3036,7 @@ _ph_summ__obj_only:i4
 Ins_DELTAP:qu
 ft_var_load_gvar:Qu
 global_hatch_data:N2
-JSCompiler_StaticMethods_SetProp:Ec
+JSCompiler_StaticMethods_SetProp:Dc
 RotateState:KF
 c_oSerBordersType$bottom:LH
 locktype_Other2:QA
@@ -3059,7 +3059,7 @@ c_oAscXAlign$Inside:lV
 JSCompiler_StaticMethods_Set_Before:Ud
 TT_Face:Iu
 BinarySettingsTableWriter:WR
-L 73:Mf
+L 73:Nf
 L 74:jh
 L 75:Lk
 Int64:Bl
@@ -3080,13 +3080,13 @@ gray_record_cell:ls
 JSCompiler_StaticMethods_Stop:SZ
 c_oSerExtent$Cx:RN
 c_oSerExtent$Cy:SN
-L 70:Lf
+L 70:Mf
 L 72:Bi
 FT_PEEK_USHORT:ol
 L 71:bd
 L 64:Zb
 L 65:Mc
-L 62:Kf
+L 62:Lf
 c_oSer_SettingsType$ClrSchemeMapping:MO
 CUniFill:Ge
 L 63:tg
@@ -3144,9 +3144,9 @@ c_oSerParType$Run:HM
 c_oSerRunType$tab:WM
 c_oEditorId$Speadsheet:ba
 c_oSer_BasicChartType$Series:OI
-L 83:Nf
+L 83:Of
 L 82:yd
 c_oSerPropLenType$Byte:tH
 L 81:ab
 tt_cmap2_get_subheader:Pq
-L 80:Dc
+L 80:Ec
