@@ -959,6 +959,13 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 		this.isStartCoAuthoringOnEndLoad = false;
 	}
 
+    if (this.isMobileVersion)
+    {
+        window.USER_AGENT_SAFARI_MACOS = false;
+        PASTE_ELEMENT_ID = "wrd_pastebin";
+        ELEMENT_DISPAY_STYLE = "none";
+    }
+
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
 }
