@@ -2460,6 +2460,8 @@ Woorksheet.prototype.initPostOpen = function(){
 							chart.range.intervalObject = ws.getRange2(oRefParsed.range);
 					}
 				}
+				if(null == chart.range.intervalObject)
+					this.Drawings.splice(i, 1);
 			}
 		}
 	}
