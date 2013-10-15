@@ -6083,7 +6083,7 @@ CDocument.prototype =
                 Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
 
                 // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
-                if ( undefined != Result_ParaPr.FramePr )
+                if ( undefined != Result_ParaPr.FramePr && type_Paragraph === this.Content[StartPos].GetType() )
                     this.Content[StartPos].Supplement_FramePr( Result_ParaPr.FramePr );
                 else if ( StartPos === EndPos && StartPos > 0 && type_Paragraph === this.Content[StartPos - 1].GetType()  )
                 {
