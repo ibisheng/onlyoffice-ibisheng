@@ -5147,7 +5147,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 1 );
 
                 this.Internal_ReIndexing(Data.Pos);
-                this.Recalc_CompliedPr2();
+                this.Recalc_CompiledPr2();
 
                 break;
             }
@@ -5159,7 +5159,7 @@ CTable.prototype =
                 this.RowsInfo.splice( Data.Pos, 0, Data.Item.RowsInfo );
 
                 this.Internal_ReIndexing(Data.Pos);
-                this.Recalc_CompliedPr2();
+                this.Recalc_CompiledPr2();
 
                 break;
             }
@@ -6271,7 +6271,7 @@ CTable.prototype =
                 else
                     this.Pr.TableLayout = Reader.GetLong();
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
 
                 break;
             }
@@ -6319,7 +6319,7 @@ CTable.prototype =
                     this.Pr.TableCellMar.Bottom.Read_FromBinary(Reader);
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6364,7 +6364,7 @@ CTable.prototype =
                     this.Pr.TableBorders.Left.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6381,7 +6381,7 @@ CTable.prototype =
                     this.Pr.TableBorders.Right.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6398,7 +6398,7 @@ CTable.prototype =
                     this.Pr.TableBorders.Top.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6415,7 +6415,7 @@ CTable.prototype =
                     this.Pr.TableBorders.Bottom.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6432,7 +6432,7 @@ CTable.prototype =
                     this.Pr.TableBorders.InsideH.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6449,7 +6449,7 @@ CTable.prototype =
                     this.Pr.TableBorders.InsideV.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6466,7 +6466,7 @@ CTable.prototype =
                     this.Pr.Shd.Read_FromBinary( Reader );
                 }
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6499,6 +6499,8 @@ CTable.prototype =
                         this.Content.splice( Pos, 0, Element );
                 }
 
+                this.Recalc_CompiledPr2();
+
                 break;
             }
 
@@ -6519,6 +6521,8 @@ CTable.prototype =
 
                     this.Content.splice( Pos, 1 );
                 }
+
+                this.Recalc_CompiledPr2();
 
                 break;
             }
@@ -6547,7 +6551,7 @@ CTable.prototype =
                 TableLook.Read_FromBinary( Reader );
                 this.TableLook = TableLook;
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6644,7 +6648,7 @@ CTable.prototype =
                 else
                     this.TableStyle = Reader.GetString2();
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
 
@@ -6654,7 +6658,7 @@ CTable.prototype =
                 this.Pr = new CTablePr();
                 this.Pr.Read_FromBinary( Reader );
 
-                this.Recalc_CompiledPr();
+                this.Recalc_CompiledPr2();
                 break;
             }
         }
@@ -9528,7 +9532,7 @@ CTable.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
-    Recalc_CompliedPr2 : function()
+    Recalc_CompiledPr2 : function()
     {
         this.Recalc_CompiledPr();
 
@@ -11052,7 +11056,7 @@ CTable.prototype =
             }
         }
 
-        this.Recalc_CompliedPr2();
+        this.Recalc_CompiledPr2();
         this.Internal_Recalculate_1();
     },
 
@@ -11158,7 +11162,7 @@ CTable.prototype =
         this.Markup.Internal.CellIndex = 0;
         this.Markup.Internal.PageNum   = PageNum;
 
-        this.Recalc_CompliedPr2();
+        this.Recalc_CompiledPr2();
 
         this.Internal_Recalculate_1();
 
