@@ -1080,7 +1080,7 @@ recalcresult_CurPage:P6
 FORMULA_TYPE_VALUE:gY
 JSCompiler_StaticMethods_scrollByX:wS
 JSCompiler_StaticMethods_scrollByY:vS
-T1_Parse_Glyph_And_Get_Char_String:yv
+T1_Parse_Glyph_And_Get_Char_String:sv
 ETableStyleType$tablestyletypeBlankRow:GJ
 SFNT_HeaderRec:Jk
 IS_PS_SPACE:pm
@@ -1395,7 +1395,7 @@ T1_DecoderRec:Fn
 CreateParaItem:G5
 FT_ServiceCache:Zi
 fSortDescending:Da
-UndoRedoData_CellData:ZO
+UndoRedoData_CellData:YO
 _weight_clipArt:yW
 c_oAscPrintType$ActiveSheets:Gy
 c_oAscCleanOptions$Formula:qS
@@ -2692,9 +2692,9 @@ L 166:qC
 L 163:nC
 L 164:oC
 c_dScalePPTXSizes:RY
-L 161:xv
+L 161:yv
 L 162:mC
-L 160:wv
+L 160:xv
 nSldLtTPicTx:dW
 T1_Face_Init:Ov
 CFontSetup:Tx
@@ -2722,7 +2722,7 @@ c_oSer_ConditionalFormattingIconSet$Reverse:oI
 FT_Bitmap_Copy:Jj
 L 140:h9
 L 145:Hb
-L 146:uv
+L 146:vv
 tt_cmap12_init:cp
 L 143:Xr
 L 144:Yr
@@ -2748,7 +2748,7 @@ L 153:$r
 JSCompiler_StaticMethods_buildDependency:KN
 c_oAscPrintDefaultSettings$PageRightField:wO
 L 154:kj
-L 155:vv
+L 155:wv
 L 156:xn
 L 157:Uc
 ft_adobe_glyph_list:Pl
@@ -2778,7 +2778,7 @@ L 116:Vg
 ParaNewLine:vi
 L 117:Ce
 L 114:rk
-L 115:sv
+L 115:tv
 c_Date1900Const:DA
 JSCompiler_StaticMethods_addMasterEdge:mN
 FT_Set_Transform:ww
@@ -2794,7 +2794,7 @@ CParaLineRange:I6
 L 131:kC
 L 130:Vr
 DecodeBase64:Cy
-L 129:tv
+L 129:uv
 c_oSer_ConditionalFormattingRule$Operator:RH
 L 125:cV
 L 126:Fp
@@ -3162,7 +3162,7 @@ cff_size_done:Bu
 c_oMainTables$Main:tZ
 JSCompiler_StaticMethods_CreatePlaces:Tw
 historyitem_Chart_yAxisIsShow:rf
-c_oSer_ConditionalFormattingRule$StopIfTrue:XH
+c_oSer_ConditionalFormattingRule$StopIfTrue:WH
 BinaryCommonWriter:mK
 FT_Grays_Raster:Fq
 L 13:F
