@@ -628,7 +628,7 @@ CGraphicObjects.prototype = {
             {
                 images.push(selected_object);
             }
-            else if(typeof  selected_object.isGroup())
+            else if(typeof  selected_object.isGroup === "function" && selected_object.isGroup())
             {
                 groups.push(selected_object);
             }
