@@ -26,6 +26,8 @@ prop:get_UserId
 prop:put_UserId
 prop:get_UserName
 prop:put_UserName
+prop:get_IsNew
+prop:put_IsNew
 ---
 var:CListType
 prop:get_ListType
@@ -1120,6 +1122,8 @@ CDocInfo.prototype['get_UserId'] = CDocInfo.prototype.get_UserId;
 CDocInfo.prototype['put_UserId'] = CDocInfo.prototype.put_UserId;
 CDocInfo.prototype['get_UserName'] = CDocInfo.prototype.get_UserName;
 CDocInfo.prototype['put_UserName'] = CDocInfo.prototype.put_UserName;
+CDocInfo.prototype['get_IsNew'] = CDocInfo.prototype.get_IsNew;
+CDocInfo.prototype['put_IsNew'] = CDocInfo.prototype.put_IsNew;
 window['CListType'] = CListType;
 CListType.prototype['get_ListType'] = CListType.prototype.get_ListType;
 CListType.prototype['get_ListSubType'] = CListType.prototype.get_ListSubType;
