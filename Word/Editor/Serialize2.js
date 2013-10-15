@@ -7889,9 +7889,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 }
             }
             if(null != sLink)
-                hyp.Value = this.trimField(sLink);
+                hyp.Set_Value( this.trimField(sLink) );
             if(null != sTooltip)
-                hyp.ToolTip = this.trimField(sTooltip);
+                hyp.Set_ToolTip( this.trimField(sTooltip) );
         }
     };
     this.trimField = function( str ){
