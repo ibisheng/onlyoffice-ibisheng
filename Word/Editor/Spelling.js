@@ -891,6 +891,11 @@ Paragraph.prototype.Continue_CheckSpelling = function()
         }
     }
 
+    // Если у нас осталось одно слово в параграфе, состоящее из одной буквы, тогда надо перерисовать данный параграф,
+    // чтобы избавиться от подчеркивания.
+    if ( 1 === this.SpellChecker.Elements.length && 1 === this.SpellChecker.Elements[0].Word.length )
+        ParaForceRedraw = this;
+
     this.SpellChecker.RecalcId = this.LogicDocument.RecalcId;
     this.SpellChecker.ParaId   = this.Get_Id();
     this.SpellChecker.Check(ParaForceRedraw );
