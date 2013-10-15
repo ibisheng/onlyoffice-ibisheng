@@ -2804,8 +2804,8 @@
 			{
 				var ws = this.worksheet;
 				var isSet = options.isSetFilter;
-				var height = 11;
-				var width = 11;
+				var height = 11.25;
+				var width = 11.25;
 				var rowHeight = ws.rows[options.row].height;
 				var colWidth = ws.cols[options.col].width;
 				var index = 1;
@@ -2854,41 +2854,74 @@
 					.fillRect(x1 + diffX, y1 + diffY, width, height)
 					.strokeRect(x1 + diffX, y1 + diffY, width, height);
 						
+				//координаты левого верхнего угла кнопки
+				var upLeftXButton = x1 + diffX;
+				var upLeftYButton = y1 + diffY;
 				if(isSet)
-					this._drawFilterMark(x1 + diffX + (width/2)*index,y1 + 8*index + diffY,index);
+				{
+					var centerX = upLeftXButton + (width/2);
+					var heigthObj = Math.ceil((height/2)/0.75)*0.75;
+					var marginTop = Math.floor(((height - heigthObj)/2)/0.75)*0.75;
+					
+					var coordY = upLeftYButton + heigthObj + marginTop;
+					this._drawFilterMark(centerX, coordY, heigthObj, index);
+				}
 				else
-					this._drawFilterDreieck(Math.floor(x1 + diffX + 4*index) + 0.5,Math.floor(y1 + 4.5*index + diffY) + 0.5,index);
+				{
+					//центр кнопки
+					var centerX = upLeftXButton + (width/2);
+					var centerY = upLeftYButton + (height/2);
+					this._drawFilterDreieck(centerX, centerY, index);
+				}
 			},
 			
-			_drawFilterMark: function(x,y,index)
+			_drawFilterMark: function(x,y,height,index)
 			{
 				var ws = this.worksheet;
-				var shift = 0.5;
-				var size = 4*index;
-				// ToDo переделать
+				var size = 5.25*index;
+				var halfSize = Math.round((size/2)/0.75)*0.75;
+				var meanLine = Math.round((size*Math.sqrt(3)/3)/0.75)*0.75;//длина биссектрисы равностороннего треугольника
+				//округляем + смещаем
+				x = Math.round((x)/0.75)*0.75;
+				y = Math.round((y)/0.75)*0.75;
+				var y1  = y - height;
+
 				ws.drawingCtx
-				.beginPath()
-				.moveTo(x, y)
-				.lineTo(x,y - size/2)
-				.lineTo(x - 2.5*index,y - size)
-				.lineTo(x + 3*index,y - size)
-				.lineTo(x + shift,y - size/2)
-				.lineTo(x + shift,y)
-				.setFillStyle('#787878')
-				.fill();
+					.beginPath()
+					.moveTo(x, y)
+					.lineTo(x, y1)
+					.setStrokeStyle('#787878')
+					.stroke();
+				
+				ws.drawingCtx
+					.beginPath()
+					.lineTo(x + halfSize, y1)
+					.lineTo(x, y1 + meanLine)
+					.lineTo(x  - halfSize, y1)
+					.lineTo(x ,y1)
+					.setFillStyle('#787878')
+					.fill();
 			},
 			
 			_drawFilterDreieck: function(x,y,index)
 			{
 				var ws = this.worksheet;
-				var size = 4*index;
-				var shift = 0.5;
-				// ToDo переделать
+				var size = 5.25*index;
+				//сюда приходят координаты центра кнопки
+				//чтобы кнопка была в центре, необходимо сместить 
+				var leftDiff = size/2;
+				var upDiff = Math.round(((size*Math.sqrt(3))/6)/0.75)*0.75;//радиус вписанной окружности в треугольник
+				//округляем + смещаем
+				x = Math.round((x - leftDiff)/0.75)*0.75;
+				y = Math.round((y - upDiff)/0.75)*0.75;
+				var meanLine = Math.round((size*Math.sqrt(3)/3)/0.75)*0.75;//длина биссектрисы равностороннего треугольника
+				var halfSize = Math.round((size/2)/0.75)*0.75;
+				//рисуем
 				ws.drawingCtx
 					.beginPath()
 					.moveTo(x , y)
 					.lineTo(x + size,y)
-					.lineTo(x + size/2,y + size/2)
+					.lineTo(x + halfSize,y + meanLine)
 					.lineTo(x , y)
 					.setFillStyle('#787878')
 					.fill();
