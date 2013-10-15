@@ -6277,7 +6277,8 @@ CPresentation.prototype =
                 start = i;
             }
         }
-        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_current_slide, _presentation, arrInd, start, _arr_new_layouts,0, _slides_array)}, 30);
+        var _this = this;
+        this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide2(_current_slide, _presentation, arrInd, start, _arr_new_layouts,0, _this.Slides)}, 30);
 
 
         this.Document_UpdateUndoRedoState();
