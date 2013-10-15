@@ -3150,12 +3150,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		{
 			var oOldProps = oCurRow.getHeightProp();
 			if(bHidden)
-			{
-				if(true != oCurRow.CustomHeight)
-					oCurRow.h = null;
 				oCurRow.hd = bHidden;
-				oCurRow.CustomHeight = true;
-			}
 			else
 				oCurRow.hd = null;
 			var oNewProps = oCurRow.getHeightProp();
