@@ -707,10 +707,10 @@ function CCollaborativeEditing()
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
 
             var check_obj = null;
-            if(Class instanceof CShape
+            if((Class instanceof CShape
                 || Class instanceof CImageShape
                 || Class instanceof CGroupShape
-                || Class instanceof CGraphicFrame)
+                || Class instanceof CGraphicFrame) && isRealObject(Class.parent))
             {
                 check_obj =
                 {

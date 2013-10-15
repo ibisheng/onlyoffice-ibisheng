@@ -2528,7 +2528,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
                 if(t_o[i].originalObject.copy)
                 {
                     t_o[i].originalObject.deselect(this.drawingObjectsController);
-                    var copy = t_o[i].originalObject.copy();
+                    var copy = t_o[i].originalObject.copy(this.drawingObjects);
                     copy.setParent(this.drawingObjects);
                     copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
                     this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, copy);

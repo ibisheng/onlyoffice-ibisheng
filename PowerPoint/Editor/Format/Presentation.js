@@ -3695,9 +3695,9 @@ CPresentation.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
             {
-                this.Create_NewHistoryPoint();
                 if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
                 {
+                    this.Create_NewHistoryPoint();
                     this.Document_Format_Paste();
                     bRetValue = true;
                 }

@@ -320,15 +320,10 @@ Paragraph.prototype =
         if ( "undefined" != typeof(OtherParagraph.NumPr) )
             OtherParagraph.Numbering_Remove();
 
-        var NumPr = this.Numbering_Get();
-        if ( undefined != NumPr  )
-        {
-            OtherParagraph.Numbering_Set( NumPr.NumId, NumPr.Lvl );
-        }
 
-        var Bullet = this.Get_PresentationNumbering();
-        if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
-            OtherParagraph.Add_PresentationNumbering( Bullet.Copy() );
+        //var Bullet = this.Get_PresentationNumbering();
+        //if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
+        //    OtherParagraph.Add_PresentationNumbering( Bullet.Copy() );
 
         OtherParagraph.Set_PresentationLevel( this.PresentationPr.Level );
 
@@ -10638,7 +10633,7 @@ Paragraph.prototype =
 
         // Убираем нумерацию, если она была у следующего параграфа
         Para.Numbering_Remove();
-        Para.Remove_PresentationNumbering();
+        Para.Remove_PresentationNumbering(true);
 
         this.Internal_Content_Concat( Para.Content );
 

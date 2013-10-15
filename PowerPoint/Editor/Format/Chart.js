@@ -2178,6 +2178,10 @@ CChartAsGroup.prototype =
     copy: function(parent, group)
     {
         var _group = isRealObject(group) ? group : null;
+        if(isRealObject(_group))
+        {
+            this.setGroup(_group);
+        }
         var c = new CChartAsGroup(parent, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, _group);
         c.setChartBinary(this.getChartBinary());
         return c;
