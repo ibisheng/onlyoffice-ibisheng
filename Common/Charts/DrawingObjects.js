@@ -2202,11 +2202,11 @@ prot["asc_clear"] = prot.asc_clear;
 function asc_CParagraphBorders(obj) {
 	
 	if (obj) {
-		this.Left = (undefined != obj.Left && null != obj.Left) ? new asc_CBorder (obj.Left) : null;
-		this.Top = (undefined != obj.Top && null != obj.Top) ? new asc_CBorder (obj.Top) : null;
-		this.Right = (undefined != obj.Right && null != obj.Right) ? new asc_CBorder (obj.Right) : null;
-		this.Bottom = (undefined != obj.Bottom && null != obj.Bottom) ? new asc_CBorder (obj.Bottom) : null;
-		this.Between = (undefined != obj.Between && null != obj.Between) ? new asc_CBorder (obj.Between) : null;
+		this.Left = (undefined != obj.Left && null != obj.Left) ? new asc_CTextBorder (obj.Left) : null;
+		this.Top = (undefined != obj.Top && null != obj.Top) ? new asc_CTextBorder (obj.Top) : null;
+		this.Right = (undefined != obj.Right && null != obj.Right) ? new asc_CTextBorder (obj.Right) : null;
+		this.Bottom = (undefined != obj.Bottom && null != obj.Bottom) ? new asc_CTextBorder (obj.Bottom) : null;
+		this.Between = (undefined != obj.Between && null != obj.Between) ? new asc_CTextBorder (obj.Between) : null;
 	}
 	else {
 		this.Left = null;
@@ -2219,15 +2219,15 @@ function asc_CParagraphBorders(obj) {
 
 asc_CParagraphBorders.prototype = {
 	asc_getLeft: function(){return this.Left; },
-	asc_putLeft: function(v){this.Left = (v) ? new asc_CBorder (v) : null;},
+	asc_putLeft: function(v){this.Left = (v) ? new asc_CTextBorder (v) : null;},
 	asc_getTop: function(){return this.Top; },
-	asc_putTop: function(v){this.Top = (v) ? new asc_CBorder (v) : null;},
+	asc_putTop: function(v){this.Top = (v) ? new asc_CTextBorder (v) : null;},
 	asc_getRight: function(){return this.Right; },
-	asc_putRight: function(v){this.Right = (v) ? new asc_CBorder (v) : null;},
+	asc_putRight: function(v){this.Right = (v) ? new asc_CTextBorder (v) : null;},
 	asc_getBottom: function(){return this.Bottom; },
-	asc_putBottom: function(v){this.Bottom = (v) ? new asc_CBorder (v) : null;},
+	asc_putBottom: function(v){this.Bottom = (v) ? new asc_CTextBorder (v) : null;},
 	asc_getBetween: function(){return this.Between; },
-	asc_putBetween: function(v){this.Between = (v) ? new asc_CBorder (v) : null;}
+	asc_putBetween: function(v){this.Between = (v) ? new asc_CTextBorder (v) : null;}
 }
 
 //{ asc_CParagraphBorders export
@@ -2251,7 +2251,7 @@ prot["asc_putBetween"] = prot.asc_putBetween;
 // CBorder
 //-----------------------------------------------------------------------------------
 
-function asc_CBorder(obj) {
+function asc_CTextBorder(obj) {
 	
 	if (obj) {
 		this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustomEx(obj.Color.r, obj.Color.g, obj.Color.b) : null;
@@ -2267,7 +2267,7 @@ function asc_CBorder(obj) {
 	}
 }
 
-asc_CBorder.prototype = {
+asc_CTextBorder.prototype = {
 	asc_getColor: function(){return this.Color; },
 	asc_putColor: function(v){this.Color = v;},
 	asc_getSize: function(){return this.Size; },
@@ -2280,10 +2280,10 @@ asc_CBorder.prototype = {
 	asc_putForSelectedCells: function(v){this.ForSelectedCells = v;}
 }
 
-//{ asc_CBorder export
-window["Asc"].asc_CBorder = asc_CBorder;
-window["Asc"]["asc_CBorder"] = asc_CBorder;
-prot = asc_CBorder.prototype;
+//{ asc_CTextBorder export
+window["Asc"].asc_CTextBorder = asc_CTextBorder;
+window["Asc"]["asc_CTextBorder"] = asc_CTextBorder;
+prot = asc_CTextBorder.prototype;
 
 prot["asc_getColor"] = prot.asc_getColor;
 prot["asc_putColor"] = prot.asc_putColor;
