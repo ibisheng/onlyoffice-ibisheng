@@ -11070,7 +11070,8 @@ Paragraph.prototype =
             {
                 if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
                 {
-                    NewFramePr.Lines = this.Update_DropCapByHeight( H );
+                    var _H = Math.min( H, Page_Height );
+                    NewFramePr.Lines = this.Update_DropCapByHeight( _H );
                     NewFramePr.HRule = linerule_Auto;
                 }
                 else
