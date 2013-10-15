@@ -520,6 +520,30 @@ asc_CChart.prototype = {
 		var api_sheet = window["Asc"]["editor"];
 		var api = api_sheet ? api_sheet : api_doc;
 		
+		var aData = [];
+		for (var j = 0; j < _t.series.length; j++) {
+			aData.push(_t.series[j].Val.NumCache.length);
+			aData.push(_t.series[j].xVal.NumCache.length);
+			aData.push(_t.series[j].Cat.NumCache.length);
+		}
+		maxDataLen = Math.max.apply(Math, aData);
+		var emptyItem = { numFormatStr: "General", isDateTimeFormat: false, val: "", isHidden: false };
+		
+		for (var j = 0; j < _t.series.length; j++) {
+			if ( _t.series[j].Val.NumCache.length ) {
+				while ( _t.series[j].Val.NumCache.length < maxDataLen )
+					_t.series[j].Val.NumCache.push(emptyItem);
+			}
+			if ( _t.series[j].xVal.NumCache.length ) {
+				while ( _t.series[j].xVal.NumCache.length < maxDataLen )
+					_t.series[j].xVal.NumCache.push(emptyItem);
+			}
+			if ( _t.series[j].Cat.NumCache.length ) {
+				while ( _t.series[j].Cat.NumCache.length < maxDataLen )
+					_t.series[j].Cat.NumCache.push(emptyItem);
+			}
+		}
+		
 		if ( serLen ) {
 			for (var i = 0; i < _t.series[0].Val.NumCache.length; i++) {
 				
