@@ -4116,7 +4116,7 @@ PasteProcessor.prototype =
 						//чтобы не возникало ошибок при copy/paste из word в excel
 						checkSheetsData = binary_shape.substring(12, 18);
 					}
-                    if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup") && checkSheetsData != "Sheets")
+                    if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup") && checkSheetsData != "Sheets" && g_bIsDocumentCopyPaste)
                     {
                         var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
                         var first_string = null;
