@@ -4702,6 +4702,12 @@ CTableMeasurement.prototype =
 
         this.W    = Reader.GetDouble();
         this.Type = Reader.GetLong();
+    },
+
+    Set_FromObject : function(Obj)
+    {
+        this.W    = Obj.W;
+        this.Type = Obj.Type;
     }
 }
 

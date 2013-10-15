@@ -14678,7 +14678,6 @@ CTable.prototype =
             this.HeaderInfo.Pages[CurPage].Draw = false;
         }
 
-        var Shifted_Cell = new Object();
         var bNextPage = false;
         for ( var CurRow = FirstRow; CurRow < this.Content.length; CurRow++  )
         {
@@ -14850,7 +14849,6 @@ CTable.prototype =
                         {
                             bCanShift = true;
                             ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
-                            Shifted_Cell[Cell.Get_Id()] = Cell;
                         }
                     }
 
@@ -14865,8 +14863,7 @@ CTable.prototype =
                 {
                     if ( true === bCanShift )
                     {
-                        if ( Math.abs( ShiftDx ) > 0.001 || Math.abs( ShiftDy ) > 0.001 )
-                            Cell.Content.Shift( 0, ShiftDx, ShiftDy );
+                        Cell.Content.Shift( 0, ShiftDx, ShiftDy );
                     }
                     else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
                     {
@@ -15179,27 +15176,24 @@ CTable.prototype =
 
                 Y_0 += CellMar.Top.W;
 
-                if ( undefined === Shifted_Cell[Cell.Get_Id()] )
+                var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
+                var CellHeight = Y_1 - Y_0;
+
+                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
+
+                var Dy = 0;
+                if ( CellHeight - ContentHeight > 0.001 )
                 {
-                    var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
-                    var CellHeight = Y_1 - Y_0;
+                    if ( vertalignjc_Bottom === VAlign )
+                        Dy = CellHeight - ContentHeight;
+                    else if ( vertalignjc_Center === VAlign )
+                        Dy = (CellHeight - ContentHeight) / 2;
 
-                    var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
-                    var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
-
-                    var Dy = 0;
-                    if ( CellHeight - ContentHeight > 0.001 )
-                    {
-                        if ( vertalignjc_Bottom === VAlign )
-                            Dy = CellHeight - ContentHeight;
-                        else if ( vertalignjc_Center === VAlign )
-                            Dy = (CellHeight - ContentHeight) / 2;
-
-                        Cell.Content.Shift( CellPageIndex, 0, Dy );
-                    }
-
-                    Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
+                    Cell.Content.Shift( CellPageIndex, 0, Dy );
                 }
+
+                Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
             }
         }
 
