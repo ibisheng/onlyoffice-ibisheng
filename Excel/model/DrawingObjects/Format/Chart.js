@@ -1830,6 +1830,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
+        this.setAscChart(new asc_CChart());
         this.chart.Read_FromBinary2(r, false);
         this.spPr.Read_FromBinary2(r);
         if(isRealNumber(x) && isRealNumber(y))
