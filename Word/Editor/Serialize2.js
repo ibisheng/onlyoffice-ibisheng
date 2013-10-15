@@ -8719,7 +8719,10 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
         }
 		else if ( c_oSer_SettingsType.DefaultTabStop === type )
         {
-            Default_Tab_Stop = this.bcr.ReadDouble();
+			var dNewTab_Stop = this.bcr.ReadDouble();
+			//word поддерживает 0, но наш редактор к такому не готов.
+			if(dNewTab_Stop > 0)
+				Default_Tab_Stop = dNewTab_Stop;
         }
         else
             res = c_oSerConstants.ReadUnknown;
