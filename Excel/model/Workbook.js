@@ -1447,85 +1447,69 @@ Workbook.prototype.init=function(){
 		Сортировка графа производится при необходимости пересчета формул: 
 			при открытии документа если есть ячейки помеченные как пересчитываемые или есть ячейки без значения.
 	*/
-	this.buildDependency();
-	var nR = this.needRecalc, thas = this, timerID, calculatedCells = {}, nRLength = nR.length, timeStart, timeEnd, timeCurrent, timeCount = 0, first = true, sr, timeoutID1;
+    this.buildDependency();
+	var nR = this.needRecalc, thas = this, calculatedCells = {}, nRLength = nR.length, timeStart, timeEnd, timeCount = 0, first = true, sr;
 
-	function R(){
-		while( nR.length > 0 ){
-			var sr1, sr2;
-			timeStart = (new Date()).getTime();
-			var dep1, f = false, id;
-			for(var id1 in nR) {
-				if( id1 == "length" ){
-					continue;
-				}
-				id = id1;
-				break;
-			}
-			
-			if( id in nR){
-				dep1 = thas.dependencyFormulas.t_sort_master( nR[id][0], nR[id][1] );
+    function R() {
 
-				for(var i = 0; i < dep1.badF.length; i++){
-					for(var j = 0; j < dep1.depF.length; j++){
-						if(dep1.badF[i] == dep1.depF[j])
-							dep1.depF.splice(j,1);
-					}
-				}
-				for(var j = 0; j < dep1.depF.length; j++){
-					if( dep1.depF[j].nodeId in nR){
-						nR[dep1.depF[j].nodeId] = undefined;
-						delete nR[dep1.depF[j].nodeId]
-						nR.length--;
-					}
-				}
-				for(var j = 0; j < dep1.badF.length; j++){
-					if( dep1.badF[j].nodeId in nR){
-						nR[dep1.badF[j].nodeId] = undefined;
-						delete nR[dep1.badF[j].nodeId]
-						nR.length--;
-					}
-				}
-				sr1 = thas.recalcDependency(dep1.badF,true,true);
+        for ( var id in nR ) {
+            var sr1, sr2;
+            timeStart = (new Date()).getTime();
+            var dep1, f = false;
+            if ( id == "length" ) {
+                continue;
+            }
 
-				for(var k = 0; k < dep1.depF.length; k++){
-					if(dep1.depF[k].nodeId in calculatedCells){
-						dep1.depF.splice(k,1);
-						k--;
-					}
-				}
-				sr2 = thas.recalcDependency(dep1.depF,false);
-				
-				for(var k = 0; k < dep1.depF.length; k++){
-					calculatedCells[dep1.depF[k].nodeId] = dep1.depF[k].nodeId
-				}
-				sr = searchCleenCacheArea( sr, searchCleenCacheArea(sr1,sr2) );
-			}
-			
-			clearTimeout(timerID);
-			timeEnd = (new Date()).getTime();
-			timeCount += (timeEnd - timeStart);
-			if(first){
-				thas.isNeedCacheClean = false;
-				first = false;
-				if ( thas.startActionOn ){
-					thas.handlers.trigger("asc_onStartAction",c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc);
-					thas.startActionOn = false;
-				}
-				else{
-					thas.startActionOn = true;
-				}
-			}
-		}
+            dep1 = thas.dependencyFormulas.t_sort_master( nR[id][0], nR[id][1] );
 
-		clearTimeout( timeoutID1 );
-		first = false;
-		thas.isNeedCacheClean = true;
-		var ws = thas.getWorksheet(thas.getActive());
-		thas.handlers.trigger("cleanCellCache", ws.getId(), new Asc.Range( 0, 0, ws.getColsCount()-1, ws.getRowsCount()-1 ), c_oAscCanChangeColWidth.numbers);
-		thas.startActionOn = false;
-		thas.handlers.trigger("asc_onEndAction",c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc);
-	}
+            for ( var i = 0; i < dep1.badF.length; i++ ) {
+                for ( var j = 0; j < dep1.depF.length; j++ ) {
+                    if ( dep1.badF[i] == dep1.depF[j] )
+                        dep1.depF.splice( j, 1 );
+                }
+            }
+            for ( var j = 0; j < dep1.depF.length; j++ ) {
+                if ( dep1.depF[j].nodeId in nR ) {
+                    nR[dep1.depF[j].nodeId] = undefined;
+                    delete nR[dep1.depF[j].nodeId]
+                    nR.length--;
+                }
+            }
+            for ( var j = 0; j < dep1.badF.length; j++ ) {
+                if ( dep1.badF[j].nodeId in nR ) {
+                    nR[dep1.badF[j].nodeId] = undefined;
+                    delete nR[dep1.badF[j].nodeId]
+                    nR.length--;
+                }
+            }
+            sr1 = thas.recalcDependency( dep1.badF, true, true );
+
+            for ( var k = 0; k < dep1.depF.length; k++ ) {
+                if ( dep1.depF[k].nodeId in calculatedCells ) {
+                    dep1.depF.splice( k, 1 );
+                    k--;
+                }
+            }
+            sr2 = thas.recalcDependency( dep1.depF, false );
+
+            for ( var k = 0; k < dep1.depF.length; k++ ) {
+                calculatedCells[dep1.depF[k].nodeId] = dep1.depF[k].nodeId
+            }
+            sr = searchCleenCacheArea( sr, searchCleenCacheArea( sr1, sr2 ) );
+
+            timeEnd = (new Date()).getTime();
+            timeCount += (timeEnd - timeStart);
+
+        }
+
+        first = false;
+        thas.isNeedCacheClean = true;
+        var ws = thas.getWorksheet( thas.getActive() );
+        thas.handlers.trigger( "cleanCellCache", ws.getId(), new Asc.Range( 0, 0, ws.getColsCount() - 1, ws.getRowsCount() - 1 ), c_oAscCanChangeColWidth.numbers );
+        thas.startActionOn = false;
+        thas.handlers.trigger( "asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc );
+
+    }
 	
 	if( nR.length > 0 ){
 		R();
@@ -3881,7 +3865,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 
 		if( c && c.sFormula ){
 			c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
-			c.formulaParsed.parse();
+                c.formulaParsed.parse();
 			c.formulaParsed.buildDependencies();
 		}
 	}
