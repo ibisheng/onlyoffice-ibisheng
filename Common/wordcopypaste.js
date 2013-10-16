@@ -3249,6 +3249,10 @@ PasteProcessor.prototype =
                     }
                 }
                 var aContent;
+				//если находимся внутри шейп, вставляем html
+				if(this.oDocument.Parent && this.oDocument.Parent instanceof WordShape)
+					base64 = null;
+					
                 if(base64 != null)
                     aContent = this.ReadFromBinary(base64);
                 if(aContent)
