@@ -25,8 +25,7 @@
 			asc_getLockText: function() { return this.lockText; }
 		};
 
-		window["Asc"].asc_CCellFlag = asc_CCellFlag;
-		window["Asc"]["asc_CCellFlag"] = asc_CCellFlag;
+		window["Asc"].asc_CCellFlag = window["Asc"]["asc_CCellFlag"] = asc_CCellFlag;
 		prot = asc_CCellFlag.prototype;
 
 		prot["asc_getMerge"] = prot.asc_getMerge;
@@ -59,8 +58,7 @@
 			asc_getColor: function () { return this.color; }
 		};
 
-		window["Asc"].asc_CFont = asc_CFont;
-		window["Asc"]["asc_CFont"] = asc_CFont;
+		window["Asc"].asc_CFont = window["Asc"]["asc_CFont"] = asc_CFont;
 		prot = asc_CFont.prototype;
 
 		prot["asc_getName"]			= prot.asc_getName;
@@ -81,29 +79,30 @@
 			asc_getColor: function() { return this.color; }
 		};
 
-		window["Asc"].asc_CFill = asc_CFill;
-		window["Asc"]["asc_CFill"] = asc_CFill;
+		window["Asc"].asc_CFill = window["Asc"]["asc_CFill"] = asc_CFill;
 		prot = asc_CFill.prototype;
 
 		prot["asc_getColor"] = prot.asc_getColor;
 
-		function asc_CBorder(width, style, color) {
-			this.width = width !== undefined ? width : null;
-			this.style = style !== undefined ? style : "none";
-			this.color = color !== undefined ? color : null;
+		function asc_CBorder(style, color) {
+			if (3 === arguments.length) {
+				// ToDo заглушка на время, пока уберут код в меню
+				this.style = arguments[1] !== undefined ? arguments[1] : "none";
+				this.color = arguments[2] !== undefined ? arguments[2] : null;
+			} else {
+				this.style = style !== undefined ? style : "none";
+				this.color = color !== undefined ? color : null;
+			}
 		}
 
 		asc_CBorder.prototype = {
-			asc_getWidth: function() { return this.width; },
 			asc_getStyle: function() { return this.style; },
 			asc_getColor: function() { return this.color; }
 		};
 
-		window["Asc"].asc_CBorder = asc_CBorder;
-		window["Asc"]["asc_CBorder"] = asc_CBorder;
+		window["Asc"].asc_CBorder = window["Asc"]["asc_CBorder"] = asc_CBorder;
 		prot = asc_CBorder.prototype;
 
-		prot["asc_getWidth"] = prot.asc_getWidth;
 		prot["asc_getStyle"] = prot.asc_getStyle;
 		prot["asc_getColor"] = prot.asc_getColor;
 
@@ -125,8 +124,7 @@
 			asc_getDiagUp: function() { return this.diagUp; }
 		};
 
-		window["Asc"].asc_CBorders = asc_CBorders;
-		window["Asc"]["asc_CBorders"] = asc_CBorders;
+		window["Asc"].asc_CBorders = window["Asc"]["asc_CBorders"] = asc_CBorders;
 		prot = asc_CBorders.prototype;
 
 		prot["asc_getLeft"]		= prot.asc_getLeft;
@@ -176,8 +174,7 @@
 			asc_getAngle: function () { return this.angle; }
 		};
 
-		window["Asc"].asc_CCellInfo = asc_CCellInfo;
-		window["Asc"]["asc_CCellInfo"] = asc_CCellInfo;
+		window["Asc"].asc_CCellInfo = window["Asc"]["asc_CCellInfo"] = asc_CCellInfo;
 		prot = asc_CCellInfo.prototype;
 
 		prot["asc_getName"]				= prot.asc_getName;
