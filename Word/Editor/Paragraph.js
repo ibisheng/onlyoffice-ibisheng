@@ -5970,7 +5970,7 @@ Paragraph.prototype =
                 Item = this.Content[Pos];
                 if ( para_TextPr === Item.Type )
                 {
-                    if ( undefined != typeof(Item.Value.FontSize) )
+                    if ( undefined != Item.Value.FontSize )
                         Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, Item.Value.FontSize ) );
                     else
                         Item.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
@@ -6006,7 +6006,7 @@ Paragraph.prototype =
             this.Set_ContentPos( Pos + 1, true, -1 );
 
             // Выставляем настройки для символа параграфа
-            if ( undefined != typeof(this.TextPr.Value.FontSize) )
+            if ( undefined != this.TextPr.Value.FontSize )
                 this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
             else
                 this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
