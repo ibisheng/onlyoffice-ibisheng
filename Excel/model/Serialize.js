@@ -4196,7 +4196,13 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			{
 				//В спецификации нет стилей для чисел 5-8, экспериментально установлено, что это денежный формат, зависящий от локали.
 				//Устанавливаем как в Engilsh(US)
-				sFormat = "$#,##0.00_);[Red]($#,##0.00)";
+				switch(oNum.id)
+				{
+					case 5: sFormat = "$#,##0_);($#,##0)";break;
+					case 6: sFormat = "$#,##0_);[Red]($#,##0)";break;
+					case 7: sFormat = "$#,##0.00_);($#,##0.00)";break;
+					case 8: sFormat = "$#,##0.00_);[Red]($#,##0.00)";break;
+				}
 			}
 			else
 			{

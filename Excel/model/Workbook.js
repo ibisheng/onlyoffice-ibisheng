@@ -1369,7 +1369,7 @@ $(function(){
 	aStandartNumFormats[19] = "h:mm:ss AM/PM";
 	aStandartNumFormats[20] = "h:mm";
 	aStandartNumFormats[21] = "h:mm:ss";
-	aStandartNumFormats[22] = "m/d/yy h:mm";
+	aStandartNumFormats[22] = "m/d/yyyy h:mm";
 	aStandartNumFormats[37] = "#,##0_);(#,##0)";
 	aStandartNumFormats[38] = "#,##0_);[Red](#,##0)";
 	aStandartNumFormats[39] = "#,##0.00_);(#,##0.00)";
