@@ -81,10 +81,7 @@
 			this.lines = [];
 			this.ratio = 1;
             this.angle = 0;
-            this.bound = {x: 0, y: 0, dx: 0, dy: 0};
 
-            //
-            this.xtrange = {sx: 0, sw: 0};
             this.fontNeedUpdate = false;
 
 			return this;
@@ -164,22 +161,26 @@
 
             /**
              * Применяем только трансформации поворота в области
-             * @param {type} angle  Угол поворота в градусах
-             */
-            rotateAtPoint: function (drawingCtx, angle, x, y) {
-
-                var m = new asc.Matrix();   m.rotate(angle, 0);
+             * @param {drawingCtx} drawingCtx
+             * @param {type} angle Угол поворота в градусах
+             * @param {Number} x
+             * @param {Number} y
+             * @param {Number} dx
+             * @param {Number} dy
+             * */
+            rotateAtPoint: function (drawingCtx, angle, x, y, dx, dy) {
+                var m   = new asc.Matrix();   m.rotate(angle, 0);
                 var mbt = new asc.Matrix();
 
-                if (undefined === drawingCtx) {
-                    mbt.translate(x + this.bound.dx, y + this.bound.dy);
+                if (null === drawingCtx) {
+                    mbt.translate(x + dx, y + dy);
 
                     this.drawingCtx.setTextTransform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
                     this.drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
                     this.drawingCtx.updateTransforms();
                 } else {
 
-                    mbt.translate((x + this.bound.dx) * vector_koef, (y + this.bound.dy) * vector_koef);
+                    mbt.translate((x + dx) * vector_koef, (y + dy) * vector_koef);
                     mbt.multiply(m, 0);
 
                     drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
@@ -189,7 +190,7 @@
             },
 
             resetTransform: function (drawingCtx)  {
-                if (undefined === drawingCtx) {
+                if (null === drawingCtx) {
                     this.drawingCtx.resetTransforms();
                 } else {
                     var m = new asc.Matrix();
@@ -207,116 +208,172 @@
              * @param {Number} w
              * @param {Number} h
              * @param {Number} textW
-             * @param {Number} alignH
-             * @param {Number} alignV
+             * @param {String} alignHorizontal
+             * @param {String} alignVertical
              */
-            getTransformBound: function(angle, x, y, w, h, textW, alignH, alignV) {
-                this.angle = angle;
-                this.fontNeedUpdate = true;
+            getTransformBound: function(angle, x, y, w, h, textW, alignHorizontal, alignVertical) {
 
-                var dx = 0, dy = 0;
-                var tm = this._doMeasure(undefined);
-                var ah = alignH[0], av = alignV[0];
+                this.angle          =   0;  //  angle;
+                this.fontNeedUpdate =   true;
+
+                var dx = 0, dy = 0, sx = 0, sw = 0;
+                var tm = this._doMeasure();
+
                 var mul = (90 - (Math.abs(angle)) ) / 90;
                 var posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW);
                 var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
-                var sx = 0, sw = 0;
 
-                if ('b' === av) {           //  bottom - vertical
+                if ("bottom" === alignVertical) {
+
                     if (angle < 0) {
-                        if ('l' === ah) { dx = (posv* 0.5 + (1 - mul) * tm.height * 0.5);
-                            sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
+                        if ("left" === alignHorizontal) {
+                            dx = (1 - mul) * tm.height;
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ("center" === alignHorizontal) {
+                            dx = (w + tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                         }
-
-                        if ('r' === ah) { dx = w - (mul * 0.5) * tm.height - posv; sx = x + dx - (mul * 0.5) * tm.height; }
+                        else if ("right" === alignHorizontal) {
+                            dx = w -  posv;
+                            sx = x + dx - (mul * 0.5) * tm.height;
+                        }
                     } else {
-                        if ('l' === ah) { sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' === ah) { dx = (w - tm.height - posv) * 0.5;
+                        if ("left" === alignHorizontal) {
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ("center" === alignHorizontal) {
+                            dx = (w - tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                         }
-                        if ('r' === ah) { dx = w - posv - tm.height; sx = x + dx;}
+                        else if ("right" === alignHorizontal) {
+                            dx = w - posv - (1 - mul) * tm.height;
+                            sx = x + dx;
+                        }
                     }
+
+                    //
 
                     if (posh < h) {
                         if (angle < 0) {
                             dy = h - (posh + mul * tm.height);
-                        } else {
+                        }
+                        else {
                             dy = h - mul * tm.height;
                         }
                     } else {
-                        if (angle > 0) {dy = h - mul * tm.height;} // Math.min(posh, posh - h); } //  dy = h - mul * tm.height;
+                        if (angle > 0) {
+                            dy = h - mul * tm.height;
+                        }
+                        else {
+
+                        }
                     }
                 }
+                else if ("center" === alignVertical) {
 
-                if ('c' === av) {           //  center - vertical
                     if (angle < 0) {
-                        if ('l' === ah) { dx = (1 - mul * 0.5) * tm.height; sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
+                        if ("left" === alignHorizontal) {
+                            dx = (1 - mul * 0.5) * tm.height;
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ("center" === alignHorizontal) {
+                            dx = (w + tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                         }
-                        if ('r' === ah) { dx = w - (mul * 0.5) * tm.height - posv; sx = x + dx - (mul * 0.5) * tm.height; }
+                        else if ("right" === alignHorizontal) {
+                            dx = w - (mul * 0.5) * tm.height - posv;
+                            sx = x + dx - (mul * 0.5) * tm.height;
+                        }
                     } else {
-                        if ('l' === ah) { sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' == ah)  { dx = (w - tm.height - posv) * 0.5; }
-                        if ('r' === ah) { dx = w - posv - tm.height; sx = x + dx; }
+                        if ("left" === alignHorizontal) {
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ("center" == alignHorizontal)  {
+                            dx = (w - tm.height - posv) * 0.5;
+                            sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
+                            sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
+                        }
+                        else if ("right" === alignHorizontal) {
+                            dx = w - posv - tm.height; sx = x + dx;
+                            sx = x + dx - (mul * 0.5) * tm.height;
+                        }
                     }
+
+                    //
 
                     if (posh < h) {
                         if (angle < 0) {
                             dy = (h - posh) * 0.5;
-                        } else {
+                        }
+                        else {
                             dy = (h + posh) * 0.5;
                         }
                     } else {
                         if (angle > 0) {
-                            dy = Math.min(h + tm.height * mul, posh);
+                            dy = h - mul * tm.height;
+                        }
+                        else {
+
                         }
                     }
                 }
+                else if ("top" === alignVertical) {
 
-                if ('t' === av) {           //  top - verictal
                     if (angle < 0) {
-                        if ('l' === ah) { dx = (1 - mul * 0.5) * tm.height; sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
+                        if ("left" === alignHorizontal) {
+                            dx = (1 - mul * 0.5) * tm.height;
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ('c' === alignHorizontal) {
+                            dx = (w + tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                         }
-                        if ('r' === ah) { dx = w - (mul * 0.5) * tm.height - posv; sx = x + dx - (mul * 0.5) * tm.height;}
+                        else if ("right" === alignHorizontal) {
+                            dx = w - (mul * 0.5) * tm.height - posv;
+                            sx = x + dx - (mul * 0.5) * tm.height;
+                        }
                     } else {
-                        if ('l' === ah) { sw = x + posv + (mul * 0.5) * tm.height; }
-                        if ('c' === ah) { dx = (w - tm.height - posv) * 0.5;
+                        if ("left" === alignHorizontal) {
+                            sw = x + posv + (mul * 0.5) * tm.height;
+                        }
+                        else if ('c' === alignHorizontal) {
+                            dx = (w - tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
                         }
-                        if ('r' === ah) { dx = w - posv - tm.height; sx = x + dx; }
+                        else if ("right" === alignHorizontal) {
+                            dx = w - posv - tm.height; sx = x + dx;
+                            sx = x + dx - (mul * 0.5) * tm.height;
+                        }
+
+                        //
 
                         dy = Math.min(h + tm.height * mul, posh);
                     }
                 }
 
-                this.bound.dx   =   dx;
-                this.bound.dy   =   dy;
-                this.bound.x    =   x;
-                this.bound.y    =   y;
+                var bound = {};
 
-                this.bound.sx   =   sx;
-                this.bound.sw   =   sw;
+                bound.dx   =   dx;
+                bound.dy   =   dy;
+                bound.x    =   x;
+                bound.y    =   y;
+
+                bound.sx   =   sx;
+                bound.sw   =   sw;
 
                 if (angle === 90 || angle === -90) {
-                    this.bound.height = textW;
+                    bound.height = textW;
                 } else {
-                    this.bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
+                    bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
                 }
 
-              
-
-                return {x: this.bound.x, y: this.bound.y, dx: this.bound.dx, dy: this.bound.dy, sx: this.bound.sx, sw: this.bound.sw,
-                height: this.bound.height};
+                return bound;
             },
 
             /**
@@ -953,6 +1010,7 @@
              * @param {Number} alignV
              * */
             _boundTransform: function(angle, tm, x, y, w, h, textW, alignH, alignV) {
+
                 var dx = 0, dy = 0;
                 var mbt = new asc.Matrix();
                 var ah = alignH[0], av = alignV[0];

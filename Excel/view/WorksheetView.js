@@ -2338,46 +2338,66 @@
                 var textY = this._calcTextVertPos(y1, y2, bl, ct.metrics, ct.cellVA);
                 var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
-                // TODO : все в отдельный метод
-                var xb1, yb1, wb, hb, bound, colLeft, colRight, sw, sx;
+                var xb1, yb1, wb, hb, bound, colLeft, colRight, i;
+                var txtRotX, txtRotW;
 
                 if (drawingCtx) {
+
+                    // для печати
+
                     if (ct.angle || 0) {
 
                         xb1         =   this.cols[col].left - offsetX;
                         yb1         =   this.rows[row].top - offsetY;
                         wb          =   this.cols[col].width;
                         hb          =   this.rows[row].height;
-                        sx          =   ct.textBound.sx + xb1;
-                        sw          =   ct.textBound.sw + xb1;
 
-                        bound       =   this.stringRender.getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
-                        bound.x     =   xb1;
-                        bound.y     =   yb1;
+                        txtRotX     =   ct.textBound.sx + xb1;
+                        txtRotW     =   ct.textBound.sw + xb1;
+
+                        if (isMerged) {
+
+                            wb = 0;
+
+                            for (i = colL; i <= colR && i < this.nColsCount; ++i) {
+                                wb += this.cols[i].width;
+                            }
+
+                            hb = 0;
+
+                            for (i = rowT; i <= rowB && i < this.nColsCount; ++i) {
+                                hb += this.rows[i].height;
+                            }
+
+                            ctx.AddClipRect (xb1, yb1, wb, hb);
+                        }
+
+                        this.stringRender.angle             =   ct.angle;
+                        this.stringRender.fontNeedUpdate    =   true;
 
                         if (90 === ct.angle || -90 === ct.angle) {
                             // клип по ячейке
-                            ctx.AddClipRect (xb1, yb1, wb, hb);
+                            if (!isMerged) ctx.AddClipRect (xb1, yb1, wb, hb);
                         } else {
                             // клип по строке
-                            ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);
+                            if (!isMerged) ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
-                                if (0 !== sx) {
+                                if (0 !== txtRotX) {
                                     while (true) {
                                         if (0 == colLeft) break;
-                                        if (bound.sx >= this.cols[colLeft].left) break;
+                                        if (txtRotX >= this.cols[colLeft].left) break;
                                         --colLeft;
                                     }
                                 }
 
                                 colRight = Math.min(col, this.nColsCount - 1);
-                                if (0 !== sw) {
+                                if (0 !== txtRotW) {
                                     while (true) {
                                         ++colRight;
                                         if (colRight >= this.nColsCount) { --colRight; break; }
-                                        if (sw <= this.cols[colRight].left) { --colRight; break; }
+                                        if (txtRotW <= this.cols[colRight].left) { --colRight; break; }
                                     }
                                 }
 
@@ -2388,55 +2408,73 @@
                             }
                         }
 
-                        this.stringRender.rotateAtPoint(drawingCtx, ct.angle, xb1, yb1);
-
+                        this.stringRender.rotateAtPoint(drawingCtx, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy);
                         this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, 0, 0, textW, ct.color);
                         this.stringRender.resetTransform(drawingCtx);
+
+                        if (!isMerged) ctx.RemoveClipRect();
                     } else {
                         ctx.AddClipRect (x1, y1, w, h);
                         this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, textX, textY, textW, ct.color);
+                        ctx.RemoveClipRect();
                     }
-                    ctx.RemoveClipRect();
                 } else {
+
+                    // для отрисовки
+
                     if (ct.angle || 0) {
 
                         xb1         =   this.cols[col].left - offsetX;
                         yb1         =   this.rows[row].top - offsetY;
                         wb          =   this.cols[col].width;
                         hb          =   this.rows[row].height;
-                        sx          =   ct.textBound.sx + xb1;
-                        sw          =   ct.textBound.sw + xb1;
 
-                        bound       =   this.stringRender.getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
-                        bound.x     =   xb1;
-                        bound.y     =   yb1;
+                        txtRotX     =   ct.textBound.sx + xb1;
+                        txtRotW     =   ct.textBound.sw + xb1;
 
-                        this.stringRender.bound = bound;
-                        //this.stringRender.fontNeedUpdate = true;
+                        if (isMerged) {
+
+                            wb = 0;
+
+                            for (i = colL; i <= colR && i < this.nColsCount; ++i) {
+                                wb += this.cols[i].width;
+                            }
+
+                            hb = 0;
+
+                            for (i = rowT; i <= rowB && i < this.nColsCount; ++i) {
+                                hb += this.rows[i].height;
+                            }
+
+                            ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
+                        }
+
+                        this.stringRender.angle             =   ct.angle;
+                        this.stringRender.fontNeedUpdate    =   true;
 
                         if (90 === ct.angle || -90 === ct.angle) {
-                            // клип по ячейке
-                            ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
+                           // клип по ячейке
+                           if (!isMerged) ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
                         } else {
                             // клип по строке
-                            ctx.save().beginPath().rect(0, y1, this.drawingCtx.getWidth(), h).clip();
+                            if (!isMerged) ctx.save().beginPath().rect(0, y1, this.drawingCtx.getWidth(), h).clip();
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
-                                if (0 !== sx) {
+                                if (0 !== txtRotX) {
                                     while (true) {
                                         if (0 == colLeft) break;
-                                        if (sx >= this.cols[colLeft].left) break;
+                                        if (txtRotX >= this.cols[colLeft].left) break;
                                         --colLeft;
                                     }
                                 }
 
                                 colRight = Math.min(col, this.nColsCount - 1);
-                                if (0 !== sw) {
+                                if (0 !== txtRotW) {
                                     while (true) {
                                         ++colRight;
                                         if (colRight >= this.nColsCount) { --colRight; break; }
-                                        if (sw <= this.cols[colRight].left) { --colRight; break; }
+                                        if (txtRotW <= this.cols[colRight].left) { --colRight; break; }
                                     }
                                 }
 
@@ -2447,12 +2485,12 @@
                             }
                         }
 
-                        this.stringRender.rotateAtPoint(undefined, ct.angle, xb1, yb1);
+                        this.stringRender.rotateAtPoint(null, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy);
                         this.stringRender.restoreInternalState(ct.state).render(0, 0, textW, ct.color);
+                        this.stringRender.resetTransform(null);
 
-                        ctx.restore();
+                        if (!isMerged) ctx.restore();
 
-                        this.stringRender.resetTransform(undefined);
                     } else {
                         ctx.save().beginPath().rect(x1, y1, w, h).clip();
                         this.stringRender.restoreInternalState(ct.state).render(textX, textY, textW, ct.color);
@@ -3548,240 +3586,270 @@
 				return undefined;
 			},
 
-			_addCellTextToCache: function (col, row, canChangeColWidth) {
-				var self = this;
+            _addCellTextToCache: function (col, row, canChangeColWidth) {
+                var self = this;
 
-				function isFixedWidthCell(frag) {
-					for (var i = 0; i < frag.length; ++i) {
-						var f = frag[i].format;
-						if (f && f.repeat) {return true;}
-					}
-					return false;
-				}
+                function isFixedWidthCell(frag) {
+                    for (var i = 0; i < frag.length; ++i) {
+                        var f = frag[i].format;
+                        if (f && f.repeat) {return true;}
+                    }
+                    return false;
+                }
 
-				function truncFracPart(frag) {
-					var s = frag.reduce(function (prev,val) {return prev + val.text;}, "");
-					// Проверка scientific format
-					if (s.search(/E/i) >= 0) {
-						return frag;
-					}
-					// Поиск десятичной точки
-					var pos = s.search(/[,\.]/);
-					if (pos >= 0) {
-						frag[0].text = s.slice(0, pos);
-						frag.splice(1, frag.length - 1);
-					}
-					return frag;
-				}
+                function truncFracPart(frag) {
+                    var s = frag.reduce(function (prev,val) {return prev + val.text;}, "");
+                    // Проверка scientific format
+                    if (s.search(/E/i) >= 0) {
+                        return frag;
+                    }
+                    // Поиск десятичной точки
+                    var pos = s.search(/[,\.]/);
+                    if (pos >= 0) {
+                        frag[0].text = s.slice(0, pos);
+                        frag.splice(1, frag.length - 1);
+                    }
+                    return frag;
+                }
 
-				function makeFnIsGoodNumFormat(flags, width) {
-					return function (str) {
-						return self.stringRender.measureString(str, flags, width).width <= width;
-					};
-				}
+                function makeFnIsGoodNumFormat(flags, width) {
+                    return function (str) {
+                        return self.stringRender.measureString(str, flags, width).width <= width;
+                    };
+                }
 
-				function changeColWidth(col, width, pad) {
-					var cc = Math.min(self._colWidthToCharCount(width + pad), /*max col width*/255);
-					var modelw = self._charCountToModelColWidth(cc, true);
-					var colw = self._calcColWidth(modelw);
+                function changeColWidth(col, width, pad) {
+                    var cc = Math.min(self._colWidthToCharCount(width + pad), /*max col width*/255);
+                    var modelw = self._charCountToModelColWidth(cc, true);
+                    var colw = self._calcColWidth(modelw);
 
-					if (colw.width > self.cols[col].width) {
-						self.cols[col].width = colw.width;
-						self.cols[col].innerWidth = colw.innerWidth;
-						self.cols[col].charCount = colw.charCount;
+                    if (colw.width > self.cols[col].width) {
+                        self.cols[col].width = colw.width;
+                        self.cols[col].innerWidth = colw.innerWidth;
+                        self.cols[col].charCount = colw.charCount;
 
-						History.Create_NewPoint();
-						History.SetSelection(null, true);
-						History.StartTransaction();
-						// Выставляем, что это bestFit
-						self.model.setColBestFit (true, modelw, col, col);
-						History.EndTransaction();
+                        History.Create_NewPoint();
+                        History.SetSelection(null, true);
+                        History.StartTransaction();
+                        // Выставляем, что это bestFit
+                        self.model.setColBestFit (true, modelw, col, col);
+                        History.EndTransaction();
 
-						self._updateColumnPositions();
-						self.isChanged = true;
-					}
-				}
+                        self._updateColumnPositions();
+                        self.isChanged = true;
+                    }
+                }
 
-				var c = this._getCell(col, row);
-				if (c === undefined) {return col;}
+                var c = this._getCell(col, row);
+                if (c === undefined) {return col;}
 
-				var bUpdateScrollX = false;
-				var bUpdateScrollY = false;
-				// Проверка на увеличение колличества столбцов
-				if (col >= this.cols.length) {
-					bUpdateScrollX = this.expandColsOnScroll(/*isNotActive*/ false, /*updateColsCount*/ true);
-				}
-				// Проверка на увеличение колличества строк
-				if (row >= this.rows.length) {
-					bUpdateScrollY = this.expandRowsOnScroll(/*isNotActive*/ false, /*updateRowsCount*/ true);
-				}
-				if (bUpdateScrollX && bUpdateScrollY) {
-					this._trigger("reinitializeScroll");
-				}
-				else if (bUpdateScrollX) {
-					this._trigger("reinitializeScrollX");
-				}
-				else if (bUpdateScrollY) {
-					this._trigger("reinitializeScrollY");
-				}
+                var bUpdateScrollX = false;
+                var bUpdateScrollY = false;
+                // Проверка на увеличение колличества столбцов
+                if (col >= this.cols.length) {
+                    bUpdateScrollX = this.expandColsOnScroll(/*isNotActive*/ false, /*updateColsCount*/ true);
+                }
+                // Проверка на увеличение колличества строк
+                if (row >= this.rows.length) {
+                    bUpdateScrollY = this.expandRowsOnScroll(/*isNotActive*/ false, /*updateRowsCount*/ true);
+                }
+                if (bUpdateScrollX && bUpdateScrollY) {
+                    this._trigger("reinitializeScroll");
+                }
+                else if (bUpdateScrollX) {
+                    this._trigger("reinitializeScrollX");
+                }
+                else if (bUpdateScrollY) {
+                    this._trigger("reinitializeScrollY");
+                }
 
-				// Range для замерженной ячейки
-				var mc = this.model.getMergedByCell(row, col);
-				var fl = this._getCellFlags(c);
-				var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
-				var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
-				if (null !== mc) {
-					if (col !== mc.c1 || row !== mc.r1) {return mc.c2;} // skip other merged cell from range
-					if (mc.c1 !== mc.c2)
-						fMergedColumns = true;
-					if (mc.r1 !== mc.r2)
-						fMergedRows = true;
-				}
+                // Range для замерженной ячейки
+                var mc = this.model.getMergedByCell(row, col);
+                var fl = this._getCellFlags(c);
+                var fMergedColumns = false;	// Замержены ли колонки (если да, то автоподбор ширины не должен работать)
+                var fMergedRows = false;	// Замержены ли строки (если да, то автоподбор высоты не должен работать)
+                if (null !== mc) {
+                    if (col !== mc.c1 || row !== mc.r1) {return mc.c2;} // skip other merged cell from range
+                    if (mc.c1 !== mc.c2)
+                        fMergedColumns = true;
+                    if (mc.r1 !== mc.r2)
+                        fMergedRows = true;
+                }
 
-				if (this._isCellEmpty(c)) {return mc ? mc.c2 : col;}
+                if (this._isCellEmpty(c)) {return mc ? mc.c2 : col;}
 
-				var dDigitsCount = 0;
-				var colWidth = 0;
-				var cellType = c.getType();
-				var isNumberFormat = (!cellType || CellValueType.Number === cellType);
-				var numFormatStr = c.getNumFormatStr();
-				var pad = this.width_padding * 2 + this.width_1px;
-				var sstr, sfl, stm;
+                var dDigitsCount = 0;
+                var colWidth = 0;
+                var cellType = c.getType();
+                var isNumberFormat = (!cellType || CellValueType.Number === cellType);
+                var numFormatStr = c.getNumFormatStr();
+                var pad = this.width_padding * 2 + this.width_1px;
+                var sstr, sfl, stm;
 
                 if (!this.cols[col].isCustomWidth && isNumberFormat && !fMergedColumns &&
-					(c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
-						c_oAscCanChangeColWidth.all === canChangeColWidth)) {
-					colWidth = this.cols[col].innerWidth;
-					// Измеряем целую часть числа
-					sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-					//todo убрать Asc.clone на другой clone или изменить truncFracPart, чтобы не изменяла исходный массив
-					if ("General" === numFormatStr) {sstr = truncFracPart(Asc.clone(sstr));}
-					sfl = asc_clone(fl);
-					sfl.wrapText = false;
-					stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
-					// Если целая часть числа не убирается в ячейку, то расширяем столбец
-					if (stm.width > colWidth) {changeColWidth(col, stm.width, pad);}
-					// Обновленная ячейка
-					dDigitsCount = this.cols[col].charCount;
-					colWidth = this.cols[col].innerWidth;
-				} else if (null === mc) {
-					// Обычная ячейка
-					dDigitsCount = this.cols[col].charCount;
-					colWidth = this.cols[col].innerWidth;
-					// подбираем ширину
-					if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText &&
-						c_oAscCanChangeColWidth.all === canChangeColWidth) {
-						sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
-						stm = this._roundTextMetrics( this.stringRender.measureString(sstr, fl, colWidth) );
-						if (stm.width > colWidth) {
-							changeColWidth(col, stm.width, pad);
-							// Обновленная ячейка
-							dDigitsCount = this.cols[col].charCount;
-							colWidth = this.cols[col].innerWidth;
-						}
-					}
-				} else {
-					// Замерженная ячейка, нужна сумма столбцов
-					for (var i = mc.c1; i <= mc.c2 && i < this.nColsCount; ++i) {
-						colWidth += this.cols[i].width;
-					}
-					colWidth -= pad;
-					dDigitsCount = gc_nMaxDigCountView;
-				}
+                    (c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
+                        c_oAscCanChangeColWidth.all === canChangeColWidth)) {
+                    colWidth = this.cols[col].innerWidth;
+                    // Измеряем целую часть числа
+                    sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
+                    //todo убрать Asc.clone на другой clone или изменить truncFracPart, чтобы не изменяла исходный массив
+                    if ("General" === numFormatStr) {sstr = truncFracPart(Asc.clone(sstr));}
+                    sfl = asc_clone(fl);
+                    sfl.wrapText = false;
+                    stm = this._roundTextMetrics( this.stringRender.measureString(sstr, sfl, colWidth) );
+                    // Если целая часть числа не убирается в ячейку, то расширяем столбец
+                    if (stm.width > colWidth) {changeColWidth(col, stm.width, pad);}
+                    // Обновленная ячейка
+                    dDigitsCount = this.cols[col].charCount;
+                    colWidth = this.cols[col].innerWidth;
+                } else if (null === mc) {
+                    // Обычная ячейка
+                    dDigitsCount = this.cols[col].charCount;
+                    colWidth = this.cols[col].innerWidth;
+                    // подбираем ширину
+                    if (!this.cols[col].isCustomWidth && !fMergedColumns && !fl.wrapText &&
+                        c_oAscCanChangeColWidth.all === canChangeColWidth) {
+                        sstr = c.getValue2(gc_nMaxDigCountView, function(){return true;});
+                        stm = this._roundTextMetrics( this.stringRender.measureString(sstr, fl, colWidth) );
+                        if (stm.width > colWidth) {
+                            changeColWidth(col, stm.width, pad);
+                            // Обновленная ячейка
+                            dDigitsCount = this.cols[col].charCount;
+                            colWidth = this.cols[col].innerWidth;
+                        }
+                    }
+                } else {
+                    // Замерженная ячейка, нужна сумма столбцов
+                    for (var i = mc.c1; i <= mc.c2 && i < this.nColsCount; ++i) {
+                        colWidth += this.cols[i].width;
+                    }
+                    colWidth -= pad;
+                    dDigitsCount = gc_nMaxDigCountView;
+                }
 
-				// ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
-				var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
-				var ha   = c.getAlignHorizontalByValue().toLowerCase();
-				var va   = c.getAlignVertical().toLowerCase();
-				var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
-				var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
-				var cto  = (fl.isMerged || fl.wrapText) ?
-						{
-							maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
-							leftSide: 0,
-							rightSide: 0
-						} :
-						this._calcCellTextOffset(col, row, ha, tm.width);
+                // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
+                var str  = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
+                var ha   = c.getAlignHorizontalByValue().toLowerCase();
+                var va   = c.getAlignVertical().toLowerCase();
+                var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
+                var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
+                var cto  = (fl.isMerged || fl.wrapText) ?
+                {
+                    maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
+                    leftSide: 0,
+                    rightSide: 0
+                } :
+                    this._calcCellTextOffset(col, row, ha, tm.width);
 
-				// check right side of cell text and append columns if it exceeds existing cells borders
-				if (!fl.isMerged) {
-					var rside = this.cols[col - cto.leftSide].left + tm.width;
-					var lc    = this.cols[this.cols.length - 1];
-					if (rside > lc.left + lc.width) {
-						this._appendColumns(rside);
-						cto = this._calcCellTextOffset(col, row, ha, tm.width);
-					}
-				}
-				var oFontColor = c.getFontcolor();
-				if(null != oFontColor)
-					oFontColor = oFontColor.getRgb();
+                // check right side of cell text and append columns if it exceeds existing cells borders
+                if (!fl.isMerged) {
+                    var rside = this.cols[col - cto.leftSide].left + tm.width;
+                    var lc    = this.cols[this.cols.length - 1];
+                    if (rside > lc.left + lc.width) {
+                        this._appendColumns(rside);
+                        cto = this._calcCellTextOffset(col, row, ha, tm.width);
+                    }
+                }
+                var oFontColor = c.getFontcolor();
+                if(null != oFontColor)
+                    oFontColor = oFontColor.getRgb();
 
+                var rowHeight = this.rows[row].height;
                 var textBound = {};
+
                 if (c.getAngle() || 0) {
-                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, this.cols[col].width, this.rows[row].height, tm.width, ha, va);
+
+                    //  повернутый текст учитывает мерж ячеек по строкам
+
+                    if (fMergedRows) {
+                        rowHeight = 0;
+
+                        for (var j = mc.r1; j <= mc.r2 && j < this.nRowsCount; ++j) {
+                            rowHeight += this.rows[j].height;
+                        }
+                    }
+
+                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va);
                 }
 
                 this._fetchCellCache(col, row).text = {
-					state		: this.stringRender.getInternalState(),
-					flags		: fl,
-					color		: (oFontColor || this.settings.cells.defaultState.color),
-					metrics		: tm,
-					cellW		: cto.maxWidth,
-					cellHA		: ha,
-					cellVA		: va,
-					sideL		: cto.leftSide,
-					sideR		: cto.rightSide,
-					cellType	: cellType,
-					isFormula	: c.getFormula().length > 0,
-					angle		: c.getAngle(),
+                    state		: this.stringRender.getInternalState(),
+                    flags		: fl,
+                    color		: (oFontColor || this.settings.cells.defaultState.color),
+                    metrics		: tm,
+                    cellW		: cto.maxWidth,
+                    cellHA		: ha,
+                    cellVA		: va,
+                    sideL		: cto.leftSide,
+                    sideR		: cto.rightSide,
+                    cellType	: cellType,
+                    isFormula	: c.getFormula().length > 0,
+                    angle		: c.getAngle(),
                     textBound	: textBound,
-					mc			: mc
-				};
+                    mc			: mc
+                };
 
-				this._fetchCellCacheText(col, row).hasText = true;
+                this._fetchCellCacheText(col, row).hasText = true;
 
-				if (cto.leftSide !== 0 || cto.rightSide !== 0) {
-					this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
-				}
+                if (cto.leftSide !== 0 || cto.rightSide !== 0) {
+                    this._addErasedBordersToCache(col - cto.leftSide, col + cto.rightSide, row);
+                }
 
-				// update row's descender
-				if (va !== kvaTop && va !== kvaCenter && !fl.isMerged) {
-					this.rows[row].descender = Math.max(this.rows[row].descender, tm.height - tm.baseline);
-				}
+                // update row's descender
+                if (va !== kvaTop && va !== kvaCenter && !fl.isMerged) {
+                    this.rows[row].descender = Math.max(this.rows[row].descender, tm.height - tm.baseline);
+                }
 
-				// update row's height
-				if (!this.rows[row].isCustomHeight) {
-					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-					if (!fMergedRows) {
-						this.rows[row].heightReal = this.rows[row].height = Math.min(this.maxRowHeight, Math.max(this.rows[row].height, tm.height));
-						if (!this.rows[row].isDefaultHeight) {
-							this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
-						}
-						this.isChanged = true;
-					}
-				}
-
-                // TODO: отступы
+                // update row's height
+                if (!this.rows[row].isCustomHeight) {
+                    // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+                    if (!fMergedRows) {
+                        this.rows[row].heightReal = this.rows[row].height = Math.min(this.maxRowHeight, Math.max(this.rows[row].height, tm.height));
+                        if (!this.rows[row].isDefaultHeight) {
+                            this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
+                        }
+                        this.isChanged = true;
+                    }
+                }
 
                 if ((c.getAngle() || 0) && !this.rows[row].isCustomHeight) {
 
                     if (this.isChanged) {
+
                         if (textBound) {
+
                             if (this.rows[row].height < textBound.height) {
-								this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
+
+                                this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
+                                rowHeight = this.rows[row].heightReal;
 
                                 if (!this.rows[row].isDefaultHeight) {
                                     this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
                                 }
-                            }
 
-                            this.isChanged = true;
+                                this._fetchCellCache(col, row).text.textBound   =
+                                    this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va);
+                            }
+                            else {
+
+                                // если была автоподстройка по высоте, надо ее сбросить и оставить текущее значение высоты
+
+                                if (fMergedRows) {
+                                    this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
+
+                                    if (this.rows[row].isDefaultHeight) {
+                                        this.model.setRowHeight(this.rows[row].height, row, row);
+                                    }
+                                }
+                            }
                         }
+
+                        this.isChanged = true;
                     }
                 }
 
-				return mc ? mc.c2 : col;
-			},
+                return mc ? mc.c2 : col;
+            },
 
 			_calcMaxWidth: function (col, row, mc) {
 				if (null === mc) {return this.cols[col].innerWidth;}
