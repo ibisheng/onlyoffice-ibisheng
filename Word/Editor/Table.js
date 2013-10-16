@@ -3087,7 +3087,7 @@ CTable.prototype =
             var CellsCount = Row.Get_CellsCount();
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
-                var Cell = Row.Get_Cell();
+                var Cell = Row.Get_Cell(CurCell);
                 Cell.Content.Recalculate_AllTables();
             }
         }
