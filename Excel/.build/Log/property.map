@@ -2504,7 +2504,7 @@ codePageName:gCa
 max_kern:cGa
 _uploadMessage:vya
 getCvtRatio:t4
-TableCellBorders:Wc
+TableCellBorders:Xc
 asc_setCellTextShrink:T3a
 BrdBottom:lQ
 undoParser:UIa
@@ -3453,7 +3453,7 @@ majorFont:LT
 totalLeftBottom:seb
 setFontcolor:Yv
 load_kern:w$a
-outStack:Xc
+outStack:Wc
 _key_shadow_blur:Bxa
 dir_tables:GL
 fillHandleArea:Rx
