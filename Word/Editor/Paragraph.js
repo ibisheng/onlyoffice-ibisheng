@@ -453,7 +453,7 @@ Paragraph.prototype =
 
     // Удаляем элемент из содержимого параграфа. (Здесь передвигаются все позиции
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
-    Internal_Content_Remove : function (Pos)
+    Internal_Content_Remove : function (Pos, bCorrectPos)
     {
         var Item = this.Content[Pos];
         if ( true === Item.Is_RealContent() )
@@ -515,7 +515,7 @@ Paragraph.prototype =
         this.Content.splice( Pos, 1 );
 
         if ( this.CurPos.ContentPos > Pos )
-            this.Set_ContentPos( this.CurPos.ContentPos - 1 );
+            this.Set_ContentPos( this.CurPos.ContentPos - 1, bCorrectPos );
 
         // Комментарий удаляем после, чтобы не нарушить позиции
         if ( true === this.DeleteCommentOnRemove && ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) )
@@ -5166,14 +5166,14 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Remove_CollaborativeMarks : function()
+    Internal_Remove_CollaborativeMarks : function(bCorrectPos)
     {
         for ( var Pos = 0; Pos < this.Content.length; Pos++ )
         {
             var Item = this.Content[Pos];
             if ( para_CollaborativeChangesEnd === Item.Type || para_CollaborativeChangesStart === Item.Type )
             {
-                this.Internal_Content_Remove(Pos);
+                this.Internal_Content_Remove(Pos, bCorrectPos);
                 Pos--;
             }
         }
@@ -5185,7 +5185,7 @@ Paragraph.prototype =
     // bOnlyText - true: удаляем только текст и пробелы, false - Удаляем любые элементы
     Remove : function(nCount, bOnlyText)
     {
-        this.Internal_Remove_CollaborativeMarks();
+        this.Internal_Remove_CollaborativeMarks(true);
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
@@ -10717,7 +10717,7 @@ Paragraph.prototype =
         // Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
         // удаляем.
 
-        this.Internal_Remove_CollaborativeMarks();
+        this.Internal_Remove_CollaborativeMarks(false);
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
@@ -11441,8 +11441,8 @@ Paragraph.prototype =
 
         // Удаляем все элементы после текущей позиции и добавляем признак окончания параграфа.
         this.DeleteCommentOnRemove = false;
-        this.Internal_Remove_CollaborativeMarks();
         this.Internal_Content_Remove2( Pos, this.Content.length - Pos );
+        this.Internal_Remove_CollaborativeMarks(false);
         this.DeleteCommentOnRemove = true;
 
         if ( null != Hyperlink )
