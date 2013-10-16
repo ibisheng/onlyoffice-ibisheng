@@ -1684,31 +1684,32 @@ CopyProcessor.prototype =
 								
 								if(copyPasteUseBinery)
 								{
-									var index = cur_element.Parent.Index;
+									var parent = cur_element.Parent;
 									selectionTrue = 
 									{
-										EndPos : oDocument.Content[index].Selection.EndPos,
-										StartPos: oDocument.Content[index].Selection.StartPos
+										EndPos : parent.Selection.EndPos,
+										StartPos: parent.Selection.StartPos
 									};
 									var inIndex;
-									for(var k = 0; k < oDocument.Content[index].Content.length;k++)
+									for(var k = 0; k < parent.Content.length;k++)
 									{
-										if(oDocument.Content[index].Content[k] == cur_element)
+										if(parent.Content[k] == cur_element)
 										{
 											inIndex = k;
 											break;
 										}
 									}
 									//меняем Selection
-									oDocument.Content[index].Selection.EndPos = inIndex + 1;
-									oDocument.Content[index].Selection.StartPos = inIndex;
-									oDocument.Content[index].Selection.Use = true;
+									parent.Selection.EndPos = inIndex + 1;
+									parent.Selection.StartPos = inIndex;
+									parent.Selection.Use = true;
 									
-									this.oBinaryFileWriter.CopyParagraph(oDocument.Content[index], true);
+									this.oBinaryFileWriter.CopyParagraph(parent, true);
 									
 									//возвращаем Selection
-									oDocument.Content[index].Selection.StartPos = selectionTrue.StartPos;
-									oDocument.Content[index].Selection.EndPos = selectionTrue.EndPos;
+									parent.Selection.StartPos = selectionTrue.StartPos;
+									parent.Selection.EndPos = selectionTrue.EndPos;
+									
 								}
                             }
 							
