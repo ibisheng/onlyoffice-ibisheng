@@ -3075,6 +3075,24 @@ CTable.prototype =
         return { Min : Min, Max : Max };
     },
 
+    Recalculate_AllTables : function()
+    {
+        this.Internal_RecalculateGrid();
+        this.Internal_Recalculate_Borders();
+
+        var RowsCount = this.Content.length;
+        for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+        {
+            var Row = this.Content[CurRow];
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            {
+                var Cell = Row.Get_Cell();
+                Cell.Content.Recalculate_AllTables();
+            }
+        }
+    },
+
     Draw : function(nPageIndex, pGraphics)
     {
         var PNum = nPageIndex - this.PageNum;

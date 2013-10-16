@@ -809,6 +809,17 @@ CDocumentContent.prototype =
         return { Min : Min, Max : Max };
     },
 
+    Recalculate_AllTables : function()
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            if ( type_Table === Item.GetType() )
+                Item.Recalculate_AllTables();
+        }
+    },
+
     ReDraw : function(StartPage, EndPage)
     {
         if ( "undefined" === typeof(StartPage) )

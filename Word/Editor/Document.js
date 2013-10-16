@@ -1331,6 +1331,17 @@ CDocument.prototype =
         }
     },
 
+    Recalculate_AllTables : function()
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+            if ( type_Table === Item.GetType() )
+                Item.Recalculate_AllTables();
+        }
+    },
+
     OnContentReDraw : function(StartPage, EndPage)
     {
         this.ReDraw( StartPage, EndPage );
