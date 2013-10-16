@@ -811,6 +811,12 @@ CChartTitle.prototype =
     {
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transformText);
+
+        if (window.IsShapeToImageConverter)
+        {
+            pageIndex = 0;
+        }
+
         this.txBody.draw(graphics, pageIndex);
         graphics.reset();
         graphics.SetIntegerGrid(true);

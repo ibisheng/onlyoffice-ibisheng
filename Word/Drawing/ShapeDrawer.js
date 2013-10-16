@@ -1,3 +1,4 @@
+window.IsShapeToImageConverter = false;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
@@ -1651,6 +1652,7 @@ CShapeDrawer.prototype =
 
 function ShapeToImageConverter(shape, pageIndex)
 {
+	window.IsShapeToImageConverter = true;
     var _bounds_cheker = new CSlideBoundsChecker();
 
     var dKoef = g_dKoef_mm_to_pix;
@@ -1663,7 +1665,7 @@ function ShapeToImageConverter(shape, pageIndex)
     _bounds_cheker.transform(1,0,0,1,0,0);
 
     _bounds_cheker.AutoCheckLineWidth = true;
-    shape.draw(_bounds_cheker, pageIndex);
+    shape.draw(_bounds_cheker, /*pageIndex*/0);
 
     var _need_pix_width     = _bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1;
     var _need_pix_height    = _bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1;
@@ -1699,7 +1701,9 @@ function ShapeToImageConverter(shape, pageIndex)
     g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
     g.transform(1,0,0,1,0,0);
 
-    shape.draw(g, pageIndex);
+    shape.draw(g, /*pageIndex*/0);
+
+	window.IsShapeToImageConverter = false;
 
     var _ret = { ImageNative : _canvas, ImageUrl : "" };
     try

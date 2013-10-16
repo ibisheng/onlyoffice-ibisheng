@@ -2099,6 +2099,12 @@ WordShape.prototype =
             if (graphics.CheckUseFonts2 !== undefined)
                 graphics.CheckUseFonts2(this.transformText);
 
+            if (window.IsShapeToImageConverter)
+            {
+                this.textBoxContent.Set_StartPage(0);
+                result_page_index = 0;
+            }
+
             this.textBoxContent.Draw(result_page_index, graphics);
 
             if (graphics.UncheckUseFonts2 !== undefined)
