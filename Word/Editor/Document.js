@@ -968,6 +968,15 @@ CDocument.prototype =
                         FrameW = Element.Lines[0].Ranges[0].W;
                         var ParaPr = Element.Get_CompiledPr2(false).ParaPr;
                         FrameW += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+
+                        // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
+                        // с учетом того, что ширина буквицы должна быть FrameW
+                        if ( align_Left != ParaPr.Jc )
+                        {
+                            TempElement.Reset( 0, 0, FrameW, Frame_YLimit, PageIndex );
+                            TempElement.Recalculate_Page( PageIndex );
+                            FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
+                        }
                     }
                     else if ( -1 === FrameW )
                         FrameW = Frame_XLimit;
