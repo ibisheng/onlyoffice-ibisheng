@@ -1797,11 +1797,11 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
         _hit = chart.parent.hit(x, y);
         if(_hit)
         {
+            var _common_selection_array = graphicObjects.selectionInfo.selectionArray;
+            var _current_graphic_object = paraDrawing;
             graphicObjects.majorGraphicObject = chart.parent;
             if(!(e.CtrlKey || e.ShiftKey))
             {
-                var _common_selection_array = graphicObjects.selectionInfo.selectionArray;
-                var _current_graphic_object = paraDrawing;
                 var b_sel = _current_graphic_object.selected;
                 if(_current_graphic_object.selected === false)
                 {
