@@ -1246,15 +1246,6 @@ CChartAsGroup.prototype =
 
     hitToHandle: function(x, y, radius)
     {
-        var _radius;
-        if(!(typeof radius === "number"))
-            _radius = editor.WordControl.m_oDrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
-        else
-        {
-            _radius = radius;
-        }
-        if(typeof global_mouseEvent.KoefPixToMM === "number" && !isNaN(global_mouseEvent.KoefPixToMM))
-            _radius *= global_mouseEvent.KoefPixToMM;
 
         var t_x, t_y;
         if(this.group != null)
@@ -1268,9 +1259,43 @@ CChartAsGroup.prototype =
             t_x = x;
             t_y = y;
         }
+        var result_x, result_y;
+        result_x = t_x;
+        result_y = t_y;
+        if(isRealObject(this.parent))
+        {
+            if(this.parent.Is_Inline())
+            {
+                if(this.parent.DocumentContent instanceof  CDocumentContent)
+                {
+                    var cur_doc_content = this.parent.DocumentContent;
+                    while(cur_doc_content.Is_TableCellContent())
+                    {
+                        cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
+
+                    }
+                    if((cur_doc_content instanceof CDocumentContent && cur_doc_content.Parent instanceof WordShape))
+                    {
+                        var invert_matrix = cur_doc_content.Parent.invertTextMatrix;
+                        result_x = invert_matrix.TransformPointX(t_x, t_y);
+                        result_y = invert_matrix.TransformPointY(t_x, t_y);
+                    }
+                }
+            }
+        }
+
+        var _radius;
+        if(!(typeof radius === "number"))
+            _radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+        else
+            _radius = radius;
+
+        if(typeof global_mouseEvent.KoefPixToMM === "number" && !isNaN(global_mouseEvent.KoefPixToMM))
+            _radius *= global_mouseEvent.KoefPixToMM;
+
         this.calculateLeftTopPoint();
-        var _temp_x = t_x - this.absXLT;
-        var _temp_y = t_y - this.absYLT;
+        var _temp_x = result_x - this.absXLT;
+        var _temp_y = result_y - this.absYLT;
 
         var _sin = Math.sin(this.absRot);
         var _cos = Math.cos(this.absRot);
@@ -1279,6 +1304,10 @@ CChartAsGroup.prototype =
         var _relative_x = _temp_x*_cos + _temp_y*_sin;
         var _relative_y = -_temp_x*_sin + _temp_y*_cos;
 
+        if(this.absFlipH)
+            _relative_x = this.absExtX - _relative_x;
+        if(this.absFlipV)
+            _relative_y = this.absExtY - _relative_y;
 
         var _dist_x, _dist_y;
         if(!this.checkLine())
@@ -1342,6 +1371,14 @@ CChartAsGroup.prototype =
                 {
                     return {hit: true, handleRotate: false, handleNum: 5};
                 }
+            }
+
+            _dist_x = _relative_x - _horizontal_center;
+            _dist_y = _relative_y + this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
+
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: true, handleNum: 8};
             }
         }
         else

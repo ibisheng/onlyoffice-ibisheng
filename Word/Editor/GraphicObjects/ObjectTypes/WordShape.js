@@ -555,6 +555,36 @@ WordShape.prototype =
         for(var i = 0; i < arr_graphic_objects.length; ++i )
         {
             global_MatrixTransformer.MultiplyAppend(arr_graphic_objects[i].getTransformMatrix(), this.transformText);
+            if(arr_graphic_objects[i].GraphicObj instanceof CChartAsGroup)
+            {
+                var obj = arr_graphic_objects[i].GraphicObj;
+                obj.invertTransform = global_MatrixTransformer.Invert(obj.transform);
+                if(isRealObject(obj.chartTitle))
+                {
+                    global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transform, this.transformText);
+                    global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transformText, this.transformText);
+                    obj.chartTitle.invertTransform = global_MatrixTransformer.Invert(obj.chartTitle.transform);
+                    obj.chartTitle.invertTransformText = global_MatrixTransformer.Invert(obj.chartTitle.transformText);
+
+                }
+
+                if(isRealObject(obj.hAxisTitle))
+                {
+                    global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transform, this.transformText);
+                    global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transformText, this.transformText);
+
+                    obj.hAxisTitle.invertTransform = global_MatrixTransformer.Invert(obj.hAxisTitle.transform);
+                    obj.hAxisTitle.invertTransformText = global_MatrixTransformer.Invert(obj.hAxisTitle.transformText);
+                }
+
+                if(isRealObject(obj.vAxisTitle))
+                {
+                    global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transform, this.transformText);
+                    global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transformText, this.transformText);
+                    obj.vAxisTitle.invertTransform = global_MatrixTransformer.Invert(obj.vAxisTitle.transform);
+                    obj.vAxisTitle.invertTransformText = global_MatrixTransformer.Invert(obj.vAxisTitle.transformText);
+                }
+            }
             arr_graphic_objects[i].updateCursorTypes();
         }
     },
@@ -5661,25 +5691,34 @@ WordShape.prototype =
             {
                 arr_graphic_objects[i].GraphicObj.recalculate();
                 global_MatrixTransformer.MultiplyAppend(arr_graphic_objects[i].getTransformMatrix(), this.transformText);
-                if(arr_graphic_objects[i] instanceof CChartAsGroup)
+                if(arr_graphic_objects[i].GraphicObj instanceof CChartAsGroup)
                 {
-                    var obj = arr_graphic_objects[i];
+                    var obj = arr_graphic_objects[i].GraphicObj;
+                    obj.invertTransform = global_MatrixTransformer.Invert(obj.transform);
                     if(isRealObject(obj.chartTitle))
                     {
                         global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transform, this.transformText);
                         global_MatrixTransformer.MultiplyAppend(obj.chartTitle.transformText, this.transformText);
+                        obj.chartTitle.invertTransform = global_MatrixTransformer.Invert(obj.chartTitle.transform);
+                        obj.chartTitle.invertTransformText = global_MatrixTransformer.Invert(obj.chartTitle.transformText);
+
                     }
 
                     if(isRealObject(obj.hAxisTitle))
                     {
                         global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transform, this.transformText);
                         global_MatrixTransformer.MultiplyAppend(obj.hAxisTitle.transformText, this.transformText);
+
+                        obj.hAxisTitle.invertTransform = global_MatrixTransformer.Invert(obj.hAxisTitle.transform);
+                        obj.hAxisTitle.invertTransformText = global_MatrixTransformer.Invert(obj.hAxisTitle.transformText);
                     }
 
                     if(isRealObject(obj.vAxisTitle))
                     {
                         global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transform, this.transformText);
                         global_MatrixTransformer.MultiplyAppend(obj.vAxisTitle.transformText, this.transformText);
+                        obj.vAxisTitle.invertTransform = global_MatrixTransformer.Invert(obj.vAxisTitle.transform);
+                        obj.vAxisTitle.invertTransformText = global_MatrixTransformer.Invert(obj.vAxisTitle.transformText);
                     }
                 }
                 arr_graphic_objects[i].updateCursorTypes();
