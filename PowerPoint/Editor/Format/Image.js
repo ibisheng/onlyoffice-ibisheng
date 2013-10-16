@@ -66,7 +66,7 @@ CImageShape.prototype =
 
     copy: function(sp)
     {
-        if(!sp)
+        if(!(sp instanceof CImageShape))
             sp = new CImageShape();
         if(this.blipFill)
             sp.setBlipFill(this.blipFill.createDuplicate());

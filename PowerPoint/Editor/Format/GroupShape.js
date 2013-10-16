@@ -63,7 +63,7 @@ CGroupShape.prototype =
 
     copy: function(sp)
     {
-        if(!sp)
+        if(!(sp instanceof CGroupShape))
             sp = new CGroupShape();
         sp.setSpPr(this.spPr.createDuplicate());
         if(this.nvGrpSpPr)

@@ -1624,7 +1624,7 @@ CShape.prototype =
 
     copy: function(sp)
     {
-        if(!sp)
+        if(!(sp instanceof CShape))
             sp = new CShape();
         sp.setSpPr(this.spPr.createDuplicate());
         sp.setStyle(this.style);
