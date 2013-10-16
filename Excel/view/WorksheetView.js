@@ -2339,7 +2339,7 @@
                 var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
                 var xb1, yb1, wb, hb, bound, colLeft, colRight, i;
-                var txtRotX, txtRotW;
+                var txtRotX, txtRotW, clipUse = false;;
 
                 if (drawingCtx) {
 
@@ -2365,11 +2365,12 @@
 
                             hb = 0;
 
-                            for (i = rowT; i <= rowB && i < this.nColsCount; ++i) {
+                            for (i = rowT; i <= rowB && i < this.nRowsCount; ++i) {
                                 hb += this.rows[i].height;
                             }
 
                             ctx.AddClipRect (xb1, yb1, wb, hb);
+                            clipUse = true;
                         }
 
                         this.stringRender.angle             =   ct.angle;
@@ -2377,10 +2378,16 @@
 
                         if (90 === ct.angle || -90 === ct.angle) {
                             // клип по ячейке
-                            if (!isMerged) ctx.AddClipRect (xb1, yb1, wb, hb);
+                            if (!isMerged) {
+                                ctx.AddClipRect (xb1, yb1, wb, hb);
+                                clipUse = true;
+                            }
                         } else {
                             // клип по строке
-                            if (!isMerged) ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);
+                            if (!isMerged) {
+                                ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);
+                                clipUse = true;
+                            }
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
@@ -2412,7 +2419,7 @@
                         this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, 0, 0, textW, ct.color);
                         this.stringRender.resetTransform(drawingCtx);
 
-                        if (!isMerged) ctx.RemoveClipRect();
+                        if (clipUse) ctx.RemoveClipRect();
                     } else {
                         ctx.AddClipRect (x1, y1, w, h);
                         this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, textX, textY, textW, ct.color);
@@ -2442,11 +2449,12 @@
 
                             hb = 0;
 
-                            for (i = rowT; i <= rowB && i < this.nColsCount; ++i) {
+                            for (i = rowT; i <= rowB && i < this.nRowsCount; ++i) {
                                 hb += this.rows[i].height;
                             }
 
                             ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
+                            clipUse = true;
                         }
 
                         this.stringRender.angle             =   ct.angle;
@@ -2454,10 +2462,16 @@
 
                         if (90 === ct.angle || -90 === ct.angle) {
                            // клип по ячейке
-                           if (!isMerged) ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
+                           if (!isMerged) {
+                               ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
+                               clipUse = true;
+                           }
                         } else {
                             // клип по строке
-                            if (!isMerged) ctx.save().beginPath().rect(0, y1, this.drawingCtx.getWidth(), h).clip();
+                            if (!isMerged) {
+                                ctx.save().beginPath().rect(0, y1, this.drawingCtx.getWidth(), h).clip();
+                                clipUse = true;
+                            }
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
@@ -2489,7 +2503,7 @@
                         this.stringRender.restoreInternalState(ct.state).render(0, 0, textW, ct.color);
                         this.stringRender.resetTransform(null);
 
-                        if (!isMerged) ctx.restore();
+                        if (clipUse) ctx.restore();
 
                     } else {
                         ctx.save().beginPath().rect(x1, y1, w, h).clip();
