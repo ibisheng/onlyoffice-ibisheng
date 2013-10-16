@@ -679,7 +679,13 @@ CopyProcessor.prototype =
                 if(sSrc.length > 0)
                 {
                     sSrc = this.getSrc(sSrc);
-                    this.aInnerHtml.push("<img width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\"  alt=\""+ParaItem.writeToBinaryForCopyPaste()+"\"/>"); break;
+
+                    if (this.api.DocumentReaderMode)
+                        this.aInnerHtml.push("<img style=\"max-width:100%;\" width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+                    else
+                        this.aInnerHtml.push("<img width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\"  alt=\""+ParaItem.writeToBinaryForCopyPaste()+"\"/>");
+
+                    break;
                 }
                 // var _canvas     = document.createElement('canvas');
                 // var w = img.width;
@@ -718,6 +724,10 @@ CopyProcessor.prototype =
 						}
 						else
 							sStyle += "margin:0pt 10pt 0pt 10pt;";
+
+                        if (this.api.DocumentReaderMode)
+                            sStyle += "max-width:100%;";
+
 						this.aInnerHtml.push("<img style=\""+sStyle+"\" width=\""+Math.round(oFlowObj.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oFlowObj.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />"); break;
                     }
                 }
@@ -1542,7 +1552,11 @@ CopyProcessor.prototype =
 							if(sSrc.length > 0)
 							{
 								sSrc = this.getSrc(sSrc);
-								this.aInnerHtml.push("<img width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+
+                                if (this.api.DocumentReaderMode)
+                                    this.aInnerHtml.push("<img style=\"max-width:100%;\" width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+                                else
+                                    this.aInnerHtml.push("<img width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
 							}
 							this.CommitSpan(false);
 							this.ElemToSelect.appendChild( this.Para );
@@ -1637,9 +1651,14 @@ CopyProcessor.prototype =
 									}
 									
                                     var src = this.getSrc(base64_img);
-                                    var alt_content = cur_element.parent.writeToBinaryForCopyPaste();
 
-                                    this.aInnerHtml.push("<img width=\""+Math.round(cur_element.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+                                    if (this.api.DocumentReaderMode)
+                                        this.aInnerHtml.push("<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />");
+                                    else
+                                    {
+                                        var alt_content = cur_element.parent.writeToBinaryForCopyPaste();
+                                        this.aInnerHtml.push("<img width=\""+Math.round(cur_element.absExtX * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.absExtY * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+                                    }
 
                                     this.ElemToSelect.appendChild( this.Para );
                                 }
@@ -1676,9 +1695,14 @@ CopyProcessor.prototype =
                                 var cur_element = selection_array[i];
                                 var base64_img = cur_element.getBase64Img();
                                 var src = this.getSrc(base64_img);
-                                var alt_content = cur_element.writeToBinaryForCopyPaste();
 
-                                this.aInnerHtml.push("<img width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+                                if (this.api.DocumentReaderMode)
+                                    this.aInnerHtml.push("<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />");
+                                else
+                                {
+                                    var alt_content = cur_element.writeToBinaryForCopyPaste();
+                                    this.aInnerHtml.push("<img width=\""+Math.round(cur_element.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+                                }
 
                                 this.ElemToSelect.appendChild( this.Para );
 								
@@ -2216,7 +2240,12 @@ CopyProcessor.prototype =
             sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             oGraphicObj.draw(_bounds_cheker, 0);
-            this.aInnerHtml.push("<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+
+            if (this.api.DocumentReaderMode)
+                this.aInnerHtml.push("<img style=\"max-width:100%;\" width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+            else
+                this.aInnerHtml.push("<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+
             if(oGraphicObj instanceof CShape)
             {
                 this.oPresentationWriter.WriteShape(oGraphicObj);
