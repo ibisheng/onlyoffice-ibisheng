@@ -2136,6 +2136,59 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+
+        this.drawingObjectsController.resetSelection();
+
+
+        var presetGeom = this.presetGeom;
+        if(presetGeom.indexOf("WithArrow") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 9);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 1;
+
+        }
+        if(presetGeom.indexOf("WithTwoArrows") > -1)
+        {
+            presetGeom = presetGeom.substr(0, presetGeom.length - 13);
+            this.presetGeom = presetGeom;
+            this.arrowsCount = 2;
+        }
+
+        History.Create_NewPoint();
+        var shape = new CShape(null, this.drawingObjects);
+        shape.setParent(drawingObjects);
+        if(this.presetGeom !== "textRect")
+            shape.initDefault(this.startX, this.startY, 50, 50, false, false, this.presetGeom, this.arrowsCount);
+        else
+            shape.initDefaultTextRect(this.startX, this.startY, 50, 50, false, false);
+        shape.select(this.drawingObjects.graphicObjects);
+        drawingObjects.shapeAdd(drawingObjects.cSld.spTree.length, shape);
+        this.drawingObjects.graphicObjects.State.resultObject = shape;
+
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, shape) === false)
+        {
+            shape.select(this.drawingObjectsController);
+            this.drawingObjects.shapeAdd(this.drawingObjects.cSld.spTree.length, shape);
+            if(this.presetGeom != "textRect")
+            {
+                this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+            }
+            else
+            {
+                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, shape));
+            }
+            this.drawingObjects.presentation.Recalculate();
+            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        }
+        else
+        {
+            editor.WordControl.m_oLogicDocument.Document_Undo();
+            this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        }
+        editor.sync_EndAddShape();
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.OnUpdateOverlay();
     };
 
     this.onKeyDown = function(e)
