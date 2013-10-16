@@ -4533,21 +4533,18 @@ Cell.prototype.setAlignVertical=function(val){
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_AlignVertical, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setAlignHorizontal=function(val){
 	var oRes = this.sm.setAlignHorizontal(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_AlignHorizontal, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setFill=function(val){
 	var oRes = this.sm.setFill(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Fill, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setBorder=function(val){
 	var oRes = this.sm.setBorder(this, val);
@@ -4561,35 +4558,30 @@ Cell.prototype.setBorder=function(val){
         History.Add(g_oUndoRedoCell, historyitem_Cell_Border, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
 	}
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setShrinkToFit=function(val){
 	var oRes = this.sm.setShrinkToFit(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_ShrinkToFit, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setWrap=function(val){
 	var oRes = this.sm.setWrap(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Wrap, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
-	this.oValue.cleanCache();
 };
 Cell.prototype.setAngle=function(val){
     var oRes = this.sm.setAngle(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
     this.bNeedCompileXfs = true;
-    this.oValue.cleanCache();
 };
 Cell.prototype.setVerticalText=function(val){
     var oRes = this.sm.setVerticalText(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
     this.bNeedCompileXfs = true;
-    this.oValue.cleanCache();
 };
 Cell.prototype.setQuotePrefix=function(val){
 	var oRes = this.sm.setQuotePrefix(this, val);
