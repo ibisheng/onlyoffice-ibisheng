@@ -2798,8 +2798,9 @@ function Editor_CopyPaste_Create(api)
     };
 
     ElemToSelect["onbeforecopy"] = function(e){
-		if(!api.isCellEdited)
-			api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+		var ws = api.wb.getWorksheet();
+		if(!ws.isCellEditMode)
+			api.wb.clipboard.copyRange(ws.getSelectedRange(), ws);
     };
 	
 	ElemToSelect["onbeforecut"] = function(e){
