@@ -292,7 +292,7 @@ btblPrr:rF
 _labels_above_bold:iK
 UpdateScrolls:Ypa
 colnumToColstr:aua
-horiAdvance:Zl
+horiAdvance:$l
 _text:dk
 XLimit:Pe
 CellsBackground:km
@@ -572,7 +572,7 @@ attrConformance:$sa
 ReadLegendEntry:yFa
 minRealR:Q9
 Cursor_MoveUp_To_LastRow:PG
-Objects:Ql
+Objects:Rl
 isManual:awa
 put_Superscript:ZZa
 GetDescender:r4
@@ -1692,7 +1692,7 @@ ReadTablePr:NHa
 preset:zv
 ARGS_ARE_XY_VALUES:ula
 Subscript:ns
-deleteLock:Vl
+deleteLock:Wl
 Refresh:qQ
 calculatedType:BV
 p_color:Ph
@@ -1917,7 +1917,7 @@ originalCanvasX:hYa
 numIDefs:IS
 swap_table:NX
 size_object_size:uya
-yy:Ml
+yy:Nl
 ReadInd:wFa
 max_instruction_defs:e2
 chartAsGroup:lx
@@ -2151,9 +2151,9 @@ asc_getSeries:PPa
 glyph_transform:Bva
 Statistics:RJ
 ALLOW_X_MOVE_ZP2_RULES_SIZE:mAa
-maxY:Jl
+maxY:Kl
 Set_Border:bh
-maxX:Il
+maxX:Jl
 hints_funcs:nD
 _labels_above:YQ
 maxR:oA
@@ -2198,7 +2198,7 @@ m_pFace:vi
 ReadTblStyleProperty:THa
 UnfoldFromCenter:q7a
 to_token:Lgb
-translatetNumberHandle:Ll
+translatetNumberHandle:Ml
 vertical:EG
 createResizeInGroupTrack:Ifa
 asc_getChart:TOa
@@ -2375,7 +2375,7 @@ DocumentOrientation:LT
 drawingObjectsController:S
 LoadFont:Pw
 DifferentFirst:zY
-Descent:Ol
+Descent:Pl
 AfterLoad:AAa
 vscrollStep:YX
 check_points:U9a
@@ -2414,7 +2414,7 @@ GetMMPerDot:Tg
 oldLayout:IO
 EndShowMessage:Fma
 CurLine:dE
-_ylabels_specific:Bl
+_ylabels_specific:Cl
 SkipRecord:Si
 sync_AlignCellCallback:V1a
 FontSlot:Uaa
@@ -2427,7 +2427,7 @@ _invalidCoord:G6
 m_oHtmlPage:MW
 GridSpan:Vf
 ALLOW_X_DMOVEX_RULES_SIZE:iAa
-Transition:Sl
+Transition:Tl
 Clear_LinkData:qBa
 CanvasHitContext:EA
 TableOutline:qs
@@ -2593,7 +2593,7 @@ Recalculate_Page:Io
 private_index:Qeb
 CommentAuthors:gC
 ReadBasicChart:UEa
-angle:Cl
+angle:Dl
 GetCurPos:t4a
 saturation:C0a
 baseJc:Zea
@@ -2722,7 +2722,7 @@ paraApply:nYa
 put_UseAlign:Nja
 asc_getCanReaderMode:QOa
 _ylabels_count:Jh
-rIns:Kl
+rIns:Ll
 GetCharSpacing:s4a
 darkgreen:hab
 Brd:wa
@@ -3314,7 +3314,7 @@ private_len:Av
 ctCommandDouble2:n$a
 ctCommandDouble1:m$a
 put_LineEndSize:kZa
-blipFill:Ul
+blipFill:Vl
 putLineEndSize:$eb
 force_bold_threshold:Eua
 deleteImage:hTa
@@ -3627,7 +3627,7 @@ getNumFormatStr:OTa
 transitionLock:Ev
 ScaleCrop:bpa
 WriteColorSpreadsheet:F7a
-hitInInnerArea:Yl
+hitInInnerArea:Zl
 load_sbit_image:twa
 canDownload:Gta
 __increments__:o_
@@ -3688,7 +3688,7 @@ put_HSpace:ZYa
 _labels_above_underline:kK
 reg:p0a
 library:zf
-m_arrTabs:Hl
+m_arrTabs:Il
 startAt:$I
 m_bIsSearching:pS
 get_ForSelectedCells:Fga
@@ -4144,7 +4144,7 @@ TopMargin:YJa
 setCellAllAlign:T0a
 GetDrawingPageInfo:NY
 GetLong:oa
-TxCache:zl
+TxCache:Al
 RestoreGrState:ky
 _id:$U
 polyline:Gn
@@ -4333,7 +4333,7 @@ cid_fd_array_offset:yfa
 m_bIsUpdateTargetNoAttack:sL
 standard_width:o3
 onKeyDownTBIM:bYa
-styleIndex:ql
+styleIndex:rl
 selectionInfo:N0a
 ClipInfo:HA
 get_Lines:VUa
@@ -4780,7 +4780,7 @@ get_t1_funcs:Cbb
 bulletSize:ar
 asc_getDefaultTitleFlag:F_
 WriteCSld:g_
-IntToUInt:vl
+IntToUInt:wl
 gold:Hbb
 _events_mousemove:ZE
 Items:pk
@@ -4789,7 +4789,7 @@ transformText:CG
 pp4:Hn
 pp1:um
 unicodes_char_index:Rza
-CoAuthoringApi:Nl
+CoAuthoringApi:Ol
 pp3:vm
 pp2:Zn
 getArrGraphicObjects:aA
@@ -4801,9 +4801,9 @@ lightsalmon:Bcb
 BoundY2:zT
 ClearRasterMemory:hma
 sbit_num_strikes:xfb
-chOffY:El
+chOffY:Fl
 put_Api:uja
-chOffX:Dl
+chOffX:El
 WriteTextBody:Dqa
 header_bottom:kD
 memory_size:Ndb
@@ -4969,7 +4969,7 @@ createRotateInGroupTrack:Jfa
 g_font_loader:hga
 axisHeight:kta
 Is_ContentOnFirstPage:bQ
-tt_metrics:sl
+tt_metrics:tl
 showPNG:fgb
 WritePolygonPoint:xqa
 asc_putGroup:EQa
@@ -5098,7 +5098,7 @@ put_isChartPross:Sja
 ReadMathMaxDist:wGa
 compiledLine:EV
 xMin:Qg
-Redo:yl
+Redo:zl
 ycount:haa
 _onConnectionStateChanged:ANa
 Rect:Fb
@@ -5262,7 +5262,7 @@ ignore_unpatented_hinter:Ybb
 newXfrmOffX:Kia
 newXfrmOffY:Lia
 ReadMathStrikeH:$Ga
-Read:xl
+Read:yl
 Refresh_DCChanges:mIa
 ReadMathPhantPr:JGa
 Start:Ad
@@ -5339,7 +5339,7 @@ api:hl
 COMPATIBILITY_MODE_RULES_SIZE:IAa
 AutoShapesTrack:lM
 Read_pgSz:hIa
-arrFormatAdobeLabels:Tl
+arrFormatAdobeLabels:Ul
 oCur_rPr:JI
 _annotatable:PC
 image_format:B8
@@ -5380,7 +5380,7 @@ put_WidowControl:H_a
 __hmargin__:Uqa
 CachedCanvasCtx:N3
 set_sbit_strike_stub:agb
-tIns:rl
+tIns:sl
 onPrevPage:qxa
 _scale_units_pre:h8a
 put_LastCol:fZa
@@ -5400,7 +5400,7 @@ faceIndexB:dI
 Caps:ej
 _font:yy
 getFullFlipH:gv
-WriteXfrm:Al
+WriteXfrm:Bl
 faceIndexI:fI
 updateExtents:qT
 MergeCells:UDa
@@ -5784,7 +5784,7 @@ nor:aeb
 func_round:yp
 asc_getAllCaps:COa
 _autoGrouping:el
-oDocument:$l
+oDocument:ql
 arrTransforms2:C_
 parentTrack:tA
 minMemType42:CXa
@@ -5862,7 +5862,7 @@ CalcValue:vP
 DetectData:xY
 get_mm:wbb
 SetStreamIndex:G5
-lIns:Gl
+lIns:Hl
 asc_getFontThumbnail:gPa
 m_oLeftRuler_vertRuler:XF
 m_bSizePct:yW
@@ -5943,7 +5943,7 @@ example:Zfa
 baseColors:dSa
 sync_SendProgress:Hka
 darkgoldenrod:fab
-BinaryFileWriter:tl
+BinaryFileWriter:ul
 IsPlayMode:bZ
 nType:i2
 move_to:NXa
@@ -6190,7 +6190,7 @@ UpdateInterfaceState:eKa
 getCanvasXY:fv
 checkMouseMove:T9a
 Shape:GC
-GetString2LE:ul
+GetString2LE:vl
 Id_new:cDa
 m_nIdCounterEdit:Bwa
 UpdateTargetFromPaint:PU
@@ -6391,7 +6391,7 @@ Timing:Wca
 Bounds:La
 Len:Mna
 asc_getTitleFormula:jQa
-IsRetina:Pl
+IsRetina:Ql
 get_Hyperlink:IUa
 IsSlideSelect:Fna
 CheckFontCache:S3
@@ -6440,7 +6440,7 @@ family:B0
 _isAuth:Cra
 put_Spacing:Kja
 getBounds:hD
-intervalObject:Fl
+intervalObject:Gl
 InitGuiCanvasShape:nna
 oUsedNumIdMap:bz
 ctPathCommandArcTo:E$a
@@ -6612,7 +6612,7 @@ get_Italic:OUa
 glyphCount:tva
 m_bBand_Hor:Sy
 fsType:yTa
-IsLocked:wl
+IsLocked:xl
 to_fixed_array:Mza
 sfnt_id:Eh
 ReadExtraColorScheme:dFa
@@ -7037,7 +7037,7 @@ lvl5pPr:adb
 Set_TableRowPr:sJa
 get_Jc:PUa
 Is_TopDocument:sE
-Status:Rl
+Status:Sl
 CopyTextPr:FP
 IsCanMoveMargins:ZY
 put_PageCount:BZa
@@ -7052,7 +7052,7 @@ ReleaseFontFace:V5a
 ps_parser_funcs:rja
 ctPenAlign:K$a
 load_hdmx_stub:Rcb
-getInvertTransform:Xl
+getInvertTransform:Yl
 sync_TextCaps:pza
 Add_AbstractNum:wAa
 num_charmaps:GI
@@ -7063,7 +7063,7 @@ ColumnEndX:Baa
 hdmx_table_size:Iva
 locals_bias:Rha
 Table_AddRow:O5
-drawingCtxCharts:Wl
+drawingCtxCharts:Xl
 put_pattern_type:W_a
 asc_editChartDrawingObject:yOa
 EndTrackAutoShape:j4a
