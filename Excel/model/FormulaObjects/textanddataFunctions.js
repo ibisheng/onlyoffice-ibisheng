@@ -339,8 +339,7 @@ cFormulaFunction.TextAndData = {
 
             if( num_digits > 0 ){
                 cNull=".";
-                for ( var i = 0; i < num_digits; i++, cNull += "0" ) {
-                }
+                for ( var i = 0; i < num_digits; i++, cNull += "0" ) {}
             }
 
             this.value = new cString(oNumFormatCache.get("$#,##0"+cNull+";($#,##0"+cNull+")").format(roundHelper( number, num_digits ).getValue(), CellValueType.Number, gc_nMaxDigCount)[0].text)
@@ -635,7 +634,13 @@ cFormulaFunction.TextAndData = {
 
             var number = arg0.getValue(), num_digits = arg1.getValue();
 
-            return this.value = new cString( toFix( roundHelper( number, num_digits ).toString(), arg2.toBool() ) );
+            var cNull = ""
+
+            if( num_digits > 0 ){
+                cNull=".";
+                for ( var i = 0; i < num_digits; i++, cNull += "0" ) {}
+            }
+            return this.value = new cString(oNumFormatCache.get("#"+(arg2.toBool()?"":",")+"##0"+cNull).format(roundHelper( number, num_digits ).getValue(), CellValueType.Number, gc_nMaxDigCount)[0].text)
         }
         r.getInfo = function () {
             return {
