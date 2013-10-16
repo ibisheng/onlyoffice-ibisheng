@@ -948,7 +948,7 @@ JSCompiler_StaticMethods_Add_Cell:Md
 _weight_obj:f1
 FT_Var_Axis:Dm
 JSCompiler_StaticMethods_swapTrackObjects:sE
-ParaTextPr:Be
+ParaTextPr:Ae
 ft_bitmap_glyph_class:hm
 JSCompiler_StaticMethods_Set_TableLook:WS
 FT_Var_Named_Style:Em
@@ -2385,7 +2385,7 @@ JSCompiler_StaticMethods_DrawRightBars:RT
 c_oAscSlideTransitionParams$Param_Bottom:Fi
 ft_var_apply_tuple:Ru
 JSCompiler_StaticMethods__commit_rPr:Se
-ParaTab:Me
+ParaTab:Le
 c_oSerProp_rPrType$Strikeout:aM
 c_oMainTables$Slides:pk
 FT_DivFix:Il
@@ -2939,12 +2939,12 @@ L 47:Ai
 L 46:je
 xhrSupported$$inline_1053:cz
 L 41:Kd
-JSCompiler_StaticMethods__read_rPr:ze
+JSCompiler_StaticMethods__read_rPr:xe
 L 40:ud
 ft_bitmap_glyph_init:Kl
 TT_Post_NamesRec:Ym
 L 43:hf
-L 42:xe
+L 42:ye
 HSLToRGB:t2
 STATES_ID_POLY_LINE_ADD:gF
 nbsp_string:KB
@@ -3090,7 +3090,7 @@ c_oSer_SettingsType$ClrSchemeMapping:OO
 CUniFill:Ge
 L 63:tg
 BULLET_TYPE_TYPEFACE_BUFONT:Lj
-L 68:ye
+L 68:ze
 L 69:Td
 c_oSerProp_rPrType$LangBidi:xM
 TRACK_DISTANCE_ROTATE2:F2
@@ -3128,10 +3128,10 @@ JSCompiler_StaticMethods_Document_UpdateUndoRedoState:HA
 L 93:bm
 CFontFileLoader:V
 FT_RoundFix:Al
-L 90:Le
+L 90:Me
 tt_name_entry_ascii_from_utf16:Zr
 Editor_Copy_GetElem:ka
-L 88:Ae
+L 88:Be
 L 89:Hg
 L 86:am
 L 87:cg
