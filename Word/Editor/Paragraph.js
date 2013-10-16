@@ -4021,7 +4021,7 @@ Paragraph.prototype =
         this.Internal_Draw_6( CurPage, pGraphics, Pr );
 
         // Убираем обрезку
-        if ( undefined != FramePr )
+        if ( undefined != FramePr && this.Parent instanceof CDocument  )
         {
             pGraphics.RestoreGrState();
         }
