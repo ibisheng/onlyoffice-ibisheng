@@ -3077,7 +3077,7 @@ parserFormula.prototype = {
             }
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) && ref.isValid() &&
-                this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction && this.outStack[i + 1].name == "ROWS" ) {
+                this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction && ( this.outStack[i + 1].name == "ROWS" || this.outStack[i + 1].name == "COLUMNS" ) ) {
                 continue;
             }
 
@@ -3099,7 +3099,7 @@ parserFormula.prototype = {
     },
 
     parseDiagramRef: function(){
-        var operand_expected = true, res = [[]];
+        var res = [[]];
         while ( this.pCurrPos < this.Formula.length ) {
             if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
 
@@ -3109,7 +3109,7 @@ parserFormula.prototype = {
 
             }
             else{
-                var found_operand = null, _3DRefTmp = null;
+                var _3DRefTmp = null;
 
                 if ( (_3DRefTmp = parserHelp.is3DRef.call( this, this.Formula, this.pCurrPos ))[0] ) {
                     this.is3D = true;
