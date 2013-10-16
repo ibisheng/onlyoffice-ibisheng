@@ -3201,6 +3201,7 @@ Paragraph.prototype =
                     if ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() )
                     {
                         Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits );
+                        Item.Reset_SavedPosition();
                         bFirstLineItem = false;
 
                         X += Item.WidthVisible;
@@ -3237,6 +3238,7 @@ Paragraph.prototype =
                                 {
                                     // Все нормально, можно продолжить пересчет
                                     LDRecalcInfo.Reset();
+                                    Item.Reset_SavedPosition();
                                 }
                                 else if ( true === this.Parent.Is_TableCellContent() )
                                 {
@@ -3268,6 +3270,7 @@ Paragraph.prototype =
                         {
                             // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
                             Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                            Item.Reset_SavedPosition();
                             continue;
                         }
                     }

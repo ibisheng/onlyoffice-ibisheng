@@ -3901,6 +3901,20 @@ ParaDrawing.prototype =
     },
     Update_Position : function(X, Y, PageNum, LastItemW, ColumnStartX, ColumnEndX, Left_Margin, Right_Margin, Page_W, Top_Margin, Bottom_Margin, Page_H, MarginH, MarginV, LineTop, ParagraphTop, PageLimits)
     {
+        if ( undefined != this.PositionH_Old )
+        {
+            this.PositionH.RelativeFrom = this.PositionH_Old.RelativeFrom2;
+            this.PositionH.Align        = this.PositionH_Old.Align2;
+            this.PositionH.Value        = this.PositionH_Old.Value2;
+        }
+
+        if ( undefined != this.PositionV_Old )
+        {
+            this.PositionV.RelativeFrom = this.PositionV_Old.RelativeFrom2;
+            this.PositionV.Align        = this.PositionV_Old.Align2;
+            this.PositionV.Value        = this.PositionV_Old.Value2;
+        }
+
         this.DocumentContent = this.Parent.Parent;
 
         var OtherFlowObjects = this.mainGraphicObjects.getAllFloatObjectsOnPage( PageNum, this.Parent.Parent );
@@ -3947,8 +3961,6 @@ ParaDrawing.prototype =
             this.Set_PositionH( this.PositionH_Old.RelativeFrom, false, Value );
             // На всякий случай пересчитаем заново координату
             this.X = this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
-
-            this.PositionH_Old = undefined;
         }
 
         if ( undefined != this.PositionV_Old )
@@ -3963,11 +3975,15 @@ ParaDrawing.prototype =
             this.Set_PositionV( this.PositionV_Old.RelativeFrom, false, Value );
             // На всякий случай пересчитаем заново координату
             this.Y = this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
-
-            this.PositionV_Old = undefined;
         }
 
         this.updatePosition3( this.PageNum, this.X, this.Y );
+    },
+
+    Reset_SavedPosition : function()
+    {
+        this.PositionV_Old = undefined;
+        this.PositionH_Old = undefined;
     },
 
     setParagraphBorders: function(val)
@@ -4250,14 +4266,22 @@ ParaDrawing.prototype =
         {
             RelativeFrom : this.PositionH.RelativeFrom,
             Align        : this.PositionH.Align,
-            Value        : this.PositionH.Value
+            Value        : this.PositionH.Value,
+
+            RelativeFrom2 : c_oAscRelativeFromH.Page,
+            Align2        : false,
+            Value2        : X
         };
 
         this.PositionV_Old =
         {
             RelativeFrom : this.PositionV.RelativeFrom,
             Align        : this.PositionV.Align,
-            Value        : this.PositionV.Value
+            Value        : this.PositionV.Value,
+
+            RelativeFrom2 : c_oAscRelativeFromV.Page,
+            Align2        : false,
+            Value2        : Y
         };
 
         this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
@@ -4342,14 +4366,22 @@ ParaDrawing.prototype =
             {
                 RelativeFrom : this.PositionH.RelativeFrom,
                 Align        : this.PositionH.Align,
-                Value        : this.PositionH.Value
+                Value        : this.PositionH.Value,
+
+                RelativeFrom2 : c_oAscRelativeFromH.Page,
+                Align2        : false,
+                Value2        : X
             };
 
             this.PositionV_Old =
             {
                 RelativeFrom : this.PositionV.RelativeFrom,
                 Align        : this.PositionV.Align,
-                Value        : this.PositionV.Value
+                Value        : this.PositionV.Value,
+
+                RelativeFrom2 : c_oAscRelativeFromV.Page,
+                Align2        : false,
+                Value2        : Y
             };
 
             this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
