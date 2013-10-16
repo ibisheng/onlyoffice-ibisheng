@@ -51,8 +51,8 @@ function CDocInfo (obj){
 		if (typeof obj.UserName != 'undefined'){
 			this.UserName = obj.UserName;
 		}
-		if (typeof obj.IsNew != 'undefined'){
-			this.IsNew = obj.IsNew;
+		if (typeof obj.Options != 'undefined'){
+			this.Options = obj.Options;
 		}
         if (obj.OfflineApp === true)
             this.OfflineApp = true;
@@ -65,7 +65,7 @@ function CDocInfo (obj){
 		this.VKey = null;
         this.UserId = null;
 		this.UserName = null;
-		this.IsNew = null;
+		this.Options = null;
 	}
 }
 CDocInfo.prototype.get_Id = function(){return this.Id}
@@ -84,8 +84,8 @@ CDocInfo.prototype.get_UserId = function(){return this.UserId;}
 CDocInfo.prototype.put_UserId = function(v){this.UserId = v;}
 CDocInfo.prototype.get_UserName = function(){return this.UserName;}
 CDocInfo.prototype.put_UserName = function(v){this.UserName = v;}
-CDocInfo.prototype.get_IsNew = function(){return this.IsNew;}
-CDocInfo.prototype.put_IsNew = function(v){this.IsNew = v;}
+CDocInfo.prototype.get_Options = function(){return this.Options;}
+CDocInfo.prototype.put_Options = function(v){this.Options = v;}
 
 function CListType(obj)
 {
@@ -916,7 +916,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     }
 
 	if(documentId){
-		if(this.DocInfo.get_IsNew())
+		var oOpenOptions = this.DocInfo.get_Options();
+		if(oOpenOptions && oOpenOptions["IsEmpty"])
 		{
 			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"create", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": g_sEmpty_bin};
 			sendCommand( oThis, function(){}, JSON.stringify(rData) );

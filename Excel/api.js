@@ -428,7 +428,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentOrigin 		= this.DocInfo["Origin"];
 					this.chartEditor			= this.DocInfo["ChartEditor"];
 					this.documentOpenOptions 	= this.DocInfo["Options"];
-					this.documentIsNew			= this.DocInfo["IsNew"];
 
 					var nIndex = -1;
 					if(this.documentTitle)
@@ -912,7 +911,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				}
 				else {
-					if(this.documentIsNew)
+					if(this.documentOpenOptions && this.documentOpenOptions["IsEmpty"])
 					{
 						var sEmptyWorkbook = getEmptyWorkbook();
 						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"create", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": sEmptyWorkbook};
