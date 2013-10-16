@@ -3523,6 +3523,7 @@ function DrawingObjects() {
 			else {
 				_this.asyncImageEndLoaded = function(_image) {
 					addImageObject(_image);
+					_this.asyncImageEndLoaded = null;
 				}
 			}
 		}
@@ -3568,6 +3569,7 @@ function DrawingObjects() {
 			else {
 				_this.asyncImageEndLoaded = function(_image) {
 					addImageObject(_image);
+					_this.asyncImageEndLoaded = null;
 				}
 			}
 		}
@@ -4412,6 +4414,7 @@ function DrawingObjects() {
 		else {
 			_this.asyncImageEndLoaded = function(_image) {
 				imageLoaded(_image);
+				_this.asyncImageEndLoaded = null;
 			}
 		}
 		
@@ -4462,13 +4465,12 @@ function DrawingObjects() {
             var _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1) 
             
 			if (null != _img) {
-                //objectProperties.ImageUrl = _img.src;
                 _this.controller.setGraphicObjectProps( objectProperties );
             }
             else {
                 _this.asyncImageEndLoaded = function(_image) {
-                    //objectProperties.ImageUrl = _image.src;
                     _this.controller.setGraphicObjectProps( objectProperties );
+					_this.asyncImageEndLoaded = null;
                 }
             }
         }
@@ -4477,13 +4479,12 @@ function DrawingObjects() {
 					
             var _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);            
 			if ( null != _img ) {
-                //objectProperties.ImageUrl = _img.src;
                 _this.controller.setGraphicObjectProps( objectProperties );
             }
             else {
                 _this.asyncImageEndLoaded = function(_image) {
-                    //objectProperties.ImageUrl = _image.src;
                     _this.controller.setGraphicObjectProps( objectProperties );
+					_this.asyncImageEndLoaded = null;
                 }
             }
         }
