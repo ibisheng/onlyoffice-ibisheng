@@ -91,12 +91,13 @@ CGroupShape.prototype =
 
     setDrawingObjects: function(drawingObjects)
     {
-        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
-        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-        this.drawingObjects = drawingObjects;
-
+		if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
+		{
+			var newValue = drawingObjects.getWorksheet().model.getId();
+			var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+			History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+			this.drawingObjects = drawingObjects;
+		}
     },
 
 

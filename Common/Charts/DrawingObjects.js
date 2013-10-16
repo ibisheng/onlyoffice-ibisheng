@@ -2757,13 +2757,13 @@ function DrawingObjects() {
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
 			drawingObject.updateAnchorPosition();
 			
+			// Check drawing area
 			if ( !worksheet.cols[drawingObject.to.col] ) {
 				while ( !worksheet.cols[drawingObject.to.col] ) {
 					worksheet.expandColsOnScroll(true);
 				}
 				worksheet.expandColsOnScroll(true); 	// для colOff
 			}
-			
 			if ( !worksheet.rows[drawingObject.to.row] ) {
 				while ( !worksheet.rows[drawingObject.to.row] ) {
 					worksheet.expandRowsOnScroll(true);
@@ -2771,11 +2771,12 @@ function DrawingObjects() {
 				worksheet.expandRowsOnScroll(true); 	// для rowOff
 			}
 			
+			// Object types
             if (drawingObject.graphicObject instanceof  CChartAsGroup) {
 				
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
 				drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.drawingObjects = _this;
+                drawingObject.graphicObject.setDrawingObjects(_this);
                 
 				if (drawingObject.graphicObject.chartTitle)
                     drawingObject.graphicObject.chartTitle.drawingObjects = _this;
@@ -2785,12 +2786,15 @@ function DrawingObjects() {
 				
                 drawingObject.graphicObject.init();
                 aObjects.push( drawingObject );
+				
+				var boundsChecker = _this.getBoundsChecker(drawingObject);
+				aBoundsCheckers.push(boundsChecker);
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
 				
 				drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.drawingObjects = _this;
-                drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
+				drawingObject.graphicObject.setDrawingObjects(_this);
+                drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
                 if(!xfrm)
@@ -2806,12 +2810,16 @@ function DrawingObjects() {
                 }
 				drawingObject.graphicObject.recalculate();
 				aObjects.push( drawingObject );
+				
+				var boundsChecker = _this.getBoundsChecker(drawingObject);
+				aBoundsCheckers.push(boundsChecker);
 			}
             if (drawingObject.graphicObject instanceof  CImageShape) {
 
 				aObjectsSync[aObjectsSync.length] = drawingObject;
                 drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.drawingObjects = _this;
+				drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
+                drawingObject.graphicObject.setDrawingObjects(_this);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
                 if(!xfrm)
@@ -2827,11 +2835,10 @@ function DrawingObjects() {
                 }
                 drawingObject.graphicObject.recalculate(aImagesSync);
 			}
-
             if (drawingObject.graphicObject instanceof  CGroupShape) {
 
                 drawingObject.graphicObject.drawingBase = drawingObject;
-                drawingObject.graphicObject.drawingObjects = _this;
+                drawingObject.graphicObject.setDrawingObjects(_this);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
                 if(!xfrm)
@@ -2849,6 +2856,9 @@ function DrawingObjects() {
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
                 drawingObject.graphicObject.recalculate(aImagesSync);
                 aObjects.push( drawingObject );
+				
+				var boundsChecker = _this.getBoundsChecker(drawingObject);
+				aBoundsCheckers.push(boundsChecker);
             }
 		}
 		
@@ -3517,6 +3527,7 @@ function DrawingObjects() {
 					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
 					drawingObject.graphicObject.initDefault( pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y), _image.src );
 					drawingObject.graphicObject.select(_this.controller);
+					drawingObject.graphicObject.setDrawingObjects(_this);
 					
 					drawingObject.graphicObject.addToDrawingObjects();
 				}

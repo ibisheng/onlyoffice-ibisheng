@@ -74,11 +74,13 @@ CChartAsGroup.prototype =
 
     setDrawingObjects: function(drawingObjects)
     {
-        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
-        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-        this.drawingObjects = drawingObjects;
+		if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
+		{
+			var newValue = drawingObjects.getWorksheet().model.getId();
+			var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+			History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+			this.drawingObjects = drawingObjects;
+		}
     },
 
     getBoundsInGroup: function()
@@ -1859,6 +1861,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
+		this.chart = new asc_CChart();
         this.chart.Read_FromBinary2(r, false);
         this.spPr.Read_FromBinary2(r);
         if(isRealNumber(x) && isRealNumber(y))

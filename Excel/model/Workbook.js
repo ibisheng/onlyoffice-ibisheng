@@ -2292,7 +2292,6 @@ Woorksheet.prototype.clone=function(sNewId){
 	oNewWs.hyperlinkManager.startRecalculate();
 	if(null != this.Drawings && this.Drawings.length > 0)
     {
-
         oNewWs.Drawings = [];
         var w = new CMemory();
         for(var i = 0; i < this.Drawings.length; ++i)
@@ -2305,7 +2304,8 @@ Woorksheet.prototype.clone=function(sNewId){
         for(var i = 0; i < this.Drawings.length; ++i)
         {
             var obj = null;
-            switch(stream.GetLong())
+			var objectType = stream.GetLong();
+            switch (objectType)
             {
                 case CLASS_TYPE_SHAPE:
                 {
@@ -2322,7 +2322,7 @@ Woorksheet.prototype.clone=function(sNewId){
                     obj = new CGroupShape(null, null);
                     break;
                 }
-                case CLASS_TYPE_CHART:
+                case CLASS_TYPE_CHART_AS_GROUP:
                 {
                     obj = new CChartAsGroup(null, null);
                     break;
@@ -2330,8 +2330,8 @@ Woorksheet.prototype.clone=function(sNewId){
             }
             if(isRealObject(obj))
             {
-                var drawingObject = drawingObjects.createDrawingObject();
-                obj.readFromBinaryForCopyPaste2(stream, null, null, null, null);
+                var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
+                obj.readFromBinaryForCopyPaste2(stream, null, drawingObjects, null, null);
                 drawingObject.graphicObject = obj;
                 oNewWs.Drawings.push(drawingObject);
             }
