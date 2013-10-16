@@ -2704,7 +2704,7 @@ CChartAsGroup.prototype =
                     if(r.GetBool())
                     {
                         this.chart = new asc_CChart();
-                        r.GetLong();
+                        //r.GetLong();
                         this.chart.Read_FromBinary2(r);
                     }
                     else
