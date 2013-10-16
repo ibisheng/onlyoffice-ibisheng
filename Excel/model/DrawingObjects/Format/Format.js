@@ -1523,7 +1523,7 @@ CBlipFill.prototype =
         Writer.WriteBool(flag);
         if(flag)
         {
-            var string_to_write =  getFullImageSrc(this.RasterImageId);
+            var string_to_write = window["Asc"]["editor"].documentOrigin +  getFullImageSrc(this.RasterImageId);
             /*if(string_to_write.indexOf(documentOrigin) !== 0
                 && string_to_write.indexOf("http:") !== 0
                 && string_to_write.indexOf("https:") !== 0
@@ -1550,6 +1550,17 @@ CBlipFill.prototype =
         }
 
         Writer.WriteBool(this.rotWithShape);
+        var w = Writer;
+        var bool = isRealObject(this.srcRect) && isRealNumber(this.srcRect.l) && isRealNumber(this.srcRect.t)
+            && isRealNumber(this.srcRect.r) && isRealNumber(this.srcRect.b);
+        w.WriteBool(bool);
+        if(bool)
+        {
+            w.WriteDouble(this.srcRect.l);
+            w.WriteDouble(this.srcRect.t);
+            w.WriteDouble(this.srcRect.r);
+            w.WriteDouble(this.srcRect.b);
+        }
     },
 
     Read_FromBinary2 : function(Reader)
@@ -1582,6 +1593,14 @@ CBlipFill.prototype =
         }
 
         this.rotWithShape = Reader.GetBool();
+        if(Reader.GetBool())
+        {
+            this.srcRect = new CSrcRect();
+            this.srcRect.l = Reader.GetDouble();
+            this.srcRect.t = Reader.GetDouble();
+            this.srcRect.r = Reader.GetDouble();
+            this.srcRect.b = Reader.GetDouble();
+        }
     },
 
     createDuplicate : function()
