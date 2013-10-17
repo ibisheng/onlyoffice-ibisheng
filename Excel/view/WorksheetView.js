@@ -1048,7 +1048,8 @@
 								if (1 !== oRule.aRuleElements.length)
 									break;
 								oRuleElement = oRule.aRuleElements[0];
-								if (!(oRuleElement instanceof asc.CColorScale))
+								// ToDo убрать null === aCFs[i].SqRefRange когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
+								if (!(oRuleElement instanceof asc.CColorScale) || null === aCFs[i].SqRefRange)
 									break;
 								aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function (c) {
 									if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
