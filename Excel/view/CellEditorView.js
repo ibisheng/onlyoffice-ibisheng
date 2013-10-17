@@ -1779,7 +1779,7 @@
 						}
 						break;
 
-					case 83: // S
+					/*case 83: // S
 						if (event.ctrlKey) {
 							if (!t.hasFocus) {t.setFocus(true);}
 							if (hieroglyph) {t._syncEditors();}
@@ -1788,7 +1788,7 @@
 								tryCloseEditor();
 							return false;
 						}
-						break;
+						break;*/
 
 					case 85: // U
 						if (event.ctrlKey) {

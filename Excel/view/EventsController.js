@@ -626,7 +626,7 @@
 					}
 
 					// Почему-то очень хочется обрабатывать лишние условия в нашем коде, вместо обработки наверху...
-					if (!t.enableKeyEvents && event.ctrlKey && (80 === event.which || 83 === event.which)) {
+					if (!t.enableKeyEvents && event.ctrlKey && (80 === event.which/* || 83 === event.which*/)) {
 						// Только если отключены эвенты и нажаты Ctrl+S или Ctrl+P мы их обработаем
 						break;
 					}
@@ -789,7 +789,7 @@
 					case 53: // make strikethrough	Ctrl + 5
 					case 66: // make bold			Ctrl + b
 					case 73: // make italic			Ctrl + i
-					case 83: // save				Ctrl + s
+					//case 83: // save				Ctrl + s
 					case 85: // make underline		Ctrl + u
 					case 86: // paste				Ctrl + v
 					case 88: // cut					Ctrl + x
@@ -816,7 +816,7 @@
 								73: function () {stop(); t.handlers.trigger("setFontAttributes", "i");},
 								85: function () {stop(); t.handlers.trigger("setFontAttributes", "u");},
 								80: function () {stop(); t.handlers.trigger("print");},
-								83: function () {stop(); t.handlers.trigger("save");},
+								//83: function () {stop(); t.handlers.trigger("save");},
 								67: function () {t.handlers.trigger("copy");},
 								86: function () {
 									if (!window.GlobalPasteFlag)
