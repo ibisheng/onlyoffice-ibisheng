@@ -85,14 +85,8 @@
 		prot["asc_getColor"] = prot.asc_getColor;
 
 		function asc_CBorder(style, color) {
-			if (3 === arguments.length) {
-				// ToDo заглушка на время, пока уберут код в меню
-				this.style = arguments[1] !== undefined ? arguments[1] : "none";
-				this.color = arguments[2] !== undefined ? arguments[2] : null;
-			} else {
-				this.style = style !== undefined ? style : "none";
-				this.color = color !== undefined ? color : null;
-			}
+			this.style = style !== undefined ? style : "none";
+			this.color = color !== undefined ? color : null;
 		}
 
 		asc_CBorder.prototype = {
