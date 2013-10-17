@@ -2424,7 +2424,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     else
         ParaPr.StyleName = this.WordControl.m_oLogicDocument.Styles.Style[ParaPr.PStyle].Name;
 
-    if ( null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId )
+    if ( null == ParaPr.NumPr || 0 === ParaPr.NumPr.NumId || "0" === ParaPr.NumPr.NumId )
         ParaPr.ListType = {Type: -1, SubType : -1};
     else
     {
