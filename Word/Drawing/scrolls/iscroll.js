@@ -1009,6 +1009,12 @@ CTouchScroll.prototype = {
 		that.minScrollY = 0;
 		that.scrollerW = that.api.m_dDocumentWidth;
 		that.scrollerH = that.api.m_dDocumentHeight;
+
+        var _oldMaxX = that.maxScrollX;
+        var _oldMaxY = that.maxScrollY;
+        var _oldX = that.x;
+        var _oldY = that.y;
+
 		that.maxScrollX = -that.api.m_dScrollX_max;
 		that.maxScrollY = -that.api.m_dScrollY_max;
 
@@ -1023,11 +1029,32 @@ CTouchScroll.prototype = {
 			that.maxScrollX = that.wrapperW - that.scrollerW;
 			that.maxScrollY = that.wrapperH - that.scrollerH + that.minScrollY;
 
-			that.y = 0;
+            // теперь посмотрим
+			/*
+            that.y = 0;
 			if (0 < that.api.m_dScrollY_max)
 			{
 				that.y = (that.api.m_dScrollY * that.maxScrollY / that.api.m_dScrollY_max) >> 0;
 			}
+			*/
+            that.x = 0;
+            that.y = 0;
+            if (that.maxScrollX < 0)
+            {
+                that.x = (_oldX * _oldMaxX / that.maxScrollX) >> 0;
+                if (that.x > 0)
+                    that.x = 0;
+                if (that.x < that.maxScrollX)
+                    that.x = that.maxScrollX;
+            }
+            if (that.maxScrollY < 0)
+            {
+                that.y = (_oldY * _oldMaxY / that.maxScrollY) >> 0;
+                if (that.y > 0)
+                    that.y = 0;
+                if (that.y < that.maxScrollY)
+                    that.y = that.maxScrollY;
+            }
 		}
 		that.dirX = 0;
 		that.dirY = 0;

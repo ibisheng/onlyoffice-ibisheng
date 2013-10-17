@@ -1755,7 +1755,7 @@ function CMobileTouchManager()
         if (_bIsRet)
             return;
 
-        if (null != this.RectSelect1 && null != this.RectSelect2)
+        if (null != this.RectSelect1 && null != this.RectSelect2 && !this.HtmlPage.m_oApi.isViewMode)
         {
             var _matrix = this.DrawingDocument.TextMatrix;
 
@@ -1843,6 +1843,9 @@ function CMobileTouchManager()
 
     this.OnScrollAnimationEnd = function()
     {
+        if (this.HtmlPage.m_oApi.isViewMode)
+            return;
+
         if (null != this.RectSelect1 && null != this.RectSelect2)
         {
             var pos1 = null;
@@ -2685,7 +2688,10 @@ function CReaderTouchManager()
         this.HtmlPage.ReaderModeDivWrapper.style.height = this.HtmlPage.m_oMainView.HtmlElement.style.height;
 
         if (this.iScroll != null)
+        {
             this.iScroll.refresh();
+            this.iScroll._pos(this.iScroll.x, this.iScroll.y, false);
+        }
     }
 
     this.Destroy = function()

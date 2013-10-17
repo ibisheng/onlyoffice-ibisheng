@@ -75,7 +75,7 @@ COverlay.prototype =
     VertLine : function(position)
     {
         this.Clear();
-        if (this.m_bIsAlwaysUpdateOverlay || editor.WordControl.m_oDrawingDocument.m_bIsSelection)
+        if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
         {
             if (!editor.WordControl.OnUpdateOverlay())
             {
@@ -138,7 +138,7 @@ COverlay.prototype =
     HorLine : function(position)
     {
         this.Clear();
-        if (this.m_bIsAlwaysUpdateOverlay || editor.WordControl.m_oDrawingDocument.m_bIsSelection)
+        if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
         {
             if (!editor.WordControl.OnUpdateOverlay())
             {

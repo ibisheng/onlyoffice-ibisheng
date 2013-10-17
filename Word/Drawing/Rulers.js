@@ -1223,7 +1223,7 @@ function CHorRuler()
         if (7 != this.DragType)
         {
             word_control.UpdateHorRuler();
-            word_control.m_oOverlayApi.UnShow();
+            //word_control.m_oOverlayApi.UnShow();
         }
 
         var _margin_left = this.m_dMarginLeft;
@@ -1279,7 +1279,7 @@ function CHorRuler()
         if (7 == this.DragType)
         {
             word_control.UpdateHorRuler();
-            word_control.m_oOverlayApi.UnShow();
+            //word_control.m_oOverlayApi.UnShow();
         }
 
         this.IsDrawingCurTab = true;
@@ -1298,7 +1298,7 @@ function CHorRuler()
         if (7 != this.DragType)
         {
             word_control.UpdateHorRuler();
-            word_control.m_oOverlayApi.UnShow();
+            //word_control.m_oOverlayApi.UnShow();
         }
 
         var _margin_left = this.m_dMarginLeft;
@@ -1354,7 +1354,7 @@ function CHorRuler()
         if (7 == this.DragType)
         {
             word_control.UpdateHorRuler();
-            word_control.m_oOverlayApi.UnShow();
+            //word_control.m_oOverlayApi.UnShow();
         }
 
         this.IsDrawingCurTab = true;
@@ -2474,7 +2474,7 @@ function CVerRuler()
     {
         var lockedElement = check_MouseUpEvent(e);
 
-        this.m_oWordControl.m_oOverlayApi.UnShow();
+        //this.m_oWordControl.m_oOverlayApi.UnShow();
         this.m_oWordControl.m_oOverlayApi.Clear();
 
         switch (this.DragType)
@@ -2504,7 +2504,7 @@ function CVerRuler()
 
     this.OnMouseUpExternal = function()
     {
-        this.m_oWordControl.m_oOverlayApi.UnShow();
+        //this.m_oWordControl.m_oOverlayApi.UnShow();
         this.m_oWordControl.m_oOverlayApi.Clear();
 
         switch (this.DragType)
