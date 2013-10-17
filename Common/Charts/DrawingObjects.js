@@ -3320,6 +3320,10 @@ function DrawingObjects() {
 		}
 		*****************************************/
 		
+		// Undo/Redo
+		if ( worksheet.model.index != api.wb.wsActive )
+			return;
+		
 		if ( drawingCtx ) {
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
