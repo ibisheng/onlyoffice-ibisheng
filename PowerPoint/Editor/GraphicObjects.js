@@ -1602,11 +1602,14 @@ CGraphicObjects.prototype = {
         options.theme = this.slide.Layout.Master.Theme;
         editor.chartStyleManager.init(options);
 
+        var presentation = editor.WordControl.m_oLogicDocument;
+        var chart_width = 0.264583*c_oAscChartDefines.defaultChartWidth;
+        var chart_height = 0.264583*c_oAscChartDefines.defaultChartHeight;
         ret.chart.initDefault();
-        ret.spPr.xfrm.offX = 0;
-        ret.spPr.xfrm.offY = 0;
-        ret.spPr.xfrm.extX = editor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);//this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
-        ret.spPr.xfrm.extY = editor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);//0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
+        ret.spPr.xfrm.offX = (presentation.Width - chart_width)/2;
+        ret.spPr.xfrm.offY = (presentation.Height - chart_height)/2;
+        ret.spPr.xfrm.extX = chart_width;//this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
+        ret.spPr.xfrm.extY = chart_height;//0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
         return ret;
     },
 
