@@ -3194,7 +3194,7 @@ UndoRedoWoorksheet.prototype = {
 				if(g_oUndoRedoAutoFiltersMoveData)
 				{
 					var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-					worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
+					worksheetView.autoFilters._moveAutoFilters(null, null, g_oUndoRedoAutoFiltersMoveData);
 					g_oUndoRedoAutoFiltersMoveData = null;
 				}
 			}
