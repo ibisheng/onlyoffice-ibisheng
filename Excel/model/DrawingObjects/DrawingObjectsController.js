@@ -403,7 +403,7 @@ DrawingObjectsController.prototype =
 
     getAscChartObject: function()
     {
-        if (this.selectedObjects.length === 1)
+        /*if (this.selectedObjects.length === 1)
         {
             if ( this.selectedObjects[0].isChart() ) {
 				this.selectedObjects[0].syncAscChart();
@@ -420,9 +420,26 @@ DrawingObjectsController.prototype =
 					}
                 }
             }
-        }
+        }*/
 		
-        return null;
+		var chart = null;
+		for (var i = 0; i < this.selectedObjects.length; i++) {
+			if ( this.selectedObjects[i].isChart() ) {
+				if ( chart != null )
+					return null;
+				chart = new asc_CChart(this.selectedObjects[0].chart);
+			}
+			if ( this.selectedObjects[i].isGroup() ) {
+				for ( var j = 0; j < this.selectedObjects[i].arrGraphicObjects.length; j++ ) {
+					if ( this.selectedObjects[i].arrGraphicObjects[j].isChart() ) {
+						if ( chart != null )
+							return null;
+						chart = new asc_CChart(this.selectedObjects[i].arrGraphicObjects[j].chart);
+					}
+				}
+			}
+		}
+        return chart;
     },
 
     editChartDrawingObjects: function(chart)
