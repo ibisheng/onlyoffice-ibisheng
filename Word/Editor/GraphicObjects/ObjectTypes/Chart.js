@@ -1286,7 +1286,7 @@ CChartAsGroup.prototype =
 
         var _radius;
         if(!(typeof radius === "number"))
-            _radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+            _radius = editor.WordControl.m_oDrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
         else
             _radius = radius;
 
@@ -1374,7 +1374,7 @@ CChartAsGroup.prototype =
             }
 
             _dist_x = _relative_x - _horizontal_center;
-            _dist_y = _relative_y + this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
+            _dist_y = _relative_y + editor.WordControl.m_oDrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
 
             if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
             {
