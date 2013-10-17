@@ -2764,15 +2764,12 @@ CCellValue.prototype =
 					}
 					if(false == bFindResult)
 					{
+						aRes = null;
 						sText = null;
-						var oNewFont = new Font();
 						if(dDigitsCount > 1)
-						{
-							oNewFont.repeat = true;
-							aText = [{text: "#", format: oNewFont}];
-						}
+							aText = [{text: "#", format: {repeat: true}}];
 						else
-							aText = [{text: "", format: oNewFont}];
+							aText = [{text: "", format: {}}];
 					}
 				}
 			}
