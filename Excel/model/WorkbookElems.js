@@ -3072,15 +3072,17 @@ CCellValue.prototype =
 					var format = item.format;
 					if(null != item.theme)
 						format.c = g_oColorManager.getThemeColor(item.theme, item.tint);
-					else
+					else if(null != format && null != format.c)
 					{
-						//todo убрать это преобразование
-						if(null != format && null != format.c && "string" == typeof(format.c))
+						var color = format.c;
+						format.c = null;
+						if("string" == typeof(color))
 						{
+							//todo убрать это преобразование
 							//переводим обратно в число
-							if(0 == format.c.indexOf("#"))
+							if(0 == color.indexOf("#"))
 							{
-								var hex = format.c.substring(1);
+								var hex = color.substring(1);
 								if(hex.length == 3)
 									hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
 								if(hex.length == 6)
@@ -3088,11 +3090,14 @@ CCellValue.prototype =
 									var r = parseInt("0x" + hex.substring(0,2));
 									var g = parseInt("0x" + hex.substring(2,4));
 									var b = parseInt("0x" + hex.substring(4,6));
-									format.c = r << 16 | g <<  8 | b;
+									format.c = new RgbColor(r << 16 | g <<  8 | b);
 								}
 							}
 						}
-						format.c = new RgbColor(format.c);
+						else if("number" == typeof(color))
+							format.c = new RgbColor(color);
+						else if(color instanceof RgbColor || color instanceof ThemeColor)
+							format.c = color;
 					}
 					
 					var oNewElem = new CCellValueMultiText();
