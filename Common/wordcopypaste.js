@@ -740,8 +740,8 @@ CopyProcessor.prototype =
 					this.oCurHyperlinkElem = document.createElement( "a" );
 					if(null != this.oCurHyperlink.Value)
 						this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
-					if(null != this.oCurHyperlink.Tooltip)
-						this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+					if(null != this.oCurHyperlink.ToolTip)
+						this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.ToolTip);
 				}
                 break;
             case para_HyperlinkEnd:
@@ -793,8 +793,8 @@ CopyProcessor.prototype =
                         this.oCurHyperlinkElem = document.createElement( "a" );
                         if(null != this.oCurHyperlink.Value)
                             this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
-                        if(null != this.oCurHyperlink.Tooltip)
-                            this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+                        if(null != this.oCurHyperlink.ToolTip)
+                            this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.ToolTip);
                         //���������� ��� �������������� �������� � ������
                         for(var i = 0; i < this.Para.childNodes.length; i++)
                         {
@@ -942,8 +942,8 @@ CopyProcessor.prototype =
             this.oCurHyperlinkElem = document.createElement( "a" );
             if(null != this.oCurHyperlink.Value)
                 this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
-            if(null != this.oCurHyperlink.Tooltip)
-                this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+            if(null != this.oCurHyperlink.ToolTip)
+                this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.ToolTip);
         }
         // TODO : ����������� ��������, ���  ������ ������� Hyperlink. ������� �� ����������.
         if ( ParaStart > 0 )
