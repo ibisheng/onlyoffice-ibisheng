@@ -1089,55 +1089,55 @@
 			}
 			case "1":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "4":{
 				val = [];
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "16":{
 				val = [];
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "64":{
 				val = [];
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "85":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder("thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "170":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder("thick", "#000");
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder("thick", "#000");
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder("thick", "#000");
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder("thick", "#000");
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "324":{
 				val = [];
-				val[c_oAscBorderOptions.DiagD] = new window.Asc.asc_CBorder("thin", "#000");
+				val[c_oAscBorderOptions.DiagD] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, "#000");
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "341":{
 				val = [];
-				val[c_oAscBorderOptions.DiagU] = new window.Asc.asc_CBorder("thin", "#000");
+				val[c_oAscBorderOptions.DiagU] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, "#000");
 				api.asc_setCellBorders(val);
 				break;
 			}

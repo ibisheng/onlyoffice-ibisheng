@@ -629,7 +629,8 @@ function BorderProp()
 		s: 0,
 		c: 1
 	};
-	this.s = "none";
+	this.s = c_oAscBorderStyles.None;
+	//this.w = c_oAscBorderWidth.None;
 	this.c = g_oColorManager.getThemeColor(1);
 }
 BorderProp.prototype = {
@@ -642,11 +643,11 @@ BorderProp.prototype = {
 	},
 	isEmpty : function()
 	{
-		return "none" == this.s;
+		return c_oAscBorderStyles.None === this.s;
 	},
 	isEqual : function(val)
 	{
-		return this.s == val.s && g_oColorManager.isEqual(this.c, val.c);
+		return this.s === val.s && g_oColorManager.isEqual(this.c, val.c);
 	},
 	clone : function()
 	{
@@ -656,7 +657,7 @@ BorderProp.prototype = {
 	},
 	merge : function(oBorderProp)
 	{
-		if(null != oBorderProp.s && "none" != oBorderProp.s)
+		if(null != oBorderProp.s && c_oAscBorderStyles.None !== oBorderProp.s)
 		{
 			this.s = oBorderProp.s;
 			if(null != oBorderProp.c)
@@ -687,7 +688,7 @@ BorderProp.prototype = {
 			case this.Properties.c: this.c = value;break;
 		}
 	}
-}
+};
 /** @constructor */
 function Border(val)
 {
@@ -713,7 +714,7 @@ function Border(val)
 	this.iv = val.iv.clone();
 	this.dd = val.dd;
 	this.du = val.du;
-};
+}
 Border.prototype =
 {
 	_mergeProperty : function(first, second, def)
@@ -967,7 +968,7 @@ CellXfs.prototype =
 				if(null != first.merge)
 					res = first.merge(second);
 				else
-					res = from;
+					res = first;
 			}
 		}
 		return res;

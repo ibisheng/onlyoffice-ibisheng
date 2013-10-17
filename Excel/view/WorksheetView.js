@@ -80,19 +80,19 @@
 		 * @const
 		 */
 		var kcbNone             = "none";
-		var kcbThick            = "thick";
-		var kcbThin             = "thin";
-		var kcbMedium           = "medium";
-		var kcbDashDot          = "dashDot";
-		var kcbDashDotDot       = "dashDotDot";
-		var kcbDashed           = "dashed";
-		var kcbDotted           = "dotted";
-		var kcbDouble           = "double";
-		var kcbHair             = "hair";
-		var kcbMediumDashDot    = "mediumDashDot";
-		var kcbMediumDashDotDot = "mediumDashDotDot";
-		var kcbMediumDashed     = "mediumDashed";
-		var kcbSlantDashDot     = "slantDashDot";
+		var kcbThick            = c_oAscBorderStyles.Thick;
+		var kcbThin             = c_oAscBorderStyles.Thin;
+		var kcbMedium           = c_oAscBorderStyles.Medium;
+		var kcbDashDot          = c_oAscBorderStyles.DashDot;
+		var kcbDashDotDot       = c_oAscBorderStyles.DashDotDot;
+		var kcbDashed           = c_oAscBorderStyles.Dashed;
+		var kcbDotted           = c_oAscBorderStyles.Dotted;
+		var kcbDouble           = c_oAscBorderStyles.Double;
+		var kcbHair             = c_oAscBorderStyles.Hair;
+		var kcbMediumDashDot    = c_oAscBorderStyles.MediumDashDot;
+		var kcbMediumDashDotDot = c_oAscBorderStyles.MediumDashDotDot;
+		var kcbMediumDashed     = c_oAscBorderStyles.MediumDashed;
+		var kcbSlantDashDot     = c_oAscBorderStyles.SlantDashDot;
 
 		var kcbThinBorders      = [kcbThin, kcbDashDot, kcbDashDotDot, kcbDashed, kcbDotted, kcbHair];
 		var kcbMediumBorders    = [kcbMedium, kcbMediumDashDot, kcbMediumDashDotDot, kcbMediumDashed, kcbSlantDashDot];
@@ -163,7 +163,7 @@
 				return new CellBorder(style, color, width, isErased, isActive);
 			}
 			/** @type {String} */
-			this.s = style !== undefined ? style : kcbNone;
+			this.s = style !== undefined ? style : c_oAscBorderStyles.None;
 			/** @type {Number} */
 			this.c = color !== undefined ? color.getRgb() : 0;
 			/** @type {Number} */
@@ -2547,7 +2547,7 @@
 
 				// ToDo в одну функцию
 				function drawBorderHor(border, x1, y, x2) {
-					if (border.s !== kcbNone && !border.isErased) {
+					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
 							color = asc_n2css(bc);
@@ -2561,7 +2561,7 @@
 				}
 
 				function drawBorderVer(border, x1, y1, y2) {
-					if (border.s !== kcbNone && !border.isErased) {
+					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
 							color = asc_n2css(bc);
@@ -2575,7 +2575,7 @@
 				}
 
 				function drawDiag(border, x1, y1, x2, y2) {
-					if (border.s !== kcbNone && !border.isErased) {
+					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
 							color = asc_n2css(bc);
@@ -2650,8 +2650,8 @@
 						if (isMerged || mergedCellsStage &&
 							row !== range.r1 && row !== range.r2&& col !== range.c1 && col !== range.c2) {continue;}
 
-						var hasDD = dd.w > 0 && dd.s !== kcbNone;
-						var hasDU = du.w > 0 && du.s !== kcbNone;
+						var hasDD = dd.w > 0 && dd.s !== c_oAscBorderStyles.None;
+						var hasDU = du.w > 0 && du.s !== c_oAscBorderStyles.None;
 						if ( (hasDD || hasDU) && (!mergedCellsStage || row === range.r1 && col === range.c1) ) {
 							// ToDo bug merge cells
 							ctx.save()
@@ -4047,7 +4047,7 @@
 				var border = this._getBorderPropById(bor, type);
 
 				function calcActiveBorder(prev, next) {
-					var ab = next && (next.s !== kcbNone || !prev) ? next : prev;
+					var ab = next && (next.s !== c_oAscBorderStyles.None || !prev) ? next : prev;
 					if (prev && prev !== ab) {
 						prev.s = ab.s;
 						prev.c = ab.c;
@@ -4184,8 +4184,9 @@
 				if (null !== bg)
 					return false;
 				var cb = c.getBorder();
-				if ((cb.l && kcbNone !== cb.l.s) || (cb.r && kcbNone !== cb.r.s) || (cb.t && kcbNone !== cb.t.s) ||
-					(cb.b && kcbNone !== cb.b.s) || (cb.dd && kcbNone !== cb.dd.s)  || (cb.du && kcbNone !== cb.du.s))
+				if ((cb.l && c_oAscBorderStyles.None !== cb.l.s) || (cb.r && c_oAscBorderStyles.None !== cb.r.s) ||
+					(cb.t && c_oAscBorderStyles.None !== cb.t.s) || (cb.b && c_oAscBorderStyles.None !== cb.b.s) ||
+					(cb.dd && c_oAscBorderStyles.None !== cb.dd.s)  || (cb.du && c_oAscBorderStyles.None !== cb.du.s))
 					return false;
 				return c.getValue().search(/[^ ]/) < 0;
 			},
@@ -6907,7 +6908,7 @@
 					function makeBorder(b) {
 						var border = {};
 						if (b === false) {
-							border.s = kcbNone;
+							border.s = c_oAscBorderStyles.None;
 						} else if (b) {
 							if (b.style !== null && b.style !== undefined) {border.s = b.style;}
 							if (b.color !== null && b.color !== undefined) {
@@ -7085,7 +7086,7 @@
 										if(!aFilters[aF].autoFilter)
 											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
 									}
-								};
+								}
 								
 								// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
 								arn.c1 = 0;

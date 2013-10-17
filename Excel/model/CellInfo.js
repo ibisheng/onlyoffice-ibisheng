@@ -85,7 +85,17 @@
 		prot["asc_getColor"] = prot.asc_getColor;
 
 		function asc_CBorder(style, color) {
-			this.style = style !== undefined ? style : "none";
+			// ToDo заглушка для создания border-а
+			if (typeof style === "string") {
+				switch (style) {
+					case "thin"		: this.style = c_oAscBorderStyles.Thin; break;
+					case "medium"	: this.style = c_oAscBorderStyles.Medium; break;
+					case "thick"	: this.style = c_oAscBorderStyles.Thick; break;
+					default			: this.style = c_oAscBorderStyles.None; break;
+				}
+			} else {
+				this.style = style !== undefined ? style : c_oAscBorderStyles.None;
+			}
 			this.color = color !== undefined ? color : null;
 		}
 

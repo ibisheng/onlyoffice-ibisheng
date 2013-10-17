@@ -746,20 +746,19 @@
 			 * cell border styles
 			 * @const
 			 */
-			this.kcbNone             = "none";
-			this.kcbThick            = "thick";
-			this.kcbThin             = "thin";
-			this.kcbMedium           = "medium";
-			this.kcbDashDot          = "dashDot";
-			this.kcbDashDotDot       = "dashDotDot";
-			this.kcbDashed           = "dashed";
-			this.kcbDotted           = "dotted";
-			this.kcbDouble           = "double";
-			this.kcbHair             = "hair";
-			this.kcbMediumDashDot    = "mediumDashDot";
-			this.kcbMediumDashDotDot = "mediumDashDotDot";
-			this.kcbMediumDashed     = "mediumDashed";
-			this.kcbSlantDashDot     = "slantDashDot";
+			this.kcbThick            = c_oAscBorderStyles.Thick;
+			this.kcbThin             = c_oAscBorderStyles.Thin;
+			this.kcbMedium           = c_oAscBorderStyles.Medium;
+			this.kcbDashDot          = c_oAscBorderStyles.DashDot;
+			this.kcbDashDotDot       = c_oAscBorderStyles.DashDotDot;
+			this.kcbDashed           = c_oAscBorderStyles.Dashed;
+			this.kcbDotted           = c_oAscBorderStyles.Dotted;
+			this.kcbDouble           = c_oAscBorderStyles.Double;
+			this.kcbHair             = c_oAscBorderStyles.Hair;
+			this.kcbMediumDashDot    = c_oAscBorderStyles.MediumDashDot;
+			this.kcbMediumDashDotDot = c_oAscBorderStyles.MediumDashDotDot;
+			this.kcbMediumDashed     = c_oAscBorderStyles.MediumDashed;
+			this.kcbSlantDashDot     = c_oAscBorderStyles.SlantDashDot;
 
 			this.kcbThinBorders      = [this.kcbThin, this.kcbDashDot, this.kcbDashDotDot, this.kcbDashed, this.kcbDotted, this.kcbHair];
 			this.kcbMediumBorders    = [this.kcbMedium, this.kcbMediumDashDot, this.kcbMediumDashDotDot, this.kcbMediumDashed, this.kcbSlantDashDot];
@@ -890,7 +889,7 @@
 				var bc, bw;
 				var t = this;
 				var drawBorder = function (b, x1, y1, x2, y2) {
-					if (null != b && "none" != b.s) {
+					if (null != b && c_oAscBorderStyles.None !== b.s) {
 						bc = asc.numberToCSSColor(b.c.getRgb());
 						oGraphics.setStrokeStyle(bc);
 

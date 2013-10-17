@@ -5222,31 +5222,31 @@
 					if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.border)
 					{
 						var borders = styleOptions.wholeTable.dxf.border;
-						if(borders.t.s != 'none')
+						if(borders.t.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(borders.t.getRgbOrNull()).color;
 							ctx.moveTo(0.5,0.5);
 							ctx.lineTo(Math.floor(xSize) + 0.5,0.5);
 						}
-						if(borders.b.s != 'none')
+						if(borders.b.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(borders.b.getRgbOrNull()).color;
 							ctx.moveTo(0,Math.floor(ySize) - 0.5);
 							ctx.lineTo(Math.floor(xSize) + 0.5,Math.floor(ySize) - 0.5)
 						}					
-						if(borders.l.s != 'none')
+						if(borders.l.s !== c_oAscBorderStyles.None)
 						{	
 							ctx.strokeStyle = Asc.parseColor(borders.l.getRgbOrNull()).color;
 							ctx.moveTo(0.5,0.5);
 							ctx.lineTo(0.5,Math.floor(ySize) + 0.5)
 						}
-						if(borders.r.s != 'none')
+						if(borders.r.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(borders.r.getRgbOrNull()).color;
 							ctx.moveTo(Math.floor(xSize) - 0.5,0.5);
 							ctx.lineTo(Math.floor(xSize) - 0.5,Math.floor(ySize) + 0.5);
 						}
-						if(borders.ih.s != 'none')
+						if(borders.ih.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(borders.ih.getRgbOrNull()).color;
 							for(var n = 1; n < 5; n++)
@@ -5256,7 +5256,7 @@
 							}
 							ctx.stroke();			
 						}
-						if(borders.iv.s != 'none')
+						if(borders.iv.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(borders.iv.getRgbOrNull()).color;
 							for(var n = 1; n < 5; n++)
@@ -5272,7 +5272,6 @@
 					if(styleInfo.ShowRowStripes)
 					{
 						var border;
-						var color;
 						if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border)
 							border = styleOptions.firstRowStripe.dxf.border;
 						else if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border)
@@ -5280,11 +5279,6 @@
 						
 						if(border)
 						{
-							if(border.t.s != 'none')
-								color = Asc.parseColor(border.t.getRgbOrNull()).color;
-							else if(border.b.s != 'none')
-								color = Asc.parseColor(border.b.getRgbOrNull()).color;
-							
 							for(n = 1; n < 5; n++)
 							{
 								ctx.moveTo(0,Math.floor(stepY*n) + 0.5);
@@ -5296,7 +5290,7 @@
 					if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
 					{
 						var border = styleOptions.totalRow.dxf.border;
-						if(border.t.s != 'none')
+						if(border.t.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(border.t.getRgbOrNull()).color;
 							ctx.moveTo(xSize,0.5);
@@ -5306,13 +5300,13 @@
 					if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
 					{
 						var border = styleOptions.headerRow.dxf.border;
-						if(border.t.s != 'none')
+						if(border.t.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(border.t.getRgbOrNull()).color;
 							ctx.moveTo(0,0.5);
 							ctx.lineTo(xSize,0.5);
 						}
-						if(border.b.s != 'none')
+						if(border.b.s !== c_oAscBorderStyles.None)
 						{
 							ctx.strokeStyle = Asc.parseColor(border.b.getRgbOrNull()).color;
 							ctx.moveTo(0,Math.floor(stepY) + 0.5);

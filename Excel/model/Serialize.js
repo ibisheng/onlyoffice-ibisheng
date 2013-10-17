@@ -1494,20 +1494,20 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
             var nStyle = EBorderStyle.borderstyleNone;
             switch(borderProp.s)
             {
-            case "dashDot":nStyle = EBorderStyle.borderstyleDashDot;break;
-            case "dashDotDot":nStyle = EBorderStyle.borderstyleDashDotDot;break;
-            case "dashed":nStyle = EBorderStyle.borderstyleDashed;break;
-            case "dotted":nStyle = EBorderStyle.borderstyleDotted;break;
-            case "double":nStyle = EBorderStyle.borderstyleDouble;break;
-            case "hair":nStyle = EBorderStyle.borderstyleHair;break;
-            case "medium":nStyle = EBorderStyle.borderstyleMedium;break;
-            case "mediumDashDot":nStyle = EBorderStyle.borderstyleMediumDashDot;break;
-            case "mediumDashDotDot":nStyle = EBorderStyle.borderstyleMediumDashDotDot;break;
-            case "mediumDashed":nStyle = EBorderStyle.borderstyleMediumDashed;break;
-            case "none":nStyle = EBorderStyle.borderstyleNone;break;
-            case "slantDashDot":nStyle = EBorderStyle.borderstyleSlantDashDot;break;
-            case "thick":nStyle = EBorderStyle.borderstyleThick;break;
-            case "thin":nStyle = EBorderStyle.borderstyleThin;break;
+				case c_oAscBorderStyles.DashDot:			nStyle = EBorderStyle.borderstyleDashDot;break;
+            	case c_oAscBorderStyles.DashDotDot:			nStyle = EBorderStyle.borderstyleDashDotDot;break;
+            	case c_oAscBorderStyles.Dashed:				nStyle = EBorderStyle.borderstyleDashed;break;
+            	case c_oAscBorderStyles.Dotted:				nStyle = EBorderStyle.borderstyleDotted;break;
+            	case c_oAscBorderStyles.Double:				nStyle = EBorderStyle.borderstyleDouble;break;
+            	case c_oAscBorderStyles.Hair:				nStyle = EBorderStyle.borderstyleHair;break;
+            	case c_oAscBorderStyles.Medium:				nStyle = EBorderStyle.borderstyleMedium;break;
+            	case c_oAscBorderStyles.MediumDashDot:		nStyle = EBorderStyle.borderstyleMediumDashDot;break;
+            	case c_oAscBorderStyles.MediumDashDotDot:	nStyle = EBorderStyle.borderstyleMediumDashDotDot;break;
+            	case c_oAscBorderStyles.MediumDashed:		nStyle = EBorderStyle.borderstyleMediumDashed;break;
+            	case c_oAscBorderStyles.None:				nStyle = EBorderStyle.borderstyleNone;break;
+            	case c_oAscBorderStyles.SlantDashDot:		nStyle = EBorderStyle.borderstyleSlantDashDot;break;
+            	case c_oAscBorderStyles.Thick:				nStyle = EBorderStyle.borderstyleThick;break;
+            	case c_oAscBorderStyles.Thin:				nStyle = EBorderStyle.borderstyleThin;break;
             }
             this.memory.WriteByte(c_oSerBorderPropTypes.Style);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -4351,21 +4351,21 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
         {
             switch(this.stream.GetUChar())
             {
-            case EBorderStyle.borderstyleDashDot:oBorderProp.s = "dashDot";break;
-            case EBorderStyle.borderstyleDashDotDot:oBorderProp.s = "dashDotDot";break;
-            case EBorderStyle.borderstyleDashed:oBorderProp.s = "dashed";break;
-            case EBorderStyle.borderstyleDotted:oBorderProp.s = "dotted";break;
-            case EBorderStyle.borderstyleDouble:oBorderProp.s = "double";break;
-            case EBorderStyle.borderstyleHair:oBorderProp.s = "hair";break;
-            case EBorderStyle.borderstyleMedium:oBorderProp.s = "medium";break;
-            case EBorderStyle.borderstyleMediumDashDot:oBorderProp.s = "mediumDashDot";break;
-            case EBorderStyle.borderstyleMediumDashDotDot:oBorderProp.s = "mediumDashDotDot";break;
-            case EBorderStyle.borderstyleMediumDashed:oBorderProp.s = "mediumDashed";break;
-            case EBorderStyle.borderstyleNone:oBorderProp.s = "none";break;
-            case EBorderStyle.borderstyleSlantDashDot:oBorderProp.s = "slantDashDot";break;
-            case EBorderStyle.borderstyleThick:oBorderProp.s = "thick";break;
-            case EBorderStyle.borderstyleThin:oBorderProp.s = "thin";break;
-            default :oBorderProp.s = "none";break;
+				case EBorderStyle.borderstyleDashDot:			oBorderProp.s = c_oAscBorderStyles.DashDot;break;
+            	case EBorderStyle.borderstyleDashDotDot:		oBorderProp.s = c_oAscBorderStyles.DashDotDot;break;
+            	case EBorderStyle.borderstyleDashed:			oBorderProp.s = c_oAscBorderStyles.Dashed;break;
+            	case EBorderStyle.borderstyleDotted:			oBorderProp.s = c_oAscBorderStyles.Dotted;break;
+            	case EBorderStyle.borderstyleDouble:			oBorderProp.s = c_oAscBorderStyles.Double;break;
+            	case EBorderStyle.borderstyleHair:				oBorderProp.s = c_oAscBorderStyles.Hair;break;
+            	case EBorderStyle.borderstyleMedium:			oBorderProp.s = c_oAscBorderStyles.Medium;break;
+            	case EBorderStyle.borderstyleMediumDashDot:		oBorderProp.s = c_oAscBorderStyles.MediumDashDot;break;
+            	case EBorderStyle.borderstyleMediumDashDotDot:	oBorderProp.s = c_oAscBorderStyles.MediumDashDotDot;break;
+            	case EBorderStyle.borderstyleMediumDashed:		oBorderProp.s = c_oAscBorderStyles.MediumDashed;break;
+            	case EBorderStyle.borderstyleNone:				oBorderProp.s = c_oAscBorderStyles.None;break;
+            	case EBorderStyle.borderstyleSlantDashDot:		oBorderProp.s = c_oAscBorderStyles.SlantDashDot;break;
+            	case EBorderStyle.borderstyleThick:				oBorderProp.s = c_oAscBorderStyles.Thick;break;
+            	case EBorderStyle.borderstyleThin:				oBorderProp.s = c_oAscBorderStyles.Thin;break;
+            	default :										oBorderProp.s = c_oAscBorderStyles.None;break;
             }
         }
         else if ( c_oSerBorderPropTypes.Color == type )

@@ -316,7 +316,7 @@
 					var g = Math.floor(Math.random() * 255);
 					var b = Math.floor(Math.random() * 255);
 					val = [];
-					val[t] = new window.Asc.asc_CBorder("thick", "rgb("+r+","+g+","+b+")");
+					val[t] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "rgb("+r+","+g+","+b+")");
 					api.asc_setCellBorders(val);
 				});
 				$("#copyws").click(function(){

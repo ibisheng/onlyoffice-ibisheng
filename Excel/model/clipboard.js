@@ -11,23 +11,6 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var doc = window.document;
-
-		
-		var kBorder = {
-			"thick"            : ["solid", 3],
-			"thin"             : ["solid", 1],
-			"medium"           : ["solid", 2],
-			"dashDot"          : ["dashed", 1],
-			"dashDotDot"       : ["dashed", 1],
-			"dashed"           : ["dashed", 1],
-			"dotted"           : ["dotted", 1],
-			"double"           : ["double", 3],
-			"hair"             : ["dotted", 1],
-			"mediumDashDot"    : ["dashed", 2],
-			"mediumDashDotDot" : ["dashed", 2],
-			"mediumDashed"     : ["dashed", 2],
-			"slantDashDot"     : ["dashed", 2]
-		};
 		
 		var isTruePaste = false;
 		//activate local buffer
@@ -1193,30 +1176,45 @@
 					text: ''});
 				return res; 
 			},
-			
-			_getTrueWidth: function (borderWidth)
-			{
-				if(borderWidth == '0.5pt')
-					borderWidth = '1px';
-				else if(borderWidth == '1pt')
-					borderWidth = '2px';
-				else if(borderWidth == '1.5pt')
-					borderWidth = '3px';
-				return borderWidth;
+
+			_getBorderStyleName: function (borderStyle, borderWidth) {
+				var res = null;
+				var nBorderWidth = parseFloat(borderWidth);
+				if (isNaN(nBorderWidth))
+					return res;
+				if (-1 !== borderWidth.indexOf("pt"))
+					nBorderWidth = nBorderWidth * 96 / 72;
+
+				switch (borderStyle) {
+					case "solid":
+						if (0 < nBorderWidth && nBorderWidth <= 1)
+							res = c_oAscBorderStyles.Thin;
+						else if (1 < nBorderWidth && nBorderWidth <= 2)
+							res = c_oAscBorderStyles.Medium;
+						else
+							res = c_oAscBorderStyles.Thick;
+						break;
+					case "dashed":
+						if (0 < nBorderWidth && nBorderWidth <= 1)
+							res = c_oAscBorderStyles.DashDot;
+						else
+							res = c_oAscBorderStyles.MediumDashDot;
+						break;
+					case "double": res = c_oAscBorderStyles.Double; break;
+					case "dotted": res = c_oAscBorderStyles.hair; break;
+				}
+				return res;
 			},
 			
 			_getArray: function (node, isText)
             {
                 var aResult = new Array();
-                var oNewItem = new Object();
+                var oNewItem = [];
+				var tmpBorderStyle, borderStyleName;
                 var t = this;
-                var kBorderRev = ["solid3","solid1","solid2","dashed1","double3","dotted1","dashed2","dashed2"]
-                var kBorderRevVal = ["thick","thin","medium","dashDot","double","hair","mediumDashDot","slantDashDot"]
 				
 				if(node == undefined)
 					node = document.createElement('span');
-				
-                oNewItem = [];
 				
 				if(node == undefined || node == null)
 				{
@@ -1227,106 +1225,108 @@
 				//style for text
 				else if(node.children != undefined && node.children.length == 0)
 				{
-					oNewItem[0] = t._setStylesTextPaste(node)
+					oNewItem[0] = t._setStylesTextPaste(node);
 					oNewItem.fonts = [];
 					oNewItem.fonts[0] = oNewItem[0].format.fn;
 				}
 				else
 				{
 					if(typeof(node) == 'string' || node.children.length == 0 || node.children.length == 1  && node.children[0].nodeName == '#text')
-						oNewItem =t._makeCellValuesHtml(node,isText)
+						oNewItem =t._makeCellValuesHtml(node,isText);
 					else
-						oNewItem =t._makeCellValuesHtml(node.childNodes,isText)
+						oNewItem =t._makeCellValuesHtml(node.childNodes,isText);
 				}
 				
 				//borders
                 oNewItem.borders = {};
                 oNewItem.borders.l  = {};oNewItem.borders.r  = {};oNewItem.borders.b  = {};oNewItem.borders.t  = {};
-                if($(node).css('border-top-style') != 'none' && $(node).css('border-top-style') != null)
-                {
+
+				tmpBorderStyle = $(node).css('border-top-style');
+                if ("none" !== tmpBorderStyle && null != tmpBorderStyle) {
                     var borderTopWidth = node.style.borderTopWidth;
 					if(borderTopWidth == '')
 						borderTopWidth = $(node).css('border-top-width');
-					borderTopWidth = t._getTrueWidth(borderTopWidth);
 					
 					var borderTopStyle = node.style.borderTopStyle;
 					if(borderTopStyle == '')
-						borderTopStyle = $(node).css('border-top-style');
+						borderTopStyle = tmpBorderStyle;
 					
 					/*var borderTopColor = node.style.borderTopColor;
 					if(borderTopColor == '')
 						borderTopColor = $(node).css('border-top-color');*/
 					var borderTopColor = 0;
-					
-					oNewItem.borders.t.c = new RgbColor(borderTopColor);
-                    var style = borderTopStyle + parseInt(borderTopWidth).toString();
-					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
-						oNewItem.borders.t.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+
+					borderStyleName = this._getBorderStyleName(borderTopStyle, borderTopWidth);
+					if (null !== borderStyleName) {
+						oNewItem.borders.t.s = borderStyleName;
+						oNewItem.borders.t.c = new RgbColor(borderTopColor);
+					}
                 }
-                if($(node).css('border-bottom-style') != 'none' && $(node).css('border-bottom-style') != null)
-                {
+
+				tmpBorderStyle = $(node).css('border-bottom-style');
+				if ("none" !== tmpBorderStyle && null != tmpBorderStyle) {
 					var borderBottomWidth = node.style.borderBottomWidth;
 					if(borderBottomWidth == '')
 						borderBottomWidth = $(node).css('border-bottom-width');
-					borderBottomWidth = t._getTrueWidth(borderBottomWidth);
 					
 					var borderBottomStyle = node.style.borderBottomStyle;
 					if(borderBottomStyle == '')
-						borderBottomStyle = $(node).css('border-bottom-style');
+						borderBottomStyle = tmpBorderStyle;
 					
 					/*var borderBottomColor = node.style.borderBottomColor;
 					if(borderBottomColor == '')
 						borderBottomColor = $(node).css('border-bottom-color');*/
 					var borderBottomColor = 0;
-					
-					oNewItem.borders.b.c = new RgbColor(borderBottomColor);
-                     var style = borderBottomStyle + parseInt(borderBottomWidth).toString();
-					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
-						 oNewItem.borders.b.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
-                    
-                }
-                if($(node).css('border-left-style') != 'none' && $(node).css('border-left-style') != null)
-                {
 
+					borderStyleName = this._getBorderStyleName(borderBottomStyle, borderBottomWidth);
+					if (null !== borderStyleName) {
+						oNewItem.borders.b.s = borderStyleName;
+						oNewItem.borders.b.c = new RgbColor(borderBottomColor);
+					}
+                }
+
+				tmpBorderStyle = $(node).css('border-left-style');
+                if ("none" !== tmpBorderStyle && null != tmpBorderStyle) {
                     var borderLeftWidth = node.style.borderLeftWidth;
 					if(borderLeftWidth == '')
 						borderLeftWidth = $(node).css('border-left-width');
-					borderLeftWidth = t._getTrueWidth(borderLeftWidth);
 					
 					var borderLeftStyle = node.style.borderLeftStyle;
 					if(borderLeftStyle == '')
-						borderLeftStyle = $(node).css('border-left-style');
+						borderLeftStyle = tmpBorderStyle;
 					
 					/*var borderLeftColor = node.style.borderLeftColor;
 					if(borderLeftColor == '')
 						borderLeftColor = $(node).css('border-left-color');*/
 					var borderLeftColor = 0;
-					
-					oNewItem.borders.l.c = new RgbColor(borderLeftColor);
-                      var style = borderLeftStyle + parseInt(borderLeftWidth).toString();
-					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
-						 oNewItem.borders.l.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+
+					borderStyleName = this._getBorderStyleName(borderLeftStyle, borderLeftWidth);
+					if (null !== borderStyleName) {
+						oNewItem.borders.l.s = borderStyleName;
+						oNewItem.borders.l.c = new RgbColor(borderLeftColor);
+					}
                 }
-                if($(node).css('border-right-style') != 'none' && $(node).css('border-right-style') != null)
-                {
+
+				tmpBorderStyle = $(node).css('border-right-style');
+                if ("none" !== tmpBorderStyle && null != tmpBorderStyle) {
                     var borderRightWidth = node.style.borderRightWidth;
 					if(borderRightWidth == '')
 						borderRightWidth = $(node).css('border-right-width');
-					borderRightWidth = t._getTrueWidth(borderRightWidth);
 					
 					var borderRightStyle = node.style.borderRightStyle;
 					if(borderRightStyle == '')
-						borderRightStyle = $(node).css('border-right-style');
+						borderRightStyle = tmpBorderStyle;
 					
 					/*var borderRightColor = node.style.borderRightColor;
 					if(borderRightColor == '')
 						borderRightColor = $(node).css('border-right-color'); */
 					var borderRightColor = 0;
-					
-					oNewItem.borders.r.c = new RgbColor(borderRightColor);
-                      var style = borderRightStyle + parseInt(borderRightWidth).toString();
-					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
-						 oNewItem.borders.r.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+
+					borderStyleName = this._getBorderStyleName(borderRightStyle, borderRightWidth);
+					if (null !== borderStyleName) {
+						oNewItem.borders.r.s = borderStyleName;
+						oNewItem.borders.r.c = new RgbColor(borderRightColor);
+					}
                 }
 				
 				//wrap
@@ -1360,7 +1360,7 @@
                 }
 				
 				if(node.style.verticalAlign != undefined  && node.style.verticalAlign != null && node.style.verticalAlign != '' && node.style.verticalAlign != 'middle')
-					oNewItem.va = node.style.verticalAlign
+					oNewItem.va = node.style.verticalAlign;
 				else if(node.style.verticalAlign == 'middle')
 					oNewItem.va = 'center';
 				else
@@ -1396,8 +1396,8 @@
 						oNewItem.toolTip = null;
 				}
                 
-                aResult.push(oNewItem)
-                return aResult
+                aResult.push(oNewItem);
+                return aResult;
             },
 
 			_IsBlockElem : function(name)
@@ -1439,8 +1439,8 @@
 							if(child.nodeName.toLowerCase() != 'table')
 								t._countTags(child,array);
 						child = child.nextSibling;
-					};
-				};
+					}
+				}
 				return array;
 			},
 			
@@ -1552,7 +1552,7 @@
                 var isMerge  = worksheet.model.getRange(new CellAddress(range.r1, range.c1, 0), new CellAddress(range.r2, range.c2, 0));
 				var testFragment = $.extend(true, {},node);
 				var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-				$(testFragment).children('br').remove()
+				$(testFragment).children('br').remove();
 				
 				//в случае если приходит простой текст, преращаем его в корректную html - проблема характерна для FF
 				if(testFragment.children.length == 0)
@@ -1774,13 +1774,13 @@
 															var curCell = {
 																col: tC ,
 																row: tR + imgCol
-															}
+															};
 															var tag = $(_tBody).find('img')[imgCol];
 															addImages[imCount] = 
 															{
 																curCell: curCell,
 																tag: tag
-															}
+															};
 															imCount++;
 														}
 														
@@ -1817,13 +1817,13 @@
 													var curCell = {
 														col: tC,
 														row: tR + imgCol
-													}
+													};
 													var tag = $(_tBody).find('img')[imgCol];
 													addImages[imCount] = 
 													{
 														curCell: curCell,
 														tag: tag
-													}
+													};
 													imCount++;
 												}
 												
@@ -1859,14 +1859,14 @@
 							var curCell = {
 								col: c,
 								row: r + tableRowCount
-							}
+							};
 							if(addImages == null)
 								addImages = [];
 							addImages[imCount] = 
 							{
 								curCell: curCell,
 								tag: tag
-							}
+							};
 							imCount++;
 							c = range.c2;
 						}
@@ -2105,9 +2105,41 @@
 				}
 
 				function makeBorder(border) {
-					return !border || !border.s || border.s === "none" ?
-							"" :
-							kBorder[border.s][1] + "px " + kBorder[border.s][0] + " " + number2color(border.getRgbOrNull());
+					var style = "";
+					var width = 0;
+					if (!border || border.s === c_oAscBorderStyles.None)
+						return "";
+
+					switch(border.s) {
+						case c_oAscBorderStyles.Thin:
+							style = "solid"; width = 1;
+							break;
+						case c_oAscBorderStyles.Medium:
+							style = "solid"; width = 2;
+							break;
+						case c_oAscBorderStyles.Thick:
+							style = "solid"; width = 3;
+							break;
+						case c_oAscBorderStyles.DashDot:
+						case c_oAscBorderStyles.DashDotDot:
+						case c_oAscBorderStyles.Dashed:
+							style = "dashed"; width = 1;
+							break;
+						case c_oAscBorderStyles.Double:
+							style = "double"; width = 2;
+							break;
+						case c_oAscBorderStyles.Hair:
+						case c_oAscBorderStyles.Dotted:
+							style = "dotted"; width = 1;
+							break;
+						case c_oAscBorderStyles.MediumDashDot:
+						case c_oAscBorderStyles.MediumDashDotDot:
+						case c_oAscBorderStyles.MediumDashed:
+						case c_oAscBorderStyles.SlantDashDot:
+							style = "dashed"; width = 2;
+							break;
+					}
+					return style + "px " + width + " " + number2color(border.getRgbOrNull());
 				}
 
 				table = doc.createElement("TABLE");
