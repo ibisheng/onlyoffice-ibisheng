@@ -1929,7 +1929,8 @@ function CDrawingDocument()
 
     this.OnRecalculatePage = function(index, pageObject)
     {
-        this.TableOutlineDr.TableOutline = null;
+        if (!this.m_oWordControl.MobileTouchManager)
+            this.TableOutlineDr.TableOutline = null;
         editor.asc_fireCallback("asc_onDocumentChanged");
         if (true === this.m_bIsSearching)
         {

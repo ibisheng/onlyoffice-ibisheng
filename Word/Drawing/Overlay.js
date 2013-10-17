@@ -72,14 +72,17 @@ COverlay.prototype =
         this.m_oControl.HtmlElement.style.display = "none";
     },
 
-    VertLine : function(position)
+    VertLine : function(position, bIsSimpleAdd)
     {
-        this.Clear();
-        if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
+        if (bIsSimpleAdd !== true)
         {
-            if (!editor.WordControl.OnUpdateOverlay())
+            this.Clear();
+            if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
             {
-                editor.WordControl.EndUpdateOverlay();
+                if (!editor.WordControl.OnUpdateOverlay())
+                {
+                    editor.WordControl.EndUpdateOverlay();
+                }
             }
         }
 
@@ -135,14 +138,17 @@ COverlay.prototype =
         this.Show();
     },
 
-    HorLine : function(position)
+    HorLine : function(position, bIsSimpleAdd)
     {
-        this.Clear();
-        if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
+        if (bIsSimpleAdd !== true)
         {
-            if (!editor.WordControl.OnUpdateOverlay())
+            this.Clear();
+            if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
             {
-                editor.WordControl.EndUpdateOverlay();
+                if (!editor.WordControl.OnUpdateOverlay())
+                {
+                    editor.WordControl.EndUpdateOverlay();
+                }
             }
         }
 

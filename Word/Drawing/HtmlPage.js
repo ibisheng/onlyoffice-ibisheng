@@ -184,6 +184,7 @@ function CEditorPage(api)
     this.bIsRetinaNoSupportAttack = false;
 
     this.IsUpdateOverlayOnlyEnd = false;
+    this.IsUpdateOverlayOnlyEndReturn = false;
     this.IsUpdateOverlayOnEndCheck = false;
 
     this.m_oApi = api;
@@ -562,29 +563,64 @@ function CEditorPage(api)
             if (__hasTouch)
             {
                 this.TextBoxBackground.HtmlElement["ontouchcancel"] = function (e){
-                    return oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
 
                 this.TextBoxBackground.HtmlElement["ontouchstart"] = function (e){
-                    return oThis.MobileTouchManager.onTouchStart(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchStart(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
                 this.TextBoxBackground.HtmlElement["ontouchmove"] = function (e){
-                    return oThis.MobileTouchManager.onTouchMove(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchMove(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
                 this.TextBoxBackground.HtmlElement["ontouchend"] = function (e){
-                    return oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
             }
             else
             {
                 this.TextBoxBackground.HtmlElement["onmousedown"] = function (e){
-                    return oThis.MobileTouchManager.onTouchStart(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchStart(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
                 this.TextBoxBackground.HtmlElement["onmousemove"] = function (e){
-                    return oThis.MobileTouchManager.onTouchMove(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchMove(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
                 this.TextBoxBackground.HtmlElement["onmouseup"] = function (e){
-                    return oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = true;
+                    oThis.StartUpdateOverlay();
+                    var ret = oThis.MobileTouchManager.onTouchEnd(e);
+                    oThis.IsUpdateOverlayOnlyEndReturn = false;
+                    oThis.EndUpdateOverlay();
+                    return ret;
                 }
             }
 
@@ -2654,6 +2690,9 @@ function CEditorPage(api)
     }
     this.EndUpdateOverlay = function()
     {
+        if (this.IsUpdateOverlayOnlyEndReturn)
+            return;
+
         this.IsUpdateOverlayOnlyEnd = false;
         if (this.IsUpdateOverlayOnEndCheck)
             this.OnUpdateOverlay();

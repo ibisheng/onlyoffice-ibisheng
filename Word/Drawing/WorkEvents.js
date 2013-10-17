@@ -2230,12 +2230,12 @@ function CMobileTouchManager()
                 if (0 == this.TableCurrentMoveDir)
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex);
-                    overlay.VertLine(_pos.X);
+                    overlay.VertLine(_pos.X, true);
                 }
                 else
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex);
-                    overlay.HorLine(_pos.Y);
+                    overlay.HorLine(_pos.Y, true);
                 }
             }
         }
@@ -2337,12 +2337,12 @@ function CMobileTouchManager()
                 if (0 == this.TableCurrentMoveDir)
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-                    overlay.VertLine(_pos.X);
+                    overlay.VertLine(_pos.X, true);
                 }
                 else
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue,_table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-                    overlay.HorLine(_pos.Y);
+                    overlay.HorLine(_pos.Y, true);
                 }
             }
         }
@@ -2505,12 +2505,12 @@ function CMobileTouchManager()
                 if (0 == this.TableCurrentMoveDir)
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex);
-                    overlay.VertLine(_pos.X);
+                    overlay.VertLine(_pos.X, true);
                 }
                 else
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue, _table_outline_dr.CurrentPageIndex);
-                    overlay.HorLine(_pos.Y);
+                    overlay.HorLine(_pos.Y, true);
                 }
             }
         }
@@ -2628,12 +2628,12 @@ function CMobileTouchManager()
                 if (0 == this.TableCurrentMoveDir)
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(this.TableCurrentMoveValue, 0, _table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-                    overlay.VertLine(_pos.X);
+                    overlay.VertLine(_pos.X, true);
                 }
                 else
                 {
                     var _pos = this.DrawingDocument.ConvertCoordsToCursorWR(0, this.TableCurrentMoveValue,_table_outline_dr.CurrentPageIndex, _table_outline_dr.TableMatrix);
-                    overlay.HorLine(_pos.Y);
+                    overlay.HorLine(_pos.Y, true);
                 }
             }
         }
