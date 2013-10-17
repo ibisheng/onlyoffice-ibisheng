@@ -1267,6 +1267,9 @@ CPresentation.prototype =
         this.Recalculate();
     },
 
+    redrawCharts: function()
+    {},
+
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( undefined === bFlow )

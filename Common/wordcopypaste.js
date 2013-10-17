@@ -4036,6 +4036,12 @@ PasteProcessor.prototype =
             {
                 arr_shapes[arr_shapes.length - 1].setGraphicObject(arr_shapes[arr_shapes.length - 1].graphicObject.Copy(arr_shapes[arr_shapes.length - 1]));
             }
+            if(arr_shapes[arr_shapes.length - 1] instanceof  CChartAsGroup)
+            {
+                var chart = arr_shapes[arr_shapes.length - 1];
+                var copy = chart.copy(chart.parent);
+                arr_shapes[arr_shapes.length - 1] = copy;
+            }
         }
 
         return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl()};

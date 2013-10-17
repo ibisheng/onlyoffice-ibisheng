@@ -31,7 +31,7 @@ function CChartTitle(chartGroup, type)
     this.transform = new CMatrix();
     this.transformText = new CMatrix();
 
-    this.recalculateInfo =
+    this.recalcInfo =
     {
         recalculateTransform: true,
         recalculateBrush: true,

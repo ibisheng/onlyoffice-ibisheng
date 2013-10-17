@@ -198,17 +198,26 @@ CChartAsGroup.prototype =
     setDiagram: function(chartPr)
     {
         var chart = chartPr.ChartProperties;
+
+        var w = new CMemory();
+        this.chart.Write_ToBinary2(w);
+        var bin =  w.pos + ";" + w.GetBase64Memory();
+
+        var new_chart_data = new asc_CChart(this.chart);
+        var r = CreateBinaryReader(bin, 0, bin.length);
+        new_chart_data.Read_FromBinary2(r);
         if(chart.styleId != null)
-            this.chart.asc_setStyleId(chart.styleId);
+            new_chart_data.asc_setStyleId(chart.styleId);
         if(chart.subType != null)
-            this.chart.asc_setSubType(chart.subType);
+            new_chart_data.asc_setSubType(chart.subType);
         if(chart.type != null)
-            this.chart.asc_setType(chart.type);
+            new_chart_data.asc_setType(chart.type);
 
         if(chartPr.Width != null && chartPr.Height != null)
             this.setXfrm(null, null,chartPr.Width,  chartPr.Height, null, null, null);
         if(chart.type != null)
-            this.chart.asc_setType(chart.type);
+            new_chart_data.asc_setType(chart.type);
+        this.setAscChart(new_chart_data);
         this.recalcInfo.recalculateTransform = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1098,192 +1107,198 @@ CChartAsGroup.prototype =
 
     recalculate: function(updateImage)
     {
-        var parents = this.getParentObjects();
-        this.recalculatePosExt();
-        this.recalculateTransform();
-        if(isRealObject(this.chartTitle))
-        {
-            var max_title_width = this.extX*0.8;
-            var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
-            this.chartTitle.extX = title_width;
-            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width);
-            this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
-            if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
-            {
-                this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-                if(this.chartTitle.x + this.chartTitle.extX > this.extX)
-                    this.chartTitle.x = this.extX - this.chartTitle.extX;
-                if(this.chartTitle.x < 0)
-                    this.chartTitle.x = 0;
-            }
-            else
-            {
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-            }
-
-            if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.y))
-            {
-                this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-                if(this.chartTitle.y + this.chartTitle.extY > this.extY)
-                    this.chartTitle.y = this.extY - this.chartTitle.extY;
-                if(this.chartTitle.y < 0)
-                    this.chartTitle.y = 0;
-            }
-            else
-            {
-                this.chartTitle.y = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
-            }
-
-            this.chartTitle.recalculateTransform();
-            this.chartTitle.calculateContent();
-            this.chartTitle.calculateTransformTextMatrix();
-        }
-
-        if(isRealObject(this.hAxisTitle))
-        {
-            var max_title_widh = this.extX*0.8;
-            var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
-            this.hAxisTitle.extX = title_width;
-            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width);
-            this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
-        }
-
-        if(isRealObject(this.vAxisTitle))
-        {
-            var max_title_height = this.extY*0.8;
-            var body_pr = this.vAxisTitle.txBody.getBodyPr();
-            this.vAxisTitle.extY = this.vAxisTitle.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-            this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.extX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
-            this.vAxisTitle.spPr.geometry.Recalculate(this.vAxisTitle.extX, this.vAxisTitle.extY);
-
-        }
-        var lInd, tInd, rInd, bInd;
-        tInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
-        lInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
-        rInd = 0;
-        bInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
-        if(isRealObject(this.vAxisTitle))
-        {
-            if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
-            {
-                this.vAxisTitle.x = this.extX*this.vAxisTitle.layout.x;
-                if(this.vAxisTitle.x + this.vAxisTitle.extX > this.extX)
-                    this.vAxisTitle.x = this.extX - this.vAxisTitle.extX;
-                if(this.vAxisTitle.x < 0)
-                    this.vAxisTitle.x = 0;
-            }
-            else
-            {
-                this.vAxisTitle.x = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
-            }
-
-            if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
-            {
-                this.vAxisTitle.y = this.extY*this.vAxisTitle.layout.y;
-                if(this.vAxisTitle.y + this.vAxisTitle.extY > this.extY)
-                    this.vAxisTitle.y = this.extY - this.vAxisTitle.extY;
-                if(this.vAxisTitle.y < 0)
-                    this.vAxisTitle.y = 0;
-            }
-            else
-            {
-                this.vAxisTitle.y = (this.extY - this.vAxisTitle.extY)*0.5;
-                if(this.vAxisTitle.y < tInd)
-                    this.vAxisTitle.y = tInd;
-            }
-            this.vAxisTitle.recalculateTransform();
-            this.vAxisTitle.calculateContent();
-            this.vAxisTitle.calculateTransformTextMatrix();
-        }
-        if(isRealObject(this.hAxisTitle))
+        try
         {
 
-            if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.x))
+            var parents = this.getParentObjects();
+            this.recalculatePosExt();
+            this.recalculateTransform();
+            if(isRealObject(this.chartTitle))
             {
-                this.hAxisTitle.x = this.extX*this.hAxisTitle.layout.x;
-                if(this.hAxisTitle.x + this.hAxisTitle.extX > this.extX)
-                    this.hAxisTitle.x = this.extX - this.hAxisTitle.extX;
-                if(this.hAxisTitle.x < 0)
-                    this.hAxisTitle.x = 0;
-            }
-            else
-            {
-                this.hAxisTitle.x = ((this.extX - rInd) - (lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
-                if(this.hAxisTitle.x < lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25))
-                    this.hAxisTitle.x = lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                var max_title_width = this.extX*0.8;
+                var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
+                this.chartTitle.extX = title_width;
+                this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width);
+                this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
+                if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
+                {
+                    this.chartTitle.x = this.extX*this.chartTitle.layout.x;
+                    if(this.chartTitle.x + this.chartTitle.extX > this.extX)
+                        this.chartTitle.x = this.extX - this.chartTitle.extX;
+                    if(this.chartTitle.x < 0)
+                        this.chartTitle.x = 0;
+                }
+                else
+                {
+                    this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
+                }
+
+                if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.y))
+                {
+                    this.chartTitle.y = this.extY*this.chartTitle.layout.y;
+                    if(this.chartTitle.y + this.chartTitle.extY > this.extY)
+                        this.chartTitle.y = this.extY - this.chartTitle.extY;
+                    if(this.chartTitle.y < 0)
+                        this.chartTitle.y = 0;
+                }
+                else
+                {
+                    this.chartTitle.y = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
+                }
+
+                this.chartTitle.recalculateTransform();
+                this.chartTitle.calculateContent();
+                this.chartTitle.calculateTransformTextMatrix();
             }
 
-            if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
+            if(isRealObject(this.hAxisTitle))
             {
-                this.hAxisTitle.y = this.extY*this.hAxisTitle.layout.y;
-                if(this.hAxisTitle.y + this.hAxisTitle.extY > this.extY)
-                    this.hAxisTitle.y = this.extY - this.hAxisTitle.extY;
-                if(this.hAxisTitle.y < 0)
-                    this.hAxisTitle.y = 0;
+                var max_title_widh = this.extX*0.8;
+                var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
+                this.hAxisTitle.extX = title_width;
+                this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width);
+                this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
             }
-            else
-            {
-                this.hAxisTitle.y = this.extY - bInd;
-            }
-            this.hAxisTitle.recalculateTransform();
-            this.hAxisTitle.calculateContent();
-            this.hAxisTitle.calculateTransformTextMatrix();
-        }
 
-        var title_margin = {w:0, h: 0}, key = {w:0, h: 0}, xAxisTitle = {w:0, h: 0}, yAxisTitle = {w:0, h: 0};
-        if(isRealObject(this.chartTitle))
-        {
-            if(!this.chartTitle.overlay)
+            if(isRealObject(this.vAxisTitle))
             {
-                title_margin = {
-                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extX),
-                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extY)
+                var max_title_height = this.extY*0.8;
+                var body_pr = this.vAxisTitle.txBody.getBodyPr();
+                this.vAxisTitle.extY = this.vAxisTitle.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
+                this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.extX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
+                this.vAxisTitle.spPr.geometry.Recalculate(this.vAxisTitle.extX, this.vAxisTitle.extY);
+
+            }
+            var lInd, tInd, rInd, bInd;
+            tInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
+            lInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
+            rInd = 0;
+            bInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
+            if(isRealObject(this.vAxisTitle))
+            {
+                if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
+                {
+                    this.vAxisTitle.x = this.extX*this.vAxisTitle.layout.x;
+                    if(this.vAxisTitle.x + this.vAxisTitle.extX > this.extX)
+                        this.vAxisTitle.x = this.extX - this.vAxisTitle.extX;
+                    if(this.vAxisTitle.x < 0)
+                        this.vAxisTitle.x = 0;
+                }
+                else
+                {
+                    this.vAxisTitle.x = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
+                }
+
+                if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
+                {
+                    this.vAxisTitle.y = this.extY*this.vAxisTitle.layout.y;
+                    if(this.vAxisTitle.y + this.vAxisTitle.extY > this.extY)
+                        this.vAxisTitle.y = this.extY - this.vAxisTitle.extY;
+                    if(this.vAxisTitle.y < 0)
+                        this.vAxisTitle.y = 0;
+                }
+                else
+                {
+                    this.vAxisTitle.y = (this.extY - this.vAxisTitle.extY)*0.5;
+                    if(this.vAxisTitle.y < tInd)
+                        this.vAxisTitle.y = tInd;
+                }
+                this.vAxisTitle.recalculateTransform();
+                this.vAxisTitle.calculateContent();
+                this.vAxisTitle.calculateTransformTextMatrix();
+            }
+            if(isRealObject(this.hAxisTitle))
+            {
+
+                if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.x))
+                {
+                    this.hAxisTitle.x = this.extX*this.hAxisTitle.layout.x;
+                    if(this.hAxisTitle.x + this.hAxisTitle.extX > this.extX)
+                        this.hAxisTitle.x = this.extX - this.hAxisTitle.extX;
+                    if(this.hAxisTitle.x < 0)
+                        this.hAxisTitle.x = 0;
+                }
+                else
+                {
+                    this.hAxisTitle.x = ((this.extX - rInd) - (lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                    if(this.hAxisTitle.x < lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25))
+                        this.hAxisTitle.x = lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                }
+
+                if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
+                {
+                    this.hAxisTitle.y = this.extY*this.hAxisTitle.layout.y;
+                    if(this.hAxisTitle.y + this.hAxisTitle.extY > this.extY)
+                        this.hAxisTitle.y = this.extY - this.hAxisTitle.extY;
+                    if(this.hAxisTitle.y < 0)
+                        this.hAxisTitle.y = 0;
+                }
+                else
+                {
+                    this.hAxisTitle.y = this.extY - bInd;
+                }
+                this.hAxisTitle.recalculateTransform();
+                this.hAxisTitle.calculateContent();
+                this.hAxisTitle.calculateTransformTextMatrix();
+            }
+
+            var title_margin = {w:0, h: 0}, key = {w:0, h: 0}, xAxisTitle = {w:0, h: 0}, yAxisTitle = {w:0, h: 0};
+            if(isRealObject(this.chartTitle))
+            {
+                if(!this.chartTitle.overlay)
+                {
+                    title_margin = {
+                        w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extX),
+                        h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extY)
+                    }
                 }
             }
-        }
 
-        if(isRealObject(this.hAxisTitle))
-        {
-            if(!this.hAxisTitle.overlay)
+            if(isRealObject(this.hAxisTitle))
             {
-                xAxisTitle = {
-                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
-                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
+                if(!this.hAxisTitle.overlay)
+                {
+                    xAxisTitle = {
+                        w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
+                        h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
+                    }
                 }
             }
-        }
 
-        if(isRealObject(this.vAxisTitle))
-        {
-            if(!this.vAxisTitle.overlay)
+            if(isRealObject(this.vAxisTitle))
             {
-                yAxisTitle = {
-                    w:  7 + editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
-                    h: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
+                if(!this.vAxisTitle.overlay)
+                {
+                    yAxisTitle = {
+                        w:  7 + editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
+                        h: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
+                    }
                 }
             }
+
+            this.chart.margins =
+            {
+                key: key,
+
+                xAxisTitle: xAxisTitle,
+
+                yAxisTitle: yAxisTitle,
+                title: title_margin
+            };
+
+            /*if ( !this.chart.range.intervalObject )
+             this.drawingObjects.intervalToIntervalObject(this.chart);           */
+            if(!(updateImage === false))
+            {
+
+                var options = {theme: parents.theme, slide: parents.slide, layout: parents.layout, master: parents.master};
+                this.brush.fill.canvas = (new ChartRender(options)).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extY), undefined, undefined, options);
+                this.brush.fill.RasterImageId = "";
+                //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
+            }
         }
-
-        this.chart.margins =
-        {
-            key: key,
-
-            xAxisTitle: xAxisTitle,
-
-            yAxisTitle: yAxisTitle,
-            title: title_margin
-        };
-
-        /*if ( !this.chart.range.intervalObject )
-         this.drawingObjects.intervalToIntervalObject(this.chart);           */
-        if(!(updateImage === false))
-        {
-
-            var options = {theme: parents.theme, slide: parents.slide, layout: parents.layout, master: parents.master};
-            this.brush.fill.canvas = (new ChartRender(options)).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extY), undefined, undefined, options);
-            this.brush.fill.RasterImageId = "";
-            //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
-        }
+        catch(e)
+        {}
     },
 
     getBase64Img: function()

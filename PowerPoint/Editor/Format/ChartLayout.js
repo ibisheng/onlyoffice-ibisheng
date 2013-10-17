@@ -69,19 +69,19 @@ CChartLayout.prototype =
 
         w.WriteBool(isRealNumber(this.x));
         if(isRealNumber(this.x))
-            w.WriteLong(this.x);
+            w.WriteDouble(this.x);
 
         w.WriteBool(isRealNumber(this.y));
         if(isRealNumber(this.y))
-            w.WriteLong(this.y);
+            w.WriteDouble(this.y);
 
         w.WriteBool(isRealNumber(this.w));
         if(isRealNumber(this.w))
-            w.WriteLong(this.w);
+            w.WriteDouble(this.w);
 
         w.WriteBool(isRealNumber(this.h));
         if(isRealNumber(this.h))
-            w.WriteLong(this.h);
+            w.WriteDouble(this.h);
     },
 
 
@@ -105,17 +105,17 @@ CChartLayout.prototype =
 
 
         if(r.GetBool())
-            (this.x) = r.GetLong();
+            (this.x) = r.GetDouble();
 
 
         if(r.GetBool())
-            (this.y) = r.GetLong();
+            (this.y) = r.GetDouble();
 
         if(r.GetBool())
-            (this.w) = r.GetLong();
+            (this.w) = r.GetDouble();
 
         if(r.GetBool())
-            (this.h) = r.GetLong();
+            (this.h) = r.GetDouble();
     },
 
     setXMode: function(mode)

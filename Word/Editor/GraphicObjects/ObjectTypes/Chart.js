@@ -587,6 +587,20 @@ CChartAsGroup.prototype =
     },
 
 
+    syncAscChart: function() {
+
+        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
+            this.chart.asc_getHeader().asc_setTitle(getTextString(this.chartTitle.txBody.content));
+        }
+        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
+            this.chart.asc_getYAxis().asc_setTitle(getTextString(this.vAxisTitle.txBody.content));
+        }
+        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
+            this.chart.asc_getXAxis().asc_setTitle(getTextString(this.hAxisTitle.txBody.content));
+        }
+    },
+
+
     setChart: function(chart, bEdit)
     {
 		if ( bEdit ) {
@@ -2132,6 +2146,7 @@ CChartAsGroup.prototype =
 
     getChartBinary: function()
     {
+        this.syncAscChart();
         var w = new CMemory();
         w.WriteBool(isRealObject(this.chartTitle));
         if(isRealObject(this.chartTitle))
