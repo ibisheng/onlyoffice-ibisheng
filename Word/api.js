@@ -5835,10 +5835,18 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
 	for (var i in _loader_object.ImageMap)
         ++_count;
 
-    // add const textures
-    var _st_count = g_oUserTexturePresets.length;
-    for (var i = 0; i < _st_count; i++)
-        _loader_object.ImageMap[_count + i] = g_oUserTexturePresets[i];
+    if (!this.isOnlyReaderMode)
+    {
+        // add const textures
+        var _st_count = g_oUserTexturePresets.length;
+        for (var i = 0; i < _st_count; i++)
+            _loader_object.ImageMap[_count + i] = g_oUserTexturePresets[i];
+
+        if (this.OpenDocumentProgress && !this.ImageLoader.bIsAsyncLoadDocumentImages)
+        {
+            this.OpenDocumentProgress.ImagesCount += _st_count;
+        }
+    }
 
     if (_count > 0)
     {
