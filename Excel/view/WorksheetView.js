@@ -5738,12 +5738,12 @@
 				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_obj2Color(bg) : bg);
 
 				cell_info.border = new asc_CBorders();
-				cell_info.border.left = new asc_CBorder(b.l.w, b.l.s, b.l.c);
-				cell_info.border.top = new asc_CBorder(b.t.w, b.t.s, b.t.c);
-				cell_info.border.right = new asc_CBorder(b.r.w, b.r.s, b.r.c);
-				cell_info.border.bottom = new asc_CBorder(b.b.w, b.b.s, b.b.c);
-				cell_info.border.diagDown = new asc_CBorder(b.dd.w, b.dd.s, b.dd.c);
-				cell_info.border.diagUp = new asc_CBorder(b.du.w, b.du.s, b.du.c);
+				cell_info.border.left = new asc_CBorder(b.l.s, b.l.c);
+				cell_info.border.top = new asc_CBorder(b.t.s, b.t.c);
+				cell_info.border.right = new asc_CBorder(b.r.s, b.r.c);
+				cell_info.border.bottom = new asc_CBorder(b.b.s, b.b.c);
+				cell_info.border.diagDown = new asc_CBorder(b.dd.s, b.dd.c);
+				cell_info.border.diagUp = new asc_CBorder(b.du.s, b.du.c);
 
 				cell_info.numFormatType = c.getNumFormatType();
 
