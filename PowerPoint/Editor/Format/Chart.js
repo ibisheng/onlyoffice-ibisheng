@@ -199,6 +199,7 @@ CChartAsGroup.prototype =
     {
         var chart = chartPr.ChartProperties;
 
+
         var w = new CMemory();
         this.chart.Write_ToBinary2(w);
         var bin =  w.pos + ";" + w.GetBase64Memory();
@@ -206,6 +207,7 @@ CChartAsGroup.prototype =
         var new_chart_data = new asc_CChart(this.chart);
         var r = CreateBinaryReader(bin, 0, bin.length);
         new_chart_data.Read_FromBinary2(r);
+
         if(chart.styleId != null)
             new_chart_data.asc_setStyleId(chart.styleId);
         if(chart.subType != null)

@@ -1614,6 +1614,31 @@ CGraphicObjects.prototype = {
         return ret;
     },
 
+    redrawCharts: function()
+    {
+        var sp_tree = this.slide.cSlcd.spTree;
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            var sp = sp_tree[i];
+            if(sp instanceof CChartAsGroup)
+            {
+                sp.recalculate();
+            }
+            if(sp instanceof CGroupShape)
+            {
+                var arr_g_o = sp.arrGraphicObjects;
+                for(var j = 0; j < arr_g_o.length; ++j)
+                {
+                    var cur_group_sp = arr_g_o[j];
+                    if(cur_group_sp instanceof CChartAsGroup)
+                    {
+                        cur_group_sp.recalculate();
+                    }
+                }
+            }
+        }
+    },
+
     Hyperlink_CanAdd: function(bCheck)
     {
         if(this.State.textObject && this.State.textObject.Hyperlink_CanAdd)

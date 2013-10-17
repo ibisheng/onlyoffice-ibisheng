@@ -1268,7 +1268,12 @@ CPresentation.prototype =
     },
 
     redrawCharts: function()
-    {},
+    {
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            this.Slides[i].graphicObjects.redrawCharts();
+        }
+    },
 
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
