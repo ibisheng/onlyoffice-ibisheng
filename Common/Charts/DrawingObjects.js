@@ -166,14 +166,47 @@ function asc_CChart(object) {
 			ser.asc_setTitle(object.series[i].TxCache.Tx);
 			ser.asc_setTitleFormula(object.series[i].TxCache.Formula);
 			
-			if (object.series[i].Val && object.series[i].Val.Formula)
+			// Val
+			if (object.series[i].Val) {
 				ser.asc_setValFormula(object.series[i].Val.Formula);
 				
-			if (object.series[i].xVal && object.series[i].xVal.Formula)
+				for (var j = 0; j < object.series[i].Val.NumCache.length; j++) {
+					var item = {};
+					item.numFormatStr = object.series[i].Val.NumCache[j].numFormatStr;
+					item.isDateTimeFormat = object.series[i].Val.NumCache[j].isDateTimeFormat;
+					item.val = object.series[i].Val.NumCache[j].val;
+					item.isHidden = object.series[i].Val.NumCache[j].isHidden;
+					ser.Val.NumCache.push(item);
+				}
+			}
+				
+			// xVal
+			if (object.series[i].xVal) {
 				ser.asc_setxValFormula(object.series[i].xVal.Formula);
 				
-			if (object.series[i].Cat && object.series[i].Cat.Formula)
+				for (var j = 0; j < object.series[i].xVal.NumCache.length; j++) {
+					var item = {};
+					item.numFormatStr = object.series[i].xVal.NumCache[j].numFormatStr;
+					item.isDateTimeFormat = object.series[i].xVal.NumCache[j].isDateTimeFormat;
+					item.val = object.series[i].xVal.NumCache[j].val;
+					item.isHidden = object.series[i].xVal.NumCache[j].isHidden;
+					ser.xVal.NumCache.push(item);
+				}
+			}
+				
+			// Cat
+			if (object.series[i].Cat) {
 				ser.asc_setCatFormula(object.series[i].Cat.Formula);
+				
+				for (var j = 0; j < object.series[i].Cat.NumCache.length; j++) {
+					var item = {};
+					item.numFormatStr = object.series[i].Cat.NumCache[j].numFormatStr;
+					item.isDateTimeFormat = object.series[i].Cat.NumCache[j].isDateTimeFormat;
+					item.val = object.series[i].Cat.NumCache[j].val;
+					item.isHidden = object.series[i].Cat.NumCache[j].isHidden;
+					ser.Cat.NumCache.push(item);
+				}
+			}
 				
 			if (object.series[i].Marker) {
 				ser.asc_setMarkerSize(object.series[i].Marker.Size);
@@ -3720,6 +3753,7 @@ function DrawingObjects() {
 	}
 
 	_this.editChartDrawingObject = function(chart) {
+	
 		if ( chart ) {
 			_this.controller.editChartDrawingObjects(chart);
 			_this.showDrawingObjects(false);
