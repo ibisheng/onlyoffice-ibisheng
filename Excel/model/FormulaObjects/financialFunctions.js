@@ -248,10 +248,16 @@ cFormulaFunction.Financial = {
 
             var res;
             if ( rate.getValue() != 0 ) {
-                res = -1 * ( fv.getValue() + pmt.getValue() * (1 + rate.getValue() * type.getValue()) * ( (Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1) / rate.getValue() ) ) / Math.pow( 1 + rate.getValue(), nper.getValue() )
+                rate = rate.getValue();
+                pmt = pmt.getValue();
+                pv = pv.getValue();
+                fv = fv.getValue();
+                type = type.getValue();
+                res = (-fv * rate + pmt * (1 + rate * type)) / (rate * pv + pmt * (1 + rate * type))
+                res = Math.log( res ) / Math.log( 1+rate )
             }
             else {
-                res = -1 * ( fv.getValue() + pmt.getValue() * pmt.getValue() );
+                res = - pv.getValue() - fv.getValue() / pmt.getValue() ;
             }
 
             return this.value = new cNumber( res );
