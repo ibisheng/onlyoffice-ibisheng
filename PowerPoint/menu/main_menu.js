@@ -1479,6 +1479,7 @@ $(document).ready(function(){
 
         editor.asc_registerCallback("asc_onTextLanguage", function()
         {
+            return;
             var Value = arguments[0];
 
             var PrLang = document.getElementById("prLang");

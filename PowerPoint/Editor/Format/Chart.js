@@ -205,8 +205,8 @@ CChartAsGroup.prototype =
         var bin =  w.pos + ";" + w.GetBase64Memory();
 
         var new_chart_data = new asc_CChart(this.chart);
-        var r = CreateBinaryReader(bin, 0, bin.length);
-        new_chart_data.Read_FromBinary2(r);
+       /* var r = CreateBinaryReader(bin, 0, bin.length);
+        new_chart_data.Read_FromBinary2(r);   */
 
         if(chart.styleId != null)
             new_chart_data.asc_setStyleId(chart.styleId);

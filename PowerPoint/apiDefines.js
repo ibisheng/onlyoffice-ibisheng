@@ -117,7 +117,10 @@ var c_oAscError = {
 		ConvertationPassword:	-19,
 		VKeyEncrypt: 			-20,
 		KeyExpire: 				-21,
-		UserCountExceed: 		-22
+		UserCountExceed: 		-22,
+        SplitCellMaxRows:       -23,
+        SplitCellMaxCols:       -24,
+        SplitCellRowsDivider:   -25
 	}
 };
 
