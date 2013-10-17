@@ -1203,6 +1203,7 @@ NumFormat.prototype =
         else if(numFormat_DigitSpace == item.type)
         {
 			var oNewFont = new Font();
+			oNewFont.clean();
 			oNewFont.skip = true;
             this._CommitText(res, oCurText, "0", oNewFont);
             if(null != item.val)
@@ -1229,7 +1230,10 @@ NumFormat.prototype =
             if(-1 != this.Color)
             {
                 if(null == format)
+				{
                     format = new Font();
+					format.clean();
+				}
                 format.c = new RgbColor(this.Color);
             }
             if(null != prev && ((null == prev.format && null == format) || (null != prev.format && null != format && format.isEqual(prev.format))))
@@ -1324,6 +1328,7 @@ NumFormat.prototype =
                 if(this.isInvalidDateValue(number))
                 {
 					var oNewFont = new Font();
+					oNewFont.clean();
 					oNewFont.repeat = true;
                     this._CommitText(res, null, "#", oNewFont);
                     return res;
@@ -1517,12 +1522,14 @@ NumFormat.prototype =
                 else if(numFormat_Repeat == item.type)
                 {
 					var oNewFont = new Font();
+					oNewFont.clean();
 					oNewFont.repeat = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
                 else if(numFormat_Skip == item.type)
                 {
 					var oNewFont = new Font();
+					oNewFont.clean();
 					oNewFont.skip = true;
                     this._CommitText(res, oCurText, item.val, oNewFont);
                 }
@@ -2092,6 +2099,7 @@ CellFormat.prototype =
 			else if(null != this.aComporationFormats)
 			{
 				var oNewFont = new Font();
+				oNewFont.clean();
 				oNewFont.repeat = true;
 				res = [{text: "#", format: oNewFont}];
 			}

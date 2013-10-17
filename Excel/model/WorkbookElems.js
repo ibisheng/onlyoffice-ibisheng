@@ -333,13 +333,27 @@ function Font(val)
 	this.u = val.u;
 	this.s = val.s;
 	this.c = val.c;
-	this.va = val.va
+	this.va = val.va;
     //skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
     this.skip = val.skip;
     this.repeat = val.repeat;
 };
 Font.prototype =
 {
+	clean : function()
+	{
+		this.fn = null;
+		this.scheme = null;
+		this.fs = null;
+		this.b = null;
+		this.i = null;
+		this.u = null;
+		this.s = null;
+		this.c = null;
+		this.va = null;
+		this.skip = null;
+		this.repeat = null;
+	},
 	_mergeProperty : function(first, second, def)
 	{
 		if(def != first)
