@@ -5350,6 +5350,8 @@ function RotateState(graphicObjects)
         }
         this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
         this.graphicObjects.curState.updateAnchorPos();
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
 
 
@@ -5521,6 +5523,8 @@ function ChangeAdjState(graphicObjects)
         this.graphicObjects.arrTrackObjects = [];
         this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
         this.graphicObjects.curState.updateAnchorPos();
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
 
 
@@ -5857,6 +5861,7 @@ function MoveState(graphicObjects)
                 doc.Recalculate();
         }
         tracks.length = 0;
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
         this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
         this.graphicObjects.curState.updateAnchorPos();
     };
@@ -6206,6 +6211,8 @@ function ResizeState(graphicObjects, majorHandleNum)
         this.graphicObjects.arrTrackObjects = [];
         this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
         this.graphicObjects.curState.updateAnchorPos();
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
 
 
@@ -9193,6 +9200,8 @@ function ChangeAdjInGroup(graphicObjects, group)
         }
         this.graphicObjects.arrTrackObjects.length = 0;
         this.graphicObjects.changeCurrentState(new GroupState(this.graphicObjects, this.group.parent));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
 
     this.updateCursorType = function()
@@ -9404,6 +9413,8 @@ function RotateInGroup(graphicObjects, group, majorObject)
         }
         this.graphicObjects.arrTrackObjects.length = 0;
         this.graphicObjects.changeCurrentState(new GroupState(this.graphicObjects, this.group.parent));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
 
 
@@ -9654,6 +9665,8 @@ function MoveInGroup(graphicObjects, group, startX, startY)
         }
         this.graphicObjects.arrTrackObjects.length = 0;
         this.graphicObjects.changeCurrentState(new GroupState(this.graphicObjects, this.group.parent));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     }
 
     this.updateCursorType = function(pageIndex, x, y)
@@ -9769,6 +9782,8 @@ function RotateInGroupState(graphicObjects, group, majorObject)
                 this.group.parent.OnEnd_ChangeFlow(this.group.absOffsetX, this.group.absOffsetY, this.group.parent.getPageIndex(), bounds.r - bounds.l, bounds.b - bounds.t, near_pos, true, true);
             }
         }
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
     };
     this.updateCursorType = function(pageIndex, x, y)
     {
