@@ -5222,3 +5222,19 @@ function readFromBinaryParagraphContent(r)
 
     return Element;
 }
+
+function getTextString(docContent)
+{
+    var ret = "";
+    for(var i = 0; i < docContent.Content.length; ++i)
+    {
+        for(var j = 0; j < docContent.Content[i].Content.length; ++j)
+        {
+            if(docContent.Content[i].Content[j].Type === para_Text)
+                ret += docContent.Content[i].Content[j].Value;
+            if(docContent.Content[i].Content[j].Type === para_Space)
+                ret += " ";
+        }
+    }
+    return ret;
+}

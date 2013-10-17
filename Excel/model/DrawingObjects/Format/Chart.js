@@ -1728,7 +1728,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle.readFromBinary(r);
         }
         this.chart.Read_FromBinary2(r, false);
-        if(typeof  this.chart.header.title === "string")
+        /*if(typeof  this.chart.header.title === "string" && this.chart.header.title != "")
         {
             var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
             var tx_body = new CTextBody(chart_title);
@@ -1744,7 +1744,7 @@ CChartAsGroup.prototype =
         {
             this.addTitle(null);
         }
-        if(typeof  this.chart.xAxis.title === "string")
+        if(typeof  this.chart.xAxis.title === "string" && this.chart.xAxis.title != "")
         {
             var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             var tx_body = new CTextBody(chart_title);
@@ -1761,7 +1761,7 @@ CChartAsGroup.prototype =
             this.addXAxis(null);
         }
 
-        if(typeof  this.chart.yAxis.title === "string")
+        if(typeof  this.chart.yAxis.title === "string" && this.chart.yAxis.title != "")
         {
             var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             var tx_body = new CTextBody(chart_title);
@@ -1776,7 +1776,7 @@ CChartAsGroup.prototype =
         else
         {
             this.addYAxis(null);
-        }
+        }   */
         this.spPr.Read_FromBinary2(r);
         var chartLeft =this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);

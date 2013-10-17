@@ -109,7 +109,31 @@ CChartTitle.prototype =
 
     Get_Styles: function()
     {
-        return new CStyles();
+        var styles = new CStyles();
+        var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+        default_legend_style.TextPr.themeFont = "Calibri";
+        default_legend_style.TextPr.Bold = true;
+        if(this.getTitleType() === CHART_TITLE_TYPE_TITLE)
+            default_legend_style.TextPr.FontSize = 18;
+        else
+            default_legend_style.TextPr.FontSize = 10;
+
+        default_legend_style.ParaPr.Spacing.After = 0;
+        default_legend_style.ParaPr.Spacing.Before = 0;
+        default_legend_style.ParaPr.Jc = align_Center;
+
+
+
+        //TODO:ParaPr: default_legend_style.ParaPr.Ind
+        var tx_pr;
+        if(isRealObject(this.txPr))
+        {
+            //TODO
+        }
+        styles.Style[styles.Id] = default_legend_style;
+        ++styles.Id;
+        return styles;
     },
 
     select: function()

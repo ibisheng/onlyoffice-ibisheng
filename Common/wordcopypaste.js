@@ -2979,6 +2979,11 @@ PasteProcessor.prototype =
         var nNewContentLength = aNewContent.length;
         //����� ���� �� Document.Add_NewParagraph
 
+        for(var i = 0; i < aNewContent.length; ++i)
+        {
+            aNewContent[i].Clear_TextFormatting();
+            aNewContent[i].Clear_Formatting();
+        }
         oDoc.Remove(1, true, true);
         var Item = oDoc.Content[oDoc.CurPos.ContentPos];
         if( type_Paragraph == Item.GetType() )
@@ -3019,7 +3024,7 @@ PasteProcessor.prototype =
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
                 var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
-                if(true !== oSourceFirstPar.Cursor_IsEnd())
+                if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
                 var oInsLastPar = null;
@@ -3399,6 +3404,8 @@ PasteProcessor.prototype =
                                             {
                                                 var content = (slide.graphicObjects.State.textObject instanceof CShape) ? slide.graphicObjects.State.textObject.txBody.content : slide.graphicObjects.State.textObject.graphicObject.CurCell.Content;
                                                 oThis.insertInPlace2(content, shape.txBody.content.Content);
+                                                shape.txBody.content = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
+                                                shape.txBody.setDocContent(shape.txBody.content);
                                                 if(slide.graphicObjects.State.textObject instanceof CShape)
                                                     slide.graphicObjects.State.textObject.txBody.bRecalculateNumbering = true;
                                                 else
@@ -3422,7 +3429,10 @@ PasteProcessor.prototype =
                                                 if(b_add_slide)
                                                 {
                                                     shape.setParent(presentation.Slides[0]);
+                                                    slide = presentation.Slides[0];
                                                 }
+                                                slide.graphicObjects.resetSelectionState();
+                                                shape.select(slide.graphicObjects);
                                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, shape);
                                                 var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                                                 var h = shape.txBody.getRectHeight(2000, w);
@@ -3433,6 +3443,8 @@ PasteProcessor.prototype =
                                         }
                                     }
                                     presentation.Recalculate();
+                                    presentation.Document_UpdateInterfaceState();
+
                                     node.blur();
                                     node.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
@@ -3470,6 +3482,7 @@ PasteProcessor.prototype =
                                     var slide = presentation.Slides[presentation.CurPage];
                                     if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, arr_shapes) === false)
                                     {
+                                        slide.graphicObjects.resetSelectionState();
                                         for(var i = 0; i < arr_shapes.length; ++i)
                                         {
                                             if(b_add_slide)
@@ -3478,9 +3491,12 @@ PasteProcessor.prototype =
                                             }
                                             arr_shapes[i].changeSize(kw, kh);
                                             slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
+                                            arr_shapes[i].select(slide.graphicObjects);
                                         }
                                     }
                                     presentation.Recalculate();
+                                    presentation.Document_UpdateInterfaceState();
+
                                     node.blur();
                                     node.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
@@ -3802,6 +3818,7 @@ PasteProcessor.prototype =
                                         var slide = presentation.Slides[presentation.CurPage];
                                         if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                                         {
+                                            slide.graphicObjects.resetSelectionState();
                                             for(var i = 0; i < arr_shapes.length; ++i)
                                             {
                                                 if(b_add_slide)
@@ -3810,6 +3827,8 @@ PasteProcessor.prototype =
                                                 }
                                                 arr_shapes[i].changeSize(kw, kh);
                                                 slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
+                                                arr_shapes[i].select(slide.graphicObjects);
+
                                             }
                                         }
                                         presentation.Recalculate();
@@ -3873,6 +3892,10 @@ PasteProcessor.prototype =
                     for(var i = 0; i < arrShapes.length; ++i)
                     {
                         shape = arrShapes[i];
+                        if(shape.txBody.content.Content.length > 1)
+                        {
+                            shape.txBody.content.Internal_Content_Remove(0, 1);
+                        }
                         var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                         var h = shape.txBody.getRectHeight(2000, w);
                         shape.setXfrm(null, null, w, h, null, null, null);
@@ -3881,7 +3904,7 @@ PasteProcessor.prototype =
                      if(false == oThis.bNested)
                      {
                          var slide = presentation.Slides[presentation.CurPage];
-                         if(slide.graphicObjects.State.id === STATES_ID_TEXT_ADD || slide.graphicObjects.State.id === STATES_ID_TEXT_ADD_IN_GROUP
+                         if((slide.graphicObjects.State.id === STATES_ID_TEXT_ADD || slide.graphicObjects.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
                              && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
                          {
                              if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
@@ -3899,7 +3922,11 @@ PasteProcessor.prototype =
                                  }
                                  presentation.recalcMap[textObject.Get_Id()] = textObject;
                                  oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
+                                 arrShapes[0].txBody.content = new CDocumentContent(arrShapes[0].txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
+                                 arrShapes[0].txBody.setDocContent(shape.txBody.content);
                                  presentation.Recalculate();
+                                 presentation.Document_UpdateInterfaceState();
+
                              }
                          }
                          else
@@ -3907,23 +3934,37 @@ PasteProcessor.prototype =
                              var check_objectcs = arrShapes.concat(arrImages).concat(arrTables);
                              if(presentation.Document_Is_SelectionLocked(changestype_AddShapes, check_objectcs) === false)
                              {
+                                 slide.graphicObjects.resetSelectionState();
+                                 if(arrShapes.length ===1 && arrShapes[0].txBody.content.Is_Empty())
+                                 {
+                                     arrShapes.length = 0;
+                                 }
                                  for(var i = 0; i < arrShapes.length; ++i)
                                  {
+                                     var new_pos_x = (presentation.Width -  arrShapes[i].spPr.xfrm.extX)/2;
+                                     var new_pos_y = (presentation.Height -  arrShapes[i].spPr.xfrm.extY)/2;
+                                     arrShapes[i].setOffset(new_pos_x, new_pos_y);
+                                     arrShapes[i].select(slide.graphicObjects);
                                      slide.addToSpTreeToPos(slide.cSld.spTree.length, arrShapes[i]);
                                      presentation.recalcMap[arrShapes[i].Get_Id()] = arrShapes[i];
                                  }
                                  for(var i = 0; i < arrImages.length; ++i)
                                  {
+
+                                     arrImages[i].select(slide.graphicObjects);
                                      slide.addToSpTreeToPos(slide.cSld.spTree.length, arrImages[i]);
                                      presentation.recalcMap[arrImages[i].Get_Id()] = arrImages[i];
                                  }
                                  for(var i = 0; i < arrTables.length; ++i)
                                  {
+                                     arrTables[i].select(slide.graphicObjects);
                                      slide.addToSpTreeToPos(slide.cSld.spTree.length, arrTables[i]);
                                      arrTables[i].recalcAll();
                                      presentation.recalcMap[arrTables[i].Get_Id()] = arrTables[i];
                                  }
                                  presentation.Recalculate();
+                                 presentation.Document_UpdateInterfaceState();
+
                              }
                          }
                          //oThis.InsertInDocument();

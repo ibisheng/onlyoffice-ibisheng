@@ -1606,6 +1606,7 @@ CGraphicObjects.prototype = {
         var chart_width = 0.264583*c_oAscChartDefines.defaultChartWidth;
         var chart_height = 0.264583*c_oAscChartDefines.defaultChartHeight;
         ret.chart.initDefault();
+        ret.setChart(ret.chart);
         ret.spPr.xfrm.offX = (presentation.Width - chart_width)/2;
         ret.spPr.xfrm.offY = (presentation.Height - chart_height)/2;
         ret.spPr.xfrm.extX = chart_width;//this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);

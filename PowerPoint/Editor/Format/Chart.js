@@ -367,18 +367,7 @@ CChartAsGroup.prototype =
         return OtherProps;
     },
 
-    syncAscChart: function() {
 
-        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
-            this.chart.asc_getHeader().asc_setTitle(this.chartTitle.txBody.content.getTextString());
-        }
-        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
-            this.chart.asc_getYAxis().asc_setTitle(this.vAxisTitle.txBody.content.getTextString());
-        }
-        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
-            this.chart.asc_getXAxis().asc_setTitle(this.hAxisTitle.txBody.content.getTextString());
-        }
-    },
 
     setDrawingObjects: function(drawingObjects)
     {
@@ -809,130 +798,73 @@ CChartAsGroup.prototype =
 
     setChart: function(chart, bEdit)
     {
-        if ( bEdit ) {
 
-            History.Create_NewPoint();
-
-            // type, subType, styleId
-            if ( this.chart.type != chart.type ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Type, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.type, chart.type)));
-                this.chart.type = chart.type;
+        if(typeof  this.chart.header.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = chart.header.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
             }
-
-            if ( this.chart.subType != chart.subType ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_SubType, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.subType, chart.subType)));
-                this.chart.subType = chart.subType;
-            }
-
-            if ( this.chart.styleId != chart.styleId ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Style, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.styleId, chart.styleId)));
-                this.chart.styleId = chart.styleId;
-            }
-
-            // showValue, showBorder
-            if ( this.chart.bShowValue != chart.bShowValue ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsShowValue, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowValue, chart.bShowValue)));
-                this.chart.bShowValue = chart.bShowValue;
-            }
-
-            if ( this.chart.bShowBorder != chart.bShowBorder ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsShowBorder, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowBorder, chart.bShowBorder)));
-                this.chart.bShowBorder = chart.bShowBorder;
-            }
-
-            // range
-            if ( this.chart.range.interval != chart.range.interval ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.range.interval, chart.range.interval)));
-                this.chart.range.interval = chart.range.interval;
-                this.chart.range.intervalObject = convertFormula(this.chart.range.interval, this.drawingObjects.getWorksheet());
-                this.chart.rebuildSeries();
-            }
-
-            if ( this.chart.range.rows != chart.range.rows ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeRowColumns, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.range.rows, chart.range.rows)));
-                this.chart.range.rows = chart.range.rows;
-                this.chart.range.columns = !chart.range.rows;
-            }
-
-            // header
-            if ( this.chart.header.title != chart.header.title ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.title, chart.header.title)));
-                this.chart.header.title = chart.header.title;
-            }
-
-            if ( this.chart.header.subTitle != chart.header.subTitle ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderSubTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.subTitle, chart.header.subTitle)));
-                this.chart.header.subTitle = chart.header.subTitle;
-            }
-
-            if ( this.chart.header.bDefaultTitle != chart.header.bDefaultTitle ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsDefaultHeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.bDefaultTitle, chart.header.bDefaultTitle)));
-                this.chart.header.bDefaultTitle = chart.header.bDefaultTitle;
-            }
-
-            // xAxis
-            if ( this.chart.xAxis.title != chart.xAxis.title ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.title, chart.xAxis.title)));
-                this.chart.xAxis.title = chart.xAxis.title;
-            }
-
-            if ( this.chart.xAxis.bDefaultTitle != chart.xAxis.bDefaultTitle ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsDefaultTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bDefaultTitle, chart.xAxis.bDefaultTitle)));
-                this.chart.xAxis.bDefaultTitle = chart.xAxis.bDefaultTitle;
-            }
-
-            if ( this.chart.xAxis.bShow != chart.xAxis.bShow ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bShow, chart.xAxis.bShow)));
-                this.chart.xAxis.bShow = chart.xAxis.bShow;
-            }
-
-            if ( this.chart.xAxis.bGrid != chart.xAxis.bGrid ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsGrid, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bGrid, chart.xAxis.bGrid)));
-                this.chart.xAxis.bGrid = chart.xAxis.bGrid;
-            }
-
-            // yAxis
-            if ( this.chart.yAxis.title != chart.yAxis.title ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.title, chart.yAxis.title)));
-                this.chart.yAxis.title = chart.yAxis.title;
-            }
-
-            if ( this.chart.yAxis.bDefaultTitle != chart.yAxis.bDefaultTitle ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsDefaultTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bDefaultTitle, chart.yAxisbDefaultTitle)));
-                this.chart.yAxis.bDefaultTitle = chart.yAxis.bDefaultTitle;
-            }
-
-            if ( this.chart.yAxis.bShow != chart.yAxis.bShow ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bShow, chart.yAxis.bShow)));
-                this.chart.yAxis.bShow = chart.yAxis.bShow;
-            }
-
-            if ( this.chart.yAxis.bGrid != chart.yAxis.bGrid ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsGrid, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bGrid, chart.yAxis.bGrid)));
-                this.chart.yAxis.bGrid = chart.yAxis.bGrid;
-            }
-
-            // legend
-            if ( this.chart.legend.position != chart.legend.position ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendPosition, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.position, chart.legend.position)));
-                this.chart.legend.position = chart.legend.position;
-            }
-
-            if ( this.chart.legend.bShow != chart.legend.bShow ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.bShow, chart.legend.bShow)));
-                this.chart.legend.bShow = chart.legend.bShow;
-            }
-
-            if ( this.chart.legend.bOverlay != chart.legend.bOverlay ) {
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendIsOverlay, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.bOverlay, chart.legend.bOverlay)));
-                this.chart.legend.bOverlay = chart.legend.bOverlay;
-            }
-            this.chart.rebuildSeries();
+            chart_title.setTextBody(tx_body);
+            this.addTitle(chart_title);
         }
         else
-            this.chart = chart;
+        {
+            this.addTitle(null);
+        }
+
+        if(typeof  this.chart.xAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.xAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addXAxis(chart_title);
+        }
+        if(typeof  this.chart.yAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.yAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addYAxis(chart_title);
+        }
     },
 
+    addXAxis: function(title)
+    {
+        var oldValue = isRealObject(this.hAxisTitle) ? this.hAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.hAxisTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddXAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
+
+    addYAxis: function(title)
+    {
+        var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.vAxisTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddYAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
+
+    addTitle: function(title)
+    {
+        var oldValue = isRealObject(this.chartTitle) ? this.chartTitle.Get_Id() : null;
+        var newValue = isRealObject(title) ? title.Get_Id() : null;
+        this.chartTitle = title;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddTitle, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
+    },
     deleteDrawingBase: function()
     {
         var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
@@ -1497,7 +1429,7 @@ CChartAsGroup.prototype =
         if(is_on)
             History.TurnOn();
 
-        this.recalculate();
+     //   this.recalculate();
 
     },
 
@@ -2144,6 +2076,19 @@ CChartAsGroup.prototype =
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
+
+    syncAscChart: function() {
+
+        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
+            this.chart.asc_getHeader().asc_setTitle(getTextString(this.chartTitle.txBody.content));
+        }
+        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
+            this.chart.asc_getYAxis().asc_setTitle(getTextString(this.vAxisTitle.txBody.content));
+        }
+        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
+            this.chart.asc_getXAxis().asc_setTitle(getTextString(this.hAxisTitle.txBody.content));
+        }
+    },
 
     setChartBinary: function(binary)
     {
