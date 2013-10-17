@@ -10570,6 +10570,9 @@ CDocument.prototype =
                                 var StartPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos );
                                 var EndPos   = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos );
 
+                                if ( StartPos != EndPos && changestype_Delete === CheckType )
+                                    CheckType = changestype_Remove;
+
                                 for ( var Index = StartPos; Index <= EndPos; Index++ )
                                     this.Content[Index].Document_Is_SelectionLocked(CheckType);
                             }
