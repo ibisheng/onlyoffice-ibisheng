@@ -15109,9 +15109,9 @@ CTable.prototype =
             var CellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
 
             // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow] )
+            if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value )
             {
-                CellHeight = RowH.Value - MaxTopBorder[CurRow];
+                CellHeight = RowH.Value;
                 this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
             }
 

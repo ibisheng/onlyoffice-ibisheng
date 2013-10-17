@@ -1153,7 +1153,7 @@ Paragraph.prototype =
                         if ( para_Numbering === NumberingType )
                         {
                             var NumPr = ParaPr.NumPr;
-                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === ParaPr.NumPr.NumId )
+                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                             {
                                 // Так мы обнуляем все рассчитанные ширины данного элемента
                                 NumberingItem.Measure( g_oTextMeasurer, undefined );
@@ -2693,7 +2693,7 @@ Paragraph.prototype =
                                 }
                             }
 
-                            if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && false === bBreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) )
+                            if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && false === bBreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) && this.Lines[CurLine - 1].Ranges.length <= 1 )
                             {
                                 this.Parent.RecalcInfo.Set_WidowControl(this, ( CurLine > 2 ? CurLine - 1 : 0 ) ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
                                 RecalcResult = recalcresult_PrevPage;
@@ -3602,7 +3602,7 @@ Paragraph.prototype =
         var ParaPr = Pr.ParaPr;
         var NumPr  = ParaPr.NumPr;
 
-        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === ParaPr.NumPr.NumId )
+        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
             return new CTextPr();
 
         var Numbering = this.Parent.Get_Numbering();
@@ -4162,7 +4162,7 @@ Paragraph.prototype =
                         if ( para_Numbering === NumberingType )
                         {
                             var NumPr = Pr.ParaPr.NumPr;
-                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === ParaPr.NumPr.NumId )
+                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                                 break;
 
                             var Numbering = this.Parent.Get_Numbering();
@@ -4577,7 +4577,7 @@ Paragraph.prototype =
                     if ( para_Numbering === this.Numbering.Type )
                     {
                         var NumPr = Pr.ParaPr.NumPr;
-                        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === ParaPr.NumPr.NumId )
+                        if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                             break;
 
                         var Numbering = this.Parent.Get_Numbering();
@@ -10532,7 +10532,7 @@ Paragraph.prototype =
             {
                 var ParaPr = this.CompiledPr.Pr.ParaPr;
                 var NumPr = ParaPr.NumPr;
-                if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === ParaPr.NumPr.NumId )
+                if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                     continue;
 
                 var Numbering = this.Parent.Get_Numbering();
