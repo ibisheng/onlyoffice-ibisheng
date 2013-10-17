@@ -767,8 +767,8 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
 function checkTypeCell( val ) {
     if ( val == "" )
         return new cEmpty();
-    else if ( parserHelp.isNumber( val, 0 ) )
-        return new cNumber( parserHelp.operand_str );
+    else if ( parseNum(val) )
+        return new cNumber( val-0 );
     else if ( parserHelp.isString( val, 0 ) )
         return new cString( parserHelp.operand_str );
     else if ( parserHelp.isBoolean( val, 0 ) )
