@@ -361,7 +361,7 @@ Set_Load:jT
 SectPr:qta
 cache_first:Zxa
 asc_setTitleFormula:hxa
-m_oDrawingDocument:Ga
+m_oDrawingDocument:Fa
 fontFiles:IZ
 TableMovePoint:Nh
 calculateAfterChangeLayout:Udb
@@ -386,7 +386,7 @@ WriteByte:ba
 getSelectedElements:xZa
 mediumturquoise:Eib
 centery:nc
-WordControl:H
+WordControl:F
 stackedOrGrouped:Soa
 oMapCommentId:bO
 ConvertCoordsFromCursor2:Fo
@@ -3072,7 +3072,7 @@ UseArray:PJ
 ahPolarLstInfo:sD
 CheckTableSprite:jGa
 sync_ShareCallBack:e8a
-Get_Id:Fa
+Get_Id:Ga
 fHoriBearingY:EZ
 ALWAYS_DO_DELTAP_RULES_SIZE:qFa
 fHoriBearingX:DZ
@@ -3092,7 +3092,7 @@ processSavedFile:Bda
 IsUseFullSrc:S$a
 bitmap_left:QM
 oCommentsPlaces:dda
-LogicDocument:Hb
+LogicDocument:Ib
 DELTAP_RTG_Rules:d$a
 m_lMaxSize:lib
 params:Kjb
@@ -3525,7 +3525,7 @@ get_Name:Q4
 GetLongLE:nra
 matchedTypes:Gn
 check_bounds:Bz
-ContentPos:F
+ContentPos:H
 ReadMathCGpRule:VKa
 EOF:FL
 pointRelX:Rjb
@@ -3646,7 +3646,7 @@ yMax:Ag
 Left:I
 SendControlColors:QNa
 RecalculateData:iz
-OnUpdateOverlay:Ib
+OnUpdateOverlay:Gb
 bMillisec:Mxa
 _background_grid_hlines:wva
 asc_getWrappingStyle:BVa
@@ -4712,7 +4712,7 @@ asc_getSeveralChartStyles:XUa
 asc_CParagraphShd:bdb
 hitToHandle:Wl
 m_oPanelRight:UF
-Skip2:Gb
+Skip2:Hb
 get_TableLayout:E0a
 CountWords:Lqa
 getTableByXY:SZ
