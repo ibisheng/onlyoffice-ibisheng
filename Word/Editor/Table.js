@@ -11727,6 +11727,12 @@ CTable.prototype =
                             if ( CurCol != Col - 1 )
                                 this.TableGrid[CurCol] = this.TableGridCalc[CurCol];
                         }
+
+                        for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
+                        {
+                            if ( CurCol != Col - 1 )
+                                this.Internal_UpdateCellW(CurCol);
+                        }
                     }
                 }
                 else
@@ -11756,6 +11762,12 @@ CTable.prototype =
                             {
                                 if ( CurCol != Col - 1 )
                                     this.TableGrid[CurCol] = this.TableGridCalc[CurCol];
+                            }
+
+                            for ( var CurCol = 0; CurCol < ColsCount; CurCol++ )
+                            {
+                                if ( CurCol != Col - 1 )
+                                    this.Internal_UpdateCellW(CurCol);
                             }
                         }
                     }
