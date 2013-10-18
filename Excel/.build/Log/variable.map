@@ -401,7 +401,7 @@ JSCompiler_StaticMethods_getexploded:n0
 CFF_SizeRec:yu
 TT_Set_CodeRange:jr
 JSCompiler_StaticMethods_getNormalPoint:O7
-JSCompiler_StaticMethods_getColLetter:fC
+JSCompiler_StaticMethods_getColLetter:eC
 cff_size_select:Cu
 FT_GlyphSlot:tl
 c_oSer_TableStyleInfo$ShowLastColumn:oG
@@ -491,7 +491,7 @@ BULLET_TYPE_SIZE_PCT:NW
 JSCompiler_StaticMethods_getBold:dQ
 nOTOwerflow:yW
 c_oSer_PageSetup$Orientation:YF
-asc_CChartAxisX:Qe
+asc_CChartAxisX:Ne
 asc_CChartAxisY:Re
 cElementType$array:UA
 CorrectUniFill:y3
@@ -794,7 +794,7 @@ historyitem_Cell_Fontname:yP
 c_oSer_ConditionalFormattingDataBar$CFVO:DI
 c_oSer_TableStyleElement$Type:FH
 align_Right:OR
-c_oAscError$ID$KeyExpire:Qy
+c_oAscError$ID$KeyExpire:Py
 g_oThemeColorTint:GA
 asc_CParagraphShd:hg
 g_oDefaultFill:WK
@@ -1037,7 +1037,7 @@ g_oUndoRedoWorkbook:eO
 tt_size_ready_bytecode:gr
 c_oSerWorksheetsTypes$SheetViews:xE
 FT_Bitmap_Size:pl
-numbering_presentationnumfrmt_None:q4
+numbering_presentationnumfrmt_None:p4
 Read_CVT_Stretched:Ds
 Ph:yU
 c_oAscFillGradType$GRAD_PATH:Gz
@@ -1370,7 +1370,7 @@ JSCompiler_StaticMethods_addPreTrackObject:M0
 JSCompiler_StaticMethods_Set_PositionH:l5
 c_oSerFillTypes$PatternFill:BD
 tt_find_sbit_image:Bo
-UndoRedoData_RowProp:eP
+UndoRedoData_RowProp:dP
 _strcmp_data:tj
 JSCompiler_StaticMethods_getAlignHorizontal:Vz
 cff_get_advances:av
@@ -1817,7 +1817,7 @@ Load_Glyph:zt
 JSCompiler_StaticMethods_setFType:GT
 historyitem_AutoFilter_Add:gA
 FT_Smooth_Renderer:Lq
-numbering_presentationnumfrmt_Char:r4
+numbering_presentationnumfrmt_Char:q4
 CIdCounter:YN
 FT_Select_Size:kw
 JSCompiler_StaticMethods__compileSetBorder:eM
@@ -2737,8 +2737,8 @@ g_tabtype_left:eZ
 JSCompiler_StaticMethods_startRecalculate:uN
 ft_sid_names:Ll
 T1_Decoder_ZoneRec:Fn
-L 102:Pe
-L 101:Oe
+L 102:Qe
+L 101:Pe
 c_oAscAsyncAction$Recalc:Ty
 L 100:bi
 c_oAscBorderStyles$Thin:dz
@@ -2895,7 +2895,7 @@ historyitem_Worksheet_Merge:lQ
 pscmaps_interface:$l
 RangeDataManager:mN
 c_oSer_ConditionalFormattingDataBar$Color:EI
-c_oSer_CommentData$Time:$H
+c_oSer_CommentData$Time:ZH
 tt_face_load_directory_stub:Ip
 t1_builder_init:fn
 EChartBasicTypes$chartbasicStockChart:L_
@@ -3171,19 +3171,19 @@ L 76:zn
 JSCompiler_StaticMethods_rebuildSeries:bf
 _ph_summ__sec_head:fW
 L 77:hh
-L 78:Ne
+L 78:Oe
 t1_args_count:sn
 L 79:pb
 c_oAscSelectionType$RangeShape:Lh
 UndoRedoData_IndexSimpleProp:DM
 GetDiffDate360:uC
 JSCompiler_StaticMethods_addDefinedName:GL
-numbering_presentationnumfrmt_ArabicPeriod:s4
+numbering_presentationnumfrmt_ArabicPeriod:r4
 c_oRangeType$Row:qN
 asc_CParagraphProperty:cg
 TT_Forget_Glyph_Frame:dt
 gray_record_cell:kq
-cString:tB
+cString:sB
 L 70:fe
 L 72:oe
 FT_PEEK_USHORT:kj
