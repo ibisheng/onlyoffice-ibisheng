@@ -1026,7 +1026,7 @@
 
 									reader.onload = function(evt) {
 										//t._editorPasteExec(worksheet,"<html><body><img src=\"" + evt.target.result + "\"/></body></html>",isText);
-										t._addHtmlToIframe(worksheet,"<html><body><img src=\"" + evt.target.result + "\"/></body></html>",isText);
+										t._addHtmlToIframe(worksheet,"<html><body><img src=\"" + evt.target.result + "\"/></body></html>",isText, evt);
 										//fPasteHtml("<html><body><img src=\"" + evt.target.result + "\"/></body></html>");
 									};
 									reader.readAsDataURL(blob);
