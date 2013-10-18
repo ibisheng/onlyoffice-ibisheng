@@ -391,7 +391,7 @@ c_oSerNumTypes$AbstractNum_Lvls:CK
 cff_get_kerning:bx
 BinaryStyleTableWriter:fS
 c_oSerHdrFtrTypes$HdrFtr_First:tK
-c_oSer_ChartType$Title:kI
+c_oSer_ChartType$Title:jI
 Ins_SFVTCA:cu
 WriteObjectString:r2
 FONT_TYPE_EMBEDDED:mz
@@ -460,7 +460,7 @@ CAscSlideTiming:Hi
 TT_VecLen:At
 BULLET_TYPE_SIZE_PCT:Nk
 DrawBackground:Y0
-nOTOwerflow:N0
+nOTOwerflow:M0
 sendTrack:S5
 asc_CChartAxisX:IG
 asc_CChartAxisY:JG
@@ -1432,7 +1432,7 @@ RULER_OBJECT_TYPE_FOOTER:aV
 c_oSerNumTypes$AbstractNum:AK
 CBgPr:oj
 documentVKey:p5
-MoveShapeImageTrackInGroup:i0
+MoveShapeImageTrackInGroup:h0
 FT_Module:On
 c_oSerPoint2D$Y:wO
 c_oSerPoint2D$X:vO
@@ -1446,7 +1446,7 @@ JSCompiler_StaticMethods_Row_Remove2:pX
 CSeekTableEntry:Ck
 c_oAscServerError$ConvertTimeout:Tg
 CGlyphString:ez
-CAscStroke:Z5
+CAscStroke:Y5
 DrawLineEnd:Y2
 tt_face_load_bdf_props:bq
 Get_TableOffsetCorrection:eT
@@ -1597,7 +1597,7 @@ JSCompiler_StaticMethods_Get_W:cW
 c_oMainTables$ThemeRels:zk
 c_oAscColor$COLOR_TYPE_SRGB:X4
 JSCompiler_StaticMethods_Set_Header:xX
-_ph_summ__tx_and_clip_art:D4
+_ph_summ__tx_and_clip_art:C4
 c_oSerDocTableType$Row_Content:XM
 cff_expert_encoding:jw
 redrawSlide2:k_
@@ -1639,7 +1639,7 @@ g_dKoef_in_to_mm:Uf
 CGradFill:mi
 c_oSer_CommentsType$Id:IO
 STATES_ID_RESIZE_IN_GROUP:cF
-historyitem_Table_AddRow:XV
+historyitem_Table_AddRow:WV
 CDrawingPage:u3
 JSCompiler_StaticMethods_getPropsArrays:IE
 CreateDefaultStylesForTables:Kh
@@ -2904,7 +2904,7 @@ recalcresult_PrevPage:QY
 LineEndType$None:R3
 rx_array:th
 CParagraphAndTextProp:w5
-JSCompiler_StaticMethods_Set_CellInfo:YV
+JSCompiler_StaticMethods_Set_CellInfo:XV
 CDocOpenProgress:q5
 c_oSerProp_pPrType$PageBreakBefore:IL
 tt_face_load_bhed:nq
