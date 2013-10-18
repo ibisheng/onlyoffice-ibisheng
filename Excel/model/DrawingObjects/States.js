@@ -1228,7 +1228,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     {
                                         if(title.hitInTextRect(x, y))
                                         {
-                                            return {objectId: this.chart.Id, cursorType: "move"};
+                                            return {objectId: this.chart.Id, cursorType: "text"};
                                         }
                                         else
                                         {
