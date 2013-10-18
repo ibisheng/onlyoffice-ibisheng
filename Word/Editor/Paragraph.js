@@ -3365,7 +3365,7 @@ Paragraph.prototype =
                 _X += this.Numbering.WidthVisible;
 
             if ( true === UpdateCurPos)
-                this.Internal_UpdateCurPos( _X, Y, Pos, CurPage, UpdateTarget );
+                this.Internal_UpdateCurPos( _X, Y, Pos, CurLine, CurPage, UpdateTarget );
 
             if ( true === ReturnTarget )
                 return { X : _X, Y : Y, Height : 0, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
@@ -3390,7 +3390,7 @@ Paragraph.prototype =
                     _X += this.Numbering.WidthVisible;
 
                 if ( true === UpdateCurPos)
-                    this.Internal_UpdateCurPos( _X, Y, ItemNum, CurPage, UpdateTarget );
+                    this.Internal_UpdateCurPos( _X, Y, ItemNum, CurLine, CurPage, UpdateTarget );
 
                 if ( true === ReturnTarget )
                 {
@@ -3453,7 +3453,7 @@ Paragraph.prototype =
             return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
     },
 
-    Internal_UpdateCurPos : function(X, Y, CurPos, CurPage, UpdateTarget)
+    Internal_UpdateCurPos : function(X, Y, CurPos, CurLine, CurPage, UpdateTarget)
     {
         this.CurPos.X        = X;
         this.CurPos.Y        = Y;
