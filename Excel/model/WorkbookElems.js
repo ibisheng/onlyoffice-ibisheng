@@ -233,7 +233,7 @@ function CorrectAscColor(asc_color)
 			// тут выставляется ТОЛЬКО из меню. поэтому:
 			var _index = parseInt(asc_color.get_value());
 			var _id = (_index / 6) >> 0;
-			var _pos = _index - _id * 6
+			var _pos = _index - _id * 6;
 			var tint = g_oThemeColorTint[_id][_pos];
 			ret = g_oColorManager.getThemeColor(_id, tint);
 			break;
