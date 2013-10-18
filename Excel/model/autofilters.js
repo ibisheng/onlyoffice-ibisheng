@@ -1271,7 +1271,8 @@
 			drawAutoF: function(isNotDraw){
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
-				if(buttons)
+				//проверяем, затрагивают ли данные кнопки визуальную область
+				if(buttons && this._isNeedDrawButton())
 				{
 					var activeButtonFilter = [];
 					var passiveButtonFilter = [];
@@ -3408,6 +3409,14 @@
 				var firstCellAddress = new CellAddress(id);
 				var endCellAddress = new CellAddress(idNext);
 				var bbox = {r1: firstCellAddress.getRow0(), c1: firstCellAddress.getCol0(), r2: endCellAddress.getRow0(), c2: endCellAddress.getCol0()};
+				//ограничим количество строчек/столбцов				
+				var maxValCol = 20000;
+				var maxValRow = 100000;
+				if((bbox.r2 - bbox.r1) > maxValRow)
+					bbox.r2 = bbox.r1 + maxValRow;
+				if((bbox.c2 - bbox.c1) > maxValCol)
+					bbox.c2 = bbox.c1 + maxValCol;
+				
 				//todo убрать Asc.clone
 				var style = Asc.clone(options.TableStyleInfo);
 				var styleForCurTable;
@@ -6250,6 +6259,21 @@
 					}
 				}
 				return true;
+			},
+			
+			_isNeedDrawButton: function()
+			{
+				var ws = this.worksheet;
+				var buttons = this.allButtonAF;
+				var visibleRange = ws.visibleRange;
+				var buttonCell;
+				for(var i = 0; i < buttons.length; i++)
+				{
+					buttonRange = this._idToRange(buttons[i].id);
+					if(buttonRange.r1 >= visibleRange.r1 && buttonRange.r1 <= visibleRange.r2 && buttonRange.c1 >= visibleRange.c1 && buttonRange.c1 <= visibleRange.c2)
+						return true;
+				}
+				return false;
 			}
 		};
 
