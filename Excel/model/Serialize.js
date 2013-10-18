@@ -4351,21 +4351,21 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
         {
             switch(this.stream.GetUChar())
             {
-				case EBorderStyle.borderstyleDashDot:			oBorderProp.s = c_oAscBorderStyles.DashDot;break;
-            	case EBorderStyle.borderstyleDashDotDot:		oBorderProp.s = c_oAscBorderStyles.DashDotDot;break;
-            	case EBorderStyle.borderstyleDashed:			oBorderProp.s = c_oAscBorderStyles.Dashed;break;
-            	case EBorderStyle.borderstyleDotted:			oBorderProp.s = c_oAscBorderStyles.Dotted;break;
-            	case EBorderStyle.borderstyleDouble:			oBorderProp.s = c_oAscBorderStyles.Double;break;
-            	case EBorderStyle.borderstyleHair:				oBorderProp.s = c_oAscBorderStyles.Hair;break;
-            	case EBorderStyle.borderstyleMedium:			oBorderProp.s = c_oAscBorderStyles.Medium;break;
-            	case EBorderStyle.borderstyleMediumDashDot:		oBorderProp.s = c_oAscBorderStyles.MediumDashDot;break;
-            	case EBorderStyle.borderstyleMediumDashDotDot:	oBorderProp.s = c_oAscBorderStyles.MediumDashDotDot;break;
-            	case EBorderStyle.borderstyleMediumDashed:		oBorderProp.s = c_oAscBorderStyles.MediumDashed;break;
-            	case EBorderStyle.borderstyleNone:				oBorderProp.s = c_oAscBorderStyles.None;break;
-            	case EBorderStyle.borderstyleSlantDashDot:		oBorderProp.s = c_oAscBorderStyles.SlantDashDot;break;
-            	case EBorderStyle.borderstyleThick:				oBorderProp.s = c_oAscBorderStyles.Thick;break;
-            	case EBorderStyle.borderstyleThin:				oBorderProp.s = c_oAscBorderStyles.Thin;break;
-            	default :										oBorderProp.s = c_oAscBorderStyles.None;break;
+				case EBorderStyle.borderstyleDashDot:			oBorderProp.setStyle(c_oAscBorderStyles.DashDot);break;
+            	case EBorderStyle.borderstyleDashDotDot:		oBorderProp.setStyle(c_oAscBorderStyles.DashDotDot);break;
+            	case EBorderStyle.borderstyleDashed:			oBorderProp.setStyle(c_oAscBorderStyles.Dashed);break;
+            	case EBorderStyle.borderstyleDotted:			oBorderProp.setStyle(c_oAscBorderStyles.Dotted);break;
+            	case EBorderStyle.borderstyleDouble:			oBorderProp.setStyle(c_oAscBorderStyles.Double);break;
+            	case EBorderStyle.borderstyleHair:				oBorderProp.setStyle(c_oAscBorderStyles.Hair);break;
+            	case EBorderStyle.borderstyleMedium:			oBorderProp.setStyle(c_oAscBorderStyles.Medium);break;
+            	case EBorderStyle.borderstyleMediumDashDot:		oBorderProp.setStyle(c_oAscBorderStyles.MediumDashDot);break;
+            	case EBorderStyle.borderstyleMediumDashDotDot:	oBorderProp.setStyle(c_oAscBorderStyles.MediumDashDotDot);break;
+            	case EBorderStyle.borderstyleMediumDashed:		oBorderProp.setStyle(c_oAscBorderStyles.MediumDashed);break;
+            	case EBorderStyle.borderstyleNone:				oBorderProp.setStyle(c_oAscBorderStyles.None);break;
+            	case EBorderStyle.borderstyleSlantDashDot:		oBorderProp.setStyle(c_oAscBorderStyles.SlantDashDot);break;
+            	case EBorderStyle.borderstyleThick:				oBorderProp.setStyle(c_oAscBorderStyles.Thick);break;
+            	case EBorderStyle.borderstyleThin:				oBorderProp.setStyle(c_oAscBorderStyles.Thin);break;
+            	default :										oBorderProp.setStyle(c_oAscBorderStyles.None);break;
             }
         }
         else if ( c_oSerBorderPropTypes.Color == type )

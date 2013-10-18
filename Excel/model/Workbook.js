@@ -5479,38 +5479,37 @@ Range.prototype.setFill=function(val){
 		cell.setFill(val);
 	});
 };
-Range.prototype.setBorderSrc=function(val){
+Range.prototype.setBorderSrc=function(border){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
 	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
-	var oNewBorder = new Border();
-	oNewBorder.set(val);
+	if (null == border)
+		border = new Border();
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
 	if(c_oRangeType.All == nRangeType)
 	{
-		this.worksheet.getAllCol().setBorder(oNewBorder.clone());
+		this.worksheet.getAllCol().setBorder(border.clone());
 		fSetProperty = this._setPropertyNoEmpty;
 	}
 	fSetProperty.call(this, function(row){
 		if(c_oRangeType.All == nRangeType && null == row.xfs)
 			return;
-		row.setBorder(oNewBorder.clone());
+		row.setBorder(border.clone());
 	},
 	function(col){
-		col.setBorder(oNewBorder.clone());
+		col.setBorder(border.clone());
 	},
 	function(cell){
-		cell.setBorder(oNewBorder.clone());
+		cell.setBorder(border.clone());
 	});
 	History.EndTransaction();
-}
+};
 Range.prototype.setBorder=function(border){
 	History.Create_NewPoint();
 	//border = null очисть border
-	//border: {"l": {"s": "solid", "c": 0xff0000}, "t": {} ,"r": {} ,"b": {} ,"ih": {},"iv": {}"d": {},"dd": false ,"du": false }
 	//"ih" - внутренние горизонтальные, "iv" - внутренние вертикальные
 	var oBBox = this.bbox;
 	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
@@ -5587,7 +5586,8 @@ Range.prototype.setBorder=function(border){
 					oNewBorderProp = oNewBorder.b;
 				break;
 		}
-		if(null != oNewBorderProp && null != oCurBorderProp && null != oCurBorderProp.s && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
+		if(null != oNewBorderProp && null != oCurBorderProp && null != oCurBorderProp.s &&
+			(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 			switch(type)
 			{
 				case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
@@ -5631,7 +5631,8 @@ Range.prototype.setBorder=function(border){
 						oNewBorderProp = oNewBorder.b;
 					break;
 			}
-			if(null != oNewBorderProp && null != oCurBorderProp && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
+			if(null != oNewBorderProp && null != oCurBorderProp &&
+				(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 				switch(type)
 				{
 					case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
@@ -5643,10 +5644,8 @@ Range.prototype.setBorder=function(border){
 			}
 		}
 	};
-	var oAddBorder = new Border();
-	oAddBorder.set(border);
-	if(oAddBorder.isEqual(g_oDefaultBorderAbs))
-		oAddBorder = null;
+	if (null != border && border.isEqual(g_oDefaultBorderAbs))
+		border = null;
 	if(nRangeType == c_oRangeType.Col)
 	{
 		var oLeftOuter = null;
@@ -5655,54 +5654,54 @@ Range.prototype.setBorder=function(border){
 		var oRightInner = null;
 		var oRightOuter = null;
 		var nWidth = oBBox.c2 - oBBox.c1 + 1;
-		if(null != oAddBorder)
+		if(null != border)
 		{
-			if(oBBox.c1 > 0 && null != oAddBorder.l)
+			if(oBBox.c1 > 0 && null != border.l)
 			{
 				oLeftOuter = new Border();
-				oLeftOuter.l = oAddBorder.l;
+				oLeftOuter.l = border.l;
 			}
-			if(oBBox.c2 < gc_nMaxCol0 && null != oAddBorder.r)
+			if(oBBox.c2 < gc_nMaxCol0 && null != border.r)
 			{
 				oRightOuter = new Border();
-				oRightOuter.r = oAddBorder.r;
+				oRightOuter.r = border.r;
 			}
 			oLeftInner = new Border();
-			oLeftInner.l = oAddBorder.l;
-			oLeftInner.t = oAddBorder.ih;
+			oLeftInner.l = border.l;
+			oLeftInner.t = border.ih;
 			if(nWidth > 1)
-				oLeftInner.r = oAddBorder.iv;
+				oLeftInner.r = border.iv;
 			else
-				oLeftInner.r = oAddBorder.r;
-			oLeftInner.b = oAddBorder.ih;
-			oLeftInner.d = oAddBorder.d;
-			oLeftInner.dd = oAddBorder.dd;
-			oLeftInner.du = oAddBorder.du;
+				oLeftInner.r = border.r;
+			oLeftInner.b = border.ih;
+			oLeftInner.d = border.d;
+			oLeftInner.dd = border.dd;
+			oLeftInner.du = border.du;
 			if(oLeftInner.isEqual(g_oDefaultBorderAbs))
 				oLeftInner = null;
 			if(nWidth > 1)
 			{
 				oRightInner = new Border();
-				oRightInner.l = oAddBorder.iv;
-				oRightInner.t = oAddBorder.ih;
-				oRightInner.r = oAddBorder.r;
-				oRightInner.b = oAddBorder.ih;
-				oRightInner.d = oAddBorder.d;
-				oRightInner.dd = oAddBorder.dd;
-				oRightInner.du = oAddBorder.du;
+				oRightInner.l = border.iv;
+				oRightInner.t = border.ih;
+				oRightInner.r = border.r;
+				oRightInner.b = border.ih;
+				oRightInner.d = border.d;
+				oRightInner.dd = border.dd;
+				oRightInner.du = border.du;
 				if(oRightInner.isEqual(g_oDefaultBorderAbs))
 					oRightInner = null;
 			}
 			if(nWidth > 2)
 			{
 				oInner = new Border();
-				oInner.l = oAddBorder.iv;
-				oInner.t = oAddBorder.ih;
-				oInner.r = oAddBorder.iv;
-				oInner.b = oAddBorder.ih;
-				oInner.d = oAddBorder.d;
-				oInner.dd = oAddBorder.dd;
-				oInner.du = oAddBorder.du;
+				oInner.l = border.iv;
+				oInner.t = border.ih;
+				oInner.r = border.iv;
+				oInner.b = border.ih;
+				oInner.d = border.d;
+				oInner.dd = border.dd;
+				oInner.du = border.du;
 				if(oInner.isEqual(g_oDefaultBorderAbs))
 					oInner = null;
 			}
@@ -5770,54 +5769,54 @@ Range.prototype.setBorder=function(border){
 		var oBottomInner = null;
 		var oBottomOuter = null;
 		var nHeight = oBBox.r2 - oBBox.r1 + 1;
-		if(null != oAddBorder)
+		if(null != border)
 		{
-			if(oBBox.r1 > 0 && null != oAddBorder.t)
+			if(oBBox.r1 > 0 && null != border.t)
 			{
 				oTopOuter = new Border();
-				oTopOuter.t = oAddBorder.t;
+				oTopOuter.t = border.t;
 			}
-			if(oBBox.r2 < gc_nMaxRow0 && null != oAddBorder.b)
+			if(oBBox.r2 < gc_nMaxRow0 && null != border.b)
 			{
 				oBottomOuter = new Border();
-				oBottomOuter.b = oAddBorder.b;
+				oBottomOuter.b = border.b;
 			}
 			oTopInner = new Border();
-			oTopInner.l = oAddBorder.iv;
-			oTopInner.t = oAddBorder.t;
-			oTopInner.r = oAddBorder.iv;
+			oTopInner.l = border.iv;
+			oTopInner.t = border.t;
+			oTopInner.r = border.iv;
 			if(nHeight > 1)
-				oTopInner.b = oAddBorder.ih;
+				oTopInner.b = border.ih;
 			else
-				oTopInner.b = oAddBorder.b;
-			oTopInner.d = oAddBorder.d;
-			oTopInner.dd = oAddBorder.dd;
-			oTopInner.du = oAddBorder.du;
+				oTopInner.b = border.b;
+			oTopInner.d = border.d;
+			oTopInner.dd = border.dd;
+			oTopInner.du = border.du;
 			if(oTopInner.isEqual(g_oDefaultBorderAbs))
 				oTopInner = null;
 			if(nHeight > 1)
 			{
 				oBottomInner = new Border();
-				oBottomInner.l = oAddBorder.iv;
-				oBottomInner.t = oAddBorder.ih;
-				oBottomInner.r = oAddBorder.iv;
-				oBottomInner.b = oAddBorder.b;
-				oBottomInner.d = oAddBorder.d;
-				oBottomInner.dd = oAddBorder.dd;
-				oBottomInner.du = oAddBorder.du;
+				oBottomInner.l = border.iv;
+				oBottomInner.t = border.ih;
+				oBottomInner.r = border.iv;
+				oBottomInner.b = border.b;
+				oBottomInner.d = border.d;
+				oBottomInner.dd = border.dd;
+				oBottomInner.du = border.du;
 				if(oBottomInner.isEqual(g_oDefaultBorderAbs))
 					oBottomInner = null;
 			}
 			if(nHeight > 2)
 			{
 				oInner = new Border();
-				oInner.l = oAddBorder.iv;
-				oInner.t = oAddBorder.ih;
-				oInner.r = oAddBorder.iv;
-				oInner.b = oAddBorder.ih;
-				oInner.d = oAddBorder.d;
-				oInner.dd = oAddBorder.dd;
-				oInner.du = oAddBorder.du;
+				oInner.l = border.iv;
+				oInner.t = border.ih;
+				oInner.r = border.iv;
+				oInner.b = border.ih;
+				oInner.d = border.d;
+				oInner.dd = border.dd;
+				oInner.du = border.du;
 				if(oInner.isEqual(g_oDefaultBorderAbs))
 					oInner = null;
 			}
@@ -5883,9 +5882,9 @@ Range.prototype.setBorder=function(border){
 		var bTopBorder = false;
 		var bRightBorder = false;
 		var bBottomBorder = false;
-		if(null == oAddBorder){
+		if(null == border){
 			this._foreachNoEmpty(function(cell){
-				cell.setBorder(oAddBorder);
+				cell.setBorder(border);
 			});
 			bLeftBorder = true;
 			bTopBorder = true;
@@ -5893,92 +5892,92 @@ Range.prototype.setBorder=function(border){
 			bBottomBorder = true;
 		}
 		else{
-			bLeftBorder = null != oAddBorder.l;
-			bTopBorder = null != oAddBorder.t;
-			bRightBorder = null != oAddBorder.r;
-			bBottomBorder = null != oAddBorder.b;
-			var bInnerHBorder = null != oAddBorder.ih;
-			var bInnerVBorder = null != oAddBorder.iv;
-			var bDiagonal = null != oAddBorder.d;
+			bLeftBorder = null != border.l;
+			bTopBorder = null != border.t;
+			bRightBorder = null != border.r;
+			bBottomBorder = null != border.b;
+			var bInnerHBorder = null != border.ih;
+			var bInnerVBorder = null != border.iv;
+			var bDiagonal = null != border.d;
 			if(oBBox.c1 == oBBox.c2 && oBBox.r1 == oBBox.r2){
 				//Если ячейка одна
-				fSetBorder(oBBox.r1, oBBox.c1, oAddBorder);
+				fSetBorder(oBBox.r1, oBBox.c1, border);
 			}
 			else{
 				//бордеры угловых ячеек
 				if(oBBox.c1 == oBBox.c2){
 					if(bLeftBorder || bTopBorder || bRightBorder || bInnerHBorder || bDiagonal){
 						var oLTBorder = new Border();
-						oLTBorder.l = oAddBorder.l;
-						oLTBorder.t = oAddBorder.t;
-						oLTBorder.r = oAddBorder.r;
-						oLTBorder.b = oAddBorder.ih;
-						oLTBorder.d = oAddBorder.d;
-						oLTBorder.dd = oAddBorder.dd;
-						oLTBorder.du = oAddBorder.du;
+						oLTBorder.l = border.l;
+						oLTBorder.t = border.t;
+						oLTBorder.r = border.r;
+						oLTBorder.b = border.ih;
+						oLTBorder.d = border.d;
+						oLTBorder.dd = border.dd;
+						oLTBorder.du = border.du;
 						fSetBorder(oBBox.r1, oBBox.c1, oLTBorder);
 					}
 					if(bLeftBorder || bBottomBorder || bRightBorder || bInnerHBorder || bDiagonal){
 						var oLBBorder = new Border();
-						oLBBorder.l = oAddBorder.l;
-						oLBBorder.t = oAddBorder.ih;
-						oLBBorder.r = oAddBorder.r;
-						oLBBorder.b = oAddBorder.b;
-						oLBBorder.d = oAddBorder.d;
-						oLBBorder.dd = oAddBorder.dd;
-						oLBBorder.du = oAddBorder.du;
+						oLBBorder.l = border.l;
+						oLBBorder.t = border.ih;
+						oLBBorder.r = border.r;
+						oLBBorder.b = border.b;
+						oLBBorder.d = border.d;
+						oLBBorder.dd = border.dd;
+						oLBBorder.du = border.du;
 						fSetBorder(oBBox.r2, oBBox.c1, oLBBorder);
 					}
 				}
 				else{
 					if(bLeftBorder || bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
 						var oLTBorder = new Border();
-						oLTBorder.l = oAddBorder.l;
-						oLTBorder.t = oAddBorder.t;
-						oLTBorder.r = oAddBorder.iv;
+						oLTBorder.l = border.l;
+						oLTBorder.t = border.t;
+						oLTBorder.r = border.iv;
 						if(oBBox.r1 == oBBox.r2)
-							oLTBorder.b = oAddBorder.b;
+							oLTBorder.b = border.b;
 						else
-							oLTBorder.b = oAddBorder.ih;
-						oLTBorder.d = oAddBorder.d;
-						oLTBorder.dd = oAddBorder.dd;
-						oLTBorder.du = oAddBorder.du;
+							oLTBorder.b = border.ih;
+						oLTBorder.d = border.d;
+						oLTBorder.dd = border.dd;
+						oLTBorder.du = border.du;
 						fSetBorder(oBBox.r1, oBBox.c1, oLTBorder);
 					}
 					if(oBBox.r1 != oBBox.r2 && (bLeftBorder || bInnerVBorder || bInnerHBorder || bBottomBorder || bDiagonal)){
 						var oLBBorder = new Border();
-						oLBBorder.l = oAddBorder.l;
-						oLBBorder.t = oAddBorder.ih;
-						oLBBorder.r = oAddBorder.iv;
-						oLBBorder.b = oAddBorder.b;
-						oLBBorder.d = oAddBorder.d;
-						oLBBorder.dd = oAddBorder.dd;
-						oLBBorder.du = oAddBorder.du;
+						oLBBorder.l = border.l;
+						oLBBorder.t = border.ih;
+						oLBBorder.r = border.iv;
+						oLBBorder.b = border.b;
+						oLBBorder.d = border.d;
+						oLBBorder.dd = border.dd;
+						oLBBorder.du = border.du;
 						fSetBorder(oBBox.r2, oBBox.c1, oLBBorder);
 					}
 					if(bRightBorder || bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
 						var oRTBorder = new Border();
-						oRTBorder.l = oAddBorder.iv;
-						oRTBorder.t = oAddBorder.t;
-						oRTBorder.r = oAddBorder.r;
+						oRTBorder.l = border.iv;
+						oRTBorder.t = border.t;
+						oRTBorder.r = border.r;
 						if(oBBox.r1 == oBBox.r2)
-							oRTBorder.b = oAddBorder.b;
+							oRTBorder.b = border.b;
 						else
-							oRTBorder.b = oAddBorder.ih;
-						oRTBorder.d = oAddBorder.d;
-						oRTBorder.dd = oAddBorder.dd;
-						oRTBorder.du = oAddBorder.du;
+							oRTBorder.b = border.ih;
+						oRTBorder.d = border.d;
+						oRTBorder.dd = border.dd;
+						oRTBorder.du = border.du;
 						fSetBorder(oBBox.r1, oBBox.c2, oRTBorder);
 					}
 					if(oBBox.r1 != oBBox.r2 && (bRightBorder || bInnerHBorder || bInnerVBorder || bBottomBorder || bDiagonal) ){
 						var oRBBorder = new Border();
-						oRBBorder.l = oAddBorder.iv;
-						oRBBorder.t = oAddBorder.ih;
-						oRBBorder.r = oAddBorder.r;
-						oRBBorder.b = oAddBorder.b;
-						oRBBorder.d = oAddBorder.d;
-						oRBBorder.dd = oAddBorder.dd;
-						oRBBorder.du = oAddBorder.du;
+						oRBBorder.l = border.iv;
+						oRBBorder.t = border.ih;
+						oRBBorder.r = border.r;
+						oRBBorder.b = border.b;
+						oRBBorder.d = border.d;
+						oRBBorder.dd = border.dd;
+						oRBBorder.du = border.du;
 						fSetBorder(oBBox.r2, oBBox.c2, oRBBorder);
 					}
 				}
@@ -5986,58 +5985,58 @@ Range.prototype.setBorder=function(border){
 				if(bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
 					for(var  i = oBBox.c1 + 1 ; i < oBBox.c2; i++){
 						var oTopBorder = new Border();
-						oTopBorder.l = oAddBorder.iv;
-						oTopBorder.t = oAddBorder.t;
-						oTopBorder.r = oAddBorder.iv;
+						oTopBorder.l = border.iv;
+						oTopBorder.t = border.t;
+						oTopBorder.r = border.iv;
 						if(oBBox.r1 == oBBox.r2)
-							oTopBorder.b = oAddBorder.b;
+							oTopBorder.b = border.b;
 						else
-							oTopBorder.b = oAddBorder.ih;
-						oTopBorder.d = oAddBorder.d;
-						oTopBorder.dd = oAddBorder.dd;
-						oTopBorder.du = oAddBorder.du;
+							oTopBorder.b = border.ih;
+						oTopBorder.d = border.d;
+						oTopBorder.dd = border.dd;
+						oTopBorder.du = border.du;
 						fSetBorder(oBBox.r1, i, oTopBorder);
 					}
 				}
 				if(oBBox.r1 != oBBox.r2 && (bBottomBorder || bInnerVBorder || bInnerHBorder || bDiagonal)){
 					for(var  i = oBBox.c1 + 1 ; i < oBBox.c2; i++){
 						var oBottomBorder = new Border();
-						oBottomBorder.l = oAddBorder.iv;
-						oBottomBorder.t = oAddBorder.ih;
-						oBottomBorder.r = oAddBorder.iv;
-						oBottomBorder.b = oAddBorder.b;
-						oBottomBorder.d = oAddBorder.d;
-						oBottomBorder.dd = oAddBorder.dd;
-						oBottomBorder.du = oAddBorder.du;
+						oBottomBorder.l = border.iv;
+						oBottomBorder.t = border.ih;
+						oBottomBorder.r = border.iv;
+						oBottomBorder.b = border.b;
+						oBottomBorder.d = border.d;
+						oBottomBorder.dd = border.dd;
+						oBottomBorder.du = border.du;
 						fSetBorder(oBBox.r2, i, oBottomBorder);
 					}
 				}
 				if(bLeftBorder || bInnerHBorder || (oBBox.c1 == oBBox.c2 ? bRightBorder : bInnerVBorder) || bDiagonal){
 					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
 						var oLeftBorder = new Border();
-						oLeftBorder.l = oAddBorder.l;
-						oLeftBorder.t = oAddBorder.ih;
+						oLeftBorder.l = border.l;
+						oLeftBorder.t = border.ih;
 						if(oBBox.c1 == oBBox.c2)
-							oLeftBorder.r = oAddBorder.r;
+							oLeftBorder.r = border.r;
 						else
-							oLeftBorder.r = oAddBorder.iv;
-						oLeftBorder.b = oAddBorder.ih;
-						oLeftBorder.d = oAddBorder.d;
-						oLeftBorder.dd = oAddBorder.dd;
-						oLeftBorder.du = oAddBorder.du;
+							oLeftBorder.r = border.iv;
+						oLeftBorder.b = border.ih;
+						oLeftBorder.d = border.d;
+						oLeftBorder.dd = border.dd;
+						oLeftBorder.du = border.du;
 						fSetBorder(i, oBBox.c1, oLeftBorder);
 					}
 				}
 				if(oBBox.c1 != oBBox.c2 && (bRightBorder || bInnerVBorder || bInnerHBorder || bDiagonal)){
 					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
 						var oRightBorder = new Border();
-						oRightBorder.l = oAddBorder.iv;
-						oRightBorder.t = oAddBorder.ih;
-						oRightBorder.r = oAddBorder.r;
-						oRightBorder.b = oAddBorder.ih;
-						oRightBorder.d = oAddBorder.d;
-						oRightBorder.dd = oAddBorder.dd;
-						oRightBorder.du = oAddBorder.du;
+						oRightBorder.l = border.iv;
+						oRightBorder.t = border.ih;
+						oRightBorder.r = border.r;
+						oRightBorder.b = border.ih;
+						oRightBorder.d = border.d;
+						oRightBorder.dd = border.dd;
+						oRightBorder.du = border.du;
 						fSetBorder(i, oBBox.c2, oRightBorder);
 					}
 				}
@@ -6046,13 +6045,13 @@ Range.prototype.setBorder=function(border){
 					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
 						for(var  j = oBBox.c1 + 1 ; j < oBBox.c2; j++){
 							var oInnerBorder = new Border();
-							oInnerBorder.l = oAddBorder.iv;
-							oInnerBorder.t = oAddBorder.ih;
-							oInnerBorder.r = oAddBorder.iv;
-							oInnerBorder.b = oAddBorder.ih;
-							oInnerBorder.d = oAddBorder.d;
-							oInnerBorder.dd = oAddBorder.dd;
-							oInnerBorder.du = oAddBorder.du;
+							oInnerBorder.l = border.iv;
+							oInnerBorder.t = border.ih;
+							oInnerBorder.r = border.iv;
+							oInnerBorder.b = border.ih;
+							oInnerBorder.d = border.d;
+							oInnerBorder.dd = border.dd;
+							oInnerBorder.du = border.du;
 							fSetBorder(i, j, oInnerBorder);
 						}
 					}
@@ -6063,35 +6062,35 @@ Range.prototype.setBorder=function(border){
 		if(bLeftBorder && oBBox.c1 > 0){
 			var nCol = oBBox.c1 - 1;
 			for(var  i = oBBox.r1 ; i <= oBBox.r2; i++)
-				fSetBorderEdge(i, nCol, oAddBorder, nEdgeTypeLeft);
+				fSetBorderEdge(i, nCol, border, nEdgeTypeLeft);
 		}
 		if(bTopBorder && oBBox.r1 > 0){
 			var nRow = oBBox.r1 - 1;
 			for(var  i = oBBox.c1 ; i <= oBBox.c2; i++)
-				fSetBorderEdge(nRow, i, oAddBorder, nEdgeTypeTop);
+				fSetBorderEdge(nRow, i, border, nEdgeTypeTop);
 		}
 		if(bRightBorder && oBBox.c2 + 1 < this.worksheet.getColsCount()){
 			var nCol = oBBox.c2 + 1;
 			for(var  i = oBBox.r1 ; i <= oBBox.r2; i++)
-				fSetBorderEdge(i, nCol, oAddBorder, nEdgeTypeRight);
+				fSetBorderEdge(i, nCol, border, nEdgeTypeRight);
 		}
 		if(bBottomBorder && oBBox.r2 + 1 < this.worksheet.getRowsCount()){
 			var nRow = oBBox.r2 + 1;
 			for(var  i = oBBox.c1 ; i <= oBBox.c2; i++)
-				fSetBorderEdge(nRow, i, oAddBorder, nEdgeTypeBottom);
+				fSetBorderEdge(nRow, i, border, nEdgeTypeBottom);
 		}
 	}
 	else
 	{
-		this.worksheet.getAllCol().setBorder(oAddBorder);
+		this.worksheet.getAllCol().setBorder(border);
 		this._setPropertyNoEmpty(function(row){
-			row.setBorder(oAddBorder);
+			row.setBorder(border);
 		},
 		function(col){
-			col.setBorder(oAddBorder);
+			col.setBorder(border);
 		},
 		function(cell){
-			cell.setBorder(oAddBorder);
+			cell.setBorder(border);
 		});
 	}
 };
@@ -6700,28 +6699,28 @@ Range.prototype.getBorderFull=function(){
 	var borders = this.getBorder(this.getFirst()).clone();
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;    
-	if("none" == borders.l.s){
+	if(c_oAscBorderStyles.None === borders.l.s){
 		if(nCol > 1){
 			var left = this.getBorder(new CellAddress(nRow, nCol - 1, 0));
-			if("none" != left.r.s)
+			if(c_oAscBorderStyles.None !== left.r.s)
 				borders.l = left.r;
 		}
 	}
-	if("none" == borders.t.s){
+	if(c_oAscBorderStyles.None === borders.t.s){
 		if(nRow > 1){
 			var top = this.getBorder(new CellAddress(nRow - 1, nCol, 0));
-			if("none" != top.b.s)
+			if(c_oAscBorderStyles.None !== top.b.s)
 				borders.t = top.b;
 		}
 	}
-	if("none" == borders.r.s){
+	if(c_oAscBorderStyles.None === borders.r.s){
 		var right = this.getBorder(new CellAddress(nRow, nCol + 1, 0));
-		if("none" != right.l.s)
+		if(c_oAscBorderStyles.None !== right.l.s)
 			borders.r = right.l;
 	}
-	if("none" == borders.b.s){
+	if(c_oAscBorderStyles.None === borders.b.s){
 		var bottom = this.getBorder(new CellAddress(nRow + 1, nCol, 0));
-		if("none" != bottom.t.s)
+		if(c_oAscBorderStyles.None !== bottom.t.s)
 			borders.b = bottom.t;
 	}
 	return borders;

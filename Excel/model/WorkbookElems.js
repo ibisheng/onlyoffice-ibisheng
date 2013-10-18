@@ -337,7 +337,7 @@ function Font(val)
     //skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
     this.skip = val.skip;
     this.repeat = val.repeat;
-};
+}
 Font.prototype =
 {
 	clean : function()
@@ -557,7 +557,7 @@ function Fill(val)
 		bg: 0
 	};
 	this.bg = val.bg;
-};
+}
 Fill.prototype =
 {
 	_mergeProperty : function(first, second, def)
@@ -630,10 +630,38 @@ function BorderProp()
 		c: 1
 	};
 	this.s = c_oAscBorderStyles.None;
-	//this.w = c_oAscBorderWidth.None;
+	this.w = c_oAscBorderWidth.None;
 	this.c = g_oColorManager.getThemeColor(1);
 }
 BorderProp.prototype = {
+	setStyle : function (style) {
+		this.s = style;
+		switch (this.s) {
+			case c_oAscBorderStyles.Thin:
+			case c_oAscBorderStyles.DashDot:
+			case c_oAscBorderStyles.DashDotDot:
+			case c_oAscBorderStyles.Dashed:
+			case c_oAscBorderStyles.Dotted:
+			case c_oAscBorderStyles.Hair:
+				this.w = c_oAscBorderWidth.Thin;
+				break;
+			case c_oAscBorderStyles.Medium:
+			case c_oAscBorderStyles.MediumDashDot:
+			case c_oAscBorderStyles.MediumDashDotDot:
+			case c_oAscBorderStyles.MediumDashed:
+			case c_oAscBorderStyles.None:
+			case c_oAscBorderStyles.SlantDashDot:
+				this.w = c_oAscBorderWidth.Medium;
+				break;
+			case c_oAscBorderStyles.Thick:
+			case c_oAscBorderStyles.Double:
+				this.w = c_oAscBorderWidth.Thick;
+				break;
+			default:
+				this.w = c_oAscBorderWidth.None;
+				break;
+		}
+	},
 	getRgbOrNull : function()
 	{
 		var nRes = null;
@@ -660,6 +688,7 @@ BorderProp.prototype = {
 		if(null != oBorderProp.s && c_oAscBorderStyles.None !== oBorderProp.s)
 		{
 			this.s = oBorderProp.s;
+			this.w = oBorderProp.w;
 			if(null != oBorderProp.c)
 				this.c = oBorderProp.c;
 		}
@@ -801,14 +830,7 @@ Border.prototype =
 		this.dd = g_oDefaultBorder.dd;
 		this.du = g_oDefaultBorder.du;
 	},
-    set : function(border)
-    {
-		//border может быть не класса Border
-		this.clean();
-		this.mergeInner(border);
-    },
     mergeInner : function(border){
-		//border может быть не класса Border
         if(border){
             if(border.l)
 				this.l.merge(border.l);

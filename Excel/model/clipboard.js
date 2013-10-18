@@ -151,7 +151,7 @@
 			  return string;
 			 }
 
-		}
+		};
 
 		function number2color(n) {
 			if( typeof(n)=="string" && n.indexOf("rgb")>-1)
@@ -609,7 +609,7 @@
 					var fCheckMergedRowCol = function()
 					{
 						bCorrect = false;
-					}
+					};
 					var fCheckMergedRange = function(row, nRowIndex, nColIndex)
 					{
 						if(false == bCorrect)
@@ -625,7 +625,7 @@
 							if(false == (bR1In && bR2In && bC1In && bC2In) && true == (bR1In || bR2In || bC1In || bC2In))
 								bCorrect = false;
 						}
-					}
+					};
 					ws.model.oMergedCache._forEachBBox({r1: range.r1, c1: range.c1, r2: range.r2, c2: range.c2}, fCheckMergedRowCol, fCheckMergedRowCol, fCheckMergedRange, null);
 					if(false == bCorrect)
 						return false;
@@ -937,13 +937,13 @@
 			_getTextFromTable: function (table)
 			{
 				//если присутсвуют только изображения
-				var images = $(table).find('img')
+				var images = $(table).find('img');
 				if(images.length != 0 && images.length == $(table).children().length)
 				{
 					var stringImg = {};
 					stringImg.isImage = true;
 					stringImg.text = '';
-					for(i = 0; i < images.length; i++)
+					for(var i = 0; i < images.length; i++)
 					{
 						stringImg.text += images[i].name + ';';
 					}
@@ -992,7 +992,7 @@
 								return true;
 						}
 						return false;
-					}
+					};
                     if (fTest(e.clipboardData.types, "text/html"))
                     {
                         var sHtml = e.clipboardData.getData('text/html');
@@ -1162,7 +1162,7 @@
             
 			_getDefaultCell: function ()
 			{
-				res = [];
+				var res = [];
 				res.push({
 					format: {
 						fn: 'Arial',
@@ -1201,7 +1201,7 @@
 							res = c_oAscBorderStyles.MediumDashDot;
 						break;
 					case "double": res = c_oAscBorderStyles.Double; break;
-					case "dotted": res = c_oAscBorderStyles.hair; break;
+					case "dotted": res = c_oAscBorderStyles.Hair; break;
 				}
 				return res;
 			},
@@ -1238,8 +1238,7 @@
 				}
 				
 				//borders
-                oNewItem.borders = {};
-                oNewItem.borders.l  = {};oNewItem.borders.r  = {};oNewItem.borders.b  = {};oNewItem.borders.t  = {};
+                oNewItem.borders = new Border();
 
 				tmpBorderStyle = $(node).css('border-top-style');
                 if ("none" !== tmpBorderStyle && null != tmpBorderStyle) {
@@ -1258,7 +1257,7 @@
 
 					borderStyleName = this._getBorderStyleName(borderTopStyle, borderTopWidth);
 					if (null !== borderStyleName) {
-						oNewItem.borders.t.s = borderStyleName;
+						oNewItem.borders.t.setStyle(borderStyleName);
 						oNewItem.borders.t.c = new RgbColor(borderTopColor);
 					}
                 }
@@ -1280,7 +1279,7 @@
 
 					borderStyleName = this._getBorderStyleName(borderBottomStyle, borderBottomWidth);
 					if (null !== borderStyleName) {
-						oNewItem.borders.b.s = borderStyleName;
+						oNewItem.borders.b.setStyle(borderStyleName);
 						oNewItem.borders.b.c = new RgbColor(borderBottomColor);
 					}
                 }
@@ -1302,7 +1301,7 @@
 
 					borderStyleName = this._getBorderStyleName(borderLeftStyle, borderLeftWidth);
 					if (null !== borderStyleName) {
-						oNewItem.borders.l.s = borderStyleName;
+						oNewItem.borders.l.setStyle(borderStyleName);
 						oNewItem.borders.l.c = new RgbColor(borderLeftColor);
 					}
                 }
@@ -1324,7 +1323,7 @@
 
 					borderStyleName = this._getBorderStyleName(borderRightStyle, borderRightWidth);
 					if (null !== borderStyleName) {
-						oNewItem.borders.r.s = borderStyleName;
+						oNewItem.borders.r.setStyle(borderStyleName);
 						oNewItem.borders.r.c = new RgbColor(borderRightColor);
 					}
                 }
@@ -1368,7 +1367,7 @@
 				
 				//check format
 				if( node.getAttribute("class") != null ){
-					cL = node.getAttribute("class").split(" ");
+					var cL = node.getAttribute("class").split(" ");
 					for (var i = 0; i < cL.length; i++){
 						if(cL[i].indexOf("nFormat") > -1)
 						{
@@ -1448,7 +1447,7 @@
 			{
 				 var newArr = [];
 				 var k = 0;
-				 for (n = 0;n < nodes.length; ++n)
+				 for (var n = 0;n < nodes.length; ++n)
 				 {
 					if(!(nodes[n].nodeName.toLowerCase() == '#comment' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
 					{
@@ -1628,7 +1627,7 @@
 				var addImages = null;
 				var imCount = 0;
 				//пробегаемся по html
-                for (r = range.r1;r - range.r1 < countChild; ++r) {//цикл по r
+                for (var r = range.r1;r - range.r1 < countChild; ++r) {//цикл по r
 					var firstRow = mainChildrens[r - range.r1 - countEmptyRow];
                     if(firstRow.nodeName.toLowerCase() == 'br')
                         r++;
@@ -1636,7 +1635,7 @@
                     var tag = mainChildrens[r - range.r1 - countEmptyRow];
 					if(pasteFragment.children.length == 1 && pasteFragment.children[0].nodeName.toLowerCase() == 'table')
 						aResult.isOneTable = true;
-                    for (c = range.c1; c <= range.c2; ++c) {
+                    for (var c = range.c1; c <= range.c2; ++c) {
                         if((tag.nodeName.toLowerCase() == 'div' || tag.nodeName.toLowerCase() == 'p' || tag.nodeName.toLowerCase() == 'h' ||  tag.nodeName.toLowerCase().search('h') != -1) && c == range.c1 || tag.nodeName.toLowerCase() == 'li')
 						{
 							var prevSib = mainChildrens[r - range.r1 - countEmptyRow -1];
@@ -1703,16 +1702,16 @@
                             var n = 0;
 							var arrCount = [];
                             var cellCount = 0;
-							for(i = 0;i < tableBody.children.length;++i)
+							for(var i = 0;i < tableBody.children.length;++i)
                             {
 								arrCount[i]  = 0;
-								for(j = 0;j < tableBody.children[i].children.length;++j)
+								for(var j = 0;j < tableBody.children[i].children.length;++j)
 								{
 									arrCount[i] += tableBody.children[i].children[j].colSpan;
 								}
                             }
 							cellCount = Math.max.apply({}, arrCount);
-							for(i = 0;i < tableBody.children.length;++i)
+							for(var i = 0;i < tableBody.children.length;++i)
                             {
                                 if(tableBody.children[i].children[0] != undefined && (tableBody.children[i].children.length == cellCount|| tableBody.children[i].children[0].colSpan == cellCount))
 									rowCount += tableBody.children[i].children[0].rowSpan;
@@ -1748,14 +1747,14 @@
 							}
 							else
 							{*/
-								for (tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
+								for (var tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
 									aResult[tR] = new Array();
 									var cNew = 0;
-									for(tC = range.c1; tC < range.c1 + cellCount; ++tC) {
+									for(var tC = range.c1; tC < range.c1 + cellCount; ++tC) {
 										
 										if(0 != mergeArr.length)
 										{
-											for(k = 0; k < mergeArr.length; ++k)
+											for(var k = 0; k < mergeArr.length; ++k)
 											{
 												if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && tR >= mergeArr[k].r1 && tR <= mergeArr[k].r2)
 												{
@@ -1942,7 +1941,7 @@
                 if(table && table.children[0] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
                 {
                     if( table.children[0].getAttribute("class") != null ){
-                        cL = table.children[0].getAttribute("class").split(" ");
+                        var cL = table.children[0].getAttribute("class").split(" ");
                         for (var i = 0; i < cL.length; i++){
                             if(cL[i].indexOf("pasteFragment_") > -1){
                                 if(cL[i] == t.copyText.pasteFragment)
@@ -2041,7 +2040,7 @@
 						else if(isFormat && isFormat.f && isFormat.wFormat)
 						{
 							var text = '';
-							for (k = 0; k < val.length; ++k) {
+							for (var k = 0; k < val.length; ++k) {
 								text += val[k].text;
 							}
 							span.textContent = text;
@@ -2105,41 +2104,40 @@
 				}
 
 				function makeBorder(border) {
-					var style = "";
-					var width = 0;
 					if (!border || border.s === c_oAscBorderStyles.None)
 						return "";
 
+					var style = "";
 					switch(border.s) {
 						case c_oAscBorderStyles.Thin:
-							style = "solid"; width = 1;
+							style = "solid";
 							break;
 						case c_oAscBorderStyles.Medium:
-							style = "solid"; width = 2;
+							style = "solid";
 							break;
 						case c_oAscBorderStyles.Thick:
-							style = "solid"; width = 3;
+							style = "solid";
 							break;
 						case c_oAscBorderStyles.DashDot:
 						case c_oAscBorderStyles.DashDotDot:
 						case c_oAscBorderStyles.Dashed:
-							style = "dashed"; width = 1;
+							style = "dashed";
 							break;
 						case c_oAscBorderStyles.Double:
-							style = "double"; width = 2;
+							style = "double";
 							break;
 						case c_oAscBorderStyles.Hair:
 						case c_oAscBorderStyles.Dotted:
-							style = "dotted"; width = 1;
+							style = "dotted";
 							break;
 						case c_oAscBorderStyles.MediumDashDot:
 						case c_oAscBorderStyles.MediumDashDotDot:
 						case c_oAscBorderStyles.MediumDashed:
 						case c_oAscBorderStyles.SlantDashDot:
-							style = "dashed"; width = 2;
+							style = "dashed";
 							break;
 					}
-					return style + "px " + width + " " + number2color(border.getRgbOrNull());
+					return border.w + "px " + style + " " + number2color(border.getRgbOrNull());
 				}
 
 				table = doc.createElement("TABLE");
@@ -2218,11 +2216,11 @@
 						//add local buffer
 						for (row = bbox.r1; row <= bbox.r2; ++row) {
 							if(row != bbox.r1)
-								localStText += '\n'
+								localStText += '\n';
 							for (col = bbox.c1; col <= bbox.c2; ++col) {
 								if(col != bbox.c1)
 									localStText += ' ';
-								var currentRange = range.worksheet.getCell( new CellAddress(row, col, 0) )
+								var currentRange = range.worksheet.getCell( new CellAddress(row, col, 0) );
 								//добавляем текст
 								var textRange = currentRange.getValue();
 								if(textRange == '')
@@ -2263,7 +2261,7 @@
 								td.style.textAlign = cell.getAlignHorizontal();
 							td.style.verticalAlign = cell.getAlignVertical();
 							if(cell.getAlignVertical() == 'center')
-								td.style.verticalAlign = 'middle'
+								td.style.verticalAlign = 'middle';
 
 							b = cell.getBorderFull();
 							if(mbbox)
@@ -2300,7 +2298,7 @@
 							// если b==0 мы не зайдем в if, хотя b==0 это ни что иное, как черный цвет заливки.
 							if (b!=null) {td.style.backgroundColor = number2color(b.getRgb());}
 
-							var isQPrefix = cell.getQuotePrefix()
+							var isQPrefix = cell.getQuotePrefix();
 							this._makeNodesFromCellValue(cell.getValue2(), fn ,fs,isQPrefix,isFormat,cell).forEach(
 									function(node){
 										td.appendChild(node);
@@ -2351,7 +2349,7 @@
 						hyperlink: cell.getHyperlink(),
 						valWithoutFormat: cell.getValueWithoutFormat(),
 						angle: cell.getAngle()
-					}
+					};
 					if(cell.getQuotePrefix() && t.lStorage[row][col] && t.lStorage[row][col].value2 && t.lStorage[row][col].value2[0])
 						t.lStorage[row][col].value2[0].text = "'" + t.lStorage[row][col].value2[0].text;
 					//проверка на наличие автофильтров
@@ -2619,8 +2617,8 @@
 				if(this.Api.FontLoader.map_font_index[fontName] != undefined)
 					return fontName;
 				var arrName = fontName.toLowerCase().split(' ');
-				var newFontName = ''
-				for(i = 0;i < arrName.length;i++)
+				var newFontName = '';
+				for(var i = 0;i < arrName.length;i++)
 				{
 					arrName[i] = arrName[i].substr(0,1).toUpperCase() + arrName[i].substr(1).toLowerCase();
 					if(i == arrName.length - 1)
@@ -2670,7 +2668,7 @@
 					return false;
 				
 				var firstRange = ws.activeRange.clone(true);
-				for(i=0;i < array.length;i++)
+				for(var i=0;i < array.length;i++)
 				{
 					var binary_shape = array[i].image.getAttribute("alt");
 					var sub;
@@ -2687,7 +2685,7 @@
 						{
 							first_string = sub;
 						}
-						var positionX = null
+						var positionX = null;
 						var positionY = null;
 						
 						if(ws.cols && firstRange && firstRange.c1 != undefined && ws.cols[firstRange.c1].left != undefined)
@@ -2870,7 +2868,7 @@ function Editor_CopyPaste_Create(api)
 	 elementText["onbeforecopy"] = function(e){
 		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
 		{
-			v = api.wb.cellEditor.copySelection();
+			var v = api.wb.cellEditor.copySelection();
 			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
 		}	
     };
@@ -2882,7 +2880,7 @@ function Editor_CopyPaste_Create(api)
 			isNeedEmptyAfterCut = false;
 			if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
 			{
-				v = api.wb.cellEditor.cutSelection();
+				var v = api.wb.cellEditor.cutSelection();
 				if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
 			}	
 		}

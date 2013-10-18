@@ -164,6 +164,14 @@ var c_oAscBorderOptions = {
 	InnerH	: 7
 };
 
+// Толщина бордера
+var c_oAscBorderWidth = {
+	None	: 0,	// 0px
+	Thin	: 1,	// 1px
+	Medium	: 2,	// 2px
+	Thick	: 3		// 3px
+};
+
 // Располагаются в порядке значимости для отрисовки
 var c_oAscBorderStyles = {
 	None				: 0,

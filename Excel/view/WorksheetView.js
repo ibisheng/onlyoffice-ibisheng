@@ -75,28 +75,7 @@
 		var kvaCenter = "center";
 		var kvaBottom = "bottom";
 
-		/**
-		 * cell border styles
-		 * @const
-		 */
-		var kcbNone             = "none";
-		var kcbThick            = c_oAscBorderStyles.Thick;
-		var kcbThin             = c_oAscBorderStyles.Thin;
-		var kcbMedium           = c_oAscBorderStyles.Medium;
-		var kcbDashDot          = c_oAscBorderStyles.DashDot;
-		var kcbDashDotDot       = c_oAscBorderStyles.DashDotDot;
-		var kcbDashed           = c_oAscBorderStyles.Dashed;
-		var kcbDotted           = c_oAscBorderStyles.Dotted;
-		var kcbDouble           = c_oAscBorderStyles.Double;
-		var kcbHair             = c_oAscBorderStyles.Hair;
-		var kcbMediumDashDot    = c_oAscBorderStyles.MediumDashDot;
-		var kcbMediumDashDotDot = c_oAscBorderStyles.MediumDashDotDot;
-		var kcbMediumDashed     = c_oAscBorderStyles.MediumDashed;
-		var kcbSlantDashDot     = c_oAscBorderStyles.SlantDashDot;
-
-		var kcbThinBorders      = [kcbThin, kcbDashDot, kcbDashDotDot, kcbDashed, kcbDotted, kcbHair];
-		var kcbMediumBorders    = [kcbMedium, kcbMediumDashDot, kcbMediumDashDotDot, kcbMediumDashed, kcbSlantDashDot];
-		var kcbThickBorders     = [kcbThick, kcbDouble];
+		var kNone             = "none";
 
 		/**
 		 * cursor styles
@@ -4011,13 +3990,12 @@
 				}
 
 				function makeBorder(border, type, isActive) {
+					var tmpBorder = self._getBorderPropById(border, type);
 					return new CellBorder(
-							self._getBorderPropById( border, type ).s,
-							self._getBorderPropById( border, type ).c,
-							self._calcBorderWidth( self._getBorderPropById( border, type ) ),
-							type === kcbidLeft ? self._isLeftBorderErased(col, row) : (type === kcbidRight ?
-									self._isRightBorderErased(col, row) : false),
-							isActive !== undefined ? isActive : false);
+						tmpBorder.s, tmpBorder.c, tmpBorder.w,
+						type === kcbidLeft ? self._isLeftBorderErased(col, row) : (type === kcbidRight ?
+							self._isRightBorderErased(col, row) : false),
+						isActive !== undefined ? isActive : false);
 				}
 
 				var cc = self._fetchCellCache(col, row);
@@ -4149,7 +4127,7 @@
 
 			_getCellFlags: function (col, row) {
 				var c = row !== undefined ? this._getCell(col, row) : col;
-				var fl = {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: kcbNone};
+				var fl = {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: kNone};
 				if (c !== undefined) {
 					fl.wrapText = c.getWrap();
 					fl.shrinkToFit = c.getShrinkToFit();
@@ -4190,26 +4168,6 @@
 					(cb.dd && c_oAscBorderStyles.None !== cb.dd.s)  || (cb.du && c_oAscBorderStyles.None !== cb.du.s))
 					return false;
 				return c.getValue().search(/[^ ]/) < 0;
-			},
-
-			_isThinBorder: function (bs) {
-				return $.inArray(bs, kcbThinBorders) >= 0;
-			},
-
-			_isMediumBorder: function (bs) {
-				return $.inArray(bs, kcbMediumBorders) >= 0;
-			},
-
-			_isThickBorder: function (bs) {
-				return $.inArray(bs, kcbThickBorders) >= 0;
-			},
-
-			_calcBorderWidth: function (b) {
-				var s = b.s;
-				return b === undefined ? 0 : (
-						this._isThinBorder(s) ? 1 : (
-						this._isMediumBorder(s) ? 2 : (
-						this._isThickBorder(s) ? 3 : 0)));
 			},
 
 			_getRange: function (c1, r1, c2, r2) {
@@ -6903,20 +6861,19 @@
 					}
 
 					var isLargeRange = t._isLargeRange(range), callTrigger = false;
-					var res, flag;
+					var res;
 					var mc, r, c, cell;
 
 					function makeBorder(b) {
-						var border = {};
+						var border = new BorderProp();
 						if (b === false) {
-							border.s = c_oAscBorderStyles.None;
+							border.setStyle(c_oAscBorderStyles.None);
 						} else if (b) {
-							if (b.style !== null && b.style !== undefined) {border.s = b.style;}
+							if (b.style !== null && b.style !== undefined) {border.setStyle(b.style);}
 							if (b.color !== null && b.color !== undefined) {
 								if(b.color instanceof CAscColor)
 									border.c = CorrectAscColor(b.color);
 							}
-							flag = flag || (b.width === null || b.style === null || b.color === null);
 						}
 						return border;
 					}
@@ -6945,13 +6902,12 @@
 
 						case "border":
 							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
-							res = {};
-							flag = false;
 							// None
 							if (val.length < 1) {
 								range.setBorder(null);
 								break;
 							}
+							res = new Border();
 							// Diagonal
 							res.d = makeBorder( val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU] );
 							res.dd = val[c_oAscBorderOptions.DiagD] ? true : false;
@@ -6965,7 +6921,7 @@
 							res.ih = makeBorder( val[c_oAscBorderOptions.InnerH] );
 							res.b = makeBorder( val[c_oAscBorderOptions.Bottom] );
 							// Change border
-							range.setBorder(res, flag);
+							range.setBorder(res);
 							break;
 						case "merge":
 							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
@@ -7374,8 +7330,6 @@
 								{
 									var range = t.model.getRange3(r + autoR*plRow, c + autoC*plCol, r + autoR*plRow, c + autoC*plCol);
 
-									var res, flag, v;
-
 									var currentObj = values[r][c][0];
 									if( currentObj.length === 1 ){
 										//if(!isMultiple)
@@ -7426,11 +7380,11 @@
 									}
 
 									if(currentObj.length === 1 && currentObj[0].format.fs !== '' && currentObj[0].format.fs !== null && currentObj[0].format.fs !== undefined)
-										range.setFontsize(currentObj[0].format.fs)
+										range.setFontsize(currentObj[0].format.fs);
 									if(!isOneMerge)
 										range.setAlignHorizontal(currentObj.a);
 									var isMerged = false;
-									for(mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck)
+									for(var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck)
 									{
 										if(r + 1 + autoR*plRow <= mergeArr[mergeCheck].r2 && r + 1 + autoR*plRow >= mergeArr[mergeCheck].r1 && c + autoC*plCol + 1 <= mergeArr[mergeCheck].c2 && c + 1 + autoC*plCol >= mergeArr[mergeCheck].c1)
 											isMerged = true;
@@ -7451,9 +7405,8 @@
 											range.setValue('');
 										range.merge(c_oAscMergeOptions.Merge);
 									}
-									//range.setBorder(null);
 									if(!isOneMerge)
-										range.setBorderSrc(currentObj.borders, false);
+										range.setBorderSrc(currentObj.borders);
 									range.setWrap(currentObj.wrap);
 									if(currentObj.bc && currentObj.bc != 'rgba(0, 0, 0, 0)' && currentObj.bc != 'transparent' && '' != currentObj.bc && !isOneMerge)
 										range.setFill(new RgbColor(asc_parsecolor(currentObj.bc).binary));
@@ -7756,7 +7709,7 @@
 									if(!isOneMerge)
 										range.setAlignHorizontal(newVal.horAlign);
 									if(!isOneMerge)
-										range.setBorderSrc(newVal.borders, false);
+										range.setBorderSrc(newVal.borders);
 
 									var nameFormat;
 									/*if(newVal.format.oPositiveFormat)
