@@ -57,7 +57,7 @@ asc_CParagraphBorders:jH
 __gray_convert_glyph:Ks
 c_oSerPosHV$Align:aO
 tt_face_free_name:qq
-ResizeTrackShapeImageInGroup:h0
+ResizeTrackShapeImageInGroup:g0
 historyitem_type_Layout:tA
 JSCompiler_StaticMethods_Update_TableMarkupFromRuler:jV
 historyitem_Table_RemoveRow:AW
@@ -1973,7 +1973,7 @@ CRGBColor:ci
 g_stringBase64:sU
 historyitem_Table_PositionV:EW
 BinaryFileWriter:qa
-pHText:M0
+pHText:L0
 ft_recompute_scaled_metrics:jy
 ResizeTrackChart:G0
 c_oSer_OMathContentType$SSupPr:kR
