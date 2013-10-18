@@ -1948,7 +1948,7 @@ Round_To_Grid:Ly
 c_oAscServerError$StorageWrite:wg
 Body_Paste:zc
 TT_NameEntryRec:Pr
-ETblStyleOverrideType$tblstyleoverridetypeNwCell:Q4
+ETblStyleOverrideType$tblstyleoverridetypeNwCell:O4
 FORMULA_TYPE_PIN:fO
 c_oSerWrapPolygon$LineTo:C1
 c_oSerParType$CommentStart:X_
@@ -2545,7 +2545,7 @@ numFormat_Hour:qh
 JSCompiler_StaticMethods_Row_Remove:CW
 CFontFile:uD
 tt_face_free_ps_names:Bv
-CDocMeta:O8
+CDocMeta:N8
 c_oSer_FramePrType$HRule:r2
 c_oSer_ChartSeriesNumCacheType$NumCacheVal:$m
 _ph_summ__two_obj_and_two_tx:MN
@@ -3153,7 +3153,7 @@ JSCompiler_StaticMethods_Clear_Additional:SQ
 rx_array:eh
 CParagraphAndTextProp:s$
 JSCompiler_StaticMethods_Set_CellInfo:aY
-CDocOpenProgress:V9
+CDocOpenProgress:U9
 c_oSerProp_pPrType$PageBreakBefore:QZ
 StartAddNewArrow:fG
 tt_face_load_bhed:hv
