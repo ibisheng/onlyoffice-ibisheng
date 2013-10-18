@@ -2880,11 +2880,12 @@ function DrawingObjects() {
                 }
                 if(isRealObject(drawingObject.graphicObject.drawingBase))
                 {
-                    var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
-                    drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
-                    drawingObject.graphicObject.spPr.xfrm.setChildExtents(metrics.extX, metrics.extY);
-                    drawingObject.graphicObject.spPr.xfrm.setChildOffsets(0, 0);
+                    //var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
+                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                    //drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
+                    //drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
+                    //drawingObject.graphicObject.spPr.xfrm.setChildExtents(metrics.extX, metrics.extY);
+                    //drawingObject.graphicObject.spPr.xfrm.setChildOffsets(0, 0);
                 }
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
                 drawingObject.graphicObject.recalculate(aImagesSync);
