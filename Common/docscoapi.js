@@ -790,9 +790,9 @@
                     }
                     if (data["changes"]) {
                         docsCoApi._onFirstLoadChanges(data);
-                    } else if (this.onFirstLoadChanges) {
+                    } else if (docsCoApi.onFirstLoadChanges) {
 						// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
-						this.onFirstLoadChanges([]);
+						docsCoApi.onFirstLoadChanges([]);
 					}
 
                     //Send prebuffered
