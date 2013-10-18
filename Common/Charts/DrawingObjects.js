@@ -147,6 +147,7 @@ function asc_CChart(object) {
 	
 	this.bChartEditor = bCopy ? object.bChartEditor : false;
 	this.bShowValue = bCopy ? object.bShowValue : false;
+	this.bShowCatName = bCopy ? object.bShowCatName : false;
 	this.bShowBorder = bCopy ? object.bShowBorder : true;
 	this.styleId = bCopy ? object.styleId : c_oAscChartStyle.Standart;
 
@@ -257,6 +258,9 @@ asc_CChart.prototype = {
 
 	asc_getShowValueFlag: function() { return this.bShowValue; },
 	asc_setShowValueFlag: function(show) { this.bShowValue = show; },
+	
+	asc_getShowCatNameFlag: function() { return this.bShowCatName; },
+	asc_setShowCatNameFlag: function(show) { this.bShowCatName = show; },
 	
 	asc_getShowBorderFlag: function() { return this.bShowBorder; },
 	asc_setShowBorderFlag: function(show) { this.bShowBorder = show; },
@@ -659,6 +663,7 @@ asc_CChart.prototype = {
 		
 		Writer.WriteBool( this.bChartEditor );
 		Writer.WriteBool( this.bShowValue );
+		Writer.WriteBool( this.bShowCatName );
 		Writer.WriteBool( this.bShowBorder );
 		
 		// Header
@@ -751,6 +756,7 @@ asc_CChart.prototype = {
 		
 		this.bChartEditor = Reader.GetBool();
 		this.bShowValue = Reader.GetBool();
+		this.bShowCatName = Reader.GetBool();
 		this.bShowBorder = Reader.GetBool();
 		
 		// Header
@@ -1088,6 +1094,9 @@ prot["asc_setStyleId"] = prot.asc_setStyleId;
 
 prot["asc_getShowValueFlag"] = prot.asc_getShowValueFlag;
 prot["asc_setShowValueFlag"] = prot.asc_setShowValueFlag;
+
+prot["asc_getShowCatNameFlag"] = prot.asc_getShowCatNameFlag;
+prot["asc_setShowCatNameFlag"] = prot.asc_setShowCatNameFlag;
 
 prot["asc_getShowBorderFlag"] = prot.asc_getShowBorderFlag;
 prot["asc_setShowBorderFlag"] = prot.asc_setShowBorderFlag;
