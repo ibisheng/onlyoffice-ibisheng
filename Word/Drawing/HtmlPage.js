@@ -1649,6 +1649,9 @@ function CEditorPage(api)
     }
     this.onMouseUp = function(e, bIsWindow)
     {
+        oThis.m_oScrollVerApi.evt_mouseup(e);
+        oThis.m_oScrollHor.evt_mouseup(e);
+
         if (false === oThis.m_oApi.bInit_word_control)
             return;
         //if (true == global_mouseEvent.IsLocked)
