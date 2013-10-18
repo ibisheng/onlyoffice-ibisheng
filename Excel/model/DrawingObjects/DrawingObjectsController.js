@@ -184,7 +184,7 @@ DrawingObjectsController.prototype =
     deleteSelectedObjects: function()
     {
         var drawingObjectsController = this;
-        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+        for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
         {
             drawingObjectsController.selectedObjects[i].deleteDrawingBase();
         }
