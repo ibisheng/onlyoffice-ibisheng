@@ -3664,6 +3664,13 @@ function DrawingObjects() {
 					var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
 					if ( _range )
 						graphicObject.chart.range.intervalObject = _range;
+					
+					while ( worksheet.cols.length < _range.bbox.c2 ) {
+						worksheet.expandColsOnScroll(true);
+					}
+					while ( worksheet.rows.length < _range.bbox.r2 ) {
+						worksheet.expandRowsOnScroll(true);
+					}
 				}
 			}
 			
