@@ -3298,7 +3298,7 @@ PasteProcessor.prototype =
                                 }
                             }
                             oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
-                        }, JSON.stringify(rData) );
+                        }, rData );
                     }
                     else
                         oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
@@ -3537,7 +3537,7 @@ PasteProcessor.prototype =
                                         }
                                     }
                                     oThis.api.pre_Paste(fonts, image_map, paste_callback);
-                                }, JSON.stringify(rData) );
+                                }, rData );
                             }
                             else
                             {
@@ -3760,7 +3760,7 @@ PasteProcessor.prototype =
                                         }
                                     }
                                     oThis.api.pre_Paste(fonts, image_map, paste_callback);
-                                }, JSON.stringify(rData) );
+                                }, rData );
                             }
                             else
                             {
@@ -3841,7 +3841,7 @@ PasteProcessor.prototype =
                                             {									oThis.oImages[sFrom] = sTo;									oPrepeareImages[i] = sTo;								}							}
                                     }
                                     oThis.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
-                                }, JSON.stringify(rData) );
+                                }, rData );
                             }
                             else
                             {
@@ -4107,7 +4107,7 @@ PasteProcessor.prototype =
 								{									oThis.oImages[sFrom] = sTo;									oPrepeareImages[i] = sTo;								}							}
 						}
 						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
-					}, JSON.stringify(rData) );
+					}, rData );
 			}
 			else
 				this.api.pre_Paste(aPrepeareFonts, this.oImages, fCallback);

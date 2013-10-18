@@ -499,7 +499,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					v["format"] = this.DocInfo["Format"];
 					v["vkey"] = this.DocInfo["VKey"];
 					v["editorid"] = c_oEditorId.Excel;
-					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, JSON.stringify(v));
+					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, v);
 				}
 				else
 				{
@@ -692,7 +692,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						// Проверяем тип состояния в данный момент
 						if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
 							var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"reopen", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "delimiter": option.asc_getDelimiter(), "codepage": option.asc_getCodePage()};
-							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, JSON.stringify(v));
+							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
 							this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
 								if(null != incomeObject && "save" == incomeObject["type"])
@@ -728,6 +728,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_asc_sendCommand: function (callback, rdata) {
+				if("string" !== typeof(rdata))
+				{
+					//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
+					if(null != rdata.data && "string" === typeof(rdata.data) && rdata.data.length > g_nMaxJsonLength / 2)
+					{
+						var sData = rdata.data;
+						rdata.data = null;
+						rdata = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sData;
+					}
+					else
+						rdata = JSON.stringify(rdata);
+				}
 				var oThis = this;
 				asc_ajax({
 					type: 'POST',
@@ -805,7 +817,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 											var cp = JSON.parse(result);
 											oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
 											//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
-											//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
+											//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, value);
 										},
 										error:function(){
 											result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
@@ -830,7 +842,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									var cp = JSON.parse(incomeObject["data"]);
 									oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
 									//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
-									//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
+									//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, value);
 									break;
 								case "save":
 									if(callback)
@@ -838,11 +850,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									break;
 								case "waitopen":
 									var rData = {"id":oThis.documentId, "format": oThis.documentFormat, "vkey": oThis.documentVKey, "editorid": c_oEditorId.Spreadsheet, "c":"chopen"};
-									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
+									setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 									break;
 								case "waitsave":
 									var rData = {"id": oThis.documentId, "vkey": oThis.documentVKey, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject["data"]};
-									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
+									setTimeout(function(){oThis._asc_sendCommand(callback, rData);}, 3000);
 									break;
 								case "savepart":
 									var outputData = JSON.parse(incomeObject["data"]);
@@ -915,7 +927,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					{
 						var sEmptyWorkbook = getEmptyWorkbook();
 						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"create", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": sEmptyWorkbook};
-						this._asc_sendCommand (fCallback, JSON.stringify(v));
+						this._asc_sendCommand (fCallback, v);
 						var wb = this.asc_OpenDocument(g_sResourceServiceLocalUrl + this.documentId + "/", sEmptyWorkbook);
 						fCallback({returnCode: 0, val:wb});
 					}
@@ -924,7 +936,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						// Меняем тип состояния (на открытие)
 						this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
 						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"open", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
-						this._asc_sendCommand (fCallback, JSON.stringify(v));
+						this._asc_sendCommand (fCallback, v);
 					}
 				}
 			},
@@ -992,7 +1004,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				} else if (c_oAscFileType.CSV === sFormat && !options) {
 					var v = {"id":this.documentId, "vkey": this.documentVKey, "c":"getcodepage"};
-					return this._asc_sendCommand (fCallback, JSON.stringify(v));
+					return this._asc_sendCommand (fCallback, v);
 				} else {
 					this.wb._initCommentsToSave();
 					var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
@@ -2258,7 +2270,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						return ws.objectRender.addImageDrawingObject(incomeObject["data"], null);
 					}
 					oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-				}, JSON.stringify(rData) );
+				}, rData );
 			},
 
 			asc_showImageFileDialog: function (options) {

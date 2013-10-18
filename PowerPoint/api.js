@@ -712,7 +712,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 		rData["vkey"] = this.DocInfo.get_VKey();
 		rData["editorid"] = c_oEditorId.Presentation;
 
-		sendCommand( this, this.asc_getEditorPermissionsCallback, JSON.stringify(rData) );	
+		sendCommand( this, this.asc_getEditorPermissionsCallback, rData );	
 	}
 	else
 	{
@@ -800,7 +800,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     {
         this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Presentation, "c":"open", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
-        sendCommand( oThis, function(){}, JSON.stringify(rData) );
+        sendCommand( oThis, function(){}, rData );
 
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
     }
@@ -1414,7 +1414,7 @@ asc_docs_api.prototype.Help = function(){
 }
 asc_docs_api.prototype.ClearCache = function(){
 	var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"cc"};
-	sendCommand(editor, function(){}, JSON.stringify(rData));
+	sendCommand(editor, function(){}, rData);
 }
 asc_docs_api.prototype.startGetDocInfo = function(){
 	/*
@@ -2903,7 +2903,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 			if(null != incomeObject && "imgurl" == incomeObject["type"])
 				oThis.AddImageUrlAction(incomeObject["data"]);
 			oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-		}, JSON.stringify(rData) );
+		}, rData );
 	}
 };
 asc_docs_api.prototype.AddImageUrlAction = function(url){
@@ -4789,6 +4789,18 @@ function getURLParameter(name) {
     return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
 };
 function sendCommand(editor, fCallback, rdata){
+	if("string" !== typeof(rdata))
+	{
+		//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
+		if(null != rdata.data && "string" === typeof(rdata.data) && rdata.data.length > g_nMaxJsonLength / 2)
+		{
+			var sData = rdata.data;
+			rdata.data = null;
+			rdata = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sData;
+		}
+		else
+			rdata = JSON.stringify(rdata);
+	}
 	asc_ajax({
         type: 'POST',
         url: g_sMainServiceLocalUrl,
@@ -4845,7 +4857,7 @@ function sendCommand(editor, fCallback, rdata){
                         editor.sync_SendProgress(editor._lastConvertProgress);
                     }
 					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Presentation, "c":"chopen"};
-                    setTimeout( function(){sendCommand(editor, fCallback,  JSON.stringify(rData))}, 3000);
+                    setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
                 break;
                 case "save":
 					if(fCallback)
@@ -4853,7 +4865,7 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject["data"]};
-                    setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
+                    setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
                 break;
 				case "savepart":
 					var outputData = JSON.parse(incomeObject["data"]);
