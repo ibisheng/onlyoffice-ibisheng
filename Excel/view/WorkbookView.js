@@ -1324,6 +1324,11 @@
 				var t = this, ws, v;
 				if (!t.controller.isCellEditMode && !window.USER_AGENT_SAFARI_MACOS) {
 					ws = t.getWorksheet();
+					
+					// Запрещаем копирование диаграмм в iframe
+					if ( t.Api.isChartEditor && ws.objectRender.selectedGraphicObjectsExists() )
+						return;
+					
 					t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
 					ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
 				} else if(!window.USER_AGENT_SAFARI_MACOS){
