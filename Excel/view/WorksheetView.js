@@ -2729,8 +2729,8 @@
 
 			_drawSelectionRange: function (range) {
 				
-				if ( asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists() ) {
-					if ( this.isChartAreaEditMode ) {
+				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
+					if (this.isChartAreaEditMode) {
 						this._drawFormulaRange(this.arrActiveChartsRanges)
 					}
 					return;
@@ -2762,6 +2762,9 @@
 
 				if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
 					this._drawActiveHeaders();
+					if (this.isSelectionDialogMode) {
+						this._drawSelectRange(this.activeRange.clone(true));
+					}
 					return;
 				}
 
