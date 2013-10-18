@@ -269,7 +269,7 @@ c_oSer_pgMarType$Header:M1
 NumComporationOperators$less:Jh
 c_oMainTables$ImageMap:Gk
 nVertTTvert:Pj
-ScrollArrowType$ARROW_RIGHT:O8
+ScrollArrowType$ARROW_RIGHT:P8
 FT_GlyphLoader_New:vr
 c_oSer_OMathBottomNodesType$DegHide:M2
 asc_CChartLegend:kp
@@ -333,7 +333,7 @@ JSCompiler_StaticMethods_documentIsSelectionLocked:VG
 c_oSer_OMathBottomNodesType$NoBreak:Y2
 c_oSer_OMathBottomNodesType$OpEmu:a3
 ShapeToImageConverter:qK
-SectPr:fV
+SectPr:gV
 t1_get_index:pC
 historyitem_GroupRecalculate:RF
 c_oSerConstants$ErrorUnknown:$k
@@ -403,7 +403,7 @@ changestype_HdrFtr:vQ
 numbering_lvltext_Num:iV
 changestype_ColorScheme:ZE
 AddPolyLine2State2:iJ
-AddPolyLine2State3:jJ
+AddPolyLine2State3:kJ
 cff_charset_compute_cids:rB
 c_oSer_OMathBottomNodesType$McJc:X2
 tt_face_load_os2:mv
@@ -725,7 +725,7 @@ Editor_CopyPaste_Create:Vf
 FORMULA_TYPE_MOD:eO
 contentchanges_Add:xQ
 JSCompiler_StaticMethods_DrawInlineMoveCursor:gF
-c_oSer_sts$Style_TablePr:oZ
+c_oSer_sts$Style_TablePr:pZ
 asc_CImgProperty:vp
 historyitem_SetShapeBodyPr:ZO
 AddPolyLine2State:eG
@@ -821,7 +821,7 @@ c_oSerImageType2$BSimplePos:P0
 cff_slot_done:HB
 FT_CFF_SERVICE_GET_CMAP_INFO_GET:hC
 historyitem_AddGraphicObject:tL
-__FT_CharmapRec:Hs
+__FT_CharmapRec:Is
 PreChangeWrapContourAddPoint:VI
 c_oSerRunType$fldstart:r0
 c_oSer_OMathBottomNodesType$StrikeBLTR:j3
@@ -1339,7 +1339,7 @@ t1_builder_start_point:yu
 c_oAscServerError$StorageRemoveDir:xg
 STATES_ID_PRE_ROTATE_IN_GROUP:oF
 CHeaderFooterController:nQ
-c_oSer_sts$Style_Default:pZ
+c_oSer_sts$Style_Default:qZ
 findPrevValue:Xo
 cff_index_get_pointers:mB
 raster_memory:ox
@@ -1649,7 +1649,7 @@ FILL_TYPE_PATT:$i
 c_oSer_OMathBottomNodesType$MaxDist:W2
 historyitem_AddHdrFtrGrObjects:OE
 CTextStyles:kj
-CDocInfo:V9
+CDocInfo:W9
 FT_OutlineGlyphRec:mr
 ComparisonByZIndex:BG
 phType_chart:iM
@@ -1711,7 +1711,7 @@ TT_HoriHeader:ds
 JSCompiler_StaticMethods_HorLine:Q6
 JSCompiler_StaticMethods_Set_TableFirstCol:iR
 PasteProcessor:Fc
-c_oSerProp_pPrType$Jc:MZ
+c_oSerProp_pPrType$Jc:NZ
 c_oAscXAlign$Center:kb
 CFF_ParserRec:SA
 g_mouse_button_right:wW
@@ -1803,7 +1803,7 @@ create_t1_field4:Hu
 Ins_UNKNOWN:cz
 ImageLoadStatus$Complete:uE
 JSCompiler_StaticMethods_startCalculateAfterInternalResize:QI
-c_oSerProp_pPrType$KeepLines:NZ
+c_oSerProp_pPrType$KeepLines:OZ
 c_oMainTables$ViewProps:qk
 _iup_worker_interpolate:fz
 historyitem_type_AbstractNum:XP
@@ -2121,7 +2121,7 @@ c_oSerDocTableType$tblGrid:$_
 TT_Round_Up_To_Grid:Wx
 historyitem_ChangeColorScheme:ZF
 T1_Driver_Init:MC
-ETblStyleOverrideType$tblstyleoverridetypeSeCell:P4
+ETblStyleOverrideType$tblstyleoverridetypeSeCell:R4
 TT_Load_Simple_Glyph:eA
 close:Zk
 LineEndType$Stealth:aM
@@ -2538,7 +2538,7 @@ c_oSer_OMathContentType$SSup:r4
 g_anchor_left:p8
 tt_face_get_name:bx
 StartAddNewShape:hG
-JSCompiler_StaticMethods_Continue:IU
+JSCompiler_StaticMethods_Continue:JU
 tab_Center:xR
 c_oSer_OMathContentType$SSub:n4
 numFormat_Hour:qh
@@ -3122,7 +3122,7 @@ g_oLcidIdToNameMap:B5
 FT_Service_PsInfoRec:eq
 historyitem_RemoveFtr:nH
 CHistory:PQ
-historyitem_SetVerticalShapeAlign:uK
+historyitem_SetVerticalShapeAlign:vK
 tt_services:mA
 RULER_OBJECT_TYPE_PARAGRAPH:K7
 TT_LongMetricsRec:Or
