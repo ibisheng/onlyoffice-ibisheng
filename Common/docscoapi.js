@@ -556,9 +556,8 @@
 			this.onUnSaveLock ();
 	};
 
-    DocsCoApi.prototype._onFirstLoadChanges = function (data) {
+    DocsCoApi.prototype._onFirstLoadChanges = function (allServerChanges) {
 		var t = this;
-		var allServerChanges = data["changes"];
         if (allServerChanges && this.onFirstLoadChanges) {
 			var allChanges = [];
 			for (var changeId in allServerChanges) {
@@ -571,12 +570,11 @@
 				}
 			}
 			
-			if (0 < allChanges.length) {
-				// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
-				window.setTimeout(function () {
-					t.onFirstLoadChanges(allChanges);
-				}, 10);
-			}
+			// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
+			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
+			window.setTimeout(function () {
+				t.onFirstLoadChanges(allChanges);
+			}, 10);
         }
     };
 	
@@ -788,12 +786,8 @@
                         }
                         docsCoApi._onGetLock(data);
                     }
-                    if (data["changes"]) {
-                        docsCoApi._onFirstLoadChanges(data);
-                    } else if (docsCoApi.onFirstLoadChanges) {
-						// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
-						docsCoApi.onFirstLoadChanges([]);
-					}
+					// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
+					docsCoApi._onFirstLoadChanges(data["changes"] || []);
 
                     //Send prebuffered
                     docsCoApi._sendPrebuffered();
