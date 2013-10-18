@@ -6852,7 +6852,7 @@ function ParaHyperlinkStart()
     this.Value = "";
 
     this.Visited = false;
-    this.ToolTip = null;
+    this.ToolTip = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -7053,8 +7053,8 @@ ParaHyperlinkStart.prototype =
                 // String : ToolTip
                 this.ToolTip = Reader.GetString2();
 
-                if ( "" === this.ToolTip )
-                    this.ToolTip = null;
+                //if ( "" === this.ToolTip )
+                //    this.ToolTip = null;
 
                 break;
             }
@@ -7088,8 +7088,8 @@ ParaHyperlinkStart.prototype =
         this.Value   = Reader.GetString2();
         this.ToolTip = Reader.GetString2();
 
-        if ( "" === this.ToolTip )
-            this.ToolTip = null;
+        //if ( "" === this.ToolTip )
+         //   this.ToolTip = null;
     },
 
     Write_ToBinary : function(Writer)

@@ -1010,8 +1010,8 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.Document_CreateFontMap();
 
 
-            //Menu_Hyperlink_Add();
-            editor.WordControl.m_oLogicDocument.Add_DropCap();
+            Menu_Hyperlink_Add();
+            //editor.WordControl.m_oLogicDocument.Add_DropCap();
 
             //editor.WordControl.m_oLogicDocument.Search_Start(String);
 			break;
@@ -1760,7 +1760,7 @@ $(".colorWatch").mouseover(function(){
              case c_oAscMouseMoveDataTypes.Hyperlink:
              {
                  var Hyperlink = Data.Hyperlink;
-                 var ToolTip = (Hyperlink.get_ToolTip() === null ? Hyperlink.get_Value() : Hyperlink.get_ToolTip() );
+                 var ToolTip = (Hyperlink.get_ToolTip() === null || Hyperlink.get_ToolTip() === "" ? Hyperlink.get_Value() : Hyperlink.get_ToolTip() );
                  var X = Data.X_abs, Y = Data.Y_abs;
                  Hyperlink_Show( X, Y, ToolTip );
                  sendStatus(Data.Hyperlink.get_Value());
@@ -3289,7 +3289,7 @@ $(".colorWatch").mouseover(function(){
              oHyperlinkProp.put_Text( $("#hyperText").val() == "" ? null : $("#hyperText").val() );
          }
 
-         oHyperlinkProp.put_ToolTip( $("#hyperToolTip").val() == "" ? null : $("#hyperToolTip").val() );
+         oHyperlinkProp.put_ToolTip( $("#hyperToolTip").val() );
          oHyperlinkProp.put_Value( $("#hyperUrl").val() );
 
          editor.change_Hyperlink( oHyperlinkProp );

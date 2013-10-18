@@ -5279,13 +5279,13 @@ function CHyperlinkProperty( obj )
     {
         this.Text    = (undefined != obj.Text   ) ? obj.Text    : null;
         this.Value   = (undefined != obj.Value  ) ? obj.Value   : "";
-        this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : null;
+        this.ToolTip = (undefined != obj.ToolTip) ? obj.ToolTip : "";
     }
     else
     {
         this.Text    = null;
         this.Value   = "";
-        this.ToolTip = null;
+        this.ToolTip = "";
     }
 }
 
