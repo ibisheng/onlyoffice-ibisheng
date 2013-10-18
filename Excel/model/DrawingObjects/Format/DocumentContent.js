@@ -6728,8 +6728,7 @@ CDocumentContent.prototype =
 
         if ( "undefined" == typeof(NextObj) )
             NextObj = null;
-
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_DocumentContent_AddItem, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataDocContentAddItem(Position, NewObject.Get_Id())));
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParagraph, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(Position, NewObject.Get_Id())));
 
         this.Content.splice( Position, 0, NewObject );
         NewObject.setParent( this );

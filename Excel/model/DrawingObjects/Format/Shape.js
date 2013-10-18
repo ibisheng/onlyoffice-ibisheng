@@ -2711,6 +2711,7 @@ CShape.prototype =
                 {
                     this.txBody.calculateContent();
                     this.calculateTransformTextMatrix();
+                    this.recalculateCurPos();
                 }
                 break;
             }
