@@ -6042,6 +6042,9 @@ CDocumentContent.prototype =
                     }
                 }
             }
+
+            this.Selection.StartPos = 0;
+            this.Selection.EndPos   = 0;
         }
     },
 
