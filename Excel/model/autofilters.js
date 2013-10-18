@@ -2127,7 +2127,7 @@
 				}
 				
 				//при вставке ошибка в MS Excel может возникать как в случае автофильтров, так и в случае форматированных таблиц
-				if((InsertCellsAndShiftRight || InsertCellsAndShiftDown) && autoFilter)
+				/*if((InsertCellsAndShiftRight || InsertCellsAndShiftDown) && autoFilter)
 				{
 					tableRange = this._refToRange(autoFilter.Ref);
 					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
@@ -2181,7 +2181,7 @@
 					{
 						result = 'changeAutoFilter';
 					}
-				}
+				}*/
 				return result;
 			},
 			
