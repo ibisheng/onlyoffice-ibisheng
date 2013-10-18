@@ -332,7 +332,7 @@ CParaSpellChecker.prototype =
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Element = this.Elements[Index];
-            if ( Element.StartPos > Pos )
+            if ( Element.StartPos >= Pos )
             {
                 if ( null == Right )
                     Right = Element;
