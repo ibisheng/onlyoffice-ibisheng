@@ -49,6 +49,7 @@
 		else {
 			// Фиктивные вызовы
 			this.callback_OnSetIndexUser ("123");
+			this.callback_OnFirstLoadChanges ([]);
 		}
 	};
 
@@ -789,7 +790,10 @@
                     }
                     if (data["changes"]) {
                         docsCoApi._onFirstLoadChanges(data);
-                    }
+                    } else if (this.onFirstLoadChanges) {
+						// Нужно послать фиктивное завершение (эта функция означает что мы соединились)
+						this.onFirstLoadChanges([]);
+					}
 
                     //Send prebuffered
                     docsCoApi._sendPrebuffered();

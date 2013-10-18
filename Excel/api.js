@@ -1480,10 +1480,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				};
 				this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
 					t.FirstLoadChanges = e;
-					t._applyFirstLoadChanges();
+					t.asyncServerIdEndLoaded ();
 				};
 				this.CoAuthoringApi.onSetIndexUser				= function (e) {
-					t.asyncServerIdEndLoaded ();
 				};
 				this.CoAuthoringApi.onStartCoAuthoring			= function (isStartEvent) {
 					t.startCollaborationEditing();

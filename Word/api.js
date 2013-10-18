@@ -1460,12 +1460,12 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onFirstLoadChanges			= function (e)
 	{
         t.CoAuthoringApi.onSaveChanges(e,false);
+		t.asyncServerIdEndLoaded ();
         //CollaborativeEditing.Apply_Changes();
 	};
 	this.CoAuthoringApi.onSetIndexUser			= function (e)
 	{
 		g_oIdCounter.Set_UserId("" + e);
-		t.asyncServerIdEndLoaded ();
 	};
 	this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
 		if (t.ParcedDocument) {
