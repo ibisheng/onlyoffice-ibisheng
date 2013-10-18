@@ -3357,10 +3357,20 @@ Paragraph.prototype =
 
         if ( Pos < this.Lines[CurLine].Ranges[CurRange].StartPos )
         {
+            // Если так случилось, что у нас заданная позиция идет до позиции с нумерацией, к которой привязана нумерация,
+            // тогда добавляем ширину нумерации.
+
+            var _X = X;
+            if ( Pos < this.Numbering.Pos )
+                _X += this.Numbering.WidthVisible;
+
+            if ( true === UpdateCurPos)
+                this.Internal_UpdateCurPos( _X, Y, Pos, CurPage, UpdateTarget );
+
             if ( true === ReturnTarget )
-                return { X : X, Y : TargetY, Height : 0, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+                return { X : _X, Y : Y, Height : 0, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
             else
-                return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+                return { X : _X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
         }
 
         for ( var ItemNum = this.Lines[CurLine].Ranges[CurRange].StartPos; ItemNum < this.Content.length; ItemNum++ )
@@ -3380,59 +3390,7 @@ Paragraph.prototype =
                     _X += this.Numbering.WidthVisible;
 
                 if ( true === UpdateCurPos)
-                {
-                    this.CurPos.X        = _X;
-                    this.CurPos.Y        = Y;
-                    this.CurPos.PagesPos = CurPage;
-
-                    if ( true === UpdateTarget )
-                    {
-                        var CurTextPr = this.Internal_CalculateTextPr(ItemNum);
-                        g_oTextMeasurer.SetTextPr( CurTextPr );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
-                        var Height    = g_oTextMeasurer.GetHeight();
-                        var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
-                        var Ascender  = Height - Descender;
-
-                        this.DrawingDocument.SetTargetSize( Height );
-                        this.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
-
-                        var TargetY = Y - Ascender - CurTextPr.Position;
-                        switch( CurTextPr.VertAlign )
-                        {
-                            case vertalign_SubScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                                break;
-                            }
-                            case vertalign_SuperScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                                break;
-                            }
-                        }
-
-                        var Page_Abs = this.Get_StartPage_Absolute() + CurPage;
-                        this.DrawingDocument.UpdateTarget( _X, TargetY, Page_Abs );
-
-                        // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
-                        //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
-                        //       такой вариант будет смотреться плохо.
-                        if ( undefined != this.Get_FramePr() )
-                        {
-                            var __Y0 = TargetY, __Y1 = TargetY + Height;
-                            var ___Y0 = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
-                            var ___Y1 = this.Pages[CurPage].Y + this.Lines[CurLine].Bottom;
-
-                            var __Y0 = Math.max( __Y0, ___Y0 );
-                            var __Y1 = Math.min( __Y1, ___Y1 );
-
-                            this.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
-                            this.DrawingDocument.UpdateTarget( _X, __Y0, Page_Abs );
-                        }
-
-                    }
-                }
+                    this.Internal_UpdateCurPos( _X, Y, ItemNum, CurPage, UpdateTarget );
 
                 if ( true === ReturnTarget )
                 {
@@ -3493,6 +3451,60 @@ Paragraph.prototype =
             return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
         else
             return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+    },
+
+    Internal_UpdateCurPos : function(X, Y, CurPos, CurPage, UpdateTarget)
+    {
+        this.CurPos.X        = X;
+        this.CurPos.Y        = Y;
+        this.CurPos.PagesPos = CurPage;
+
+        if ( true === UpdateTarget )
+        {
+            var CurTextPr = this.Internal_CalculateTextPr(CurPos);
+            g_oTextMeasurer.SetTextPr( CurTextPr );
+            g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+            var Height    = g_oTextMeasurer.GetHeight();
+            var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
+            var Ascender  = Height - Descender;
+
+            this.DrawingDocument.SetTargetSize( Height );
+            this.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+
+            var TargetY = Y - Ascender - CurTextPr.Position;
+            switch( CurTextPr.VertAlign )
+            {
+                case vertalign_SubScript:
+                {
+                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                    break;
+                }
+                case vertalign_SuperScript:
+                {
+                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                    break;
+                }
+            }
+
+            var Page_Abs = this.Get_StartPage_Absolute() + CurPage;
+            this.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
+
+            // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
+            //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
+            //       такой вариант будет смотреться плохо.
+            if ( undefined != this.Get_FramePr() )
+            {
+                var __Y0 = TargetY, __Y1 = TargetY + Height;
+                var ___Y0 = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                var ___Y1 = this.Pages[CurPage].Y + this.Lines[CurLine].Bottom;
+
+                var __Y0 = Math.max( __Y0, ___Y0 );
+                var __Y1 = Math.min( __Y1, ___Y1 );
+
+                this.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                this.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+            }
+        }
     },
 
     // Нужно ли добавлять нумерацию в начале данной строки
@@ -6679,6 +6691,13 @@ Paragraph.prototype =
         //    Это делается для того, чтобы если мы находимся в конце гиперссылки выйти из нее.
         var Count = this.Content.length;
         var CurPos = this.CurPos.ContentPos;
+
+        var TempPos = CurPos;
+        while ( TempPos >= 0 && TempPos < Count && undefined === this.Content[TempPos].CurLine )
+            TempPos--;
+
+        var CurLine = ( this.CurPos.Line === -1 ?  ( TempPos >= 0 && TempPos < Count ? this.Content[TempPos].CurLine : -1 ) : this.CurPos.Line );
+
         while ( CurPos < Count - 1 )
         {
             var Item = this.Content[CurPos];
@@ -6698,11 +6717,12 @@ Paragraph.prototype =
             CurPos--;
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
+            var bEnd = false;
 
             if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType )
             {
                 this.CurPos.ContentPos = CurPos + 1;
-                return;
+                bEnd = true;
             }
             else if ( para_HyperlinkEnd === ItemType )
             {
@@ -6710,6 +6730,20 @@ Paragraph.prototype =
                     CurPos++;
 
                 this.CurPos.ContentPos = CurPos + 1;
+                bEnd = true;
+            }
+
+            if ( true === bEnd )
+            {
+                TempPos = CurPos;
+                while ( TempPos >= 0 && TempPos < Count && undefined === this.Content[TempPos].CurLine )
+                    TempPos--;
+
+                var NewLine = ( TempPos >= 0 && TempPos < Count ? this.Content[TempPos].CurLine : -1 );
+
+                if ( NewLine != CurLine && -1 != CurLine )
+                    this.CurPos.Line = CurLine;
+
                 return;
             }
         }
