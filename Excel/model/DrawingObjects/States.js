@@ -252,22 +252,19 @@ function NullState(drawingObjectsController, drawingObjects)
                                 this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                                 return;
                             }
-                            this.drawingObjectsController.clearPreTrackObjects();
-                            var is_selected = cur_drawing.selected;
-                            if(!(e.ctrlKey || e.shiftKey) && !is_selected)
-                                this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            this.drawingObjects.OnUpdateOverlay();
-                            for(var j = 0; j < selected_objects.length; ++j)
-                            {
-                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                            }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, is_selected, true));
-                            return;
                         }
-
-
-
+                        this.drawingObjectsController.clearPreTrackObjects();
+                        var is_selected = cur_drawing.selected;
+                        if(!(e.ctrlKey || e.shiftKey) && !is_selected)
+                            this.drawingObjectsController.resetSelection();
+                        cur_drawing.select(this.drawingObjectsController);
+                        this.drawingObjects.OnUpdateOverlay();
+                        for(var j = 0; j < selected_objects.length; ++j)
+                        {
+                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                        }
+                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, is_selected, true));
+                        return;
                     }
                 }
             }
