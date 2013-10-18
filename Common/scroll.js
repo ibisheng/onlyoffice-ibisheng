@@ -271,7 +271,6 @@ function ScrollObject( elemID, settings, dbg ) {
 
     this.moveble = false;
     this.lock = false;
-    this.scrollTimeout = null;
 
     this.StartMousePosition = {x:0, y:0};
     this.EndMousePosition = {x:0, y:0};
@@ -1123,8 +1122,6 @@ ScrollObject.prototype = {
     evt_mouseup:function ( e ) {
         var evt = e || windows.event;
         var mousePos = this.that.getMousePosition( evt );
-        this.that.scrollTimeout && clearTimeout( this.that.scrollTimeout );
-        this.that.scrollTimeout = null;
         if ( !this.that.scrollerMouseDown ) {
             if ( this.that.settings.showArrows && this.that._MouseHoverOnArrowDown( mousePos ) ) {
                 this.that.handleEvents( "onmouseup", evt );
@@ -1181,6 +1178,7 @@ ScrollObject.prototype = {
                         direction = mousePos.y - this.that.scroller.y - this.that.scroller.h / 2,
                         step = this.that.paneHeight * this.that.settings.scrollPagePercent,
                         verticalDragPosition = this.that.scroller.y,
+                        scrollTimeout,
                         isFirst = true,
                         doScroll = function () {
                             _tmp.that.lock = true;
@@ -1206,12 +1204,12 @@ ScrollObject.prototype = {
                                     return;
                                 }
                             }
-                            _tmp.that.scrollTimeout = setTimeout( doScroll, isFirst ? _tmp.that.settings.initialDelay : _tmp.that.settings.trackClickRepeatFreq );
+                            scrollTimeout = setTimeout( doScroll, isFirst ? _tmp.that.settings.initialDelay : _tmp.that.settings.trackClickRepeatFreq );
                             isFirst = false;
                         },
                         cancelClick = function () {
-                            _tmp.that.scrollTimeout && clearTimeout( _tmp.that.scrollTimeout );
-                            _tmp.that.scrollTimeout = null;
+                            scrollTimeout && clearTimeout( scrollTimeout );
+                            scrollTimeout = null;
                             _tmp.that.unbind( "mouseup.main", cancelClick );
                             _tmp.that.lock = false;
                         };
@@ -1223,6 +1221,7 @@ ScrollObject.prototype = {
                         direction = mousePos.x - this.that.scroller.x - this.that.scroller.w / 2,
                         step = this.that.paneWidth * this.that.settings.scrollPagePercent,
                         horizontalDragPosition = this.that.scroller.x,
+                        scrollTimeout,
                         isFirst = true,
                         doScroll = function () {
                             _tmp.that.lock = true;
@@ -1248,12 +1247,12 @@ ScrollObject.prototype = {
                                     return;
                                 }
                             }
-                            _tmp.that.scrollTimeout = setTimeout( doScroll, isFirst ? _tmp.that.settings.initialDelay : _tmp.that.settings.trackClickRepeatFreq );
+                            scrollTimeout = setTimeout( doScroll, isFirst ? _tmp.that.settings.initialDelay : _tmp.that.settings.trackClickRepeatFreq );
                             isFirst = false;
                         },
                         cancelClick = function () {
-                            _tmp.that.scrollTimeout && clearTimeout( _tmp.that.scrollTimeout );
-                            _tmp.that.scrollTimeout = null;
+                            scrollTimeout && clearTimeout( scrollTimeout );
+                            scrollTimeout = null;
                             _tmp.that.unbind( "mouseup.main", cancelClick );
                             _tmp.that.lock = false;
                         };

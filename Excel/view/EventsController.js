@@ -978,9 +978,7 @@
 
 			/** @param event {jQuery.Event} */
 			_onWindowMouseUp: function (event) {
-
-                this.vsbApi.evt_mouseup(event);
-                this.hsbApi.evt_mouseup(event);
+			
 				// Shapes
 				var coord = this._getCoordinates(event);
 				if ( this.isGraphicObjectMode ) {

@@ -2449,7 +2449,7 @@ cFormulaFunction.Statistical = {
         r.getInfo = function () {
             return {
                 name:this.name,
-                args:"( number-failures , number-successes , success-probability )"
+                args:"( number-successes , number-trials , success-probability )"
             };
         }
         return r;
@@ -2924,7 +2924,7 @@ cFormulaFunction.Statistical = {
         r.getInfo = function () {
             return {
                 name:this.name,
-                args:"( array , x [ , significance ]  )"
+                args:"( argument-list )"
             };
         }
         return r;
