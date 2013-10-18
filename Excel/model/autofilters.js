@@ -2600,7 +2600,9 @@
 				var cell = ws.model.getCell( new CellAddress(ar.r1, ar.c1, 0)).getCells();
 				var cloneActiveRange = Asc.clone(ar);
 				var isEnd = true;
-		
+				var range;
+				var merged;
+				var valueMerg;
 				var rowNum = cloneActiveRange.r1;
 				for(var n = cloneActiveRange.r1 - 1; n <= cloneActiveRange.r2 + 1; n++)
 				{
@@ -2611,14 +2613,61 @@
 						rowNum = cloneActiveRange.r1;
 						if(cloneActiveRange.r1 > 0)
 							n = cloneActiveRange.r1 - 1;
+						if(cloneActiveRange.c1 > 0)
+							k = cloneActiveRange.c1 - 1;
 					}
+					if(n > cloneActiveRange.r1 && n < cloneActiveRange.r2 && k > cloneActiveRange.c1 && k < cloneActiveRange.c2)
+						continue;
 					isEnd  = true;
 					for(var k = cloneActiveRange.c1 - 1; k <= cloneActiveRange.c2 + 1; k++)
 					{
 						if(k < 0)
 							continue;
 						cell = ws.model._getCell(n,k);
-						if(cell.getValueWithoutFormat() != '')
+						//если находимся уже внутри выделенного фрагмента, то смысла его просматривать нет
+						if(k >= cloneActiveRange.c1 && k <= cloneActiveRange.c2 && n >= cloneActiveRange.r1 && n <= cloneActiveRange.r2)
+							continue
+						range = ws.model.getCell(new CellAddress(n + 1,k + 1));
+						//если мерженная ячейка
+						if(!(n == ar.r1 && k == ar.c1) && range)
+						{
+							merged = range.hasMerged();
+							valueMerg = null;
+							if(merged)
+							{
+								valueMerg = ws.model.getRange(new CellAddress(merged.r1 + 1,merged.c1 + 1), new CellAddress(merged.r2 + 1,merged.c2 + 1)).getValue();
+								if(valueMerg != null && valueMerg != "")
+								{	
+									if(merged.r1 < cloneActiveRange.r1)
+									{
+										cloneActiveRange.r1 = merged.r1;
+										n = cloneActiveRange.r1 - 1;
+									}	
+									if(merged.r2 > cloneActiveRange.r2)
+									{
+										cloneActiveRange.r2 = merged.r2;
+										n = cloneActiveRange.r2 - 1;
+									}
+									if(merged.c1 < cloneActiveRange.c1)
+									{
+										cloneActiveRange.c1 = merged.c1;
+										k = cloneActiveRange.c1 - 1;
+									}	
+									if(merged.c2 > cloneActiveRange.c2)
+									{
+										cloneActiveRange.c2 = merged.c2;
+										k = cloneActiveRange.c2 - 1;
+									}
+									if(n < 0)
+										n = 0;
+									if(k < 0)
+										k = 0;
+									cell = ws.model._getCell(n,k);	
+								}
+							}
+						}
+						
+						if(cell.getValueWithoutFormat() != '' || (valueMerg != null && valueMerg != ""))
 						{
 							if(k < cloneActiveRange.c1)
 							{
