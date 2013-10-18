@@ -249,6 +249,7 @@ function NullState(drawingObjectsController, drawingObjects)
                                 this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
                                 this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
                                 this.drawingObjects.OnUpdateOverlay();
+                                this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                                 return;
                             }
                             this.drawingObjectsController.clearPreTrackObjects();
@@ -867,6 +868,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                     this.drawingObjects.OnUpdateOverlay();
+                    this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                     return;
                 }
             }
@@ -988,6 +990,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                         this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                         this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                                         this.drawingObjects.OnUpdateOverlay();
+                                        this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                                         return;
                                     }
                                 }
@@ -1010,6 +1013,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                             this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                             this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                                             this.drawingObjects.OnUpdateOverlay();
+                                            this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                                         }
                                         return;
                                     }
@@ -1080,6 +1084,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
                                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
                                     this.drawingObjects.OnUpdateOverlay();
+                                    this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+
                                     return;
                                 }
                                 this.drawingObjectsController.clearPreTrackObjects();
