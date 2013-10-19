@@ -101,6 +101,296 @@ CChartTitle.prototype =
             this.txBody.content.Selection_Remove();
     },
 
+    getParagraphParaPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_ParaPr();
+        }
+        return null;
+    },
+
+    getParagraphTextPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_TextPr();
+        }
+        return null;
+    },
+
+    getAllParagraphParaPr: function()
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            var paraPr = this.txBody.content.Get_Paragraph_ParaPr();
+            this.txBody.content.Set_ApplyToAll(false);
+            return paraPr;
+        }
+        return null;
+    },
+
+    getAllParagraphTextPr: function()
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            var paraPr = this.txBody.content.Get_Paragraph_TextPr();
+            this.txBody.content.Set_ApplyToAll(false);
+            return paraPr;
+        }
+        return null;
+    },
+
+
+
+    // Увеличение размера шрифта
+    increaseFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Paragraph_IncDecFontSize(true);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    // Уменьшение размера шрифта
+    decreaseFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Paragraph_IncDecFontSize(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+
+    increaseAllFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Paragraph_IncDecFontSize(true);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    // Уменьшение размера шрифта
+    decreaseAllFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Paragraph_IncDecFontSize(false);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellFontName: function (fontName) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellFontSize: function (fontSize) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontSize(fontSize);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellBold: function (isBold) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Bold(isBold);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellItalic: function (isItalic) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Italic(isItalic);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellUnderline: function (isUnderline) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Underline(isUnderline);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellStrikeout: function (isStrikeout) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Strikeout(isStrikeout);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+
+    setCellTextColor: function (color) {
+        if(isRealObject(this.txBody))
+        {
+            var unifill = new CUniFill();
+            unifill.setFill(new CSolidFill());
+            unifill.fill.setColor(CorrectUniColor2(color, null));
+            var text_pr = new ParaTextPr();
+            text_pr.SetUniFill(unifill);
+            this.txBody.paragraphAdd(text_pr);
+            this.chartGroup.recalculate();
+
+        }
+
+    },
+
+    setCellAllFontName: function (fontName) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+        }
+    },
+
+    setCellAllFontSize: function (fontSize) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontSize(fontSize);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllBold: function (isBold) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Bold(isBold);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllItalic: function (isItalic) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Italic(isItalic);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllUnderline: function (isUnderline) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Underline(isUnderline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllStrikeout: function (isStrikeout) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Strikeout(isStrikeout);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllSubscript: function (isSubscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SubScript : vertalign_Baseline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+
+        }
+    },
+
+    setCellAllSuperscript: function (isSuperscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SuperScript : vertalign_Baseline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+        }
+    },
+
+
+
+    setCellAllTextColor: function (color) {
+        if(isRealObject(this.txBody))
+        {
+            var unifill = new CUniFill();
+            unifill.setFill(new CSolidFill());
+            unifill.fill.setColor(CorrectUniColor2(color, null));
+            var text_pr = new ParaTextPr();
+            text_pr.SetUniFill(unifill);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.chartGroup.recalculate();
+        }
+
+    },
+
     getStyles: function()
     {
         var styles = new CStyles();

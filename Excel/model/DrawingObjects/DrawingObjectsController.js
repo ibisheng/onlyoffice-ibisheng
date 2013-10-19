@@ -318,6 +318,38 @@ DrawingObjectsController.prototype =
                 return new CParaPr();
 
             }
+            case STATES_ID_CHART:
+            case STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT:
+            {
+                var chart = this.curState.chart;
+                var selected_title;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    selected_title = chart.chartTitle;
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    selected_title = chart.hAxisTitle;
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    selected_title = chart.vAxisTitle;
+                }
+                if(selected_title)
+                {
+                    return selected_title.getAllParagraphParaPr();
+                }
+                else
+                {
+                    return null;
+                }
+                break;
+            }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                return this.curState.textObject.getParagraphParaPr();
+                break;
+            }
             default:
             {
                 var result = null;
@@ -368,6 +400,38 @@ DrawingObjectsController.prototype =
                 }
                 //return new CTextPr();
 				return null;
+            }
+            case STATES_ID_CHART:
+            case STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT:
+            {
+                var chart = this.curState.chart;
+                var selected_title;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    selected_title = chart.chartTitle;
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    selected_title = chart.hAxisTitle;
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    selected_title = chart.vAxisTitle;
+                }
+                if(selected_title)
+                {
+                    return selected_title.getAllParagraphTextPr();
+                }
+                else
+                {
+                    return null;
+                }
+                break;
+            }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                return this.curState.textObject.getParagraphTextPr();
+                break;
             }
             default:
             {
@@ -820,6 +884,34 @@ DrawingObjectsController.prototype =
                 }
                 break;
             }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                state.id = STATES_ID_CHART_TEXT_ADD;
+                state.chart = this.curState.chart;
+                state.textObjectId = this.curState.textObject.Get_Id();
+                state.textState = this.curState.textObject.txBody.content.Get_SelectionState();
+                break;
+            }
+            case STATES_ID_CHART:
+            {
+                state.id = STATES_ID_CHART;
+                state.chart = this.curState.chart;
+                state.selectedTitle = null;
+                var chart = this.curState.chart;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    state.selectedTitle = chart.chartTitle;
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    state.selectedTitle = chart.hAxisTitle;
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    state.selectedTitle = chart.vAxisTitle;
+                }
+                break;
+            }
             default :
             {
                 state.id = STATES_ID_NULL;
@@ -856,6 +948,28 @@ DrawingObjectsController.prototype =
                     g_oTableId.Get_ById(state.selectedObjects[i]).select(group);
                 }
                 this.changeCurrentState(new GroupState(this, this.drawingObjects, group));
+                break;
+            }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                state.chart.select(this);
+                var text_title = g_oTableId.Get_ById(state.textObjectId);
+                if(text_title)
+                {
+                    text_title.select()
+                    text_title.txBody.content.Set_SelectionState(state.textState, state.textState.length - 1);
+                }
+                this.changeCurrentState(new ChartTextAdd(this, this.drawingObjects, state.chart, text_title));
+                break;
+            }
+            case STATES_ID_CHART:
+            {
+                state.chart.select(this);
+                if(state.selectedTitle)
+                {
+                    state.selectedTitle.select();
+                }
+                this.changeCurrentState(new ChartState(this, this.drawingObjects, state.chart));
                 break;
             }
             default :

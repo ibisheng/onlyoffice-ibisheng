@@ -954,7 +954,7 @@ CChartAsGroup.prototype =
                 break;
             }
         }
-
+        this.resetSelection();
     },
 
     resetSelection: function()
