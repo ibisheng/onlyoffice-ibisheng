@@ -361,7 +361,10 @@ CHistory.prototype =
         if ( true != this.Can_Undo() )
             return null;
 		var bIsOn = false;
-		
+
+        if ( this.Index === this.Points.length - 1 )
+            this.LastState = this.workbook.handlers.trigger("getSelectionState");
+
 		this._checkCurPoint();
 
 		var Point = this.Points[this.Index--];
@@ -407,7 +410,8 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone(), /*validRange*/false);
 		if ( Point.SelectionState != null )
 			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
-		
+
+
 		this._sendCanUndoRedo();
 
 		this.workbook.bUndoChanges = false;
@@ -417,7 +421,11 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("drawWS");
 		else
 			this.workbook.handlers.trigger("showDrawingObjects", true);
-		
+		if(isRealObject(this.lastDrawingObjects))
+        {
+            this.lastDrawingObjects.sendGraphicObjectProps();
+            this.lastDrawingObjects = null;
+        }
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 		buildRecalc(this.workbook);
 		unLockDraw(this.workbook);
@@ -461,8 +469,20 @@ CHistory.prototype =
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
         }
-		if ( Point.SelectionState != null )
-			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
+        // Восстанавливаем состояние на следующую точку
+        var State = null;
+        if ( this.Index === this.Points.length - 1 )
+            State = this.LastState;
+        else
+            State = this.Points[this.Index + 1].SelectionState;
+
+		if ( isRealObject(State) )
+			this.workbook.handlers.trigger("setSelectionState", State);
+        if(isRealObject(this.lastDrawingObjects))
+        {
+            this.lastDrawingObjects.sendGraphicObjectProps();
+            this.lastDrawingObjects = null;
+        }
 	},
 	RedoEnd : function(Point, oRedoObjectParam)
 	{

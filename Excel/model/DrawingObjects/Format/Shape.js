@@ -116,7 +116,7 @@ function CMouseEventHandler()
 
     this.fromJQueryEvent = function(e)
     {
-        this.ClickCount = 1;//e.ClickCount;
+        this.ClickCount = isRealNumber(e.ClickCount) && e.ClickCount === 2 ? 2 : 1;
         this.Type =  g_o_event_map[e.type];
         this.ShiftKey = e.shiftKey;
         this.IsLocked = true;
@@ -2820,7 +2820,8 @@ CShape.prototype =
                 break;
             }
         }
-		this.drawingObjects.sendGraphicObjectProps();
+        History.lastDrawingObjects = this.drawingObjects;
+		//this.drawingObjects.sendGraphicObjectProps();
     },
 
     Redo: function(type, data)
@@ -2948,7 +2949,8 @@ CShape.prototype =
                 break;
             }
         }
-		this.drawingObjects.sendGraphicObjectProps();
+        History.lastDrawingObjects = this.drawingObjects;
+		//this.drawingObjects.sendGraphicObjectProps();
     },
 
     setNvSpPr: function(pr)
