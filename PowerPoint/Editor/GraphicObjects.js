@@ -2439,6 +2439,11 @@ CGraphicObjects.prototype = {
     {
         var chart = new CChartAsGroup(this.slide);
         chart.initFromBinary(binary);
+        var p = editor.WordControl.m_oLogicDocument;
+        var pos_x = (p.Width - chart.spPr.xfrm.extX)/2;
+        var pos_y = (p.Height - chart.spPr.xfrm.extY)/2;
+        if(isRealNumber(pos_x) && isRealNumber(pos_y))
+            chart.setXfrm(pos_x, pos_y, null, null, null, null, null);
         if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, chart) === false)
         {
             this.slide.addToSpTreeToPos(this.slide.cSld.spTree, chart);
@@ -3228,7 +3233,7 @@ CGraphicObjects.prototype = {
 
     drawSelect: function(drawingDocument)
     {
-        this.State.drawSelection(drawingDocument)
+        this.State.drawSelection(drawingDocument);
     },
 
 
