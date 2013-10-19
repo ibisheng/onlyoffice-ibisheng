@@ -4617,6 +4617,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
 				// Если открыт iframe, то нельзя удалить диаграмму
 				if ( drawingObjectsController.selectedObjects.length == 1 )
@@ -4694,6 +4695,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 var a_drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
                 if(!e.shiftKey)
@@ -4859,6 +4861,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape())
                 {
@@ -4932,6 +4935,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
 				drawingObjectsController.drawingObjects.unselectDrawingObjects();
 				drawingObjectsController.drawingObjects.getWorksheet()._drawSelection();
@@ -5011,6 +5015,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.ctrlKey)
                 {
@@ -5100,6 +5105,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 //TODO реализовать изменение размеров объектов с shiftKey
                 drawingObjectsController.drawingObjects.objectLocker.reset();
@@ -5188,6 +5194,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 //TODO реализовать изменение размеров объектов с shiftKey
                 drawingObjectsController.drawingObjects.objectLocker.reset();
@@ -5276,6 +5283,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 //TODO реализовать изменение размеров объектов с shiftKey
                 drawingObjectsController.drawingObjects.objectLocker.reset();
@@ -5357,6 +5365,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         switch(state.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
+
             {
                 //TODO реализовать изменение размеров объектов с shiftKey
                 drawingObjectsController.drawingObjects.objectLocker.reset();
@@ -5622,6 +5632,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_NULL:
             case STATES_ID_GROUP:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 if(state.id === STATES_ID_GROUP)
                     state.group.resetSelection();
@@ -5880,6 +5891,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
                 if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.ctrlKey)
                 {
