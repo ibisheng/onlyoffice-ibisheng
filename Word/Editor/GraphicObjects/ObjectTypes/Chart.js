@@ -601,130 +601,51 @@ CChartAsGroup.prototype =
     },
 
 
+
     setChart: function(chart, bEdit)
     {
-		if ( bEdit ) {
-		
-			History.Create_NewPoint();
-			
-			// type, subType, styleId
-			if ( this.chart.type != chart.type ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Type, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.type, chart.type)));
-				this.chart.type = chart.type;
-			}
-			
-			if ( this.chart.subType != chart.subType ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_SubType, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.subType, chart.subType)));
-				this.chart.subType = chart.subType;
-			}
-			
-			if ( this.chart.styleId != chart.styleId ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Style, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.styleId, chart.styleId)));
-				this.chart.styleId = chart.styleId;
-			}
-			
-			// showValue, showBorder
-			if ( this.chart.bShowValue != chart.bShowValue ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsShowValue, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowValue, chart.bShowValue)));
-				this.chart.bShowValue = chart.bShowValue;
-			}
-			
-			if ( this.chart.bShowBorder != chart.bShowBorder ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsShowBorder, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowBorder, chart.bShowBorder)));
-				this.chart.bShowBorder = chart.bShowBorder;
-			}
-			
-			// range
-			if ( this.chart.range.interval != chart.range.interval ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.range.interval, chart.range.interval)));
-				this.chart.range.interval = chart.range.interval;
-				this.chart.range.intervalObject = convertFormula(this.chart.range.interval, this.drawingObjects.getWorksheet());
-				this.chart.rebuildSeries();
-			}
-			
-			if ( this.chart.range.rows != chart.range.rows ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeRowColumns, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.range.rows, chart.range.rows)));
-				this.chart.range.rows = chart.range.rows;
-				this.chart.range.columns = !chart.range.rows;
-			}
-			
-			// header
-			if ( this.chart.header.title != chart.header.title ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.title, chart.header.title)));
-				this.chart.header.title = chart.header.title;
-			}
-			
-			if ( this.chart.header.subTitle != chart.header.subTitle ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderSubTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.subTitle, chart.header.subTitle)));
-				this.chart.header.subTitle = chart.header.subTitle;
-			}
-			
-			if ( this.chart.header.bDefaultTitle != chart.header.bDefaultTitle ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_IsDefaultHeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.bDefaultTitle, chart.header.bDefaultTitle)));
-				this.chart.header.bDefaultTitle = chart.header.bDefaultTitle;
-			}
-			
-			// xAxis
-			if ( this.chart.xAxis.title != chart.xAxis.title ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.title, chart.xAxis.title)));
-				this.chart.xAxis.title = chart.xAxis.title;
-			}
-			
-			if ( this.chart.xAxis.bDefaultTitle != chart.xAxis.bDefaultTitle ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsDefaultTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bDefaultTitle, chart.xAxis.bDefaultTitle)));
-				this.chart.xAxis.bDefaultTitle = chart.xAxis.bDefaultTitle;
-			}
-			
-			if ( this.chart.xAxis.bShow != chart.xAxis.bShow ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bShow, chart.xAxis.bShow)));
-				this.chart.xAxis.bShow = chart.xAxis.bShow;
-			}
-			
-			if ( this.chart.xAxis.bGrid != chart.xAxis.bGrid ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsGrid, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bGrid, chart.xAxis.bGrid)));
-				this.chart.xAxis.bGrid = chart.xAxis.bGrid;
-			}
-			
-			// yAxis
-			if ( this.chart.yAxis.title != chart.yAxis.title ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.title, chart.yAxis.title)));
-				this.chart.yAxis.title = chart.yAxis.title;
-			}
-			
-			if ( this.chart.yAxis.bDefaultTitle != chart.yAxis.bDefaultTitle ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsDefaultTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bDefaultTitle, chart.yAxisbDefaultTitle)));
-				this.chart.yAxis.bDefaultTitle = chart.yAxis.bDefaultTitle;
-			}
-			
-			if ( this.chart.yAxis.bShow != chart.yAxis.bShow ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bShow, chart.yAxis.bShow)));
-				this.chart.yAxis.bShow = chart.yAxis.bShow;
-			}
-			
-			if ( this.chart.yAxis.bGrid != chart.yAxis.bGrid ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsGrid, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bGrid, chart.yAxis.bGrid)));
-				this.chart.yAxis.bGrid = chart.yAxis.bGrid;
-			}
-			
-			// legend
-			if ( this.chart.legend.position != chart.legend.position ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendPosition, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.position, chart.legend.position)));
-				this.chart.legend.position = chart.legend.position;
-			}
-			
-			if ( this.chart.legend.bShow != chart.legend.bShow ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.bShow, chart.legend.bShow)));
-				this.chart.legend.bShow = chart.legend.bShow;
-			}
-			
-			if ( this.chart.legend.bOverlay != chart.legend.bOverlay ) {
-				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendIsOverlay, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.bOverlay, chart.legend.bOverlay)));
-				this.chart.legend.bOverlay = chart.legend.bOverlay;
-			}
-			this.chart.rebuildSeries();
-		}
-		else
-			this.chart = chart;
+
+        if(typeof  this.chart.header.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = chart.header.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addTitle(chart_title);
+        }
+        else
+        {
+            this.addTitle(null);
+        }
+
+        if(typeof  this.chart.xAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.xAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addXAxis(chart_title);
+        }
+        if(typeof  this.chart.yAxis.title === "string")
+        {
+            var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            var tx_body = new CTextBody(chart_title);
+            var title_str = this.chart.yAxis.title;
+            for(var i in title_str)
+            {
+                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+            }
+            chart_title.setTextBody(tx_body);
+            this.addYAxis(chart_title);
+        }
     },
 
     deleteDrawingBase: function()
@@ -1144,12 +1065,70 @@ CChartAsGroup.prototype =
             {
                 var title_str = "Chart Title";
                 this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-                this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
+                if(this.chartTitle.txBody.content && this.chartTitle.txBody.shape instanceof CChartTitle)
+                {
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.chartTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.chartTitle.txBody.content.Styles = styles;
+                    this.chartTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+                }
+                //this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
                 for(var i in title_str)
                     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
             }
             else
             {
+                if(this.chartTitle.txBody.content && this.chartTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.chartTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.chartTitle.txBody.content.Styles = styles;
+                    this.chartTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
                 var content = this.chartTitle.txBody.content;
                 content.Parent = this.chartTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
@@ -1157,12 +1136,13 @@ CChartAsGroup.prototype =
                 {
                     content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                     content.Content[i].Parent = content;
+                    this.chartTitle.txBody.content.Content[i].Style_Add_Open(default_legend_style.Id);
                 }
             }
             var content = this.chartTitle.txBody.content;
             for(var i = 0; i < content.Content.length; ++i)
             {
-                content.Content[i].Pr.PStyle = this.chartTitle.txBody.content.Styles.Style.length - 1;
+                //content.Content[i].Pr.PStyle = this.chartTitle.txBody.content.Styles.Style.length - 1;
             }
 
             this.chartTitle.txBody.content.Set_ApplyToAll(true);
@@ -1180,28 +1160,89 @@ CChartAsGroup.prototype =
             {
                 var title_str = "X Axis";
                 this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-                this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
+                if(this.hAxisTitle.txBody.content && this.hAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.hAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.hAxisTitle.txBody.content.Styles = styles;
+                    this.hAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
                 for(var i in title_str)
                     this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
             }
             else
             {
-                this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
+
                 var content = this.hAxisTitle.txBody.content;
                 content.Parent = this.hAxisTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                if(this.hAxisTitle.txBody.content && this.hAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.hAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.hAxisTitle.txBody.content.Styles = styles;
+                    this.hAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
                 for(var i = 0; i < content.Content.length; ++i)
                 {
                     content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                     content.Content[i].Parent = content;
+                    content.Content[i].Style_Add_Open(default_legend_style.Id);
                 }
+
             }
 
 
             var content = this.hAxisTitle.txBody.content;
             for(var i = 0; i < content.Content.length; ++i)
             {
-                content.Content[i].Pr.PStyle = this.hAxisTitle.txBody.content.Styles.Style.length - 1;
+                //content.Content[i].Pr.PStyle = this.hAxisTitle.txBody.content.Styles.Style.length - 1;
             }
             this.hAxisTitle.txBody.content.Set_ApplyToAll(true);
             this.hAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
@@ -1219,7 +1260,36 @@ CChartAsGroup.prototype =
             {
                 var title_str = "Y Axis";
                 this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-                this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
+                if(this.vAxisTitle.txBody.content && this.vAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.vAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.vAxisTitle.txBody.content.Styles = styles;
+                    this.vAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
                 this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
 
                 for(var i in title_str)
@@ -1230,7 +1300,35 @@ CChartAsGroup.prototype =
                 this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
                 var content = this.vAxisTitle.txBody.content;
 
-                this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
+                if(this.vAxisTitle.txBody.content && this.vAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}}
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.vAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.vAxisTitle.txBody.content.Styles = styles;
+
+                }
 
                 content.Parent = this.vAxisTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
@@ -1238,13 +1336,15 @@ CChartAsGroup.prototype =
                 {
                     content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                     content.Content[i].Parent = content;
+
+                    this.vAxisTitle.txBody.content.Content[i].Style_Add_Open(default_legend_style.Id);
                     //content.Content[i].setTextPr(new ParaTextPr());
                 }
             }
             var content = this.vAxisTitle.txBody.content;
             for(var i = 0; i < content.Content.length; ++i)
             {
-                content.Content[i].Pr.PStyle = this.vAxisTitle.txBody.content.Styles.Style.length - 1;
+                //content.Content[i].Pr.PStyle = this.vAxisTitle.txBody.content.Styles.Style.length - 1;
             }
             this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
             this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);

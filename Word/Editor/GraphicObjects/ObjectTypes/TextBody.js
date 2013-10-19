@@ -93,7 +93,44 @@ CTextBody.prototype =
     {
         History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
         this.content = docContent;
+        if(this.content && this.shape instanceof CChartTitle)
+        {
+            var is_on = History.Is_On();
+            if(is_on)
+            {
+                History.TurnOff();
+            }
+            var styles = new CStyles();
+            var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
+            var TextPr = {FontFamily:{}}
+            TextPr.FontFamily.Name = "Calibri";
+            TextPr.Bold = true;
+            if(this.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                TextPr.FontSize = 18;
+            else
+                TextPr.FontSize = 10;
+
+            default_legend_style.TextPr.Set_FromObject(TextPr);
+            default_legend_style.ParaPr.Spacing.After = 0;
+            default_legend_style.ParaPr.Spacing.Before = 0;
+            default_legend_style.ParaPr.Jc = align_Center;
+
+            //TODO:ParaPr: default_legend_style.ParaPr.Ind
+            var tx_pr;
+            if(isRealObject(this.txPr))
+            {
+                //TODO
+            }
+            styles.Style[default_legend_style.Id] = default_legend_style;
+            ++styles.Id;
+            this.content.Styles = styles;
+            this.content.Content[0].Style_Add_Open(default_legend_style.Id);
+            if(is_on)
+            {
+                History.TurnOn();
+            }
+        }
     },
 
     Refresh_RecalcData: function()
@@ -523,6 +560,41 @@ CTextBody.prototype =
             case historyitem_SetDocContent:
             {
                 this.content = data.oldPr;
+                if(this.content && this.shape instanceof CChartTitle)
+                {
+                    var is_on = History.Is_On();
+                    if(is_on)
+                    {
+                        History.TurnOff();
+                    }
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    default_legend_style.TextPr.themeFont = "Calibri";
+                    default_legend_style.TextPr.Bold = true;
+                    if(this.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        default_legend_style.TextPr.FontSize = 18;
+                    else
+                        default_legend_style.TextPr.FontSize = 10;
+
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[styles.Id] = default_legend_style;
+                    ++styles.Id;
+                    this.content.Styles = styles;
+                    if(is_on)
+                    {
+                        History.TurnOn();
+                    }
+                }
                 break;
             }
             case historyitem_SetLstStyle:
@@ -547,6 +619,41 @@ CTextBody.prototype =
             case historyitem_SetDocContent:
             {
                 this.content = data.newPr;
+                if(this.content && this.shape instanceof CChartTitle)
+                {
+                    var is_on = History.Is_On();
+                    if(is_on)
+                    {
+                        History.TurnOff();
+                    }
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    default_legend_style.TextPr.themeFont = "Calibri";
+                    default_legend_style.TextPr.Bold = true;
+                    if(this.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        default_legend_style.TextPr.FontSize = 18;
+                    else
+                        default_legend_style.TextPr.FontSize = 10;
+
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[styles.Id] = default_legend_style;
+                    ++styles.Id;
+                    this.content.Styles = styles;
+                    if(is_on)
+                    {
+                        History.TurnOn();
+                    }
+                }
                 break;
             }
 
@@ -616,6 +723,41 @@ CTextBody.prototype =
                     else
                     {
                         this.content = null;
+                    }
+                    if(this.content && this.shape instanceof CChartTitle)
+                    {
+                        var is_on = History.Is_On();
+                        if(is_on)
+                        {
+                            History.TurnOff();
+                        }
+                        var styles = new CStyles();
+                        var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                        default_legend_style.TextPr.themeFont = "Calibri";
+                        default_legend_style.TextPr.Bold = true;
+                        if(this.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                            default_legend_style.TextPr.FontSize = 18;
+                        else
+                            default_legend_style.TextPr.FontSize = 10;
+
+                        default_legend_style.ParaPr.Spacing.After = 0;
+                        default_legend_style.ParaPr.Spacing.Before = 0;
+                        default_legend_style.ParaPr.Jc = align_Center;
+
+                        //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                        var tx_pr;
+                        if(isRealObject(this.txPr))
+                        {
+                            //TODO
+                        }
+                        styles.Style[styles.Id] = default_legend_style;
+                        ++styles.Id;
+                        this.content.Styles = styles;
+                        if(is_on)
+                        {
+                            History.TurnOn();
+                        }
                     }
                     break;
                 }
