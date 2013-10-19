@@ -1465,24 +1465,36 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onKeyDown = function(e)
     {
-        var b_prevent_default = false;
-        switch (e.keyCode)
-        {
-            case 8:
-            {
-                b_prevent_default = true;
-            }
-        }
-        if(b_prevent_default)
-            e.preventDefault();
+        return DefaultKeyDownHandle(this.drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
     {
         if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
-            this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-            this.drawingObjects.showDrawingObjects(true);
+            //var worksheet = this.drawingObjects.getWorksheet();
+            //worksheet.collaborativeEditing.onStartCheckLock();
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(this.chart.Get_Id());
+
+            var drawingObjects = this.drawingObjects;
+            var text_object = this.textObject;
+            var callback = function(bLock)
+            {
+                if(bLock)
+                {
+                    History.Create_NewPoint();
+                    text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                    drawingObjects.showDrawingObjects(true);
+                    text_object.updateSelectionState(drawingObjects.drawingDocument);
+                }
+            };
+
+            //worksheet.collaborativeEditing.onEndCheckLock(callback);
+            this.drawingObjects.objectLocker.checkObjects(callback);
+            // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+            // this.drawingObjects.showDrawingObjects(true);
+            // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
         }
     };
 
@@ -4772,10 +4784,15 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
                 if(state.id === STATES_ID_TEXT_ADD)
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                }
                 else
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
 
@@ -4951,11 +4968,16 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
 
                 drawingObjectsController.drawingObjects.objectLocker.reset();
                 if(state.id === STATES_ID_TEXT_ADD)
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                }
                 else
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
 
@@ -5183,9 +5205,21 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
+                if(state.id === STATES_ID_CHART_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
+                else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                }
+                else
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+                }
+
 
                 var selection_state =  drawingObjectsController.getSelectionState();
                 var callback = function(bLock)
@@ -5227,6 +5261,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Selection_Remove();
                 drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjectsController.drawingObjects));
@@ -5243,14 +5278,21 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 if(!e.ctrlKey)
                 {
                     drawingObjectsController.drawingObjects.objectLocker.reset();
-                    if(state.id === STATES_ID_TEXT_ADD)
-                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                    if(state.id === STATES_ID_CHART_TEXT_ADD)
+                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
+                    else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                    {
+                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                    }
                     else
-                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+                    {
+                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+                    }
 
                     var selection_state =  drawingObjectsController.getSelectionState();
                     var callback = function(bLock)
@@ -5343,6 +5385,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+
             {
                 if (e.ctrlKey) // Ctrl + End - переход в конец документа
                 {
@@ -5366,6 +5410,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 if (e.ctrlKey) // Ctrl + End - переход в конец документа
                 {
@@ -5464,8 +5509,10 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Cursor_MoveLeft(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.recalculateCurPos();
                 drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
             }
@@ -5553,8 +5600,10 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Cursor_MoveUp(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.recalculateCurPos();
                 drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
             }
@@ -5635,8 +5684,10 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Cursor_MoveRight(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.recalculateCurPos();
                 drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
             }
@@ -5718,8 +5769,10 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Cursor_MoveDown(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.recalculateCurPos();
                 drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
             }
@@ -5736,12 +5789,19 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_TEXT_ADD)
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                if(state.id === STATES_ID_CHART_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
+                else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                }
                 else
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+                }
 
                 var selection_state =  drawingObjectsController.getSelectionState();
                 var callback = function(bLock)
@@ -5930,6 +5990,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             }
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 state.textObject.txBody.content.Select_All();
                 state.drawingObjectsController.updateSelectionState();
@@ -5961,9 +6022,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var ParaPr = drawingObjectsController.getParagraphParaPr();
         if ( isRealObject(ParaPr))
         {
-            if(typeof state.setCellAlign === "function")
+            if(typeof drawingObjectsController.setCellAlign === "function")
             {
-                state.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
             }
             bRetValue = true;
         }
@@ -5973,9 +6034,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var TextPr = drawingObjectsController.getParagraphTextPr();
         if ( isRealObject(TextPr))
         {
-            if(typeof state.setCellItalic === "function")
+            if(typeof drawingObjectsController.setCellItalic === "function")
             {
-                state.setCellItalic(TextPr.Italic === true ? false : true );
+                drawingObjectsController.setCellItalic(TextPr.Italic === true ? false : true );
             }
             bRetValue = true;
         }
@@ -5985,9 +6046,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var ParaPr = drawingObjectsController.getParagraphParaPr();
         if ( isRealObject(ParaPr))
         {
-            if(typeof state.setCellAlign === "function")
+            if(typeof drawingObjectsController.setCellAlign === "function")
             {
-                state.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
             }
             bRetValue = true;
         }
@@ -6003,9 +6064,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var ParaPr = drawingObjectsController.getParagraphParaPr();
         if ( isRealObject(ParaPr))
         {
-            if(typeof state.setCellAlign === "function")
+            if(typeof drawingObjectsController.setCellAlign === "function")
             {
-                state.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
             }
             bRetValue = true;
         }
@@ -6026,9 +6087,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var ParaPr = drawingObjectsController.getParagraphParaPr();
         if ( isRealObject(ParaPr))
         {
-            if(typeof state.setCellAlign === "function")
+            if(typeof drawingObjectsController.setCellAlign === "function")
             {
-                state.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
             }
             bRetValue = true;
         }
@@ -6042,9 +6103,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var TextPr = drawingObjectsController.getParagraphTextPr();
         if ( isRealObject(TextPr))
         {
-            if(typeof state.setCellUnderline === "function")
+            if(typeof drawingObjectsController.setCellUnderline === "function")
             {
-                state.setCellUnderline(TextPr.Underline === true ? false : true );
+                drawingObjectsController.setCellUnderline(TextPr.Underline === true ? false : true );
             }
             bRetValue = true;
         }
@@ -6081,12 +6142,12 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var TextPr = drawingObjectsController.getParagraphTextPr();
         if ( isRealObject(TextPr))
         {
-            if(typeof state.setCellSubscript === "function" && typeof state.setCellSuperscript === "function")
+            if(typeof drawingObjectsController.setCellSubscript === "function" && typeof drawingObjectsController.setCellSuperscript === "function")
             {
                 if ( true === e.shiftKey )
-                    state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
                 else
-                    state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
             }
             bRetValue = true;
         }
@@ -6096,9 +6157,9 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var TextPr = drawingObjectsController.getParagraphTextPr();
         if ( isRealObject(TextPr))
         {
-            if(typeof state.setCellSuperscript === "function")
+            if(typeof drawingObjectsController.setCellSuperscript === "function")
             {
-                    state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
             }
             bRetValue = true;
         }
@@ -6120,10 +6181,15 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
                 if(state.id === STATES_ID_TEXT_ADD)
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else if(state.id === STATES_ID_CHART_TEXT_ADD)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.chart.Get_Id());
+                }
                 else
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
 
@@ -6207,26 +6273,26 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         var TextPr = drawingObjectsController.getParagraphTextPr();
         if ( isRealObject(TextPr))
         {
-            if(typeof state.setCellSubscript === "function")
+            if(typeof drawingObjectsController.setCellSubscript === "function")
             {
-                state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
             }
             bRetValue = true;
         }
     }
     else if ( e.keyCode == 219 && false === isViewMode && true === e.ctrlKey ) // Ctrl + [
     {
-        if(typeof state.decreaseFontSize === "function")
+        if(typeof drawingObjectsController.decreaseFontSize === "function")
         {
-            state.decreaseFontSize();
+            drawingObjectsController.decreaseFontSize();
         }
         bRetValue = true;
     }
     else if ( e.keyCode == 221 && false === isViewMode && true === e.ctrlKey ) // Ctrl + ]
     {
-        if(typeof state.increaseFontSize === "function")
+        if(typeof drawingObjectsController.increaseFontSize === "function")
         {
-            state.increaseFontSize();
+            drawingObjectsController.increaseFontSize();
         }
         bRetValue = true;
     }
