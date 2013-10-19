@@ -2113,7 +2113,7 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
         {
             image_url = bg.bgPr.Fill.fill.RasterImageId;
         }
-        if (image_url != "")
+        if (image_url != "" && _back_fill.fill && _back_fill.fill.url != "" && _back_fill.fill.url != null)
         {
             var _image = this.ImageLoader.LoadImage(image_url, 1);
 
@@ -3675,6 +3675,39 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
             presentation.DrawingDocument.OnEndRecalculate();
 
+            this.WordControl.m_oLayoutDrawer.IsRetina = this.WordControl.bIsRetinaSupport;
+
+            this.WordControl.m_oLayoutDrawer.WidthMM = presentation.Width;
+            this.WordControl.m_oLayoutDrawer.HeightMM = presentation.Height;
+            this.WordControl.m_oMasterDrawer.WidthMM = presentation.Width;
+            this.WordControl.m_oMasterDrawer.HeightMM = presentation.Height;
+            this.WordControl.m_oLogicDocument.GenerateThumbnails(this.WordControl.m_oMasterDrawer, this.WordControl.m_oLayoutDrawer);
+
+            var _masters = this.WordControl.m_oLogicDocument.slideMasters;
+            for (var i = 0; i < _masters.length; i++)
+            {
+                var theme_load_info = new CThemeLoadInfo();
+                theme_load_info.Master = _masters[i];
+                theme_load_info.Theme = _masters[i].Theme;
+
+                var _lay_cnt = _masters[i].sldLayoutLst.length;
+                for (var j = 0; j < _lay_cnt; j++)
+                    theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
+
+                var th_info = new Object();
+                th_info["Name"] = "Doc Theme " + i;
+                th_info["Url"] = "";
+                th_info["Thumbnail"] = _masters[i].ImageBase64;
+
+                var th = new CAscThemeInfo(th_info);
+                this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;
+                th.Index = -this.ThemeLoader.Themes.DocumentThemes.length;
+
+                this.ThemeLoader.themes_info_document[this.ThemeLoader.Themes.DocumentThemes.length - 1] = theme_load_info;
+            }
+
+            this.sync_InitEditorThemes(this.ThemeLoader.Themes.EditorThemes, this.ThemeLoader.Themes.DocumentThemes);
+
             this.asc_fireCallback("asc_onPresentationSize", presentation.Width, presentation.Height);
 
             this.WordControl.GoToPage(0);
@@ -4448,6 +4481,8 @@ asc_docs_api.prototype.EndLoadTheme = function(theme_load_info)
         this.WordControl.m_oLogicDocument.changeTheme(theme_load_info);
     else
         this.WordControl.m_oLogicDocument.changeTheme2(theme_load_info, _array);
+
+    this.WordControl.ThemeGenerateThumbnails(theme_load_info.Master);
 
     // меняем шаблоны в меню
     this.WordControl.CheckLayouts();

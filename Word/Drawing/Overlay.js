@@ -1435,48 +1435,49 @@ CAutoshapeTrack.prototype =
 
     AddRectDashClever : function(ctx, x, y, r, b, w_dot, w_dist)
     {
+        // здесь расчитано на толщину линии в один пиксел!
         var _x = x + 0.5;
         var _y = y + 0.5;
         var _r = r + 0.5;
         var _b = b + 0.5;
 
-        for (var i = _x; i < _r; i += w_dist)
+        for (var i = x; i < r; i += w_dist)
         {
             ctx.moveTo(i, _y);
             i += w_dot;
 
-            if (i > _r)
-                i = _r;
+            if (i > (r - 1))
+                i = r - 1;
 
             ctx.lineTo(i, _y);
         }
-        for (var i = _y; i < _b; i += w_dist)
+        for (var i = y; i < b; i += w_dist)
         {
             ctx.moveTo(_r, i);
             i += w_dot;
 
-            if (i > _b)
-                i = _b;
+            if (i > (b - 1))
+                i = b - 1;
 
             ctx.lineTo(_r, i);
         }
-        for (var i = _r; i > _x; i -= w_dist)
+        for (var i = r + 1; i > (x + 1); i -= w_dist)
         {
             ctx.moveTo(i, _b);
             i -= w_dot;
 
-            if (i < _x)
-                i = _x;
+            if (i < (x + 2))
+                i = x + 2;
 
             ctx.lineTo(i, _b);
         }
-        for (var i = _b; i > _y; i -= w_dist)
+        for (var i = b + 1; i > (y + 1); i -= w_dist)
         {
             ctx.moveTo(_x, i);
             i -= w_dot;
 
-            if (i < _y)
-                i = _y;
+            if (i < (y + 2))
+                i = y + 2;
 
             ctx.lineTo(_x, i);
         }

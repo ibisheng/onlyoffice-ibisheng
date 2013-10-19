@@ -147,6 +147,12 @@ function CEditorPage(api)
     this.m_oDrawingDocument = new CDrawingDocument();
     this.m_oLogicDocument   = null;
 
+    this.m_oLayoutDrawer = new CLayoutThumbnailDrawer();
+    this.m_oLayoutDrawer.DrawingDocument = this.m_oDrawingDocument;
+
+    this.m_oMasterDrawer = new CMasterThumbnailDrawer();
+    this.m_oMasterDrawer.DrawingDocument = this.m_oDrawingDocument;
+
     this.m_oDrawingDocument.m_oWordControl = this;
     this.m_oDrawingDocument.TransitionSlide.HtmlPage = this;
     this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
@@ -2781,6 +2787,20 @@ function CEditorPage(api)
         this.m_oVerRuler.CreateBackground(cachedPage);
     }
 
+    this.ThemeGenerateThumbnails = function(_master)
+    {
+        var _layouts = _master.sldLayoutLst;
+        var _len = _layouts.length;
+
+        for (var i = 0; i < _len; i++)
+        {
+            _layouts[i].recalculate();
+            _layouts[i].recalculate2();
+
+            _layouts[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(_layouts[i]);
+        }
+    }
+
     this.CheckLayouts = function(bIsAttack)
     {
         if (-1 == this.m_oDrawingDocument.SlideCurrent)
@@ -2804,7 +2824,11 @@ function CEditorPage(api)
                     arr[i].Type = __type;
 
                 arr[i].Name = master.sldLayoutLst[i].cSld.name;
-                arr[i].Image = "data:image/png;base64," + master.sldLayoutLst[i].ImageBase64;
+
+                if ("" == master.sldLayoutLst[i].ImageBase64)
+                    master.sldLayoutLst[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(master.sldLayoutLst[i]);
+
+                arr[i].Image = master.sldLayoutLst[i].ImageBase64;
             }
 
             editor.asc_fireCallback("asc_onUpdateLayout", arr);

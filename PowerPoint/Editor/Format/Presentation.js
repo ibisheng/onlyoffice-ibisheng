@@ -782,6 +782,22 @@ CPresentation.prototype =
         }
     },
 
+    GenerateThumbnails : function(_drawerThemes, _drawerLayouts)
+    {
+        var _masters = this.slideMasters;
+        var _len = _masters.length;
+        for (var i = 0; i < _len; i++)
+        {
+            _masters[i].ImageBase64 = _drawerThemes.GetThumbnail(_masters[i]);
+        }
+
+        var _layouts = this.slideLayouts;
+        _len = _layouts.length;
+        for (var i = 0; i < _len; i++)
+        {
+            _layouts[i].ImageBase64 = _drawerLayouts.GetThumbnail(_layouts[i]);
+        }
+    },
 
     RecalculateAfterUndoRedo: function()
     {

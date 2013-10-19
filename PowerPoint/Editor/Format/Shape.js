@@ -3098,7 +3098,7 @@ CShape.prototype =
                     graphics.p_color(127,127,127,255);
 
                     graphics._s();
-                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDash(graphics.m_oContext, x1, y1, x2, y2, x3, y3, x4, y4, 2, 2);
+                    editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDash(graphics.m_oContext, x1, y1, x2, y2, x3, y3, x4, y4, 3, 1);
                     graphics.ds();
                 }
             }

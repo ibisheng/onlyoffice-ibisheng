@@ -684,8 +684,8 @@ function BinaryPPTYLoader()
                 this.presentation.Slides[0] = GenerateDefaultSlide(this.presentation.slideLayouts[0]);
             }
 
-            var _editor = this.Api;
-            _editor.sync_InitEditorThemes(_editor.ThemeLoader.Themes.EditorThemes, _editor.ThemeLoader.Themes.DocumentThemes);
+            //var _editor = this.Api;
+            //_editor.sync_InitEditorThemes(_editor.ThemeLoader.Themes.EditorThemes, _editor.ThemeLoader.Themes.DocumentThemes);
 
             // шейпы посылаются только на подписке
             //_editor.asc_fireCallback("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
@@ -726,7 +726,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    master.ImageBase64 = s.GetString2A();
+                    s.GetString2A();
                     break;
                 }
                 default:
@@ -756,7 +756,7 @@ function BinaryPPTYLoader()
                     }
                     case 1:
                     {
-                        master.sldLayoutLst[master.sldLayoutLst.length - 1].ImageBase64 = s.GetString2A();
+                        s.GetString2A();
                         break;
                     }
                     default:
@@ -767,7 +767,7 @@ function BinaryPPTYLoader()
 
         s.Seek2(_end_rec);
 
-        if (this.Api != null)
+        if (this.Api != null && this.IsThemeLoader)
         {
             var theme_loader = this.Api.ThemeLoader;
 
@@ -779,25 +779,7 @@ function BinaryPPTYLoader()
             for (var i = 0; i < _lay_cnt; i++)
                 theme_load_info.Layouts[i] = master.sldLayoutLst[i];
 
-            if (!this.IsThemeLoader)
-            {
-                // посылаем темы документа в меню
-                var th_info = new Object();
-                th_info["Name"] = "Doc Theme " + indexMaster;
-                th_info["Url"] = "";
-                th_info["Thumbnail"] = "data:image/png;base64," + master.ImageBase64;
-
-
-                var th = new CAscThemeInfo(th_info);
-                theme_loader.Themes.DocumentThemes[theme_loader.Themes.DocumentThemes.length] = th;
-                th.Index = -theme_loader.Themes.DocumentThemes.length;
-
-                theme_loader.themes_info_document[theme_loader.Themes.DocumentThemes.length - 1] = theme_load_info;
-            }
-            else
-            {
-                theme_loader.themes_info_editor[theme_loader.CurrentLoadThemeIndex] = theme_load_info;
-            }
+            theme_loader.themes_info_editor[theme_loader.CurrentLoadThemeIndex] = theme_load_info;
         }
     }
 

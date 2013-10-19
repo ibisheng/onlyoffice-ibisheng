@@ -1575,6 +1575,8 @@ Slide.prototype =
                 this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
+                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill &&  this.cSld.Bg.bgPr.Fill.fill instanceof CBlipFill)
+                    CollaborativeEditing.Add_NewImage(this.cSld.Bg.bgPr.Fill.fill.RasterImageId);
                 break;
             }
             case historyitem_ChangeTiming:

@@ -1069,16 +1069,23 @@ CBlipFill.prototype =
         Writer.WriteBool(flag);
         if(flag)
         {
-            var string_to_write =  _getFullImageSrc(this.RasterImageId);
-            if(string_to_write.indexOf(documentOrigin) !== 0
-                && string_to_write.indexOf("http:") !== 0
-                && string_to_write.indexOf("https:") !== 0
-                && string_to_write.indexOf("ftp:") !== 0
-                && string_to_write.indexOf("data:") !== 0)
+            if (0 == this.RasterImageId.indexOf("theme"))
             {
-                string_to_write = documentOrigin + string_to_write;
+                Writer.WriteString2(this.RasterImageId);
             }
-            Writer.WriteString2(string_to_write);
+            else
+            {
+                var string_to_write =  _getFullImageSrc(this.RasterImageId);
+                if(string_to_write.indexOf(documentOrigin) !== 0
+                    && string_to_write.indexOf("http:") !== 0
+                    && string_to_write.indexOf("https:") !== 0
+                    && string_to_write.indexOf("ftp:") !== 0
+                    && string_to_write.indexOf("data:") !== 0)
+                {
+                    string_to_write = documentOrigin + string_to_write;
+                }
+                Writer.WriteString2(string_to_write);
+            }
         }
 
         flag = this.stretch !== null;

@@ -486,6 +486,18 @@ function SlideLayout(slideMaster)
         }
     };
 
+    this.recalculate2 = function()
+    {
+        var _shapes = this.cSld.spTree;
+        var _shape_index;
+        var _shape_count = _shapes.length;
+        for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+        {
+            if(_shapes[_shape_index].isPlaceholder())
+                _shapes[_shape_index].recalculate();
+        }
+    };
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -1037,6 +1049,8 @@ SlideLayout.prototype =
                 this.cSld.Bg.Read_FromBinary2(r);
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
+                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill &&  this.cSld.Bg.bgPr.Fill.fill instanceof CBlipFill)
+                    CollaborativeEditing.Add_NewImage(this.cSld.Bg.bgPr.Fill.fill.RasterImageId);
                 break;
             }
             case historyitem_ChangeTiming:
@@ -1207,4 +1221,214 @@ SlideLayout.prototype =
     }
 };
 
+function CLayoutThumbnailDrawer()
+{
+    this.CanvasImage    = null;
+    this.IsRetina       = false;
+    this.WidthMM        = 0;
+    this.HeightMM       = 0;
 
+    this.DrawingDocument = null;
+
+    this.GetThumbnail = function(_layout)
+    {
+        _layout.recalculate2();
+
+        var h_px = 67;
+        var w_px = (this.WidthMM * h_px / this.HeightMM) >> 0;
+
+        if (this.IsRetina)
+        {
+            w_px <<= 1;
+            h_px <<= 1;
+        }
+
+        if (this.CanvasImage == null)
+            this.CanvasImage = document.createElement('canvas');
+
+        this.CanvasImage.width = w_px;
+        this.CanvasImage.height = h_px;
+
+        var _ctx = this.CanvasImage.getContext('2d');
+
+        var g = new CGraphics();
+        g.init(_ctx, w_px, h_px, this.WidthMM, this.HeightMM);
+        g.m_oFontManager = g_fontManager;
+
+        g.transform(1,0,0,1,0,0);
+
+        // background
+        var _back_fill = null;
+        var RGBA = {R:0, G:0, B:0, A:255};
+
+        var _master = _layout.Master;
+        var _theme = _master.Theme;
+        if (_layout != null)
+        {
+            if (_layout.cSld.Bg != null)
+            {
+                if (null != _layout.cSld.Bg.bgPr)
+                    _back_fill = _layout.cSld.Bg.bgPr.Fill;
+                else if(_layout.cSld.Bg.bgRef != null)
+                {
+                    _layout.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
+                    RGBA = _layout.cSld.Bg.bgRef.Color.RGBA;
+                    _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx);
+                }
+            }
+            else if (_master != null)
+            {
+                if (_master.cSld.Bg != null)
+                {
+                    if (null != _master.cSld.Bg.bgPr)
+                        _back_fill = _master.cSld.Bg.bgPr.Fill;
+                    else if(_master.cSld.Bg.bgRef != null)
+                    {
+                        _master.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
+                        RGBA = _master.cSld.Bg.bgRef.Color.RGBA;
+                        _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx);
+                    }
+                }
+                else
+                {
+                    _back_fill = new CUniFill();
+                    _back_fill.fill = new CSolidFill();
+                    _back_fill.fill.color.color = new CRGBColor();
+                    _back_fill.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+                }
+            }
+        }
+
+        if (_back_fill != null)
+            _back_fill.calculate(_theme, null, _layout, _master, RGBA);
+
+        DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
+
+        var _sx = g.m_oCoordTransform.sx;
+        var _sy = g.m_oCoordTransform.sy;
+
+        if (_layout.showMasterSp == true || _layout.showMasterSp == undefined)
+        {
+            _master.draw(g);
+        }
+
+        for (var i = 0; i < _layout.cSld.spTree.length; i++)
+        {
+            var _sp_elem = _layout.cSld.spTree[i];
+            if (!_sp_elem.isPlaceholder())
+                _sp_elem.draw(g);
+            else
+            {
+                _ctx.globalAlpha = 1;
+                var _matrix = _sp_elem.transform;
+                var _x = 1;
+                var _y = 1;
+                var _r = Math.max(_sp_elem.extX - 1, 1);
+                var _b = Math.max(_sp_elem.extY - 1, 1);
+
+                var _isIntegerGrid = g.GetIntegerGrid();
+                if (!_isIntegerGrid)
+                    g.SetIntegerGrid(true);
+
+                if (_matrix)
+                {
+                    var _x1 = _sx * _matrix.TransformPointX(_x, _y);
+                    var _y1 = _sy * _matrix.TransformPointY(_x, _y);
+
+                    var _x2 = _sx * _matrix.TransformPointX(_r, _y);
+                    var _y2 = _sy * _matrix.TransformPointY(_r, _y);
+
+                    var _x3 = _sx * _matrix.TransformPointX(_x, _b);
+                    var _y3 = _sy * _matrix.TransformPointY(_x, _b);
+
+                    var _x4 = _sx * _matrix.TransformPointX(_r, _b);
+                    var _y4 = _sy * _matrix.TransformPointY(_r, _b);
+
+                    if (Math.abs(_matrix.shx) < 0.001 && Math.abs(_matrix.shy) < 0.001)
+                    {
+                        _x = _x1;
+                        if (_x > _x2)
+                            _x = _x2;
+                        if (_x > _x3)
+                            _x = _x3;
+
+                        _r = _x1;
+                        if (_r < _x2)
+                            _r = _x2;
+                        if (_r < _x3)
+                            _r = _x3;
+
+                        _y = _y1;
+                        if (_y > _y2)
+                            _y = _y2;
+                        if (_y > _y3)
+                            _y = _y3;
+
+                        _b = _y1;
+                        if (_b < _y2)
+                            _b = _y2;
+                        if (_b < _y3)
+                            _b = _y3;
+
+                        _x >>= 0;
+                        _y >>= 0;
+                        _r >>= 0;
+                        _b >>= 0;
+
+                        _ctx.lineWidth = 1;
+
+                        _ctx.strokeStyle = "#FFFFFF";
+                        _ctx.beginPath();
+                        _ctx.strokeRect(_x + 0.5, _y + 0.5, _r - _x, _b - _y);
+                        _ctx.strokeStyle = "#000000";
+                        _ctx.beginPath();
+                        this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2);
+                        _ctx.stroke();
+                        _ctx.beginPath();
+                    }
+                    else
+                    {
+                        _ctx.lineWidth = 1;
+
+                        _ctx.strokeStyle = "#000000";
+                        _ctx.beginPath();
+                        _ctx.moveTo(_x1, _y1);
+                        _ctx.lineTo(_x2, _y2);
+                        _ctx.lineTo(_x4, _y4);
+                        _ctx.lineTo(_x3, _y3);
+                        _ctx.closePath();
+                        _ctx.stroke();
+                        _ctx.strokeStyle = "#FFFFFF";
+                        _ctx.beginPath();
+                        this.DrawingDocument.AutoShapesTrack.AddRectDash(_ctx, _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4, 2, 2);
+                        _ctx.stroke();
+                        _ctx.beginPath();
+                    }
+                }
+                else
+                {
+                    _x = (_sx * _x) >> 0;
+                    _y = (_sy * _y) >> 0;
+                    _r = (_sx * _r) >> 0;
+                    _b = (_sy * _b) >> 0;
+
+                    _ctx.lineWidth = 1;
+
+                    _ctx.strokeStyle = "#000000";
+                    _ctx.beginPath();
+                    _ctx.strokeRect(_x + 0.5, _y + 0.5, _r - _x, _b - _y);
+                    _ctx.strokeStyle = "#FFFFFF";
+                    _ctx.beginPath();
+                    this.DrawingDocument.AutoShapesTrack.AddRectDashClever(_ctx, _x, _y, _r, _b, 2, 2);
+                    _ctx.stroke();
+                    _ctx.beginPath();
+                }
+
+                if (!_isIntegerGrid)
+                    g.SetIntegerGrid(true);
+            }
+        }
+
+        return this.CanvasImage.toDataURL("image/png");
+    }
+}

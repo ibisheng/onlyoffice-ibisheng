@@ -4815,7 +4815,7 @@ function CSlideDrawer()
             g.m_oFontManager = g_fontManager;
 
             if (this.m_oWordControl.bIsRetinaSupport)
-                g.IsRetina = 2;
+                g.IsRetina = true;
 
             g.m_oCoordTransform.tx = -this.BoundsChecker.Bounds.min_x;
             g.m_oCoordTransform.ty = -this.BoundsChecker.Bounds.min_y;
