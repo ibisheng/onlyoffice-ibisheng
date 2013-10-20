@@ -165,9 +165,15 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalShape.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Undo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalShape.setAdjustmentValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX], this.refY, this.geometry.gdLst[this.adjastment.gdRefY]);
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Redo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalShape.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.originalShape.recalculateGeometry();
         this.originalShape.calculateContent();
         this.originalShape.calculateTransformTextMatrix();
@@ -319,9 +325,17 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalShape.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Undo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalShape.setAdjustmentValue(this.refR, this.geometry.gdLst[this.adjastment.gdRefR], this.refAng, this.geometry.gdLst[this.adjastment.gdRefAng]);
         this.originalShape.recalculateGeometry();
         this.originalShape.calculateContent();
         this.originalShape.calculateTransformTextMatrix();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalShape.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Redo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
     };
 }
