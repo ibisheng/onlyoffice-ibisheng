@@ -400,7 +400,7 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onKeyPress = function(e)
     {
-        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        if(!(e.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
             var selected_objects = this.drawingObjectsController.selectedObjects;
             if(selected_objects.length === 1 && selected_objects[0].isShape())
@@ -1470,7 +1470,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onKeyPress = function(e)
     {
-        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        if(!(e.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
             //var worksheet = this.drawingObjects.getWorksheet();
             //worksheet.collaborativeEditing.onStartCheckLock();
@@ -3031,7 +3031,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onKeyPress = function(e)
     {
-        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        if(!(e.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
             var selected_objects = this.group.selectedObjects;
             if(selected_objects.length === 1 && selected_objects[0].isShape())
@@ -3232,7 +3232,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
 
     this.onKeyPress = function(e)
     {
-        if(!(event.metaKey && window.USER_AGENT_SAFARI_MACOS))
+        if(!(e.metaKey && window.USER_AGENT_SAFARI_MACOS))
         {
             var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
 
