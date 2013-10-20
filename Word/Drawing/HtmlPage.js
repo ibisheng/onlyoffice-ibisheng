@@ -1953,7 +1953,7 @@ function CEditorPage(api)
         this.ReaderFontSizeCur++;
         this.ReaderModeDiv.style.fontSize = this.ReaderFontSizes[this.ReaderFontSizeCur] + "pt";
 
-        this.ReaderTouchManager.iScroll._changeMaxes();
+        this.ReaderTouchManager.ChangeFontSize();
     }
     this.DecreaseReaderFontSize = function()
     {
@@ -1968,7 +1968,7 @@ function CEditorPage(api)
         this.ReaderFontSizeCur--;
         this.ReaderModeDiv.style.fontSize = this.ReaderFontSizes[this.ReaderFontSizeCur] + "pt";
 
-        this.ReaderTouchManager.iScroll._changeMaxes();
+        this.ReaderTouchManager.ChangeFontSize();
     }
 
     this.EnableReaderMode = function()

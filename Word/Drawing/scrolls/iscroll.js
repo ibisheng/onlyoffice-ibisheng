@@ -1039,17 +1039,17 @@ CTouchScroll.prototype = {
 			*/
             that.x = 0;
             that.y = 0;
-            if (that.maxScrollX < 0)
+            if (_oldMaxX < 0)
             {
-                that.x = (_oldX * _oldMaxX / that.maxScrollX) >> 0;
+                that.x = (_oldX * that.maxScrollX / _oldMaxX) >> 0;
                 if (that.x > 0)
                     that.x = 0;
                 if (that.x < that.maxScrollX)
                     that.x = that.maxScrollX;
             }
-            if (that.maxScrollY < 0)
+            if (_oldMaxY < 0)
             {
-                that.y = (_oldY * _oldMaxY / that.maxScrollY) >> 0;
+                that.y = (_oldY * that.maxScrollY / _oldMaxY) >> 0;
                 if (that.y > 0)
                     that.y = 0;
                 if (that.y < that.maxScrollY)

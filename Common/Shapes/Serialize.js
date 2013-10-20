@@ -2675,10 +2675,10 @@ function BinaryPPTYLoader()
             }
             else if (3 == _at)
             {
+                var _spd = s.GetUChar();
                 if (!_presentDuration)
                 {
                     _timing.TransitionDuration = 250;
-                    var _spd = s.GetUChar();
                     if (_spd == 1)
                         _timing.TransitionDuration = 500;
                     else if (_spd == 2)

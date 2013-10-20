@@ -3453,6 +3453,10 @@ asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
 
 asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
 {
+    if (this.WordControl.m_oMainContent)
+    {
+        X -= ((this.WordControl.m_oMainContent.Bounds.L * g_dKoef_mm_to_pix) >> 0);
+    }
     // TODO: Переделать на нормальный массив
     this.asc_fireCallback("asc_onShowComment", [ Id ], X, Y);
 }

@@ -2694,6 +2694,16 @@ function CReaderTouchManager()
         }
     }
 
+    this.ChangeFontSize = function()
+    {
+        if (this.iScroll != null)
+        {
+            //this.ReaderTouchManager.iScroll._changeMaxes();
+            this.iScroll.refresh();
+            this.iScroll._pos(this.iScroll.x, this.iScroll.y, false);
+        }
+    }
+
     this.Destroy = function()
     {
         if (this.iScroll != null)
