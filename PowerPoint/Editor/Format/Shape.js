@@ -598,6 +598,23 @@ CShape.prototype =
             this.compiledFill = null;
             if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill))
             {
+                if(this.spPr.Fill.fill instanceof CGradFill && this.spPr.Fill.fill.colors.length === 0)
+                {
+                    History.TurnOff();
+                    var parent_objects = this.getParentObjects();
+                    var theme = parent_objects.theme;
+                    var fmt_scheme = theme.themeElements.fmtScheme;
+                    var fill_style_lst = fmt_scheme.fillStyleLst;
+                    for(var i = fill_style_lst.length - 1; i > -1; --i)
+                    {
+                        if(fill_style_lst[i] && fill_style_lst[i].fill instanceof CGradFill)
+                        {
+                            this.spPr.Fill = fill_style_lst[i].createDuplicate();
+                            break;
+                        }
+                    }
+                    History.TurnOn();
+                }
                 this.compiledFill = this.spPr.Fill.createDuplicate();
             }
             else if(isRealObject(this.group))

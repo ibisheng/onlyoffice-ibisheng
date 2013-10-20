@@ -692,7 +692,8 @@ CGraphicObjects.prototype = {
                         verticalTextAlign: _current_object.txBody ? _current_object.txBody.getCompiledBodyPr().anchor : undefined,
                         paddings: _current_object.getPaddings(),
                         w:_current_object.extX,
-                        h:_current_object.extY
+                        h:_current_object.extY,
+                        canFill: _current_object.spPr.geometry && _current_object.spPr.geometry.canFill()
                     };
 
                     if(shape_props === null)
@@ -771,7 +772,8 @@ CGraphicObjects.prototype = {
                             verticalTextAlign: _current_object.txBody ? _current_object.txBody.getCompiledBodyPr().anchor : undefined,
                             paddings: _current_object.getPaddings(),
                             w:_current_object.extX,
-                            h:_current_object.extY
+                            h:_current_object.extY,
+                            canFill: _current_object.spPr.geometry && _current_object.spPr.geometry.canFill()
                         };
 
                         if(shape_props === null)

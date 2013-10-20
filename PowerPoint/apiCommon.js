@@ -1014,6 +1014,7 @@ function CAscShapeProp()
     this.h = null;
     this.paddings = null;
     this.verticalTextAlign = null;
+    this.canFill = true;
 }
 CAscShapeProp.prototype.get_Locked = function(){return this.Locked}
 CAscShapeProp.prototype.put_Locked = function(v){this.Locked = v;}
@@ -1032,6 +1033,9 @@ CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
 
 CAscShapeProp.prototype.get_VerticalTextAlign = function(){return this.verticalTextAlign}
 CAscShapeProp.prototype.put_VerticalTextAlign = function(v){this.verticalTextAlign = v;}
+
+CAscShapeProp.prototype.get_CanFill = function(){return this.canFill}
+CAscShapeProp.prototype.put_CanFill = function(v){this.canFill = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)

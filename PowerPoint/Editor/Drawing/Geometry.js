@@ -1234,6 +1234,18 @@ Geometry.prototype=
     },
 
 
+    canFill: function()
+    {
+        if(this.preset === "line")
+            return false;
+        for(var i = 0; i < this.pathLst.length; ++i)
+        {
+            if(this.pathLst[i].fill !== "none")
+                return true;
+        }
+        return  false;
+    },
+
     setAdjustmentValue: function(ref1, value1, ref2, value2)
     {
 
@@ -1300,8 +1312,6 @@ Geometry.prototype=
         }
     },
 
-    Save_Changes: function(data, writer)
-    {},
 
 
 

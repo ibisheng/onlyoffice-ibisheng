@@ -5003,36 +5003,6 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
     }
     else if ( e.keyCode == 13 && false === isViewMode ) // Enter
     {
-        /*var Hyperlink = this.Hyperlink_Check(false);
-         if ( null != Hyperlink && false === e.ShiftKey )
-         {
-         editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() )
-         Hyperlink.Set_Visited(true);
-
-         // TODO: Пока сделаем так, потом надо будет переделать
-         this.DrawingDocument.ClearCachePages();
-         this.DrawingDocument.FirePaint();
-         }
-         else
-         {
-         var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
-         if ( false === this.Document_Is_SelectionLocked(CheckType) )
-         {
-         this.Create_NewHistoryPoint();
-         if ( e.ShiftKey )
-         {
-         this.Paragraph_Add( new ParaNewLine( break_Line ) );
-         }
-         else if ( e.CtrlKey )
-         {
-         this.Paragraph_Add( new ParaNewLine( break_Page ) );
-         }
-         else
-         {
-         this.Add_NewParagraph();
-         }
-         }
-         }  */
         switch(state.id)
         {
             case STATES_ID_NULL:

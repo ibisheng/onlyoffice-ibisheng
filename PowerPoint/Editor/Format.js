@@ -1949,6 +1949,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.paddings.Right = isRealNumber(shapeProp1.paddings.Right) ? (shapeProp1.paddings.Right === shapeProp2.paddings.Right ? shapeProp1.paddings.Right : undefined) : undefined;
         _result_shape_prop.paddings.Bottom = isRealNumber(shapeProp1.paddings.Bottom) ? (shapeProp1.paddings.Bottom === shapeProp2.paddings.Bottom ? shapeProp1.paddings.Bottom : undefined) : undefined;
     }
+    _result_shape_prop.canFill = shapeProp1.canFill === true || shapeProp2.canFill === true;
     return _result_shape_prop;
 }
 
