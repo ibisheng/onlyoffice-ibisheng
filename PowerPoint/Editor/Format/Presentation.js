@@ -6706,6 +6706,7 @@ CPresentation.prototype =
                 var pos = Reader.GetLong();
                 var id = Reader.GetString2();
                 this.slideMasters.splice(pos, 0, g_oTableId.Get_ById(id));
+                this.bGoToPage = true;
                 break;
             }
         }
