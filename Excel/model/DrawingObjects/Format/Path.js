@@ -148,9 +148,9 @@ Path.prototype = {
 
     Read_FromBinary2: function(Reader)
     {
-        this.stroke = Reader.GetBool();
+        this.setStroke( Reader.GetBool());
         this.extrusionOk = Reader.GetBool();
-        this.fill = Reader.GetString2();
+        this.setFill(Reader.GetString2());
 
         var flag = Reader.GetBool();
         if(flag)
@@ -160,6 +160,10 @@ Path.prototype = {
         if(flag)
             this.pathH = Reader.GetLong();
 
+        if(isRealNumber(this.pathH && this.pathW))
+        {
+            this.setWH(this.pathW, this.pathH);
+        }
         flag = Reader.GetBool();
         if(flag)
             this.divPW = Reader.GetDouble();
@@ -189,7 +193,19 @@ Path.prototype = {
                 {
                     c.X = read_function.call(Reader);
                     c.Y = read_function.call(Reader);
-
+                    for(var key in c)
+                    {
+                        if(!isNaN(parseInt(c[key], 10)))
+                            c[key] = parseInt(c[key], 10);
+                    }
+                    if(id === moveTo)
+                    {
+                        this.moveTo(c.X, c.Y);
+                    }
+                    else
+                    {
+                        this.lnTo(c.X, c.Y);
+                    }
                     break;
                 }
                 case bezier3:
@@ -198,6 +214,12 @@ Path.prototype = {
                     c.Y0 = read_function.call(Reader);
                     c.X1 = read_function.call(Reader);
                     c.Y1 = read_function.call(Reader);
+                    for(var key in c)
+                    {
+                        if(!isNaN(parseInt(c[key], 10)))
+                            c[key] = parseInt(c[key], 10);
+                    }
+                    this.quadBezTo(c.X0, c.Y0, c.X1, c.Y1);
                     break;
                 }
                 case bezier4:
@@ -208,6 +230,12 @@ Path.prototype = {
                     c.Y1 = read_function.call(Reader);
                     c.X2 = read_function.call(Reader);
                     c.Y2 = read_function.call(Reader);
+                    for(var key in c)
+                    {
+                        if(!isNaN(parseInt(c[key], 10)))
+                            c[key] = parseInt(c[key], 10);
+                    }
+                    this.cubicBezTo(c.X0, c.Y0, c.X1, c.Y1, c.X2, c.Y2);
                     break;
                 }
                 case arcTo:
@@ -216,20 +244,22 @@ Path.prototype = {
                     c.wR = read_function.call(Reader);
                     c.stAng = read_function.call(Reader);
                     c.swAng = read_function.call(Reader);
-
+                    for(var key in c)
+                    {
+                        if(!isNaN(parseInt(c[key], 10)))
+                            c[key] = parseInt(c[key], 10);
+                    }
+                    this.arcTo(c.wR, c.hR, c.stAng, c.swAng);
                     break;
                 }
                 case close:
                 {
+                    this.close();
                     break;
                 }
             }
-            for(var key in c)
-            {
-                if(!isNaN(parseInt(c[key], 10)))
-                    c[key] = parseInt(c[key], 10);
-            }
-            this.ArrPathCommandInfo.push(c);
+
+            //this.ArrPathCommandInfo.push(c);
         }
         for(index = 0; index < path_command_count; ++index)
         {

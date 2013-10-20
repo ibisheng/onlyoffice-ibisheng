@@ -140,7 +140,8 @@ function CShape(drawingBase, drawingObjects, legendEntry)
     {
         recalculateTransform: true,
         recalculateBrush: true,
-        recalculatePen: true
+        recalculatePen: true,
+        recalculateGeometry: true
     };
 
     this.x = null;
@@ -1122,6 +1123,15 @@ CShape.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
 
         this.spPr.geometry.Init(5, 5);
+    },
+
+    setGeometry: function(geometry)
+    {
+        var oldId = this.spPr.geometry ? this.spPr.geometry.Get_Id() : null;
+        this.spPr.geometry = geometry;
+        var newId = this.spPr.geometry.Get_Id();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetPresetGeometry, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
     },
 
     setRecalculateAll: function()
@@ -2858,6 +2868,7 @@ CShape.prototype =
             case historyitem_AutoShapes_SetPresetGeometry:
             {
                 this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
+                this.spPr.geometry.Init(5, 5);
                 break;
             }
             case historyitem_AutoShapes_RecalculateTransformRedo:
@@ -3087,7 +3098,8 @@ CShape.prototype =
         {
             var geometry = new CGeometry();
             geometry.Read_FromBinary2(Reader);
-            this.setPresetGeometry(geometry.preset);
+            geometry.Init(5, 5);
+            this.setGeometry(geometry);
         }
 
         flag = Reader.GetBool();

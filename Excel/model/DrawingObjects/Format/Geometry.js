@@ -502,6 +502,16 @@ CGeometry.prototype=
     Write_ToBinary2: function(Writer)
     {
         var w = Writer;
+        var count = 0;
+        for(var key in this.avLst)
+        {
+            ++count;
+        }
+        w.WriteLong(count);
+        for(key in this.avLst)
+        {
+            w.WriteString2(key);
+        }
         var gd_lst_info_count = this.gdLstInfo.length;
         Writer.WriteLong(gd_lst_info_count);
 
@@ -530,16 +540,7 @@ CGeometry.prototype=
         }
 
         WriteObjectLong(w, this.gdLst);
-        var count = 0;
-        for(var key in this.avLst)
-        {
-            ++count;
-        }
-        w.WriteLong(count);
-        for(key in this.avLst)
-        {
-            w.WriteString2(key);
-        }
+
 
 
         var cnx_lst_count = this.cnxLstInfo.length;
@@ -762,6 +763,11 @@ CGeometry.prototype=
     Read_FromBinary2: function(Reader)
     {
         var r = Reader;
+        var count = r.GetLong();
+        for(index = 0; index < count; ++index)
+        {
+            this.avLst[r.GetString2()] = true;
+        }
         var gd_lst_info_count = Reader.GetLong();
         for(var index = 0; index < gd_lst_info_count; ++index)
         {
@@ -777,17 +783,18 @@ CGeometry.prototype=
             if(r.GetBool())
                 gd_info.z = r.GetString2();
 
-            this.gdLstInfo.push(gd_info);
+            if(this.avLst[gd_info.name])
+            {
+                this.AddAdj(gd_info.name, gd_info.formula, gd_info.x, gd_info.y, gd_info.z)
+            }
+            else
+            {
+                this.AddGuide(gd_info.name, gd_info.formula, gd_info.x, gd_info.y, gd_info.z)
+            }
         }
 
 
         this.gdLst = ReadObjectLong(r);
-
-        var count = r.GetLong();
-        for(index = 0; index < count; ++index)
-        {
-            this.avLst[r.GetString2()] = true;
-        }
 
         var cnx_lst_count = Reader.GetLong();
         for(index = 0; index < cnx_lst_count; ++index)
@@ -823,7 +830,7 @@ CGeometry.prototype=
 
             if(r.GetBool())
                 o.posY = r.GetString2();
-            this.ahXYLstInfo.push(o);
+            this.AddHandleXY(o.gdRefX, o.minX, o.maxX, o.gdRefY, o.minY, o.maxY, o.posX, o.posY);
         }
 
         for(index = 0; index < ah_xy_count; ++index)
@@ -884,7 +891,8 @@ CGeometry.prototype=
 
             if(r.GetBool())
                 o.posY = r.GetString2();
-            this.ahPolarLstInfo.push(o);
+            this.AddHandlePolar(o.gdRefAng, o.minAng, o.maxAng, o.gdRefR, o.minR, o.maxR, o.posX, o.posY);
+
         }
 
         for(index = 0; index < ah_polar_count; ++index)
@@ -920,14 +928,16 @@ CGeometry.prototype=
         var path_count = Reader.GetLong();
         for(index = 0; index < path_count; ++index)
         {
-            this.pathLst[index] = new Path();
-            this.pathLst[index].Read_FromBinary2(Reader);
+            var new_path = new Path();
+            new_path.Read_FromBinary2(Reader);
+            this.AddPath(new_path);
         }
         if(r.GetBool())
         {
             this.preset = r.GetString2();
         }
-        this.rectS = ReadObjectString(r);
+        var rectS = ReadObjectString(r);
+        this.AddRect(rectS.l, rectS.t, rectS.r, rectS.b);
         this.rect = ReadObjectDouble(r);
     },
 
