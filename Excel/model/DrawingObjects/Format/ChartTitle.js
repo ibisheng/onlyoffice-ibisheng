@@ -484,10 +484,14 @@ CChartTitle.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
         if(!isRealObject(this.txBody))
             this.txBody = new CTextBody(this);
         this.txBody.paragraphAdd(paraItem);
         this.recalculatePosExt();
+        this.txBody.recalculateCurPos();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         return;
     },
 
@@ -504,7 +508,7 @@ CChartTitle.prototype =
                 var max_title_width = this.chartGroup.extX*0.8;
                 var title_width = this.txBody.getRectWidth(max_title_width);
                 this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.extY, title_width);
+                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width);
 
                 this.x = old_cx - this.extX*0.5;
                 if(this.x + this.extX > this.chartGroup.extX)
@@ -553,6 +557,7 @@ CChartTitle.prototype =
         this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.recalculateTransform();
         this.calculateTransformTextMatrix();
+        this.calculateContent();
     },
 
     addNewParagraph: function()

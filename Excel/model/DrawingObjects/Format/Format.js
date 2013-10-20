@@ -3205,7 +3205,7 @@ CLn.prototype =
     setHeadEnd: function(end)
     {
         var old_value = null;
-        if(this.tailEnd)
+        if(this.headEnd)
         {
             var w = new CMemory();
             this.headEnd.Write_ToBinary2(w);

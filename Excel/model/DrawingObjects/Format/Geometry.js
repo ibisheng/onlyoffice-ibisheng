@@ -475,6 +475,15 @@ function CGeometry()
 
 CGeometry.prototype=
 {
+    canFill: function()
+    {
+        for(var i = 0; i < this.pathLst.length; ++i)
+        {
+            if(this.pathLst[i].fill !== "none")
+                return true;
+        }
+        return  false;
+    },
 
     Get_Id: function()
     {

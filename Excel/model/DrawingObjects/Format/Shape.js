@@ -1962,6 +1962,13 @@ CShape.prototype =
                 graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
             }
 
+          /*  graphics.p_width(1000);
+            graphics._m(0, 0);
+            graphics._l(this.txBody.contentWidth, 0);
+            graphics._l(this.txBody.contentWidth, this.txBody.contentHeight2);
+            graphics._l(0, this.txBody.contentHeight);
+            graphics._z();
+            graphics.ds();  */
             this.txBody.draw(graphics);
           /*  if (graphics.FreeFont !== undefined)
                 graphics.FreeFont(); */
@@ -2595,7 +2602,7 @@ CShape.prototype =
             var t_x, t_y;
             t_x = this.invertTransformText.TransformPointX(x, y);
             t_y = this.invertTransformText.TransformPointY(x, y);
-            return  t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight;
+            return  t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight2;
         }
         return false;
     },

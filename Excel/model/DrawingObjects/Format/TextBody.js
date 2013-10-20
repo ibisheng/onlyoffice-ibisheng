@@ -539,8 +539,11 @@ CTextBody.prototype =
     paragraphAdd: function(paraItem)
     {
         this.content.Paragraph_Add(paraItem);
-        this.content.Recalculate_Page(0, true );
-        this.content.RecalculateCurPos();
+        if(this.shape instanceof CChartTitle )
+            return;
+        this.calculateContent();
+       // this.content.Recalculate_Page(0, true );
+       // this.content.RecalculateCurPos();
         if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
         {
             this.shape.calculateTransformTextMatrix();
@@ -680,6 +683,7 @@ CTextBody.prototype =
         {
             this.content.Content[i].recalculateTextPr();
         }
+        this.contentHeight2 = this.content.Get_SummaryHeight();
     },
 
     OnEndRecalculate_Page: function()

@@ -4720,13 +4720,18 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     };
 }
 
+
+function CheckLineDrawingObject(drawingObject)
+{
+    return drawingObject instanceof CShape && drawingObject.spPr.geometry && drawingObject.spPr.geometry.preset === "line"
+}
 function DrawDefaultSelection(drawingObjectsController, drawingDocument)
 {
     var selected_objects = drawingObjectsController.selectedObjects;
     for(var i = 0; i < selected_objects.length; ++i)
     {
         var canRotate = selected_objects[i].canRotate ? selected_objects[i].canRotate() : false;
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY,false, canRotate);
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY,CheckLineDrawingObject(selected_objects[i]), canRotate);
     }
     if(selected_objects.length === 1)
     {
