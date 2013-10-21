@@ -3663,7 +3663,6 @@ function DrawingObjects() {
 			chart.rebuildSeries();
 			chart.worksheet = worksheet; 	// Для формул серий
 			
-			History.Create_NewPoint();
 			return this.controller.addChartDrawingObject(chart, options);
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
@@ -4695,6 +4694,7 @@ function DrawingObjects() {
         var chart = this.controller.getAscChartObject();
 		if ( !chart ) {
 			
+			History.Create_NewPoint();
 			chart = new asc_CChart();
 			chart.header.title = api.chartTranslate.title;
 			chart.xAxis.title = api.chartTranslate.xAxis;
