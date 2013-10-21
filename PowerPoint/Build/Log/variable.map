@@ -609,7 +609,7 @@ historyitem_Table_Pr:JW
 JSCompiler_StaticMethods_Check_NeedRecalc:yB
 nSldLtTTbl:N1
 tt_cmap14_char_map_def_binary:Dr
-JSCompiler_StaticMethods_Set_TableStyle:Ce
+JSCompiler_StaticMethods_Set_TableStyle:Be
 para_FlowObjectAnchor:Bc
 c_oMainTables$Core:ok
 GetRGBColorFromUniFillAndRef:DB
@@ -697,7 +697,7 @@ cd16:N3
 JSCompiler_StaticMethods_GetMax:TT
 cd13:O3
 t1_standard_encoding:Yn
-JSCompiler_StaticMethods_Set_TableCellMar:me
+JSCompiler_StaticMethods_Set_TableCellMar:je
 JSCompiler_StaticMethods_VertLine:gV
 c_oSer_OMathContentType$EqArr:DQ
 tt_cmap4_next:ar
@@ -846,7 +846,7 @@ c_oSerProp_rPrType$RStyle:pM
 bar:X
 cff_slot_init:Iw
 tt_cmap_init:Sq
-Y_Bottom_Field:Ae
+Y_Bottom_Field:ye
 PolarAdjustmentTrack:yF
 FILL_TYPE_NONE:XW
 c_oSerRunType$image:gN
@@ -2921,7 +2921,7 @@ L 56:mf
 L 55:bm
 L 54:Pj
 L 53:cg
-L 52:ke
+L 52:le
 L 51:Mp
 FT_TT_SERVICES_GET:qv
 FT_Memory:ql
@@ -2941,7 +2941,7 @@ JSCompiler_StaticMethods_getVerticalAlign:gE
 L 45:Qa
 L 44:ob
 L 47:Bi
-L 46:je
+L 46:ke
 L 41:Md
 xhrSupported$$inline_1052:iz
 JSCompiler_StaticMethods__read_rPr:Ee
@@ -2949,7 +2949,7 @@ L 40:ud
 ft_bitmap_glyph_init:Ql
 TT_Post_NamesRec:dn
 L 43:lf
-L 42:ye
+L 42:ze
 HSLToRGB:z2
 STATES_ID_POLY_LINE_ADD:lF
 nbsp_string:PB
@@ -3075,7 +3075,7 @@ _ph_summ__sec_head:q4
 L 77:od
 L 78:gj
 t1_args_count:Bp
-L 79:le
+L 79:me
 CHorRulerRepaintChecker:cV
 c_oSerRunType$linebreak:fN
 numbering_presentationnumfrmt_ArabicPeriod:Da
@@ -3096,7 +3096,7 @@ c_oSer_SettingsType$ClrSchemeMapping:TO
 CUniFill:Ke
 L 63:ug
 BULLET_TYPE_TYPEFACE_BUFONT:Yj
-L 68:ze
+L 68:Ae
 L 69:Td
 c_oSerProp_rPrType$LangBidi:CM
 TRACK_DISTANCE_ROTATE2:L2
@@ -3137,7 +3137,7 @@ FT_RoundFix:Gl
 L 90:Ne
 tt_name_entry_ascii_from_utf16:es
 Editor_Copy_GetElem:ka
-L 88:Be
+L 88:Ce
 L 89:Lg
 L 86:dm
 L 87:eg
