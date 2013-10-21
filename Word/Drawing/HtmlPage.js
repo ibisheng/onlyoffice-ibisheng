@@ -691,6 +691,7 @@ function CEditorPage(api)
                     var val = oThis.TextBoxBackground.HtmlElement.value;
                     oThis.TextBoxBackground.HtmlElement.value = "a";
 
+                    /*
                     if (!window.IS_USE_INPUT && val == "aa")
                     {
                         if (e.preventDefault)
@@ -701,6 +702,7 @@ function CEditorPage(api)
                         window.IS_USE_INPUT = true;
                         return;
                     }
+                    */
 
                     if (val.length == 2)
                     {
@@ -733,7 +735,29 @@ function CEditorPage(api)
                     else if (0 == val.length)
                     {
                         // пришла пустая. следом ждем "aa"
-                        window.IS_USE_INPUT = false;
+                        //window.IS_USE_INPUT = false;
+
+                        var _e = {
+                            altKey : global_keyboardEvent.AltKey,
+                            ctrlKey : global_keyboardEvent.CtrlKey,
+                            shiftKey : global_keyboardEvent.ShiftKey,
+
+                            srcElement : global_keyboardEvent.Sender,
+
+                            charCode : global_keyboardEvent.CharCode,
+                            keyCode : global_keyboardEvent.KeyCode,
+                            which : 8
+                        };
+
+                        _e.preventDefault = function()
+                        {
+                        };
+
+                        if (_e.which == 8)
+                        {
+                            _e.keyCode = 8;
+                            oThis.onKeyDown(_e);
+                        }
                     }
                     else
                     {
