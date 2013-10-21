@@ -2325,6 +2325,8 @@ function CEditorPage(api)
             }
         }
 
+        drDoc.DrawHorVerAnchor();
+
         return true;
     }
 

@@ -2856,6 +2856,8 @@ function CEditorPage(api)
             {
                 drDoc.DrawFrameTrack(overlay);
             }
+
+            drDoc.DrawHorVerAnchor();
         }
         else
         {

@@ -972,6 +972,8 @@ function CDrawingDocument()
     this.m_sLockedCursorType = "";
     this.TableOutlineDr = new CTableOutlineDr();
 
+    this.HorVerAnchors = [];
+
     this.m_lCurrentRendererPage = -1;
     this.m_oDocRenderer = null;
     this.m_bOldShowMarks = false;
@@ -2982,26 +2984,51 @@ function CDrawingDocument()
         return g_comment_image_offsets[_index][3] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
     }
 
-    this.DrawVerAnchor = function(xPos)
+    this.DrawVerAnchor = function(xPos, bIsFromDrawings)
     {
+        if (undefined === bIsFromDrawings)
+        {
+            this.HorVerAnchors.push({ Type : 0, Pos : xPos });
+            return;
+        }
+
         var _pos = this.ConvertCoordsToCursor(xPos, 0);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
-            this.m_oWordControl.m_oOverlayApi.VertLine(_pos.X, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.VertLine2(_pos.X);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
     }
 
-    this.DrawHorAnchor = function(yPos)
+    this.DrawHorAnchor = function(yPos, bIsFromDrawings)
     {
+        if (undefined === bIsFromDrawings)
+        {
+            this.HorVerAnchors.push({ Type : 1, Pos : yPos });
+            return;
+        }
+
         var _pos = this.ConvertCoordsToCursor(0, yPos);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
-            this.m_oWordControl.m_oOverlayApi.HorLine(_pos.Y, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.HorLine2(_pos.Y);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
+    }
+
+    this.DrawHorVerAnchor = function()
+    {
+        for (var i = 0; i < this.HorVerAnchors.length; i++)
+        {
+            var _anchor = this.HorVerAnchors[i];
+            if (_anchor.Type == 0)
+                this.DrawVerAnchor(_anchor.Pos, true);
+            else
+                this.DrawHorAnchor(_anchor.Pos, true);
+        }
+        this.HorVerAnchors.splice(0, this.HorVerAnchors.length);
     }
 }
 

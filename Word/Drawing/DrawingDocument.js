@@ -1856,6 +1856,8 @@ function CDrawingDocument()
     this.Overlay = null;
     this.IsTextMatrixUse = false;
 
+    this.HorVerAnchors = [];
+
     // массивы ректов для поиска
     this._search_HdrFtr_All          = new Array(); // Поиск в колонтитуле, который находится на всех страницах
     this._search_HdrFtr_All_no_First = new Array(); // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -2669,6 +2671,22 @@ function CDrawingDocument()
 
         var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x + 0.5) >> 0;
         var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y + 0.5) >> 0;
+
+        return { X : x_pix, Y : y_pix, Error: false };
+    }
+
+    this.ConvertCoordsToCursor4 = function(x, y, pageIndex)
+    {
+        // теперь крутить всякие циклы нет смысла
+        if (pageIndex < 0 || pageIndex >= this.m_lPagesCount)
+        {
+            return { X : 0, Y : 0, Error: true };
+        }
+
+        var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+        var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + 0.5) >> 0;
+        var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + 0.5) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
@@ -5613,26 +5631,51 @@ function CDrawingDocument()
         }
     }
 
-    this.DrawVerAnchor = function(pageNum, xPos)
+    this.DrawVerAnchor = function(pageNum, xPos, bIsFromDrawings)
     {
-        var _pos = this.ConvetToPageCoords(xPos, 0, pageNum);
+        if (undefined === bIsFromDrawings)
+        {
+            this.HorVerAnchors.push({ Type : 0, Page : pageNum, Pos : xPos });
+            return;
+        }
+
+        var _pos = this.ConvertCoordsToCursor4(xPos, 0, pageNum);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
-            this.m_oWordControl.m_oOverlayApi.VertLine(_pos.X, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.VertLine2(_pos.X);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
     }
 
-    this.DrawHorAnchor = function(pageNum, yPos)
+    this.DrawHorAnchor = function(pageNum, yPos, bIsFromDrawings)
     {
-        var _pos = this.ConvetToPageCoords(0, yPos, pageNum);
+        if (undefined === bIsFromDrawings)
+        {
+            this.HorVerAnchors.push({ Type : 1, Page : pageNum, Pos : yPos });
+            return;
+        }
+
+        var _pos = this.ConvertCoordsToCursor4(0, yPos, pageNum);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
-            this.m_oWordControl.m_oOverlayApi.HorLine(_pos.Y, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.HorLine2(_pos.Y);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
+    }
+
+    this.DrawHorVerAnchor = function()
+    {
+        for (var i = 0; i < this.HorVerAnchors.length; i++)
+        {
+            var _anchor = this.HorVerAnchors[i];
+            if (_anchor.Type == 0)
+                this.DrawVerAnchor(_anchor.Page, _anchor.Pos, true);
+            else
+                this.DrawHorAnchor(_anchor.Page, _anchor.Pos, true);
+        }
+        this.HorVerAnchors.splice(0, this.HorVerAnchors.length);
     }
 }
 

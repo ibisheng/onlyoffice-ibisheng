@@ -140,6 +140,45 @@ COverlay.prototype =
         this.Show();
     },
 
+    VertLine2 : function(position)
+    {
+        if (this.min_x > position)
+            this.min_x = position;
+        if (this.max_x < position)
+            this.max_x = position;
+
+        this.min_y = 0;
+        this.max_y = this.m_oControl.HtmlElement.height;
+
+        this.m_oContext.lineWidth = 1;
+
+        var x = ((position + 0.5) >> 0) + 0.5;
+        var y = 0;
+
+        this.m_oContext.strokeStyle = "#FFFFFF";
+        this.m_oContext.beginPath();
+        this.m_oContext.moveTo(x, y);
+        this.m_oContext.lineTo(x, this.max_y);
+        this.m_oContext.stroke();
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        var dist = 5;
+
+        while (y < this.max_y)
+        {
+            this.m_oContext.moveTo(x, y);
+            y += dist;
+            this.m_oContext.lineTo(x, y);
+            y += dist;
+        }
+
+        this.m_oContext.stroke();
+        this.m_oContext.beginPath();
+        this.Show();
+    },
+
     HorLine : function(position, bIsSimpleAdd)
     {
         if (bIsSimpleAdd !== true)
@@ -203,6 +242,45 @@ COverlay.prototype =
         }
 
         this.m_oContext.stroke();
+        this.Show();
+    },
+
+    HorLine2 : function(position)
+    {
+        if (this.min_y > position)
+            this.min_y = position;
+        if (this.max_y < position)
+            this.max_y = position;
+
+        this.min_x = 0;
+        this.max_x = this.m_oControl.HtmlElement.width;
+
+        this.m_oContext.lineWidth = 1;
+
+        var y = ((position + 0.5) >> 0) + 0.5;
+        var x = 0;
+
+        this.m_oContext.strokeStyle = "#FFFFFF";
+        this.m_oContext.beginPath();
+        this.m_oContext.moveTo(x, y);
+        this.m_oContext.lineTo(this.max_x, y);
+        this.m_oContext.stroke();
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        var dist = 5;
+
+        while (x < this.max_x)
+        {
+            this.m_oContext.moveTo(x, y);
+            x += dist;
+            this.m_oContext.lineTo(x, y);
+            x += dist;
+        }
+
+        this.m_oContext.stroke();
+        this.m_oContext.beginPath();
         this.Show();
     },
 
