@@ -1497,6 +1497,21 @@
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
 				
+				//если находимся внутри шейпа
+				if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+				{
+					if(onlyFromLocalStorage)
+					{
+						if(t.lStorage && t.lStorage.htmlInShape)
+							worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
+					}
+					else
+						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+					return;
+				}
+				
 				if(activateLocalStorage)
 				{
 					//в случае вставки по нажатию на правую кнопку мыши
@@ -1515,17 +1530,25 @@
 							}
 							else
 							{
-								worksheet.setSelectionInfo('paste',t,false,true);
+								if(t.lStorage.htmlInShape)
+								{
+									node = t.lStorage.htmlInShape;
+									pasteFragment = node;
+								}
+								else
+								{
+									worksheet.setSelectionInfo('paste',t,false,true);
+									window.GlobalPasteFlag = false;
+									window.GlobalPasteFlagCounter = 0;
+									return;
+								}
 							}	
-						}
-						window.GlobalPasteFlag = false;
-						window.GlobalPasteFlagCounter = 0;
-						return;
+						}	
 					}
 					
 					//проверяем на равенство содержимому локального буфера
 					var textNode = t._getTextFromTable(node);
-					if(t._isEqualText(textNode, node))
+					if(t._isEqualText(textNode, node) && !onlyFromLocalStorage)
 					{
 						if(t.copyText.isImage)
 						{
@@ -2153,19 +2176,31 @@
 				var isImage = false;
 				var isChart = false;
 				
+				var objectRender = worksheet.objectRender;
 				//копируем изображения
-				if(isSelectedImages && isSelectedImages != -1)
+				if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.textObject && objectRender.controller.curState.textObject.txBody)//если курсор находится внутри шейпа
+				{
+					var htmlInShape = objectRender.controller.curState.textObject.txBody.getSelectedTextHtml();
+					if(activateLocalStorage && htmlInShape)
+					{
+						t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut, htmlInShape);
+					}
+					if(!htmlInShape)
+						htmlInShape = "";
+					return htmlInShape;
+				}
+				else if(isSelectedImages && isSelectedImages != -1)
 				{
 					if(this.Api && this.Api.isChartEditor)
 						return false;
-					worksheet.objectRender.preCopy();
+					objectRender.preCopy();
 					var nLoc = 0;
 					var table = document.createElement('span');
 					var drawings = worksheet.model.Drawings;
 					t.lStorage = [];
 					for (j = 0; j < isSelectedImages.length; ++j) {
 						var image = drawings[isSelectedImages[j]];
-						var cloneImg = worksheet.objectRender.cloneDrawingObject(image);
+						var cloneImg = objectRender.cloneDrawingObject(image);
 						var curImage = new Image();
 						var url;
 
@@ -2314,11 +2349,16 @@
 				return table;
 			},
 			
-			_addLocalStorage : function (isImage,isChart,cell,activeRange,trueRow,trueCol, worksheet, isCut) {
+			_addLocalStorage : function (isImage,isChart,cell,activeRange,trueRow,trueCol, worksheet, isCut, htmlInShape) {
 				var t = this;
 				var numRow = activeRange.r1;
 				var numCol = activeRange.c1;
-				if(isChart)
+				if(htmlInShape)
+				{
+					t.lStorage = {};
+					t.lStorage.htmlInShape = htmlInShape;
+				}
+				else if(isChart)
 				{
 					t.lStorage = [];
 					t.lStorage[0] = {};
