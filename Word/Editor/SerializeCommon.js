@@ -929,18 +929,22 @@ function CPPTXContentWriter()
                 _writer.StartRecord(0);
 				
 				var elem = spTree[i];
-                if ((undefined !== window.WordShape && elem instanceof WordShape) || (undefined !== window.CShape && elem instanceof CShape))
-                {
-                    this.WriteShape(elem, Document, oMapCommentId, oNumIdMap);
-                }
-                else if ((undefined !== window.WordImage && elem instanceof WordImage) || (undefined !== window.CImageShape && elem instanceof CImageShape))
-                {
-                    this.WriteImage(elem);
-                }
-                else if ((undefined !== window.WordGroupShapes && elem instanceof WordGroupShapes) || (undefined !== window.CGroupShape && elem instanceof CGroupShape))
-                {
-                    this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap);
-                }
+				if ("undefined" !== typeof(WordShape) && elem instanceof WordShape)
+				{
+					this.WriteShape(elem, Document, oMapCommentId, oNumIdMap);
+				}
+				else if ("undefined" !== typeof(CShape) && elem instanceof CShape)
+				{
+					this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap);
+				}
+				else if (("undefined" !== typeof(WordImage) && elem instanceof WordImage) || ("undefined" !== typeof(CImageShape) && elem instanceof CImageShape))
+				{
+					this.WriteImage(elem);
+				}
+				else if (("undefined" !== typeof(WordGroupShapes) && elem instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && elem instanceof CGroupShape))
+				{
+					this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap);
+				}
 
                 _writer.EndRecord(0);
             }
