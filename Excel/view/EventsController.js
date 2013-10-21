@@ -923,8 +923,10 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length && t.enableKeyEvents ) {
-					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
-						return true;
+					if ( (event.which != 99) && (event.which != 118) ) {		// Mozilla Fix #20080
+						if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
+							return true;
+					}
 				}
 
 				// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
