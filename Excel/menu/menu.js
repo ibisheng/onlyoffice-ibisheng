@@ -339,14 +339,6 @@
 
 				"valign: " + info.asc_getVertAlign() + ", " +
 
-				"border:" +
-				(info.asc_getBorders().asc_getLeft().asc_getWidth() > 0 ? " l" : "") +
-				(info.asc_getBorders().asc_getTop().asc_getWidth() > 0 ? " t" : "") +
-				(info.asc_getBorders().asc_getRight().asc_getWidth() > 0 ? " r" : "") +
-				(info.asc_getBorders().asc_getBottom().asc_getWidth() > 0 ? " b" : "") +
-				(info.asc_getBorders().asc_getDiagDown().asc_getWidth() > 0 ? " dd" : "") +
-				(info.asc_getBorders().asc_getDiagUp().asc_getWidth() > 0 ? " du" : "") + ", " +
-
 				"wrap: " + info.asc_getFlags().asc_getWrapText() + ", " +
 
 				"merge: " + info.asc_getFlags().asc_getMerge() + ", " +
@@ -355,7 +347,7 @@
 
 				", formula: " + info.asc_getFormula()
 
-			)
+			);
 			if(info.asc_getFormula())
 				$("#cv1").val("="+info.asc_getFormula())
 			else
