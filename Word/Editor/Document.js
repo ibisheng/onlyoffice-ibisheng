@@ -671,13 +671,19 @@ CDocument.prototype =
 
 
         // Останавливаем поиск
-        if ( this.SearchEngine.Count > 0 && false != this.SearchEngine.ClearOnRecalc )
+        if ( false != this.SearchEngine.ClearOnRecalc )
         {
-            this.SearchEngine.Clear();
-            editor.sync_SearchEndCallback();
+            var bOldSearch = ( this.SearchEngine.Count > 0 ? true : false );
 
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+            this.SearchEngine.Clear();
+
+            if ( true === bOldSearch )
+            {
+                editor.sync_SearchEndCallback();
+
+                this.DrawingDocument.ClearCachePages();
+                this.DrawingDocument.FirePaint();
+            }
         }
 
         // Обновляем позицию курсора
