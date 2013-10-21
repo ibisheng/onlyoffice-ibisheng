@@ -2178,7 +2178,61 @@
 				
 				var objectRender = worksheet.objectRender;
 				//копируем изображения
-				if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.textObject && objectRender.controller.curState.textObject.txBody)//если курсор находится внутри шейпа
+				//если выделены графические объекты внутри группы
+				if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.group && objectRender.controller.curState.group.selectedObjects)
+				{
+					if(this.Api && this.Api.isChartEditor)
+						return false;
+					objectRender.preCopy();
+					var nLoc = 0;
+					var table = document.createElement('span');
+					var drawings = objectRender.controller.curState.group.selectedObjects;
+					t.lStorage = [];
+					for (j = 0; j < drawings.length; ++j) {
+						var image = drawings[j].drawingBase;
+						var cloneImg = objectRender.cloneDrawingObject(image);
+						var curImage = new Image();
+						var url;
+
+						if(cloneImg.graphicObject.isChart() && cloneImg.graphicObject.brush.fill.RasterImageId)
+							url = cloneImg.graphicObject.brush.fill.RasterImageId;
+						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup() || cloneImg.graphicObject.isChart()))
+						{
+							var cMemory = new CMemory();
+							var altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
+							var isImage = cloneImg.graphicObject.isImage();
+							var imageUrl;
+							if(isImage)
+								imageUrl = cloneImg.graphicObject.getImageUrl();
+							if(isImage && imageUrl)
+								url = imageUrl;
+							else
+								url = cloneImg.graphicObject.getBase64Image();
+							curImage.alt = altAttr;
+						}
+						else
+							url = cloneImg.image.src;
+							
+						curImage.src = url;
+						curImage.width = cloneImg.getWidthFromTo();
+						curImage.height = cloneImg.getHeightFromTo();
+						if(image.guid)
+							curImage.name = image.guid;
+						
+						table.appendChild(curImage);
+						
+						//add image or chart in local buffer
+							t.lStorage[nLoc] = {};
+							t.lStorage[nLoc].image = curImage;
+							t.lStorage[nLoc].fromCol = cloneImg.from.col;
+							t.lStorage[nLoc].fromRow = cloneImg.from.row;
+							nLoc++;
+							isImage = true;
+						
+						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox, image.from.row, image.from.col, worksheet, isCut);
+					}
+				}
+				else if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.textObject && objectRender.controller.curState.textObject.txBody)//если курсор находится внутри шейпа
 				{
 					var htmlInShape = objectRender.controller.curState.textObject.txBody.getSelectedTextHtml();
 					if(activateLocalStorage && htmlInShape)
