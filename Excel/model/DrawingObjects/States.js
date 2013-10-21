@@ -2612,34 +2612,47 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
         var worksheet = this.drawingObjects.getWorksheet();
-		this.drawingObjects.objectLocker.reset();
         var track_objects = this.drawingObjectsController.arrTrackObjects;
+        var ctrlKey = e.ctrlKey;
+        var track_objects2 = [];
+        for(i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
         if(!isViewMode)
         {
-            for(var i =0; i < track_objects.length; ++i)
+            if(!ctrlKey)
             {
-                this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
-            }
-            var track_objects2 = [];
-            for(i = 0; i < track_objects.length; ++i)
-            {
-                track_objects2.push(track_objects[i]);
-            }
-
-            var drawingObjects = this.drawingObjects;
-            var callback = function(bLock)
-            {
-                if(bLock)
+                this.drawingObjects.objectLocker.reset();
+                for(var i =0; i < track_objects.length; ++i)
                 {
-                    History.Create_NewPoint();
-                    for(var i = 0; i < track_objects2.length; ++i)
-                        track_objects2[i].trackEnd();
-                    drawingObjects.showDrawingObjects(true);
-
+                    this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
                 }
-            };
-            this.drawingObjects.objectLocker.checkObjects(callback);
+                var drawingObjects = this.drawingObjects;
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        for(var i = 0; i < track_objects2.length; ++i)
+                            track_objects2[i].trackEnd();
+                        drawingObjects.showDrawingObjects(true);
 
+                    }
+                };
+                this.drawingObjects.objectLocker.checkObjects(callback);
+            }
+            else
+            {
+                this.drawingObjectsController.resetSelection();
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                {
+                    var copy = track_objects2[i].originalObject.copy(track_objects2[i].x, track_objects2[i].y);
+                    copy.select(this.drawingObjects.controller);
+                    copy.addToDrawingObjects();
+                }
+            }
         }
         //History.Create_NewPoint();
         //this.drawingObjectsController.trackEnd();

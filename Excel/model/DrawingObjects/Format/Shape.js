@@ -3020,9 +3020,21 @@ CShape.prototype =
         return  "TeamLabShapeSheets" + w.pos + ";" + w.GetBase64Memory();
     },
 
+    copy: function(x, y)
+    {
+        var w = new CMemory();
+        var bin = this.writeToBinaryForCopyPaste(w);
+        bin = bin.substring("TeamLabShapeSheets".length, bin.length - "TeamLabShapeSheets".length);
+        var r = CreateBinaryReader(bin, 0, bin.length);
+        var copy = new CShape(null,this.drawingObjects, null);
+        r.GetLong();
+        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        return copy;
+    },
+
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
-        this.group = group;
+        this.setGroup(group);
         this.setDrawingObjects(drawingObjects);
 
         var dx = 0, dy = 0;
@@ -3146,7 +3158,7 @@ CShape.prototype =
 
     readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
     {
-        this.group = group;
+        this.setGroup(group);
         this.setDrawingObjects(drawingObjects);
 
         var dx = 0, dy = 0;

@@ -1786,6 +1786,67 @@ CChartAsGroup.prototype =
         this.addToDrawingObjects();
     },
 
+    normalize: function()
+    {
+        var new_off_x, new_off_y, new_ext_x, new_ext_y;
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            new_off_x = xfrm.offX;
+            new_off_y = xfrm.offY;
+            new_ext_x = xfrm.extX;
+            new_ext_y = xfrm.extY;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+        }
+        this.setPosition(new_off_x, new_off_y);
+        this.setExtents(new_ext_x, new_ext_y);
+    },
+
+    getFullFlipH: function()
+    {
+        return false;
+    },
+
+
+    getFullFlipV: function()
+    {
+
+        return false;
+    },
+
+
+
+    getFullRotate: function()
+    {
+        return !isRealObject(this.group) ? 0 :  this.group.getFullRotate();
+    },
+
+    setFlips: function()
+    {},
+
+    setRotate: function()
+    {},
+
+
+    copy: function(x, y)
+    {
+        var w = new CMemory();
+        var bin = this.writeToBinaryForCopyPaste(w);
+        bin = bin.substring("TeamLabChartSheets".length, bin.length - "TeamLabGroupSheets".length);
+        var r = CreateBinaryReader(bin, 0, bin.length);
+        var copy = new CChartAsGroup(null,this.drawingObjects);
+        r.GetLong();
+        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        return copy;
+    },
+
     writeToBinaryForCopyPaste: function(w)
     {
         w.WriteLong(CLASS_TYPE_CHART_AS_GROUP);

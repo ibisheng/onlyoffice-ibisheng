@@ -1255,6 +1255,18 @@ CImageShape.prototype =
 
     },
 
+    copy: function(x, y)
+    {
+        var w = new CMemory();
+        var bin = this.writeToBinaryForCopyPaste(w);
+        bin = bin.substring("TeamLabImageSheets".length, bin.length - "TeamLabImageSheets".length);
+        var r = CreateBinaryReader(bin, 0, bin.length);
+        var copy = new CImageShape(null,this.drawingObjects);
+        r.GetLong();
+        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        return copy;
+    },
+
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
         this.group = group;

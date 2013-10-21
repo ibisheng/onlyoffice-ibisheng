@@ -1114,12 +1114,17 @@ CGroupShape.prototype =
                 break;
             }
         }
+        this.resetSelection(drawingObjectsController);
     },
 
     resetSelection: function(drawingObjectsController)
     {
-        while(this.selectedObjects.length > 0)
+        var count = this.selectedObjects.length;
+        while(count > 0)
+        {
             this.selectedObjects[0].deselect(drawingObjectsController);
+            --count;
+        }
     },
 
     createRotateTrack: function()
@@ -1691,11 +1696,22 @@ CGroupShape.prototype =
         this.spPr = pr;
     },
 
+    copy: function(x, y)
+    {
+        var w = new CMemory();
+        var bin = this.writeToBinaryForCopyPaste(w);
+        bin = bin.substring("TeamLabGroupSheets".length, bin.length - "TeamLabGroupSheets".length);
+        var r = CreateBinaryReader(bin, 0, bin.length);
+        var copy = new CGroupShape(null,this.drawingObjects);
+        r.GetLong();
+        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        return copy;
+    },
+
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
-
-        this.group = group;
-        this.drawingObjects = drawingObjects;
+        this.setGroup(group);
+        this.setDrawingObjects(drawingObjects);
         this.spPr.Read_FromBinary2(r);
         var dx = 0, dy = 0;
         if(r.GetBool())
