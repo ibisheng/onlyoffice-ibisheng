@@ -1632,8 +1632,6 @@ Paragraph.prototype =
                                         }
                                     }
 
-                                    this.Internal_Content_Add( StartPos, new ParaPageBreakRenderer() );
-
                                     this.Pages[CurPage].Set_EndLine( -1 );
                                     if ( 0 === CurLine )
                                     {
@@ -1648,8 +1646,6 @@ Paragraph.prototype =
                                 {
                                     if ( CurLine != this.Pages[CurPage].FirstLine )
                                     {
-                                        this.Internal_Content_Add( LineStart_Pos, new ParaPageBreakRenderer() );
-
                                         this.Pages[CurPage].Set_EndLine( CurLine - 1 );
                                         if ( 0 === CurLine )
                                         {
@@ -3200,7 +3196,7 @@ Paragraph.prototype =
 
                     if ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() )
                     {
-                        Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits );
+                        Item.Update_Position( new CParagraphLayout(X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y), PageLimits );
                         Item.Reset_SavedPosition();
                         bFirstLineItem = false;
 
@@ -3222,7 +3218,7 @@ Paragraph.prototype =
                             if ( true === LDRecalcInfo.Can_RecalcObject() )
                             {
                                 // Обновляем позицию объекта
-                                Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                                Item.Update_Position( new CParagraphLayout(X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y), PageLimits);
                                 LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
                                 return recalcresult_CurPage;
                             }
@@ -3246,7 +3242,7 @@ Paragraph.prototype =
                                     // мы не персчитываем заново текущую страницу, а не предыдущую
 
                                     // Обновляем позицию объекта
-                                    Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                                    Item.Update_Position( new CParagraphLayout(X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y), PageLimits);
 
                                     LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
                                     LDRecalcInfo.Set_PageBreakBefore( false );
@@ -3269,7 +3265,7 @@ Paragraph.prototype =
                         else
                         {
                             // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
-                            Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                            Item.Update_Position( new CParagraphLayout(X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y), PageLimits);
                             Item.Reset_SavedPosition();
                             continue;
                         }
@@ -10016,6 +10012,89 @@ Paragraph.prototype =
             this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
 
         return Result;
+    },
+
+    Get_Layout : function(ContentPos, Drawing)
+    {
+        var LinePos = this.Internal_Get_ParaPos_By_Pos( ContentPos );
+
+        var CurLine  = LinePos.Line;
+        var CurRange = LinePos.Range;
+        var CurPage  = LinePos.Page;
+
+        var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+        var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        if ( StartPos < this.Numbering.Pos )
+            X += this.Numbering.WidthVisible;
+
+        var LastW = 0;
+        for ( var ItemNum = StartPos; ItemNum < this.Content.length; ItemNum++ )
+        {
+            var Item = this.Content[ItemNum];
+
+            if ( ItemNum === ContentPos )
+            {
+                var DrawingObjects = this.Parent.DrawingObjects;
+                var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
+                var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
+
+                var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
+                var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[CurPage].XLimit);
+
+                var Top_Margin    = Y_Top_Margin;
+                var Bottom_Margin = Y_Bottom_Margin;
+                var Page_H        = Page_Height;
+
+                if ( true === this.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap() )
+                {
+                    Top_Margin    = 0;
+                    Bottom_Margin = 0;
+                    Page_H        = 0;
+                }
+
+                if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
+                {
+                    PageFields.X      = X_Left_Field;
+                    PageFields.Y      = Y_Top_Field;
+                    PageFields.XLimit = X_Right_Field;
+                    PageFields.YLimit = Y_Bottom_Field;
+
+                    PageLimits.X = 0;
+                    PageLimits.Y = 0;
+                    PageLimits.XLimit = Page_Width;
+                    PageLimits.YLimit = Page_Height;
+                }
+
+                return { ParagraphLayout : new CParagraphLayout( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y ), PageLimits : PageLimits };
+            }
+
+            switch ( Item.Type )
+            {
+                case para_Text:
+                case para_Space:
+                case para_PageNum:
+                {
+                    LastW = Item.WidthVisible;
+
+                    break;
+                }
+                case para_Drawing:
+                {
+                    if ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() )
+                    {
+                        LastW = Item.WidthVisible;
+                    }
+
+                    break;
+                }
+            }
+
+            X += Item.WidthVisible;
+        }
+
+        return undefined;
     },
 
     Get_AnchorPos : function(Drawing)
