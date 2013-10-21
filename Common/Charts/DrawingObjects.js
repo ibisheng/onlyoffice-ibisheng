@@ -964,8 +964,8 @@ asc_CChart.prototype = {
 			
 		}
 		if ( ws ) {
-			ws.objectRender.rebuildChartGraphicObjects();
-			ws.objectRender.showDrawingObjects(false);
+			//ws.objectRender.rebuildChartGraphicObjects();
+			//ws.objectRender.showDrawingObjects(false);
 		}
 	},
 	
@@ -1072,8 +1072,8 @@ asc_CChart.prototype = {
 				break;
 		}
 		if ( ws ) {
-			ws.objectRender.rebuildChartGraphicObjects();
-			ws.objectRender.showDrawingObjects(false);
+			//ws.objectRender.rebuildChartGraphicObjects();
+			//ws.objectRender.showDrawingObjects(false);
 		}
 	}
 }

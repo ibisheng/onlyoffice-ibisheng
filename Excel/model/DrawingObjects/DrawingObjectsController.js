@@ -514,7 +514,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects[0].isChart())
             {
-                this.selectedObjects[0].setChart(chart, true);
+                this.selectedObjects[0].setChart(chart);
                 this.selectedObjects[0].recalculate();
                 return;
 
@@ -525,7 +525,7 @@ DrawingObjectsController.prototype =
                 {
                     if(this.curState.group.selectedObjects[0].isChart())
                     {
-                        this.curState.group.selectedObjects[0].setChart(chart, true);
+                        this.curState.group.selectedObjects[0].setChart(chart);
                         this.curState.group.selectedObjects[0].recalculate();
                         return;
                     }
@@ -1532,7 +1532,7 @@ DrawingObjectsController.prototype =
                     }
                     if(ArrGlyph[i].isChart() && isRealObject(props.ChartProperties))
                     {
-                        ArrGlyph[i].setChart(props.ChartProperties, true);
+                        ArrGlyph[i].setChart(props.ChartProperties);
                         ArrGlyph[i].recalculate();
                     }
 
