@@ -2381,6 +2381,9 @@ CShape.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
         this.setPresetGeometry(sPreset);
         this.spPr.geometry.Recalculate(this.extX, this.extY);
+        this.recalculateTransform();
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
 
     },
