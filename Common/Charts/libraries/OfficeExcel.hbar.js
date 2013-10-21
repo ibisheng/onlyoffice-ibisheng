@@ -1078,6 +1078,8 @@
 					formatLabel = this.coords[i][7];
 				if(this.coords[i][8])
 					textLabel = this.coords[i][8];
+				else
+					continue;
 					
 				if(this.coords[i][7] == null && !textLabel)
 					textLabel = "";
