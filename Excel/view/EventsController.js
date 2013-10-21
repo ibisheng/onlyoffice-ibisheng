@@ -264,6 +264,8 @@
 						if (resized) {
 							// Мы изменяли размеры колонки/строки, не редактируем ячейку
 							t.isCellEditMode = false;
+							// Обновим состояние курсора
+							t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 						}
 					});
 				}, 100);
