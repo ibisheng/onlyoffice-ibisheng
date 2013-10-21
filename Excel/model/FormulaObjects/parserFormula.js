@@ -1439,7 +1439,11 @@ cArea.prototype.getValue2 = function ( cell ) {
                             _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                 }
         } );
-    return _val[0];
+
+    if( _val[0] == undefined || _val[0] == null )
+        return new cEmpty();
+    else
+        return _val[0];
 };
 cArea.prototype.getRange = function () {
     return this.ws.getRange2( this._cells );
@@ -1755,7 +1759,11 @@ cArea3D.prototype.getValue2 = function ( cell ) {
                         _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
             }
     } )
-    return _val[0];
+
+    if( _val[0] == undefined || _val[0] == null )
+        return new cEmpty();
+    else
+        return _val[0];
 };
 cArea3D.prototype.changeSheet = function ( lastName, newName ) {
     if ( this.wsFrom == this._wb.getWorksheetByName( lastName ).getId() && this.wsTo == this._wb.getWorksheetByName( lastName ).getId() ) {

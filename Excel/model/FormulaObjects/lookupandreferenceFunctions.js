@@ -256,6 +256,9 @@ cFormulaFunction.LookupAndReference = {
                         var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell(cv);
                         if ( c == c1 )
                             min = cv;
+                        else if ( min > cv ) {
+                            min = cv;
+                        }
                         if ( arg3.value == true ) {
                             if ( arg0 instanceof cString ) {
                                 if ( cvType instanceof cString ){
@@ -738,6 +741,9 @@ cFormulaFunction.LookupAndReference = {
                         var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell(cv);
                         if ( r == r1 )
                             min = cv;
+                        else if( min > cv ){
+                            min = cv;
+                        }
                         if ( arg3.value == true ) {
                             if ( arg0 instanceof cString ) {
                                 if ( cvType instanceof cString ){
