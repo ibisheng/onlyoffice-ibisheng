@@ -935,7 +935,7 @@ Paragraph.prototype =
 
         // Смещаемся в начало параграфа на первой странице или в начало страницы, если страница не первая
         var X, Y, XLimit, YLimit, _X, _XLimit;
-        if ( 0 === CurPage || undefined != this.Get_FramePr() )
+        if ( 0 === CurPage || ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
             X       = this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
             Y       = this.Y;
