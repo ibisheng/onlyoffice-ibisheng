@@ -629,6 +629,9 @@ function asc_CCellCommentator(currentSheet) {
 				
 					comment.nCol += colOffset;
 					comment.nRow += rowOffset;
+					var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
+					comment.sQuoteText = cellAddress.getID() + " : " + _this.worksheet.model.getCell(cellAddress).getValueWithFormat();
+					_this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 					
 					var commentAfter = new asc_CCommentData(comment);
 					
