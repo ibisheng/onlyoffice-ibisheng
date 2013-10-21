@@ -33,6 +33,8 @@ function COverlay()
     this.m_bIsAlwaysUpdateOverlay = false;
 
     this.m_oHtmlPage = null;
+
+    this.DashLineColor = "#000000";
 }
 
 COverlay.prototype =
@@ -101,7 +103,7 @@ COverlay.prototype =
         var x = ((position + 0.5) >> 0) + 0.5;
         var y = 0;
 
-        this.m_oContext.strokeStyle = "#000000";
+        this.m_oContext.strokeStyle = this.DashLineColor;
         this.m_oContext.beginPath();
 
         while (y < this.max_y)
@@ -167,7 +169,7 @@ COverlay.prototype =
         var y = ((position + 0.5) >> 0) + 0.5;
         var x = 0;
 
-        this.m_oContext.strokeStyle = "#000000";
+        this.m_oContext.strokeStyle = this.DashLineColor;
         this.m_oContext.beginPath();
 
         while (x < this.max_x)

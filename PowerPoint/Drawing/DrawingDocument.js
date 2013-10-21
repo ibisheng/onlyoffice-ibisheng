@@ -1783,8 +1783,8 @@ function CDrawingDocument()
         var _word_control = this.m_oWordControl;
         var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-        var x_pix = parseInt(this.SlideCurrectRect.left + x * dKoef);
-        var y_pix = parseInt(this.SlideCurrectRect.top  + y * dKoef);
+        var x_pix = (this.SlideCurrectRect.left + x * dKoef) >> 0;
+        var y_pix = (this.SlideCurrectRect.top  + y * dKoef) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
@@ -2958,7 +2958,7 @@ function CDrawingDocument()
 
     this.OnSelectEnd = function()
     {
-    },
+    }
 
     this.GetCommentWidth = function(type)
     {
@@ -2969,7 +2969,7 @@ function CDrawingDocument()
             _index += 1;
 
         return g_comment_image_offsets[_index][2] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
-    },
+    }
 
     this.GetCommentHeight = function(type)
     {
@@ -2980,6 +2980,28 @@ function CDrawingDocument()
             _index += 1;
 
         return g_comment_image_offsets[_index][3] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
+    }
+
+    this.DrawVerAnchor = function(xPos)
+    {
+        var _pos = this.ConvertCoordsToCursor(xPos, 0);
+        if (_pos.Error === false)
+        {
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
+            this.m_oWordControl.m_oOverlayApi.VertLine(_pos.X, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
+        }
+    }
+
+    this.DrawHorAnchor = function(yPos)
+    {
+        var _pos = this.ConvertCoordsToCursor(0, yPos);
+        if (_pos.Error === false)
+        {
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
+            this.m_oWordControl.m_oOverlayApi.HorLine(_pos.Y, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
+        }
     }
 }
 

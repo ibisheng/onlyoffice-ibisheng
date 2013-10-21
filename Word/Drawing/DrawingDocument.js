@@ -5176,7 +5176,7 @@ function CDrawingDocument()
     {
         if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
             this.m_oWordControl.MobileTouchManager.CheckSelectEnd(false);
-    },
+    }
 
     // mouse events
     this.checkMouseDown_Drawing = function(pos)
@@ -5271,7 +5271,7 @@ function CDrawingDocument()
         }
 
         return false;
-    },
+    }
 
     this.checkMouseMove_Drawing = function(pos)
     {
@@ -5359,7 +5359,7 @@ function CDrawingDocument()
         }
 
         return false;
-    },
+    }
 
     this.checkMouseUp_Drawing = function(pos)
     {
@@ -5401,7 +5401,7 @@ function CDrawingDocument()
         }
 
         return false;
-    },
+    }
 
     this.checkCursorOnTrackRect = function(X, Y, eps, rect)
     {
@@ -5485,7 +5485,7 @@ function CDrawingDocument()
         }
 
         return -1;
-    },
+    }
 
     this.checkTrackRect = function(pos)
     {
@@ -5610,6 +5610,28 @@ function CDrawingDocument()
                 _track.PageIndex = pos.Page;
                 break;
             }
+        }
+    }
+
+    this.DrawVerAnchor = function(pageNum, xPos)
+    {
+        var _pos = this.ConvetToPageCoords(xPos, 0, pageNum);
+        if (_pos.Error === false)
+        {
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
+            this.m_oWordControl.m_oOverlayApi.VertLine(_pos.X, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
+        }
+    }
+
+    this.DrawHorAnchor = function(pageNum, yPos)
+    {
+        var _pos = this.ConvetToPageCoords(0, yPos, pageNum);
+        if (_pos.Error === false)
+        {
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#D08A78";
+            this.m_oWordControl.m_oOverlayApi.HorLine(_pos.Y, true);
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
     }
 }
