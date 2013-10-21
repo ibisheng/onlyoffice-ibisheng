@@ -4739,6 +4739,8 @@
 					var c2 = vr.c2;
 					var r2 = dy > 0 || oldH <= 0 ? vr.r2 : vr.r1 - 1 - delta; /* delta < 0 here */
 					var range = asc_Range(c1, r1, c2, r2);
+					// Это необходимо для того, чтобы строки, у которых высота по тексту рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
+					this._prepareCellTextMetricsCache(range);
 					if (dx === 0) {
 						this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2);
 					} else {
