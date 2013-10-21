@@ -687,7 +687,7 @@
 							if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
 							{
 								//при добавлении общего фильтра проверка на пустой диапазон
-								if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells))
+								if(paramsForCallBackAdd == "addAutoFilterOneCell" && t._isEmptyRange(activeCells, true))
 								{
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 									return;
@@ -2689,6 +2689,53 @@
 						}
 					}
 				}
+				//проверяем есть ли пустые строчки и столбцы в диапазоне
+				if(ar.r1 == cloneActiveRange.r1)
+				{
+					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
+					{
+						cell = ws.model._getCell(cloneActiveRange.r1, n);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.c2 && cloneActiveRange.c2 > cloneActiveRange.c1)
+							cloneActiveRange.r1++;
+					}
+				}
+				else if(ar.r1 == cloneActiveRange.r2)
+				{
+					for(var n = cloneActiveRange.c1; n <= cloneActiveRange.c2; n++)
+					{
+						cell = ws.model._getCell(cloneActiveRange.r2, n);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.c2 && cloneActiveRange.r2 > cloneActiveRange.r1)
+							cloneActiveRange.r2--;
+					}
+				}
+				
+				if(ar.c1 == cloneActiveRange.c1)
+				{
+					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
+					{
+						cell = ws.model._getCell(n, cloneActiveRange.c1);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.r2 && cloneActiveRange.r2 > cloneActiveRange.r1)
+							cloneActiveRange.c1++;
+					}
+				}
+				else if(ar.c1 == cloneActiveRange.c2)
+				{
+					for(var n = cloneActiveRange.r1; n <= cloneActiveRange.r2; n++)
+					{
+						cell = ws.model._getCell(n, cloneActiveRange.c2);
+						if(cell.getValueWithoutFormat() != '')
+							break;
+						if(n == cloneActiveRange.r2 && cloneActiveRange.c2 > cloneActiveRange.c1)
+							cloneActiveRange.c2--;
+					}
+				}
+				
 				//проверяем не вошёл ли другой фильтр в область нового фильтра
 				
 				if(aWs.AutoFilter || aWs.TableParts)
@@ -6293,17 +6340,35 @@
 				}
 			},
 			
-			_isEmptyRange: function(activeCells)
+			_isEmptyRange: function(activeCells, isAllAutoFilter)
 			{
 				var ws = this.worksheet;
-				for(var n = activeCells.r1; n <= activeCells.r2; n++)
+				//в данном случае проверяем близлежащие ячейки
+				if(isAllAutoFilter && activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)
 				{
-					for(var k = activeCells.c1; k <= activeCells.c2; k++)
+					for(var n = activeCells.r1 - 1; n <= activeCells.r2 + 1; n++)
 					{
-						cell = ws.model._getCell(n,k);
-						if(cell.getValueWithoutFormat() != '')
+						for(var k = activeCells.c1 - 1; k <= activeCells.c2 + 1; k++)
 						{
-							return false;	
+							cell = ws.model._getCell(n,k);
+							if(cell.getValueWithoutFormat() != '')
+							{
+								return false;	
+							}
+						}
+					}
+				}
+				else
+				{
+					for(var n = activeCells.r1; n <= activeCells.r2; n++)
+					{
+						for(var k = activeCells.c1; k <= activeCells.c2; k++)
+						{
+							cell = ws.model._getCell(n,k);
+							if(cell.getValueWithoutFormat() != '')
+							{
+								return false;	
+							}
 						}
 					}
 				}
