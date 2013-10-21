@@ -873,6 +873,11 @@ CTextBody.prototype =
         }
     },
 
+    getSelectedTextHtml: function()
+    {
+
+    },
+
     Refresh_RecalcData2: function()
     {},
     getRectWidth: function(maxWidth)

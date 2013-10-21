@@ -2400,34 +2400,6 @@ CChartAsGroup.prototype =
 
     setChartBinary: function(binary)
     {
-        // Приводим бинарник к внутренней структуре
-        /*var r = CreateBinaryReader(binary, 0, binary.length);
-        if(r.GetBool())
-        {
-            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
-            this.chartTitle.readFromBinary(r);
-        }
-
-        if(r.GetBool())
-        {
-            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
-            this.vAxisTitle.readFromBinary(r);
-        }
-        if(r.GetBool())
-        {
-            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
-            this.hAxisTitle.readFromBinary(r);
-        }
-        this.setAscChart(new asc_CChart());
-        this.chart.Read_FromBinary2(r);
-        this.spPr.Read_FromBinary2(r);
-        if(isRealObject(this.parent))
-        {
-            this.parent.Extent.W = this.spPr.xfrm.extX;
-            this.parent.Extent.H = this.spPr.xfrm.extY;
-        }
-        this.init();
-        this.recalculate();  */
 
         var r = CreateBinaryReader(binary, 0, binary.length);
         if(r.GetBool())

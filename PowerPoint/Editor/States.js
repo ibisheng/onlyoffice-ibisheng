@@ -2548,6 +2548,8 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     this.rectW = rectW;
     this.rectH = rectH;
     this.majorObject = majorObject;
+    this.majorTrack = null;
+
     this.onMouseDown = function(e, x, y)
     {
 
@@ -2557,6 +2559,15 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         var dx = x - this.startX;
         var dy = y - this.startY;
+        var shiftX = 0, shiftY = 0;
+        if(!e.ShiftKey)
+        {
+
+        }
+        else
+        {
+
+        }
         this.drawingObjectsController.trackMoveObjects(dx, dy);
         this.drawingObjects.OnUpdateOverlay();
     };

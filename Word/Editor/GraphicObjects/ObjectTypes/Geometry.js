@@ -494,6 +494,13 @@ CGeometry.prototype=
     Write_ToBinary2: function(Writer)
     {
         var w = Writer;
+
+        var count = 0;
+        for(var key in this.avLst)
+        {
+            ++count;
+        }
+        w.WriteLong(count);
         var gd_lst_info_count = this.gdLstInfo.length;
         Writer.WriteLong(gd_lst_info_count);
 
@@ -522,12 +529,6 @@ CGeometry.prototype=
         }
 
         WriteObjectLong(w, this.gdLst);
-        var count = 0;
-        for(var key in this.avLst)
-        {
-            ++count;
-        }
-        w.WriteLong(count);
         for(key in this.avLst)
         {
             w.WriteString2(key);
@@ -592,52 +593,6 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-       /* for(index = 0; index < ah_xy_count; ++index)
-        {
-            o = this.ahXYLst[index];
-            bool = typeof  o.gdRefX === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefX);
-
-
-            bool = typeof  o.gdRefY === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefY);
-
-            bool = typeof  o.minX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minX);
-
-            bool = typeof  o.maxX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxX);
-
-
-            bool = typeof  o.minY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minY);
-
-            bool = typeof  o.maxY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxY);
-
-            bool = typeof  o.posX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posX);
-
-
-            bool = typeof  o.posY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posY);
-        }   */
 
         var ah_polar_count = this.ahPolarLstInfo.length;
         Writer.WriteLong(ah_polar_count);
@@ -688,52 +643,6 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-        /*for(index = 0; index < ah_polar_count; ++index)
-        {
-            o = this.ahPolarLst[index];
-            bool = typeof  o.gdRefR === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefR);
-
-
-            bool = typeof  o.gdRefAng === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefAng);
-
-            bool = typeof  o.minR === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minR);
-
-            bool = typeof  o.maxR === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxR);
-
-
-            bool = typeof  o.minAng === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minAng);
-
-            bool = typeof  o.maxAng === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxAng);
-
-            bool = typeof  o.posX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posX);
-
-
-            bool = typeof  o.posY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posY);
-        }     */
 
         var path_count = this.pathLst.length;
         Writer.WriteLong(path_count);
@@ -754,6 +663,12 @@ CGeometry.prototype=
     Read_FromBinary2: function(Reader)
     {
         var r = Reader;
+
+        var count = r.GetLong();
+        for(index = 0; index < count; ++index)
+        {
+            this.avLst[r.GetString2()] = true;
+        }
         var gd_lst_info_count = Reader.GetLong();
         for(var index = 0; index < gd_lst_info_count; ++index)
         {
@@ -775,11 +690,6 @@ CGeometry.prototype=
 
         this.gdLst = ReadObjectLong(r);
 
-        var count = r.GetLong();
-        for(index = 0; index < count; ++index)
-        {
-            this.avLst[r.GetString2()] = true;
-        }
 
         var cnx_lst_count = Reader.GetLong();
         for(index = 0; index < cnx_lst_count; ++index)

@@ -1991,6 +1991,7 @@ CChartAsGroup.prototype =
     getChartBinary: function()
     {
         var w = new CMemory();
+
         w.WriteBool(isRealObject(this.chartTitle));
         if(isRealObject(this.chartTitle))
         {
@@ -2058,7 +2059,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle.readFromBinary(r);
         }
         this.chart.Read_FromBinary2(r);
-        this.spPr.Read_FromBinary2(r);
+        this.spPr.xfrm.Read_FromBinary2(r);
         if(isRealObject(this.parent))
         {
             this.parent.Extent.W = this.spPr.xfrm.extX;

@@ -560,6 +560,16 @@ CChartTitle.prototype =
         this.calculateContent();
     },
 
+    getFullRotate: function()
+    {
+        return 0;
+    },
+
+    getFullFlip: function()
+    {
+        return {flipH: false, flipV: false}
+    },
+
     addNewParagraph: function()
     {
         this.txBody.addNewParagraph();
@@ -673,7 +683,7 @@ CChartTitle.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if(_body_pr.upright ===  false)
+        //if(_body_pr.upright ===  false)
         {
             if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
             {
@@ -821,145 +831,6 @@ CChartTitle.prototype =
             {
                 this.clipRect = {x: 0, y: 0, w: this.absExtX, h: this.absExtY};
             }
-        }
-        else
-        {
-            var _full_rotate = this.getFullRotate();
-            var _full_flip = this.getFullFlip();
-
-            var _hc = this.absExtX*0.5;
-            var _vc = this.absExtY*0.5;
-            var _transformed_shape_xc = this.transform.TransformPointX(_hc, _vc);
-            var _transformed_shape_yc = this.transform.TransformPointY(_hc, _vc);
-
-
-            var _content_width, content_height2;
-            if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
-                    _content_width = _r - _l;
-                    content_height2 = _b - _t;
-                }
-                else
-                {
-                    _content_width = _b - _t;
-                    content_height2 = _r - _l;
-                }
-            }
-            else
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
-                    _content_width = _b - _t;
-                    content_height2 = _r - _l;
-
-                }
-                else
-                {
-                    _content_width = _r - _l;
-                    content_height2 = _b - _t;
-                }
-            }
-
-            if(_content_height < content_height2)
-            {
-                switch (_body_pr.anchor)
-                {
-                    case 0 ://b
-                    { // (Text Anchor Enum ( Bottom ))
-                        _vertical_shift = content_height2 - _content_height;
-                        break;
-                    }
-                    case 1 :    //ctr
-                    {// (Text Anchor Enum ( Center ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  2 : //dist
-                    {// (Text Anchor Enum ( Distributed ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  3 ://just
-                    {// (Text Anchor Enum ( Justified ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case 4 ://t
-                    {//Top
-                        _vertical_shift = 0;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                _vertical_shift = 0;
-                /*if(_body_pr.anchor === 0)
-                 {
-                 _vertical_shift =  content_height2 - _content_height;
-                 }
-                 else
-                 {
-                 _vertical_shift = 0;
-                 } */
-            }
-
-            var _text_rect_xc = _l + (_r - _l)*0.5;
-            var _text_rect_yc = _t + (_b - _t)*0.5;
-
-            var _vx = _text_rect_xc - _hc;
-            var _vy = _text_rect_yc - _vc;
-
-            var _transformed_text_xc, _transformed_text_yc;
-            if(!_full_flip.flipH)
-            {
-                _transformed_text_xc = _transformed_shape_xc + _vx;
-            }
-            else
-            {
-                _transformed_text_xc = _transformed_shape_xc - _vx;
-            }
-
-            if(!_full_flip.flipV)
-            {
-                _transformed_text_yc = _transformed_shape_yc + _vy;
-            }
-            else
-            {
-                _transformed_text_yc = _transformed_shape_yc - _vy;
-            }
-
-            global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-            if(_body_pr.vert === nVertTTvert)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*0.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
-
-            }
-            if(_body_pr.vert === nVertTTvert270)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*1.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
-            }
-            global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width*0.5,  _transformed_text_yc - content_height2*0.5);
-
-            var body_pr = this.bodyPr;
-            var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 1;
-            var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 0.5;
-            var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 0.5;
-            var b_ins = typeof body_pr.bIns === "number" ? body_pr.bIns : 0.5;
-            this.clipRect = {
-                x: -l_ins,
-                y: -_vertical_shift - t_ins,
-                w: this.contentWidth + (r_ins + l_ins),
-                h: this.contentHeight + (b_ins + t_ins)
-            };
         }
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },

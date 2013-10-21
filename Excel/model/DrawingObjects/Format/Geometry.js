@@ -601,52 +601,6 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-        for(index = 0; index < ah_xy_count; ++index)
-        {
-            o = this.ahXYLst[index];
-            bool = typeof  o.gdRefX === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefX);
-
-
-            bool = typeof  o.gdRefY === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefY);
-
-            bool = typeof  o.minX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minX);
-
-            bool = typeof  o.maxX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxX);
-
-
-            bool = typeof  o.minY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minY);
-
-            bool = typeof  o.maxY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxY);
-
-            bool = typeof  o.posX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posX);
-
-
-            bool = typeof  o.posY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posY);
-        }
 
         var ah_polar_count = this.ahPolarLstInfo.length;
         Writer.WriteLong(ah_polar_count);
@@ -697,52 +651,6 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-        for(index = 0; index < ah_polar_count; ++index)
-        {
-            o = this.ahPolarLst[index];
-            bool = typeof  o.gdRefR === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefR);
-
-
-            bool = typeof  o.gdRefAng === "string";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteString2(o.gdRefAng);
-
-            bool = typeof  o.minR === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minR);
-
-            bool = typeof  o.maxR === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxR);
-
-
-            bool = typeof  o.minAng === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.minAng);
-
-            bool = typeof  o.maxAng === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.maxAng);
-
-            bool = typeof  o.posX === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posX);
-
-
-            bool = typeof  o.posY === "number";
-            w.WriteBool(bool);
-            if(bool)
-                w.WriteLong(o.posY);
-        }
 
         var path_count = this.pathLst.length;
         Writer.WriteLong(path_count);
@@ -833,35 +741,6 @@ CGeometry.prototype=
             this.AddHandleXY(o.gdRefX, o.minX, o.maxX, o.gdRefY, o.minY, o.maxY, o.posX, o.posY);
         }
 
-        for(index = 0; index < ah_xy_count; ++index)
-        {
-            o = {};
-            if(r.GetBool())
-                o.gdRefX = r.GetString2();
-
-            if(r.GetBool())
-                o.gdRefY = r.GetString2();
-
-            if(r.GetBool())
-                o.minX = r.GetLong();
-
-
-            if(r.GetBool())
-                o.maxX = r.GetLong();
-
-            if(r.GetBool())
-                o.minY = r.GetLong();
-
-            if(r.GetBool())
-                o.maxY = r.GetLong();
-
-            if(r.GetBool())
-                o.posX = r.GetLong();
-
-            if(r.GetBool())
-                o.posY = r.GetLong();
-            this.ahXYLst.push(o);
-        }
 
         var ah_polar_count = Reader.GetLong();
         for(index = 0; index < ah_polar_count; ++index)
@@ -895,35 +774,6 @@ CGeometry.prototype=
 
         }
 
-        for(index = 0; index < ah_polar_count; ++index)
-        {
-            o = {};
-            if(r.GetBool())
-                o.gdRefR = r.GetString2();
-
-            if(r.GetBool())
-                o.gdRefAng = r.GetString2();
-
-            if(r.GetBool())
-                o.minR = r.GetLong();
-
-
-            if(r.GetBool())
-                o.maxR = r.GetLong();
-
-            if(r.GetBool())
-                o.minAng = r.GetLong();
-
-            if(r.GetBool())
-                o.maxAng = r.GetLong();
-
-            if(r.GetBool())
-                o.posX = r.GetLong();
-
-            if(r.GetBool())
-                o.posY = r.GetLong();
-            this.ahPolarLst.push(o);
-        }
 
         var path_count = Reader.GetLong();
         for(index = 0; index < path_count; ++index)
