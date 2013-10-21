@@ -3487,12 +3487,20 @@ function DrawingObjects() {
 			canvas.m_oContext.beginPath();
 			canvas.m_oContext.rect(x, y, w, h);
 			canvas.m_oContext.clip();
+
+            // этот сэйв нужен для восстановления сложных вложенных клипов
+            canvas.m_oContext.save();
 		}
 	}
 	
 	_this.restoreGraphicsCanvas = function(canvas) {
 		if ( canvas instanceof CGraphics )
-			canvas.m_oContext.restore();
+        {
+            // этот рестор нужен для восстановления сложных вложенных клипов
+            canvas.m_oContext.restore();
+
+            canvas.m_oContext.restore();
+        }
 	}
 	
 	//-----------------------------------------------------------------------------------
