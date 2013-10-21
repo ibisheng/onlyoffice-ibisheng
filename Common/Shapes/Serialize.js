@@ -1,4 +1,22 @@
 var c_dScalePPTXSizes = 36000;
+function IsHiddenObj(object)
+{
+    if (!object)
+        return false;
+    var _uniProps = object.nvSpPr;
+    if (!_uniProps)
+        _uniProps = object.nvPicPr;
+    if (!_uniProps)
+        _uniProps = object.nvGrpSpPr;
+
+    if (!_uniProps)
+        return false;
+
+    if (_uniProps.cNvPr && _uniProps.cNvPr.isHidden)
+        return true;
+
+    return false;
+}
 
 function FileStream(data, size)
 {
@@ -4432,31 +4450,49 @@ function BinaryPPTYLoader()
 
                         var _type = s.GetUChar();
 
+                        var _object = null;
+
                         switch (_type)
                         {
                             case 1:
                             {
-                                shape.addToSpTree(shape.spTree.length,this.ReadShape());
-                                shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                _object = this.ReadShape();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shape.addToSpTree(shape.spTree.length,_object);
+                                    shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                }
                                 break;
                             }
                             case 2:
                             {
-                                shape.addToSpTree(shape.spTree.length,this.ReadPic());
-                                shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                _object = this.ReadPic();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shape.addToSpTree(shape.spTree.length,_object);
+                                    shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                }
                                 break;
                             }
                             case 3:
                             {
-                                shape.addToSpTree(shape.spTree.length,this.ReadCxn());
-                                shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                _object = this.ReadCxn();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shape.addToSpTree(shape.spTree.length,_object);
+                                    shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                }
                                 break;
                             }
                             case 4:
                             {
-                                shape.addToSpTree(shape.spTree.length,this.ReadGroupShape());
-                                shape.spTree[shape.spTree.length-1].setGroup(shape);
-                                this.TempGroupObject = shape;
+                                _object = this.ReadGroupShape();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shape.addToSpTree(shape.spTree.length,_object);
+                                    shape.spTree[shape.spTree.length-1].setGroup(shape);
+                                    this.TempGroupObject = shape;
+                                }
                                 break;
                             }
                             case 5:
@@ -4532,22 +4568,38 @@ function BinaryPPTYLoader()
                         {
                             case 1:
                             {
-                                shapes[shapes.length] = this.ReadShape();
+                                var _object = this.ReadShape();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shapes[shapes.length] = _object;
+                                }
                                 break;
                             }
                             case 2:
                             {
-                                shapes[shapes.length] = this.ReadPic();
+                                var _object = this.ReadPic();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shapes[shapes.length] = _object;
+                                }
                                 break;
                             }
                             case 3:
                             {
-                                shapes[shapes.length] = this.ReadCxn();
+                                var _object = this.ReadCxn();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shapes[shapes.length] = _object;
+                                }
                                 break;
                             }
                             case 4:
                             {
-                                shapes[shapes.length] = this.ReadGroupShape();
+                                var _object = this.ReadGroupShape();
+                                if (!IsHiddenObj(_object))
+                                {
+                                    shapes[shapes.length] = _object;
+                                }
                                 break;
                             }
                             case 5:
@@ -4851,7 +4903,7 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
-                    s.Skip2(1);
+                    cNvPr.isHidden = (1 == s.GetUChar()) ? true : false;
                     break;
                 }
                 case 3:

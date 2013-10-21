@@ -2446,12 +2446,14 @@ function CNvPr()
 {
     this.id = 0;
     this.name = "";
+    this.isHidden = false;
 
     this.createDuplicate = function()
     {
         var duplicate = new CNvPr();
         duplicate.id = this.id;
         duplicate.name = this.name;
+        duplicate.isHidden = this.isHidden;
         return duplicate;
     };
 

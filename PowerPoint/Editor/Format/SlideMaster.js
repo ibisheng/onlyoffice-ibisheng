@@ -1013,11 +1013,14 @@ function CMasterThumbnailDrawer()
         var h_px = 40;
         var w_px = (this.WidthMM * h_px / this.HeightMM) >> 0;
 
+        // пока не будем генерить для ретины
+        /*
         if (this.IsRetina)
         {
             w_px <<= 1;
             h_px <<= 1;
         }
+        */
 
         if (this.CanvasImage == null)
             this.CanvasImage = document.createElement('canvas');
