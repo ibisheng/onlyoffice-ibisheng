@@ -254,6 +254,11 @@ CTableId.prototype =
                         Class = new GradLin();
                         break;
                     }
+                    case CLASS_TYPE_CHART_DATA:
+                    {
+                        Class = new asc_CChart();
+                        break;
+                    }
                 }
 
                 if(isRealObject(Class))

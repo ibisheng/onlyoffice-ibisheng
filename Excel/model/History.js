@@ -188,6 +188,7 @@ var historyitem_AutoShapes_SetHeadEnd = 76;
 var historyitem_AutoShapes_AddTitle = 77;
 var historyitem_AutoShapes_AddXAxis = 78;
 var historyitem_AutoShapes_AddYAxis = 79;
+var historyitem_AutoShapes_AddChartGroup = 80;
 
 
 

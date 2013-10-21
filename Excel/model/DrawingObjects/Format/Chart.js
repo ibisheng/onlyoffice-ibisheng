@@ -56,10 +56,11 @@ CChartAsGroup.prototype =
 
     setAscChart: function(chart)
     {
+        var add_chart = new asc_CChart(chart);
         var old_id = isRealObject(this.chart) ? this.chart.Get_Id() : null;
-        var new_id = isRealObject(chart) ? chart.Get_Id() : null;
+        var new_id = isRealObject(add_chart) ? add_chart.Get_Id() : null;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_AscChart, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(old_id, new_id)), null);
-        this.chart = chart;
+        this.chart = add_chart;
     },
 
     Get_Id: function()
@@ -191,16 +192,25 @@ CChartAsGroup.prototype =
 		}
 	},
 
+
     setDrawingObjects: function(drawingObjects)
     {
-        this.drawingObjects = drawingObjects;
-        if(isRealObject(this.chartTitle))
-            this.chartTitle.drawingObjects = drawingObjects;
-        if(isRealObject(this.hAxisTitle))
-            this.hAxisTitle.drawingObjects = drawingObjects;
-        if(isRealObject(this.vAxisTitle))
-            this.vAxisTitle.drawingObjects = drawingObjects;
+        if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
+        {
+            var newValue = drawingObjects.getWorksheet().model.getId();
+            var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+            this.drawingObjects = drawingObjects;
+
+            if(isRealObject(this.chartTitle))
+                this.chartTitle.setDrawingObjects(drawingObjects);
+            if(isRealObject(this.hAxisTitle))
+                this.hAxisTitle.setDrawingObjects(drawingObjects);
+            if(isRealObject(this.vAxisTitle))
+                this.vAxisTitle.setDrawingObjects(drawingObjects);
+        }
     },
+
 
     addToDrawingObjects: function()
     {
@@ -707,6 +717,7 @@ CChartAsGroup.prototype =
 
         this.init();
         this.addToDrawingObjects();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
     setDrawingBase: function(drawingBase)
@@ -1581,6 +1592,24 @@ CChartAsGroup.prototype =
                 this.recalculate();
                 break;
             }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.oldValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
             case historyitem_AutoShapes_Add_To_Drawing_Objects:
             {
                 this.drawingObjects.deleteDrawingBase(this.Id);
@@ -1618,6 +1647,24 @@ CChartAsGroup.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.newValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
             case historyitem_AutoShapes_RecalculateTransformRedo:
             {
                 this.recalculate();

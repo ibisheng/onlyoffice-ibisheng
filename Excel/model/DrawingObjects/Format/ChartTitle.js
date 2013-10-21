@@ -9,8 +9,7 @@ function CChartTitle(chartGroup, type)
     this.layout = null;
     this.overlay = false;
     this.spPr = new CSpPr();
-    this.chartGroup = chartGroup;
-    this.drawingObjects = chartGroup.drawingObjects;
+
     this.type = type;
 
     this.txPr = null;
@@ -42,6 +41,8 @@ function CChartTitle(chartGroup, type)
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(chartGroup)
+        this.setChartGroup(chartGroup);
 }
 
 CChartTitle.prototype =
@@ -389,6 +390,91 @@ CChartTitle.prototype =
             this.chartGroup.recalculate();
         }
 
+    },
+
+    setChartGroup: function(chartGroup)
+    {
+        var old_value = this.chartGroup ? this.chartGroup.Get_Id() : null;
+        var new_value = chartGroup ? chartGroup.Get_Id() : null;
+        this.chartGroup = chartGroup;
+        this.setDrawingObjects(chartGroup ? chartGroup.drawingObjects : null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddChartGroup, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(old_value, new_value)), null);
+    },
+
+
+    setDrawingObjects: function(drawingObjects)
+    {
+        if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
+        {
+            var newValue = drawingObjects.getWorksheet().model.getId();
+            var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+            this.drawingObjects = drawingObjects;
+        }
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_AddChartGroup:
+            {
+                this.chartGroup = g_oTableId.Get_ById(data.oldValue);
+                if(isRealObject(this.chartGroup))
+                {
+                    this.drawingObjects = this.chartGroup.drawingObjects;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.oldValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_AddChartGroup:
+            {
+                this.chartGroup = g_oTableId.Get_ById(data.newValue);
+                if(isRealObject(this.chartGroup))
+                {
+                    this.drawingObjects = this.chartGroup.drawingObjects;
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.newValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
+        }
     },
 
     getStyles: function()
