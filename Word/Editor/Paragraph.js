@@ -12472,6 +12472,10 @@ Paragraph.prototype =
 
         if ( true === bNeedRecalc )
         {
+            var Prev = this.Get_DocumentPrev();
+            if ( 0 === CurPage && null != Prev && type_Paragraph === Prev.GetType() && true === Prev.Get_CompiledPr2(false).ParaPr.KeepNext )
+               Prev.Refresh_RecalcData2( Prev.Pages.length - 1 );
+
             // Сообщаем родительскому классу, что изменения произошли в элементе с номером this.Index и на странице this.PageNum
             return this.Refresh_RecalcData2(CurPage);
         }
