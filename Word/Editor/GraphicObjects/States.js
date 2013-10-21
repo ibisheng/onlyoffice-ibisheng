@@ -4811,7 +4811,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
 
 
             near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
-            Drawing.Set_XYForAdd(_offset_x, _offset_y);
+            Drawing.Set_XYForAdd(_offset_x, _offset_y, near_pos, this.graphicObjects.startTrackPos.pageIndex);
             Drawing.Add_ToDocument(near_pos);
 
             this.graphicObjects.resetSelection();
@@ -4892,7 +4892,7 @@ function TrackNewShape(graphicObjects, beginArrow, endArrow)
 
 
             near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
-            Drawing.Set_XYForAdd(track_obj.posX, track_obj.posY);
+            Drawing.Set_XYForAdd(track_obj.posX, track_obj.posY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
             Drawing.Add_ToDocument(near_pos);
             this.graphicObjects.resetSelection();
             Drawing.select(this.graphicObjects.startTrackPos.pageIndex);
@@ -5040,7 +5040,7 @@ function TrackTextRect(graphicObjects)
             Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
             shape.init2(track_obj.presetGeom, track_obj.posX, track_obj.posY, track_obj.extX, track_obj.extY, track_obj.flipH, track_obj.flipV, false, false/*track_obj.beginFlag, track_obj.endFlag TODO*/);
             near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
-            Drawing.Set_XYForAdd(track_obj.posX, track_obj.posY);
+            Drawing.Set_XYForAdd(track_obj.posX, track_obj.posY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
             Drawing.Add_ToDocument(near_pos);
             this.graphicObjects.arrTrackObjects.length = 0;
 
@@ -10225,7 +10225,7 @@ function SplineBezierState2(graphicObjects)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10307,7 +10307,7 @@ function SplineBezierState3(graphicObjects, startX, startY)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, near_pos.Page);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10391,7 +10391,7 @@ function SplineBezierState3(graphicObjects, startX, startY)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, near_pos.Page);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10429,7 +10429,7 @@ function SplineBezierState4(graphicObjects)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10560,7 +10560,7 @@ function SplineBezierState5(graphicObjects, startX, startY)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10660,7 +10660,7 @@ function SplineBezierState5(graphicObjects, startX, startY)
                 _new_word_graphic_object.recalculateWrapPolygon();
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             this.graphicObjects.arrTrackObjects.length = 0;
@@ -10769,7 +10769,7 @@ function PolyLineAddState2(graphicObjects, minDistance)
                 this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             editor.sync_StartAddShapeCallback(false);
@@ -10916,7 +10916,7 @@ function AddPolyLine2State3(graphicObjects)
                 this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             editor.sync_StartAddShapeCallback(false);
@@ -10980,7 +10980,7 @@ function AddPolyLine2State3(graphicObjects)
                 this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
                 _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
                 _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
-                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY, near_pos, this.graphicObjects.startTrackPos.pageIndex);
                 _new_word_graphic_object.Add_ToDocument(near_pos);
             }
             editor.sync_StartAddShapeCallback(false);
