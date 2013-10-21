@@ -3500,6 +3500,8 @@ WordShape.prototype =
         snapArrayX.push(t.TransformPointX(this.absExtX, 0));
         snapArrayY.push(t.TransformPointY(this.absExtX, 0));
 
+        snapArrayX.push(t.TransformPointX(this.absExtX*0.5, this.absExtY*0.5));
+        snapArrayY.push(t.TransformPointY(this.absExtX*0.5, this.absExtY*0.5))
         snapArrayX.push(t.TransformPointX(this.absExtX, this.absExtY));
         snapArrayY.push(t.TransformPointY(this.absExtX, this.absExtY));
         snapArrayX.push(t.TransformPointX(0, this.absExtY));

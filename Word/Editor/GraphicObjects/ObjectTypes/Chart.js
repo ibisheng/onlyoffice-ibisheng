@@ -1358,6 +1358,43 @@ CChartAsGroup.prototype =
 
     },
 
+    calculateSnapArrays: function(snapArrayX, snapArrayY)
+    {
+        var t = this.transform;
+        var _t = t;
+        if(isRealObject(this.parent))
+        {
+            if(this.parent.Is_Inline())
+            {
+                if(this.parent.DocumentContent instanceof  CDocumentContent)
+                {
+                    var cur_doc_content = this.parent.DocumentContent;
+                    while(cur_doc_content.Is_TableCellContent())
+                    {
+                        cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
+
+                    }
+                    if((cur_doc_content instanceof CDocumentContent && cur_doc_content.Parent instanceof WordShape))
+                    {
+                        _t = t.CreateDublicate();
+                        global_MatrixTransformer.MultiplyAppend(_t, cur_doc_content.Parent.transformText);
+                    }
+                }
+            }
+        }
+        snapArrayX.push(_t.TransformPointX(0, 0));
+        snapArrayY.push(_t.TransformPointY(0, 0));
+        snapArrayX.push(_t.TransformPointX(this.absExtX, 0));
+        snapArrayY.push(_t.TransformPointY(this.absExtX, 0));
+
+        snapArrayX.push(t.TransformPointX(this.absExtX*0.5, this.absExtY*0.5));
+        snapArrayY.push(t.TransformPointY(this.absExtX*0.5, this.absExtY*0.5))
+        snapArrayX.push(_t.TransformPointX(this.absExtX, this.absExtY));
+        snapArrayY.push(_t.TransformPointY(this.absExtX, this.absExtY));
+        snapArrayX.push(_t.TransformPointX(0, this.absExtY));
+        snapArrayY.push(_t.TransformPointY(0, this.absExtY));
+    },
+
     hitToHandle: function(x, y, radius)
     {
 

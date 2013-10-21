@@ -795,6 +795,8 @@ WordImage.prototype =
         snapArrayX.push(_t.TransformPointX(this.absExtX, 0));
         snapArrayY.push(_t.TransformPointY(this.absExtX, 0));
 
+        snapArrayX.push(t.TransformPointX(this.absExtX*0.5, this.absExtY*0.5));
+        snapArrayY.push(t.TransformPointY(this.absExtX*0.5, this.absExtY*0.5))
         snapArrayX.push(_t.TransformPointX(this.absExtX, this.absExtY));
         snapArrayY.push(_t.TransformPointY(this.absExtX, this.absExtY));
         snapArrayX.push(_t.TransformPointX(0, this.absExtY));

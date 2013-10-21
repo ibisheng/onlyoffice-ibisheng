@@ -393,6 +393,8 @@ function CGeometry()
         return duplicate;
     };
 
+
+
     this.createDuplicateForTrack = function()
     {
         var _duplicate = new Geometry();
@@ -477,6 +479,16 @@ CGeometry.prototype=
     Write_ToBinary: function(Writer)
     {
 
+    },
+
+    canFill: function()
+    {
+        for(var i = 0; i < this.pathLst.length; ++i)
+        {
+            if(this.pathLst[i].fill !== "none")
+                return true;
+        }
+        return  false;
     },
 
     Write_ToBinary2: function(Writer)

@@ -5600,31 +5600,76 @@ function MoveState(graphicObjects)
         var startBehindArr = startPage.behindDocObjects;
         var min_dx = null, min_dy = null;
         var dx, dy;
+        var snap_x = null, snap_y = null;
+
+        var snapHorArray = [], snapVerArray = [];
+        snapHorArray.push(X_Left_Field);
+        snapHorArray.push(X_Right_Field);
+        snapHorArray.push(Page_Width/2);
+        snapVerArray.push(Y_Top_Field);
+        snapVerArray.push(Y_Bottom_Field);
+        snapVerArray.push(Page_Height/2);
         if(result_x === this.graphicObjects.startTrackPos.x)
         {
             min_dx = 0;
         }
         else
         {
-
             for(var track_index = 0; track_index < _arr_track_objects.length; ++track_index)
             {
                 var cur_track_original_shape = _arr_track_objects[track_index].originalGraphicObject;
                 var trackSnapArrayX = cur_track_original_shape.snapArrayX;
                 var curDX =  result_x - startPos.x;
+
+
+                for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
+                {
+                    var snap_obj = GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
+                    if(isRealObject(snap_obj))
+                    {
+                        dx = snap_obj.dist;
+                        if(dx !== null)
+                        {
+                            if(min_dx === null)
+                            {
+                                min_dx = dx;
+                                snap_x = snap_obj.pos;
+                            }
+                            else
+                            {
+                                if(Math.abs(min_dx) > Math.abs(dx))
+                                {
+                                    min_dx = dx;
+                                    snap_x = snap_obj.pos;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if(startBeforeArr.length > 0)
                 {
                     for(var snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        dx = GetMinSnapDistanceX(trackSnapArrayX[snap_index] + curDX, startBeforeArr);
-                        if(dx !== null)
+                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, startBeforeArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dx === null)
-                                min_dx = dx;
-                            else
+                            dx = snap_obj.dist;
+                            if(dx !== null)
                             {
-                                if(Math.abs(min_dx) > Math.abs(dx))
+                                if(min_dx === null)
+                                {
+                                    snap_x = snap_obj.pos;
                                     min_dx = dx;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dx) > Math.abs(dx))
+                                    {
+                                        min_dx = dx;
+                                        snap_x = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5635,15 +5680,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        dx = GetMinSnapDistanceX(trackSnapArrayX[snap_index] + curDX, startWrapArr);
-                        if(dx !== null)
+                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, startWrapArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dx === null)
-                                min_dx = dx;
-                            else
+                            dx = snap_obj.dist;
+                            if(dx !== null)
                             {
-                                if(Math.abs(min_dx) > Math.abs(dx))
+                                if(min_dx === null)
+                                {
                                     min_dx = dx;
+                                    snap_x = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dx) > Math.abs(dx))
+                                    {
+                                        min_dx = dx;
+                                        snap_x = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5653,15 +5708,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        dx = GetMinSnapDistanceX(trackSnapArrayX[snap_index] + curDX, startInlineArr);
-                        if(dx !== null)
+                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, startInlineArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dx === null)
-                                min_dx = dx;
-                            else
+                            dx = snap_obj.dist;
+                            if(dx !== null)
                             {
-                                if(Math.abs(min_dx) > Math.abs(dx))
+                                if(min_dx === null)
+                                {
                                     min_dx = dx;
+                                    snap_x = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dx) > Math.abs(dx))
+                                    {
+                                        min_dx = dx;
+                                        snap_x = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5672,15 +5737,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        dx = GetMinSnapDistanceX(trackSnapArrayX[snap_index] + curDX, startBehindArr);
-                        if(dx !== null)
+                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, startBehindArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dx === null)
-                                min_dx = dx;
-                            else
+                            dx = snap_obj.dist;
+                            if(dx !== null)
                             {
-                                if(Math.abs(min_dx) > Math.abs(dx))
+                                if(min_dx === null)
+                                {
                                     min_dx = dx;
+                                    snap_x = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dx) > Math.abs(dx))
+                                    {
+                                        min_dx = dx;
+                                        snap_x = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5700,19 +5775,55 @@ function MoveState(graphicObjects)
                 var trackSnapArrayY = cur_track_original_shape.snapArrayY;
                 var curDY =  result_y - startPos.y;
 
+
+                for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
+                {
+                    var snap_obj = GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
+                    if(isRealObject(snap_obj))
+                    {
+                        dy = snap_obj.dist;
+                        if(dy !== null)
+                        {
+                            if(min_dy === null)
+                            {
+                                min_dy = dy;
+                                snap_y = snap_obj.pos;
+                            }
+                            else
+                            {
+                                if(Math.abs(min_dy) > Math.abs(dy))
+                                {
+                                    min_dy = dy;
+                                    snap_y = snap_obj.pos;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if(startBeforeArr.length > 0)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        dy = GetMinSnapDistanceY(trackSnapArrayY[snap_index] + curDY, startBeforeArr);
-                        if(dy !== null)
+                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, startBeforeArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dy === null)
-                                min_dy = dy;
-                            else
+                            dy = snap_obj.dist;
+                            if(dy !== null)
                             {
-                                if(Math.abs(min_dy) > Math.abs(dy))
+                                if(min_dy === null)
+                                {
                                     min_dy = dy;
+                                    snap_y = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dy) > Math.abs(dy))
+                                    {
+                                        min_dy = dy;
+                                        snap_y = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5724,15 +5835,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        dy = GetMinSnapDistanceY(trackSnapArrayY[snap_index] + curDY, startWrapArr);
-                        if(dy !== null)
+                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, startWrapArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dy === null)
-                                min_dy = dy;
-                            else
+                            dy = snap_obj.dist;
+                            if(dy !== null)
                             {
-                                if(Math.abs(min_dy) > Math.abs(dy))
+                                if(min_dy === null)
+                                {
                                     min_dy = dy;
+                                    snap_y = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dy) > Math.abs(dy))
+                                    {
+                                        min_dy = dy;
+                                        snap_y = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5743,15 +5864,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        dy = GetMinSnapDistanceY(trackSnapArrayY[snap_index] + curDY, startInlineArr);
-                        if(dy !== null)
+                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, startInlineArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dy === null)
-                                min_dy = dy;
-                            else
+                            dy = snap_obj.dist;
+                            if(dy !== null)
                             {
-                                if(Math.abs(min_dy) > Math.abs(dy))
+                                if(min_dy === null)
+                                {
                                     min_dy = dy;
+                                    snap_y = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dy) > Math.abs(dy))
+                                    {
+                                        min_dy = dy;
+                                        snap_y = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5761,15 +5892,25 @@ function MoveState(graphicObjects)
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        dy = GetMinSnapDistanceY(trackSnapArrayY[snap_index] + curDY, startBehindArr);
-                        if(dy !== null)
+                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, startBehindArr);
+                        if(isRealObject(snap_obj))
                         {
-                            if(min_dy === null)
-                                min_dy = dy;
-                            else
+                            dy = snap_obj.dist;
+                            if(dy !== null)
                             {
-                                if(Math.abs(min_dy) > Math.abs(dy))
+                                if(min_dy === null)
+                                {
                                     min_dy = dy;
+                                    snap_y = snap_obj.pos;
+                                }
+                                else
+                                {
+                                    if(Math.abs(min_dy) > Math.abs(dy))
+                                    {
+                                        min_dy = dy;
+                                        snap_y = snap_obj.pos;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5782,9 +5923,24 @@ function MoveState(graphicObjects)
 
         if(min_dx === null || Math.abs(min_dx) > SNAP_DISTANCE)
             min_dx = 0;
+        else
+        {
+            if(isRealNumber(snap_x))
+            {
+                editor.WordControl.m_oDrawingDocument.DrawVerAnchor(pageIndex, snap_x);
+            }
+        }
 
         if(min_dy === null || Math.abs(min_dy) > SNAP_DISTANCE)
             min_dy = 0;
+        else
+        {
+            if(isRealNumber(snap_y))
+            {
+                editor.WordControl.m_oDrawingDocument.DrawHorAnchor(pageIndex, snap_y);
+
+            }
+        }
 
         for(_object_index = 0; _object_index < _objects_count; ++_object_index)
             _arr_track_objects[_object_index].track(result_x + min_dx, result_y + min_dy, pageIndex);
@@ -5794,44 +5950,6 @@ function MoveState(graphicObjects)
         this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
     };
 
-    /*this.OnMouseUp2 = function(e, x, y, pageIndex)
-     {
-     var _arr_track_objects = this.graphicObjects.arrTrackObjects;
-     var _objects_count = _arr_track_objects.length;
-     var _object_index;
-     var near_pos = null;
-     for(var i = 0; i < _objects_count; ++i)
-     {
-     if(_arr_track_objects[i].originalGraphicObject === this.graphicObjects.majorGraphicObject)
-     {
-     var bounds33 = _arr_track_objects[i].getBounds();
-     near_pos =  this.graphicObjects.document.Get_NearestPos(pageIndex, bounds33.l, bounds33.t, true, this.graphicObjects.majorGraphicObject);
-     }
-     }
-     if(near_pos!= null && false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
-     {
-     History.Create_NewPoint();
-     for(_object_index = 0; _object_index < _objects_count; ++_object_index)
-     {
-     _arr_track_objects[_object_index].trackEnd(e);
-     }
-     var bounds_2 = this.graphicObjects.majorGraphicObject.getBounds();
-     for(var i = 0; i < _arr_track_objects.length; ++i)
-     {
-     var or_gr_obj = _arr_track_objects[i].originalGraphicObject;
-     or_gr_obj.calculateOffset();
-     var pos_x = or_gr_obj.absOffsetX - or_gr_obj.boundsOffsetX;
-     var pos_y = or_gr_obj.absOffsetY - or_gr_obj.boundsOffsetY;
-     bounds_2 = or_gr_obj.getBounds();
-     var W = bounds_2.r - bounds_2.l;
-     var H = bounds_2.b - bounds_2.t;
-     or_gr_obj.OnEnd_ChangeFlow(pos_x, pos_y, or_gr_obj.pageIndex, W, H, near_pos, _arr_track_objects[i].trackGraphicObject.boolChangePos, i == _arr_track_objects.length-1);
-     }
-
-     }
-     this.graphicObjects.arrTrackObjects = [];
-     this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
-     }    */
 
     this.OnMouseUp = function(e, x, y, pageIndex)
     {
@@ -10926,4 +11044,114 @@ function GetMinSnapDistanceY(pointY, arrGrObjects)
         }
     }
     return min_dy;
+}
+
+function GetMinSnapDistanceXObject(pointX, arrGrObjects)
+{
+    var min_dx = null;
+    var ret = null;
+    for(var i = 0; i < arrGrObjects.length; ++i)
+    {
+        var cur_snap_arr_x = arrGrObjects[i].snapArrayX;
+        var count = cur_snap_arr_x.length;
+        for(var snap_index  = 0; snap_index < count; ++snap_index)
+        {
+            var dx = cur_snap_arr_x[snap_index] - pointX;
+            if(min_dx === null)
+            {
+                ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+                min_dx = dx;
+            }
+            else
+            {
+                if(Math.abs(dx) < Math.abs(min_dx))
+                {
+                    min_dx = dx;
+                    ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceYObject(pointY, arrGrObjects)
+{
+    var min_dy = null;
+    var ret = null;
+    for(var i = 0; i < arrGrObjects.length; ++i)
+    {
+        var cur_snap_arr_y = arrGrObjects[i].snapArrayY;
+        var count = cur_snap_arr_y.length;
+        for(var snap_index  = 0; snap_index < count; ++snap_index)
+        {
+            var dy = cur_snap_arr_y[snap_index] - pointY;
+            if(min_dy === null)
+            {
+                min_dy = dy;
+                ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+            }
+            else
+            {
+                if(Math.abs(dy) < Math.abs(min_dy))
+                {
+                    min_dy = dy;
+                    ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceXObjectByArrays(pointX, snapArrayX)
+{
+    var min_dx = null;
+    var ret = null;
+    var cur_snap_arr_x = snapArrayX;
+    var count = cur_snap_arr_x.length;
+    for(var snap_index  = 0; snap_index < count; ++snap_index)
+    {
+        var dx = cur_snap_arr_x[snap_index] - pointX;
+        if(min_dx === null)
+        {
+            ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+            min_dx = dx;
+        }
+        else
+        {
+            if(Math.abs(dx) < Math.abs(min_dx))
+            {
+                min_dx = dx;
+                ret = {dist: dx, pos: cur_snap_arr_x[snap_index]};
+            }
+        }
+    }
+    return ret;
+}
+
+function GetMinSnapDistanceYObjectByArrays(pointY, snapArrayY)
+{
+    var min_dy = null;
+    var ret = null;
+    var cur_snap_arr_y = snapArrayY;
+    var count = cur_snap_arr_y.length;
+    for(var snap_index  = 0; snap_index < count; ++snap_index)
+    {
+        var dy = cur_snap_arr_y[snap_index] - pointY;
+        if(min_dy === null)
+        {
+            min_dy = dy;
+            ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+        }
+        else
+        {
+            if(Math.abs(dy) < Math.abs(min_dy))
+            {
+                min_dy = dy;
+                ret = {dist: dy, pos: cur_snap_arr_y[snap_index]};
+            }
+        }
+    }
+    return ret;
 }
