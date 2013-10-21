@@ -3418,8 +3418,10 @@ function DrawingObjects() {
 								drawingObject.graphicObject.transform.tx = tx;
 								drawingObject.graphicObject.transform.ty = ty;
 							}
-							worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
-							worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
+							if ( printPagesData.pageHeadings ) {
+								worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
+								worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
+							}
 						}
 						else {
 							drawingObject.graphicObject.draw( shapeCtx );
@@ -4254,6 +4256,22 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.updateChartReferences = function(oldWorksheet, newWorksheet) {
+		
+		for (var i = 0; i < aObjects.length; i++) {
+			var graphicObject = aObjects[i].graphicObject;
+			if ( graphicObject.isChart() && (graphicObject.chart.range.interval.indexOf(oldWorksheet) == 0) ) {
+				graphicObject.chart.range.interval = graphicObject.chart.range.interval.replace(oldWorksheet, newWorksheet);
+				var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
+				if ( _range ) {
+					graphicObject.chart.range.intervalObject = _range;
+					graphicObject.chart.rebuildSeries();
+					graphicObject.recalculate();
+				}
+			}
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Graphic object
 	//-----------------------------------------------------------------------------------
@@ -4421,12 +4439,17 @@ function DrawingObjects() {
 			if ( id == aObjects[i].graphicObject.Id ) {
 				aObjects[i].graphicObject.lockType = state;
 				
+				// Clip
+				_this.clipGraphicsCanvas(shapeCtx);
+				
 				shapeCtx.SetIntegerGrid(false);
 				shapeCtx.transform3(aObjects[i].graphicObject.transform, false);		
 				shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, 0, 0, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
 				shapeCtx.reset();
 				shapeCtx.SetIntegerGrid(true);
 				
+				// Restore
+				_this.restoreGraphicsCanvas(shapeCtx);
 				break;
 			}
 		}
