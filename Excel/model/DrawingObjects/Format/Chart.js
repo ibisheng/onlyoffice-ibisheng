@@ -645,7 +645,7 @@ CChartAsGroup.prototype =
     initFromChartObject: function(chart, options)
     {
         this.setAscChart(chart);
-        this.spPr.xfrm = new CXfrm();
+        this.setXfrmObject(new CXfrm());
         var xfrm = this.spPr.xfrm;
         var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
@@ -703,11 +703,6 @@ CChartAsGroup.prototype =
             this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
             for(var i in title_string)
                 this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
-
-
-            //this.chart.yAxis.bDefaultTitle = false;
-            //this.chart.yAxis.bShow = false;
-            //this.chart.yAxis.title = "";
         }
 
         this.init();
