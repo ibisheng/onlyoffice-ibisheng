@@ -1661,23 +1661,6 @@ CGroupShape.prototype =
         }
     },
 
-    writeToBinaryForCopyPaste: function(w)
-    {
-        w.WriteLong(CLASS_TYPE_GROUP);
-        this.spPr.Write_ToBinary2(w);
-        w.WriteBool(isRealObject(this.drawingObjects.shiftMap[this.Id]));
-        if(isRealObject(this.drawingObjects.shiftMap[this.Id]))
-        {
-            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].x);
-            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
-        }
-        w.WriteLong(this.spTree.length);
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].writeToBinaryForCopyPaste(w);
-        }
-        return  "TeamLabGroupSheets" + w.pos + ";" + w.GetBase64Memory();
-    },
 
 
     getBase64Image: function()
@@ -1708,17 +1691,134 @@ CGroupShape.prototype =
         return copy;
     },
 
+
+    writeToBinaryForCopyPaste: function(w)
+    {
+        w.WriteLong(CLASS_TYPE_GROUP);
+        this.spPr.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.drawingObjects.shiftMap[this.Id]));
+        if(isRealObject(this.drawingObjects.shiftMap[this.Id]))
+        {
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].x);
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
+        }
+        w.WriteLong(this.spTree.length);
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].writeToBinaryForCopyPaste(w);
+        }
+        return  "TeamLabGroupSheets" + w.pos + ";" + w.GetBase64Memory();
+    },
+
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
         this.setGroup(group);
         this.setDrawingObjects(drawingObjects);
-        this.spPr.Read_FromBinary2(r);
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+
+        var Reader = r;
+
+
+        var offX, offY, extX, extY, flipH, flipV, rot;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+        var chExtX, chExtY, chOffX, chOffY;
+
+        flag = Reader.GetBool();
+        if(flag)
+            chOffX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chOffY = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chExtX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chExtY = Reader.GetDouble();
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        if(isRealNumber(chOffX) && isRealNumber(chOffY))
+            this.setChildOffsets(chOffX, chOffY);
+
+        if(isRealNumber(chExtX) && isRealNumber(chExtY))
+            this.setChildExtents(chExtX, chExtY);
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            geometry.Init(5, 5);
+            //this.setGeometry(geometry);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+           // this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            //this.setUniLine(ln);
+        }
+
         var dx = 0, dy = 0;
         if(r.GetBool())
         {
             dx = r.GetDouble();
             dy = r.GetDouble();
         }
+
         if(isRealNumber(x) && isRealNumber(y))
         {
             this.setPosition(x + dx, y + dy);
@@ -1756,7 +1856,7 @@ CGroupShape.prototype =
 
         if(!isRealObject(group))
         {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             this.recalculate();
         }
