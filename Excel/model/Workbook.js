@@ -1713,11 +1713,13 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 			if(se){
 				for(var id in se){
 					var cID = se[id].cellId, _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(cID).getCells()[0].sFormula;
+                    if( f == null || f == undefined ){
+                        continue;
+                    }
 					if( f.indexOf(tempW.wFN+":") > 0 || f.indexOf(":"+tempW.wFN) > 0 ){
 						var _c = _ws.getCell2(cID).getCells()[0];
 						_c.setFormula(_c.formulaParsed.moveSheet(tempW).assemble());//Перестраиваем трехмерные ссылки в формуле.
 						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
-						_ws._BuildDependencies({id:cID});
 						if( !arrRecalc[_ws.getId()] ){
 							arrRecalc[_ws.getId()] = {};
 						}
