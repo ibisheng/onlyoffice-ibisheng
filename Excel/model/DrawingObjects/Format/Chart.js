@@ -644,7 +644,7 @@ CChartAsGroup.prototype =
 
     initFromChartObject: function(chart, options)
     {
-        this.setChart(chart);
+        this.setAscChart(chart);
         this.spPr.xfrm = new CXfrm();
         var xfrm = this.spPr.xfrm;
         var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);

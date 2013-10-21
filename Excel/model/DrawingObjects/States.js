@@ -6003,7 +6003,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 {
                     drawing_bases[i].graphicObject.select(drawingObjectsController);
                 }
-                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
             case STATES_ID_TEXT_ADD:
