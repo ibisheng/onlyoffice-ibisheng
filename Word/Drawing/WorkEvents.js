@@ -386,6 +386,10 @@ function Window_OnMouseUp(e)
     {
         editor.WordControl.m_oDrawingDocument.UnlockCursorType();
         editor.WordControl.m_oDrawingDocument.SetCursorType("default");
+        if( editor.WordControl.m_oScrollVerApi )
+            editor.WordControl.m_oScrollVerApi.evt_mouseup(e);
+        if( editor.WordControl.m_oScrollHorApi )
+            editor.WordControl.m_oScrollHorApi.evt_mouseup(e);
     }
 }
 
