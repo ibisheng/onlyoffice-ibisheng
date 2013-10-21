@@ -1730,22 +1730,25 @@ CGroupShape.prototype =
             {
                 case CLASS_TYPE_SHAPE:
                 {
-                    this.spTree[i] = new CShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
 
                 case CLASS_TYPE_IMAGE:
                 {
-                    this.spTree[i] = new CImageShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CImageShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
 
                 case CLASS_TYPE_GROUP:
                 {
-                    this.spTree[i] = new CGroupShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CGroupShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
             }
@@ -1753,6 +1756,8 @@ CGroupShape.prototype =
 
         if(!isRealObject(group))
         {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             this.recalculate();
         }
     },

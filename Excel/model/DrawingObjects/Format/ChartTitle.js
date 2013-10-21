@@ -445,6 +445,11 @@ CChartTitle.prototype =
                 }
                 break;
             }
+            case historyitem_AutoShapes_AddTextBody:
+            {
+                this.txBody = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
         }
     },
 
@@ -472,6 +477,11 @@ CChartTitle.prototype =
                         this.drawingObjects = ws.objectRender;
                     }
                 }
+                break;
+            }
+            case historyitem_AutoShapes_AddTextBody:
+            {
+                this.txBody = g_oTableId.Get_ById(data.newValue);
                 break;
             }
         }
@@ -543,9 +553,13 @@ CChartTitle.prototype =
         global_MatrixTransformer.MultiplyAppend(this.transform, this.chartGroup.getTransform());
     },
 
-    setTextBody: function(txBody)
+    setTextBody: function(textBody)
     {
-        this.txBody = txBody;
+        var oldId = isRealObject(this.txBody) ? this.txBody.Get_Id() : null;
+        var newId = isRealObject(textBody) ? textBody.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddTextBody, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.txBody = textBody;
     },
 
 

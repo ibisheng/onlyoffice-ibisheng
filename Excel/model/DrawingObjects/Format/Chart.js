@@ -488,21 +488,24 @@ CChartAsGroup.prototype =
 		if ( (this.chart.header.title != chart.header.title) || (isCollaborative === true) ) {
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_HeaderTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header.title, chart.header.title)));
 			this.chart.header.title = chart.header.title;
-            if(typeof  this.chart.header.title === "string")
+            if(!(isCollaborative === true))
             {
-                var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
-                var tx_body = new CTextBody(chart_title);
-                var title_str = chart.header.title;
-                for(var i in title_str)
+                if(typeof  this.chart.header.title === "string")
                 {
-                    tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = chart.header.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addTitle(chart_title);
                 }
-                chart_title.setTextBody(tx_body);
-                this.addTitle(chart_title);
-            }
-            else
-            {
-                this.addTitle(null);
+                else
+                {
+                    this.addTitle(null);
+                }
             }
 		}
 		
@@ -520,21 +523,24 @@ CChartAsGroup.prototype =
 		if ( (this.chart.xAxis.title != chart.xAxis.title) || (isCollaborative === true) ) {
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.title, chart.xAxis.title)));
 			this.chart.xAxis.title = chart.xAxis.title;
-            if(typeof  this.chart.xAxis.title === "string")
+            if(!(isCollaborative === true))
             {
-                var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
-                var tx_body = new CTextBody(chart_title);
-                var title_str = this.chart.xAxis.title;
-                for(var i in title_str)
+                if(typeof  this.chart.xAxis.title === "string")
                 {
-                    tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = this.chart.xAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addXAxis(chart_title);
                 }
-                chart_title.setTextBody(tx_body);
-                this.addXAxis(chart_title);
-            }
-            else
-            {
-                this.addXAxis(null);
+                else
+                {
+                    this.addXAxis(null);
+                }
             }
 		}
 		
@@ -557,21 +563,25 @@ CChartAsGroup.prototype =
 		if ( (this.chart.yAxis.title != chart.yAxis.title) || (isCollaborative === true) ) {
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisTitle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.title, chart.yAxis.title)));
 			this.chart.yAxis.title = chart.yAxis.title;
-            if(typeof  this.chart.yAxis.title === "string")
+            if(!(isCollaborative === true))
             {
-                var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
-                var tx_body = new CTextBody(chart_title);
-                var title_str = this.chart.yAxis.title;
-                for(var i in title_str)
+                if(typeof  this.chart.yAxis.title === "string")
                 {
-                    tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = this.chart.yAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addYAxis(chart_title);
                 }
-                chart_title.setTextBody(tx_body);
-                this.addYAxis(chart_title);
-            }
-            else
-            {
-                this.addYAxis(null);
+                else
+                {
+                    this.addYAxis(null);
+                }
             }
 		}
 		
@@ -673,7 +683,7 @@ CChartAsGroup.prototype =
             else
                 title_string = this.chart.header.title;
 
-            this.setChartTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
             for(var i in title_string)
                 this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
@@ -686,7 +696,7 @@ CChartAsGroup.prototype =
             else
                 title_string = this.chart.xAxis.title;
 
-            this.setXAxisTitle(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
             for(var i in title_string)
                 this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
@@ -704,7 +714,7 @@ CChartAsGroup.prototype =
             else
                 title_string = this.chart.yAxis.title;
 
-            this.setYAxisTitle(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
             for(var i in title_string)
                 this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
