@@ -28,7 +28,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.transform = new CMatrix();
     this.invertTransform = new CMatrix();
     this.group = null;
-
+    this.rot = 0;
     this.recalculateInfo =
     {
         recalculateAll: true
@@ -49,6 +49,10 @@ function CChartAsGroup(drawingBase, drawingObjects)
 
 CChartAsGroup.prototype =
 {
+    calculateContent: function()
+    {
+        this.recalculate();
+    },
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_AS_GROUP;
@@ -731,6 +735,20 @@ CChartAsGroup.prototype =
         this.drawingBase = drawingBase;
     },
 
+    createRotateInGroupTrack: function()
+    {
+        return new RotateTrackShapeImageInGroup(this);
+    },
+
+    createResizeInGroupTrack: function(cardDirection)
+    {
+        return new ResizeTrackShapeImageInGroup(this, cardDirection);
+    },
+
+    createMoveInGroupTrack: function()
+    {
+        return new MoveShapeImageTrackInGroup(this);
+    },
 
     setChartTitle: function(chartTitle)
     {
@@ -1593,6 +1611,11 @@ CChartAsGroup.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
             case historyitem_AutoShapes_RecalculateTransformUndo:
             {
                 this.recalculate();
@@ -1653,6 +1676,11 @@ CChartAsGroup.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
             case historyitem_AutoShapes_SetXfrm:
             {
                 this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);

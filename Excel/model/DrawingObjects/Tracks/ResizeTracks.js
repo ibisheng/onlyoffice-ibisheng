@@ -706,10 +706,33 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
     this.transform = originalObject.transform.CreateDublicate();
     this.geometry = originalObject.spPr.geometry.createDuplicate();
-    this.brush = originalObject.brush;
-    this.pen = originalObject.pen;
+
+    var pen, brush;
+    if(!(originalObject instanceof CChartAsGroup))
+    {
+        pen = originalObject.pen;
+        brush = originalObject.brush;
+    }
+    else
+    {
+        brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+    }
+    this.brush = brush;
+    this.pen = pen;
+
 
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
+
 
     this.overlayObject = new OverlayObject(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transform);
 
@@ -1792,9 +1815,9 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
     this.y = originalObject.y;
     this.extX = originalObject.extX;
     this.extY = originalObject.extY;
-    this.rot = originalObject.rot;
-    this.flipH = originalObject.flipH;
-    this.flipV = originalObject.flipV;
+    this.rot = isRealNumber(originalObject.rot) ? originalObject.rot : 0;
+    this.flipH = originalObject.flipH === true;
+    this.flipV = originalObject.flipV === true;
     this.transform = originalObject.transform.CreateDublicate();
     this.bSwapCoef = !(this.rot < Math.PI*0.25 || this.rot>Math.PI*1.75 || (this.rot>Math.PI*0.75 && this.rot<Math.PI*1.25));
     this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
@@ -1804,7 +1827,27 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
     {
         this.geometry.Recalculate(this.extX, this.extY);
     }
-    this.overlayObject = new OverlayObject(this.geometry, this.extX, this.extY, originalObject.brush, originalObject.pen, this.transform);
+    var pen, brush;
+    if(!(originalObject instanceof CChartAsGroup))
+    {
+        pen = originalObject.pen;
+        brush = originalObject.brush;
+    }
+    else
+    {
+        brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+    }
+    this.overlayObject = new OverlayObject(this.geometry, this.extX, this.extY, brush, pen, this.transform);
     this.updateSize = function(kw, kh)
     {
         var _kw, _kh;

@@ -6436,7 +6436,7 @@ ParaFlowObjectAnchor.prototype =
 // Класс начало гиперссылки
 function ParaHyperlinkStart()
 {
-    this.Id = g_oIdCounter.Get_NewId();
+   // this.Id = g_oIdCounter.Get_NewId();
 
     this.Type = para_HyperlinkStart;
 
@@ -6446,7 +6446,7 @@ function ParaHyperlinkStart()
     this.ToolTip = null;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+   // g_oTableId.Add( this, this.Id );
 }
 
 ParaHyperlinkStart.prototype =
@@ -6498,7 +6498,7 @@ ParaHyperlinkStart.prototype =
 
     Set_ToolTip : function(ToolTip)
     {
-        History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+        //History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
         this.ToolTip = ToolTip;
     },
 
@@ -6522,7 +6522,7 @@ ParaHyperlinkStart.prototype =
 
     Set_Value : function(Value)
     {
-        History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+        //History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
         this.Value = Value;
     },
 

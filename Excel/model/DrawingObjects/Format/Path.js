@@ -1128,6 +1128,7 @@ Path.prototype = {
             case historyitem_AutoShapes_Add_PathArcTo:
             case historyitem_AutoShapes_Add_PathQuadBezTo:
             case historyitem_AutoShapes_Add_PathCubicBezTo:
+            case historyitem_AutoShapes_Add_PathClose:
             {
                 this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
                 break;
@@ -1151,6 +1152,17 @@ Path.prototype = {
                 break;
             }
 
+            case historyitem_AutoShapes_Add_PathQuadBezTo:
+            {
+                this.ArrPathCommandInfo.push({id:bezier3, X0:data.x0, Y0:data.y0, X1:data.x1, Y1:data.y1});
+
+                break;
+            }
+            case historyitem_AutoShapes_Add_PathCubicBezTo:
+            {
+                this.ArrPathCommandInfo.push({id:bezier4, X0:data.x0, Y0:data.y0, X1:data.x1, Y1:data.y1, X2:data.x2, Y2: data.y2});
+                break;
+            }
 
             case historyitem_AutoShapes_Add_PathArcTo:
             {

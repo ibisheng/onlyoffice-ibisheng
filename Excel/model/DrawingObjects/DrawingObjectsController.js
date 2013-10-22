@@ -916,6 +916,37 @@ DrawingObjectsController.prototype =
             }
             default :
             {
+                if(this.curState.group)
+                {
+                    state.id = STATES_ID_GROUP;
+                    state.groupId = this.curState.group.Get_Id();
+                    state.selectedObjects = [];
+                    for(var i = 0; i < this.curState.group.selectedObjects; ++i)
+                    {
+                        state.selectedObjects.push(this.curState.group.selectedObjects[i].Get_Id());
+                    }
+                    break;
+                }
+                else if(this.curState.chart)
+                {
+                    state.id = STATES_ID_CHART;
+                    state.chart = this.curState.chart;
+                    state.selectedTitle = null;
+                    var chart = this.curState.chart;
+                    if(chart.chartTitle && chart.chartTitle.selected)
+                    {
+                        state.selectedTitle = chart.chartTitle;
+                    }
+                    else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                    {
+                        state.selectedTitle = chart.hAxisTitle;
+                    }
+                    else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                    {
+                        state.selectedTitle = chart.vAxisTitle;
+                    }
+                    break;
+                }
                 state.id = STATES_ID_NULL;
                 state.selectedObjects = [];
                 for(var i = 0; i < this.selectedObjects.length; ++i)
@@ -985,6 +1016,8 @@ DrawingObjectsController.prototype =
                 break;
             }
         }
+        this.recalculateCurPos();
+        this.updateSelectionState();
         return state;
     },
 

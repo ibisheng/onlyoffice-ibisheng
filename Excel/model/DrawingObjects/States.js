@@ -410,7 +410,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
                     this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
                     this.drawingObjects.showDrawingObjects(true);
-                    this.drawingObjects.OnUpdateOverlay();
+                    this.drawingObjectsController.updateSelectionState();
                 }
             }
         }
@@ -5227,7 +5227,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
 
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_CHART_TEXT_ADD)
+                if(state.id === STATES_ID_TEXT_ADD)
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
                 else if(state.id === STATES_ID_CHART_TEXT_ADD)
                 {
@@ -5301,7 +5301,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 if(!e.ctrlKey)
                 {
                     drawingObjectsController.drawingObjects.objectLocker.reset();
-                    if(state.id === STATES_ID_CHART_TEXT_ADD)
+                    if(state.id === STATES_ID_TEXT_ADD)
                         drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
                     else if(state.id === STATES_ID_CHART_TEXT_ADD)
                     {
@@ -5810,7 +5810,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             case STATES_ID_CHART_TEXT_ADD:
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_CHART_TEXT_ADD)
+                if(state.id === STATES_ID_TEXT_ADD)
                     drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
                 else if(state.id === STATES_ID_CHART_TEXT_ADD)
                 {

@@ -681,6 +681,11 @@ CGroupShape.prototype =
 
     canRotate: function()
     {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(!this.spTree[i].canRotate || !this.spTree[i].canRotate())
+                return false;
+        }
         return true;
     },
 

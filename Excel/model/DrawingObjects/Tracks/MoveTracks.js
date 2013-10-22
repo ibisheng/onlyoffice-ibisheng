@@ -61,7 +61,29 @@ function MoveShapeImageTrackInGroup(originalObject)
     this.x = null;
     this.y = null;
     this.transform = new CMatrix();
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush, this.originalObject.pen, this.transform);
+
+    var pen, brush;
+    if(!(this.originalObject instanceof CChartAsGroup))
+    {
+        pen = this.originalObject.pen;
+        brush = this.originalObject.brush;
+    }
+    else
+    {
+        brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+    }
+
+    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, brush, pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
     this.inv.tx = 0;
     this.inv.ty = 0;
@@ -129,8 +151,29 @@ function MoveGroupTrack(originalObject)
         var gr_obj_transform_copy = arr_graphic_objects[i].getTransform().CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
+
+        var pen, brush;
+        if(!(arr_graphic_objects[i] instanceof CChartAsGroup))
+        {
+            pen = arr_graphic_objects[i].pen;
+            brush = arr_graphic_objects[i].brush;
+        }
+        else
+        {
+            brush = new CUniFill();
+            brush.fill = new CSolidFill();
+            brush.fill.color = new CUniColor();
+            brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+            brush.fill.color.color = new CRGBColor();
+            brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+            pen = new CLn();
+            pen.Fill = new CUniFill();
+            pen.Fill.fill = new CSolidFill();
+            pen.Fill.fill.color = new CUniColor();
+            pen.Fill.fill.color.color = new CRGBColor();
+        }
         this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
-            arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
+            brush,  pen, new CMatrix());
     }
 
 
