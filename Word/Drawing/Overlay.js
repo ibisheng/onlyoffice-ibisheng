@@ -44,6 +44,11 @@ COverlay.prototype =
         if (null == this.m_oContext)
         {
             this.m_oContext = this.m_oControl.HtmlElement.getContext('2d');
+
+            this.m_oContext.imageSmoothingEnabled = false;
+            this.m_oContext.mozImageSmoothingEnabled = false;
+            this.m_oContext.oImageSmoothingEnabled = false;
+            this.m_oContext.webkitImageSmoothingEnabled = false;
         }
 
         this.m_oContext.beginPath();

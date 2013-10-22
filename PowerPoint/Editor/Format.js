@@ -1788,7 +1788,7 @@ CUniFill.prototype =
 
                 return RGBA;
             }
-            if (this.fill.type = FILL_TYPE_PATT)
+            if (this.fill.type == FILL_TYPE_PATT)
             {
                 return this.fill.fgClr.RGBA;
             }

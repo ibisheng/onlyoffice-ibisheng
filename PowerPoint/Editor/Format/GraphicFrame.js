@@ -1261,8 +1261,8 @@ CGraphicFrame.prototype =
 
                 if(layoutShapeStyle && layoutShapeStyle.TextPr && layoutShapeStyle.TextPr.unifill)
                 {
-                    layoutShapeStyle.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
-                    var _rgba = layoutShapeStyle.unifill.getRGBAColor();
+                    layoutShapeStyle.TextPr.unifill.calculate(theme, this.parent, layout, master, {R:0, G:0, B:0, A:0});
+                    var _rgba = layoutShapeStyle.TextPr.unifill.getRGBAColor();
                     layoutShapeStyle.TextPr.Color =  new CDocumentColor(_rgba.R, _rgba.G, _rgba.B);
                 }
             }
