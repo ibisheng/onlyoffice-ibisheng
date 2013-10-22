@@ -838,6 +838,7 @@ CShape.prototype =
             var hyper_props = new CHyperlinkProperty();
             hyper_props.Text = options.text;
             hyper_props.Value = options.hyperlinkModel.Hyperlink;
+			hyper_props.ToolTip = options.hyperlinkModel.Tooltip;
             this.txBody.content.Hyperlink_Add(hyper_props);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
