@@ -4009,54 +4009,15 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
     };
     this.InitStyleManager = function (oStyleObject)
     {
-        for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
-            var xfs = oStyleObject.aCellXfs[i];
-            var oNewXfs = new CellXfs();
-
-            if(null != xfs.borderid)
-			{
-				var border = oStyleObject.aBorders[xfs.borderid];
-				if(null != border)
-					oNewXfs.border = border.clone();
-			}
-            if(null != xfs.fillid)
-			{
-				var fill = oStyleObject.aFills[xfs.fillid];
-				if(null != fill)
-					oNewXfs.fill = fill.clone();
-			}
-            if(null != xfs.fontid)
-			{
-				var font = oStyleObject.aFonts[xfs.fontid];
-				if(null != font)
-					oNewXfs.font = font.clone();
-			}
-            if(null != xfs.numid)
-            {
-                var oCurNum = oStyleObject.oNumFmts[xfs.numid];
-				if(null != oCurNum)
-					oNewXfs.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
-				else
-					oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
-            }
-            if(null != xfs.QuotePrefix)
-                oNewXfs.QuotePrefix = xfs.QuotePrefix;
-            if(null != xfs.align)
-                oNewXfs.align = xfs.align.clone();
-			if (null !== xfs.XfId)
-				oNewXfs.XfId = xfs.XfId;
-
-			if(0 == this.aCellXfs.length)
-				this.oStyleManager.init(oNewXfs);
-			this.minimizeXfs(oNewXfs);
-			this.aCellXfs.push(oNewXfs);
-        }
 		for (var nIndex in oStyleObject.aCellStyles) {
 			if (!oStyleObject.aCellStyles.hasOwnProperty(nIndex))
 				continue;
 
 			var oCellStyle = oStyleObject.aCellStyles[nIndex];
 			var oCellStyleXfs = oStyleObject.aCellStyleXfs[oCellStyle.XfId];
+			// Если есть стиль, но нет описания, то уберем этот стиль (Excel делает также)
+			if (null == oCellStyleXfs)
+				continue;
 
 			oCellStyle.xfs = new CellXfs();
 			// Border
@@ -4107,8 +4068,54 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			if (null !== oCellStyleXfs.ApplyNumberFormat)
 				oCellStyle.ApplyNumberFormat = oCellStyleXfs.ApplyNumberFormat;
 
+			// ToDo при отсутствии имени все не очень хорошо будет!
 			this.wb.CellStyles.CustomStyles.push(oCellStyle);
 		}
+
+        for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
+            var xfs = oStyleObject.aCellXfs[i];
+            var oNewXfs = new CellXfs();
+
+            if(null != xfs.borderid)
+			{
+				var border = oStyleObject.aBorders[xfs.borderid];
+				if(null != border)
+					oNewXfs.border = border.clone();
+			}
+            if(null != xfs.fillid)
+			{
+				var fill = oStyleObject.aFills[xfs.fillid];
+				if(null != fill)
+					oNewXfs.fill = fill.clone();
+			}
+            if(null != xfs.fontid)
+			{
+				var font = oStyleObject.aFonts[xfs.fontid];
+				if(null != font)
+					oNewXfs.font = font.clone();
+			}
+            if(null != xfs.numid)
+            {
+                var oCurNum = oStyleObject.oNumFmts[xfs.numid];
+				if(null != oCurNum)
+					oNewXfs.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
+				else
+					oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
+            }
+            if(null != xfs.QuotePrefix)
+                oNewXfs.QuotePrefix = xfs.QuotePrefix;
+            if(null != xfs.align)
+                oNewXfs.align = xfs.align.clone();
+			if (null !== xfs.XfId) {
+				oNewXfs.XfId = xfs.XfId;
+				// ToDo При отсутствии Id в списке стилей, мы должны сбросить на 0 (Normall)
+			}
+
+			if(0 == this.aCellXfs.length)
+				this.oStyleManager.init(oNewXfs);
+			this.minimizeXfs(oNewXfs);
+			this.aCellXfs.push(oNewXfs);
+        }
 		for(var i in oStyleObject.oCustomTableStyles)
 		{
 			var item = oStyleObject.oCustomTableStyles[i];

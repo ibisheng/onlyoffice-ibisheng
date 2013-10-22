@@ -6295,7 +6295,10 @@ Range.prototype.getXfId=function(){
 	return g_oDefaultXfId;
 };
 Range.prototype.getStyleName=function(){
-	return this.worksheet.workbook.CellStyles.getStyleNameByXfId(this.getXfId());
+	var res = this.worksheet.workbook.CellStyles.getStyleNameByXfId(this.getXfId());
+
+	// ToDo убрать эту заглушку (нужно делать на открытии) в InitStyleManager
+	return res || this.worksheet.workbook.CellStyles.getStyleNameByXfId(g_oDefaultXfId);
 };
 Range.prototype.getNumFormat=function(){
 	return oNumFormatCache.get(this.getNumFormatStr());

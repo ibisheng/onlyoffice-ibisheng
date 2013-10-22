@@ -1205,6 +1205,7 @@ Align.prototype =
 function CCellStyles() {
 	this.CustomStyles = [];
 	this.DefaultStyles = [];
+	// ToDo нужно все компоновать в общий список стилей (для того, чтобы не было проблем с добавлением стилей и отсутствия имени стиля)
 	this.AllStyles = {};
 }
 CCellStyles.prototype = {
@@ -1395,7 +1396,7 @@ function StyleManager(){
 	this.oDefaultQuotePrefix = null;
     //стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
-};
+}
 StyleManager.prototype =
 {
     init : function(oDefaultXfs)
@@ -1423,14 +1424,14 @@ StyleManager.prototype =
 	},
     _prepareSetFont : function(oItemWithXfs)
 	{
-        xfs = this._prepareSet(oItemWithXfs);
+		var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.font)
 			xfs.font = new Font();
         return xfs;
 	},
     _prepareSetAlign : function(oItemWithXfs)
 	{
-        xfs = this._prepareSet(oItemWithXfs);
+        var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.align)
 			xfs.align = new Align();
         return xfs;
