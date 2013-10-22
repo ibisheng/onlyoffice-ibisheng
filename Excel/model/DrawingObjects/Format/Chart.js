@@ -366,6 +366,7 @@ CChartAsGroup.prototype =
 					this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
 					for(var i in title_str)
 						this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+					this.chart.header.title = this.chartTitle.txBody.content.getTextString();
 				}
 				else
 				{
@@ -383,8 +384,9 @@ CChartAsGroup.prototype =
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
                 }
+				
+				this.chart.header.title = this.chartTitle.txBody.content.getTextString();
 			}
-            this.chart.header.title = this.chartTitle.txBody.content.getTextString();
         }
 
         if(isRealObject(this.hAxisTitle)&& isRealObject(this.hAxisTitle.txBody)&& isRealObject(this.hAxisTitle.txBody.content))
@@ -399,6 +401,8 @@ CChartAsGroup.prototype =
 					this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
 					for(var i in title_str)
 						this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+						
+					this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
 				}
 				else
 				{
@@ -416,9 +420,10 @@ CChartAsGroup.prototype =
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
                 }
+				
+				this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
             }
 
-            this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
         }
 
         if(isRealObject(this.vAxisTitle) && isRealObject(this.vAxisTitle.txBody)&& isRealObject(this.vAxisTitle.txBody.content))
@@ -436,6 +441,8 @@ CChartAsGroup.prototype =
 
 					for(var i in title_str)
 						this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+						
+					this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
 				}
 				else
 				{
@@ -454,8 +461,9 @@ CChartAsGroup.prototype =
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
                 }
+				
+				this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
             }
-            this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
         }
 
         this.recalculate();
