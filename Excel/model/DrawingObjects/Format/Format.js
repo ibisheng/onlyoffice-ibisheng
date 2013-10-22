@@ -1442,7 +1442,72 @@ CSrcRect.prototype =
         _ret.r = this.r;
         _ret.b = this.b;
         return _ret;
-    }
+    },
+	
+	createBinary: function()
+	{
+		var w = new CMemory();
+		w.WriteBool(isRealNumber(this.l));
+		if(isRealNumber(this.l))
+		{
+			w.WriteDoube(this.l);
+		}
+		w.WriteBool(isRealNumber(this.t));
+		if(isRealNumber(this.t))
+		{
+			w.WriteDoube(this.t);
+		}
+		w.WriteBool(isRealNumber(this.r));
+		if(isRealNumber(this.r))
+		{
+			w.WriteDoube(this.r);
+		}
+		w.WriteBool(isRealNumber(this.b));
+		if(isRealNumber(this.b))
+		{
+			w.WriteDoube(this.b);
+		}
+		return w.pos + ";" + w.GetBase64Memory();
+	},
+	
+	setFromBinary: function(bin)
+	{
+		var r = CreateBinaryReader(bin, 0, bin.length);
+		if(r.GetBool())
+		{
+			this.l = r.GetDouble();
+		}
+		else
+		{
+			this.l = null;
+		}
+		if(r.GetBool())
+		{
+			this.t = r.GetDouble();
+		}
+		else
+		{
+			this.t = null;
+		}
+		
+		if(r.GetBool())
+		{
+			this.r = r.GetDouble();
+		}
+		else
+		{
+			this.r = null;
+		}
+		
+		if(r.GetBool())
+		{
+			this.b = r.GetDouble();
+		}
+		else
+		{
+			this.b = null;
+		}
+	}
 };
 
 function CBlipFill()
@@ -1484,11 +1549,26 @@ CBlipFill.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.RasterImageId = rasterImageId;
     },
+	
+	setSrcRect: function()
+	{
+		
+	},
+	
+	setTile: function(tile)
+	{
+		var oldValue = this.tile;
+        var newValue = tile;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddChartGroup, null, null,
+		new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.tile = tile;
+	},
 
     Copy: function()
     {
         var ret = new CBlipFill();
         ret.setRasterImageId(this.RasterImageId);
+		ret.setTile(this.tile);
         return ret;
     },
 
@@ -1501,6 +1581,11 @@ CBlipFill.prototype =
                 this.RasterImageId = data.oldValue;
                 break;
             }
+			case historyitem_AutoShapes_AddChartGroup:
+			{
+				this.tile = data.oldValue;
+				break;
+			}
         }
     },
 
@@ -1513,6 +1598,11 @@ CBlipFill.prototype =
                 this.RasterImageId = data.newValue;
                 break;
             }
+			case historyitem_AutoShapes_AddChartGroup:
+			{
+				this.tile = data.newValue;
+				break;
+			}
         }
     },
 

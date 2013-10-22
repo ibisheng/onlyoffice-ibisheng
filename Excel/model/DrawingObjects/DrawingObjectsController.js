@@ -2085,9 +2085,9 @@ function CorrectUniFillEx(asc_fill, unifill) {
 
                 var tile = _fill.asc_getType();
                 if (tile == c_oAscFillBlipType.STRETCH)
-                    ret.fill.tile = null;
+                    ret.fill.setTile(null);
                 else if (tile == c_oAscFillBlipType.TILE)
-                    ret.fill.tile = true;
+                    ret.fill.setTile(true);
 
                 break;
             }
