@@ -573,11 +573,11 @@ function CellAddressUtils(){
 			var sResult = "";
 			var n = num - 1;
 			if (n >= 702) {
-				val = (Asc.floor(n / 676) - 1) % 26;
+				val = (Math.floor(n / 676) - 1) % 26;
 				sResult += String.fromCharCode(val + 65);
 			}
 			if (n >= 26) {
-				val = (Asc.floor(n / 26) - 1) % 26;
+				val = (Math.floor(n / 26) - 1) % 26;
 				sResult += String.fromCharCode(val + 65);
 			}
 			sResult += String.fromCharCode( (n % 26) + 65);
