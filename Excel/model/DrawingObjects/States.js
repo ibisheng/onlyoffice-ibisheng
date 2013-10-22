@@ -1606,6 +1606,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
         {
             this.textObject.setCellVertAlign(align);
             this.drawingObjects.showDrawingObjects(true);
+			this.drawingObjectsController.recalculateCurPos();
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
         }
     };
@@ -1842,6 +1843,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
             this.textObject.setCellVertAlign(align);
             this.drawingObjects.showDrawingObjects(true);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+			this.drawingObjectsController.recalculateCurPos();
         }
     };
 
@@ -3381,6 +3383,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
             this.textObject.setCellVertAlign(align);
             this.drawingObjects.showDrawingObjects(true);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+			this.drawingObjectsController.recalculateCurPos();
         }
     };
 

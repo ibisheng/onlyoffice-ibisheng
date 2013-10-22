@@ -1463,6 +1463,8 @@ DrawingObjectsController.prototype =
             {
                 _this.setSelectionState(selection_state);
                 callback.apply(_this, args);
+				_this.recalculateCurPos();
+
             }
         };
         this.drawingObjects.objectLocker.checkObjects(callback2);

@@ -601,6 +601,7 @@ CShape.prototype =
             this.txBody.paragraphAdd(text_pr);
             this.txBody.content.Set_ApplyToAll(false);
             this.calculateTransformTextMatrix();
+			this.recalculateCurPos();
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 
@@ -618,6 +619,8 @@ CShape.prototype =
             this.txBody.paragraphAdd(text_pr);
             this.txBody.content.Set_ApplyToAll(false);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 
@@ -635,6 +638,8 @@ CShape.prototype =
             this.txBody.paragraphAdd(text_pr);
             this.txBody.content.Set_ApplyToAll(false);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -678,6 +683,8 @@ CShape.prototype =
                 this.txBody.content.Set_ApplyToAll(false);
                 this.calculateContent();
                 this.calculateTransformTextMatrix();
+							this.recalculateCurPos();
+
                 History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                     new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             }
@@ -693,6 +700,8 @@ CShape.prototype =
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             this.txBody.setVerticalAlign(align);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -705,6 +714,8 @@ CShape.prototype =
             text_pr.Set_FontFamily({Name: fontName, Index: -1});
             this.txBody.paragraphAdd(text_pr);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
         }
     },
 
@@ -715,6 +726,8 @@ CShape.prototype =
             text_pr.Set_FontFamily({Name: fontName, Index: -1});
             this.txBody.paragraphAdd(text_pr);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
         }
     },
 
@@ -732,6 +745,8 @@ CShape.prototype =
             this.txBody.paragraphAdd(text_pr);
             this.txBody.content.Set_ApplyToAll(false);
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -761,6 +776,8 @@ CShape.prototype =
             this.txBody.setVert(angle);
             this.calculateContent();
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddredo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -778,6 +795,8 @@ CShape.prototype =
             this.txBody.content.Paragraph_IncDecFontSize(true);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -792,6 +811,8 @@ CShape.prototype =
             this.txBody.content.Paragraph_IncDecFontSize(false);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -808,6 +829,8 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -824,6 +847,8 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
+						this.recalculateCurPos();
+
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
