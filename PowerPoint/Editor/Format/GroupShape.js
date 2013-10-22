@@ -675,6 +675,25 @@ CGroupShape.prototype =
         }
         return this.transform;
     },
+    getPlaceholderType: function()
+    {
+        return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.type : null;
+    },
+
+    getPlaceholderIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.idx : null;
+    },
+
+    getPhType: function()
+    {
+        return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.type : null;
+    },
+
+    getPhIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.idx : null;
+    },
 
     getHierarchy: function()
     {
