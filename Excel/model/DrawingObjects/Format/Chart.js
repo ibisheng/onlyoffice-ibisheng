@@ -353,7 +353,7 @@ CChartAsGroup.prototype =
             this.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
         }
 
-        if(isRealObject(this.chartTitle))
+        if(isRealObject(this.chartTitle) && isRealObject(this.chartTitle.txBody)&& isRealObject(this.chartTitle.txBody.content))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
             this.chartTitle.drawingObjects = this.drawingObjects;
@@ -379,7 +379,7 @@ CChartAsGroup.prototype =
             this.chart.header.title = this.chartTitle.txBody.content.getTextString();
         }
 
-        if(isRealObject(this.hAxisTitle))
+        if(isRealObject(this.hAxisTitle)&& isRealObject(this.hAxisTitle.txBody)&& isRealObject(this.hAxisTitle.txBody.content))
         {
             this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.drawingObjects = this.drawingObjects;
@@ -406,7 +406,7 @@ CChartAsGroup.prototype =
             this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
         }
 
-        if(isRealObject(this.vAxisTitle))
+        if(isRealObject(this.vAxisTitle) && isRealObject(this.vAxisTitle.txBody)&& isRealObject(this.vAxisTitle.txBody.content))
         {
             this.chart.xAxis.title = "";
             this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
@@ -1973,6 +1973,6 @@ CChartAsGroup.prototype =
     getBase64Image: function()
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
-    },
+    }
 };
 
