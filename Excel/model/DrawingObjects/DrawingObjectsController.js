@@ -543,6 +543,8 @@ DrawingObjectsController.prototype =
     changeCurrentState: function(newState)
     {
         this.curState = newState;
+		this.updateSelectionState();
+		this.recalculateCurPos();
     },
 
     recalculateCurPos: function()
