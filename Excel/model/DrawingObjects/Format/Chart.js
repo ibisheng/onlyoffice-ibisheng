@@ -353,19 +353,27 @@ CChartAsGroup.prototype =
             this.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
         }
 
-        if(isRealObject(this.chartTitle) && isRealObject(this.chartTitle.txBody)&& isRealObject(this.chartTitle.txBody.content))
+		var api = window["Asc"]["editor"];
+        if(isRealObject(this.chartTitle))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
             this.chartTitle.drawingObjects = this.drawingObjects;
-            /*if(this.chartTitle.isEmpty())
-            { */
-                /*var title_str = "Chart Title";
-                this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-                for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);*/
-            /*}
+            if(this.chartTitle.isEmpty())
+            { 
+				if(this.chart.header && this.chart.header.bDefaultTitle)
+				{
+					var title_str = api.chartTranslate.title;
+					this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
+					for(var i in title_str)
+						this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+				}
+				else
+				{
+					this.addTitle(null);
+				}
+            }
             else
-            {    */
+            {    
                 var content = this.chartTitle.txBody.content;
                 content.setParent(this.chartTitle.txBody);
                 content.setDrawingDocument(this.drawingObjects.drawingDocument);
@@ -375,7 +383,7 @@ CChartAsGroup.prototype =
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
                 }
-         //   }
+			}
             this.chart.header.title = this.chartTitle.txBody.content.getTextString();
         }
 
@@ -383,12 +391,19 @@ CChartAsGroup.prototype =
         {
             this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.drawingObjects = this.drawingObjects;
-            if(this.hAxisTitle.isEmpty())
+            if(this.hAxisTitle.isEmpty() )
             {
-                var title_str = "X Axis";
-                this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-                for(var i in title_str)
-                    this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+				if(this.chart.xAxis && this.chart.xAxis.bDefaultTitle)
+				{
+					var title_str = api.chartTranslate.xAxis;;
+					this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+					for(var i in title_str)
+						this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+				}
+				else
+				{
+					this.addXAxis(null);
+				}
             }
             else
             {
@@ -413,12 +428,19 @@ CChartAsGroup.prototype =
             this.vAxisTitle.drawingObjects = this.drawingObjects;
             if(this.vAxisTitle.isEmpty())
             {
-                var title_str = "Y Axis";
-                this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-                this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+				if(this.chart.yAxis && this.chart.yAxis.bDefaultTitle)
+				{
+					var title_str = api.chartTranslate.yAxis;
+					this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+					this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
 
-                for(var i in title_str)
-                    this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+					for(var i in title_str)
+						this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+				}
+				else
+				{
+					this.addYAxis(null);
+				}
             }
             else
             {
