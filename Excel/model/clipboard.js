@@ -1933,7 +1933,9 @@
 				else
 					aResult.cellCount = Math.max.apply(Math, cellCountAll);
 				aResult.rowSpanSpCount = rowSpanPlus;
-				aResult.addImages = addImages;
+				var api = window["Asc"]["editor"];
+				if(!api || (api && !api.isChartEditor))
+					aResult.addImages = addImages;
 				aResult.fontsNew = fontsNew;
 				worksheet.setSelectionInfo('paste',aResult,t);
 				window.GlobalPasteFlagCounter = 0;
