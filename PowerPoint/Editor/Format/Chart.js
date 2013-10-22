@@ -53,6 +53,7 @@ function CChartAsGroup(parent)
     {
         this.setParent(parent);
         this.setAscChart(new asc_CChart());
+
     }
 }
 
