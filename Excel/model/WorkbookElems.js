@@ -713,7 +713,7 @@ BorderProp.prototype = {
 	{
 		switch(nType)
 		{
-			case this.Properties.s: this.s = value;break;
+			case this.Properties.s: this.setStyle(value);break;
 			case this.Properties.c: this.c = value;break;
 		}
 	}
