@@ -1334,7 +1334,7 @@
 								{
 									//для мерженных головных ячеек 
 									var colId = filters[k].ColId;
-									if(filters[k].ShowButton == false)
+									if(filters[k].ShowButton == false && currentFilter.result)
 									{
 										for(var sb = filters[k].ColId; sb < currentFilter.result.length; sb++)
 										{	
