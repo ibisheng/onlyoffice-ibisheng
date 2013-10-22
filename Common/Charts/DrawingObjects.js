@@ -4462,12 +4462,15 @@ function DrawingObjects() {
 	
 	_this.tryResetLockedGraphicObject = function(id) {
 		
+		var bObjectFound = false;
 		for (var i = 0; i < aObjects.length; i++) {
 			if ( aObjects[i].graphicObject.Id == id ) {
 				aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
+				bObjectFound = true;
 				break;
 			}
 		}
+		return bObjectFound;
 	}
 	
 	_this.setScrollOffset = function() {

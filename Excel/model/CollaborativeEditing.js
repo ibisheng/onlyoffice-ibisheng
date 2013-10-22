@@ -194,6 +194,7 @@
 					return;
 
 				var bCheckRedraw = false;
+				var bRedrawGraphicObjects = false;
 				if (0 < this.m_arrNeedUnlock.length ||
 					0 < this.m_arrNeedUnlock2.length) {
 					bCheckRedraw = true;
@@ -205,8 +206,10 @@
 				while (0 < this.m_arrNeedUnlock2.length) {
 					oLock = this.m_arrNeedUnlock2.shift();
 					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
-					if ( oLock.Element["type"] == c_oAscLockTypeElem.Object )
-						this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]);
+					if ( oLock.Element["type"] == c_oAscLockTypeElem.Object ) {
+						if ( this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]) )
+							bRedrawGraphicObjects = true;
+					}
 					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
 				}
 				// Очищаем примененные чужие изменения
@@ -215,8 +218,10 @@
 				for (; nIndex < nCount; ++nIndex) {
 					oLock = this.m_arrNeedUnlock[nIndex];
 					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-						if ( oLock.Element["type"] == c_oAscLockTypeElem.Object )
-							this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]);
+						if ( oLock.Element["type"] == c_oAscLockTypeElem.Object ) {
+							if ( this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element["rangeOrObjectId"]) )
+								bRedrawGraphicObjects = true;
+						}
 						this.m_arrNeedUnlock.splice(nIndex, 1);
 						--nIndex;
 						--nCount;
@@ -246,8 +251,10 @@
 					this.handlers.trigger("updateAllSheetsLock");
 					this.handlers.trigger("unlockComments");
 					this.handlers.trigger("showComments");
-					this.handlers.trigger("showDrawingObjects");
 				}
+				
+				if ( bCheckRedraw || bRedrawGraphicObjects )
+					this.handlers.trigger("showDrawingObjects");
 			},
 
 			getRecalcIndexSave: function (oRecalcIndex) {

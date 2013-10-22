@@ -1350,7 +1350,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"updateAllSheetsLock":				function () {t._onUpdateAllSheetsLock.apply(t, arguments);},
 					"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
 					"resetLockedGraphicObjects":		function () {t._onResetLockedGraphicObjects.apply(t, arguments);},
-					"tryResetLockedGraphicObject":		function () {t._onTryResetLockedGraphicObject.apply(t, arguments);},
+					"tryResetLockedGraphicObject":		function () {return t._onTryResetLockedGraphicObject.apply(t, arguments);},
 					"showComments":						function () {t._onShowComments.apply(t, arguments);},
 					"unlockComments":					function () {t._onUnlockComments.apply(t);},
 					"tryUnlockComment":					function () {t._onTryUnlockComment.apply(t, arguments);},
@@ -1601,8 +1601,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			_onTryResetLockedGraphicObject: function (id) {
 				if (this.wb) {
-					this.wb.getWorksheet().objectRender.tryResetLockedGraphicObject(id);
+					return this.wb.getWorksheet().objectRender.tryResetLockedGraphicObject(id);
 				}
+				return false;
 			},
 			
 			_onShowComments: function () {
