@@ -5822,10 +5822,8 @@
 						this.objectRender.OnUpdateOverlay();
 					}
 					else {
-						if ( this.objectRender.controller.curState.id != STATES_ID_BEGIN_TRACK_NEW_SHAPE ) {
+						if ( !asc["editor"].isStartAddShape ) {
 							this.objectRender.unselectDrawingObjects();
-							asc["editor"].isStartAddShape = false;
-							
 							if ( this.isUpdateSelection )
 								this._trigger("selectionChanged", this.getSelectionInfo());
 						}

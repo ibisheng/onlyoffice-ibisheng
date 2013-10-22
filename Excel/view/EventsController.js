@@ -64,6 +64,11 @@
 			// Режим формулы
 			this.isFormulaEditMode = false;
 			this.endWasPressed = false;
+			
+			// DblClick для граф.объектов
+			this.dbClickInterval = 500;
+			this.mouseClickCount = 0;
+			this.lastMouseDownTime = getCurrentTime();
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -1106,12 +1111,21 @@
 				
 				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
 					this.isGraphicObjectMode = true;
-					asc["editor"].isStartAddShape = false;
 				}
 				
 				if ( this.isGraphicObjectMode ) {
-					event.ClickCount = 1;
+				
+					var currTime = getCurrentTime();
+					if ( currTime - this.lastMouseDownTime < this.dbClickInterval )
+						this.mouseClickCount = 2;
+					else
+						this.mouseClickCount = 1;
+						
+					event.ClickCount = this.mouseClickCount;
+
+					this.lastMouseDownTime = currTime;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
+
 					if ( t.isCellEditMode )
 						t.handlers.trigger("stopCellEditing");
 					
@@ -1251,6 +1265,7 @@
 				var coord = this._getCoordinates(event);
 				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
 				if ( this.isGraphicObjectMode ) {
+					event.ClickCount = this.mouseClickCount;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
 					this.isGraphicObjectMode = false;
@@ -1376,14 +1391,6 @@
 			_onMouseDblClick: function (event) {
 				var t = this;
 				var coord = t._getCoordinates(event);
-			
-				// shapes
-				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isGraphicObject ) {
-					event.ClickCount = 2;
-					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
-					return;
-				}
 			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;

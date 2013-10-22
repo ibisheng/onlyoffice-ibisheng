@@ -3986,8 +3986,8 @@ function SplineBezierState(drawingObjectsController, drawingObjects)
         var spline = new Spline(this.drawingObjects);
         this.drawingObjectsController.addTrackObject(spline);
         spline.addPathCommand(new SplineCommandMoveTo(x, y));
+		this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new SplineBezierState33(this.drawingObjectsController, this.drawingObjects, x, y, spline));
-        this.drawingObjectsController.resetSelection();
         this.drawingObjects.OnUpdateOverlay();
     };
 
