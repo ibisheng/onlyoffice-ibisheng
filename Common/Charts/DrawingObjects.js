@@ -4489,6 +4489,7 @@ function DrawingObjects() {
 			autoShapeTrack.Graphics.m_oCoordTransform.tx = x;
 			autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
 			autoShapeTrack.Graphics.CalculateFullTransform();
+            this.controller.recalculateCurPos();
             this.controller.updateSelectionState();
 		}
 	}
