@@ -2724,15 +2724,29 @@ CShape.prototype =
             return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
-
-    hitInTextRect: function(x, y)
+	
+	hitInTextRect: function(x, y)
     {
         if(isRealObject(this.txBody))
         {
             var t_x, t_y;
             t_x = this.invertTransformText.TransformPointX(x, y);
             t_y = this.invertTransformText.TransformPointY(x, y);
-            return  t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight2;
+
+            if(t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight2)
+            {
+                var hit_paragraph = this.txBody.content.Internal_GetContentPosByXY(t_x, t_y, 0);
+                var par = this.txBody.content.Content[hit_paragraph];
+                if(isRealObject(par))
+                {
+                    var check_hyperlink = par.Check_Hyperlink(t_x, t_y, 0);
+                    if(isRealObject(check_hyperlink))
+                    {
+                        return check_hyperlink;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     },
