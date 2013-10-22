@@ -1914,7 +1914,8 @@ Hyperlink.prototype = {
 	},
 	setVisited : function (bVisited) {
 		this.bVisited = bVisited;
-		this.Ref.cleanCache();
+		if (this.Ref)
+			this.Ref.cleanCache();
 	},
 	getVisited : function () {
 		return this.bVisited;

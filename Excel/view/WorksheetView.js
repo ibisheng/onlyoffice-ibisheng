@@ -4957,6 +4957,7 @@
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (drawingInfo && drawingInfo.id) {
+					
 					// Возможно картинка с lock
 					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
 					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,false);
@@ -4965,6 +4966,27 @@
 						userId = isLocked.UserId;
 						lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
 						lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
+					}
+					
+					if ( drawingInfo.hyperlink && (drawingInfo.hyperlink instanceof ParaHyperlinkStart) ) {
+					
+						var oHyperlink = new Hyperlink();
+						oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
+						oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
+						
+						var cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
+							row: (r ? r.row : -1), userId: userId,
+							lockRangePosLeft: undefined, lockRangePosTop: undefined,
+							userIdAllProps: undefined, lockAllPosLeft: undefined,
+							lockAllPosTop: undefined, userIdAllSheet: undefined,
+							commentIndexes: undefined, commentCoords: undefined};
+						
+						return {cursor: kCurHyperlink, target: "hyperlink",
+								hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
+								userId: userId, lockRangePosLeft: undefined,
+								lockRangePosTop: undefined, userIdAllProps: undefined,
+								userIdAllSheet: undefined, lockAllPosLeft: undefined,
+								lockAllPosTop: undefined, commentIndexes: undefined, commentCoords: undefined};						
 					}
 
 					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1,
@@ -5721,7 +5743,10 @@
 					var oHyperlink = new asc_CHyperlink(hyperlink);
 					oHyperlink.asc_setText (cell_info.text);
 					cell_info.hyperlink = oHyperlink;
-				} else
+				}
+				//else if ( graphicObjects.length > 0 ) {
+				//}
+				else
 					cell_info.hyperlink = null;
 
 				cell_info.flags.merge = null !== range.hasMerged();

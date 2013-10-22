@@ -522,7 +522,8 @@
 					if (isHyperlinkClick) {
 						if (false === ct.hyperlink.hyperlinkModel.getVisited()) {
 							ct.hyperlink.hyperlinkModel.setVisited(true);
-							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});
+							if (ct.hyperlink.hyperlinkModel.Ref)
+								ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});
 						}
 						switch (ct.hyperlink.asc_getType()) {
 							case c_oAscHyperlinkType.WebLink:
