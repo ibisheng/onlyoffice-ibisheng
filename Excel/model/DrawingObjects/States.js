@@ -486,7 +486,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     }
                     else if(hit_in_text_rect)
                     {
-                        return {objectId: cur_drawing.Id, cursorType: "text"};
+                        return {objectId: cur_drawing.Id, cursorType: "text", hyperlink: hit_in_text_rect};
                     }
                 }
                 else if(cur_drawing.isGroup())
@@ -504,7 +504,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         }
                         else if(hit_in_text_rect)
                         {
-                            return {objectId: cur_drawing.Id, cursorType: "text"};
+                            return {objectId: cur_drawing.Id, cursorType: "text", hyperlink: hit_in_text_rect};
                         }
                     }
                 }
@@ -3147,7 +3147,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                     }
                     else if(hit_in_text_rect)
                     {
-                        return {objectId: cur_drawing.Id, cursorType: "text"};
+                        return {objectId: cur_drawing.Id, cursorType: "text", hyperlink: hit_in_text_rect};
                     }
                 }
                 else
@@ -3167,7 +3167,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                return {objectId: this.group.Id, cursorType: "text"};
+                                return {objectId: this.group.Id, cursorType: "text", hyperlink: hit_in_text_rect};
                             }
                         }
                     }
@@ -3186,7 +3186,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                return {objectId: cur_drawing.Id, cursorType: "text"};
+                                return {objectId: cur_drawing.Id, cursorType: "text", hyperlink: hit_in_text_rect};
                             }
                         }
                     }
