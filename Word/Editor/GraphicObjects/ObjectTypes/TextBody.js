@@ -114,6 +114,9 @@ CTextBody.prototype =
             default_legend_style.TextPr.Set_FromObject(TextPr);
             default_legend_style.ParaPr.Spacing.After = 0;
             default_legend_style.ParaPr.Spacing.Before = 0;
+            default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+            default_legend_style.ParaPr.Spacing.Line = 1;
+
             default_legend_style.ParaPr.Jc = align_Center;
 
             //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -123,7 +126,6 @@ CTextBody.prototype =
                 //TODO
             }
             styles.Style[default_legend_style.Id] = default_legend_style;
-            ++styles.Id;
             this.content.Styles = styles;
             this.content.Content[0].Style_Add_Open(default_legend_style.Id);
             if(is_on)
@@ -579,6 +581,8 @@ CTextBody.prototype =
 
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -588,7 +592,6 @@ CTextBody.prototype =
                         //TODO
                     }
                     styles.Style[styles.Id] = default_legend_style;
-                    ++styles.Id;
                     this.content.Styles = styles;
                     if(is_on)
                     {
@@ -638,6 +641,8 @@ CTextBody.prototype =
 
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -647,7 +652,6 @@ CTextBody.prototype =
                         //TODO
                     }
                     styles.Style[styles.Id] = default_legend_style;
-                    ++styles.Id;
                     this.content.Styles = styles;
                     if(is_on)
                     {
@@ -743,6 +747,8 @@ CTextBody.prototype =
 
                         default_legend_style.ParaPr.Spacing.After = 0;
                         default_legend_style.ParaPr.Spacing.Before = 0;
+                        default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                        default_legend_style.ParaPr.Spacing.Line = 1;
                         default_legend_style.ParaPr.Jc = align_Center;
 
                         //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -752,7 +758,6 @@ CTextBody.prototype =
                             //TODO
                         }
                         styles.Style[styles.Id] = default_legend_style;
-                        ++styles.Id;
                         this.content.Styles = styles;
                         if(is_on)
                         {
@@ -828,7 +833,7 @@ CTextBody.prototype =
             var par = dc.Content[i];
             for(var i = 0; i < par.Content.length; ++i)
             {
-                if(par.Content[i].Copy)
+                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty) && par.Content[i].Copy)
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }

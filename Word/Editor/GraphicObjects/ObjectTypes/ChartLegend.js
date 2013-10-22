@@ -72,7 +72,6 @@ CChartLegend.prototype =
             //TODO
         }
         styles.Style[styles.Id] = default_legend_style;
-        ++styles.Id;
         return styles;
     },
 
@@ -250,19 +249,16 @@ CLegendEntryGroup.prototype =
 
         //default_style.ParaPr  TODO
         styles.Style[styles.Id] = default_style;
-        ++styles.Id;
 
         var legend_style = new CStyle("legend_style", styles.Id-1, null, styletype_Paragraph);
         /*TODO*/
         styles.Style[styles.Id] = legend_style;
-        ++styles.Id;
         var entry_style = new CStyle("entry_style", styles.Id - 1, null, styletype_Paragraph);
         if(isRealObject(this.legendGroup.legendEntries[this.idx]) && isRealObject(this.legendGroup.legendEntries[this.idx].txPr))
         {
             //TODO
         }
         styles.Style[styles.Id] = entry_style;
-        ++styles.Id;
         return styles;
     },
 

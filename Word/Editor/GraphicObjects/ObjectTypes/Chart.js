@@ -1081,6 +1081,9 @@ CChartAsGroup.prototype =
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -1117,6 +1120,9 @@ CChartAsGroup.prototype =
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
                     default_legend_style.ParaPr.Jc = align_Center;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
                     var tx_pr;
@@ -1177,6 +1183,9 @@ CChartAsGroup.prototype =
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -1216,6 +1225,8 @@ CChartAsGroup.prototype =
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -1277,6 +1288,8 @@ CChartAsGroup.prototype =
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
@@ -1317,6 +1330,8 @@ CChartAsGroup.prototype =
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
                     default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
                     default_legend_style.ParaPr.Jc = align_Center;
 
                     //TODO:ParaPr: default_legend_style.ParaPr.Ind
