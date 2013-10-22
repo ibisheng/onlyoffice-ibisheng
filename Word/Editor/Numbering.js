@@ -198,6 +198,7 @@ function CAbstractNum(Type)
     }
 
     this.NumStyleLink = undefined;
+	this.StyleLink = undefined;
 
     this.Lvl = new Array();
     for ( var Index = 0; Index < 9; Index++ )

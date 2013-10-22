@@ -54,7 +54,9 @@ var c_oSerNumTypes = {
     Num: 18,
     Num_ANumId: 19,
     Num_NumId: 20,
-	lvl_PStyle: 21
+	lvl_PStyle: 21,
+	NumStyleLink: 22,
+	StyleLink: 23
 };
 var c_oSerOtherTableTypes = {
     ImageMap:0,
@@ -1841,23 +1843,26 @@ Binary_tblPrWriter.prototype =
     },
     WriteW: function(WAfter)
     {
-        //Type
-        if(null != WAfter.Type)
-        {
-            this.memory.WriteByte(c_oSerWidthType.Type);
-            this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(WAfter.Type);
-        }
-        //W
-        if(null != WAfter.W)
-        {
-			var nVal = WAfter.W;
-			if(tblwidth_Mm == WAfter.Type)
-				nVal = Math.round(g_dKoef_mm_to_twips * WAfter.W);
-            this.memory.WriteByte(c_oSerWidthType.WDocx);
-            this.memory.WriteByte(c_oSerPropLenType.Long);
-            this.memory.WriteLong(nVal);
-        }
+		if(tblwidth_Pct != WAfter.Type)
+		{
+			//Type
+			if(null != WAfter.Type)
+			{
+				this.memory.WriteByte(c_oSerWidthType.Type);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(WAfter.Type);
+			}
+			//W
+			if(null != WAfter.W)
+			{
+				var nVal = WAfter.W;
+				if(tblwidth_Mm == WAfter.Type)
+					nVal = Math.round(g_dKoef_mm_to_twips * WAfter.W);
+				this.memory.WriteByte(c_oSerWidthType.WDocx);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(nVal);
+			}
+		}
     },
     WriteCellPr: function(cellPr, vMerge)
     {
@@ -2061,6 +2066,16 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
         //Id
         if(null != num.Id)
             this.bs.WriteItem(c_oSerNumTypes.AbstractNum_Id, function(){oThis.memory.WriteLong(index);});
+		if(null != num.NumStyleLink)
+		{
+            this.memory.WriteByte(c_oSerNumTypes.NumStyleLink);
+            this.memory.WriteString2(num.NumStyleLink);
+		}
+        if(null != num.StyleLink)
+		{
+            this.memory.WriteByte(c_oSerNumTypes.StyleLink);
+            this.memory.WriteString2(num.StyleLink);
+		}
         //Lvl
         if(null != num.Lvl)
             this.bs.WriteItem(c_oSerNumTypes.AbstractNum_Lvls, function(){oThis.WriteLevels(num.Lvl);});
@@ -4981,6 +4996,10 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				return oThis.ReadLevels(t, l, nLevelNum++, oNewNum);
             });
         }
+		else if ( c_oSerNumTypes.NumStyleLink === type )
+			oNewNum.NumStyleLink = this.stream.GetString2LE(length);
+		else if ( c_oSerNumTypes.StyleLink === type )
+			oNewNum.StyleLink = this.stream.GetString2LE(length);
         else if ( c_oSerNumTypes.AbstractNum_Id === type )
         {
 			this.m_oANumToNumClass[this.stream.GetULongLE()] = oNewNum;
