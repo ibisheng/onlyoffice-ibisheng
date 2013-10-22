@@ -859,7 +859,8 @@ var c_oSer_ChartSeriesMarkerType =
 var c_oSer_ChartSeriesDataLabelsType =
 {
 	ShowVal: 0,
-	TxPrPptx: 1
+	TxPrPptx: 1,
+	ShowCatName: 2
 };
 /** @enum */
 var c_oSer_ChartSeriesNumCacheType =
@@ -1211,6 +1212,12 @@ function BinaryChartWriter(memory)
 			this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowVal);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(chart.bShowValue);
+		}
+		if(null != chart.bShowCatName)
+		{
+			this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowCatName);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(chart.bShowCatName);
 		}
     };
 	this.WriteTitlePptx = function(txBody, bDefault)
@@ -1787,12 +1794,14 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_BasicChartType.DataLabels === type )
 		{
-			var oOutput = {ShowVal: null, TxPrPptx: null};
+			var oOutput = {ShowVal: null, ShowCatName: null, TxPrPptx: null};
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadDataLabels(t,l, oOutput);
 				});
 			if(null != oOutput.ShowVal)
 				this.chart.bShowValue = oOutput.ShowVal;
+			if(null != oOutput.ShowCatName)
+				this.chart.bShowCatName = oOutput.ShowCatName;
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1864,14 +1873,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartSeriesType.DataLabels === type )
 		{
-			var oOutput = {ShowVal: null, TxPrPptx: null};
+			var oOutput = {ShowVal: null, ShowCatName: null, TxPrPptx: null};
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadDataLabels(t,l, oOutput);
 				});
 			if(null != oOutput.TxPrPptx && null != oOutput.TxPrPptx.font)
 				seria.LabelFont = oOutput.TxPrPptx.font;
-			if(null != oOutput.ShowVal)
-				seria.bShowValue = oOutput.ShowVal;
 		}
 		else if ( c_oSer_ChartSeriesType.SpPr === type )
 		{
@@ -1996,6 +2003,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
 			//oOutput.TxPrPptx = this.ParsePptxParagraph(textBody);
 		}
+		else if ( c_oSer_ChartSeriesDataLabelsType.ShowCatName === type )
+			oOutput.ShowCatName = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;

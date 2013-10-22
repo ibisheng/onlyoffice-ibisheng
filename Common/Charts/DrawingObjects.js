@@ -1501,7 +1501,6 @@ function asc_CChartSeria() {
 	this.Cat = { Formula: null, NumCache: [] };
 	this.TxCache = { Formula: null, Tx: null };
 	this.Marker = { Size: null, Symbol: null };
-	this.bShowValue = false;
 	this.OutlineColor = null;
 	this.FormatCode = "";
 	this.isHidden = false;
