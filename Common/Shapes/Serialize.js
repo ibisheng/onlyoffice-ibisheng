@@ -673,6 +673,7 @@ function BinaryPPTYLoader()
 
                 s.Skip2(6); // type + len + start attr
 
+                var _slideNum = 0;
                 while (true)
                 {
                     var _at = s.GetUChar();
@@ -680,8 +681,9 @@ function BinaryPPTYLoader()
                         break;
 
                     var indexL = s.GetULong();
-                    this.presentation.Slides[_at].setLayout(this.presentation.slideLayouts[indexL]);
-                    this.presentation.Slides[_at].Master = this.presentation.slideLayouts[indexL].Master;
+                    this.presentation.Slides[_slideNum].setLayout(this.presentation.slideLayouts[indexL]);
+                    this.presentation.Slides[_slideNum].Master = this.presentation.slideLayouts[indexL].Master;
+                    _slideNum++;
                 }
             }
         }
@@ -2668,6 +2670,9 @@ function BinaryPPTYLoader()
 
         var s = this.stream;
         var end = s.cur + s.GetULong() + 4;
+
+        if (s.cur == end)
+            return _timing;
 
         s.Skip2(1); // attribute start
         var _presentDuration = false;
