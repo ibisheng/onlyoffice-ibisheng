@@ -1523,7 +1523,12 @@ CBlipFill.prototype =
         Writer.WriteBool(flag);
         if(flag)
         {
-            var string_to_write = window["Asc"]["editor"].documentOrigin +  getFullImageSrc(this.RasterImageId);
+			
+            var string_to_write = getFullImageSrc(this.RasterImageId);
+			if(string_to_write.indexOf(window["Asc"]["editor"].documentOrigin) !== 0)
+			{
+				string_to_write = window["Asc"]["editor"].documentOrigin + string_to_write;
+			}
             /*if(string_to_write.indexOf(documentOrigin) !== 0
                 && string_to_write.indexOf("http:") !== 0
                 && string_to_write.indexOf("https:") !== 0
