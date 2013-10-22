@@ -1220,6 +1220,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asyncServerIdStartLoaded();
 				var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
 				this.FontLoader.LoadDocumentFonts(fonts);
+
+				// Какая-то непонятная заглушка, чтобы не падало в ipad
+				if (this.isMobileVersion) {
+					window.USER_AGENT_SAFARI_MACOS = false;
+					PASTE_ELEMENT_ID = "wrd_pastebin";
+					ELEMENT_DISPAY_STYLE = "none";
+				}
 				
 				 if (window.USER_AGENT_SAFARI_MACOS)
 					setInterval(SafariIntervalFocus, 10);
