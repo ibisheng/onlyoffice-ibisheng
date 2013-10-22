@@ -529,7 +529,7 @@ CChartAsGroup.prototype =
 			this.chart.xAxis.title = chart.xAxis.title;
             if(!(isCollaborative === true))
             {
-                if(typeof  this.chart.xAxis.title === "string")
+                if(typeof  this.chart.xAxis.title === "string" )
                 {
                     var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
                     var tx_body = new CTextBody(chart_title);
@@ -556,6 +556,10 @@ CChartAsGroup.prototype =
 		if ( (this.chart.xAxis.bShow != chart.xAxis.bShow) || (isCollaborative === true) ) {
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_xAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis.bShow, chart.xAxis.bShow)));
 			this.chart.xAxis.bShow = chart.xAxis.bShow;
+			if(!this.chart.xAxis.bShow)
+			{
+				this.addXAxis(null)
+			}
 		}
 		
 		if ( (this.chart.xAxis.bGrid != chart.xAxis.bGrid) || (isCollaborative === true) ) {
@@ -569,7 +573,7 @@ CChartAsGroup.prototype =
 			this.chart.yAxis.title = chart.yAxis.title;
             if(!(isCollaborative === true))
             {
-                if(typeof  this.chart.yAxis.title === "string")
+                if(typeof  this.chart.yAxis.title === "string" )
                 {
 
                     var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
@@ -597,6 +601,10 @@ CChartAsGroup.prototype =
 		if ( (this.chart.yAxis.bShow != chart.yAxis.bShow) || (isCollaborative === true) ) {
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_yAxisIsShow, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis.bShow, chart.yAxis.bShow)));
 			this.chart.yAxis.bShow = chart.yAxis.bShow;
+			if(!this.chart.yAxis.bShow)
+			{
+				this.addYAxis(null)
+			}
 		}
 		
 		if ( (this.chart.yAxis.bGrid != chart.yAxis.bGrid) || (isCollaborative === true) ) {
@@ -1810,7 +1818,6 @@ CChartAsGroup.prototype =
         var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
         this.spPr.xfrm.setPosition(chartLeft, chartTop);
         this.init();
-        this.recalculate();
         this.addToDrawingObjects();
     },
 
@@ -1958,9 +1965,14 @@ CChartAsGroup.prototype =
     },
 
 
-    getBase64Image: function()
+    /*getBase64Image: function()
     {
         return this.brush.fill.canvas.toDataURL();
-    }
+    }*/
+	
+    getBase64Image: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
 };
 
