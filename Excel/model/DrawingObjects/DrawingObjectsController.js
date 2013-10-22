@@ -1534,7 +1534,7 @@ DrawingObjectsController.prototype =
 						}
                     }
 
-                    else if (ArrGlyph[i].isImage())
+                    else if (ArrGlyph[i].isImage() && typeof props.ImageUrl === "string")
                     {
                         ArrGlyph[i].setRasterImage(props.ImageUrl);
                     }
