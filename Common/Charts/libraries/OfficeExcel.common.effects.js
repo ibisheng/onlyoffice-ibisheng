@@ -22,7 +22,7 @@
     */
     OfficeExcel.Effects.Fade.In = function (obj)
     {
-        var canvas = obj.canvas;
+        /*var canvas = obj.canvas;
 
         // Initially the opacity should be zero
         canvas.style.opacity = 0;
@@ -36,12 +36,10 @@
             setTimeout('document.getElementById("' + canvas.id + '").style.opacity = ' + (i * 0.1), i * 50);
         }
         
-        /**
-        * Callback
-        */
+        // Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], 500);
-        }
+        }*/
     }
 
 
@@ -54,7 +52,7 @@
     */
     OfficeExcel.Effects.Fade.Out = function (obj)
     {
-        var canvas = obj.canvas;
+        /*var canvas = obj.canvas;
         
         // Draw the chart
         OfficeExcel.Clear(obj.canvas);
@@ -65,12 +63,10 @@
             setTimeout('document.getElementById("' + canvas.id + '").style.opacity = ' + (i * 0.1), (10 - i) * 50);
         }
         
-        /**
-        * Callback
-        */
+        // Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], 500);
-        }
+        }*/
     }
 
 
@@ -85,7 +81,7 @@
     OfficeExcel.Effects.jQuery.Expand = function (obj)
     {
         // Check for jQuery
-        if (typeof(jQuery) == 'undefined') {
+        /*if (typeof(jQuery) == 'undefined') {
             alert('[ERROR] Could not find jQuery object - have you included the jQuery file?');
         }
         
@@ -120,12 +116,10 @@
             top: '-=' + (obj.canvas.height / 2) + 'px'
         }, 1000);
         
-        /**
-        * Callback
-        */
+       // Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], 1000);
-        }
+        }*/
     }
 
 
@@ -137,7 +131,7 @@
     */
     OfficeExcel.Effects.ReplaceCanvasWithDIV  = function (canvas)
     {
-        if (!canvas.replacementDIV) {
+        /*if (!canvas.replacementDIV) {
             // Create the place holder DIV
             var div    = document.createElement('DIV');
                 div.style.width = canvas.width + 'px';
@@ -170,7 +164,7 @@
             var div = canvas.replacementDIV;
         }
         
-        return div;
+        return div;*/
     }
 
 
@@ -183,7 +177,7 @@
     */
     OfficeExcel.Effects.jQuery.Snap = function (obj)
     {
-        var delay = 500;
+        /*var delay = 500;
 
         var div = OfficeExcel.Effects.ReplaceCanvasWithDIV(obj.canvas);
         
@@ -210,12 +204,10 @@
             top: targetTop + 'px'
         }, delay);
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay + 50);
-        }
+        }*/
     }
 
 
@@ -229,15 +221,12 @@
     */
     OfficeExcel.Effects.jQuery.Reveal = function (obj)
     {
-        var opts   = arguments[1] ? arguments[1] : null;
+        /*var opts   = arguments[1] ? arguments[1] : null;
         var delay  = 1000;
         var canvas = obj.canvas;
         var xy     = OfficeExcel.getCanvasXY(obj.canvas);
 
 
-        /**
-        * Hide the canvas and draw it
-        */
         obj.canvas.style.visibility = 'hidden';
         OfficeExcel.Clear(obj.canvas);
         obj.Draw();
@@ -262,9 +251,6 @@
             document.body.appendChild(div);
         }
         
-        /**
-        * Now the covering DIVs are in place show the canvas again
-        */
         obj.canvas.style.visibility = 'visible';
 
 
@@ -284,12 +270,9 @@
             }
             , delay);
         
-        /**
-        * Callback
-        */
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -303,7 +286,7 @@
     */
     OfficeExcel.Effects.jQuery.Conceal = function (obj)
     {
-        var opts   = arguments[1] ? arguments[1] : null;
+        /*var opts   = arguments[1] ? arguments[1] : null;
         var delay  = 1000;
         var canvas = obj.canvas;
         var xy     = OfficeExcel.getCanvasXY(obj.canvas);
@@ -347,12 +330,11 @@
             
         setTimeout(function () {OfficeExcel.Clear(obj.canvas);}, delay);
         
-        /**
-        * Callback
-        */
+        
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -363,16 +345,13 @@
     */
     OfficeExcel.Effects.jQuery.HBlinds.Open = function (obj)
     {
-        var canvas  = obj.canvas;
+        /*var canvas  = obj.canvas;
         var opts   = arguments[1] ? arguments[1] : [];
         var delay  = 1000;
         var color  = opts['color'] ? opts['color'] : 'white';
         var xy     = OfficeExcel.getCanvasXY(canvas);
         var height = canvas.height / 5;
         
-        /**
-        * First draw the chart
-        */
         OfficeExcel.Clear(obj.canvas);
         obj.Draw();
 
@@ -396,12 +375,10 @@
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_3'));}, delay);
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_4'));}, delay);
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -412,7 +389,7 @@
     */
     OfficeExcel.Effects.jQuery.HBlinds.Close = function (obj)
     {
-        var canvas  = obj.canvas;
+        /*var canvas  = obj.canvas;
         var opts   = arguments[1] ? arguments[1] : [];
         var delay  = 1000;
         var color  = opts['color'] ? opts['color'] : 'white';
@@ -440,12 +417,10 @@
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_3'));}, delay + 100);
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_4'));}, delay + 100);
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -456,16 +431,13 @@
     */
     OfficeExcel.Effects.jQuery.VBlinds.Open = function (obj)
     {
-        var canvas  = obj.canvas;
+        /*var canvas  = obj.canvas;
         var opts   = arguments[1] ? arguments[1] : [];
         var delay  = 1000;
         var color  = opts['color'] ? opts['color'] : 'white';
         var xy     = OfficeExcel.getCanvasXY(canvas);
         var width  = canvas.width / 10;
         
-        /**
-        * First draw the chart
-        */
         OfficeExcel.Clear(obj.canvas);
         obj.Draw();
 
@@ -494,12 +466,10 @@
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_8'));}, delay + 100);
         setTimeout(function () {document.body.removeChild(document.getElementById('blinds_9'));}, delay + 100);
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -510,7 +480,7 @@
     */
     OfficeExcel.Effects.jQuery.VBlinds.Close = function (obj)
     {
-        var canvas  = obj.canvas;
+        /*var canvas  = obj.canvas;
         var opts   = arguments[1] ? arguments[1] : [];
         var delay  = 1000;
         var color  = opts['color'] ? opts['color'] : 'white';
@@ -548,12 +518,10 @@
             setTimeout(function () {document.body.removeChild(document.getElementById('blinds_9'));}, delay + 100);
         }
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -566,7 +534,7 @@
     */
     OfficeExcel.Effects.Pie.Grow = function (obj)
     {
-        var canvas  = obj.canvas;
+        /*var canvas  = obj.canvas;
         var opts   = arguments[1] ? arguments[1] : [];
         var color  = opts['color'] ? opts['color'] : 'white';
         var xy     = OfficeExcel.getCanvasXY(canvas);
@@ -579,7 +547,7 @@
 
         obj._otherProps._radius = 0;
 
-        OfficeExcel.Effects.Animate(obj, {'chart.radius': radius}, arguments[2]); // ToDo chart.radius -> _otherProps._radius??
+        OfficeExcel.Effects.Animate(obj, {'chart.radius': radius}, arguments[2]); // ToDo chart.radius -> _otherProps._radius??*/
     }
 
 
@@ -593,7 +561,7 @@
     OfficeExcel.Effects.Bar.Grow = function (obj)
     {
         // Save the data
-        obj.original_data = OfficeExcel.array_clone(obj.data);
+        /*obj.original_data = OfficeExcel.array_clone(obj.data);
         
         // Zero the data
         obj.__animation_frame__ = 0;
@@ -637,9 +605,8 @@
                 }
             }
 
-            /**
-            * Increment the hmargin to the target
-            */
+            
+            //Increment the hmargin to the target
             obj._otherProps._hmargin = ((1 - (obj.__animation_frame__ / numFrames)) * (obj.__hmargin__ - obj.__original_hmargin__)) + obj.__original_hmargin__;
 
 
@@ -657,7 +624,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow);
+        OfficeExcel.Effects.UpdateCanvas(Grow);*/
     }
 
 
@@ -700,7 +667,7 @@
     */
     OfficeExcel.Effects.Fuel.Grow = function (obj)
     {
-        var totalFrames  = 30;
+        /*var totalFrames  = 30;
         var currentFrame = 0;
         var diff         = obj.value - obj.currentValue;
         var increment    = diff / totalFrames;
@@ -721,7 +688,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow);
+        OfficeExcel.Effects.UpdateCanvas(Grow);*/
     }
 
 
@@ -736,7 +703,7 @@
     */
     OfficeExcel.Effects.Animate = function (obj, map)
     {
-        obj.Draw();
+        /*obj.Draw();
 
         OfficeExcel.Effects.__total_frames__  = (map && map['frames']) ? map['frames'] : 30;
 
@@ -801,7 +768,7 @@
             }
         }
 
-        Animate_Iterator(arguments[2]);
+        Animate_Iterator(arguments[2]);*/
     }
 
 
@@ -814,7 +781,7 @@
     */
     OfficeExcel.Effects.jQuery.Slide.In = function (obj)
     {
-        OfficeExcel.Clear(obj.canvas);
+        /*OfficeExcel.Clear(obj.canvas);
         obj.Draw();
 
         var canvas = obj.canvas;
@@ -841,12 +808,10 @@
         
         $('#' + obj.id).animate({left:0,top:0}, delay);
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -859,7 +824,7 @@
     */
     OfficeExcel.Effects.jQuery.Slide.Out = function (obj)
     {
-        var canvas = obj.canvas;
+        /*var canvas = obj.canvas;
         var div    = OfficeExcel.Effects.ReplaceCanvasWithDIV(obj.canvas);
         var delay = 1000;
         div.style.overflow= 'hidden';
@@ -879,12 +844,10 @@
             $('#' + obj.id).animate({left: (0 + canvas.width) + 'px'}, delay);
         }
         
-        /**
-        * Callback
-        */
+        //Callback
         if (typeof(arguments[2]) == 'function') {
             setTimeout(arguments[2], delay);
-        }
+        }*/
     }
 
 
@@ -897,8 +860,8 @@
     */
     OfficeExcel.Effects.Line.Unfold = function (obj)
     {
-        obj._otherProps._animation_factor = obj._otherProps._animation_unfold_initial;
-        OfficeExcel.Effects.Animate(obj, {'chart.animation.factor': 1}, arguments[2]);
+        /*obj._otherProps._animation_factor = obj._otherProps._animation_unfold_initial;
+        OfficeExcel.Effects.Animate(obj, {'chart.animation.factor': 1}, arguments[2]);*/
     }
 
 
@@ -913,7 +876,7 @@
     */
     OfficeExcel.Effects.Rose.Grow = function (obj)
     {
-        var numFrames       = 60;
+        /*var numFrames       = 60;
         var currentFrame    = 0;
         var original_margin = obj._otherProps._margin;
         var margin          = (360 / obj.data.length) / 2;
@@ -944,7 +907,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_inner);*/
     }
 
 
@@ -955,7 +918,7 @@
     */
     OfficeExcel.Effects.Line.UnfoldFromCenter = function (obj)
     {
-        var numFrames = 30;
+        /*var numFrames = 30;
 
         var original_opacity = obj.canvas.style.opacity;
         obj.canvas.style.opacity = 0;
@@ -1011,7 +974,7 @@
             }
         }
         
-        UnfoldFromCenter();
+        UnfoldFromCenter();*/
     }
 
 
@@ -1022,7 +985,7 @@
     */
     OfficeExcel.Effects.Line.FoldToCenter = function (obj)
     {
-        var totalFrames = 30;
+        /*var totalFrames = 30;
         var numFrame    = totalFrames;
         obj.Draw();
         var center_value = obj.scale[4] / 2;
@@ -1056,7 +1019,7 @@
             }
         }
 
-        OfficeExcel.Effects.UpdateCanvas(FoldToCenter);
+        OfficeExcel.Effects.UpdateCanvas(FoldToCenter);*/
     }
 
 
@@ -1071,7 +1034,7 @@
     */
     OfficeExcel.Effects.Odo.Grow = function (obj)
     {
-        var numFrames = 30;
+        /*var numFrames = 30;
         var origValue = Number(obj.currentValue);
         var newValue  = obj.value;
         var diff      = newValue - origValue;
@@ -1096,7 +1059,7 @@
         }
         
         //setTimeout(Grow, 100);
-        OfficeExcel.Effects.UpdateCanvas(Grow_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_inner);*/
     }
 
 
@@ -1111,7 +1074,7 @@
     */
     OfficeExcel.Effects.Meter.Grow = function (obj)
     {
-        if (!obj.currentValue) {
+        /*if (!obj.currentValue) {
             obj.currentValue = obj.min;
         }
 
@@ -1135,7 +1098,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_meter_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_meter_inner);*/
     }
 
 
@@ -1149,7 +1112,7 @@
     OfficeExcel.Effects.HBar.Grow = function (obj)
     {
         // Save the data
-        obj.original_data = OfficeExcel.array_clone(obj.data);
+        /*obj.original_data = OfficeExcel.array_clone(obj.data);
         
         // Zero the data
         obj.__animation_frame__ = 0;
@@ -1173,9 +1136,9 @@
             obj._otherProps._xmax = xmax;
         }
         
-        /**
-        * Turn off shadow blur for the duration of the animation
-        */
+        
+        //Turn off shadow blur for the duration of the animation
+
         if (obj._shadow._blur > 0) {
             var __original_shadow_blur__ = obj._shadow._blur;
             obj._shadow._blur = 0;
@@ -1207,9 +1170,9 @@
                 }
             }
 
-            /**
-            * Increment the vmargin to the target
-            */
+            
+            //Increment the vmargin to the target
+            
             obj._otherProps._vmargin = ((1 - (obj.__animation_frame__ / numFrames)) * (obj.__vmargin__ - obj.__original_vmargin__)) + obj.__original_vmargin__;
 
 
@@ -1231,7 +1194,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow);
+        OfficeExcel.Effects.UpdateCanvas(Grow);*/
     }
 
 
@@ -1249,12 +1212,10 @@
     */
     OfficeExcel.Effects.Line.jQuery.Trace = function (obj)
     {
-        OfficeExcel.Clear(obj.canvas);
+        /*OfficeExcel.Clear(obj.canvas);
         obj.Draw();
 
-        /**
-        * Create the DIV that the second canvas will sit in
-        */
+        //Create the DIV that the second canvas will sit in
         var div = document.createElement('DIV');
         var xy = OfficeExcel.getCanvasXY(obj.canvas);
         div.id = '__OfficeExcel_trace_animation_' + OfficeExcel.random(0, 4351623) + '__';
@@ -1266,9 +1227,7 @@
         div.style.overflow = 'hidden';
         document.body.appendChild(div);
         
-        /**
-        * Make the second canvas
-        */
+        //Make the second canvas
         var id      = '__OfficeExcel_line_reveal_animation_' + OfficeExcel.random(0, 99999999) + '__';
         var canvas2 = document.createElement('CANVAS');
         canvas2.width = obj.canvas.width;
@@ -1289,9 +1248,7 @@
         }
         window.addEventListener('resize', reposition_canvas2, false)
         
-        /**
-        * Make a copy of the original Line object
-        */
+        //Make a copy of the original Line object
         var obj2 = new OfficeExcel.Line(id, OfficeExcel.array_clone(obj.original_data));
 
         for (i in obj.properties) {
@@ -1312,9 +1269,7 @@
 
         obj2.Draw();
 
-        /**
-        * This effectively hides the line
-        */
+        //This effectively hides the line
         obj._otherProps._line_visible = false;
         obj._otherProps._colors = ['rgba(0,0,0,0)'];
         if (obj._otherProps._filled) {
@@ -1330,10 +1285,10 @@
         }, arguments[2] ? arguments[2] : 1500, OfficeExcel.Effects.Line.Trace_callback);
 
 
-        /**
-        * Get rid of the second canvas and turn the line back on
-        * on the original.
-        */
+        
+        // Get rid of the second canvas and turn the line back on
+        // on the original.
+        
         OfficeExcel.Effects.Line.Trace_callback = function ()
         {
             // Remove the window resize listener
@@ -1351,7 +1306,7 @@
 
             OfficeExcel.Clear(obj.canvas);
             obj.Draw();
-        }
+        }*/
     }
 
 
@@ -1367,7 +1322,7 @@
     */
     OfficeExcel.Effects.Pie.RoundRobin = function (obj)
     {
-        var callback     = arguments[2] ? arguments[2] : null;
+        /*var callback     = arguments[2] ? arguments[2] : null;
         var opt          = arguments[1];
         var currentFrame = 0;
         var numFrames    = 90;
@@ -1392,7 +1347,7 @@
             }
         }
 
-        OfficeExcel.Effects.UpdateCanvas(RoundRobin_inner);
+        OfficeExcel.Effects.UpdateCanvas(RoundRobin_inner);*/
     }
 
 
@@ -1406,7 +1361,7 @@
     */
     OfficeExcel.Effects.Pie.Implode = function (obj)
     {
-        var numFrames = 90;
+        /*var numFrames = 90;
         var distance = Math.min(obj.canvas.width, obj.canvas.height);
         
         function Implode_inner ()
@@ -1426,7 +1381,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Implode_inner);
+        OfficeExcel.Effects.UpdateCanvas(Implode_inner);*/
     }
 
 
@@ -1441,7 +1396,7 @@
     */
     OfficeExcel.Effects.Gauge.Grow = function (obj)
     {
-        var numFrames = 30;
+        /*var numFrames = 30;
         var origValue = Number(obj.currentValue);
         
         if (obj.currentValue == null) {
@@ -1478,7 +1433,7 @@
         }
         
         //setTimeout(Grow, 100);
-        OfficeExcel.Effects.UpdateCanvas(Grow);
+        OfficeExcel.Effects.UpdateCanvas(Grow);*/
     }
 
 
@@ -1493,7 +1448,7 @@
     */
     OfficeExcel.Effects.Radar.Grow = function (obj)
     {
-        var totalframes   = 30;
+        /*var totalframes   = 30;
         var framenum      = totalframes;
         var data          = OfficeExcel.array_clone(obj.data);
         var callback      = arguments[2];
@@ -1523,7 +1478,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_inner);*/
     }
 
 
@@ -1536,7 +1491,7 @@
     */
     OfficeExcel.Effects.Waterfall.Grow = function (obj)
     {
-        var totalFrames = 45;
+        /*var totalFrames = 45;
         var numFrame    = 0;
         var data = OfficeExcel.array_clone(obj.data);
         var callback = arguments[2];
@@ -1547,9 +1502,9 @@
             
         }
         
-        /**
-        * Fix the scale
-        */
+        
+        //Fix the scale
+        
         if (obj._otherProps._ymax == null) {
             var max = OfficeExcel.getScale(obj.getMax(data))[4]
             obj._otherProps._ymax = max;
@@ -1578,7 +1533,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_inner)
+        OfficeExcel.Effects.UpdateCanvas(Grow_inner)*/
     }
 
 
@@ -1590,7 +1545,7 @@
     */
     OfficeExcel.Effects.Bar.Wave = function (obj)
     {
-        var callback = arguments[2] ? arguments[2] : null;
+        /*var callback = arguments[2] ? arguments[2] : null;
 
         var max = 0;
         for (var i=0; i<obj.data.length; ++i) {
@@ -1647,7 +1602,7 @@
         }
         
         OfficeExcel.Clear(obj.canvas);
-        obj.Draw();
+        obj.Draw();*/
     }
 
 
@@ -1658,7 +1613,7 @@
     */
     OfficeExcel.Effects.HProgress.Grow = function (obj)
     {
-        var canvas       = obj.canvas;
+        /*var canvas       = obj.canvas;
         var context      = obj.context;
         var diff         = obj.value - Number(obj.currentValue);
         var numFrames    = 30;
@@ -1680,7 +1635,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_hprogress_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_hprogress_inner);*/
     }
 
 
@@ -1691,7 +1646,7 @@
     */
     OfficeExcel.Effects.VProgress.Grow = function (obj)
     {
-        var canvas       = obj.canvas;
+        /*var canvas       = obj.canvas;
         var context      = obj.context;
         var diff         = obj.value - Number(obj.currentValue);
         var numFrames    = 30;
@@ -1713,7 +1668,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_vprogress_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_vprogress_inner);*/
     }
 
 
@@ -1726,10 +1681,8 @@
     */        
     OfficeExcel.Effects.Pie.Wave = function (obj)
     {
-        /**
-        * Zero all the data and set the max value
-        */
-        var max = OfficeExcel.array_max(obj.data);
+        //Zero all the data and set the max value
+        /*var max = OfficeExcel.array_max(obj.data);
         var scale = OfficeExcel.getScale(max);
         obj._otherProps._ymax = scale[4];
 
@@ -1750,15 +1703,15 @@
             for (var k=0; k<=totalFrames; ++k) {
                 setTimeout('OfficeExcel.Effects.Pie.Wave_inner_iterator(__OfficeExcel_pie_wave_object__, '+idx+', '+(k / totalFrames)+');', 20 * k);
             }
-        }
+        }*/
     }
 
     OfficeExcel.Effects.Pie.Wave_inner_iterator = function (obj, idx, factor)
     {
-        obj.data[idx] = original_pie_data[idx] * factor;
+        /*obj.data[idx] = original_pie_data[idx] * factor;
         
         OfficeExcel.Clear(obj.canvas);
-        obj.Draw();
+        obj.Draw();*/
     }
 
 
@@ -1769,7 +1722,7 @@
     */
     OfficeExcel.Effects.Bar.Wave2 = function (obj)
     {
-        var callback = arguments[2] ? arguments[2] : null;
+        /*var callback = arguments[2] ? arguments[2] : null;
     
         var max = 0;
         for (var i=0; i<obj.data.length; ++i) {
@@ -1789,9 +1742,8 @@
         original_bar_data = OfficeExcel.array_clone(obj.data);
         __OfficeExcel_bar_wave_object__ = obj;
     
-        /**
-        * Zero all the bars
-        */
+        
+        //Zero all the bars
         for (var i=0; i<obj.data.length; ++i) {
              if (typeof(obj.data[i]) == 'number') {
                 obj.data[i] = 0;
@@ -1800,7 +1752,7 @@
              }
              
             setTimeout('a = new OfficeExcel.Effects.Bar.Wave2.Iterator(__OfficeExcel_bar_wave_object__, ' + i + ', 45); a.Animate();', i * 150);
-        }
+        }*/
     }
 
     
@@ -1817,7 +1769,7 @@
 
     OfficeExcel.Effects.Bar.Wave2.Iterator.prototype.Animate = function ()
     {
-        if (typeof(this.obj.data[this.idx]) == 'number') {
+        /*if (typeof(this.obj.data[this.idx]) == 'number') {
             this.obj.data[this.idx] = (this.curFrame / this.frames) * original_bar_data[this.idx];
         } else if (typeof(this.obj.data[this.idx]) == 'object') {
             for (var j=0; j<this.obj.data[this.idx].length; ++j) {
@@ -1833,7 +1785,7 @@
             this.curFrame += 1;
     
             OfficeExcel.Effects.UpdateCanvas(this.Animate.bind(this));
-        }
+        }*/
     }
 
 
@@ -1844,7 +1796,7 @@
     */
     OfficeExcel.Effects.Gantt.Grow = function (obj)
     {
-        var canvas       = obj.canvas;
+        /*var canvas       = obj.canvas;
         var context      = obj.context;
         var numFrames    = 30;
         var currentFrame = 0
@@ -1882,7 +1834,7 @@
             }
         }
         
-        OfficeExcel.Effects.UpdateCanvas(Grow_gantt_inner);
+        OfficeExcel.Effects.UpdateCanvas(Grow_gantt_inner);*/
     }
 
 
@@ -1890,7 +1842,7 @@
     * This is a compatibility hack provided for Opera and Safari which
     * don't support ther Javascript 1.8.5 function.bind()
     */
-    if (!Function.prototype.bind) {  
+    /*if (!Function.prototype.bind) {  
       Function.prototype.bind = function (oThis) {  
         if (typeof this !== "function") {  
           // closest thing possible to the ECMAScript 5 internal IsCallable function  
@@ -1912,7 +1864,7 @@
       
         return fBound;  
       };  
-    }
+    }*/
 
 
     /**
@@ -1924,14 +1876,14 @@
     */
     OfficeExcel.Effects.Rose.Explode = function (obj)
     {
-        var canvas   = obj.canvas;
+       /* var canvas   = obj.canvas;
         var opts     = arguments[1] ? arguments[1] : [];
         var callback = arguments[2] ? arguments[2] : null;
         var frames   = opts['frames'] ? opts['frames'] : 60;
 
         obj._otherProps._exploded = 0;
 
-        OfficeExcel.Effects.Animate(obj, {'frames': frames, 'chart.exploded': Math.min(canvas.width, canvas.height)}, callback); // ToDo ??
+        OfficeExcel.Effects.Animate(obj, {'frames': frames, 'chart.exploded': Math.min(canvas.width, canvas.height)}, callback);*/
     }
 
 
@@ -1952,5 +1904,5 @@
 
         obj._otherProps._exploded = Math.min(canvas.width, canvas.height);
 
-        OfficeExcel.Effects.Animate(obj, {'frames': frames, 'chart.exploded': 0}, callback); // ToDo ??
+        OfficeExcel.Effects.Animate(obj, {'frames': frames, 'chart.exploded': 0}, callback);
     }

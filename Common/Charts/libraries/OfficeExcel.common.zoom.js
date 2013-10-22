@@ -8,7 +8,7 @@
     */
     OfficeExcel.ZoomArea = function (obj)
     {
-        if (obj._zoom._mode == 'area') {
+        /*if (obj._zoom._mode == 'area') {
 
             var canvas  = obj.canvas;
             var context = obj.context;
@@ -45,9 +45,7 @@
                     }
                 }
 
-                /**
-                * Create the indicator DIV
-                */
+                //Create the indicator DIV
                 var canvasXY = OfficeExcel.getCanvasXY(canvas);
                 var areaDiv  = document.createElement('DIV');
                     areaDiv.__canvas__     = canvas;
@@ -214,9 +212,7 @@
                     div.appendChild(img);
 
 
-                    /**
-                    * This facilitates expanding the zoomed area once visible (the double click)
-                    */
+                    //This facilitates expanding the zoomed area once visible (the double click)
                     div.ondblclick = function (event)
                     {
                         var event = OfficeExcel.FixEventObject(event);
@@ -276,9 +272,7 @@
                         
                         div.ondblclick = null;
                     }
-                    /**
-                    * Make the zoomed bit draggable
-                    */
+                    //Make the zoomed bit draggable
                     div.onmousedown = function (e)
                     {
                         e = OfficeExcel.FixEventObject(e);
@@ -305,9 +299,8 @@
                             OfficeExcel.Registry.Set('chart.mousedown', img);
                             OfficeExcel.Registry.Set('chart.button', 2);
                             
-                            /**
-                            * Don't show a context menu when the zoomed area is right-clicked on
-                            */
+
+                            //Don't show a context menu when the zoomed area is right-clicked on
                             window.oncontextmenu = function (e)
                             {
                                 e = OfficeExcel.FixEventObject(e);
@@ -431,9 +424,7 @@
                     OfficeExcel.Registry.Set('chart.zoomed.area.mousedown', null);
                 }
 
-                /**
-                * Fire the zoom event
-                */
+                //Fire the zoom event
                 OfficeExcel.FireCustomEvent(obj, 'onzoom');
             }
             
@@ -443,7 +434,7 @@
                 OfficeExcel.Registry.Set('chart.zoomed.area.mousedown', null);
                 OfficeExcel.Registry.Set('chart.zoomed.area.div', null);
             }
-        }
+        }*/
     }
 
 
@@ -469,7 +460,7 @@
     */
     OfficeExcel.ZoomWindow = function (canvas)
     {
-        canvas.onmousemove = function (e)
+        /*canvas.onmousemove = function (e)
         {
             e = OfficeExcel.FixEventObject(e);
 
@@ -478,9 +469,7 @@
             var context = obj.context;
             var coords  = OfficeExcel.getMouseXY(e);
             
-            /**
-            * Create the DIV
-            */
+            //Create the DIV
             if (!OfficeExcel.Registry.Get('chart.zoomed.div')) {
 
                 var div = document.createElement('div');
@@ -514,9 +503,7 @@
                 div.__object__ = obj;
                 document.body.appendChild(div);
         
-                /**
-                * Get the canvas as an image
-                */
+                //Get the canvas as an image
                 var img = document.createElement('img');
                 img.width  = obj.canvas.width * obj._zoom._factor;
                 img.height = obj.canvas.height * obj._zoom._factor;
@@ -541,23 +528,18 @@
             // Make sure the image is up-to-date
             img.src = canvas.toDataURL();
             
-            /**
-            * Ensure the div is visible
-            */
+            
+            //Ensure the div is visible
             if (div && div.style.opacity < 1) {
                 setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 1", 400);
             }
 
-            /**
-            * Get the canvas x/y coords
-            */
+            //Get the canvas x/y coords
             var c = OfficeExcel.getCanvasXY(obj.canvas);
             var x = c[0];
             var y = c[1];
 
-            /**
-            * Position the div and img
-            */
+			//Position the div and img
             var offset = 7;
 
             if (obj._zoom._thumbnail_fixed) {
@@ -582,25 +564,21 @@
                 img.style.top = (t + (obj._zoom._factor)) + 'px';
             }
             
-            /**
-            * Fire the onzoom event
-            */
-            OfficeExcel.FireCustomEvent(obj, 'onzoom');
+            //Fire the onzoom event
+            OfficeExcel.FireCustomEvent(obj, 'onzoom');*/
         }
         
         /**
         * The onmouseover event. Evidently. Fades the zoom window in
         */
-        canvas.onmouseover = function (e)
+        /*canvas.onmouseover = function (e)
         {
             var div = OfficeExcel.Registry.Get('chart.zoomed.div');
 
             // ???
             if (!div) return;
             
-            /**
-            * Allow for fixed positioning
-            */
+            //Allow for fixed positioning
             if (div && OfficeExcel.Registry.Get('chart.zoomed.div').__object__._zoom._thumbnail_fixed) {
                 return
             }
@@ -679,7 +657,7 @@
                 }
             }
         }
-    }
+    }*/
 
 
     /**
@@ -689,20 +667,17 @@
     */
     OfficeExcel.Zoom = function (e)
     {
-        e = OfficeExcel.FixEventObject(e);
+        /*e = OfficeExcel.FixEventObject(e);
 
-        /**
-        * Show the zoom window
-        */
+        //Show the zoom window
         //if ((e.target.__canvas__ && e.target.__canvas__.__object__._zoom._mode == 'thumbnail') || (e.target.parentNode.__canvas__ && e.target.parentNode.__canvas__.__object__._zoom._mode == 'thumbnail') ) {
         //    return OfficeExcel.ZoomWindow(e);
         //}
         if (e && e.target && e.target.__canvas__) {
             var canvas  = e.target.__canvas__;
         
-        /*******************************************************
-        * This is here to facilitate zooming by just a single left click
-        *******************************************************/
+       
+        //This is here to facilitate zooming by just a single left click
         } else if (e && e.target && e.target.__object__) {
             var canvas = e.target.__object__.canvas;
             e.stopPropagation(); // Hmmmm
@@ -832,34 +807,6 @@
             }
         }
 
-        /**
-        * The onmouseout event. Hides the zoom window. Fades the zoom out
-        *
-        canvas.onmouseout = function (e)
-        {
-            if (OfficeExcel.Registry.Get('chart.zoomed.div') && OfficeExcel.Registry.Get('chart.zoomed.div').__object__._zoom._fade_out) {
-
-                OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 0.8;
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 0.6", 100);
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 0.4", 200);
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 0.2", 300);
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.opacity = 0", 400);
-
-                // Get rid of the zoom window
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.left = '-400px'", 400);
-                setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.top = '-400px'", 400);
-            
-            } else {
-
-                // Get rid of the zoom window
-                if (OfficeExcel.Registry.Get('chart.zoomed.div')) {
-                    setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.left = '-400px'", 1);
-                    setTimeout("OfficeExcel.Registry.Get('chart.zoomed.div').style.top = '-400px'", 1);
-                }
-            }
-        }
-        */
-
         // The background
         if (obj._zoom._background) {
 
@@ -901,8 +848,7 @@
             }
         }
         
-        /**
-        * Fire the onzoom event
-        */
-        OfficeExcel.FireCustomEvent(obj, 'onzoom');
+
+        //Fire the onzoom event
+        OfficeExcel.FireCustomEvent(obj, 'onzoom');*/
     }

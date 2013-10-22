@@ -3094,13 +3094,12 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     * 
     * @param object obj The graph object (from which we can get the context and canvas as required)
     */
-    OfficeExcel.DrawCrosshairs = function (obj)
+    OfficeExcel.DrawCrosshairs = function (obj)//показывает позицию на графике
     {
-        if (obj._otherProps._crosshairs) {
+        /*if (obj._otherProps._crosshairs) {
             var canvas  = obj.canvas;
             var context = obj.context;
             
-            //canvas.onmousemove = function (e)
             var crosshairs_mousemove = function (e)
             {
                 var e       = OfficeExcel.FixEventObject(e);
@@ -3154,10 +3153,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
                     context.stroke();
                     
                     
-                    /**
-                    * Need to show the coords?
-                    */
-                    if (obj._otherProps._crosshairs_coords) {
+					//Need to show the coords?                    if (obj._otherProps._crosshairs_coords) {
                         if (obj.type == 'scatter') {
 
                             var xCoord = (((x - obj._chartGutter._left) / (obj.canvas.width - gutterLeft - gutterRight)) * (obj._otherProps._xmax - obj._otherProps._xmin)) + obj._otherProps._xmin;
@@ -3218,10 +3214,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
                         }
                     }
 
-                    /**
-                    * Fire the oncrosshairs custom event
-                    */
-                    OfficeExcel.FireCustomEvent(obj, 'oncrosshairs');
+					//Fire the oncrosshairs custom event                    OfficeExcel.FireCustomEvent(obj, 'oncrosshairs');
 
                 } else {
                     OfficeExcel.HideCrosshairCoords();
@@ -3229,7 +3222,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
             }
             canvas.addEventListener('mousemove', crosshairs_mousemove, false);
             OfficeExcel.AddEventListener(obj.id, 'mousemove', crosshairs_mousemove);
-        }
+        }*/
     }
 
     /**
@@ -3237,7 +3230,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     */
     OfficeExcel.HideCrosshairCoords = function ()
     {
-        var div = OfficeExcel.Registry.Get('chart.coordinates.coords.div');
+        /*var div = OfficeExcel.Registry.Get('chart.coordinates.coords.div');
 
         if (   div
             && div.style.opacity == 1
@@ -3254,7 +3247,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
             setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.1;}, 450);
             setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0;}, 500);
             setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.display = 'none';}, 550);
-        }
+        }*/
     }
 
 
@@ -3399,7 +3392,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     */
     OfficeExcel.Async = function (func)
     {
-        return setTimeout(func, arguments[1] ? arguments[1] : 1);
+        //return setTimeout(func, arguments[1] ? arguments[1] : 1);
     }
 
 
@@ -3591,7 +3584,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     */
     OfficeExcel.HideZoomedCanvas = function ()
     {
-        var interval = 15;
+        /*var interval = 15;
         var frames   = 10;
 
         if (typeof(__zoomedimage__) == 'object') {
@@ -3618,7 +3611,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
 
         if (typeof(__zoomedbackground__) == 'object') {
             setTimeout("__zoomedbackground__.style.display = 'none'", obj._zoom._fade_out ? (frames * interval) + 10 : 0);
-        }
+        }*/
     }
 
 

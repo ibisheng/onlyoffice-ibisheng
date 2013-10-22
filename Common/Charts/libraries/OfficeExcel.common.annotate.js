@@ -11,15 +11,12 @@
         /**
         * This installs some event handlers
         */
-        if (obj._otherProps._annotatable) {
+        /*if (obj._otherProps._annotatable) {
 
             var canvas  = obj.canvas;
             var context = obj.context;
             
-            /**
-            * Capture the mouse events so we can set whther the mouse is down or not
-            */
-            var canvas_onmousedown = function (e)
+			//Capture the mouse events so we can set whther the mouse is down or not            var canvas_onmousedown = function (e)
             {
                 if (e.button == 0) {
 
@@ -50,10 +47,7 @@
                     OfficeExcel.Registry.Set('started.annotating', false);
                     OfficeExcel.Registry.Set('chart.annotating', obj);
                     
-                    /**
-                    * Fire the onannotatebegin event. It also fires an event called ononnotatestart for BC purposes
-                    */
-                    OfficeExcel.FireCustomEvent(obj, 'onannotatestart');
+					// Fire the onannotatebegin event. It also fires an event called ononnotatestart for BC purposes                    OfficeExcel.FireCustomEvent(obj, 'onannotatestart');
                     OfficeExcel.FireCustomEvent(obj, 'onannotatebegin');
                 }
                 
@@ -62,9 +56,6 @@
             canvas.addEventListener('mousedown', canvas_onmousedown, false);
             OfficeExcel.AddEventListener(canvas.id, 'mousedown', canvas_onmousedown);
             
-            /**
-            * This cancels annotating for ALL canvases
-            */
             var window_onmouseup = function (e)
             {
                 var obj  = OfficeExcel.Registry.Get('chart.annotating');
@@ -93,19 +84,12 @@
                 
                 // Clear the recorded annotations
                 OfficeExcel.Registry.Set('annotate.actions', []);
-                
-                /**
-                * Fire the annotate event
-                */
 
                 OfficeExcel.FireCustomEvent(obj, 'onannotateend');
             }
             window.addEventListener('mouseup', window_onmouseup, false);
             OfficeExcel.AddEventListener(canvas.id, 'window_mouseup', window_onmouseup);
             
-            /**
-            * Canvas onmouseup event
-            */
             var canvas_onmouseup = function (e)
             {
                 var obj = e.target.__object__;
@@ -115,9 +99,6 @@
             canvas.addEventListener('mouseup', canvas_onmouseup, false);
             OfficeExcel.AddEventListener(canvas.id, 'mouseup', canvas_onmouseup);
 
-            /**
-            * The canvas onmousemove function
-            */
             var canvas_onmousemove = function (e)
             {
                 var e      = OfficeExcel.FixEventObject(e);
@@ -142,9 +123,6 @@
                        // Special case for HBars and Gantts with their extra wide left gutter
                        if ( (obj.type != 'hbar' && obj.type != 'gantt') || x > obj._chartGutter._left) {
 
-                           /**
-                           * This is here to stop annotating in the gutter
-                           */
                             if (OfficeExcel.Registry.Get('started.annotating') == false) {
                                 context.moveTo(x, y);
                                 OfficeExcel.Registry.Set('started.annotating', true)
@@ -156,9 +134,7 @@
 
                             context.stroke();
 
-                            /**
-                            * Fire the annotate event
-                            */
+                         
                             OfficeExcel.FireCustomEvent(obj, 'onannotate');
                         }
                     }
@@ -171,7 +147,7 @@
             OfficeExcel.AddEventListener(canvas.id, 'mousemove', canvas_onmousemove);
 
             OfficeExcel.ReplayAnnotations(obj);
-        }
+        }*/
     }
 
 
@@ -182,7 +158,7 @@
     */
     OfficeExcel.Showpalette = function (e)
     {
-        var isSafari = navigator.userAgent.indexOf('Safari') ? true : false;
+        /*var isSafari = navigator.userAgent.indexOf('Safari') ? true : false;
 
         e = OfficeExcel.FixEventObject(e);
 
@@ -228,17 +204,11 @@
         div.innerHTML = str;
         document.body.appendChild(div);
         
-        /**
-        * Now the div has been added to the document, move it up and left and set the width and height
-        */
         div.style.width  = (div.offsetWidth) + 'px';
         div.style.height = (div.offsetHeight - (OfficeExcel.isIE9up() ? 5 : 5)) + 'px';
         div.style.left   = Math.max(0, e.pageX - div.offsetWidth - 2) + 'px';
         div.style.top    = (e.pageY - div.offsetHeight - 2) + 'px';
 
-        /**
-        * Store the palette div in the registry
-        */
         OfficeExcel.Registry.Set('palette', div);
         
         setTimeout("OfficeExcel.Registry.Get('palette').style.opacity = 0.2", 50);
@@ -256,20 +226,20 @@
 
         // Should this be here? Yes. This function is being used as an event handler.
         e.stopPropagation();
-        return false;
+        return false;*/
     }
 
     // Clears any annotation data from global storage
     OfficeExcel.ClearAnnotations = function (id)
     {
-        var canvas = document.getElementById(id);
+        /*var canvas = document.getElementById(id);
         var obj    = canvas.__object__;
 
         if (window.localStorage && window.localStorage['__OfficeExcel_annotations_' + id + '__'] && window.localStorage['__OfficeExcel_annotations_' + id + '__'].length) {
             window.localStorage['__OfficeExcel_annotations_' + id + '__'] = [];
             
             OfficeExcel.FireCustomEvent(obj, 'onannotateclear');
-        }
+        }*/
     }
 
 
@@ -281,7 +251,7 @@
     OfficeExcel.ReplayAnnotations = function (obj)
     {
         // Check for support
-        if (!window.localStorage) {
+       /* if (!window.localStorage) {
             return;
         }
 
@@ -317,5 +287,5 @@
             }
         }
         
-        context.stroke();
+        context.stroke();*/
     }

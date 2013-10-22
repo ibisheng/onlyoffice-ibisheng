@@ -22,21 +22,15 @@
     */
     OfficeExcel.Tooltip = function (canvas, text, x, y, idx)
     {
-        /**
-        * chart.tooltip.override allows you to totally take control of rendering the tooltip yourself
-        */
-        if (typeof(canvas.__object__._tooltip._override) == 'function') {
+        //chart.tooltip.override allows you to totally take control of rendering the tooltip yourself
+        /*if (typeof(canvas.__object__._tooltip._override) == 'function') {
             return canvas.__object__._tooltip._override(canvas, text, x, y, idx);
         }
 
-        /**
-        * This facilitates the "id:xxx" format
-        */
+        //This facilitates the "id:xxx" format
         text = OfficeExcel.getTooltipTextFromDIV(text);
 
-        /**
-        * First clear any exising timers
-        */
+        //First clear any exising timers
         var timers = OfficeExcel.Registry.Get('chart.tooltip.timers');
 
         if (timers && timers.length) {
@@ -46,9 +40,7 @@
         }
         OfficeExcel.Registry.Set('chart.tooltip.timers', []);
 
-        /**
-        * Hide the context menu if it's currently shown
-        */
+        //Hide the context menu if it's currently shown
         if (canvas.__object__._otherProps._contextmenu) {
             OfficeExcel.HideContext();
         }
@@ -77,15 +69,11 @@
                 tooltipObj.innerHTML = text;
                 tooltipObj.__text__  = text;
         
-                /**
-                * Now that the new content has been set, re-set the width & height
-                */
+                //Now that the new content has been set, re-set the width & height
                 OfficeExcel.Registry.Get('chart.tooltip').style.width  = OfficeExcel.getTooltipWidth(text, canvas.__object__) + 'px';
                 OfficeExcel.Registry.Get('chart.tooltip').style.height = OfficeExcel.Registry.Get('chart.tooltip').offsetHeight + 'px';
 
-                /**
-                * Now (25th September 2011) use jQuery if it's available
-                */
+               // Now (25th September 2011) use jQuery if it's available
                 if (typeof(jQuery) == 'function' && typeof($) == 'function') {
                     $('#' + tooltipObj.id).animate({
                         opacity: 1,
@@ -120,23 +108,17 @@
                 alert('[TOOLTIPS] The "snap" effect is only supported on the Line, Rscatter, Scatter and Radar charts (tried to use it with type: ' + canvas.__object__.type);
             }
 
-            /**
-            * Fire the tooltip event
-            */
+            //Fire the tooltip event
             OfficeExcel.FireCustomEvent(canvas.__object__, 'ontooltip');
 
             return;
         }
 
-        /**
-        * Hide any currently shown tooltip
-        */
+        //Hide any currently shown tooltip
         OfficeExcel.HideTooltip();
 
 
-        /**
-        * Show a tool tip
-        */
+        //Show a tool tip
         var tooltipObj  = document.createElement('DIV');
         tooltipObj.className             = canvas.__object__._tooltip._css_class;
         tooltipObj.style.display         = 'none';
@@ -170,9 +152,7 @@
         if (typeof(idx) == 'number') {
             tooltipObj.__index__ = idx;
             
-            /**
-            * Just for the line chart
-            */
+            //Just for the line chart
             if (canvas.__object__.type == 'line') {
                 var index2 = idx;
                 
@@ -195,16 +175,12 @@
             y = y + 2;
         }
 
-        /**
-        * Set the width on the tooltip so it doesn't resize if the window is resized
-        */
+        //Set the width on the tooltip so it doesn't resize if the window is resized
         tooltipObj.style.width = width + 'px';
         //tooltipObj.style.height = 0; // Initially set the tooltip height to nothing
 
-        /**
-        * If the mouse is towards the right of the browser window and the tooltip would go outside of the window,
-        * move it left
-        */
+        //If the mouse is towards the right of the browser window and the tooltip would go outside of the window,
+       // move it left
         if ( (x + width) > document.body.offsetWidth ) {
             x = x - width - 7;
             var placementLeft = true;
@@ -357,16 +333,12 @@
             // When the animation is finished, set the tooltip HTML
             OfficeExcel.Registry.Get('chart.tooltip.timers').push(setTimeout("if (OfficeExcel.Registry.Get('chart.tooltip')) { OfficeExcel.Registry.Get('chart.tooltip').innerHTML = OfficeExcel.Registry.Get('chart.tooltip').__text__; }", 250));
 
-            /**
-            * This resets the pointer
-            */
+            //This resets the pointer
             OfficeExcel.Registry.Get('chart.tooltip.timers').push(setTimeout("if (OfficeExcel.Registry.Get('chart.tooltip')) { OfficeExcel.Registry.Get('chart.tooltip').style.cursor = 'default'; }", 275));
 
         } else if (effect == 'snap') {
 
-            /*******************************************************
-            * Move the tooltip
-            *******************************************************/
+            //Move the tooltip
             for (var i=1; i<=10; ++i) {
                 OfficeExcel.Registry.Get('chart.tooltip.timers').push(setTimeout("if (OfficeExcel.Registry.Get('chart.tooltip')) { OfficeExcel.Registry.Get('chart.tooltip').style.left = '" + (x * 0.1 * i) + "px'; }", 15 * i));
                 OfficeExcel.Registry.Get('chart.tooltip.timers').push(setTimeout("if (OfficeExcel.Registry.Get('chart.tooltip')) { OfficeExcel.Registry.Get('chart.tooltip').style.top = '" + (y * 0.1 * i) + "px'; }", 15 * i));
@@ -393,9 +365,7 @@
 
         setTimeout("if (OfficeExcel.Registry.Get('chart.tooltip')) { OfficeExcel.Registry.Get('chart.tooltip').style.opacity = 1;}", effect == 'none' ? 50 : 250);
 
-        /**
-        * If the tooltip it self is clicked, cancel it
-        */
+        //If the tooltip it self is clicked, cancel it
         tooltipObj.onmousedown = function (e)
         {
             e = OfficeExcel.FixEventObject(e)
@@ -410,9 +380,7 @@
             }
         }
 
-        /**
-        * Install the function for hiding the tooltip.
-        */
+        //Install the function for hiding the tooltip.
         document.body.onmousedown = function (event)
         {
             var tooltip = OfficeExcel.Registry.Get('chart.tooltip');
@@ -427,9 +395,7 @@
             }
         }
 
-        /**
-        * If the window is resized, hide the tooltip
-        */
+        //If the window is resized, hide the tooltip
         window.onresize = function ()
         {
             var tooltip = OfficeExcel.Registry.Get('chart.tooltip');
@@ -448,15 +414,12 @@
             }
         }
 
-        /**
-        * Keep a reference to the tooltip
-        */
+        
+        //Keep a reference to the tooltip
         OfficeExcel.Registry.Set('chart.tooltip', tooltipObj);
 
-        /**
-        * Fire the tooltip event
-        */
-        OfficeExcel.FireCustomEvent(canvas.__object__, 'ontooltip');
+        //Fire the tooltip event
+        OfficeExcel.FireCustomEvent(canvas.__object__, 'ontooltip');*/
     }
     
     
@@ -466,7 +429,7 @@
     OfficeExcel.getTooltipTextFromDIV = function (text)
     {
         // This regex is duplicated firher down on roughly line 888
-        var result = /^id:(.*)/.exec(text);
+        /*var result = /^id:(.*)/.exec(text);
 
         if (result && result[1] && document.getElementById(result[1])) {
             text = document.getElementById(result[1]).innerHTML;
@@ -474,7 +437,7 @@
             text = '';
         }
         
-        return text;
+        return text;*/
     }
 
 
@@ -484,7 +447,7 @@
     OfficeExcel.parseTooltipText = function (tooltips, idx)
     {
         // Get the tooltip text
-        if (typeof(tooltips) == 'function') {
+        /*if (typeof(tooltips) == 'function') {
             var text = tooltips(idx);
 
         } else if (typeof(tooltips) == 'object' && tooltips && typeof(tooltips[idx]) == 'function') {
@@ -503,7 +466,7 @@
             text = '';
         }
 
-        return OfficeExcel.getTooltipTextFromDIV(text);
+        return OfficeExcel.getTooltipTextFromDIV(text);*/
     }
 
 
@@ -512,7 +475,7 @@
     */
     OfficeExcel.getTooltipWidth = function (text, obj)
     {
-        var div = document.createElement('DIV');
+        /*var div = document.createElement('DIV');
             div.className             = obj._tooltip._css_class;
             div.style.paddingLeft     = OfficeExcel.tooltips.padding;
             div.style.paddingRight    = OfficeExcel.tooltips.padding;
@@ -526,7 +489,7 @@
             div.innerHTML             = OfficeExcel.getTooltipTextFromDIV(text);
         document.body.appendChild(div);
 
-        return div.offsetWidth;
+        return div.offsetWidth;*/
     }
 
 
@@ -535,14 +498,14 @@
     */
     OfficeExcel.HideTooltip = function ()
     {
-        var tooltip = OfficeExcel.Registry.Get('chart.tooltip');
+        /*var tooltip = OfficeExcel.Registry.Get('chart.tooltip');
 
         if (tooltip) {
             tooltip.parentNode.removeChild(tooltip);
             tooltip.style.display = 'none';                
             tooltip.style.visibility = 'hidden';
             OfficeExcel.Registry.Set('chart.tooltip', null);
-        }
+        }*/
     }
 
 
@@ -556,10 +519,8 @@
     */
     OfficeExcel.InstallBarTooltipEventListeners = function (obj)
     {
-        /**
-        * Install the window onclick handler
-        */
-        var window_onclick_func = function (){OfficeExcel.Redraw();};
+        //Install the window onclick handler
+        /*var window_onclick_func = function (){OfficeExcel.Redraw();};
         window.addEventListener('click', window_onclick_func, false);
         OfficeExcel.AddEventListener('window_' + obj.id, 'click', window_onclick_func);
 
@@ -579,15 +540,11 @@
 
             var barCoords = obj.getBar(e);
     
-            /**
-            * If there are bar coords AND the bar has height
-            */
+            //If there are bar coords AND the bar has height
     
             if (barCoords && barCoords[4] > 0 && OfficeExcel.parseTooltipText(obj._tooltip._tooltips, barCoords[5])) {
 
-                /**
-                * Get the tooltip text
-                */
+                //Get the tooltip text
                 var text = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, barCoords[5]);
 
                 if (text) {
@@ -596,9 +553,7 @@
                     canvas.style.cursor = 'default';
                 }
                 
-                /**
-                * Hide the currently displayed tooltip if the index is the same
-                */
+                //Hide the currently displayed tooltip if the index is the same
                 if (   OfficeExcel.Registry.Get('chart.tooltip')
                     && OfficeExcel.Registry.Get('chart.tooltip').__canvas__.id != obj.id
                     && obj._tooltip._event == 'onmousemove') {
@@ -607,9 +562,7 @@
                     OfficeExcel.HideTooltip();
                 }
     
-                /**
-                * This facilitates the tooltips using the onmousemove event
-                */
+                //This facilitates the tooltips using the onmousemove event
     
                 if (   obj._tooltip._event == 'onmousemove'
                     && (
@@ -617,9 +570,8 @@
                         || !OfficeExcel.Registry.Get('chart.tooltip')
                        )
                     && text) {
-                    /**
-                    * Show a tooltip if it's defined
-                    */
+                    
+					//Show a tooltip if it's defined
                     OfficeExcel.Redraw(obj);
 
                     if (obj._tooltip._highlight) {
@@ -656,9 +608,7 @@
 
 
 
-        /**
-        * Install the onclick event handler for the tooltips
-        */
+        //Install the onclick event handler for the tooltips
         if (obj._tooltip._event == 'onclick') {
 
             var canvas_onclick = function (e)
@@ -679,25 +629,18 @@
 
                 var barCoords = obj.getBar(e);
 
-                /**
-                * Redraw the graph first, in effect resetting the graph to as it was when it was first drawn
-                * This "deselects" any already selected bar
-                */
+
+                //Redraw the graph first, in effect resetting the graph to as it was when it was first drawn
+                //This "deselects" any already selected bar
                 OfficeExcel.Redraw();
 
-                /**
-                * Loop through the bars determining if the mouse is over a bar
-                */
+                //Loop through the bars determining if the mouse is over a bar
                 if (barCoords) {
 
-                    /**
-                    * Get the tooltip text
-                    */
+                    //Get the tooltip text
                     var text = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, barCoords[5]);
 
-                    /**
-                    * Show a tooltip if it's defined
-                    */
+                    //Show a tooltip if it's defined
                     if (text && text != 'undefined') {
                         if (obj._tooltip._highlight) {
 
@@ -714,14 +657,12 @@
                     }
                 }
 
-                /**
-                * Stop the event bubbling
-                */
+                //Stop the event bubbling
                 e.stopPropagation();
             }
             OfficeExcel.AddEventListener(obj.id, 'click', canvas_onclick);
             obj.canvas.addEventListener('click', canvas_onclick, false);
-        }
+        }*/
     }
 
 
@@ -733,7 +674,7 @@
     */
     OfficeExcel.InstallLineTooltipEventListeners = function (obj)
     {
-        var canvas_onclick_func = function (e)
+        /*var canvas_onclick_func = function (e)
         {
             e = OfficeExcel.FixEventObject(e);
     
@@ -778,9 +719,7 @@
                         canvas.style.cursor = 'default';
                     }
 
-                    /**
-                    * If the tooltip is the same one as is currently visible (going by the array index), don't do squat and return.
-                    */
+                    //If the tooltip is the same one as is currently visible (going by the array index), don't do squat and return.
     
                     if (   OfficeExcel.Registry.Get('chart.tooltip')
                         && OfficeExcel.Registry.Get('chart.tooltip').__index__ == idx
@@ -791,9 +730,7 @@
                         return;
                     }
     
-                    /**
-                    * Redraw the graph
-                    */
+                    //Redraw the graph
                     if (obj._tooltip._highlight || obj.__bar__) {
                         
                         OfficeExcel.Redraw();
@@ -811,25 +748,20 @@
                     if (typeof(obj._tooltip._override) != 'function') {
                         OfficeExcel.Registry.Get('chart.tooltip').__index__ = Number(idx);
     
-                        /**
-                        * This converts idx into the index that is not greater than the
-                        * number of items in the data array
-                        */
+                        //This converts idx into the index that is not greater than the
+                        //number of items in the data array
                         while (idx >= obj.data[0].length) {
                             idx -= obj.data[0].length
                         }
     
                         OfficeExcel.Registry.Get('chart.tooltip').__index2__ = idx;
                     
-                        /**
-                        * Set the source event
-                        */
+                        //Set the source event
+ 
                         OfficeExcel.Registry.Get('chart.tooltip').__event__ = 'mousemove';
 
     
-                        /**
-                        * Highlight the graph
-                        */
+                        //Highlight the graph
                         if (obj._tooltip._highlight) {
                         
                             context.beginPath();
@@ -847,9 +779,7 @@
                 }
             }
             
-            /**
-            * Not over a hotspot?
-            */
+            //Not over a hotspot?
             canvas.style.cursor = 'default';
         }
         obj.canvas.addEventListener('click', canvas_onclick_func, false);
@@ -905,7 +835,7 @@
             }
             obj.canvas.addEventListener('mousemove', canvas_onmousemove_func, false);
             OfficeExcel.AddEventListener(obj.id, 'mousemove', canvas_onmousemove_func);
-        }
+        }*/
     }
 
 
@@ -916,7 +846,7 @@
     */
     OfficeExcel.PreLoadTooltipImages = function (obj)
     {
-        var tooltips = obj._tooltip._tooltips;
+        /*var tooltips = obj._tooltip._tooltips;
         
         if (obj.type == 'rscatter') {
             tooltips = [];
@@ -955,6 +885,6 @@
 
             // Now remove the div
             document.body.removeChild(div);
-        }
+        }*/
         
     }
