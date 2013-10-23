@@ -1168,8 +1168,10 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
 				if(chart.bShowCatName && chart.type != 'Scatter')
 				{
-					if(chart.bShowCatName && series[numSeries] && series[numSeries].Cat && chart.type != "Pie")
+					if(series[numSeries] && series[numSeries].Cat && series[numSeries].Cat.NumCache[col] && chart.type != "Pie")
 						catNameLabels[numSeries][n] = series[numSeries].Cat.NumCache[col].val;
+					else if(chart.type != "Pie" && series[numSeries] && series[numSeries].TxCache)
+						catNameLabels[numSeries][n] = series[numSeries].TxCache.Tx;
 					else if(series[numSeries] && series[numSeries] && series[numSeries].TxCache)
 						catNameLabels[numSeries][n] = series[numSeries].TxCache.Tx;
 					
