@@ -623,6 +623,7 @@
         var labels     = this._otherProps._labels;
         var context    = this.context;
 		var bold 	   = this._otherProps._labels_above_bold;
+		var curLabel;
 		var textOptions =
 		{
 			color: this._otherProps._labels_above_color,
@@ -714,13 +715,19 @@
 
 
                 context.fillStyle = this._otherProps._text_color;
-
+				if(this.catNameLabels && typeof this.catNameLabels[0][i] == "string")
+				{
+					curLabel = this.catNameLabels[0][i];
+					isFormatCellTrue = "General";
+				}
+				else
+					curLabel = labels[i];
                 OfficeExcel.Text(context,
                             this._otherProps._text_font,
                             text_size,
                             centerx + explosion_offsetx + ((this.radius - 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
                             this.centery + explosion_offsety + (((this.radius - 10) * Math.sin(a))),
-                            OfficeExcel.numToFormatText(labels[i],isFormatCellTrue),
+                            OfficeExcel.numToFormatText(curLabel,isFormatCellTrue),
                             vAlignment,
                             hAlignment, false, null,null, bold, null, textOptions);
             }

@@ -1388,6 +1388,8 @@
 	
 	OfficeExcel.num_round = function (num)
 	{
+		if(num.toString() && num.toString().indexOf('e+') == -1 && isNaN(parseFloat(num)))
+			return num;
 		var floatKoff = 100000000000;
 		if(num.toString() && num.toString().indexOf('e+') > -1)
 		{

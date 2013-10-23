@@ -1009,6 +1009,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	var formatCellScOy = 'General';
 	var defaultFormat = 'General';
 	var isDateTimeFormat;
+	var catNameFormat;
 	
 	var api_doc = window["editor"];
 	var api_sheet = window["Asc"]["editor"];
@@ -1018,6 +1019,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
 	var arrFormatAdobeLabels = [];
+	var catNameLabels = [];
 	
 	//просматриваем bShowValue для каждой из серий 
 	//TODO позже отрисовывать значения для каждой серии индивидуально
@@ -1029,7 +1031,10 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 			}
 		}
 	}
-				
+			
+	if(chart.bShowCatName)
+		chart.bShowValue = true;
+	
 	if(chart.series && chart.series.length != 0 /*&& !chart.range.intervalObject*/)//берём данные из NumCache
 	{
 		isSeries = true;
@@ -1092,6 +1097,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 			skipSeries[l] = false;
 			arrValues[numSeries] = [];
 			arrFormatAdobeLabels[numSeries] = [];
+			catNameLabels[numSeries] = [];
 			isSkip[numSeries] = true;
 	
 			var row = firstRow;
@@ -1160,6 +1166,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				else
 					arrValues[numSeries][n] = value;
 				arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
+				if(chart.bShowCatName && chart.type != 'Scatter')
+				{
+					if(chart.bShowCatName && series[numSeries] && series[numSeries].Cat && chart.type != "Pie")
+						catNameLabels[numSeries][n] = series[numSeries].Cat.NumCache[col].val;
+					else if(series[numSeries] && series[numSeries] && series[numSeries].TxCache)
+						catNameLabels[numSeries][n] = series[numSeries].TxCache.Tx;
+					
+				}
 				n++;
 			}
 			numSeries++;
@@ -1321,7 +1335,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	chart.max = max;
 	if(skipSeries)
 		chart.skipSeries = skipSeries;
-		
+	chart.catNameLabels = null;	
 	if(newArr != undefined)
 	{
 		chart.arrFormatAdobeLabels = newAdobeLabels;
@@ -1337,12 +1351,16 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				chart.isSkip = arrReverse(isSkip);
 				arrValuesRev = arrReverse(arrValues);
 				chart.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
+				if(catNameLabels && catNameLabels.length)
+					chart.catNameLabels = arrReverse(catNameLabels);
 				drawChart(chart, arrValuesRev, width, height, options);
 			}
 			else
 			{
 				chart.isSkip = isSkip;
 				chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
+				if(catNameLabels && catNameLabels.length)
+					chart.catNameLabels = catNameLabels;
 				drawChart(chart, arrValues, width, height, options);
 			}
 		}
@@ -1701,6 +1719,10 @@ function drawChart(chart, arrValues, width, height, options) {
 	else
 		bar._otherProps._background_image_color = defaultColor;
 	bar.margins = chart.margins;
+	if(chart.catNameLabels && chart.catNameLabels.length)
+		bar.catNameLabels = chart.catNameLabels;
+	else
+		bar.catNameLabels = null;
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 

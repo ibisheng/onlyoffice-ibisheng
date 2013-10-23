@@ -1977,11 +1977,19 @@
         n = 0;
         for (var i = 0; i < this.firstData.length; ++i) {
              for (var j = 0; j < this.firstData[i].length; ++j) {
-                tempData[n] = this.firstData[i][j];
-				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
-					formatLabels[n] = this.arrFormatAdobeLabels[i][j];
+				if(this.catNameLabels && this.catNameLabels[i] && this.catNameLabels[i][j])
+				{	
+					tempData[n] = this.catNameLabels[i][j];
+					formatLabels[n] = "General";
+				}
 				else
-					formatLabels[n] = format;
+				{
+					 tempData[n] = this.firstData[i][j];
+					if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
+						formatLabels[n] = this.arrFormatAdobeLabels[i][j];
+					else
+						formatLabels[n] = format;
+				}
 				n++;
             }
         }

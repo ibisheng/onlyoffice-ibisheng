@@ -993,7 +993,12 @@
                         //this.context.strokeRect(startX, startY, width, individualBarHeight);
                         if(width != 0)
                             this.context.fillRect(startX, startY, width, individualBarHeight);
-
+						
+						var catName;
+						if(this.catNameLabels && this.catNameLabels[i] && this.catNameLabels[i][j])
+						{
+							catName = this.catNameLabels[i][j];
+						}						
                         this.coords.push([startX,
                                           startY,
                                           width,
@@ -1002,7 +1007,8 @@
                                           this.data[i][j],
                                           true,
 										  this.arrFormatAdobeLabels[i][j],
-										  this.firstData[i][j]
+										  this.firstData[i][j],
+										  catName
 										  ]);
                     }
                 }
@@ -1076,14 +1082,16 @@
 				var formatLabel = format;
 				if(this.coords[i][7])
 					formatLabel = this.coords[i][7];
-				if(this.coords[i][8])
+				if(this.coords[i][9])
+					textLabel = this.coords[i][9];
+				else if(this.coords[i][8])
 					textLabel = this.coords[i][8];
 				else
 					continue;
 					
 				if(this.coords[i][7] == null && !textLabel)
 					textLabel = "";
-				if(textLabel != '')
+				if(textLabel != '' && !this.coords[i][9])
 					textLabel = OfficeExcel.numToFormatText(OfficeExcel.num_round(textLabel),formatLabel);
 					
                 OfficeExcel.Text(this.context,

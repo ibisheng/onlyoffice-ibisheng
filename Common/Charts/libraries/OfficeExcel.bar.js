@@ -1302,7 +1302,10 @@
 						var formatCellTrue = formatCell;
 						if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i])
 							formatCellTrue = this.arrFormatAdobeLabels[i][j];
-						this.coords.push([startX, startY, individualBarWidth, height, formatCellTrue, this.firstData[i][j]]);
+						var catName;
+						if(this.catNameLabels && this.catNameLabels[i] && this.catNameLabels[i][j])
+							catName = this.catNameLabels[i][j];
+						this.coords.push([startX, startY, individualBarWidth, height, formatCellTrue, this.firstData[i][j], catName]);
 							
                         // Facilitate shadows going to the left
                         if (this._shadow._visible) {
@@ -2069,7 +2072,10 @@
 					value = this.coords[i][5];
 				if(value != '')
 					value = OfficeExcel.numToFormatText(OfficeExcel.num_round(value),formatCellTrue);
-			
+				//catName
+				if(this.catNameLabels && this.coords[i][6])
+					value = this.coords[i][6];
+					
 				this.context.fillStyle = this._otherProps._text_color;
 				OfficeExcel.Text(this.context,
 							this._otherProps._labels_above_font,
