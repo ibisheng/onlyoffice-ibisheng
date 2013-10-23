@@ -667,7 +667,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	{
 		tempScale = bar._otherProps._labels;
 	}
-	var hBarTempLeft;
+	var hBarTempLeft = 0;
 	if(tempScale != undefined && tempScale[tempScale.length -1] != undefined && bar._otherProps._ylabels != false)
 	{
 		//left = bar.context.measureText(bar.scale[bar.scale.length -1]).width;
