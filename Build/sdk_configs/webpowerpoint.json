@@ -55,6 +55,8 @@
                 "../Common/Charts/charts.js",
                 "../Excel/graphics/DrawingContextWord.js",
 
+                "../Common/trackFile.js",
+
                 "../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../Common/Charts/libraries/OfficeExcel.common.annotate.js",
                 "../Common/Charts/libraries/OfficeExcel.common.context.js",
