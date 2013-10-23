@@ -403,7 +403,6 @@ prop:asc_addChartDrawingObject
 prop:asc_editChartDrawingObject
 prop:asc_getChartPreviews
 prop:sync_closeChartEditor
-prop:_StartTracking
 prop:sync_ContextMenuCallback
 ---
 var:CChatMessage
@@ -1547,7 +1546,6 @@ asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
 asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
 asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
-asc_docs_api.prototype['_StartTracking'] = asc_docs_api.prototype._StartTracking;
 asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync_ContextMenuCallback;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
