@@ -183,12 +183,13 @@ DrawingObjectsController.prototype =
 
     deleteSelectedObjects: function()
     {
-        var drawingObjectsController = this;
+		this.remove(-1);
+        /*var drawingObjectsController = this;
         for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
         {
             drawingObjectsController.selectedObjects[i].deleteDrawingBase();
         }
-        drawingObjectsController.resetSelectionState();
+        drawingObjectsController.resetSelectionState();*/
     },
 
     setCellAlignCallBack: function (align) {
@@ -571,7 +572,7 @@ DrawingObjectsController.prototype =
 	
 	remove: function(dir)
 	{
-		 this.checkSelectedObjectsAndCallback(this.removeCallback, [dir])
+		 this.checkSelectedObjectsAndCallback(this.removeCallback, [dir]);
 	},
 	
 	removeCallback: function(dir)
