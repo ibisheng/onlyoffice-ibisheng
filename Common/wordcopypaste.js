@@ -3078,7 +3078,13 @@ PasteProcessor.prototype =
                 oDoc.CurPos.ContentPos = LastPosCurDoc;
             }
         }
-    },
+		
+		var content = oDoc.Content;
+		for(var  i = 0;  i < content.length; ++i)
+		{
+			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
+		}
+	},
     ReadFromBinary : function(sBase64)
 	{
 		//надо сбросить то, что остался после открытия документа
