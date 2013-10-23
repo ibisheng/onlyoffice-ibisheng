@@ -458,7 +458,11 @@ WordShape.prototype =
             var hdr_ftr = doc_content.Is_HdrFtr(true);
             if(!isRealObject(hdr_ftr))
             {
-                editor.WordControl.m_oLogicDocument.CurPos.Type = docpostype_DrawingObjects;
+                var LogicDocument = editor.WordControl.m_oLogicDocument;
+                LogicDocument.CurPos.Type = docpostype_DrawingObjects;
+                LogicDocument.Document_UpdateInterfaceState();
+                LogicDocument.Document_UpdateRulersState();
+                LogicDocument.Document_UpdateSelectionState();
             }
             else
             {
