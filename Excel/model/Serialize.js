@@ -2413,67 +2413,33 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		}
 	};
 	this.WriteSheetView = function (oSheetView) {
-		if (null !== oSheetView.showGridLines) {
-			this.memory.WriteByte(c_oSer_SheetView.ShowGridLines);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(oSheetView.showGridLines);
-		}
-		if (null !== oSheetView.showRowColHeaders) {
-			this.memory.WriteByte(c_oSer_SheetView.ShowRowColHeaders);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(oSheetView.showRowColHeaders);
-		}
+		if (null !== oSheetView.showGridLines)
+			this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
+		if (null !== oSheetView.showRowColHeaders)
+			this.bs.WriteItem(c_oSer_SheetView.ShowRowColHeaders, function(){oThis.memory.WriteBool(oSheetView.showRowColHeaders);});
 	};
 	this.WriteSheetPr = function (sheetPr) {
 		var oThis = this;
-		if (null !== sheetPr.CodeName) {
-			this.memory.WriteByte(c_oSer_SheetPr.CodeName);
-			this.memory.WriteString2(sheetPr.CodeName);
-		}
-		if (null !== sheetPr.EnableFormatConditionsCalculation) {
-			this.memory.WriteByte(c_oSer_SheetPr.EnableFormatConditionsCalculation);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.EnableFormatConditionsCalculation);
-		}
-		if (null !== sheetPr.FilterMode) {
-			this.memory.WriteByte(c_oSer_SheetPr.FilterMode);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.FilterMode);
-		}
-		if (null !== sheetPr.Published) {
-			this.memory.WriteByte(c_oSer_SheetPr.Published);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.Published);
-		}
-		if (null !== sheetPr.SyncHorizontal) {
-			this.memory.WriteByte(c_oSer_SheetPr.SyncHorizontal);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.SyncHorizontal);
-		}
-		if (null !== sheetPr.SyncRef) {
-			this.memory.WriteByte(c_oSer_SheetPr.SyncRef);
-			this.memory.WriteString2(sheetPr.SyncRef);
-		}
-		if (null !== sheetPr.SyncVertical) {
-			this.memory.WriteByte(c_oSer_SheetPr.SyncVertical);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.SyncVertical);
-		}
-		if (null !== sheetPr.TransitionEntry) {
-			this.memory.WriteByte(c_oSer_SheetPr.TransitionEntry);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.TransitionEntry);
-		}
-		if (null !== sheetPr.TransitionEvaluation) {
-			this.memory.WriteByte(c_oSer_SheetPr.TransitionEvaluation);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(sheetPr.TransitionEvaluation);
-		}
-		if (null !== sheetPr.TabColor) {
-			this.memory.WriteByte(c_oSer_SheetPr.TabColor);
-			this.memory.WriteByte(c_oSerPropLenType.Variable);
-			this.bs.WriteItemWithLength(function(){oThis.bs.WriteColorSpreadsheet(sheetPr.TabColor);});
-		}
+		if (null !== sheetPr.CodeName)
+			this.bs.WriteItem(c_oSer_SheetPr.CodeName, function(){oThis.memory.WriteString3(sheetPr.CodeName);});
+		if (null !== sheetPr.EnableFormatConditionsCalculation)
+			this.bs.WriteItem(c_oSer_SheetPr.EnableFormatConditionsCalculation, function(){oThis.memory.WriteBool(sheetPr.EnableFormatConditionsCalculation);});
+		if (null !== sheetPr.FilterMode)
+			this.bs.WriteItem(c_oSer_SheetPr.FilterMode, function(){oThis.memory.WriteBool(sheetPr.FilterMode);});
+		if (null !== sheetPr.Published)
+			this.bs.WriteItem(c_oSer_SheetPr.Published, function(){oThis.memory.WriteBool(sheetPr.Published);});
+		if (null !== sheetPr.SyncHorizontal)
+			this.bs.WriteItem(c_oSer_SheetPr.SyncHorizontal, function(){oThis.memory.WriteBool(sheetPr.SyncHorizontal);});
+		if (null !== sheetPr.SyncRef)
+			this.bs.WriteItem(c_oSer_SheetPr.SyncRef, function(){oThis.memory.WriteString3(sheetPr.SyncRef);});
+		if (null !== sheetPr.SyncVertical)
+			this.bs.WriteItem(c_oSer_SheetPr.SyncVertical, function(){oThis.memory.WriteBool(sheetPr.SyncVertical);});
+		if (null !== sheetPr.TransitionEntry)
+			this.bs.WriteItem(c_oSer_SheetPr.TransitionEntry, function(){oThis.memory.WriteBool(sheetPr.TransitionEntry);});
+		if (null !== sheetPr.TransitionEvaluation)
+			this.bs.WriteItem(c_oSer_SheetPr.TransitionEvaluation, function(){oThis.memory.WriteBool(sheetPr.TransitionEvaluation);});
+		if (null !== sheetPr.TabColor)
+			this.bs.WriteItem(c_oSer_SheetPr.TabColor, function(){oThis.bs.WriteColorSpreadsheet(sheetPr.TabColor);});
 	};
     this.WriteSheetFormatPr = function(ws)
     {

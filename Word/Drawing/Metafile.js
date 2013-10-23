@@ -630,6 +630,21 @@ function CMemory(bIsNoInit)
             this.data[this.pos++] = (c >>> 8)&0xFF;
         }
     }
+	this.WriteString3 = function(text)
+    {
+        if ( "string" != typeof text )
+            text = text + "";
+
+		var count = text.length & 0x7FFFFFFF;
+		var countWrite = 2 * count;
+        this.CheckSize(countWrite);
+        for (var i=0;i<count;i++)
+        {
+            var c = text.charCodeAt(i) & 0xFFFF;
+            this.data[this.pos++] = c&0xFF;
+            this.data[this.pos++] = (c >>> 8)&0xFF;
+        }
+    }
     this.ClearNoAttack = function()
     {
         this.pos = 0;
