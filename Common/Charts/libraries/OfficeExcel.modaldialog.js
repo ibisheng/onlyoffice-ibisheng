@@ -34,7 +34,7 @@
     */
     ModalDialog.ShowBackground = function ()
     {
-        // Create the background if neccessary
+       /* // Create the background if neccessary
         ModalDialog.background = document.createElement('DIV');
         ModalDialog.background.className      = 'ModalDialog_background';
         ModalDialog.background.style.position = 'fixed';
@@ -49,7 +49,7 @@
             
         document.body.appendChild(ModalDialog.background);
 
-        ModalDialog.background.style.visibility = 'visible';
+        ModalDialog.background.style.visibility = 'visible';*/
     }
 
 
@@ -60,7 +60,7 @@
     {
         // Create the DIV if necessary
         // Jan 2012- Changed so that the dialog is ALWAYS (re)created
-        if (!ModalDialog.dialog || true) {
+       /* if (!ModalDialog.dialog || true) {
             ModalDialog.dialog = document.createElement('DIV');
     
             ModalDialog.dialog.id                    = 'ModalDialog_dialog';
@@ -153,7 +153,7 @@
         setTimeout('ModalDialog.background.style.opacity = 0.2', 100);
         setTimeout('ModalDialog.background.style.opacity = 0.3', 150);
         setTimeout('ModalDialog.background.style.opacity = 0.4', 200);
-        setTimeout('ModalDialog.background.style.opacity = 0.5', 250);
+        setTimeout('ModalDialog.background.style.opacity = 0.5', 250);*/
     }
 
     
@@ -162,7 +162,7 @@
     */
     ModalDialog.Close = function ()
     {
-        if (ModalDialog.dialog) {
+        /*if (ModalDialog.dialog) {
             ModalDialog.dialog.style.visibility = 'hidden';
             ModalDialog.dialog.style.opacity = 0;
         }
@@ -170,7 +170,7 @@
         if (ModalDialog.background) {
             ModalDialog.background.style.visibility = 'hidden';
             ModalDialog.background.style.opacity = 0;
-        }        
+        }*/      
     }
     
     // An alias
@@ -182,12 +182,12 @@
     */
     ModalDialog.Resize = function ()
     {
-        if (ModalDialog.dialog) {
+        /*if (ModalDialog.dialog) {
             ModalDialog.dialog.style.left = (document.body.offsetWidth / 2) - (ModalDialog.dialog.offsetWidth / 2) + 'px';
         }
 
         ModalDialog.background.style.width  = '2500px';
-        ModalDialog.background.style.height = '2500px';
+        ModalDialog.background.style.height = '2500px';*/
     }
 
 
@@ -198,11 +198,11 @@
     */
     ModalDialog.AddCustomEventListener = function (name, func)
     {
-        if (typeof(ModalDialog.events) == 'undefined') {
+        /*if (typeof(ModalDialog.events) == 'undefined') {
             ModalDialog.events = [];
         }
 
-        ModalDialog.events.push([name, func]);
+        ModalDialog.events.push([name, func]);*/
     }
 
 
@@ -214,11 +214,11 @@
     */
     ModalDialog.FireCustomEvent = function (name)
     {
-        for (var i=0; i<ModalDialog.events.length; ++i) {
+        /*for (var i=0; i<ModalDialog.events.length; ++i) {
             if (typeof(ModalDialog.events[i][0]) == 'string' && ModalDialog.events[i][0] == name && typeof(ModalDialog.events[i][1]) == 'function') {
                 ModalDialog.events[i][1]();
             }
-        }
+        }*/
     }
 
 
