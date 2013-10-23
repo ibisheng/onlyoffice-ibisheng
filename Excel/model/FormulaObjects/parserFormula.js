@@ -120,9 +120,8 @@ Math.fact = function ( n ) {
     if ( n < 0 ) return Number.NaN;
     else if ( n > 170 ) return Number.Infinity;
     while ( n != 0 ) {
-        res *= n--
+        res *= n--;
     }
-    ;
     return res;
 }
 
@@ -135,7 +134,7 @@ Math.binomCoeff = function ( n, k ) {
 }
 
 Math.permut = function ( n, k ) {
-    return this.fact( n ) / this.fact( n - k );
+    return Math.floor( this.fact( n ) / this.fact( n - k ) + .5 );
 }
 var _func = [];//для велосипеда а-ля перегрузка функций.
 _func[cElementType.number] = [];
