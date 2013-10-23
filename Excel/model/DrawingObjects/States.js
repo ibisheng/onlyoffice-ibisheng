@@ -4800,8 +4800,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
     var isViewMode = drawingObjectsController.drawingObjects.isViewerMode();
     if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
     {
-
-        switch(state.id)
+		drawingObjectsController.remove(-1);
+        /*switch(state.id)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
@@ -4981,7 +4981,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
         }
-        bRetValue = true;
+        */
+		bRetValue = true;
     }
     else if ( e.keyCode == 9 && false === isViewMode ) // Tab
     {
@@ -5806,7 +5807,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
     }
     else if ( e.keyCode == 46 && false === isViewMode ) // Delete
     {
-        switch(state.id)
+		drawingObjectsController.remove(1);
+        /*switch(state.id)
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
@@ -5988,7 +5990,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
         }
-        bRetValue = true;
+        */bRetValue = true;
     }
     else if ( e.keyCode == 65 && true === e.ctrlKey ) // Ctrl + A - выделяем все
     {

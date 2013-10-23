@@ -568,6 +568,147 @@ DrawingObjectsController.prototype =
             this.drawingObjects.drawingDocument.SelectShow();
         }
     },
+	
+	remove: function(dir)
+	{
+		 this.checkSelectedObjectsAndCallback(this.removeCallback, [dir])
+	},
+	
+	removeCallback: function(dir)
+	{
+		var state = this.curState;
+		var drawingObjectsController = this;
+		switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+               
+				History.Create_NewPoint();
+				var state = drawingObjectsController.curState;
+				state.textObject.remove(dir, true);
+				state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+				History.Create_NewPoint();
+				var state = drawingObjectsController.curState;
+				var group = state.group;
+				var selected_objects = [];
+				for(var i = 0; i < group.selectedObjects.length; ++i)
+				{
+					selected_objects.push(group.selectedObjects[i]);
+				}
+				group.resetSelection();
+				drawingObjectsController.resetSelectionState2();
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+					new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+				var groups = [];
+				for(i = 0; i < selected_objects.length; ++i)
+				{
+					var parent_group = selected_objects[i].group;
+					parent_group.removeFromSpTree(selected_objects[i].Get_Id());
+					for(var j = 0; j < groups.length; ++j)
+					{
+						if(groups[i] === parent_group)
+							break;
+					}
+					if(j === groups.length)
+						groups.push(parent_group);
+				}
+				groups.sort(CompareGroups);
+				for(i  = 0; i < groups.length; ++i)
+				{
+					var parent_group = groups[i];
+					if(parent_group !== group)
+					{
+						if(parent_group.spTree.length === 0)
+						{
+							parent_group.group.removeFromSpTree(parent_group.Get_Id());
+						}
+						if(parent_group.spTree.length === 1)
+						{
+							var sp = parent_group.spTree[0];
+							sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+							sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+								sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+							sp.setPosition(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
+							parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
+						}
+					}
+					else
+					{
+						switch (parent_group.spTree.length)
+						{
+							case 0:
+							{
+								parent_group.deleteDrawingBase();
+								break;
+							}
+							case 1:
+							{
+								var sp = parent_group.spTree[0];
+								sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+								sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+									sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+								sp.setPosition(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
+								sp.setGroup(null);
+								var pos = parent_group.deleteDrawingBase();
+								sp.addToDrawingObjects(pos);
+								sp.select(drawingObjectsController);
+								sp.recalculateTransform();
+								sp.calculateTransformTextMatrix();
+								
+								drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+								History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null,
+									new UndoRedoDataGraphicObjects(sp.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+								break;
+							}
+							default:
+							{
+								parent_group.normalize();
+								parent_group.updateCoordinatesAfterInternalResize();
+								parent_group.select(drawingObjectsController);
+								parent_group.recalculate();
+								
+								drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+								History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+									new UndoRedoDataGraphicObjects(parent_group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+								break;
+							}
+						}
+					}
+				}
+                break;
+            }
+            case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
+            {
+				// Если открыт iframe, то нельзя удалить диаграмму
+				if ( drawingObjectsController.selectedObjects.length == 1 )
+				{
+					if ( (drawingObjectsController.selectedObjects[0] instanceof CChartAsGroup) && (drawingObjectsController.selectedObjects[0].chart.bChartEditor) )
+						break;
+				}
+				History.Create_NewPoint();
+				for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
+				{
+					drawingObjectsController.selectedObjects[i].deleteDrawingBase();
+				}
+				drawingObjectsController.resetSelectionState2();
+				drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+            default :
+            {
+                break;
+            }
+        }
+		
+		drawingObjectsController.drawingObjects.showDrawingObjects(true);
+	},
 
     onMouseDown: function(e, x, y)
     {
@@ -882,7 +1023,7 @@ DrawingObjectsController.prototype =
                 state.id = STATES_ID_GROUP;
                 state.groupId = this.curState.group.Get_Id();
                 state.selectedObjects = [];
-                for(var i = 0; i < this.curState.group.selectedObjects; ++i)
+                for(var i = 0; i < this.curState.group.selectedObjects.length; ++i)
                 {
                     state.selectedObjects.push(this.curState.group.selectedObjects[i].Get_Id());
                 }
