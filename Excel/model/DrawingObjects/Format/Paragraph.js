@@ -7980,6 +7980,7 @@ Paragraph.prototype =
     {
         // Если у нас была задана нумерации в стиле, тогда чтобы ее отменить(не удаляя нумерацию в стиле)
         // мы проставляем NumPr с NumId undefined
+		return;
         var NewNumPr = undefined;
         if ( undefined != this.CompiledPr.Pr.ParaPr.StyleNumPr )
         {

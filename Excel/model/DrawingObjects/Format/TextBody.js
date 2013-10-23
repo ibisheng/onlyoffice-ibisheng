@@ -973,15 +973,36 @@ CTextBody.prototype =
         ret =  copy_processor.Start();
         this.content.Styles = old_styles;
         g_oTableId.m_bTurnOff = false;
-        return ret.childNodes[0];
+        return ret;
     },
 
     insertHtml: function(node)
     {
-        var paste_processor = new PasteProcessor(this.content);
-        paste_processor.Start(node);
-        this.OnContentRecalculate();
+		var controller;
+		if(this.shape instanceof CShape)
+		{
+			controller = this.shape.drawingObjects.controller;
+		}
+		else if(this.shape instanceof CChartTitle)
+		{
+			controller = this.shape.chartGroup.drawingObjects.controller;
+		}
+		if(controller)
+		{
+			controller.checkSelectedObjectsAndCallback(this.insertHtmlCallBack, [node]);
+		}
     },
+	
+	insertHtmlCallBack: function(node)
+	{
+		if(this.curState.textObject && this.curState.textObject.txBody)
+		{
+			var paste_processor = new PasteProcessor(this.curState.textObject.txBody.content);
+			paste_processor.Start(node);
+			this.curState.textObject.txBody.OnContentRecalculate();
+			this.drawingObjects.showDrawingObjects(true);
+		}
+	},
 
     writeToBinaryForCopyPaste: function(w)
     {
@@ -2089,11 +2110,11 @@ PasteProcessor.prototype =
         var nNewContentLength = aNewContent.length;
         //����� ���� �� Document.Add_NewParagraph
 
-        for(var i = 0; i < aNewContent.length; ++i)
+        /*for(var i = 0; i < aNewContent.length; ++i)
         {
             aNewContent[i].Clear_TextFormatting();
             aNewContent[i].Clear_Formatting();
-        }
+        }*/
         oDoc.Remove(1, true, true);
         var Item = oDoc.Content[oDoc.CurPos.ContentPos];
         if( type_Paragraph == Item.GetType() )
@@ -3133,14 +3154,20 @@ PasteProcessor.prototype =
             var font_family = computedStyle.getPropertyValue( "font-family" );
             if(font_family && "" != font_family)
             {
-                var oFontItem = this.oFonts[font_family];
-                if(null != oFontItem && null != oFontItem.Name)
+                //var oFontItem = this.oFonts[font_family];
+				font_family = font_family.replace(/"/g, '');
+				font_family = font_family.replace(/'/g, '');
+                if(null != font_family)
                 {
-                    rPr.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
-                    rPr.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
-                    rPr.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
-                    rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
+                    rPr.RFonts.Ascii = {Name: font_family, Index: -1};
+                    rPr.RFonts.HAnsi = {Name: font_family, Index: -1};
+                    rPr.RFonts.CS = {Name: font_family, Index: -1};
+                    rPr.RFonts.EastAsia = {Name: font_family, Index: -1};
                 }
+				else
+				{
+					rPr.RFonts = undefined;
+				}
             }
             var font_size = node.style.fontSize;
             if(!font_size)
@@ -4136,11 +4163,11 @@ PasteProcessor.prototype =
                     if(value.length > 0)
                     {
                         this.oDocument = shape.txBody.content;
-                        shape.txBody.content.Add_NewParagraph();
+                       // shape.txBody.content.Add_NewParagraph();
                         // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
                         //��������� ������� ����� ���� �� ���������
-                        //this._commit_rPr(node.parentNode);
+                        this._commit_rPr(node.parentNode);
 
 
                         var rPr = this._read_rPr(node.parentNode);
@@ -4355,4 +4382,39 @@ PasteProcessor.prototype =
 
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
+};
+
+function Common_CmpObj2(Obj1, Obj2)
+{
+    if(!Obj1 || !Obj2 || typeof(Obj1) != typeof(Obj2))
+        return false;
+    var p, v1, v2;
+    //проверяем чтобы Obj1 имел теже свойства что и Obj2
+    for(p in Obj2)
+    {
+        if(!Obj1.hasOwnProperty(p))
+            return false;
+    }
+    //проверяем чтобы Obj2 имел теже свойства что и Obj1 и сравниваем их
+    for(p in Obj1)
+    {
+        if(Obj2.hasOwnProperty(p))
+        {
+            v1 = Obj1[p];
+            v2 = Obj2[p];
+            if(v1 && v2 && 'object' === typeof(v1) && 'object' === typeof(v2) )
+            {
+                if( false == Common_CmpObj2(v1, v2))
+                    return false;
+            }
+            else
+            {
+                if(v1 != v2)
+                    return false;
+            }
+        }
+        else
+            return false;
+    }
+    return true;
 };
