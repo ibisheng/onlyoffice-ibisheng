@@ -3332,7 +3332,7 @@ function RangeDataManager(bAllowIntersect, fChange)
 	this.fChange = fChange;
 }
 RangeDataManager.prototype = {
-	add : function(bbox, data)
+	add : function(bbox, data, bTriggerEvent)
 	{
 		var oNewElem = new RangeDataManagerElem(new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2), data);
 		oNewElem.id = this.idGen++;
@@ -3409,6 +3409,8 @@ RangeDataManager.prototype = {
 		}
 		this.oElements[this._getBBoxIndex(bbox)] = oNewElem;
 		this._recalculate();
+		if(false != bTriggerEvent)
+			this.fChange.call(this, oNewElem.data, null, oNewElem.bbox);
 	},
 	_getExecElem : function(elem, oFindElems)
 	{
@@ -3679,10 +3681,10 @@ RangeDataManager.prototype = {
 			}
 			else if(c_oRangeType.All == nRangeType)
 				this.oAll = this._removeExecElem(this.oAll, null, elemToDelete);
-			if(false != bTriggerEvent)
-				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
 			delete this.oElements[this._getBBoxIndex(elemToDelete.bbox)];
 			this._recalculate();
+			if(false != bTriggerEvent)
+				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
 		}
 		else
 		{

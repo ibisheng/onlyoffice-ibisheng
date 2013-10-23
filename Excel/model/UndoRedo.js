@@ -3293,30 +3293,69 @@ UndoRedoWoorksheet.prototype = {
 			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
 		}
 		else if(historyitem_Worksheet_ChangeMerge === Type){
+			var from = null;
+			if(null != Data.from)
+				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+			var to = null;
+			if(null != Data.to)
+				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
 			if(bUndo)
 			{
-				var data = 1;
-				if(null != Data.to)
-				{
-					//todo сделать через get/remove
-					var elem = new RangeDataManagerElem(Data.to, data);
-					ws.mergeManager.remove(elem.bbox, elem, false);
-				}
-				ws.mergeManager.add(Data.from, data);
+				var temp = from;
+				from = to;
+				to = temp;
 			}
+			var data = 1;
+			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
+			{
+				var aMerged = ws.mergeManager.get(from);
+				for(var i in aMerged.inner)
+				{
+					var merged = aMerged.inner[i];
+					if(merged.bbox.isEqual(from))
+					{
+						var elem = new RangeDataManagerElem(from, data);
+						ws.mergeManager.remove(elem.bbox, elem, false);
+						break;
+					}
+				}
+			}
+			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
+				ws.mergeManager.add(to, data, false);
 		}
 		else if(historyitem_Worksheet_ChangeHyperlink === Type){
+			var from = null;
+			if(null != Data.from)
+				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+			var to = null;
+			if(null != Data.to)
+				to = new Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
 			if(bUndo)
 			{
-				var data = Data.hyperlink;
-				if(null != Data.to)
+				var temp = from;
+				from = to;
+				to = temp;
+			}
+			//не делаем clone потому что предполагаем, что здесь могут быть только операции изменения рзмеров, перемещение или удаления одной ссылки
+			var data = Data.hyperlink;
+			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
+			{
+				var aHyperlinks = ws.hyperlinkManager.get(from);
+				for(var i in aHyperlinks.inner)
 				{
-					//todo сделать через get/remove
-					var elem = new RangeDataManagerElem(Data.to, data);
-					ws.hyperlinkManager.remove(elem.bbox, elem, false);
+					var hyp = aHyperlinks.inner[i];
+					if(hyp.bbox.isEqual(from))
+					{
+						var elem = new RangeDataManagerElem(from, data);
+						ws.hyperlinkManager.remove(elem.bbox, elem, false);
+						break;
+					}
 				}
-				data.Ref = ws.getRange3(Data.from.r1, Data.from.c1, Data.from.r2, Data.from.c2);
-				ws.hyperlinkManager.add(Data.from, data);
+			}
+			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
+			{
+				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
+				ws.hyperlinkManager.add(to, data, false);
 			}
 		}
 	}
