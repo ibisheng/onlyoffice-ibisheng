@@ -731,18 +731,18 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 			null != oSettings['trackingInfo'])
 		{
 			var asc_CTrackFile = window["Asc"].CTrackFile;
-			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
+			editor.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 			
-			this.TrackFile.setDocId(this.DocInfo.get_Id());
-			this.TrackFile.setUserId(this.DocInfo.get_UserId());
-			this.TrackFile.setTrackFunc(sendTrack);
-			this.TrackFile.setIsDocumentModifiedFunc(this.isDocumentModified);
+			editor.TrackFile.setDocId(editor.DocInfo.get_Id());
+			editor.TrackFile.setUserId(editor.DocInfo.get_UserId());
+			editor.TrackFile.setTrackFunc(sendTrack);
+			editor.TrackFile.setIsDocumentModifiedFunc(editor.isDocumentModified);
 			
 			if(undefined != oSettings['TrackingInterval'] &&
 				null != oSettings['TrackingInterval'])
-				this.TrackFile.setInterval(oSettings['TrackingInterval']);
+				editor.TrackFile.setInterval(oSettings['TrackingInterval']);
 				
-			this.TrackFile.Start();							
+			editor.TrackFile.Start();							
 		}
 	}
 }
