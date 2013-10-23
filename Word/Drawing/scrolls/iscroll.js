@@ -992,7 +992,7 @@ CTouchScroll.prototype = {
         that._scrollbar('v');
     },
 
-	refresh: function () {
+	refresh: function (bIsNoReaderAttack) {
 		var that = this,
 			offset,
 			i, l,
@@ -1021,7 +1021,7 @@ CTouchScroll.prototype = {
 		that.x = -that.api.m_dScrollX;
 		that.y = -that.api.m_dScrollY;
 
-		if (that.api.ReaderModeDiv != null)
+		if (that.api.ReaderModeDiv != null && undefined === bIsNoReaderAttack)
 		{
 			var _elem = that.api.ReaderModeDiv;
 			that.scrollerW = m.round(_elem.offsetWidth);

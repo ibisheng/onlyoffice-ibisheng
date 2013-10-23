@@ -1832,7 +1832,7 @@ function CMobileTouchManager()
     this.Resize = function()
     {
         if (this.iScroll != null)
-            this.iScroll.refresh();
+            this.iScroll.refresh(true);
     }
 
     this.SendShowMenu = function(x, y)
