@@ -1669,7 +1669,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
             this.memory.WriteLong(num.id);
         }
     };
-	this.WriteCellStyleXfs = function(cellStyles)
+	this.WriteCellStyleXfs = function()
 	{
 		var oThis = this;
 		for(var i = 0, length = this.oXfsStylesMap.length; i < length; ++i)
@@ -1839,7 +1839,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 		var oThis = this;
 		for(var i = 0, length = Dxfs.length; i < length; ++i)
 			this.bs.WriteItem(c_oSerStylesTypes.Dxf, function(){oThis.WriteDxf(Dxfs[i]);});
-	}
+	};
 	this.WriteDxf = function(Dxf)
     {
 		var oThis = this;
@@ -1851,8 +1851,8 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 			this.bs.WriteItem(c_oSer_Dxf.Fill, function(){oThis.WriteFill(Dxf.fill);});
 		if(null != Dxf.font)
 			this.bs.WriteItem(c_oSer_Dxf.Font, function(){oThis.WriteFont(Dxf.font);});
-		if(null != Dxf.numFmt)
-			this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum(Dxf.numFmt);});
+		if(null != Dxf.num)
+			this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum(Dxf.num);});
 	};
 	this.WriteCellStyles = function (cellStyles) {
 		var oThis = this;
@@ -2173,7 +2173,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			}
 		}
 		return sRes;
-	}
+	};
 	this._prepeareStyles = function()
 	{
 		this.oFontMap[this._getStringFromObjWithProperty(g_oDefaultFont)] = {index: this.nFontMapIndex++, val: g_oDefaultFont};
@@ -4009,6 +4009,12 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
     };
     this.InitStyleManager = function (oStyleObject)
     {
+		// ToDo убрать - это заглушка
+		var arrStyleMap = {};
+		// Начнем с 1, т.к. 2 зарегистрировано для normal
+		var nIndexStyleMap = 1;
+		var XfIdTmp;
+
 		for (var nIndex in oStyleObject.aCellStyles) {
 			if (!oStyleObject.aCellStyles.hasOwnProperty(nIndex))
 				continue;
@@ -4020,6 +4026,16 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				continue;
 
 			oCellStyle.xfs = new CellXfs();
+			// XfId
+			XfIdTmp = oCellStyle.XfId;
+			if (null !== XfIdTmp) {
+				if (0 !== XfIdTmp) {
+					arrStyleMap[XfIdTmp] = nIndexStyleMap;
+					oCellStyle.XfId = nIndexStyleMap++;
+				}
+			} else
+				continue;	// Если его нет, то это ошибка по спецификации
+
 			// Border
 			if (null != oCellStyleXfs.borderid) {
 				var borderCellStyle = oStyleObject.aBorders[oCellStyleXfs.borderid];
@@ -4052,9 +4068,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			// align
 			if(null != oCellStyleXfs.align)
 				oCellStyle.xfs.align = oCellStyleXfs.align.clone();
-			// XfId
-			if (null !== oCellStyleXfs.XfId)
-				oCellStyle.xfs.XfId = oCellStyleXfs.XfId;
 			// ApplyBorder (ToDo возможно это свойство должно быть в xfs)
 			if (null !== oCellStyleXfs.ApplyBorder)
 				oCellStyle.ApplyBorder = oCellStyleXfs.ApplyBorder;
@@ -4071,6 +4084,8 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			// ToDo при отсутствии имени все не очень хорошо будет!
 			this.wb.CellStyles.CustomStyles.push(oCellStyle);
 		}
+
+		// ToDo это нужно будет переделать (проходимся по всем стилям и меняем у них XfId по порядку)
 
         for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
             var xfs = oStyleObject.aCellXfs[i];
@@ -4107,8 +4122,10 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             if(null != xfs.align)
                 oNewXfs.align = xfs.align.clone();
 			if (null !== xfs.XfId) {
-				oNewXfs.XfId = xfs.XfId;
-				// ToDo При отсутствии Id в списке стилей, мы должны сбросить на 0 (Normall)
+				XfIdTmp = arrStyleMap[xfs.XfId];
+				if (null == XfIdTmp)
+					XfIdTmp = 0;
+				oNewXfs.XfId = XfIdTmp;
 			}
 
 			if(0 == this.aCellXfs.length)
