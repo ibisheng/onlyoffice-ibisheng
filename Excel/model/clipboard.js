@@ -2188,10 +2188,16 @@
 					objectRender.preCopy();
 					var nLoc = 0;
 					var table = document.createElement('span');
+					var image;
 					var drawings = objectRender.controller.curState.group.selectedObjects;
 					t.lStorage = [];
 					for (j = 0; j < drawings.length; ++j) {
-						var image = drawings[j].drawingBase;
+						image = drawings[j].drawingBase;
+						if(!image)
+						{
+							image = objectRender.createDrawingObject();
+							image.graphicObject = drawings[j];
+						}
 						var cloneImg = objectRender.cloneDrawingObject(image);
 						var curImage = new Image();
 						var url;
