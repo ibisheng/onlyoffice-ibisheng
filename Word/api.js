@@ -620,8 +620,7 @@ function asc_docs_api(name)
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 	
-	this.isTrackingEnable = false;
-	this.TrackingInterval = 300 * 1000;
+	this.TrackFile = null;
 
 	var oThis = this;
 	if(window.addEventListener)
@@ -853,15 +852,23 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);
 		
-		if(undefined != oSettings['isTrackingEnable'] &&
-			null != oSettings['isTrackingEnable'])
-			editor.isTrackingEnable = oSettings['isTrackingEnable'];
+		if(undefined != oSettings['trackingInfo'] &&
+			null != oSettings['trackingInfo'])
+		{
+			var asc_CTrackFile = window["Asc"].CTrackFile;
+			this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 			
-		if(undefined != oSettings['TrackingInterval'] &&
-			null != oSettings['TrackingInterval'])
-			editor.TrackingInterval = oSettings['TrackingInterval'] * 1000;
+			this.TrackFile.setDocId(this.DocInfo.get_Id());
+			this.TrackFile.setUserId(this.DocInfo.get_UserId());
+			this.TrackFile.setTrackFunc(sendTrack);
+			this.TrackFile.setIsDocumentModifiedFunc(this.isDocumentModified);
 			
-		editor._StartTracking();
+			if(undefined != oSettings['TrackingInterval'] &&
+				null != oSettings['TrackingInterval'])
+				this.TrackFile.setInterval(oSettings['TrackingInterval']);
+				
+			this.TrackFile.Start();							
+		}
 	}
 }
 asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
@@ -6693,24 +6700,6 @@ asc_docs_api.prototype.asc_setCoAuthoringEnable = function (isCoAuthoringEnable)
 	this.isCoAuthoringEnable = !!isCoAuthoringEnable;
 }
 
-asc_docs_api.prototype._StartTracking = function () 
-{
-	var t = editor;
-	if(t.isTrackingEnable)
-	{
-		var rData = {
-			"docId": t.DocInfo.get_Id(), 
-			"clientId": t.DocInfo.get_UserId(),
-			"isAlive": t.isDocumentModified()? 1: 0
-		};
-			
-		sendTrack( t, function(){
-				setTimeout(t._StartTracking, t.TrackingInterval);
-			},
-			JSON.stringify(rData) );
-	}
-}
-
 var cCharDelimiter = String.fromCharCode(5);
 
 function getURLParameter(name) {
@@ -6891,20 +6880,19 @@ function sendCommand(editor, fCallback, rdata){
 	})
 
 	};
-function sendTrack(editor, fCallback, rdata){
+function sendTrack(fCallback, url, rdata){
 	asc_ajax({
         type: 'POST',
-        url: g_sTrackingServiceLocalUrl,
+        url: url,
         data: rdata,
         error: function(jqXHR, textStatus, errorThrown){
-				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
 					fCallback();
             },
         success: function(msg){
 			var incomeObject = JSON.parse(msg);
 			if(fCallback)
-				fCallback(editor, incomeObject);			
+				fCallback(incomeObject);			
 		}
 	})
 };
