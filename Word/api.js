@@ -2579,12 +2579,11 @@ function OnSave_Callback(e)
 			////uncoment to save changes only instead send file complete
             //var data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
 			//oAdditionalData["savetype"] = "changes";
-			
-            var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
+			oAdditionalData["data"] = data;
             sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], true);
-			}, sData);
+			}, oAdditionalData);
         }
 
 		// Пересылаем свои изменения
@@ -6779,22 +6778,20 @@ function _onSpellCheck_Callback2 (response)
 	})
 };*/
 function sendCommand(editor, fCallback, rdata){
-	if("string" !== typeof(rdata))
+	var sData;
+	//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
+	if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
 	{
-		//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-		if(null != rdata.data && "string" === typeof(rdata.data) && rdata.data.length > g_nMaxJsonLength / 2)
-		{
-			var sData = rdata.data;
-			rdata.data = null;
-			rdata = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sData;
-		}
-		else
-			rdata = JSON.stringify(rdata);
+		var sTemp = rdata["data"];
+		rdata["data"] = null;
+		sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
 	}
+	else
+		sData = JSON.stringify(rdata);
 	asc_ajax({
         type: 'POST',
         url: g_sMainServiceLocalUrl,
-        data: rdata,
+        data: sData,
         error: function(jqXHR, textStatus, errorThrown){
 				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 				if(fCallback)
@@ -6877,7 +6874,11 @@ function sendCommand(editor, fCallback, rdata){
                         fCallback(incomeObject);
 				break;
                 case "err":
-					editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.Critical);
+					var nErrorLevel = c_oAscError.Level.NoCritical;
+					//todo передалеть работу с callback
+					if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+						nErrorLevel = c_oAscError.Level.Critical;
+					editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
@@ -6923,37 +6924,26 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 		if(dd.isComleteRenderer2())
 		{
 			if(false == bStart)
-			{
 				oAdditionalData["savetype"] = "complete";
-				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + dd.ToRendererPart();
-			}
 			else
-			{
 				oAdditionalData["savetype"] = "completeall";
-				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + dd.ToRendererPart();
-			}
 		}
 		else
 		{
 			if(false == bStart)
-			{
 				oAdditionalData["savetype"] = "part";
-				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + dd.ToRendererPart();
-			}
 			else
-			{
 				oAdditionalData["savetype"] = "partstart";
-				sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + dd.ToRendererPart();
-			}
 		}
-		sendCommand(editor, fCallback, sData);
+		oAdditionalData["data"] = dd.ToRendererPart();
+		sendCommand(editor, fCallback, oAdditionalData);
 	}
 	else
 	{
 		var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
 		oAdditionalData["savetype"] = "completeall";
-		sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + oBinaryFileWriter.Write();
-		sendCommand(editor, fCallback, sData);
+		oAdditionalData["data"] = oBinaryFileWriter.Write();
+		sendCommand(editor, fCallback, oAdditionalData);
 	}
 };
 

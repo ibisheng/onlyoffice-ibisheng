@@ -728,23 +728,21 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_asc_sendCommand: function (callback, rdata) {
-				if("string" !== typeof(rdata))
+				var sData;
+				//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
+				if(null != rdata["data"] && "string" === typeof(rdata["data"]) && rdata["data"].length > g_nMaxJsonLengthChecked)
 				{
-					//json не должен превышать размера g_nMaxJsonLength, иначе при его чтении будет exception
-					if(null != rdata.data && "string" === typeof(rdata.data) && rdata.data.length > g_nMaxJsonLength / 2)
-					{
-						var sData = rdata.data;
-						rdata.data = null;
-						rdata = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sData;
-					}
-					else
-						rdata = JSON.stringify(rdata);
+					var sTemp = rdata["data"];
+					rdata["data"] = null;
+					sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(rdata) + cCharDelimiter + sTemp;
 				}
+				else
+					sData = JSON.stringify(rdata);
 				var oThis = this;
 				asc_ajax({
 					type: 'POST',
 					url: g_sMainServiceLocalUrl,
-					data: rdata,
+					data: sData,
 					error: function(jqXHR, textStatus, errorThrown){
 						var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 						oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
@@ -865,8 +863,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 										callback(incomeObject);
 									break;									
 								case "err":
-									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject["data"])};
-									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), c_oAscError.Level.Critical);
+									var nErrorLevel = c_oAscError.Level.NoCritical;
+									//todo передалеть работу с callback
+									if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
+										nErrorLevel = c_oAscError.Level.Critical;
+									result = {returnCode: nErrorLevel, val:parseInt(incomeObject["data"])};
+									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
 									if(callback)
 										callback(result);
 									break;
@@ -953,10 +955,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["outputformat"] = c_oAscFileType.INNER;
 				oAdditionalData["innersave"] = true;
 				oAdditionalData["savetype"] = "completeall";
+				oAdditionalData["data"] = data;
 				this._asc_sendCommand (/*callback*/ function(incomeObject){
 					if(null != incomeObject && "save" == incomeObject["type"])
 						that.asc_processSavedFile(incomeObject["data"], true);
-				}, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
+				}, oAdditionalData);
 			},
 
 			_asc_downloadAs: function (sFormat, fCallback, bStart, options, sSaveKey) { //fCallback({returnCode:"", ...})
@@ -1023,7 +1026,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         return;
                     }
 				}
-				this._asc_sendCommand (fCallback, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
+				oAdditionalData["data"] = data;
+				this._asc_sendCommand (fCallback, oAdditionalData);
 			},
 
 
