@@ -16,6 +16,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
 		var asc_user  = asc.asc_CUser;
 		var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
+		var asc_CTrackFile = asc.CTrackFile;
 		var prot;
 
 
@@ -145,8 +146,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Использовать ли обрезанные шрифты
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 			
-			this.isTrackingEnable = false;
-			this.TrackingInterval = 300 * 1000;
+			this.TrackFile = null;
 			
 			var oThis = this;
 			if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
@@ -882,11 +882,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					dataType: "text"});
 			},
 			
-			_asc_sendTrack: function (callback, rdata) {
+			_asc_sendTrack: function (callback, url, rdata) {
 				var oThis = this;
 				asc_ajax({
 					type: 'POST',
-					url: g_sTrackingServiceLocalUrl,
+					url: url,
 					data: rdata,
 					error: function(jqXHR, textStatus, errorThrown){
 						var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
@@ -1248,38 +1248,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					
 					this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);
 												
-					if(undefined != oSettings['isTrackingEnable'] &&
-						null != oSettings['isTrackingEnable'])
-						this.isTrackingEnable = oSettings['isTrackingEnable'];
-			
-					if(undefined != oSettings['TrackingInterval'] &&
-						null != oSettings['TrackingInterval'])
-						this.TrackingInterval = oSettings['TrackingInterval'] * 1000;
-			
-					this._startTracking();
-				}
-			},
-
-			//Посылаем трек, и инициализируем таймер для его последующей отправки.
-			_startTracking: function() {
-				var oThis = this;
-				
-				if(oThis.isTrackingEnable){
-					var rData = {
-						"docId": oThis.DocInfo.Id, 
-						"clientId": oThis.DocInfo.UserId,
-						"isAlive": oThis.asc_isDocumentModified()? 1: 0
-					};
-					
-					var _OnTrackingTimer = function(){
-						oThis._startTracking();
-					};
-			
-					var _OnSendTrack = function(){
-						setTimeout(_OnTrackingTimer, oThis.TrackingInterval);
-					};
+					if(undefined != oSettings['trackingInfo'] &&
+						null != oSettings['trackingInfo'])
+					{
+						this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 						
-					oThis._asc_sendTrack(_OnSendTrack, JSON.stringify(rData));
+						this.TrackFile.setDocId(this.DocInfo.Id);
+						this.TrackFile.setUserId(this.DocInfo.UserId);
+						this.TrackFile.setTrackFunc(this._asc_sendTrack);
+						this.TrackFile.setIsDocumentModifiedFunc(this.asc_isDocumentModified);
+						
+						if(undefined != oSettings['TrackingInterval'] &&
+							null != oSettings['TrackingInterval'])
+							this.TrackFile.setInterval(oSettings['TrackingInterval']);
+							
+						this.TrackFile.Start();							
+					}
 				}
 			},
 

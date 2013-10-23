@@ -35,6 +35,7 @@
                 "../Word/Drawing/AllFonts.js",
 				"../Excel/model/DrawingObjects/GlobalLoaders.js",				
                 "../Common/FontsFreeType/FontExport.js",
+				"../Common/trackFile.js",
 				"../Excel/apiDefines.js",
                 "../Excel/offlinedocs/test-workbook9/Editor.js",
                 "../Excel/offlinedocs/empty-workbook.js",
