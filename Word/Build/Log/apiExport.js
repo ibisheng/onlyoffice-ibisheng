@@ -549,7 +549,6 @@ prop:OfflineAppDocumentStartLoad
 prop:OfflineAppDocumentEndLoad
 prop:SetDrawImagePlaceParagraph
 prop:asc_setCoAuthoringEnable
-prop:_StartTracking
 prop:asc_getChartObject
 prop:asc_addChartDrawingObject
 prop:asc_editChartDrawingObject
@@ -1631,7 +1630,6 @@ asc_docs_api.prototype['OfflineAppDocumentStartLoad'] = asc_docs_api.prototype.O
 asc_docs_api.prototype['OfflineAppDocumentEndLoad'] = asc_docs_api.prototype.OfflineAppDocumentEndLoad;
 asc_docs_api.prototype['SetDrawImagePlaceParagraph'] = asc_docs_api.prototype.SetDrawImagePlaceParagraph;
 asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
-asc_docs_api.prototype['_StartTracking'] = asc_docs_api.prototype._StartTracking;
 asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;
 asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc_addChartDrawingObject;
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
