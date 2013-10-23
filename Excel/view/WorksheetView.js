@@ -4973,6 +4973,8 @@
 						var oHyperlink = new Hyperlink();
 						oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
 						oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
+						var _r = this.activeRange.clone(true);
+						oHyperlink.Ref = this.model.getRange3(_r.r1, _r.c1, _r.r2, _r.c2);
 						
 						var cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
 							row: (r ? r.row : -1), userId: userId,

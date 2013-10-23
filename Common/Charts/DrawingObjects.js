@@ -963,10 +963,8 @@ asc_CChart.prototype = {
 				break;
 			
 		}
-		if ( ws ) {
-			//ws.objectRender.rebuildChartGraphicObjects();
-			//ws.objectRender.showDrawingObjects(false);
-		}
+		if ( ws )
+			ws.objectRender.rebuildChartGraphicObjects();
 	},
 	
 	Redo: function(type, data) {
@@ -1071,10 +1069,8 @@ asc_CChart.prototype = {
 				this.legend.bOverlay = data.newValue;
 				break;
 		}
-		if ( ws ) {
-			//ws.objectRender.rebuildChartGraphicObjects();
-			//ws.objectRender.showDrawingObjects(false);
-		}
+		if ( ws )
+			ws.objectRender.rebuildChartGraphicObjects();
 	}
 }
 
@@ -3792,7 +3788,7 @@ function DrawingObjects() {
 	_this.rebuildChartGraphicObjects = function() {
 		for (var i = 0; i < aObjects.length; i++) {
 			var graphicObject = aObjects[i].graphicObject;
-			if ( graphicObject.isChart() ) {
+			if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
 				graphicObject.chart.rebuildSeries();
 				graphicObject.recalculate();
 			}
@@ -4367,6 +4363,7 @@ function DrawingObjects() {
 	
 	_this.deleteDrawingBase = function(graphicId) {
 		
+		var position = null;
 		var bRedraw = false;
 		for (var i = 0; i < aObjects.length; i++) {
 			if ( aObjects[i].graphicObject.Id == graphicId ) {
@@ -4375,14 +4372,15 @@ function DrawingObjects() {
 					worksheet.arrActiveChartsRanges = [];
 				aObjects.splice(i, 1);
 				bRedraw = true;
-                return i;
+                position = i;
+				break;
 			}
 		}
 		
 		if ( bRedraw )
 			_this.showDrawingObjects(true);
 		
-        return null;
+        return position;
 	};
 	
 	_this.checkGraphicObjectPosition = function(x, y, w, h) {
