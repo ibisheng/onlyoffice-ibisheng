@@ -57,7 +57,7 @@ CGraphicFrame.prototype =
 
     copy: function(sp)
     {
-        if(!sp)
+        if(!(sp instanceof CGraphicFrame))
             sp = new CGraphicFrame();
         sp.setSpPr(this.spPr.createDuplicate());
         if(this.nvGraphicFramePr)
