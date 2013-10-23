@@ -3326,7 +3326,7 @@ function DrawingObjects() {
 		*****************************************/
 		
 		// Undo/Redo
-		if ( worksheet.model.index != api.wb.wsActive )
+		if ( worksheet.model.index != api.wb.model.getActive() )
 			return;
 		
 		if ( drawingCtx ) {
