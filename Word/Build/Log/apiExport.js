@@ -463,6 +463,7 @@ prop:sync_UpdateCommentPosition
 prop:sync_ChangeCommentData
 prop:sync_LockComment
 prop:sync_UnLockComment
+prop:asc_getComments
 prop:sync_LockHeaderFooters
 prop:sync_LockDocumentProps
 prop:sync_UnLockHeaderFooters
@@ -1544,6 +1545,7 @@ asc_docs_api.prototype['sync_UpdateCommentPosition'] = asc_docs_api.prototype.sy
 asc_docs_api.prototype['sync_ChangeCommentData'] = asc_docs_api.prototype.sync_ChangeCommentData;
 asc_docs_api.prototype['sync_LockComment'] = asc_docs_api.prototype.sync_LockComment;
 asc_docs_api.prototype['sync_UnLockComment'] = asc_docs_api.prototype.sync_UnLockComment;
+asc_docs_api.prototype['asc_getComments'] = asc_docs_api.prototype.asc_getComments;
 asc_docs_api.prototype['sync_LockHeaderFooters'] = asc_docs_api.prototype.sync_LockHeaderFooters;
 asc_docs_api.prototype['sync_LockDocumentProps'] = asc_docs_api.prototype.sync_LockDocumentProps;
 asc_docs_api.prototype['sync_UnLockHeaderFooters'] = asc_docs_api.prototype.sync_UnLockHeaderFooters;
