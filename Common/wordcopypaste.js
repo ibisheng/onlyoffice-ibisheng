@@ -3202,7 +3202,14 @@ PasteProcessor.prototype =
 		for(var i in AllFonts)
 			aPrepeareFonts.push(new CFont(i, 0, "", 0));
 		//создаем список используемых картинок
-		var oPastedImagesUnique = {};		var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();		for(var i = 0, length = aPastedImages.length; i < length; ++i)		{			var elem = aPastedImages[i];			oPastedImagesUnique[elem.Url] = 1;		}		var aPrepeareImages = [];
+		var oPastedImagesUnique = {};
+		var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+		for(var i = 0, length = aPastedImages.length; i < length; ++i)
+		{
+			var elem = aPastedImages[i];
+			oPastedImagesUnique[elem.Url] = 1;
+		}
+		var aPrepeareImages = [];
 		for(var i in oPastedImagesUnique)
 			aPrepeareImages.push(i);
 		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};
