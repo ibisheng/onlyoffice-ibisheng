@@ -28,14 +28,14 @@ function(window, undefined)
 		
 		if(undefined != obj && null != obj)
 		{
-			if(undefined != obj.licenseId && null != obj.licenseId)
-				this.licenseId = obj.licenseId;
+			if(undefined != obj["licenseId"] && null != obj["licenseId"])
+				this.licenseId = obj["licenseId"];
 				
-			if(undefined != obj.trackingType && null != obj.trackingType)
-				this.trackingType = obj.trackingType;
+			if(undefined != obj["trackingType"] && null != obj["trackingType"])
+				this.trackingType = obj["trackingType"];
 				
-			if(undefined != obj.trackingUrl && null != obj.trackingUrl)
-				this.trackingUrl = obj.trackingUrl;
+			if(undefined != obj["trackingUrl"] && null != obj["trackingUrl"])
+				this.trackingUrl = obj["trackingUrl"];
 		}
 		
 		if(c_TrackingType.TT_ACTIVE_CONNECTION == this.trackingType)
