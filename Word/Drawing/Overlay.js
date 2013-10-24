@@ -1581,7 +1581,7 @@ CAutoshapeTrack.prototype =
 
         if (x1 <= x2 && y1 <= y2)
         {
-            for (var i = x1, j = y1; i < x2 || j < y2; i += len_x2, j += len_y2)
+            for (var i = x1, j = y1; i < x2 && j < y2; i += len_x2, j += len_y2)
             {
                 ctx.moveTo(i, j);
 
@@ -1598,7 +1598,7 @@ CAutoshapeTrack.prototype =
         }
         else if (x1 <= x2 && y1 > y2)
         {
-            for (var i = x1, j = y1; i < x2 || j > y2; i += len_x2, j -= len_y2)
+            for (var i = x1, j = y1; i < x2 && j > y2; i += len_x2, j -= len_y2)
             {
                 ctx.moveTo(i, j);
 
@@ -1615,7 +1615,7 @@ CAutoshapeTrack.prototype =
         }
         else if (x1 > x2 && y1 <= y2)
         {
-            for (var i = x1, j = y1; i > x2 || j < y2; i -= len_x2, j += len_y2)
+            for (var i = x1, j = y1; i > x2 && j < y2; i -= len_x2, j += len_y2)
             {
                 ctx.moveTo(i, j);
 
@@ -1632,7 +1632,7 @@ CAutoshapeTrack.prototype =
         }
         else
         {
-            for (var i = x1, j = y1; i > x2 || j > y2; i -= len_x2, j -= len_y2)
+            for (var i = x1, j = y1; i > x2 && j > y2; i -= len_x2, j -= len_y2)
             {
                 ctx.moveTo(i, j);
 
