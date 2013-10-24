@@ -300,6 +300,9 @@ asc_CChart.prototype = {
 		this.range.interval = "Sheet1!A1:D7";
 		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 		
+		this.xAxis.title = "Countries";
+		this.yAxis.title = "Medals";
+		
 		this.series = [];
 		var uniColors = this.generateUniColors(3);
 		
