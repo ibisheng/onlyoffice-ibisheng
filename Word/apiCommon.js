@@ -621,7 +621,7 @@ function CreateAscStroke(ln, _canChangeArrows)
                 var _c = _fill.colors;
                 if (_c != 0)
                 {
-                    ret.color = CreateAscColor(_fill.colors[0]);
+                    ret.color = CreateAscColor(_fill.colors[0].color);
                     ret.type = c_oAscStrokeType.STROKE_COLOR;
                 }
 

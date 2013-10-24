@@ -4703,10 +4703,10 @@ WordGroupShapes.prototype =
 
     documentGetAllFontNames: function(AllFonts)
     {
-        for(var i = 0; i < this.spTree.length; ++i)
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
         {
-            if(typeof this.spTree[i].documentGetAllFontNames === "function")
-                this.spTree[i].documentGetAllFontNames(AllFonts);
+            if(typeof this.arrGraphicObjects[i].documentGetAllFontNames === "function")
+                this.arrGraphicObjects[i].documentGetAllFontNames(AllFonts);
         }
     },
 
