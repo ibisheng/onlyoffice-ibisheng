@@ -1049,7 +1049,7 @@ SlideLayout.prototype =
                 this.cSld.Bg.Read_FromBinary2(r);
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
-                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill &&  this.cSld.Bg.bgPr.Fill.fill instanceof CBlipFill)
+                if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill &&  this.cSld.Bg.bgPr.Fill.fill instanceof CBlipFill)
                     CollaborativeEditing.Add_NewImage(this.cSld.Bg.bgPr.Fill.fill.RasterImageId);
                 break;
             }

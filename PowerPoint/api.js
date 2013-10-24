@@ -3954,6 +3954,7 @@ asc_docs_api.prototype.DublicateSlide = function()
 
     var div = document.createElement("div");
     var copy_processor = new CopyProcessor(editor, div);
+    copy_processor.oPresentationWriter.End_UseFullUrl();
     copy_processor.Start();
     var oPasteProcessor = new PasteProcessor(this, true, true, false);
     History.Create_NewPoint();

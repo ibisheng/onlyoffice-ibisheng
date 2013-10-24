@@ -1575,8 +1575,6 @@ Slide.prototype =
                 this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
-                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill &&  this.cSld.Bg.bgPr.Fill.fill instanceof CBlipFill)
-                    CollaborativeEditing.Add_NewImage(this.cSld.Bg.bgPr.Fill.fill.RasterImageId);
                 break;
             }
             case historyitem_ChangeTiming:
@@ -1942,7 +1940,7 @@ Slide.prototype =
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary2(r);
                 var bg = this.cSld.Bg;
-                if(bg.bgPr && bg.bgPr.Fill && bg.bgPr.Fill.fill instanceof CBlipFill
+                if(bg && bg.bgPr && bg.bgPr.Fill && bg.bgPr.Fill.fill instanceof CBlipFill
                     && typeof  bg.bgPr.Fill.fill.RasterImageId === "string")
                 {
                     CollaborativeEditing.Add_NewImage(bg.bgPr.Fill.fill.RasterImageId);
