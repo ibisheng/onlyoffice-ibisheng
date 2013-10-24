@@ -5235,7 +5235,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
     this.lastPar = null;
 	this.oComments = oComments;
 	this.nCurCommentsCount = 0;
-	this.oCurComments = [];//вспомогательный массив  для заполнения QuotedText
+	this.oCurComments = {};//вспомогательный массив  для заполнения QuotedText
     this.Reset = function()
     {
         this.lastPar = null;
@@ -8399,7 +8399,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
 			var oCellContent = new Array();
             var oCellContentReader = new Binary_DocumentTableReader(cell.Content, this.oReadResult, this.openParams, this.stream, false, this.oComments);
+			oCellContentReader.nCurCommentsCount = this.nCurCommentsCount;
+			oCellContentReader.oCurComments = this.oCurComments;
 			oCellContentReader.Read(length, oCellContent);
+			this.nCurCommentsCount = oCellContentReader.nCurCommentsCount;
 			
 			for(var i = 0, length = oCellContent.length; i < length; ++i)
 				cell.Content.Internal_Content_Add(i + 1, oCellContent[i]);
