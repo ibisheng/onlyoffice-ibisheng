@@ -3668,7 +3668,10 @@ asc_docs_api.prototype.asc_getComments = function()
 
         for (var j = 0; j < _commentsCount; j++)
         {
-            comms.push(_comments[j]);
+            var _id = _comments[j].Get_Id();
+            var _ascCommentData = new asc_CCommentData(_comments[j].Data);
+
+            comms.push({ "Id" : _id, "Comment" : _ascCommentData });
         }
     }
     return comms;
