@@ -2280,7 +2280,6 @@ function Editor_Paste_GetElem(api, bClean)
             api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
             pastebin.style.fontSize = "1em";
         }
-        pastebin.style.lineHeight = "1px";//todo FF ������ ���������� computedStyle � px, ������� ����� ���� ������� default ���������
         pastebin.style.MozUserSelect = "text";
         pastebin.style["-khtml-user-select"] = "text";
         pastebin.style["-o-user-select"] = "text";
@@ -4582,47 +4581,7 @@ PasteProcessor.prototype =
                     Para.Set_Align(Jc, false);
             }
             //Spacing
-            var line_height = computedStyle.getPropertyValue( "line-height" );
-            if(null != line_height)
-            {
-                var Spacing = new CParaSpacing();
-                if("normal" == line_height || "1px" == line_height)
-                {
-                    Spacing.Line = 1;
-                    Spacing.LineRule = linerule_Auto;
-                }
-                else
-                {
-                    var obj = this._ValueToMmType(line_height);
-                    if(obj)
-                    {
-                        if("%" == obj.type)
-                        {
-                            Spacing.Line = obj.val;
-                            Spacing.LineRule = linerule_Auto;
-                        }
-                        else
-                        {
-                            // pPr.Spacing.LineRule = linerule_AtLeast;
-                            // pPr.Spacing.Line = obj.val;
-
-                            //Todo ����� ����� ��������� � ���������, ���� ��� ������������.
-                            //����� �������� � chrome ��� �������� line-height:100% � ��������� �� ��������� � �������
-                            //� �������� html ��������� ���. ��������� �������� ��� �� �� �����
-                            //�� ���� � ��������� ���� ������ ������������ ����������� ��������, �� ����������� ��� �������� �� ������ ������
-                            var font_size = computedStyle.getPropertyValue( "font-size" );
-                            if(font_size && null != (font_size = this._ValueToMm(font_size)))
-                            {
-                                if(font_size != 0)
-									Spacing.Line = parseInt(100 * obj.val / font_size) / 100;
-                                Spacing.LineRule = linerule_Auto;
-                            }
-                        }
-                    }
-                }
-            }
-            // if("exactly" == pNoHtmlPr["mso-line-height-rule"])
-                // Spacing.LineRule = linerule_Exact;
+			var Spacing = new CParaSpacing();
             var margin_top = computedStyle.getPropertyValue( "margin-top" );
             if(margin_top && null != (margin_top = this._ValueToMm(margin_top)))
                 Spacing.Before = margin_top;
@@ -6957,8 +6916,6 @@ function Editor_CopyPaste_Create(api)
         api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
         ElemToSelect.style.fontSize = "1em";
     }
-
-    ElemToSelect.style.lineHeight = "1px";
 
     ElemToSelect.onpaste = function(e){
         if (!window.GlobalPasteFlag)
