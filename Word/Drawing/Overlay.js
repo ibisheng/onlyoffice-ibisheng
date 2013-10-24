@@ -2039,6 +2039,9 @@ CSlideBoundsChecker.prototype =
     drawCollaborativeChanges: function()
     {},
 
+    drawSearchResult : function(x, y, w, h)
+    {},
+
     IsShapeNeedBounds : function(preset)
     {
         if (preset === undefined || preset == null)

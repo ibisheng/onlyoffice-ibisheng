@@ -1746,6 +1746,9 @@ CDocumentRenderer.prototype =
     drawCollaborativeChanges : function(x, y, w, h)
     {
     },
+    drawSearchResult : function(x, y, w, h)
+    {
+    },
 
     DrawEmptyTableLine : function(x1,y1,x2,y2)
     {
