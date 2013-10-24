@@ -5591,6 +5591,23 @@ asc_docs_api.prototype.sync_UnLockComment = function(Id)
 {
     this.asc_fireCallback("asc_onUnLockComment", Id);
 }
+
+asc_docs_api.prototype.asc_getComments = function()
+{
+    var ResComments = new Array();
+    var LogicDocument = this.WordControl.m_oLogicDocument;
+    if ( undefined != LogicDocument )
+    {
+        var DocComments = LogicDocument.Comments;
+        for ( var Id in DocComments.m_aComments )
+        {
+            var AscCommentData = new asc_CCommentData(DocComments.m_aComments[Id].Data);
+            ResComments.push( { "Id" : Id, "Comment" : AscCommentData } );
+        }
+    }
+
+    return ResComments;
+}
 //-----------------------------------------------------------------
 asc_docs_api.prototype.sync_LockHeaderFooters = function()
 {
