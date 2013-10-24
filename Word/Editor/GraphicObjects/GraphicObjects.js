@@ -1568,7 +1568,7 @@ CGraphicObjects.prototype =
     getAllFloatTablesOnPage: function(pageIndex)
     {
         if(this.document.CurPos.Type !== docpostype_HdrFtr)
-            return this.graphicPages[pageIndex].flowTables;
+            return this.graphicPages[pageIndex] ? this.graphicPages[pageIndex].flowTables : [];
 
         var hdr_ftr;
         if(pageIndex === 0)
