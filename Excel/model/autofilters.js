@@ -1,4 +1,4 @@
-﻿
+﻿var gUndoInsDelCellsFlag = true;
 (	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
@@ -1789,6 +1789,7 @@
 				var cloneData = Asc.clone(data);
 				if(!cloneData)
 					return;
+				gUndoInsDelCellsFlag = false;
 				if(cloneData.refTable)
 				{
 					if(aWs.TableParts)
@@ -4599,8 +4600,10 @@
 					}
 					else
 					{
-						cRange.start.c1 = cRange.start.c1 + val;
-						cRange.end.c1 = cRange.end.c1 + val;
+						if((cRange.start.c1 + val) >= 0)
+							cRange.start.c1 = cRange.start.c1 + val;
+						if((cRange.end.c1 + val) >= 0)
+							cRange.end.c1 = cRange.end.c1 + val;
 						if(cRange.start.c1 < 0)
 							cRange.start.c1 = 0;
 						if(cRange.end.c1 < 0)
@@ -4627,11 +4630,13 @@
 							}
 							else
 							{
-								newFirstCol.c1 = newFirstCol.c1 + val;
-								newNextCol.c1 = newNextCol.c1 + val;
+								if((newFirstCol.c1 + val) >= 0)
+									newFirstCol.c1 = newFirstCol.c1 + val;
+								if((newNextCol.c1 + val) >= 0)
+									newNextCol.c1 = newNextCol.c1 + val;
 								if(newFirstCol.c1 < 0)
 									newFirstCol.c1 = 0;
-								if(newNextCol.c11 < 0)
+								if(newNextCol.c1 < 0)
 									newNextCol.c1 = 0;
 							}
 							

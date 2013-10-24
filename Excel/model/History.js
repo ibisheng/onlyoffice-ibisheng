@@ -396,6 +396,7 @@ CHistory.prototype =
 			if (g_oUndoRedoGraphicObjects === Item.Class)
 				isRedrawAll = false;
         }
+		gUndoInsDelCellsFlag = true;
 		var oSelectRange = null;
 		if(null != Point.SelectRange)
 			oSelectRange = Point.SelectRange;

@@ -8167,7 +8167,8 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
-									t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
+									if(gUndoInsDelCellsFlag)
+										t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
@@ -8182,7 +8183,8 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
-									t.autoFilters.insertRows(prop,_updateRangeIns, arn);
+									if(gUndoInsDelCellsFlag)
+										t.autoFilters.insertRows(prop,_updateRangeIns, arn);
 									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
