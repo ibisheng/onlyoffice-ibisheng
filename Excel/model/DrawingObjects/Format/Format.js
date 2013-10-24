@@ -343,9 +343,9 @@ CColorModifiers.prototype =
         var count = Reader.GetLong();
         for(var i = 0; i < count; ++i)
         {
-            var cur_mod = {};
-            cur_mod.name = Reader.GetString2();
-            cur_mod.val = Reader.GetLong();
+            var cur_mod = new CColorMod();
+            cur_mod.setName(Reader.GetString2());
+            cur_mod.setVal(Reader.GetLong());
             this.Mods.push(cur_mod);
         }
         return  this;
@@ -713,7 +713,7 @@ CSysColor.prototype =
 
     Read_FromBinary2 : function(Reader)
     {
-        this.id = Reader.GetString2();
+        this.setColorId(Reader.GetString2());
         this.RGBA = ReadObjectLong(Reader);
     },
 
@@ -819,7 +819,7 @@ CPrstColor.prototype =
 
     Read_FromBinary2 : function(Reader)
     {
-        this.id = Reader.GetString2();
+        this.setColorId(Reader.GetString2());
         this.RGBA = ReadObjectLong(Reader);
     },
 
@@ -930,7 +930,9 @@ CRGBColor.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
-        WriteObjectLong(Writer, this.RGBA);
+        var RGBA = {R:0, G:0, B:0, A:255};
+        WriteObjectLong(Writer, RGBA);
+        this.setColor(((RGBA.R << 16) & 0xFF0000) + ((RGBA.G << 8) & 0xFF00) + RGBA.B);
     },
 
     Read_FromBinary2 : function(Reader)
@@ -1029,7 +1031,7 @@ CSchemeColor.prototype =
 
     Read_FromBinary2 : function(Reader)
     {
-        this.id = Reader.GetLong();
+        this.setColorId(Reader.GetLong());
         this.RGBA = ReadObjectLong(Reader);
     },
 
@@ -1200,31 +1202,38 @@ CUniColor.prototype =
             {
                 case COLOR_TYPE_SCHEME:
                 {
-                    this.color = new CSchemeColor();
+                    this.setColor(new CSchemeColor());
                     this.color.Read_FromBinary2(Reader);
                     break;
                 }
                 case COLOR_TYPE_SRGB:
                 {
-                    this.color = new CRGBColor();
+                    this.setColor(new CRGBColor());
                     this.color.Read_FromBinary2(Reader);
                     break;
                 }
                 case COLOR_TYPE_PRST:
                 {
-                    this.color = new CPrstColor();
+                    this.setColor(new CPrstColor());
                     this.color.Read_FromBinary2(Reader);
                     break;
                 }
                 case COLOR_TYPE_SYS:
                 {
-                    this.color = new CSysColor();
+                    this.setColor(new CSysColor());
                     this.color.Read_FromBinary2(Reader);
                     break;
                 }
             }
         }
-        this.Mods.Read_FromBinary2(Reader);
+
+        var mods = new CColorModifiers();
+        mods.Read_FromBinary2(Reader);
+        for(var i = 0; i < mods.Mods.length; ++i)
+        {
+            this.addMod(mods.Mods[i]);
+        }
+        //this.Mods.Read_FromBinary2(Reader);
         this.RGBA = ReadObjectLong(Reader);
     },
 
@@ -1550,9 +1559,13 @@ CBlipFill.prototype =
         this.RasterImageId = rasterImageId;
     },
 	
-	setSrcRect: function()
+	setSrcRect: function(srcRect)
 	{
-		
+        var oldValue = isRealObject(this.srcRect) ? this.srcRect.createBinary() : null;
+        var newValue = isRealObject(srcRect) ? srcRect.createBinary() : null;
+        this.srcRect = srcRect;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddYAxis, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
 	},
 	
 	setTile: function(tile)
@@ -1586,6 +1599,19 @@ CBlipFill.prototype =
 				this.tile = data.oldValue;
 				break;
 			}
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                if(typeof data.oldValue === "string")
+                {
+                    this.srcRect = new CSrcRect();
+                    this.srcRect.setFromBinary(data.oldValue);
+                }
+                else
+                {
+                    this.srcRect = null;
+                }
+                break;
+            }
         }
     },
 
@@ -1603,6 +1629,19 @@ CBlipFill.prototype =
 				this.tile = data.newValue;
 				break;
 			}
+            case historyitem_AutoShapes_AddYAxis:
+            {
+                if(typeof data.oldValue === "string")
+                {
+                    this.srcRect = new CSrcRect();
+                    this.srcRect.setFromBinary(data.newValue);
+                }
+                else
+                {
+                    this.srcRect = null;
+                }
+                break;
+            }
         }
     },
 
@@ -1665,9 +1704,9 @@ CBlipFill.prototype =
         {
             var imageId = Reader.GetString2();
             if(typeof imageId === "string" && isRealObject(Reader.oImages) && typeof Reader.oImages[imageId] === "string" && Reader.oImages[imageId] !== "error")
-				this.RasterImageId = Reader.oImages[imageId];
+				this.setRasterImageId(Reader.oImages[imageId]);
 			else
-				this.RasterImageId = imageId;
+				this.setRasterImageId(imageId);
 
             /*if(typeof this.RasterImageId === "string" && isRealObject(Reader.oImages))
             {
@@ -1684,17 +1723,26 @@ CBlipFill.prototype =
         flag = Reader.GetBool();
         if(flag)
         {
-            this.tile =  Reader.GetBool();
+            this.setTile(Reader.GetBool());
+        }
+        else
+        {
+            this.setTile(null);
         }
 
         this.rotWithShape = Reader.GetBool();
         if(Reader.GetBool())
         {
-            this.srcRect = new CSrcRect();
-            this.srcRect.l = Reader.GetDouble();
-            this.srcRect.t = Reader.GetDouble();
-            this.srcRect.r = Reader.GetDouble();
-            this.srcRect.b = Reader.GetDouble();
+            var  srcRect = new CSrcRect();
+            srcRect.l = Reader.GetDouble();
+            srcRect.t = Reader.GetDouble();
+            srcRect.r = Reader.GetDouble();
+            srcRect.b = Reader.GetDouble();
+            this.setSrcRect(srcRect);
+        }
+        else
+        {
+            this.setSrcRect(null);
         }
     },
 
@@ -1855,7 +1903,7 @@ CSolidFill.prototype =
     {
         if(Reader.GetBool())
         {
-            this.color = new CUniColor();
+            this.setColor(new CUniColor());
             this.color.Read_FromBinary2(Reader);
         }
     },
@@ -2723,35 +2771,35 @@ CUniFill.prototype =
             {
                 case FILL_TYPE_SOLID:
                 {
-                    this.fill = new CSolidFill();
+                    this.setFill(new CSolidFill());
                     this.fill.Read_FromBinary2(reader);
                     break;
                 }
 
                 case FILL_TYPE_GRAD:
                 {
-                    this.fill = new CGradFill();
+                    this.setFill(new CGradFill());
                     this.fill.Read_FromBinary2(reader);
                     break;
                 }
 
                 case FILL_TYPE_BLIP:
                 {
-                    this.fill = new CBlipFill();
+                    this.setFill(new CBlipFill());
                     this.fill.Read_FromBinary2(reader);
                     break;
                 }
 
                 case FILL_TYPE_NOFILL:
                 {
-                    this.fill = new CNoFill();
+                    this.setFill(new CNoFill());
                     this.fill.Read_FromBinary2(reader);
                     break;
                 }
 
                 case FILL_TYPE_PATT:
                 {
-                    this.fill = new CPattFill();
+                    this.setFill(new CPattFill());
                     this.fill.Read_FromBinary2(reader);
                     break;
                 }
@@ -2761,7 +2809,7 @@ CUniFill.prototype =
         flag = reader.GetBool();
         if(flag)
         {
-            this.transparent = reader.GetDouble();
+            this.setTransparent(reader.GetDouble());
         }
     },
 

@@ -2459,7 +2459,7 @@ CShape.prototype =
 
     getParagraphParaPr: function()
     {
-        if(this.txBody)
+        if(this.txBody && this.txBody.content)
         {
             return this.txBody.content.Get_Paragraph_ParaPr();
         }
@@ -2468,7 +2468,7 @@ CShape.prototype =
 
     getParagraphTextPr: function()
     {
-        if(this.txBody)
+        if(this.txBody && this.txBody.content)
         {
             return this.txBody.content.Get_Paragraph_TextPr();
         }
