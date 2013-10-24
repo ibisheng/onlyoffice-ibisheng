@@ -654,10 +654,10 @@
 
             var text_size = this._otherProps._text_size;
 
-            for (i=0; i<labels.length; ++i) {
+            for (lNum=0; lNum<labels.length; ++lNum) {
 				isFormatCellTrue = isFormatCell;
-				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i])
-					isFormatCellTrue = this.arrFormatAdobeLabels[0][i];
+				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[lNum])
+					isFormatCellTrue = this.arrFormatAdobeLabels[0][lNum];
                 /**
                 * T|his ensures that if we're given too many labels, that we don't get an error
                 */
@@ -668,7 +668,7 @@
                 // Move to the centre
                 context.moveTo(centerx,this.centery);
                 
-                var a = this.angles[i][0] + ((this.angles[i][1] - this.angles[i][0]) / 2);
+                var a = this.angles[lNum][0] + ((this.angles[lNum][1] - this.angles[lNum][0]) / 2);
 
                 /**
                 * Alignment
@@ -687,15 +687,15 @@
                     vAlignment = 'center';
                 }
 
-                var angle = ((this.angles[i][1] - this.angles[i][0]) / 2) + this.angles[i][0];
+                var angle = ((this.angles[lNum][1] - this.angles[lNum][0]) / 2) + this.angles[lNum][0];
 
                 /**
                 * Handle the additional "explosion" offset
                 */
-                if (typeof(this._otherProps._exploded) == 'object' && this._otherProps._exploded[i] || typeof(this._otherProps._exploded) == 'number') {
+                if (typeof(this._otherProps._exploded) == 'object' && this._otherProps._exploded[lNum] || typeof(this._otherProps._exploded) == 'number') {
 
-                    var t = ((this.angles[i][1] - this.angles[i][0]) / 2);
-                    var seperation = typeof(this._otherProps._exploded) == 'number' ? this._otherProps._exploded : this._otherProps._exploded[i];
+                    var t = ((this.angles[lNum][1] - this.angles[lNum][0]) / 2);
+                    var seperation = typeof(this._otherProps._exploded) == 'number' ? this._otherProps._exploded : this._otherProps._exploded[lNum];
 
                     // Adjust the angles
                     var explosion_offsetx = (Math.cos(angle) * seperation);
@@ -715,13 +715,13 @@
 
 
                 context.fillStyle = this._otherProps._text_color;
-				if(this.catNameLabels && typeof this.catNameLabels[0][i] == "string")
+				if(this.catNameLabels && typeof this.catNameLabels[0][lNum] == "string")
 				{
-					curLabel = this.catNameLabels[0][i];
+					curLabel = this.catNameLabels[0][lNum];
 					isFormatCellTrue = "General";
 				}
 				else
-					curLabel = labels[i];
+					curLabel = labels[lNum];
                 OfficeExcel.Text(context,
                             this._otherProps._text_font,
                             text_size,
