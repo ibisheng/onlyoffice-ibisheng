@@ -4694,7 +4694,7 @@ function CThumbnailsManager()
                 }
                 break;
             }
-            case 83: // S
+            case 80: // P
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
@@ -4702,7 +4702,7 @@ function CThumbnailsManager()
                 }
                 break;
             }
-            case 80: // P
+            case 83: // S
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
