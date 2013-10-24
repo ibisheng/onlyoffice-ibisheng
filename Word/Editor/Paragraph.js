@@ -4081,7 +4081,7 @@ Paragraph.prototype =
         var _Page = this.Pages[CurPage];
 
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var bDrawComments    = DocumentComments.Is_Use();
+        var bDrawComments    = ( DocumentComments.Is_Use() && true != editor.isViewMode);
         var CommentsFlag     = DocumentComments.Check_CurrentDraw();
 
         var CollaborativeChanges = 0;
