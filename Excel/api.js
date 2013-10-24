@@ -1261,7 +1261,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							return oThis._asc_sendTrack(callback, url, data);
 						};
 						
-						this.TrackFile.setTrackFunc();
+						this.TrackFile.setTrackFunc(_sendTrack);
 						
 						var _isDocumentModified = function(){
 							return oThis.asc_isDocumentModified()
