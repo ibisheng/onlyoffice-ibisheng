@@ -2565,6 +2565,10 @@ function ParaTab()
     this.Type = para_Tab;
 
     this.TabType = tab_Left;
+
+    this.Width        = 0;
+    this.Height       = 0;
+    this.WidthVisible = 0;
 }
 
 ParaTab.prototype =
@@ -2588,10 +2592,6 @@ ParaTab.prototype =
     {
         Context.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
         this.RealWidth = Context.Measure( String.fromCharCode( tab_Symbol ) ).Width;
-
-        this.Width        = 0;
-        this.Height       = 0;
-        this.WidthVisible = 0;
     },
 
     Is_RealContent : function()
