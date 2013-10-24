@@ -3305,7 +3305,6 @@ UndoRedoWoorksheet.prototype = {
 				from = to;
 				to = temp;
 			}
-			var data = 1;
 			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
 			{
 				var aMerged = ws.mergeManager.get(from);
@@ -3314,14 +3313,14 @@ UndoRedoWoorksheet.prototype = {
 					var merged = aMerged.inner[i];
 					if(merged.bbox.isEqual(from))
 					{
-						var elem = new RangeDataManagerElem(from, data);
-						ws.mergeManager.remove(elem.bbox, elem, false);
+						ws.mergeManager.remove(merged.bbox, merged);
 						break;
 					}
 				}
 			}
+			var data = 1;
 			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
-				ws.mergeManager.add(to, data, false);
+				ws.mergeManager.add(to, data);
 		}
 		else if(historyitem_Worksheet_ChangeHyperlink === Type){
 			var from = null;
@@ -3337,7 +3336,7 @@ UndoRedoWoorksheet.prototype = {
 				to = temp;
 			}
 			//не делаем clone потому что предполагаем, что здесь могут быть только операции изменения рзмеров, перемещение или удаления одной ссылки
-			var data = Data.hyperlink;
+			var data = null;
 			if(null != from && null != from.r1 && null != from.c1 && null != from.r2 && null != from.c2)
 			{
 				var aHyperlinks = ws.hyperlinkManager.get(from);
@@ -3346,16 +3345,18 @@ UndoRedoWoorksheet.prototype = {
 					var hyp = aHyperlinks.inner[i];
 					if(hyp.bbox.isEqual(from))
 					{
-						var elem = new RangeDataManagerElem(from, data);
-						ws.hyperlinkManager.remove(elem.bbox, elem, false);
+						data = hyp.data;
+						ws.hyperlinkManager.remove(hyp.bbox, hyp);
 						break;
 					}
 				}
 			}
-			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
+			if(null == data)
+				data = Data.hyperlink;
+			if(null != data && null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
 			{
 				data.Ref = ws.getRange3(to.r1, to.c1, to.r2, to.c2);
-				ws.hyperlinkManager.add(to, data, false);
+				ws.hyperlinkManager.add(to, data);
 			}
 		}
 	}

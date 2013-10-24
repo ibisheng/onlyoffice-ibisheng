@@ -3332,7 +3332,7 @@ function RangeDataManager(bAllowIntersect, fChange)
 	this.fChange = fChange;
 }
 RangeDataManager.prototype = {
-	add : function(bbox, data, bTriggerEvent)
+	add : function(bbox, data)
 	{
 		var oNewElem = new RangeDataManagerElem(new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2), data);
 		oNewElem.id = this.idGen++;
@@ -3409,7 +3409,7 @@ RangeDataManager.prototype = {
 		}
 		this.oElements[this._getBBoxIndex(bbox)] = oNewElem;
 		this._recalculate();
-		if(false != bTriggerEvent)
+		if(null != this.fChange)
 			this.fChange.call(this, oNewElem.data, null, oNewElem.bbox);
 	},
 	_getExecElem : function(elem, oFindElems)
@@ -3652,7 +3652,7 @@ RangeDataManager.prototype = {
 		}
 		return container;
 	},
-	remove : function(bbox, elemToDelete, bTriggerEvent)
+	remove : function(bbox, elemToDelete)
 	{
 		if(null != elemToDelete)
 		{
@@ -3683,7 +3683,7 @@ RangeDataManager.prototype = {
 				this.oAll = this._removeExecElem(this.oAll, null, elemToDelete);
 			delete this.oElements[this._getBBoxIndex(elemToDelete.bbox)];
 			this._recalculate();
-			if(false != bTriggerEvent)
+			if(null != this.fChange)
 				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
 		}
 		else
@@ -3693,7 +3693,7 @@ RangeDataManager.prototype = {
 			for(var i = 0, length = aElems.all.length; i < length; ++i)
 			{
 				var elem = aElems.all[i];
-				this.remove(elem.bbox, elem, bTriggerEvent);
+				this.remove(elem.bbox, elem);
 			}
 			this.startRecalculate();
 		}
@@ -3812,11 +3812,7 @@ RangeDataManager.prototype = {
 		{
 			var item = aToChange[i];
 			var elem = item.elem;
-			var from = elem.bbox;
-			var to = item.to;
-			if(null != this.fChange)
-				this.fChange.call(this, elem.data, from, to);
-			this.remove(elem.bbox, elem, false);
+			this.remove(elem.bbox, elem);
 		}
 		//добавляем измененные ячейки
 		for(var i = 0, length = aToChange.length; i < length; ++i)

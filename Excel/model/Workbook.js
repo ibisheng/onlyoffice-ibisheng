@@ -2177,7 +2177,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.aCommentsCoords = new Array();
 	var oThis = this;
 	this.mergeManager = new RangeDataManager(false, function(data, from, to){
-		if(null != from || null != to)
+		if(History.Is_On() && (null != from || null != to))
 		{
 			if(null != from)
 				from = from.clone();
@@ -2190,20 +2190,22 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 		}
 	});
 	this.hyperlinkManager = new RangeDataManager(true, function(data, from, to){
-		if(null != from || null != to)
+		if(History.Is_On() && (null != from || null != to))
 		{
 			if(null != from)
 				from = from.clone();
 			if(null != to)
-			{
 				to = to.clone();
-				data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
-			}
 			var oHistoryRange = from;
 			if(null == oHistoryRange)
 				oHistoryRange = to;
-			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange, new UndoRedoData_FromToHyperlink(from, to, data));
+			var oHistoryData = null;
+			if(null == from || null == to)
+				oHistoryData = data.clone();
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange, new UndoRedoData_FromToHyperlink(from, to, oHistoryData));
 		}
+		if(null != to)
+			data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
 
@@ -3595,24 +3597,27 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 			}
 		}
 	}
-	var aMerged = this.mergeManager.get(oBBoxFrom);
-	if(aMerged.inner.length > 0)
+	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
 	{
-		aTempObj.merged = aMerged.inner;
-		for(var i = 0, length = aTempObj.merged.length; i < length; i++)
+		var aMerged = this.mergeManager.get(oBBoxFrom);
+		if(aMerged.inner.length > 0)
 		{
-			var elem = aTempObj.merged[i];
-			this.mergeManager.remove(elem.bbox, elem, false);
+			aTempObj.merged = aMerged.inner;
+			for(var i = 0, length = aTempObj.merged.length; i < length; i++)
+			{
+				var elem = aTempObj.merged[i];
+				this.mergeManager.remove(elem.bbox, elem);
+			}
 		}
-	}
-	var aHyperlinks = this.hyperlinkManager.get(oBBoxFrom);
-	if(aHyperlinks.inner.length > 0)
-	{
-		aTempObj.hyperlinks = aHyperlinks.inner;
-		for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+		var aHyperlinks = this.hyperlinkManager.get(oBBoxFrom);
+		if(aHyperlinks.inner.length > 0)
 		{
-			var elem = aTempObj.hyperlinks[i];
-			this.hyperlinkManager.remove(elem.bbox, elem, false);
+			aTempObj.hyperlinks = aHyperlinks.inner;
+			for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+			{
+				var elem = aTempObj.hyperlinks[i];
+				this.hyperlinkManager.remove(elem.bbox, elem);
+			}
 		}
 	}
 	//удаляем to через историю, для undo
@@ -3662,23 +3667,26 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 	// this.renameDependencyNodes( offset, oBBoxFrom );
 	// buildRecalc(this.workbook);
 	// unLockDraw(this.workbook);
-	if(null != aTempObj.merged)
+	History.TurnOn();
+	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
 	{
-		for(var i = 0, length = aTempObj.merged.length; i < length; i++)
+		if(null != aTempObj.merged)
 		{
-			var elem = aTempObj.merged[i];
-			elem.bbox.setOffset(offset);
-			this.mergeManager.add(elem.bbox, elem.data, false);
+			for(var i = 0, length = aTempObj.merged.length; i < length; i++)
+			{
+				var elem = aTempObj.merged[i];
+				elem.bbox.setOffset(offset);
+				this.mergeManager.add(elem.bbox, elem.data);
+			}
 		}
-	}
-	if(null != aTempObj.hyperlinks)
-	{
-		for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+		if(null != aTempObj.hyperlinks)
 		{
-			var elem = aTempObj.hyperlinks[i];
-			elem.bbox.setOffset(offset);
-			elem.data.Ref.setOffset(offset);
-			this.hyperlinkManager.add(elem.bbox, elem.data, false);
+			for(var i = 0, length = aTempObj.hyperlinks.length; i < length; i++)
+			{
+				var elem = aTempObj.hyperlinks[i];
+				elem.bbox.setOffset(offset);
+				this.hyperlinkManager.add(elem.bbox, elem.data);
+			}
 		}
 	}
 	//расширяем границы
@@ -3690,7 +3698,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 		this.nRowsCount = oBBoxTo.r2 + 1;
 	if(oBBoxTo.c2 > this.nColsCount)
 		this.nColsCount = oBBoxTo.c2 + 1;
-	History.TurnOn();
 	
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
@@ -6861,7 +6868,7 @@ Range.prototype.hasMerged=function(){
 	return null;
 };
 Range.prototype.mergeOpen=function(){
-	this.worksheet.mergeManager.add(this.bbox, 1, false);
+	this.worksheet.mergeManager.add(this.bbox, 1);
 }
 Range.prototype.merge=function(type){
 	if(null == type)
@@ -7170,7 +7177,7 @@ Range.prototype.merge=function(type){
 	if(type == c_oAscMergeOptions.MergeCenter)
 		this.setAlignHorizontal("center");
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
-		this.worksheet.mergeManager.add(this.bbox, 1, true);
+		this.worksheet.mergeManager.add(this.bbox, 1);
 	History.EndTransaction();
 };
 Range.prototype.unmerge=function(bOnlyInRange){
@@ -7178,7 +7185,7 @@ Range.prototype.unmerge=function(bOnlyInRange){
 	History.SetSelection(this.bbox.clone());
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
-		this.worksheet.mergeManager.remove(this.bbox, null, true);
+		this.worksheet.mergeManager.remove(this.bbox, null);
 	History.EndTransaction();
 };
 Range.prototype._getHyperlinks=function(){
@@ -7251,7 +7258,7 @@ Range.prototype.getHyperlinks=function(){
 Range.prototype.setHyperlinkOpen=function(val){
 	if(null != val && false == val.isValid())
 		return;
-	this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val, false);
+	this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val);
 }
 Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	if(null != val && false == val.isValid())
@@ -7281,7 +7288,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 			{
 				var hyp = aHyperlinks.all[i];
 				if(hyp.bbox.isEqual(this.bbox))
-					this.worksheet.hyperlinkManager.remove(hyp.bbox, hyp, true);
+					this.worksheet.hyperlinkManager.remove(hyp.bbox, hyp);
 			}
 		}
 		//todo перейти на CellStyle
@@ -7295,7 +7302,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 			this.setFont(oHyperlinkFont);
 		}
 		if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
-			this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val, true);
+			this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val);
 		History.EndTransaction();
 	}
 };
@@ -7311,7 +7318,7 @@ Range.prototype.removeHyperlink=function(val){
 	History.SetSelection(bbox.clone());
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
-		this.worksheet.hyperlinkManager.remove(bbox, elem, true);
+		this.worksheet.hyperlinkManager.remove(bbox, elem);
 	History.EndTransaction();
 }
 Range.prototype.deleteCellsShiftUp=function(){
@@ -7349,7 +7356,7 @@ Range.prototype._shiftLeftRight=function(bLeft){
 				var elem = aMerged.outer[i];
 				if(!(elem.bbox.c1 < oShiftGet.bbox.c1 && oShiftGet.bbox.r1 <= elem.bbox.r1 && elem.bbox.r2 <= oShiftGet.bbox.r2))
 				{
-					mergeManager.remove(elem.bbox, elem, true);
+					mergeManager.remove(elem.bbox, elem);
 					bChanged = true;
 				}
 			}
@@ -7403,7 +7410,7 @@ Range.prototype._shiftUpDown=function(bUp){
 				var elem = aMerged.outer[i];
 				if(!(elem.bbox.r1 < oShiftGet.bbox.r1 && oShiftGet.bbox.c1 <= elem.bbox.c1 && elem.bbox.c2 <= oShiftGet.bbox.c2))
 				{
-					mergeManager.remove(elem.bbox, elem, true);
+					mergeManager.remove(elem.bbox, elem);
 					bChanged = true;
 				}
 			}
@@ -7730,24 +7737,27 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		oSortedIndexes[nFrom] = nTo;
 	}
 	//сортируются только одинарные гиперссылки, все неодинарные оставляем
-	var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
 	var aSortedHyperlinks = new Array();
-	for(var i = 0, length = aHyperlinks.inner.length; i < length; i++)
+	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
-		var elem = aHyperlinks.inner[i];
-		var hyp = elem.data;
-		if(hyp.Ref.isOneCell())
+		var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
+		for(var i = 0, length = aHyperlinks.inner.length; i < length; i++)
 		{
-			var nFrom = elem.bbox.r1;
-			var nTo = oSortedIndexes[nFrom];
-			if(null != nTo)
+			var elem = aHyperlinks.inner[i];
+			var hyp = elem.data;
+			if(hyp.Ref.isOneCell())
 			{
-				//удаляем ссылки, а не перемеаем, чтобы не было конфликтов(например в случае если все ячейки имеют ссылки и их надо передвинуть)
-				var oTempBBox = hyp.Ref.getBBox0();
-				this.worksheet.hyperlinkManager.remove(oTempBBox, new RangeDataManagerElem(oTempBBox, hyp), false);
-				var oNewHyp = hyp.clone();
-				oNewHyp.Ref.setOffset({offsetCol: 0, offsetRow: nTo - nFrom});
-				aSortedHyperlinks.push(oNewHyp);
+				var nFrom = elem.bbox.r1;
+				var nTo = oSortedIndexes[nFrom];
+				if(null != nTo)
+				{
+					//удаляем ссылки, а не перемеаем, чтобы не было конфликтов(например в случае если все ячейки имеют ссылки и их надо передвинуть)
+					var oTempBBox = hyp.Ref.getBBox0();
+					this.worksheet.hyperlinkManager.remove(oTempBBox, new RangeDataManagerElem(oTempBBox, hyp));
+					var oNewHyp = hyp.clone();
+					oNewHyp.Ref.setOffset({offsetCol: 0, offsetRow: nTo - nFrom});
+					aSortedHyperlinks.push(oNewHyp);
+				}
 			}
 		}
 	}
@@ -7821,13 +7831,16 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 //    this.worksheet.workbook.needRecalc = rec;
 
 //    recalc(this.worksheet.workbook);
-	//восстанавливаем удаленые гиперссылки
-	if(aSortedHyperlinks.length > 0)
+	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
-		for(var i = 0, length = aSortedHyperlinks.length; i < length; i++)
+		//восстанавливаем удаленые гиперссылки
+		if(aSortedHyperlinks.length > 0)
 		{
-			var hyp = aSortedHyperlinks[i];
-			this.worksheet.hyperlinkManager.add(hyp.Ref.getBBox0(), hyp, false);
+			for(var i = 0, length = aSortedHyperlinks.length; i < length; i++)
+			{
+				var hyp = aSortedHyperlinks[i];
+				this.worksheet.hyperlinkManager.add(hyp.Ref.getBBox0(), hyp);
+			}
 		}
 	}
 };
