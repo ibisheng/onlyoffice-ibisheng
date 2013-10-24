@@ -5765,6 +5765,7 @@
 							hyperlink.Location = shapeHyperlink.Value;
 							hyperlink.LocationSheet = spl[0];
 							hyperlink.LocationRange = spl[1];
+							this.objectRender.controller.resetSelectionState();
 						}
 						else
 							hyperlink.Hyperlink = shapeHyperlink.Value;
