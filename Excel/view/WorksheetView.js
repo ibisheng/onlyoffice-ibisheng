@@ -368,10 +368,12 @@
 			this.width_1px = 0;
 			this.width_2px = 0;
 			this.width_3px = 0;
+			this.width_4px = 0;
 			this.width_padding = 0;
 			this.height_1px = 0;
 			this.height_2px = 0;
 			this.height_3px = 0;
+			this.height_4px = 0;
 			this.highlightedCol = -1;
 			this.highlightedRow = -1;
 			this.visibleRange = asc_Range(0, 0, 0, 0);
@@ -1115,11 +1117,13 @@
 				this.width_1px = asc_calcnpt(0, ppiX, 1/*px*/);
 				this.width_2px = asc_calcnpt(0, ppiX, 2/*px*/);
 				this.width_3px = asc_calcnpt(0, ppiX, 3/*px*/);
+				this.width_4px = asc_calcnpt(0, ppiX, 4/*px*/);
 				this.width_padding = asc_calcnpt(0, ppiX, this.settings.cells.padding/*px*/);
 
 				this.height_1px = asc_calcnpt(0, ppiY, 1/*px*/);
 				this.height_2px = asc_calcnpt(0, ppiY, 2/*px*/);
 				this.height_3px = asc_calcnpt(0, ppiY, 3/*px*/);
+				this.height_4px = asc_calcnpt(0, ppiY, 4/*px*/);
 			},
 			_initCellsArea: function (fullRecalc) {
 				// calculate rows heights and visible rows
@@ -3030,22 +3034,20 @@
                             ctx.lineVer( xFormula1, yFormula1 - this.width_1px * (aFormulaIntersection.r1 != this.visibleRange.r1), yFormula2 + this.width_1px );
                         }
 						if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
-						
+
 						if (drawLeftSideFormula && drawTopSideFormula)
-							ctx.fillRect(xFormula1 + this.width_1px, yFormula1, 3, 3);
-							
+							ctx.fillRect(xFormula1 + this.width_1px, yFormula1, this.width_4px, this.height_4px);
+
 						if (drawRightSideFormula && drawTopSideFormula)
-							ctx.fillRect(xFormula2 - 4 * this.width_1px, yFormula1, 3, 3);
-							
+							ctx.fillRect(xFormula2 - this.width_4px, yFormula1, this.width_4px, this.height_4px);
+
 						if (drawRightSideFormula && drawBottomSideFormula)
-							ctx.fillRect(xFormula2 - 4 * this.width_1px, yFormula2 - 4 * this.height_1px, 3, 3);
-							
+							ctx.fillRect(xFormula2 - this.width_4px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
+
 						if (drawLeftSideFormula && drawBottomSideFormula)
-							ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - 4 * this.height_1px, 3, 3);
+							ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
 						
-						ctx.closePath()
-							.stroke()
-							.fill();
+						ctx.closePath().stroke();
 					}
 				}
 			},
