@@ -120,7 +120,7 @@ recalcresult2_End:zK
 SpellCheck_CallBack:v6
 historyitem_AutoShapes_AddYAxis:KO
 monthShort:zh
-MobileTouchMode$Cursor:m8
+MobileTouchMode$Cursor:n8
 tt_cmap14_ensure:xw
 cff_decoder_parse_charstrings:ZB
 JSCompiler_StaticMethods__Execute:Pc
@@ -196,7 +196,7 @@ c_oSer_OMathContentType$FPr:S3
 JSCompiler_StaticMethods_updateChartImage:lL
 T1_Face_Done:IC
 c_oSer_ChartSeriesDataLabelsType$ShowCatName:Ym
-c_oAscFileType$PDF:u9
+c_oAscFileType$PDF:v9
 c_oAscAlignH$Center:QS
 c_oAscFillBlipType$TILE:N9
 PS_Conv_ToInt:Et
@@ -473,7 +473,7 @@ Ins_MDAP:cz
 c_oSer_ChartSeriesNumCacheType$NumCache:$m
 tab_Clear:NR
 TGlyphBitmap:BD
-MobileTouchMode$FlowObj:l8
+MobileTouchMode$FlowObj:m8
 Round_To_Double_Grid:Oy
 CStyle:Ai
 CTrackWrapPolygon:YI
@@ -1347,7 +1347,7 @@ raster_memory:nx
 c_oSer_ClrSchemeMappingType$T1:q2
 c_oSer_ClrSchemeMappingType$T2:r2
 LoadFontFile:QD
-c_oSer_OMathContentType$SPre:p4
+c_oSer_OMathContentType$SPre:r4
 c_oAscChartType$scatter:Jn
 c_oAscWrapStyle2$Through:uT
 c_oAscServerError$NoError:mg
@@ -2497,7 +2497,7 @@ LoadMobileImages:r8
 selectionflag_Common:iQ
 c_oAscAlignV$Inside:hT
 c_oSerParType$pPr:W_
-c_oAscFileType$INNER:t9
+c_oAscFileType$INNER:u9
 FT_Service_MultiMastersRec:Tp
 JSCompiler_StaticMethods_Clear_Redo:jQ
 JSCompiler_StaticMethods_Remove_CommentMarks:FQ
