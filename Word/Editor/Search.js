@@ -273,7 +273,12 @@ CDocument.prototype.Search_GetId = function(bNext)
     if ( docpostype_DrawingObjects === this.CurPos.Type )
     {
         var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-        ParaDrawing.Parent.Document_SetThisElementCurrent();
+
+        var Id = ParaDrawing.Search_GetId( bNext, true );
+        if ( null != Id )
+            return Id;
+
+        ParaDrawing.GoTo_Text( true === bNext ? false : true );
     }
 
     if ( docpostype_Content === this.CurPos.Type )
@@ -362,16 +367,21 @@ CDocumentContent.prototype.Search = function(Str, Props, SearchEngine, Type)
 
 CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
 {
+    // Получим Id найденного элемента
+    var Id = null;
+
     if ( true === bCurrent )
     {
-        // Получим Id найденного элемента
         if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
-            ParaDrawing.Parent.Document_SetThisElementCurrent();
-        }
+            var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 
-        var Id = null;
+            Id = ParaDrawing.Search_GetId( bNext, true );
+            if ( null != Id )
+                return Id;
+
+            ParaDrawing.GoTo_Text( true === bNext ? false : true );
+        }
 
         var Pos = this.CurPos.ContentPos;
         if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
@@ -930,6 +940,7 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
 
     if ( true === bNext )
     {
+        // Найдем ближайший элемент среди найденных элементов в самом параграфе
         for ( var ElemId in this.SearchResults )
         {
             var Element = this.SearchResults[ElemId];
@@ -937,6 +948,21 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
             {
                 NearElementPos = Element.StartPos;
                 NearElementId  = ElemId;
+            }
+        }
+
+        var StartPos = Pos;
+        var EndPos   = ( null === NearElementId ? this.Content.length - 1 : Element.StartPos );
+
+        // Проверяем автофигуры между StartPos и EndPos
+        for ( var TempPos = StartPos; TempPos < EndPos; TempPos++ )
+        {
+            var Item = this.Content[TempPos];
+            if ( para_Drawing === Item.Type )
+            {
+                var TempElementId = Item.Search_GetId( true, false );
+                if ( null != TempElementId )
+                    return TempElementId;
             }
         }
     }
@@ -949,6 +975,21 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
             {
                 NearElementPos = Element.EndPos;
                 NearElementId  = ElemId;
+            }
+        }
+
+        var StartPos = ( null === NearElementId ? 0 : Element.EndPos );
+        var EndPos   = Pos;
+
+        // Проверяем автофигуры между StartPos и EndPos
+        for ( var TempPos = EndPos; TempPos > StartPos; TempPos-- )
+        {
+            var Item = this.Content[TempPos];
+            if ( para_Drawing === Item.Type )
+            {
+                var TempElementId = Item.Search_GetId( false, false );
+                if ( null != TempElementId )
+                    return TempElementId;
             }
         }
     }

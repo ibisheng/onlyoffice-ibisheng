@@ -6651,8 +6651,11 @@ Paragraph.prototype =
         }
     },
 
-    Cursor_MoveTo_Drawing : function(Id)
+    Cursor_MoveTo_Drawing : function(Id, bBefore)
     {
+        if ( undefined === bBefore )
+            bBefore = true;
+
         // Ставим курсор перед автофигурой с заданным Id
         var Pos = -1;
         var Count = this.Content.length;
@@ -6665,6 +6668,9 @@ Paragraph.prototype =
 
         if ( -1 === Pos )
             return;
+
+        if ( true != bBefore )
+            Pos = Pos + 1;
 
         this.Set_ContentPos( Pos, true, -1 );
         this.RecalculateCurPos();

@@ -3478,6 +3478,12 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 ParaDrawing.prototype =
 {
 
+    Search_GetId : function(bNext, bCurrent)
+    {
+        // TODO: Реализовать
+        return null;
+    },
+
     canRotate: function()
     {
         return isRealObject(this.GraphicObj) && typeof this.GraphicObj.canRotate == "function" && this.GraphicObj.canRotate();
@@ -4451,11 +4457,11 @@ ParaDrawing.prototype =
             editor.WordControl.m_oLogicDocument.Recalculate();
     },
 
-    GoTo_Text : function()
+    GoTo_Text : function(bBefore)
     {
         if ( undefined != this.Parent && null != this.Parent )
         {
-            this.Parent.Cursor_MoveTo_Drawing( this.Id );
+            this.Parent.Cursor_MoveTo_Drawing( this.Id, bBefore );
             this.Parent.Document_SetThisElementCurrent();
         }
     },
