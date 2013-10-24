@@ -1733,12 +1733,22 @@ CNumbering.prototype =
 
     Get_AbstractNum : function(Id)
     {
-        return this.AbstractNum[Id];
+        var AbstractNum = this.AbstractNum[Id];
+        if ( undefined != AbstractNum && undefined != AbstractNum.NumStyleLink )
+        {
+            var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
+            var NumStyle = Styles.Style[AbstractNum.NumStyleLink];
+
+            if ( undefined != NumStyle && undefined != NumStyle.ParaPr.NumPr && undefined != NumStyle.ParaPr.NumPr.NumId )
+                return this.Get_AbstractNum( NumStyle.ParaPr.NumPr.NumId );
+        }
+
+        return AbstractNum;
     },
 
     Get_ParaPr : function(NumId, Lvl)
     {
-        var AbstractId = this.AbstractNum[NumId];
+        var AbstractId = this.Get_AbstractNum(NumId);
 
         if ( undefined != AbstractId )
             return AbstractId.Lvl[Lvl].ParaPr;
@@ -1748,7 +1758,7 @@ CNumbering.prototype =
 
     Get_Format : function(NumId, Lvl)
     {
-        var AbstractId = this.AbstractNum[NumId];
+        var AbstractId = this.Get_AbstractNum(NumId);
 
         if ( undefined != AbstractId )
             return AbstractId.Lvl[Lvl].Format;
@@ -1769,19 +1779,19 @@ CNumbering.prototype =
 
     Draw : function(NumId, Lvl, X, Y, Context, NumInfo, TextPr)
     {
-        var AbstractId = this.AbstractNum[NumId];
+        var AbstractId = this.Get_AbstractNum(NumId);
         return AbstractId.Draw(X,Y, Context, Lvl, NumInfo, TextPr);
     },
 
     Measure : function(NumId, Lvl, Context, NumInfo, TextPr)
     {
-        var AbstractId = this.AbstractNum[NumId];
+        var AbstractId = this.Get_AbstractNum(NumId);
         return AbstractId.Measure( Context, Lvl, NumInfo, TextPr );
     },
 
     Document_CreateFontCharMap : function(FontCharMap, NumTextPr, NumPr, NumInfo)
     {
-        var AbstractId = this.AbstractNum[NumPr.NumId];
+        var AbstractId = this.Get_AbstractNum(NumPr.NumId);
         AbstractId.Document_CreateFontCharMap( FontCharMap, NumPr.Lvl, NumInfo, NumTextPr );
     },
 
@@ -1789,7 +1799,7 @@ CNumbering.prototype =
     {
         for ( var Id in this.AbstractNum )
         {
-            var AbstractNum = this.AbstractNum[Id];
+            var AbstractNum = this.Get_AbstractNum(Id);
             AbstractNum.Document_Get_AllFontNames( AllFonts );
         }
 
