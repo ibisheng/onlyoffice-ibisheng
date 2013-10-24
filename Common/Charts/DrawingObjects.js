@@ -4691,8 +4691,10 @@ function DrawingObjects() {
 		}
 		
 		if ( api.isChartEditor ) {
-			if ( aObjects.length && aObjects[0].isChart() )
+			if ( aObjects.length && aObjects[0].isChart() ) {
+				aObjects[0].graphicObject.syncAscChart();
 				return new asc_CChart(aObjects[0].graphicObject.chart);
+			}
 		}
 
         var chart = this.controller.getAscChartObject();
