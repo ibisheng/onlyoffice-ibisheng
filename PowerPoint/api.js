@@ -736,7 +736,11 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 			editor.TrackFile.setDocId(editor.DocInfo.get_Id());
 			editor.TrackFile.setUserId(editor.DocInfo.get_UserId());
 			editor.TrackFile.setTrackFunc(sendTrack);
-			editor.TrackFile.setIsDocumentModifiedFunc(editor.isDocumentModified);
+			
+			var _isDocumentModified = function(){
+				return editor.isDocumentModified();
+			};
+			editor.TrackFile.setIsDocumentModifiedFunc(_isDocumentModified);
 			
 			if(undefined != oSettings['TrackingInterval'] &&
 				null != oSettings['TrackingInterval'])

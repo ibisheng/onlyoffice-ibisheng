@@ -1255,8 +1255,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						
 						this.TrackFile.setDocId(this.DocInfo.Id);
 						this.TrackFile.setUserId(this.DocInfo.UserId);
-						this.TrackFile.setTrackFunc(this._asc_sendTrack);
-						this.TrackFile.setIsDocumentModifiedFunc(this.asc_isDocumentModified);
+						
+						var oThis = this;
+						var _sendTrack = function(callback, url, data){
+							return oThis._asc_sendTrack(callback, url, data);
+						};
+						
+						this.TrackFile.setTrackFunc();
+						
+						var _isDocumentModified = function(){
+							return oThis.asc_isDocumentModified()
+						};
+						
+						this.TrackFile.setIsDocumentModifiedFunc(_isDocumentModified);
 						
 						if(undefined != oSettings['TrackingInterval'] &&
 							null != oSettings['TrackingInterval'])
