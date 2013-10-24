@@ -855,13 +855,19 @@ CShape.prototype =
 
     insertHyperlink: function (options) {
         if(isRealObject(this.txBody) && this.txBody.content.Hyperlink_CanAdd(false)
-            && options && options.hyperlinkModel && options.hyperlinkModel.Hyperlink)
+            && options && options.hyperlinkModel)
         {
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
             var hyper_props = new CHyperlinkProperty();
             hyper_props.Text = options.text;
-            hyper_props.Value = options.hyperlinkModel.Hyperlink;
+			
+			if ( options.hyperlinkModel.Hyperlink )
+				hyper_props.Value = options.hyperlinkModel.Hyperlink;
+			else {
+				hyper_props.Value = options.hyperlinkModel.LocationSheet + "!" + options.hyperlinkModel.LocationRange;
+			}
+				
 			hyper_props.ToolTip = options.hyperlinkModel.Tooltip;
             this.txBody.content.Hyperlink_Add(hyper_props);
             this.txBody.calculateContent();

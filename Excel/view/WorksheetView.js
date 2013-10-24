@@ -4971,8 +4971,16 @@
 					if ( drawingInfo.hyperlink && (drawingInfo.hyperlink instanceof ParaHyperlinkStart) ) {
 					
 						var oHyperlink = new Hyperlink();
-						oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
 						oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
+						var spl = drawingInfo.hyperlink.Value.split("!");
+						if (spl.length === 2) {
+							oHyperlink.Location = drawingInfo.hyperlink.Value;
+							oHyperlink.LocationSheet = spl[0];
+							oHyperlink.LocationRange = spl[1];
+						}
+						else
+							oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
+						
 						var _r = this.activeRange.clone(true);
 						oHyperlink.Ref = this.model.getRange3(_r.r1, _r.c1, _r.r2, _r.c2);
 						
@@ -5625,7 +5633,7 @@
 				return sListName + "!" + this.getActiveRange(this.activeRange.clone(true));
 			},
 
-			getSelectionInfo: function (bExt) {
+			getSelectionInfo: function (bExt, x, y) {
 				var c_opt = this.settings.cells;
 				var activeCell = this.activeRange;
 				var mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol);
@@ -5739,15 +5747,32 @@
 				// Получаем гиперссылку
 				var ar = this.activeRange.clone();
 				var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
-				var hyperlink = range.getHyperlink ();
+				var hyperlink = range.getHyperlink();
 				if (null !== hyperlink) {
 					// Гиперлинк
 					var oHyperlink = new asc_CHyperlink(hyperlink);
-					oHyperlink.asc_setText (cell_info.text);
+					oHyperlink.asc_setText(cell_info.text);
 					cell_info.hyperlink = oHyperlink;
 				}
-				//else if ( graphicObjects.length > 0 ) {
-				//}
+				else if ( isGraphicObject && textPr && (x != undefined) && (y != undefined) ) {
+					var shapeHyperlink = this.objectRender.checkCursorDrawingObject(x, y).hyperlink;
+					if ( shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart) ) {
+						var hyperlink = new Hyperlink();
+						hyperlink.Tooltip = shapeHyperlink.ToolTip;
+						
+						var spl = shapeHyperlink.Value.split("!");
+						if ( spl.length === 2 ) {
+							hyperlink.Location = shapeHyperlink.Value;
+							hyperlink.LocationSheet = spl[0];
+							hyperlink.LocationRange = spl[1];
+						}
+						else
+							hyperlink.Hyperlink = shapeHyperlink.Value;
+						
+						var oHyperlink = new asc_CHyperlink(hyperlink);
+						cell_info.hyperlink = oHyperlink;
+					}
+				}
 				else
 					cell_info.hyperlink = null;
 
@@ -5878,7 +5903,7 @@
 
 				if ( drawingInfo && drawingInfo.isGraphicObject ) {
 					// отправляем евент для получения свойств картинки, шейпа или группы
-					this._trigger("selectionChanged", this.getSelectionInfo());
+					this._trigger("selectionChanged", this.getSelectionInfo(false, x, y));
 				} else {
 					this._drawSelection();
 					//ToDo this.drawDepCells();

@@ -928,7 +928,7 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length && t.enableKeyEvents ) {
-					if ( (event.which != 99) && (event.which != 118) ) {		// Mozilla Fix #20080
+					if ( !(event.ctrlKey && (event.which == 99) && (event.which == 118)) ) {		// Mozilla Firefox Fix #20080
 						if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
 							return true;
 					}
