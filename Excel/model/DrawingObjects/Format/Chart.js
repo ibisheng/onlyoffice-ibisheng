@@ -1775,6 +1775,11 @@ CChartAsGroup.prototype =
                 this.vAxisTitle = g_oTableId.Get_ById(data.newValue);
                 break;
             }
+            case historyitem_AutoShapes_RecalculateAfterInit:
+            {
+                this.recalculate();
+                break;
+            }
         }
     },
 
@@ -1910,7 +1915,7 @@ CChartAsGroup.prototype =
         var r = CreateBinaryReader(bin, 0, bin.length);
         var copy = new CChartAsGroup(null,this.drawingObjects);
         r.GetLong();
-        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        copy.readFromBinaryForCopyPaste(r, this.group, this.drawingObjects, x, y);
         return copy;
     },
 

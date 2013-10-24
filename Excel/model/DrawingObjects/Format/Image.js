@@ -1263,7 +1263,7 @@ CImageShape.prototype =
         var r = CreateBinaryReader(bin, 0, bin.length);
         var copy = new CImageShape(null,this.drawingObjects);
         r.GetLong();
-        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        copy.readFromBinaryForCopyPaste(r, this.group, this.drawingObjects, x, y);
         return copy;
     },
 

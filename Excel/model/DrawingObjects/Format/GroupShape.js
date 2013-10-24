@@ -1127,7 +1127,11 @@ CGroupShape.prototype =
         var count = this.selectedObjects.length;
         while(count > 0)
         {
+            var obj = this.selectedObjects[0];
+            var old_group = obj.group;
+            obj.group = this;
             this.selectedObjects[0].deselect(drawingObjectsController);
+            obj.group = old_group;
             --count;
         }
     },
@@ -1692,7 +1696,7 @@ CGroupShape.prototype =
         var r = CreateBinaryReader(bin, 0, bin.length);
         var copy = new CGroupShape(null,this.drawingObjects);
         r.GetLong();
-        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        copy.readFromBinaryForCopyPaste(r, this.group, this.drawingObjects, x, y);
         return copy;
     },
 

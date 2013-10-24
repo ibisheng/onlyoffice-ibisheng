@@ -847,8 +847,7 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(false);
             this.txBody.calculateContent();
             this.calculateTransformTextMatrix();
-						this.recalculateCurPos();
-
+			
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
@@ -3188,7 +3187,7 @@ CShape.prototype =
         var r = CreateBinaryReader(bin, 0, bin.length);
         var copy = new CShape(null,this.drawingObjects, null);
         r.GetLong();
-        copy.readFromBinaryForCopyPaste(r, null, this.drawingObjects, x, y);
+        copy.readFromBinaryForCopyPaste(r, this.group, this.drawingObjects, x, y);
         return copy;
     },
 

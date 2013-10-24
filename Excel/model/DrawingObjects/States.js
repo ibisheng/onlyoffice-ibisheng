@@ -3555,6 +3555,8 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
         var worksheet = this.drawingObjects.getWorksheet();
         var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
 
+        var o_this = this;
+        var ctrlKey = e.ctrlKey;
         if(!isViewMode)
         {
             this.drawingObjects.objectLocker.reset();
@@ -3574,13 +3576,36 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
                     History.Create_NewPoint();
                     History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
                         new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                    for(var i = 0; i < track_objects2.length; ++i)
-                        track_objects2[i].trackEnd();
-                    group.normalize();
-                    group.updateCoordinatesAfterInternalResize();
+                    if(!ctrlKey)
+                    {
+                        for(var i = 0; i < track_objects2.length; ++i)
+                            track_objects2[i].trackEnd();
+                        group.normalize();
+                        group.updateCoordinatesAfterInternalResize();
+                    }
+                    else
+                    {
+                        for(var i = 0; i < track_objects2.length; ++i)
+                        {
+                            var track_object = track_objects2[i];
+                            var original_object = track_object.originalObject;
+                            var scale_scale_coefficients = original_object.group.getResultScaleCoefficients();
+                            var xfrm = original_object.group.spPr.xfrm;
+                            var pos_x = track_object.x/scale_scale_coefficients.cx + xfrm.chOffX;
+                            var pos_y = track_object.y/scale_scale_coefficients.cy + xfrm.chOffY;
+                            var copy = original_object.copy(pos_x, pos_y);
+                            original_object.group.addToSpTree(copy);
+                            original_object.deselect(o_this.drawingObjectsController);
+                            copy.select(o_this.drawingObjectsController);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+                                new UndoRedoDataGraphicObjects(copy.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                        }
+                        group.normalize();
+                        group.updateCoordinatesAfterInternalResize();
+                    }
                     History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
                         new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                    group.recalculateTransform();
+                    group.recalculate();
                     drawingObjects.showDrawingObjects(true);
 
                 }
