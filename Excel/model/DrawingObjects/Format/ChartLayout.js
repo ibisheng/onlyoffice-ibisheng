@@ -26,6 +26,11 @@ function CChartLayout()
 
 CChartLayout.prototype =
 {
+    Get_Id: function ()
+    {
+        return this.Id;
+    },
+
     setXMode: function(mode)
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.xMode, mode)), null);
@@ -38,6 +43,8 @@ CChartLayout.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_Y_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.yMode, mode)), null);
         this.yMode = mode;
     },
+
+
 
 
     setX: function(x)

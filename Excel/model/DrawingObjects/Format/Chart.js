@@ -437,7 +437,7 @@ CChartAsGroup.prototype =
 				{
 					var title_str = api.chartTranslate.yAxis;
 					this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-					this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+					this.vAxisTitle.txBody.setVert(90);
 
 					for(var i in title_str)
 						this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
@@ -451,7 +451,7 @@ CChartAsGroup.prototype =
             }
             else
             {
-                this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+                this.vAxisTitle.txBody.setVert(90);
                 var content = this.vAxisTitle.txBody.content;
                 content.setParent(this.vAxisTitle.txBody);
                 content.setDrawingDocument(this.drawingObjects.drawingDocument);
@@ -1656,6 +1656,13 @@ CChartAsGroup.prototype =
                 this.group = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
+
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+
             case historyitem_AutoShapes_RecalculateTransformUndo:
             {
                 this.recalculate();
@@ -1724,6 +1731,13 @@ CChartAsGroup.prototype =
                 this.group = g_oTableId.Get_ById(data.newValue);
                 break;
             }
+
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
             case historyitem_AutoShapes_SetXfrm:
             {
                 this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);
@@ -1925,6 +1939,16 @@ CChartAsGroup.prototype =
         return copy;
     },
 
+
+    setGeometry: function(geometry)
+    {
+        var oldId = this.spPr.geometry ? this.spPr.geometry.Get_Id() : null;
+        this.spPr.geometry = geometry;
+        var newId = this.spPr.geometry.Get_Id();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetPresetGeometry, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+    },
+
     writeToBinaryForCopyPaste: function(w)
     {
         w.WriteLong(CLASS_TYPE_CHART_AS_GROUP);
@@ -1953,31 +1977,127 @@ CChartAsGroup.prototype =
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
-        this.group = group;
-        this.drawingObjects = drawingObjects;
+        this.setGroup(group);
+        this.setDrawingObjects(drawingObjects);
         if(r.GetBool())
         {
-            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.readFromBinary(r);
         }
 
         if(r.GetBool())
         {
-            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.readFromBinary(r);
         }
         if(r.GetBool())
         {
-            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.readFromBinary(r);
         }
         this.setAscChart(new asc_CChart());
         this.chart.Read_FromBinary2(r, false);
-        this.spPr.Read_FromBinary2(r);
+        this.setChart(this.chart, true);
+        //this.spPr.Read_FromBinary2(r);
+        //*********************
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+        var Reader = r;
+        var offX, offY, extX, extY, flipH, flipV, rot;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            geometry.Init(5, 5);
+            this.setGeometry(geometry);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            // this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            //this.setUniLine(ln);
+        }
+
+
+        //***********************************
         if(isRealNumber(x) && isRealNumber(y))
             this.spPr.xfrm.setPosition(x, y);
         this.init();
-        this.recalculate();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_InitChart, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+        if(!isRealObject(group))
+        {
+            this.recalculate();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
     },
 
     readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)

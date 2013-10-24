@@ -10,7 +10,7 @@ function CChartTitle(chartGroup, type)
     this.overlay = false;
     this.spPr = new CSpPr();
 
-    this.type = type;
+
 
     this.txPr = null;
     this.isDefaultText = false;
@@ -43,6 +43,10 @@ function CChartTitle(chartGroup, type)
     g_oTableId.Add(this, this.Id);
     if(chartGroup)
         this.setChartGroup(chartGroup);
+    if(isRealNumber(type))
+    {
+        this.setType(type);
+    }
 }
 
 CChartTitle.prototype =
@@ -82,7 +86,11 @@ CChartTitle.prototype =
 
     setType: function(type)
     {
+        var oldValue = this.type;
+        var newValue = type;
         this.type = type;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetChartTitleType, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
     },
 
     Get_Styles: function()
@@ -507,6 +515,17 @@ CChartTitle.prototype =
                 this.txBody = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
+            case historyitem_AutoShapes_SetChartTitleLayout:
+            {
+                this.layout = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type= data.oldValue;
+                break;
+            }
+
         }
     },
 
@@ -539,6 +558,17 @@ CChartTitle.prototype =
             case historyitem_AutoShapes_AddTextBody:
             {
                 this.txBody = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetChartTitleLayout:
+            {
+                this.layout = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetChartTitleType:
+            {
+                this.type= data.newValue;
                 break;
             }
         }
@@ -625,14 +655,14 @@ CChartTitle.prototype =
     setLayoutX: function(x)
     {
         if(!isRealObject(this.layout))
-            this.layout = new CChartLayout();
+            this.setLayout(new CChartLayout());
         this.layout.setX(x);
     },
 
     setLayoutY: function(y)
     {
         if(!isRealObject(this.layout))
-            this.layout = new CChartLayout();
+            this.setLayout(new CChartLayout());
         this.layout.setY(y);
     },
 
@@ -640,6 +670,7 @@ CChartTitle.prototype =
     {
         this.txBody = txBody;
     },
+
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
@@ -1114,9 +1145,21 @@ CChartTitle.prototype =
 
     setLayout: function(layout)
     {
+        var oldValue = this.layout ? this.layout.Get_Id() : null;
+        var newValue = layout ? layout.Get_Id() : null;
         this.layout = layout;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetChartTitleLayout, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
     },
 
+
+    setOverlay: function(overlay)
+    {
+        historyitem_AutoShapes_SetChartOverlay
+        var oldValue = this.overlay;
+        var newValue = overlay;
+        this.overlay = overlay;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetChartOverlay, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+    },
 
 
     hit: function(x, y)
@@ -1204,10 +1247,10 @@ CChartTitle.prototype =
     {
         if(r.GetBool())
         {
-            this.layout = new CChartLayout();
+            this.setLayout(new CChartLayout());
             this.layout.readFromBinary(r);
         }
-        this.overlay = r.GetBool();
+        this.setOverlay(r.GetBool());
         this.spPr.Read_FromBinary2(r);
         if(r.GetBool())
         {
@@ -1217,7 +1260,7 @@ CChartTitle.prototype =
 
         if(r.GetBool())
         {
-            this.txBody = new CTextBody(this);
+            this.setTextBody(new CTextBody(this));
             this.txBody.readFromBinary(r);
         }
 

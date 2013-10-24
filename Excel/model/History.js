@@ -189,6 +189,15 @@ var historyitem_AutoShapes_AddTitle = 77;
 var historyitem_AutoShapes_AddXAxis = 78;
 var historyitem_AutoShapes_AddYAxis = 79;
 var historyitem_AutoShapes_AddChartGroup = 80;
+var historyitem_AutoShapes_SetChartTitleLayout = 81;
+var historyitem_AutoShapes_SetChartOverlay = 82;
+var historyitem_AutoShapes_InitChart = 83;
+var historyitem_AutoShapes_SetChartTitleType = 84;
+
+
+
+
+
 
 
 
