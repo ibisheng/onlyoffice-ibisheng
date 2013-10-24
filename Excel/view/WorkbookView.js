@@ -479,7 +479,14 @@
 			},
 			
 			_onSetSelectionState: function (state) {
-				var ws = this.getWorksheet();
+				var index = 0;
+				for ( var i = 0; i < this.wsViews.length; i++ ) {
+					if ( state.sheetId === this.wsViews[i].model.Id ) {
+						index = this.wsViews[i].model.index;
+						break;
+					}
+				}
+				var ws = this.getWorksheet(index);
 				ws.objectRender.controller.setSelectionState(state);
                 ws.objectRender.controller.updateSelectionState();
 			},

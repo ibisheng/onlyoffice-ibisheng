@@ -1800,7 +1800,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjectsEx(false);
+				this.objectRender.showDrawingObjects(false);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
