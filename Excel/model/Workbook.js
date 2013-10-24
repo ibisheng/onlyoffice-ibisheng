@@ -361,7 +361,18 @@ function DependencyGraph(wb) {
 	
 	//сортировка по ведущим ячейкам. у объекта берем массив masterEdges и по нему бегаем.
 	this.t_sort_master = function(sheetId,cellId){
-		
+
+        for( var id in nodes ){
+            if( !nodes[id].isArea ){
+                for( var id2  in areaNodes ){
+                    if( areaNodes[id2].containCell(nodes[id]) ){
+                        areaNodes[id2].addMasterEdge(nodes[id]);
+                        nodes[id].addSlaveEdge(areaNodes[id2]);
+                    }
+                }
+            }
+        }
+
 		function getFirstNode(sheetId,cellId) {
 			
 			var n = new Vertex(sheetId,cellId,thas.wb);
@@ -1450,8 +1461,7 @@ Workbook.prototype.init=function(){
     this.buildDependency();
 	var nR = this.needRecalc, thas = this, calculatedCells = {}, nRLength = nR.length, timeStart, timeEnd, timeCount = 0, first = true, sr;
 
-    function R() {
-
+    if( nR.length > 0 ){
         for ( var id in nR ) {
             var sr1, sr2;
             timeStart = (new Date()).getTime();
@@ -1510,11 +1520,7 @@ Workbook.prototype.init=function(){
         thas.handlers.trigger( "asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc );
 
     }
-	
-	if( nR.length > 0 ){
-		R();
-	}
-	
+
 	//charts
 	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 	{
