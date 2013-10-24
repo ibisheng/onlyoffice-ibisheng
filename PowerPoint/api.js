@@ -2159,6 +2159,8 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
 
                     this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
                     this.asyncImageEndLoaded2 = null;
+
+                    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
                 }
             }
         }
