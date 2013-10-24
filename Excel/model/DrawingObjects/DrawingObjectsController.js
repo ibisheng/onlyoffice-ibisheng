@@ -1065,7 +1065,7 @@ DrawingObjectsController.prototype =
                     state.id = STATES_ID_GROUP;
                     state.groupId = this.curState.group.Get_Id();
                     state.selectedObjects = [];
-                    for(var i = 0; i < this.curState.group.selectedObjects; ++i)
+                    for(var i = 0; i < this.curState.group.selectedObjects.length; ++i)
                     {
                         state.selectedObjects.push(this.curState.group.selectedObjects[i].Get_Id());
                     }

@@ -1669,7 +1669,10 @@ CChartAsGroup.prototype =
                     if ( api.wb )
                     {
                         var ws = api.wb.getWorksheetById(data.oldValue);
-                        this.drawingObjects = ws.objectRender;
+                        if(isRealObject(ws))
+                            this.drawingObjects = ws.objectRender;
+                        else
+                            this.drawingObjects = null;
                     }
                 }
                 break;
@@ -1734,7 +1737,10 @@ CChartAsGroup.prototype =
                     if ( api.wb )
                     {
                         var ws = api.wb.getWorksheetById(data.newValue);
-                        this.drawingObjects = ws.objectRender;
+                        if(isRealObject(ws))
+                            this.drawingObjects = ws.objectRender;
+                        else
+                            this.drawingObjects = null;
                     }
                 }
                 break;
