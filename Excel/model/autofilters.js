@@ -1845,7 +1845,17 @@
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = data;
 								var splitRange = data.Ref.split(':');
-								this._setColorStyleTable(splitRange[0], splitRange[1], data, null, true);
+								if(!gUndoInsDelCellsFlag)
+								{
+									gUndoInsDelCellsFlag = 
+									{
+										arg1: splitRange[0],
+										arg2: splitRange[1],
+										data: data
+									}
+								}
+								else
+									this._setColorStyleTable(splitRange[0], splitRange[1], data, null, true);
 								this._addButtonAF({result: data.result,isVis: true});
 							}
 							else
