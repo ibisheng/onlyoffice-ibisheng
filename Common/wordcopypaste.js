@@ -2535,7 +2535,6 @@ function Body_Paste(api, e)
                     ifr.style.zIndex = -1000;
                     document.body.appendChild(ifr);
                 }
-                ifr.style.display  = "block";
                 var frameWindow = window.frames["pasteFrame"];
                 if(frameWindow)
                 {
@@ -2544,11 +2543,11 @@ function Body_Paste(api, e)
                     frameWindow.document.close();
 					if(null != frameWindow.document && null != frameWindow.document.body)
 					{
-						Editor_Paste_Exec(api, frameWindow.document.body);
+						ifr.style.display  = "block";
+						Editor_Paste_Exec(api, frameWindow.document.body, ifr);
 						bExist = true;
 					}
                 }
-                ifr.style.display  = ELEMENT_DISPAY_STYLE;
             }
 
             if(bExist)
@@ -2653,10 +2652,12 @@ function Body_Paste(api, e)
         }
     }
 }
-function Editor_Paste_Exec(api, pastebin)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay)
 {
+	if(null == nodeDisplay)
+		nodeDisplay = pastebin;
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-    oPasteProcessor.Start(pastebin);
+    oPasteProcessor.Start(pastebin, nodeDisplay);
 };
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
@@ -3214,7 +3215,7 @@ PasteProcessor.prototype =
 			aPrepeareImages.push(i);
 		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};
 	},
-	Start : function(node)
+	Start : function(node, nodeDisplay)
     {
 		if(g_bIsDocumentCopyPaste)
         {
@@ -3264,8 +3265,8 @@ PasteProcessor.prototype =
                         {
                             editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen(true);
                             oThis.InsertInDocument();
-                            node.blur();
-                            node.style.display  = ELEMENT_DISPAY_STYLE;
+                            nodeDisplay.blur();
+                            nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
@@ -3331,11 +3332,9 @@ PasteProcessor.prototype =
                     if(false == oThis.bNested)
                     {
                         oThis.InsertInDocument();
+						nodeDisplay.blur();
+						nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                     }
-
-                    node.blur();
-                    node.style.display  = ELEMENT_DISPAY_STYLE;
-
                 });
         }
         else
@@ -3442,8 +3441,8 @@ PasteProcessor.prototype =
                                     presentation.Recalculate();
                                     presentation.Document_UpdateInterfaceState();
 
-                                    node.blur();
-                                    node.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.blur();
+                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3494,8 +3493,8 @@ PasteProcessor.prototype =
                                     presentation.Recalculate();
                                     presentation.Document_UpdateInterfaceState();
 
-                                    node.blur();
-                                    node.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.blur();
+                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3718,8 +3717,8 @@ PasteProcessor.prototype =
                                         presentation.insertSlide(presentation.CurPage + i+1, arr_slides[i]);
                                     }
                                     presentation.Recalculate();
-                                    node.blur();
-                                    node.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.blur();
+                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3830,8 +3829,8 @@ PasteProcessor.prototype =
                                         }
                                         presentation.Recalculate();
                                     }
-                                    node.blur();
-                                    node.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.blur();
+                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3967,8 +3966,8 @@ PasteProcessor.prototype =
                          //oThis.InsertInDocument();
                      }
 
-                     node.blur();
-                     node.style.display  = ELEMENT_DISPAY_STYLE;
+                     nodeDisplay.blur();
+                     nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
 
                 });
 
