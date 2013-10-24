@@ -796,7 +796,7 @@ b64_decode:Gh
 FT_Outline_Copy:Xl
 historyitem_CalculateAfterPaste:hD
 c_oSerTableTypes$HdrFtr:lK
-CHeader:F5
+CHeader:G5
 tt_cmap14_char_index:Ar
 AA:UT
 JSCompiler_StaticMethods_drawFillStroke:C2
@@ -1556,7 +1556,7 @@ Direct_Move_Y:Jt
 Direct_Move_X:Ht
 JSCompiler_StaticMethods_Is_Punctuation:VB
 STATES_ID_CHART_TEXT_ADD:VD
-LineEndType$Arrow:O_
+LineEndType$Arrow:P_
 JSCompiler_StaticMethods_Internal_GetCellByXY:iW
 chartCanvas:pT
 CBinaryFileWriter:pa
@@ -2073,7 +2073,7 @@ CorrectUniColor:K5
 CCollaborativeChanges:CA
 c_oSer_OMathContentType$Rad:dR
 c_oSer_OMathContentType$SSubSupPr:lR
-_ph_summ_chart_and_tx:i4
+_ph_summ_chart_and_tx:j4
 ft_glyphslot_free_bitmap:Rn
 JSCompiler_StaticMethods__ExecuteTableRow:ef
 CPrstColor:Xh
@@ -2271,7 +2271,7 @@ CWriteCommentData:Ai
 MoveShapeImageTrack:g0
 Editor_Paste_Button:Jc
 HitToArc:E2
-_ph_summ_chart:h4
+_ph_summ_chart:i4
 Ins_SPVTCA:au
 ft_outline_glyph_class:nm
 CFF_FontRec:Sv
@@ -2370,7 +2370,7 @@ historyitem_TableId_Add:Pz
 ArcToCurvers:B2
 CFF_Decoder_Zone:Qw
 t1_cmap_std_char_index:Yo
-JSCompiler_StaticMethods_Read_Lvl_FromBinary:r0
+JSCompiler_StaticMethods_Read_Lvl_FromBinary:s0
 c_oSer_DrawingType$Chart:iI
 c_oSer_sts$Style_TblStylePr:vL
 _weight_subTitle:n1
@@ -2629,7 +2629,7 @@ TT_CMapRec:Pq
 CParaLineRange:BZ
 DecodeBase64:Fz
 recalcresult2_NextPage:iX
-_fakeHeaders:E5
+_fakeHeaders:F5
 c_oSer_ClrSchemeMappingType$FollowedHyperlink:fP
 c_oSer_OMathContentType$Box:AQ
 JSCompiler_StaticMethods_Internal_Copy_Grid:KV
