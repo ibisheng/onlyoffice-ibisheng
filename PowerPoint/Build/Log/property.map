@@ -1281,7 +1281,7 @@ OnStartRecalculate:Y3a
 AddClipRect:sL
 isUseEmbeddedCutFonts:F0
 lUnicode:uN
-yAxis:Oe
+yAxis:Pe
 WriteTextParagraphPr:zpa
 close_contour:C9a
 glyph_hints:eV
@@ -1777,7 +1777,7 @@ _hpos:C5
 MobileTouchManager:R3a
 Splitter2Pos:Ix
 put_VAnchor:TYa
-sy:fd
+sy:ed
 sz:Z9
 sx:$c
 lawngreen:dcb
@@ -1889,7 +1889,7 @@ bShow:ci
 originalCanvasY:yWa
 min_Bottom_Side_Bearing:UVa
 setCellFontSize:EW
-HighLight:Me
+HighLight:Ne
 _defaultcolor:yLa
 ConvertCoordsToCursor:QS
 setShowMasterSp:cja
@@ -2024,7 +2024,7 @@ SetHeaderProperties:doa
 fromWordArt:JE
 change_DocSize:IQa
 cur_end:Aea
-UniFill:Pe
+UniFill:Qe
 IsReloadBinaryThemeEditorNow:raa
 palegreen:peb
 __canvas__:eE
@@ -3474,7 +3474,7 @@ fsSelection:R_
 Is_ThisElementCurrent:nP
 invertTransformText2:XUa
 num_gray_spans:YR
-Distance:Te
+Distance:Me
 Clear_ContentChanges:NO
 get_ImagesCount:Dta
 selectStartPage:vfb
@@ -5340,7 +5340,7 @@ X_grid_start:IG
 Focused:K2a
 ServerIdWaitComplete:aoa
 magenta:hdb
-adjastment:Qe
+adjastment:Re
 sync_currentPageCallback:zja
 yAxisTitle:q1a
 IsFocused:HL
@@ -5692,7 +5692,7 @@ Set_TableBand1Vert:a5a
 ReadEffectExtent:hba
 scrollerMouseDown:zW
 get_id:BUa
-num:Re
+num:Se
 setClMapOverride:n2
 sync_EndCatchSelectedElements:Y9
 _xmin:Ih
@@ -5727,7 +5727,7 @@ OpenDocumentProgress:wP
 m_bLast_Col:oy
 m_bIsScrollVisible:xN
 asc_setUserName:c_
-CheckPoint:Se
+CheckPoint:Te
 AutoNumType:lD
 isAutosaveEnable:Eua
 SelectClear:RI
@@ -5926,7 +5926,7 @@ _onSetIndexUser:YLa
 service_WINFNT:Dfb
 COMPATIBLE_WIDTHS_Rules:Aza
 _linewidth:rv
-tailEnd:Ne
+tailEnd:Oe
 put_FramePr:iXa
 TableGridCalc:Gs
 maxFunc:LN
@@ -6335,7 +6335,7 @@ Prop:jna
 ctEdgeColor:$9a
 ReadClrScheme:qna
 recalculateTransformText:Hc
-Paddings:dd
+Paddings:fd
 Animate:qza
 WriteHdrFtrContent:jpa
 originalFlipH:ef
@@ -6862,7 +6862,7 @@ _ylabels_invert:kE
 put_XAlign:$Ya
 m_oPanelRight_buttonNextPage:Z0
 internal:ve
-RelativeFrom:ed
+RelativeFrom:dd
 Caller_Range:rX
 CheckRetinaElement:Pka
 Set_ParagraphAlign:br
