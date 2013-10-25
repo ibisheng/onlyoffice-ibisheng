@@ -4924,6 +4924,7 @@ function DrawingObjects() {
 			objectInfo.id = graphicObjectInfo.objectId;
 			objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
 			objectInfo.cursor = graphicObjectInfo.cursorType;
+            objectInfo.hyperlink = graphicObjectInfo.hyperlink;
 			objectInfo.isGraphicObject = true;
 			
 			return objectInfo;
