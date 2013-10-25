@@ -1487,13 +1487,13 @@ function CHorRuler()
 
             if (!this.IsRetina)
             {
-                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                    left - 5, 0, this.m_oCanvas.width, this.m_oCanvas.height);
+                context.drawImage(this.m_oCanvas, 5, 0, this.m_oCanvas.width - 10, this.m_oCanvas.height,
+                    left - 5, 0, this.m_oCanvas.width - 10, this.m_oCanvas.height);
             }
             else
             {
-                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                    (left - 5) << 1, 0, this.m_oCanvas.width, this.m_oCanvas.height);
+                context.drawImage(this.m_oCanvas, 10, 0, this.m_oCanvas.width - 20, this.m_oCanvas.height,
+                    (left - 5) << 1, 0, this.m_oCanvas.width - 20, this.m_oCanvas.height);
                 context.setTransform(2, 0, 0, 2, 0, 0);
             }
 
@@ -2546,13 +2546,13 @@ function CVerRuler()
         {
             if (!this.IsRetina)
             {
-                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                    0, top - 5, this.m_oCanvas.width, this.m_oCanvas.height);
+                context.drawImage(this.m_oCanvas, 0, 5, this.m_oCanvas.width, this.m_oCanvas.height - 10,
+                    0, top - 5, this.m_oCanvas.width, this.m_oCanvas.height - 10);
             }
             else
             {
-                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                    0, (top - 5) << 1, this.m_oCanvas.width, this.m_oCanvas.height);
+                context.drawImage(this.m_oCanvas, 0, 10, this.m_oCanvas.width, this.m_oCanvas.height - 20,
+                    0, (top - 5) << 1, this.m_oCanvas.width, this.m_oCanvas.height - 20);
             }
         }
     }
