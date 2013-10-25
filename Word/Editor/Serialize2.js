@@ -4514,10 +4514,10 @@ Binary_tblPrReader.prototype =
 					table.Set_PositionH(oAdditionalPr.HRelativeFrom, oAdditionalPr.HAlign, oAdditionalPr.HValue);
 				if(null != oAdditionalPr.VRelativeFrom && null != oAdditionalPr.VAlign && null != oAdditionalPr.VValue)
 					table.Set_PositionV(oAdditionalPr.VRelativeFrom, oAdditionalPr.VAlign, oAdditionalPr.VValue);
-				if(null != oAdditionalPr.Paddings)
+				if(null != oAdditionalPr.Distance)
 				{
-					var Paddings = oAdditionalPr.Paddings;
-					table.Set_Distance(Paddings.L, Paddings.T, Paddings.R, Paddings.B);
+					var Distance = oAdditionalPr.Distance;
+					table.Set_Distance(Distance.L, Distance.T, Distance.R, Distance.B);
 				}
 			}
 			else if( c_oSerProp_tblPrType.Look === type )
