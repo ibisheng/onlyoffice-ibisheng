@@ -8151,7 +8151,13 @@
 									if (range.addCellsShiftRight()) {
 										fullRecalc = true;
 										if(isCheckChangeAutoFilter == 'changeAutoFilter')
-											t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
+										{
+											if(gUndoInsDelCellsFlag == true)
+												t.autoFilters.insertColumn(prop, _updateRangeIns, arn);
+											else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
+												t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
+											gUndoInsDelCellsFlag = true;
+										}
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
@@ -8171,7 +8177,13 @@
 									if (range.addCellsShiftBottom()) {
 										fullRecalc = true;
 										if(isCheckChangeAutoFilter == 'changeAutoFilter')
-											t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
+										{
+											if(gUndoInsDelCellsFlag == true)
+												t.autoFilters.insertRows(prop,_updateRangeIns, _updateRangeIns);
+											else if(gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
+												t.autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
+											gUndoInsDelCellsFlag = true;
+										}	
 										t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									}
