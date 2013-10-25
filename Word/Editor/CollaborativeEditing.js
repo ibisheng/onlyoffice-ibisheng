@@ -636,6 +636,32 @@ function CCollaborativeEditing()
             }
         }
 
+        this.Release_Locks();
+
+        var UnlockCount2 = this.m_aNeedUnlock2.length;
+        for ( var Index = 0; Index < UnlockCount2; Index++ )
+        {
+            var Class = this.m_aNeedUnlock2[Index];
+            Class.Lock.Set_Type( locktype_None, false);
+            editor.CoAuthoringApi.releaseLocks( Class.Get_Id() );
+        }
+
+        this.m_aNeedUnlock.length  = 0;
+        this.m_aNeedUnlock2.length = 0;
+
+        editor.CoAuthoringApi.saveChanges(aChanges);
+
+        // Чистим Undo/Redo
+        History.Clear();
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+
+        editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+        editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    };
+
+    this.Release_Locks = function()
+    {
         var UnlockCount = this.m_aNeedUnlock.length;
         for ( var Index = 0; Index < UnlockCount; Index++ )
         {
@@ -658,27 +684,6 @@ function CCollaborativeEditing()
                 this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
             }
         }
-
-        var UnlockCount2 = this.m_aNeedUnlock2.length;
-        for ( var Index = 0; Index < UnlockCount2; Index++ )
-        {
-            var Class = this.m_aNeedUnlock2[Index];
-            Class.Lock.Set_Type( locktype_None, false);
-            editor.CoAuthoringApi.releaseLocks( Class.Get_Id() );
-        }
-
-        this.m_aNeedUnlock.length  = 0;
-        this.m_aNeedUnlock2.length = 0;
-
-        editor.CoAuthoringApi.saveChanges(aChanges);
-
-        // Чистим Undo/Redo
-        History.Clear();
-        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-        editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
-
-        editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
-        editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     };
 
     this.OnStart_Load_Objects = function()

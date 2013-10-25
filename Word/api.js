@@ -6120,6 +6120,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 var Document = this.WordControl.m_oLogicDocument;
 
                 CollaborativeEditing.Apply_Changes();
+                CollaborativeEditing.Release_Locks();
 
                 //Recalculate HdrFtr
                 if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
