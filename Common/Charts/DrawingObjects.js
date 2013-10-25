@@ -2844,7 +2844,7 @@ function DrawingObjects() {
                 if(isRealObject(drawingObject.graphicObject.drawingBase))
                 {
                     var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
                     drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
@@ -2869,7 +2869,7 @@ function DrawingObjects() {
                 if(isRealObject(drawingObject.graphicObject.drawingBase))
                 {
                     var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
                     drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
@@ -4924,7 +4924,6 @@ function DrawingObjects() {
 			objectInfo.id = graphicObjectInfo.objectId;
 			objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
 			objectInfo.cursor = graphicObjectInfo.cursorType;
-			objectInfo.hyperlink = graphicObjectInfo.hyperlink;
 			objectInfo.isGraphicObject = true;
 			
 			return objectInfo;
@@ -5220,9 +5219,10 @@ function writeToBinaryParagraph(p, w)
     for ( var Index = 0; Index < Len; Index++ )
     {
         var Item = p.Content[Index];
-        if ( true === Item.Is_RealContent() )
+        if ( true === Item.Is_RealContent())
         {
             writeToBinaryParagraphContent(Item, w);
+			w.WriteLong(Index);
             Count++;
         }
     }
@@ -5246,6 +5246,7 @@ function readFromBinaryParagraph(p, r)
     for ( var Index = 0; Index < Count; Index++ )
     {
         var Element = readFromBinaryParagraphContent(r);
+		var index_test = r.GetLong();
         if ( null != Element )
             p.Content.push( Element );
     }
