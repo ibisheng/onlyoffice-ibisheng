@@ -5897,6 +5897,13 @@
 					this._reDrawFilters();
 					this.drawAutoF();
 				}
+				else
+				{
+					if(arnTo)
+						this.reDrawFilter(arnTo);
+					if(arnFrom)
+						this.reDrawFilter(arnFrom);
+				}
 			},
 			
 			_refToRange: function(ref)
