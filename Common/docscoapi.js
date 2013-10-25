@@ -616,7 +616,7 @@
 	DocsCoApi.prototype._onParticipantsChanged = function (participants, isStartEvent) {
 		this._participants = [];
 		if (participants) {
-			var tmpUser, countEditUsers = 1;
+			var tmpUser, countEditUsers = 0;
 			for (var i = 0; i < participants.length; ++i) {
 				tmpUser = new asc_user ();
 				tmpUser.asc_setId (participants[i]["id"]);
@@ -793,8 +793,7 @@
                     docsCoApi._sendPrebuffered();
                 }
                 //TODO: Add errors
-                if (docsCoApi._initCallback)
-                {
+                if (docsCoApi._initCallback) {
                     docsCoApi._initCallback({result:data["result"]});
                 }
             },
