@@ -951,8 +951,8 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
             }
         }
 
-        var StartPos = Pos;
-        var EndPos   = ( null === NearElementId ? this.Content.length - 1 : Element.StartPos );
+        var StartPos = Math.max( Pos, 0 );
+        var EndPos   = Math.min( ( null === NearElementId ? this.Content.length - 1 : Element.StartPos ), this.Content.length - 1 );
 
         // Проверяем автофигуры между StartPos и EndPos
         for ( var TempPos = StartPos; TempPos < EndPos; TempPos++ )
@@ -978,8 +978,8 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
             }
         }
 
-        var StartPos = ( null === NearElementId ? 0 : Element.EndPos );
-        var EndPos   = Pos;
+        var StartPos = Math.max( ( null === NearElementId ? 0 : Element.EndPos ), 0 );
+        var EndPos   = Math.min( Pos, this.Content.length - 1 );
 
         // Проверяем автофигуры между StartPos и EndPos
         for ( var TempPos = EndPos; TempPos > StartPos; TempPos-- )
