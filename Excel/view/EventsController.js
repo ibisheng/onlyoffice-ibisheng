@@ -52,8 +52,7 @@
 			this.targetInfo = undefined;
 			this.isResizeMode = false;
 			this.isResizeModeMove = false;
-			// Для обработки событий автофигур
-			this.isGraphicObjectMode = false;
+			
 			// Режим автозаполнения
 			this.isFillHandleMode = false;
 			this.isMoveRangeMode = false;
@@ -992,10 +991,9 @@
                 this.hsbApi.evt_mouseup(event);
 				// Shapes
 				var coord = this._getCoordinates(event);
-				if ( this.isGraphicObjectMode ) {
+				if ( asc["editor"].isStartAddShape ) {
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
-					this.isGraphicObjectMode = false;
 					return true;
 				}
 			
@@ -1106,15 +1104,10 @@
 				}
 				
 				// Shapes
-				this.isGraphicObjectMode = false;
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				
 				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
-					this.isGraphicObjectMode = true;
-				}
-				
-				if ( this.isGraphicObjectMode ) {
-				
+					
+					asc["editor"].isStartAddShape = true;
 					var currTime = getCurrentTime();
 					if ( currTime - this.lastMouseDownTime < this.dbClickInterval )
 						this.mouseClickCount = 2;
@@ -1137,7 +1130,6 @@
 				}
 				else if ( t.targetInfo && t.targetInfo.target != "moveResizeRange" ) {
 					t.handlers.trigger("resetSelectedGraphicObjects");
-					this.isGraphicObjectMode = false;
 				}
 
 				if (event.originalEvent && 2 === event.originalEvent.detail) {
@@ -1264,11 +1256,10 @@
 				// Shapes
 				var coord = this._getCoordinates(event);
 				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
-				if ( this.isGraphicObjectMode ) {
+				if ( asc["editor"].isStartAddShape ) {
 					event.ClickCount = this.mouseClickCount;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
-					this.isGraphicObjectMode = false;
 					return true;
 				}
 			
@@ -1311,7 +1302,7 @@
 				t.hasCursor = true;
 				
 				// Shapes
-				if ( this.isGraphicObjectMode ) {
+				if ( asc["editor"].isStartAddShape ) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return;
