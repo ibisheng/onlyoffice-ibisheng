@@ -210,14 +210,15 @@
              * @param {Number} textW
              * @param {String} alignHorizontal
              * @param {String} alignVertical
+             * @param {Number} maxWidth
              */
-            getTransformBound: function(angle, x, y, w, h, textW, alignHorizontal, alignVertical) {
+            getTransformBound: function(angle, x, y, w, h, textW, alignHorizontal, alignVertical, maxWidth) {
 
                 this.angle          =   0;  //  angle;
                 this.fontNeedUpdate =   true;
 
                 var dx = 0, dy = 0, sx = 0, sw = 0;
-                var tm = this._doMeasure();
+                var tm = this._doMeasure(maxWidth);
 
                 var mul = (90 - (Math.abs(angle)) ) / 90;
                 var posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW);
@@ -838,15 +839,17 @@
 					this.charWidths[this.charWidths.length - 1] += delta;
 				}
 
-				if (hasRepeats) {
-					if (maxWidth === undefined) {throw "Undefined width of cell width Numeric Format";}
-					this._insertRepeatChars(maxWidth);
-				}
+                if (hasRepeats) {
+                    if (maxWidth === undefined) {
+                        throw "Undefined width of cell width Numeric Format";
+                    }
+                    this._insertRepeatChars(maxWidth);
+                }
 
-				return this._calcTextMetrics();
-			},
+                return this._calcTextMetrics();
+            },
 
-			/**
+            /**
 			 * @param {Number} maxWidth
 			 * @return {TextMetrics}
 			 */
@@ -997,92 +1000,6 @@
 					renderFragment(strBeg, i, p_, this.angle);
 				}
 			},
-
-            /**
-             * @param {Number} angle
-             * @param {Object} tm
-             * @param {Number} x
-             * @param {Number} y
-             * @param {Number} w
-             * @param {Number} h
-             * @param {Number} textW
-             * @param {Number} alignH
-             * @param {Number} alignV
-             * */
-            _boundTransform: function(angle, tm, x, y, w, h, textW, alignH, alignV) {
-
-                var dx = 0, dy = 0;
-                var mbt = new asc.Matrix();
-                var ah = alignH[0], av = alignV[0];
-                var mul = (90 - (Math.abs(angle)) ) / 90;
-                var posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW);
-                var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
-
-                if ('b' === av) {
-                    if (posh < h) {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                            dy = h - (posh + mul * tm.height);
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = h - mul * tm.height;
-                        }
-                    } else {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = h - mul * tm.height;
-                        }
-                    }
-                }
-
-                if ('c' === av) {
-                    if (posh < h) {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                            dy = (h - posh) * 0.5;
-                        } else {
-                            if ('c' == ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = (h + posh) * 0.5;
-                        }
-                    } else {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = Math.min(h + tm.height * mul, posh);
-                        }
-                    }
-                }
-
-                if ('t' === av) {
-                    if (angle < 0) {
-                        if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                        if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                        if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                    } else {
-                        if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                        if ('r' === ah) dx = w - posv - tm.height;
-                        dy = Math.min(h + tm.height * mul, posh);
-                    }
-                }
-
-                mbt.translate(x + dx, y + dy);
-                return mbt;
-            },
 
             getInternalState: function () {
                 //for (var fr = [], i = 0; i < this.fragments.length; ++i) {

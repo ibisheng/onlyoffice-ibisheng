@@ -3768,7 +3768,25 @@
                         }
                     }
 
-                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va);
+                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
+
+//  NOTE: надо сделать как в экселе если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
+
+//                    if (isNumberFormat) {
+//                        var prj = Math.abs(Math.sin(c.getAngle() * Math.PI / 180.0) * tm.width);
+//                        if (prj > rowHeight) {
+//                            //if (maxW === undefined) {}
+//                            maxW = rowHeight / Math.abs(Math.cos(c.getAngle() * Math.PI / 180.0));
+//                            str  =  c.getValue2(gc_nMaxDigCountView, makeFnIsGoodNumFormat(fl, maxW));
+//
+//                            for (i = 0; i < str.length; ++i) {
+//                                var f = str[i].format;
+//                                if (f) f.repeat = true;
+//                            }
+//
+//                            tm   =  this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
+//                        }
+//                    }
                 }
 
                 this._fetchCellCache(col, row).text = {
@@ -3827,7 +3845,7 @@
                                 }
 
                                 this._fetchCellCache(col, row).text.textBound   =
-                                    this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va);
+                                    this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
                             }
                             else {
 
