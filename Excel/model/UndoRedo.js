@@ -3557,7 +3557,11 @@ UndoRedoAutoFilters.prototype = {
 		Data.worksheet = ws;
 		var autoFilters = ws.autoFilters;
 		if (bUndo == true)
+		{
 			autoFilters.Undo(Type, Data);
+			if(Data && Data.undo && !Data.undo.insCells && gUndoInsDelCellsFlag && typeof gUndoInsDelCellsFlag == "object" && gUndoInsDelCellsFlag.arg1 && gUndoInsDelCellsFlag.arg2 && gUndoInsDelCellsFlag.data)
+				autoFilters._setColorStyleTable(gUndoInsDelCellsFlag.arg1, gUndoInsDelCellsFlag.arg2, gUndoInsDelCellsFlag.data, null, true);
+		}
 		else
 			autoFilters.Redo(Type, Data);
 	}

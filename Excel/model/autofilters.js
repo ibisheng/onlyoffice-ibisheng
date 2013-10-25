@@ -1646,7 +1646,7 @@
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ar, turnOnHistory)
+			isEmptyAutoFilters: function(ar, turnOnHistory, insCells)
 			{
 				if(turnOnHistory)
 				{
@@ -1663,10 +1663,14 @@
 					//смотрим находится ли фильтр внутри выделенного фрагмента
 					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
-						var oldFilter = aWs.AutoFilter;
+						var oldFilter = Asc.clone(aWs.AutoFilter);
 						aWs.AutoFilter = null;
 						//открываем скрытые строки
 						aWs.setRowHidden(false, bbox.r1, bbox.r2);
+						
+						if(insCells)
+							oldFilter.insCells = true;
+							
 						//заносим в историю
 						this._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
 					}
@@ -1677,8 +1681,10 @@
 					var k = 0;
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var oCurFilter = aWs.TableParts[i];
+						var oCurFilter = Asc.clone(aWs.TableParts[i]);
 						var oRange = aWs.getRange2(oCurFilter.Ref);
+						if(insCells)
+							oCurFilter.insCells = true;
 						var bbox = oRange.getBBox0();
 						//смотрим находится ли фильтр внутри выделенного фрагмента
 						if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
@@ -1789,6 +1795,8 @@
 				var cloneData = Asc.clone(data);
 				if(!cloneData)
 					return;
+				if(cloneData.insCells)
+					delete cloneData.insCells;
 				gUndoInsDelCellsFlag = false;
 				if(cloneData.refTable)
 				{
@@ -1843,25 +1851,25 @@
 							{
 								if(!aWs.TableParts)
 									aWs.TableParts = [];
-								aWs.TableParts[aWs.TableParts.length] = data;
-								var splitRange = data.Ref.split(':');
+								aWs.TableParts[aWs.TableParts.length] = cloneData;
+								var splitRange = cloneData.Ref.split(':');
 								if(!gUndoInsDelCellsFlag)
 								{
 									gUndoInsDelCellsFlag = 
 									{
 										arg1: splitRange[0],
 										arg2: splitRange[1],
-										data: data
+										data: cloneData
 									}
 								}
 								else
-									this._setColorStyleTable(splitRange[0], splitRange[1], data, null, true);
-								this._addButtonAF({result: data.result,isVis: true});
+									this._setColorStyleTable(splitRange[0], splitRange[1], cloneData, null, true);
+								this._addButtonAF({result: cloneData.result,isVis: true});
 							}
 							else
 							{
-								aWs.AutoFilter = data;
-								this._addButtonAF({result: data.result,isVis: true});
+								aWs.AutoFilter = cloneData;
+								this._addButtonAF({result: cloneData.result,isVis: true});
 							}
 						}
 					}
@@ -4548,6 +4556,7 @@
 				var aWs = this._getCurrentWS();
 				var filter;
 				var filterColums;
+				var buttons = this.allButtonAF;
 				if(cRange.index == 'all')
 				{
 					filter = aWs.AutoFilter;
@@ -4589,7 +4598,7 @@
 							r2: endCell.r1,
 							c2: endCell.c1
 						}
-						this.isEmptyAutoFilters(activeRange, true);
+						this.isEmptyAutoFilters(activeRange, true, true);
 						return;
 					}
 				}
@@ -4648,11 +4657,25 @@
 									newNextCol.c1 = 0;
 							}
 							
-							 var id = this._rangeToId(newFirstCol);
-							 var nextId = this._rangeToId(newNextCol);
-							 curFilter.inFilter = filter.Ref;
-							 curFilter.id = id;
-							 curFilter.idNext = nextId;
+							
+							var id = this._rangeToId(newFirstCol);
+							var nextId = this._rangeToId(newNextCol);
+							if(buttons && buttons.length)
+							{
+								for(var b = 0; b < buttons.length; b++)
+								{
+									if(buttons[b].id == curFilter.id)
+									{
+										buttons[b].inFilter = filter.Ref;
+										buttons[b].id = id;
+										buttons[b].idNext = nextId;
+										break;
+									}
+								}
+							}
+							curFilter.inFilter = filter.Ref;
+							curFilter.id = id;
+							curFilter.idNext = nextId;
 						}
 					}
 					filter.Ref = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
