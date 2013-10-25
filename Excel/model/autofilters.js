@@ -5870,11 +5870,24 @@
 							var buttons = this.allButtonAF;
 							for(var n = 0; n < buttons.length; n++)
 							{
-								if(buttons[n].inFilter == ref)
+								var id;
+								var idNext;
+								if(buttons[n].inFilter == ref && findFilters[i] && findFilters[i].result && findFilters[i].result.length)
 								{
+									for(var b = 0; b < findFilters[i].result.length; b++)
+									{
+										if(buttons[n].id == findFilters[i].result[b].id)
+										{
+											id = this._shiftId(buttons[n].id, diffCol, diffRow);
+											idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
+											findFilters[i].result[b].id = id;
+											findFilters[i].result[b].idNext = idNext;
+											break;
+										}
+									}
 									buttons[n].inFilter = newRef;
-									buttons[n].id = this._shiftId(buttons[n].id, diffCol, diffRow);
-									buttons[n].idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
+									buttons[n].id = id ? id : this._shiftId(buttons[n].id, diffCol, diffRow);
+									buttons[n].idNext = idNext ? idNext : this._shiftId(buttons[n].idNext, diffCol, diffRow);
 								}
 							}
 						}
