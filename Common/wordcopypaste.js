@@ -4135,8 +4135,7 @@ PasteProcessor.prototype =
         {
             if(Node.TEXT_NODE == nodeType)
             {
-                var defaultView = node.ownerDocument.defaultView;
-                var computedStyle = defaultView.getComputedStyle( node.parentNode, null );
+                var computedStyle = this._getComputedStyle(node.parentNode);
                 if ( computedStyle )
                 {
                     var fontFamily = computedStyle.getPropertyValue( "font-family" );
@@ -4310,6 +4309,15 @@ PasteProcessor.prototype =
             return true;
         return false;
     },
+	_getComputedStyle : function(node){
+		var computedStyle = null;
+		if(null != node && Node.ELEMENT_NODE == node.nodeType)
+		{
+			var defaultView = node.ownerDocument.defaultView;
+            computedStyle = defaultView.getComputedStyle( node, null );
+		}
+		return computedStyle;
+	},
     _ValueToMm : function(value)
     {
         var obj = this._ValueToMmType(value);
@@ -4545,8 +4553,7 @@ PasteProcessor.prototype =
             oNewBorder.Between = oNewBrd;
         }
 
-        var defaultView = node.ownerDocument.defaultView;
-        var computedStyle = defaultView.getComputedStyle( node, null );
+        var computedStyle = this._getComputedStyle(node);
         if (computedStyle)
         {
             //Ind
@@ -4608,7 +4615,7 @@ PasteProcessor.prototype =
             var oTempNode = node;
             while(true)
             {
-                var tempComputedStyle = defaultView.getComputedStyle( oTempNode, null );
+                var tempComputedStyle = this._getComputedStyle(oTempNode);
                 if(null == tempComputedStyle)
                     break;
                 background_color = tempComputedStyle.getPropertyValue( "background-color" );
@@ -4874,8 +4881,7 @@ PasteProcessor.prototype =
                 HighLight : highlight_None
             });
         }
-        var defaultView = node.ownerDocument.defaultView;
-        var computedStyle = defaultView.getComputedStyle( node, null );
+        var computedStyle = this._getComputedStyle(node);
         if ( computedStyle )
         {
             var font_family = computedStyle.getPropertyValue( "font-family" );
@@ -4929,7 +4935,7 @@ PasteProcessor.prototype =
             var oTempNode = node;
             while(true)
             {
-                var tempComputedStyle = defaultView.getComputedStyle( oTempNode, null );
+                var tempComputedStyle = this._getComputedStyle(oTempNode);
                 if(null == tempComputedStyle)
                     break;
                 if(null == underline || null == Strikeout)
@@ -5075,7 +5081,6 @@ PasteProcessor.prototype =
     _StartExecuteTable : function(node, pPr)
     {
         var oDocument = this.oDocument;
-        var defaultView = node.ownerDocument.defaultView;
         var tableNode = node;
         //���� ���� ���� tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
@@ -5125,7 +5130,7 @@ PasteProcessor.prototype =
                         fParseSpans();
 
                         var dWidth = null;
-                        var computedStyle = defaultView.getComputedStyle( tc, null );
+                        var computedStyle = this._getComputedStyle(tc);
                         if ( computedStyle )
                         {
                             var computedWidth = computedStyle.getPropertyValue( "width" );
@@ -5292,8 +5297,7 @@ PasteProcessor.prototype =
             var oTestDiv = document.createElement("div");
             oTestDiv.setAttribute("style", "border-left:"+border);
             document.body.appendChild( oTestDiv );
-            var defaultView = oTestDiv.ownerDocument.defaultView;
-            var computedStyle = defaultView.getComputedStyle( oTestDiv, null );
+            var computedStyle = this._getComputedStyle(oTestDiv);
             if(null != computedStyle)
             {
                 res = this._ExecuteBorder(computedStyle, oTestDiv, "left", "Left", true);
@@ -5309,14 +5313,13 @@ PasteProcessor.prototype =
 		table.Set_TableLayout(tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
-        var defaultView = tableNode.ownerDocument.defaultView;
         //align ������� � parent tableNode
 		var sTableAlign = null;
 		if(null != tableNode.align)
 			sTableAlign = tableNode.align
         else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
         {
-            computedStyleParent = defaultView.getComputedStyle(tableNode.parentNode, null);
+            computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
                 //����� ��������� -webkit-right
@@ -5379,7 +5382,7 @@ PasteProcessor.prototype =
             if(null != insidev)
                 table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
         }
-        var computedStyle = defaultView.getComputedStyle(tableNode, null);
+		var computedStyle = this._getComputedStyle(tableNode);
         if(computedStyle)
         {
 			if(align_Left == table.Get_TableAlign())
@@ -5538,8 +5541,7 @@ PasteProcessor.prototype =
         var bAddIfNull = false;
         if(null != spacing)
             bAddIfNull = true;
-        var defaultView = node.ownerDocument.defaultView;
-        var computedStyle = defaultView.getComputedStyle(node, null);
+		var computedStyle = this._getComputedStyle(node);
         if(null != computedStyle)
         {
             background_color = computedStyle.getPropertyValue( "background-color" );
@@ -5730,8 +5732,7 @@ PasteProcessor.prototype =
                     var nHeight = parseInt(node.getAttribute("height"));
                     if(!nWidth || !nHeight)
                     {
-                        var defaultView = node.ownerDocument.defaultView;
-                        var computedStyle = defaultView.getComputedStyle( node, null );
+						var computedStyle = this._getComputedStyle(node);
                         if ( computedStyle )
                         {
                             nWidth = parseInt(computedStyle.getPropertyValue("width"));
@@ -6214,8 +6215,7 @@ PasteProcessor.prototype =
                 var nHeight = parseInt(node.getAttribute("height"));
                 if(!nWidth || !nHeight)
                 {
-                    var defaultView = node.ownerDocument.defaultView;
-                    var computedStyle = defaultView.getComputedStyle( node, null );
+					var computedStyle = this._getComputedStyle(node);
                     if ( computedStyle )
                     {
                         nWidth = parseInt(computedStyle.getPropertyValue("width"));
@@ -6392,7 +6392,6 @@ PasteProcessor.prototype =
     _StartExecuteTablePresentation : function(node, pPr, arrShapes, arrImages, arrTables)
     {
         var oDocument = this.oDocument;
-        var defaultView = node.ownerDocument.defaultView;
         var tableNode = node;
         //���� ���� ���� tbody
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
@@ -6442,7 +6441,7 @@ PasteProcessor.prototype =
                         fParseSpans();
 
                         var dWidth = null;
-                        var computedStyle = defaultView.getComputedStyle( tc, null );
+						var computedStyle = this._getComputedStyle(tc);
                         if ( computedStyle )
                         {
                             var computedWidth = computedStyle.getPropertyValue( "width" );
@@ -6586,14 +6585,13 @@ PasteProcessor.prototype =
         table.Set_TableLayout(tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
-        var defaultView = tableNode.ownerDocument.defaultView;
         //align ������� � parent tableNode
         var sTableAlign = null;
         if(null != tableNode.align)
             sTableAlign = tableNode.align
         else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
         {
-            computedStyleParent = defaultView.getComputedStyle(tableNode.parentNode, null);
+			computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
                 //����� ��������� -webkit-right
@@ -6656,7 +6654,7 @@ PasteProcessor.prototype =
             if(null != insidev)
                 table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
         }
-        var computedStyle = defaultView.getComputedStyle(tableNode, null);
+		var computedStyle = this._getComputedStyle(tableNode);
         if(computedStyle)
         {
             if(align_Left == table.Get_TableAlign())
@@ -6815,8 +6813,7 @@ PasteProcessor.prototype =
         var bAddIfNull = false;
         if(null != spacing)
             bAddIfNull = true;
-        var defaultView = node.ownerDocument.defaultView;
-        var computedStyle = defaultView.getComputedStyle(node, null);
+		var computedStyle = this._getComputedStyle(node);
         if(null != computedStyle)
         {
             background_color = computedStyle.getPropertyValue( "background-color" );
