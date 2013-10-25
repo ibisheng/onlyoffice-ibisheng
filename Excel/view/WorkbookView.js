@@ -483,7 +483,7 @@
 			_onSetSelectionState: function (state) {
 				var index = 0;
 				for ( var i = 0; i < this.wsViews.length; i++ ) {
-					if ( state.sheetId === this.wsViews[i].model.Id ) {
+					if (this.wsViews[i] &&  state.sheetId === this.wsViews[i].model.Id ) {
 						index = this.wsViews[i].model.index;
 						break;
 					}
