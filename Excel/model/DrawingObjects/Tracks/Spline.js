@@ -247,10 +247,10 @@ function Spline(drawingObjects)
         yMin = min_y;
         yMax = max_y;
         var shape = new CShape(null, this.drawingObjects);
-
+        shape.setXfrmObject(new CXfrm());
         shape.setPosition(xMin, yMin);
         shape.setExtents(xMax-xMin, yMax-yMin);
-        shape.setStyle(CreateDefaultShapeStyle());
+        shape.setStyleBinary(CreateDefaultShapeStyle());
 
         var geometry = new CGeometry();
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
@@ -281,9 +281,13 @@ function Spline(drawingObjects)
             geometry.AddPathCommand(6);
         }
         geometry.Init( xMax-xMin, yMax-yMin);
-        shape.spPr.geometry = geometry;
+        shape.setGeometry(geometry);
         shape.recalculate();
-        this.drawingObjects.addGraphicObject(shape);
+        shape.addToDrawingObjects();
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+            new UndoRedoDataGraphicObjects(shape.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        return shape;
     };
 
     this.addPathCommand = function(pathCommand)

@@ -2406,8 +2406,6 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
             this.drawingObjectsController.onMouseUp(e, x, y);*/
         }
 
-        //лочим добавленный шейп
-        var worksheet = this.drawingObjects.getWorksheet();
 				
 		this.drawingObjects.objectLocker.reset();
 		this.drawingObjects.objectLocker.addObjectId(this.resultObject.Get_Id());
@@ -4130,13 +4128,18 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(null, this.drawingObjects);
+            History.Create_NewPoint();
+            var shape = this.spline.createShape(null, this.drawingObjects);
             asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
             asc["editor"].asc_endAddShape();
+
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
 
         }
     };
@@ -4185,13 +4188,19 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
+            History.Create_NewPoint();
+            var shape = this.spline.createShape(this.drawingObjects);
             asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
             asc["editor"].asc_endAddShape();
+
+
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
 
         }
     };
@@ -4274,13 +4283,18 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
+            History.Create_NewPoint();
+            var shape = this.spline.createShape(this.drawingObjects);
             asc["editor"].asc_endAddShape();
 
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
             asc["editor"].asc_endAddShape();
+
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
 
         }
     };
@@ -4382,12 +4396,17 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
     {
         if(e.ClickCount >= 2)
         {
-            this.spline.createShape(this.drawingObjects);
+            History.Create_NewPoint();
+            var shape = this.spline.createShape(this.drawingObjects);
             asc["editor"].asc_endAddShape();
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
             asc["editor"].asc_endAddShape();
+
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
 
         }
     };
@@ -4560,7 +4579,12 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
     {
         if(this.polyline.arrPoint.length > 1)
         {
-            this.polyline.createShape();
+            History.Create_NewPoint();
+            var shape = this.polyline.createShape();
+
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
         }
 
         this.drawingObjectsController.clearTrackObjects();
@@ -4701,7 +4725,11 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
         this.polyline.arrPoint.push({x: x, y: y});
         if(e.ClickCount > 1)
         {
-            this.polyline.createShape();
+            History.Create_NewPoint();
+            var shape = this.polyline.createShape();
+            this.drawingObjects.objectLocker.reset();
+            this.drawingObjects.objectLocker.addObjectId(shape.Get_Id());
+            this.drawingObjects.objectLocker.checkObjects(function(bLock){});
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
