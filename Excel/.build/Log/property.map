@@ -261,7 +261,7 @@ WriteGroupShape:Vua
 stretched:n_
 setGraphicObjectLayer:uHa
 table_end:Opa
-loader:Vr
+loader:Wr
 _saveCellValueAfterEdit:vxa
 writeToBinary:Pt
 _background_grid_vlines_interim_color:hjb
@@ -782,7 +782,7 @@ isIntersectionInCols:dEa
 get_psname:hpb
 axisCount:GD
 TargetShowFlag:Mga
-selectedGraphicObjectsExists:Zr
+selectedGraphicObjectsExists:$r
 Version:hR
 Drawings:Sn
 ctPenXML:fnb
@@ -882,7 +882,7 @@ drawArrow:xt
 _getFragmentsLength:Q1
 SKIP_IUP_RULES_SIZE:dPa
 TryRead:aib
-BoldCS:xr
+BoldCS:yr
 rightBottomRowBand1ColBand2:Mab
 rightBottomRowBand1ColBand1:TGa
 ReadGrSpPr:xNa
@@ -917,7 +917,7 @@ centerDistY:Bka
 local_subrs_offset:nca
 resize:wE
 maxStorage:qna
-font_bbox:Qr
+font_bbox:Rr
 checkMouseDown:gmb
 asc_getMarkerSize:t_a
 rangeChars:oab
@@ -1336,7 +1336,7 @@ oldXfrmRot:poa
 themes_info_editor:Gcb
 _WriteLimit1:ova
 Open:dMa
-_WriteLimit2:Gr
+_WriteLimit2:Hr
 ps_get_font_private:Lsb
 get_pattern_type:H7a
 num_family_blues:t5
@@ -1372,7 +1372,7 @@ yAxis:$c
 getHeight:fo
 WriteTextParagraphPr:hva
 close_contour:lmb
-m_oLastFont:Wr
+m_oLastFont:Xr
 glyph_hints:oY
 numRanges:$na
 lev_stack:R8a
@@ -1436,7 +1436,7 @@ _m:Ch
 m_bUseCIDs:$qb
 asc_setShowBorderFlag:w3a
 m_lWidthPix:Cz
-block:Lr
+block:Mr
 drawCommentCells:OD
 USER_AGENT_SAFARI_MACOS:wx
 _c:Sp
@@ -1578,7 +1578,7 @@ Reserved2:qga
 Reserved4:sga
 paste:I$a
 groupGraphicObjects:S7a
-GrState:Ar
+GrState:Br
 free_charmap_stub:mob
 hR:Bq
 pasteAsText:J$a
@@ -1593,7 +1593,7 @@ Write_cNvPr:NSa
 load_face:HEa
 _onPreviousLocks:IVa
 ea:uaa
-Para:Er
+Para:Fr
 asc_setShowRowColHeaders:z3a
 checkOffset:Z4a
 grapharea:nd
@@ -1850,7 +1850,7 @@ Refresh:$gb
 _calcMFT:vha
 calculatedType:J$
 ConvetToPageCoords:veb
-wsViews:ds
+wsViews:xr
 p_color:$k
 presetGeom:uE
 rightTopColBand2:abb
@@ -2052,7 +2052,7 @@ changeFill:j3
 asc_OpenDocument:PW
 code_last:tBa
 refTable:bpa
-LineGap:Dr
+LineGap:Er
 ReadCNvPr:GMa
 Update_ParaTab:vib
 GetLineWidth:QM
@@ -2214,7 +2214,7 @@ notesStyle:Srb
 WriteTableCustomStyleElement:Ao
 bCurrency:mAa
 endWasPressed:$nb
-GuiCanvasFillTextureCtx:Br
+GuiCanvasFillTextureCtx:Cr
 asc_CFillHatch:Ykb
 removeCallback:Fab
 scrollVCurrentY:oU
@@ -2585,7 +2585,7 @@ olivedrab:ksb
 SetFontSlot:Tu
 _doubleEncodeLE754:WTa
 springgreen:Utb
-themeFont:bs
+themeFont:cs
 maps:RL
 Api:gh
 cmap:ji
@@ -2694,9 +2694,9 @@ ALLOW_X_DMOVEX_RULES_SIZE:JIa
 CanvasHitContext:Jqa
 TableOutline:yf
 CheckGuiControlColors:eeb
-arg2:Ir
+arg2:Jr
 _calcMaxWidth:BTa
-arg1:Hr
+arg1:Ir
 ParagraphAddParaItem:Nsa
 get_Image:dma
 KoefPixToMM:Qfb
@@ -3187,7 +3187,7 @@ isEmptyToSave:x4
 insideV:Npb
 maxRow:AG
 isArea:ou
-ItalicCS:Cr
+ItalicCS:Dr
 sph_set_tweaks:ocb
 m_oAutoShapesTrack:o9a
 drawTurnedText:n6a
@@ -3655,7 +3655,7 @@ xTickGap:nqa
 Center:lH
 StartPos:Pa
 asc_mapAscServerErrorToAscError:Wya
-copyText:Pr
+copyText:Qr
 ctPathCommandMoveTo:M5a
 asc_getSeveralChartTypes:W_a
 limit:Dc
@@ -4598,7 +4598,7 @@ asc_getCodePages:mZa
 _text_underline:ekb
 ImageMapChecker:bw
 asc_getEditorPermissions:FZa
-getLockOtherColumn2:Sr
+getLockOtherColumn2:Tr
 put_TextureBoundsEnabled:EZ
 Set_SelectionState:n1
 IsThumbnail:E7
@@ -5236,7 +5236,7 @@ lastCellAddress:nG
 _cleanElement:R8
 ChartHeader:zJa
 isPlaceholder:yC
-arrCols:Jr
+arrCols:Kr
 get_color_fg:cDa
 setLnRef:acb
 asc_getFirstLine:uya
@@ -5320,7 +5320,7 @@ nCurSequenceIndex:ET
 _getPPIX:ts
 get_linebeginsize:gDa
 afm_parser_funcs:q2
-cap:Mr
+cap:Nr
 fromJQueryEvent:Taa
 asc_getBorders:Via
 ShowOverlay:l8
@@ -5328,7 +5328,7 @@ asc_setSheet:u3a
 ExitFrame:Jg
 cleanHighlightedHeaders:mBa
 Transform:Wn
-DocInfo:zr
+DocInfo:Ar
 pageFieldLabels:nda
 moveHor:k5
 DocumentType:Heb
@@ -5479,7 +5479,7 @@ verticalTextAlign:Ju
 _border_color:wTa
 glyph_offset:ZS
 m_bIsRuler:k9a
-lineVer:Ur
+lineVer:Vr
 oElements:kP
 ctShadowVisible:nnb
 asc_CCSVOptions:Hkb
@@ -5666,7 +5666,7 @@ standard_height:v6
 argumentsMax:rb
 memset_p:Crb
 IsLockObjectsEnable:osa
-ftype:Rr
+ftype:Sr
 asc_CColor:Ukb
 cellType:oX
 lStorageText:Vma
@@ -5800,7 +5800,7 @@ oMedia:e$a
 indexInArray:Eba
 LoadImageAsync:DLa
 BrushType:N_
-CheckSize:yr
+CheckSize:zr
 asc_getValue:QK
 lineHor:Dq
 Color1:xn
@@ -5887,7 +5887,7 @@ GridBefore:ZE
 StartTrackTable:Hhb
 StartLine:Vu
 recalculateCurPos:fm
-headerRow:Tr
+headerRow:Ur
 Set_Value:IV
 _onFirstLoadChanges:tVa
 WriteDxf:fRa
@@ -5953,7 +5953,7 @@ editChartDrawingObject:s6a
 ReadDateGroupItem:$Ma
 typeface:yea
 InstallLineTooltipEventListeners:Hfb
-clrScheme:Or
+clrScheme:Pr
 SelectRange:l1
 isClearCell:p8a
 CLock:Gqa
@@ -6197,7 +6197,7 @@ ctBrushColor2:xmb
 ctBrushColor1:w5a
 _isCellEmptyOrMergedOrBackgroundColorOrBorders:BUa
 WriteTextRun:E1
-pathW:Yr
+pathW:Zr
 resizedflipH:Pg
 _xscale_units_post:YWa
 _right:Oc
@@ -6327,7 +6327,7 @@ getSlaveNodes:Vob
 SelectClear:nhb
 customStyle:cla
 _invalidId:sW
-style_name:$r
+style_name:as
 transparent:cf
 WriteTableStylePartWH:xSa
 firstTotalCell:TD
@@ -6377,7 +6377,7 @@ arrTransforms2:u2
 parentTrack:Mz
 minMemType42:H9a
 range:$a
-minR:Xr
+minR:Yr
 asc_getTitle:rI
 ConditionDescending:Y_
 minX:Ii
@@ -6649,7 +6649,7 @@ asc_CChartRange:Pkb
 m_oInvertFullTransform:Ez
 calculateCoords:aO
 _WriteInt1:Mg
-_WriteInt2:Fr
+_WriteInt2:Gr
 _WriteInt3:Tib
 _WriteInt4:rs
 callTop:Xp
@@ -6846,11 +6846,11 @@ TableChunkLen:p8
 asc_getDocumentComments:B2
 WriteTableCell:nSa
 LoadDocumentFonts2:BLa
-table:as
+table:bs
 changeBackground:YAa
 asc_setSizeWithCells:Cza
 pPr:Uh
-catNameLabels:Nr
+catNameLabels:Or
 aTypes:P9
 fillHandleB:ula
 asc_CDelimiter:Vkb
@@ -7212,7 +7212,7 @@ stroke_width:fea
 m_bGlobalLock:WO
 RowBand1:sq
 RowBand2:nx
-totalRow:cs
+totalRow:ds
 parse_state:hy
 Right:Da
 _action:Yib
@@ -7222,7 +7222,7 @@ pageClipRectTop:gGa
 font_type:F6a
 default_design_vector:c6a
 asc_setCellVertAlign:P2a
-badF:Kr
+badF:Lr
 gindex:ij
 goto_table:Yk
 original:EJ
