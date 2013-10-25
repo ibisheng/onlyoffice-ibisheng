@@ -13,7 +13,7 @@ RecalcInfo:hd
 OnScroll:Qo
 asc_getShowBorderFlag:pTa
 GetUOffsetLE:FGa
-Wrap:yv
+Wrap:zv
 TT_ACTIVE_CONNECTION:ENa
 yellowgreen:Mlb
 asyncFontsDocumentStartLoaded:e$
@@ -403,7 +403,7 @@ kern_pairs:Vgb
 forget_glyph_frame:kaa
 firebrick:tfb
 clipRect:vT
-KeyCode:$e
+KeyCode:af
 _crosshairs:Rab
 isDateTimeFormat:Mp
 HRule:Fj
@@ -564,7 +564,7 @@ m_bFirst_Row:sD
 asc_putSmallCaps:yUa
 Get_Paragraph_TextPr:am
 WriteDouble2:yOa
-IsIdentity:fw
+IsIdentity:gw
 Get_Next:xt
 addColumnLeft:wRa
 Param_TopRight:h8
@@ -631,7 +631,7 @@ selectedObjects:rna
 WriteSlideMaster:uPa
 gdLstInfo:hD
 attrAutoCompressPictures:Tva
-funcs:be
+funcs:ce
 GetString2:Ma
 GetString1:AW
 createShape:kJ
@@ -729,7 +729,7 @@ WriteNoteMaster:VOa
 LoadString2:zHa
 ReadMathLimLoc:dKa
 LoadString3:u9a
-twilight:Xv
+twilight:Yv
 builder:pg
 m_lCurrentPage:De
 _coSpellCheckInit:nua
@@ -979,7 +979,7 @@ put_Color:S5
 glyphIns:pU
 local_subrs_index:qZ
 Calculate_X_Value:EK
-fontInfos:Jv
+fontInfos:Kv
 ctDrawImage:Zdb
 asc_getRowsFlag:hTa
 FramePr:Th
@@ -1026,7 +1026,7 @@ _xlabels_color:US
 asc_selectComment:ZUa
 WriteLn:yta
 shapeAdd:WBa
-getMouseXY:Kv
+getMouseXY:Lv
 SKIP_OFFPIXEL_Y_MOVES_RULES_EXCEPTIONS_SIZE:zMa
 Selection_Stop:G1
 _animation_grow_factor:Aab
@@ -1255,7 +1255,7 @@ ReadLongLE:V9a
 sync_StartAction:pt
 Y1:Sg
 _xAxisTitle:vl
-Y2:Av
+Y2:Bv
 onTouchMove_renderer:B1a
 Y0:Yn
 TypeFamily:TNa
@@ -1271,7 +1271,7 @@ X0:qe
 X1:oe
 selectCell:$4a
 headEnd:Hf
-X2:zv
+X2:Av
 TableBand2Horz:Cu
 Margin_V:f1
 ReadUniColor:dL
@@ -1432,7 +1432,7 @@ horz_metrics_offset:Egb
 strid:$Q
 GlobalPasteFlag:Sz
 max_advance:PA
-lenIV:Ov
+lenIV:Pv
 linear_def:p4
 ownTransform:$t
 user_data:Z6a
@@ -1708,7 +1708,7 @@ WriteFileHeader:BOa
 achVendID:E2
 Cursor_IsStart:UD
 changePresetGeometry:r3
-inv:Mv
+inv:Nv
 _visibleTitle:O9
 zoom_Fire:P_
 invertGroupMatrix:Gka
@@ -1733,7 +1733,7 @@ get_Top:iU
 IsKeyDownButNoPress:H7
 wrapperH:eW
 ReadAsTable:KIa
-preset:Vv
+preset:Wv
 ReadTablePr:ELa
 ARGS_ARE_XY_VALUES:zoa
 OnSearchPage:dra
@@ -1770,7 +1770,7 @@ violetred:Dlb
 y2:PF
 CharCode:W6
 formatCache:rja
-y3:$v
+y3:aw
 RecalcResult:B1
 set_TblAlign:N5a
 UpdateVerRulerBack:GX
@@ -1791,7 +1791,7 @@ SaveGrState:wu
 x2:ky
 newXfrmFlipH:Ula
 wR:Jz
-x3:Zv
+x3:$v
 x0:Ul
 x1:vi
 NumInfo:Yqa
@@ -1831,7 +1831,7 @@ asc_CChartTranslate:scb
 Paragraph_Format_Paste:Gy
 LoadFontAsync2:xHa
 metrics:Ud
-min_ey:Tv
+min_ey:Uv
 min_ex:RA
 sync_TextLangCallBack:ZCa
 _hpos:x9
@@ -2013,7 +2013,7 @@ setAbsoluteTransform:mf
 map_bounds_shape:x0a
 clip_box:uw
 checkMouseUp:sWa
-GetByte:dw
+GetByte:ew
 App:Foa
 Make_ArrayOfSimpleActions:KHa
 LoadedObjectDS:Pqa
@@ -2299,7 +2299,7 @@ m_fEndY:H4
 __original_height__:r9
 get_glyph_cbox:cgb
 version_patch:ylb
-Paragraph_IncDecFontSize:jw
+Paragraph_IncDecFontSize:kw
 TableW:oj
 glyph_index:WE
 GetShort:Ue
@@ -2378,7 +2378,7 @@ zoomOut:F7a
 Cursor_MoveToStartPos:gh
 hints:WB
 _labels_above_color:SO
-AnchorPosition:aw
+AnchorPosition:bw
 Load_Comments:w9a
 num_sbit_strikes:PZ
 load_table:Chb
@@ -2483,7 +2483,7 @@ args:qj
 Table_Version:LNa
 elementsManipulator:$n
 GetMMPerDot:ei
-TargetEnd:xv
+TargetEnd:yv
 oldLayout:cca
 CurLine:Pz
 _ylabels_specific:im
@@ -2575,7 +2575,7 @@ WriteShape:FS
 m_oTopRuler:RU
 NeedScrollToTarget:Uqa
 _effect:cbb
-oBinaryFileWriter:Uv
+oBinaryFileWriter:Vv
 Ranges:Hd
 asc_CChartSeria:qcb
 NumTrackKern:$z
@@ -2685,7 +2685,7 @@ CommentAuthors:a7
 arrPoints:wj
 StopSearch:wNa
 ReadBasicChart:LIa
-angle:Ev
+angle:Fv
 GetCurPos:D8a
 saturation:W4a
 baseJc:iia
@@ -2916,7 +2916,7 @@ global_subrs_index:uaa
 WriteStylesContent:APa
 font_name:JP
 initial_random_seed:Sya
-tile:Wv
+tile:Xv
 free_glyph_data:Dfb
 Get_ById:Yc
 _background_grid_border:Fab
@@ -3032,7 +3032,7 @@ mediumvioletred:mib
 onLocksReleased:EH
 cvt:Dn
 CopyTable:LR
-Line2:hw
+Line2:iw
 Line1:zy
 m_lDrawingFirst:Im
 load_hhea:wza
@@ -3172,7 +3172,7 @@ char_next:Owa
 GetChar2:B8a
 inlineObjects:rp
 recalculateBrush:nBa
-addElementToContent:Dv
+addElementToContent:Ev
 ParcedDocument:kra
 usWidthClass:X6a
 setting:Qca
@@ -3224,7 +3224,7 @@ sync_AddTableCallback:c6a
 load_kern:k0a
 _key_shadow_blur:Fua
 dir_tables:jM
-TableBand2Vert:wv
+TableBand2Vert:xv
 _scale_units_post:Cbb
 TargetShow:pw
 ReadUOffset:a$a
@@ -3300,7 +3300,7 @@ delta_shift:tY
 WriteBool:ba
 read_simple_glyph:mBa
 sync_ReplaceAllCallback:Nna
-Set_Spacing:ow
+Set_Spacing:uv
 globals:Z3
 Right_Margin:fG
 buttonObject:ZC
@@ -3373,9 +3373,9 @@ TableVerRulerPoints:sr
 glyph_indices:Bya
 start_glyph:fCa
 checkNeedRules:C$
-m_lPagesCount:jc
+m_lPagesCount:kc
 IsIdentity2:Yz
-m_dDocumentWidth:Rv
+m_dDocumentWidth:Sv
 NeedScrollToTargetFlag:cG
 m_dDocumentHeight:Wu
 getTooltipWidth:Zfb
@@ -3429,7 +3429,7 @@ TableGridOpen:Jsa
 DrawHorAnchor:Lpa
 header_top:$E
 get_ThumbnailOffset:a_a
-Load_LinkData:iw
+Load_LinkData:jw
 ctPathCommandText:oeb
 FontsCount:$pa
 geometry:Oa
@@ -3457,7 +3457,7 @@ number_Of_HMetrics:mV
 oldEven:d1a
 m_oScrollVer_:tQ
 ReadMathSSubSup:IKa
-m_arrCTM:Qv
+m_arrCTM:Rv
 rSpRule:iBa
 recalculateTransformMatrix:X5
 ImageTrackType:Hea
@@ -3577,7 +3577,7 @@ num_gray_spans:jV
 Distance:Pc
 Clear_ContentChanges:b0
 get_ImagesCount:Zxa
-selectStartPage:xe
+selectStartPage:ye
 MaxBotMargin:S7
 reader:FV
 indexEnd:FA
@@ -4110,7 +4110,7 @@ m_dMarginBottom:jF
 asc_getLine:TSa
 instanceSize:Fka
 set_Borders:G5a
-After:ce
+After:ae
 TablePaddings:FI
 pint:tca
 OnImageLoad:lS
@@ -4266,7 +4266,7 @@ GetDrawingPageInfo:eO
 GetLong:ma
 TxCache:Nk
 cursorMoveEndOfLine:eM
-RestoreGrState:mw
+RestoreGrState:nw
 _id:OX
 polyline:fo
 m_oLogicDocument:K
@@ -4314,7 +4314,7 @@ entry_selector:mXa
 m_oBoundsController:lba
 clazz:gf
 _text_underline:Gbb
-ImageMapChecker:ew
+ImageMapChecker:fw
 asc_getEditorPermissions:wSa
 put_TextureBoundsEnabled:zca
 m_arrdTextMatrix:HJ
@@ -4526,7 +4526,7 @@ ClearNoAttack:IR
 _curvy_factor:AQa
 _sendTrack:jRa
 sty:Zca
-ReaderTouchManager:lw
+ReaderTouchManager:mw
 cnxLst:t3
 Align2:lEa
 m_bIsUpdateVerRuler:iQ
@@ -4595,7 +4595,7 @@ AddPageSelection2:cEa
 AddPageNum:I6
 ChangeSmallPoint:FR
 IsPressed:Wea
-m_dMarginLeft:Sv
+m_dMarginLeft:Tv
 SetState:lX
 maximalRealY:E0a
 maximalRealX:D0a
@@ -4723,7 +4723,7 @@ selectionArray:fb
 t1_cmap_classes:oDa
 Set_PageBreakBefore:jG
 Get_CompiledPr:kg
-_create_SPH_TweakRule:ic
+_create_SPH_TweakRule:jc
 newOdd:Qba
 IsUpdateOverlayOnEndCheck:Yea
 KernPairs:mu
@@ -4854,7 +4854,7 @@ pathCommand:wma
 Set_Distance:Wr
 asc_setxValFormula:Kva
 CalculateMargins:Xoa
-_color:Bv
+_color:Cv
 asyncImageEndLoadedBackground:f$
 ReleaseFrame:g$a
 requires:KQ
@@ -4982,7 +4982,7 @@ TextBoxChangedValueEvent:pga
 ReadMathRSpRule:Qra
 get_linebeginsize:lya
 afm_parser_funcs:G2
-cap:Gv
+cap:Hv
 oldImage:g1a
 Table_RemoveTable:AB
 asc_getBorders:bSa
@@ -5040,7 +5040,7 @@ tableSelect:kR
 _background_grid_vlines:dua
 cornsilk:Ldb
 StartSearch:Csa
-len_buildchar:Pv
+len_buildchar:Qv
 askSaveChanges:d$
 m_oStartInfo:eo
 Internal_Get_ClearPos:ZF
@@ -5075,7 +5075,7 @@ Is_InDrawing:eE
 canSave:mY
 subTitle:JN
 isSaveFonts_Images:FU
-Is_TableBorder:gw
+Is_TableBorder:hw
 load_any:uhb
 Draw3DAxes:Jpa
 ReadStyleTableContent:CLa
@@ -5173,7 +5173,7 @@ glyph_copy:yya
 _ticksize:hm
 ReadTableStyles:HLa
 Flags:VR
-Line:kc
+Line:ic
 Width_new:ita
 put_TextPrItalic:K3a
 ReadMathNoBreak:vKa
@@ -5312,7 +5312,7 @@ AutosaveMinInterval:Koa
 hideRight:zgb
 DrawAboveLabels:p0
 Hyperlink:bE
-get_Value:Lv
+get_Value:Mv
 g_bIsMouseUpLockedSend:oaa
 _crosshairs_coords:Tab
 setNvSpPr:wna
@@ -5477,7 +5477,7 @@ _text_size:bs
 Set_StartInfo:rE
 ReadMathRad:CKa
 Clock_Counterclockwise:gFa
-wrappingArray:Yv
+wrappingArray:Zv
 WritePresentation:hPa
 freeVector:qg
 get_Between:UXa
@@ -5512,9 +5512,9 @@ put_Group:w2a
 put_KeepLines:Kma
 m_bIsRePaintOnScroll:vZ
 ReadLineTo:wJa
-GridBefore:ae
+GridBefore:be
 recalculateCurPos:bv
-StartLine:uv
+StartLine:vv
 StartTrackTable:Dsa
 Set_Value:BO
 _onFirstLoadChanges:UQa
@@ -5611,7 +5611,7 @@ _LoadFonts:o2
 scrollerMinHeight:GBa
 codes:xT
 clrSchemeMap:tA
-ContentLastChangePos:we
+ContentLastChangePos:xe
 lightyellow:ohb
 Remove_ById:uO
 fMinX:qM
@@ -5847,7 +5847,7 @@ AddImageUrl2:Boa
 getBase64Img:SE
 get_VAnchor:d_a
 WriteItemWithLengthStart:Mga
-Set_FromObject:ff
+Set_FromObject:$e
 Underline:lh
 put_value:x4a
 y_offset:z7a
@@ -5864,7 +5864,7 @@ Value2:cOa
 scrollerMouseDown:n_
 Track:LI
 get_id:t_a
-num:bf
+num:cf
 setClMapOverride:LBa
 sync_EndCatchSelectedElements:uCa
 _xmin:Bi
@@ -6010,7 +6010,7 @@ UpdateTargetTimer:ZNa
 mmvar_len:S0a
 sync_PrAlignCallBack:NCa
 Recalc_0_Spell:Xm
-canRotate:Fv
+canRotate:Gv
 crimson:Odb
 presentation:If
 attrShowSpecialPlsOnTitleSld:cwa
@@ -6075,7 +6075,7 @@ _numyticks:UO
 strings_size:IN
 SharedDoc:xsa
 Inline:Oo
-isVerticalScroll:Nv
+isVerticalScroll:Ov
 bbox:Bf
 t1_decoder_funcs:z6
 vScrollbarProp:$6a
@@ -6110,7 +6110,7 @@ service_WINFNT:wkb
 _linewidth:Cx
 COMPATIBLE_WIDTHS_Rules:xEa
 _pos:SS
-tailEnd:df
+tailEnd:ef
 put_FramePr:Ima
 TableGridCalc:Gp
 maxFunc:vQ
@@ -6288,7 +6288,7 @@ distY:aja
 Add_User:K7a
 distX:$ia
 LinearScale:cfa
-coordsKey:Hv
+coordsKey:Iv
 TableAlignment:mL
 canCoAuthoring:Fwa
 glyph_codes:mka
@@ -6320,7 +6320,7 @@ darken:pxa
 oldBodyPr:c1a
 Apply_LinkData:rEa
 memory_base:oib
-Paragraph:ef
+Paragraph:ff
 setPageIndex:Uw
 _yaxispos:og
 IsArrowsDrawing:dS
@@ -6386,7 +6386,7 @@ sync_PasteCallBack:m6a
 doubleTapTimer:S$
 opc:FH
 SelectShow:AO
-cover:Iv
+cover:Jv
 Even:Ob
 setTrackFunc:D5a
 min_Top_Side_Bearing:N0a
@@ -6461,7 +6461,7 @@ ReadDocTable:Ara
 wheat:Flb
 ReDraw:qO
 Param_TopLeft:g8
-num_glyphs:cf
+num_glyphs:df
 m_aNewImages:$ka
 Get_NearestPos:vh
 put_ParagraphShade:W2a
@@ -6488,7 +6488,7 @@ get_globals_funcs:r_a
 getDenominator:Ofb
 m_oPanelRight_buttonRulers:R4
 scrollerH:m_
-Paragraph_IncDecIndent:kw
+Paragraph_IncDecIndent:lw
 maximalRealativeRadius:yla
 isAutoSave:cQ
 MsoStyles:QHa
@@ -6661,7 +6661,7 @@ m_dIndentLeft:Hn
 ctSetTransform:YWa
 seac:HD
 IsNoSupportTextDraw:NW
-Selection_Is_TableBorderMove:nw
+Selection_Is_TableBorderMove:ow
 GetBase64Memory2:aqa
 num_fixed_sizes:hV
 ushGID:vK
@@ -6947,7 +6947,7 @@ showArrows:LD
 Cell:Ta
 ParseFormula:lra
 WriteOtherContent:ZOa
-TableBand1Vert:vv
+TableBand1Vert:wv
 no_recurse:eV
 invPropCoefficient:Q_a
 onDestroy:LAa
@@ -7022,7 +7022,7 @@ globals_bias:lka
 sldNum:cCa
 _sendPrebuffered:iRa
 Clock:Sda
-Before:ye
+Before:we
 DrawTableTrack:RFa
 asc_setType:yVa
 _offset:Sua
@@ -7079,7 +7079,7 @@ _ylabels_invert:AG
 put_XAlign:f4a
 hScrollbarIndicator:tU
 m_oPanelRight_buttonNextPage:P4
-internal:af
+internal:bf
 GetJSONLogicDocument:zGa
 RelativeFrom:zc
 Caller_Range:W_
@@ -7168,7 +7168,7 @@ num_subrs:Yx
 ColorGradEnd:nFa
 m_bLast_Row:nH
 async_SaveToPdf_Progress:Rva
-EndMousePosition:cw
+EndMousePosition:dw
 lvl2pPr:Ehb
 _key_shadow_offsetx:Hua
 _key_shadow_offsety:Iua
@@ -7216,7 +7216,7 @@ DocumentContent:Zl
 Note:I9a
 Conceal:h8a
 get_charset_id:agb
-Document_SetThisElementCurrent:bw
+Document_SetThisElementCurrent:cw
 oldChExtY:Wib
 m_pData:qF
 get_CellsVAlign:cYa
@@ -7363,7 +7363,7 @@ EndLine:Xp
 map_font_index:Lw
 GetTargetStyle:yea
 ReadComments:SIa
-aContent:Cv
+aContent:Dv
 Words:Ip
 nDocumentWriterPos:jAa
 LinesFree:pI
