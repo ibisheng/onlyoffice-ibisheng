@@ -2139,20 +2139,18 @@
 				}
 				
 				//при вставке ошибка в MS Excel может возникать как в случае автофильтров, так и в случае форматированных таблиц
-				/*if((InsertCellsAndShiftRight || InsertCellsAndShiftDown) && autoFilter)
+				if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop) && autoFilter)
 				{
 					tableRange = this._refToRange(autoFilter.Ref);
 					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 					if(this._rangeHitInAnRange(activeCells, tableRange))
 					{
-						//если селектом засхвачена не вся таблица, то выдаём ошибку и возвращаем false
-						if(!(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2))
+						if(activeCells.c1 <= tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.c2 >= tableRange.c2 && activeCells.r2 >= tableRange.r2)
 						{
-							ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
-							return false;
+							result = 'changeAutoFilter';
 						}	
 					}
-					else
+					/*else
 					{
 						//проверка на то, что хотим сдвинуть часть отфильтрованного диапазона
 						if(InsertCellsAndShiftRight)
@@ -2192,8 +2190,8 @@
 					else if(InsertCellsAndShiftDown && tableRange.r1 >= activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
 					{
 						result = 'changeAutoFilter';
-					}
-				}*/
+					}*/
+				}
 				return result;
 			},
 			
