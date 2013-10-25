@@ -442,6 +442,14 @@ CGroupShape.prototype =
     {
         for(var i = 0; i < this.spTree.length; ++i)
             this.spTree[i].draw(graphics);
+		
+		if ( (graphics instanceof CGraphics) && !graphics.m_oContext.isOverlay ) {
+			graphics.SetIntegerGrid(false);
+			graphics.transform3(this.transform, false);
+			graphics.DrawLockObjectRect(this.lockType, 0, 0, this.extX, this.extY );
+			graphics.reset();
+			graphics.SetIntegerGrid(true);
+		}
     },
 
     recalculate: function(aImages)
