@@ -3385,8 +3385,13 @@ function DrawingObjects() {
 							else {
 								var tx = drawingObject.graphicObject.transform.tx;
 								var ty = drawingObject.graphicObject.transform.ty;
+								var txTxt = drawingObject.graphicObject.transformText.tx;
+								var tyTxt = drawingObject.graphicObject.transformText.ty;
+								
 								drawingObject.graphicObject.transform.tx -= left;
 								drawingObject.graphicObject.transform.ty -= top;
+								drawingObject.graphicObject.transformText.tx -= left;
+								drawingObject.graphicObject.transformText.ty -= top;
 								
 								// Save chart transforms
 								var chartTxtAreas = [];
@@ -3415,6 +3420,8 @@ function DrawingObjects() {
 								// Restore
 								drawingObject.graphicObject.transform.tx = tx;
 								drawingObject.graphicObject.transform.ty = ty;
+								drawingObject.graphicObject.transformText.tx = txTxt;
+								drawingObject.graphicObject.transformText.ty = tyTxt;
 							}
 							if ( printPagesData.pageHeadings ) {
 								worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
