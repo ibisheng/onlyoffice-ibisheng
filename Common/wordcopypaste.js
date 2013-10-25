@@ -4471,16 +4471,28 @@ PasteProcessor.prototype =
     _set_pPr : function(node, Para,  pNoHtmlPr)
     {
         //����������� ����� �� ������ � ������� �������� ��������
+		var sNodeName = node.nodeName.toLowerCase();
         if(node != this.oRootNode)
         {
-            while(false == this._IsBlockElem(node.nodeName.toLowerCase()))
+            while(false == this._IsBlockElem(sNodeName))
             {
                 if(this.oRootNode != node.parentNode)
+				{
                     node = node.parentNode;
+					sNodeName = node.nodeName.toLowerCase();
+				}
                 else
                     break;
             }
         }
+		if("td" == sNodeName || "th" == sNodeName)
+		{
+			//для случая <td>br<span></span></td> без текста в ячейке
+			var oNewSpacing = new CParaSpacing();
+			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: linerule_Auto});
+            Para.Set_Spacing(oNewSpacing);
+			return;
+		}
         var oDocument = this.oDocument;
         //Heading
         if(null != pNoHtmlPr.hLevel)
@@ -5585,7 +5597,9 @@ PasteProcessor.prototype =
             var oDocContent = cell.Content;
             var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
-            oNewPar.Set_Spacing({After: 0, Before: 0, Line: linerule_Auto});
+			var oNewSpacing = new CParaSpacing();
+			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: linerule_Auto});
+            oNewPar.Set_Spacing(oNewSpacing);
             oPasteProcessor.aContent.push(oNewPar);
         }
         //��������� ����� ���������
