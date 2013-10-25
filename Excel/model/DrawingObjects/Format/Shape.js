@@ -2089,8 +2089,9 @@ CShape.prototype =
 			if(!isRealObject(this.group))
 			{
 				graphics.SetIntegerGrid(false);
-				graphics.transform3(transform, false);		
-				graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
+				graphics.transform3(transform, false);
+				if ( !graphics.m_oContext.isOverlay )
+					graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
 				graphics.reset();
 				graphics.SetIntegerGrid(true);
 			}

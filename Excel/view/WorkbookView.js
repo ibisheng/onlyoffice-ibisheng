@@ -139,6 +139,8 @@
 
 				this.buffers.main		= asc_DC({canvas: this.canvas[0],			units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				this.buffers.overlay.ctx.isOverlay = true;		// Для разруливания _activateOverlayCtx / _deactivateOverlayCtx
+				
 				this.drawingCtx			= this.buffers.main;
 				this.overlayCtx			= this.buffers.overlay;
 				
