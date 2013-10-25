@@ -511,12 +511,25 @@ DrawingObjectsController.prototype =
 
     editChartDrawingObjects: function(chart)
     {
+        if(this.selectedObjects.length === 1
+            && (this.selectedObjects[0].isChart()
+            || (isRealObject(this.curState.group) && this.curState.group.selectedObjects.length === 1 && this.curState.group.selectedObjects[0].isChart())))
+        {
+
+            this.checkSelectedObjectsAndCallback(this.editChartCallback, [chart]);
+        }
+
+    },
+
+    editChartCallback: function(chart)
+    {
         if(this.selectedObjects.length === 1)
         {
             if(this.selectedObjects[0].isChart())
             {
                 this.selectedObjects[0].setChart(chart);
                 this.selectedObjects[0].recalculate();
+                this.drawingObjects.showDrawingObjects(true);
                 return;
 
             }
@@ -528,7 +541,9 @@ DrawingObjectsController.prototype =
                     {
                         this.curState.group.selectedObjects[0].setChart(chart);
                         this.curState.group.selectedObjects[0].recalculate();
+                        this.drawingObjects.showDrawingObjects(true);
                         return;
+
                     }
                 }
             }

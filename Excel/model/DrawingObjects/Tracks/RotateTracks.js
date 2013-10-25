@@ -72,7 +72,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
 function RotateTrackShapeImage(originalObject)
 {
     this.originalObject = originalObject;
-    this.transform = new CMatrix();
+    this.transform = originalObject.transform.CreateDublicate();
     this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;

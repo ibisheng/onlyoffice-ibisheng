@@ -805,8 +805,28 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 
     this.onMouseUp = function(e, x, y)
     {
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+
+        var track_objects = this.drawingObjectsController.arrTrackObjects;
+
+
+        this.drawingObjects.objectLocker.addObjectId(this.chartElement.chartGroup.Get_Id());
+        var track_objects2 = [];
+        for(var i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                track_objects2[0].trackEnd();
+                drawingObjects.showDrawingObjects(true);
+            }
+        };
+        this.drawingObjects.objectLocker.checkObjects(callback);
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
@@ -2472,7 +2492,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                 var gr_obj = this.majorObject;
                 if(gr_obj.isChart())
                 {
-                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects));
+                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects, gr_obj));
 					asc["editor"].asc_endAddShape();
                     return;
                     /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
@@ -2530,17 +2550,17 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     };
 }
 
-function ExtpectDoubleClickState(drawingObjectsController, drawingObjects)
+function ExtpectDoubleClickState(drawingObjectsController, drawingObjects, chart)
 {
     this.id = STATES_ID_EXPECT_DOUBLE_CLICK;
     this.drawingObjects = drawingObjects;
     this.drawingObjectsController = drawingObjectsController;
     this.nullState = new NullState(drawingObjectsController, drawingObjects);
-
+    this.chart = chart;
     this.onMouseDown = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        if(e.ClickCount > 1)
+        if(e.ClickCount > 1 && (this.chart.lockType === c_oAscLockTypes.kLockTypeNone || this.chart.lockType === c_oAscLockTypes.kLockTypeMine))
         {
             this.drawingObjects.showChartSettings();
         }

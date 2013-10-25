@@ -136,6 +136,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         this.setDrawingDocument(DrawingDocument);
         this.setParent(Parent);
         this.setTextPr(new ParaTextPr());
+        //this.Internal_Content_Add(this.Content.length, new ParaNumbering());
+        //this.Internal_Content_Add(this.Content.length, new ParaEnd());
+        //this.Internal_Content_Add(this.Content.length, new ParaEmpty());
     }
 }
 

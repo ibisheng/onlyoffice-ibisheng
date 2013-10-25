@@ -259,6 +259,11 @@ CTableId.prototype =
                         Class = new asc_CChart();
                         break;
                     }
+                    case CLASS_TYPE_CHART_LAYOUT:
+                    {
+                        Class = new CChartLayout();
+                        break;
+                    }
                 }
 
                 if(isRealObject(Class))
@@ -873,6 +878,12 @@ CTextBody.prototype =
         var r_ins = body_pr.rIns;
         var l_ins = body_pr.lIns;
         var max_content_width = maxWidth - r_ins - l_ins;
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            var par = this.content.Content[i];
+            par.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+        }
+
         this.content.Reset(0, 0, max_content_width, 20000);
         this.content.Recalculate_Page(0, true);
         var max_width = 0;
@@ -892,6 +903,11 @@ CTextBody.prototype =
 
     getRectHeight: function(maxHeight, width)
     {
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            var par = this.content.Content[i];
+            par.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+        }
         this.content.Reset(0, 0, width, 20000);
         this.content.Recalculate_Page(0, true);
         var content_height = this.getSummaryHeight();
@@ -1059,7 +1075,7 @@ CTextBody.prototype =
             var par = dc.Content[i];
             for(var i = 0; i < par.Content.length; ++i)
             {
-                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty) && par.Content[i].Copy)
+                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty || par.Content[i] instanceof ParaNumbering) && par.Content[i].Copy)
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }

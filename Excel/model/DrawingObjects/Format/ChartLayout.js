@@ -31,6 +31,11 @@ CChartLayout.prototype =
         return this.Id;
     },
 
+    getObjectType: function()
+    {
+        return CLASS_TYPE_CHART_LAYOUT;
+    },
+
     setXMode: function(mode)
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.xMode, mode)), null);
@@ -177,11 +182,11 @@ CChartLayout.prototype =
 
 
         if(r.GetBool())
-            this.xMode = r.GetLong();
+            this.setXMode(r.GetLong());
 
 
         if(r.GetBool())
-            this.yMode = r.GetLong();
+            this.setYMode(r.GetLong());
 
 
         if(r.GetBool())
@@ -193,10 +198,10 @@ CChartLayout.prototype =
 
 
         if(r.GetBool())
-            this.x = r.GetDouble();
+            this.setX(r.GetDouble());
 
         if(r.GetBool())
-            this.y = r.GetDouble();
+            this.setY(r.GetDouble());
 
         if(r.GetBool())
             this.w = r.GetDouble();
