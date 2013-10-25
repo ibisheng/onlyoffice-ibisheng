@@ -88,7 +88,13 @@ function CreateParaItem(type, value)
           case   para_Empty                    : return new ParaEmpty(value);   break;
           case   para_Text                     : return new ParaText(value);    break;
           case   para_Space                    : return new ParaSpace(value);   break;
-          case   para_TextPr                   : return g_oTableId.Get_ById(value);   break;
+          case   para_TextPr                   :
+          {
+              var r = CreateBinaryReader(value, 0, value.length);
+              var text_pr = new CTextPr();
+              text_pr.Read_FromBinary(r);
+              return new ParaTextPr(text_pr);
+          }
           case   para_End                      : return new ParaEnd();   break;
           case   para_NewLine                  : return new ParaNewLine(value); break;
           case   para_NewLineRendered          : return new ParaNewLineRendered();  break;
@@ -284,7 +290,6 @@ function ParaSpace(Count)
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
-    this.Id
 }
 ParaSpace.prototype =
 {
@@ -434,7 +439,7 @@ function ParaTextPr(Props)
 
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+   // g_oTableId.Add( this, this.Id );
     if(isRealObject(Props))
     {
         this.Set_Value(Props);
@@ -449,17 +454,19 @@ ParaTextPr.prototype =
 
     setParent: function(parent)
     {
-        var oldValue = isRealObject(this.Parent)  ? this.Parent.Get_Id() : null;
-        var newValue = isRealObject(parent) ? parent.Get_Id(): null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParent, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        //var oldValue = isRealObject(this.Parent)  ? this.Parent.Get_Id() : null;
+        //var newValue = isRealObject(parent) ? parent.Get_Id(): null;
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParent, null, null,
+        //    new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.Parent = parent;
     },
 
 
     getValue: function()
     {
-        return this.Get_Id();
+        var w = new CMemory();
+        this.Value.Write_ToBinary(w);
+        return w.pos + ";" + w.GetBase64Memory();
     },
     Draw : function()//(X,Y,Context)
     {

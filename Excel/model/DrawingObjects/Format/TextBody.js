@@ -878,11 +878,6 @@ CTextBody.prototype =
         var r_ins = body_pr.rIns;
         var l_ins = body_pr.lIns;
         var max_content_width = maxWidth - r_ins - l_ins;
-        for(var i = 0; i < this.content.Content.length; ++i)
-        {
-            var par = this.content.Content[i];
-            par.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
-        }
 
         this.content.Reset(0, 0, max_content_width, 20000);
         this.content.Recalculate_Page(0, true);
@@ -903,11 +898,6 @@ CTextBody.prototype =
 
     getRectHeight: function(maxHeight, width)
     {
-        for(var i = 0; i < this.content.Content.length; ++i)
-        {
-            var par = this.content.Content[i];
-            par.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
-        }
         this.content.Reset(0, 0, width, 20000);
         this.content.Recalculate_Page(0, true);
         var content_height = this.getSummaryHeight();
@@ -946,6 +936,12 @@ CTextBody.prototype =
                 this.bodyPr.vert = data.oldValue;
                 break;
             }
+            case historyitem_AutoShapes_OnContentRecalculateUndo:
+            {
+                if(this.shape && this.shape.OnContentRecalculate)
+                    this.shape.OnContentRecalculate();
+                break;
+            }
         }
     },
 
@@ -975,6 +971,12 @@ CTextBody.prototype =
                 this.bodyPr.vert = data.newValue;
                 break;
             }
+            case historyitem_AutoShapes_OnContentRecalculateRedo:
+            {
+                if(this.shape && this.shape.OnContentRecalculate)
+                    this.shape.OnContentRecalculate();
+                break;
+            }
         }
     },
 
@@ -984,11 +986,10 @@ CTextBody.prototype =
         var old_styles = this.content.Styles;
         g_oTableId.m_bTurnOff = true;
         this.content.Styles = new CStyles();
-        this.content.Styles = new CStyles();
+        g_oTableId.m_bTurnOff = false;
         var copy_processor = new CopyProcessor(this.content);
         ret =  copy_processor.Start();
         this.content.Styles = old_styles;
-        g_oTableId.m_bTurnOff = false;
         return ret;
     },
 
@@ -1013,9 +1014,16 @@ CTextBody.prototype =
 	{
 		if(this.curState.textObject && this.curState.textObject.txBody)
 		{
+            History.Create_NewPoint();
+
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 			var paste_processor = new PasteProcessor(this.curState.textObject.txBody.content);
 			paste_processor.Start(node);
 			this.curState.textObject.txBody.OnContentRecalculate();
+
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 			this.drawingObjects.showDrawingObjects(true);
 		}
 	},
@@ -2375,10 +2383,11 @@ PasteProcessor.prototype =
                 //�� ����� ���������� �������� ��� ������� ��������� �������
                 var arrShapes = [], arrImages = [], arrTables = [];
                 History.TurnOff();
-                g_oTableId.m_bTurnOff = true;
+               // g_oTableId.m_bTurnOff = true;
                 var shape = new CShape(null);
                 shape.drawingObjects = content.Parent.shape.drawingObjects;
                 shape.setTextBody(new CTextBody(shape));
+              //  g_oTableId.m_bTurnOff = false;
                 arrShapes.push(shape);
                 var ret = oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
 
@@ -2390,7 +2399,6 @@ PasteProcessor.prototype =
                         shape.txBody.content.Internal_Content_Remove(0, 1);
                     }
                 }
-                g_oTableId.m_bTurnOff = false;
                 History.TurnOn();
                 oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
                 node.blur();

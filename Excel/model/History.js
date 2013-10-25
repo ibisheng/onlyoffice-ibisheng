@@ -193,6 +193,9 @@ var historyitem_AutoShapes_SetChartTitleLayout = 81;
 var historyitem_AutoShapes_SetChartOverlay = 82;
 var historyitem_AutoShapes_InitChart = 83;
 var historyitem_AutoShapes_SetChartTitleType = 84;
+var historyitem_AutoShapes_OnContentRecalculateUndo = 85;
+var historyitem_AutoShapes_OnContentRecalculateRedo = 86;
+
 
 
 

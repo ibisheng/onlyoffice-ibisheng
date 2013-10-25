@@ -165,8 +165,8 @@ Paragraph.prototype =
 
     setTextPr: function(textPr)
     {
-        var oldValue = isRealObject(this.TextPr)  ? this.TextPr.Get_Id() : null;
-        var newValue = isRealObject(textPr) ? textPr.Get_Id(): null;
+        var oldValue = isRealObject(this.TextPr)  ? this.TextPr.getValue() : null;
+        var newValue = isRealObject(textPr) ? textPr.getValue(): null;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetTextPr, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.TextPr = textPr;
@@ -9926,7 +9926,18 @@ Paragraph.prototype =
 
             case historyitem_AutoShapes_SetTextPr:
             {
-                this.TextPr = g_oTableId.Get_ById(Data.oldValue);
+                if(typeof Data.oldValue === "string")
+                {
+                    var value = Data.oldValue;
+                    var r = CreateBinaryReader(value, 0, value.length);
+                    var text_pr = new CTextPr();
+                    text_pr.Read_FromBinary(r);
+                    this.TextPr = new ParaTextPr(text_pr);
+                }
+                else
+                {
+                    this.TextPr = null;
+                }
                 break;
             }
             case  historyitem_Paragraph_AddItem:
@@ -10341,7 +10352,18 @@ Paragraph.prototype =
             }
             case historyitem_AutoShapes_SetTextPr:
             {
-                this.TextPr = g_oTableId.Get_ById(Data.newValue);
+                if(typeof Data.newValue === "string")
+                {
+                    var value = Data.newValue;
+                    var r = CreateBinaryReader(value, 0, value.length);
+                    var text_pr = new CTextPr();
+                    text_pr.Read_FromBinary(r);
+                    this.TextPr = new ParaTextPr(text_pr);
+                }
+                else
+                {
+                    this.TextPr = null;
+                }
                 break;
             }
             case  historyitem_Paragraph_AddItem:

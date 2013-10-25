@@ -2315,7 +2315,8 @@ function CorrectUniFillEx(asc_fill, unifill) {
                     {
                         for (var i = 0; i < _colors.length; i++)
                         {
-                            ret.fill.colors[i].setColor(CorrectUniColorEx(_colors[i], ret.fill.colors[i].color));
+                            if(!(_colors[i].value == null && _colors[i].type ===c_oAscColor.COLOR_TYPE_SCHEME))
+                                ret.fill.colors[i].setColor(CorrectUniColorEx(_colors[i], ret.fill.colors[i].color));
                         }
                     }
                 }

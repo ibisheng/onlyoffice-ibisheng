@@ -1264,5 +1264,11 @@ CChartTitle.prototype =
             this.txBody.readFromBinary(r);
         }
 
+    },
+
+    OnContentRecalculate: function()
+    {
+        if(this.chartGroup)
+            this.chartGroup.recalculate();
     }
 };
