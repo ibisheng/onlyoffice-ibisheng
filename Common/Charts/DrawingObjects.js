@@ -4181,6 +4181,17 @@ function DrawingObjects() {
 			var bRedraw = false;
 			History.Create_NewPoint();
 			History.StartTransaction();
+			
+			var chartDrawings = [];
+			function callbackCheck(result) {
+				for (var i = 0; result && (i < chartDrawings.length); i++) {
+					editChart(chartDrawings[i]);
+					bRedraw = true;
+				}
+				if ( bRedraw )
+					_this.showDrawingObjects(true);
+			}
+			
 			for (var i = 0; i < aObjects.length; i++) {
 								
 				var drawingObject = aObjects[i];
@@ -4189,20 +4200,22 @@ function DrawingObjects() {
 					if ( oBBoxFrom.isEqual(bbox) ) {
 						if ( bResize ) {
 							if ( drawingObject.graphicObject.selected ) {
-								editChart(drawingObject);
-								bRedraw = true;
+								chartDrawings.push(drawingObject);
 								break;
 							}
 						}
 						else
-							editChart(drawingObject);
+							chartDrawings.push(drawingObject);
 					}
 				}
 			}
+			// Проверяем локи
+			this.objectLocker.reset();
+			for (var i = 0; i < chartDrawings.length; i++) {
+				this.objectLocker.addObjectId( chartDrawings[i].graphicObject.Get_Id() );
+			}
+			this.objectLocker.checkObjects(callbackCheck);
 			History.EndTransaction();
-			
-			if ( bRedraw )
-				_this.showDrawingObjects(true);
 		}
 	}
 
