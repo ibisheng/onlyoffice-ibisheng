@@ -951,14 +951,26 @@ DrawingObjectsController.prototype =
             cur_group.deleteDrawingBase();
             var ungrouped_sp_tree = ungrouped_objects[i].getUnGroupedSpTree();
 
+			// Блокируем дочерние объекты
+			var _this = this;
+			this.drawingObjects.objectLocker.reset();
+			
+			function callbackUngroupedObjects(result) {
+				if ( result ) {
+					for (var j = 0; j < ungrouped_sp_tree.length; ++j) {
+						ungrouped_sp_tree[j].recalculateTransform();
+						History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+						ungrouped_sp_tree[j].addToDrawingObjects(start_position + j);
+						ungrouped_sp_tree[j].select(_this);
+					}
+				}
+			}
+			
             for(var j = 0; j < ungrouped_sp_tree.length; ++j)
             {
-                ungrouped_sp_tree[j].recalculateTransform();
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null,
-                    new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                ungrouped_sp_tree[j].addToDrawingObjects(start_position + j);
-                ungrouped_sp_tree[j].select(this);
+				this.drawingObjects.objectLocker.addObjectId(ungrouped_sp_tree[j].Get_Id());                
             }
+			this.drawingObjects.objectLocker.checkObjects(callbackUngroupedObjects);
         }
 		this.changeCurrentState(new NullState(this, this.drawingObjects));
 		this.drawingObjects.OnUpdateOverlay();
