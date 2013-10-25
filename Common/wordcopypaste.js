@@ -5634,10 +5634,14 @@ PasteProcessor.prototype =
                     value = value.replace(/(\r|\t|\n)/g, ' ');
                     if(value.length > 0)
                     {
-                        bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
+						var oTargetNode = node;
+						//чтобы разделить случаи <p>text</p> и <p><span>text</span></p>
+						if(null != node.parentNode && false == this._IsBlockElem(node.parentNode.nodeName.toLowerCase()))
+							oTargetNode = node.parentNode;
+                        bAddParagraph = this._Decide_AddParagraph(oTargetNode, pPr, bAddParagraph);
 
                         //��������� ������� ����� ���� �� ���������
-                        this._commit_rPr(node.parentNode);
+                        this._commit_rPr(oTargetNode);
                         for(var i = 0, length = value.length; i < length; i++)
                         {
                             var Char = value.charAt(i);
