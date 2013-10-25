@@ -640,7 +640,7 @@
 			// Вид печати
 			this.printType = c_oAscPrintType.ActiveSheets;
 			// Вид печати
-			this.layoutPageType = c_oAscLayoutPageType.ActualSize;
+			this.layoutPageType = c_oAscLayoutPageType.FitToWidth;
 
 			return this;
 		}
