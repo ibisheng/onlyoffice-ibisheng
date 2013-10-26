@@ -1732,6 +1732,8 @@ CGraphicObjects.prototype =
             case changestype_Image_Properties:
             case changestype_Delete:
             case changestype_Remove:
+            case changestype_Paragraph_Content:
+            case changestype_Document_Content_Add:
             {
                 var selection_array =  this.selectionInfo.selectionArray;
                 for(var i = 0; i < selection_array.length; ++i)
@@ -5706,9 +5708,13 @@ CGraphicObjects.prototype =
     {
         if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.curState.textObject.addNewParagraph(bRecalculate);
-            this.drawingDocument.OnRecalculatePage(this.curState.textObject.pageIndex, this.document.Pages[this.curState.textObject.pageIndex]);
-            this.drawingDocument.OnEndRecalculate(false, false);
+          //  var check_object = this.curState.id === STATES_ID_TEXT_ADD ? this.curState.textObject : this.curState.group.parent;
+           // if(check_object && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : check_object.Parent, CheckType : changestype_Paragraph_Content} ))
+            {
+                this.curState.textObject.addNewParagraph(bRecalculate);
+                this.drawingDocument.OnRecalculatePage(this.curState.textObject.pageIndex, this.document.Pages[this.curState.textObject.pageIndex]);
+                this.drawingDocument.OnEndRecalculate(false, false);
+            }
         }
     },
 
@@ -6026,7 +6032,7 @@ CGraphicObjects.prototype =
                     }
                 }
             }
-            if(isRealObject(parent) && isRealObject(parent.Parent)&&false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} ))
+            if(isRealObject(parent) && isRealObject(parent.Parent)/*&&false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} )*/)
                 cur_state.textObject.paragraphAdd(paraItem, bRecalculate);
         }
         else
@@ -6038,7 +6044,7 @@ CGraphicObjects.prototype =
                 {
                     for(var sel_index = 0; sel_index < selected_array.length; ++sel_index)
                     {
-                        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[sel_index].Parent, CheckType : changestype_Paragraph_Content} ))
+                        //if(/*false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[sel_index].Parent, CheckType : changestype_Paragraph_Content} )*/)
                             selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
                     }
 
@@ -6048,7 +6054,7 @@ CGraphicObjects.prototype =
                 else
                 {
                     if(selected_array.length === 1 && typeof selected_array[0].GraphicObj.isShape === "function" && selected_array[0].GraphicObj.isShape()
-                       && !CheckLinePreset(selected_array[0].GraphicObj.getPresetGeom()) && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[0].Parent, CheckType : changestype_Paragraph_Content} ))
+                       && !CheckLinePreset(selected_array[0].GraphicObj.getPresetGeom())/* && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[0].Parent, CheckType : changestype_Paragraph_Content} )*/)
                     {
                         this.changeCurrentState(new TextAddState(this, selected_array[0]));
                         selected_array[0].paragraphAdd(paraItem, bRecalculate);
@@ -6096,7 +6102,7 @@ CGraphicObjects.prototype =
                             }
                         }
                         if(isRealObject(parent) && isRealObject(parent.Parent)
-                            && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} ))
+                            /*&& false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} )*/)
                         {
                             this.changeCurrentState(new TextAddInGroup(this, selected_array[0], cur_state.group));
                             selected_array[0].paragraphAdd(paraItem, bRecalculate);
@@ -6113,7 +6119,7 @@ CGraphicObjects.prototype =
             else if(cur_state.id === STATES_ID_CHART_TITLE_TEXT)
             {
                 var parent = cur_state.chart;
-                if(isRealObject(parent) && isRealObject(parent.Parent)&&false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} ))
+                if(isRealObject(parent) && isRealObject(parent.Parent)/*&&false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} )*/)
                 {
                     cur_state.title.paragraphAdd(paraItem, bRecalculate);
                     this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
