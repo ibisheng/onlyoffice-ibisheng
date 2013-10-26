@@ -199,12 +199,12 @@ CChartAsGroup.prototype =
 
         this.spPr.xfrm.extX = w;
         this.spPr.xfrm.extY = h;
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
+        //this.spPr.xfrm.flipH = flipH;
+        //this.spPr.xfrm.flipV = flipV;
         this.absExtX = w;
         this.absExtY = h;
-        this.absFlipH = flipH;
-        this.absFlipV = flipV;
+        //this.absFlipH = flipH;
+        //this.absFlipV = flipV;
         this.absOffsetX = posX;
         this.absOffsetY = posY;
         if(this.parent)
@@ -213,8 +213,8 @@ CChartAsGroup.prototype =
             this.parent.absOffsetY = posY;
             this.parent.absExtX = w;
             this.parent.absExtY = h;
-            this.parent.flipH = flipH;
-            this.parent.flipV = flipV;
+            //this.parent.flipH = flipH;
+            //this.parent.flipV = flipV;
         }
         this.calculateAfterResize();
     },
@@ -2004,12 +2004,12 @@ CChartAsGroup.prototype =
             {
                 this.spPr.xfrm.extX = data.oldW;
                 this.spPr.xfrm.extY = data.oldH;
-                this.spPr.xfrm.flipH = data.oldFlipH;
-                this.spPr.xfrm.flipV = data.oldFlipV;
+                //this.spPr.xfrm.flipH = data.oldFlipH;
+                //this.spPr.xfrm.flipV = data.oldFlipV;
                 this.absExtX = data.oldW;
                 this.absExtY = data.oldH;
-                this.absFlipH = data.oldFlipH;
-                this.absFlipV = data.oldFlipV;
+                //this.absFlipH = data.oldFlipH;
+                //this.absFlipV = data.oldFlipV;
                 this.absOffsetX = data.oldPosX;
                 this.absOffsetY = data.oldPosY;
                 if(this.parent)
@@ -2018,8 +2018,8 @@ CChartAsGroup.prototype =
                     this.parent.absOffsetY = data.oldPosY;
                     this.parent.absExtX = data.oldW;
                     this.parent.absExtY = data.oldH;
-                    this.parent.flipH = data.oldFlipH;
-                    this.parent.flipV = data.oldFlipV;
+                    //this.parent.flipH = data.oldFlipH;
+                    //this.parent.flipV = data.oldFlipV;
                 }
 
                 this.calculateAfterResize();
@@ -2140,12 +2140,12 @@ CChartAsGroup.prototype =
                 var flipV = reader.GetBool();
                 this.spPr.xfrm.extX = extX;
                 this.spPr.xfrm.extY = extY;
-                this.spPr.xfrm.flipH = flipH;
-                this.spPr.xfrm.flipV = flipV;
+                //this.spPr.xfrm.flipH = flipH;
+                //this.spPr.xfrm.flipV = flipV;
                 this.absExtX = extX;
                 this.absExtY = extY;
-                this.absFlipH = flipH;
-                this.absFlipV = flipV;
+                //this.absFlipH = flipH;
+                //this.absFlipV = flipV;
                 this.absOffsetX = posX;
                 this.absOffsetY = posY;
                 if(this.parent)
@@ -2154,8 +2154,8 @@ CChartAsGroup.prototype =
                     this.parent.absOffsetY = posY;
                     this.parent.absExtX = extX;
                     this.parent.absExtY = extY;
-                    this.parent.absFlipH = flipH;
-                    this.parent.absFlipV = flipV;
+                    //this.parent.absFlipH = flipH;
+                    //this.parent.absFlipV = flipV;
                 }
 
                 this.calculateAfterResize();
@@ -2239,12 +2239,12 @@ CChartAsGroup.prototype =
             {
                 this.spPr.xfrm.extX = data.oldW;
                 this.spPr.xfrm.extY = data.oldH;
-                this.spPr.xfrm.flipH = data.oldFlipH;
-                this.spPr.xfrm.flipV = data.oldFlipV;
+                //this.spPr.xfrm.flipH = data.oldFlipH;
+                //this.spPr.xfrm.flipV = data.oldFlipV;
                 this.absExtX = data.oldW;
                 this.absExtY = data.oldH;
-                this.absFlipH = data.oldFlipH;
-                this.absFlipV = data.oldFlipV;
+                //this.absFlipH = data.oldFlipH;
+                //this.absFlipV = data.oldFlipV;
                 this.absOffsetX = data.oldPosX;
                 this.absOffsetY = data.oldPosY;
                 if(this.parent)
@@ -2253,8 +2253,8 @@ CChartAsGroup.prototype =
                     this.parent.absOffsetY = data.oldPosY;
                     this.parent.absExtX = data.oldW;
                     this.parent.absExtY = data.oldH;
-                    this.parent.flipH = data.oldFlipH;
-                    this.parent.flipV = data.oldFlipV;
+                    //this.parent.flipH = data.oldFlipH;
+                    //this.parent.flipV = data.oldFlipV;
                 }
 
                 this.calculateAfterResize();

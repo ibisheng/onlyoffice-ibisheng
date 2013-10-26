@@ -6297,7 +6297,32 @@ function ResizeState(graphicObjects, majorHandleNum)
             if(tracks[0].originalGraphicObject.Is_Inline())
             {
                 para_drawing = tracks[0].originalGraphicObject;
-                if(false === editor.isViewMode && false === doc.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_Drawing_Props, Element : para_drawing.Parent, CheckType : changestype_Paragraph_Content} ))
+                var paragraph = null;
+                if(!para_drawing.isShapeChild())
+                {
+                    paragraph = para_drawing.Parent;
+                }
+                else
+                {
+                    var parent_shape = para_drawing.getParentShape();
+                    if(!parent_shape.group)
+                    {
+                        paragraph = parent_shape.parent.Parent;
+                    }
+                    else
+                    {
+                        main_group = parent_shape.getMainGroup();
+                        if(isRealObject(main_group))
+                        {
+                            paragraph = main_group.parent.Parent;
+                        }
+                        else
+                        {
+                            paragraph = para_drawing.Parent;
+                        }
+                    }
+                }
+                if(false === editor.isViewMode && false === doc.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type, Element : paragraph, CheckType : changestype_Paragraph_Content} ))
                 {
                     tracks[0].trackEnd();
                     bounds = para_drawing.getBounds();

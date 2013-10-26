@@ -1035,6 +1035,23 @@ WordShape.prototype =
     },
 
 
+    getMainGroup: function()
+    {
+        var cur_group = this.group;
+        if(isRealObject(cur_group))
+        {
+            while(isRealObject(cur_group.group))
+            {
+                cur_group = cur_group.group;
+            }
+            return cur_group;
+        }
+        else
+        {
+            return null;
+        }
+    },
+
 
     getOwnTransform: function()
     {
