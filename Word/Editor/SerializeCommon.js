@@ -277,9 +277,12 @@ function CPPTXContentLoader()
 
                     var oBinary_DocumentTableReader = new Binary_DocumentTableReader(shape.textBoxContent, oThis.oReadResult, null, oThis.stream, false, oThis.oComments);
                     var nDocLength = oThis.stream.GetULongLE();
+                    var content_arr = [];
                     oThis.bcr.Read1(nDocLength, function(t,l){
-                        return oBinary_DocumentTableReader.ReadDocumentContent(t,l, shape.textBoxContent.Content);
+                        return oBinary_DocumentTableReader.ReadDocumentContent(t,l, content_arr);
                     });
+                    for(var i = 0, length = content_arr.length; i < length; ++i)
+                        shape.textBoxContent.Internal_Content_Add(i, content_arr[i]);
 
                     s.pos = oThis.stream.pos;
                     s.cur = oThis.stream.cur;

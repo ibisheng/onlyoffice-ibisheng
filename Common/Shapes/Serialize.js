@@ -4823,8 +4823,9 @@ function BinaryPPTYLoader()
         if (_table != null)
         {
             _graphic_frame.spPr.xfrm = _xfrm;
-            _graphic_frame.nvGraphicFramePr = _nvGraphicFramePr;
-            _graphic_frame.graphicObject = _table;
+            _graphic_frame.setSpPr(_graphic_frame.spPr);
+            _graphic_frame.setNvSpPr(_nvGraphicFramePr);
+            _graphic_frame.setGraphicObject(_table);
         }
         else if (_chart != null)
         {
@@ -4988,9 +4989,9 @@ function BinaryPPTYLoader()
         var _table = new CTable(this.presentation.DrawingDocument, _graphic_frame, false, 0, 0, 0, _xfrm.extX, _xfrm.extY, rows, cols.length, cols);
         if (null != props)
         {
-            _table.Pr = props.props;
-            _table.TableLook = props.look;
-            _table.styleIndex = props.style;
+            _table.Set_Pr(props.props);
+            _table.Set_TableLook(props.look);
+            _table.Set_TableStyle(props.style);
         }
 
         s.Seek2(_return_to_rows);
@@ -5025,7 +5026,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    row.Pr.Height = new CTableRowHeight(s.GetULong() / 36000, heightrule_AtLeast);
+                    row.Set_Height(s.GetULong() / 36000, heightrule_AtLeast);
                     break;
                 }
                 default:
