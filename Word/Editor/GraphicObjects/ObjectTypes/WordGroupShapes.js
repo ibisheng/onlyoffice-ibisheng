@@ -5462,8 +5462,8 @@ function GroupForResize(originalGroup, parentTrack, numberHandle, majorOffsetX, 
             {
                 var para_drawing = this.original.parent.copy();
                 this.original = para_drawing.GraphicObj;
-                para_drawing.Set_XYForAdd(this.x, this.y);
                 var near_pos = this.original.document.Get_NearestPos(this.pageIndex, this.x, this.y);
+                para_drawing.Set_XYForAdd(this.x, this.y, near_pos, this.pageIndex);
                 para_drawing.Add_ToDocument(near_pos, false);
                 this.original.setAbsoluteTransform(this.x, this.y, null, null, null, null, null);
                 this.original.recalculate();

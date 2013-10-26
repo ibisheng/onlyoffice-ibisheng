@@ -3591,7 +3591,7 @@ CGraphicObjects.prototype =
                 _selection_objects.push(_new_word_graphic_object);
                 var bounds = _new_word_graphic_object.getBounds();
                 var nearest_pos = this.document.Get_NearestPos(_page_index, _new_group.absOffsetX, _new_group.absOffsetY, true, _new_word_graphic_object);
-                _new_word_graphic_object.Set_XYForAdd(_new_group.absOffsetX, _new_group.absOffsetY);
+                _new_word_graphic_object.Set_XYForAdd(_new_group.absOffsetX, _new_group.absOffsetY, nearest_pos, _page_index);
                 _new_word_graphic_object.Add_ToDocument(nearest_pos, true);
 
 
@@ -3670,7 +3670,7 @@ CGraphicObjects.prototype =
                         cur_child_graphic_object.parent.Measure();
                         cur_child_graphic_object.parent.updatePosition(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.calculateOffset();
-                        cur_child_graphic_object.parent.Set_XYForAdd(new_offset_x, new_offset_y);
+                        cur_child_graphic_object.parent.Set_XYForAdd2(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.Add_ToDocument2(paragraph);
                         cur_child_graphic_object.parent.calculateSnapArrays();
                     }
@@ -3757,7 +3757,7 @@ CGraphicObjects.prototype =
                         cur_child_graphic_object.parent.Measure();
                         cur_child_graphic_object.parent.updatePosition(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.calculateOffset();
-                        cur_child_graphic_object.parent.Set_XYForAdd(new_offset_x, new_offset_y);
+                        cur_child_graphic_object.parent.Set_XYForAdd2(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.Add_ToDocument2(paragraph);
                         cur_child_graphic_object.parent.calculateSnapArrays();
                     }

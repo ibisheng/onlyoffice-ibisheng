@@ -171,8 +171,8 @@ function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY, bChart)
             {
                 this.originalShape = para_drawing.GraphicObj;
 
-                para_drawing.Set_XYForAdd(this.posX, this.posY);
                 var near_pos = this.originalShape.document.Get_NearestPos(this.pageIndex, this.posX, this.posY);
+                para_drawing.Set_XYForAdd(this.posX, this.posY, near_pos, this.pageIndex);
                 para_drawing.Add_ToDocument(near_pos);
                 this.originalShape.setAbsoluteTransform(this.posX, this.posY, null, null, null, null, null);
                 this.originalShape.calculateTransformMatrix();

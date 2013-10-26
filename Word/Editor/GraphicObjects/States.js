@@ -179,7 +179,7 @@ function NullState(graphicObjects)
                             for(var _sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push( _current_graphic_object);
                             editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
                             editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
@@ -233,7 +233,7 @@ function NullState(graphicObjects)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
 
@@ -293,7 +293,7 @@ function NullState(graphicObjects)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
 
@@ -309,7 +309,7 @@ function NullState(graphicObjects)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
 
@@ -350,7 +350,7 @@ function NullState(graphicObjects)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
 
@@ -364,7 +364,7 @@ function NullState(graphicObjects)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
 
@@ -381,7 +381,7 @@ function NullState(graphicObjects)
                         }
 
                         sp.selectionSetStart(x, y, e);
-                        sp.select();
+                        sp.select(pageIndex);
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
@@ -402,7 +402,7 @@ function NullState(graphicObjects)
                         return;
                     if(_current_graphic_object.selected === false)
                     {
-                        _current_graphic_object.select();
+                        _current_graphic_object.select(pageIndex);
                         _common_selection_array.push(_current_graphic_object);
                         _common_selection_array.sort(ComparisonByZIndex);
 
@@ -470,7 +470,7 @@ function NullState(graphicObjects)
                                 for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                     _common_selection_array[_sel_index].deselect();
                                 _common_selection_array.length = 0;
-                                _current_graphic_object.select();
+                                _current_graphic_object.select(pageIndex);
                                 _common_selection_array.push(_current_graphic_object);
                             }
                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -489,7 +489,7 @@ function NullState(graphicObjects)
                                 b_sel = _current_graphic_object.selected;
                                 if(_current_graphic_object.selected === false)
                                 {
-                                    _current_graphic_object.select();
+                                    _current_graphic_object.select(pageIndex);
                                     _common_selection_array.push(_current_graphic_object);
                                 }
                                 this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -509,7 +509,7 @@ function NullState(graphicObjects)
                             _common_selection_array[_sel_index].deselect();
                         }
                         _common_selection_array.length = 0;
-                        _current_graphic_object.select();
+                        _current_graphic_object.select(pageIndex);
                         _common_selection_array.push(_current_graphic_object);
                         if(!_current_graphic_object.isGroup())
                         {
@@ -529,7 +529,7 @@ function NullState(graphicObjects)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -542,7 +542,7 @@ function NullState(graphicObjects)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -579,7 +579,7 @@ function NullState(graphicObjects)
                                                 for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                     _common_selection_array[_sel_index].deselect();
                                                 _common_selection_array.length = 0;
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -592,7 +592,7 @@ function NullState(graphicObjects)
                                             {
                                                 if(cur_inline_object.selected === false)
                                                 {
-                                                    cur_inline_object.select();
+                                                    cur_inline_object.select(pageIndex);
                                                     _common_selection_array.push(cur_inline_object);
                                                 }
                                                 this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -608,7 +608,7 @@ function NullState(graphicObjects)
                                 }
                             }
                             sp.selectionSetStart(x, y, e);
-                            sp.select();
+                            sp.select(pageIndex);
 
                             _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
@@ -650,7 +650,7 @@ function NullState(graphicObjects)
                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
                             this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -708,7 +708,7 @@ function NullState(graphicObjects)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
                         }
@@ -744,7 +744,7 @@ function NullState(graphicObjects)
                         _common_selection_array[_sel_index].deselect();
                     }
                     _common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     _common_selection_array.push(_current_graphic_object);
 
                     if(!_current_graphic_object.isGroup())
@@ -764,7 +764,7 @@ function NullState(graphicObjects)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
                                     this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -777,7 +777,7 @@ function NullState(graphicObjects)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -816,7 +816,7 @@ function NullState(graphicObjects)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -829,7 +829,7 @@ function NullState(graphicObjects)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -847,7 +847,7 @@ function NullState(graphicObjects)
                         sp.selectionSetStart(x, y, e);
 
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
-                        sp.select();
+                        sp.select(pageIndex);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
                             this.graphicObjects.updateSelectionState();
@@ -888,7 +888,7 @@ function NullState(graphicObjects)
                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
                             this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -942,7 +942,7 @@ function NullState(graphicObjects)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
                         }
@@ -978,7 +978,7 @@ function NullState(graphicObjects)
                         _common_selection_array[_sel_index].deselect();
                     }
                     _common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     _common_selection_array.push(_current_graphic_object);
 
                     if(!_current_graphic_object.isGroup())
@@ -998,7 +998,7 @@ function NullState(graphicObjects)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
                                     this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -1011,7 +1011,7 @@ function NullState(graphicObjects)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -1050,7 +1050,7 @@ function NullState(graphicObjects)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -1063,7 +1063,7 @@ function NullState(graphicObjects)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -1081,7 +1081,7 @@ function NullState(graphicObjects)
                         _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
 
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(_current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num]);
-                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num], _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
                             this.graphicObjects.updateSelectionState();
@@ -1664,7 +1664,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                 if(hit && !hit_in_text_rect)
                 {
                     paraDrawing.select(pageIndex);
-                    cur_title.select();
+                    cur_title.select(pageIndex);
                     graphicObjects.selectionInfo.selectionArray.push(paraDrawing);
                     graphicObjects.arrPreTrackObjects.push(new MoveTitleInChart(cur_title));
                     graphicObjects.changeCurrentState(new PreMoveChartTitleState(graphicObjects, cur_title, paraDrawing, x, y, pageIndex));
@@ -1704,7 +1704,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     for(var _sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                         _common_selection_array[_sel_index].deselect();
                     _common_selection_array.length = 0;
-                    chart.select();
+                    chart.select(pageIndex);
                     _common_selection_array.push(paraDrawing);
                     editor.asc_fireCallback("asc_canGroup", graphicObjects.canGroup());
                     editor.asc_fireCallback("asc_canUnGroup", graphicObjects.canUnGroup());
@@ -1757,7 +1757,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     return true;
                 if(chart.selected === false)
                 {
-                    chart.select();
+                    chart.select(pageIndex);
                     _common_selection_array.push(chart);
                     _common_selection_array.sort(ComparisonByZIndex);
 
@@ -1808,7 +1808,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                         _common_selection_array[_sel_index].deselect();
                     _common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     _common_selection_array.push(_current_graphic_object);
                 }
                 graphicObjects.changeCurrentState(new PreMoveInlineObject(graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -1827,7 +1827,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     b_sel = _current_graphic_object.selected;
                     if(_current_graphic_object.selected === false)
                     {
-                        _current_graphic_object.select();
+                        _current_graphic_object.select(pageIndex);
                         _common_selection_array.push(_current_graphic_object);
                     }
                     graphicObjects.changeCurrentState(new PreMoveInlineObject(graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -1920,7 +1920,7 @@ function handleSelectedChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                 for(var _sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                     _common_selection_array[_sel_index].deselect();
                 _common_selection_array.length = 0;
-                chart.select();
+                chart.select(pageIndex);
                 _common_selection_array.push(paraDrawing);
                 editor.asc_fireCallback("asc_canGroup", graphicObjects.canGroup());
                 editor.asc_fireCallback("asc_canUnGroup", graphicObjects.canUnGroup());
@@ -1973,7 +1973,7 @@ function handleSelectedChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                 return true;
             if(chart.selected === false)
             {
-                chart.select();
+                chart.select(pageIndex);
                 _common_selection_array.push(chart);
                 _common_selection_array.sort(ComparisonByZIndex);
 
@@ -2328,8 +2328,8 @@ function NullStateHeaderFooter(graphicObjects)
                         }
                     }
 
-                    sp.selectionSetStart(x, y, e, pageIndex);
                     sp.select(pageIndex);
+                    sp.selectionSetStart(x, y, e, pageIndex);
                     _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
                     this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
                     if(e.ClickCount <= 1)
@@ -3470,7 +3470,7 @@ function ChartState(graphicObjects, chart)
                             for(var _sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push( _current_graphic_object);
                             editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
                             editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
@@ -3524,7 +3524,7 @@ function ChartState(graphicObjects, chart)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
 
@@ -3584,7 +3584,7 @@ function ChartState(graphicObjects, chart)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
 
@@ -3600,7 +3600,7 @@ function ChartState(graphicObjects, chart)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
 
@@ -3641,7 +3641,7 @@ function ChartState(graphicObjects, chart)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
 
@@ -3655,7 +3655,7 @@ function ChartState(graphicObjects, chart)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
 
@@ -3672,7 +3672,7 @@ function ChartState(graphicObjects, chart)
                         }
 
                         sp.selectionSetStart(x, y, e);
-                        sp.select();
+                        sp.select(pageIndex);
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
@@ -3718,7 +3718,7 @@ function ChartState(graphicObjects, chart)
                                 for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                     _common_selection_array[_sel_index].deselect();
                                 _common_selection_array.length = 0;
-                                _current_graphic_object.select();
+                                _current_graphic_object.select(pageIndex);
                                 _common_selection_array.push(_current_graphic_object);
                             }
                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -3737,7 +3737,7 @@ function ChartState(graphicObjects, chart)
                                 b_sel = _current_graphic_object.selected;
                                 if(_current_graphic_object.selected === false)
                                 {
-                                    _current_graphic_object.select();
+                                    _current_graphic_object.select(pageIndex);
                                     _common_selection_array.push(_current_graphic_object);
                                 }
                                 this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
@@ -3757,7 +3757,7 @@ function ChartState(graphicObjects, chart)
                             _common_selection_array[_sel_index].deselect();
                         }
                         _common_selection_array.length = 0;
-                        _current_graphic_object.select();
+                        _current_graphic_object.select(pageIndex);
                         _common_selection_array.push(_current_graphic_object);
                         if(!_current_graphic_object.isGroup())
                         {
@@ -3777,7 +3777,7 @@ function ChartState(graphicObjects, chart)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -3790,7 +3790,7 @@ function ChartState(graphicObjects, chart)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -3827,7 +3827,7 @@ function ChartState(graphicObjects, chart)
                                                 for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                     _common_selection_array[_sel_index].deselect();
                                                 _common_selection_array.length = 0;
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -3840,7 +3840,7 @@ function ChartState(graphicObjects, chart)
                                             {
                                                 if(cur_inline_object.selected === false)
                                                 {
-                                                    cur_inline_object.select();
+                                                    cur_inline_object.select(pageIndex);
                                                     _common_selection_array.push(cur_inline_object);
                                                 }
                                                 this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -3856,7 +3856,7 @@ function ChartState(graphicObjects, chart)
                                 }
                             }
                             sp.selectionSetStart(x, y, e);
-                            sp.select();
+                            sp.select(pageIndex);
 
                             _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
@@ -3898,7 +3898,7 @@ function ChartState(graphicObjects, chart)
                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
                             this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -3956,7 +3956,7 @@ function ChartState(graphicObjects, chart)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
                         }
@@ -3992,7 +3992,7 @@ function ChartState(graphicObjects, chart)
                         _common_selection_array[_sel_index].deselect();
                     }
                     _common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     _common_selection_array.push(_current_graphic_object);
 
                     if(!_current_graphic_object.isGroup())
@@ -4012,7 +4012,7 @@ function ChartState(graphicObjects, chart)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
                                     this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4025,7 +4025,7 @@ function ChartState(graphicObjects, chart)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4064,7 +4064,7 @@ function ChartState(graphicObjects, chart)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4077,7 +4077,7 @@ function ChartState(graphicObjects, chart)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4095,7 +4095,7 @@ function ChartState(graphicObjects, chart)
                         sp.selectionSetStart(x, y, e);
 
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
-                        sp.select();
+                        sp.select(pageIndex);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
                             this.graphicObjects.updateSelectionState();
@@ -4136,7 +4136,7 @@ function ChartState(graphicObjects, chart)
                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                 _common_selection_array[_sel_index].deselect();
                             _common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
                             this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -4190,7 +4190,7 @@ function ChartState(graphicObjects, chart)
                             return;
                         if(_current_graphic_object.selected === false)
                         {
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             _common_selection_array.push(_current_graphic_object);
                             _common_selection_array.sort(ComparisonByZIndex);
                         }
@@ -4226,7 +4226,7 @@ function ChartState(graphicObjects, chart)
                         _common_selection_array[_sel_index].deselect();
                     }
                     _common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     _common_selection_array.push(_current_graphic_object);
 
                     if(!_current_graphic_object.isGroup())
@@ -4246,7 +4246,7 @@ function ChartState(graphicObjects, chart)
                                         for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                             _common_selection_array[_sel_index].deselect();
                                         _common_selection_array.length = 0;
-                                        cur_inline_object.select();
+                                        cur_inline_object.select(pageIndex);
                                         _common_selection_array.push(cur_inline_object);
                                     }
                                     this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4259,7 +4259,7 @@ function ChartState(graphicObjects, chart)
                                     {
                                         if(cur_inline_object.selected === false)
                                         {
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4298,7 +4298,7 @@ function ChartState(graphicObjects, chart)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4311,7 +4311,7 @@ function ChartState(graphicObjects, chart)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -4329,7 +4329,7 @@ function ChartState(graphicObjects, chart)
                         _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
 
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(_current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num]);
-                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num], _current_graphic_object.GraphicObj));
                         if(e.ClickCount <= 1)
                             this.graphicObjects.updateSelectionState();
@@ -4815,7 +4815,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
             Drawing.Add_ToDocument(near_pos);
 
             this.graphicObjects.resetSelection();
-            Drawing.select();
+            Drawing.select(pageIndex);
             this.graphicObjects.selectionInfo.selectionArray.push(Drawing);
 
         }
@@ -6670,7 +6670,7 @@ function GroupState(graphicObjects, group)
                             this.groupWordGO.deselect();
                             common_selection_array.length = 0;
 
-                            _cur_object.select();
+                            _cur_object.select(pageIndex);
                             common_selection_array.push(_cur_object);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
                             this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_cur_object,   _cur_object.absOffsetX - x ,  _cur_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -6686,7 +6686,7 @@ function GroupState(graphicObjects, group)
                             }
                             _group_selection_array.length = 0;
 
-                            _cur_object.select();
+                            _cur_object.select(pageIndex);
                             common_selection_array.push(_cur_object);
                             common_selection_array.sort(ComparisonByZIndex);
                             this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -6712,7 +6712,7 @@ function GroupState(graphicObjects, group)
                         _group_selection_array.length = 0;
                         this.groupWordGO.deselect();
                         common_selection_array.length = 0;
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
 
                         if(!_cur_object.isGroup())
@@ -6768,7 +6768,7 @@ function GroupState(graphicObjects, group)
                                 }
                             }
                             _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                            _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                            _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                             _cur_object.GraphicObj.selectionInfo.selectionArray.push(_cur_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_object.GraphicObj.spTree[_hit_to_text_rect.num], _cur_object.GraphicObj));
                         }
@@ -6799,7 +6799,7 @@ function GroupState(graphicObjects, group)
 
                                     _group_selection_array.length = 0;
 
-                                    cur_sp.select();
+                                    cur_sp.select(pageIndex);
                                     _group_selection_array.push(cur_sp);
 
                                     this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -6822,7 +6822,7 @@ function GroupState(graphicObjects, group)
                             {
                                 if(cur_sp.selected === false)
                                 {
-                                    cur_sp.select();
+                                    cur_sp.select(pageIndex);
                                     _group_selection_array.push(cur_sp);
                                     _group_selection_array.sort(ComparisonByZIndexSimple);
                                 }
@@ -6867,7 +6867,7 @@ function GroupState(graphicObjects, group)
                             _group_selection_array.length = 0;
 
                             cur_sp.selectionSetStart(x, y, e);
-                            cur_sp.select();
+                            cur_sp.select(pageIndex);
                             _group_selection_array.push(cur_sp);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, cur_sp, this.group));
                             if(e.ClickCount <= 1)
@@ -6918,7 +6918,7 @@ function GroupState(graphicObjects, group)
                                 for(_sel_index = 0; _sel_index < common_selection_array.length; ++_sel_index)
                                     common_selection_array[_sel_index].deselect();
                                 common_selection_array.length = 0;
-                                _current_graphic_object.select();
+                                _current_graphic_object.select(pageIndex);
                                 common_selection_array.push(_current_graphic_object);
                             }
                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel_m_o));
@@ -6933,7 +6933,7 @@ function GroupState(graphicObjects, group)
                             common_selection_array[_sel_index].deselect();
                         }
                         common_selection_array.length = 0;
-                        _current_graphic_object.select();
+                        _current_graphic_object.select(pageIndex);
                         common_selection_array.push(_current_graphic_object);
                         if(!_current_graphic_object.isGroup())
                         {
@@ -6953,7 +6953,7 @@ function GroupState(graphicObjects, group)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -6966,7 +6966,7 @@ function GroupState(graphicObjects, group)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -7001,7 +7001,7 @@ function GroupState(graphicObjects, group)
                                             for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
                                                 _common_selection_array[_sel_index].deselect();
                                             _common_selection_array.length = 0;
-                                            cur_inline_object.select();
+                                            cur_inline_object.select(pageIndex);
                                             _common_selection_array.push(cur_inline_object);
                                         }
                                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -7014,7 +7014,7 @@ function GroupState(graphicObjects, group)
                                         {
                                             if(cur_inline_object.selected === false)
                                             {
-                                                cur_inline_object.select();
+                                                cur_inline_object.select(pageIndex);
                                                 _common_selection_array.push(cur_inline_object);
                                             }
                                             this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
@@ -7030,7 +7030,7 @@ function GroupState(graphicObjects, group)
                             }
 
                             _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                            _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                            _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                             _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(_current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num], _current_graphic_object.GraphicObj));
                         }
@@ -7061,7 +7061,7 @@ function GroupState(graphicObjects, group)
 
                                     _group_selection_array.length = 0;
 
-                                    cur_sp.select();
+                                    cur_sp.select(pageIndex);
                                     _group_selection_array.push(cur_sp);
 
                                     this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7084,7 +7084,7 @@ function GroupState(graphicObjects, group)
                             {
                                 if(cur_sp.selected === false)
                                 {
-                                    cur_sp.select();
+                                    cur_sp.select(pageIndex);
                                     _group_selection_array.push(cur_sp);
                                     _group_selection_array.sort(ComparisonByZIndexSimple);
                                 }
@@ -7129,7 +7129,7 @@ function GroupState(graphicObjects, group)
                             _group_selection_array.length = 0;
 
                             cur_sp.selectionSetStart(x, y, e);
-                            cur_sp.select();
+                            cur_sp.select(pageIndex);
                             _group_selection_array.push(cur_sp);
                             this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, cur_sp, this.group));
                             if(e.ClickCount <= 1)
@@ -7192,7 +7192,7 @@ function GroupState(graphicObjects, group)
                                 this.groupWordGO.deselect();
                                 common_selection_array.length = 0;
 
-                                _cur_object.select();
+                                _cur_object.select(pageIndex);
                                 common_selection_array.push(_cur_object);
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
                                 this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_cur_object,   _cur_object.absOffsetX - x ,  _cur_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -7208,7 +7208,7 @@ function GroupState(graphicObjects, group)
                                 }
                                 _group_selection_array.length = 0;
 
-                                _cur_object.select();
+                                _cur_object.select(pageIndex);
                                 common_selection_array.push(_cur_object);
                                 common_selection_array.sort(ComparisonByZIndex);
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7234,7 +7234,7 @@ function GroupState(graphicObjects, group)
                             _group_selection_array.length = 0;
                             this.groupWordGO.deselect();
                             common_selection_array.length = 0;
-                            _cur_object.select();
+                            _cur_object.select(pageIndex);
                             common_selection_array.push(_cur_object);
 
                             if(!_cur_object.isGroup())
@@ -7290,7 +7290,7 @@ function GroupState(graphicObjects, group)
                                     }
                                 }
                                 _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                                _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                                _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                                 _cur_object.GraphicObj.selectionInfo.selectionArray.push(_cur_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                                 this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_object.GraphicObj.spTree[_hit_to_text_rect.num], _cur_object.GraphicObj));
                             }
@@ -7321,7 +7321,7 @@ function GroupState(graphicObjects, group)
 
                                         _group_selection_array.length = 0;
 
-                                        cur_sp.select();
+                                        cur_sp.select(pageIndex);
                                         _group_selection_array.push(cur_sp);
 
                                         this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7344,7 +7344,7 @@ function GroupState(graphicObjects, group)
                                 {
                                     if(cur_sp.selected === false)
                                     {
-                                        cur_sp.select();
+                                        cur_sp.select(pageIndex);
                                         _group_selection_array.push(cur_sp);
                                         _group_selection_array.sort(ComparisonByZIndexSimple);
                                     }
@@ -7389,7 +7389,7 @@ function GroupState(graphicObjects, group)
                                 _group_selection_array.length = 0;
 
                                 cur_sp.selectionSetStart(x, y, e);
-                                cur_sp.select();
+                                cur_sp.select(pageIndex);
                                 _group_selection_array.push(cur_sp);
                                 this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, cur_sp, this.group));
                                 if(e.ClickCount <= 1)
@@ -7563,7 +7563,7 @@ function GroupState(graphicObjects, group)
                         this.groupWordGO.deselect();
                         common_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
                         this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_cur_object,   _cur_object.absOffsetX - x ,  _cur_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -7579,7 +7579,7 @@ function GroupState(graphicObjects, group)
                         }
                         _group_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         common_selection_array.sort(ComparisonByZIndex);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7605,7 +7605,7 @@ function GroupState(graphicObjects, group)
                     _group_selection_array.length = 0;
                     this.groupWordGO.deselect();
                     common_selection_array.length = 0;
-                    _cur_object.select();
+                    _cur_object.select(pageIndex);
                     common_selection_array.push(_cur_object);
 
                     if(!_cur_object.isGroup())
@@ -7664,7 +7664,7 @@ function GroupState(graphicObjects, group)
                             }
                         }
                         _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         _cur_object.GraphicObj.selectionInfo.selectionArray.push(_cur_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_object.GraphicObj.spTree[_hit_to_text_rect.num], _cur_object.GraphicObj));
                     }
@@ -7708,7 +7708,7 @@ function GroupState(graphicObjects, group)
 
                                 _group_selection_array.length = 0;
 
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push(_cur_sp);
 
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7732,7 +7732,7 @@ function GroupState(graphicObjects, group)
                         {
                             if(_cur_sp.selected === false)
                             {
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push( _cur_sp);
                                 _group_selection_array.sort(ComparisonByZIndexSimple);
                             }
@@ -7758,7 +7758,7 @@ function GroupState(graphicObjects, group)
                         _group_selection_array.length = 0;
 
                         _cur_sp.selectionSetStart(_translated_to_group_page_coors_x, _translated_to_group_page_coors_y, e);
-                        _cur_sp.select();
+                        _cur_sp.select(pageIndex);
                         _group_selection_array.push(_cur_sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_sp, this.group));
                         if(e.ClickCount <= 1)
@@ -7791,7 +7791,7 @@ function GroupState(graphicObjects, group)
                             for(_sel_index = 0; _sel_index < common_selection_array.length; ++_sel_index)
                                 common_selection_array[_sel_index].deselect();
                             common_selection_array.length = 0;
-                            _current_graphic_object.select();
+                            _current_graphic_object.select(pageIndex);
                             common_selection_array.push(_current_graphic_object);
                         }
                         this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel_m_o));
@@ -7806,7 +7806,7 @@ function GroupState(graphicObjects, group)
                         common_selection_array[_sel_index].deselect();
                     }
                     common_selection_array.length = 0;
-                    _current_graphic_object.select();
+                    _current_graphic_object.select(pageIndex);
                     common_selection_array.push(_current_graphic_object);
                     if(!_current_graphic_object.isGroup())
                     {
@@ -7816,7 +7816,7 @@ function GroupState(graphicObjects, group)
                     else
                     {
                         _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(_current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num], _current_graphic_object.GraphicObj));
                     }
@@ -7860,7 +7860,7 @@ function GroupState(graphicObjects, group)
 
                                 _group_selection_array.length = 0;
 
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push(_cur_sp);
 
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7884,7 +7884,7 @@ function GroupState(graphicObjects, group)
                         {
                             if(_cur_sp.selected === false)
                             {
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push( _cur_sp);
                                 _group_selection_array.sort(ComparisonByZIndexSimple);
                             }
@@ -7910,7 +7910,7 @@ function GroupState(graphicObjects, group)
                         _group_selection_array.length = 0;
 
                         _cur_sp.selectionSetStart(_translated_to_group_page_coors_x, _translated_to_group_page_coors_y, e);
-                        _cur_sp.select();
+                        _cur_sp.select(pageIndex);
                         _group_selection_array.push(_cur_sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_sp, this.group));
                         if(e.ClickCount <= 1)
@@ -7951,7 +7951,7 @@ function GroupState(graphicObjects, group)
                         this.groupWordGO.deselect();
                         common_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
                         this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_cur_object,   _cur_object.absOffsetX - x ,  _cur_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -7967,7 +7967,7 @@ function GroupState(graphicObjects, group)
                         }
                         _group_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         common_selection_array.sort(ComparisonByZIndex);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -7993,7 +7993,7 @@ function GroupState(graphicObjects, group)
                     _group_selection_array.length = 0;
                     this.groupWordGO.deselect();
                     common_selection_array.length = 0;
-                    _cur_object.select();
+                    _cur_object.select(pageIndex);
                     common_selection_array.push(_cur_object);
 
                     if(!_cur_object.isGroup())
@@ -8004,7 +8004,7 @@ function GroupState(graphicObjects, group)
                     else
                     {
                         _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         _cur_object.GraphicObj.selectionInfo.selectionArray.push(_cur_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_object.GraphicObj.spTree[_hit_to_text_rect.num], _cur_object.GraphicObj));
                     }
@@ -8048,7 +8048,7 @@ function GroupState(graphicObjects, group)
 
                                 _group_selection_array.length = 0;
 
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push(_cur_sp);
 
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -8072,7 +8072,7 @@ function GroupState(graphicObjects, group)
                         {
                             if(_cur_sp.selected === false)
                             {
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push( _cur_sp);
                                 _group_selection_array.sort(ComparisonByZIndexSimple);
                             }
@@ -8098,7 +8098,7 @@ function GroupState(graphicObjects, group)
                         _group_selection_array.length = 0;
 
                         _cur_sp.selectionSetStart(_translated_to_group_page_coors_x, _translated_to_group_page_coors_y, e);
-                        _cur_sp.select();
+                        _cur_sp.select(pageIndex);
                         _group_selection_array.push(_cur_sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_sp, this.group));
                         if(e.ClickCount <= 1)
@@ -8139,7 +8139,7 @@ function GroupState(graphicObjects, group)
                         this.groupWordGO.deselect();
                         common_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
                         this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_cur_object,   _cur_object.absOffsetX - x ,  _cur_object.absOffsetY - y, this.graphicObjects, pageIndex);
@@ -8155,7 +8155,7 @@ function GroupState(graphicObjects, group)
                         }
                         _group_selection_array.length = 0;
 
-                        _cur_object.select();
+                        _cur_object.select(pageIndex);
                         common_selection_array.push(_cur_object);
                         common_selection_array.sort(ComparisonByZIndex);
                         this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -8181,7 +8181,7 @@ function GroupState(graphicObjects, group)
                     _group_selection_array.length = 0;
                     this.groupWordGO.deselect();
                     common_selection_array.length = 0;
-                    _cur_object.select();
+                    _cur_object.select(pageIndex);
                     common_selection_array.push(_cur_object);
 
                     if(!_cur_object.isGroup())
@@ -8192,7 +8192,7 @@ function GroupState(graphicObjects, group)
                     else
                     {
                         _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select();
+                        _cur_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
                         _cur_object.GraphicObj.selectionInfo.selectionArray.push(_cur_object.GraphicObj.spTree[_hit_to_text_rect.num]);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_object.GraphicObj.spTree[_hit_to_text_rect.num], _cur_object.GraphicObj));
                     }
@@ -8236,7 +8236,7 @@ function GroupState(graphicObjects, group)
 
                                 _group_selection_array.length = 0;
 
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push(_cur_sp);
 
                                 this.graphicObjects.arrPreTrackObjects.length = 0;
@@ -8260,7 +8260,7 @@ function GroupState(graphicObjects, group)
                         {
                             if(_cur_sp.selected === false)
                             {
-                                _cur_sp.select();
+                                _cur_sp.select(pageIndex);
                                 _group_selection_array.push( _cur_sp);
                                 _group_selection_array.sort(ComparisonByZIndexSimple);
                             }
@@ -8286,7 +8286,7 @@ function GroupState(graphicObjects, group)
                         _group_selection_array.length = 0;
 
                         _cur_sp.selectionSetStart(_translated_to_group_page_coors_x, _translated_to_group_page_coors_y, e);
-                        _cur_sp.select();
+                        _cur_sp.select(pageIndex);
                         _group_selection_array.push(_cur_sp);
                         this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _cur_sp, this.group));
                         if(e.ClickCount <= 1)

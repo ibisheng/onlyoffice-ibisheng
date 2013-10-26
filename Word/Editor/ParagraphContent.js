@@ -4152,6 +4152,34 @@ ParaDrawing.prototype =
         this.updateCursorTypes();
     },
 
+    Set_XYForAdd2 : function(X, Y)
+    {
+        this.Set_PositionH( c_oAscRelativeFromH.Column, false, 0 );
+        this.Set_PositionV( c_oAscRelativeFromV.Paragraph, false, 0 );
+
+        this.PositionH_Old =
+        {
+            RelativeFrom : this.PositionH.RelativeFrom,
+            Align        : this.PositionH.Align,
+            Value        : this.PositionH.Value
+        };
+
+        this.PositionV_Old =
+        {
+            RelativeFrom : this.PositionV.RelativeFrom,
+            Align        : this.PositionV.Align,
+            Value        : this.PositionV.Value
+        };
+
+        this.PositionH.RelativeFrom = c_oAscRelativeFromH.Page;
+        this.PositionH.Align        = false;
+        this.PositionH.Value        = X;
+
+        this.PositionV.RelativeFrom = c_oAscRelativeFromV.Page;
+        this.PositionV.Align        = false;
+        this.PositionV.Value        = Y;
+    },
+
     calculateAfterChangeTheme: function()
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateAfterChangeTheme === "function")
