@@ -2247,6 +2247,31 @@ WordShape.prototype =
     },
 
 
+    setFillSpPr: function(unifill)
+    {
+        var historyObj = {Type: historyitem_ChangeFill};
+        if(this.spPr.Fill == null)
+        {
+            historyObj.old_Fill = null;
+        }
+        else
+        {
+            historyObj.old_Fill = this.spPr.Fill.createDuplicate();
+        }
+
+        this.spPr.Fill = unifill;
+        if(this.spPr.Fill == null)
+        {
+            historyObj.new_Fill = null;
+        }
+        else
+        {
+            historyObj.new_Fill = this.spPr.Fill.createDuplicate();
+        }
+        History.Add(this, historyObj);
+        this.calculateFill();
+    },
+
     changeFill : function(ascFill)
     {
         var historyObj = {Type: historyitem_ChangeFill};
@@ -2305,7 +2330,8 @@ WordShape.prototype =
         var _old_line;
         var _new_line;
 
-
+        var brush = null;
+        var style = null;
         if(this.spPr.ln == null)
         {
             _old_line = null;
@@ -2445,6 +2471,47 @@ WordShape.prototype =
                 _new_line.headEnd.w = LineEndSize.Mid;
                 break;
             }
+            case "textRect":
+            {
+                _final_preset = "rect";
+                _arrow_flag = true;
+                style = new CShapeStyle();
+                style.lnRef = new StyleRef();
+                style.lnRef.idx = 0;
+                style.lnRef.Color.color = new CSchemeColor();
+                style.lnRef.Color.color.id = g_clr_accent1;
+                style.lnRef.Color.Mods.Mods.push({name: "shade", val:50000});
+
+                style.fillRef = new StyleRef();
+                style.fillRef.idx = 0;
+                style.fillRef.Color.color = new CSchemeColor();
+                style.fillRef.Color.color.id = g_clr_accent1;
+
+                style.effectRef = new StyleRef();
+                style.effectRef.idx = 0;
+                style.effectRef.Color.color = new CSchemeColor();
+                style.effectRef.Color.color.id = g_clr_accent1;
+
+
+                style.fontRef = new FontRef();
+                style.fontRef.idx = fntStyleInd_minor;
+                style.fontRef.Color = new CUniColor();
+                style.fontRef.Color.color = new CSchemeColor();
+                style.fontRef.Color.color.id = 8;
+
+                _new_line = new CLn();
+                _new_line.w = 6350;
+                _new_line.Fill = new CUniFill();
+                _new_line.Fill.fill = new CSolidFill();
+                _new_line.Fill.fill.color.color  = new CPrstColor();
+                _new_line.Fill.fill.color.color.id = "black";
+
+                brush = new CUniFill();
+                brush.fill = new CSolidFill();
+                brush.fill.color.color  = new CSchemeColor();
+                brush.fill.color.color.id = 12;
+                break;
+            }
             default  :
             {
                 _final_preset = sPreset;
@@ -2473,6 +2540,8 @@ WordShape.prototype =
             historyData.newLine = _new_line;
             this.spPr.ln = _new_line;
             this.calculateLine();
+
+
         }
         historyData.old_geometryPreset = isRealObject(this.spPr.geometry) ? this.spPr.geometry.preset : null;
         historyData.new_geometryPreset = _final_preset;
@@ -2486,6 +2555,14 @@ WordShape.prototype =
         historyData.newGeometry = this.spPr.geometry;
         this.calculateAfterResize();
         History.Add(this, historyData);
+        if(isRealObject(style))
+        {
+            this.setStyle(style);
+        }
+        if(isRealObject(brush))
+        {
+            this.setFillSpPr(brush);
+        }
 
     },
 
@@ -4296,6 +4373,7 @@ WordShape.prototype =
                 {
                     this.spPr.ln = data.oldLine;
                     this.calculateLine();
+                    this.calculateFill();
                 }
                 if(typeof data.old_geometryPreset === "string")
                     this.spPr.geometry = CreateGeometry(data.old_geometryPreset);
@@ -4321,7 +4399,7 @@ WordShape.prototype =
 
             case historyitem_SetStyle:
             {
-                this.style = null;
+                this.style = data.oldStyle;
                 break;
             }
             case historyitem_SetBodyPr:
@@ -5466,6 +5544,7 @@ WordShape.prototype =
             {
                 this.style = new CShapeStyle();
                 this.style.Read_FromBinary2(reader);
+                this.calculateLine();
                 break;
             }
 
@@ -5839,7 +5918,7 @@ WordShape.prototype =
 
     setStyle: function(style)
     {
-        var data = {Type: historyitem_SetStyle, style: style};
+        var data = {Type: historyitem_SetStyle, style: style, oldStyle: this.style};
         History.Add(this, data);
         this.style = style;
     },
