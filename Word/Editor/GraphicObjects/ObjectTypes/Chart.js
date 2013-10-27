@@ -468,6 +468,15 @@ CChartAsGroup.prototype =
             this.absOffsetY = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.absExtX = scale_scale_coefficients.cx*xfrm.extX;
             this.absExtY = scale_scale_coefficients.cy*xfrm.extY;
+
+        }
+
+        if(this.parent)
+        {
+            //this.parent.absOffsetX = data.oldPosX;
+            //this.parent.absOffsetY = data.oldPosY;
+            this.parent.absExtX = this.absExtX;
+            this.parent.absExtY = this.absExtY;
         }
         this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
     },
