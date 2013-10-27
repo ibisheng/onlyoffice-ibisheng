@@ -120,8 +120,10 @@ CChartAsGroup.prototype =
 
     setDiagram: function(chart)
     {
-        this.chart = chart;
+        History.Add(this, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+        this.setAscChart(chart);
         this.recalculate();
+        History.Add(this, {Type:historyitem_AutoShapes_RecalculateChartRedo});
     },
 
     OnContentReDraw: function()
@@ -2051,6 +2053,11 @@ CChartAsGroup.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RecalculateChartUndo:
+            {
+                this.recalculate();
+                break;
+            }
             case historyitem_SetParent:
             {
                 if(data.oldParent == null)
@@ -2446,6 +2453,11 @@ CChartAsGroup.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AutoShapes_RecalculateChartRedo:
+            {
+                this.recalculate();
+                break;
+            }
             case historyitem_SetSizes:
             {
                 this.spPr.xfrm.extX = data.oldW;

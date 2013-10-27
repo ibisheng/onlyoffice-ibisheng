@@ -365,7 +365,7 @@ CGraphicObjects.prototype =
                         if(!isRealObject(chart_props))
                         {
                             chart_props = {fromGroup: true};
-                            chart_props.ChartProperties = c_obj.chart;
+                            chart_props.ChartProperties = new asc_CChart(c_obj.chart);
                         }
                         else
                         {
@@ -473,7 +473,7 @@ CGraphicObjects.prototype =
                             {
                                 chart_props = {};
                                 chart_props = s_arr[i].Get_Props(null);
-                                chart_props.ChartProperties = c_obj.chart;
+                                chart_props.ChartProperties =  new asc_CChart(c_obj.chart);
                             }
                             else
                             {
