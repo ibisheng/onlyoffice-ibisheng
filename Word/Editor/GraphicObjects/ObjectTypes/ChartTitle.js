@@ -39,6 +39,7 @@ function CChartTitle(chartGroup, type)
         recalculateBrush: true,
         recalculatePen: true
     };
+    this.recalcInfo = {};
 
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();

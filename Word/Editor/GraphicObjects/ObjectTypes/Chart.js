@@ -2280,6 +2280,10 @@ CChartAsGroup.prototype =
         var type = reader.GetLong();
         switch(type)
         {
+            case historyitem_CalculateAfterCopyInGroup:
+            {
+                this.recalculate();
+            }
             case historyitem_SetXfrmShape:
             {
                 var xfrm = this.spPr.xfrm;
@@ -2429,7 +2433,9 @@ CChartAsGroup.prototype =
             {
                 if(r.GetBool())
                 {
+                    g_oTableId.m_bTurnOff = true;
                     this.chart = new asc_CChart();
+                    g_oTableId.m_bTurnOff = false;
                     //r.GetLong();
                     this.chart.Read_FromBinary2(r);
                 }

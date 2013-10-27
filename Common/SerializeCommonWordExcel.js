@@ -1443,7 +1443,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			else
 			{
 				if(!isRealObject(this.chartAsGroup.chartTitle))
-					this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+                {
+                    if(this.chartAsGroup.addTitle)
+                        this.chartAsGroup.addTitle(new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE));
+                    else
+                        this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+                }
 				this.InitOldChartTitle(this.chartAsGroup.chartTitle, sTitle);
 			}
 		}
@@ -1510,9 +1515,19 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				this.chart.yAxis = oTemp;
 			}
 			if ( xAxis )
-				this.chartAsGroup.hAxisTitle = xAxis.chartTitle;
+            {
+                if(this.chartAsGroup.addXAxis)
+                    this.chartAsGroup.addXAxis(xAxis.chartTitle);
+                else
+                    this.chartAsGroup.hAxisTitle = xAxis.chartTitle;
+            }
 			if ( yAxis )
-				this.chartAsGroup.vAxisTitle = yAxis.chartTitle;
+            {
+                if(this.chartAsGroup.addYAxis)
+                    this.chartAsGroup.addYAxis(yAxis.chartTitle);
+                else
+                    this.chartAsGroup.vAxisTitle = yAxis.chartTitle;
+            }
 		}
 		else if ( c_oSer_ChartType.Style === type )
 		{
@@ -1521,7 +1536,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		else if ( c_oSer_ChartType.TitlePptx === type)
 		{
             if(!isRealObject(this.chartAsGroup.chartTitle))
-                this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+            {
+                if(this.chartAsGroup.addTitle)
+                    this.chartAsGroup.addTitle(new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE));
+                else
+                    this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+            }
 			this.chart.header.bDefaultTitle = true;
 			
 			res = this.bcr.Read1(length, function(t,l){
@@ -1703,7 +1723,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			else
 			{
 				if(!isRealObject(oAx.chartTitle))
-					oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+                {
+                    if(oAx.addTitle)
+                        oAx.addTitle(new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE));
+                    else
+                        oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+                }
 				this.InitOldChartTitle(oAx.chartTitle, sTitle);
 				if(bValAx && null != oAx.chartTitle && null != oAx.chartTitle.txBody && null != oAx.chartTitle.txBody.bodyPr)
 				{
@@ -1722,7 +1747,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		else if ( c_oSer_ChartCatAxType.TitlePptx === type )
 		{
             if(!isRealObject(oAx.chartTitle))
-                oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+            {
+                if(oAx.addTitle)
+                    oAx.addTitle(new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE));
+                else
+                    oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+            }
 			oAx.bDefaultTitle = true;
 			
 			res = this.bcr.Read1(length, function(t,l){

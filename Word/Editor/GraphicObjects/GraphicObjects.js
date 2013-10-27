@@ -83,9 +83,13 @@ CGraphicObjects.prototype =
                     }
                     if(bAddHistory)
                     {
-                        if(obj instanceof WordShape || obj instanceof WordImage)
+                        if(obj instanceof WordShape || obj instanceof WordImage )
                         {
                             History.Add(obj, {Type: historyitem_CalculateAfterCopyInGroup});
+                        }
+                        if(obj instanceof CChartAsGroup)
+                        {
+                            History.Add(obj, {Type: historyitem_AutoShapes_RecalculateAfterResize});
                         }
                     }
                 }
@@ -365,7 +369,9 @@ CGraphicObjects.prototype =
                         if(!isRealObject(chart_props))
                         {
                             chart_props = {fromGroup: true};
+                            g_oTableId.m_bTurnOff = true;
                             chart_props.ChartProperties = new asc_CChart(c_obj.chart);
+                            g_oTableId.m_bTurnOff = false;
                         }
                         else
                         {
@@ -473,7 +479,9 @@ CGraphicObjects.prototype =
                             {
                                 chart_props = {};
                                 chart_props = s_arr[i].Get_Props(null);
+                                g_oTableId.m_bTurnOff = true;
                                 chart_props.ChartProperties =  new asc_CChart(c_obj.chart);
+                                g_oTableId.m_bTurnOff = false;
                             }
                             else
                             {
