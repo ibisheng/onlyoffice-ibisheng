@@ -228,6 +228,65 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+    setXfrm: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
+    {
+        var data = {Type: historyitem_SetXfrmShape};
+
+        var _xfrm = this.spPr.xfrm;
+        if(offsetX !== null)
+        {
+            data.oldOffsetX = _xfrm.offX;
+            data.newOffsetX = offsetX;
+            _xfrm.offX = offsetX;
+        }
+
+        if(offsetY !== null)
+        {
+            data.oldOffsetY = _xfrm.offY;
+            data.newOffsetY = offsetY;
+            _xfrm.offY = offsetY;
+        }
+
+
+        if(extX !== null)
+        {
+            data.oldExtX = _xfrm.extX;
+            data.newExtX = extX;
+            _xfrm.extX = extX;
+        }
+
+        if(extY !== null)
+        {
+            data.oldExtY = _xfrm.extY;
+            data.newExtY = extY;
+            _xfrm.extY = extY;
+        }
+
+        if(rot !== null)
+        {
+            data.oldRot = _xfrm.rot == null ? 0 : _xfrm.rot;
+            data.newRot = rot;
+            _xfrm.rot = rot;
+        }
+
+        if(flipH !== null)
+        {
+            data.oldFlipH = _xfrm.flipH == null ? false : _xfrm.flipH;
+            data.newFlipH = flipH;
+            _xfrm.flipH = flipH;
+        }
+
+        if(flipV !== null)
+        {
+            data.oldFlipV = _xfrm.flipV == null ? false : _xfrm.flipV;
+            data.newFlipV = flipV;
+            _xfrm.flipV = flipV;
+        }
+
+        History.Add(this, data);
+    },
+
+
 
     setDrawingObjects: function(drawingObjects)
     {
@@ -2050,6 +2109,49 @@ CChartAsGroup.prototype =
                 this.spPr = data.oldPr;
                 break;
             }
+
+            case historyitem_SetXfrmShape:
+            {
+                var xfrm = this.spPr.xfrm;
+                if(typeof data.oldOffsetX === "number")
+                    xfrm.offX = data.oldOffsetX;
+
+                if(typeof data.oldOffsetY === "number")
+                    xfrm.offY = data.oldOffsetY;
+
+                if(typeof data.oldExtX === "number")
+                    xfrm.extX = data.oldExtX;
+
+                if(typeof data.oldExtY === "number")
+                    xfrm.extY = data.oldExtY;
+
+                if(typeof data.oldRot === "number")
+                    xfrm.rot = data.oldRot;
+
+                if(data.oldFlipH != null)
+                    xfrm.flipH = data.oldFlipH;
+                if(data.oldFlipV != null)
+                    xfrm.flipV = data.oldFlipV;
+
+                if(typeof data.oldExtX === "number" || typeof data.oldExtY === "number")
+                {
+                    if(this.spPr.geometry)
+                        this.spPr.geometry.Recalculate(xfrm.extX, xfrm.extY);
+                }
+                var posX, posY;
+                if(this.group == null)
+                {
+                    posX = null;
+                    posY = null;
+                }
+                else
+                {
+                    posX = xfrm.offX;
+                    posY = xfrm.offY;
+                }
+                this.setAbsoluteTransform(posX, posY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV);
+                break;
+            }
         }
     },
 
@@ -2060,6 +2162,59 @@ CChartAsGroup.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case historyitem_SetXfrmShape:
+            {
+                bool = typeof data.newOffsetX === "number";
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteDouble(data.newOffsetX);
+                }
+
+                bool = typeof data.newOffsetY === "number";
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteDouble(data.newOffsetY);
+                }
+
+
+                bool = typeof data.newExtX === "number";
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteDouble(data.newExtX);
+                }
+
+                bool = typeof data.newExtY === "number";
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteDouble(data.newExtY);
+                }
+
+                bool = typeof data.newRot === "number";
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteDouble(data.newRot);
+                }
+
+                bool = data.newFlipH != null;
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteBool(data.newFlipH);
+                }
+
+                bool = data.newFlipV != null;
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteBool(data.newFlipV);
+                }
+                break;
+            }
             case historyitem_SetParent:
             {
                 writer.WriteBool(data.newParent != null);
@@ -2118,6 +2273,62 @@ CChartAsGroup.prototype =
         var type = reader.GetLong();
         switch(type)
         {
+            case historyitem_SetXfrmShape:
+            {
+                var xfrm = this.spPr.xfrm;
+                if(reader.GetBool())
+                {
+                    xfrm.offX = reader.GetDouble();
+                }
+
+                if(reader.GetBool())
+                {
+                    xfrm.offY = reader.GetDouble();
+                }
+
+
+                if(reader.GetBool())
+                {
+                    xfrm.extX = reader.GetDouble();
+                }
+
+                if(reader.GetBool())
+                {
+                    xfrm.extY = reader.GetDouble();
+                }
+
+                if(reader.GetBool())
+                {
+                    xfrm.rot = reader.GetDouble();
+                }
+
+                if(reader.GetBool())
+                {
+                    xfrm.flipH = reader.GetBool();
+                }
+
+                if(reader.GetBool())
+                {
+                    xfrm.flipV = reader.GetBool();
+                }
+
+
+                if(this.spPr.geometry)
+                    this.spPr.geometry.Recalculate(xfrm.extX, xfrm.extY);
+                var posX, posY;
+                if(this.group == null)
+                {
+                    posX = null;
+                    posY = null;
+                }
+                else
+                {
+                    posX = xfrm.offX;
+                    posY = xfrm.offY;
+                }
+                this.setAbsoluteTransform(posX, posY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV);
+                break;
+            }
             case historyitem_SetParent:
             {
                 if(reader.GetBool())
@@ -2258,6 +2469,48 @@ CChartAsGroup.prototype =
                 }
 
                 this.calculateAfterResize();
+                break;
+            }
+            case historyitem_SetXfrmShape:
+            {
+                var xfrm = this.spPr.xfrm;
+                if(typeof data.newOffsetX === "number")
+                    xfrm.offX = data.newOffsetX;
+
+                if(typeof data.newOffsetY === "number")
+                    xfrm.offY = data.newOffsetY;
+
+                if(typeof data.newExtX === "number")
+                    xfrm.extX = data.newExtX;
+
+                if(typeof data.newExtY === "number")
+                    xfrm.extY = data.newExtY;
+
+                if(typeof data.newRot === "number")
+                    xfrm.rot = data.newRot;
+
+                if(data.newFlipH != null)
+                    xfrm.flipH = data.newFlipH;
+                if(data.newFlipV != null)
+                    xfrm.flipV = data.newFlipV;
+
+                if(typeof data.newExtX === "number" || typeof data.newExtY === "number")
+                {
+                    if(this.spPr.geometry)
+                        this.spPr.geometry.Recalculate(xfrm.extX, xfrm.extY);
+                }
+                var posX, posY;
+                if(this.group == null)
+                {
+                    posX = null;
+                    posY = null;
+                }
+                else
+                {
+                    posX = xfrm.offX;
+                    posY = xfrm.offY;
+                }
+                this.setAbsoluteTransform(posX, posY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV);
                 break;
             }
             case historyitem_AutoShapes_AddXAxis:

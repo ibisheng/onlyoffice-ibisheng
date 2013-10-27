@@ -3731,7 +3731,7 @@ ParaDrawing.prototype =
             else
                 result_height = this.GraphicObj.absExtY;
 
-            if(this.GraphicObj.isShape() || this.GraphicObj.isImage())
+            if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || this.GraphicObj instanceof  CChartAsGroup)
             {
                 this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
                 this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
