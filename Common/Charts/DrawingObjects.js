@@ -3371,69 +3371,8 @@ function DrawingObjects() {
 							var left = worksheet.getCellLeft(range.c1, 3) - worksheet.getCellLeft(0, 3) - ptToMm(printPagesData.leftFieldInPt);
 							var top = worksheet.getCellTop(range.r1, 3) - worksheet.getCellTop(0, 3) - ptToMm(printPagesData.topFieldInPt);
 							
-							if ( drawingObject.graphicObject instanceof CGroupShape ) {
-								for ( var n = 0; n < drawingObject.graphicObject.arrGraphicObjects.length; n++ ) {
-									var item = drawingObject.graphicObject.arrGraphicObjects[n];
-									
-									var tx = item.transform.tx;
-									var ty = item.transform.ty;
-									var txTxt = item.transformText.tx;
-									var tyTxt = item.transformText.ty;
-									
-									item.transform.tx -= left;
-									item.transform.ty -= top;
-									item.transformText.tx -= left;
-									item.transformText.ty -= top;
-									item.draw( printOptions.ctx.DocumentRenderer );
-									
-									// Restore
-									item.transform.tx = tx;
-									item.transform.ty = ty;
-									item.transformText.tx = txTxt;
-									item.transformText.ty = tyTxt;
-								}
-							}
-							else {
-								var tx = drawingObject.graphicObject.transform.tx;
-								var ty = drawingObject.graphicObject.transform.ty;
-								var txTxt = drawingObject.graphicObject.transformText.tx;
-								var tyTxt = drawingObject.graphicObject.transformText.ty;
-								
-								drawingObject.graphicObject.transform.tx -= left;
-								drawingObject.graphicObject.transform.ty -= top;
-								drawingObject.graphicObject.transformText.tx -= left;
-								drawingObject.graphicObject.transformText.ty -= top;
-								
-								// Save chart transforms
-								var chartTxtAreas = [];
-								var aTxtTransform = [];
-								if ( drawingObject.graphicObject instanceof CChartAsGroup ) {
-									chartTxtAreas = [ drawingObject.graphicObject.chartTitle, drawingObject.graphicObject.vAxisTitle, drawingObject.graphicObject.hAxisTitle ];
-									for ( var n = 0; n < chartTxtAreas.length; n++ ) {
-										var item = chartTxtAreas[n];
-										aTxtTransform.push( { tx: item.transformText.tx, ty: item.transformText.ty } );
-										item.transformText.tx -= left;
-										item.transformText.ty -= top;
-									}
-								}
-								
-								drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
-								
-								// Restore chart transforms
-								if ( drawingObject.graphicObject instanceof CChartAsGroup ) {
-									for ( var n = 0; n < chartTxtAreas.length; n++ ) {
-										var item = chartTxtAreas[n];
-										item.transformText.tx = aTxtTransform[n].tx;
-										item.transformText.ty = aTxtTransform[n].ty;
-									}
-								}
-								
-								// Restore
-								drawingObject.graphicObject.transform.tx = tx;
-								drawingObject.graphicObject.transform.ty = ty;
-								drawingObject.graphicObject.transformText.tx = txTxt;
-								drawingObject.graphicObject.transformText.ty = tyTxt;
-							}
+							_this.printGraphicObject(drawingObject.graphicObject, printOptions.ctx.DocumentRenderer, top, left);
+							
 							if ( printPagesData.pageHeadings ) {
 								worksheet._drawColumnHeaders(printOptions.ctx, range.c1, range.c2, /*style*/ undefined, worksheet.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - worksheet.cellsTop);
 								worksheet._drawRowHeaders(printOptions.ctx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - worksheet.cellsLeft, worksheet.rows[range.r1].top - printPagesData.topFieldInPt);
@@ -3459,6 +3398,127 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.printGraphicObject = function(graphicObject, ctx, top, left) {
+	
+		if ( graphicObject && ctx ) {
+			// Image
+			if ( graphicObject instanceof CImageShape )
+				printImage(graphicObject, ctx, top, left);
+			// Shape
+			else if ( graphicObject instanceof CShape )
+				printShape(graphicObject, ctx, top, left);
+			// Chart
+			else if ( graphicObject instanceof CChartAsGroup )
+				printChart(graphicObject, ctx, top, left);
+			// Group
+			else if ( graphicObject instanceof CGroupShape )
+				printGroup(graphicObject, ctx, top, left);
+		}
+		
+		// Print functions
+		function printImage(graphicObject, ctx, top, left) {
+			
+			if ( (graphicObject instanceof CImageShape) && graphicObject && ctx ) {
+				// Save
+				var tx = graphicObject.transform.tx;
+				var ty = graphicObject.transform.ty;
+				graphicObject.transform.tx -= left;
+				graphicObject.transform.ty -= top;
+				// Print
+				graphicObject.draw( ctx );
+				// Restore
+				graphicObject.transform.tx = tx;
+				graphicObject.transform.ty = ty;
+			}
+		}
+		
+		function printShape(graphicObject, ctx, top, left) {
+		
+			if ( (graphicObject instanceof CShape) && graphicObject && ctx ) {
+				// Save
+				var tx = graphicObject.transform.tx;
+				var ty = graphicObject.transform.ty;
+				graphicObject.transform.tx -= left;
+				graphicObject.transform.ty -= top;
+				var txTxt, tyTxt;
+				if ( graphicObject.txBody && graphicObject.transformText ) {
+					txTxt = graphicObject.transformText.tx;
+					tyTxt = graphicObject.transformText.ty;
+					graphicObject.transformText.tx -= left;
+					graphicObject.transformText.ty -= top;
+				}
+				// Print
+				graphicObject.draw( ctx );
+				// Restore
+				graphicObject.transform.tx = tx;
+				graphicObject.transform.ty = ty;
+				if ( graphicObject.txBody && graphicObject.transformText ) {
+					graphicObject.transformText.tx = txTxt;
+					graphicObject.transformText.ty = tyTxt;
+				}
+			}
+		}
+				
+		function printChart(graphicObject, ctx, top, left) {
+			
+			if ( (graphicObject instanceof CChartAsGroup) && graphicObject && ctx ) {
+				
+				// Save
+				var tx = graphicObject.transform.tx;
+				var ty = graphicObject.transform.ty;
+				graphicObject.transform.tx -= left;
+				graphicObject.transform.ty -= top;
+				
+				var chartTxtAreas = [], aTxtTransform = [];				
+				// Title
+				if ( graphicObject.chartTitle.txBody && graphicObject.chartTitle.transformText )
+					chartTxtAreas.push(graphicObject.chartTitle);
+				// Axis Y
+				if ( graphicObject.vAxisTitle.txBody && graphicObject.vAxisTitle.transformText )
+					chartTxtAreas.push(graphicObject.vAxisTitle);
+				// Axis X
+				if ( graphicObject.hAxisTitle.txBody && graphicObject.hAxisTitle.transformText )
+					chartTxtAreas.push(graphicObject.hAxisTitle);
+				
+				for ( var i = 0; i < chartTxtAreas.length; i++ ) {
+					var item = chartTxtAreas[i];
+					aTxtTransform.push( { tx: item.transformText.tx, ty: item.transformText.ty } );
+					item.transformText.tx -= left;
+					item.transformText.ty -= top;
+				}
+				// Print
+				graphicObject.draw( ctx );
+				// Restore
+				graphicObject.transform.tx = tx;
+				graphicObject.transform.ty = ty;
+				
+				for ( var i = 0; i < chartTxtAreas.length; i++ ) {
+					var item = chartTxtAreas[i];
+					item.transformText.tx = aTxtTransform[i].tx;
+					item.transformText.ty = aTxtTransform[i].ty;
+				}
+			}
+		}
+		
+		function printGroup(graphicObject, ctx, top, left) {
+		
+			if ( (graphicObject instanceof CGroupShape) && graphicObject && ctx ) {
+				for ( var i = 0; i < graphicObject.arrGraphicObjects.length; i++ ) {
+					var graphicItem = graphicObject.arrGraphicObjects[i];
+					
+					if ( graphicItem instanceof CImageShape )
+						printImage(graphicItem, ctx, top, left);
+						
+					else if ( graphicItem instanceof CShape )
+						printShape(graphicItem, ctx, top, left);
+						
+					else if ( graphicItem instanceof CChartAsGroup )
+						printChart(graphicItem, ctx, top, left);
+				}
+			}
+		}
+	}
+	
 	_this.getDrawingAreaMetrics = function() {
 
 		/*
