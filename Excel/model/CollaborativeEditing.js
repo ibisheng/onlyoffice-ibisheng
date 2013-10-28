@@ -24,12 +24,13 @@
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function CCollaborativeEditing (handlers) {
+		function CCollaborativeEditing (handlers, isViewerMode) {
 			if ( !(this instanceof CCollaborativeEditing) ) {
 				return new CCollaborativeEditing ();
 			}
 
 			this.handlers					= new asc.asc_CHandlersList(handlers);
+			this.m_bIsViewerMode			= !!isViewerMode; // Режим Viewer-а
 			this.m_bIsCollaborative			= false; // Совместное ли редактирование
 			this.m_bGlobalLock				= false; // Глобальный lock
 			this.m_bGlobalLockEditCell		= false; // Глобальный lock (для редактирования ячейки) - отключаем смену select-а, но разрешаем сразу вводить
@@ -77,8 +78,13 @@
 				this.m_bIsCollaborative = true;
 			},
 
+			// Выставление режима view
+			setViewerMode: function (isViewerMode) {
+				this.m_bIsViewerMode = isViewerMode;
+			},
+
 			getCollaborativeEditing: function () {
-				if (true !== this.isCoAuthoringExcellEnable())
+				if (true !== this.isCoAuthoringExcellEnable() || this.m_bIsViewerMode)
 					return false;
 				return this.m_bIsCollaborative;
 			},

@@ -3084,7 +3084,6 @@
 			
 			_drawCollaborativeElements: function (bIsDrawObjects) {
 				if (this.collaborativeEditing.getCollaborativeEditing()) {
-					//this.overlayCtx.ctx.globalAlpha = 1;
 					this._drawCollaborativeElementsMeOther (c_oAscLockTypes.kLockTypeMine, bIsDrawObjects);
 					this._drawCollaborativeElementsMeOther (c_oAscLockTypes.kLockTypeOther, bIsDrawObjects);
 					this._drawCollaborativeElementsAllLock ();

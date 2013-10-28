@@ -653,6 +653,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_setViewerMode: function (isViewerMode) {
 				if (this.controller.setViewerMode) {
 					this.controller.setViewerMode(isViewerMode);
+					if (this.collaborativeEditing)
+						this.collaborativeEditing.setViewerMode(isViewerMode);
 					if (false === isViewerMode) {
 						// Загружаем не обрезанные шрифты для полной версии (при редактировании)
 						if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
@@ -1351,7 +1353,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"unlockComments":					function () {t._onUnlockComments.apply(t);},
 					"tryUnlockComment":					function () {t._onTryUnlockComment.apply(t, arguments);},
 					"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);}
-				});
+				}, this.asc_getViewerMode());
 
 				if (!this.CoAuthoringApi) {
 					this.asyncServerIdEndLoaded ();
