@@ -1358,7 +1358,9 @@ CGs.prototype =
 
     IsIdentical : function(fill)
     {
-        return false;
+        if(!isRealObject(fill))
+            return false;
+        return this.pos === fill.pos && this.color.IsIdentical(fill.color);
     },
 
     createDuplicate : function()
@@ -1518,6 +1520,20 @@ CGradFill.prototype =
         {
             return false;
         }
+        if((this.lin == null && fill.lin != null)
+            || (this.lin != null && fill.lin == null) )
+            return false;
+        if(isRealObject(this.lin))
+        {
+            if(this.lin.angle != fill.lin.angle
+                || this.lin.scale != fill.lin.scale)
+                return false;
+        }
+
+        if((this.path == null && fill.path != null)
+            || (this.path != null && fill.path == null) )
+            return false;
+
         if(fill.colors.length!= this.colors.length)
         {
             return false;
@@ -1555,8 +1571,19 @@ CGradFill.prototype =
         {
             return null;
         }
-        var _ret  = new CGradFill();
-        return _ret;
+       /* if(this.lin != fill.lin)
+            return _ret;
+        _ret.lin = this.lin;
+        if(this.path != fill.path)
+            return _ret;
+        _ret.path = this.path;
+        if(this.colors.length != fill.colors.length)
+            return _ret;   */
+
+        if(!this.IsIdentical(fill))
+            return  _ret  = new CGradFill()
+
+        return this.createDuplicate();
     }
 };
 
