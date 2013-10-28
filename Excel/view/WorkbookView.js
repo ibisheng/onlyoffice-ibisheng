@@ -246,7 +246,8 @@
 				this.model.handlers.add("showWorksheet", function (wsId) {
 					self.showWorksheetById(wsId);
 					var ws = self.getWorksheetById(wsId);
-					self.handlers.trigger("asc_onActiveSheetChanged", ws.model.getIndex());
+					if ( ws )
+						self.handlers.trigger("asc_onActiveSheetChanged", ws.model.getIndex());
 				});
 				this.model.handlers.add("setSelection", function () {
 					self._onSetSelection.apply(self, arguments);
@@ -992,7 +993,8 @@
 
 			showWorksheetById: function (id) {
 				var wsModel = this.model.getWorksheetById(id);
-				this.showWorksheet(wsModel.getIndex());
+				if ( wsModel )
+					this.showWorksheet(wsModel.getIndex());
 			},
 
 			/** @param index {Number} */
