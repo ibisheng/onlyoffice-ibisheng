@@ -46,6 +46,25 @@ var STATES_ID_CHART_TEXT_ADD = 0x36;
 var STATES_ID_TEXT_ADD_IN_GROUP = 0x37;
 var STATES_ID_EXPECT_DOUBLE_CLICK = 0x38;
 
+var ADD_SHAPE_ID_MAP = {};
+ADD_SHAPE_ID_MAP[STATES_ID_START_TRACK_NEW_SHAPE] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_BEGIN_TRACK_NEW_SHAPE] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_TRACK_NEW_SHAPE] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_SPLINE_BEZIER] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_SPLINE_BEZIER33] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_SPLINE_BEZIER2] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_SPLINE_BEZIER3] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_SPLINE_BEZIER5] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_POLY_LINE_ADD] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_POLY_LINE_ADD2] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE2] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE22] = true;
+ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE23] = true;
+
+function CheckIdSatetShapeAdd(id)
+{
+	return ADD_SHAPE_ID_MAP[id] === true;
+}
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
@@ -272,6 +291,7 @@ function NullState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjects.OnUpdateOverlay();
+		asc["editor"].asc_endAddShape();
     };
 
     this.onMouseMove = function(e, x, y)

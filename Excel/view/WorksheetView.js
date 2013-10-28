@@ -2733,7 +2733,7 @@
 
 			_drawSelectionRange: function (range) {
 				
-				if (asc["editor"].isStartAddShape && this.objectRender.selectedGraphicObjectsExists()) {
+				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
 					if (this.isChartAreaEditMode) {
 						this._drawFormulaRange(this.arrActiveChartsRanges)
 					}
@@ -4976,7 +4976,7 @@
 				if (drawingInfo)
 					return {cursor: drawingInfo.cursor, target: "shape", col: -1, row: -1};
 				
-				if (asc["editor"].isStartAddShape)
+				if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
