@@ -2476,6 +2476,8 @@ CHeaderFooterController.prototype =
             this.CurHdrFtr.Selection_SetStart( _X, _Y, this.CurPage, MouseEvent );
             this.ChangeCurPageOnEnd = false;
 
+            this.WaitMouseDown = false;
+
             return true;
         }
 
@@ -2551,7 +2553,7 @@ CHeaderFooterController.prototype =
             // Ничего не делаем и отключаем дальнейшую обработку MouseUp и MouseMove
             this.WaitMouseDown = true;
 
-            return true
+            return true;
         }
         else
         {
