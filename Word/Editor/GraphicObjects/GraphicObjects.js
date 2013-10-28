@@ -3967,12 +3967,14 @@ CGraphicObjects.prototype =
                         {
                             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Parent, CheckType : changestype_Paragraph_Content} ))
                             {
+                                var nearest_pos = this.document.Get_NearestPos(drawing.pageIndex, drawing.absOffsetX, drawing.absOffsetY, true, drawing.parent);
                                 var dist = this.drawingDocument.GetMMPerDot(5);
                                 drawing.setAbsoluteTransform(drawing.absOffsetX - dist, drawing.absOffsetY, null, null, null, null, null);
+
                                 if(isRealObject(drawing.GraphicObj))
                                     drawing.GraphicObj.recalculate();
                                 var bounds = drawing.getBounds();
-                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, null, true, false);
+                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, nearest_pos, true, false);
                                 b_recalc = true;
                             }
                         }
@@ -4021,12 +4023,14 @@ CGraphicObjects.prototype =
                         {
                             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Parent, CheckType : changestype_Paragraph_Content} ))
                             {
+
+                                var nearest_pos = this.document.Get_NearestPos(drawing.pageIndex, drawing.absOffsetX, drawing.absOffsetY, true, drawing.parent);
                                 var dist = this.drawingDocument.GetMMPerDot(5);
                                 drawing.setAbsoluteTransform(drawing.absOffsetX + dist, drawing.absOffsetY, null, null, null, null, null);
                                 if(isRealObject(drawing.GraphicObj))
                                     drawing.GraphicObj.recalculate();
                                 var bounds = drawing.getBounds();
-                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, null, true, false);
+                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, nearest_pos, true, false);
                                 b_recalc = true;
                             }
                         }
@@ -4075,12 +4079,14 @@ CGraphicObjects.prototype =
                         {
                             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Parent, CheckType : changestype_Paragraph_Content} ))
                             {
+                                var nearest_pos = this.document.Get_NearestPos(drawing.pageIndex, drawing.absOffsetX, drawing.absOffsetY, true, drawing.parent);
+
                                 var dist = this.drawingDocument.GetMMPerDot(5);
                                 drawing.setAbsoluteTransform(drawing.absOffsetX , drawing.absOffsetY- dist, null, null, null, null, null);
                                 if(isRealObject(drawing.GraphicObj))
                                     drawing.GraphicObj.recalculate();
                                 var bounds = drawing.getBounds();
-                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, null, true, false);
+                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, nearest_pos, true, false);
                                 b_recalc = true;
                             }
                         }
@@ -4128,12 +4134,14 @@ CGraphicObjects.prototype =
                         {
                             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : drawing.Parent, CheckType : changestype_Paragraph_Content} ))
                             {
+                                var nearest_pos = this.document.Get_NearestPos(drawing.pageIndex, drawing.absOffsetX, drawing.absOffsetY, true, drawing.parent);
+
                                 var dist = this.drawingDocument.GetMMPerDot(5);
                                 drawing.setAbsoluteTransform(drawing.absOffsetX , drawing.absOffsetY + dist, null, null, null, null, null);
                                 if(isRealObject(drawing.GraphicObj))
                                     drawing.GraphicObj.recalculate();
                                 var bounds = drawing.getBounds();
-                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, null, true, false);
+                                drawing.OnEnd_ChangeFlow(drawing.absOffsetX, drawing.absOffsetY,drawing.pageIndex,  bounds.r - bounds.l, bounds.b - bounds.t, nearest_pos, true, false);
                                 b_recalc = true;
                             }
                         }
