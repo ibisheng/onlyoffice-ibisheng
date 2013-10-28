@@ -6421,6 +6421,8 @@ CDocument.prototype =
         Page_Width  = W;
         Page_Height = H;
 
+        editor.sync_DocSizeCallback( W, H );
+
         X_Left_Field   = X_Left_Margin;
         X_Right_Field  = Page_Width  - X_Right_Margin;
         Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
@@ -10169,6 +10171,8 @@ CDocument.prototype =
                 Page_Width  = Data.Width_old;
                 Page_Height = Data.Height_old;
 
+                editor.sync_DocSizeCallback( Page_Width, Page_Height );
+
                 X_Left_Field   = X_Left_Margin;
                 X_Right_Field  = Page_Width  - X_Right_Margin;
                 Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
@@ -10253,6 +10257,8 @@ CDocument.prototype =
             {
                 Page_Width  = Data.Width_new;
                 Page_Height = Data.Height_new;
+
+                editor.sync_DocSizeCallback( Page_Width, Page_Height );
 
                 X_Left_Field   = X_Left_Margin;
                 X_Right_Field  = Page_Width  - X_Right_Margin;
@@ -10996,6 +11002,8 @@ CDocument.prototype =
 
                 Page_Width  = Reader.GetDouble();
                 Page_Height = Reader.GetDouble();
+
+                editor.sync_DocSizeCallback( Page_Width, Page_Height );
 
                 X_Left_Field   = X_Left_Margin;
                 X_Right_Field  = Page_Width  - X_Right_Margin;
