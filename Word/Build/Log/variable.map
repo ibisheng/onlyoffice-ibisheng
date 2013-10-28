@@ -1483,7 +1483,7 @@ CDocumentRenderer:n7
 skip_string:Yt
 STATES_ID_CHANGE_ADJ:uH
 cff_encoding_load:iB
-CStyleImage:O7
+CStyleImage:N7
 JSCompiler_StaticMethods_AddHandlePolar:xj
 nSldLtTClipArtAndVertTx:GM
 CSrcRect:Pi
@@ -1512,7 +1512,7 @@ CGraphics:t6
 JSCompiler_prototypeAlias:H
 docpostype_HdrFtr:vb
 DecodeBase64Char:qi
-c_oSer_OMathContentType$Nary:Z3
+c_oSer_OMathContentType$Nary:X3
 JSCompiler_StaticMethods_Internal_Remove_Row:RX
 CStylesPainter:P7
 asc_docs_api:Z
@@ -2698,7 +2698,7 @@ global_map_bounds_shape:uK
 c_oAscWrapStyle$Inline:bX
 _arr_lt_types_weight:LN
 JSCompiler_StaticMethods_DrawSticks:po
-JSCompiler_StaticMethods__drawArrow:W8
+JSCompiler_StaticMethods__drawArrow:V8
 JSCompiler_StaticMethods_StartFont:CU
 STATES_ID_SPLINE_BEZIER:BH
 tt_load_sbit_metrics:wv
@@ -2821,7 +2821,7 @@ FT_Bitmap_Copy:Iq
 c_oAscAlignH$Inside:MS
 tt_cmap12_init:aw
 c_oSerBordersType$between:Fl
-c_oSer_OMathContentType$Mr:Y3
+c_oSer_OMathContentType$Mr:W3
 tt_face_init:jA
 getMinValueArray:Ro
 JSCompiler_StaticMethods_Get_After:iX
