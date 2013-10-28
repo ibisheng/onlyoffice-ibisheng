@@ -5790,7 +5790,6 @@ CGraphicObjects.prototype =
         if(cur_state.id === STATES_ID_TEXT_ADD || cur_state.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
             cur_state.textObject.setParagraphNumbering(NumInfo);
-            this.drawingDocument.OnRecalculatePage(cur_state.textObject.pageIndex, this.document.Pages[cur_state.textObject.pageIndex]);
         }
         else
         {
