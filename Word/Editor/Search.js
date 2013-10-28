@@ -62,9 +62,12 @@ CDocumentSearch.prototype =
             Paragraph.SearchResults = new Object();
         }
 
-        this.Id       = 0;
-        this.Count    = 0;
-        this.Elements = new Object();
+        this.Id        = 0;
+        this.Count     = 0;
+        this.Elements  = new Object();
+        this.CurId     = -1;
+        this.Direction = true;
+        this.Selection = false;
     },
 
     Add : function(Paragraph)
