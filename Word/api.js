@@ -6609,6 +6609,13 @@ asc_docs_api.prototype.SetViewMode = function( isViewMode )
             this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
             return;
         }
+
+        if ( this.bInit_word_control === true )
+        {
+            CollaborativeEditing.Apply_Changes();
+            CollaborativeEditing.Release_Locks();
+        }
+
         this.isUseEmbeddedCutFonts = false;
 
         this.isViewMode = false;
