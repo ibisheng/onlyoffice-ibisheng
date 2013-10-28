@@ -1800,7 +1800,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
@@ -2733,7 +2733,7 @@
 
 			_drawSelectionRange: function (range) {
 				
-				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
+				if (asc["editor"].isStartAddShape && this.objectRender.selectedGraphicObjectsExists()) {
 					if (this.isChartAreaEditMode) {
 						this._drawFormulaRange(this.arrActiveChartsRanges)
 					}
@@ -4970,6 +4970,11 @@
 				var lockRangePosTop = undefined;
 				var lockInfo = undefined;
 				var isLocked = false;
+				
+				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+				
+				if (drawingInfo)
+					return {cursor: drawingInfo.cursor, target: "shape", col: -1, row: -1};
 				
 				if (asc["editor"].isStartAddShape)
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};

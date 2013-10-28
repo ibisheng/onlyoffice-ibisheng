@@ -4525,17 +4525,20 @@ function DrawingObjects() {
 			if ( id == aObjects[i].graphicObject.Id ) {
 				aObjects[i].graphicObject.lockType = state;
 				
-				// Clip
-				_this.clipGraphicsCanvas(shapeCtx);
-				
-				shapeCtx.SetIntegerGrid(false);
-				shapeCtx.transform3(aObjects[i].graphicObject.transform, false);		
-				shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, 0, 0, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
-				shapeCtx.reset();
-				shapeCtx.SetIntegerGrid(true);
-				
-				// Restore
-				_this.restoreGraphicsCanvas(shapeCtx);
+				if ( !shapeCtx.m_oContext.isOverlay ) {
+					
+					// Clip
+					_this.clipGraphicsCanvas(shapeCtx);
+					
+					shapeCtx.SetIntegerGrid(false);
+					shapeCtx.transform3(aObjects[i].graphicObject.transform, false);
+					shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, 0, 0, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
+					shapeCtx.reset();
+					shapeCtx.SetIntegerGrid(true);
+					
+					// Restore
+					_this.restoreGraphicsCanvas(shapeCtx);
+				}
 				break;
 			}
 		}
