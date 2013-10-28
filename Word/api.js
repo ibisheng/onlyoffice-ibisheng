@@ -1464,9 +1464,9 @@ asc_docs_api.prototype._coAuthoringInit = function()
             CollaborativeEditing.Add_Changes( Changes );
         }
 
-        // т.е. если bSendEvent не задан, то посылаем  сообщение
-        if ( Count > 0 && false != bSendEvent )
-            editor.sync_CollaborativeChanges();
+        // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
+        if ( Count > 0 && false != bSendEvent && t.bInit_word_control )
+            t.sync_CollaborativeChanges();
 	};
 	this.CoAuthoringApi.onFirstLoadChanges			= function (e)
 	{
