@@ -230,6 +230,69 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+    updateCursorTypes: function()
+    {
+        this.cursorTypes = [];
+        var transform = this.transform;
+        if(transform == null)
+        {
+            transform = new CMatrix();
+        }
+        var vc = this.spPr.xfrm.extX*0.5;
+        var hc = this.spPr.xfrm.extY*0.5;
+        var xc = transform.TransformPointX(hc, vc);
+        var yc = transform.TransformPointY(hc, vc);
+        var xt = transform.TransformPointX(hc, 0);
+        var yt = transform.TransformPointY(hc, 0);
+        var vx = xt-xc;
+        var vy = yc-yt;
+        var angle = Math.atan2(vy, vx)+Math.PI/8;
+        if(angle < 0)
+        {
+            angle+=2*Math.PI;
+        }
+        if(angle > 2*Math.PI)
+        {
+            angle-=2*Math.PI;
+        }
+
+        var xlt = transform.TransformPointX(0, 0);
+        var ylt = transform.TransformPointY(0, 0);
+        var vx_lt = xlt-xc;
+        var vy_lt = yc-ylt;
+        var curTypes = [];
+        curTypes[0] = "n-resize";
+        curTypes[1] = "ne-resize";
+        curTypes[2] = "e-resize";
+        curTypes[3] = "se-resize";
+        curTypes[4] = "s-resize";
+        curTypes[5] = "sw-resize";
+        curTypes[6] = "w-resize";
+        curTypes[7] = "nw-resize";
+
+        var _index = Math.floor(angle/(Math.PI/4));
+        var _index2, t;
+        if(vx_lt*vy-vx*vy_lt < 0) // нумерация якорьков по часовой стрелке
+        {
+            for(var i = 0; i<8; ++i)
+            {
+                t = i- _index + 17;
+                _index2 =  t - ((t/8) >> 0)*8;
+                this.cursorTypes[i] = curTypes[_index2];
+            }
+        }
+        else
+        {
+            for(i = 0; i<8; ++i)
+            {
+                t = -i-_index+19;
+                _index2 = t - ((t/8) >> 0)*8;//(-i-_index+19)%8;
+                this.cursorTypes[i] = curTypes[_index2];
+            }
+        }
+    },
+
+
     setXfrm: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
     {
         var data = {Type: historyitem_SetXfrmShape};
@@ -335,10 +398,11 @@ CChartAsGroup.prototype =
 
     setGroup: function(group)
     {
-        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
-        var newId = isRealObject(group) ? group.Get_Id() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        var data = {};
+        data.Type = historyitem_SetGroup;
+        data.oldGroup = this.group;
+        data.newGroup = group;
+        History.Add(this, data);
         this.group = group;
     },
 
@@ -440,6 +504,14 @@ CChartAsGroup.prototype =
     {
         return this.transform;
     },
+    calculateContent: function()
+    {},
+
+    hitToPath: function()
+    {},
+
+    hitToTextRect: function()
+    {},
 
     recalculatePosExt: function()
     {
@@ -463,12 +535,10 @@ CChartAsGroup.prototype =
         }
         else
         {
-            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.absOffsetX = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            this.absOffsetY = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            this.absExtX = scale_scale_coefficients.cx*xfrm.extX;
-            this.absExtY = scale_scale_coefficients.cy*xfrm.extY;
-
+            this.absOffsetX = xfrm.offX;
+            this.absOffsetY = xfrm.offY;
+            this.absExtX = xfrm.extX;
+            this.absExtY = xfrm.extY;
         }
 
         if(this.parent)
@@ -845,6 +915,27 @@ CChartAsGroup.prototype =
     hitToAdjustment: function(x, y)
     {
         return {hit: false, adjPolarFlag: null, adjNum: null};
+    },
+
+
+    transformPointRelativeShape: function(x, y)
+    {
+        //this.calculateLeftTopPoint();
+        //
+        //var _sin = Math.sin(this.absRot);
+        //var _cos = Math.cos(this.absRot);
+        //
+        //var _temp_x = x - this.absXLT;
+        //var _temp_y = y - this.absYLT;
+        //
+        //var _relative_x = _temp_x*_cos + _temp_y*_sin;
+        //var _relative_y = -_temp_x*_sin + _temp_y*_cos;
+
+        var invert_transform = this.getInvertTransform();
+        var t_x, t_y;
+        t_x = invert_transform.TransformPointX(x, y);
+        t_y = invert_transform.TransformPointY(x, y);
+        return {x: t_x, y: t_y};
     },
 
     hitToHandles: function(x, y)
@@ -1707,7 +1798,7 @@ CChartAsGroup.prototype =
 
     canGroup: function()
     {
-        return false;
+        return true;
     },
 
     canRotate: function()
@@ -1822,8 +1913,8 @@ CChartAsGroup.prototype =
         cy= this.absExtY > 0 ? this.absExtY : 0.01;
 
         var invert_transform = this.getInvertTransform();
-        var t_x = invert_transform.TransformPointX(x, y);
-        var t_y = invert_transform.TransformPointY(x, y);
+        var t_x = x - this.absOffsetX;//invert_transform.TransformPointX(x, y);
+        var t_y = y - this.absOffsetY;//invert_transform.TransformPointY(x, y);
 
         switch(numHandle)
         {
@@ -2050,7 +2141,15 @@ CChartAsGroup.prototype =
 
 
 
-
+    setMainGroup: function(group)
+    {
+        var data = {};
+        data.Type = historyitem_SetMainGroup;
+        data.oldGroup = this.mainGroup;
+        data.newGroup = group;
+        History.Add(this, data);
+        this.mainGroup = group;
+    },
 
     Refresh_RecalcData: function()
     {},
@@ -2062,6 +2161,16 @@ CChartAsGroup.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SetMainGroup:
+            {
+                this.mainGroup = data.oldGroup;
+                break;
+            }
+            case historyitem_SetGroup:
+            {
+                this.group = data.oldGroup;
+                break;
+            }
             case historyitem_AutoShapes_RecalculateChartUndo:
             {
                 this.recalculate();
@@ -2277,6 +2386,18 @@ CChartAsGroup.prototype =
                 }
                 break;
             }
+            case historyitem_SetGroup:
+            case historyitem_SetMainGroup:
+            {
+                bool = data.newGroup != null;
+                writer.WriteBool(bool);
+                if(bool)
+                {
+                    writer.WriteString2(data.newGroup.Get_Id());
+                }
+                break;
+            }
+
         }
     },
 
@@ -2289,6 +2410,30 @@ CChartAsGroup.prototype =
         var type = reader.GetLong();
         switch(type)
         {
+            case historyitem_SetMainGroup:
+            {
+                if(reader.GetBool())
+                {
+                    this.mainGroup = g_oTableId.Get_ById(reader.GetString2());
+                }
+                else
+                {
+                    this.mainGroup = null;
+                }
+                break;
+            }
+            case historyitem_SetGroup:
+            {
+                if(reader.GetBool())
+                {
+                    this.group = g_oTableId.Get_ById(reader.GetString2());
+                }
+                else
+                {
+                    this.group = null;
+                }
+                break;
+            }
             case historyitem_AutoShapes_RecalculateChartRedo:
             {
                 this.recalculate();
@@ -2473,6 +2618,16 @@ CChartAsGroup.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SetMainGroup:
+            {
+                this.mainGroup = data.newGroup;
+                break;
+            }
+            case historyitem_SetGroup:
+            {
+                this.group = data.newGroup;
+                break;
+            }
             case historyitem_AutoShapes_RecalculateChartRedo:
             {
                 this.recalculate();
