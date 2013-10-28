@@ -3923,6 +3923,11 @@ CStyles.prototype =
 
         if ( styletype_Table === Type )
         {
+            // Кроме того настройки для параграфа и текста, дополняются дефолтовыми настройками параграфа
+            var DefParaId = this.Default.Paragraph;
+            Pr.ParaPr.Merge( this.Style[DefParaId].ParaPr );
+            Pr.TextPr.Merge( this.Style[DefParaId].TextPr );
+
             // Соединим настройки для всей таблицы в одну общую настройку и удалим одну из них за ненадобностью
             Pr.ParaPr.Merge( Pr.TableWholeTable.ParaPr );
             Pr.TextPr.Merge( Pr.TableWholeTable.TextPr );
@@ -4039,8 +4044,8 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Table;
 
-                        //Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        //Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
                         Pr.TablePr.Merge( this.Styles[DefId].TablePr );
                         Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
                         Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
@@ -4087,8 +4092,8 @@ CStyles.prototype =
                     {
                         var DefId = this.Default.Table;
 
-                        //Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
-                        //Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
                         Pr.TablePr.Merge( this.Styles[DefId].TablePr );
                         Pr.TableRowPr.Merge( this.Styles[DefId].TableRowPr );
                         Pr.TableCellPr.Merge( this.Styles[DefId].TableCellPr );
@@ -4122,8 +4127,8 @@ CStyles.prototype =
                 }
                 case styletype_Table:
                 {
-                    //Pr.ParaPr.Merge( Style.ParaPr );
-                    //Pr.TextPr.Merge( Style.TextPr );
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
 
                     // Заглушка на случай, если в табличные стили начнут объединять с не табличными стилями
                     if ( undefined != Style.TablePr )
@@ -4193,8 +4198,8 @@ CStyles.prototype =
                 }
                 case styletype_Table:
                 {
-                    //Pr.ParaPr.Merge( Style.ParaPr );
-                    //Pr.TextPr.Merge( Style.TextPr );
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
 
                     if ( undefined != Style.TablePr )
                     {
