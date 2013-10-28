@@ -2005,9 +2005,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.sheetsChanged();
 			},
 
-            setStartPointHistory: function(){History.Create_NewPoint(); History.StartTransaction()},
-            setEndPointHistory: function(){History.EndTransaction()},
-
 			// Удаление листа
 			asc_deleteWorksheet: function () {
 				// Проверка глобального лока
@@ -2389,6 +2386,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			// Shapes
+            setStartPointHistory: function(){History.Create_NewPoint(); History.StartTransaction()},
+            setEndPointHistory: function(){History.EndTransaction()},
+
 			asc_startAddShape: function(sPreset) {
 				this.isStartAddShape = true;
 				var ws = this.wb.getWorksheet();
@@ -3396,6 +3396,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;
 		
 		// Shapes
+        prot["setStartPointHistory"] = prot.setStartPointHistory;
+        prot["setEndPointHistory"] = prot.setEndPointHistory;
 		prot["asc_startAddShape"] = prot.asc_startAddShape;
 		prot["asc_endAddShape"] = prot.asc_endAddShape;
 		prot["asc_isAddAutoshape"] = prot.asc_isAddAutoshape;

@@ -1070,7 +1070,7 @@ CShape.prototype =
         this.drawingBase = drawingBase;
     },
 
-    recalculate: function()
+    recalculate: function(aImges)
     {
         if(this.recalcInfo.recalculateTransform)
 		{
@@ -1079,7 +1079,7 @@ CShape.prototype =
 		}
         if(this.recalcInfo.recalculateBrush)
 		{
-            this.recalculateBrush();
+            this.recalculateBrush(aImges);
 			this.recalcInfo.recalculateBrush = false;
 		}
 		if(this.recalcInfo.recalculatePen)
@@ -1992,7 +1992,7 @@ CShape.prototype =
         this.setExtents(new_ext_x, new_ext_y);
     },
 
-    recalculateBrush: function()
+    recalculateBrush: function(aImagesSync)
     {
         var brush;
         var wb = this.drawingObjects.getWorkbook();
@@ -2022,6 +2022,17 @@ CShape.prototype =
         brush.merge(this.spPr.Fill);
         this.brush = brush;
         this.brush.calculate(theme, colorMap, RGBA);
+        if(this.brush.fill instanceof CBlipFill && typeof this.brush.fill.RasterImageId === "string")
+        {
+            if(Array.isArray(aImagesSync))
+            {
+                aImagesSync.push(getFullImageSrc(this.brush.fill.RasterImageId));
+            }
+            if(this.drawingObjects)
+            {
+                this.drawingObjects.loadImageRedraw(getFullImageSrc(this.brush.fill.RasterImageId));
+            }
+        }
     },
 
     recalculatePen: function()
