@@ -116,8 +116,8 @@ prop:startSearchText
 prop:goToNextSearchResult
 prop:gotoSearchResultText
 prop:stopSearchText
-prop:asc_searchEnabled
 prop:findText
+prop:asc_searchEnabled
 prop:asc_findText
 prop:sync_SearchFoundCallback
 prop:sync_SearchStartCallback
@@ -1260,8 +1260,8 @@ asc_docs_api.prototype['startSearchText'] = asc_docs_api.prototype.startSearchTe
 asc_docs_api.prototype['goToNextSearchResult'] = asc_docs_api.prototype.goToNextSearchResult;
 asc_docs_api.prototype['gotoSearchResultText'] = asc_docs_api.prototype.gotoSearchResultText;
 asc_docs_api.prototype['stopSearchText'] = asc_docs_api.prototype.stopSearchText;
-asc_docs_api.prototype['asc_searchEnabled'] = asc_docs_api.prototype.asc_searchEnabled;
 asc_docs_api.prototype['findText'] = asc_docs_api.prototype.findText;
+asc_docs_api.prototype['asc_searchEnabled'] = asc_docs_api.prototype.asc_searchEnabled;
 asc_docs_api.prototype['asc_findText'] = asc_docs_api.prototype.asc_findText;
 asc_docs_api.prototype['sync_SearchFoundCallback'] = asc_docs_api.prototype.sync_SearchFoundCallback;
 asc_docs_api.prototype['sync_SearchStartCallback'] = asc_docs_api.prototype.sync_SearchStartCallback;
