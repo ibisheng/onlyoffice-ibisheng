@@ -92,8 +92,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.ServerIdWaitComplete = false;
 			// Переменная отвечает, отрисовали ли мы все (иначе при рестарте, получится переинициализация)
 			this.DocumentLoadComplete = false;
-			// Переменная, которая хранит пришедшие изменения при открытии
-			this.FirstLoadChanges = null;
 			// Переменная, которая отвечает, послали ли мы окончание открытия документа
 			this.IsSendDocumentLoadCompleate = false;
 
@@ -1301,16 +1299,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			// Их нужно применять после того, как мы создали WorkbookView
 			// т.к. автофильтры, диаграммы, изображения и комментарии завязаны на WorksheetView (ToDo переделать)
 			_applyFirstLoadChanges: function () {
-				if (this.DocumentLoadComplete && null !== this.FirstLoadChanges) {
-					this.CoAuthoringApi.onSaveChanges(this.FirstLoadChanges, false);
-					this.FirstLoadChanges = null;
-					if (this.collaborativeEditing.applyChanges() && !this.IsSendDocumentLoadCompleate) {
-						this.IsSendDocumentLoadCompleate = true;
-						this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-					}
-				} else if (this.DocumentLoadComplete && !this.IsSendDocumentLoadCompleate) {
+				if (this.IsSendDocumentLoadCompleate)
+					return;
+				if (this.collaborativeEditing.applyChanges()) {
+					// Изменений не было
 					this.IsSendDocumentLoadCompleate = true;
 					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+				} else {
+					// При открытии после принятия изменений мы должны сбросить пересчетные индексы
+					this.collaborativeEditing.sendChanges();
 				}
 			},
 
@@ -1480,12 +1477,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 					}
 
-					// т.е. если bSendEvent не задан, то посылаем  сообщение
-					if (true === bAddChanges && false !== bSendEvent)
+					// т.е. если bSendEvent не задан, то посылаем  сообщение + если мы уже открыли документ
+					if (true === bAddChanges && false !== bSendEvent && t.IsSendDocumentLoadCompleate)
 						t.syncCollaborativeChanges();
 				};
 				this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
-					t.FirstLoadChanges = e;
+					t.CoAuthoringApi.onSaveChanges(e, false);
 					t.asyncServerIdEndLoaded ();
 				};
 				this.CoAuthoringApi.onSetIndexUser				= function (e) {
@@ -1534,10 +1531,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_onSaveChanges: function (recalcIndexColumns, recalcIndexRows) {
-				var arrChanges = this.wbModel.SerializeHistory();
-				arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
-				arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
-				this.CoAuthoringApi.saveChanges(arrChanges);
+				if (this.IsSendDocumentLoadCompleate) {
+					var arrChanges = this.wbModel.SerializeHistory();
+					arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
+					arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+					this.CoAuthoringApi.saveChanges(arrChanges);
+				}
 			},
 
 			_onApplyChanges: function (changes, fCallback) {
@@ -1546,8 +1545,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_onUpdateAfterApplyChanges: function () {
 				if (!this.IsSendDocumentLoadCompleate) {
-					// При открытии после принятия изменений мы должны сбросить пересчетные индексы
-					this.collaborativeEditing.clearRecalcIndex();
 					this.IsSendDocumentLoadCompleate = true;
 					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 				}

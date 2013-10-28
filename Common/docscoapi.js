@@ -569,12 +569,9 @@
 						allChanges.push(changesOneUser[i]);
 				}
 			}
-			
-			// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
+
 			// Посылать нужно всегда, т.к. на это рассчитываем при открытии
-			window.setTimeout(function () {
-				t.onFirstLoadChanges(allChanges);
-			}, 10);
+			t.onFirstLoadChanges(allChanges);
         }
     };
 	

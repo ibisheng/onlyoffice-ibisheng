@@ -176,10 +176,11 @@
 					return true;
 
 				var t = this;
-				// Отправляем на сервер изменения
-				if (0 < this.m_arrChanges.length) {
+				var length = this.m_arrChanges.length;
+				// Принимаем изменения
+				if (0 < length) {
 					this.handlers.trigger("applyChanges", this.m_arrChanges, function () {
-						t.m_arrChanges.splice(0, t.m_arrChanges.length);
+						t.m_arrChanges.splice(0, length);
 						t.handlers.trigger("updateAfterApplyChanges");
 					});
 
