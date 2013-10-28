@@ -356,10 +356,20 @@ CGraphicObjects.prototype =
                         if(!isRealObject(image_props))
                         {
                             image_props = {fromGroup: true};
+                            image_props.Width  = c_obj.absExtX;
+                            image_props.Height = c_obj.absExtY;
                             image_props.ImageUrl = c_obj.getImageUrl();
                         }
                         else
                         {
+                            if(image_props.Width != null)
+                            {
+                                if(image_props.Width != c_obj.absExtX || image_props.Height != c_obj.absExtY)
+                                {
+                                    image_props.Width = null;
+                                    image_props.Height = null;
+                                }
+                            }
                             if(image_props.ImageUrl != null && c_obj.getImageUrl() !== image_props.ImageUrl)
                                 image_props.ImageUrl = null;
                         }
@@ -394,6 +404,8 @@ CGraphicObjects.prototype =
                         if(!isRealObject(shape_props))
                         {
                             shape_props = {fromGroup: true};
+                            shape_props.Width  = c_obj.absExtX;
+                            shape_props.Height = c_obj.absExtY;
                             shape_props.ShapeProperties =
                             {
                                 type: c_obj.getPresetGeom(),
@@ -405,6 +417,15 @@ CGraphicObjects.prototype =
                         }
                         else
                         {
+
+                            if(shape_props.Width != null)
+                            {
+                                if(shape_props.Width != c_obj.absExtX || shape_props.Height != c_obj.absExtY)
+                                {
+                                    shape_props.Width = null;
+                                    shape_props.Height = null;
+                                }
+                            }
                             var ShapeProperties =
                             {
                                 type: c_obj.getPresetGeom(),
@@ -414,6 +435,41 @@ CGraphicObjects.prototype =
                             };
                             shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                             shape_props.verticalTextAlign = undefined;
+                        }
+                    }
+
+                    if(c_obj.chart)
+                    {
+                        if(!isRealObject(chart_props))
+                        {
+                            chart_props = {fromGroup: true};
+                            chart_props.Width  = c_obj.absExtX;
+                            chart_props.Height = c_obj.absExtY;
+                            g_oTableId.m_bTurnOff = true;
+                            chart_props.ChartProperties =  new asc_CChart(c_obj.chart);
+                            g_oTableId.m_bTurnOff = false;
+                        }
+                        else
+                        {
+                            if(chart_props.Width != null)
+                            {
+                                if(chart_props.Width != c_obj.absExtX || chart_props.Height != c_obj.absExtY)
+                                {
+                                    chart_props.Width = null;
+                                    chart_props.Height = null;
+                                }
+                            }
+                            chart_props.severalCharts = true;
+                            if(chart_props.severalChartTypes !== true)
+                            {
+                                if(!(chart_props.ChartProperties.type === c_obj.chart.type && chart_props.ChartProperties.subType === c_obj.chart.subType) )
+                                    chart_props.severalChartTypes = true;
+                            }
+                            if(chart_props.severalChartStyles !== true)
+                            {
+                                if(chart_props.ChartProperties.styleId !== c_obj.chart.styleId )
+                                    chart_props.severalChartStyles = true;
+                            }
                         }
                     }
                 }
@@ -1353,6 +1409,7 @@ CGraphicObjects.prototype =
                             {
                                 ArrGlyph[i].GraphicObj.setPaddings(properties.paddings);
                             }
+
                         }
                     }
 
@@ -1401,15 +1458,62 @@ CGraphicObjects.prototype =
                             {
                                 ArrGlyph[i].setPaddings(properties.paddings);
                             }
+                            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+                            {
+                                ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
+                                ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
+                                if(ArrGlyph[i].spPr.geometry)
+                                   ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                b_change_diagram = true;
+                            }
                         }
                         else if(isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)
                         {
                             ArrGlyph[i].setRasterImage2(props.ImageUrl);
+                            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+                            {
+                                ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
+                                ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
+                                if(ArrGlyph[i].spPr.geometry)
+                                    ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                b_change_diagram = true;
+                            }
+                        }
+                        else if(isRealObject(props) && isRealNumber(props.Width) && isRealNumber(props.Height) && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)
+                        {
+                            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+                            {
+                                ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
+                                ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
+                                if(ArrGlyph[i].spPr.geometry)
+                                    ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                b_change_diagram = true;
+                            }
                         }
                         else if(ArrGlyph[i].chart != null && isRealObject(props) && isRealObject(props.ChartProperties))
                         {
                             b_change_diagram = true;
-                            ArrGlyph[i].setDiagram(props.ChartProperties)
+                            ArrGlyph[i].setDiagram(props.ChartProperties);
+                            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+                            {
+                                ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
+                                ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
+                                if(ArrGlyph[i].spPr.geometry)
+                                    ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                b_change_diagram = true;
+                            }
+                        }
+                        else if(ArrGlyph[i].chart != null && isRealObject(props) && isRealNumber(props.Width) && isRealNumber(props.Height))
+                        {
+                            b_change_diagram = true;
+                            if(isRealNumber(props.Width) && isRealNumber(props.Height))
+                            {
+                                ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
+                                ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
+                                if(ArrGlyph[i].spPr.geometry)
+                                    ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                b_change_diagram = true;
+                            }
                         }
 
                         if(typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
