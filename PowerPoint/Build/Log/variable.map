@@ -1,6 +1,6 @@
 CSlideBoundsChecker:Rb
 ft_div64by32:Hl
-c_oAscLockTypeElemPresentation$Object:KA
+c_oAscLockTypeElemPresentation$Object:HA
 c_oSer_ChartLegendLayoutType$Y:HI
 c_oSer_ChartLegendLayoutType$W:DI
 c_oSer_ChartLegendLayoutType$X:FI
@@ -281,7 +281,7 @@ Numbering_Number_To_Roman:f0
 phType_dgm:y_
 asc_CParagraphSpacing:jH
 sfnt_service_glyph_dict:Yr
-JSCompiler_StaticMethods_HSL2RGB:I3
+JSCompiler_StaticMethods_HSL2RGB:H3
 JSCompiler_StaticMethods_Col_Remove:gX
 tt_face_get_ps_name:Cq
 FT_Add64:Jl
@@ -410,7 +410,7 @@ CHeaderProp:D5
 JSCompiler_StaticMethods_Set_CurPosXY:GW
 c_oSer_OMathContentType$Column:qR
 JSCompiler_StaticMethods_TurnOff:ec
-c_oAscLockTypeElemPresentation$Slide:LA
+c_oAscLockTypeElemPresentation$Slide:IA
 ps_parser_to_token:mp
 sfnt_services:ds
 JSCompiler_StaticMethods_Is_InnerTable:aW
@@ -892,7 +892,7 @@ c_oSer_pgMarType$Right:GO
 historyitem_RemoveFromSpTree:kY
 c_oSer_ChartType$PlotArea:mI
 TT_Load_Composite_Glyph:iv
-JSCompiler_StaticMethods_LoadTestDocument:u_
+JSCompiler_StaticMethods_LoadTestDocument:t_
 CStyles:rB
 JSCompiler_StaticMethods_Set_W:be
 c_oSerProp_pPrType$numPr:YL
@@ -1078,7 +1078,7 @@ historyitem_TableRow_CellSpacing:sX
 FT_Size:Cn
 JSCompiler_StaticMethods_generateUniColors:NG
 CreateFontData2:Hz
-CPresentation:JA
+CPresentation:MA
 t1_allocate_blend:Qx
 cToRad:g2
 tt_get_advances:Dv
@@ -1827,7 +1827,7 @@ CSchemeColor:$h
 c_oSer_sts$Style_unhideWhenUsed:tL
 COLOR_TYPE_PRST:Wh
 T1_BuilderRec:Kp
-documentFormat:h5
+documentFormat:g5
 JSCompiler_StaticMethods_getPaddings:fE
 g_dKoef_pix_to_mm:we
 CPPTXContentLoader:eK
@@ -2260,7 +2260,7 @@ TGlyph:cz
 rgbToHsv:cU
 CTableId:Oz
 CWriteCommentData:Ai
-MoveShapeImageTrack:Y_
+MoveShapeImageTrack:X_
 Editor_Paste_Button:Jc
 HitToArc:t2
 _ph_summ_chart:Y3
@@ -2414,9 +2414,9 @@ dublicate_pointer:ol
 c_oAscError$Level$Critical:B4
 CompareGroups:rE
 c_oAscTableSelectionType$Row:cW
-documentTitleWithoutExtention:g5
+documentTitleWithoutExtention:f5
 PreChangeAdjState:AF
-locktype_Other:HA
+locktype_Other:LA
 nVertTTvert270:J_
 IS_PS_DELIM:Bo
 JSCompiler_StaticMethods_Internal_Get_StartMergedCell2:JW
@@ -2854,12 +2854,12 @@ pararecalc_0_None:pZ
 L 39:tg
 L 38:$e
 L 37:Gd
-locktype_None:IA
+locktype_None:GA
 PS_PrivateRec:po
 L 32:Oa
 L 31:Wd
 cff_standard_encoding:hw
-L 30:wb
+L 30:xb
 LineJoinType$Round:Y2
 JSCompiler_StaticMethods__ExecutePresentation:Cd
 L 36:ed
@@ -3036,7 +3036,7 @@ RotateState:RF
 c_oSerBordersType$bottom:UH
 locktype_Other2:WA
 c_oAscSlideTransitionParams$Param_TopRight:Qi
-locktype_Other3:GA
+locktype_Other3:KA
 JSCompiler_StaticMethods_Internal_CopyLvl:Cf
 FontStyle$FontStyleBoldItalic:Zy
 Ins_DELTAC:yu
@@ -3095,7 +3095,7 @@ Ins_MSIRP:nu
 L 66:gd
 L 67:fg
 isRealBool:LE
-JSCompiler_StaticMethods_getSrc:xb
+JSCompiler_StaticMethods_getSrc:wb
 FontProperties:LT
 g_NumberingArr:yZ
 c_oSer_OMathContentType$EqArrPr:IQ
@@ -3121,7 +3121,7 @@ c_oSer_OMathBottomNodesType$Chr:FP
 L 91:ij
 L 94:hg
 nSldLtTObjTx:z1
-JSCompiler_StaticMethods_Document_UpdateUndoRedoState:MA
+JSCompiler_StaticMethods_Document_UpdateUndoRedoState:JA
 L 93:im
 CFontFileLoader:R
 FT_RoundFix:Fl
