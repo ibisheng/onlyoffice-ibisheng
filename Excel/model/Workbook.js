@@ -1234,7 +1234,7 @@ function helpRecalc(dep1, nR, calculatedCells, wb){
 }
 
 function sortDependency(ws, ar){
-	var wb = ws.workbook, dep, sr1, sr2, sr;
+	var wb = ws.workbook, dep, sr1, sr2, sr, calculatedCells = {};
 	/*
 		Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 	*/
@@ -1250,9 +1250,10 @@ function sortDependency(ws, ar){
 				}
 			}
 		}
-        sr1 = wb.recalcDependency(dep.badF,true);
-		sr2 = wb.recalcDependency(dep.depF,false);
-		sr = searchCleenCacheArea( sr, searchCleenCacheArea( sr1, sr2 ) );
+//        sr1 = wb.recalcDependency(dep.badF,true);
+        sr1 = helpRecalc(dep, wb.needRecalc, calculatedCells, wb);
+//		sr2 = wb.recalcDependency(dep.depF,false);
+		sr = searchCleenCacheArea( sr, sr1 );
 	}
 	
 	for(var _item in sr){
@@ -3659,6 +3660,16 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 			}
 		}
 	}
+
+    var move = this.workbook.dependencyFormulas.helper(oBBoxTo,this.Id);
+    for(var id in move.recalc){
+        var n = move.recalc[id];
+        var _sn = n.getSlaveEdges2();
+        for( var _id in _sn ){
+            rec[_sn[_id].nodeId] = [ _sn[_id].sheetId, _sn[_id].cellId ];
+            rec.length++;
+        }
+    }
 
 	this.workbook.buildDependency();
 	this.workbook.needRecalc = rec;
