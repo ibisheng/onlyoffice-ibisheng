@@ -1098,7 +1098,7 @@ DrawingObjectsController.prototype =
                     }
                     break;
                 }
-                else if(this.curState.chart)
+                else if(this.curState.chart && this.curState.id !== STATES_ID_EXPECT_DOUBLE_CLICK)
                 {
                     state.id = STATES_ID_CHART;
                     state.chart = this.curState.chart;
