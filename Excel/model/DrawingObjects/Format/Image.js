@@ -413,6 +413,15 @@ CImageShape.prototype =
 
     },
 
+    setGroup: function(group)
+    {
+        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
+        var newId = isRealObject(group) ? group.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.group = group;
+    },
+
     recalculateTransform: function()
     {
         var xfrm = this.spPr.xfrm;
@@ -714,10 +723,6 @@ CImageShape.prototype =
         return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
 
-    setGroup: function(group)
-    {
-        this.group = group;
-    },
 
     getFullOffset: function()
     {
@@ -1115,6 +1120,11 @@ CImageShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
             case historyitem_AutoShapes_SetPresetGeometry:
             {
                 this.spPr.geometry = g_oTableId.Get_ById(data.oldValue);
@@ -1171,6 +1181,11 @@ CImageShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
             case historyitem_AutoShapes_SetPresetGeometry:
             {
                 this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
