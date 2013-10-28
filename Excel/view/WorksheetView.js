@@ -7178,19 +7178,19 @@
 														var Drawing;
 														switch(first_string) {
 															case "TeamLabImageSheets": {
-																Drawing = new CImageShape();
+																Drawing = new CImageShape(null, t.objectRender);
 																break;
 															}
 															case "TeamLabShapeSheets": {
-																Drawing = new CShape();
+																Drawing = new CShape(null, t.objectRender);
 																break;
 															}
 															case "TeamLabGroupSheets": {
-																Drawing = new CGroupShape();
+																Drawing = new CGroupShape(null, t.objectRender);
 																break;
 															}
 															case "TeamLabChartSheets": {
-																Drawing = new CChartAsGroup();
+																Drawing = new CChartAsGroup(null, t.objectRender);
 																break;
 															}
 															default : {
