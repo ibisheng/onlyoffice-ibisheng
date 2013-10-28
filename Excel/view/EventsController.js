@@ -1106,6 +1106,10 @@
 				// Shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
+				
+					//for Mac OS
+					if ( event.metaKey )
+						event.ctrlKey = true;
 					
 					asc["editor"].isStartAddShape = true;
 					var currTime = getCurrentTime();
@@ -1257,6 +1261,11 @@
 				var coord = this._getCoordinates(event);
 				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
 				if ( asc["editor"].isStartAddShape ) {
+				
+					//for Mac OS
+					if ( event.metaKey )
+						event.ctrlKey = true;
+				
 					event.ClickCount = this.mouseClickCount;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
