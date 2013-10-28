@@ -4252,7 +4252,13 @@ Cell.prototype.setValue=function(val,callback){
 			Если значение является формулой, то проверяем содержиться ли в ячейке формула или нет, если "да" - то очищаем в графе зависимостей список, от которых зависит формула(masterNodes), позже будет построен новый. Затем выставляем флаг о необходимости дальнейшего пересчета, и заносим ячейку в список пересчитываемых ячеек.
 		*/
 		if( null != val && val[0] == "=" && val.length > 1){
-			this.formulaParsed = new parserFormula(val.substring(1),this.oId.getID(),this.ws);
+
+            var oldFP = undefined;
+
+            if( this.formulaParsed  )
+                oldFP = this.formulaParsed;
+
+            this.formulaParsed = new parserFormula(val.substring(1),this.oId.getID(),this.ws);
 			if( !this.formulaParsed.parse() ){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
@@ -4261,10 +4267,12 @@ Cell.prototype.setValue=function(val,callback){
 						wb.handlers.trigger("asc_onError",this.formulaParsed.error[this.formulaParsed.error.length-1], c_oAscError.Level.NoCritical);
 						if( callback )
 							callback(false);
+                        if( oldFP !== undefined ){
+                            this.formulaParsed = oldFP;
+                        }
 						return;
 					}
 				}
-
 			}
 			else{
 				val = "="+this.formulaParsed.assemble();
