@@ -526,6 +526,11 @@ function CEditorPage(api)
         if (this.m_oMainContent.HtmlElement.addEventListener)
             this.m_oMainContent.HtmlElement.addEventListener("DOMMouseScroll", this.onMouseWhell, false);
 
+        this.m_oBody.HtmlElement.onmousewheel = function(e){
+            e.preventDefault();
+            return false;
+        };
+
         this.m_oTopRuler_horRuler.HtmlElement.onmousedown = this.horRulerMouseDown;
         this.m_oTopRuler_horRuler.HtmlElement.onmouseup   = this.horRulerMouseUp;
         this.m_oTopRuler_horRuler.HtmlElement.onmousemove = this.horRulerMouseMove;

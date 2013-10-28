@@ -404,8 +404,8 @@ function CHorRuler()
 
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
 
-        this.m_nTop     = parseInt(1.8 * g_dKoef_mm_to_pix);
-        this.m_nBottom  = parseInt(5.2 * g_dKoef_mm_to_pix);
+        this.m_nTop     = (1.8 * g_dKoef_mm_to_pix) >> 0;
+        this.m_nBottom  = (5.2 * g_dKoef_mm_to_pix) >> 0;
 
         var context = this.m_oCanvas.getContext('2d');
         if (!this.IsRetina)
@@ -422,8 +422,8 @@ function CHorRuler()
 
         if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
         {
-            left_margin  = parseInt(this.m_dMarginLeft * dKoef_mm_to_pix);
-            right_margin = parseInt(this.m_dMarginRight * dKoef_mm_to_pix);
+            left_margin  = (this.m_dMarginLeft * dKoef_mm_to_pix) >> 0;
+            right_margin = (this.m_dMarginRight * dKoef_mm_to_pix) >> 0;
 
             checker.MarginLeft = this.m_dMarginLeft;
             checker.MarginRight = this.m_dMarginRight;
@@ -460,15 +460,15 @@ function CHorRuler()
                     _start += markup.Cols[i];
                 }
 
-                left_margin  = parseInt((markup.X + markup.Margins[0].Left) * dKoef_mm_to_pix);
-                right_margin = parseInt((markup.X + _start - markup.Margins[markup.Margins.length - 1].Right) * dKoef_mm_to_pix);
+                left_margin  = ((markup.X + markup.Margins[0].Left) * dKoef_mm_to_pix) >> 0;
+                right_margin = ((markup.X + _start - markup.Margins[markup.Margins.length - 1].Right) * dKoef_mm_to_pix) >> 0;
             }
         }
 
         context.fillStyle = "#EDEDED";
         context.fillRect(left_margin + 0.5, this.m_nTop + 0.5, right_margin - left_margin, this.m_nBottom - this.m_nTop);
 
-        var intW = parseInt(width);
+        var intW = width >> 0;
 
         // �����
         //context.shadowBlur = 0;
@@ -477,7 +477,7 @@ function CHorRuler()
         context.strokeStyle = "#929292";
 
         context.lineWidth = 1;
-        context.strokeRect(0.5, this.m_nTop + 0.5, intW, this.m_nBottom - this.m_nTop);
+        context.strokeRect(0.5, this.m_nTop + 0.5, Math.max(intW - 1, 1), this.m_nBottom - this.m_nTop);
         context.beginPath();
         context.moveTo(left_margin + 0.5, this.m_nTop + 0.5);
         context.lineTo(left_margin + 0.5, this.m_nBottom - 0.5);
@@ -492,8 +492,8 @@ function CHorRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = parseInt((width - left_margin) / mm_1_4);
-        var lCount2 = parseInt(left_margin / mm_1_4);
+        var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
+        var lCount2 = (left_margin / mm_1_4) >> 0;
 
         var middleVert = (this.m_nTop + this.m_nBottom) / 2;
         var part1 = 1;
@@ -505,7 +505,7 @@ function CHorRuler()
         var num = 0;
         for (var i = 1; i < lCount1; i++)
         {
-            var lXPos = parseInt(left_margin + i * mm_1_4) + 0.5;
+            var lXPos = ((left_margin + i * mm_1_4) >> 0) + 0.5;
             index++;
 
             if (index == 4)
@@ -550,7 +550,7 @@ function CHorRuler()
         num = 0;
         for (var i = 1; i <= lCount2; i++)
         {
-            var lXPos = parseInt(left_margin - i * mm_1_4) + 0.5;
+            var lXPos = ((left_margin - i * mm_1_4) >> 0) + 0.5;
             index++;
 
             if (index == 4)
@@ -624,8 +624,8 @@ function CHorRuler()
                         break;
                     }
 
-                    var __x = parseInt((_offset - markup.Margins[i-1].Right) * dKoef_mm_to_pix) + 0.5;
-                    var __r = parseInt((_offset + markup.Margins[i].Left) * dKoef_mm_to_pix) + 0.5;
+                    var __x = (((_offset - markup.Margins[i-1].Right) * dKoef_mm_to_pix) >> 0) + 0.5;
+                    var __r = (((_offset + markup.Margins[i].Left) * dKoef_mm_to_pix) >> 0) + 0.5;
 
                     context.fillRect(__x, this.m_nTop + 0.5, __r - __x, this.m_nBottom - this.m_nTop);
                     context.strokeRect(__x, this.m_nTop + 0.5, __r - __x, this.m_nBottom - this.m_nTop);
@@ -1488,12 +1488,12 @@ function CHorRuler()
             if (!this.IsRetina)
             {
                 context.drawImage(this.m_oCanvas, 5, 0, this.m_oCanvas.width - 10, this.m_oCanvas.height,
-                    left - 5, 0, this.m_oCanvas.width - 10, this.m_oCanvas.height);
+                    left, 0, this.m_oCanvas.width - 10, this.m_oCanvas.height);
             }
             else
             {
                 context.drawImage(this.m_oCanvas, 10, 0, this.m_oCanvas.width - 20, this.m_oCanvas.height,
-                    (left - 5) << 1, 0, this.m_oCanvas.width - 20, this.m_oCanvas.height);
+                    left << 1, 0, this.m_oCanvas.width - 20, this.m_oCanvas.height);
                 context.setTransform(2, 0, 0, 2, 0, 0);
             }
 
@@ -1933,8 +1933,8 @@ function CVerRuler()
 
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
 
-        this.m_nLeft   = parseInt(0.8 * g_dKoef_mm_to_pix);
-        this.m_nRight  = parseInt(4.2 * g_dKoef_mm_to_pix);
+        this.m_nLeft   = (0.8 * g_dKoef_mm_to_pix) >> 0;
+        this.m_nRight  = (4.2 * g_dKoef_mm_to_pix) >> 0;
 
         var context = this.m_oCanvas.getContext('2d');
         if (!this.IsRetina)
@@ -1950,16 +1950,16 @@ function CVerRuler()
 
         if (RULER_OBJECT_TYPE_PARAGRAPH == this.CurrentObjectType)
         {
-            top_margin = parseInt(this.m_dMarginTop * dKoef_mm_to_pix);
-            bottom_margin = parseInt(this.m_dMarginBottom * dKoef_mm_to_pix);
+            top_margin = (this.m_dMarginTop * dKoef_mm_to_pix) >> 0;
+            bottom_margin = (this.m_dMarginBottom * dKoef_mm_to_pix) >> 0;
 
             checker.MarginTop = this.m_dMarginTop;
             checker.MarginBottom = this.m_dMarginBottom;
         }
         else if (RULER_OBJECT_TYPE_HEADER == this.CurrentObjectType || RULER_OBJECT_TYPE_FOOTER == this.CurrentObjectType)
         {
-            top_margin = parseInt(this.header_top * dKoef_mm_to_pix);
-            bottom_margin = parseInt(this.header_bottom * dKoef_mm_to_pix);
+            top_margin = (this.header_top * dKoef_mm_to_pix) >> 0;
+            bottom_margin = (this.header_bottom * dKoef_mm_to_pix) >> 0;
 
             checker.HeaderTop = this.header_top;
             checker.HeaderBottom = this.header_bottom;
@@ -1985,8 +1985,8 @@ function CVerRuler()
 
             if (_count != 0)
             {
-                top_margin = parseInt(markup.Rows[0].Y * dKoef_mm_to_pix);
-                bottom_margin = parseInt((markup.Rows[_count - 1].Y + markup.Rows[_count - 1].H) * dKoef_mm_to_pix);
+                top_margin = (markup.Rows[0].Y * dKoef_mm_to_pix) >> 0;
+                bottom_margin = ((markup.Rows[_count - 1].Y + markup.Rows[_count - 1].H) * dKoef_mm_to_pix) >> 0;
             }
         }
 
@@ -1996,13 +1996,13 @@ function CVerRuler()
             context.fillRect(this.m_nLeft + 0.5, top_margin + 0.5, this.m_nRight - this.m_nLeft, bottom_margin - top_margin);
         }
 
-        var intH = parseInt(height);
+        var intH = height >> 0;
 
         // �����
         context.strokeStyle = "#929292";
 
         context.lineWidth = 1;
-        context.strokeRect(this.m_nLeft + 0.5, 0.5, this.m_nRight - this.m_nLeft, intH);
+        context.strokeRect(this.m_nLeft + 0.5, 0.5, this.m_nRight - this.m_nLeft, Math.max(intH - 1, 1));
         context.beginPath();
         context.moveTo(this.m_nLeft + 0.5, top_margin + 0.5);
         context.lineTo(this.m_nRight - 0.5, top_margin + 0.5);
@@ -2017,8 +2017,8 @@ function CVerRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = parseInt((height - top_margin) / mm_1_4);
-        var lCount2 = parseInt(top_margin / mm_1_4);
+        var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
+        var lCount2 = (top_margin / mm_1_4) >> 0;
 
         var middleHor = (this.m_nLeft + this.m_nRight) / 2;
         var part1 = 1;
@@ -2030,7 +2030,7 @@ function CVerRuler()
         var num = 0;
         for (var i = 1; i < lCount1; i++)
         {
-            var lYPos = parseInt(top_margin + i * mm_1_4) + 0.5;
+            var lYPos = ((top_margin + i * mm_1_4) >> 0) + 0.5;
             index++;
 
             if (index == 4)
@@ -2083,7 +2083,7 @@ function CVerRuler()
         num = 0;
         for (var i = 1; i <= lCount2; i++)
         {
-            var lYPos = parseInt(top_margin - i * mm_1_4) + 0.5;
+            var lYPos = ((top_margin - i * mm_1_4) >> 0) + 0.5;
             index++;
 
             if (index == 4)
@@ -2141,7 +2141,7 @@ function CVerRuler()
             if (0 == _count)
                 return;
 
-            var start_dark = parseInt((markup.Rows[0].Y + markup.Rows[0].H) * dKoef_mm_to_pix) + 0.5;
+            var start_dark = (((markup.Rows[0].Y + markup.Rows[0].H) * dKoef_mm_to_pix) >> 0) + 0.5;
             var end_dark = 0;
 
             context.fillStyle = "#B0B0B0";
@@ -2151,11 +2151,11 @@ function CVerRuler()
             var _w = this.m_nRight - this.m_nLeft;
             for (var i = 1; i < _count; i++)
             {
-                end_dark = parseInt(markup.Rows[i].Y * dKoef_mm_to_pix) + 0.5;
+                end_dark = ((markup.Rows[i].Y * dKoef_mm_to_pix) >> 0) + 0.5;
                 context.fillRect(_x, start_dark, _w, Math.max(end_dark - start_dark, 7));
                 context.strokeRect(_x, start_dark, _w, Math.max(end_dark - start_dark, 7));
 
-                start_dark = parseInt((markup.Rows[i].Y + markup.Rows[i].H) * dKoef_mm_to_pix) + 0.5;
+                start_dark = (((markup.Rows[i].Y + markup.Rows[i].H) * dKoef_mm_to_pix) >> 0) + 0.5;
             }
         }
     }
@@ -2547,12 +2547,12 @@ function CVerRuler()
             if (!this.IsRetina)
             {
                 context.drawImage(this.m_oCanvas, 0, 5, this.m_oCanvas.width, this.m_oCanvas.height - 10,
-                    0, top - 5, this.m_oCanvas.width, this.m_oCanvas.height - 10);
+                    0, top, this.m_oCanvas.width, this.m_oCanvas.height - 10);
             }
             else
             {
                 context.drawImage(this.m_oCanvas, 0, 10, this.m_oCanvas.width, this.m_oCanvas.height - 20,
-                    0, (top - 5) << 1, this.m_oCanvas.width, this.m_oCanvas.height - 20);
+                    0, top << 1, this.m_oCanvas.width, this.m_oCanvas.height - 20);
             }
         }
     }
