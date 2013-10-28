@@ -226,6 +226,10 @@ CGroupShape.prototype =
 
     setGroup: function(group)
     {
+        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
+        var newId = isRealObject(group) ? group.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.group = group;
     },
 
@@ -1553,6 +1557,11 @@ CGroupShape.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
             case  historyitem_AutoShapes_AddToSpTree:
             {
                 for(var i = this.spTree.length -1; i > -1; --i)
@@ -1621,6 +1630,11 @@ CGroupShape.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
             case  historyitem_AutoShapes_AddToSpTree:
             {
                 this.spTree.push(g_oTableId.Get_ById(data.oldValue));
