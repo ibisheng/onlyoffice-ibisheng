@@ -646,57 +646,7 @@ function CCollaborativeEditing()
             }
         }
 
-        var UnlockCount = this.m_aNeedUnlock.length;
-        for ( var Index = 0; Index < UnlockCount; Index++ )
-        {
-            var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
-            if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
-            {
-                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
-                if(this.m_aNeedUnlock[Index] instanceof Slide)
-                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
-
-                /*if ( this.m_aNeedUnlock[Index] instanceof CHeaderFooterController )
-                    editor.sync_UnLockHeaderFooters();
-                else if ( this.m_aNeedUnlock[Index] instanceof CDocument )
-                    editor.sync_UnLockDocumentProps();
-                else if ( this.m_aNeedUnlock[Index] instanceof CComment )
-                    editor.sync_UnLockComment( this.m_aNeedUnlock[Index].Get_Id() );
-                else if ( this.m_aNeedUnlock[Index] instanceof CGraphicObjects )
-                    editor.sync_UnLockDocumentSchema();   */
-
-                var Class =  this.m_aNeedUnlock[Index];
-                if ( Class instanceof PropLocker )
-                {
-                    var object = g_oTableId.Get_ById(Class.objectId);
-                    if(object instanceof CPresentation)
-                    {
-                        if(Class === editor.WordControl.m_oLogicDocument.themeLock)
-                        {
-                            editor.asc_fireCallback("asc_onUnLockDocumentTheme");
-                        }
-                        else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
-                        {
-                            editor.asc_fireCallback("asc_onUnLockDocumentSchema");
-                        }
-                        else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
-                        {
-                            editor.asc_fireCallback("asc_onUnLockDocumentProps");
-                        }
-                    }
-                }
-                if(Class instanceof CComment)
-                {
-                    editor.sync_UnLockComment(Class.Get_Id());
-                }
-            }
-            else if ( locktype_Other3 === CurLockType )
-            {
-                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
-                if(this.m_aNeedUnlock[Index] instanceof Slide)
-                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
-            }
-        }
+        this.Release_Locks();
 
         var UnlockCount2 = this.m_aNeedUnlock2.length;
         for ( var Index = 0; Index < UnlockCount2; Index++ )
@@ -745,6 +695,61 @@ function CCollaborativeEditing()
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
         editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    };
+
+    this.Release_Locks = function()
+    {
+        var UnlockCount = this.m_aNeedUnlock.length;
+        for ( var Index = 0; Index < UnlockCount; Index++ )
+        {
+            var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
+            if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
+            {
+                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
+                if(this.m_aNeedUnlock[Index] instanceof Slide)
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
+
+                /*if ( this.m_aNeedUnlock[Index] instanceof CHeaderFooterController )
+                 editor.sync_UnLockHeaderFooters();
+                 else if ( this.m_aNeedUnlock[Index] instanceof CDocument )
+                 editor.sync_UnLockDocumentProps();
+                 else if ( this.m_aNeedUnlock[Index] instanceof CComment )
+                 editor.sync_UnLockComment( this.m_aNeedUnlock[Index].Get_Id() );
+                 else if ( this.m_aNeedUnlock[Index] instanceof CGraphicObjects )
+                 editor.sync_UnLockDocumentSchema();   */
+
+                var Class =  this.m_aNeedUnlock[Index];
+                if ( Class instanceof PropLocker )
+                {
+                    var object = g_oTableId.Get_ById(Class.objectId);
+                    if(object instanceof CPresentation)
+                    {
+                        if(Class === editor.WordControl.m_oLogicDocument.themeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+                        }
+                        else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentSchema");
+                        }
+                        else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentProps");
+                        }
+                    }
+                }
+                if(Class instanceof CComment)
+                {
+                    editor.sync_UnLockComment(Class.Get_Id());
+                }
+            }
+            else if ( locktype_Other3 === CurLockType )
+            {
+                this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
+                if(this.m_aNeedUnlock[Index] instanceof Slide)
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
+            }
+        }
     };
 
     this.OnStart_Load_Objects = function()

@@ -3691,6 +3691,12 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     {
         if(this.LoadedObject)
         {
+
+            if(this.LoadedObject === 1)
+            {
+                CollaborativeEditing.Apply_Changes();
+                CollaborativeEditing.Release_Locks();
+            }
             this.WordControl.m_oLogicDocument.RecalculateAfterOpen();
             var presentation = this.WordControl.m_oLogicDocument;
 
