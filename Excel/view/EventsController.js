@@ -1168,12 +1168,12 @@
 							t.isResizeMode = true;
 							t._resizeElement(event);
 							return;
-						} else if (t.targetInfo.target === "fillhandle" && false === this.settings.isViewerMode){
+						} else if (t.targetInfo && t.targetInfo.target === "fillhandle" && false === this.settings.isViewerMode){
 							// В режиме автозаполнения
 							this.isFillHandleMode = true;
 							t._changeFillHandle(event);
 							return;
-						} else if (t.targetInfo.target === "moveRange" && false === this.settings.isViewerMode) {
+						} else if ( t.targetInfo && t.targetInfo.target === "moveRange" && false === this.settings.isViewerMode ) {
 							// В режиме перемещения диапазона
 							this.isMoveRangeMode = true;
 							t._moveRangeHandle(event);
@@ -1186,7 +1186,7 @@
 						else if (t.targetInfo && (undefined !== t.targetInfo.commentIndexes) && (false === this.settings.isViewerMode)) {
 							t._commentCellClick(event);
 						}
-						else if ( t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
+						else if ( t.targetInfo && t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
 							this.isMoveResizeRange = true;
 							this.isMoveResizeChartsRange = true;
 							t._moveResizeRangeHandle(event, t.targetInfo);
@@ -1204,7 +1204,7 @@
 						} else {
 							if (t.isFormulaEditMode) {
 								// !!! в зависимости от цели делаем разные действия - либо селектим область либо мувим существующий диапазон
-								if ( t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
+								if ( t.targetInfo && t.targetInfo.target === "moveResizeRange" && false === this.settings.isViewerMode ){
 									this.isMoveResizeRange = true;
 									t._moveResizeRangeHandle(event, t.targetInfo);
 									return;
