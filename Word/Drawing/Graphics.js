@@ -1118,7 +1118,7 @@ CGraphics.prototype =
     font : function(font_id,font_size)
     {
         g_font_infos[g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager,
-            font_size, 0, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            Math.max(font_size, 1), 0, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
     },
     SetFont : function(font)
     {

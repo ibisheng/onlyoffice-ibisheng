@@ -1456,7 +1456,11 @@ function FT_MulDiv(a, b, c)
 function FT_MulFix(a, b)
 {
     if (a > 2147483647 || b > 2147483647)
-        alert("error");
+    {
+		//alert("error");
+		a &= 0xFFFFFFFF;
+		b &= 0xFFFFFFFF;
+	}
 
     if (a == 0 || b == 0x10000)
         return a;
