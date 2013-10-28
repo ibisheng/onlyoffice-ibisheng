@@ -2848,7 +2848,7 @@ function DrawingObjects() {
                     drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
-				drawingObject.graphicObject.recalculate();
+				drawingObject.graphicObject.recalculate(aImagesSync);
 				aObjects.push( drawingObject );
 				
 				var boundsChecker = _this.getBoundsChecker(drawingObject);
@@ -2895,7 +2895,10 @@ function DrawingObjects() {
                     //drawingObject.graphicObject.spPr.xfrm.setChildOffsets(0, 0);
                 }
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
+                var old_len = aImagesSync.length;
                 drawingObject.graphicObject.recalculate(aImagesSync);
+                if(aImagesSync.length > old_len)
+                    aObjectsSync[aObjectsSync.length] = drawingObject;
                 aObjects.push( drawingObject );
 				
 				var boundsChecker = _this.getBoundsChecker(drawingObject);
