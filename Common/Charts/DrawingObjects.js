@@ -3371,15 +3371,23 @@ function DrawingObjects() {
 							if ( drawingObject.graphicObject instanceof CGroupShape ) {
 								for ( var n = 0; n < drawingObject.graphicObject.arrGraphicObjects.length; n++ ) {
 									var item = drawingObject.graphicObject.arrGraphicObjects[n];
+									
 									var tx = item.transform.tx;
 									var ty = item.transform.ty;
+									var txTxt = item.transformText.tx;
+									var tyTxt = item.transformText.ty;
+									
 									item.transform.tx -= left;
 									item.transform.ty -= top;
+									item.transformText.tx -= left;
+									item.transformText.ty -= top;
 									item.draw( printOptions.ctx.DocumentRenderer );
 									
 									// Restore
 									item.transform.tx = tx;
 									item.transform.ty = ty;
+									item.transformText.tx = txTxt;
+									item.transformText.ty = tyTxt;
 								}
 							}
 							else {
