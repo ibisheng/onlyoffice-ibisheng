@@ -1646,7 +1646,7 @@
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ar, turnOnHistory, insCells)
+			isEmptyAutoFilters: function(ar, turnOnHistory, insCells, deleteFilterAfterDeleteColRow)
 			{
 				if(turnOnHistory)
 				{
@@ -1694,7 +1694,7 @@
 							//открываем скрытые строки
 							aWs.setRowHidden(false, bbox.r1, bbox.r2);
 							//заносим в историю
-							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
+							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells},deleteFilterAfterDeleteColRow);
 						}
 						else
 						{
@@ -1853,7 +1853,7 @@
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = cloneData;
 								var splitRange = cloneData.Ref.split(':');
-								if(!gUndoInsDelCellsFlag)
+								/*if(!gUndoInsDelCellsFlag)
 								{
 									gUndoInsDelCellsFlag = 
 									{
@@ -1862,7 +1862,7 @@
 										data: cloneData
 									}
 								}
-								else
+								else*/
 									this._setColorStyleTable(splitRange[0], splitRange[1], cloneData, null, true);
 								this._addButtonAF({result: cloneData.result,isVis: true});
 							}
@@ -2036,18 +2036,83 @@
 				return objOptions;
 			},
 			//если селект затрагивает часть хотя бы одной форматированной таблицы(для случая insert(delete) cells)
-			isActiveCellsCrossHalfFTable: function(activeCells, val, prop)
+			isActiveCellsCrossHalfFTable: function(activeCells, val, prop, bUndoRedo)
 			{
 				var InsertCellsAndShiftDown = (val == c_oAscInsertOptions.InsertCellsAndShiftDown && prop == 'insCell') ? true : false;
 				var InsertCellsAndShiftRight = (val == c_oAscInsertOptions.InsertCellsAndShiftRight && prop == 'insCell') ? true : false;
-				var DeleteCellsAndShiftLeft = (val == c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell') ? true : false;;
-				var DeleteCellsAndShiftTop = (val == c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell') ? true : false;;
+				var DeleteCellsAndShiftLeft = (val == c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell') ? true : false;
+				var DeleteCellsAndShiftTop = (val == c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell') ? true : false;
+				
+				var DeleteColumns = (val == c_oAscDeleteOptions.DeleteColumns && prop == 'delCell') ? true : false;
+				var DeleteRows = (val == c_oAscDeleteOptions.DeleteRows && prop == 'delCell') ? true : false;
 				
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var tableParts = aWs.TableParts;
 				var autoFilter = aWs.AutoFilter;
 				var result = true;
+				
+				if(DeleteColumns || DeleteRows)
+				{
+					//меняем активную область
+					var newActiveRange;
+					if(DeleteRows)
+					{
+						newActiveRange = 
+						{
+							c1: ws.visibleRange.c1,
+							c2: ws.visibleRange.c2,
+							r1: activeCells.r1,
+							r2: activeCells.r2
+						}
+					}
+					else
+					{
+						newActiveRange = 
+						{
+							c1: activeCells.c1,
+							c2: activeCells.c2,
+							r1: ws.visibleRange.r1,
+							r2: ws.visibleRange.r2
+						}
+					}
+					//если активной областью захвачена полнотью форматированная таблица(или её часть) + часть форматированной таблицы - выдаём ошибку
+					if(tableParts)
+					{
+						var tableRange;
+						var isExp = false;
+						var isPart = false;
+						for(var i = 0; i < tableParts.length; i++ )
+						{
+							tableRange = this._refToRange(tableParts[i].Ref);
+							//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
+							if(this._rangeHitInAnRange(newActiveRange, tableRange))
+							{
+								if(isExp && isPart)//часть + целая
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									return false;
+								}	
+								if(newActiveRange.c1 <= tableRange.c1 && newActiveRange.c2 >= tableRange.c2 && newActiveRange.r1 <= tableRange.r1 && newActiveRange.r2 >= tableRange.r2)
+									isExp = true;
+								else if(isExp)
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									return false;
+								}
+								else if(isPart)//уже часть захвачена + ещё одна часть
+								{
+									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									return false;
+								}
+								else	
+									isPart = true;	
+							}
+						}
+					}
+					return result;
+				}
+				
 				//проверка на то, что захвачен кусок форматированной таблицы
 				if(tableParts)//при удалении в MS Excel ошибка может возникать только в случае форматированных таблиц
 				{
@@ -2079,7 +2144,8 @@
 								}
 								if(!isExp)
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									if(!bUndoRedo)
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2092,7 +2158,8 @@
 								//если данный фильтр находится справа
 								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									if(!bUndoRedo)
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2101,7 +2168,8 @@
 								//если данный фильтр находится внизу
 								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									if(!bUndoRedo)
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								
@@ -2111,7 +2179,8 @@
 								//если данный фильтр находится справа
 								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									if(!bUndoRedo)
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -2120,7 +2189,8 @@
 								//если данный фильтр находится внизу
 								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
 								{
-									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									if(!bUndoRedo)
+										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -4431,24 +4501,30 @@
 			},
 			
 			//change filters after insert column
-			_changeFiltersAfterColumn: function(col,val,type)
+			_changeFiltersAfterColumn: function(col, val, type)
 			{
 				History.TurnOff();
 				var aWs = this._getCurrentWS();
+				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
 				if(aWs.AutoFilter)
 				{
 					var ref = aWs.AutoFilter.Ref.split(':');
+					var doNotChangesHeadString = false;
+					var newCol = col;
+					if(val > 0 && bUndoChanges && ((col == this._idToRange(ref[0]).c1 && type == "insCol") || (col == this._idToRange(ref[0]).r1 && type == "insRow")))
+						newCol++;
 					var options = {
 						ref:ref,
 						val:val,
 						type:type,
-						col:col
+						col:newCol
 					};
 					//внутри данного фильтра располагается колонка(колонки)
 					this._changeFilterAfterInsertColumn(options,type);
 				}
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
+					var length;
 					for(var lT = 0; lT < aWs.TableParts.length; lT++)
 					{
 						var ref = aWs.TableParts[lT].Ref.split(':');
@@ -4459,8 +4535,11 @@
 							col:col,
 							index: lT
 						};
+						length = aWs.TableParts.length;
 						//внутри данного фильтра располагается колонка
 						this._changeFilterAfterInsertColumn(options,type);
+						if(length > aWs.TableParts.length)
+							lT--;
 					}
 				}
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
@@ -4485,6 +4564,7 @@
 				var  colStart = col;
 				var colEnd = col + Math.abs(val) - 1;
 				
+				//диапазон фильтра
 				var startRangeCell = startRange.c1;
 				var endRangeCell   = endRange.c2;
 				if(type == 'insRow')
@@ -4520,8 +4600,9 @@
 					{
 						var valNew = startRangeCell - colEnd - 1;
 						var val2 = colStart - startRangeCell;
-						this._editFilterAfterInsertColumn(range,valNew,startRangeCell,type);
-						this._editFilterAfterInsertColumn(range,val2,undefined,type);
+						var retVal = this._editFilterAfterInsertColumn(range,valNew,startRangeCell,type);
+						if(!retVal)
+							this._editFilterAfterInsertColumn(range,val2,undefined,type);
 					}
 					else
 					{
@@ -4598,8 +4679,8 @@
 							r2: endCell.r1,
 							c2: endCell.c1
 						}
-						this.isEmptyAutoFilters(activeRange, true, true);
-						return;
+						this.isEmptyAutoFilters(activeRange, true, true, true);
+						return true;
 					}
 				}
 				
@@ -4631,6 +4712,7 @@
 					//change result into filter and change info in button
 					if(filter.result && filter.result.length > 0)
 					{
+						var insertIndexes = [];
 						for(var filR = 0; filR < filter.result.length; filR++)
 						{
 							 var curFilter = filter.result[filR];
@@ -4664,11 +4746,12 @@
 							{
 								for(var b = 0; b < buttons.length; b++)
 								{
-									if(buttons[b].id == curFilter.id)
+									if(buttons[b].id == curFilter.id && !insertIndexes[b])
 									{
 										buttons[b].inFilter = filter.Ref;
 										buttons[b].id = id;
 										buttons[b].idNext = nextId;
+										insertIndexes[b] = true;
 										break;
 									}
 								}
@@ -4699,6 +4782,7 @@
 						var newResult = [];
 						var n = 0;
 						var isChangeColumn  = false;
+						var insertIndexes = [];
 						for(var filR = 0; filR < filter.result.length; filR++)
 						{
 							var endCount = 0;
@@ -4828,6 +4912,21 @@
 								
 								var id = this._rangeToId(newFirstCol);
 								var nextId = this._rangeToId(newNextCol);
+								if(buttons && buttons.length)
+								{
+									for(var b = 0; b < buttons.length; b++)
+									{
+										if(buttons[b].id == curFilter.id && !insertIndexes[b])
+										{
+											buttons[b].inFilter = inFilter;
+											buttons[b].id = id;
+											buttons[b].idNext = nextId;
+											insertIndexes[b] = true;
+											break;
+										}
+									}
+								}
+								
 								curFilter.inFilter = inFilter;
 								curFilter.id = id;
 								curFilter.idNext = nextId;
@@ -5594,7 +5693,7 @@
 				}
 			},
 			
-			_addHistoryObj: function (oldObj, type, redoObject) {
+			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow) {
 				var ws = this.worksheet;
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
@@ -5609,6 +5708,11 @@
 				oHistoryObject.moveTo               = redoObject.arnTo;
 
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
+				if(deleteFilterAfterDeleteColRow && History.CurPoint && History.CurPoint.Items && History.CurPoint.Items.length)
+				{
+					var popEl = History.CurPoint.Items.pop();
+					History.CurPoint.Items.unshift(popEl);
+				}
 			},
 			
 			_isAddNameColumn: function(range)
@@ -5716,6 +5820,8 @@
 				var isSequence = false;
 				if(indexInsertColumn != undefined)
 				{
+					if(indexInsertColumn < 0)
+						indexInsertColumn = 0;
 					var nameStart;
 					var nameEnd;
 					if(tableColumns[indexInsertColumn] && tableColumns[indexInsertColumn].Name)

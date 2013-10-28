@@ -8149,7 +8149,7 @@
 						switch (val) {
 							case c_oAscInsertOptions.InsertCellsAndShiftRight:
 								functionModelAction = function () {
-									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
+									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftRight, prop, bUndoRedo);
 									if(!isCheckChangeAutoFilter)
 										return;
 									if (range.addCellsShiftRight()) {
@@ -8175,7 +8175,7 @@
 								return;
 							case c_oAscInsertOptions.InsertCellsAndShiftDown:
 								functionModelAction = function () {
-									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
+									var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeIns, c_oAscInsertOptions.InsertCellsAndShiftDown, prop, bUndoRedo);
 									if(!isCheckChangeAutoFilter)
 										return;
 									if (range.addCellsShiftBottom()) {
@@ -8252,7 +8252,7 @@
 						range = t.model.getRange3(_updateRangeDel.r1, _updateRangeDel.c1, _updateRangeDel.r2, _updateRangeDel.c2);
 						switch (val) {
 							case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop, bUndoRedo);
 								if(!isCheckChangeAutoFilter)
 									return;
 								
@@ -8278,7 +8278,7 @@
 										gc_nMaxCol0, _updateRangeDel.r2), null, onChangeWorksheetCallback);
 								return;
 							case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop, bUndoRedo);
 								if(!isCheckChangeAutoFilter)
 									return;
 							
@@ -8304,6 +8304,9 @@
 										_updateRangeDel.c2, gc_nMaxRow0), null, onChangeWorksheetCallback);
 								return;
 							case c_oAscDeleteOptions.DeleteColumns:
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteColumns, prop, bUndoRedo);
+								if(!isCheckChangeAutoFilter)
+									return;
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
@@ -8324,6 +8327,9 @@
 										onChangeWorksheetCallback);
 								return;
 							case c_oAscDeleteOptions.DeleteRows:
+								var isCheckChangeAutoFilter = t.autoFilters.isActiveCellsCrossHalfFTable(_updateRangeDel, c_oAscDeleteOptions.DeleteRows, prop, bUndoRedo);
+								if(!isCheckChangeAutoFilter)
+									return;
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
