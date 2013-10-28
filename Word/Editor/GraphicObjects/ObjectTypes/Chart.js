@@ -2289,6 +2289,11 @@ CChartAsGroup.prototype =
         var type = reader.GetLong();
         switch(type)
         {
+            case historyitem_AutoShapes_RecalculateChartRedo:
+            {
+                this.recalculate();
+                break;
+            }
             case historyitem_CalculateAfterCopyInGroup:
             {
                 this.recalculate();
