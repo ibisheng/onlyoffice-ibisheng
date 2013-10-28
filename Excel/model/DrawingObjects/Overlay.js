@@ -838,8 +838,11 @@ CAutoshapeTrack.prototype =
                     else
                     {
                         overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
-                        overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+                        if (!isLine)
+                        {
+                            overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
+                            overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+                        }
                         overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
                     }
 
@@ -938,8 +941,11 @@ CAutoshapeTrack.prototype =
                     else
                     {
                         overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-                        overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+                        if (!isLine)
+                        {
+                            overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+                            overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+                        }
                         overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
                     }
 
