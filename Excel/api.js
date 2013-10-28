@@ -2107,6 +2107,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.IsFocus = isEnabled;
 			},
 
+            asc_searchEnabled: function(bIsEnabled)
+            {
+            },
+
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
 				var d = this.wb.findCellText({text: text, scanByRows: scanByRows, scanForward: scanForward,
 					isMatchCase: isMatchCase, isWholeCell: isWholeCell, isNotSelect: false});
@@ -3335,6 +3339,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getZoom"] = prot.asc_getZoom;
 		prot["asc_setZoom"] = prot.asc_setZoom;
 		prot["asc_enableKeyEvents"] = prot.asc_enableKeyEvents;
+        prot["asc_searchEnabled"] = prot.asc_searchEnabled;
 		prot["asc_findText"] = prot.asc_findText;
 		prot["asc_replaceText"] = prot.asc_replaceText;
 		prot["asc_findCell"] = prot.asc_findCell;

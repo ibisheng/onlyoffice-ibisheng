@@ -366,6 +366,17 @@ function CDocMeta()
         Text    : null
     };
 
+    this.SearchResults = {
+        IsSearch    : false,
+        Text        : "",
+        MachingCase : false,
+        Pages       : [],
+        CurrentPage : -1,
+        Current     : -1,
+        Show        : false,
+        Count       : 0
+    };
+
     var oThisDoc = this;
 
     this.Load = function(url, doc_bin_base64)
@@ -437,6 +448,12 @@ function CDocMeta()
         drDoc.m_lCurrentPage = 0;
         drDoc.m_lPagesCount = this.PagesCount;
         drDoc.m_lCountCalculatePages = this.PagesCount;
+
+        this.SearchResults.Pages = new Array(this.PagesCount);
+        for (var i = 0; i < this.PagesCount; i++)
+        {
+            this.SearchResults.Pages[i] = [];
+        }
 
         editor.sync_countPagesCallback(this.PagesCount);
         editor.sync_currentPageCallback(0);
@@ -2551,6 +2568,449 @@ function CDocMeta()
         }
     }
 
+    this.SearchPage2 = function(pageNum)
+    {
+        var page = this.Pages[pageNum];
+        var s = this.stream;
+        s.Seek(page.start);
+
+        var _searchResults = this.SearchResults;
+        var _navRects = _searchResults.Pages[pageNum];
+
+        var glyphsEqualFound = 0;
+        var text = _searchResults.Text;
+        var glyphsFindCount = text.length;
+
+        if (!_searchResults.MachingCase)
+        {
+            text = text.toLowerCase();
+        }
+
+        if (0 == glyphsFindCount)
+            return;
+
+        var _numLine = -1;
+        var _lineGidExist = false;
+        var _linePrevCharX = 0;
+        var _lineCharCount = 0;
+        var _lineLastGlyphWidth = 0;
+
+        var _findLine = 0;
+        var _findLineOffsetX = 0;
+        var _findLineOffsetR = 0;
+        var _findGlyphIndex = 0;
+
+        var _SeekToNextPoint = 0;
+        var _SeekLinePrevCharX = 0;
+
+        var arrayLines = new Array();
+        var curLine = null;
+
+        while (s.pos < page.end)
+        {
+            var command = s.GetUChar();
+
+            switch (command)
+            {
+                case 41:
+                {
+                    s.Skip(12);
+                    break;
+                }
+                case 22:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 1:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 3:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 131:
+                {
+                    break;
+                }
+                case 130:
+                {
+                    s.Skip(24);
+                    break;
+                }
+                case 80:
+                {
+                    if (0 != _lineCharCount)
+                        _linePrevCharX += s.GetDouble2();
+
+                    _lineCharCount++;
+
+                    var _char = s.GetUShort();
+                    if (_lineGidExist)
+                        s.Skip(2);
+
+                    if (0xFFFF == _char)
+                        curLine.text += " ";
+                    else
+                        curLine.text += String.fromCharCode(_char);
+
+                    if (curLine.W != 0)
+                        s.Skip(2);
+                    else
+                        curLine.W = s.GetDouble2();
+
+                    break;
+                }
+                case 98:
+                case 100:
+                {
+                    break;
+                }
+                case 91:
+                {
+                    // moveto
+                    s.Skip(8);
+                    break;
+                }
+                case 92:
+                {
+                    // lineto
+                    s.Skip(8);
+                    break;
+                }
+                case 94:
+                {
+                    // curveto
+                    s.Skip(24);break;
+                }
+                case 97:
+                {
+                    break;
+                }
+                case 99:
+                {
+                    // drawpath
+                    s.Skip(4);
+                    break;
+                }
+                case 110:
+                {
+                    // drawImage
+                    s.SkipImage();
+                    break;
+                }
+                case 160:
+                {
+                    _linePrevCharX = 0;
+                    _lineCharCount = 0;
+
+                    arrayLines[arrayLines.length] = new CLineInfo();
+                    curLine = arrayLines[arrayLines.length - 1];
+
+                    var mask = s.GetUChar();
+                    curLine.X = s.GetDouble();
+                    curLine.Y = s.GetDouble();
+
+                    if ((mask & 0x01) == 1)
+                    {
+                        var dAscent = s.GetDouble();
+                        var dDescent = s.GetDouble();
+
+                        curLine.Y -= dAscent;
+                        curLine.H = dAscent + dDescent;
+                    }
+                    else
+                    {
+                        curLine.Ex = s.GetDouble();
+                        curLine.Ey = s.GetDouble();
+
+                        var dAscent = s.GetDouble();
+                        var dDescent = s.GetDouble();
+
+                        curLine.X = curLine.X + dAscent * curLine.Ey;
+                        curLine.Y = curLine.Y - dAscent * curLine.Ex;
+
+                        curLine.H = dAscent + dDescent;
+                    }
+
+                    if ((mask & 0x04) != 0)
+                        curLine.W = s.GetDouble();
+
+                    if ((mask & 0x02) != 0)
+                        _lineGidExist = true;
+                    else
+                        _lineGidExist = false;
+
+                    break;
+                }
+                case 162:
+                {
+                    break;
+                }
+                case 161:
+                {
+                    // text transform
+                    s.Skip(16);
+                    break;
+                }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
+                    s.Skip(16);
+                    break;
+                }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
+                    break;
+                }
+                default:
+                {
+                    s.pos = page.end;
+                }
+            }
+        }
+
+        // òåêñò çàïîëíåí. òåïåðü íóæíî ïðîñòî ïðîáåãàòüñÿ è ñìîòðåòü
+        // îòêóäà ñîâïàäåíèå íà÷àëîñü è ãäå çàêîí÷èëîñü
+        _linePrevCharX = 0;
+        _lineCharCount = 0;
+        _numLine = 0;
+
+        s.Seek(page.start);
+
+        while (s.pos < page.end)
+        {
+            var command = s.GetUChar();
+
+            switch (command)
+            {
+                case 41:
+                {
+                    s.Skip(12);
+                    break;
+                }
+                case 22:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 1:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 3:
+                {
+                    s.Skip(4);
+                    break;
+                }
+                case 131:
+                {
+                    break;
+                }
+                case 130:
+                {
+                    s.Skip(24);
+                    break;
+                }
+                case 80:
+                {
+                    if (0 != _lineCharCount)
+                        _linePrevCharX += s.GetDouble2();
+
+                    _lineCharCount++;
+
+                    var _char = s.GetUShort();
+                    if (_lineGidExist)
+                        s.Skip(2);
+
+                    if (0xFFFF == _char)
+                        _char = " ".charCodeAt(0);
+
+                    _lineLastGlyphWidth = s.GetDouble2();
+
+                    var _isFound = false;
+                    if (_searchResults.MachingCase)
+                    {
+                        if (_char == text.charCodeAt(glyphsEqualFound))
+                            _isFound = true;
+                    }
+                    else
+                    {
+                        var _strMem = String.fromCharCode(_char);
+                        _strMem = _strMem.toLowerCase();
+                        if (_strMem.charCodeAt(0) == text.charCodeAt(glyphsEqualFound))
+                            _isFound = true;
+                    }
+
+                    if (_isFound)
+                    {
+                        if (0 == glyphsEqualFound)
+                        {
+                            _findLine = _numLine;
+                            _findLineOffsetX = _linePrevCharX;
+                            _findGlyphIndex = _lineCharCount;
+
+                            _SeekToNextPoint = s.pos;
+                            _SeekLinePrevCharX = _linePrevCharX;
+                        }
+
+                        glyphsEqualFound++;
+                        _findLineOffsetR = _linePrevCharX + _lineLastGlyphWidth;
+                        if (glyphsFindCount == glyphsEqualFound)
+                        {
+                            var _rects = new Array();
+                            for (var i = _findLine; i <= _numLine; i++)
+                            {
+                                var ps = 0;
+                                if (_findLine == i)
+                                    ps = _findLineOffsetX;
+                                var pe = arrayLines[i].W;
+                                if (i == _numLine)
+                                    pe = _findLineOffsetR;
+
+                                var _l = arrayLines[i];
+                                if (_l.Ex == 1 && _l.Ey == 0)
+                                {
+                                    _rects[_rects.length] = { PageNum : pageNum, X : _l.X + ps, Y : _l.Y, W : pe - ps, H : _l.H };
+                                }
+                                else
+                                {
+                                    _rects[_rects.length] = { PageNum : pageNum, X : _l.X + ps * _l.Ex, Y : _l.Y + ps * _l.Ey, W : pe - ps, H : _l.H, Ex : _l.Ex, Ey : _l.Ey };
+                                }
+                            }
+
+                            _navRects[_navRects.length] = _rects;
+
+                            // íóæíî âåðíóòüñÿ è ïîïðîáîâàòü èñêàòü ñî ñëåä áóêâû.
+                            glyphsEqualFound = 0;
+                            s.pos = _SeekToNextPoint;
+                            _linePrevCharX = _SeekLinePrevCharX;
+                            _lineCharCount = _findGlyphIndex;
+                            _numLine = _findLine;
+                        }
+                    }
+                    else
+                    {
+                        if (0 != glyphsEqualFound)
+                        {
+                            // íóæíî âåðíóòüñÿ è ïîïðîáîâàòü èñêàòü ñî ñëåä áóêâû.
+                            glyphsEqualFound = 0;
+                            s.pos = _SeekToNextPoint;
+                            _linePrevCharX = _SeekLinePrevCharX;
+                            _lineCharCount = _findGlyphIndex;
+                            _numLine = _findLine;
+                        }
+                    }
+
+                    break;
+                }
+                case 98:
+                case 100:
+                {
+                    break;
+                }
+                case 91:
+                {
+                    // moveto
+                    s.Skip(8);
+                    break;
+                }
+                case 92:
+                {
+                    // lineto
+                    s.Skip(8);
+                    break;
+                }
+                case 94:
+                {
+                    // curveto
+                    s.Skip(24);break;
+                }
+                case 97:
+                {
+                    break;
+                }
+                case 99:
+                {
+                    // drawpath
+                    s.Skip(4);
+                    break;
+                }
+                case 110:
+                {
+                    // drawImage
+                    s.SkipImage();
+                    break;
+                }
+                case 160:
+                {
+                    // textline
+                    _linePrevCharX = 0;
+                    _lineCharCount = 0;
+
+                    var mask = s.GetUChar();
+                    s.Skip(8);
+
+                    if ((mask & 0x01) == 0)
+                        s.Skip(8);
+
+                    s.Skip(8);
+
+                    if ((mask & 0x04) != 0)
+                        s.Skip(4);
+
+                    if ((mask & 0x02) != 0)
+                        _lineGidExist = true;
+                    else
+                        _lineGidExist = false;
+
+                    break;
+                }
+                case 162:
+                {
+                    ++_numLine;
+                    break;
+                }
+                case 161:
+                {
+                    // text transform
+                    s.Skip(16);
+                    break;
+                }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
+                    s.Skip(16);
+                    break;
+                }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
+                    break;
+                }
+                default:
+                {
+                    s.pos = page.end;
+                }
+            }
+        }
+    }
+
     this.OnMouseDown = function(page, x, y)
     {
         var ret = this.GetNearestPos(page, x, y);
@@ -2736,5 +3196,141 @@ function CDocMeta()
             this.SearchInfo.Id = null;
         }
         editor.WordControl.m_oDrawingDocument.EndSearch(false);
+    }
+
+    this.findText = function(text, isMachingCase, isNext)
+    {
+        this.SearchResults.IsSearch = true;
+        if (text == this.SearchResults.Text && isMachingCase == this.SearchResults.MachingCase)
+        {
+            if (this.SearchResults.Count == 0)
+            {
+                editor.WordControl.m_oDrawingDocument.CurrentSearchNavi = null;
+                this.SearchResults.CurrentPage = -1;
+                this.SearchResults.Current = -1;
+                return;
+            }
+
+            // поиск совпал, просто делаем навигацию к нужному месту
+            if (isNext)
+            {
+                if ((this.SearchResults.Current + 1) < this.SearchResults.Pages[this.SearchResults.CurrentPage].length)
+                {
+                    // результат на этой же странице
+                    this.SearchResults.Current++;
+                }
+                else
+                {
+                    var _pageFind = this.SearchResults.CurrentPage + 1;
+                    var _bIsFound = false;
+                    for (var i = _pageFind; i < this.PagesCount; i++)
+                    {
+                        if (0 < this.SearchResults.Pages[i].length)
+                        {
+                            this.SearchResults.Current = 0;
+                            this.SearchResults.CurrentPage = i;
+                            _bIsFound = true;
+                            break;
+                        }
+                    }
+                    if (!_bIsFound)
+                    {
+                        for (var i = 0; i < _pageFind; i++)
+                        {
+                            if (0 < this.SearchResults.Pages[i].length)
+                            {
+                                this.SearchResults.Current = 0;
+                                this.SearchResults.CurrentPage = i;
+                                _bIsFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (this.SearchResults.Current > 0)
+                {
+                    // результат на этой же странице
+                    this.SearchResults.Current--;
+                }
+                else
+                {
+                    var _pageFind = this.SearchResults.CurrentPage - 1;
+                    var _bIsFound = false;
+                    for (var i = _pageFind; i >= 0; i--)
+                    {
+                        if (0 < this.SearchResults.Pages[i].length)
+                        {
+                            this.SearchResults.Current = this.SearchResults.Pages[i].length - 1;
+                            this.SearchResults.CurrentPage = i;
+                            _bIsFound = true;
+                            break;
+                        }
+                    }
+                    if (!_bIsFound)
+                    {
+                        for (var i = this.PagesCount - 1; i > _pageFind; i++)
+                        {
+                            if (0 < this.SearchResults.Pages[i].length)
+                            {
+                                this.SearchResults.Current = this.SearchResults.Pages[i].length - 1;
+                                this.SearchResults.CurrentPage = i;
+                                _bIsFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            editor.WordControl.m_oDrawingDocument.CurrentSearchNavi =
+                this.SearchResults.Pages[this.SearchResults.CurrentPage][this.SearchResults.Current];
+
+            editor.WordControl.ToSearchResult();
+            return;
+        }
+        // новый поиск
+        for (var i = 0; i < this.PagesCount; i++)
+        {
+            this.SearchResults.Pages[i].splice(0,  this.SearchResults.Pages[i].length);
+        }
+        this.SearchResults.Count = 0;
+
+        this.SearchResults.CurrentPage = -1;
+        this.SearchResults.Current = -1;
+
+        this.SearchResults.Text = text;
+        this.SearchResults.MachingCase = isMachingCase;
+
+        for (var i = 0; i < this.PagesCount; i++)
+        {
+            this.SearchPage2(i);
+            this.SearchResults.Count += this.SearchResults.Pages[i].length;
+        }
+
+        if (this.SearchResults.Count == 0)
+        {
+            editor.WordControl.m_oDrawingDocument.CurrentSearchNavi = null;
+            editor.WordControl.OnUpdateOverlay();
+            return;
+        }
+
+        for (var i = 0; i < this.SearchResults.Pages.length; i++)
+        {
+            if (0 != this.SearchResults.Pages[i].length)
+            {
+                this.SearchResults.CurrentPage = i;
+                this.SearchResults.Current = 0;
+
+                break;
+            }
+        }
+
+        editor.WordControl.m_oDrawingDocument.CurrentSearchNavi =
+            this.SearchResults.Pages[this.SearchResults.CurrentPage][this.SearchResults.Current];
+
+        editor.WordControl.ToSearchResult();
     }
 }

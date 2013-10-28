@@ -2961,8 +2961,23 @@ asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
 	}
 */
 
+asc_docs_api.prototype.asc_searchEnabled = function(bIsEnabled)
+{
+    if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+    {
+        this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.IsSearch = false;
+        this.WordControl.OnUpdateOverlay();
+    }
+}
+
 asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 {
+    if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+    {
+        this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.findText(text, isMatchCase, isNext);
+        return this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.Count;
+    }
+
     var SearchEngine = editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
 
     var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
@@ -2975,7 +2990,10 @@ asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 
 asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
 {
-    editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    this.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
 
     if ( true === isReplaceAll )
         this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, true, -1);
@@ -3000,11 +3018,21 @@ asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAl
 
 asc_docs_api.prototype.asc_selectSearchingResults = function(bShow)
 {
+    if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+    {
+        this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.Show = bShow;
+        this.WordControl.OnUpdateOverlay();
+        return;
+    }
     this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
 }
 
 asc_docs_api.prototype.asc_isSelectSearchingResults = function()
 {
+    if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
+    {
+        return this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.Show;
+    }
     return this.WordControl.m_oLogicDocument.Search_Get_Selection();
 }
 

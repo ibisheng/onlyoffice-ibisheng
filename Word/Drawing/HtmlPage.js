@@ -1038,71 +1038,12 @@ function CEditorPage(api)
     {
         var naviG = this.m_oDrawingDocument.CurrentSearchNavi;
 
-        var navi = naviG.Place[0];
+        var navi = naviG[0];
         var x = navi.X;
         var y = navi.Y;
 
         var type = (naviG.Type & 0xFF);
         var PageNum = navi.PageNum;
-
-        switch (type)
-        {
-            case search_HdrFtr_All:
-            {
-                PageNum = this.m_oDrawingDocument.m_lCurrentPage;
-                break;
-            }
-            case search_HdrFtr_All_no_First:
-            {
-                var curPage = this.m_oDrawingDocument.m_lCurrentPage;
-                if (curPage == 0)
-                    curPage = 1;
-
-                PageNum = curPage;
-                break;
-            }
-            case search_HdrFtr_First:
-            {
-                PageNum = 0;
-                break;
-            }
-            case search_HdrFtr_Even:
-            {
-                var curPage = this.m_oDrawingDocument.m_lCurrentPage;
-                if ((curPage & 1) == 0)
-                {
-                    if (curPage == 0)
-                        curPage = 1;
-                    else
-                        curPage -= 1;
-                }
-                PageNum = curPage;
-                break;
-            }
-            case search_HdrFtr_Odd:
-            {
-                var curPage = this.m_oDrawingDocument.m_lCurrentPage;
-                if ((curPage & 1) == 1)
-                    curPage -= 1;
-
-                PageNum = curPage;
-                break;
-            }
-            case search_HdrFtr_Odd_no_First:
-            {
-                var curPage = this.m_oDrawingDocument.m_lCurrentPage;
-                if ((curPage & 1) == 1)
-                    curPage -= 1;
-
-                if (curPage == 0)
-                    curPage = 2;
-
-                PageNum = curPage;
-                break;
-            }
-            default:
-                break;
-        }
 
         if (navi.Transform)
         {
@@ -1112,10 +1053,6 @@ function CEditorPage(api)
             x = xx;
             y = yy;
         }
-
-        this.m_oDrawingDocument.CurrentSearchNavi.PageNum = PageNum;
-        if (PageNum < 0 || PageNum >= this.m_oDrawingDocument.m_lCountCalculatePages)
-            return;
 
         var rectSize = (navi.H * this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
         var pos = this.m_oDrawingDocument.ConvertCoordsToCursor2(x, y, PageNum);
@@ -2757,53 +2694,6 @@ function CEditorPage(api)
             ctx.fill();
             ctx.beginPath();
             ctx.globalAlpha = 1.0;
-
-            if (null != drDoc.CurrentSearchNavi)
-            {
-                ctx.globalAlpha = 0.2;
-                ctx.fillStyle = "rgba(51,102,204,255)";
-
-                var places = drDoc.CurrentSearchNavi.Place;
-
-                switch ((drDoc.CurrentSearchNavi.Type & 0xFF))
-                {
-                    case search_HdrFtr_All:
-                    case search_HdrFtr_All_no_First:
-                    case search_HdrFtr_First:
-                    case search_HdrFtr_Even:
-                    case search_HdrFtr_Odd:
-                    case search_HdrFtr_Odd_no_First:
-                    {
-                        var _page_num = drDoc.CurrentSearchNavi.PageNum;
-                        for (var i = 0; i < places.length; i++)
-                        {
-                            var place = places[i];
-                            if (drDoc.m_lDrawingFirst <= _page_num && _page_num <= drDoc.m_lDrawingEnd)
-                            {
-                                var drawPage = drDoc.m_arrPages[_page_num].drawingPage;
-                                drDoc.m_arrPages[place.PageNum].DrawSearchCur1(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, place);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                    {
-                        for (var i = 0; i < places.length; i++)
-                        {
-                            var place = places[i];
-                            if (drDoc.m_lDrawingFirst <= place.PageNum && place.PageNum <= drDoc.m_lDrawingEnd)
-                            {
-                                var drawPage = drDoc.m_arrPages[place.PageNum].drawingPage;
-                                drDoc.m_arrPages[place.PageNum].DrawSearchCur1(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, place);
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-            }
         }
 
         if (null == drDoc.m_oDocumentRenderer)
@@ -2885,6 +2775,44 @@ function CEditorPage(api)
         }
         else
         {
+            ctx.globalAlpha = 0.2;
+
+            if (drDoc.m_oDocumentRenderer.SearchResults.IsSearch)
+            {
+                this.m_oOverlayApi.Show();
+
+                if (drDoc.m_oDocumentRenderer.SearchResults.Show)
+                {
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = "rgba(255,200,0,1)";
+                    ctx.beginPath();
+                    for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
+                    {
+                        var _searching = drDoc.m_oDocumentRenderer.SearchResults.Pages[i];
+
+                        if (0 != _searching.length)
+                        {
+                            var drawPage = drDoc.m_arrPages[i].drawingPage;
+                            drDoc.m_arrPages[i].DrawSearch2(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, _searching);
+                        }
+                    }
+                    ctx.fill();
+                    ctx.globalAlpha = 0.2;
+                }
+                ctx.beginPath();
+
+                if (drDoc.CurrentSearchNavi)
+                {
+                    var _pageNum = drDoc.CurrentSearchNavi[0].PageNum;
+                    ctx.fillStyle = "rgba(51,102,204,255)";
+                    if (_pageNum >= drDoc.m_lDrawingFirst && _pageNum <= drDoc.m_lDrawingEnd)
+                    {
+                        var drawPage = drDoc.m_arrPages[_pageNum].drawingPage;
+                        drDoc.m_arrPages[_pageNum].DrawSearchCur(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.CurrentSearchNavi);
+                    }
+                }
+            }
+
             ctx.fillStyle = "rgba(51,102,204,255)";
             ctx.beginPath();
 
@@ -2894,7 +2822,6 @@ function CEditorPage(api)
                 drDoc.m_oDocumentRenderer.DrawSelection(i, overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
             }
 
-            ctx.globalAlpha = 0.2;
             ctx.fill();
             ctx.beginPath();
             ctx.globalAlpha = 1.0;

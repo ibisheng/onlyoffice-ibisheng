@@ -1182,6 +1182,78 @@ function CPage()
         }
     }
 
+    this.DrawSearch2 = function(overlay, xDst, yDst, wDst, hDst, _searching)
+    {
+        var dKoefX = wDst / this.width_mm;
+        var dKoefY = hDst / this.height_mm;
+
+        var ctx = overlay.m_oContext;
+        for (var i = 0; i < _searching.length; i++)
+        {
+            var _find_count = _searching[i].length;
+
+            for (var j = 0; j < _find_count; j++)
+            {
+                var place = _searching[i][j];
+
+                if (!place.Transform)
+                {
+                    if (undefined === place.Ex)
+                    {
+                        var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                        var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
+
+                        var _w = ((dKoefX * place.W) >> 0) + 1;
+                        var _h = ((dKoefY * place.H) >> 0) + 1;
+
+                        if (_x < overlay.min_x)
+                            overlay.min_x = _x;
+                        if ((_x + _w) > overlay.max_x)
+                            overlay.max_x = _x + _w;
+
+                        if (_y < overlay.min_y)
+                            overlay.min_y = _y;
+                        if ((_y + _h) > overlay.max_y)
+                            overlay.max_y = _y + _h;
+
+                        ctx.rect(_x,_y,_w,_h);
+                    }
+                    else
+                    {
+                        var _x1 = (xDst + dKoefX * place.X) >> 0;
+                        var _y1 = (yDst + dKoefY * place.Y) >> 0;
+
+                        var x2 = place.X + place.W * place.Ex;
+                        var y2 = place.Y + place.W * place.Ey;
+                        var _x2 = (xDst + dKoefX * x2) >> 0;
+                        var _y2 = (yDst + dKoefY * y2) >> 0;
+
+                        var x3 = x2 - place.H * place.Ey;
+                        var y3 = y2 + place.H * place.Ex;
+                        var _x3 = (xDst + dKoefX * x3) >> 0;
+                        var _y3 = (yDst + dKoefY * y3) >> 0;
+
+                        var x4 = place.X - place.H * place.Ey;
+                        var y4 = place.Y + place.H * place.Ex;
+                        var _x4 = (xDst + dKoefX * x4) >> 0;
+                        var _y4 = (yDst + dKoefY * y4) >> 0;
+
+                        overlay.CheckPoint(_x1, _y1);
+                        overlay.CheckPoint(_x2, _y2);
+                        overlay.CheckPoint(_x3, _y3);
+                        overlay.CheckPoint(_x4, _y4);
+
+                        ctx.moveTo(_x1, _y1);
+                        ctx.lineTo(_x2, _y2);
+                        ctx.lineTo(_x3, _y3);
+                        ctx.lineTo(_x4, _y4);
+                        ctx.lineTo(_x1, _y1);
+                    }
+                }
+            }
+        }
+    }
+
     this.drawInHdrFtr = function(overlay, xDst, yDst, wDst, hDst, dKoefX, dKoefY, arr)
     {
         var _c = arr.length;
@@ -1314,143 +1386,15 @@ function CPage()
         return true;
     }
 
-    this.DrawSearchCur1 = function(overlay, xDst, yDst, wDst, hDst, place)
+    this.DrawSearchCur = function(overlay, xDst, yDst, wDst, hDst, places)
     {
         var dKoefX = wDst / this.width_mm;
         var dKoefY = hDst / this.height_mm;
 
-        var ctx = overlay.m_oContext;
-
-        if (!place.Transform)
-        {
-            if (undefined === place.Ex)
-            {
-                var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
-                var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
-
-                var _w = ((dKoefX * place.W) >> 0) + 1;
-                var _h = ((dKoefY * place.H) >> 0) + 1;
-
-                if (_x < overlay.min_x)
-                    overlay.min_x = _x;
-                if ((_x + _w) > overlay.max_x)
-                    overlay.max_x = _x + _w;
-
-                if (_y < overlay.min_y)
-                    overlay.min_y = _y;
-                if ((_y + _h) > overlay.max_y)
-                    overlay.max_y = _y + _h;
-
-                ctx.rect(_x,_y,_w,_h);
-            }
-            else
-            {
-                var _x1 = (xDst + dKoefX * place.X) >> 0;
-                var _y1 = (yDst + dKoefY * place.Y) >> 0;
-
-                var x2 = place.X + place.W * place.Ex;
-                var y2 = place.Y + place.W * place.Ey;
-                var _x2 = (xDst + dKoefX * x2) >> 0;
-                var _y2 = (yDst + dKoefY * y2) >> 0;
-
-                var x3 = x2 - place.H * place.Ey;
-                var y3 = y2 + place.H * place.Ex;
-                var _x3 = (xDst + dKoefX * x3) >> 0;
-                var _y3 = (yDst + dKoefY * y3) >> 0;
-
-                var x4 = place.X - place.H * place.Ey;
-                var y4 = place.Y + place.H * place.Ex;
-                var _x4 = (xDst + dKoefX * x4) >> 0;
-                var _y4 = (yDst + dKoefY * y4) >> 0;
-
-                overlay.CheckPoint(_x1, _y1);
-                overlay.CheckPoint(_x2, _y2);
-                overlay.CheckPoint(_x3, _y3);
-                overlay.CheckPoint(_x4, _y4);
-
-                ctx.moveTo(_x1, _y1);
-                ctx.lineTo(_x2, _y2);
-                ctx.lineTo(_x3, _y3);
-                ctx.lineTo(_x4, _y4);
-                ctx.lineTo(_x1, _y1);
-            }
-        }
-        else
-        {
-            var _tr = place.Transform;
-            if (undefined === place.Ex)
-            {
-                var _x1 = xDst + dKoefX * _tr.TransformPointX(place.X, place.Y);
-                var _y1 = yDst + dKoefY * _tr.TransformPointY(place.X, place.Y);
-
-                var _x2 = xDst + dKoefX * _tr.TransformPointX(place.X + place.W, place.Y);
-                var _y2 = yDst + dKoefY * _tr.TransformPointY(place.X + place.W, place.Y);
-
-                var _x3 = xDst + dKoefX * _tr.TransformPointX(place.X + place.W, place.Y + place.H);
-                var _y3 = yDst + dKoefY * _tr.TransformPointY(place.X + place.W, place.Y + place.H);
-
-                var _x4 = xDst + dKoefX * _tr.TransformPointX(place.X, place.Y + place.H);
-                var _y4 = yDst + dKoefY * _tr.TransformPointY(place.X, place.Y + place.H);
-
-                overlay.CheckPoint(_x1, _y1);
-                overlay.CheckPoint(_x2, _y2);
-                overlay.CheckPoint(_x3, _y3);
-                overlay.CheckPoint(_x4, _y4);
-
-                ctx.moveTo(_x1, _y1);
-                ctx.lineTo(_x2, _y2);
-                ctx.lineTo(_x3, _y3);
-                ctx.lineTo(_x4, _y4);
-                ctx.lineTo(_x1, _y1);
-            }
-            else
-            {
-                var x2 = place.X + place.W * place.Ex;
-                var y2 = place.Y + place.W * place.Ey;
-
-                var x3 = x2 - place.H * place.Ey;
-                var y3 = y2 + place.H * place.Ex;
-
-                var x4 = place.X - place.H * place.Ey;
-                var y4 = place.Y + place.H * place.Ex;
-
-                var _x1 = xDst + dKoefX * _tr.TransformPointX(place.X, place.Y);
-                var _y1 = yDst + dKoefY * _tr.TransformPointY(place.X, place.Y);
-
-                var _x2 = xDst + dKoefX * _tr.TransformPointX(x2, y2);
-                var _y2 = yDst + dKoefY * _tr.TransformPointY(x2, y2);
-
-                var _x3 = xDst + dKoefX * _tr.TransformPointX(x3, y3);
-                var _y3 = yDst + dKoefY * _tr.TransformPointY(x3, y3);
-
-                var _x4 = xDst + dKoefX * _tr.TransformPointX(x4, y4);
-                var _y4 = yDst + dKoefY * _tr.TransformPointY(x4, y4);
-
-                overlay.CheckPoint(_x1, _y1);
-                overlay.CheckPoint(_x2, _y2);
-                overlay.CheckPoint(_x3, _y3);
-                overlay.CheckPoint(_x4, _y4);
-
-                ctx.moveTo(_x1, _y1);
-                ctx.lineTo(_x2, _y2);
-                ctx.lineTo(_x3, _y3);
-                ctx.lineTo(_x4, _y4);
-                ctx.lineTo(_x1, _y1);
-            }
-        }
-    }
-
-    this.DrawSearchCur = function(overlay, xDst, yDst, wDst, hDst, navi)
-    {
-        var dKoefX = wDst / this.width_mm;
-        var dKoefY = hDst / this.height_mm;
-
-        var places = navi.Place;
         var len = places.length;
 
         var ctx = overlay.m_oContext;
 
-        ctx.globalAlpha = 0.2;
         ctx.fillStyle = "rgba(51,102,204,255)";
 
         for (var i = 0; i < len; i++)
@@ -1510,7 +1454,7 @@ function CPage()
         }
 
         ctx.fill();
-        ctx.globalAlpha = 1.0;
+        ctx.beginPath();
     }
 
     this.DrawTableOutline = function(overlay, xDst, yDst, wDst, hDst, table_outline_dr)
@@ -3016,12 +2960,6 @@ function CDrawingDocument()
         }
 
         this.CheckTargetDraw(x, y);
-
-        if (this.m_bIsSearching && null != this.CurrentSearchNavi)
-        {
-            this.CurrentSearchNavi = null;
-            this.m_oWordControl.OnUpdateOverlay();
-        }
     }
     this.UpdateTarget2 = function(x, y, pageIndex)
     {
@@ -3208,12 +3146,6 @@ function CDrawingDocument()
         oThis.TargetHtmlElement.style.top  = pos.Y + "px";
 
         this.m_oWordControl.CheckTextBoxInputPos();
-
-        if (this.m_bIsSearching && null != this.CurrentSearchNavi)
-        {
-            this.CurrentSearchNavi = null;
-            oWordControl.OnUpdateOverlay();
-        }
     }
 
     this.SetTargetSize = function(size)
@@ -3601,7 +3533,6 @@ function CDrawingDocument()
 
         this.m_oWordControl.m_oOverlayApi.Clear();
         this.m_bIsSearching = false;
-        this.CurrentSearchNavi = null;
     }
     this.AddPageSearch = function(findText, rects, type)
     {
@@ -3765,7 +3696,6 @@ function CDrawingDocument()
         if (this.m_bIsSelection)
             this.m_oWordControl.OnUpdateOverlay();
         this.m_bIsSearching = true;
-        this.CurrentSearchNavi = null;
     }
     this.EndSearch = function(bIsChange)
     {

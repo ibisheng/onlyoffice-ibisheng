@@ -1584,6 +1584,10 @@ asc_docs_api.prototype.findText = function(text, scanForward){
     return this.WordControl.m_oLogicDocument.findText(text, scanForward);
 }
 
+asc_docs_api.prototype.asc_searchEnabled = function(bIsEnabled)
+{
+    // пустой метод
+}
 
 asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 {
