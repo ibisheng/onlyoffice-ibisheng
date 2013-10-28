@@ -5309,7 +5309,7 @@
 						c1 = c2 = findVisibleCol(ar.c1, dc);
 					}
 				} else {
-					if (t.nColsCount > ar.c2 && t.cols[ar.c2].width < t.width_1px) {
+					if (0 !== dc && t.nColsCount > ar.c2 && t.cols[ar.c2].width < t.width_1px) {
 						// Проверка для одновременно замерженных и скрытых ячеек (A1:C1 merge, B:C hidden)
 						for (mc = null, i = arn.r1; i <= arn.r2; ++i) {
 							mc = t.model.getMergedByCell(i, ar.c2);
@@ -5325,7 +5325,7 @@
 						r1 = r2 = findVisibleRow(ar.r1, dr);
 					}
 				} else {
-					if (t.nRowsCount > ar.r2 && t.rows[ar.r2].height < t.height_1px) {
+					if (0 !== dr && t.nRowsCount > ar.r2 && t.rows[ar.r2].height < t.height_1px) {
 						//Проверка для одновременно замерженных и скрытых ячеек (A1:A3 merge, 2:3 hidden)
 						for (mc = null, i = arn.c1; i <= arn.c2; ++i) {
 							mc = t.model.getMergedByCell(ar.r2, i);
