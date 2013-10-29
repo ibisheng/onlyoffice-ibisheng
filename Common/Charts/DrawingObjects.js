@@ -4499,20 +4499,22 @@ function DrawingObjects() {
 		
 		// выход за границу справа
 		if ( x + w > right ) {
-			var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+			var scrollX = scrollOffset.getX();
+			var foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
 			while ( foundCol == null ) {
 				worksheet.expandColsOnScroll(true);
 				worksheet._trigger("reinitializeScrollX");
-				foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+				foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
 			}
 		}
 		// выход за границу снизу
 		if ( y + h > bottom ) {
-			var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+			var scrollY = scrollOffset.getY();
+			var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
 			while ( foundRow == null ) {
 				worksheet.expandRowsOnScroll(true);
 				worksheet._trigger("reinitializeScrollY");
-				foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+				foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
 			}
 		}
 		
