@@ -291,6 +291,7 @@ CDocument.prototype.Search_GetId = function(bNext)
         if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
             Pos = ( true === bNext ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : Math.min(this.Selection.StartPos, this.Selection.EndPos) );
 
+        var StartPos = Pos;
 
         if ( true === bNext )
         {
@@ -311,6 +312,19 @@ CDocument.prototype.Search_GetId = function(bNext)
 
                 Pos++;
             }
+
+            Pos = 0;
+            while ( Pos <= StartPos )
+            {
+                Id = this.Content[Pos].Search_GetId(true, false);
+
+                if ( null != Id )
+                    return Id;
+
+                Pos++;
+            }
+
+            return null;
         }
         else
         {
@@ -330,12 +344,27 @@ CDocument.prototype.Search_GetId = function(bNext)
 
                 Pos--;
             }
+
+            Pos = this.Content.length - 1;
+            while ( Pos >= StartPos )
+            {
+                Id = this.Content[Pos].Search_GetId(false, false);
+
+                if ( null != Id )
+                    return Id;
+
+                Pos--;
+            }
+
+            return null;
         }
     }
     else if ( docpostype_HdrFtr === this.CurPos.Type )
     {
         return this.HdrFtr.Search_GetId( bNext );
     }
+
+    return null;
 };
 
 CDocument.prototype.Search_Set_Selection = function(bSelection)
