@@ -3788,7 +3788,7 @@ CPresentation.prototype =
                         pos_x = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].x;
                         pos_y = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].y;
                     }
-                    var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( pos_x, pos_y, this.PageNum );
+                    var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR_2( pos_x, pos_y, this.PageNum );
                     var X_abs = ConvertedPos.X;
                     var Y_abs = ConvertedPos.Y;
                     editor.sync_ContextMenuCallback(new CMouseMoveData({ Type : type, X_abs : X_abs, Y_abs : Y_abs }) );
