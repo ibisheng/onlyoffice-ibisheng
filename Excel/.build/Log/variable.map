@@ -20,7 +20,7 @@ numbering_presentationnumfrmt_RomanUcPeriod:n5
 c_oSerRowTypes$Row:XE
 deg2rad:Nx
 ETableStyleType$tablestyletypeThirdSubtotalColumn:DK
-JSCompiler_returnArg:ca
+JSCompiler_returnArg:da
 ETableStyleType$tablestyletypeHeaderRow:pK
 UndoRedoData_AutoFilter:GA
 TT_Get_VMetrics:$s
@@ -46,7 +46,7 @@ c_oSer_TableColumns$DataDxfId:vG
 JSCompiler_StaticMethods_setHyperlinkOpen:NL
 historyitem_Cell_AlignVertical:JP
 g_mouse_event_type_move:T2
-fontstyle_mask_italic:zx
+fontstyle_mask_italic:yx
 c_oSer_TableStyles$DefaultPivotStyle:yH
 CellValueType$Error:oa
 para_HyperlinkStart:fZ
@@ -193,7 +193,7 @@ c_oSer_ConditionalFormattingIconSet$Percent:NI
 ETableStyleType$tablestyletypeSecondRowStripe:xK
 JSCompiler_StaticMethods_getRange3:nA
 JSCompiler_StaticMethods_IncDec_FontSize:q7
-JSCompiler_StaticMethods_getRange2:Ge
+JSCompiler_StaticMethods_getRange2:Fe
 EUnderline$underlineDoubleAccounting:AJ
 T1_Face_Done:Fv
 JSCompiler_StaticMethods_createCellOnRowColCross:$P
@@ -251,7 +251,7 @@ nVertTThorz:GW
 Current_Ratio:ks
 Direct_Move:xr
 getMaxValueArray:ye
-xhrSupported$$inline_1238:rx
+xhrSupported$$inline_1239:rx
 historyitem_Cell_AlignHorizontal:KP
 JSCompiler_StaticMethods_getMousePosition:oS
 EUnderline$underlineNone:BJ
@@ -278,9 +278,9 @@ FT_GlyphLoader_New:kk
 ScrollArrowType$ARROW_RIGHT:dS
 asc_CChartLegend:Oe
 SLIDE_KIND:RS
-_builder_funcs$$inline_664:Jn
 BULLET_TYPE_COLOR_NONE:OW
 FT_CFF_CMAP_ENCODING_CLASS_REC_GET:Hu
+_builder_funcs$$inline_665:Jn
 align_Left:SR
 FT_Common:Gi
 JSCompiler_StaticMethods_rebuild:kM
@@ -350,7 +350,7 @@ tt_service_truetype_engine:jt
 STATES_ID_MOVE_INTERNAL_CHART_OBJECT:F1
 c_oSer_ConditionalFormattingDataBar$ShowValue:KI
 phType_dt:rU
-CellFormat:od
+CellFormat:nd
 tt_face_vary_cvt:Ys
 JSCompiler_StaticMethods__foreachNoEmpty:HB
 SplineBezierState5:w2
@@ -359,8 +359,8 @@ SplineBezierState3:t2
 SplineBezierState2:s2
 JSCompiler_StaticMethods_drawStrokeFillStyle:n8
 c_oSerWorksheetColTypes$CustomWidth:NE
+_decoder_funcs$$inline_666:Kn
 Move_Zp2_Point:Rr
-_decoder_funcs$$inline_665:Kn
 c_oAscServerError$ConvertDownload:Xa
 ColorManager:pM
 JSCompiler_StaticMethods_CheckFontLoadStyles:Dx
@@ -368,7 +368,7 @@ FormatParser:Ad
 TTC_HeaderRec:Gk
 historyitem_Workbook_SheetMove:mO
 CNumbering:K3
-historyitem_Worksheet_ChangeHyperlink:IO
+historyitem_Worksheet_ChangeHyperlink:HO
 BULLET_TYPE_SIZE_NONE:SW
 CArrowDrawer:jS
 cff_builder_add_point1:Ru
@@ -615,7 +615,7 @@ c_oSer_Comments$WidthMM:YH
 gc_nMaxCol:cC
 generateColors:ue
 EChartLegendPos$chartlegendposRightTop:I_
-CLASS_TYPE_CHART_DATA:Se
+CLASS_TYPE_CHART_DATA:Re
 JSCompiler_StaticMethods_SetSelectionRedo:iA
 UndoRedoDataAddHandleXY:mR
 CAscShapeProp:J8
@@ -629,7 +629,7 @@ EFontScheme$fontschemeNone:JK
 JSCompiler_StaticMethods_Set_Italic:$2
 COLOR_TYPE_SRGB:NS
 JSCompiler_StaticMethods_SerializeDataObject:aR
-c_oAscServerError$Unknown:Ha
+c_oAscServerError$Unknown:Ia
 tt_cmap0_char_index:Ho
 Ins_MDRP:zs
 CCMapIndex:vw
@@ -653,7 +653,7 @@ c_oSer_Comments$HeightMM:ZH
 JSCompiler_StaticMethods_setValueData:UP
 c_oSer_SheetPr$TransitionEntry:iJ
 JSCompiler_StaticMethods_Check_NeedRecalc:X4
-UndoRedoData_FromToHyperlink:JO
+UndoRedoData_FromToHyperlink:IO
 nSldLtTTbl:AV
 CLASS_TYPE_TEXT_BODY:A3
 tt_cmap14_char_map_def_binary:rp
@@ -702,7 +702,7 @@ STATES_ID_ROTATE:b1
 JSCompiler_StaticMethods_Internal_MoveCursorBackward:Q6
 c_oSerFormulaTypes$Dt2D:oF
 UndoRedoDataAddGeometryRect:qR
-Editor_CopyPaste_Create:eA
+Editor_CopyPaste_Create:dA
 FORMULA_TYPE_MOD:vX
 asc_CImgProperty:Lf
 JSCompiler_StaticMethods_resetSelectionState:Bh
@@ -729,12 +729,12 @@ JSCompiler_StaticMethods_lnTo:QX
 c_oSerNumFmtTypes$FormatCode:PD
 g_nodeAttributeEnd:ny
 gray_set_cell:kq
-c_oAscChartLegend$right:ra
+c_oAscChartLegend$right:sa
 CLASS_TYPE_TABLE_ID:y3
 c_oSerAligmentTypes$TextRotation:BD
 Pop_Push_Count:or
 skip_comment:Tm
-PostMessageType$UploadImage:Ea
+PostMessageType$UploadImage:Fa
 EVerticalAlignRun$verticalalignrunBaseline:EJ
 c_oSer_ChartTitlePptxType$TxPptx:yZ
 JSCompiler_StaticMethods_createBinary:vT
@@ -817,16 +817,16 @@ c_oSer_ChartType$TitlePptx:wZ
 REND_MODE:Cw
 HF:YU
 tt_face_load_sbit_stub:Hp
-fontslot_CS:Xx
+fontslot_CS:Wx
 FT_Open_Args:tl
 c_oSerFormat$Signature:CC
 c_oSer_FilterColumn$DynamicFilter:TG
-c_oAscServerError$ReadRequestStream:Ia
+c_oAscServerError$ReadRequestStream:Ja
 nSldLtTObjOverTx:wV
 tt_cmap13_char_next:kp
 FT_MM_Axis:rk
 EChartBasicTypes$chartbasicScatterChart:Q_
-historyitem_Chart_RangeRowColumns:ef
+historyitem_Chart_RangeRowColumns:af
 FT_GlyphLoader_CheckSubGlyphs:nk
 tt_cmap14_def_char_count:yp
 historyitem_Chart_LegendPosition:rf
@@ -910,7 +910,7 @@ bezier4:YX
 bezier3:XX
 EBorderStyle$borderstyleMedium:rJ
 JSCompiler_StaticMethods_Selection_CalculateTextPr:n7
-break_Page:k4
+break_Page:j4
 Page_Height:W5
 c_oAscColor$COLOR_TYPE_PRST:mz
 c_oSer_PageMargins$Top:XF
@@ -1174,8 +1174,8 @@ rtl_math_erfc:fC
 GX_AVarSegmentRec:Ns
 FT_FACE_FIND_SERVICE:Si
 Path:OX
-c_oSerRowTypes$Hidden:aF
-SignType$Negative:pc
+c_oSerRowTypes$Hidden:$E
+SignType$Negative:oc
 TT_HdmxRec:Ok
 JSCompiler_StaticMethods_CheckColors:nx
 CreateAscFill:F8
@@ -1259,7 +1259,7 @@ historyitem_RowCol_ShrinkToFit:WM
 raster_memory:hq
 LoadFontFile:Uw
 c_oAscChartType$scatter:Yd
-c_oAscServerError$NoError:Fa
+c_oAscServerError$NoError:Ga
 JSCompiler_StaticMethods_getResultScaleCoefficients:j2
 c_oAscError$ID$DownloadError:Hy
 CHatchBrush:mx
@@ -1329,7 +1329,7 @@ tt_cmap13_char_index:jp
 JSCompiler_StaticMethods__removeTileZeros:yd
 cff_index_read_offset:gu
 c_oSerFontTypes$Sz:LD
-historyitem_Chart_Type:Ue
+historyitem_Chart_Type:Te
 c_oSer_TablePart$TableColumns:lG
 lc:GN
 TT_Vary_Get_Glyph_Deltas:Zs
@@ -1369,7 +1369,7 @@ Project:vr
 T1_DecoderRec:An
 CreateParaItem:z5
 FT_ServiceCache:Vi
-fSortDescending:Ca
+fSortDescending:Da
 UndoRedoData_CellData:kP
 _weight_clipArt:TV
 c_oAscPrintType$ActiveSheets:sz
@@ -1532,8 +1532,8 @@ CFontFilesCache:Ww
 JSCompiler_StaticMethods__moveCellHor:oP
 cElementType$number:OA
 _ph_summ__two_obj_and_tx:qW
-_cmap_classes$$inline_667:Ln
 FT_Glyph_Class:tq
+_cmap_classes$$inline_668:Ln
 tt_size_run_prep:mr
 CompositeCommentData:cR
 c_oSer_CalcChainType$CalcChainItem:KF
@@ -1760,7 +1760,7 @@ CParaSpacing:$4
 asc_CChartFont:Hf
 c_oAscBorderStyles$Medium:hz
 tt_cmap4_char_index:So
-lcl_GetGammaHelper:lC
+lcl_GetGammaHelper:kC
 CDocumentPage:v7
 CreateUniColorRGB:wf
 JSCompiler_StaticMethods_getXfId:cQ
@@ -1865,8 +1865,8 @@ FT_SFNT_SERVICES_GET:eq
 ParaCommentEnd:Ei
 global_hatch_offsets:jx
 c_oAscImageUploadProp$MaxFileSize:qb
+_files$$inline_1251:Q
 c_oSer_DrawingType$PicSrc:VL
-_files$$inline_1250:Q
 align_Center:UR
 JSCompiler_StaticMethods_DrawVBars:k0
 c_oSerFormulaTypes$Aca:jF
@@ -1987,7 +1987,7 @@ fntStyleInd_minor:FU
 historyitem_Cell_Strikeout:HP
 CParaInd:Z4
 linerule_Auto:FY
-FT_Stream2:fA
+FT_Stream2:eA
 FT_CFF_SERVICES_GET:gv
 CColorMod:VS
 GraphicPicture:j6
@@ -2006,7 +2006,7 @@ t1_decoder_funcs:Dn
 ChangeAdjState:b2
 c_oSerDefinedNameTypes$LocalSheetId:eE
 cff_index_get_name:lu
-lcl_GetLogGammaHelper:mC
+lcl_GetLogGammaHelper:lC
 CTextPr:li
 UndoRedoData_BBox:GO
 c_oSerXfsTypes$NumFmtId:tD
@@ -2084,10 +2084,10 @@ FormatObjScientific:Rc
 JSCompiler_StaticMethods_Check_Hyperlink:v3
 g_oDefaultAlignAbs:WK
 c_oAscAsyncAction$LoadImage:Kg
-lcl_getLanczosSum:kC
+lcl_getLanczosSum:jC
 TT_OS2:al
 para_PageBreakRendered:Xh
-c_oAscServerError$TaskQueue:Ja
+c_oAscServerError$TaskQueue:Ka
 CSolidFill:AT
 UndoRedoDataTypeParaItemId:zR
 FT_CharMapRec:pl
@@ -2113,7 +2113,7 @@ ParaCollaborativeChangesEnd:C5
 asc_CChartRange:Le
 ECellAnchorType$cellanchorAbsolute:HJ
 tt_cmap8_char_index:Wo
-c_oEditorId:Da
+c_oEditorId:Ea
 ETableStyleType$tablestyletypeFirstRowSubheading:lK
 para_CollaborativeChangesEnd:w5
 CMatrix:Ox
@@ -2127,8 +2127,8 @@ c_oAscImageUploadProp$SupportedFormats:rb
 ft_smooth_render:Gq
 RGBToHSL:kY
 FT_NEXT_ULONG:mj
+_infos$$inline_1252:ry
 CLASS_TYPE_BLIP_FILL:wT
-_infos$$inline_1251:ry
 c_oAscFill$FILL_TYPE_SOLID:xz
 JSCompiler_StaticMethods_insertWorksheet:kO
 numFormat_DecimalFrac:dc
@@ -2260,7 +2260,7 @@ FT_Generic:ml
 _ph_summ__pic_tx:lW
 gc_dDefaultColWidthCharsAttribute:cL
 Row:PL
-c_oAscChartLegend$top:sa
+c_oAscChartLegend$top:ta
 GUID:eZ
 TT_Driver:It
 load_post_names:po
@@ -2377,7 +2377,7 @@ cff_size_request:Cu
 T1_New_Parser:xv
 c_oSerTableTypes$Worksheets:IC
 c_oMainTables$NotesSlides:ZY
-c_oSerRowTypes$Height:$E
+c_oSerRowTypes$Height:ZE
 tt_face_free_eblc:vo
 SetSuperRound:Mr
 ParaHyperlinkStart:RR
@@ -2471,7 +2471,7 @@ g_dKoef_mm_to_pt:d4
 dublicate_pointer:aj
 c_oSer_Dxf$Fill:uH
 JSCompiler_StaticMethods_buildDependencies:UB
-Font:cd
+Font:bd
 CompareGroups:z0
 c_oSer_TableStyle$Table:DH
 PreChangeAdjState:I1
@@ -2504,7 +2504,7 @@ CURSOR_TYPES_BY_CARD_DIRECTION:S1
 cff_driver_done:Ku
 EHorizontalAlignment$horizontalalignmentLeft:SJ
 c_oAscError$ID$StockChartError:je
-fontstyle_mask_bold:Ax
+fontstyle_mask_bold:zx
 FT_Face_Internal:zl
 ChartState:L0
 compare_kern_pairs:mv
@@ -2605,7 +2605,7 @@ tt_cmap4_set_range:Oo
 c_oSer_FilterColumn$Filters:NG
 c_oSer_Comments$MoveWithCells:$H
 clonePrototype:EX
-fSortAscending:Ba
+fSortAscending:Ca
 c_oSer_ConditionalFormattingIconSet$IconSet:MI
 tt_cmap4_char_map_binary:Ro
 cff_index_done:iu
@@ -2617,7 +2617,7 @@ g_oDefaultXfId:iM
 JSCompiler_StaticMethods_rotateTrackObjects:O0
 EBorderStyle$borderstyleHair:qJ
 LineEndSize$Large:aU
-JSCompiler_StaticMethods_parse_para_TextPr:j4
+JSCompiler_StaticMethods_parse_para_TextPr:i4
 JSCompiler_StaticMethods_setRowHidden:kA
 c_oSerStylesTypes$Dxfs:UC
 FT_BitmapGlyphRec:Yj
@@ -2691,6 +2691,7 @@ L 138:$d
 JSCompiler_StaticMethods_Internal_FindWordStart:p7
 L 137:uC
 L 136:u8
+ret$$inline_670:Mn
 g_oUndoRedoCol:DM
 JSCompiler_StaticMethods_RedoPrepare:xO
 L 150:Ug
@@ -2703,7 +2704,7 @@ JSCompiler_StaticMethods_buildDependency:dO
 L 154:rj
 L 155:Ov
 L 156:Hn
-L 157:bd
+L 157:cd
 ft_adobe_glyph_list:Nl
 historyitem_AutoShapes_RecalculateAfterInit:QQ
 c_oRangeType$All:uN
@@ -2730,22 +2731,21 @@ L 119:If
 c_oSerWorksheetPropTypes$Name:EE
 L 116:ih
 ParaNewLine:pi
-L 117:Fe
+L 117:Ge
 L 114:yk
 L 115:Lv
 c_Date1900Const:lB
 JSCompiler_StaticMethods_addMasterEdge:IN
 FT_Set_Transform:uw
-_parser_funcs$$inline_663:Fn
 CAscTableStyle:l8
 cff_parse_fixed:Yt
+_parser_funcs$$inline_664:Fn
 TT_CMapRec:Eo
 L 133:Tp
 L 132:t8
 L 135:Wf
 gc_nMaxRow:fe
 L 134:hV
-ret$$inline_669:Mn
 CParaLineRange:x6
 L 131:tC
 L 130:qs
@@ -2765,8 +2765,8 @@ g_tabtype_left:lZ
 JSCompiler_StaticMethods_startRecalculate:xN
 ft_sid_names:Kl
 T1_Decoder_ZoneRec:zn
-L 102:df
-L 101:bf
+L 102:ef
+L 101:df
 c_oAscAsyncAction$Recalc:Sy
 L 100:vi
 c_oAscBorderStyles$Thin:cz
@@ -2952,7 +2952,7 @@ JSCompiler_StaticMethods__MouseHoverOnArrowDown:pS
 CLASS_TYPE_GS:DT
 JSCompiler_StaticMethods__getByCell:zN
 BDF_PropertyRec:Nn
-isObject:Ce
+isObject:Be
 c_oAscLayoutPageType$FitToWidth:tz
 c_oSer_FilterColumn$CustomFilters:QG
 c_oSerPropLenType$Short:jZ
@@ -2999,14 +2999,14 @@ L 37:zb
 g_o_event_map:V2
 L 32:kb
 PS_PrivateRec:cm
-L 31:Ga
+L 31:Ha
 cff_standard_encoding:eu
-L 30:Ka
+L 30:Ba
 L 36:bb
 JSCompiler_StaticMethods__ExecutePresentation:t4
 L 35:lb
 L 34:Ra
-L 33:Na
+L 33:Ua
 FT_Data:ll
 FT_Service_PsInfoRec:Ni
 CHistory:$N
@@ -3015,10 +3015,10 @@ tt_services:mt
 Align:DL
 TT_LongMetricsRec:Jk
 L 27:ha
-L 26:V
-L 29:Ua
+L 26:U
+L 29:Na
 c_oAscPrintDefaultSettings$PageOrientation:qz
-L 28:ta
+L 28:ra
 ParaPageBreakRenderer:wi
 c_oSer_SortState$ConditionDxfId:HG
 UndoRedoWoorksheet:IR
@@ -3026,12 +3026,12 @@ sfnt_load_face:$p
 nSldLtTChartAndTx:nV
 arcTo:WX
 numbering_numfmt_LowerLetter:b4
-L 21:U
+L 21:V
 L 20:P
 L 23:R
 L 22:Y
 L 25:M
-L 24:da
+L 24:ca
 L 50:uk
 tt_size_reset:Dt
 recalcresult_PrevPage:E6
@@ -3200,7 +3200,7 @@ L 76:Xn
 JSCompiler_StaticMethods_rebuildSeries:$e
 _ph_summ__sec_head:mW
 L 77:sh
-L 78:af
+L 78:bf
 t1_args_count:on
 L 79:tb
 c_oAscSelectionType$RangeShape:Gh
@@ -3214,12 +3214,12 @@ TT_Forget_Glyph_Frame:ct
 gray_record_cell:iq
 cString:wB
 L 70:qe
-L 72:Be
+L 72:Ce
 FT_PEEK_USHORT:gj
 L 71:Yi
-L 64:Re
-L 65:nd
-L 62:oc
+L 64:Se
+L 65:od
+L 62:pc
 L 63:fb
 CUniFill:FS
 BULLET_TYPE_TYPEFACE_BUFONT:ZW
@@ -3242,7 +3242,7 @@ L 99:xj
 L 95:Qb
 c_oSer_SheetPr$FilterMode:dJ
 L 96:Nf
-L 97:Te
+L 97:Ue
 L 98:eg
 c_oSer_ChartCatAxType$Title:UZ
 c_oSerWorksheetColTypes$Width:ME
