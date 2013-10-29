@@ -64,10 +64,8 @@
 			this.isFormulaEditMode = false;
 			this.endWasPressed = false;
 			
-			// DblClick для граф.объектов
-			this.dbClickInterval = 500;
-			this.mouseClickCount = 0;
-			this.lastMouseDownTime = getCurrentTime();
+			// Обработчик кликов для граф.объектов
+			this.clickCounter = new ClickCounter();
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -1112,15 +1110,9 @@
 						event.ctrlKey = true;
 					
 					asc["editor"].isStartAddShape = true;
-					var currTime = getCurrentTime();
-					if ( currTime - this.lastMouseDownTime < this.dbClickInterval )
-						this.mouseClickCount = 2;
-					else
-						this.mouseClickCount = 1;
-						
-					event.ClickCount = this.mouseClickCount;
-
-					this.lastMouseDownTime = currTime;
+					
+					this.clickCounter.mouseDownEvent(coord.x, coord.y);
+					event.ClickCount = this.clickCounter.clickCount;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 
 					if ( t.isCellEditMode )
@@ -1266,7 +1258,7 @@
 					if ( event.metaKey )
 						event.ctrlKey = true;
 				
-					event.ClickCount = this.mouseClickCount;
+					event.ClickCount = this.clickCounter.clickCount;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
 					return true;
@@ -1311,6 +1303,10 @@
 				t.hasCursor = true;
 				
 				// Shapes
+				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
+				if ( graphicsInfo && graphicsInfo.isGraphicObject )
+					this.clickCounter.mouseMoveEvent(coord.x, coord.y);
+					
 				if ( asc["editor"].isStartAddShape ) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});

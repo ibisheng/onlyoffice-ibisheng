@@ -5202,6 +5202,49 @@ function ObjectLocker(ws) {
 	}
 }
 
+function ClickCounter() {
+	
+	var _this = this;
+	_this.x = 0;
+	_this.y = 0;
+	_this.time = 0;
+	_this.clickCount = 0;
+	_this.log = false;
+	
+	_this.mouseDownEvent = function(x, y) {
+	
+		var currTime = getCurrentTime();
+		if ( (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) )
+			_this.clickCount++;
+		else
+			_this.clickCount = 1;
+		
+		if ( _this.log ) {
+			console.log("x: " + (_this.x === x));
+			console.log("y: " + (_this.y === y));
+			console.log("Time: " + (currTime - _this.time));
+			console.log("Count: " + _this.clickCount);
+		}
+			
+		_this.time = currTime;
+	}
+	
+	_this.mouseMoveEvent = function(x, y) {
+		if ( (_this.x != x) || (_this.y != y) ) {
+			_this.x = x;
+			_this.y = y;
+			_this.clickCount = 0;
+			
+			if ( _this.log )
+				console.log("Reset counter");
+		}
+	}
+	
+	_this.getClickCount = function() {
+		return _this.clickCount;
+	}
+}
+
 function CoordsManager(ws, bLog) {
 	
 	var _t = this;

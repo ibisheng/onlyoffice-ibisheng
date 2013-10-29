@@ -5941,8 +5941,13 @@
 
 				// Выделяем объект
 				var graphicCursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if ( graphicCursorInfo && graphicCursorInfo.isGraphicObject )
+				if ( graphicCursorInfo && graphicCursorInfo.isGraphicObject ) {
+					this.cleanSelection();
+					this.cleanHighlightedHeaders();
 					return;
+				}
+				else
+					this._moveActiveCellToXY(x, y);
 
 				var ar = this.activeRange;
 				this.model.workbook.handlers.trigger("asc_onHideComment");
