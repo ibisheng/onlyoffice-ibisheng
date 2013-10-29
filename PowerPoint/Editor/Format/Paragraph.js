@@ -194,7 +194,8 @@ Paragraph.prototype =
             if ( true === Item.Is_RealContent() )
                 Para.Internal_Content_Add( Para.Content.length, Item.Copy() );
         }
-
+        if(isRealObject(this.PresentationPr) && isRealNumber(this.PresentationPr.Level))
+            Para.Set_PresentationLevel(this.PresentationPr.Level)
         return Para;
     },
 
