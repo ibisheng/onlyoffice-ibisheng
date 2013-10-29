@@ -4972,14 +4972,12 @@
 				var isLocked = false;
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				
 				if (drawingInfo)
 					return {cursor: drawingInfo.cursor, target: "shape", col: -1, row: -1};
 				
 				if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
-				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (drawingInfo && drawingInfo.id) {
 					
 					// Возможно картинка с lock
