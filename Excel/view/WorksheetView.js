@@ -5943,8 +5943,6 @@
 				var graphicCursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if ( graphicCursorInfo && graphicCursorInfo.isGraphicObject )
 					return;
-				else
-					this.objectRender.unselectDrawingObjects();
 
 				var ar = this.activeRange;
 				this.model.workbook.handlers.trigger("asc_onHideComment");
@@ -5996,6 +5994,7 @@
 
 				if (!isInSelection) {
 					// Не попали в выделение (меняем первую точку)
+					this.objectRender.unselectDrawingObjects();
 					this.cleanSelection();
 					this._moveActiveCellToXY(x, y);
 					if ( !graphicCursorInfo )
@@ -6005,8 +6004,6 @@
 					this._trigger("selectionChanged", this.getSelectionInfo());
 					return false;
 				}
-				if ( !graphicCursorInfo )
-					this._drawSelection();
 				return true;
 			},
 
