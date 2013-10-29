@@ -60,7 +60,6 @@ var recalcresult_NextPage    = 0x03; // Пересчитываем следую�
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
 var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
 
-var History = null;
 var StartTime;
 
 function Document_Recalculate_Page()
@@ -327,8 +326,10 @@ CDocumentRecalcInfo.prototype =
 
 function CDocument(DrawingDocument)
 {
-    // Создаем глобальные объекты, необходимые для совместного редактирования
     this.History   = History;
+    History.Document = this;
+
+    // Создаем глобальные объекты, необходимые для совместного редактирования
     this.IdCounter = g_oIdCounter;
     this.TableId   = g_oTableId;
     this.CollaborativeEditing = CollaborativeEditing;
