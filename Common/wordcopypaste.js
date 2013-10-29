@@ -5838,7 +5838,7 @@ PasteProcessor.prototype =
                                 }
                                 else
                                 {
-                                    Drawing = CreateImageFromBinary(sSrc);
+                                    Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
                                     // oTargetDocument.DrawingObjects.Add( Drawing );
                                 }
 

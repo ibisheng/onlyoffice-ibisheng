@@ -6959,43 +6959,52 @@ function CreateGraphicObjectFromBinary(bin)
 }
 
 
-function CreateImageFromBinary(bin)
+function CreateImageFromBinary(bin, nW, nH)
 {
     var w, h;
-    var _image = editor.ImageLoader.map_image_index[bin];
-    if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
+
+    if (nW === undefined || nH === undefined)
     {
-        var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
-        var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
-
-        var bIsCorrect = false;
-        if (_image.Image != null)
+        var _image = editor.ImageLoader.map_image_index[bin];
+        if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
         {
-            var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-            var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+            var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+            var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
 
-            var dKoef = Math.max(__w / _w, __h / _h);
-            if (dKoef > 1)
+            var bIsCorrect = false;
+            if (_image.Image != null)
             {
-                _w = Math.max(5, __w / dKoef);
-                _h = Math.max(5, __h / dKoef);
+                var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
+                var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
 
-                bIsCorrect = true;
+                var dKoef = Math.max(__w / _w, __h / _h);
+                if (dKoef > 1)
+                {
+                    _w = Math.max(5, __w / dKoef);
+                    _h = Math.max(5, __h / dKoef);
+
+                    bIsCorrect = true;
+                }
+                else
+                {
+                    _w = __w;
+                    _h = __h;
+                }
             }
-            else
-            {
-                _w = __w;
-                _h = __h;
-            }
+
+            w = __w;
+            h = __h;
         }
-
-        w = __w;
-        h = __h;
+        else
+        {
+            w = 50;
+            h = 50;
+        }
     }
     else
     {
-        w = 50;
-        h = 50;
+        w = nW;
+        h = nH;
     }
     var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
     var word_image = new WordImage(para_drawing,  editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, null);
