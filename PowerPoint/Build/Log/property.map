@@ -604,7 +604,7 @@ oRecalcDocument:eD
 Char:xD
 asc_getIsCorrect:GQa
 ALWAYS_SKIP_DELTAP_Rules:dAa
-Write_ToBinary:Ac
+Write_ToBinary:Bc
 ElemToSelect:ak
 _key_interactive:Yca
 _onReleaseLock:QOa
@@ -936,7 +936,7 @@ TempImage:MA
 alignTop:vda
 linearHoriAdvance:TC
 InitEditor:Bma
-EastAsia:cg
+EastAsia:dg
 steelblue:$ib
 User:rJ
 Select_DrawingObject:V4
@@ -1064,7 +1064,7 @@ TurnOn_RecalcEvent:zo
 centerPointY:bR
 centerPointX:aR
 HAnchor:uP
-Bg:Ec
+Bg:Fc
 _coAuthoringSetServerUrl:Wca
 WriteMathLimLow:NLa
 _annotate_color:W9a
@@ -1258,7 +1258,7 @@ texture_id:pza
 X0:ef
 X1:xf
 selectCell:f2a
-headEnd:Vf
+headEnd:Wf
 X2:zz
 Margin_V:gba
 TableBand2Horz:lr
@@ -1297,7 +1297,7 @@ WriteMathStrikeBLTR:FMa
 free_hdmx_stub:Ldb
 onBodyMouseMove:vZa
 isCurrentElementTable:Oga
-Internal_Content_Add:Hc
+Internal_Content_Add:yc
 StrokeWidth:aQ
 HintsSupport:wP
 Bottom_AfterCount:k3
@@ -1665,7 +1665,7 @@ ReadCommentContent:Nna
 asyncImagesEndLoaded:$da
 _WriteString1:Sg
 kern_order_bits:Eva
-_WriteString2:Bc
+_WriteString2:Cc
 CheckType:ZAa
 WriteMathWrapIndent:PMa
 Write_ph:UNa
@@ -2286,7 +2286,7 @@ min_kern:rW
 put_ToolTip:Xia
 widthTable:u4a
 SetIntegerGrid:hg
-err:Uf
+err:Vf
 asc_putHeight:URa
 FocusRectDraw:I3
 hyperlinkCheck:Gga
@@ -2415,7 +2415,7 @@ setTextBody:hv
 oldXfrmFlipH:lia
 asc_registerCallback:DSa
 asc_setDocInfo:Wra
-EnterFrame:eg
+EnterFrame:fg
 DocumentOrientation:mT
 drawingObjectsController:S
 LoadFont:vw
@@ -2440,7 +2440,7 @@ Character:SX
 _zoom:p6
 Read2Spreadsheet:aZ
 resizedExtX:ue
-Found:fg
+Found:Sf
 resizedExtY:ve
 unicode_map:sjb
 mediumseagreen:tgb
@@ -2592,7 +2592,7 @@ minorFont:XK
 put_PrIndentRight:h0a
 sync_SendThemeColorSchemes:Tya
 sync_SpaceBetweenPrgCallback:M3a
-Cat:bg
+Cat:cg
 _labels_specific:O$a
 allIncreaseDecFontSize:vPa
 Remove:Wn
@@ -2635,7 +2635,7 @@ asc_putAllowOverlap:IRa
 DrawingDocument:ka
 BlitMarginLeftInd:Zka
 blue_scale:TQ
-TransitionOption:Xf
+TransitionOption:Yf
 ReadMathMcs:uGa
 notice:UH
 Recalculate_Page:Vn
@@ -3398,7 +3398,7 @@ recalcColors:ija
 StartPos:aa
 asc_getSeveralChartTypes:dRa
 ctPathCommandMoveTo:nUa
-limit:Dc
+limit:Ec
 GetDefaultFont:hma
 charstrings:qy
 setDocId:E2a
@@ -3614,7 +3614,7 @@ Top:J
 asc_getContextualSpacing:lQa
 Table_RemoveCol:oca
 CorrectDefaultFontSize:sBa
-yMax:ag
+yMax:bg
 SendControlColors:JIa
 Left:A
 RecalculateData:JA
@@ -4002,11 +4002,11 @@ ranges_offset:gja
 ReadMathStrikeTLBR:WGa
 ctFontStyle:a7
 DrawSlide:aCa
-_ymin:Tf
+_ymin:Uf
 WriteSlide:Ypa
 Read_setting:dIa
 CellsVAlign:q3
-ReadDouble:Sf
+ReadDouble:Tf
 charstring_type:cV
 _onSaveChanges:ROa
 nvPicPr:No
@@ -4134,7 +4134,7 @@ _resize_handle_background:YOa
 nNumIdIndex:Lha
 ImageMapIndex:Baa
 m_lUnits_Per_Em:Uu
-bodyPr:Yf
+bodyPr:Zf
 GetResult:Q3
 EndPos:Z
 DrawEmptyTableLine:Sn
@@ -4171,7 +4171,7 @@ WriteMathPhant:lMa
 GetTextPr:tY
 Core:Cla
 readFromBinary:PW
-nvSpPr:$f
+nvSpPr:ag
 SetCurrentPage:VP
 service_GLYPH_DICT:o2a
 cur_charcode:Mn
@@ -4233,7 +4233,7 @@ _id:zU
 polyline:xn
 ApplySlideTiming:Qka
 m_oLogicDocument:p
-Merge:yc
+Merge:zc
 OpenDocument2:qba
 drawingPage:c0
 PrepareSlide:zEa
@@ -4644,7 +4644,7 @@ put_paddings:s1a
 OpenDocumentEndCallback:rba
 onMouseMove:Cg
 GoToPage:uk
-m_oEditor:Zf
+m_oEditor:$f
 Get_Text:q6a
 m_oCanvas:kg
 DeleteSlide:FBa
@@ -4689,7 +4689,7 @@ changeShapeFill:Hbb
 limLoc:p8
 get_HSpace:YVa
 num_subglyphs:tp
-colors:Cc
+colors:Dc
 GetUShortLE:nma
 SavedIndex:U4
 fgClr:$k
@@ -4810,7 +4810,7 @@ ReleaseFrame:L7a
 requires:tO
 severalChartStyles:Jr
 Italic:Yc
-Effects:dg
+Effects:eg
 BlitLeft:Yka
 storeSize:u$
 GetULong:mb
@@ -5330,7 +5330,7 @@ hints_globals:AK
 xMax:Uh
 num_family_other_blues:Q1
 Set_Data:oZ
-RealX:Wf
+RealX:Xf
 m_oContext:rb
 RealY:Kf
 PageCount:XY
@@ -5629,7 +5629,7 @@ SymbolsCount:yZ
 fontdata:Uta
 m_aNewObjects:A8
 ReadWrapTopBottom:I7a
-Lock:Fc
+Lock:Gc
 canEdit:Ysa
 arrayStackStarts:ms
 ReadMathFPr:WFa
@@ -5789,7 +5789,7 @@ getBase64Img:hB
 get_VAnchor:rXa
 LoadThemeJSAsync:xDa
 WriteItemWithLengthStart:Kca
-Set_FromObject:Gc
+Set_FromObject:Hc
 Underline:Lf
 put_value:A1a
 y_offset:O4a
@@ -6753,7 +6753,7 @@ extra:hq
 put_LastRow:F_a
 WriteLevelTextItem:RKa
 lvl3pPr:Mfb
-PositionH:zc
+PositionH:Ac
 isEmptyPlaceholder:cF
 selectoverColor:uib
 m_fCharSpacing:KK
