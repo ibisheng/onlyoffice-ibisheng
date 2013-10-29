@@ -1885,7 +1885,7 @@ function CEditorPage(api)
         if (this.m_oDrawingDocument.IsEmptyPresentation)
         {
             this.StartVerticalScroll = false;
-            this.m_oScrollVerApi.scrollByY(0, false);
+            this.m_oScrollVerApi.scrollByY(0, true);
             return;
         }
 
@@ -1896,7 +1896,7 @@ function CEditorPage(api)
             this.StartVerticalScroll = false;
             this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
 
-            this.m_oScrollVerApi.scrollByY(0, false);
+            this.m_oScrollVerApi.scrollByY(0, true);
         }
     }
     this.CorrectSpeedVerticalScroll = function(newScrollPos)

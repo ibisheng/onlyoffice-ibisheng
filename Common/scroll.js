@@ -509,12 +509,12 @@ ScrollObject.prototype = {
         this._draw();
         this._drawArrow();
     },
-    _scrollV:function ( that, evt, pos, isTop, isBottom ) {
+    _scrollV:function ( that, evt, pos, isTop, isBottom, bIsAttack ) {
         if ( !this.isVerticalScroll ) {
             return;
         }
 
-        if ( that.scrollVCurrentY !== pos ) {
+        if ( that.scrollVCurrentY !== pos || bIsAttack === true) {
             that.scrollVCurrentY = pos;
             evt.scrollD = evt.scrollPositionY = that.scrollVCurrentY;
             evt.maxScrollY = that.maxScrollY;
@@ -573,7 +573,7 @@ ScrollObject.prototype = {
         }
 
     },
-    scrollByY:function ( delta ) {
+    scrollByY:function ( delta, bIsAttack ) {
         if ( !this.isVerticalScroll ) {
             return;
         }
@@ -613,7 +613,7 @@ ScrollObject.prototype = {
         if ( vend ) {
             this.moveble = true;
         }
-        this._scrollV( this, {}, destY, isTop, isBottom );
+        this._scrollV( this, {}, destY, isTop, isBottom, bIsAttack );
         if ( vend ) {
             this.moveble = false;
         }
