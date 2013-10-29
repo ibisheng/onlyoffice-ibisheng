@@ -15864,6 +15864,8 @@ CTable.prototype =
                 // Для прилегания к верху или для второй страницы ничего не делаем (так изначально рассчитывалось)
                 if ( vertalignjc_Top === VAlign || CellPageIndex > 1 || (1 === CellPageIndex && true === this.RowsInfo[CurRow].FirstPage ) )
                 {
+                    if(!Cell.Temp.Y_VAlign_offset)
+                        Cell.Temp.Y_VAlign_offset = [];
                     Cell.Temp.Y_VAlign_offset[CellPageIndex] = 0;
                     continue;
                 }
@@ -16015,7 +16017,7 @@ CTable.prototype =
     // это приведет к изменению высоты строки, то пересчитываем все строки дальше.
     Internal_RecalculateFrom : function(RowIndex, CellIndex, bChange, bForceRecalc)
     {
-        return editor.WordControl.m_oLogicDocument.Recalculate();
+//        return editor.WordControl.m_oLogicDocument.Recalculate();
 
         if ( true === this.TurnOffRecalc )
             return;

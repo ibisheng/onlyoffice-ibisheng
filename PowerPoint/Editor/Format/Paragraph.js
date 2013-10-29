@@ -114,6 +114,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.SpellChecker = new CParaSpellChecker();
 
+   //this.folHlinkColor = {};
+   //this.folHlinkColor.unifill = unifill;
+   //this.folHlinkColor.Color = {r:128, g:0, b:151};
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
