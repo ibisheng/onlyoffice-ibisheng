@@ -205,6 +205,8 @@ CGraphicObjects.prototype = {
     },
     Update_CursorType: function(x, y,  e )
     {
+
+        var drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
         switch(this.State.id)
         {
             case STATES_ID_GROUP:
@@ -212,10 +214,30 @@ CGraphicObjects.prototype = {
             {
                 break;
             }
+            case STATES_ID_MOVE:
+            case STATES_ID_MOVE_COMMENT:
+            case STATES_ID_MOVE_IN_GROUP:
+            case STATES_ID_MOVE_INTERNAL_CHART_OBJECT:
+            {
+                drawingDocument.SetCursorType("move");
+                break;
+            }
+            case STATES_ID_ROTATE:
+            case STATES_ID_ROTATE_IN_GROUP:
+            {
+                drawingDocument.SetCursorType("crosshair");
+                break;
+            }
+            case STATES_ID_RESIZE:
+            case STATES_ID_RESIZE_IN_GROUP:
+            {
+                drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[this.State.cardDirection])
+                break;
+            }
+
             default :
             {
                 var selected_objects = this.selectedObjects;
-                var drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                 if(selected_objects.length === 1)
                 {
                     var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
