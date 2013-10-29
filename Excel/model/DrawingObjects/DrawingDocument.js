@@ -4370,7 +4370,7 @@ function CDrawingDocument(drawingObjects)
 
 		var api = window["Asc"]["editor"];
         var _img = api.ImageLoader.map_image_index[getFullImageSrc(this.LastDrawingUrl)];
-        if (_img != undefined && _img.Image != null || _img.Status == ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
             var _y = 0;
