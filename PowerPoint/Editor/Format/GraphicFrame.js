@@ -73,6 +73,27 @@ CGraphicFrame.prototype =
     {
         return true;
     },
+
+    Cursor_MoveToStartPos : function()
+    {
+        if(isRealObject(this.graphicObject))
+        {
+            this.graphicObject.Cursor_MoveToStartPos();
+            this.graphicObject.RecalculateCurPos();
+
+        }
+    },
+
+    Cursor_MoveToEndPos : function()
+    {
+        if(isRealObject(this.graphicObject))
+        {
+            this.graphicObject.Cursor_MoveToEndPos();
+            this.graphicObject.RecalculateCurPos();
+
+        }
+    },
+
     getSearchResults: function(str)
     {
         if(this.graphicObject instanceof CTable)

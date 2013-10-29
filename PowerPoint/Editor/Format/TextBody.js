@@ -166,6 +166,25 @@ CTextBody.prototype =
 
     },
 
+    recalcAll: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateBodyPr: true,
+            recalculateContent2: true
+        };
+        this.bRecalculateNumbering = true;
+        var content = this.content;
+
+        for(var i = 0; i < content.Content.length; ++i)
+        {
+            content.Content[i].Recalc_CompiledPr();
+            content.Content[i].RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+        }
+        this.arrStyles = [];
+        content.arrStyles = [];
+    },
+
     recalcColors: function()
     {
         this.content.recalcColors();

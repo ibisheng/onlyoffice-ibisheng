@@ -192,6 +192,10 @@ CShape.prototype =
             recalculateGroupHierarchy: true,
             recalculateTextStyles: [true, true, true, true, true, true, true, true, true]
         };
+        if(this.txBody)
+        {
+            this.txBody.recalcAll();
+        }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -2868,6 +2872,26 @@ CShape.prototype =
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+    Cursor_MoveToStartPos : function()
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Cursor_MoveToStartPos();
+            this.txBody.content.RecalculateCurPos();
+
+        }
+    },
+
+    Cursor_MoveToEndPos : function()
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Cursor_MoveToEndPos();
+            this.txBody.content.RecalculateCurPos();
+
         }
     },
 

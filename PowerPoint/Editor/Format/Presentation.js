@@ -1566,28 +1566,14 @@ CPresentation.prototype =
 
     Cursor_MoveToStartPos : function()
     {
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = 0;
-        this.Selection.Flag     = selectionflag_Common;
-
-        this.CurPos.ContentPos = 0;
-        this.CurPos.Type       = docpostype_Content;
-        this.Content[0].Cursor_MoveToStartPos();
+        this.Slides[this.CurPage].graphicObjects.Cursor_MoveToStartPos();
+        return true;
     },
 
     Cursor_MoveToEndPos : function()
     {
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = 0;
-        this.Selection.Flag     = selectionflag_Common;
-
-        this.CurPos.ContentPos = this.Content.length - 1;
-        this.CurPos.Type       = docpostype_Content;
-        this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+        this.Slides[this.CurPage].graphicObjects.Cursor_MoveToEndPos();
+        return true;
     },
 
     Cursor_MoveLeft : function(AddToSelect, Word)
