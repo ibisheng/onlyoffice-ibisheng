@@ -332,9 +332,7 @@ function CDocument(DrawingDocument)
 
     // Создаем глобальные объекты, необходимые для совместного редактирования
     this.IdCounter = g_oIdCounter;
-
-    this.TableId = new CTableId();
-    g_oTableId = this.TableId;
+    this.TableId   = g_oTableId;
 
     this.CollaborativeEditing = CollaborativeEditing;
     //------------------------------------------------------------------------
