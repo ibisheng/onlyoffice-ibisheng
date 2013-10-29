@@ -6510,8 +6510,12 @@
 				{
 					for(var n = activeCells.r1 - 1; n <= activeCells.r2 + 1; n++)
 					{
+						if(n < 0)
+							n = 0;
 						for(var k = activeCells.c1 - 1; k <= activeCells.c2 + 1; k++)
 						{
+							if(k < 0)
+								k = 0;
 							cell = ws.model._getCell(n,k);
 							if(cell.getValueWithoutFormat() != '')
 							{
