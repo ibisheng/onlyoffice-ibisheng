@@ -719,7 +719,7 @@ function BinaryFileWriter(doc)
         this.WriteTable(c_oSerTableTypes.HdrFtr, new BinaryHeaderFooterTableWriter(this.memory, this.Document, oNumIdMap));
         //Write DocumentTable
         //DocumentTable всегда пишем последней, чтобы сначала заполнить все вспомогательные структуры, а при заполении документа, вызывать методы типа Style_Add...
-        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap));
+        this.WriteTable(c_oSerTableTypes.Document, new BinaryDocumentTableWriter(this.memory, this.Document, oMapCommentId, oNumIdMap, null));
         //Write OtherTable
 		var oBinaryOtherTableWriter = new BinaryOtherTableWriter(this.memory, this.Document)
         this.WriteTable(c_oSerTableTypes.Other, oBinaryOtherTableWriter);
@@ -743,8 +743,7 @@ function BinaryFileWriter(doc)
 		this.copyParams.oUsedNumIdMap = new Object();
 		this.copyParams.nNumIdIndex = 1;
 		this.copyParams.oUsedStyleMap = new Object();		
-		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap);
-		this.copyParams.bdtw.bCopyPasteMode = true;
+		this.copyParams.bdtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.copyParams.oUsedNumIdMap, this.copyParams);
 		this.copyParams.nDocumentWriterTablePos = 0;
 		this.copyParams.nDocumentWriterPos = 0;
 		
@@ -753,49 +752,21 @@ function BinaryFileWriter(doc)
 		this.copyParams.nDocumentWriterTablePos = this.WriteTableStart(c_oSerTableTypes.Document);
 		this.copyParams.nDocumentWriterPos = this.bs.WriteItemWithLengthStart();
 	}
-	this.CopyParagraph = function(Item, bUseSelection)
+	this.CopyParagraph = function(Item)
     {
-		var oThis = this;
-		//анализируем используемые списки и стили
-		var sParaStyle = Item.Style_Get();
-		if(null != sParaStyle)
-			this.copyParams.oUsedStyleMap[sParaStyle] = 1;
-		var oNumPr = Item.Numbering_Get();
-		if(null != oNumPr && null != oNumPr.NumId && 0 != oNumPr.NumId)
-		{
-			if(null == this.copyParams.oUsedNumIdMap[oNumPr.NumId])
-			{
-				this.copyParams.oUsedNumIdMap[oNumPr.NumId] = this.copyParams.nNumIdIndex;
-				this.copyParams.nNumIdIndex++;
-				//проверяем PStyle уровней списка
-				var aNum = this.Document.Numbering.Get_AbstractNum(oNumPr.NumId);
-				if(null != aNum)
-				{
-					for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
-					{
-						var oLvl = aNum.Lvl[i];
-						if(null != oLvl.PStyle)
-							this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
-					}
-				}
-			}
-		}
 		//сами параграфы скопируются в методе CopyTable, нужно только проанализировать стили
 		if(this.copyParams.bLockCopyElems > 0)
 			return;
-        this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, bUseSelection);});
+		var oThis = this;
+        this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, true);});
 		this.copyParams.itemCount++;
 	}
 	this.CopyTable = function(Item, aRowElems, nMinGrid, nMaxGrid)
     {
-		var oThis = this;
-		//анализируем используемые списки и стили
-		var sTableStyle = Item.Get_TableStyle();
-		if(null != sTableStyle)
-			this.copyParams.oUsedStyleMap[sTableStyle] = 1;
 		//сама таблица скопируются в методе CopyTable у родительской таблицы, нужно только проанализировать стили
 		if(this.copyParams.bLockCopyElems > 0)
 			return;
+		var oThis = this;
         this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item, aRowElems, nMinGrid, nMaxGrid);});
 		this.copyParams.itemCount++;
 	}
@@ -1976,7 +1947,7 @@ function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap)
         //BoundY2
         this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Y2, function(){oThis.memory.WriteDouble(item.BoundY2);});
         //Content
-        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.oNumIdMap);
+        var dtw = new BinaryDocumentTableWriter(this.memory, this.Document, null, this.oNumIdMap, null);
         this.bs.WriteItem(c_oSerHdrFtrTypes.HdrFtr_Content, function(){dtw.WriteDocumentContent(item.Content);});
     };
 };
@@ -2180,7 +2151,7 @@ function BinaryNumberingTableWriter(memory, doc, oNumIdMap, oUsedNumIdMap)
         }
     };
 };
-function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
+function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyParams)
 {
     this.memory = memory;
     this.Document = doc;
@@ -2192,7 +2163,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
     this.sCurText = "";
     this.oCur_rPr = null;
 	this.oMapCommentId = oMapCommentId;
-	this.bCopyPasteMode = false;
+	this.copyParams = copyParams;
     this.Write = function()
     {
         var oThis = this;
@@ -2227,6 +2198,36 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
         var oThis = this;
 		var ParaStart = 0;
         var ParaEnd   = par.Content.length - 1;
+		if(null != this.copyParams)
+        {
+			//анализируем используемые списки и стили
+			var sParaStyle = par.Style_Get();
+			if(null != sParaStyle)
+				this.copyParams.oUsedStyleMap[sParaStyle] = 1;
+			var oNumPr = par.Numbering_Get();
+			if(null != oNumPr && null != oNumPr.NumId && 0 != oNumPr.NumId)
+			{
+				if(null == this.copyParams.oUsedNumIdMap[oNumPr.NumId])
+				{
+					this.copyParams.oUsedNumIdMap[oNumPr.NumId] = this.copyParams.nNumIdIndex;
+					this.copyParams.nNumIdIndex++;
+					//проверяем PStyle уровней списка
+					var Numbering = par.Parent.Get_Numbering();
+					var aNum = null;
+					if(null != Numbering)
+						aNum = Numbering.Get_AbstractNum(oNumPr.NumId);
+					if(null != aNum)
+					{
+						for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
+						{
+							var oLvl = aNum.Lvl[i];
+							if(null != oLvl.PStyle)
+								this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
+						}
+					}
+				}
+			}
+        }
         if(true == bUseSelection)
         {
             ParaStart = par.Selection.StartPos;
@@ -2483,7 +2484,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap);});
+				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams);});
 			}
 		}
 		else
@@ -2617,7 +2618,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap);});
+				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams);});
 			}
 		}
     };
@@ -2755,6 +2756,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 	this.WriteDocTable = function(table, aRowElems, nMinGrid, nMaxGrid)
     {
         var oThis = this;
+		if(null != this.copyParams)
+		{
+			//анализируем используемые списки и стили
+			var sTableStyle = table.Get_TableStyle();
+			if(null != sTableStyle)
+				this.copyParams.oUsedStyleMap[sTableStyle] = 1;
+		}
         //tblPr
         //tblPr должна идти раньше Content
         if(null != table.Pr)
@@ -2876,7 +2884,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
         //Content
         if(null != cell.Content)
         {
-            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap);
+            var oInnerDocument = new BinaryDocumentTableWriter(this.memory, this.Document, this.oMapCommentId, this.oNumIdMap, this.copyParams);
             this.bs.WriteItem(c_oSerDocTableType.Cell_Content, function(){oInnerDocument.WriteDocumentContent(cell.Content);});
         }
     };

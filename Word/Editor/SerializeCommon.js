@@ -730,7 +730,7 @@ function CPPTXContentWriter()
 
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
     }
-    this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap)
+    this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams)
     {
         this.TreeDrawingIndex++;
 
@@ -741,11 +741,11 @@ function CPPTXContentWriter()
 
         if ("undefined" !== typeof(WordShape) && grObject instanceof WordShape)
         {
-            this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap);
+            this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
         }
         else if ("undefined" !== typeof(CShape) && grObject instanceof CShape)
         {
-            this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap);
+            this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
         }
 		else if (("undefined" !== typeof(WordImage) && grObject instanceof WordImage) || ("undefined" !== typeof(CImageShape) && grObject instanceof CImageShape))
         {
@@ -753,7 +753,7 @@ function CPPTXContentWriter()
         }
 		else if (("undefined" !== typeof(WordGroupShapes) && grObject instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && grObject instanceof CGroupShape))
         {
-            this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap);
+            this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams);
         }
 
         this.BinaryFileWriter.EndRecord();
@@ -768,13 +768,13 @@ function CPPTXContentWriter()
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
     }
 
-    this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap)
+    this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap, copyParams)
     {
         var _writer = this.BinaryFileWriter;
         _writer.WriteShape(shape);
     }
 
-    this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap)
+    this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap, copyParams)
     {
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(1);
@@ -815,7 +815,7 @@ function CPPTXContentWriter()
 
             this.arrayStackStartsTextBoxContent.push(memory.pos);
 
-			var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap);
+			var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams);
 			var bcw = new BinaryCommonWriter(memory);
 			bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
 
@@ -919,7 +919,7 @@ function CPPTXContentWriter()
         this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
     }
 
-    this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap)
+    this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams)
     {
         var _writer = this.BinaryFileWriter;
 
@@ -953,11 +953,11 @@ function CPPTXContentWriter()
 				var elem = spTree[i];
 				if ("undefined" !== typeof(WordShape) && elem instanceof WordShape)
 				{
-					this.WriteShape(elem, Document, oMapCommentId, oNumIdMap);
+					this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams);
 				}
 				else if ("undefined" !== typeof(CShape) && elem instanceof CShape)
 				{
-					this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap);
+					this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams);
 				}
 				else if (("undefined" !== typeof(WordImage) && elem instanceof WordImage) || ("undefined" !== typeof(CImageShape) && elem instanceof CImageShape))
 				{
@@ -965,7 +965,7 @@ function CPPTXContentWriter()
 				}
 				else if (("undefined" !== typeof(WordGroupShapes) && elem instanceof WordGroupShapes) || ("undefined" !== typeof(CGroupShape) && elem instanceof CGroupShape))
 				{
-					this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap);
+					this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
 				}
 
                 _writer.EndRecord(0);

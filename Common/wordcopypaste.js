@@ -1512,7 +1512,7 @@ CopyProcessor.prototype =
             else if ( type_Paragraph === Item.GetType() )
             {
                 //todo ����� ������ ��� �������� ������ ���� Index == End
-				this.oBinaryFileWriter.CopyParagraph(Item, bUseSelection);
+				this.oBinaryFileWriter.CopyParagraph(Item);
                 this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
             }
         }
@@ -1643,7 +1643,7 @@ CopyProcessor.prototype =
 										tempParagraph.Selection.StartPos = index;
 										tempParagraph.Selection.Use = true;
 										
-										this.oBinaryFileWriter.CopyParagraph(tempParagraph, true);
+										this.oBinaryFileWriter.CopyParagraph(tempParagraph);
 									}
 									
                                     var src = this.getSrc(base64_img);
@@ -1711,7 +1711,7 @@ CopyProcessor.prototype =
 									parent.Selection.StartPos = inIndex;
 									parent.Selection.Use = true;
 									
-									this.oBinaryFileWriter.CopyParagraph(parent, true);
+									this.oBinaryFileWriter.CopyParagraph(parent);
 									
 									//возвращаем Selection
 									parent.Selection.StartPos = selectionTrue.StartPos;
