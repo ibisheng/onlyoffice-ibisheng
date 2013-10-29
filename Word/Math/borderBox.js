@@ -53,7 +53,8 @@ CBorderBox.prototype.recalculateSize = function()
     var height = ss.height;
     var center = ss.center;
 
-    this.gapBrd = this.getTxtPrp().FontSize*0.08104587131076388;
+    //this.gapBrd = this.getTxtPrp().FontSize*0.08104587131076388;
+    this.gapBrd = this.getPrpToControlLetter().FontSize*0.08104587131076388;
 
     if(this.bTop)
     {
@@ -74,7 +75,8 @@ CBorderBox.prototype.draw = function(pGraphics)
 {
     this.elements[0][0].draw(pGraphics);
 
-    var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 ;
+    //var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 ;
+    var penW = this.getPrpToControlLetter().FontSize* 25.4/96 * 0.08 ;
 
     if(this.bTop)
     {

@@ -362,6 +362,10 @@ CIterators.prototype.setReduct = function(reduct)
     this.elements[0][0].setReduct(reduct);
     this.elements[1][0].setReduct(reduct);
 }
+CIterators.prototype.getCtrPrp = function()
+{
+    return this.Parent.getCtrPrp();
+}
 
 function CDegreeSubSup()
 {

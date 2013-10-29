@@ -305,6 +305,7 @@ CMathContent.prototype =
     addTxt: function(txt)
     {
         var Pos = this.CurPos;
+
         for(var i = 0; i < txt.length; i++)
         {
             this.addLetter( txt.charCodeAt(i));
@@ -323,6 +324,16 @@ CMathContent.prototype =
     {
         if(this.rInterval.startPos == this.rInterval.endPos)
             this.rInterval.startPos = this.rInterval.endPos = this.CurPos + 1;
+
+        this.checkRunPrp();
+
+        /*if(this.IsEmpty())
+        {
+            if(this.bRoot)
+                this.addRunPrp(this.Composition.DefaultTxtPrp);
+            else
+                this.addRunPrp(this.Parent.getCtrPrp());
+        }*/
 
         /*var gps = null;
         if(code == 0x002B || code == 0x002F || code == 0x002A || code == 0x002D)
@@ -452,13 +463,20 @@ CMathContent.prototype =
 
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
 
+            mathElem.relate(this);
+            mathElem.setComposition(this.Composition);
+
             var ctrPrp = new CTextPr();
 
             if(this.CurPos > 1) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
             {
                 ctrPrp = this.getCurrRunPrp();
             }
-            else if(!this.bRoot && this.content.length == 1)
+            else if(!this.bRoot && this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP) //есть RunPrp
+            {
+                ctrPrp.Merge( this.Parent.getCtrPrp() );
+            }
+            else if(!this.bRoot && this.content.length == 1) // нет RunPrp, добавляем мат. объект
             {
                 ctrPrp.Merge( this.Parent.getCtrPrp() );
             }
@@ -472,10 +490,9 @@ CMathContent.prototype =
             }
 
             mathElem.setCtrPrp(ctrPrp);
-            mathElem.setComposition(this.Composition);
-
 
             this.addToContent(mathElem);
+
             var empty = new CEmpty();
             this.addToContent(empty);
 
@@ -500,12 +517,6 @@ CMathContent.prototype =
     addToContent: function(obj)          // for "edit"
     {
         var elem = new mathElem(obj);
-        if(obj.typeObj === MATH_COMP)
-        {
-            obj.relate(this);
-            //obj.setReferenceComp(this.Composition);
-            obj.setComposition(this.Composition);
-        }
 
         /*var runPrp = this.getRunPrp(this.CurPos);
          element.setTxtPrp( runPrp );*/
@@ -521,68 +532,6 @@ CMathContent.prototype =
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
 
-    },
-    addRunPrp: function(runPrp)          // for "edit"
-    {
-        var rPrp = new CMathRunPrp();
-        rPrp.Merge(runPrp);
-
-        var element = new mathElem(rPrp);
-
-        var tmp = this.content.splice(0, this.CurPos + 1);
-        tmp.push(element);
-        tmp = tmp.concat( this.content.splice(0, this.content.length) );
-
-        this.content.length = 0;
-        this.content = tmp;
-        this.CurPos++;
-    },
-    addRunPrpToContent: function(runPrp) // for "read"
-    {
-        var rPrp = new CMathRunPrp();
-        rPrp.Merge(runPrp);
-
-        var element = new mathElem(rPrp);
-
-        this.content.push(element);
-        this.CurPos++;
-    },
-    getCurrRunPrp: function()
-    {
-        var runPrp = new CTextPr();
-
-        if(this.content.length > 1)
-        {
-            if( this.IsPlaceholder())
-            {
-                runPrp.Merge(this.Parent.getCtrPrp());
-            }
-            else
-            {
-                for(var i = this.CurPos; i > 0; i--)
-                {
-                    var obj = this.content[i].value;
-
-                    if(obj.typeObj == MATH_RUN_PRP)
-                    {
-                        runPrp.Merge(obj.getRunPrp());
-                        break;
-                    }
-                    else if(obj.typeObj == MATH_COMP)
-                    {
-                        runPrp.Merge(obj.getCtrPrp());
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            //runPrp = this.Composition.GetFirstPrp();
-            runPrp = this.Composition.GetTxtPrp();
-        }
-
-        return runPrp;
     },
     setComposition: function(Composition)
     {
@@ -2143,6 +2092,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("sin");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2156,6 +2108,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("cos");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2169,6 +2124,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("tan");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2182,6 +2140,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("csc");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2195,6 +2156,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("sec");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2208,6 +2172,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("cot");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2271,6 +2238,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("sinh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2284,6 +2254,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("cosh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2297,6 +2270,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("tanh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2310,6 +2286,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("csch");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2323,6 +2302,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("sech");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2336,6 +2318,9 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
+                var rPrp = new CTextPr();
+                rPrp.Italic = false;
+                base.addRunPrp(rPrp);
                 base.addTxt("coth");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -3561,6 +3546,8 @@ CMathContent.prototype =
         this.content.push( new mathElem( placeholder ) );
 
     },
+
+    /////////   перемещение     //////////
     cursor_moveRight: function()
     {
         var state = true,
@@ -3907,7 +3894,7 @@ CMathContent.prototype =
                 this.content[this.CurPos].value.mouseUp();
         }
     },
-    mouseDown: function( mouseCoord, inside_flag )
+    mouseDown: function(mouseCoord, inside_flag)
     {
         var result = null;
 
@@ -3942,7 +3929,7 @@ CMathContent.prototype =
 
         return result;
     },
-    mouseMove: function( mouseCoord )
+    mouseMove: function(mouseCoord)
     {
         var state = true;
         var SelectContent = null;
@@ -4002,6 +3989,7 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
+    /////////
     // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
     afterDisplacement: function(coord) //аналог mouseDown для goToUpperLevel и goToLowerLever
     {
@@ -4745,8 +4733,121 @@ CMathContent.prototype =
     {
         this.plhHide = flag;
     },
-    /////
 
+    ///// RunPrp, CtrPrp
+    addRunPrp: function(runPrp)          // for "edit"
+    {
+        var rPrp = new CMathRunPrp();
+        rPrp.Merge(runPrp);
+
+        var element = new mathElem(rPrp);
+
+        var tmp = this.content.splice(0, this.CurPos + 1);
+        tmp.push(element);
+        tmp = tmp.concat( this.content.splice(0, this.content.length) );
+
+        this.content.length = 0;
+        this.content = tmp;
+        this.CurPos++;
+    },
+    addRunPrpToContent: function(runPrp) // for "read"
+    {
+        var rPrp = new CMathRunPrp();
+        rPrp.Merge(runPrp);
+
+        var element = new mathElem(rPrp);
+
+        this.content.push(element);
+        this.CurPos++;
+    },
+    getCurrRunPrp: function()
+    {
+        var runPrp = new CTextPr();
+
+        if(this.content.length > 1)
+        {
+            if( this.IsPlaceholder())
+            {
+                runPrp.Merge(this.Parent.getCtrPrp());
+            }
+            else
+            {
+                for(var i = this.CurPos; i > 0; i--)
+                {
+                    var obj = this.content[i].value;
+
+                    if(obj.typeObj == MATH_RUN_PRP)
+                    {
+                        runPrp.Merge(obj.getRunPrp());
+                        break;
+                    }
+                    else if(obj.typeObj == MATH_COMP)
+                    {
+                        runPrp.Merge(obj.getCtrPrp());
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            //runPrp = this.Composition.GetFirstPrp();
+            runPrp = this.Composition.GetTxtPrp();
+        }
+
+        return runPrp;
+    },
+    getFirstPrp:    function()
+    {
+        var txtPrp =  new CMathTextPrp();
+        txtPrp.Merge(DEFAULT_RUN_PRP);
+
+        if(this.content.length > 1)
+        {
+            if(this.content[1].value.typeObj === MATH_RUN_PRP) // если первый объект - буква
+            {
+                var runPrp = this.content[1].value.getRunPrp();
+                txtPrp.Merge(runPrp);
+            }
+            else if(this.content[1].value.typeObj === MATH_COMP)
+            {
+                var ctrPrp = this.content[1].value.getCtrPrp();
+                txtPrp.Merge(ctrPrp);
+            }
+        }
+
+        return txtPrp;
+    },
+    checkRunPrp: function()
+    {
+        var bEmpty = this.IsEmpty(),
+            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
+
+
+        if(bEmpty || OnlyRunPrp)
+        {
+            var txtPrp;
+            if(this.bRoot)
+                txtPrp = this.Composition.DefaultTxtPrp;
+            else
+                txtPrp = this.Parent.getCtrPrp();
+
+
+            if(bEmpty)
+                this.addRunPrp(txtPrp);
+            else
+            {
+                var Run = this.content[1].value.runPrp;
+                var currRun = new CTextPr();
+                currRun.Merge(Run);
+
+                Run.Merge(txtPrp);
+                Run.Merge(currRun);
+
+            }
+
+        }
+    },
     ////////   /////////
     getMetricsLetter: function(pos)
     {
@@ -4997,27 +5098,7 @@ CMathContent.prototype =
         return content;
 
     },
-    getFirstPrp:    function()
-    {
-        var txtPrp =  new CMathTextPrp();
-        txtPrp.Merge(DEFAULT_RUN_PRP);
 
-        if(this.content.length > 1)
-        {
-            if(this.content[1].value.typeObj === MATH_RUN_PRP) // если первый объект - буква
-            {
-                var runPrp = this.content[1].value.getRunPrp();
-                txtPrp.Merge(runPrp);
-            }
-            else if(this.content[1].value.typeObj === MATH_COMP)
-            {
-                var ctrPrp = this.content[1].value.getCtrPrp();
-                txtPrp.Merge(ctrPrp);
-            }
-        }
-
-        return txtPrp;
-    },
     IsEmpty:    function()
     {
         return this.content.length == 1;
@@ -5276,8 +5357,8 @@ CMathComposition.prototype =
         this.ClearSelect();
 
         this.SelectContent.removeAreaSelect();
-        if(this.Root.IsEmpty())
-            this.Root.addRunPrp(this.DefaultTxtPrp);
+        /*if(this.Root.IsEmpty())
+            this.Root.addRunPrp(this.DefaultTxtPrp);*/
 
         var items =  this.SelectContent.addLetter(code);
 
@@ -5318,7 +5399,6 @@ CMathComposition.prototype =
             var Pos = this.SelectContent.CurPos + 1;
 
         var items = this.SelectContent.createEquation(indef);
-        //this.Root.setTxtPrp(this.TxtPrp);
 
         ///
         // временно

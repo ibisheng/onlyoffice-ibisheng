@@ -22,10 +22,8 @@ function CMathBase()
     /*this.TxtPrp = new CMathTextPrp();
     this.OwnTPrp = new CMathTextPrp();*/
 
-    this.CtrPrp =
-    {
-        RunPrp:     new CTextPr()
-    };
+    this.CtrPrp = new CTextPr();
+
 
     //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
     //this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
@@ -86,13 +84,13 @@ CMathBase.prototype =
     },
     setCtrPrp: function(runPrp)
     {
-        this.CtrPrp.RunPrp = runPrp; // only runPrp for paragraph
+        this.CtrPrp.Merge(runPrp); // only runPrp for paragraph
     },
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
         ctrPrp.Merge(DEFAULT_RUN_PRP);
-        ctrPrp.Merge(this.CtrPrp.RunPrp);
+        ctrPrp.Merge(this.CtrPrp);
         return ctrPrp;
     },
     getPrpToControlLetter: function()
@@ -107,6 +105,10 @@ CMathBase.prototype =
     setComposition: function(composition)
     {
         this.Composition = composition;
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].setComposition(composition);
     },
     setReferenceComp: function(Comp)
     {
@@ -220,7 +222,6 @@ CMathBase.prototype =
             this.setContent();
         }
     },
-
     relate: function(parent)
     {
         this.Parent = parent;

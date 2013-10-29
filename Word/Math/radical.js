@@ -9,7 +9,8 @@ function CSignRadical()
 }
 CSignRadical.prototype.draw = function(pGraphics)
 {
-    var txtPrp = this.Parent.getTxtPrp();
+    var txtPrp = this.Parent.getPrpToControlLetter();
+    //var txtPrp = this.Parent.getTxtPrp();
     var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
 
     var plH = 9.877777777777776 * txtPrp.FontSize /36;
@@ -78,7 +79,8 @@ CSignRadical.prototype.draw = function(pGraphics)
 }
 CSignRadical.prototype.recalculateSize = function()
 {
-    var txtPrp = this.Parent.getTxtPrp();
+    //var txtPrp = this.Parent.getTxtPrp();
+    var txtPrp = this.Parent.getPrpToControlLetter();
     var sizeArg = this.Parent.getBase().size;
 
     var height, width;
@@ -221,7 +223,7 @@ CRadical.prototype.recalculateSize = function()
 
         var width = degr.width - wTick + sign.width;
 
-        var txtPrp = this.getTxtPrp();
+        var txtPrp = this.getPrpToControlLetter();
         var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
         if( sign.height < plH )
@@ -288,7 +290,6 @@ CRadical.prototype.setPosition = function(pos)
 
         this.elements[0][1].setPosition({x: x3, y: y3});
     }
-
 }
 CRadical.prototype.findDisposition = function(mCoord)
 {

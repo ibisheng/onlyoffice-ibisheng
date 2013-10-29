@@ -145,13 +145,19 @@ CMathFunc.prototype.init = function()
 {
     this.setDimension(1, 2);
     this.setContent();
-    this.elements[0][0].setOwnTPrp({Italic: false});  // trigonometrical function
+
+    var runPrp = new CTextPr();
+    runPrp.Italic = false;
+    this.elements[0][0].addRunPrp(runPrp);
+
+    //this.elements[0][0].setOwnTPrp({Italic: false});  // trigonometrical function
     //this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function
 
 }
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
+    //this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.getPrpToControlLetter().FontSize/6*g_dKoef_pt_to_mm;
 }
 CMathFunc.prototype.getFName = function()
 {
