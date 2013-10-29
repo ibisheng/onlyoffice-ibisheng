@@ -1275,6 +1275,15 @@ CGraphics.prototype =
             _lastFont.SetUpStyle = _style;
 
             g_font_infos[_lastFont.SetUpIndex].LoadFont(g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+
+            var _mD = _lastFont.SetUpMatrix;
+            var _mS = this.m_oTransform;
+            _mD.sx = _mS.sx;
+            _mD.sy = _mS.sy;
+            _mD.shx = _mS.shx;
+            _mD.shy = _mS.shy;
+            _mD.tx = _mS.tx;
+            _mD.ty = _mS.ty;
         }
         else
         {
