@@ -3188,12 +3188,11 @@ function DrawingObjects() {
 		}
 		aBoundsCheckers = [];
 		
-		// Чистим текущие области
+		// Сохраняем текущие области
 		for ( var i = 0; i < aObjects.length; i++ ) {
 			if ( !aObjects[i].inVisibleArea() )
 				continue;
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
-			_this.restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
 		}
 	}
