@@ -2331,6 +2331,8 @@ CDocumentContent.prototype =
                         {
                             // Продолжаем (в плане настроек) новый параграф
                             Item.Continue( NewParagraph );
+                            if(isRealObject(Item.bullet))
+                                NewParagraph.setPresentationBullet(Item.bullet.createDuplicate());
                         }
                         else
                         {

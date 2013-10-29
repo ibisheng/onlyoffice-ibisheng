@@ -2714,6 +2714,7 @@ CShape.prototype =
             //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
+            this.txBody.bRecalculateNumbering = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },

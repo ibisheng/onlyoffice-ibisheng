@@ -195,7 +195,7 @@ Paragraph.prototype =
                 Para.Internal_Content_Add( Para.Content.length, Item.Copy() );
         }
         if(isRealObject(this.PresentationPr) && isRealNumber(this.PresentationPr.Level))
-            Para.Set_PresentationLevel(this.PresentationPr.Level)
+            Para.Set_PresentationLevel(this.PresentationPr.Level);
         return Para;
     },
 
@@ -10620,6 +10620,8 @@ Paragraph.prototype =
 
         // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
         this.CopyPr( NewParagraph );
+        if(isRealObject(this.bullet))
+            NewParagraph.setPresentationBullet(this.bullet.createDuplicate());
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
         NewParagraph.RecalcInfo.Set_Type_0(pararecalc_0_All);
