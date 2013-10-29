@@ -1461,6 +1461,7 @@ CGroupShape.prototype =
             shape_props.stroke = this.getStroke();
             shape_props.canChangeArrows = this.canChangeArrows();
             shape_props.paddings = this.getPaddings();
+            shape_props.canFill = true;
 
             return {ShapeProperties : shape_props}
         }

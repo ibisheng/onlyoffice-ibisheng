@@ -1287,6 +1287,7 @@ DrawingObjectsController.prototype =
                          shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
                         shape_props.ShapeProperties.paddings = c_obj.getPaddings();
                         shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
+                        shape_props.ShapeProperties.canFill = c_obj.canFill();
                     }
                     else
                     {
@@ -1296,7 +1297,8 @@ DrawingObjectsController.prototype =
                             fill: c_obj.getFill(),
                             stroke: c_obj.getStroke(),
                             canChangeArrows: c_obj.canChangeArrows(),
-                            paddings: c_obj.getPaddings()
+                            paddings: c_obj.getPaddings(),
+                            canFill: c_obj.canFill()
                         };
                         shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                         shape_props.verticalTextAlign = undefined;
@@ -1327,6 +1329,8 @@ DrawingObjectsController.prototype =
                             shape_props.ShapeProperties.paddings = c_obj.getPaddings();
                             shape_props.ShapeProperties.IsLocked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone || c_obj.lockType === c_oAscLockTypes.kLockTypeNone);
                             shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
+                            shape_props.ShapeProperties.canFill = c_obj.canFill();
+
                         }
                         else
                         {
@@ -1337,7 +1341,9 @@ DrawingObjectsController.prototype =
                              ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
                              ShapeProperties.paddings = c_obj.getPaddings();
                              ShapeProperties.IsLocked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone || c_obj.lockType === c_oAscLockTypes.kLockTypeNone);
-                             shape_props =  c_obj.Get_Props(shape_props);
+                             ShapeProperties.canFill = c_obj.canFill();
+
+                            shape_props =  c_obj.Get_Props(shape_props);
                              shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                              shape_props.verticalTextAlign = undefined;
                         }

@@ -215,6 +215,14 @@ CShape.prototype =
         return true;
     },
 
+
+    canFill: function()
+    {
+        if(this.spPr && this.spPr.geometry )
+            return  this.spPr.geometry.canFill();
+        return true;
+    },
+
     OnContentRecalculate: function()
     {
         this.calculateContent();

@@ -793,6 +793,7 @@ CGeometry.prototype=
         this.rect = ReadObjectDouble(r);
     },
 
+
     AddAdj: function(name, formula, x, y, z)
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_Adjustment, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddAdjustment(name, parseInt(x))), null);
