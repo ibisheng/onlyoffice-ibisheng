@@ -1434,7 +1434,7 @@
 				else if(type == 'delCell')
 					val = activeCells.c1 - activeCells.c2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insCol');
+				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells);
 			},
 			//при вставке пользователем строки изменяем фильтры
 			insertRows: function(type, val, ar)
@@ -1460,7 +1460,7 @@
 				else if(type == 'delCell')
 					val = activeCells.r1 - activeCells.r2 - 1;
 				//val > 0 - добавление, < 0 - удаление
-				this._changeFiltersAfterColumn(colInsert,val,'insRow');
+				this._changeFiltersAfterColumn(colInsert,val,'insRow',activeCells);
 			},
 			//применяем сортировку из меню фильтра
 			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
@@ -1871,6 +1871,28 @@
 								aWs.AutoFilter = cloneData;
 								this._addButtonAF({result: cloneData.result,isVis: true});
 							}
+						}
+					}
+				}
+				else if(cloneData.oldFilter)//в случае удаления/добавления строк 
+				{
+					if(aWs.AutoFilter && this._rangeHitInAnRange(this._refToRange(cloneData.oldFilter.Ref), this._refToRange(aWs.AutoFilter.Ref)))
+					{
+						aWs.AutoFilter = cloneData.oldFilter;
+						this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+					}
+					else if(aWs.TableParts)
+					{
+						for(var l = 0; l < aWs.TableParts.length; l++)
+						{
+							if(this._rangeHitInAnRange(this._refToRange(cloneData.oldFilter.Ref), this._refToRange(aWs.TableParts[l].Ref)))
+							{
+								aWs.TableParts[l] = cloneData.oldFilter;
+								this._addButtonAF({result: cloneData.oldFilter.result,isVis: true});
+								var splitRange = cloneData.oldFilter.Ref.split(':');
+								this._setColorStyleTable(splitRange[0], splitRange[1], cloneData.oldFilter, null, true);
+								break;
+							}	
 						}
 					}
 				}
@@ -3527,24 +3549,36 @@
 					if(arr.isVis)
 					{
 						var isButtonDraw = false;
-						for(var i = 0; i < this.allButtonAF.length; i++)
-						{
-							if(this.allButtonAF[i] && this.allButtonAF[i].id == arr.result[0].id)
-							{
-								isButtonDraw = true;
-							}
-						}
 						if(!isButtonDraw)
 						{
 							var leng = this.allButtonAF.length;
 							var n = 0;
+							var isInsert = false;
 							for(var i = 0; i < arr.result.length; i++)
 							{
 								if(arr.result[i].showButton != false)
 								{
-									this.allButtonAF[leng + n] = arr.result[i];
-									this.allButtonAF[leng + n].inFilter = arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext;
-									n++;
+									isInsert = false;
+									if(leng)
+									{
+										for(aF = 0; aF < this.allButtonAF.length; aF++)
+										{
+											//проверка на то, что эти кнопки уже имеются
+											if(this.allButtonAF[aF].id == arr.result[i].id)
+											{
+												this.allButtonAF[aF] = arr.result[i];
+												this.allButtonAF[aF].inFilter = arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext;
+												isInsert = true;
+												break;
+											}
+										}
+									}
+									if(!isInsert)
+									{
+										this.allButtonAF[leng + n] = arr.result[i];
+										this.allButtonAF[leng + n].inFilter = arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext;
+										n++;
+									}
 								}
 							}
 						}
@@ -4501,7 +4535,7 @@
 			},
 			
 			//change filters after insert column
-			_changeFiltersAfterColumn: function(col, val, type)
+			_changeFiltersAfterColumn: function(col, val, type, activeCells)
 			{
 				History.TurnOff();
 				var aWs = this._getCurrentWS();
@@ -4510,17 +4544,14 @@
 				{
 					var ref = aWs.AutoFilter.Ref.split(':');
 					var doNotChangesHeadString = false;
-					var newCol = col;
-					if(val > 0 && bUndoChanges && ((col == this._idToRange(ref[0]).c1 && type == "insCol") || (col == this._idToRange(ref[0]).r1 && type == "insRow")))
-						newCol++;
 					var options = {
 						ref:ref,
 						val:val,
 						type:type,
-						col:newCol
+						col:col
 					};
 					//внутри данного фильтра располагается колонка(колонки)
-					this._changeFilterAfterInsertColumn(options,type);
+					this._changeFilterAfterInsertColumn(options,type,activeCells);
 				}
 				if(aWs.TableParts && aWs.TableParts.length > 0)
 				{
@@ -4537,7 +4568,7 @@
 						};
 						length = aWs.TableParts.length;
 						//внутри данного фильтра располагается колонка
-						this._changeFilterAfterInsertColumn(options,type);
+						this._changeFilterAfterInsertColumn(options,type,activeCells);
 						if(length > aWs.TableParts.length)
 							lT--;
 					}
@@ -4547,7 +4578,7 @@
 				History.TurnOn();
 			},
 			
-			_changeFilterAfterInsertColumn: function(options,type)
+			_changeFilterAfterInsertColumn: function(options,type,activeCells)
 			{
 				var ref = options.ref, val = options.val, col = options.col, index = options.index;
 				//var aWs = this._getCurrentWS(ws);
@@ -4576,23 +4607,23 @@
 				//определяем диапазоны добавляемых(удаляемых) ячеек (val < 0 - удаление колонок) 
 				if(startRangeCell < colStart && endRangeCell > colEnd)
 				{
-					this._editFilterAfterInsertColumn(range,val,col,type);
+					this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
 				}
 				else if(startRangeCell <= colStart && endRangeCell >= colEnd)
 				{
 					if(val < 0)
-						this._editFilterAfterInsertColumn(range,val,col,type);
+						this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
 					else
 					{
 						if(startRangeCell < colStart)
-							this._editFilterAfterInsertColumn(range,val,col,type);
+							this._editFilterAfterInsertColumn(range,val,col,type,activeCells);
 						else
-							this._editFilterAfterInsertColumn(range,val,undefined,type);
+							this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 					}
 				}
 				else if((colEnd <= startRangeCell && val > 0) || (colEnd < startRangeCell && val < 0))
 				{
-					this._editFilterAfterInsertColumn(range,val,undefined,type);
+					this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 				}
 				else if((colStart < startRangeCell && colEnd > startRangeCell && colEnd <= endRangeCell) || (colEnd <= startRangeCell && val < 0))
 				{
@@ -4602,11 +4633,11 @@
 						var val2 = colStart - startRangeCell;
 						var retVal = this._editFilterAfterInsertColumn(range,valNew,startRangeCell,type);
 						if(!retVal)
-							this._editFilterAfterInsertColumn(range,val2,undefined,type);
+							this._editFilterAfterInsertColumn(range,val2,undefined,type,activeCells);
 					}
 					else
 					{
-						this._editFilterAfterInsertColumn(range,val,undefined,type);
+						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 					}
 				}
 				else if((colStart >= startRangeCell && colStart <= endRangeCell && colEnd >= endRangeCell) || (colStart >= startRangeCell && colStart <= endRangeCell && colEnd > endRangeCell && val < 0))
@@ -4615,7 +4646,7 @@
 						valNew = colStart - endRangeCell - 1;
 					else
 						valNew = val;
-					this._editFilterAfterInsertColumn(range,valNew,colStart,type);
+					this._editFilterAfterInsertColumn(range,valNew,colStart,type,activeCells);
 				}
 				else if(colStart < startRangeCell && colEnd > endRangeCell)
 				{
@@ -4623,16 +4654,18 @@
 					{
 						var valNew = startRangeCell - endRangeCell - 1;
 						var colNew = startRangeCell;
-						this._editFilterAfterInsertColumn(range,valNew,colNew,type);
+						this._editFilterAfterInsertColumn(range,valNew,colNew,type,activeCells);
 					}
 					else
-						this._editFilterAfterInsertColumn(range,val,undefined,type);
+						this._editFilterAfterInsertColumn(range,val,undefined,type,activeCells);
 				}
 			},
 			
 			//change current filter after insert column
-			_editFilterAfterInsertColumn: function(cRange,val,col,type)
+			_editFilterAfterInsertColumn: function(cRange,val,col,type,activeCells)
 			{
+				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
+				var bRedoChanges = this.worksheet.model.workbook.bRedoChanges;
 				var ws = this.worksheet;
 				var aWs = this._getCurrentWS();
 				var filter;
@@ -4649,10 +4682,13 @@
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
 				}
+				var oldFilter = Asc.clone(filter);
 				
 				if(val < 0)
 				{
 					var activeRange = ws.activeRange;
+					if(activeCells && bRedoChanges && typeof activeCells == 'object')
+						activeRange = Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
 					var splitRefFilter = filter.Ref.split(":");
 					var startCell = this._idToRange(splitRefFilter[0]);
 					var endCell = this._idToRange(splitRefFilter[1]);
@@ -4684,7 +4720,7 @@
 					}
 				}
 				
-				if(!col)//добавляем колонку, смещаем фильтры
+				if(col == null || col == undefined)//добавляем колонку, смещаем фильтры
 				{
 					//change Ref into filter
 					if(type == 'insRow')
@@ -5009,8 +5045,19 @@
 						filter.result = newResult;
 						filter.Ref = inFilter;
 					}
-					//if(cRange.index != 'all')
-						//this._setColorStyleTable(newResult[0].id,newResult[newResult.length - 1].idNext,ws)
+					//записываем в историю, если активная область касается данных фильтров
+					if(!bUndoChanges && !bRedoChanges && val < 0)
+					{
+						History.TurnOn();
+						//History.Create_NewPoint();
+						History.StartTransaction();
+						var changeElement = 
+						{
+							oldFilter: oldFilter
+						}
+						this._addHistoryObj(changeElement, null, null, true);
+						History.EndTransaction();
+					}
 				}
 			},
 			
@@ -5698,15 +5745,23 @@
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
 
-				oHistoryObject.activeCells			= Asc.clone(redoObject.activeCells);
-				oHistoryObject.lTable				= redoObject.lTable;
-				oHistoryObject.type					= redoObject.type;
-				oHistoryObject.cellId				= redoObject.cellId;
-				oHistoryObject.autoFiltersObject	= redoObject.autoFiltersObject;
-				oHistoryObject.addFormatTableOptionsObj = redoObject.addFormatTableOptionsObj;
-				oHistoryObject.moveFrom             = redoObject.arnFrom;
-				oHistoryObject.moveTo               = redoObject.arnTo;
-
+				if(redoObject)
+				{
+					oHistoryObject.activeCells			= Asc.clone(redoObject.activeCells);
+					oHistoryObject.lTable				= redoObject.lTable;
+					oHistoryObject.type					= redoObject.type;
+					oHistoryObject.cellId				= redoObject.cellId;
+					oHistoryObject.autoFiltersObject	= redoObject.autoFiltersObject;
+					oHistoryObject.addFormatTableOptionsObj = redoObject.addFormatTableOptionsObj;
+					oHistoryObject.moveFrom             = redoObject.arnFrom;
+					oHistoryObject.moveTo               = redoObject.arnTo;
+				}
+				else
+				{
+					oHistoryObject.activeCells			= Asc.clone(ws.activeRange);
+					type = null;
+				}
+				
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
 				if(deleteFilterAfterDeleteColRow && History.CurPoint && History.CurPoint.Items && History.CurPoint.Items.length)
 				{
