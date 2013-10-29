@@ -2861,11 +2861,20 @@ PasteProcessor.prototype =
                 {
 					var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [para_TextPr]);
                     var TextPr = null;
+					var nContentPos = Item.CurPos.ContentPos;
 					if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+					{
 						TextPr = Item.Content[oFindObj.LetterPos].Copy();
+						//если до этого были ParaTextPr и content для вставки не начинается с ParaTextPr, то вставляем пустые настройки
+						if(nContentLength > 0 && para_TextPr != oInsertPar.Content[0].Type)
+						{
+							Item.Internal_Content_Add(nContentPos, new ParaTextPr());
+							nContentPos++;
+						}
+					}
 					else
 						TextPr = new ParaTextPr();
-					var nContentPos = Item.CurPos.ContentPos;
+
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
                         var oCurInsItem = oInsertPar.Content[i];
@@ -2903,6 +2912,13 @@ PasteProcessor.prototype =
                     //�������� �������� ������� ������������ ��������� � ������ �������� ��������
                     //CopyPr_Open - ������� � �������, �.�. ���� �������� ��� � ���������
                     oInsFirstPar.CopyPr_Open( oSourceFirstPar );
+					//если до этого были ParaTextPr и content для вставки не начинается с ParaTextPr, то вставляем пустые настройки
+					if(oInsFirstPar.Content.length > 0 && para_TextPr != oInsFirstPar.Content[0].Type)
+					{
+						var oFindObj = oSourceFirstPar.Internal_FindForward(0, [para_TextPr]);
+						if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+							oInsFirstPar.Internal_Content_Add(0, new ParaTextPr());
+					}
                     //�������� ���������� ������������ ���������
                     oSourceFirstPar.Concat(oInsFirstPar);
                     //�������� ��������� ������ ����� ������ �� ��������� ���� ��������
@@ -2924,6 +2940,13 @@ PasteProcessor.prototype =
                     //CopyPr - �� ������� � �������, �.�. � ������� ��������� ������� ����� ��������� � ��������
                     if(null != oInsLastPar)
                         oSourceLastPar.CopyPr( oInsLastPar );
+					//если до этого были ParaTextPr и content для вставки не начинается с ParaTextPr, то вставляем пустые настройки
+					if(oSourceLastPar.Content.length > 0 && para_TextPr != oSourceLastPar.Content[0].Type)
+					{
+						var oFindObj = oInsLastPar.Internal_FindForward(0, [para_TextPr]);
+						if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+							oSourceLastPar.Internal_Content_Add(0, new ParaTextPr());
+					}
                     oInsLastPar.Concat(oSourceLastPar);
                     oInsLastPar.CurPos.ContentPos = nNewContentPos;
                     oSourceLastPar = oInsLastPar;
