@@ -411,7 +411,8 @@ CGraphicObjects.prototype =
                                 type: c_obj.getPresetGeom(),
                                 fill: c_obj.getFill(),
                                 stroke: c_obj.getStroke(),
-                                canChangeArrows: c_obj.canChangeArrows()
+                                canChangeArrows: c_obj.canChangeArrows(),
+                                canFill: c_obj.canFill()
                             };
                             shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
                         }
@@ -431,7 +432,8 @@ CGraphicObjects.prototype =
                                 type: c_obj.getPresetGeom(),
                                 fill: c_obj.getFill(),
                                 stroke: c_obj.getStroke(),
-                                canChangeArrows: c_obj.canChangeArrows()
+                                canChangeArrows: c_obj.canChangeArrows(),
+                                canFill: c_obj.canFill()
                             };
                             shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                             shape_props.verticalTextAlign = undefined;
@@ -495,7 +497,8 @@ CGraphicObjects.prototype =
                                     fill: c_obj.getFill(),
                                     stroke: c_obj.getStroke(),
                                     canChangeArrows: c_obj.canChangeArrows(),
-                                    paddings: c_obj.getPaddings()
+                                    paddings: c_obj.getPaddings(),
+                                    canFill: c_obj.canFill()
                                 };
                                 shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
                             }
@@ -507,7 +510,8 @@ CGraphicObjects.prototype =
                                     fill: c_obj.getFill(),
                                     stroke: c_obj.getStroke(),
                                     canChangeArrows: c_obj.canChangeArrows(),
-                                    paddings: c_obj.getPaddings()
+                                    paddings: c_obj.getPaddings(),
+                                    canFill: c_obj.canFill()
                                 };
                                 shape_props =  s_arr[i].Get_Props(shape_props);
                                 shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);

@@ -87,6 +87,13 @@ WordShape.prototype =
         this.calculateLine();
     },
 
+    canFill: function()
+    {
+        if(this.spPr && this.spPr.geometry)
+            return this.spPr.geometry.canFill();
+        return true;
+    },
+
 
     isShape: function()
     {

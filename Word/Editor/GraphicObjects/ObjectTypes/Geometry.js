@@ -890,6 +890,18 @@ CGeometry.prototype=
         this.rectS.b = b;
     },
 
+    canFill: function()
+    {
+        if(this.preset === "line")
+            return false;
+        for(var i = 0; i < this.pathLst.length; ++i)
+        {
+            if(this.pathLst[i].fill !== "none")
+                return true;
+        }
+        return  false;
+    },
+
     Init: function(w, h)
     {
         this.gdLst["_3cd4"]=16200000;

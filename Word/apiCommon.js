@@ -785,6 +785,7 @@ function CAscShapeProp()
     this.fill = null;
     this.stroke = null;
     this.paddings = null;
+    this.canFill = true;
 }
 CAscShapeProp.prototype.get_type = function(){return this.type}
 CAscShapeProp.prototype.put_type = function(v){this.type = v;}
@@ -795,6 +796,8 @@ CAscShapeProp.prototype.put_stroke = function(v){this.stroke = v;}
 
 CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
 CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
+CAscShapeProp.prototype.get_CanFill = function(){return this.canFill}
+CAscShapeProp.prototype.put_CanFill = function(v){this.canFill = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)
@@ -847,6 +850,10 @@ function CreateAscShapePropFromProp(shapeProp)
         obj.stroke = CreateAscStroke(shapeProp.stroke, shapeProp.canChangeArrows);
     if(isRealObject(shapeProp.paddings))
         obj.paddings = shapeProp.paddings;
+    if(shapeProp.canFill === true || shapeProp.canFill === false)
+    {
+        obj.canFill = shapeProp.canFill;
+    }
     return obj;
 }
 
