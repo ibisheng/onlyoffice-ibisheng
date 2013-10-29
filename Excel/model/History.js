@@ -762,5 +762,14 @@ CHistory.prototype =
 			}
 		}
 		return aRes;
+	},
+	//функция, которая перемещает последнее действие на первую позицию(в текущей точке)
+	ChangeActionsEndToStart : function()
+	{
+		if(null != this.CurPoint && this.CurPoint.Items.length > 0)
+		{
+			var endAction = this.CurPoint.Items.pop();
+			this.CurPoint.Items.unshift(endAction);
+		}
 	}
 };

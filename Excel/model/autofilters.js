@@ -5763,11 +5763,8 @@
 				}
 				
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
-				if(deleteFilterAfterDeleteColRow && History.CurPoint && History.CurPoint.Items && History.CurPoint.Items.length)
-				{
-					var popEl = History.CurPoint.Items.pop();
-					History.CurPoint.Items.unshift(popEl);
-				}
+				if(deleteFilterAfterDeleteColRow)
+					History.ChangeActionsEndToStart();
 			},
 			
 			_isAddNameColumn: function(range)
