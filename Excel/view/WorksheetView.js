@@ -5363,7 +5363,6 @@
 				
 				var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
 				if ( cursorInfo ) {
-					ar.type = this.objectRender.getGraphicSelectionType(cursorInfo.id);
 					return;
 				}
 
@@ -5946,8 +5945,6 @@
 					this.cleanHighlightedHeaders();
 					return;
 				}
-				else
-					this._moveActiveCellToXY(x, y);
 
 				var ar = this.activeRange;
 				this.model.workbook.handlers.trigger("asc_onHideComment");
