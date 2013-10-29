@@ -87,7 +87,7 @@ oGlyphData:Jo
 FromBinary:vHa
 mouseUp:gBa
 _crosshairs_linewidth:Deb
-ShiftKey:Nc
+ShiftKey:Oc
 getParagraphTextPr:iF
 onAuthParticipantsChanged:sN
 put_color:Fna
@@ -1334,7 +1334,7 @@ sync_SpellCheckVariantsFound:ZDa
 dataNeedSend:jya
 free_hdmx_stub:$ib
 isCurrentElementTable:WU
-Internal_Content_Add:Pc
+Internal_Content_Add:Nc
 StrokeWidth:MS
 vScrollbarWrapper:aI
 HintsSupport:sS
@@ -1732,7 +1732,7 @@ NORMAL_ROUND_RULES_SIZE:eJa
 gids:Vaa
 Fuel:wHa
 ChangeLevel:No
-handleNum:hg
+handleNum:ig
 kw:EZ
 horizontalScroll:$2a
 ReadMathMRPr:xLa
@@ -2201,7 +2201,7 @@ get_SmallCaps:Gka
 metrics_only:mV
 calculateAfterRotate:CY
 m_fTransX:TZ
-n_points:Oc
+n_points:Pc
 m_fTransY:UZ
 WriteImage:WO
 asc_getGroup:OVa
@@ -2527,7 +2527,7 @@ Read2Spreadsheet:Q1
 resizedExtX:Sf
 Recalculate_AllTables:xX
 oldPos:HV
-Found:lg
+Found:hg
 resizedExtY:Tf
 Resize:SC
 unicode_map:qob
@@ -3717,7 +3717,7 @@ asc_getContextualSpacing:AVa
 Top:U
 Table_RemoveCol:AL
 CorrectDefaultFontSize:cqa
-yMax:kg
+yMax:lg
 SendControlColors:UNa
 Left:I
 RecalculateData:Ry
@@ -6541,7 +6541,7 @@ WriteMathHideTop:QQa
 changeBackground:Fxa
 ReadMathHideBot:lLa
 WriteMathStrikeTLBR:QRa
-pPr:jg
+pPr:kg
 catNameLabels:kt
 WriteMathDelimiterPr:BQa
 recalculateScaleCoefficients:e8a
@@ -6738,7 +6738,7 @@ asc_putPos:yXa
 ppem:Gz
 encoding_offset:Qja
 None:Cra
-Prev:ig
+Prev:jg
 reserved2:enb
 isIdentical:ekb
 WriteMathEqArrPr:GQa
