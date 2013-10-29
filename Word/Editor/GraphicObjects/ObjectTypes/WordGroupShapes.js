@@ -89,6 +89,15 @@ WordGroupShapes.prototype =
     },
 
 
+    Search_GetId: function(bNext, bCurrent)
+    {
+        var first_selected = null;
+        if(bNext)
+        {
+           /// for(var i = 0; i < )
+        }
+    },
+
 
     recalcTransform: function()
     {

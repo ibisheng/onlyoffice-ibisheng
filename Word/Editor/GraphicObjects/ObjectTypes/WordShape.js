@@ -5785,6 +5785,13 @@ WordShape.prototype =
         }
     },
 
+    Search_GetId: function(bNext, bCurrent)
+    {
+        if(isRealObjec(this.textBoxContent))
+            return this.textBoxContent.Search_GetId(bNext, bCurrent);
+        return null;
+    },
+
     recalculateDocContent: function()
     {
         if(this.textBoxContent)

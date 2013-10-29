@@ -1034,8 +1034,10 @@ function MoveTitleInChart(originalObject)
 
     this.trackEnd = function()
     {
+        History.Add(this.originalObject.chartGroup, {Type: historyitem_AutoShapes_RecalculateChartUndo});
         this.originalObject.setPosition(this.x, this.y);
         this.originalObject.chartGroup.recalculate();
+        History.Add(this.originalObject.chartGroup, {Type: historyitem_AutoShapes_RecalculateChartRedo});
     }
 }
 

@@ -2151,6 +2151,11 @@ CChartAsGroup.prototype =
         this.mainGroup = group;
     },
 
+    recalculateDocContent: function()
+    {
+        this.recalculate();
+    },
+
     Refresh_RecalcData: function()
     {},
 

@@ -881,15 +881,13 @@ CChartTitle.prototype =
 
     setPosition: function(x, y)
     {
-        if(!isRealObject(this.layout))
-            this.setLayout(new CChartLayout());
-
-
-        this.layout.setIsManual(true);
-        this.layout.setXMode(LAYOUT_MODE_EDGE);
-        this.layout.setX(x/this.chartGroup.absExtX);
-        this.layout.setYMode(LAYOUT_MODE_EDGE);
-        this.layout.setY(y/this.chartGroup.absExtY);
+        var layout = new CChartLayout();
+        layout.setIsManual(true);
+        layout.setXMode(LAYOUT_MODE_EDGE);
+        layout.setX(x/this.chartGroup.absExtX);
+        layout.setYMode(LAYOUT_MODE_EDGE);
+        layout.setY(y/this.chartGroup.absExtY);
+        this.setLayout(layout);
     },
 
     setLayout: function(layout)

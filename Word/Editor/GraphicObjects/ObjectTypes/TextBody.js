@@ -546,7 +546,15 @@ CTextBody.prototype =
     Refresh_RecalcData2: function()
     {
         if(isRealObject(this.content))
-            this.content.Recalculate_Page(0, true);
+        {
+            if(this.shape instanceof  CChartTitle && this.shape.chartGroup instanceof CChartAsGroup && this.shape.chartGroup.chart)
+            {
+                this.shape.chartGroup.recalculate();
+
+            }
+            else
+                this.content.Recalculate_Page(0, true);
+        }
     },
 
     Undo: function(data)
@@ -833,7 +841,7 @@ CTextBody.prototype =
             var par = dc.Content[i];
             for(var i = 0; i < par.Content.length; ++i)
             {
-                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty) && par.Content[i].Copy)
+                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty || par.Content[i] instanceof ParaNumbering) && par.Content[i].Copy)
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }

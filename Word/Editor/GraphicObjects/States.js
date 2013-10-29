@@ -4477,6 +4477,7 @@ function MoveChartTitleState(graphicObjects, title, chart, startX, startY, start
         var doc = editor.WordControl.m_oLogicDocument;
         if(false === editor.isViewMode && false === doc.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.chart.Parent, CheckType : changestype_Paragraph_Content} ))
         {
+            History.Create_NewPoint();
             this.graphicObjects.arrTrackObjects[0].trackEnd();
             this.graphicObjects.drawingDocument.OnRecalculatePage(this.startPageIndex , this.graphicObjects.document.Pages[this.startPageIndex]);
             this.graphicObjects.drawingDocument.OnEndRecalculate(false, false);

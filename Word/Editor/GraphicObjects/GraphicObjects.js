@@ -1309,16 +1309,21 @@ CGraphicObjects.prototype =
 
     OnMouseDown: function(e, x, y, pageIndex)
     {
+        //console.log("down " + this.curState.id);
         this.curState.OnMouseDown(e, x, y, pageIndex);
     },
 
     OnMouseMove: function(e, x, y, pageIndex)
     {
+
+        //console.log("move " + this.curState.id);
         this.curState.OnMouseMove(e, x, y, pageIndex);
     },
 
     OnMouseUp: function(e, x, y, pageIndex)
     {
+
+        //console.log("up " + this.curState.id);
         this.curState.OnMouseUp(e, x, y, pageIndex);
     },
 
@@ -2090,6 +2095,26 @@ CGraphicObjects.prototype =
                 this.changeCurrentState(new StartChangeWrapContourState(this, selection_arr[0]));
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                var selection_arr = this.selectionInfo.selectionArray;
+                selection_arr.push(selection_state.chart);
+                selection_state.chart.select(selection_state.selectStartPage);
+                selection_state.title.select(selection_state.selectStartPage);
+                this.changeCurrentState(new TextAddInChartTitle(this, selection_state.chart, selection_state.title));
+                selection_state.title.txBody.content.Set_SelectionState(selection_state.textSelectionState, selection_state.textSelectionState.length - 1);
+                break;
+            }
+            case STATES_ID_CHART:
+            {
+                var selection_arr = this.selectionInfo.selectionArray;
+                selection_arr.push(selection_state.chart);
+                selection_state.chart.select(selection_state.selectStartPage);
+                if(isRealObject(selection_state.selectedTitle))
+                    selection_state.selectedTitle.select(selection_state.selectStartPage);
+                this.changeCurrentState(new ChartState(this, selection_state.chart));
+                break;
+            }
             default :
             {
 
@@ -2136,6 +2161,15 @@ CGraphicObjects.prototype =
                 selection_state.selectStartPage = this.curState.textObject.selectStartPage;
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                selection_state.stateId = STATES_ID_CHART_TITLE_TEXT;
+                selection_state.chart = this.curState.chart;
+                selection_state.title = this.curState.title;
+                selection_state.textSelectionState = this.curState.title.txBody.content.Get_SelectionState();
+                selection_state.selectStartPage = this.curState.chart.GraphicObj.selectStartPage;
+                break;
+            }
             case STATES_ID_GROUP:
             {
                 selection_state.stateId = STATES_ID_GROUP;
@@ -2153,24 +2187,62 @@ CGraphicObjects.prototype =
             }
             default :
             {
-                if(this.curState.wordGraphicObject)
+                if(isRealObject(this.curState.chart))
                 {
-                    selection_state.stateId = STATES_ID_START_CHANGE_WRAP;
+                    selection_state.stateId = STATES_ID_CHART;
+                    selection_state.chart = this.curState.chart;
+                    selection_state.selectStartPage = this.curState.chart.GraphicObj.selectStartPage;
+                    var selected_title;
+                    if(this.curState.chart.GraphicObj && this.curState.chart.GraphicObj.chartTitle && this.curState.chart.GraphicObj.chartTitle.selected)
+                    {
+                        selected_title = this.curState.chart.GraphicObj.chartTitle;
+                    }
+                    else if(this.curState.chart.GraphicObj && this.curState.chart.GraphicObj.hAxisTitle && this.curState.chart.GraphicObj.hAxisTitle.selected)
+                    {
+                        selected_title = this.curState.chart.GraphicObj.hAxisTitle;
+                    }
+                    else if(this.curState.chart.GraphicObj && this.curState.chart.GraphicObj.vAxisTitle && this.curState.chart.GraphicObj.vAxisTitle.selected)
+                    {
+                        selected_title = this.curState.chart.GraphicObj.vAxisTitle;
+                    }
+                    selection_state.selectedTitle = selected_title;
+                    break;
+                }
+                else if(this.curState.group)
+                {
+                    selection_state.stateId = STATES_ID_GROUP;
+                    selection_state.group = this.curState.group;
+                    selection_state.groupSelectStartPage = this.curState.group.selectStartPage;
+                    selection_state.selectionArray = [];
+                    selection_state.selectStartPages = [];
+                    var cur_selection_array = this.curState.group.selectionInfo.selectionArray;
+                    for(var i = 0; i < cur_selection_array.length; ++i)
+                    {
+                        selection_state.selectionArray.push(cur_selection_array[i]);
+                        selection_state.selectStartPages.push(cur_selection_array[i].selectStartPage);
+                    }
                 }
                 else
                 {
-                    selection_state.stateId = STATES_ID_NULL;
-                }
+                    if(this.curState.wordGraphicObject)
+                    {
+                        selection_state.stateId = STATES_ID_START_CHANGE_WRAP;
+                    }
+                    else
+                    {
+                        selection_state.stateId = STATES_ID_NULL;
+                    }
 
-                selection_state.selectionArray = [];
-                selection_state.selectStartPages = [];
-                cur_selection_array = this.selectionInfo.selectionArray;
-                for(i = 0; i < cur_selection_array.length; ++i)
-                {
-                    selection_state.selectionArray.push(cur_selection_array[i]);
-                    selection_state.selectStartPages.push(cur_selection_array[i].GraphicObj.selectStartPage);
+                    selection_state.selectionArray = [];
+                    selection_state.selectStartPages = [];
+                    cur_selection_array = this.selectionInfo.selectionArray;
+                    for(i = 0; i < cur_selection_array.length; ++i)
+                    {
+                        selection_state.selectionArray.push(cur_selection_array[i]);
+                        selection_state.selectStartPages.push(cur_selection_array[i].GraphicObj.selectStartPage);
+                    }
+                    break;
                 }
-                break;
             }
 
         }
@@ -2212,6 +2284,10 @@ CGraphicObjects.prototype =
                 {
                     group.selectionInfo.selectionArray[0].documentUpdateRulersState();
                 }
+                break;
+            }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
                 break;
             }
             default :
@@ -4246,8 +4322,11 @@ CGraphicObjects.prototype =
 
         if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
         {
-            this.curState.chart.GraphicObj.recalculate();
-            this.updateCharts();
+            if(this.curState.chart.GraphicObj)
+            {
+                this.curState.chart.GraphicObj.recalculate();
+                this.updateCharts();
+            }
         }
 
         for(var _sel_obj_index = 0; _sel_obj_index < this.selectionInfo.selectionArray.length; ++_sel_obj_index)
