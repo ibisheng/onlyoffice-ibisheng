@@ -91,11 +91,91 @@ WordGroupShapes.prototype =
 
     Search_GetId: function(bNext, bCurrent)
     {
-        var first_selected = null;
-        if(bNext)
+        if(!bCurrent)
         {
-           /// for(var i = 0; i < )
+            if(bNext)
+            {
+                for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId )
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, bCurrent);
+                        if(result)
+                            return result;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                for(var i = this.arrGraphicObjects.length - 1; i > -1; --i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId)
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, bCurrent);
+                        if(result)
+                            return result;
+                    }
+                }
+                return null;
+            }
         }
+        else
+        {
+            var last_selected;
+            if(bNext)
+            {
+                last_selected = -1;
+                for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId &&  this.arrGraphicObjects[i].selected)
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, bCurrent);
+                        if(result)
+                            return result;
+                        last_selected = i;
+                    }
+                }
+                for(var i = last_selected+1; i < this.arrGraphicObjects.length; ++i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId)
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, false);
+                        if(result)
+                            return result;
+                        last_selected = i;
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                last_selected = this.arrGraphicObjects.length;
+                for(var i = this.arrGraphicObjects.length - 1; i > -1; --i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId &&  this.arrGraphicObjects[i].selected)
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, bCurrent);
+                        if(result)
+                            return result;
+                        last_selected = i;
+                    }
+                }
+                for(var i = last_selected - 1; i > -1; --i)
+                {
+                    if(this.arrGraphicObjects[i].Search_GetId)
+                    {
+                        var result = this.arrGraphicObjects[i].Search_GetId(bNext, false);
+                        if(result)
+                            return result;
+                        last_selected = i;
+                    }
+                }
+                return null;
+            }
+        }
+
+
     },
 
 

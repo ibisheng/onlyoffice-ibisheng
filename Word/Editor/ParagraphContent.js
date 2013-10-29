@@ -3480,7 +3480,8 @@ ParaDrawing.prototype =
 
     Search_GetId : function(bNext, bCurrent)
     {
-        // TODO: Реализовать
+        if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.Search_GetId === "function")
+            return this.GraphicObj.Search_GetId(bNext, bCurrent);
         return null;
     },
 

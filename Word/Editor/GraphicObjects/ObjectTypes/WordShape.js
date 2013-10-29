@@ -94,6 +94,11 @@ WordShape.prototype =
         return true;
     },
 
+    Search_GetId: function(bNext, bCurrent)
+    {
+        return this.textBoxContent ? this.textBoxContent.Search_GetId(bNext, bCurrent) : null;
+    },
+
 
     isShape: function()
     {
@@ -5792,12 +5797,6 @@ WordShape.prototype =
         }
     },
 
-    Search_GetId: function(bNext, bCurrent)
-    {
-        if(isRealObjec(this.textBoxContent))
-            return this.textBoxContent.Search_GetId(bNext, bCurrent);
-        return null;
-    },
 
     recalculateDocContent: function()
     {
