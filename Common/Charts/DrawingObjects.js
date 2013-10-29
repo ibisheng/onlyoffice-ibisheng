@@ -1788,8 +1788,8 @@ asc_CShapeProperty.prototype = {
 	asc_putStroke: function(v) { this.stroke = v; },
     asc_getPaddings: function() { return this.paddings; },
     asc_putPaddings: function(v) { this.paddings = v; }
-    asc_get_CanFill = function(){return this.canFill}
-    asc_put_CanFill = function(v){this.canFill = v;}
+    asc_get_CanFill: function(){return this.canFill}
+    asc_put_CanFill: function(v){this.canFill = v;}
 }
 
 //{ asc_CShapeProperty export
