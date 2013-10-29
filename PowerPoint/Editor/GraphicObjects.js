@@ -254,12 +254,12 @@ CGraphicObjects.prototype = {
                     }
                     else
                     {
-                        if(!group_selected_objects[i].canResize())
+                        if(!this.State.group.canResize())
                         {
                             drawingDocument.SetCursorType("default");
                             return;
                         }
-                        var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                        var card_direction = this.State.group.getCardDirectionByNum(hit_to_handles);
                         drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]);
                     }
                 }

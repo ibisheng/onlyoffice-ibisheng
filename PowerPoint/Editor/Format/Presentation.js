@@ -3770,22 +3770,70 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/ ) // контекстное меню
         {
-            var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
-            var X_abs = ConvertedPos.X;
-            var Y_abs = ConvertedPos.Y;
+           // var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
+           // var X_abs = ConvertedPos.X;
+           // var Y_abs = ConvertedPos.Y;
 
-            editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
+
+            var type;
+            if(editor.WordControl.Thumbnails.FocusObjType === FOCUS_OBJECT_MAIN)
+            {
+                type = c_oAscContextMenuTypes.Main;
+
+                if(this.Slides[this.CurPage] )
+                {
+                    var pos_x = 0, pos_y = 0;
+                    if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length > 0)
+                    {
+                        pos_x = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].x;
+                        pos_y = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].y;
+                    }
+                    var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( pos_x, pos_y, this.PageNum );
+                    var X_abs = ConvertedPos.X;
+                    var Y_abs = ConvertedPos.Y;
+                    editor.sync_ContextMenuCallback(new CMouseMoveData({ Type : type, X_abs : X_abs, Y_abs : Y_abs }) );
+                }
+            }
+            else
+            {
+                type = c_oAscContextMenuTypes.Thumbnails;
+            }
 
             bUpdateSelection = false;
             bRetValue = true;
         }
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
-            var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
-            var X_abs = ConvertedPos.X;
-            var Y_abs = ConvertedPos.Y;
+           //var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( this.TargetPos.X, this.TargetPos.Y, this.TargetPos.PageNum );
+           //var X_abs = ConvertedPos.X;
+           //var Y_abs = ConvertedPos.Y;
+           //
+           //editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
 
-            editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
+
+            var type;
+            if(editor.WordControl.Thumbnails.FocusObjType === FOCUS_OBJECT_MAIN)
+            {
+                type = c_oAscContextMenuTypes.Main;
+
+                if(this.Slides[this.CurPage] )
+                {
+                    var pos_x = 0, pos_y = 0;
+                    if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length > 0)
+                    {
+                        pos_x = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].x;
+                        pos_y = this.Slides[this.CurPage].graphicObjects.selectedObjects[0].y;
+                    }
+                    var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( pos_x, pos_y, this.PageNum );
+                    var X_abs = ConvertedPos.X;
+                    var Y_abs = ConvertedPos.Y;
+                    editor.sync_ContextMenuCallback(new CMouseMoveData({ Type : type, X_abs : X_abs, Y_abs : Y_abs }) );
+                }
+            }
+            else
+            {
+                type = c_oAscContextMenuTypes.Thumbnails;
+            }
 
             bUpdateSelection = false;
             bRetValue = true;
