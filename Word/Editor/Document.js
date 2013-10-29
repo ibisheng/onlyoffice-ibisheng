@@ -327,13 +327,10 @@ CDocumentRecalcInfo.prototype =
 
 function CDocument(DrawingDocument)
 {
-    this.History = new CHistory(this);
-    History = this.History;
-
     // Создаем глобальные объекты, необходимые для совместного редактирования
+    this.History   = History;
     this.IdCounter = g_oIdCounter;
     this.TableId   = g_oTableId;
-
     this.CollaborativeEditing = CollaborativeEditing;
     //------------------------------------------------------------------------
 

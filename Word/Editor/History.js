@@ -842,3 +842,5 @@ CHistory.prototype =
     }
 
 };
+
+var History = null;

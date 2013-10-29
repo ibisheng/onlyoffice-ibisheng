@@ -264,7 +264,7 @@ function CTableId()
     };
 }
 
-var g_oTableId = new CTableId();
+var g_oTableId = null;
 
 function CCollaborativeChanges()
 {

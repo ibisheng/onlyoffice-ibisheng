@@ -502,6 +502,9 @@ var DocumentPageSize = new function() {
 
 function asc_docs_api(name)
 {
+    History    = new CHistory();
+    g_oTableId = new CTableId();
+
 	/************ private!!! **************/
     this.HtmlElementName = name;
 
