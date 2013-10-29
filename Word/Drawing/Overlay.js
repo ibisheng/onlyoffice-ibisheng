@@ -950,15 +950,10 @@ CAutoshapeTrack.prototype =
                                 ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
                             }
                         }
-                    }
 
-                    ctx.beginPath();
-
-                    if (!isLine && isCanRotate)
-                    {
+                        ctx.beginPath();
                         ctx.moveTo(xC + 0.5, y1);
                         ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-
                         ctx.stroke();
 
                         ctx.beginPath();
@@ -1000,6 +995,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
                 else
                 {
@@ -1057,19 +1054,16 @@ CAutoshapeTrack.prototype =
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
                         }
-                    }
 
-                    if (!isLine && isCanRotate)
-                    {
                         ctx.beginPath();
 
                         ctx.moveTo(xc1, yc1);
                         ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
 
                         ctx.stroke();
-                    }
 
-                    ctx.beginPath();
+                        ctx.beginPath();
+                    }
 
                     ctx.fillStyle = _style_white;
 
@@ -1104,6 +1098,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
 
                 break;
@@ -1144,20 +1140,16 @@ CAutoshapeTrack.prototype =
                                 ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
                             }
                         }
-                    }
 
-                    if (isCanRotate)
-                    {
                         ctx.beginPath();
 
                         var xC = ((x1 + x2) / 2) >> 0;
                         ctx.moveTo(xC + 0.5, y1);
                         ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-
                         ctx.stroke();
-                    }
 
-                    ctx.beginPath();
+                        ctx.beginPath();
+                    }
 
                     ctx.fillStyle = _style_white;
 
@@ -1189,6 +1181,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
                 else
                 {
@@ -1239,19 +1233,16 @@ CAutoshapeTrack.prototype =
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
                         }
-                    }
 
-                    if (isCanRotate)
-                    {
                         ctx.beginPath();
 
                         ctx.moveTo(xc1, yc1);
                         ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-
                         ctx.stroke();
-                    }
 
-                    ctx.beginPath();
+                        ctx.beginPath();
+
+                    }
 
                     ctx.fillStyle = _style_white;
 
@@ -1280,6 +1271,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
 
                 break;
@@ -1300,13 +1293,9 @@ CAutoshapeTrack.prototype =
                     ctx.strokeStyle = _style_blue;
                     ctx.stroke();
 
-                    var xC = ((x1 + x2) / 2) >> 0;
-                    ctx.moveTo(xC + 0.5, y1);
-                    ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
-
-                    ctx.stroke();
-
                     ctx.beginPath();
+
+                    var xC = ((x1 + x2) / 2) >> 0;
 
                     if (!bIsUseImageRotateTrack)
                     {
@@ -1329,6 +1318,11 @@ CAutoshapeTrack.prototype =
                             ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
                         }
                     }
+
+                    ctx.beginPath();
+                    ctx.moveTo(xC + 0.5, y1);
+                    ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
+                    ctx.stroke();
 
                     ctx.beginPath();
 
@@ -1362,6 +1356,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
                 else
                 {
@@ -1396,14 +1392,8 @@ CAutoshapeTrack.prototype =
                     var ex2 = (x1 - x3) / _len_y;
                     var ey2 = (y1 - y3) / _len_y;
 
-                    ctx.beginPath();
-
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
-                    ctx.moveTo(xc1, yc1);
-                    ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
-
-                    ctx.stroke();
 
                     ctx.beginPath();
 
@@ -1434,6 +1424,11 @@ CAutoshapeTrack.prototype =
                     }
 
                     ctx.beginPath();
+                    ctx.moveTo(xc1, yc1);
+                    ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE2, yc1 + ey2 * TRACK_DISTANCE_ROTATE2);
+                    ctx.stroke();
+
+                    ctx.beginPath();
 
                     ctx.fillStyle = _style_white;
 
@@ -1462,6 +1457,8 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
+
+                    ctx.beginPath();
                 }
 
                 break;
