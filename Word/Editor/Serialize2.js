@@ -243,7 +243,9 @@ var c_oSerParType = {
     sectPr: 4,
     Run: 5,
 	CommentStart: 6,
-	CommentEnd: 7
+	CommentEnd: 7,
+	OMathPara: 8,
+	OMath: 9
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -437,7 +439,26 @@ var c_oSer_StyleType = {
 };
 var c_oSer_SettingsType = {
 	ClrSchemeMapping: 0,
-	DefaultTabStop: 1
+	DefaultTabStop: 1,
+	MathPr: 2
+};
+var c_oSer_MathPrType = {
+	BrkBin: 0,
+	BrkBinSub: 1,
+	DefJc: 2,
+	DispDef: 3,
+	InterSp: 4,
+	IntLim: 5,
+	IntraSp: 6,
+	LMargin: 7,
+	MathFont: 8,
+	NaryLim: 9,
+	PostSp: 10,
+	PreSp: 11,
+	RMargin: 12,
+	SmallFrac: 13,
+	WrapIndent: 14,
+	WrapRight: 15
 };
 var c_oSer_ClrSchemeMappingType = {
 	Accent1: 0,
@@ -475,68 +496,53 @@ var c_oSer_OMathBottomNodesType = {
 	ArgSz: 2,
 	BaseJc: 3,
 	BegChr: 4,
-	BrkBin: 5,
-	BrkBinSub: 6,
-	CGp: 7,
-	CGpRule: 8,
-	Chr: 9,
-	Count: 10,
-	CSp: 11,
-	DefJc: 12,
-	DegHide: 13,
-	Diff: 14,
-	DispDef: 15,
-	EndChr: 16,
-	Grow: 17,
-	HideBot: 18,
-	HideLeft: 19,
-	HideRight: 20,
-	HideTop: 21,
-	InterSp: 22,
-	IntLim: 23,
-	IntraSp: 24,
-	MJc: 25,
-	LimLoc: 26,
-	Lit: 27,
-	LMargin: 28,
-	MaxDist: 29,
-	McJc: 30,
-	NaryLim: 31,
-	NoBreak: 32,
-	Nor: 33,
-	ObjDist: 34,
-	OpEmu: 35,
-	PlcHide: 36,
-	Pos: 37,
-	PostSp: 38,
-	PreSp: 39,
-	RMargin: 40,
-	RSp: 41,
-	RSpRule: 42,
-	Scr: 43,
-	SepChr: 44,
-	Show: 45,
-	Shp: 46,
-	SmallFrac: 47,
-	StrikeBLTR: 48,
-	StrikeH: 49,
-	StrikeTLBR: 50,
-	StrikeV: 51,
-	Sty: 52,
-	SubHide: 53,
-	SupHide: 54,
-	Transp: 55,
-	Type: 56,
-	VertJc: 57,
-	WrapIndent: 58,
-	WrapRight: 59,
-	ZeroAsc: 60,
-	ZeroDesc: 61,
-	ZeroWid: 62		
+	CGp: 5,
+	CGpRule: 6,
+	Chr: 7,
+	Count: 8,
+	CSp: 9,
+	DegHide: 10,
+	Diff: 11,
+	EndChr: 12,
+	Grow: 13,
+	HideBot: 14,
+	HideLeft: 15,
+	HideRight: 16,
+	HideTop: 17,
+	MJc: 18,
+	LimLoc: 19,
+	Lit: 20,
+	MaxDist: 21,
+	McJc: 22,
+	NoBreak: 23,
+	Nor: 24,
+	ObjDist: 25,
+	OpEmu: 26,
+	PlcHide: 27,
+	Pos: 28,
+	RSp: 29,
+	RSpRule: 30,
+	Scr: 31,
+	SepChr: 32,
+	Show: 33,
+	Shp: 34,
+	StrikeBLTR: 35,
+	StrikeH: 36,
+	StrikeTLBR: 37,
+	StrikeV: 38,
+	Sty: 39,
+	SubHide: 40,
+	SupHide: 41,
+	Transp: 42,
+	Type: 43,
+	VertJc: 44,
+	ZeroAsc: 45,
+	ZeroDesc: 46,
+	ZeroWid: 47	
 };
 var c_oSer_OMathBottomNodesValType = {
 	Val: 0,
-	Val1: 1
+	AlnAt: 1
 };
 var c_oSer_OMathContentType = {		
 	Acc: 0,
@@ -565,34 +571,33 @@ var c_oSer_OMathContentType = {
 	LimUpp: 23,
 	LimUppPr: 24,
 	Matrix: 25,
-	MathFont: 26,
-	MathPr: 27,
-	Mc: 28,
-	McPr: 29,
-	Mcs: 30,
-	MPr: 31,
-	Mr: 32,
-	Nary: 33,
-	NaryPr: 34,
-	OMathPara: 35,
-	OMathParaPr: 36,
-	Phant: 37,
-	PhantPr: 38,
-	MRun: 39,
-	Rad: 40,
-	RadPr: 41,
-	MRPr: 42,
-	SPre: 43,
-	SPrePr: 44,
-	SSub: 45,
-	SSubPr: 46,
-	SSubSup: 47,
-	SSubSupPr: 48,
-	SSup: 49,
-	SSupPr: 50,
-	MText: 51,
-	Column: 52,
-	Row: 53
+	MathPr: 26,
+	Mc: 27,
+	McPr: 28,
+	Mcs: 29,
+	MPr: 30,
+	Mr: 31,
+	Nary: 32,
+	NaryPr: 33,
+	OMathPara: 34,
+	OMathParaPr: 35,
+	Phant: 36,
+	PhantPr: 37,
+	MRun: 38,
+	Rad: 39,
+	RadPr: 40,
+	MRPr: 41,
+	SPre: 42,
+	SPrePr: 43,
+	SSub: 44,
+	SSubPr: 45,
+	SSubSup: 46,
+	SSubSupPr: 47,
+	SSup: 48,
+	SSupPr: 49,
+	MText: 50,
+	Column: 51,
+	Row: 52
 };
 var c_oSer_OMathArgNodesType = {		
 	Deg: 0,
@@ -2408,6 +2413,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
             }
         }
+		//if (null != MathComposition)
+		//	this.bs.WriteItem(c_oSer_OMathContentType.OMathPara, function(){oThis.WriteMathOMathPara(MathComposition);});	
         this.WriteText();
 		if(bExistHyperlink)
 		{
@@ -2424,7 +2431,852 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 					oThis.memory.WriteLong(c_oSerPropLenType.Null);
                 });
 		}
-    };
+    };	
+	this.WriteMathArg = function(oOMath)
+	{
+		var oThis = this;
+		var nStart = 0;
+        var nEnd   = oOMath.content.length - 1;
+		for(var i = nStart; i <= nEnd; i++)
+        {
+			var item = oOMath.content[i];	
+			//прокинуть GetValue
+			switch ( item.value )
+            {
+				case "CAccent"			: this.bs.WriteItem(c_oSer_OMathContentType.Acc, function(){oThis.WriteMathAcc(item);});			break;
+				case "ArgPr"			: this.bs.WriteItem(c_oSer_OMathContentType.ArgPr, function(){oThis.WriteMathArgPr(item);});		break;//нет обертки
+				case "CBar"				: this.bs.WriteItem(c_oSer_OMathContentType.Bar, function(){oThis.WriteMathBar(item);});			break;
+				case "CBorderBox"		: this.bs.WriteItem(c_oSer_OMathContentType.BorderBox, function(){oThis.WriteMathBorderBox(item);});break;
+				case "CBox"				: this.bs.WriteItem(c_oSer_OMathContentType.Box, function(){oThis.WriteMathBox(item);});			break;
+				case "CCtrlPr"			: this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(item);});		break;
+				case "CDelimiter"		: this.bs.WriteItem(c_oSer_OMathContentType.Delimiter, function(){oThis.WriteMathDelimiter(item);});break;
+				case "CEqArr"			: this.bs.WriteItem(c_oSer_OMathContentType.EqArr, function(){oThis.WriteMathEqArr(item);});		break;
+				case "CFraction"		: this.bs.WriteItem(c_oSer_OMathContentType.Fraction, function(){oThis.WriteMathFraction(item);});	break;
+				case "CMathFunc"		: this.bs.WriteItem(c_oSer_OMathContentType.Func, function(){oThis.WriteMathFunc(item);});			break;
+				case "CGroupCharacter"	: this.bs.WriteItem(c_oSer_OMathContentType.GroupChr, function(){oThis.WriteMathGroupChr(item);});	break;
+				case "CLimit"			: 
+					if (LIMIT_LOW  == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.LimLow, function(){oThis.WriteMathLimLow(item);});
+					else if (LIMIT_UP == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.LimUpp, function(){oThis.WriteMathLimUpp(item);});
+					break;
+				case "CMatrix"			: this.bs.WriteItem(c_oSer_OMathContentType.Matrix, function(){oThis.WriteMathMatrix(item);});		break;
+				case "CNary"			: this.bs.WriteItem(c_oSer_OMathContentType.Nary, function(){oThis.WriteMathNary(item);});			break;
+				case "OMath"			: this.bs.WriteItem(c_oSer_OMathArgNodesType.OMath, function(){oThis.WriteMathArg(item);});			break;
+				case "OMathPara"		: this.bs.WriteItem(c_oSer_OMathContentType.OMathPara, function(){oThis.WriteMathOMathPara(item);});break;
+				case "CPhant"			: this.bs.WriteItem(c_oSer_OMathContentType.Phant, function(){oThis.WriteMathPhant(item);});		break;
+				case "MRun"				: this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMathMRun(item);});			break; //нет обертки
+				case "CRadical"			: this.bs.WriteItem(c_oSer_OMathContentType.Rad, function(){oThis.WriteMathRad(item);});			break;
+				case "CDegreeSubSup"	: 
+					if (DEGREE_PreSubSup == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.SPre, function(){oThis.WriteMathSPre(item);});	
+					else if (DEGREE_SubSup == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.SSubSup, function(){oThis.WriteMathSSubSup(item);});
+					break;
+				case "CDegree"			: 
+					if (DEGREE_SUBSCRIPT == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.SSub, function(){oThis.WriteMathSSub(item);});
+					else if (DEGREE_SUPERSCRIPT == item.type)
+						this.bs.WriteItem(c_oSer_OMathContentType.SSup, function(){oThis.WriteMathSSup(item);});
+					break;
+				default: break; //empty
+			}
+        }
+		
+	};
+	this.WriteMathAcc = function(oAcc)
+	{
+		var oThis = this;
+		var oElem = oAcc.getBase();
+		if (null != oAcc.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.AccPr, function(){oThis.WriteMathAccPr(oAcc.props, oAcc);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathAccPr = function(props,oAcc)
+	{
+		if (null != props.chr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Chr, function(){oThis.WriteMathChr(props.chr);});
+		if (null != oAcc.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oAcc);});
+	}	
+	this.WriteMathAln = function(Aln)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Aln);
+	}	
+	this.WriteMathAlnScr = function(AlnScr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(AlnScr);
+	}
+	this.WriteMathArgPr = function(oArgPr)
+	{
+		if (null != oArgPr.argSz)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.ArgSz, function(){oThis.WriteMathArgSz(oArgPr.argSz);});
+	}
+	this.WriteMathArgSz = function(ArgSz)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(ArgSz);
+	}
+	this.WriteMathBar = function(oBar)
+	{
+		var oThis = this;
+		var oElem = oBar.getBase();
+		if (null != oBar.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.BarPr, function(){oThis.WriteMathBarPr(oBar.props, oBar);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathBarPr = function(props,oBar)
+	{
+		if (null != props.pos)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Pos, function(){oThis.WriteMathPos(props.pos);});
+		if (null != oBar.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oBar);});
+	}
+	this.WriteMathBaseJc = function(BaseJc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(BaseJc);
+	}
+	this.WriteMathBegChr = function(BegChr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.memory.WriteString2(BegChr);
+	}
+	this.WriteMathBorderBox = function(oBorderBox)
+	{
+		var oThis = this;
+		var oElem = oBorderBox.getBase();
+		if (null != oBorderBox.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteMathBorderBoxPr(oBorderBox.props, oBorderBox);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathBorderBoxPr = function(props,oBorderBox)
+	{		
+		if (null != props.hideBot)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.HideBot, function(){oThis.WriteMathHideBot(props.hideBot);});
+		if (null != props.hideLeft)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.HideLeft, function(){oThis.WriteMathHideLeft(props.hideLeft);});
+		if (null != props.hideRight)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.HideRight, function(){oThis.WriteMathHideRight(props.hideRight);});
+		if (null != props.hideTop)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.HideTop, function(){oThis.WriteMathHideTop(props.hideTop);});
+		if (null != props.strikeBLTR)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.StrikeBLTR, function(){oThis.WriteMathStrikeBLTR(props.strikeBLTR);});
+		if (null != props.strikeH)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.StrikeH, function(){oThis.WriteMathStrikeH(props.strikeH);});
+		if (null != props.strikeTLBR)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.StrikeTLBR, function(){oThis.WriteMathStrikeTLBR(props.strikeTLBR);});
+		if (null != props.strikeV)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.StrikeV, function(){oThis.WriteMathStrikeV(props.strikeV);});
+		if (null != oBorderBox.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oBorderBox);});
+	}
+	this.WriteMathBox = function(oBox)
+	{
+		var oThis = this;
+		var oElem = oBox.getBase();
+		if (null != oBox.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.BorderBoxPr, function(){oThis.WriteMathBoxPr(oBox.props, oBox);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathBoxPr = function(props,oBox)
+	{
+		if (null != props.aln)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Aln, function(){oThis.WriteMathAln(props.aln);});
+		if (null != props.brk)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Brk, function(){oThis.WriteMathBrk(props.brk);});
+		if (null != props.diff)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Diff, function(){oThis.WriteMathDiff(props.diff);});
+		if (null != props.noBreak)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.NoBreak, function(){oThis.WriteMathNoBreak(props.noBreak);});
+		if (null != props.opEmu)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.OpEmu, function(){oThis.WriteMathOpEmu(props.opEmu);});
+		if (null != oBox.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oBox);});
+	}	
+	this.WriteMathBrk = function(Brk)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.AlnAt);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(Brk);
+	}
+	this.WriteMathCGp = function(CGp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(CGp);
+	}
+	this.WriteMathCGpRule = function(CGpRule)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(CGpRule);
+	}
+	this.WriteMathChr = function(Chr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.memory.WriteString2(Chr);
+	}
+	this.WriteMathCSp = function(CSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(CSp);
+	}
+	this.WriteMathCtrlPr = function(oElem)
+	{
+		if (null != oElem.TxtPrp)
+			this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oElem.TxtPrp);});
+	}
+	this.WriteMathDegHide = function(DegHide)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(DegHide);
+	}
+	this.WriteMathDiff = function(Diff)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Diff);
+	}
+	this.WriteMathDelimiter = function(oDelimiter)
+	{
+		var oThis = this;
+		var nStart = 0;
+        var nEnd   = oDelimiter.elements.length;
+		
+		if (null != oDelimiter.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.DelimiterPr, function(){oThis.WriteMathDelimiterPr(oDelimiter.props, oDelimiter);});
+		
+		for(var i = nStart; i < nEnd; i++)	
+		{
+			var oElem = oDelimiter.getBase(i);
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		}
+	}
+	this.WriteMathDelimiterPr = function(props,oDelimiter)
+	{
+		//if (null != oDelimiter.column)
+		//	this.bs.WriteItem(c_oSer_OMathContentType.Column, function(){oThis.WriteMathColumn(oDelimiter.column);});
+		if (null != props.begChr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BegChr, function(){oThis.WriteMathBegChr(props.begChr);});
+		if (null != props.endChr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.EndChr, function(){oThis.WriteMathEndChr(props.endChr);});
+		if (null != props.grow)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Grow, function(){oThis.WriteMathGrow(props.grow);});
+		if (null != props.sepChr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.SepChr, function(){oThis.WriteMathSepChr(props.sepChr);});
+		if (null != props.shp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Shp, function(){oThis.WriteMathShp(props.shp);});
+		if (null != oDelimiter.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oDelimiter);});
+	}		
+	this.WriteMathEndChr = function(EndChr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.memory.WriteString2(EndChr);
+	}
+	this.WriteMathEqArr = function(oEqArr)
+	{
+		var oThis = this;
+		var nStart = 0;
+        var nEnd   = oEqArr.elements.length;
+		
+		if (null != oEqArr.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.EqArrPr, function(){oThis.WriteMathEqArrPr(oEqArr.props, oEqArr);});
+		
+		for(var i = nStart; i < nEnd; i++)	
+		{
+			var oElem = oEqArr.getBase(i);
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		}
+	}
+	this.WriteMathEqArrPr = function(props,oEqArr)
+	{
+		if (null != props.baseJc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BaseJc, function(){oThis.WriteMathBaseJc(props.baseJc);});
+		if (null != props.maxDist)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.MaxDist, function(){oThis.WriteMathMaxDist(props.maxDist);});
+		if (null != props.objDist)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.ObjDist, function(){oThis.WriteMathObjDist(props.objDist);});
+		if (null != props.rSp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.RSp, function(){oThis.WriteMathRSp(props.rSp);});
+		if (null != props.rSpRule)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.RSpRule, function(){oThis.WriteMathRSpRule(props.rSpRule);});
+		if (null != oEqArr.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oEqArr);});
+	}	
+	this.WriteMathFraction = function(oFraction)
+	{
+		var oThis = this;
+		var oDen = oFraction.getDenominator();
+		var oNum = oFraction.getNumerator();	
+		
+		if (null != oFraction.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteMathFPr(oFraction.props, oFraction);});		
+		if (null != oDen)		
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Den, function(){oThis.WriteMathArgNodes(oDen);});
+		if (null != oNum)		
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Num, function(){oThis.WriteMathArgNodes(oNum);});
+	}	
+	this.WriteMathFPr = function(props,oFraction)
+	{
+		if (null != props.type)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Type, function(){oThis.WriteMathType(props.type);});
+		if (null != oEqArr.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oEqArr);});
+	}
+	this.WriteMathFunc = function(oFunc)
+	{
+		var oThis = this;
+		var oFName = oFunc.getFName();
+		var oElem = oFunc.getArgument();	
+		
+		if (null != oFunc.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteMathFuncPr(oFunc.props, oFunc);});		
+		if (null != oFName)		
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.FName, function(){oThis.WriteMathArgNodes(oFName);});
+		if (null != oElem)		
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathFuncPr = function(props,oFunc)
+	{
+		if (null != oFunc.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oFunc);});
+	}
+	this.WriteMathGroupChr = function(oGroupChr)
+	{
+		var oThis = this;		
+		var oElem = oGroupChr.getArgument();
+		
+		if (null != oGroupChr.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.GroupChrPr, function(){oThis.WriteMathGroupChrPr(oBox.props, oGroupChr);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathGroupChrPr = function(props,oGroupChr)
+	{
+		if (null != props.chr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Chr, function(){oThis.WriteMathChr(props.chr);});
+		if (null != props.pos)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Pos, function(){oThis.WriteMathPos(props.pos);});
+		if (null != props.vertJc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.VertJc, function(){oThis.WriteMathVertJc(props.vertJc);});
+		if (null != oEqArr.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oEqArr);});
+	}
+	this.WriteMathGrow = function(Grow)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Grow);
+	}
+	this.WriteMathHideBot = function(HideBot)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(HideBot);
+	}
+	this.WriteMathHideLeft = function(HideLeft)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(HideLeft);
+	}
+	this.WriteMathHideRight = function(HideRight)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(HideRight);
+	}
+	this.WriteMathHideTop = function(HideTop)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(HideTop);
+	}
+	this.WriteMathMJc = function(MJc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(MJc);
+	}
+	this.WriteMathLimLoc = function(LimLoc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(LimLoc);
+	}
+	this.WriteMathLimLow = function(oLimLow)
+	{
+		var oThis = this;		
+		var oElem = oLimLow.getFName();
+		var oLim  = oLimLow.getIterator();
+		
+		if (null != oLimLow.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteMathLimLowPr(oLimLow.props, oLimLow);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		if (null != oLim)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Lim, function(){oThis.WriteMathArgNodes(oLim);});
+	}
+	this.WriteMathLimLowPr = function(props,oLimLow)
+	{
+		if (null != oLimLow.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oLimLow);});
+	}
+	this.WriteMathLimUpp = function(oLimUpp)
+	{
+		var oThis = this;		
+		var oElem = oLimUpp.getFName();
+		var oLim  = oLimUpp.getIterator();
+		
+		if (null != oLimUpp.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteMathLimUppPr(oLimUpp.props, oLimUpp);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		if (null != oLim)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Lim, function(){oThis.WriteMathArgNodes(oLim);});
+	}
+	this.WriteMathLimUppPr = function(props,oLimUpp)
+	{
+		if (null != oLimUpp.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oLimUpp);});
+	}
+	this.WriteMathLit = function(Lit)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Lit);
+	}
+	this.WriteMathMaxDist = function(MaxDist)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(MaxDist);
+	}
+	this.WriteMathMatrix = function(oMatrix)
+	{
+		var oThis 	= this;		
+		var nStart = 0;
+        var nEnd   = oMatrix.props.row;
+		
+		if (null != oMatrix.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.EqArrPr, function(){oThis.WriteMathMPr(oMatrix.props, oMatrix);});
+		
+		for(var i = nStart; i < nEnd; i++)	
+		{	
+			this.bs.WriteItem(c_oSer_OMathContentType.Mr, function(){oThis.WriteMathMr(oMatrix,i);});
+		}
+	}
+	this.WriteMathMc = function(props)
+	{
+		this.bs.WriteItem(c_oSer_OMathContentType.McPr, function(){oThis.WriteMathMcPr(props);});
+	}
+	this.WriteMathMcPr = function(props)
+	{
+		if (null != props.mcJc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.McJc, function(){oThis.WriteMathMcJc(props.mcJc);});
+		if (null != props.column)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Count, function(){oThis.WriteMathCount(props.column);});
+	}
+	this.WriteMathMcs = function(props)
+	{
+		this.bs.WriteItem(c_oSer_OMathContentType.Mc, function(){oThis.WriteMathMc(props);});
+	}
+	this.WriteMathMPr = function(props,oMatrix)
+	{
+		if (null != props.baseJc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.BaseJc, function(){oThis.WriteMathBaseJc(props.baseJc);});
+		if (null != props.cGp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CGp, function(){oThis.WriteMathCGp(props.cGp);});
+		if (null != props.cGpRule)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CGpRule, function(){oThis.WriteMathCGpRule(props.cGpRule);});
+		if (null != props.cSp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.CSp, function(){oThis.WriteMathCSp(props.cSp);});
+		if (null != props.column || null != props.mcJc)
+			this.bs.WriteItem(c_oSer_OMathContentType.Mcs, function(){oThis.WriteMathMcs(props);});
+		if (null != props.plcHide)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.PlcHide, function(){oThis.WriteMathPlcHide(props.plcHide);});
+		if (null != props.rSp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.RSp, function(){oThis.WriteMathRSp(props.rSp);});
+		if (null != props.rSpRule)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.RSpRule, function(){oThis.WriteMathRSpRule(props.rSpRule);});
+		if (null != oNary.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oMatrix);});
+	}
+	this.WriteMathMr = function(oMatrix, nRow)
+	{
+		var oThis 	= this;		
+		var nStart = 0;
+        var nEnd   = oMatrix.props.column;
+
+		for(var i = nStart; i < nEnd; i++)	
+		{	
+			var oElem = oEqArr.getBase(nRow,i);
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		}
+	}	
+	this.WriteMathNary = function(oNary)
+	{
+		var oThis = this;
+		var oElem = oNary.getBase();
+		var oSub = oNary.getLowerIterator();
+		var oSup = oNary.getUpperIterator();
+		
+		if (null != oNary.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.NaryPr, function(){oThis.WriteMathNaryPr(oNary.props, oNary);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+		if (null != oSub)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oSub);});
+		if (null != oSup)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oSup);});
+	}
+	this.WriteMathNaryPr = function(props,oNary)
+	{
+		if (null != props.chr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Chr, function(){oThis.WriteMathChr(props.chr);});
+		if (null != props.grow)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Grow, function(){oThis.WriteMathGrow(props.grow);});
+		if (null != props.limLoc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.LimLoc, function(){oThis.WriteMathLimLoc(props.limLoc);});
+		if (null != props.subHide)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.SubHide, function(){oThis.WriteMathSubHide(props.subHide);});
+		if (null != props.supHide)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.SupHide, function(){oThis.WriteMathSupHide(props.supHide);});
+		if (null != oNary.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oNary);});
+	}	
+	this.WriteMathNoBreak = function(NoBreak)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(NoBreak);
+	}
+	this.WriteMathNor = function(Nor)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Nor);
+	}
+	this.WriteMathObjDist = function(ObjDist)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(ObjDist);
+	}
+	this.WriteMathOMathPara = function(oOMathPara)
+	{
+		var oThis = this;
+		if (null != oOMathPara.Root)
+			oThis.bs.WriteItem(c_oSer_OMathArgNodesType.OMath, function(){oThis.WriteMathArg(oOMathPara.Root);});
+		if (null != oOMathPara.props)
+			oThis.bs.WriteItem(c_oSer_OMathContentType.OMathParaPr, function(){oThis.WriteMathOMathParaPr(oOMathPara.props);});		
+	};
+	this.WriteMathOMathParaPr = function(props)
+	{
+		if (null != props.mJc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.MJc, function(){oThis.WriteMathMJc(props.mJc);});
+	}
+	this.WriteMathOpEmu = function(OpEmu)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(OpEmu);
+	}
+	this.WriteMathPhant = function(oPhant)
+	{
+		var oThis = this;
+		var oElem = oPhant.getBase();
+		
+		if (null != oPhant.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.PhantPr, function(){oThis.WriteMathPhantPr(oPhant.props, oPhant);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathPhantPr = function(props,oPhant)
+	{
+		if (null != props.show)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Show, function(){oThis.WriteMathShow(props.show);});
+		if (null != props.transp)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Transp, function(){oThis.WriteMathTransp(props.transp);});
+		if (null != props.zeroAsc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.ZeroAsc, function(){oThis.WriteMathZeroAsc(props.zeroAsc);});
+		if (null != props.zeroDesc)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.ZeroDesc, function(){oThis.WriteMathZeroDesc(props.zeroDesc);});
+		if (null != props.zeroWid)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.ZeroWid, function(){oThis.WriteMathZeroWid(props.zeroWid);});
+		if (null != oPhant.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oPhant);});
+	}
+	this.WriteMathPlcHide = function(PlcHide)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(PlcHide);
+	}
+	this.WriteMathPos = function(Pos)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(Pos);
+	}
+	this.WriteMathMRun = function(oMRun)//нет обертки
+	{
+		var oThis = this;
+		var oText = oMRun.GetText();
+		
+		if (null != oMRun.props)//m:rPr
+			this.bs.WriteItem(c_oSer_OMathContentType.MRPr, function(){oThis.WriteMathMRPr(oMRun.props);});
+		if (null != oMRun.TxtPrp) //w:rPr
+			this.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(oMRun.TxtPrp);});
+		if (null != oText) //m:t
+			this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText.toString());});		
+	}
+	this.WriteMathMRPr = function(props)
+	{
+		if (null != props.aln)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Aln, function(){oThis.WriteMathAln(props.aln);});
+		if (null != props.brk)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Brk, function(){oThis.WriteMathBrk(props.brk);});
+		if (null != props.lit)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Lit, function(){oThis.WriteMathLit(props.lit);});
+		if (null != props.nor)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Nor, function(){oThis.WriteMathNor(props.nor);});
+		if (null != props.scr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Scr, function(){oThis.WriteMathScr(props.scr);});
+		if (null != props.sty)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.Sty, function(){oThis.WriteMathSty(props.sty);});
+	}
+	this.WriteMathRad = function(oRad)
+	{
+		var oThis = this;
+		var oElem = oRad.getBase();
+		var oDeg  = oRad.getDegree();
+		
+		if (null != oRad.props)
+			this.bs.WriteItem(c_oSer_OMathContentType.RadPr, function(){oThis.WriteMathRadPr(oRad.props, oRad);});
+		if (null != oDeg)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Deg, function(){oThis.WriteMathArgNodes(oDeg);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathRadPr = function(props,oRad)
+	{
+		if (null != props.degHide)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.DegHide, function(){oThis.WriteMathDegHide(props.degHide);});
+		if (null != oRad.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oRad);});
+	}	
+	this.WriteMathRSp = function(RSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(RSp);
+	}
+	this.WriteMathRSpRule = function(RSpRule)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(RSpRule);
+	}
+	this.WriteMathScr = function(Scr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(Scr);
+	}
+	this.WriteMathSepChr = function(SepChr)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.memory.WriteString2(SepChr);
+	}
+	this.WriteMathShow = function(Show)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Show);
+	}
+	this.WriteMathShp = function(Show)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(Show);
+	}
+	this.WriteMathSPre = function(oSPre)
+	{
+		var oThis = this;
+		var oSub  = oSPre.getLowerIterator();
+		var oSup  = oSPre.getUpperIterator();
+		var oElem = oSPre.getBase();
+		
+		if (null != oSPre)
+			this.bs.WriteItem(c_oSer_OMathContentType.SPrePr, function(){oThis.WriteMathSPrePr(oSPre);});
+		if (null != oSub)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sub, function(){oThis.WriteMathArgNodes(oSub);});
+		if (null != oSup)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sup, function(){oThis.WriteMathArgNodes(oSup);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathSPrePr = function(oSPre)
+	{
+		if (null != oSPre.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oSPre);});
+	}
+	this.WriteMathSSub = function(oSSub)
+	{
+		var oThis = this;
+		var oSub  = oSSub.getLowerIterator();
+		var oElem = oSSub.getBase();
+		
+		if (null != oSSub)
+			this.bs.WriteItem(c_oSer_OMathContentType.SSubPr, function(){oThis.WriteMathSSubPr(oSSub);});
+		if (null != oSub)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sub, function(){oThis.WriteMathArgNodes(oSub);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathSSubPr = function(oSSub)
+	{
+		if (null != oSSub.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oSSub);});
+	}
+	this.WriteMathSubSup = function(oSSubSup)
+	{
+		var oThis = this;
+		var oSub  = oSSubSup.getLowerIterator();
+		var oSup  = oSSubSup.getUpperIterator();
+		var oElem = oSSubSup.getBase();
+		
+		if (null != oSSubSup)
+			this.bs.WriteItem(c_oSer_OMathContentType.SSubPr, function(){oThis.WriteMathSSubSupPr(oSSubSup);});
+		if (null != oSub)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sub, function(){oThis.WriteMathArgNodes(oSub);});
+		if (null != oSup)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sup, function(){oThis.WriteMathArgNodes(oSup);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathSSubSupPr = function(oSSubSup)
+	{
+		if (null != props.alnScr)
+			this.bs.WriteItem(c_oSer_OMathBottomNodesType.AlnScr, function(){oThis.WriteMathAlnScr(props.alnScr);});
+		if (null != oSSubSup.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oSSubSup);});
+	}
+	this.WriteMathSSup = function(oSSup)
+	{
+		var oThis = this;
+		var oSup  = oSSup.getUpperIterator()();
+		var oElem = oSSup.getBase();
+		
+		if (null != oSSup)
+			this.bs.WriteItem(c_oSer_OMathContentType.SSupPr, function(){oThis.WriteMathSSupPr(oSSup);});
+		if (null != oSup)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Sup, function(){oThis.WriteMathArgNodes(oSup);});
+		if (null != oElem)
+			this.bs.WriteItem(c_oSer_OMathArgNodesType.Element, function(){oThis.WriteMathArgNodes(oElem);});
+	}
+	this.WriteMathSSupPr = function(oSSup)
+	{
+		if (null != oSSup.TxtPrp)
+			this.bs.WriteItem(c_oSer_OMathContentType.CtrlPr, function(){oThis.WriteMathCtrlPr(oSSup);});
+	}
+	this.WriteMathStrikeBLTR = function(StrikeBLTR)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(StrikeBLTR);
+	}
+	this.WriteMathStrikeH = function(StrikeH)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(StrikeH);
+	}
+	this.WriteMathStrikeTLBR = function(StrikeTLBR)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(StrikeTLBR);
+	}
+	this.WriteMathStrikeV = function(StrikeV)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(StrikeV);
+	}
+	this.WriteMathSty = function(Sty)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(Sty);
+	}
+	this.WriteMathSubHide = function(SubHide)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(SubHide);
+	}
+	this.WriteMathSupHide = function(SupHide)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(SupHide);
+	}
+	this.WriteMathTransp = function(Transp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(Transp);
+	}
+	this.WriteMathType = function(Type)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(Type);
+	}
+	this.WriteMathVertJc = function(VertJc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(VertJc);
+	}
+	this.WriteMathZeroAsc = function(ZeroAsc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(ZeroAsc);
+	}
+	this.WriteMathZeroDesc = function(ZeroDesc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(ZeroDesc);
+	}
+	this.WriteMathZeroWid = function(ZeroWid)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(ZeroWid);
+	}
     this.WriteText = function()
     {
         if("" != this.sCurText)
@@ -3078,7 +3930,141 @@ function BinarySettingsTableWriter(memory, doc)
         var oThis = this;
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
 		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
+		//this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.memory.WriteMathPr();});
     }
+	this.WriteMathPr = function()
+	{
+		var oThis = this;
+		var oMathPr = this.Document.MathPr;
+		if ( null != oMathPr.brkBin)
+			this.bs.WriteItem(c_oSer_MathPrType.BrkBin, function(){oThis.WriteMathBrkBin(oMathPr.brkBin);});
+		if ( null != oMathPr.brkBinSub)
+			this.bs.WriteItem(c_oSer_MathPrType.BrkBinSub, function(){oThis.WriteMathBrkBinSub(oMathPr.brkBinSub);});
+		if ( null != oMathPr.defJc)
+			this.bs.WriteItem(c_oSer_MathPrType.DefJc, function(){oThis.WriteMathDefJc(oMathPr.defJc);});
+		if ( null != oMathPr.dispDef)
+			this.bs.WriteItem(c_oSer_MathPrType.DispDef, function(){oThis.WriteMathDispDef(oMathPr.dispDef);});
+		if ( null != oMathPr.interSp)
+			this.bs.WriteItem(c_oSer_MathPrType.InterSp, function(){oThis.WriteMathInterSp(oMathPr.interSp);});
+		if ( null != oMathPr.intLim)
+			this.bs.WriteItem(c_oSer_MathPrType.IntLim, function(){oThis.WriteMathIntLim(oMathPr.intLim);});
+		if ( null != oMathPr.intraSp)
+			this.bs.WriteItem(c_oSer_MathPrType.IntraSp, function(){oThis.WriteMathIntraSp(oMathPr.intraSp);});	
+		if ( null != oMathPr.lMargin)
+			this.bs.WriteItem(c_oSer_MathPrType.LMargin, function(){oThis.WriteMathLMargin(oMathPr.lMargin);});	
+		if ( null != oMathPr.mathFont)
+			this.bs.WriteItem(c_oSer_MathPrType.MathFont, function(){oThis.WriteMathMathFont(oMathPr.mathFont);});	
+		if ( null != oMathPr.naryLim)
+			this.bs.WriteItem(c_oSer_MathPrType.NaryLim, function(){oThis.WriteMathNaryLim(oMathPr.naryLim);});	
+		if ( null != oMathPr.postSp)
+			this.bs.WriteItem(c_oSer_MathPrType.PostSp, function(){oThis.WriteMathPostSp(oMathPr.postSp);});	
+		if ( null != oMathPr.preSp)
+			this.bs.WriteItem(c_oSer_MathPrType.PreSp, function(){oThis.WriteMathPreSp(oMathPr.preSp);});	
+		if ( null != oMathPr.rMargin)
+			this.bs.WriteItem(c_oSer_MathPrType.RMargin, function(){oThis.WriteMathRMargin(oMathPr.rMargin);});
+		if ( null != oMathPr.smallFrac)
+			this.bs.WriteItem(c_oSer_MathPrType.SmallFrac, function(){oThis.WriteMathSmallFrac(oMathPr.smallFrac);});
+		if ( null != oMathPr.wrapIndent)
+			this.bs.WriteItem(c_oSer_MathPrType.WrapIndent, function(){oThis.WriteMathWrapIndent(oMathPr.wrapIndent);});
+		if ( null != oMathPr.wrapRight)
+			this.bs.WriteItem(c_oSer_MathPrType.WrapRight, function(){oThis.WriteMathWrapRight(oMathPr.wrapRight);});
+	}
+	this.WriteMathBrkBin = function(BrkBin)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(BrkBin);
+	}
+	this.WriteMathBrkBinSub = function(BrkBinSub)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(BrkBinSub);
+	}
+	this.WriteMathDefJc = function(DefJc)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(DefJc);
+	}
+	this.WriteMathDispDef = function(DispDef)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(DispDef);
+	}
+	this.WriteMathInterSp = function(InterSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(InterSp);
+	}
+	this.WriteMathIntLim = function(IntLim)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(IntLim);
+	}
+	this.WriteMathIntraSp = function(IntraSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(IntraSp);
+	}
+	this.WriteMathLMargin = function(LMargin)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(LMargin);
+	}
+	this.WriteMathMathFont = function(MathFont)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.memory.WriteString2(MathFont);
+	}
+	this.WriteMathNaryLim = function(NaryLim)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(NaryLim);
+	}
+	this.WriteMathPostSp = function(PostSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(PostSp);
+	}
+	this.WriteMathPreSp = function(PreSp)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(PreSp);
+	}
+	this.WriteMathRMargin = function(RMargin)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(RMargin);
+	}
+	this.WriteMathSmallFrac = function(SmallFrac)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(SmallFrac);
+	}
+	this.WriteMathWrapIndent = function(WrapIndent)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(WrapIndent);
+	}
+	this.WriteMathWrapRight = function(WrapRight)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Double);
+		this.memory.WriteDouble2(WrapRight);
+	}
     this.WriteColorSchemeMapping = function()
     {
 		var oThis = this;
@@ -5491,7 +6477,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				}
 			}
         }
-		else if ( c_oSer_OMathContentType.OMathPara == type )
+		else if ( c_oSerParType.OMathPara == type )
 		{
 			//res = this.bcr.Read1(length, function(t, l){
             //    return oThis.ReadMathOMathPara(t,l,MathComposition);
@@ -5548,6 +6534,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
+		props.aln = false;
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
 			props.aln = this.stream.GetBool(length);
@@ -5688,6 +6675,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadMathNary(t,l,oNary);
             });
 			oElem.addElementToContent(oNary);
+        }
+		else if (c_oSer_OMathContentType.OMath === type)
+        {		
+            res = this.bcr.Read1(length, function(t, l){				
+                return oThis.ReadMathArg(t,l,oElem);
+            });
         }
 		else if (c_oSer_OMathContentType.Phant === type)
         {			
@@ -6059,6 +7052,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	this.ReadMathColumn = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
+		props.column = 0;
 		
 		if(c_oSer_OMathBottomNodesValType.Val == type)
             props.column = this.stream.GetULongLE();
@@ -6302,7 +7296,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSer_OMathArgNodesType.Element === type)
         {			
-			var oElem = oGroupChr.getArgument(lRow);
+			var oElem = oGroupChr.getArgument();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });		
@@ -6713,6 +7707,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
+	this.ReadMathMJc = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesValType.Val === type)
+        {
+			var mJc = this.stream.GetUChar(length);
+			switch (mJc)
+			{
+				case 0:	props.mJc = "center"; break;
+				case 1:	props.mJc = "centerGroup"; break;
+				case 2:	props.mJc = "left"; break;
+				case 3:	props.mJc = "right"; break;
+				default: props.mJc = "centerGroup";
+			}
+        }
+		else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };	
 	this.ReadMathMPr = function(type, length, props, oMatrix)
     {
         var res = c_oSerConstants.ReadOk;
@@ -7032,6 +8046,27 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 return oThis.ReadMathArg(t,l,oOMathPara.Root);
             });
         }
+		else if (c_oSer_OMathContentType.OMathParaPr)
+		{
+			var props = new Object();
+			res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadMathOMathParaPr(t,l,props);
+            });
+		}
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadMathOMathParaPr = function(type, length, props)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		if (c_oSer_OMathBottomNodesType.MJc === type)
+        {
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadMathMJc(t,l,props);
+            });		
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -7159,14 +8194,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSer_OMathArgNodesType.Deg === type)
         {
-			var oDeg = oSPre.getDegree();
+			var oDeg = oRad.getDegree();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oDeg);
             });			
         }
 		else if (c_oSer_OMathArgNodesType.Element === type)
         {
-			var oElem = oSPre.getBase();
+			var oElem = oRad.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7198,6 +8233,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	this.ReadMathRow = function(type, length, props)
     {
         var res = c_oSerConstants.ReadOk;
+		props.row = 0;
 		
 		if(c_oSer_OMathBottomNodesValType.Val == type)
             props.row = this.stream.GetULongLE();
