@@ -3373,10 +3373,10 @@ function ClrMap()
     {
         for(var i = g_clr_MIN; i <= g_clr_MAX; i++)
         {
-            w.WriteBool(isRealObject(this.color_map[i]));
-            if(isRealObject(this.color_map[i]))
+            w.WriteBool(isRealNumber(this.color_map[i]));
+            if(isRealNumber(this.color_map[i]))
             {
-                this.color_map[i].Write_ToBinary2(w);
+                w.WriteLong(this.color_map[i]);
             }
         }
     };
@@ -3387,8 +3387,7 @@ function ClrMap()
         {
             if(r.GetBool())
             {
-                this.color_map[i] = new CUniColor();
-                this.color_map[i].Read_FromBinary2(r);
+                this.color_map[i] = r.GetLong();
             }
             else
             {
