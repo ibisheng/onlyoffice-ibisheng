@@ -212,6 +212,144 @@ CGraphicObjects.prototype = {
             case STATES_ID_GROUP:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
+                var group_selected_objects = this.State.group.selectedObjects;
+                if(group_selected_objects.length === 1)
+                {
+                    var hit_to_adj = group_selected_objects[0].hitToAdjustment(x, y);
+                    if(hit_to_adj.hit)
+                    {
+                        drawingDocument.SetCursorType("crosshair");
+                        return;
+                    }
+                }
+                for(var i = group_selected_objects.length - 1; i  > -1; --i)
+                {
+                    var hit_to_handles = group_selected_objects[i].hitToHandles(x, y);
+                    if(hit_to_handles > -1)
+                    {
+                        if(hit_to_handles === 8)
+                        {
+                            drawingDocument.SetCursorType("crosshair");
+                        }
+                        else
+                        {
+                            if(!group_selected_objects[i].canResize())
+                            {
+                                drawingDocument.SetCursorType("default");
+                                return;
+                            }
+                            var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                            drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]);
+                        }
+                        return;
+                    }
+                }
+
+                var hit_to_handles = this.State.group.hitToHandles(x, y);
+                if(hit_to_handles > -1)
+                {
+                    if(hit_to_handles === 8)
+                    {
+                        drawingDocument.SetCursorType("crosshair");
+                    }
+                    else
+                    {
+                        if(!group_selected_objects[i].canResize())
+                        {
+                            drawingDocument.SetCursorType("default");
+                            return;
+                        }
+                        var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                        drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]);
+                    }
+                }
+
+
+                for(i = group_selected_objects.length - 1; i  > -1; --i)
+                {
+                    if(group_selected_objects[i].hitInBoundingRect(x, y))
+                    {
+                        drawingDocument.SetCursorType("move");
+                    }
+                }
+
+                if(this.State.group.hitInBoundingRect(x, y))
+                {
+                    drawingDocument.SetCursorType("move");
+                    return;
+                }
+
+                var drawing_bases = this.slide.getDrawingObjects();
+                var selected_objects = this.selectedObjects;
+                for(i = drawing_bases.length - 1; i > -1; --i)
+                {
+                    var cur_drawing_base = drawing_bases[i];
+                    var cur_drawing = cur_drawing_base;
+                    if(cur_drawing.isSimpleObject())
+                    {
+                        var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                        var hit_in_path = cur_drawing.hitInPath(x, y);
+                        var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            drawingDocument.SetCursorType("move");
+
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            drawingDocument.SetCursorType("text");
+
+                        }
+                    }
+                    else
+                    {
+                        if(this.State.group === cur_drawing)
+                        {
+                            var arr_graphic_objects = this.State.group.getArrGraphicObjects();
+                            for(var s = arr_graphic_objects.length - 1; s > -1; --s)
+                            {
+                                var cur_grouped_object = arr_graphic_objects[s];
+                                var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                                var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                                var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                                {
+                                    drawingDocument.SetCursorType("move");
+                                    return;
+                                }
+                                else if(hit_in_text_rect)
+                                {
+                                    drawingDocument.SetCursorType("text");
+                                    return;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var grouped_objects = cur_drawing.getArrGraphicObjects();
+                            for(var j = grouped_objects.length - 1; j > -1; --j)
+                            {
+                                var cur_grouped_object = grouped_objects[j];
+                                var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                                var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                                var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                                {
+                                    drawingDocument.SetCursorType("move");
+                                    return;
+                                }
+                                else if(hit_in_text_rect)
+                                {
+                                    drawingDocument.SetCursorType("text");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                drawingDocument.SetCursorType("default");
                 break;
             }
             case STATES_ID_MOVE:
@@ -235,8 +373,10 @@ CGraphicObjects.prototype = {
                 break;
             }
 
+
             default :
             {
+                var b_chart_state = this.State.id === STATES_ID_CHART || this.State.id === STATES_ID_CHART_TEXT_ADD;
                 var selected_objects = this.selectedObjects;
                 if(selected_objects.length === 1)
                 {
@@ -345,63 +485,58 @@ CGraphicObjects.prototype = {
                     }
                     else if(cur_drawing.isChart())
                     {
-                        /*if(cur_drawing.hitInWorkArea(x, y))
+                        if(cur_drawing.hitInWorkArea(x, y))
                         {
-
-                            if(!e.ShiftKey && !e.CtrlKey)
+                            if(b_chart_state && cur_drawing === this.State.chart)
                             {
-                                var object_for_move_in_chart = null;
-                                if(isRealObject(cur_drawing.chartTitle))
+                                var titles = [];
+                                titles.push(this.State.chart.chartTitle);
+                                titles.push(this.State.chart.hAxisTitle);
+                                titles.push(this.State.chart.vAxisTitle);
+                                for(var j = 0; j < titles.length; ++j)
                                 {
-                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    var title = titles[j];
+                                    if(isRealObject(title))
                                     {
-                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                        if(!title.selected)
+                                        {
+                                            if(title.hit(x, y))
+                                            {
+                                                cur_drawing.sendMouseData();
+                                                drawingDocument.SetCursorType("move");
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if(title.hit(x, y))
+                                            {
+                                                if(title.hitInTextRect(x, y))
+                                                {
+                                                    cur_drawing.sendMouseData();
+                                                    drawingDocument.SetCursorType("text");
+                                                }
+                                                else
+                                                {
+                                                    cur_drawing.sendMouseData();
+                                                    drawingDocument.SetCursorType("move");
+                                                }
+                                                return;
+                                            }
+                                        }
                                     }
                                 }
-
-                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                if(cur_drawing.hitInWorkArea(x, y))
                                 {
-                                    if(cur_drawing.hAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
-                                    }
-                                }
-
-                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
-                                {
-                                    if(cur_drawing.vAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
-                                    }
-                                }
-                                if(isRealObject(object_for_move_in_chart))
-                                {
-                                    this.drawingObjectsController.resetSelection();
-                                    cur_drawing.select(this.drawingObjectsController);
-                                    object_for_move_in_chart.select();
-                                    this.drawingObjectsController.clearPreTrackObjects();
-                                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
-                                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
-                                    this.drawingObjects.OnUpdateOverlay();
+                                    cur_drawing.sendMouseData();
+                                    drawingDocument.SetCursorType("move");
                                     return;
                                 }
-                                this.drawingObjectsController.clearPreTrackObjects();
-                                var is_selected = cur_drawing.selected;
-                                if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                                    this.drawingObjectsController.resetSelection();
-                                cur_drawing.select(this.drawingObjectsController);
-                                this.drawingObjects.OnUpdateOverlay();
-                                for(var j = 0; j < selected_objects.length; ++j)
-                                {
-                                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                                }
-                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
-                                return;
                             }
-
-
-
-                        }  */
+                            drawingDocument.SetCursorType("move");
+                            cur_drawing.sendMouseData();
+                            return;
+                        }
                     }
                     else if(cur_drawing.isTable && cur_drawing.isTable())
                     {

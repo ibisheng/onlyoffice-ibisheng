@@ -2859,7 +2859,32 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                 }
                 else if(hit_in_text_rect)
                 {
-                    //TODO
+                    if(e.Button !== g_mouse_button_right || this.drawingObjectsController.State === this || (this.drawingObjectsController.State.textObject !== cur_drawing))
+                    {
+                        this.drawingObjectsController.resetSelection();
+                        cur_drawing.select(this.drawingObjectsController);
+                        cur_drawing.selectionSetStart(e, x, y);
+                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                        if(e.ClickCount < 2)
+                            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                    }
+                    else
+                    {
+                        if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
+                        {
+                            this.drawingObjectsController.resetSelection();
+                            cur_drawing.select(this.drawingObjectsController);
+                            cur_drawing.selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+                            if(e.ClickCount < 2)
+                                this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                        }
+                    }
+                    return;
                 }
             }
             else
@@ -2867,9 +2892,9 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                 if(this.group === cur_drawing)
                 {
                     var arr_graphic_objects = this.group.getArrGraphicObjects();
-                    for(i = arr_graphic_objects.length - 1; i > -1; --i)
+                    for(var s = arr_graphic_objects.length - 1; s > -1; --s)
                     {
-                        var cur_grouped_object = arr_graphic_objects[i];
+                        var cur_grouped_object = arr_graphic_objects[s];
                         var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
                         var hit_in_path = cur_grouped_object.hitInPath(x, y);
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
@@ -2917,9 +2942,9 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                 this.drawingObjectsController.resetSelection();
                             cur_drawing.select(this.drawingObjectsController);
                             this.drawingObjects.OnUpdateOverlay();
-                            for(var j = 0; j < selected_objects.length; ++j)
+                            for(var t = 0; t < selected_objects.length; ++t)
                             {
-                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                                this.drawingObjectsController.addPreTrackObject(selected_objects[t].createMoveTrack());
                             }
                             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
                             editor.WordControl.OnUpdateOverlay();
