@@ -4948,7 +4948,7 @@
 								
 								var id = this._rangeToId(newFirstCol);
 								var nextId = this._rangeToId(newNextCol);
-								if(buttons && buttons.length)
+								/*if(buttons && buttons.length)
 								{
 									for(var b = 0; b < buttons.length; b++)
 									{
@@ -4961,7 +4961,7 @@
 											break;
 										}
 									}
-								}
+								}*/
 								
 								curFilter.inFilter = inFilter;
 								curFilter.id = id;
@@ -5044,6 +5044,8 @@
 						
 						filter.result = newResult;
 						filter.Ref = inFilter;
+						if(val > 0)
+							this._addButtonAF(newResult);
 					}
 					//записываем в историю, если активная область касается данных фильтров
 					if(!bUndoChanges && !bRedoChanges && val < 0)
