@@ -1075,6 +1075,8 @@ prop:get_stroke
 prop:put_stroke
 prop:get_paddings
 prop:put_paddings
+prop:get_CanFill
+prop:put_CanFill
 ---
 var:CreateAscShapeProp
 ---
@@ -2095,6 +2097,8 @@ CAscShapeProp.prototype['get_stroke'] = CAscShapeProp.prototype.get_stroke;
 CAscShapeProp.prototype['put_stroke'] = CAscShapeProp.prototype.put_stroke;
 CAscShapeProp.prototype['get_paddings'] = CAscShapeProp.prototype.get_paddings;
 CAscShapeProp.prototype['put_paddings'] = CAscShapeProp.prototype.put_paddings;
+CAscShapeProp.prototype['get_CanFill'] = CAscShapeProp.prototype.get_CanFill;
+CAscShapeProp.prototype['put_CanFill'] = CAscShapeProp.prototype.put_CanFill;
 window['CreateAscShapeProp'] = CreateAscShapeProp;
 window['CreateAscShapePropFromProp'] = CreateAscShapePropFromProp;
 window['CorrectShapeProp'] = CorrectShapeProp;
