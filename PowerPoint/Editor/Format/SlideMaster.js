@@ -1008,7 +1008,7 @@ function CMasterThumbnailDrawer()
 
     this.DrawingDocument = null;
 
-    this.GetThumbnail = function(_master)
+    this.GetThumbnail = function(_master, use_background, use_master_shapes)
     {
         var h_px = 40;
         var w_px = (this.WidthMM * h_px / this.HeightMM) >> 0;
@@ -1066,12 +1066,14 @@ function CMasterThumbnailDrawer()
         if (_back_fill != null)
             _back_fill.calculate(_theme, null, null, _master, RGBA);
 
-        DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
+        if (use_background !== false)
+            DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
 
         var _sx = g.m_oCoordTransform.sx;
         var _sy = g.m_oCoordTransform.sy;
 
-        _master.draw(g);
+        if (use_master_shapes !== false)
+            _master.draw(g);
 
         g.reset();
         g.SetIntegerGrid(true);
@@ -1138,6 +1140,18 @@ function CMasterThumbnailDrawer()
         History.TurnOn();
         _api.isViewMode = _oldTurn;
 
-        return this.CanvasImage.toDataURL("image/png");
+        try
+        {
+            return this.CanvasImage.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            this.CanvasImage = null;
+            if (undefined === use_background && undefined === use_master_shapes)
+                return this.GetThumbnail(_master, true, false);
+            else if (use_background && !use_master_shapes)
+                return this.GetThumbnail(_master, false, false);
+        }
+        return "";
     }
 }

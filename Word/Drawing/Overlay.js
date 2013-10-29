@@ -5,6 +5,7 @@ var TRACK_DISTANCE_ROTATE   = 25;
 var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
+var IMAGE_ROTATE_TRACK_W    = 17;
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -14,7 +15,7 @@ if (bIsUseImageRotateTrack)
     window.g_track_rotate_marker.onload = function(){
         window.g_track_rotate_marker.asc_complete = true;
     };
-    window.g_track_rotate_marker.src = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iMTVweCIgaGVpZ2h0PSIxNXB4IiB2aWV3Qm94PSIwIDAgMTUgMTUiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiM5MzkzOTMiIGQ9Ik0xMS45NzksOC4wNzZjMCwwLDAuMDIxLTAuNCwwLjAyMS0wLjU3Ng0KCQljMC0yLjQ4MS0yLjAxNS00LjQ5My00LjUtNC40OTNDNS4wMTYsMy4wMDcsMyw1LjAxOSwzLDcuNXMyLjAxNiw0LjQ5Myw0LjUsNC40OTNjMC45MjYsMCwxLjc4NS0wLjI4LDIuNS0wLjc1OXYxLjEzOQ0KCQlDOS4yNDcsMTIuNzYxLDguNDA1LDEzLDcuNSwxM0M0LjQ2MywxMywyLDEwLjUzNywyLDcuNUMyLDQuNDYyLDQuNDYzLDIsNy41LDJTMTMsNC40NjIsMTMsNy41YzAsMC4xNzQtMC4wMiwwLjU2OS0wLjAyLDAuNTY5DQoJCUwxMi40Niw4LjM1NEwxMS45NzksOC4wNzZ6IE0xNSw3bC0yLjUsNEwxMCw3bDIuNDY5LDEuMzQ0TDE1LDd6Ii8+DQo8L2c+DQo8L3N2Zz4NCg==";
+    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAbBJREFUeNqsVM1qwkAQnnry71BopUVRFKoeUrx48yF8gKbtE3iRPoBP0Kdo0pM+gtBexJsgyUHswYtWggERf0HczkyzkqbGttAPvmx2duZjdnZ2QQgBHkaRVeQL0hafsJ151Vn/EnNCH4Ku66Cq6g3+PiIvwR9j5AP6P+8tLsWa+BtqmqYBUWZCGehSeLFYgGmaMBqNYLVaQSgUgng8DoqiQCQScWd1hxlpJBLFyRvygqwU2Gq1IJ/PQzqdhnA4DMvlEgaDAfR6PSiVSizowEZe0TYqMr/5fC4ajYawLOtg/mSv1+vs50IlgEplKWsYBmSzWYjFYgcrSvZcLsdbdaFMIoqc0VYymQwcA62TnwvXJHIuZ+v1mmvgh36/D5vNhmtk2zbXCHEWcIrDCAaD7OCHRCIBzWaT/2lMJpNcXBIxpBNVnU7BD5RloVDgvqLRydr8djpUfb/TIex2O9Fut3mUpyPvylhahsMhC3W7XTGbzcR2uxXT6VR0Op1DmhPkqexYFal5OxYF9x2bSqWgWCx6d3iPHfv0L3fH+wyoyPcfgmn91h0HR96T19++Jx8CDABSF1tWsa6kaQAAAABJRU5ErkJggg==";
 
     TRACK_DISTANCE_ROTATE2 = 20;
 }
@@ -152,6 +153,9 @@ COverlay.prototype =
         if (this.max_x < position)
             this.max_x = position;
 
+        var _old_global = this.m_oContext.globalAlpha;
+        this.m_oContext.globalAlpha = 1;
+
         this.min_y = 0;
         this.max_y = this.m_oControl.HtmlElement.height;
 
@@ -160,16 +164,18 @@ COverlay.prototype =
         var x = ((position + 0.5) >> 0) + 0.5;
         var y = 0;
 
+        /*
         this.m_oContext.strokeStyle = "#FFFFFF";
         this.m_oContext.beginPath();
         this.m_oContext.moveTo(x, y);
         this.m_oContext.lineTo(x, this.max_y);
         this.m_oContext.stroke();
+        */
 
         this.m_oContext.strokeStyle = this.DashLineColor;
         this.m_oContext.beginPath();
 
-        var dist = 5;
+        var dist = 1;
 
         while (y < this.max_y)
         {
@@ -182,6 +188,8 @@ COverlay.prototype =
         this.m_oContext.stroke();
         this.m_oContext.beginPath();
         this.Show();
+
+        this.m_oContext.globalAlpha = _old_global;
     },
 
     HorLine : function(position, bIsSimpleAdd)
@@ -201,8 +209,6 @@ COverlay.prototype =
         this.min_x = 0;
         this.max_x = this.m_oControl.HtmlElement.width;
 
-        //this.min_y = position;
-        //this.max_y = position;
         if (this.min_y > position)
             this.min_y = position;
         if (this.max_y < position)
@@ -257,6 +263,9 @@ COverlay.prototype =
         if (this.max_y < position)
             this.max_y = position;
 
+        var _old_global = this.m_oContext.globalAlpha;
+        this.m_oContext.globalAlpha = 1;
+
         this.min_x = 0;
         this.max_x = this.m_oControl.HtmlElement.width;
 
@@ -265,16 +274,18 @@ COverlay.prototype =
         var y = ((position + 0.5) >> 0) + 0.5;
         var x = 0;
 
+        /*
         this.m_oContext.strokeStyle = "#FFFFFF";
         this.m_oContext.beginPath();
         this.m_oContext.moveTo(x, y);
         this.m_oContext.lineTo(this.max_x, y);
         this.m_oContext.stroke();
+        */
 
         this.m_oContext.strokeStyle = this.DashLineColor;
         this.m_oContext.beginPath();
 
-        var dist = 5;
+        var dist = 1;
 
         while (x < this.max_x)
         {
@@ -287,6 +298,8 @@ COverlay.prototype =
         this.m_oContext.stroke();
         this.m_oContext.beginPath();
         this.Show();
+
+        this.m_oContext.globalAlpha = _old_global;
     },
 
     CheckPoint1 : function(x,y)
@@ -916,6 +929,33 @@ CAutoshapeTrack.prototype =
 
                     if (!isLine && isCanRotate)
                     {
+                        if (!bIsUseImageRotateTrack)
+                        {
+                            ctx.beginPath();
+                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+                            ctx.fillStyle = _style_green;
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                        else
+                        {
+                            if (window.g_track_rotate_marker.asc_complete)
+                            {
+                                var _w = IMAGE_ROTATE_TRACK_W;
+                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+                                overlay.CheckRect(_xI, _yI, _w, _w);
+                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                            }
+                        }
+                    }
+
+                    ctx.beginPath();
+
+                    if (!isLine && isCanRotate)
+                    {
                         ctx.moveTo(xC + 0.5, y1);
                         ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
 
@@ -960,33 +1000,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (!isLine && isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _w = 15;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                                overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                            }
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
                 else
                 {
@@ -1014,6 +1027,37 @@ CAutoshapeTrack.prototype =
 
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
+
+                    ctx.beginPath();
+
+                    if (!isLine && isCanRotate)
+                    {
+                        if (!bIsUseImageRotateTrack)
+                        {
+                            ctx.beginPath();
+                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+                            ctx.fillStyle = _style_green;
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                        else
+                        {
+                            if (window.g_track_rotate_marker.asc_complete)
+                            {
+                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+                                var _w = IMAGE_ROTATE_TRACK_W;
+                                var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+                                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+                            }
+                        }
+                    }
 
                     if (!isLine && isCanRotate)
                     {
@@ -1060,37 +1104,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (!isLine && isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                                var _w = 15;
-                                var _w2 = 7.5;
-
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                            }
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
 
                 break;
@@ -1105,6 +1118,33 @@ CAutoshapeTrack.prototype =
 
                     ctx.strokeStyle = _style_blue;
                     ctx.stroke();
+
+                    ctx.beginPath();
+
+                    if (isCanRotate)
+                    {
+                        if (!bIsUseImageRotateTrack)
+                        {
+                            ctx.beginPath();
+                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+                            ctx.fillStyle = _style_green;
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                        else
+                        {
+                            if (window.g_track_rotate_marker.asc_complete)
+                            {
+                                var _w = IMAGE_ROTATE_TRACK_W;
+                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+                                overlay.CheckRect(_xI, _yI, _w, _w);
+                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                            }
+                        }
+                    }
 
                     if (isCanRotate)
                     {
@@ -1149,33 +1189,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _w = 15;
-                                var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                                var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                                overlay.CheckRect(_xI, _yI, _w, _w);
-                                ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                            }
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
                 else
                 {
@@ -1196,6 +1209,37 @@ CAutoshapeTrack.prototype =
 
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
+
+                    ctx.beginPath();
+
+                    if (isCanRotate)
+                    {
+                        if (!bIsUseImageRotateTrack)
+                        {
+                            ctx.beginPath();
+                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+
+                            ctx.fillStyle = _style_green;
+                            ctx.fill();
+                            ctx.stroke();
+                        }
+                        else
+                        {
+                            if (window.g_track_rotate_marker.asc_complete)
+                            {
+                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+                                var _w = IMAGE_ROTATE_TRACK_W;
+                                var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+                                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+                            }
+                        }
+                    }
 
                     if (isCanRotate)
                     {
@@ -1236,37 +1280,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (isCanRotate)
-                    {
-                        if (!bIsUseImageRotateTrack)
-                        {
-                            ctx.beginPath();
-                            overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
-
-                            ctx.fillStyle = _style_green;
-                            ctx.fill();
-                            ctx.stroke();
-                        }
-                        else
-                        {
-                            if (window.g_track_rotate_marker.asc_complete)
-                            {
-                                var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                                var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                                var _w = 15;
-                                var _w2 = 7.5;
-
-                                ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                                ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                                ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                                overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                            }
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
 
                 break;
@@ -1292,6 +1305,30 @@ CAutoshapeTrack.prototype =
                     ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE2);
 
                     ctx.stroke();
+
+                    ctx.beginPath();
+
+                    if (!bIsUseImageRotateTrack)
+                    {
+                        ctx.beginPath();
+                        overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE);
+
+                        ctx.fillStyle = _style_green;
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                    else
+                    {
+                        if (window.g_track_rotate_marker.asc_complete)
+                        {
+                            var _w = IMAGE_ROTATE_TRACK_W;
+                            var _xI = ((x1 + x2 - _w) / 2) >> 0;
+                            var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
+
+                            overlay.CheckRect(_xI, _yI, _w, _w);
+                            ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
+                        }
+                    }
 
                     ctx.beginPath();
 
@@ -1325,30 +1362,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (!bIsUseImageRotateTrack)
-                    {
-                        ctx.beginPath();
-                        overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE);
-
-                        ctx.fillStyle = _style_green;
-                        ctx.fill();
-                        ctx.stroke();
-                    }
-                    else
-                    {
-                        if (window.g_track_rotate_marker.asc_complete)
-                        {
-                            var _w = 15;
-                            var _xI = ((x1 + x2 - _w) / 2) >> 0;
-                            var _yI = y1 - TRACK_DISTANCE_ROTATE - (_w >> 1);
-
-                            overlay.CheckRect(_xI, _yI, _w, _w);
-                            ctx.drawImage(window.g_track_rotate_marker, _xI, _yI, _w, _w);
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
                 else
                 {
@@ -1394,6 +1407,34 @@ CAutoshapeTrack.prototype =
 
                     ctx.beginPath();
 
+                    if (!bIsUseImageRotateTrack)
+                    {
+                        ctx.beginPath();
+                        overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_DISTANCE_ROTATE);
+
+                        ctx.fillStyle = _style_green;
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                    else
+                    {
+                        if (window.g_track_rotate_marker.asc_complete)
+                        {
+                            var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
+                            var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
+                            var _w = IMAGE_ROTATE_TRACK_W;
+                            var _w2 = IMAGE_ROTATE_TRACK_W / 2;
+
+                            ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+                            ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
+                            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                            overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
+                        }
+                    }
+
+                    ctx.beginPath();
+
                     ctx.fillStyle = _style_white;
 
                     if (bIsEllipceCorner)
@@ -1421,34 +1462,6 @@ CAutoshapeTrack.prototype =
 
                     ctx.fill();
                     ctx.stroke();
-
-                    if (!bIsUseImageRotateTrack)
-                    {
-                        ctx.beginPath();
-                        overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_DISTANCE_ROTATE);
-
-                        ctx.fillStyle = _style_green;
-                        ctx.fill();
-                        ctx.stroke();
-                    }
-                    else
-                    {
-                        if (window.g_track_rotate_marker.asc_complete)
-                        {
-                            var _xI = xc1 + ex2 * TRACK_DISTANCE_ROTATE;
-                            var _yI = yc1 + ey2 * TRACK_DISTANCE_ROTATE;
-                            var _w = 15;
-                            var _w2 = 7.5;
-
-                            ctx.setTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
-                            ctx.drawImage(window.g_track_rotate_marker, -_w2, -_w2, _w, _w);
-                            ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-                            overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
-                        }
-                    }
-
-                    ctx.beginPath();
                 }
 
                 break;

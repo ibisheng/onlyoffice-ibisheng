@@ -5572,7 +5572,7 @@ function CDrawingDocument()
         var _pos = this.ConvertCoordsToCursor4(xPos, 0, pageNum);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#C8C8C8";
             this.m_oWordControl.m_oOverlayApi.VertLine2(_pos.X);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }
@@ -5589,7 +5589,7 @@ function CDrawingDocument()
         var _pos = this.ConvertCoordsToCursor4(0, yPos, pageNum);
         if (_pos.Error === false)
         {
-            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#FF0000";
+            this.m_oWordControl.m_oOverlayApi.DashLineColor = "#C8C8C8";
             this.m_oWordControl.m_oOverlayApi.HorLine2(_pos.Y);
             this.m_oWordControl.m_oOverlayApi.DashLineColor = "#000000";
         }

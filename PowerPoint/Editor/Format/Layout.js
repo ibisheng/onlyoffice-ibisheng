@@ -1230,7 +1230,7 @@ function CLayoutThumbnailDrawer()
 
     this.DrawingDocument = null;
 
-    this.GetThumbnail = function(_layout)
+    this.GetThumbnail = function(_layout, use_background, use_master_shapes, use_layout_shapes)
     {
         _layout.recalculate2();
 
@@ -1305,21 +1305,28 @@ function CLayoutThumbnailDrawer()
         if (_back_fill != null)
             _back_fill.calculate(_theme, null, _layout, _master, RGBA);
 
-        DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
+        if (use_background !== false)
+            DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
 
         var _sx = g.m_oCoordTransform.sx;
         var _sy = g.m_oCoordTransform.sy;
 
-        if (_layout.showMasterSp == true || _layout.showMasterSp == undefined)
+        if (use_master_shapes !== false)
         {
-            _master.draw(g);
+            if (_layout.showMasterSp == true || _layout.showMasterSp == undefined)
+            {
+                _master.draw(g);
+            }
         }
 
         for (var i = 0; i < _layout.cSld.spTree.length; i++)
         {
             var _sp_elem = _layout.cSld.spTree[i];
             if (!_sp_elem.isPlaceholder())
-                _sp_elem.draw(g);
+            {
+                if (use_layout_shapes !== false)
+                    _sp_elem.draw(g);
+            }
             else
             {
                 _ctx.globalAlpha = 1;
@@ -1432,6 +1439,21 @@ function CLayoutThumbnailDrawer()
             }
         }
 
-        return this.CanvasImage.toDataURL("image/png");
+        try
+        {
+            return this.CanvasImage.toDataURL("image/png");
+        }
+        catch (err)
+        {
+            this.CanvasImage = null;
+            if (undefined === use_background && undefined === use_master_shapes && undefined == use_layout_shapes)
+                return this.GetThumbnail(_layout, true, true, false);
+            else if (use_background && use_master_shapes && !use_layout_shapes)
+                return this.GetThumbnail(_layout, true, false, false);
+            else if (use_background && !use_master_shapes && !use_layout_shapes)
+                return this.GetThumbnail(_layout, false, false, false);
+        }
+
+        return "";
     }
 }
