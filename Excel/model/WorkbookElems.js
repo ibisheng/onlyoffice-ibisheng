@@ -2242,7 +2242,7 @@ function Row(worksheet)
     this.h = null;
     this.hd = null;
     this.CustomHeight = null;
-};
+}
 Row.prototype =
 {
 	getCells : function () {

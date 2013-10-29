@@ -5976,7 +5976,7 @@
 						// Попали в выделение ячеек
 						isInSelection = true;
 					}
-				} else if (x <= this.cellsLeft && y >= this.cellsTop && c_oAscSelectionType.RangeRow === ar.type) {
+				} else if (_x <= this.cellsLeft && _y >= this.cellsTop && c_oAscSelectionType.RangeRow === ar.type) {
 					// Выделены строки
 					// Пересчитываем Y относительно видимой области
 					_y += (this.rows[this.visibleRange.r1].top - this.cellsTop);
@@ -5985,7 +5985,7 @@
 						// Попали в выделение ячеек
 						isInSelection = true;
 					}
-				} else if (y <= this.cellsTop && x >= this.cellsLeft && c_oAscSelectionType.RangeCol === ar.type) {
+				} else if (_y <= this.cellsTop && _x >= this.cellsLeft && c_oAscSelectionType.RangeCol === ar.type) {
 					// Выделены столбцы
 					// Пересчитываем X относительно видимой области
 					_x += (this.cols[this.visibleRange.c1].left - this.cellsLeft);
