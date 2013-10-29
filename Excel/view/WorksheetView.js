@@ -5363,8 +5363,7 @@
 				
 				var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
 				if ( cursorInfo ) {
-					var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.id);
-					ar.type = graphicSelectionType;
+					ar.type = this.objectRender.getGraphicSelectionType(cursorInfo.id);
 					return;
 				}
 
@@ -5964,7 +5963,7 @@
 				var isInSelection = false;
 
 				// Проверяем попали ли мы в выделение
-				if (_x < this.cellsLeft && _y < this.cellsTop && c_oAscSelectionType.RangeMax === ar.type) {
+				if ((_x < this.cellsLeft || _y < this.cellsTop) && c_oAscSelectionType.RangeMax === ar.type) {
 					// Выделено все
 					isInSelection = true;
 				} else if (_x > this.cellsLeft && _y > this.cellsTop) {
