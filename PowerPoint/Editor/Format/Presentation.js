@@ -258,7 +258,7 @@ function CPresentation(DrawingDocument)
     this.SectPr = new SectPr();
     this.SectPr.Set_PageSize( 793.7, 1122,53 );
     this.SectPr.Set_PageMargins( { Left : 75.6  }  );
-
+    this.slidesToUnlock = [];
 
     this.ContentLastChangePos = 0;
 
@@ -734,6 +734,11 @@ CPresentation.prototype =
         }
         if(this.Slides[this.CurPage])
             this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        for(var i = 0; i < this.slidesToUnlock.length; ++i)
+        {
+            this.DrawingDocument.UnLockSlide(this.slidesToUnlock[i]);
+        }
+        this.slidesToUnlock.length = 0;
     },
 
     updateSlideIndexes: function()
@@ -6649,6 +6654,7 @@ CPresentation.prototype =
                 // действие совпало, не делаем его
                 if ( false === ChangesPos )
                     break;
+                this.slidesToUnlock.push(ChangesPos);
                 this.Slides.splice(ChangesPos, 1);
                 break;
             }
