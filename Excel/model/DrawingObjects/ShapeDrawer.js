@@ -648,7 +648,8 @@ CShapeDrawer.prototype =
             return;
 
         var bIsPatt = false;
-        if (this.UniFill != null && this.UniFill.fill != null && this.UniFill.fill.type == FILL_TYPE_PATT)
+        if (this.UniFill != null && this.UniFill.fill != null &&
+            ((this.UniFill.fill.type == FILL_TYPE_PATT) || (this.UniFill.fill.type == FILL_TYPE_GRAD)))
         {
             bIsPatt = true;
         }
@@ -1151,17 +1152,30 @@ CShapeDrawer.prototype =
                 var _x2 = trans.TransformPointX(arr[1].x, arr[1].y);
                 var _y2 = trans.TransformPointY(arr[1].x, arr[1].y);
 
-                if (this.Graphics.IsTrack)
+                var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                var cur_point = 2;
+                while (_max_delta < 0.001 && cur_point < arr.length)
                 {
-                    this.Graphics.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.Graphics.ArrayPoints = arr;
+                    _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                    _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                    _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    cur_point++;
                 }
-                else
+
+                if (_max_delta > 0.001)
                 {
-                    this.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.ArrayPoints = arr;
+                    if (this.Graphics.IsTrack)
+                    {
+                        this.Graphics.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.Graphics.ArrayPoints = arr;
+                    }
+                    else
+                    {
+                        this.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.ArrayPoints = arr;
+                    }
                 }
             }
             if (this.Ln.tailEnd != null)
@@ -1173,17 +1187,30 @@ CShapeDrawer.prototype =
                 var _x2 = trans.TransformPointX(arr[_2].x, arr[_2].y);
                 var _y2 = trans.TransformPointY(arr[_2].x, arr[_2].y);
 
-                if (this.Graphics.IsTrack)
+                var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                var cur_point = _2 - 1;
+                while (_max_delta < 0.001 && cur_point >= 0)
                 {
-                    this.Graphics.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.Graphics.ArrayPoints = arr;
+                    _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                    _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                    _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    cur_point--;
                 }
-                else
+
+                if (_max_delta > 0.001)
                 {
-                    this.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.ArrayPoints = arr;
+                    if (this.Graphics.IsTrack)
+                    {
+                        this.Graphics.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.Graphics.ArrayPoints = arr;
+                    }
+                    else
+                    {
+                        this.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.ArrayPoints = arr;
+                    }
                 }
             }
             this.IsArrowsDrawing = false;
@@ -1430,9 +1457,22 @@ CShapeDrawer.prototype =
                     var _x2 = trans.TransformPointX(arr[1].x, arr[1].y);
                     var _y2 = trans.TransformPointY(arr[1].x, arr[1].y);
 
-                    this.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.ArrayPoints = arr;
+                    var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    var cur_point = 2;
+                    while (_max_delta < 0.001 && cur_point < arr.length)
+                    {
+                        _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                        _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                        _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                        cur_point++;
+                    }
+
+                    if (_max_delta > 0.001)
+                    {
+                        this.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.headEnd.type, this.Ln.headEnd.GetWidth(_pen_w), this.Ln.headEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.ArrayPoints = arr;
+                    }
                 }
                 if (this.Ln.tailEnd != null)
                 {
@@ -1443,9 +1483,22 @@ CShapeDrawer.prototype =
                     var _x2 = trans.TransformPointX(arr[_2].x, arr[_2].y);
                     var _y2 = trans.TransformPointY(arr[_2].x, arr[_2].y);
 
-                    this.Graphics.ArrayPoints = null;
-                    DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
-                    this.Graphics.ArrayPoints = arr;
+                    var _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                    var cur_point = _2 - 1;
+                    while (_max_delta < 0.001 && cur_point >= 0)
+                    {
+                        _x2 = trans.TransformPointX(arr[cur_point].x, arr[cur_point].y);
+                        _y2 = trans.TransformPointY(arr[cur_point].x, arr[cur_point].y);
+                        _max_delta = Math.max(Math.abs(_x1 - _x2), Math.abs(_y1 - _y2));
+                        cur_point--;
+                    }
+
+                    if (_max_delta > 0.001)
+                    {
+                        this.Graphics.ArrayPoints = null;
+                        DrawLineEnd(_x1, _y1, _x2, _y2, this.Ln.tailEnd.type, this.Ln.tailEnd.GetWidth(_pen_w), this.Ln.tailEnd.GetLen(_pen_w), this, trans1);
+                        this.Graphics.ArrayPoints = arr;
+                    }
                 }
                 this.IsArrowsDrawing = false;
             }
