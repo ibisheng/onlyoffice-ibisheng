@@ -3350,7 +3350,6 @@ function DrawingObjects() {
 			if ( aObjects.length ) {
 			
 				worksheet._drawGraphic();
-				worksheet.model.Drawings = aObjects;
 				
 				// Clip
 				_this.clipGraphicsCanvas(shapeCtx);
@@ -3359,6 +3358,8 @@ function DrawingObjects() {
 
 					var index = i;
 					var drawingObject = aObjects[i];
+					if ( drawingObject.graphicObject.isChart() )
+						drawingObject.graphicObject.syncAscChart();
 					
 					if ( !printOptions ) {
 						if ( !drawingObject.inVisibleArea() )
@@ -3394,6 +3395,7 @@ function DrawingObjects() {
 				// Restore
 				_this.restoreGraphicsCanvas(shapeCtx);
 			}
+			worksheet.model.Drawings = aObjects;
 		}
 		if ( !printOptions ) {
 		
