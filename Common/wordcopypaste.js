@@ -21,17 +21,10 @@
     }
 }
 
-window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
-window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
-if (window.USER_AGENT_SAFARI_MACOS)
-{
-    // браузеры под мак все определяются как сафари
-    // проверим на дополнительные параметры
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
-        window.USER_AGENT_SAFARI_MACOS = false;
-}
-window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
-window.USER_AGENT_WEBKIT = (navigator.userAgent.toLowerCase().indexOf('webkit') > -1) ? true : false;
+window.USER_AGENT_MACOS = AscBrowser.isMacOs;
+window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs;
+window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera;
+window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
 
 window.GlobalPasteFlagCounter = 0;
 window.GlobalPasteFlag = false;
@@ -116,7 +109,7 @@ function Editor_Copy_Button(api, bCut)
             }
         }
     }*/
-    if(/MSIE/g.test(navigator.userAgent))
+    if(AscBrowser.isIE)
     {
         var ElemToSelect = Editor_Copy_GetElem(api);
         ElemToSelect.style.display  = "block";
@@ -231,7 +224,7 @@ function Editor_Copy(api, bCut)
 
         //� FF 8 ����� ��������� selectNodeContents ���������� � ������������ div, ����� ����� �������� � FF8 � ������ ��������� ����� ��� ����� ������ ��������� �������������� node
         //�������� ���� ��� ��� ��������� ��������� �� ����������. Chrome ������ ��������� ������ ����� ����� ������ ����������
-        var is_gecko = window.navigator.userAgent.indexOf('Gecko/') >= 0;
+        var is_gecko = AscBrowser.isGecko;
         if(is_gecko)
         {
             ElemToSelect.appendChild( document.createTextNode( '\xa0' ) );
@@ -2258,7 +2251,7 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
         pastebin.className = "sdk-element";
 
-        if (/MSIE/g.test(navigator.userAgent))
+        if (AscBrowser.isIE)
             pastebin.style.position = 'fixed';
         else
             pastebin.style.position = 'absolute';
@@ -2313,7 +2306,7 @@ function Editor_Paste_GetElem(api, bClean)
 }
 function Editor_Paste_Button(api)
 {
-    if(/MSIE/g.test(navigator.userAgent))
+    if(AscBrowser.isIE)
     {
         document.body.style.MozUserSelect = "text";
         delete document.body.style["-khtml-user-select"];
@@ -2410,13 +2403,7 @@ function Editor_Paste(api, bClean)
     var oWordControl = api.WordControl;
     oWordControl.bIsEventPaste = false;
     var oDocument = oWordControl.m_oLogicDocument;
-	if(isOnlyLocalBufferSafariWord && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
-	{
-		 var ElemToSelect = document.getElementById( "SelectId" );
-		 if(ElemToSelect)
-            Editor_Paste_Exec(api, ElemToSelect);
-		return;
-	}
+
     if(false == CanPaste(oDocument))
         return;
 
@@ -2511,7 +2498,7 @@ function Body_Paste(api, e)
     if (e && e.clipboardData && e.clipboardData.getData) {// Webkit - get data from clipboard, put into editdiv, cleanup, then cancel event
         var bExist = false;
         //������ chrome ��������� �������� 'text/html', safari ������ 'text/plain'
-        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        var is_chrome = AscBrowser.isChrome;
         var sHtml = null;
 
         var fPasteHtml = function(sHtml)
@@ -5871,7 +5858,7 @@ PasteProcessor.prototype =
                             }
                         }
                     }
-                    else if (nWidth && nHeight && (/msie/i.test(navigator.userAgent)))
+                    else if (nWidth && nHeight && AscBrowser.isIE)
                     {
                         var binary_shape = node.getAttribute("alt");
                         if (typeof binary_shape === "string")

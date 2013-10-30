@@ -22,6 +22,7 @@
             "src": [
                 "../Common/Build/License.js",
                 "../Common/Merge/NodejsEnv.js",
+				"../Common/browser.js",
                 "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",

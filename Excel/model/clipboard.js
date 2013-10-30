@@ -221,7 +221,7 @@
 					t.elementText.style.top = '-100px';
 					t.elementText.style.overflow = 'hidden';
 					t.elementText.style.zIndex = -1000;
-					//if(/MSIE/g.test(navigator.userAgent))
+					//if(AscBrowser.isIE)
 						t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 					t.elementText.setAttribute("contentEditable", true);
 	
@@ -277,7 +277,7 @@
 			
 
 			copyRangeButton: function (range, worksheet, isCut) {
-				if(/MSIE/g.test(navigator.userAgent))
+				if(AscBrowser.isIE)
 				{
 					this._cleanElement();
 					this.element.appendChild(this._makeTableNode(range, worksheet));
@@ -287,7 +287,7 @@
 					if (window.getSelection) {// all browsers, except IE before version 9
 						selection = window.getSelection();
 						rangeToSelect = doc.createRange();
-						if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+						if (AscBrowser.isGecko) {
 							t.element.appendChild(doc.createTextNode('\xa0'));
 							t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
 							rangeToSelect.setStartAfter(t.element.firstChild);
@@ -331,7 +331,7 @@
 			
 			pasteRangeButton: function (worksheet)
 			{
-				if(/MSIE/g.test(navigator.userAgent))
+				if(AscBrowser.isIE)
 				{
 					var t = this;
 					document.body.style.MozUserSelect = "text";
@@ -384,7 +384,7 @@
 				var outer;
 
 				// Workaround: webkit неправильно селектит один узел
-				if (window.navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 && nodes.length === 1) {
+				if (AscBrowser.isWebkit && nodes.length === 1) {
 					outer = doc.createElement("B");
 					outer.style.fontWeight = "normal";
 					outer.appendChild(nodes[0]);
@@ -404,14 +404,14 @@
 			},
 			
 			copyCellValueButton: function (value, background) {
-				if(/MSIE/g.test(navigator.userAgent))
+				if(AscBrowser.isIE)
 				{
 					var t = this;
 					var nodes = t._makeNodesFromCellValue(value);
 					var outer;
 
 					// Workaround: webkit неправильно селектит один узел
-					if (window.navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 && nodes.length === 1) {
+					if (AscBrowser.isWebkit && nodes.length === 1) {
 						outer = doc.createElement("B");
 						outer.style.fontWeight = "normal";
 						outer.appendChild(nodes[0]);
@@ -429,7 +429,7 @@
 					if (window.getSelection) {// all browsers, except IE before version 9
 						selection = window.getSelection();
 						rangeToSelect = doc.createRange();
-						if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+						if (AscBrowser.isGecko) {
 							t.element.appendChild(doc.createTextNode('\xa0'));
 							t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
 							rangeToSelect.setStartAfter(t.element.firstChild);
@@ -526,7 +526,7 @@
 			
 			pasteAsTextButton: function (callback) {
 				var t = this;
-				if(/MSIE/g.test(navigator.userAgent))
+				if(AscBrowser.isIE)
 				{
 					//t._paste(function(){t._makeCellValueFromHtml(callback)});
 					t.elementText.style.display = "block";
@@ -746,7 +746,7 @@
                 var t = this;
 				window.GlobalPasteFlagCounter = 1;
 				isTruePaste = false;
-                var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                var is_chrome = AscBrowser.isChrome;
                 document.body.style.MozUserSelect = "text";
                 delete document.body.style["-khtml-user-select"];
                 delete document.body.style["-o-user-select"];
@@ -807,7 +807,7 @@
 					
 					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 						
-					if(/MSIE/g.test(navigator.userAgent))
+					if(AscBrowser.isIE)
 						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 					
 					if (callback && callback.call) {callback();}
@@ -979,7 +979,7 @@
                 if (e && e.clipboardData && e.clipboardData.getData) {// Webkit - get data from clipboard, put into editdiv, cleanup, then cancel event
                     var bExist = false;
                     //только chrome разрешает получать 'text/html', safari только 'text/plain'
-                    var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                    var is_chrome = AscBrowser.isChrome;
                     var sHtml = null;
 					var isText = false;
 					var fTest = function(types, sPattern)
@@ -1573,7 +1573,7 @@
                 var range = worksheet.activeRange.clone(true);
                 var isMerge  = worksheet.model.getRange(new CellAddress(range.r1, range.c1, 0), new CellAddress(range.r2, range.c2, 0));
 				var testFragment = $.extend(true, {},node);
-				var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+				var is_chrome = AscBrowser.isChrome;
 				$(testFragment).children('br').remove();
 				
 				//в случае если приходит простой текст, преращаем его в корректную html - проблема характерна для FF
@@ -1991,7 +1991,7 @@
 					// добавляем дополнительные node
 					// Оставить этот код для остальных браузеров не получилось. Chrome начала
 					// вставлять разрыв линии перед первым параграфом
-					if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+					if (AscBrowser.isGecko) {
 						t.element.appendChild(doc.createTextNode('\xa0'));
 						t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
 						rangeToSelect.setStartAfter(t.element.firstChild);
@@ -2847,17 +2847,11 @@
 	}
 )(jQuery, window);
 
-window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
-window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
-window.USER_AGENT_WEBKIT = (navigator.userAgent.toLowerCase().indexOf('webkit') > -1) ? true : false;
-window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
-if (window.USER_AGENT_SAFARI_MACOS)
-{
-    // браузеры под мак все определяются как сафари
-    // проверим на дополнительные параметры
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
-        window.USER_AGENT_SAFARI_MACOS = false;
-}
+window.USER_AGENT_MACOS = AscBrowser.isMacOs;
+window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs;
+window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera;
+window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
+
 window.GlobalPasteFlag = false;
 window.GlobalPasteFlagCounter = 0;
 var COPY_ELEMENT_ID = "clipboard-helper";

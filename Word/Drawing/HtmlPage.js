@@ -4,7 +4,7 @@ var g_dDpiY = 96.0;
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_bIsMobile =  /android|avantgo|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent || navigator.vendor || window.opera);
+var g_bIsMobile =  AscBrowser.isMobile;
 var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 210;
@@ -36,7 +36,7 @@ var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
-if ((/MSIE/g.test(navigator.userAgent)) || window.opera)
+if (AscBrowser.isIE || window.opera)
 {
     // не убирать!!! это для ие. чтобы не селектились элементы
     document.onselectstart= function() {
@@ -70,7 +70,7 @@ function CEditorPage(api)
     this.ReaderModeDiv      = null;
 
     this.m_oOverlayApi      = new COverlay();
-    this.m_bIsIE            = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
+    this.m_bIsIE            = (AscBrowser.isIE || window.opera) ? true : false;
 
     this.m_oPanelRight_buttonRulers    = null;
     this.m_oPanelRight_vertScroll      = null;

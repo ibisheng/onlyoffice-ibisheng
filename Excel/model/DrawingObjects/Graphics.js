@@ -99,10 +99,10 @@ function CBrush()
 var MATRIX_ORDER_PREPEND    = 0;
 var MATRIX_ORDER_APPEND     = 1;
 
-var bIsChrome = (null == window.chrome) ? 0 : 1;
-var bIsSafari = (null == window.safari) ? 0 : 1;
-var bIsIE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
-var bIsAndroid = (navigator.userAgent.indexOf("Android") >= 0 || navigator.userAgent.indexOf("android") >= 0) ? true : false;
+var bIsChrome = AscBrowser.isChrome;
+var bIsSafari = AscBrowser.isSafari;
+var bIsIE = AscBrowser.isIE;
+var bIsAndroid = AscBrowser.isAndroid;
 
 function deg2rad(deg){
     return deg * Math.PI / 180.0;

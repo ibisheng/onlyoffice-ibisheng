@@ -1,4 +1,4 @@
-﻿var g_bIsAppleDevices = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+﻿var g_bIsAppleDevices = AscBrowser.isAppleDevices;
 
 function CGlyphData()
 {
@@ -1177,10 +1177,7 @@ function CFontManager()
 
         if (is_init_raster_memory === true)
         {
-            var __bIsIE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
-            var __bIsARM = (/ARM/g.test(navigator.userAgent)) ? true : false;
-
-            if (__bIsIE && !__bIsARM)
+            if (AscBrowser.isIE && !AscBrowser.isArm)
             {
                 this.RasterMemory = new CRasterHeapTotal();
                 this.RasterMemory.CreateFirstChuck();
