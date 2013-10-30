@@ -932,7 +932,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				}
 				else {
-					if(this.documentOpenOptions && this.documentOpenOptions["IsEmpty"])
+					if(this.documentOpenOptions && this.documentOpenOptions["isEmpty"])
 					{
 						var sEmptyWorkbook = getEmptyWorkbook();
 						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"create", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": sEmptyWorkbook};

@@ -931,7 +931,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 
 	if(documentId){
 		var oOpenOptions = this.DocInfo.get_Options();
-		if(oOpenOptions && oOpenOptions["IsEmpty"])
+		if(oOpenOptions && oOpenOptions["isEmpty"])
 		{
 			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"create", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": g_sEmpty_bin};
 			sendCommand( oThis, function(){}, rData );
