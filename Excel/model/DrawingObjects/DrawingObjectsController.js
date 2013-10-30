@@ -666,6 +666,11 @@ DrawingObjectsController.prototype =
     changeCurrentState: function(newState)
     {
         this.curState = newState;
+        if(newState.id === STATES_ID_TEXT_ADD ||  newState.id === STATES_ID_TEXT_ADD)
+        {
+            this.drawingObjects.OnUpdateOverlay();
+        }
+
 		this.updateSelectionState();
 		this.recalculateCurPos();
     },
