@@ -1040,8 +1040,30 @@ function CMasterThumbnailDrawer()
         var _back_fill = null;
         var RGBA = {R:0, G:0, B:0, A:255};
 
+        var _layout = null;
+        for (var i = 0; i < _master.sldLayoutLst.length; i++)
+        {
+            if (_master.sldLayoutLst[i].type == nSldLtTTitle)
+            {
+                _layout = _master.sldLayoutLst[i];
+                break;
+            }
+        }
+
         var _theme = _master.Theme;
-        if (_master != null)
+
+        if (_layout != null && _layout.cSld.Bg != null)
+        {
+            if (null != _layout.cSld.Bg.bgPr)
+                _back_fill = _layout.cSld.Bg.bgPr.Fill;
+            else if(_layout.cSld.Bg.bgRef != null)
+            {
+                _layout.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
+                RGBA = _layout.cSld.Bg.bgRef.Color.RGBA;
+                _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_layout.cSld.Bg.bgRef.idx);
+            }
+        }
+        else if (_master != null)
         {
             if (_master.cSld.Bg != null)
             {
@@ -1049,7 +1071,7 @@ function CMasterThumbnailDrawer()
                     _back_fill = _master.cSld.Bg.bgPr.Fill;
                 else if(_master.cSld.Bg.bgRef != null)
                 {
-                    _master.cSld.Bg.bgRef.Color.Calculate(_theme, null, null, _master, RGBA);
+                    _master.cSld.Bg.bgRef.Color.Calculate(_theme, null, _layout, _master, RGBA);
                     RGBA = _master.cSld.Bg.bgRef.Color.RGBA;
                     _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(_master.cSld.Bg.bgRef.idx);
                 }
@@ -1064,7 +1086,7 @@ function CMasterThumbnailDrawer()
         }
 
         if (_back_fill != null)
-            _back_fill.calculate(_theme, null, null, _master, RGBA);
+            _back_fill.calculate(_theme, null, _layout, _master, RGBA);
 
         if (use_background !== false)
             DrawBackground(g, _back_fill, this.WidthMM, this.HeightMM);
@@ -1073,7 +1095,20 @@ function CMasterThumbnailDrawer()
         var _sy = g.m_oCoordTransform.sy;
 
         if (use_master_shapes !== false)
-            _master.draw(g);
+        {
+            if (null == _layout)
+            {
+                _master.draw(g);
+            }
+            else
+            {
+                if (_layout.showMasterSp == true || _layout.showMasterSp == undefined)
+                {
+                    _master.draw(g);
+                }
+                _layout.draw(g);
+            }
+        }
 
         g.reset();
         g.SetIntegerGrid(true);
