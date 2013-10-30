@@ -10184,18 +10184,21 @@ Paragraph.prototype =
 
     Update_CursorType : function(X, Y, PageIndex)
     {
-        var text_transform = null;
-        var cur_parent = this.Parent;
-        if(this.Parent.Is_TableCellContent())
+        var text_transform;
+        if(this.Parent && this.Parent.Parent && this.Parent.Parent.shape)
         {
-            while(isRealObject(cur_parent) && cur_parent.Is_TableCellContent())
-            {
-                cur_parent = cur_parent.Parent.Row.Table.Parent;
-            }
+            text_transform = this.Parent.Parent.shape.transformText;
+        }
+        else
+        {
+            text_transform = new CMatrix();
         }
 
+
         var MMData = new CMouseMoveData();
-        var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
+        var t_x = text_transform.TransformPointX(X, Y);
+        var t_y = text_transform.TransformPointY(X, Y);
+        var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( t_x, t_y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
         MMData.X_abs = Coords.X;
         MMData.Y_abs = Coords.Y;
 
@@ -10210,28 +10213,11 @@ Paragraph.prototype =
         else
             MMData.Type      = c_oAscMouseMoveDataTypes.Common;
 
+        editor.sync_MouseMoveCallback( MMData );
         if ( null != Hyperlink && true === global_keyboardEvent.CtrlKey )
             this.DrawingDocument.SetCursorType( "pointer", MMData );
         else
             this.DrawingDocument.SetCursorType( "default", MMData );
-
-        if ( true === this.Lock.Is_Locked() )
-        {
-            var PNum = Math.max( 0, Math.min( PageIndex - this.PageNum, this.Pages.length - 1 ) );
-            var _X = this.Pages[PNum].X;
-            var _Y = this.Pages[PNum].Y;
-
-            var MMData = new CMouseMoveData();
-            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
-            MMData.X_abs            = Coords.X - 5;
-            MMData.Y_abs            = Coords.Y;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
-            MMData.UserId           = this.Lock.Get_UserId();
-            MMData.HaveChanges      = this.Lock.Have_Changes();
-            MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
-
-            editor.sync_MouseMoveCallback( MMData );
-        }
     },
 
     Document_CreateFontMap : function(FontMap)
