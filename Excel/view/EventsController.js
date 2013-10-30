@@ -1119,13 +1119,11 @@
 					if ( t.isCellEditMode )
 						t.handlers.trigger("stopCellEditing");
 					
-					//if (2 === event.button)
-					//	t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
-					//else
-					//	t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
-					
-					if ( asc["editor"].isStartAddShape )
+					if (asc["editor"].isStartAddShape) {
+						// SelectionChanged
+						t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
 						return;
+					}
 				}
 				
 				if (event.originalEvent && 2 === event.originalEvent.detail) {

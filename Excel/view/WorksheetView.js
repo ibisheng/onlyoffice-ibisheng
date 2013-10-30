@@ -387,6 +387,7 @@
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
 			this.isUpdateSelection = false;
+			this.isSelectOnShape = false;	// Выделен shape
 
 			this.isSelectionDialogMode = false;
 			this.copyOfActiveRange = null;
@@ -5355,14 +5356,10 @@
 
 			_moveActiveCellToXY: function (x, y) {
 				var c, r;
-				var xpos = x;
-				var ypos = y;
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
-				
-				var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
-				if ( cursorInfo ) {
+
+				if (this.objectRender.selectedGraphicObjectsExists())
 					return;
-				}
 
 				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
@@ -5720,7 +5717,7 @@
 				cell_info.flags.wrapText = c.getWrap();
 				
 				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
-				if ( graphicObjects.length )
+				if (graphicObjects.length)
 					cell_info.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
 				else
 					cell_info.flags.selectionType = this.activeRange.type;
@@ -5768,33 +5765,32 @@
 				var ar = this.activeRange.clone();
 				var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
 				var hyperlink = range.getHyperlink();
+				var oHyperlink;
 				if (null !== hyperlink) {
 					// Гиперлинк
-					var oHyperlink = new asc_CHyperlink(hyperlink);
+					oHyperlink = new asc_CHyperlink(hyperlink);
 					oHyperlink.asc_setText(cell_info.text);
 					cell_info.hyperlink = oHyperlink;
-				}
-				else if ( isGraphicObject && textPr && (x != undefined) && (y != undefined) ) {
+				} else if (isGraphicObject && textPr && x != undefined && y != undefined) {
 					var shapeHyperlink = this.objectRender.checkCursorDrawingObject(x, y).hyperlink;
-					if ( shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart) ) {
-						var hyperlink = new Hyperlink();
+					if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart)) {
+						// ToDo разобраться
+						hyperlink = new Hyperlink();
 						hyperlink.Tooltip = shapeHyperlink.ToolTip;
 						
 						var spl = shapeHyperlink.Value.split("!");
-						if ( spl.length === 2 ) {
+						if (spl.length === 2) {
 							hyperlink.Location = shapeHyperlink.Value;
 							hyperlink.LocationSheet = spl[0];
 							hyperlink.LocationRange = spl[1];
 							this.objectRender.controller.resetSelectionState();
-						}
-						else
+						} else
 							hyperlink.Hyperlink = shapeHyperlink.Value;
 						
-						var oHyperlink = new asc_CHyperlink(hyperlink);
+						oHyperlink = new asc_CHyperlink(hyperlink);
 						cell_info.hyperlink = oHyperlink;
 					}
-				}
-				else
+				} else
 					cell_info.hyperlink = null;
 
 				cell_info.flags.merge = null !== range.hasMerged();
@@ -5810,7 +5806,8 @@
 					// Пересчет для входящих ячеек в добавленные строки/столбцы
 					var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
 					if (false === isIntersection) {
-						var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
+						var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+							sheetId, new asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
 						if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 							c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
@@ -5836,6 +5833,21 @@
 				var width = this.getColumnWidth (this.activeRange.startCol, /*px*/0);
 				var height = this.getRowHeight(this.activeRange.startRow, /*px*/0);
 				return new asc_CCellRect (xL, yL, width, height);
+			},
+
+			_checkSelectionShape: function () {
+				var isSelectOnShape = this.isSelectOnShape;
+				if (this.isSelectOnShape) {
+					this.isSelectOnShape = false;
+					this.objectRender.unselectDrawingObjects();
+				}
+				return isSelectOnShape;
+			},
+
+			setSelectionShape: function (isSelectOnShape) {
+				this.isSelectOnShape = isSelectOnShape;
+				// отправляем евент для получения свойств картинки, шейпа или группы
+				this._trigger("selectionChanged", this.getSelectionInfo());
 			},
 
 			setSelection: function (range, validRange) {
@@ -5880,6 +5892,7 @@
 				
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
 				var sc = ar.startCol, sr = ar.startRow, ret = {};
+				var isChangeSelectionShape = false;
 
 				this.cleanSelection();
 				
@@ -5890,7 +5903,8 @@
 				}
 
 				if (isCoord) {
-					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+					isChangeSelectionShape = this._checkSelectionShape();
+					/*var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
 						this.objectRender.OnUpdateOverlay();
 					}
@@ -5900,7 +5914,7 @@
 							if ( this.isUpdateSelection )
 								this._trigger("selectionChanged", this.getSelectionInfo());
 						}
-					}
+					}*/
 					
 					// move active range to coordinates x,y
 					this._moveActiveCellToXY(x, y);
@@ -5911,7 +5925,7 @@
 					ret = this._calcActiveRangeOffset();
 				}
 
-				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow)) {
+				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow || isChangeSelectionShape)) {
 					if (!this.isSelectionDialogMode) {
 						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 						if (!isSelectMode)
@@ -5922,29 +5936,21 @@
 					}
 				}
 
-				if ( drawingInfo && drawingInfo.isGraphicObject ) {
+				//if ( drawingInfo && drawingInfo.isGraphicObject ) {
 					// отправляем евент для получения свойств картинки, шейпа или группы
-					this._trigger("selectionChanged", this.getSelectionInfo(false, x, y));
-				} else {
+				//	this._trigger("selectionChanged", this.getSelectionInfo(false, x, y));
+				//} else {
 					this._drawSelection();
 					//ToDo this.drawDepCells();
-				}
+				//}
 				
 				return ret;
 			},
 
 			// Смена селекта по нажатию правой кнопки мыши
 			changeSelectionStartPointRightClick: function (x, y) {
-
-				// Выделяем объект
-				var graphicCursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if ( graphicCursorInfo && graphicCursorInfo.isGraphicObject ) {
-					this.cleanSelection();
-					this.cleanHighlightedHeaders();
-					return;
-				}
-
 				var ar = this.activeRange;
+				var isChangeSelectionShape = this._checkSelectionShape();
 				this.model.workbook.handlers.trigger("asc_onHideComment");
 
 				// Получаем координаты левого верхнего угла выделения
@@ -5994,16 +6000,22 @@
 
 				if (!isInSelection) {
 					// Не попали в выделение (меняем первую точку)
-					this.objectRender.unselectDrawingObjects();
 					this.cleanSelection();
 					this._moveActiveCellToXY(x, y);
-					if ( !graphicCursorInfo )
-						this._drawSelection();
+					this._drawSelection();
 
 					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					this._trigger("selectionChanged", this.getSelectionInfo());
 					return false;
+				} else if (isChangeSelectionShape) {
+					// Попали в выделение, но были в объекте
+					this.cleanSelection();
+					this._drawSelection();
+					
+					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+					this._trigger("selectionChanged", this.getSelectionInfo());
 				}
+
 				return true;
 			},
 

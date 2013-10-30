@@ -224,7 +224,7 @@
 					"graphicObjectWindowKeyPress":			function () {return self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
 					"getGraphicsInfo":						function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 					"getSelectedGraphicObjects":			function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
-					"resetSelectedGraphicObjects":			function () {return self._onResetSelectedGraphicObjects.apply(self, arguments);}
+					"updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);}
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
@@ -757,10 +757,10 @@
 				var ws = this.getWorksheet();
 				return ws.objectRender.getSelectedGraphicObjects();
 			},
-			
-			_onResetSelectedGraphicObjects: function () {
+
+			_onUpdateSelectionShape: function (isSelectOnShape) {
 				var ws = this.getWorksheet();
-				return ws.objectRender.controller.resetSelection();
+				return ws.setSelectionShape(isSelectOnShape);
 			},
 			
 			// Double click
