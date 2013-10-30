@@ -1632,6 +1632,11 @@ Slide.prototype =
 
 
         }
+
+        if(!isRealObject(this.Layout))
+        {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
     },
 
     Redo: function(data)
