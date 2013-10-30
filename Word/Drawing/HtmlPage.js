@@ -140,6 +140,8 @@ function CEditorPage(api)
 
     this.IsKeyDownButNoPress = false;
 
+    this.MouseDownDocumentCounter = 0;
+
     this.bIsUseKeyPress = true;
     this.bIsEventPaste = false;
     this.bIsDoublePx = true;//поддерживает ли браузер нецелые пикселы
@@ -1507,12 +1509,17 @@ function CEditorPage(api)
                 oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = true;
                 oWordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
                 oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = false;
+
+                oWordControl.MouseDownDocumentCounter++;
             }
             else
             {
                 oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnMouseDown(pos.Page, pos.X, pos.Y);
+                oWordControl.MouseDownDocumentCounter++;
             }
         }
+        else if (global_mouseEvent.Button == 2)
+            oWordControl.MouseDownDocumentCounter++;
 
         if (-1 == oWordControl.m_oTimerScrollSelect)
         {
@@ -1616,7 +1623,7 @@ function CEditorPage(api)
         //    return;
 
         var oWordControl = oThis;
-        if (!global_mouseEvent.IsLocked)
+        if (!global_mouseEvent.IsLocked && 0 == oWordControl.MouseDownDocumentCounter)
             return;
 
         if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block" && undefined == bIsWindow)
@@ -1662,6 +1669,10 @@ function CEditorPage(api)
         {
             oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnMouseUp();
 
+            oWordControl.MouseDownDocumentCounter--;
+            if (oWordControl.MouseDownDocumentCounter < 0)
+                oWordControl.MouseDownDocumentCounter = 0;
+
             oWordControl.EndUpdateOverlay();
             return;
         }
@@ -1676,6 +1687,10 @@ function CEditorPage(api)
         oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = true;
         oWordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
         oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = false;
+
+        oWordControl.MouseDownDocumentCounter--;
+        if (oWordControl.MouseDownDocumentCounter < 0)
+            oWordControl.MouseDownDocumentCounter = 0;
 
         oWordControl.m_bIsMouseUpSend = false;
         oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
@@ -1745,6 +1760,10 @@ function CEditorPage(api)
         {
             oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnMouseUp();
 
+            oWordControl.MouseDownDocumentCounter--;
+            if (oWordControl.MouseDownDocumentCounter < 0)
+                oWordControl.MouseDownDocumentCounter = 0;
+
             oWordControl.EndUpdateOverlay();
             return;
         }
@@ -1757,6 +1776,11 @@ function CEditorPage(api)
             //oWordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
         }
         oWordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+
+        oWordControl.MouseDownDocumentCounter--;
+        if (oWordControl.MouseDownDocumentCounter < 0)
+            oWordControl.MouseDownDocumentCounter = 0;
+
         oWordControl.m_bIsMouseUpSend = false;
         oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         oWordControl.m_oLogicDocument.Document_UpdateRulersState();
