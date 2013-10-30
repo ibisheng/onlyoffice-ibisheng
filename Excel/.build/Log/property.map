@@ -3903,7 +3903,7 @@ SendControlColors:yPa
 Left:ka
 GetBrush:Efa
 setGraphicObjectPropsCallBack:scb
-OnUpdateOverlay:Fe
+OnUpdateOverlay:Ee
 WriteSheetData:iSa
 bMillisec:FAa
 _background_grid_hlines:Sva
@@ -4252,7 +4252,7 @@ aCFVOs:x2
 isFormulaSeq:I8a
 nvGraphicFramePr:wsb
 table_info:Mub
-NeedRecalc:Ee
+NeedRecalc:Fe
 render_span:d_
 callback_OnSaveChanges:T4a
 _parseFormulaRanges:BWa
