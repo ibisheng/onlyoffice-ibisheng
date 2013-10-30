@@ -3815,6 +3815,7 @@ CGraphicObjects.prototype =
             var cur_arr_gr_objects = cur_group.arrGraphicObjects;
             var page_index = cur_group.pageIndex;
             var paragraph = cur_group_word_graphic_obj.Parent;
+            var nearest_pos = this.document.Get_NearestPos(cur_group_word_graphic_obj.PageNum, cur_group_word_graphic_obj.absOffsetX, cur_group_word_graphic_obj.absOffsetY, !cur_group_word_graphic_obj.Is_Inline(), cur_group_word_graphic_obj)
             //if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : paragraph, CheckType : changestype_Paragraph_Content} ))
             {
                 cur_group_word_graphic_obj.Remove_FromDocument(false);
@@ -3864,7 +3865,7 @@ CGraphicObjects.prototype =
                         cur_child_graphic_object.parent.Measure();
                         cur_child_graphic_object.parent.updatePosition(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.calculateOffset();
-                        cur_child_graphic_object.parent.Set_XYForAdd2(new_offset_x, new_offset_y);
+                        cur_child_graphic_object.parent.Set_XYForAdd(new_offset_x, new_offset_y, nearest_pos, cur_group_word_graphic_obj.PageNum)
                         cur_child_graphic_object.parent.Add_ToDocument2(paragraph);
                         cur_child_graphic_object.parent.calculateSnapArrays();
                     }
@@ -3951,7 +3952,7 @@ CGraphicObjects.prototype =
                         cur_child_graphic_object.parent.Measure();
                         cur_child_graphic_object.parent.updatePosition(new_offset_x, new_offset_y);
                         cur_child_graphic_object.parent.calculateOffset();
-                        cur_child_graphic_object.parent.Set_XYForAdd2(new_offset_x, new_offset_y);
+                        cur_child_graphic_object.parent.Set_XYForAdd(new_offset_x, new_offset_y, nearest_pos, cur_group_word_graphic_obj.PageNum);
                         cur_child_graphic_object.parent.Add_ToDocument2(paragraph);
                         cur_child_graphic_object.parent.calculateSnapArrays();
                     }
