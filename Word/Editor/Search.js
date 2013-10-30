@@ -105,7 +105,6 @@ CDocumentSearch.prototype =
 
     Replace : function(NewStr, Id)
     {
-        //var _NewStr =
         var Para = this.Elements[Id];
         if ( undefined != Para )
         {
