@@ -2344,7 +2344,7 @@ SlideComments.prototype =
                 var id = r.GetString2();
                 var pos2 = this.m_oContentChanges.Check( contentchanges_Add, pos);
                 this.comments.splice(pos2, 0,  g_oTableId.Get_ById(id));
-                editor.sync_AddComment( id, this.comments[pos].Data);
+                editor.sync_AddComment( id, this.comments[pos2].Data);
                 break;
             }
             case historyitem_RemoveComment:
@@ -2352,7 +2352,7 @@ SlideComments.prototype =
                 var pos = r.GetLong();
                 var pos2 = this.m_oContentChanges.Check( contentchanges_Remove, pos);
 
-                var comment = this.comments.splice(pos, 1)[0];
+                var comment = this.comments.splice(pos2, 1)[0];
                 editor.sync_RemoveComment(comment.Id);
                 break;
             }

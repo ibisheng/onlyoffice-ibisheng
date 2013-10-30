@@ -5477,6 +5477,9 @@ CPresentation.prototype =
             {
                 var kw = Data.oldW/this.Width;
                 var kh = Data.oldH/this.Height;
+
+                this.Width = Data.oldW;
+                this.Height = Data.oldH;
                 var b_is_on = History.Is_On();
                 if(b_is_on)
                 {
@@ -5486,12 +5489,17 @@ CPresentation.prototype =
                 for(var i = 0; i < this.slideMasters.length; ++i)
                 {
                     this.slideMasters[i].changeSize(kw, kh);
+                    var master = this.slideMasters[i];
+                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
+                    {
+                        master.sldLayoutLst[j].changeSize(kw, kh);
+                    }
                 }
 
-                for(var i = 0; i < this.slideLayouts.length; ++i)
-                {
-                    this.slideLayouts[i].changeSize(kw, kh);
-                }
+               // for(var i = 0; i < this.slideLayouts.length; ++i)
+               // {
+               //     this.slideLayouts[i].changeSize(kw, kh);
+               // }
 
                 for(var i = 0; i < this.Slides.length; ++i)
                 {
@@ -5539,6 +5547,8 @@ CPresentation.prototype =
             {
                 var kw = Data.newW/this.Width;
                 var kh = Data.newH/this.Height;
+                this.Width = Data.newW;
+                this.Height = Data.newH;
                 var b_is_on = History.Is_On();
                 if(b_is_on)
                 {
@@ -5548,12 +5558,17 @@ CPresentation.prototype =
                 for(var i = 0; i < this.slideMasters.length; ++i)
                 {
                     this.slideMasters[i].changeSize(kw, kh);
+                    var master = this.slideMasters[i];
+                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
+                    {
+                        master.sldLayoutLst[j].changeSize(kw, kh);
+                    }
                 }
 
-                for(var i = 0; i < this.slideLayouts.length; ++i)
-                {
-                    this.slideLayouts[i].changeSize(kw, kh);
-                }
+               // for(var i = 0; i < this.slideLayouts.length; ++i)
+               // {
+               //     this.slideLayouts[i].changeSize(kw, kh);
+               // }
 
                 for(var i = 0; i < this.Slides.length; ++i)
                 {
@@ -6093,9 +6108,15 @@ CPresentation.prototype =
 
         var _master_width = _new_master.Width;
         var _master_height = _new_master.Height;
-        if(Math.abs(_master_height - this.Height) > 1 || Math.abs(_master_width - this.Width) > 1)
+        if(_master_height !== this.Height || _master_width !== this.Width)
         {
-         //   _new_master.setSize(this.Width, this.Height);
+            var kw = this.Width/_master_width;
+            var kh = this.Height/_master_height;
+            themeInfo.Master.changeSize(kw, kh);
+            for(var i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
+            {
+                themeInfo.Master.sldLayoutLst[i].changeSize(kw, kh);
+            }
         }
 
         _new_master.recalculate();
@@ -6163,12 +6184,17 @@ CPresentation.prototype =
             for(var i = 0; i < this.slideMasters.length; ++i)
             {
                 this.slideMasters[i].changeSize(kw, kh);
+                var master = this.slideMasters[i];
+                for(var j = 0; j < master.sldLayoutLst.length; ++j)
+                {
+                    master.sldLayoutLst[j].changeSize(kw, kh);
+                }
             }
 
-            for(var i = 0; i < this.slideLayouts.length; ++i)
-            {
-                this.slideLayouts[i].changeSize(kw, kh);
-            }
+           // for(var i = 0; i < this.slideLayouts.length; ++i)
+           // {
+           //     this.slideLayouts[i].changeSize(kw, kh);
+           // }
 
             for(var i = 0; i < this.Slides.length; ++i)
             {
@@ -6724,12 +6750,17 @@ CPresentation.prototype =
                 for(var i = 0; i < this.slideMasters.length; ++i)
                 {
                     this.slideMasters[i].changeSize(kw, kh);
+                    var master = this.slideMasters[i];
+                    for(var j = 0; j < master.sldLayoutLst.length; ++j)
+                    {
+                        master.sldLayoutLst[j].changeSize(kw, kh);
+                    }
                 }
 
-                for(var i = 0; i < this.slideLayouts.length; ++i)
-                {
-                    this.slideLayouts[i].changeSize(kw, kh);
-                }
+                //for(var i = 0; i < this.slideLayouts.length; ++i)
+                //{
+                //    this.slideLayouts[i].changeSize(kw, kh);
+                //}
 
                 for(var i = 0; i < this.Slides.length; ++i)
                 {

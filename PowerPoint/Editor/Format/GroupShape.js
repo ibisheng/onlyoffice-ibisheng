@@ -596,14 +596,10 @@ CGroupShape.prototype =
         if(this.spPr.xfrm.isNotNullForGroup())
         {
             var xfrm = this.spPr.xfrm;
-            xfrm.offX *= kw;
-            xfrm.offY *= kh;
-            xfrm.extX *= kw;
-            xfrm.extY *= kh;
-            xfrm.chOffX *= kw;
-            xfrm.chOffY *= kh;
-            xfrm.chExtX *= kw;
-            xfrm.chExtY *= kh;
+            this.setOffset(xfrm.offX*kw, xfrm.offY*kh);
+            this.setExtents(xfrm.extX*kw, xfrm.extY*kh);
+            this.setChildOffset(xfrm.chOffX*kw, xfrm.chOffY*kh);
+            this.setChildExtents(xfrm.chExtX*kw, xfrm.chExtY*kh);
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {

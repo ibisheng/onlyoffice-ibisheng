@@ -1989,10 +1989,8 @@ CShape.prototype =
         if(this.spPr.xfrm.isNotNull())
         {
             var xfrm = this.spPr.xfrm;
-            xfrm.offX*=kw;
-            xfrm.offY*=kh;
-            xfrm.extX*=kw;
-            xfrm.extY*=kh;
+            this.setOffset(xfrm.offX*kw, xfrm.offY*kh);
+            this.setExtents(xfrm.extX*kw, xfrm.extY*kh);
         }
     },
 
