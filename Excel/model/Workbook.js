@@ -3978,7 +3978,10 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		}
 		__cell.setFormulaCA(res.ca);
 		if( res.numFormat !== undefined && res.numFormat >= 0){
-			__cell.setNumFormat(aStandartNumFormats[res.numFormat])
+
+            if( aStandartNumFormatsId[__cell.getNumFormatStr()] == 0 )
+			    __cell.setNumFormat(aStandartNumFormats[res.numFormat])
+
 		}
 		else if( res.numFormat !== undefined && res.numFormat == -1 ){
 			adjustCellFormat(__cell,__cell.sFormula);
