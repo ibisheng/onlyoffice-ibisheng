@@ -5395,8 +5395,12 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             case STATES_ID_NULL:
             case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
-				drawingObjectsController.drawingObjects.getWorksheet()._checkSelectionShape();
-				drawingObjectsController.drawingObjects.getWorksheet()._drawSelection();
+				var ws = drawingObjectsController.drawingObjects.getWorksheet();
+				var isChangeSelectionShape = ws._checkSelectionShape();
+				if (isChangeSelectionShape) {
+					ws._drawSelection();
+					ws._updateSelectionNameAndInfo();
+				}
                 bRetValue = true;
                 break;
             }

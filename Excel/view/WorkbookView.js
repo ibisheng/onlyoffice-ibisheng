@@ -416,13 +416,14 @@
 			},
 
 			// Проверяет, сменили ли мы диапазон (для того, чтобы не отправлять одинаковую информацию о диапазоне)
-			_isEqualRange: function (range) {
+			_isEqualRange: function (range, isSelectOnShape) {
 				if (null === this.lastSendInfoRange)
 					return false;
 
 				return (this.lastSendInfoRange.isEqual(range) &&
 					this.lastSendInfoRange.startCol === range.startCol &&
-					this.lastSendInfoRange.startRow === range.startRow);
+					this.lastSendInfoRange.startRow === range.startRow &&
+					this.lastSendInfoRange.isSelectOnShape === isSelectOnShape);
 			},
 
 			_onWSSelectionChanged: function (info) {
@@ -431,6 +432,7 @@
 				this.lastSendInfoRange = ar.clone(true);
 				this.lastSendInfoRange.startCol = ar.startCol;
 				this.lastSendInfoRange.startRow = ar.startRow;
+				this.lastSendInfoRange.isSelectOnShape = ws.isSelectOnShape;
 
 				if (null === info) {
 					info = ws.getSelectionInfo();
@@ -513,7 +515,7 @@
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				// Проверим, нужно ли отсылать информацию о ячейке
 				var ar = ws.activeRange;
-				if (!this._isEqualRange(ar)) {
+				if (!this._isEqualRange(ar, ws.isSelectOnShape)) {
 					this._onWSSelectionChanged(ws.getSelectionInfo());
 				}
 

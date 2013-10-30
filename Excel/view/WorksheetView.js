@@ -386,7 +386,6 @@
 			this.isFormulaEditMode = false;
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
-			this.isUpdateSelection = false;
 			this.isSelectOnShape = false;	// Выделен shape
 
 			this.isSelectionDialogMode = false;
@@ -5679,10 +5678,8 @@
 					cell_info.text = this.objectRender.controller.Get_SelectedText();
 				else
 					cell_info.text = c.getValueForEdit();
-				
-				this.isUpdateSelection = false;
-				if ( isGraphicObject && textPr && paraPr ) {
-					this.isUpdateSelection = true;
+
+				if (isGraphicObject && textPr && paraPr) {
 					
 					var horAlign = "center";
 					switch (paraPr.Jc) {
@@ -5841,6 +5838,11 @@
 				return isSelectOnShape;
 			},
 
+			_updateSelectionNameAndInfo: function () {
+				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this._trigger("selectionChanged", this.getSelectionInfo());
+			},
+
 			setSelectionShape: function (isSelectOnShape) {
 				this.isSelectOnShape = isSelectOnShape;
 				// отправляем евент для получения свойств картинки, шейпа или группы
@@ -5901,17 +5903,6 @@
 
 				if (isCoord) {
 					isChangeSelectionShape = this._checkSelectionShape();
-					/*var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-					if ( drawingInfo ) {
-						this.objectRender.OnUpdateOverlay();
-					}
-					else {
-						if ( !asc["editor"].isStartAddShape ) {
-							this.objectRender.unselectDrawingObjects();
-							if ( this.isUpdateSelection )
-								this._trigger("selectionChanged", this.getSelectionInfo());
-						}
-					}*/
 					
 					// move active range to coordinates x,y
 					this._moveActiveCellToXY(x, y);
@@ -5933,13 +5924,8 @@
 					}
 				}
 
-				//if ( drawingInfo && drawingInfo.isGraphicObject ) {
-					// отправляем евент для получения свойств картинки, шейпа или группы
-				//	this._trigger("selectionChanged", this.getSelectionInfo(false, x, y));
-				//} else {
-					this._drawSelection();
-					//ToDo this.drawDepCells();
-				//}
+				this._drawSelection();
+				//ToDo this.drawDepCells();
 				
 				return ret;
 			},
@@ -6001,16 +5987,14 @@
 					this._moveActiveCellToXY(x, y);
 					this._drawSelection();
 
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					this._trigger("selectionChanged", this.getSelectionInfo());
+					this._updateSelectionNameAndInfo();
 					return false;
 				} else if (isChangeSelectionShape) {
 					// Попали в выделение, но были в объекте
 					this.cleanSelection();
 					this._drawSelection();
-					
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					this._trigger("selectionChanged", this.getSelectionInfo());
+
+					this._updateSelectionNameAndInfo();
 				}
 
 				return true;

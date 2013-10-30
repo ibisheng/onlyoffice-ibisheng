@@ -4491,9 +4491,7 @@ function DrawingObjects() {
 		*/
 		
 		var response = { result: true, x: 0, y: 0 };
-		
-		var top = worksheet.getCellTop(0, 3);
-		var left = worksheet.getCellLeft(0, 3);
+
 		var bottom = worksheet.getCellTop(worksheet.rows.length - 1, 3);
 		var right = worksheet.getCellLeft(worksheet.cols.length - 1, 3);
 						
@@ -4968,7 +4966,7 @@ function DrawingObjects() {
 		}
 		_this.controller.resetSelectionState();
 		_this.OnUpdateOverlay();
-	}
+	};
 
 	_this.getDrawingObject = function(id) {
 
