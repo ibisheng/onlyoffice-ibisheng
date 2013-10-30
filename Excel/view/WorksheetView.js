@@ -1849,30 +1849,31 @@
 
 			_doCleanHighlightedHeaders: function () {
 				var hlc = this.highlightedCol,
-				hlr = this.highlightedRow,
-				arn = this.activeRange.clone(true);
+					hlr = this.highlightedRow,
+					arn = this.activeRange.clone(true);
+				var hStyle = this.objectRender.selectedGraphicObjectsExists() ? kHeaderDefault : kHeaderActive;
 				if (hlc >= 0) {
 					if (hlc >= arn.c1 && hlc <= arn.c2) {
-						this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc, hlc, kHeaderActive);
+						this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc, hlc, hStyle);
 					} else {
 						this._cleanColumnHeaders(hlc);
 						if (hlc + 1 === arn.c1) {
 							this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc + 1, hlc + 1, kHeaderActive);
 						} else if (hlc - 1 === arn.c2) {
-							this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc - 1, hlc - 1, kHeaderActive);
+							this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc - 1, hlc - 1, hStyle);
 						}
 					}
 					this.highlightedCol = -1;
 				}
 				if (hlr >= 0) {
 					if (hlr >= arn.r1 && hlr <= arn.r2) {
-						this._drawRowHeaders(/*drawingCtx*/ undefined, hlr, hlr, kHeaderActive);
+						this._drawRowHeaders(/*drawingCtx*/ undefined, hlr, hlr, hStyle);
 					} else {
 						this._cleanRowHeades(hlr);
 						if (hlr + 1 === arn.r1) {
 							this._drawRowHeaders(/*drawingCtx*/ undefined, hlr + 1, hlr + 1, kHeaderActive);
 						} else if (hlr - 1 === arn.r2) {
-							this._drawRowHeaders(/*drawingCtx*/ undefined, hlr - 1, hlr - 1, kHeaderActive);
+							this._drawRowHeaders(/*drawingCtx*/ undefined, hlr - 1, hlr - 1, hStyle);
 						}
 					}
 					this.highlightedRow = -1;
@@ -5354,9 +5355,6 @@
 				var c, r;
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 
-				if (this.objectRender.selectedGraphicObjectsExists())
-					return;
-
 				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
 
@@ -5903,7 +5901,7 @@
 
 				if (isCoord) {
 					isChangeSelectionShape = this._checkSelectionShape();
-					
+
 					// move active range to coordinates x,y
 					this._moveActiveCellToXY(x, y);
 					
