@@ -4973,9 +4973,6 @@
 				var isLocked = false;
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if (drawingInfo)
-					return {cursor: drawingInfo.cursor, target: "shape", col: -1, row: -1};
-				
 				if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
@@ -5007,7 +5004,7 @@
 						var _r = this.activeRange.clone(true);
 						oHyperlink.Ref = this.model.getRange3(_r.r1, _r.c1, _r.r2, _r.c2);
 						
-						var cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
+						var cellCursor = {cursor: drawingInfo.cursor, target: "cells", col: (c ? c.col : -1),
 							row: (r ? r.row : -1), userId: userId,
 							lockRangePosLeft: undefined, lockRangePosTop: undefined,
 							userIdAllProps: undefined, lockAllPosLeft: undefined,

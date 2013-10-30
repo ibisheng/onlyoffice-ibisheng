@@ -5391,7 +5391,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             case STATES_ID_NULL:
             case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
-				drawingObjectsController.drawingObjects.unselectDrawingObjects();
+				drawingObjectsController.drawingObjects.getWorksheet()._checkSelectionShape();
 				drawingObjectsController.drawingObjects.getWorksheet()._drawSelection();
                 bRetValue = true;
                 break;

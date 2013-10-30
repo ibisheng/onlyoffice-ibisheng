@@ -1305,7 +1305,7 @@
 				if ( graphicsInfo && graphicsInfo.isGraphicObject )
 					this.clickCounter.mouseMoveEvent(coord.x, coord.y);
 					
-				if ( asc["editor"].isStartAddShape ) {
+				if ( asc["editor"].isStartAddShape || graphicsInfo ) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return;
