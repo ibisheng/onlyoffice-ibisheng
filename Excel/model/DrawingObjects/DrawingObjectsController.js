@@ -878,6 +878,8 @@ DrawingObjectsController.prototype =
         }
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
+        var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+        asc["editor"].asc_endAddShape();
     },
 
     resetSelectionState2: function()
@@ -889,6 +891,8 @@ DrawingObjectsController.prototype =
             --count;
         }
         this.changeCurrentState(new NullState(this, this.drawingObjects));
+
+
     },
 
     resetSelection: function()
