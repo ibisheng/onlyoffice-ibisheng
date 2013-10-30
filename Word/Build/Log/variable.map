@@ -1247,7 +1247,7 @@ c_oSer_ClrSchemeMappingType$Accent6:D2
 FT_FACE_FIND_SERVICE:mq
 c_oSer_st$Styles:nZ
 c_oSer_ClrSchemeMappingType$Accent3:A2
-c_oSer_OMathContentType$LimUpp:u4
+c_oSer_OMathContentType$LimUpp:s4
 c_oSer_ClrSchemeMappingType$Accent2:z2
 c_oSer_OMathContentType$CtrlPr:f4
 c_oSer_ClrSchemeMappingType$Accent5:C2
@@ -1389,7 +1389,7 @@ c_oAscError$ID$UplImageExt:waa
 CBullet:$N
 Y_Default_Footer:GV
 cff_builder_add_point:VB
-month:Rh
+month:Oh
 JSCompiler_StaticMethods_Numbering_Set:EU
 JSCompiler_StaticMethods_getHeightText:Bo
 Move_CVT_Stretched:Fz
@@ -1580,7 +1580,7 @@ JSCompiler_StaticMethods_Get_Bounds:FV
 JSCompiler_StaticMethods_Set_TableBorder_Left:fe
 BULLET_TYPE_BULLET_CHAR:rk
 RULER_OBJECT_TYPE_FOOTER:m8
-c_oSerNumTypes$AbstractNum:LY
+c_oSerNumTypes$AbstractNum:KY
 CBgPr:Bj
 documentVKey:T9
 FT_Module:Os
@@ -2074,7 +2074,7 @@ nSldLtTVertTx:qN
 c_oSerPropLenType$Long:vl
 AscBrowser$isAndroid:ia
 para_PageNum:nP
-c_oSerOtherTableTypes$ImageMap_Src:iZ
+c_oSerOtherTableTypes$ImageMap_Src:hZ
 c_oSer_OMathContentType$MText:U4
 historyitem_MovePoint:XJ
 para_Drawing:Dc
@@ -3198,7 +3198,7 @@ L 56:ih
 L 55:Zp
 L 54:vs
 L 53:af
-L 52:Oh
+L 52:Ph
 L 51:ie
 FT_TT_SERVICES_GET:pA
 Binary_tblPrReader:q6
@@ -3372,7 +3372,7 @@ L 65:oe
 L 62:Fk
 c_oSer_SettingsType$ClrSchemeMapping:g2
 CUniFill:ye
-L 63:Qh
+L 63:Rh
 BULLET_TYPE_TYPEFACE_BUFONT:mk
 L 68:so
 TRACK_DISTANCE_ROTATE2:i7
@@ -3386,7 +3386,7 @@ FontProperties:oo
 JSCompiler_StaticMethods_Internal_UpdateParagraphState:N6
 c_oSer_OMathContentType$EqArrPr:j4
 L 61:Ce
-L 60:Ph
+L 60:Qh
 c_oSer_ColorType$Auto:$l
 L 99:bq
 L 95:ui
