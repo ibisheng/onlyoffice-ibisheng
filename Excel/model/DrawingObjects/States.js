@@ -199,6 +199,8 @@ function NullState(drawingObjectsController, drawingObjects)
                         this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
                         if(e.ClickCount < 2)
                             cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                        this.drawingObjects.OnUpdateOverlay();
+
                         return;
                     }
                 }
@@ -235,6 +237,8 @@ function NullState(drawingObjectsController, drawingObjects)
                             this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
                             if(e.ClickCount < 2)
                                 grouped_objects[j].updateSelectionState(this.drawingObjects.drawingDocument);
+                            this.drawingObjects.OnUpdateOverlay();
+
                             return;
                         }
                     }
@@ -447,6 +451,8 @@ function NullState(drawingObjectsController, drawingObjects)
                     this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
                     this.drawingObjects.showDrawingObjects(true);
                     this.drawingObjectsController.updateSelectionState();
+                    this.drawingObjects.OnUpdateOverlay();
+
                 }
             }
         }

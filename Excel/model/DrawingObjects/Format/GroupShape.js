@@ -1451,6 +1451,46 @@ CGroupShape.prototype =
         }
     },
 
+
+    setAllParagraphIndent: function(ind)
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].setAllParagraphIndent)
+                this.arrGraphicObjects[i].setAllParagraphIndent(ind);
+        }
+    },
+
+    setAllParagraphSpacing: function(ind)
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].setAllParagraphSpacing)
+                this.arrGraphicObjects[i].setAllParagraphSpacing(ind);
+        }
+    },
+
+    setAllParagraphTabs: function(ind)
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].setAllParagraphTabs)
+                this.arrGraphicObjects[i].setAllParagraphTabs(ind);
+        }
+    },
+
+    applyTextProps: function(props, bRecalc)
+    {
+        if(isRealObject(this.txBody))
+        {
+            for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+            {
+                if(this.arrGraphicObjects[i].applyTextProps)
+                    this.arrGraphicObjects[i].applyTextProps(props, bRecalc);
+            }
+        }
+    },
+
     getShapeProps: function()
     {
         if(this.haveShapes())

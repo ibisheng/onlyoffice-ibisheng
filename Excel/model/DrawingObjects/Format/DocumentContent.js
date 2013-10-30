@@ -4589,7 +4589,7 @@ CDocumentContent.prototype =
 
                 this.Recalculate();
 
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+               // editor.Update_ParaTab( Default_Tab_Stop, Tabs );
 
                 return;
             }
@@ -4602,12 +4602,12 @@ CDocumentContent.prototype =
                 // Нам нужно пересчитать все изменения, начиная с текущего элемента
                 this.ContentLastChangePos = this.CurPos.ContentPos;
                 this.Recalculate();
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                //editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
             else if ( type_Table == Item.GetType() )
             {
                 Item.Set_ParagraphTabs( Tabs );
-                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                //editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
         }
     },
@@ -6053,7 +6053,7 @@ CDocumentContent.prototype =
 
                 if ( null != this.Selection.Data && true === this.Selection.Data.Hyperlink )
                 {
-                    editor.sync_HyperlinkClickCallback( this.Selection.Data.Value.Get_Value() );
+                    //editor.sync_HyperlinkClickCallback( this.Selection.Data.Value.Get_Value() );
                     this.Selection.Data.Value.Set_Visited( true );
 
                     for ( var PageIdx = Item.Get_StartPage_Absolute(); PageIdx < Item.Get_StartPage_Absolute() + Item.Pages.length; PageIdx++ )
@@ -7526,7 +7526,7 @@ CDocumentContent.prototype =
 
         CollaborativeEditing.Add_LinkData( this, LinkData );
 
-        this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+        //this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
     },
 
     Load_LinkData : function(LinkData)

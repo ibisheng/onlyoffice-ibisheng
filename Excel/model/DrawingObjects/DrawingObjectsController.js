@@ -258,6 +258,113 @@ DrawingObjectsController.prototype =
         }
     },
 
+
+    setPargarphIndent: function(ind)
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                this.curState.textObject.setParagraphIndent(ind);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                var selected_objects = this.curState.group.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphIndent)
+                        selected_objects[i].setAllParagraphIndent(ind);
+                }
+                break;
+            }
+
+            default:
+            {
+                var selected_objects = this.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphIndent)
+                        selected_objects[i].setAllParagraphIndent(ind);
+                }
+                break;
+            }
+
+        }
+    },
+
+
+    setPargarphSpacing: function(ind)
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                this.curState.textObject.setParagraphSpacing(ind);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                var selected_objects = this.curState.group.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphSpacing)
+                        selected_objects[i].setAllParagraphSpacing(ind);
+                }
+                break;
+            }
+
+            default:
+            {
+                var selected_objects = this.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphSpacing)
+                        selected_objects[i].setAllParagraphSpacing(ind);
+                }
+                break;
+            }
+
+        }
+    },
+
+    setPargaraphTabs: function(ind)
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                this.curState.textObject.setParagraphTabs(ind);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                var selected_objects = this.curState.group.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphTabs)
+                        selected_objects[i].setAllParagraphTabs(ind);
+                }
+                break;
+            }
+
+            default:
+            {
+                var selected_objects = this.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    if(selected_objects[i].setAllParagraphTabs)
+                        selected_objects[i].setAllParagraphTabs(ind);
+                }
+                break;
+            }
+
+        }
+    },
+
     // Увеличение размера шрифта
     increaseFontSizeCallBack: function () {
         if(typeof this.curState.increaseFontSize === "function")
@@ -1789,8 +1896,139 @@ DrawingObjectsController.prototype =
                 }
             }
         }
+        if(props instanceof asc_CParagraphProperty)
+        {
+            // TODO: Сделать так, чтобы пересчет был всего 1 здесь
+         //   if ( "undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing )
+         //       this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( Props.ContextualSpacing );
+
+            var  Props = props;
+            if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
+                this.setPargarphIndent( Props.Ind );
+
+            if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
+                this.setCellAlign( Props.Jc );
+
+          //  if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
+          //      this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( Props.KeepLines );
+
+            //if ( undefined != Props.KeepNext && null != Props.KeepNext )
+            //    this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( Props.KeepNext );
+
+            //if ( undefined != Props.WidowControl && null != Props.WidowControl )
+            //    this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( Props.WidowControl );
+
+          //  if ( "undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore )
+          //      this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( Props.PageBreakBefore );
+
+            if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
+                this.setPargarphSpacing( Props.Spacing );
+
+          //  if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
+          //      this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
+
+         //   if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
+         //       this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
+
+            if ( undefined != Props.Tabs )
+            {
+                var Tabs = new CParaTabs();
+                Tabs.Set_FromObject( Props.Tabs.Tabs );
+                this.setPargaraphTabs( Tabs );
+            }
+
+          //  if ( undefined != Props.DefaultTab )
+          //  {
+          //      this.WordControl.m_oLogicDocument.Set_DocumentDefaultTab( Props.DefaultTab );
+          //  }
+
+
+            // TODO: как только разъединят настройки параграфа и текста переделать тут
+            var TextPr = new CTextPr();
+
+            if ( true === Props.Subscript )
+                TextPr.VertAlign = vertalign_SubScript;
+            else if ( true === Props.Superscript )
+                TextPr.VertAlign = vertalign_SuperScript;
+            else if ( false === Props.Superscript || false === Props.Subscript )
+                TextPr.VertAlign = vertalign_Baseline;
+
+            if ( undefined != Props.Strikeout )
+            {
+                TextPr.Strikeout  = Props.Strikeout;
+                TextPr.DStrikeout = false;
+            }
+
+            if ( undefined != Props.DStrikeout )
+            {
+                TextPr.DStrikeout = Props.DStrikeout;
+                if ( true === TextPr.DStrikeout )
+                    TextPr.Strikeout = false;
+            }
+
+            if ( undefined != Props.SmallCaps )
+            {
+                TextPr.SmallCaps = Props.SmallCaps;
+                TextPr.AllCaps   = false;
+            }
+
+            if ( undefined != Props.AllCaps )
+            {
+                TextPr.Caps = Props.AllCaps;
+                if ( true === TextPr.AllCaps )
+                    TextPr.SmallCaps = false;
+            }
+
+            if ( undefined != Props.TextSpacing )
+                TextPr.Spacing = Props.TextSpacing;
+
+            if ( undefined != Props.Position )
+                TextPr.Position = Props.Position;
+
+            this.paragraphAdd(new ParaTextPr(TextPr), false);
+        }
         this.drawingObjects.showDrawingObjects(true);
         this.drawingObjects.sendGraphicObjectProps();
+    },
+
+    paragraphAdd: function(paraItem, bRecalculate)
+    {
+        var cur_state  = this.curState;
+        if(cur_state.id === STATES_ID_TEXT_ADD || cur_state.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+           cur_state.textObject.paragraphAdd(paraItem, bRecalculate);
+        }
+        else
+        {
+            if(cur_state.id === STATES_ID_NULL)
+            {
+                var selected_array = this.selectedObjects;
+                if(paraItem.Type === para_TextPr)
+                {
+                    for(var sel_index = 0; sel_index < selected_array.length; ++sel_index)
+                    {
+                        selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
+                    }
+
+                }
+            }
+            else if(cur_state.id === STATES_ID_GROUP)
+            {
+                selected_array = cur_state.group.selectedObjects;
+                if(paraItem.Type === para_TextPr)
+                {
+                    for(sel_index = 0; sel_index < selected_array.length; ++sel_index)
+                    {
+                        if(typeof selected_array[sel_index].applyTextPr === "function")
+                            selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
+                    }
+                }
+            }
+            else if(cur_state.id === STATES_ID_CHART_TEXT_ADD)
+            {
+                cur_state.title.paragraphAdd(paraItem, bRecalculate);
+            }
+        }
     },
 	
 	applyColorScheme: function()

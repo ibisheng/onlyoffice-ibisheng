@@ -223,6 +223,120 @@ CShape.prototype =
         return true;
     },
 
+    setParagraphIndent: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ParagraphIndent(ind);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setAllParagraphIndent: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Set_ParagraphIndent(ind);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setParagraphSpacing: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ParagraphSpacing(ind);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setAllParagraphSpacing: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Set_ParagraphSpacing(ind);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setParagraphTabs: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ParagraphTabs(ind);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setAllParagraphTabs: function(ind)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Set_ParagraphTabs(ind);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    applyTextProps: function(props, bRecalc)
+    {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Paragraph_Add(props, bRecalc);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+
     OnContentRecalculate: function()
     {
         this.calculateContent();
