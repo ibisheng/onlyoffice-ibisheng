@@ -990,6 +990,7 @@
 				// Shapes
 				var coord = this._getCoordinates(event);
 				if ( asc["editor"].isStartAddShape ) {
+					event.fromWindow = true;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
 					return true;

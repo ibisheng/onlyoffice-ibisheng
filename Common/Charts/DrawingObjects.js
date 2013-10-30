@@ -4722,6 +4722,8 @@ function DrawingObjects() {
 	}
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
+		if ( e.fromWindow && !CheckIdTrackState(_this.controller.curState.id) )
+			return;
 		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	

@@ -61,9 +61,25 @@ ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE2] = true;
 ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE22] = true;
 ADD_SHAPE_ID_MAP[STATES_ID_ADD_PPOLY_LINE23] = true;
 
+var TRACK_SHAPE_MAP = {};
+TRACK_SHAPE_MAP[STATES_ID_ROTATE] = true;
+TRACK_SHAPE_MAP[STATES_ID_RESIZE] = true;
+TRACK_SHAPE_MAP[STATES_ID_MOVE] = true;
+TRACK_SHAPE_MAP[STATES_ID_CHANGE_ADJ] = true;
+TRACK_SHAPE_MAP[STATES_ID_CHANGE_ADJ_IN_GROUP] = true;
+TRACK_SHAPE_MAP[STATES_ID_ROTATE_IN_GROUP] = true;
+TRACK_SHAPE_MAP[STATES_ID_RESIZE_IN_GROUP] = true;
+TRACK_SHAPE_MAP[STATES_ID_MOVE_IN_GROUP] = true;
+TRACK_SHAPE_MAP[STATES_ID_MOVE_INTERNAL_CHART_OBJECT] = true;
+
 function CheckIdSatetShapeAdd(id)
 {
 	return ADD_SHAPE_ID_MAP[id] === true;
+}
+
+function CheckIdTrackState(id)
+{
+	return CheckIdSatetShapeAdd(id) || (TRACK_SHAPE_MAP[id] === true);
 }
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
