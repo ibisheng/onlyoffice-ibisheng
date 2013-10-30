@@ -23,7 +23,7 @@ function CParagraphSearchElement(StartPos, EndPos, Type)
 function CDocumentSearch()
 {
     this.Text          = "";
-    this.IsMatchCase   = false;
+    this.MatchCase     = false;
 
     this.Id            = 0;
     this.Count         = 0;
@@ -38,13 +38,13 @@ CDocumentSearch.prototype =
 {
     Set : function(Text, Props)
     {
-        this.Text        = Text;
-        this.IsMatchCase = Props.IsMatchCase;
+        this.Text      = Text;
+        this.MatchCase = Props.MatchCase;
     },
 
     Compare : function(Text, Props)
     {
-        if ( this.Text === Text && this.IsMatchCase === Props.IsMatchCase )
+        if ( this.Text === Text && this.MatchCase === Props.MatchCase )
             return true;
 
         return false;
@@ -52,8 +52,8 @@ CDocumentSearch.prototype =
 
     Clear : function()
     {
-        this.Text          = "";
-        this.IsMatchCase   = false;
+        this.Text        = "";
+        this.MatchCase   = false;
 
         // Очищаем предыдущие элементы поиска
         for ( var Id in this.Elements )
