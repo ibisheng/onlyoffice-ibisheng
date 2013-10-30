@@ -12372,6 +12372,20 @@ CTable.prototype =
         if ( true != this.RecalcInfo.TableGridOpen )
             return;
 
+        // Сначала пробежимся по всем ячейкам и посмотрим, чтобы у них были корректные GridSpan (т.е. >= 1)
+        for ( var Index = 0; Index < this.Content.length; Index++ )
+        {
+            var Row = this.Content[Index];
+            var CellsCount = Row.Get_CellsCount();
+            for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
+            {
+                var Cell = Row.Get_Cell( CellIndex );
+                var GridSpan = Cell.Get_GridSpan();
+                if ( GridSpan <= 0 )
+                    Cell.Set_GridSpan( 1 );
+            }
+        }
+
         var RowGrid = new Array();
         var GridCount = 0;
         for ( var Index = 0; Index < this.Content.length; Index++ )

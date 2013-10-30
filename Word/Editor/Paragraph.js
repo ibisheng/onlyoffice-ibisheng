@@ -9263,8 +9263,15 @@ Paragraph.prototype =
         {
             if ( undefined != this.Pr.NumPr.NumId && 0 != this.Pr.NumPr.NumId )
             {
-                Pr.ParaPr.Merge( Numbering.Get_ParaPr( this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl ) );
                 Lvl = this.Pr.NumPr.Lvl;
+
+                if ( Lvl >= 0 && Lvl <= 8 )
+                    Pr.ParaPr.Merge( Numbering.Get_ParaPr( this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl ) );
+                else
+                {
+                    Lvl = -1;
+                    Pr.ParaPr.NumPr = undefined;
+                }
             }
         }
         else if ( undefined != Pr.ParaPr.NumPr )

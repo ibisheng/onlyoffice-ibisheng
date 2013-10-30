@@ -6666,6 +6666,7 @@ CDocument.prototype =
                         var Start = this.Selection.StartPos;
                         var End   = this.Selection.EndPos;
 
+
                         if ( Start > End )
                         {
                             var Temp = Start;
@@ -8747,6 +8748,8 @@ CDocument.prototype =
         this.DrawingDocument.TargetEnd();
         this.DrawingDocument.SetCurrentPage( this.CurPage );
 
+        this.Selection.Start = false;
+        this.Selection.Use   = true;
         this.CurPos.Type = docpostype_DrawingObjects;
         this.DrawingObjects.selectById( Id, this.CurPage );
 

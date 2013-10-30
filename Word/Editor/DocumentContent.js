@@ -6679,6 +6679,8 @@ CDocumentContent.prototype =
         else
             this.LogicDocument.CurPos.Type = docpostype_DrawingObjects;
 
+        this.LogicDocument.Selection.Use   = true;
+        this.LogicDocument.Selection.Start = false;
         this.LogicDocument.DrawingObjects.selectById( Id, this.Get_StartPage_Absolute() + this.CurPage );
 
         // TODO: Пока сделаем так, в будущем надо сделать функцию, которая у родительского класса обновляет Select

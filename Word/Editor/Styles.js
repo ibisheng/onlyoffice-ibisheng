@@ -7909,6 +7909,9 @@ CParaPr.prototype =
                 this.NumPr = ParaPr.NumPr.Copy();
             else
                 this.NumPr.Merge( ParaPr.NumPr );
+
+            if ( undefined != this.NumPr && this.NumPr.Lvl > 8 )
+                this.NumPr = undefined;
         }
 
         if ( undefined != ParaPr.PStyle )
