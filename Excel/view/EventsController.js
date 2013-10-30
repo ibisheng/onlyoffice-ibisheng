@@ -1119,16 +1119,15 @@
 					if ( t.isCellEditMode )
 						t.handlers.trigger("stopCellEditing");
 					
-					if (2 === event.button)
-						t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
-					else
-						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
-					return;
+					//if (2 === event.button)
+					//	t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+					//else
+					//	t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
+					
+					if ( asc["editor"].isStartAddShape )
+						return;
 				}
-				else if ( t.targetInfo && t.targetInfo.target != "moveResizeRange" ) {
-					t.handlers.trigger("resetSelectedGraphicObjects");
-				}
-
+				
 				if (event.originalEvent && 2 === event.originalEvent.detail) {
 					// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
 					// Порядок эвентов для dblClick - http://javascript.ru/tutorial/events/mouse#dvoynoy-levyy-klik

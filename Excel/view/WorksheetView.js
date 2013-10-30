@@ -5720,7 +5720,7 @@
 				cell_info.flags.wrapText = c.getWrap();
 				
 				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
-				if ( graphicObjects.length == 1 )
+				if ( graphicObjects.length )
 					cell_info.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
 				else
 					cell_info.flags.selectionType = this.activeRange.type;

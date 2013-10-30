@@ -2982,7 +2982,7 @@ function DrawingObjects() {
         return trackOverlay;
     };
 
-    _this.OnUpdateOverlay = function() {
+    _this.OnUpdateOverlay = function(bFull) {
         
         var overlay = trackOverlay;
 		var ctx = overlay.m_oContext;
@@ -2991,10 +2991,7 @@ function DrawingObjects() {
         overlay.Clear();
         this.drawingDocument.Overlay = overlay;
 		
-		// Clip
-		_this.clipGraphicsCanvas(shapeOverlayCtx);
-		
-		var bFullClear = (_this.controller.curState.id != STATES_ID_TEXT_ADD) && (_this.controller.curState.id != STATES_ID_TEXT_ADD_IN_GROUP);
+		var bFullClear = bFull || (_this.controller.curState.id != STATES_ID_TEXT_ADD) && (_this.controller.curState.id != STATES_ID_TEXT_ADD_IN_GROUP);
 
 		if ( bFullClear )
 			shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
@@ -3006,6 +3003,9 @@ function DrawingObjects() {
 				shapeOverlayCtx.m_oContext.clearRect( mmToPx(boundsChecker.Bounds.min_x) + scrollOffset.getX(), mmToPx(boundsChecker.Bounds.min_y) + scrollOffset.getY(), mmToPx(_w), mmToPx(_h) );
 			}
 		}
+		
+		// Clip
+		_this.clipGraphicsCanvas(shapeOverlayCtx);
 		
 		worksheet._drawCollaborativeElements(false);
 		
@@ -4501,11 +4501,41 @@ function DrawingObjects() {
 			response.x = Math.abs(x);
 		}
 		
+		/* Проверки на максимум в листе */
+		function isMaxCol() {
+			var result = false;
+			if ( worksheet.cols.length >= gc_nMaxCol ) {
+				var lastCol = worksheet.cols[gc_nMaxCol - 1];
+				if ( mmToPt(x + w) + scrollX > lastCol.left ) {
+					response.result = false;
+					response.x = ptToMm( lastCol.left - (mmToPt(x + w) + scrollX) );
+					result = true;
+				}
+			}
+			return result;
+		}
+		
+		function isMaxRow() {
+			var result = false;
+			if ( worksheet.rows.length >= gc_nMaxRow ) {
+				var lastRow = worksheet.rows[gc_nMaxRow - 1];
+				if ( mmToPt(y + h) + scrollY > lastRow.top ) {
+					response.result = false;
+					response.y = ptToMm( lastCol.top - (mmToPt(y + h) + scrollY) );
+					result = true;
+				}
+			}
+			return result;
+		}
+		//
+		
 		// выход за границу справа
 		if ( x + w > right ) {
 			var scrollX = scrollOffset.getX();
 			var foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
 			while ( foundCol == null ) {
+				if ( isMaxCol() )
+					break;
 				worksheet.expandColsOnScroll(true);
 				worksheet._trigger("reinitializeScrollX");
 				foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
@@ -4516,6 +4546,8 @@ function DrawingObjects() {
 			var scrollY = scrollOffset.getY();
 			var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
 			while ( foundRow == null ) {
+				if ( isMaxRow() )
+					break;
 				worksheet.expandRowsOnScroll(true);
 				worksheet._trigger("reinitializeScrollY");
 				foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
@@ -4589,7 +4621,9 @@ function DrawingObjects() {
 			autoShapeTrack.Graphics.m_oCoordTransform.ty = y;
 			autoShapeTrack.Graphics.CalculateFullTransform();
             this.controller.recalculateCurPos();
-            this.controller.updateSelectionState();
+			
+			if ( _this.selectedGraphicObjectsExists() )
+				this.controller.updateSelectionState();
 		}
 	}
 	
@@ -5271,13 +5305,34 @@ function CoordsManager(ws, bLog) {
 		var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 		var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 		
+		/* Проверки на максимум в листе */
+		function isMaxCol() {
+			var result = false;
+			if ( worksheet.cols.length >= gc_nMaxCol )
+				result = true;
+			return result;
+		}
+		
+		function isMaxRow() {
+			var result = false;
+			if ( worksheet.rows.length >= gc_nMaxRow )
+				result = true;
+			return result;
+		}
+		//
+		
 		var delta = 0;
 		var col = worksheet._findColUnderCursor( xPt - offsetX, true );
 		while (col == null) {
+			if ( isMaxCol() ) {
+				col = worksheet._findColUnderCursor( worksheet.cols[gc_nMaxCol - 1].left - 1, true );
+				break;
+			}
 			worksheet.expandColsOnScroll(true);
 			worksheet._trigger("reinitializeScrollX");
 			col = worksheet._findColUnderCursor( xPt - offsetX + delta, true );
-			delta++;
+			if ( xPt - offsetX < 0 )
+				delta++;
 		}
 		cell.col = col.col;
 		cell.colOffPx = Math.max(0, _x - worksheet.getCellLeft(cell.col, 0));
@@ -5286,10 +5341,15 @@ function CoordsManager(ws, bLog) {
 		delta = 0;
 		var row = worksheet._findRowUnderCursor( yPt - offsetY, true );
 		while (row == null) {
+			if ( isMaxRow() ) {
+				row = worksheet._findRowUnderCursor( worksheet.rows[gc_nMaxRow - 1].top - 1, true );
+				break;
+			}
 			worksheet.expandRowsOnScroll(true);
 			worksheet._trigger("reinitializeScrollY");
 			row = worksheet._findRowUnderCursor( yPt - offsetY + delta, true );
-			delta++;
+			if ( yPt - offsetY < 0 )
+				delta++;
 		}
 		cell.row = row.row;
 		cell.rowOffPx = Math.max(0, _y - worksheet.getCellTop(cell.row, 0));
