@@ -745,6 +745,12 @@ function CEditorPage(api)
         oWordControl.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, type);
         oWordControl.m_bIsUpdateTargetNoAttack = true;
         oWordControl.m_bIsRePaintOnScroll = true;
+
+        if (oWordControl.m_oLogicDocument)
+        {
+            oWordControl.m_oLogicDocument.redrawCharts();
+        }
+
         oWordControl.OnScroll();
 
         if (!oWordControl.m_oDrawingDocument.IsEmptyPresentation)

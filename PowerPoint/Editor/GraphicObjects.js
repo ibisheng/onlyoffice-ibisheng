@@ -1775,7 +1775,7 @@ CGraphicObjects.prototype = {
 
     redrawCharts: function()
     {
-        var sp_tree = this.slide.cSlcd.spTree;
+        var sp_tree = this.slide.cSld.spTree;
         for(var i = 0; i < sp_tree.length; ++i)
         {
             var sp = sp_tree[i];
