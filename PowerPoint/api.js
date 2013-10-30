@@ -3976,8 +3976,9 @@ asc_docs_api.prototype.DublicateSlide = function()
     copy_processor.oPresentationWriter.End_UseFullUrl();
     copy_processor.Start();
     var oPasteProcessor = new PasteProcessor(this, true, true, false);
+    //oPasteProcessor.End_UseFullUrl();
     History.Create_NewPoint();
-    oPasteProcessor.Start(copy_processor.ElemToSelect, copy_processor.ElemToSelect);
+    oPasteProcessor.Start(copy_processor.ElemToSelect, copy_processor.ElemToSelect, true);
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 }
 

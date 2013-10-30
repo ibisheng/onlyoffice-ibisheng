@@ -2226,7 +2226,9 @@ asc_CParagraphTabs.prototype = {
 	asc_getCount: function (){ return this.Tabs.length; },
 	asc_getTab: function (Index){ return this.Tabs[Index]; },
 	asc_addTab: function (Tab){ this.Tabs.push(Tab) },
-	asc_clear: function (){ this.Tabs.length = 0; }
+	asc_clear: function (){ this.Tabs.length = 0; },
+    add_Tab: function (Tab){ this.Tabs.push(Tab) },
+
 }
 
 //{ asc_CParagraphTabs export
@@ -2238,6 +2240,8 @@ prot["asc_getCount"] = prot.asc_getCount;
 prot["asc_getTab"] = prot.asc_getTab;
 prot["asc_addTab"] = prot.asc_addTab;
 prot["asc_clear"] = prot.asc_clear;
+prot["add_Tab"] = prot.add_Tab;
+
 //}
 
 //-----------------------------------------------------------------------------------

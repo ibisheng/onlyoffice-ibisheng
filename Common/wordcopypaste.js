@@ -3224,7 +3224,7 @@ PasteProcessor.prototype =
 			aPrepeareImages.push(i);
 		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};
 	},
-	Start : function(node, nodeDisplay)
+	Start : function(node, nodeDisplay, bDuplicate)
     {
 		if(g_bIsDocumentCopyPaste)
         {
@@ -3574,7 +3574,8 @@ PasteProcessor.prototype =
                             var arr_layouts_id = [];
                             var arr_slides = [];
                             var loader = new BinaryPPTYLoader();
-                            loader.Start_UseFullUrl();
+                            if(!(bDuplicate === true))
+                                loader.Start_UseFullUrl();
                             loader.stream = stream;
                             loader.presentation = editor.WordControl.m_oLogicDocument;
                             var slide_count = stream.GetULong();
