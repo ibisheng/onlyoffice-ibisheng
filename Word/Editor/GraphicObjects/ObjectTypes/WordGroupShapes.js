@@ -2866,7 +2866,8 @@ WordGroupShapes.prototype =
     hit: function(x, y)
     {
         if(isRealObject(this.parent) && isRealObject(this.parent.Parent) && isRealObject(this.parent.Parent.Parent)
-            && this.parent.Parent.Parent instanceof CDocumentContent && this.parent.wrappingType !== WRAPPING_TYPE_NONE && !(this.parent.Parent.Parent.Is_HdrFtr() && this.parent.Parent.Parent.Is_TopDocument()))
+            && this.parent.Parent.Parent instanceof CDocumentContent && this.parent.wrappingType !== WRAPPING_TYPE_NONE
+            && (!(this.parent.Parent.Parent.Is_HdrFtr() || this.parent.Is_Inline()))  && !this.parent.Parent.Parent.Is_TopDocument())
         {
             var tx, ty;
             var b_check = false;
