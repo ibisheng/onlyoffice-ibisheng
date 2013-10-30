@@ -2227,8 +2227,7 @@ asc_CParagraphTabs.prototype = {
 	asc_getTab: function (Index){ return this.Tabs[Index]; },
 	asc_addTab: function (Tab){ this.Tabs.push(Tab) },
 	asc_clear: function (){ this.Tabs.length = 0; },
-    add_Tab: function (Tab){ this.Tabs.push(Tab) },
-
+    add_Tab: function (Tab){ this.Tabs.push(Tab) }
 }
 
 //{ asc_CParagraphTabs export
