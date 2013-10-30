@@ -3189,14 +3189,20 @@ UndoRedoWoorksheet.prototype = {
 			else{
 				ws._moveRange(from, to);
 			}
-			if(bUndo)
+			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			if(bUndo)//если на Undo перемещается диапазон из форматированной таблицы - стиль форматированной таблицы не должен цепляться
 			{
-				if(g_oUndoRedoAutoFiltersMoveData)
-				{
-					var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-					worksheetView.autoFilters._moveAutoFilters(null, null, g_oUndoRedoAutoFiltersMoveData);
-					g_oUndoRedoAutoFiltersMoveData = null;
-				}
+				worksheetView.autoFilters._clearFormatTableStyle(to);
+			}
+			if(g_oUndoRedoAutoFiltersMoveData)
+			{
+				worksheetView.autoFilters._moveAutoFilters(null, null, g_oUndoRedoAutoFiltersMoveData);
+				g_oUndoRedoAutoFiltersMoveData = null;
+			}
+			else
+			{
+				worksheetView.autoFilters.reDrawFilter(to);
+				worksheetView.autoFilters.reDrawFilter(from);
 			}
 		}
 		else if(historyitem_Worksheet_Merge == Type || historyitem_Worksheet_Unmerge == Type)

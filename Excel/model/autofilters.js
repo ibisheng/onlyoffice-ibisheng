@@ -6615,6 +6615,22 @@
 						return true;
 				}
 				return false;
+			},
+			
+			_clearFormatTableStyle: function(range)
+			{
+				if(range && typeof range == 'object')
+				{
+					var ws = this.worksheet;
+					for(var i = range.r1; i <= range.r2; i++)
+					{
+						for(var n = range.c1; n <= range.c2; n++)
+						{
+							var cell = ws.model._getCell(i, n);
+							cell.setTableStyle(null);
+						}
+					};
+				};
 			}
 		};
 
