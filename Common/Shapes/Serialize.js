@@ -477,7 +477,11 @@ function BinaryPPTYLoader()
 
             var _sm_count = s.GetULong();
             for (var i = 0; i < _sm_count; i++)
+            {
                 this.presentation.slideMasters[i] = this.ReadSlideMaster();
+                this.presentation.slideMasters[i].Width = this.presentation.Width;
+                this.presentation.slideMasters[i].Height = this.presentation.Height;
+            }
         }
 
         if (undefined != _main_tables["23"])
