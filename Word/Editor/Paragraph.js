@@ -8881,8 +8881,8 @@ Paragraph.prototype =
 
             History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
 
-            var Left      = ParaPr.Ind.Left;
-            var FirstLine = ParaPr.Ind.FirstLine;
+            var Left      = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.Left );
+            var FirstLine = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.FirstLine );
 
             History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : Left      } );
             History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : FirstLine } );
