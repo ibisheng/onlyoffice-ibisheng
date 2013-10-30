@@ -5026,6 +5026,10 @@ asc_docs_api.prototype.ImgApply = function(obj)
     {
         if(!this.noCreatePoint)
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+        if (ImagePr.ShapeProperties)
+            ImagePr.ImageUrl = "";
+
         if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
         {
             var _img = this.ImageLoader.LoadImage(ImagePr.ImageUrl, 1)
