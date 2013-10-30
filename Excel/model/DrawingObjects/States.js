@@ -2532,7 +2532,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                 var gr_obj = this.majorObject;
                 if(gr_obj.isChart())
                 {
-                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects, gr_obj));
+                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects, gr_obj, x, y));
 					asc["editor"].asc_endAddShape();
                     return;
                     /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
@@ -2590,13 +2590,15 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     };
 }
 
-function ExtpectDoubleClickState(drawingObjectsController, drawingObjects, chart)
+function ExtpectDoubleClickState(drawingObjectsController, drawingObjects, chart, x, y)
 {
     this.id = STATES_ID_EXPECT_DOUBLE_CLICK;
     this.drawingObjects = drawingObjects;
     this.drawingObjectsController = drawingObjectsController;
     this.nullState = new NullState(drawingObjectsController, drawingObjects);
     this.chart = chart;
+	this.x = x;
+	this.y = y;
     this.onMouseDown = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
@@ -2613,6 +2615,8 @@ function ExtpectDoubleClickState(drawingObjectsController, drawingObjects, chart
 
     this.onMouseMove = function(e, x, y)
     {
+		if(this.x === x && this.y === y)
+			return;
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjectsController.onMouseMove(e, x, y);
     };
