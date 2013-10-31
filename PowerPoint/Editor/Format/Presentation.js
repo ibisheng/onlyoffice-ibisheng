@@ -5498,7 +5498,8 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
-                editor.sync_DocSizeCallback(this.Width, this.Height);
+                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+
                 if(b_is_on)
                 {
                     History.TurnOn();
@@ -5568,7 +5569,8 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
-                editor.sync_DocSizeCallback(this.Width, this.Height);
+                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+
                 if(b_is_on)
                 {
                     History.TurnOn();
@@ -6200,7 +6202,9 @@ CPresentation.prototype =
                 History.TurnOn();
             }
             this.Recalculate();
-            editor.sync_DocSizeCallback(this.Width, this.Height);
+            editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+
+            //editor.sync_DocSizeCallback(this.Width, this.Height);
         }
     },
 
@@ -6767,7 +6771,8 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
-                editor.sync_DocSizeCallback(this.Width, this.Height);
+                //editor.sync_DocSizeCallback(this.Width, this.Height);
+                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
                 if(b_is_on)
                 {
                     History.TurnOn();

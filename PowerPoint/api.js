@@ -50,6 +50,7 @@ function asc_docs_api(name)
     this.DocumentUrl = "";
     this.DocumentName = "";
 	this.DocInfo = null;
+    this.bNoSendComments = false;
 
     this.IsSupportEmptyPresentation = true;
         
@@ -815,7 +816,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "safsfsdfsdfsdasdasdasdfsdf3";
+        documentId = "safsasdasdfsdfsdfsdasdasdasdfsdf3";
         this.OfflineAppDocumentStartLoad();
 
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
@@ -3496,8 +3497,11 @@ asc_docs_api.prototype.sync_RemoveComment = function(Id)
 
 asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
 {
-    var AscCommentData = new asc_CCommentData(CommentData);
-    this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
+    if(this.bNoSendComments === false)
+    {
+        var AscCommentData = new asc_CCommentData(CommentData);
+        this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
+    }
 }
 
 asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
@@ -3729,8 +3733,10 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
             if(this.LoadedObject === 1)
             {
+                this.bNoSendComments = true;
                 CollaborativeEditing.Apply_Changes();
                 CollaborativeEditing.Release_Locks();
+                this.bNoSendComments = false;
             }
             this.WordControl.m_oLogicDocument.RecalculateAfterOpen();
             var presentation = this.WordControl.m_oLogicDocument;
