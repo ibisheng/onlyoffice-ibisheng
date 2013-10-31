@@ -5779,6 +5779,14 @@
 						case align_Justify	: horAlign = "justify";	break;
 					}
 					var vertAlign = "center";
+					switch (paraPr.anchor) {
+						case VERTICAL_ANCHOR_TYPE_BOTTOM:			vertAlign = "bottom"; break;
+						case VERTICAL_ANCHOR_TYPE_CENTER:			vertAlign = "center"; break;
+						
+						case VERTICAL_ANCHOR_TYPE_TOP:
+						case VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
+						case VERTICAL_ANCHOR_TYPE_JUSTIFIED:		vertAlign = "top"; break;
+					}
 
 					objectInfo.halign = horAlign;
 					objectInfo.valign = vertAlign;
