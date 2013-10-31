@@ -277,7 +277,7 @@ _ph_summ__two_col_tx:CW
 NumComporationOperators$less:Wc
 c_oMainTables$ImageMap:oZ
 nVertTTvert:UW
-FT_GlyphLoader_New:Ek
+FT_GlyphLoader_New:yk
 ScrollArrowType$ARROW_RIGHT:qS
 asc_CChartLegend:af
 SLIDE_KIND:dT
@@ -1035,7 +1035,7 @@ NumComporationOperators$greaterorequal:Xc
 Round_To_Half_Grid:Wr
 c_oSer_Comments$LeftOffset:cI
 cff_face_init:Tu
-g_oIdCounter:ff
+g_oIdCounter:bf
 asc_CCommentData:cP
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V:b8
 tt_size_done_bytecode:ur
@@ -1940,7 +1940,7 @@ CChartLegend:V3
 tt_service_gx_multi_masters:zt
 _cff_check_points:cv
 Ins_SHZ:rs
-numbering_numfmt_Decimal:p4
+numbering_numfmt_Decimal:q4
 c_oSerTableTypes$CalcChain:WC
 c_oAscChartType$bar:ge
 fonthint_Default:j5
@@ -2746,7 +2746,7 @@ c_oSerWorksheetPropTypes$Name:TE
 L 116:kh
 ParaNewLine:Hi
 L 117:Ie
-L 114:Dk
+L 114:Ek
 L 115:Xv
 c_Date1900Const:zB
 JSCompiler_StaticMethods_addMasterEdge:WN
@@ -2778,8 +2778,8 @@ g_tabtype_left:yZ
 JSCompiler_StaticMethods_startRecalculate:LN
 ft_sid_names:Yl
 T1_Decoder_ZoneRec:Qn
-L 102:ef
-L 101:df
+L 102:ff
+L 101:ef
 c_oAscAsyncAction$Recalc:ez
 L 100:wi
 c_oAscBorderStyles$Thin:pz
@@ -2792,7 +2792,7 @@ Binary_StylesTableReader:LL
 ShapeForResizeInGroup:f8
 ChangeAdjInGroupState:z2
 L 111:Oh
-L 110:Ck
+L 110:Dk
 L 113:Rf
 bIsSupportOriginalFormatFonts:Ex
 L 112:Ph
@@ -2874,7 +2874,7 @@ Read_CVT:Ts
 EHorizontalAlignment:hK
 historyitem_Worksheet_RemoveCols:EQ
 nSldLtTDgm:zV
-FT_PEEK_ULONG:Cj
+FT_PEEK_ULONG:Aj
 para_PresentationNumbering:yi
 EBorderStyle$borderstyleDouble:DJ
 _t1_parse_dict:jw
@@ -3048,7 +3048,7 @@ AscBrowser$isGecko:la
 L 22:Y
 L 25:M
 L 24:ca
-L 50:zk
+L 50:Ak
 tt_size_reset:Rt
 recalcresult_PrevPage:V6
 LineEndType$None:hU
@@ -3067,7 +3067,7 @@ L 56:eg
 L 55:Zc
 L 54:Ic
 L 53:Dc
-L 52:Aj
+L 52:Bj
 L 51:Xg
 FT_TT_SERVICES_GET:Bt
 FT_Memory:pj
@@ -3076,7 +3076,7 @@ JSCompiler_StaticMethods_Internal_CalculateAutoSpacing:B7
 FontStyle$FontStyleRegular:lx
 GX_BlendRec:bt
 rgCols:Ub
-L 49:yk
+L 49:zk
 c_oSerHyperlinkTypes$Tooltip:hF
 L 48:Gb
 L 45:se
@@ -3210,14 +3210,14 @@ ETableStyleType$tablestyletypeFirstRowStripe:yK
 TT_Face:$s
 L 73:ao
 JSCompiler_StaticMethods__moveCellVer:DP
-L 74:Ak
+L 74:Bk
 L 75:th
 Int64:Kj
 L 76:bo
 JSCompiler_StaticMethods_rebuildSeries:pf
 _ph_summ__sec_head:zW
 L 77:uh
-L 78:bf
+L 78:df
 t1_args_count:Cn
 L 79:tb
 c_oAscSelectionType$RangeShape:Yh
@@ -3255,7 +3255,7 @@ L 61:Bb
 L 60:Qc
 c_oSer_ColorType$Auto:iG
 JSCompiler_StaticMethods_Calculate_X_Value:$f
-L 99:Bj
+L 99:Cj
 L 95:Qb
 c_oSer_SheetPr$FilterMode:rJ
 L 96:Qf
@@ -3295,7 +3295,7 @@ c_oEditorId$Speadsheet:ra
 c_oSer_BasicChartType$Series:q_
 CellValueType$Number:xa
 L 83:fg
-L 82:Bk
+L 82:Ck
 c_oSerPropLenType$Byte:aL
 L 81:ue
 CGeometry:$U
