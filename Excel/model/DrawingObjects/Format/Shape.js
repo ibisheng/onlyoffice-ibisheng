@@ -900,7 +900,7 @@ CShape.prototype =
             this.calculateTransformTextMatrix();
 						this.recalculateCurPos();
 
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddredo, null, null,
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
     },
