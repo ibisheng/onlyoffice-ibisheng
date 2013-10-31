@@ -5093,7 +5093,8 @@
 						x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
 						y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
 						// Мы на "квадрате" для автозаполнения
-						return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
+						if ( !this.objectRender.selectedGraphicObjectsExists() )
+							return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
 					}
 
 					var xWithOffset = x + offsetX;
@@ -5114,7 +5115,8 @@
 							(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
 							null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px))) {
 							// Мы навели на границу выделения
-							return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
+							if ( !this.objectRender.selectedGraphicObjectsExists() )
+								return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 						}
 					}
 

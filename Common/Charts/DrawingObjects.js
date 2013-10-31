@@ -3671,6 +3671,7 @@ function DrawingObjects() {
 				}
 				
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				worksheet.setSelectionShape(true);
 			}
 			
 			if (null != _image) {
@@ -3735,7 +3736,9 @@ function DrawingObjects() {
 
 		if ( _this.isViewerMode() )
 			return;
-
+		
+		worksheet.setSelectionShape(true);
+		
 		if ( chart instanceof asc_CChart ) {
 			var _range = convertFormula(chart.range.interval, worksheet);
 			if ( _range )
