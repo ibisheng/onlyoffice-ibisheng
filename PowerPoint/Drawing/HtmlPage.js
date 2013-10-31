@@ -2885,6 +2885,11 @@ function CEditorPage(api)
         this.CheckLayouts();
 
         this.SlideDrawer.CheckSlide(drDoc.SlideCurrent);
+
+        this.m_oApi.sync_BeginCatchSelectedElements();
+        this.m_oApi.sync_slidePropCallback(this.m_oLogicDocument.Slides[drDoc.SlideCurrent]);
+        this.m_oApi.sync_EndCatchSelectedElements();
+
         this.CalculateDocumentSize(false);
 
         this.Thumbnails.SelectPage(lPageNum);
