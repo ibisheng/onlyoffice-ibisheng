@@ -1002,6 +1002,7 @@ function BinaryChartWriter(memory)
 			var oTemp = xAxis;
 			xAxis = yAxis;
 			yAxis = oTemp;
+			oTemp = xAxisTitle;
 			xAxisTitle = yAxisTitle;
 			yAxisTitle = oTemp;
 		}
