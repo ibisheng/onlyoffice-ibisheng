@@ -2976,7 +2976,7 @@ PasteProcessor.prototype =
         for(var i = 0; i < aNewContent.length; ++i)
         {
             aNewContent[i].Clear_TextFormatting();
-            aNewContent[i].Clear_Formatting();
+            aNewContent[i].Clear_Formatting(true);
         }
         oDoc.Remove(1, true, true);
         var Item = oDoc.Content[oDoc.CurPos.ContentPos];
@@ -3056,8 +3056,13 @@ PasteProcessor.prototype =
                     var nNewContentPos = oInsLastPar.Content.length - 2;
                     //�������� �������� ���������� ��������� ��������� � ���������  ����������� ��������
                     //CopyPr - �� ������� � �������, �.�. � ������� ��������� ������� ����� ��������� � ��������
+                    var ind = oInsLastPar.Pr.Ind;
                     if(null != oInsLastPar)
                         oSourceLastPar.CopyPr( oInsLastPar );
+                    if(oInsLastPar.bullet)
+                    {
+                        oInsLastPar.Set_Ind(ind);
+                    }
                     oInsLastPar.Concat(oSourceLastPar);
                     oInsLastPar.CurPos.ContentPos = nNewContentPos;
                     oSourceLastPar = oInsLastPar;
@@ -3092,6 +3097,7 @@ PasteProcessor.prototype =
 		var content = oDoc.Content;
 		for(var  i = 0;  i < content.length; ++i)
 		{
+            content[i].Recalc_CompiledPr();
 			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
 		}
 	},
