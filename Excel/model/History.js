@@ -412,8 +412,6 @@ CHistory.prototype =
 		var oSelectRange = null;
 		if(null != Point.SelectRange)
 			oSelectRange = Point.SelectRange;
-		for(var i in Point.Triggers)
-			this.workbook.handlers.trigger.apply(this.workbook.handlers, Point.Triggers[i]);
 		for(var i in Point.UpdateRigions)
 		{
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
@@ -507,8 +505,6 @@ CHistory.prototype =
 		}
 		if(null == Point)
 			return;
-		for(var i in Point.Triggers)
-			this.workbook.handlers.trigger.apply(this.workbook.handlers, Point.Triggers[i]);
 		var oSelectRange = null;
 		if(null != Point.SelectRangeRedo)
 			oSelectRange = Point.SelectRangeRedo;
@@ -567,7 +563,6 @@ CHistory.prototype =
         var Time  = new Date().getTime();
 		this.CurPoint = {
             Items : Items, // Массив изменений, начиная с текущего момента
-			Triggers : new Array(),
 			UpdateRigions : UpdateRigions,
 			nLastSheetId : null,
 			SelectRange : null,
@@ -617,26 +612,7 @@ CHistory.prototype =
 		if(1 == oCurPoint.Items.length)
 			this._sendCanUndoRedo();
     },
-	
-	AddTrigger : function(aArgs)
-    {
-        if ( 0 !== this.TurnOffHistory )
-            return;
 
-        if ( null == this.CurPoint )
-            return;
-		var bEqual = false;
-		for(var i = 0, length = this.CurPoint.Triggers.length; i < length; ++i)
-		{
-			if(Asc.isEqual(aArgs, this.CurPoint.Triggers[i]))
-			{
-				bEqual = true;
-				break;
-			}
-		}
-		if(false == bEqual)
-			this.CurPoint.Triggers.push(aArgs);
-    },
 	_sendCanUndoRedo : function()
 	{
 		this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
