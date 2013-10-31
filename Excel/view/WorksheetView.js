@@ -5648,6 +5648,11 @@
 			},
 
 			getSelectionInfo: function (bExt) {
+				return this.objectRender.selectedGraphicObjectsExists() ?
+					this._getSelectionInfoObject(bExt) : this._getSelectionInfoCell(bExt);
+			},
+
+			_getSelectionInfoCell: function (bExt) {
 				var c_opt = this.settings.cells;
 				var activeCell = this.activeRange;
 				var mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol);
@@ -5666,42 +5671,15 @@
 				var fa = c.getFontAlign().toLowerCase();
 				var cellType = c.getType();
 				var isNumberFormat = (!cellType || CellValueType.Number === cellType);
-				
-				var isGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-				var textPr = this.objectRender.controller.getParagraphTextPr();
-				var paraPr = this.objectRender.controller.getParagraphParaPr();
 
 				var cell_info = new asc_CCellInfo();
 				cell_info.name =  this._getColumnTitle(c1) + this._getRowTitle(r1);
 				cell_info.formula = c.getFormula();
 				
-				if ( isGraphicObject && textPr && paraPr )
-					cell_info.text = this.objectRender.controller.Get_SelectedText();
-				else
-					cell_info.text = c.getValueForEdit();
+				cell_info.text = c.getValueForEdit();
 
-				if (isGraphicObject && textPr && paraPr) {
-					
-					var horAlign = "center";
-					switch (paraPr.Jc) {
-						case align_Left:						horAlign = "left";			break;
-						case align_Right:						horAlign = "right";			break;
-						case align_Center:						horAlign = "center";		break;
-						case align_Justify:						horAlign = "justify";		break;
-					}					
-					var vertAlign = "center";
-					/*switch (textPr.VertAlign) {
-						case VERTICAL_ANCHOR_TYPE_TOP:			vertAlign = "top";			break;
-						case VERTICAL_ANCHOR_TYPE_CENTER:		vertAlign = "center";		break;
-						case VERTICAL_ANCHOR_TYPE_BOTTOM:		vertAlign = "bottom";		break;
-					}*/
-					
-					cell_info.halign = horAlign;
-					cell_info.valign = vertAlign;
-				} else {
-					cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
-					cell_info.valign = c.getAlignVertical().toLowerCase();
-				}
+				cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
+				cell_info.valign = c.getAlignVertical().toLowerCase();
 				
 				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell);
 				cell_info.styleName = c.getStyleName();
@@ -5711,38 +5689,20 @@
 				cell_info.flags.shrinkToFit = c.getShrinkToFit();
 				cell_info.flags.wrapText = c.getWrap();
 				
-				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
-				if (graphicObjects.length)
-					cell_info.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
-				else
-					cell_info.flags.selectionType = this.activeRange.type;
+				cell_info.flags.selectionType = this.activeRange.type;
 				
 				cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
 				cell_info.font = new asc_CFont();
-
-				if (isGraphicObject && textPr && paraPr) {
-					cell_info.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
-					cell_info.font.size = textPr.FontSize;
-					cell_info.font.bold = textPr.Bold;
-					cell_info.font.italic = textPr.Italic;
-					cell_info.font.underline = textPr.Underline;
-					cell_info.font.strikeout = textPr.Strikeout;
-					cell_info.font.subscript = textPr.VertAlign == vertalign_SubScript;
-					cell_info.font.superscript = textPr.VertAlign == vertalign_SuperScript;
-					if (textPr.Color)
-						cell_info.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
-				} else {
-					cell_info.font.name = c.getFontname();
-					cell_info.font.size = c.getFontsize();
-					cell_info.font.bold = c.getBold();
-					cell_info.font.italic = c.getItalic();
-					cell_info.font.underline = ("none" !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
-					cell_info.font.strikeout = c.getStrikeout();
-					cell_info.font.subscript = fa === "subscript";
-					cell_info.font.superscript = fa === "superscript";
-					cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
-				}
+				cell_info.font.name = c.getFontname();
+				cell_info.font.size = c.getFontsize();
+				cell_info.font.bold = c.getBold();
+				cell_info.font.italic = c.getItalic();
+				cell_info.font.underline = ("none" !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
+				cell_info.font.strikeout = c.getStrikeout();
+				cell_info.font.subscript = fa === "subscript";
+				cell_info.font.superscript = fa === "superscript";
+				cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
 
 				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_obj2Color(bg) : bg);
 
@@ -5766,22 +5726,6 @@
 					oHyperlink = new asc_CHyperlink(hyperlink);
 					oHyperlink.asc_setText(cell_info.text);
 					cell_info.hyperlink = oHyperlink;
-				} else if (isGraphicObject && textPr) {
-					var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
-					if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart)) {
-						
-						hyperlink = new Hyperlink();
-						hyperlink.Tooltip = shapeHyperlink.ToolTip;
-						
-						var spl = shapeHyperlink.Value.split("!");
-						if (spl.length === 2) {
-							hyperlink.setLocation(shapeHyperlink.Value);
-						} else
-							hyperlink.Hyperlink = shapeHyperlink.Value;
-						
-						oHyperlink = new asc_CHyperlink(hyperlink);
-						cell_info.hyperlink = oHyperlink;
-					}
 				} else
 					cell_info.hyperlink = null;
 
@@ -5810,6 +5754,67 @@
 				}
 
 				return cell_info;
+			},
+
+			_getSelectionInfoObject: function (bExt) {
+				var objectInfo = new asc_CCellInfo();
+
+				objectInfo.flags = new asc_CCellFlag();
+				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
+				if (graphicObjects.length)
+					objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
+
+				var textPr = this.objectRender.controller.getParagraphTextPr();
+				var paraPr = this.objectRender.controller.getParagraphParaPr();
+				if (textPr && paraPr) {
+					objectInfo.text = this.objectRender.controller.Get_SelectedText();
+
+					var horAlign = "center";
+					switch (paraPr.Jc) {
+						case align_Left		: horAlign = "left";	break;
+						case align_Right	: horAlign = "right";	break;
+						case align_Center	: horAlign = "center";	break;
+						case align_Justify	: horAlign = "justify";	break;
+					}
+					var vertAlign = "center";
+
+					objectInfo.halign = horAlign;
+					objectInfo.valign = vertAlign;
+
+					objectInfo.font = new asc_CFont();
+					objectInfo.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
+					objectInfo.font.size = textPr.FontSize;
+					objectInfo.font.bold = textPr.Bold;
+					objectInfo.font.italic = textPr.Italic;
+					objectInfo.font.underline = textPr.Underline;
+					objectInfo.font.strikeout = textPr.Strikeout;
+					objectInfo.font.subscript = textPr.VertAlign == vertalign_SubScript;
+					objectInfo.font.superscript = textPr.VertAlign == vertalign_SuperScript;
+					if (textPr.Color)
+						objectInfo.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
+
+					var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
+					if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart)) {
+
+						var hyperlink = new Hyperlink();
+						hyperlink.Tooltip = shapeHyperlink.ToolTip;
+
+						var spl = shapeHyperlink.Value.split("!");
+						if (spl.length === 2) {
+							hyperlink.setLocation(shapeHyperlink.Value);
+						} else
+							hyperlink.Hyperlink = shapeHyperlink.Value;
+
+						objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
+					}
+				}
+
+				// Заливка не нужна как таковая
+				objectInfo.fill = new asc_CFill(asc_n2Color(0));
+
+				// ToDo locks
+
+				return objectInfo;
 			},
 
 			// Получаем координаты активной ячейки
