@@ -3742,8 +3742,8 @@ CGraphicObjects.prototype =
             var gr_pos = this.getNewGroupPos();
             var near_pos = this.document.Get_NearestPos(this.selectionInfo.selectionArray[0].PageNum, gr_pos.x, gr_pos.y, true, null);
 
-            if( /*this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false
-                && */false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+           // if( /*this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false
+         //       && */false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
             {
                 History.Create_NewPoint();
                 var _selection_objects = this.selectionInfo.selectionArray;
