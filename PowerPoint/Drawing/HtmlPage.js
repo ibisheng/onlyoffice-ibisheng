@@ -1658,7 +1658,7 @@ function CEditorPage(api)
 
     this.onKeyUp = function(e)
     {
-        global_keyboardEvent.AtlKey     = false;
+        global_keyboardEvent.AltKey     = false;
         global_keyboardEvent.CtrlKey    = false;
         global_keyboardEvent.ShiftKey   = false;
 

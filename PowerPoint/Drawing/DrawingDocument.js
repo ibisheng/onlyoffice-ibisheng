@@ -3354,19 +3354,26 @@ function CThumbnailsManager()
 
             oThis.ShowPage(pos.Page);
         }
-        else if (0 == global_mouseEvent.Button)
+        else if (0 == global_mouseEvent.Button || 2 == global_mouseEvent.Button)
         {
             // приготавливаемся к треку
-            oThis.IsMouseDownTrack = true;
-            oThis.IsMouseDownTrackSimple = true;
-            oThis.MouseDownTrackPage = pos.Page;
-            oThis.MouseDownTrackX = global_mouseEvent.X;
-            oThis.MouseDownTrackY = global_mouseEvent.Y;
+
+            if (0 == global_mouseEvent.Button)
+            {
+                oThis.IsMouseDownTrack = true;
+                oThis.IsMouseDownTrackSimple = true;
+                oThis.MouseDownTrackPage = pos.Page;
+                oThis.MouseDownTrackX = global_mouseEvent.X;
+                oThis.MouseDownTrackY = global_mouseEvent.Y;
+            }
 
             if (oThis.m_arrPages[pos.Page].IsSelected)
             {
-                // чтобы не отрубался трек
-                if (global_mouseEvent.Button == 2)
+                oThis.SelectPageEnabled = false;
+                oThis.m_oWordControl.GoToPage(pos.Page);
+                oThis.SelectPageEnabled = true;
+
+                if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
                 {
                     var _data = new CContextMenuData();
                     _data.Type = c_oAscContextMenuTypes.Thumbnails;
@@ -3374,10 +3381,6 @@ function CThumbnailsManager()
                     _data.Y_abs = global_mouseEvent.Y;
                     oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
                 }
-
-                oThis.SelectPageEnabled = false;
-                oThis.m_oWordControl.GoToPage(pos.Page);
-                oThis.SelectPageEnabled = true;
 
                 return false;
             }
@@ -3399,7 +3402,7 @@ function CThumbnailsManager()
             oThis.ShowPage(pos.Page);
         }
 
-        if (global_mouseEvent.Button == 2)
+        if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
         {
             var _data = new CContextMenuData();
             _data.Type = c_oAscContextMenuTypes.Thumbnails;
