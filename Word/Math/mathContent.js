@@ -9,6 +9,11 @@
  RADICAL
  LIMIT
  */
+
+//Bugs
+
+//При добавлении в началло контента элемента , он вставляется с размером шрифта 11, пос мотреть getCurrRunPrp
+
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
@@ -95,7 +100,6 @@ CMathRunPrp.prototype =
 
 function CMathContent()
 {
-    //this.SUBCONTENT =   false;
     this.bDot       =   false;
     this.plhHide    =   false;
     this.bRoot      =   false;
@@ -455,11 +459,6 @@ CMathContent.prototype =
 
         if( mathElem !== null )
         {
-            //mathElem.relate(this);
-            //mathElem.setReduct(this.reduct);
-            //var runPrp = this.getRunPrp(this.CurPos);
-            //mathElem.setTxtPrp( runPrp );
-            //mathElem.setRunPrp( runPrp );
 
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
 
@@ -471,10 +470,6 @@ CMathContent.prototype =
             if(this.CurPos > 1) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
             {
                 ctrPrp = this.getCurrRunPrp();
-            }
-            else if(!this.bRoot && this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP) //есть RunPrp
-            {
-                ctrPrp.Merge( this.Parent.getCtrPrp() );
             }
             else if(!this.bRoot && this.content.length == 1) // нет RunPrp, добавляем мат. объект
             {
@@ -495,6 +490,14 @@ CMathContent.prototype =
 
             var empty = new CEmpty();
             this.addToContent(empty);
+
+            // добавляем RunPrp для текста, они будут такие же как и ctrPrp
+            if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos + 1].value.typeObj == MATH_TEXT)
+            {
+                var rPrp = Common_CopyObj(ctrPrp);
+                //this.addRunPrpToContent(rPrp);
+                this.addRunPrp(rPrp);
+            }
 
             //this.addElementToContent( mathElem, new dist(l_gap, r_gap, 0, 0) );
             //this.addElementToContent(empty);
@@ -540,6 +543,7 @@ CMathContent.prototype =
     createEquation: function(ind)
     {
         var Pos = this.CurPos + 1;
+        //var lng = this.content.length;
 
         switch(ind)
         {
@@ -2041,6 +2045,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("sin");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2049,6 +2054,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("cos");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2057,6 +2063,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("tan");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2065,6 +2072,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("csc");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2073,6 +2081,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("sec");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2081,6 +2090,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("cot");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2092,9 +2102,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("sin");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2108,9 +2116,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("cos");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2124,9 +2130,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("tan");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2140,9 +2144,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("csc");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2156,9 +2158,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("sec");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2172,9 +2172,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("cot");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2186,6 +2184,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("sinh");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2194,6 +2193,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("cosh");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2202,6 +2202,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("tanh");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2210,6 +2211,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("csch");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2218,6 +2220,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("sech");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2226,6 +2229,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("coth");
                 var arg = trig.getArgument();
                 arg.fillPlaceholders();
@@ -2238,9 +2242,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("sinh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2254,9 +2256,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("cosh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2270,9 +2270,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("tanh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2286,9 +2284,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("csch");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2302,9 +2298,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("sech");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2318,9 +2312,7 @@ CMathContent.prototype =
                 var degr = func.addMComponent(MATH_DEGREE);
                 degr.init({type: DEGREE_SUPERSCRIPT});
                 var base = degr.getBase();
-                var rPrp = new CTextPr();
-                rPrp.Italic = false;
-                base.addRunPrp(rPrp);
+                base.setItalic(false);
                 base.addTxt("coth");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -2331,6 +2323,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("sin");
                 var arg = trig.getArgument();
                 arg.addTxt("θ");
@@ -2339,6 +2332,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("cos");
                 var arg = trig.getArgument();
                 arg.addTxt("2x");
@@ -2347,6 +2341,7 @@ CMathContent.prototype =
                 var trig = this.addMComponent(MATH_FUNCTION);
                 trig.init();
                 var func = trig.getFName();
+                func.setItalic(false);
                 func.addTxt("tan");
                 var arg = trig.getArgument();
                 arg.addTxt("θ");
@@ -2357,6 +2352,7 @@ CMathContent.prototype =
                 var sin = num.addMComponent(MATH_FUNCTION);
                 sin.init();
                 var func1 = sin.getFName();
+                func.setItalic(false);
                 func1.addTxt("sin");
                 var arg1 = sin.getArgument();
                 arg1.addTxt("θ");
@@ -2365,6 +2361,7 @@ CMathContent.prototype =
                 cos.init();
                 var func2 = cos.getFName();
                 func2.addTxt("cos");
+                func.setItalic(false);
                 var arg2 = cos.getArgument();
                 arg2.addTxt("θ");
                 break;
@@ -2499,7 +2496,6 @@ CMathContent.prototype =
                 var iter = lim.getIterator();
                 iter.fillPlaceholders();
                 var func = lim.getFName();
-                func.setPrp({Italic: true});
                 var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
                 var props2 =
                 {
@@ -2520,7 +2516,6 @@ CMathContent.prototype =
                 var iter = lim.getIterator();
                 iter.fillPlaceholders();
                 var func = lim.getFName();
-                func.setPrp({Italic: true});
                 var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
                 var props2 =
                 {
@@ -2532,15 +2527,6 @@ CMathContent.prototype =
                 grCh.fillPlaceholders();
                 break;
             case 167:
-                /*var delim = this.addMComponent(MATH_GROUP_CHARACTER);
-                var props =
-                {
-                    chrType:        ARROW_LEFT,
-                    location:       LOCATION_TOP,
-                    justif:         VJUST_BOT
-                };
-                delim.init(props);
-                delim.fillPlaceholders();*/
                 var accent = this.addMComponent(MATH_ACCENT);
                 props =
                 {
@@ -2676,6 +2662,7 @@ CMathContent.prototype =
                 degr.init(props);
 
                 var base = degr.getBase();
+                base.setItalic(false);
                 base.addTxt("log");
                 var iter = degr.getIterator();
                 iter.fillPlaceholders();
@@ -2684,6 +2671,7 @@ CMathContent.prototype =
                 var log = this.addMComponent(MATH_FUNCTION);
                 log.init();
                 var func = log.getFName();
+                func.setItalic(false);
                 func.addTxt("log");
                 var arg = log.getArgument();
                 arg.fillPlaceholders();
@@ -2696,6 +2684,7 @@ CMathContent.prototype =
                 var min = fName.addMComponent(MATH_LIMIT);
                 min.init({type: LIMIT_LOW});
                 var base = min.getFName();
+                base.setItalic(false);
                 base.addTxt("lim");
                 var iter = min.getIterator();
                 iter.fillPlaceholders();
@@ -2711,6 +2700,7 @@ CMathContent.prototype =
                 var min = fName.addMComponent(MATH_LIMIT);
                 min.init({type: LIMIT_LOW});
                 var base = min.getFName();
+                base.setItalic(false);
                 base.addTxt("min");
                 var iter = min.getIterator();
                 iter.fillPlaceholders();
@@ -2726,6 +2716,7 @@ CMathContent.prototype =
                 var min = fName.addMComponent(MATH_LIMIT);
                 min.init({type: LIMIT_LOW});
                 var base = min.getFName();
+                base.setItalic(false);
                 base.addTxt("max");
                 var iter = min.getIterator();
                 iter.fillPlaceholders();
@@ -2737,6 +2728,7 @@ CMathContent.prototype =
                 var log = this.addMComponent(MATH_FUNCTION);
                 log.init();
                 var func = log.getFName();
+                func.setItalic(false);
                 func.addTxt("ln");
                 var arg = log.getArgument();
                 arg.fillPlaceholders();
@@ -2754,6 +2746,7 @@ CMathContent.prototype =
                 var iter = limit.getIterator();
                 iter.addTxt("n→∞");
                 var fName2 = limit.getFName();
+                fName2.setItalic(false);
                 fName2.addTxt("lim");
 
                 var arg = func.getArgument();
@@ -2800,6 +2793,7 @@ CMathContent.prototype =
                 };
                 max.init(props);
                 var fName2 = max.getFName();
+                fName2.setItalic(false);
                 fName2.addTxt("max");
                 var iter = max.getIterator();
                 iter.addTxt("0≤x≤1");
@@ -2830,25 +2824,41 @@ CMathContent.prototype =
                 break;
             case 186:
                 var box = this.addMComponent(MATH_BOX);
-                box.init();
+                var props =
+                {
+                    opEmu:  true
+                };
+                box.init(props);
                 var arg = box.getBase();
                 arg.addTxt("∶=");
                 break;
             case 187:
                 var box = this.addMComponent(MATH_BOX);
-                box.init();
+                var props =
+                {
+                    opEmu:  true
+                };
+                box.init(props);
                 var arg = box.getBase();
                 arg.addTxt("==");
                 break;
             case 188:
                 var box = this.addMComponent(MATH_BOX);
-                box.init();
+                var props =
+                {
+                    opEmu:  true
+                };
+                box.init(props);
                 var arg = box.getBase();
                 arg.addTxt("+=");
                 break;
             case 189:
                 var box = this.addMComponent(MATH_BOX);
-                box.init();
+                var props =
+                {
+                    opEmu:  true
+                };
+                box.init(props);
                 var arg = box.getBase();
                 arg.addTxt("-=");
                 break;
@@ -3474,6 +3484,7 @@ CMathContent.prototype =
         }
 
         var EndPos = this.CurPos + 1;
+        //var EndPos = Pos + this.content.length - lng; // запоминаем ве элементы, которые были добавлены, не только до той позиции, где стоит курсор (для текста могут быть добавлены дополнительно RunPrp)
 
         if(!TEST)
         {
@@ -3580,7 +3591,7 @@ CMathContent.prototype =
                     CurrContent   = this;
                 }
                 //пришли из базового класса
-                else if( this.content[this.CurPos].value.SUBCONTENT )
+                else if( this.content[this.CurPos].value.typeObj === MATH_COMP )
                 {
                     this.CurPos++;
 
@@ -3593,7 +3604,7 @@ CMathContent.prototype =
                     //если нет селекта, то просто перемещаемся по контенту
                     this.CurPos++;
 
-                    if( this.content[this.CurPos].value.SUBCONTENT )
+                    if( this.content[this.CurPos].value.typeObj === MATH_COMP )
                     {
                         CurrContent = SelectContent = this.content[this.CurPos].value.goToFirstElement();
                     }
@@ -3630,7 +3641,7 @@ CMathContent.prototype =
 
         if(this.selection.endPos < this.content.length)
         {
-            if( this.content[this.selection.startPos - 1].value.SUBCONTENT)
+            if( this.content[this.selection.startPos - 1].value.typeObj === MATH_COMP)
             {
                 if ( ! this.content[this.CurPos].value.select_moveRight() )
                 {
@@ -3641,7 +3652,7 @@ CMathContent.prototype =
                     this.setEnd_Selection(this.CurPos + 1);
                 }
             }
-            else if(this.content[this.selection.endPos].value.SUBCONTENT && ( this.selection.startPos - this.selection.endPos == 2) )
+            else if(this.content[this.selection.endPos].value.typeObj === MATH_COMP && ( this.selection.startPos - this.selection.endPos == 2) )
             {
                 //селект одного мат. эелемента
 
@@ -3650,7 +3661,7 @@ CMathContent.prototype =
             }
             else
             {
-                if(this.content[this.selection.endPos].value.SUBCONTENT) // если последнюю позицию занимает мат. формула/объект, то селектим вместе с CEMpty
+                if(this.content[this.selection.endPos].value.typeObj === MATH_COMP) // если последнюю позицию занимает мат. формула/объект, то селектим вместе с CEMpty
                     this.setEnd_Selection(this.selection.endPos + 1);
                 else
                     this.setEnd_Selection(this.selection.endPos); // для обычного случая
@@ -3700,7 +3711,7 @@ CMathContent.prototype =
 
             }
             //пришли из базового класса
-            else if( this.content[this.CurPos].value.SUBCONTENT )
+            else if( this.content[this.CurPos].value.typeObj === MATH_COMP )
             {
                 if( this.selection.active )
                 {
@@ -3721,9 +3732,18 @@ CMathContent.prototype =
             else
             {
                 //если нет селекта, то просто перемещаемся по контенту
-                this.CurPos--;
 
-                if( this.content[this.CurPos].value.SUBCONTENT )
+                var bFirstRunPrp = this.CurPos == 1 && this.content[this.CurPos].value.typeObj == MATH_RUN_PRP;
+
+                if(!bFirstRunPrp)  // иначе, по контенту не перемещаемся
+                {
+                    if(this.content[this.CurPos - 1].value.typeObj === MATH_RUN_PRP && this.CurPos > 2)
+                        this.CurPos -= 2;
+                    else
+                        this.CurPos--;
+                }
+
+                if( this.content[this.CurPos].value.typeObj === MATH_COMP )
                 {
                     CurrContent = SelectContent = this.content[this.CurPos].value.goToLastElement();
                 }
@@ -3820,7 +3840,7 @@ CMathContent.prototype =
             start = end;
             end = tmp;
         }
-        if(bSingle && this.content[this.CurPos].value.SUBCONTENT)
+        if(bSingle && this.content[this.CurPos].value.typeObj === MATH_COMP)
         {
             var end_select = this.CurPos > 0 ? this.CurPos - 1 : 0;
             this.setStart_Selection(end_select);
@@ -3890,7 +3910,7 @@ CMathContent.prototype =
         if( this.selection.active )
         {
             this.selection.active = false;
-            if( this.content[this.CurPos].value.SUBCONTENT )
+            if( this.content[this.CurPos].value.typeObj === MATH_COMP )
                 this.content[this.CurPos].value.mouseUp();
         }
     },
@@ -3916,7 +3936,7 @@ CMathContent.prototype =
             else
                 this.CurPos = this.findPosition( msCoord );
 
-            if( this.content[this.CurPos].value.SUBCONTENT )
+            if( this.content[this.CurPos].value.typeObj === MATH_COMP )
             {
                 var coord = this.getCoordElem(this.CurPos, msCoord);
                 result = this.content[this.CurPos].value.mouseDown(coord);
@@ -3944,7 +3964,7 @@ CMathContent.prototype =
             var pos = this.findPosition( msCoord );
 
             //селект внутри элемента (дроби и пр.)
-            if(this.CurPos === pos && this.content[pos].value.SUBCONTENT)
+            if(this.CurPos === pos && this.content[pos].value.typeObj === MATH_COMP)
             {
                 this.setStart_Selection( pos - 1 );
                 var coord = this.getCoordElem(this.CurPos, msCoord );
@@ -3965,7 +3985,7 @@ CMathContent.prototype =
 
                 var direction = ( this.CurPos < pos ) ? 1 : -1;
 
-                if ( this.content[this.CurPos].value.SUBCONTENT )
+                if ( this.content[this.CurPos].value.typeObj === MATH_COMP )
                 {
                     if( direction == 1 )
                         this.setStart_Selection( this.CurPos - 1);
@@ -3975,7 +3995,7 @@ CMathContent.prototype =
                 else
                     this.setStart_Selection( this.CurPos );
 
-                if( this.content[pos].value.SUBCONTENT )
+                if( this.content[pos].value.typeObj === MATH_COMP )
                 {
                     if( direction == 1 )
                         this.setEnd_Selection( pos + 1);
@@ -3989,7 +4009,29 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
-    /////////
+    home: function()
+    {
+        if( !this.IsEmpty() )
+        {
+            if(!this.IsPlaceholder())
+            {
+                if(this.content[1].value.typeObj === MATH_RUN_PRP)
+                    this.CurPos = 2;
+                else // первым идет мат объект
+                    this.CurPos = 1;
+            }
+        }
+    },
+    end: function()
+    {
+        if( !this.IsEmpty() )
+        {
+            if(!this.IsPlaceholder())
+                this.CurPos = this.content.length - 1;
+        }
+    },
+    //////////////////////////////////////
+
     // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
     afterDisplacement: function(coord) //аналог mouseDown для goToUpperLevel и goToLowerLever
     {
@@ -3998,7 +4040,7 @@ CMathContent.prototype =
 
         this.CurPos = this.findPosition( msCoord );
 
-        if( this.content[this.CurPos].value.SUBCONTENT )
+        if( this.content[this.CurPos].value.typeObj === MATH_COMP )
         {
             var _coord = this.getCoordElem(this.CurPos, msCoord);
             content = this.content[this.CurPos].value.afterDisplacement(_coord);
@@ -4007,16 +4049,6 @@ CMathContent.prototype =
             content = this;
 
         return content;
-    },
-    home: function()
-    {
-        if(!this.IsPlaceholder())
-            this.CurPos = 0;
-    },
-    end: function()
-    {
-        if(!this.IsPlaceholder())
-            this.CurPos = this.content.length - 1;
     },
     old_recalculateSize: function()
     {
@@ -4036,7 +4068,7 @@ CMathContent.prototype =
 
             var sAscent;
 
-            if( !this.content[i].value.SUBCONTENT )
+            if( !this.content[i].value.typeObj === MATH_COMP )
                 sAscent = Size.ascent;
             else
                 sAscent = Size.center;
@@ -4167,10 +4199,8 @@ CMathContent.prototype =
                     rPrp.Merge(DEFAULT_RUN_PRP);
                     rPrp.Merge( this.content[i].value.getRunPrp() );
 
-                    var ital = rPrp.Italic;
                     rPrp.Italic = false;
                     pGraphics.SetFont(rPrp);
-                    rPrp.Italic = ital;
                 }
                 else if(this.content[i].value.typeObj == MATH_PLACEHOLDER)
                 {
@@ -4181,10 +4211,9 @@ CMathContent.prototype =
                     var rPrp = new CMathTextPrp();
                     rPrp.Merge(DEFAULT_RUN_PRP);
                     rPrp.Merge(ctrPrp);
-                    //var ital = rPrp.Italic;
+
                     rPrp.Italic = false;
                     pGraphics.SetFont(rPrp);
-                    //rPrp.Italic = ital;
 
                     this.content[i].value.draw(pGraphics);
                 }
@@ -4204,7 +4233,7 @@ CMathContent.prototype =
     {
         //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
         var sizeCursor = this.getCurrRunPrp().FontSize*g_dKoef_pt_to_mm;
-        var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor/2 };
+        var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor*0.8 };
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
@@ -4245,7 +4274,7 @@ CMathContent.prototype =
         var gps = this.content[pos].g_mContext;
         if(pos !== 0)
         {
-            if( this.content[ pos ].value.SUBCONTENT )
+            if( this.content[ pos ].value.typeObj === MATH_COMP )
             {
                 if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
                     pos--;
@@ -4286,122 +4315,6 @@ CMathContent.prototype =
             Y = mCoord.y - (this.size.center - this.g_mContext.top - this.content[index].value.size.center);
 
         return {x: X, y: Y};
-    },
-    old_remove: function()
-    {
-        var state =
-        {
-            bRecPosition:           false,   /*нужно ли пересчитывать позицию или нет, работает при backspace */
-            bBeginning:             false    /*в начале контента или нет*/
-            //bTargetAfterRemove:     false   /*нужно ли селектить target, этот флаг выставляется в CMathBase*/
-        };
-        var CurrContent = SelectContent = null;
-
-        if( this.IsTarget() )
-        {
-            if ( !this.bRoot )
-            {
-                var removal = this.Parent.remove();
-                SelectContent = removal.SelectContent;
-                CurrContent = this;
-            }
-            else
-            {
-                //в основном контенте и элемент target
-                //переделать : вставлять объект типа placeholder
-                this.content.length = 0;
-                state.bRecPosition = true;
-
-                SelectContent = this;
-                CurrContent   = this;
-            }
-        }
-        else
-        {
-            if( this.CurPos != 0 || (this.selection.startPos != this.selection.endPos) ) //последнее условие, чтобы избежать ситуации, когда стоим в нулевой позиции и при этом есть селект
-            {
-                //курсор перед мат. элементом
-                if( (this.selection.startPos == this.selection.endPos) && this.content[this.CurPos].value.empty)
-                {
-                    this.setStart_Selection(this.CurPos);
-                    this.setEnd_Selection( this.CurPos-2 );
-                    this.selection.active = false;
-
-                    SelectContent = this;
-                    CurrContent   = this;
-                }
-                //пришли из базового класса
-                else if( this.content[this.CurPos].value.SUBCONTENT && (this.selection.startPos == this.selection.endPos) )
-                {
-                    this.setStart_Selection(this.CurPos + 1);
-                    this.setEnd_Selection(this.CurPos - 1);
-                    this.selection.active = false;
-
-                    SelectContent = this;
-                    CurrContent   = null; // т.к. пришли из другого контента
-                }
-                //просто удаляем элементы из контента
-                else
-                {
-                    var start, end;
-
-                    if( this.selection.startPos != this.selection.endPos )
-                    {
-                        start = this.selection.startPos;
-                        end = this.selection.endPos;
-                        if(start > end)
-                        {
-                            tmp = start;
-                            start = end;
-                            end = tmp;
-                        }
-                    }
-                    else //backspace
-                    {
-                        start = this.CurPos;
-                        end = this.CurPos + 1;
-                    }
-                    var tmp = new Array();
-
-                    for(var i = 0; i< start; i++)
-                        tmp.push(this.content[i]);
-
-                    for (var j = end; j < this.content.length; j++)
-                        tmp.push(this.content[j]);
-                    this.content.length = 0;
-                    this.content = tmp;
-
-                    this.CurPos = start - 1;
-                    this.setStart_Selection(this.CurPos);
-                    this.selection.active = false;
-
-                    SelectContent = this;
-                    CurrContent   = this;
-
-                    state.bRecPosition = true;
-
-                    /*if(this.content.length == 1 && ! this.bRoot )//только CEmpty
-                     {
-                        this.add(StartTextElement);
-                     }*/
-
-                    //this.recalculate();
-                }
-            }
-            else if ( !this.bRoot )
-            {
-                var removal = this.Parent.remove();
-                SelectContent = removal.SelectContent;
-                CurrContent = this;
-            }
-            else
-            {
-                CurrContent = SelectContent = this;
-                state.bBeginning = true;
-            }
-        }
-
-        return {CurrContent : CurrContent, SelectContent: SelectContent, state: state };
     },
     remove: function(order)
     {
@@ -4483,24 +4396,85 @@ CMathContent.prototype =
     {
         var bDelete = false;
         var bSelect = this.selection.startPos !== this.selection.endPos;
-        var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
-            bMEReverse = order == -1 && this.content[this.CurPos + 1].value.SUBCONTENT;
+        var currType = this.content[this.CurPos].value.typeObj,
+            prevType = this.CurPos > 1 ? this.content[this.CurPos - 1].value.typeObj : null,
+            prev2_Type = this.CurPos > 2 ? this.content[this.CurPos - 2].value.typeObj : null,
+            prev3_Type = this.CurPos > 3 ? this.content[this.CurPos - 3].value.typeObj : null,
+            prev4_Type = this.CurPos > 4 ? this.content[this.CurPos - 4].value.typeObj : null,
+            nextType = this.CurPos > this.content.length -1 ? this.content[this.CurPos + 1].value.typeObj : null;
+
+        var bPrevComp = prevType === MATH_EMPTY && prev2_Type === MATH_COMP,
+            bPrev2_Comp = prev3_Type === MATH_EMPTY && prev4_Type === MATH_COMP;
+
+        //var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
+        var bMEDirect = order == 1 && currType === MATH_EMPTY, // работает, если только в конце формулы стоим или после идет еще одна формула
+            bMEDirectRPrp = order == 1 && currType === MATH_RUN_PRP && bPrevComp, //стоим после формулы, после RunPrp
+            bMEReverse = order == -1 && nextType === MATH_COMP,
+            bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
 
         var items = null;
 
-        if(!bSelect && bMEDirect)   // если курсор после мат. объекта
+        if(!bSelect && bMEDirect)   // если курсор после мат. объекта и нет RunPrp
         {
             this.setStart_Selection(this.CurPos);
             this.setEnd_Selection( this.CurPos-2 );
             this.selection.active = false;
         }
-        else if(!bSelect && bMEReverse)
+        else if(!bSelect && bMEDirectRPrp)
+        {
+            /*if(this.CurPos === 3) // стоим в начале, после мат объекта
+            {
+                start = this.CurPos - 1;
+                end = this.CurPos - 3;
+            }
+            else if(bPrev2_Comp)
+            {
+                start = this.CurPos - 1;
+                end = this.CurPos - 3;
+            }*/
+
+            var bDelRunPrp = false;
+
+            if(prev3_Type === MATH_TEXT)
+            {
+                for(var i = this.CurPos - 3; i > 0; i--)
+                {
+                    if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                    {
+                        currRPrp = this.content[this.CurPos].value;
+                        prevRPrp = this.content[i].value;
+                        bDelRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                        break;
+                    }
+                }
+            }
+
+            if(bDelRunPrp)
+            {
+                this.setStart_Selection(this.CurPos);
+                this.setEnd_Selection(this.CurPos-3);
+                this.selection.active = false;
+            }
+            else
+            {
+                this.setStart_Selection(this.CurPos-1);
+                this.setEnd_Selection(this.CurPos-3);
+                this.selection.active = false;
+            }
+            /*else
+            {
+                start = this.CurPos - 1;
+                end = this.CurPos - 3;
+            }*/
+
+        }
+        else if(!bSelect && bMEReverse)     //аналогично для delete
         {
             this.setStart_Selection(this.CurPos);
             this.setEnd_Selection( this.CurPos + 2 );
             this.selection.active = false;
         }
-        else
+        else if( !bFirstRunPrp || bSelect) // исключаем если стоим в начале и есть RunPrp
         {
             var start, end;
 
@@ -4562,8 +4536,6 @@ CMathContent.prototype =
                 History.Add(this, {Type: historyitem_Math_RemoveItem, Items: items, Pos: start});
             }
 
-
-
             this.CurPos = start - 1;
             this.setStart_Selection(this.CurPos);
             this.selection.active = false;
@@ -4576,9 +4548,7 @@ CMathContent.prototype =
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
         if(this.content.length == 1 && ! this.bRoot )//только CEmpty
-        {
-            this.addLetter(StartTextElement);
-        }
+            this.fillPlaceholders();
     },
     selectUse: function()
     {
@@ -4734,8 +4704,13 @@ CMathContent.prototype =
         this.plhHide = flag;
     },
 
-    ///// RunPrp, CtrPrp
+    ///////// RunPrp, CtrPrp
     addRunPrp: function(runPrp)          // for "edit"
+    {
+        this.addRunPrpToContent(runPrp);
+        this.CurPos++;
+    },
+    addRunPrpToContent: function(runPrp)
     {
         var rPrp = new CMathRunPrp();
         rPrp.Merge(runPrp);
@@ -4748,9 +4723,8 @@ CMathContent.prototype =
 
         this.content.length = 0;
         this.content = tmp;
-        this.CurPos++;
     },
-    addRunPrpToContent: function(runPrp) // for "read"
+    addRunPrpToContent_2: function(runPrp) // for "read"
     {
         var rPrp = new CMathRunPrp();
         rPrp.Merge(runPrp);
@@ -4781,11 +4755,11 @@ CMathContent.prototype =
                         runPrp.Merge(obj.getRunPrp());
                         break;
                     }
-                    else if(obj.typeObj == MATH_COMP)
+                    /*else if(obj.typeObj == MATH_COMP)
                     {
                         runPrp.Merge(obj.getCtrPrp());
                         break;
-                    }
+                    }*/
                 }
             }
         }
@@ -4818,11 +4792,10 @@ CMathContent.prototype =
 
         return txtPrp;
     },
-    checkRunPrp: function()
+    old_checkRunPrp: function()
     {
         var bEmpty = this.IsEmpty(),
             OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
-
 
         if(bEmpty || OnlyRunPrp)
         {
@@ -4848,6 +4821,93 @@ CMathContent.prototype =
 
         }
     },
+    checkRunPrp: function()
+    {
+        var bEmpty = this.IsEmpty(),
+            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP,
+            bComposition = this.content[this.CurPos].value.typeObj == MATH_EMPTY && this.content.length > 1;
+
+        if(this.bRoot && bEmpty)
+        {
+            var rPrp = this.Composition.DefaultTxtPrp;
+            this.addRunPrp(rPrp);
+        }
+        else if(bEmpty)
+        {
+            var rPrp = this.Parent.getCtrPrp();
+            this.addRunPrp(rPrp);
+        }
+        else if(OnlyRunPrp)
+        {
+            var rPrp = this.Parent.getCtrPrp();
+
+            var Run = this.content[1].value.runPrp;
+            var currRun = new CTextPr();
+            currRun.Merge(Run);
+
+            Run.Merge(rPrp);
+            Run.Merge(currRun);
+        }
+        else if(bComposition)
+        {
+            //возможны два случая:
+            // 1. если стоим в начале перед CEmpty и после идет Composition
+            // 2. стоим после CEmpty, который относится к Composition
+
+            var rPrp;
+            if(this.CurPos == 1 && this.content[this.CurPos].value.typeObj == MATH_COMP)
+                rPrp = this.content[this.CurPos].value.getCtrPrp();
+            else if(this.content[this.CurPos - 2].value.typeObj == MATH_COMP)
+                rPrp = this.content[this.CurPos - 2].value.getCtrPrp();
+            else // на всякий случай
+                rPrp = DEFAULT_RUN_PRP;
+
+            this.addRunPrp(rPrp);
+        }
+
+        //this.addToBeginningRPrp(txtPrp);
+
+    },
+    old_addToBeginningRPrp: function(rPrp) // чтобы не возникало ошибок при добавлении RunPrp в начало, если уже выставлены некоторые RunPrp
+    {
+        var bEmpty = this.IsEmpty(),
+            OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
+
+        if(bEmpty)
+        {
+            this.addRunPrp(rPrp);
+        }
+        else if( OnlyRunPrp)
+        {
+            var Run = this.content[1].value.runPrp;
+            var currRun = new CTextPr();
+            currRun.Merge(Run);
+
+            Run.Merge(rPrp);
+            Run.Merge(currRun);
+        }
+
+    },
+    setItalic: function(flag)
+    {
+        var rPrp = new CTextPr();
+        rPrp.Italic = flag;
+
+        if(bEmpty)
+        {
+            this.addRunPrp(rPrp);
+        }
+        else
+        {
+            for(var i = 1; i < this.content.length; i++)
+            {
+                if(this.content[i].value.typeObj == MATH_RUN_PRP)
+                    this.content[i].value.Merge(rPrp);
+            }
+        }
+    },
+    ////////////////////////
+
     ////////   /////////
     getMetricsLetter: function(pos)
     {
@@ -4868,7 +4928,7 @@ CMathContent.prototype =
 
         return res;
     },
-
+    
     // (!) повторяется функция (IsHighElement)
     IsIncline: function()
     {
@@ -5066,7 +5126,7 @@ CMathContent.prototype =
 
         if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
         {
-            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].SUBCONTENT && !this.content[Data2.Pos].SUBCONTENT )
+            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].typeObj === MATH_COMP && !this.content[Data2.Pos].typeObj === MATH_COMP )
                 return true;
         }
         return false
@@ -5773,10 +5833,6 @@ CMathComposition.prototype =
 
 function CEmpty()
 {
-    //this.SUBCONTENT = false;
-    //this.empty = true;
-    //this.TxtPrp = new CMathTextPrp();
-
     this.typeObj = MATH_EMPTY;
     this.pos = null;
 

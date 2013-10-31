@@ -55,9 +55,6 @@ function CMathText()
     this.bJDraw = false;
     this.bMText  = false;
 
-
-    /*this.SUBCONTENT = false;
-    this.empty = false;*/
     //this.Parent = null;
 
     /*this.TxtPrp = new CMathTextPrp();
@@ -511,10 +508,6 @@ function old_CMathText(params)
     this.indefSize = params.indefSize;
 
     this.bMText = params.bMText ? true : false;
-
-
-    this.SUBCONTENT = false;
-    this.empty = false;
 
     this.transform =
     {

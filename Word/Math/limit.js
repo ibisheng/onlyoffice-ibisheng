@@ -57,7 +57,7 @@ CLimit.prototype.init = function(props)
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();
-    oBase.setOwnTPrp({Italic: false});
+    //oBase.setOwnTPrp({Italic: false});
 
     var oIter = new CMathContent();
     oIter.setReduct(DEGR_REDUCT);
@@ -99,7 +99,8 @@ CLimit.prototype.getIterator = function()
 }
 CLimit.prototype.setDistance = function()
 {
-    this.dH = 0.03674768518518519*this.getTxtPrp().FontSize;
+    //this.dH = 0.03674768518518519*this.getTxtPrp().FontSize;
+    this.dH = 0.03674768518518519*this.getPrpToControlLetter().FontSize;
 }
 
 
@@ -146,9 +147,9 @@ CMathFunc.prototype.init = function()
     this.setDimension(1, 2);
     this.setContent();
 
-    var runPrp = new CTextPr();
-    runPrp.Italic = false;
-    this.elements[0][0].addRunPrp(runPrp);
+    //var runPrp = new CTextPr();
+    //runPrp.Italic = false;
+    //this.elements[0][0].addToBeginningRPrp(runPrp);
 
     //this.elements[0][0].setOwnTPrp({Italic: false});  // trigonometrical function
     //this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function

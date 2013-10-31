@@ -159,7 +159,8 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 }
 CMathMatrix.prototype.recalculateSize = function()
 {
-    var txtPrp = this.getTxtPrp();
+    //var txtPrp = this.getTxtPrp();
+    var txtPrp = this.getPrpToControlLetter();
 
     var interval = this.getLineGap(txtPrp);
     this.gaps.column[0] = 0;
@@ -514,5 +515,5 @@ CEqArray.prototype.old_init = function(props)
 }
 CEqArray.prototype.getElement = function(num)
 {
-    return this.elements[num][y];
+    return this.elements[num][0];
 }

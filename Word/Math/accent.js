@@ -592,7 +592,7 @@ CSign.prototype.draw = function(pGraphics)
 CSign.prototype.setTxtPrp = function(txtPrp)
 {
     this.txtPrp = txtPrp;
-    this.sign.setTxtPrp(txtPrp);
+    //this.sign.setTxtPrp(txtPrp);
 }
 
 function old_CAccent()

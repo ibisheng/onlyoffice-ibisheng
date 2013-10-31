@@ -4625,6 +4625,11 @@ CCharacter.prototype.recalculateSize = function()
 {
     var content = this.elements[0][0];
 
+    var rPrp = this.getPrpToControlLetter();
+    rPrp.Italic = false;
+
+    g_oTextMeasurer.SetFont(rPrp);
+
     this.operator.fixSize(this.elements[0][0].size.width);
 
     var width = content.size.width > this.operator.size.width ? content.size.width : this.operator.size.width,
@@ -4664,6 +4669,11 @@ CCharacter.prototype.align = function(element)
 CCharacter.prototype.draw = function(pGraphics)
 {
     this.elements[0][0].draw(pGraphics);
+
+    var rPrp = this.getPrpToControlLetter();
+    rPrp.Italic = false;
+
+    pGraphics.SetFont(rPrp);
     this.operator.draw(pGraphics);
 }
 CCharacter.prototype.findDisposition = function(pos)

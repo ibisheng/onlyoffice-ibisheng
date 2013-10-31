@@ -10,8 +10,6 @@ function CMathBase()
 
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
-    this.empty = false;
-    this.SUBCONTENT = true;
     this.reduct = 1;
 
     this.nRow = 0;
