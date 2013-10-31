@@ -1150,6 +1150,16 @@ DrawingObjectsController.prototype =
     },
 
 
+    getHyperlinkInfo: function()
+    {
+        if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            return this.curState.textObject.txBody.content.Hyperlink_Check(false);
+        }
+        return null;
+    },
+
+
     getSelectionState: function()
     {
         var state = {};
