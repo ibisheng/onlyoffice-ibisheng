@@ -1105,7 +1105,9 @@
 				// Shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
-				
+					// При выборе диапазона не нужно выделять автофигуру
+					if (t.isSelectionDialogMode)
+						return;
 					//for Mac OS
 					if ( event.metaKey )
 						event.ctrlKey = true;
