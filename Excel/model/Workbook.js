@@ -5631,7 +5631,7 @@ Range.prototype.setBorder=function(border){
 					oNewBorderProp = oNewBorder.b;
 				break;
 		}
-		if(null != oNewBorderProp && null != oCurBorderProp && null != oCurBorderProp.s &&
+		if(null != oNewBorderProp && null != oCurBorderProp && c_oAscBorderStyles.None != oCurBorderProp.s && (null == oNewBorder || c_oAscBorderStyles.None != oNewBorderProp.s) &&
 			(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 			switch(type)
 			{
@@ -5676,7 +5676,7 @@ Range.prototype.setBorder=function(border){
 						oNewBorderProp = oNewBorder.b;
 					break;
 			}
-			if(null != oNewBorderProp && null != oCurBorderProp &&
+			if(null != oNewBorderProp && null != oCurBorderProp && c_oAscBorderStyles.None != oCurBorderProp.s && (null == oNewBorder || c_oAscBorderStyles.None != oNewBorderProp.s) &&
 				(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 				switch(type)
 				{
