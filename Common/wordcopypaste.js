@@ -2640,8 +2640,6 @@ function Body_Paste(api, e)
 }
 function Editor_Paste_Exec(api, pastebin, nodeDisplay)
 {
-	if(null == nodeDisplay)
-		nodeDisplay = pastebin;
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
     oPasteProcessor.Start(pastebin, nodeDisplay);
 };
@@ -2662,7 +2660,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.bNested = bNested;//��� ���������� � ��������
     this.oFonts = new Object();
     this.oImages = new Object();
-
+	this.aContent = new Array();
+	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
 
@@ -3232,6 +3231,8 @@ PasteProcessor.prototype =
 	},
 	Start : function(node, nodeDisplay, bDuplicate)
     {
+		if(null == nodeDisplay)
+			nodeDisplay = node;
 		if(g_bIsDocumentCopyPaste)
         {
 
@@ -5611,7 +5612,7 @@ PasteProcessor.prototype =
             oPasteProcessor.bUseScaleKoef = bUseScaleKoef;
             oPasteProcessor.dScaleKoef = dScaleKoef;
         }
-        oPasteProcessor.Start(node);
+		oPasteProcessor._Execute(node, {}, true, true, false);
         oPasteProcessor._PrepareContent();
         oPasteProcessor._AddNextPrevToContent(cell.Content);
         if(0 == oPasteProcessor.aContent.length)
