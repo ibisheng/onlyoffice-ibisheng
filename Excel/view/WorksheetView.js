@@ -5646,7 +5646,7 @@
 				return sListName + "!" + this.getActiveRange(this.activeRange.clone(true));
 			},
 
-			getSelectionInfo: function (bExt, x, y) {
+			getSelectionInfo: function (bExt) {
 				var c_opt = this.settings.cells;
 				var activeCell = this.activeRange;
 				var mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol);
@@ -5765,10 +5765,10 @@
 					oHyperlink = new asc_CHyperlink(hyperlink);
 					oHyperlink.asc_setText(cell_info.text);
 					cell_info.hyperlink = oHyperlink;
-				} else if (isGraphicObject && textPr && x != undefined && y != undefined) {
-					var shapeHyperlink = this.objectRender.checkCursorDrawingObject(x, y).hyperlink;
+				} else if (isGraphicObject && textPr) {
+					var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
 					if (shapeHyperlink && (shapeHyperlink instanceof ParaHyperlinkStart)) {
-						// ToDo разобраться
+						
 						hyperlink = new Hyperlink();
 						hyperlink.Tooltip = shapeHyperlink.ToolTip;
 						
