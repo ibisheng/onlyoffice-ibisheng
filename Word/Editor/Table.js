@@ -12004,6 +12004,9 @@ CTable.prototype =
             {
                 var Row = this.Content[CurRow];
 
+                var Spacing  = Row.Get_CellSpacing();
+                var SpacingW = ( null != Spacing ? Spacing : 0 );
+
                 var CurGridCol = 0;
 
                 // Смотрим на ширину пропущенных колонок сетки в начале строки
@@ -12073,6 +12076,12 @@ CTable.prototype =
                     var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
                     var CellW        = Cell.Get_W();
 
+                    var Add = ( ( 0 === CurCell || CellsCount - 1 === CurCell ) ? 3 / 2 * SpacingW : SpacingW );
+
+                    CellMin += Add;
+                    CellMax += Add;
+                    CellWW  = CellW.W + Add;
+
                     // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
                     if ( MinMargin[CurGridCol] < CellMarginsW )
                         MinMargin[CurGridCol] = CellMarginsW;
@@ -12092,10 +12101,10 @@ CTable.prototype =
                             if ( false === MaxFlags[CurGridCol] )
                             {
                                 MaxFlags[CurGridCol] = true;
-                                MaxContent[CurGridCol] = CellW.W;
+                                MaxContent[CurGridCol] = CellWW;
                             }
-                            else if ( MaxContent[CurGridCol] < CellW.W )
-                                MaxContent[CurGridCol] = CellW.W;
+                            else if ( MaxContent[CurGridCol] < CellWW )
+                                MaxContent[CurGridCol] = CellWW;
                         }
                     }
                     else
@@ -12119,8 +12128,8 @@ CTable.prototype =
                         // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
                         // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
                         // максимальной ширины.
-                        if ( CellW.Type === tblwidth_Mm && CellW.W > CellMax )
-                            CellMax = CellW.W;
+                        if ( CellW.Type === tblwidth_Mm && CellWW > CellMax )
+                            CellMax = CellWW;
 
                         if ( SumSpanMaxContent < CellMax )
                         {
