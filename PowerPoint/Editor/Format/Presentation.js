@@ -4880,11 +4880,14 @@ CPresentation.prototype =
             var gr_fr = this.Slides[this.CurPage].graphicObjects.State.textObject;
             this.Slides[this.CurPage].graphicObjects.resetSelectionState();
             gr_fr.select(this.Slides[this.CurPage].graphicObjects);
-            this.Remove(-1);
+            this.Slides[this.CurPage].removeSelectedObjects();
+            this.Recalculate();
+            this.Document_UpdateUndoRedoState();
+            this.Document_UpdateInterfaceState()
         }
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateUndoRedoState();
-        this.Document_UpdateInterfaceState();
+        //this.Document_UpdateSelectionState();
+        //this.Document_UpdateUndoRedoState();
+        //this.Document_UpdateInterfaceState();
     },
 
     Table_Select : function(Type)
@@ -5505,6 +5508,7 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
+                editor.sync_DocSizeCallback(this.Width, this.Height);
                 if(b_is_on)
                 {
                     History.TurnOn();
@@ -5574,6 +5578,7 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
+                editor.sync_DocSizeCallback(this.Width, this.Height);
                 if(b_is_on)
                 {
                     History.TurnOn();
@@ -6205,6 +6210,7 @@ CPresentation.prototype =
                 History.TurnOn();
             }
             this.Recalculate();
+            editor.sync_DocSizeCallback(this.Width, this.Height);
         }
     },
 
@@ -6766,6 +6772,7 @@ CPresentation.prototype =
                 {
                     this.Slides[i].changeSize(kw, kh);
                 }
+                editor.sync_DocSizeCallback(this.Width, this.Height);
                 if(b_is_on)
                 {
                     History.TurnOn();

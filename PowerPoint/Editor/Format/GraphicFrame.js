@@ -277,7 +277,7 @@ CGraphicFrame.prototype =
     },
     recalculate: function()
     {
-        if(isRealObject(this.graphicObject))
+        if(isRealObject(this.graphicObject) && isRealObject(this.parent) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
         {
             if(this.recalcInfo.recalculateNumbering)
             {
@@ -325,7 +325,6 @@ CGraphicFrame.prototype =
 
             this.graphicObject.Recalculate_Page(0);
         }
-
         if(this.recalcInfo.recalculateSizes)
         {
             this.recalculateSizes();
@@ -341,6 +340,7 @@ CGraphicFrame.prototype =
 
     onParagraphChanged: function()
     {
+
         this.recalcInfo.recalculateSizes = true;
         this.recalcInfo.recalculateTransform = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -2214,7 +2214,7 @@ CGraphicFrame.prototype =
         }
 
 
-        if(isRealObject(this.parent) && isRealObject(this.graphicObject))
+        if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
@@ -2335,10 +2335,12 @@ CGraphicFrame.prototype =
             }
         }
 
-        if(isRealObject(this.parent) && isRealObject(this.graphicObject))
+        if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         else
             delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+
+
     },
 
     Save_Changes: function(data, w)
@@ -2603,7 +2605,7 @@ CGraphicFrame.prototype =
 
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-            if(isRealObject(this.parent) && isRealObject(this.graphicObject))
+            if(isRealObject(this.parent) && isRealObject(this.graphicObject) && (Array.isArray(this.graphicObject.Content) && this.graphicObject.Content.length > 0))
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
             else
                 delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];

@@ -2508,43 +2508,75 @@ asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp){
 /*functions for working with table*/
 asc_docs_api.prototype.put_Table = function(col,row)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Add_FlowTable(col,row);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Add_FlowTable(col,row);
+    }
 }
 asc_docs_api.prototype.addRowAbove = function(count)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_AddRow(true);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_AddRow(true);
+    }
 }
 asc_docs_api.prototype.addRowBelow = function(count)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_AddRow(false);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_AddRow(false);
+    }
 }
 asc_docs_api.prototype.addColumnLeft = function(count)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_AddCol(true);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_AddCol(true);
+    }
 }
 asc_docs_api.prototype.addColumnRight = function(count)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_AddCol(false);
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_AddCol(false);
+    }
 }
 asc_docs_api.prototype.remRow = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_RemoveRow();
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_RemoveRow();
+    }
 }
 asc_docs_api.prototype.remColumn = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_RemoveCol();
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_RemoveCol();
+    }
 }
 asc_docs_api.prototype.remTable = function()
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Table_RemoveTable();
+    var doc = this.WordControl.m_oLogicDocument;
+    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Table_RemoveTable();
+    }
 }
 asc_docs_api.prototype.selectRow = function()
 {

@@ -4795,6 +4795,10 @@ function redrawSlide(slide, presentation, arr_layouts, direction, arr_slides)
         }
         slide.recalcAll();
         slide.recalculate();
+        if(direction === 0)
+        {
+           editor.WordControl.m_oLogicDocument.RecalculateCurPos();
+        }
         presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
     }
 
