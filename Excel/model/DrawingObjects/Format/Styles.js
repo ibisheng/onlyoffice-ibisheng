@@ -5991,6 +5991,17 @@ CParaPr.prototype =
                 Result_ParaPr.Locked = ParaPr.Locked;
         }
 
+        if(this.anchor == undefined || ParaPr.anchor == undefined)
+        {
+            Result_ParaPr.anchor = undefined;
+        }
+        else
+        {
+            if(this.anchor === ParaPr.anchor)
+                Result_ParaPr.anchor = this.anchor;
+            else
+                Result_ParaPr.anchor = undefined;
+        }
         return Result_ParaPr;
     },
 

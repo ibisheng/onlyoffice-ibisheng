@@ -2595,7 +2595,9 @@ CShape.prototype =
     {
         if(this.txBody && this.txBody.content)
         {
-            return this.txBody.content.Get_Paragraph_ParaPr();
+            var ret = this.txBody.content.Get_Paragraph_ParaPr();
+            ret.anchor = this.txBody.getBodyPr().anchor;
+            return ret;
         }
         return null;
     },
@@ -2616,6 +2618,7 @@ CShape.prototype =
             this.txBody.content.Set_ApplyToAll(true);
             var paraPr = this.txBody.content.Get_Paragraph_ParaPr();
             this.txBody.content.Set_ApplyToAll(false);
+            paraPr.anchor = this.txBody.getBodyPr().anchor;
             return paraPr;
         }
         return null;
