@@ -432,14 +432,18 @@
 				this.lastSendInfoRange = ar.clone(true);
 				this.lastSendInfoRange.startCol = ar.startCol;
 				this.lastSendInfoRange.startRow = ar.startRow;
-				this.lastSendInfoRange.isSelectOnShape = ws.isSelectOnShape;
+				this.lastSendInfoRange.isSelectOnShape = ws.getSelectionShape();
 
 				if (null === info) {
 					info = ws.getSelectionInfo();
 				}
 				// При редактировании ячейки не нужно пересылать изменения
 				if (false === ws.getCellEditMode()) {
-					this.input.prop("disabled", false);
+					// Сами запретим заходить в строку формул, когда выделен shape
+					if (this.lastSendInfoRange.isSelectOnShape)
+						this.input.prop("disabled", true);
+					else
+						this.input.prop("disabled", false);
 					this.input.val(info.text);
 				}
 				this.handlers.trigger("asc_onSelectionChanged", info);
@@ -515,7 +519,8 @@
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				// Проверим, нужно ли отсылать информацию о ячейке
 				var ar = ws.activeRange;
-				if (!this._isEqualRange(ar, ws.isSelectOnShape)) {
+				var isSelectOnShape = ws.getSelectionShape();
+				if (!this._isEqualRange(ar, isSelectOnShape)) {
 					this._onWSSelectionChanged(ws.getSelectionInfo());
 				}
 
@@ -524,7 +529,7 @@
 				if ("hyperlink" === ct.target) {
 					// Проверим замерженность
 					var isHyperlinkClick = false;
-					if ( (ar.c1 === ar.c2 && ar.r1 === ar.r2) || ws.isSelectOnShape )
+					if ( (ar.c1 === ar.c2 && ar.r1 === ar.r2) || isSelectOnShape )
 						isHyperlinkClick = true;
 					else {
 						var mergedRange = ws.model.getMergedByCell(ar.r1, ar.c1);
@@ -532,7 +537,7 @@
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
-						if (false === ct.hyperlink.hyperlinkModel.getVisited() && !ws.isSelectOnShape) {
+						if (false === ct.hyperlink.hyperlinkModel.getVisited() && !isSelectOnShape) {
 							ct.hyperlink.hyperlinkModel.setVisited(true);
 							if (ct.hyperlink.hyperlinkModel.Ref)
 								ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});

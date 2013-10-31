@@ -5853,6 +5853,9 @@
 				this._trigger("selectionChanged", this.getSelectionInfo());
 			},
 
+			getSelectionShape: function () {
+				return this.isSelectOnShape;
+			},
 			setSelectionShape: function (isSelectOnShape) {
 				this.isSelectOnShape = isSelectOnShape;
 				// отправляем евент для получения свойств картинки, шейпа или группы
