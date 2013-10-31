@@ -3784,8 +3784,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     this.bInit_word_control = true;
 
-    this.asc_fireCallback("asc_onDocumentContentReady");
-
     var _slides = this.WordControl.m_oLogicDocument.Slides;
     var _slidesCount = _slides.length;
     for (var i = 0; i < _slidesCount; i++)
@@ -3801,6 +3799,8 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             }
         }
     }
+
+    this.asc_fireCallback("asc_onDocumentContentReady");
 
     this.WordControl.InitControl();
 
