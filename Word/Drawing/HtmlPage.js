@@ -2460,7 +2460,7 @@ function CEditorPage(api)
             }
 
             if (this.m_oScrollVer_){
-                this.m_oScrollVer_.Repos(settings);
+                this.m_oScrollVer_.Repos(settings, undefined, true);
             }
             else {
                 this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",

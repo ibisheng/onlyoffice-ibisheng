@@ -1999,7 +1999,7 @@ function CEditorPage(api)
         }
 
         if (this.m_oScrollVer_){
-            this.m_oScrollVer_.Repos(settings);//unbind("scrollvertical")
+            this.m_oScrollVer_.Repos(settings, undefined, true);//unbind("scrollvertical")
         }
         else {
 
