@@ -9537,13 +9537,14 @@ Paragraph.prototype =
     },
 
     // Очищение форматирования параграфа
-    Clear_Formatting : function()
+    Clear_Formatting : function(noClearIndent)
     {
         this.Style_Remove();
         this.Numbering_Remove();
 
         this.Set_ContextualSpacing(undefined);
-        this.Set_Ind( new CParaInd(), true );
+        if(!(noClearIndent === true && this.bullet))
+            this.Set_Ind( new CParaInd(), true );
         this.Set_Align( undefined, false );
         this.Set_KeepLines( undefined );
         this.Set_KeepNext( undefined );

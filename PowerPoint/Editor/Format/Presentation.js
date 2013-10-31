@@ -4058,9 +4058,11 @@ CPresentation.prototype =
 
     OnMouseMove : function(e, X, Y, PageIndex)
     {
+        editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
         this.Slides[this.CurPage].graphicObjects.Update_CursorType(X, Y,  e );
+        editor.sync_MouseMoveEndCallback();
         //this.Update_CursorType( X, Y, PageIndex, e );
         return;
         return;
