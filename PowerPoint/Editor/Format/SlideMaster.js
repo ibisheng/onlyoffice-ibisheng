@@ -19,6 +19,9 @@ function MasterSlide(presentation, theme)
     this.preserve = false;
 
     this.ImageBase64 = "";
+    this.Width64 = 0;
+    this.Height64 = 0;
+
     this.ThemeIndex = 0;
 
     // pointers
@@ -1006,6 +1009,9 @@ function CMasterThumbnailDrawer()
     this.WidthMM        = 0;
     this.HeightMM       = 0;
 
+    this.WidthPx        = 0;
+    this.HeightPx       = 0;
+
     this.DrawingDocument = null;
 
     this.GetThumbnail = function(_master, use_background, use_master_shapes)
@@ -1021,6 +1027,9 @@ function CMasterThumbnailDrawer()
             h_px <<= 1;
         }
         */
+
+        this.WidthPx  = w_px;
+        this.HeightPx = h_px;
 
         if (this.CanvasImage == null)
             this.CanvasImage = document.createElement('canvas');

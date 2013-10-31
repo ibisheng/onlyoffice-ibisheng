@@ -801,6 +801,8 @@ CPresentation.prototype =
         for (var i = 0; i < _len; i++)
         {
             _layouts[i].ImageBase64 = _drawerLayouts.GetThumbnail(_layouts[i]);
+            _layouts[i].Width64 = _drawerLayouts.WidthPx;
+            _layouts[i].Height64 = _drawerLayouts.HeightPx;
         }
     },
 

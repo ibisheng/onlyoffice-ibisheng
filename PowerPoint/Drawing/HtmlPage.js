@@ -2811,6 +2811,8 @@ function CEditorPage(api)
             _layouts[i].recalculate2();
 
             _layouts[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(_layouts[i]);
+            _layouts[i].Width64 = this.m_oLayoutDrawer.WidthPx;
+            _layouts[i].Height64 = this.m_oLayoutDrawer.HeightPx;
         }
     }
 
@@ -2839,9 +2841,15 @@ function CEditorPage(api)
                 arr[i].Name = master.sldLayoutLst[i].cSld.name;
 
                 if ("" == master.sldLayoutLst[i].ImageBase64)
+                {
                     master.sldLayoutLst[i].ImageBase64 = this.m_oLayoutDrawer.GetThumbnail(master.sldLayoutLst[i]);
+                    master.sldLayoutLst[i].Width64 = this.m_oLayoutDrawer.WidthPx;
+                    master.sldLayoutLst[i].Height64 = this.m_oLayoutDrawer.HeightPx;
+                }
 
                 arr[i].Image = master.sldLayoutLst[i].ImageBase64;
+                arr[i].Width = master.sldLayoutLst[i].Width64;
+                arr[i].Height = master.sldLayoutLst[i].Height64;
             }
 
             editor.asc_fireCallback("asc_onUpdateLayout", arr);

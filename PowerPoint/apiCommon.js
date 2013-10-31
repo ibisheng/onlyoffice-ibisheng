@@ -1596,12 +1596,17 @@ function CLayoutThumbnail()
     this.Name = "";
     this.Type = 15;
     this.Image = "";
+
+    this.Width = 0;
+    this.Height = 0;
 }
 
 CLayoutThumbnail.prototype.getIndex = function() { return this.Index; }
 CLayoutThumbnail.prototype.getType = function() { return this.Type; }
 CLayoutThumbnail.prototype.get_Image = function() { return this.Image; }
 CLayoutThumbnail.prototype.get_Name = function() { return this.Name; }
+CLayoutThumbnail.prototype.get_Width = function() { return this.Width; }
+CLayoutThumbnail.prototype.get_Height = function() { return this.Height; }
 
 function CDocInfoProp(obj)
 {
