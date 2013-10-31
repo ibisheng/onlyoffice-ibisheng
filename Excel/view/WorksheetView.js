@@ -5758,11 +5758,13 @@
 
 			_getSelectionInfoObject: function (bExt) {
 				var objectInfo = new asc_CCellInfo();
+				var defaults = this.settings.cells;
+				var selectionType = c_oAscSelectionType.RangeShape;
 
 				objectInfo.flags = new asc_CCellFlag();
 				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
 				if (graphicObjects.length)
-					objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
+					selectionType = objectInfo.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
 
 				var textPr = this.objectRender.controller.getParagraphTextPr();
 				var paraPr = this.objectRender.controller.getParagraphParaPr();
@@ -5807,6 +5809,11 @@
 
 						objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
 					}
+				} else if (c_oAscSelectionType.RangeShape == selectionType) {
+					// Может быть не задано текста, поэтому выставим по умолчанию
+					objectInfo.font = new asc_CFont();
+					objectInfo.font.name = defaults.fontName;
+					objectInfo.font.size = defaults.fontSize;
 				}
 
 				// Заливка не нужна как таковая
