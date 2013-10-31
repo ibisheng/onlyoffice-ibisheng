@@ -2413,6 +2413,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		}
 	};
 	this.WriteSheetView = function (oSheetView) {
+		var oThis = this;
 		if (null !== oSheetView.showGridLines)
 			this.bs.WriteItem(c_oSer_SheetView.ShowGridLines, function(){oThis.memory.WriteBool(oSheetView.showGridLines);});
 		if (null !== oSheetView.showRowColHeaders)
