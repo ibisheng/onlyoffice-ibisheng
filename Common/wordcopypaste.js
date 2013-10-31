@@ -3253,10 +3253,13 @@ PasteProcessor.prototype =
             {
                 var base64 = null;
                 var classNode;
-                if(node.children[0] && node.children[0].getAttribute("class") != null)
-                    classNode = node.children[0].getAttribute("class");
-                else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null)
-                    classNode = node.children[0].children[0].getAttribute("class");
+                if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("docData;") > -1)
+					classNode = node.children[0].getAttribute("class");
+                else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1)
+					classNode = node.children[0].children[0].getAttribute("class");
+				else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1)
+                    classNode = node.children[0].children[0].children[0].getAttribute("class");
+				
                 if( classNode != null ){
                     cL = classNode.split(" ");
                     for (var i = 0; i < cL.length; i++){
