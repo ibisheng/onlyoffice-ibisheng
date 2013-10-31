@@ -6999,6 +6999,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
                     this.Slides[this.CurPage].changeComment( Id, CommentData );
+                    editor.sync_ChangeCommentData( Id, CommentData );
                     this.Recalculate()
                 }
                 else

@@ -3150,7 +3150,7 @@ CGraphicObjects.prototype = {
                         {
                             if(comments[i].selected)
                             {
-                                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, comments[i].Id ) )
+                                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, comments[i].Id ) )
                                 {
                                     editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                                     editor.WordControl.m_oLogicDocument.Remove_Comment(comments[i].Id, true);

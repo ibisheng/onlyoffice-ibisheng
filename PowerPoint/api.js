@@ -3458,14 +3458,13 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
+    //if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
     {
         var CommentData = new CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);
 
         this.WordControl.m_oLogicDocument.Change_Comment( Id, CommentData );
 
-        this.sync_ChangeCommentData( Id, CommentData );
     }
 }
 
