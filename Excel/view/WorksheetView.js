@@ -5618,6 +5618,9 @@
 			},
 
 			getSelectionName: function (bRangeText) {
+				if (this.isSelectOnShape)
+					return " ";	// Пока отправим пустое имя(с пробелом, пустое не воспринимаем в меню..) ToDo
+
 				var ar = this.activeRange;
 				var mc = this.model.getMergedByCell(ar.startRow, ar.startCol);
 				var c1 = mc ? mc.c1 : ar.startCol;
@@ -5841,6 +5844,7 @@
 			setSelectionShape: function (isSelectOnShape) {
 				this.isSelectOnShape = isSelectOnShape;
 				// отправляем евент для получения свойств картинки, шейпа или группы
+				this._trigger("selectionNameChanged", this.getSelectionName());
 				this._trigger("selectionChanged", this.getSelectionInfo());
 			},
 
