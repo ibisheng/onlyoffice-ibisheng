@@ -4063,20 +4063,6 @@ CPresentation.prototype =
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
         this.Slides[this.CurPage].graphicObjects.Update_CursorType(X, Y,  e );
         editor.sync_MouseMoveEndCallback();
-        //this.Update_CursorType( X, Y, PageIndex, e );
-        return;
-        return;
-        if ( PageIndex < 0 )
-            return;
-
-        this.Update_CursorType( X, Y, PageIndex, e );
-
-        if ( true === this.Selection.Use && true === this.Selection.Start )
-        {
-            this.CurPage = PageIndex;
-            this.Selection_SetEnd( X, Y, e );
-            this.Document_UpdateSelectionState();
-        }
     },
 
     Get_Numbering : function()
@@ -6329,11 +6315,16 @@ CPresentation.prototype =
 
         var _master_width = _new_master.Width;
         var _master_height = _new_master.Height;
-        if(Math.abs(_master_height - this.Height) > 1 || Math.abs(_master_width - this.Width) > 1)
+        if(_master_height !== this.Height || _master_width !== this.Width)
         {
-            //   _new_master.setSize(this.Width, this.Height);
+            var kw = this.Width/_master_width;
+            var kh = this.Height/_master_height;
+            themeInfo.Master.changeSize(kw, kh);
+            for(var i = 0; i < themeInfo.Master.sldLayoutLst.length; ++i)
+            {
+                themeInfo.Master.sldLayoutLst[i].changeSize(kw, kh);
+            }
         }
-
         _new_master.recalculate();
         var _arr_slides = this.Slides;
         var _slides_array = [];

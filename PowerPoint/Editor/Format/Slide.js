@@ -398,6 +398,8 @@ function Slide(presentation, slideLayout, slideNum)
         }
     };
 
+
+
     this.CreateFontMap = function(FontMap)
     {
         var _arr_glyph = this.elementsManipulator.ArrGlyph;
@@ -1031,6 +1033,13 @@ Slide.prototype =
         this.recalcAll();
     },
 
+    setSlideSize: function(w, h)
+    {
+        History.Add(this, {Type: historyitem_SetSlideSizes, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        this.w = w;
+        this.h = h;
+    },
+
     changeBackground: function(bg)
     {
         History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
@@ -1529,6 +1538,12 @@ Slide.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_SetSlideSizes:
+            {
+                this.Width = data.oldW;
+                this.Height = data.oldH;
+                break;
+            }
             case historyitem_AddComment:
             {
                 this.comments.splice(data.pos, 1);
@@ -1644,6 +1659,12 @@ Slide.prototype =
         switch(data.Type)
         {
 
+            case historyitem_SetSlideSizes:
+            {
+                this.Width = data.newW;
+                this.Height = data.newH;
+                break;
+            }
             case historyitem_AddComment:
             {
                 this.comments.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
@@ -1761,7 +1782,12 @@ Slide.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-
+            case historyitem_SetSlideSizes:
+            {
+                w.WriteDouble(data.newW);
+                w.WriteDouble(data.newH);
+                break;
+            }
             case historyitem_AddComment:
             {
                 w.WriteLong(data.pos);
@@ -1890,6 +1916,12 @@ Slide.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_SetSlideSizes:
+            {
+                this.Width = r.GetDouble();
+                this.Height = r.GetDouble();
+                break;
+            }
             case historyitem_AddComment:
             {
                 var pos = r.GetLong();

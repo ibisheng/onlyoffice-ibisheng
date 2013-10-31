@@ -236,7 +236,8 @@ var historyitem_SetLayoutMatchingName = 18;
 var historyitem_SetLayoutMaster = 19;
 var historyitem_SetLayoutType = 20;
 var historyitem_SetMasterTheme = 21;
-var historyitem_SetSlideComments = 22
+var historyitem_SetSlideComments = 22;
+var historyitem_SetSlideSizes = 23;
 
 
 
