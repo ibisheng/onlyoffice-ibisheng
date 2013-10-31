@@ -475,6 +475,7 @@
 
 			_onSetSelection: function (range, validRange) {
 				var ws = this.getWorksheet();
+				ws._checkSelectionShape();
 				var d = ws.setSelection(range, validRange);
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
@@ -496,6 +497,7 @@
 					}
 				}
 				var ws = this.getWorksheet(index);
+				ws.setSelectionShape(true);
 				ws.objectRender.controller.setSelectionState(state);
                 ws.objectRender.controller.updateSelectionState();
 			},
@@ -549,7 +551,6 @@
 							case c_oAscHyperlinkType.RangeLink:
 								// ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
 								this.handlers.trigger("asc_onHideComment");
-								ws._checkSelectionShape();
 								this.Api._asc_setWorksheetRange(ct.hyperlink);
 								break;
 						}

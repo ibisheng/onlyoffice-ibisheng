@@ -522,6 +522,8 @@ CHistory.prototype =
 		}
 		if(false == Point.bNoSelect && null != oSelectRange)
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
+		if (Point.SelectionState != null)
+			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 		
 		this._sendCanUndoRedo();
 
