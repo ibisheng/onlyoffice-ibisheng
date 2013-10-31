@@ -4994,9 +4994,7 @@
 						oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
 						var spl = drawingInfo.hyperlink.Value.split("!");
 						if (spl.length === 2) {
-							oHyperlink.Location = drawingInfo.hyperlink.Value;
-							oHyperlink.LocationSheet = spl[0];
-							oHyperlink.LocationRange = spl[1];
+							oHyperlink.setLocation(drawingInfo.hyperlink.Value);
 						}
 						else
 							oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
@@ -5774,10 +5772,7 @@
 						
 						var spl = shapeHyperlink.Value.split("!");
 						if (spl.length === 2) {
-							hyperlink.Location = shapeHyperlink.Value;
-							hyperlink.LocationSheet = spl[0];
-							hyperlink.LocationRange = spl[1];
-							this.objectRender.controller.resetSelectionState();
+							hyperlink.setLocation(shapeHyperlink.Value);
 						} else
 							hyperlink.Hyperlink = shapeHyperlink.Value;
 						

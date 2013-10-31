@@ -524,7 +524,7 @@
 				if ("hyperlink" === ct.target) {
 					// Проверим замерженность
 					var isHyperlinkClick = false;
-					if (ar.c1 === ar.c2 && ar.r1 === ar.r2)
+					if ( (ar.c1 === ar.c2 && ar.r1 === ar.r2) || ws.isSelectOnShape )
 						isHyperlinkClick = true;
 					else {
 						var mergedRange = ws.model.getMergedByCell(ar.r1, ar.c1);
@@ -532,7 +532,7 @@
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
-						if (false === ct.hyperlink.hyperlinkModel.getVisited()) {
+						if (false === ct.hyperlink.hyperlinkModel.getVisited() && !ws.isSelectOnShape) {
 							ct.hyperlink.hyperlinkModel.setVisited(true);
 							if (ct.hyperlink.hyperlinkModel.Ref)
 								ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkModel.Ref.getBBox0(), isLockDraw: false, canChangeColWidth: false});
@@ -544,6 +544,7 @@
 							case c_oAscHyperlinkType.RangeLink:
 								// ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
 								this.handlers.trigger("asc_onHideComment");
+								ws._checkSelectionShape();
 								this.Api._asc_setWorksheetRange(ct.hyperlink);
 								break;
 						}
