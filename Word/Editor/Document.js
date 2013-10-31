@@ -8242,7 +8242,7 @@ CDocument.prototype =
         }
 		else if ( e.KeyCode == 88 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + X - cut
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) && (window.USER_AGENT_SAFARI_MACOS !== true))
+            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
                 this.Create_NewHistoryPoint();
                 Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
