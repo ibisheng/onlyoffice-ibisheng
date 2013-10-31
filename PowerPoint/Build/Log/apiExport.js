@@ -817,6 +817,8 @@ prop:getIndex
 prop:getType
 prop:get_Image
 prop:get_Name
+prop:get_Width
+prop:get_Height
 ---
 var:CDocInfoProp
 prop:get_PageCount
@@ -1915,6 +1917,8 @@ CLayoutThumbnail.prototype['getIndex'] = CLayoutThumbnail.prototype.getIndex;
 CLayoutThumbnail.prototype['getType'] = CLayoutThumbnail.prototype.getType;
 CLayoutThumbnail.prototype['get_Image'] = CLayoutThumbnail.prototype.get_Image;
 CLayoutThumbnail.prototype['get_Name'] = CLayoutThumbnail.prototype.get_Name;
+CLayoutThumbnail.prototype['get_Width'] = CLayoutThumbnail.prototype.get_Width;
+CLayoutThumbnail.prototype['get_Height'] = CLayoutThumbnail.prototype.get_Height;
 window['CDocInfoProp'] = CDocInfoProp;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
 CDocInfoProp.prototype['put_PageCount'] = CDocInfoProp.prototype.put_PageCount;
