@@ -5886,7 +5886,6 @@
 			},
 
 			changeSelectionStartPoint: function (x, y, isCoord, isSelectMode) {
-				
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
 				var sc = ar.startCol, sr = ar.startRow, ret = {};
 				var isChangeSelectionShape = false;
@@ -5999,14 +5998,16 @@
 			},
 
 			changeSelectionEndPoint: function (x, y, isCoord, isSelectMode) {
-				
+				var isChangeSelectionShape = false;
+				if (isCoord)
+					isChangeSelectionShape = this._checkSelectionShape();
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 				var arOld = ar.clone();
 				var arnOld = ar.clone(true);
 				var ep = isCoord ? this._calcSelectionEndPointByXY(x, y) : this._calcSelectionEndPointByOffset(x, y);
 				var epOld, ret;
 
-				if (ar.c2 !== ep.c2 || ar.r2 !== ep.r2) {
+				if (ar.c2 !== ep.c2 || ar.r2 !== ep.r2 || isChangeSelectionShape) {
 					this.cleanSelection();
 					ar.assign(ar.startCol, ar.startRow, ep.c2, ep.r2);
 					if (ar.type === c_oAscSelectionType.RangeCells) {
