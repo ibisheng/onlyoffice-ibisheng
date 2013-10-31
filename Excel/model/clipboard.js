@@ -1494,7 +1494,9 @@
 			
             _editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
             {
-                var pasteFragment = node;
+				if(node == undefined)
+					return;
+				var pasteFragment = node;
                 var t = this;
 				
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
