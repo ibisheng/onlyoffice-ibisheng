@@ -3162,8 +3162,8 @@ function DrawingObjects() {
 			
 			// Коррекция для селекта при блокировке
 			var delta = 4;
-			boundsChecker.Bounds.min_x = Math.max(0, boundsChecker.Bounds.min_x - delta);
-			boundsChecker.Bounds.min_y = Math.max(0, boundsChecker.Bounds.min_y - delta);
+			boundsChecker.Bounds.min_x = Math.max(1, boundsChecker.Bounds.min_x - delta);
+			boundsChecker.Bounds.min_y = Math.max(1, boundsChecker.Bounds.min_y - delta);
 			boundsChecker.Bounds.max_x += delta;
 			boundsChecker.Bounds.max_y += delta;
 			return boundsChecker;
