@@ -280,6 +280,7 @@ CDocument.prototype.Search_GetId = function(bNext)
             return Id;
 
         ParaDrawing.GoTo_Text( true === bNext ? false : true );
+        this.DrawingObjects.resetSelection();
     }
 
     if ( docpostype_Content === this.CurPos.Type )
@@ -1012,7 +1013,7 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
         var EndPos   = Math.min( Pos, this.Content.length - 1 );
 
         // Проверяем автофигуры между StartPos и EndPos
-        for ( var TempPos = EndPos; TempPos > StartPos; TempPos-- )
+        for ( var TempPos = EndPos - 1; TempPos >= StartPos; TempPos-- )
         {
             var Item = this.Content[TempPos];
             if ( para_Drawing === Item.Type )

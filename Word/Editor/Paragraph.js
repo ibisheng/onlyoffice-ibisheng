@@ -6672,7 +6672,7 @@ Paragraph.prototype =
         if ( true != bBefore )
             Pos = Pos + 1;
 
-        this.Set_ContentPos( Pos, true, -1 );
+        this.Set_ContentPos( Pos, false, -1 );
         this.RecalculateCurPos();
         this.CurPos.RealX = this.CurPos.X;
         this.CurPos.RealY = this.CurPos.Y;
