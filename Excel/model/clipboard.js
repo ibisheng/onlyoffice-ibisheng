@@ -1329,12 +1329,15 @@
                 }
 				
 				//wrap
-				if(node.style.whiteSpace == 'nowrap')
-					oNewItem.wrap = false;
-				else if(node.style.whiteSpace == 'normal')
-					oNewItem.wrap = true;
-				else
-					oNewItem.wrap = false;
+				if(oNewItem.wrap !== true)
+				{
+					if(node.style.whiteSpace == 'nowrap')
+						oNewItem.wrap = false;
+					else if(node.style.whiteSpace == 'normal')
+						oNewItem.wrap = true;
+					else
+						oNewItem.wrap = false;
+				}
 				
 				//merge
 				if(node != undefined && node.colSpan != undefined)
@@ -2659,19 +2662,41 @@
 						if(isText || (isText == '' && typeof isText == 'string'))
 							colorText = null;
 						res.push({
-							format: {
-								fn: fn,
-								fs: fs,
-								c: colorText,
-								b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
-								i: fi.indexOf("italic") >= 0,
-								u: td.indexOf("underline") >= 0 ? "single" : "none",
-								s: td.indexOf("line-through") >= 0,
-								va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
-							},
-							text: prefix + text,
-							cellFrom : cellFrom
+								format: {
+									fn: fn,
+									fs: fs,
+									c: colorText,
+									b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
+									i: fi.indexOf("italic") >= 0,
+									u: td.indexOf("underline") >= 0 ? "single" : "none",
+									s: td.indexOf("line-through") >= 0,
+									va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
+								},
+								text: prefix + text,
+								cellFrom : cellFrom
 							});
+							//в одной ячейке находится несколько параграфов(при вставке таблицы), между параграфами добавляем символ переноса строки
+							if(elem.parentElement && elem.parentElement.parentElement && elem.parentElement.parentElement.parentElement && elem.parentElement.parentElement.nodeName.toLowerCase() == 'p' && elem.parentElement.parentElement.parentElement.nodeName.toLowerCase() == 'td')
+							{
+								if(elem.parentElement.parentElement.nextSibling && elem.parentElement.parentElement.nextSibling.nodeName.toLowerCase() == 'p')
+								{
+									res.push({
+										format: {
+											fn: fn,
+											fs: fs,
+											c: colorText,
+											b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
+											i: fi.indexOf("italic") >= 0,
+											u: td.indexOf("underline") >= 0 ? "single" : "none",
+											s: td.indexOf("line-through") >= 0,
+											va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
+										},
+										text: '\n',
+										cellFrom : cellFrom
+									});
+								}
+								res.wrap = true;
+							};
 						if (fn !== "") {fonts.push(fn);}
 						return;
 						}
@@ -2681,20 +2706,6 @@
 					else
 						Array.prototype.forEach.call(elem.childNodes, processElement);
 				});
-			/* 	if(res.format == undefined)//Что это? Нипанятнаааа! res.format - ни где не определяется для res, и после кода выполнения кода в этом if у res не появится элемент format.
-				{
-					res.push({
-					format: {
-						fn: 'Arial',
-						fs: '11',
-						b: false,
-						i: false,
-						u: false,
-						s: false,
-						va: 'none'
-					},
-					text: ''});
-				} */
 				fonts.sort();
 				for (i = 0; i < fonts.length; ) {
 					if (i+1 < fonts.length && fonts[i] === fonts[i+1]) {fonts.splice(i+1, 1); continue;}
