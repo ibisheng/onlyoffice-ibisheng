@@ -666,8 +666,17 @@ CGeometry.prototype=
         {
             Writer.WriteString2(this.preset);
         }
-        WriteObjectString(Writer, this.rectS);
-        WriteObjectDouble(Writer, this.rect);
+        var w = Writer;
+        w.WriteBool(isRealObject(this.rectS));
+        if(isRealObject(this.rectS))
+        {
+            w.WriteString2(this.rectS.l);
+            w.WriteString2(this.rectS.t);
+            w.WriteString2(this.rectS.r);
+            w.WriteString2(this.rectS.b);
+        }
+        // WriteObjectString(Writer, this.rectS);
+        //WriteObjectDouble(Writer, this.rect);
     },
 
     Read_FromBinary2: function(Reader)
@@ -788,9 +797,17 @@ CGeometry.prototype=
         {
             this.preset = r.GetString2();
         }
-        var rectS = ReadObjectString(r);
-        this.AddRect(rectS.l, rectS.t, rectS.r, rectS.b);
-        this.rect = ReadObjectDouble(r);
+        if(r.GetBool())
+        {
+            var rectS = {};
+            rectS.l = r.GetString2();
+            rectS.t = r.GetString2();
+            rectS.r = r.GetString2();
+            rectS.b = r.GetString2();
+            this.AddRect(rectS.l, rectS.t, rectS.r, rectS.b);
+        }
+        //this.rect = ReadObjectDouble(r);
+        //this.rect = ReadObjectDouble(r);
     },
 
 
