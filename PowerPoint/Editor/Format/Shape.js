@@ -3093,7 +3093,7 @@ CShape.prototype =
         }
         if(this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)
         {
-            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined)
+            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && !this.addTextFlag)
             {
                 if (global_MatrixTransformer.IsIdentity2(this.transform))
                 {
