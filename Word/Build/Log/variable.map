@@ -433,7 +433,7 @@ ft_extra_glyph_names:ft
 PARRUN_TYPE_FLD:xk
 FONT_TYPE_ADDITIONAL:kE
 c_oSerNumTypes$StyleLink:dZ
-JSCompiler_StaticMethods_Is_Empty:xd
+JSCompiler_StaticMethods_Is_Empty:vd
 c_oSerNumTypes$AbstractNum_Lvls:KY
 cff_get_kerning:cC
 BinaryStyleTableWriter:N5
@@ -3362,7 +3362,7 @@ L 70:$p
 FT_PEEK_USHORT:xq
 L 72:yl
 L 71:rg
-L 64:vd
+L 64:wd
 _files$$inline_1346:T
 ret$$inline_768:Vu
 L 65:oe
@@ -3376,7 +3376,7 @@ TRACK_DISTANCE_ROTATE2:g7
 L 69:cg
 c_oSerProp_rPrType$LangBidi:N_
 Ins_MSIRP:mz
-L 66:wd
+L 66:xd
 L 67:xl
 JSCompiler_StaticMethods_getSrc:Lb
 FontProperties:oo
