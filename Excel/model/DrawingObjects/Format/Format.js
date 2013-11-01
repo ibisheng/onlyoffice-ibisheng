@@ -958,6 +958,13 @@ CRGBColor.prototype =
 
     Calculate : function(obj)
     {
+    },
+
+    copyFromOther: function(obj)
+    {
+        var RGBA = obj.RGBA;
+        var rgba = ((RGBA.R << 16) & 0xFF0000) + ((RGBA.G << 8) & 0xFF00) + RGBA.B;
+        this.setColor(rgba);
     }
 };
 
@@ -1407,7 +1414,8 @@ CUniColor.prototype =
                     }
                 }
             }
-            this.color.copyFromOther(u.color);
+            if(this.color && this.color.copyFromOther)
+                this.color.copyFromOther(u.color);
         }
     }
 };
