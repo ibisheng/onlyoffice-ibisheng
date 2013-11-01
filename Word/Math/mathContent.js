@@ -329,7 +329,8 @@ CMathContent.prototype =
         if(this.rInterval.startPos == this.rInterval.endPos)
             this.rInterval.startPos = this.rInterval.endPos = this.CurPos + 1;
 
-        this.checkRunPrp();
+        //this.checkRunPrp();
+        this.verifyRPrp_Letter();
 
         /*if(this.IsEmpty())
         {
@@ -373,7 +374,7 @@ CMathContent.prototype =
         // txt properties
 
         //this.addElementToContent(symb, gps);
-        if(this.content[this.CurPos].typeObj === MATH_EMPTY)
+        if(this.content[this.CurPos].value.typeObj === MATH_EMPTY)
         {
             if(this.CurPos + 1 < this.content.length && this.content[this.CurPos + 1].typeObj == MATH_RUN_PRP)
                 this.CurPos++; //увеличиваем позицию курсора: вообще такого не должно быть, мы при перемещении попадаем в Run в таком случае
@@ -467,7 +468,7 @@ CMathContent.prototype =
 
             var ctrPrp = new CTextPr();
 
-            if(this.CurPos > 1) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
+            if(this.CurPos > 0) // т.к. всегда добавляем только в текущий контент, то если контент не пуст, в начале стоят либо runPrp, либо другой MathObj
             {
                 ctrPrp = this.getCurrRunPrp();
             }
@@ -486,21 +487,19 @@ CMathContent.prototype =
 
             mathElem.setCtrPrp(ctrPrp);
 
-            this.addToContent(mathElem);
+            var shift;
+            if(this.content[this.CurPos].value.typeObj === MATH_RUN_PRP)
+                shift = -1;
+            else
+                shift = 0;
+
+
+            this.addToContent(mathElem, shift);
 
             var empty = new CEmpty();
-            this.addToContent(empty);
+            this.addToContent(empty, shift);
 
-            // добавляем RunPrp для текста, они будут такие же как и ctrPrp
-            if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos + 1].value.typeObj == MATH_TEXT)
-            {
-                var rPrp = Common_CopyObj(ctrPrp);
-                //this.addRunPrpToContent(rPrp);
-                this.addRunPrp(rPrp);
-            }
-
-            //this.addElementToContent( mathElem, new dist(l_gap, r_gap, 0, 0) );
-            //this.addElementToContent(empty);
+            this.verifyRPrp_MC(ctrPrp);
 
             this.rInterval.endPos += 2;
         }
@@ -517,14 +516,21 @@ CMathContent.prototype =
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
-    addToContent: function(obj)          // for "edit"
+    addToContent: function(obj, shift)          // for "edit"
     {
         var elem = new mathElem(obj);
+
+        var bDef = typeof(shift) !== "undefined" && shift !== null;
+        var bNum = shift === shift - 0;
+        var bCont = bNum ? ( this.CurPos + shift >= 0 && this.CurPos + shift < this.content.length) : false;
+
+        if(!(bDef || bNum || bCont))
+            shift = 0;
 
         /*var runPrp = this.getRunPrp(this.CurPos);
          element.setTxtPrp( runPrp );*/
 
-        var tmp = this.content.splice(0, this.CurPos + 1);
+        var tmp = this.content.splice(0, this.CurPos + 1 + shift );
         tmp.push(elem);
         tmp = tmp.concat( this.content.splice(0, this.content.length) );
 
@@ -3685,6 +3691,7 @@ CMathContent.prototype =
         }
         else if(this.CurPos!=0 || this.selection.startPos != this.selection.endPos)
         {
+            var currType = this.content[this.CurPos].value.typeObj;
 
             if(this.selection.startPos != this.selection.endPos)
             {
@@ -3711,7 +3718,7 @@ CMathContent.prototype =
 
             }
             //пришли из базового класса
-            else if( this.content[this.CurPos].value.typeObj === MATH_COMP )
+            else if( currType === MATH_COMP )
             {
                 if( this.selection.active )
                 {
@@ -3733,17 +3740,23 @@ CMathContent.prototype =
             {
                 //если нет селекта, то просто перемещаемся по контенту
 
-                var bFirstRunPrp = this.CurPos == 1 && this.content[this.CurPos].value.typeObj == MATH_RUN_PRP;
+                var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
 
                 if(!bFirstRunPrp)  // иначе, по контенту не перемещаемся
                 {
-                    if(this.content[this.CurPos - 1].value.typeObj === MATH_RUN_PRP && this.CurPos > 2)
+                    var prevType = this.content[this.CurPos - 1].value.typeObj,
+                        prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
+
+                    var bDiffRPrp = prevType === MATH_RUN_PRP && prev2_Type == MATH_TEXT,
+                        bRPrComp = currType === MATH_RUN_PRP && prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
+
+                    if(bDiffRPrp || bRPrComp)
                         this.CurPos -= 2;
                     else
                         this.CurPos--;
                 }
 
-                if( this.content[this.CurPos].value.typeObj === MATH_COMP )
+                if( this.content[this.CurPos].value.typeObj === MATH_COMP ) // this.CurPos может измениться
                 {
                     CurrContent = SelectContent = this.content[this.CurPos].value.goToLastElement();
                 }
@@ -4400,11 +4413,12 @@ CMathContent.prototype =
             prevType = this.CurPos > 1 ? this.content[this.CurPos - 1].value.typeObj : null,
             prev2_Type = this.CurPos > 2 ? this.content[this.CurPos - 2].value.typeObj : null,
             prev3_Type = this.CurPos > 3 ? this.content[this.CurPos - 3].value.typeObj : null,
-            prev4_Type = this.CurPos > 4 ? this.content[this.CurPos - 4].value.typeObj : null,
-            nextType = this.CurPos > this.content.length -1 ? this.content[this.CurPos + 1].value.typeObj : null;
+            //prev4_Type = this.CurPos > 4 ? this.content[this.CurPos - 4].value.typeObj : null,
+            nextType = this.CurPos < this.content.length ? this.content[this.CurPos + 1].value.typeObj : null,
+            next3_Type = this.CurPos + 3 < this.content.length ? this.content[this.CurPos + 3].value.typeObj : null;
 
-        var bPrevComp = prevType === MATH_EMPTY && prev2_Type === MATH_COMP,
-            bPrev2_Comp = prev3_Type === MATH_EMPTY && prev4_Type === MATH_COMP;
+        var bPrevComp = prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
+            //bPrev2_Comp = prev3_Type === MATH_EMPTY && prev4_Type === MATH_COMP;
 
         //var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
         var bMEDirect = order == 1 && currType === MATH_EMPTY, // работает, если только в конце формулы стоим или после идет еще одна формула
@@ -4412,15 +4426,213 @@ CMathContent.prototype =
             bMEReverse = order == -1 && nextType === MATH_COMP,
             bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
 
-        var items = null;
 
-        if(!bSelect && bMEDirect)   // если курсор после мат. объекта и нет RunPrp
+        // directly
+
+        var bMEDirect = order == 1,
+            bMEReverse = order == -1;
+
+        var bDirectly_CurrComp = currType == MATH_EMPTY && prevType == MATH_COMP,
+            bDirectly_RPrpComp = currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP;
+
+        bDirectly_CurrComp = bDirectly_CurrComp && bMEDirect;
+        bDirectly_RPrpComp = bDirectly_RPrpComp && bMEDirect;
+
+        // reverse
+
+        var bReverseComp = nextType == MATH_COMP && next2_Type == MATH_EMPTY,
+            bAfterRPrp   = next3_Type == MATH_RUN_PRP;
+
+        bReverseComp = bReverseComp && bMEReverse;
+
+        var bSet_Select = (bDirectly_CurrComp|| bDirectly_RPrpComp || bReverseComp) && !bSelect;
+
+
+        // NB !
+        // учесть случаи :
+        // 1. если нажата delete и справа стоят RunPrp
+        // 2. если все текстовые элементы удалили из Run, нужно удалить RunPrp (delete и backspace)
+
+
+        if(bSet_Select)
+        {
+            var start, end;
+
+            if(bDirectly_CurrComp) // directly, only composition
+            {
+                start = this.CurPos;
+                end = this.CurPos - 2;
+            }
+            else if(bReverseComp && !bAfterRPrp) // reverse, only composition
+            {
+                start = this.CurPos;
+                end = this.CurPos + 2;
+            }
+            else // composition + RunPrp(after)
+            {
+                var bSelectRunPrp = false;
+
+                var bDirectlySearch = prev3_Type === MATH_TEXT && bMEDirect,
+                    bReverseSeach = currType === MATH_TEXT && bMEReverse;
+
+                if(bDirectlySearch || bReverseSeach)
+                {
+                    var shift;
+                    if(bMEDirect)
+                        shift = 3;
+                    else
+                        shift = 0;
+
+                    for(var i = this.CurPos - shift; i > 0; i--)
+                    {
+                        if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                        {
+                            currRPrp = this.content[this.CurPos + shift].value;
+                            prevRPrp = this.content[i].value;
+                            bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                            break;
+                        }
+                    }
+                }
+
+                if(bMEDirect)
+                {
+                    if(bSelectRunPrp)
+                    {
+                        start = this.CurPos;
+                        end = this.CurPos-3;
+                    }
+                    else
+                    {
+                        start = this.CurPos-1;
+                        end = this.CurPos-3;
+                    }
+                }
+                else
+                {
+                    if(bSelectRunPrp)
+                    {
+                        start = this.CurPos - 1;
+                        end = this.CurPos + 2;
+                    }
+                    else
+                    {
+                        start = this.CurPos - 1;
+                        end = this.CurPos + 1;
+                    }
+                }
+
+            }
+
+            this.setStart_Selection(start);
+            this.setEnd_Selection(end);
+            this.selection.active = false;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //directly
+        if(bCurrComp) // empty + math composition
         {
             this.setStart_Selection(this.CurPos);
             this.setEnd_Selection( this.CurPos-2 );
             this.selection.active = false;
         }
-        else if(!bSelect && bMEDirectRPrp)
+        else if(bRPrpComp) // runPrp, empty, math composition
+        {
+            //здесь только селектим, ничего не удаляем
+            //селектим RunPrp только в одном случае, когда слева и справа от формулы Run с одними и теми же RunPrp
+
+            var bSelectRunPrp = false;
+
+            if(prev3_Type === MATH_TEXT)
+            {
+                for(var i = this.CurPos - 3; i > 0; i--)
+                {
+                    if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                    {
+                        currRPrp = this.content[this.CurPos].value;
+                        prevRPrp = this.content[i].value;
+                        bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                        break;
+                    }
+                }
+            }
+
+            var start, end;
+            if(bSelectRunPrp)
+            {
+                start = this.CurPos;
+                end = this.CurPos-3;
+            }
+            else
+            {
+                start = this.CurPos-1;
+                end = this.CurPos-3;
+            }
+
+            this.setStart_Selection(start);
+            this.setEnd_Selection(end);
+            this.selection.active = false;
+
+        }
+        //reverse
+        else if(bReverseComp)
+        {
+            if(bAfterRPrp)
+            {
+
+            }
+
+        }
+
+
+
+
+
+        var items = null;
+
+        if(!bSelect && bMEDirect)   // если курсор после мат. объекта и нет RunPrp после ма объекта
+        {
+            this.setStart_Selection(this.CurPos);
+            this.setEnd_Selection( this.CurPos-2 );
+            this.selection.active = false;
+        }
+        else if(!bSelect && bMEDirectRPrp) // мат объект, RunPrp
         {
             /*if(this.CurPos === 3) // стоим в начале, после мат объекта
             {
@@ -4744,6 +4956,10 @@ CMathContent.prototype =
             {
                 runPrp.Merge(this.Parent.getCtrPrp());
             }
+            else if(this.CurPos == 1 && this.content[1].value.typeObj == MATH_COMP)
+            {
+                runPrp.Merge(this.content[1].value.getCtrPrp());
+            }
             else
             {
                 for(var i = this.CurPos; i > 0; i--)
@@ -4755,11 +4971,11 @@ CMathContent.prototype =
                         runPrp.Merge(obj.getRunPrp());
                         break;
                     }
-                    /*else if(obj.typeObj == MATH_COMP)
+                    else if(obj.typeObj == MATH_COMP)
                     {
                         runPrp.Merge(obj.getCtrPrp());
                         break;
-                    }*/
+                    }
                 }
             }
         }
@@ -4867,6 +5083,70 @@ CMathContent.prototype =
 
         //this.addToBeginningRPrp(txtPrp);
 
+    },
+    verifyRPrp_MC: function(rPrp)
+    {
+        // добавляем RunPrp для текста, они будут такие же как и ctrPrp
+        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj == MATH_TEXT) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
+        {
+            var runPrp = Common_CopyObj(rPrp);
+            this.addRunPrp(runPrp);
+        }
+    },
+    verifyRPrp_Letter: function()
+    {
+        var currType = this.content[this.CurPos].value.typeObj,
+            prevType = this.CurPos > 0 ? this.content[this.CurPos - 1].value.typeObj : null,
+            nextType = this.CurPos < this.content.length - 1 ? this.content[this.CurPos + 1].value.typeObj : null;
+
+
+        var bEmpty = this.IsEmpty(),
+            OnlyRunPrp = this.content.length == 2 && currType == MATH_RUN_PRP,
+            bPreComposition = currType == MATH_EMPTY && prevType == MATH_COMP,
+            bFirstComp = this.CurPos == 1 && nextType == MATH_COMP;
+
+        if(this.bRoot && bEmpty)
+        {
+            var rPrp = this.Composition.DefaultTxtPrp;
+            this.addRunPrp(rPrp);
+        }
+        else if(bEmpty)
+        {
+            var rPrp = this.Parent.getCtrPrp();
+            this.addRunPrp(rPrp);
+        }
+        else if(OnlyRunPrp)
+        {
+            var rPrp = this.Parent.getCtrPrp();
+
+            var Run = this.content[1].value.runPrp;
+            var currRun = new CTextPr();
+            currRun.Merge(Run);
+
+            Run.Merge(rPrp);
+            Run.Merge(currRun);
+        }
+        else if(bPreComposition)
+        {
+            // стоим после CEmpty, который относится к Composition, и соответственно дальше текста нет (либо конец формулы, либо между двумя мат объектами)
+
+            var rPrp;
+            if(this.CurPos == 1 && this.content[this.CurPos].value.typeObj == MATH_COMP)
+                rPrp = this.content[this.CurPos].value.getCtrPrp();
+            else if(this.content[this.CurPos - 2].value.typeObj == MATH_COMP)
+                rPrp = this.content[this.CurPos - 2].value.getCtrPrp();
+            else // на всякий случай
+                rPrp = DEFAULT_RUN_PRP;
+
+            this.addRunPrp(rPrp);
+        }
+        else if(bFirstComp)
+        {
+            // если стоим в начале перед CEmpty и после идет Composition
+            var rPrp = this.content[1].value.getCtrPrp();
+            this.addRunPrp(rPrp);
+
+        }
     },
     old_addToBeginningRPrp: function(rPrp) // чтобы не возникало ошибок при добавлении RunPrp в начало, если уже выставлены некоторые RunPrp
     {
