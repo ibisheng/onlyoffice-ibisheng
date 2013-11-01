@@ -3483,13 +3483,13 @@ function DrawingObjects() {
 				
 				var chartTxtAreas = [], aTxtTransform = [];				
 				// Title
-				if ( graphicObject.chartTitle.txBody && graphicObject.chartTitle.transformText )
+				if ( graphicObject.chartTitle && graphicObject.chartTitle.txBody && graphicObject.chartTitle.transformText )
 					chartTxtAreas.push(graphicObject.chartTitle);
 				// Axis Y
-				if ( graphicObject.vAxisTitle.txBody && graphicObject.vAxisTitle.transformText )
+				if ( graphicObject.vAxisTitle && graphicObject.vAxisTitle.txBody && graphicObject.vAxisTitle.transformText )
 					chartTxtAreas.push(graphicObject.vAxisTitle);
 				// Axis X
-				if ( graphicObject.hAxisTitle.txBody && graphicObject.hAxisTitle.transformText )
+				if ( graphicObject.hAxisTitle && graphicObject.hAxisTitle.txBody && graphicObject.hAxisTitle.transformText )
 					chartTxtAreas.push(graphicObject.hAxisTitle);
 				
 				for ( var i = 0; i < chartTxtAreas.length; i++ ) {
