@@ -1411,9 +1411,10 @@
 				}
 			},
 			//при вставке пользователем колонки изменяем фильтры
-			insertColumn: function(type, val, ar)
+			insertColumn: function(type, val, ar, insertType)
 			{
 				var activeCells;
+				var DeleteColumns = (insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') ? true : false;
                 if(typeof val == 'object')
 				{
 					activeCells = Asc.clone(val);
@@ -1425,6 +1426,13 @@
 					if(!val)
 						val = activeCells.c2 - activeCells.c1 + 1;
 				}
+				
+				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
+				{
+					activeCells.r1 = 0;
+					activeCells.r2 = this.worksheet.nRowsCount - 1;
+				}
+				
 				//определим какую колонку вставляем
 				var colInsert = activeCells.c1;
 				if(type == 'insColBefore' || type == 'insCell')
@@ -1437,9 +1445,10 @@
 				this._changeFiltersAfterColumn(colInsert,val,'insCol',activeCells);
 			},
 			//при вставке пользователем строки изменяем фильтры
-			insertRows: function(type, val, ar)
+			insertRows: function(type, val, ar, insertType)
 			{
                 var activeCells;
+				var DeleteRows = (insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') ? true : false;
                 if(typeof val == 'object')
 				{
 					activeCells = Asc.clone(val);
@@ -1451,6 +1460,13 @@
 					if(!val)
 						val = activeCells.r2 - activeCells.r1 + 1;
 				}
+				
+				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
+				{
+					activeCells.c1 = 0;
+					activeCells.c2 = this.worksheet.nColsCount - 1;
+				}
+				
 				//определим какую колонку вставляем
 				var colInsert = activeCells.r1;
 				if(type == 'insColBefore' || type == 'insCell')
@@ -4694,7 +4710,7 @@
 				if(val < 0)
 				{
 					var activeRange = ws.activeRange;
-					if(activeCells && bRedoChanges && typeof activeCells == 'object')
+					if(activeCells && typeof activeCells == 'object')
 						activeRange = Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
 					var splitRefFilter = filter.Ref.split(":");
 					var startCell = this._idToRange(splitRefFilter[0]);

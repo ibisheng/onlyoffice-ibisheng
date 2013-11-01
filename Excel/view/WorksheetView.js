@@ -8240,7 +8240,7 @@
 									if (range.deleteCellsShiftLeft()) {
 										fullRecalc = true;
 										if(isCheckChangeAutoFilter == 'changeAutoFilter')
-											t.autoFilters.insertColumn(prop, _updateRangeDel, arn);
+											t.autoFilters.insertColumn(prop, _updateRangeDel, arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
 										t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
@@ -8266,7 +8266,7 @@
 										if (range.deleteCellsShiftUp()) {
 											fullRecalc = true;
 											if(isCheckChangeAutoFilter == 'changeAutoFilter')
-												t.autoFilters.insertRows(prop, _updateRangeDel, _updateRangeDel);
+												t.autoFilters.insertRows(prop, _updateRangeDel, _updateRangeDel, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
 											t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 											t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 										}
@@ -8289,7 +8289,7 @@
 									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
-									t.autoFilters.insertColumn(prop,_updateRangeDel, arn);
+									t.autoFilters.insertColumn(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteColumns);
 									History.EndTransaction();
 
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
@@ -8312,7 +8312,7 @@
 									History.SetSelection(new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2));
 									History.StartTransaction();
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
-									t.autoFilters.insertRows(prop,_updateRangeDel, arn);
+									t.autoFilters.insertRows(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteRows);
 									History.EndTransaction();
 
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
