@@ -2069,9 +2069,6 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 	if(aChanges.length > 0)
 	{
 		this.bCollaborativeChanges = true;
-		History.Clear();
-		History.Create_NewPoint();
-		History.SetSelection(null, true);
 		//собираем общую длину
 		var dstLen = 0;
 		var aIndexes = new Array();
@@ -2109,6 +2106,9 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 			aFontMap.push(i);
 		
 		window["Asc"]["editor"]._loadFonts(aFontMap, function(){
+				History.Clear();
+				History.Create_NewPoint();
+				History.SetSelection(null, true);
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
 				var oRedoObjectParam = new Asc.RedoObjectParam();
 				History.RedoPrepare(oRedoObjectParam);
