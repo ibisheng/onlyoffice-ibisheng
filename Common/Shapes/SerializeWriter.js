@@ -3387,11 +3387,11 @@ function CBinaryFileWriter()
         oThis._WriteString1(0, oThis.tableStylesGuides[num]);
 
         var __name = tableStyle.Name;
-        __name = __name.replace("&", "_");
-        __name = __name.replace(">", "_");
-        __name = __name.replace("<", "_");
-        __name = __name.replace("\"", "_");
-        __name = __name.replace("'", "_");
+        __name = __name.replace(/&/g, "_");
+        __name = __name.replace(/>/g, "_");
+        __name = __name.replace(/</g, "_");
+        __name = __name.replace(/"/g, "_");
+        __name = __name.replace(/'/, "_");
         oThis._WriteString2(1, __name);
         oThis.WriteUChar(g_nodeAttributeEnd);
 

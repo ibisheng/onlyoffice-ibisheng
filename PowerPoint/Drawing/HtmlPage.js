@@ -3053,7 +3053,7 @@ function CEditorPage(api)
         this.m_oMainView.HtmlElement.appendChild(_p);
 
         var _t = this.TextBoxInput.value;
-        _t = _t.replace(" ", "&nbsp;");
+        _t = _t.replace(/ /, "&nbsp;");
         _p.innerHTML = "<span>" + _t + "</span>";
         var _width = _p.firstChild.offsetWidth;
         _width = Math.min(_width + 10, this.TextBoxMaxWidth);
