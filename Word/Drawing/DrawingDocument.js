@@ -5099,7 +5099,9 @@ function CDrawingDocument()
 
             var _old_mode = editor.isViewMode;
             editor.isViewMode = true;
+            editor.isShowTableEmptyLineAttack = true;
             table.Draw(0, graphics);
+            editor.isShowTableEmptyLineAttack = false;
             editor.isViewMode = _old_mode;
 
             var _styleD = new CAscTableStyle();

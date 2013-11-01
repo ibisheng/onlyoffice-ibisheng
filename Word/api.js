@@ -539,6 +539,7 @@ function asc_docs_api(name)
     this.isStartAddShape = false;
     this.addShapePreset = "";
     this.isShowTableEmptyLine = true;
+    this.isShowTableEmptyLineAttack = false;
 
     // CoAuthoring and Chat
     this.User = undefined;
