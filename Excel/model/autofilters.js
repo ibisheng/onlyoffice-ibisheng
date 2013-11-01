@@ -2697,9 +2697,9 @@
 						{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				// ToDo - здесь вызывается и _updateCellsRange в _reDrawFilters, и делается changeWorksheet
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
+				ws.isChanged = true;
 				this._reDrawFilters();
 				//ws.changeWorksheet("update");
-				//ws.isChanged = true;
 				this.drawAutoF();
 			},
 			
