@@ -2495,7 +2495,8 @@ CShape.prototype =
     {
        var tx = this.invertTransformText.TransformPointX(x, y);
        var ty = this.invertTransformText.TransformPointY(x, y);
-        this.txBody.content.Update_CursorType(tx, ty, 0)
+        var page_num = this.parent instanceof  Slide ? this.parent.num : 0;
+        this.txBody.content.Update_CursorType(tx, ty, page_num)
     },
 
 
