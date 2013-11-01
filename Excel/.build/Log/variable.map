@@ -800,7 +800,7 @@ c_oSer_TablePart$Table:tG
 JSCompiler_StaticMethods_getMainGroup:V2
 nSldLtTMediaAndTx:JV
 JSCompiler_StaticMethods_Get_Paragraph_TextPr:M3
-JSCompiler_get:A
+JSCompiler_get:z
 JSCompiler_StaticMethods_DrawSegment:v0
 historyitem_Cell_Fontname:OP
 c_oSer_ConditionalFormattingDataBar$CFVO:VI
@@ -1101,7 +1101,7 @@ ParaEnd:Gi
 g_memory:qj
 T1_FontRec:xm
 cff_isoadobe_charset:pu
-JSCompiler_StaticMethods_GetSerializeArray:KO
+JSCompiler_StaticMethods_GetSerializeArray:LO
 SplineForDrawer:j8
 ChartRender:Rd
 JSCompiler_StaticMethods_finishAdd:SQ
@@ -2706,7 +2706,7 @@ JSCompiler_StaticMethods_Internal_FindWordStart:I7
 L 137:JC
 L 136:N8
 g_oUndoRedoCol:RM
-JSCompiler_StaticMethods_RedoPrepare:LO
+JSCompiler_StaticMethods_RedoPrepare:MO
 L 150:Ug
 ADD_SHAPE_ID_MAP:Kh
 JSCompiler_StaticMethods_RedoEnd:SO
@@ -2962,7 +2962,7 @@ c_oSer_ChartTitlePptxType$TxPrPptx:NZ
 tx1:aV
 numFormat_Year:rc
 JSCompiler_StaticMethods_Set_DocumentNext:p7
-c_oSerWorksheetColTypes$Style:$E
+c_oSerWorksheetColTypes$Style:bF
 JSCompiler_StaticMethods__MouseHoverOnArrowDown:GS
 VERTICAL_ANCHOR_TYPE_BOTTOM:hS
 CLASS_TYPE_GS:UT
@@ -3138,7 +3138,7 @@ temp1:Mj
 c_oSerFontTypes$Strike:XD
 L 11:C
 temp2:Oj
-L 12:z
+L 12:A
 t1_lookup_glyph_by_stdcharcode:Dn
 L 10:v
 L 19:J
