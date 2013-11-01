@@ -684,7 +684,7 @@ Geometry.prototype=
         }
 
 
-        this.gdLst = ReadObjectLong(r);
+         this.gdLst = ReadObjectLong(r);
 
 
 

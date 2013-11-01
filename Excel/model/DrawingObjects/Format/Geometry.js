@@ -541,7 +541,7 @@ CGeometry.prototype=
 
         }
 
-        WriteObjectLong(w, this.gdLst);
+         WriteObjectLong(w, this.gdLst);
 
 
 
@@ -713,13 +713,13 @@ CGeometry.prototype=
         }
 
 
-        this.gdLst = ReadObjectLong(r);
+         this.gdLst = ReadObjectLong(r);
 
-        var cnx_lst_count = Reader.GetLong();
-        for(index = 0; index < cnx_lst_count; ++index)
-        {
-            this.cnxLstInfo[index] = ReadObjectString(Reader);
-        }
+       var cnx_lst_count = Reader.GetLong();
+       for(index = 0; index < cnx_lst_count; ++index)
+       {
+           this.cnxLstInfo[index] = ReadObjectString(Reader);
+       }
 
         var ah_xy_count = Reader.GetLong();
         for(index = 0; index < ah_xy_count; ++index)

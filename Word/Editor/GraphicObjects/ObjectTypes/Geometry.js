@@ -503,6 +503,10 @@ CGeometry.prototype=
             ++count;
         }
         w.WriteLong(count);
+        for(key in this.avLst)
+        {
+            w.WriteString2(key);
+        }
         var gd_lst_info_count = this.gdLstInfo.length;
         Writer.WriteLong(gd_lst_info_count);
 
@@ -531,10 +535,10 @@ CGeometry.prototype=
         }
 
         WriteObjectLong(w, this.gdLst);
-        for(key in this.avLst)
-        {
-            w.WriteString2(key);
-        }
+       // for(key in this.avLst)
+       // {
+          //  w.WriteString2(key);
+        //}
 
 
         var cnx_lst_count = this.cnxLstInfo.length;
@@ -667,8 +671,6 @@ CGeometry.prototype=
             w.WriteString2(this.rectS.r);
             w.WriteString2(this.rectS.b);
         }
-        // WriteObjectString(Writer, this.rectS);
-        //WriteObjectDouble(Writer, this.rect);
     },
 
     Read_FromBinary2: function(Reader)
@@ -699,14 +701,14 @@ CGeometry.prototype=
         }
 
 
-        this.gdLst = ReadObjectLong(r);
+      this.gdLst = ReadObjectLong(r);
 
 
-        var cnx_lst_count = Reader.GetLong();
-        for(index = 0; index < cnx_lst_count; ++index)
-        {
-            this.cnxLstInfo[index] = ReadObjectString(Reader);
-        }
+       var cnx_lst_count = Reader.GetLong();
+       for(index = 0; index < cnx_lst_count; ++index)
+       {
+           this.cnxLstInfo[index] = ReadObjectString(Reader);
+       }
 
         var ah_xy_count = Reader.GetLong();
         for(index = 0; index < ah_xy_count; ++index)
@@ -790,7 +792,7 @@ CGeometry.prototype=
             this.rectS.r = r.GetString2();
             this.rectS.b = r.GetString2();
         }
-        //this.rect = ReadObjectDouble(r);
+        this.Init(5, 5);
     },
 
     AddAdj: function(name, formula, x, y, z)
