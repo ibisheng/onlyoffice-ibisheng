@@ -1481,22 +1481,21 @@
 					for (var c = 0; c < maxCols; ++c) {
 						for (var r = 0; r < maxRows; ++r) {
 							if (!this._isCellEmptyOrMergedOrBackgroundColorOrBorders(c, r)) {
-								var ct = this._getCellTextCache(c, r);
-								if (undefined == ct)
-									continue;
-
 								var rightSide = 0;
-								var isMerged = ct.flags.isMerged, isWrapped = ct.flags.wrapText;
-								if (!isMerged && !isWrapped)
-									rightSide = ct.sideR;
+								var ct = this._getCellTextCache(c, r);
+								if (ct !== undefined) {
+									var isMerged = ct.flags.isMerged, isWrapped = ct.flags.wrapText;
+									if (!isMerged && !isWrapped)
+										rightSide = ct.sideR;
+								}
 
 								lastC = Math.max(lastC, c + rightSide);
 								lastR = Math.max(lastR, r);
 							}
 						}
 					}
-					maxCols = lastC+1;
-					maxRows = lastR+1;
+					maxCols = lastC + 1;
+					maxRows = lastR + 1;
 
 					// Получаем максимальную колонку/строку для изображений/чатов
 					var maxObjectsCoord = this.objectRender.getDrawingAreaMetrics();
@@ -2575,6 +2574,7 @@
 					for (var isMerged = false, hasHideCol = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
 						if (this.cols[col].width < this.width_1px) {hasHideCol = true; continue;}
 						var isFirstCol = col === range.c1;
+						var isLastCol  = col === range.c2;
 
 						if (!mergedCellsStage) {
 							// ToDo возможно можно оптимизировать
@@ -2675,7 +2675,7 @@
 								drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
 							}
 						}
-						if (!mergedCellsStage || col === range.c2) {
+						if (!mergedCellsStage || isLastCol) {
 							// draw right border
 							drawVerticalBorder.call(this, rb, tb, tbNext, bb, bbNext, x2, y1, y2);
 						}
@@ -2689,7 +2689,7 @@
 								drawHorizontalBorder.call(this, tb, lb, lbPrev, rb, rbPrev, x1, y1, x2);
 							}
 						}
-						if (!mergedCellsStage || row === range.r2) {
+						if (!mergedCellsStage || isLastRow) {
 							// draw bottom border
 							drawHorizontalBorder.call(this, bb, lb, lbNext, rb, rbNext, x1, y2, x2);
 						}
