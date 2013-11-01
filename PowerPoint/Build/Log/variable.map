@@ -1684,7 +1684,7 @@ nSldLtTSecHead:e2
 c_oSerProp_rPrType$FontAE:wM
 FontStyle$FontStyleItalic:gz
 nSldLtTTxAndChart:N1
-JSCompiler_StaticMethods_TurnOn:uc
+JSCompiler_StaticMethods_TurnOn:tc
 CBg:wj
 CParaLineMetrics:WZ
 c_oSerImageType2$Type:LN
@@ -2879,7 +2879,7 @@ L 37:Jc
 locktype_None:PA
 PS_PrivateRec:yo
 L 32:La
-L 31:tc
+L 31:uc
 cff_standard_encoding:qw
 L 30:nb
 LineJoinType$Round:y3
