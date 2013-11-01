@@ -1027,7 +1027,7 @@ CGroupShape.prototype =
 
     changeLine: function(line)
     {
-        for(var _shape_index = 0; _shape_index < this.ArrGlyph.length; ++_shape_index)
+        for(var _shape_index = 0; _shape_index < this.arrGraphicObjects.length; ++_shape_index)
         {
             if(this.arrGraphicObjects[_shape_index].changeLine)
             {
