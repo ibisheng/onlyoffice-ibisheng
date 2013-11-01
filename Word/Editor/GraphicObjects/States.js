@@ -1755,10 +1755,10 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
             {
                 if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
                     return true;
-                if(chart.selected === false)
+                if(chart.parent.selected === false)
                 {
-                    chart.select(pageIndex);
-                    _common_selection_array.push(chart);
+                    chart.parent.select(pageIndex);
+                    _common_selection_array.push(chart.parent);
                     _common_selection_array.sort(ComparisonByZIndex);
 
 
