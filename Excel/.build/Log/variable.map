@@ -800,7 +800,7 @@ c_oSer_TablePart$Table:sG
 JSCompiler_StaticMethods_getMainGroup:U2
 nSldLtTMediaAndTx:IV
 JSCompiler_StaticMethods_Get_Paragraph_TextPr:L3
-JSCompiler_get:z
+JSCompiler_get:A
 JSCompiler_StaticMethods_DrawSegment:u0
 historyitem_Cell_Fontname:NP
 c_oSer_ConditionalFormattingDataBar$CFVO:UI
@@ -1815,7 +1815,7 @@ T1_Set_MM_Blend:gw
 CParaRecalcInfo:E6
 t1_builder_close_contour:Bn
 c_oSer_BasicChartType$Seria:r_
-rx_operators:Ob
+rx_operators:Nb
 EPageOrientation$pageorientPortrait:rK
 TBand:Kq
 c_oSerRowTypes$Style:lF
@@ -3086,7 +3086,7 @@ L 47:wb
 L 46:ti
 L 41:ab
 JSCompiler_StaticMethods__read_rPr:R4
-L 40:Nb
+L 40:Ob
 ft_bitmap_glyph_init:Tj
 TT_Post_NamesRec:gl
 L 43:xc
@@ -3138,7 +3138,7 @@ temp1:Mj
 c_oSerFontTypes$Strike:XD
 L 11:C
 temp2:Oj
-L 12:A
+L 12:z
 t1_lookup_glyph_by_stdcharcode:Dn
 L 10:v
 L 19:J
