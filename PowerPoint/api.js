@@ -3737,6 +3737,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             {
                 if (this.isApplyChangesOnOpenEnabled)
                 {
+                    this.isApplyChangesOnOpenEnabled = false;
                     if (CollaborativeEditing.m_bUse == true)
                     {
                         this.isApplyChangesOnOpen = true;
@@ -3744,8 +3745,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                         CollaborativeEditing.Apply_Changes();
                         CollaborativeEditing.Release_Locks();
                         this.bNoSendComments = false;
-
-                        this.isApplyChangesOnOpenEnabled = false;
                         return;
                     }
                 }
