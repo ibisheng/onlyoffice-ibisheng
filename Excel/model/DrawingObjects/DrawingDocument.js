@@ -4992,7 +4992,7 @@ function CStylesPainter()
 			{
 				// как только меняется сериалайзер - меняется и код здесь. Да, не очень удобно,
 				// зато быстро делается
-				var formalStyle = i.toLowerCase().replace(" ", "");
+				var formalStyle = i.toLowerCase().replace(/\s/g, "");
 				var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
 				var index = (res) ? res[1] - 1 : -1;
 

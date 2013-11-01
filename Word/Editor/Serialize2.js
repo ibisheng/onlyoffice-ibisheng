@@ -2289,9 +2289,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				if(para_HyperlinkStart == item.Type)
 				{
                     this.WriteText();
-                    var sField = "HYPERLINK \"" + item.Value.replace("\"", "\\\"") + "\"";
+                    var sField = "HYPERLINK \"" + item.Value.replace(/"/g, "\\\"") + "\"";
                     if(null != item.ToolTip)
-                        sField += " \\o \"" + item.ToolTip.replace("\"", "\\\"") + "\"";
+                        sField += " \\o \"" + item.ToolTip.replace(/"/g, "\\\"") + "\"";
                     this.WriteRun(function(){
                         oThis.memory.WriteByte(c_oSerRunType.fldstart);
                         oThis.memory.WriteString2(sField);
@@ -2363,9 +2363,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     break;
                 case para_HyperlinkStart:
                     this.WriteText();
-                    var sField = "HYPERLINK \"" + item.Value.replace("\"", "\\\"") + "\"";
+                    var sField = "HYPERLINK \"" + item.Value.replace(/"/g, "\\\"") + "\"";
                     if(null != item.ToolTip)
-                        sField += " \\o \"" + item.ToolTip.replace("\"", "\\\"") + "\"";
+                        sField += " \\o \"" + item.ToolTip.replace(/"/g, "\\\"") + "\"";
                     this.WriteRun(function(){
                         oThis.memory.WriteByte(c_oSerRunType.fldstart);
                         oThis.memory.WriteString2(sField);
