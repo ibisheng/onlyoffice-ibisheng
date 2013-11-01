@@ -5268,6 +5268,7 @@ ParaDrawing.prototype =
 
                 this.W = Reader.GetDouble();
                 this.H = Reader.GetDouble();
+                this.bNeedUpdateWH = true;
                 this.Measure2();
                 break;
             }
@@ -6693,13 +6694,14 @@ ParaDrawing.prototype =
             else
                 g.calculateAfterOpen();
         }
-        c.Update_Size(this.W, this.H);
+
         var d = this.Distance;
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.setZIndex();
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
+        c.Update_Size(this.W, this.H);
 
         History.Add(c, {Type: historyitem_CalculateAfterPaste});
         return c;

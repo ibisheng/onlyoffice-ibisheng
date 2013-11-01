@@ -270,6 +270,8 @@ var historyitem_AutoShapes_RecalculateAfterResize = 48;
 var historyitem_AutoShapes_SetTextPaddings = 49;
 var historyitem_AutoShapes_RecalculateChartUndo = 50;
 var historyitem_AutoShapes_RecalculateChartRedo = 51;
+var historyitem_AutoShapes_UpdateParentWidthHeight = 52;
+
 
 
 
