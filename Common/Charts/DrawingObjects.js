@@ -378,7 +378,7 @@ asc_CChart.prototype = {
 		return headers;
 	},
 	
-	rebuildSeries: function() {
+	rebuildSeries: function(isIgnoreColors) {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
 		var nameIndex = 1;
@@ -386,7 +386,7 @@ asc_CChart.prototype = {
 		
 		// Save old series colors
 		var oldSeriaData = [];
-		for ( var i = 0; i < _t.series.length; i++ ) {
+		for ( var i = 0; !isIgnoreColors && (i < _t.series.length); i++ ) {
 			if ( _t.series[i].OutlineColor && !_t.series[i].OutlineColor.isCustom )
 				oldSeriaData[i] = _t.series[i].OutlineColor;
 		}
@@ -1529,7 +1529,10 @@ asc_CChartSeria.prototype = {
 	asc_setMarkerSymbol: function(symbol) { this.Marker.Symbol = symbol; },
 
 	asc_getOutlineColor: function() { return this.OutlineColor; },
-	asc_setOutlineColor: function(color) { this.OutlineColor = color; },
+	asc_setOutlineColor: function(color) {
+		if ( color instanceof CUniColor )
+			this.OutlineColor = color.createDuplicate();
+	},
 	
 	asc_getFormatCode: function() { return this.FormatCode; },
 	asc_setFormatCode: function(format) { this.FormatCode = format; }

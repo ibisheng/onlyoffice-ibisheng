@@ -490,7 +490,9 @@ CChartAsGroup.prototype =
 			this.chart.subType = chart.subType;
 		}
 		
+		var bChangeColors = false;
 		if ( (this.chart.styleId != chart.styleId) || (isCollaborative === true) ) {
+			bChangeColors = true;
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Style, sheetId, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.styleId, chart.styleId)));
 			this.chart.styleId = chart.styleId;
 		}
@@ -661,7 +663,7 @@ CChartAsGroup.prototype =
 		}
 		
 		if ( !(isCollaborative === true) ) {
-			this.chart.rebuildSeries();
+			this.chart.rebuildSeries(bChangeColors);
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, sheetId, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 		}
     },
