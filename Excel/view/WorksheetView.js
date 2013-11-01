@@ -1074,7 +1074,7 @@
 					this.cellCommentator.addCommentSerialize(comment);
 					commentList.push(comment);
 					// Если, например, перемещаем лист
-					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment.asc_getId());
+					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment.Id);
 				}
 				if ( commentList.length )
 					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
