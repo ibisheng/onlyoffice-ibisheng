@@ -1188,7 +1188,9 @@ CChartAsGroup.prototype =
 
     getBase64Img: function()
     {
-        return this.brush.fill.canvas.toDataURL();
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+
+        //return this.brush.fill.canvas.toDataURL();
     },
 
     initFromBinary: function(binary)
