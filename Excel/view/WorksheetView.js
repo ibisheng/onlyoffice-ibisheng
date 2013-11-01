@@ -1071,10 +1071,10 @@
 				for(var i = 0, length = this.model.aComments.length;  i < length; ++i)
 				{
 					var comment = { "Id": this.model.aComments[i].asc_getId(), "Comment": this.model.aComments[i] };
-					this.cellCommentator.addCommentSerialize(comment);
+					this.cellCommentator.addCommentSerialize(comment["Comment"]);
 					commentList.push(comment);
 					// Если, например, перемещаем лист
-					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment.Id);
+					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment["Id"]);
 				}
 				if ( commentList.length )
 					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
