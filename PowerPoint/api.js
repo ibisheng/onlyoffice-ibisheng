@@ -3705,7 +3705,7 @@ asc_docs_api.prototype.asc_getComments = function()
     var _slidesCount = _slides.length;
     for (var i = 0; i < _slidesCount; i++)
     {
-        var _comments = _slides[i].comments;
+        var _comments = _slides[i].slideComments.comments;
         var _commentsCount = _comments.length;
 
         for (var j = 0; j < _commentsCount; j++)
