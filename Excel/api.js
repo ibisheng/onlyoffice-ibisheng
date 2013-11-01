@@ -668,6 +668,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 						// Отправка стилей
 						this._sendWorkbookStyles();
+						if ( this.wb )
+							this.wb._initCommentsToSave();
 
 						if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
 							// Принимаем чужие изменения
