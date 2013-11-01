@@ -9147,6 +9147,10 @@
 				var oFontColor = c.getFontcolor();
 				if(null != oFontColor)
 					oFontColor = oFontColor.getRgb();
+					
+				// Скрываем окно редактирования комментария
+				this.model.workbook.handlers.trigger("asc_onHideComment");
+					
 				editor.open({
 					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left,
 					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top,

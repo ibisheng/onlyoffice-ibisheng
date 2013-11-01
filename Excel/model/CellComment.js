@@ -620,6 +620,8 @@ function asc_CCellCommentator(currentSheet) {
 			var colOffset = rangeTo.c1 - rangeFrom.c1;
 			var rowOffset = rangeTo.r1 - rangeFrom.r1;
 			
+			_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
+			
 			for (var i = 0; i < _this.aComments.length; i++) {
 				var comment = _this.aComments[i];
 				
