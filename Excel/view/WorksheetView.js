@@ -3715,6 +3715,7 @@
                 var va   = c.getAlignVertical().toLowerCase();
                 var maxW = fl.wrapText || fl.shrinkToFit || fl.isMerged || isFixedWidthCell(str) ? this._calcMaxWidth(col, row, mc) : undefined;
                 var tm   = this._roundTextMetrics( this.stringRender.measureString(str, fl, maxW) );
+				var angle = c.getAngle();
                 var cto  = (fl.isMerged || fl.wrapText) ?
                 {
                     maxWidth:  maxW - this.cols[col].innerWidth + this.cols[col].width,
@@ -3736,13 +3737,12 @@
                 if(null != oFontColor)
                     oFontColor = oFontColor.getRgb();
 
-                var rowHeight = this.rows[row].height;
+				var rowInfo = this.rows[row];
+                var rowHeight = rowInfo.height;
                 var textBound = {};
 
-                if (c.getAngle() || 0) {
-
+                if (angle) {
                     //  повернутый текст учитывает мерж ячеек по строкам
-
                     if (fMergedRows) {
                         rowHeight = 0;
 
@@ -3751,15 +3751,15 @@
                         }
                     }
 
-                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
+                    textBound = this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
 
 //  NOTE: надо сделать как в экселе если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
 
 //                    if (isNumberFormat) {
-//                        var prj = Math.abs(Math.sin(c.getAngle() * Math.PI / 180.0) * tm.width);
+//                        var prj = Math.abs(Math.sin(angle * Math.PI / 180.0) * tm.width);
 //                        if (prj > rowHeight) {
 //                            //if (maxW === undefined) {}
-//                            maxW = rowHeight / Math.abs(Math.cos(c.getAngle() * Math.PI / 180.0));
+//                            maxW = rowHeight / Math.abs(Math.cos(angle * Math.PI / 180.0));
 //                            str  =  c.getValue2(gc_nMaxDigCountView, makeFnIsGoodNumFormat(fl, maxW));
 //
 //                            for (i = 0; i < str.length; ++i) {
@@ -3784,7 +3784,7 @@
                     sideR		: cto.rightSide,
                     cellType	: cellType,
                     isFormula	: c.getFormula().length > 0,
-                    angle		: c.getAngle(),
+                    angle		: angle,
                     textBound	: textBound,
                     mc			: mc
                 };
@@ -3797,55 +3797,36 @@
 
                 // update row's descender
                 if (va !== kvaTop && va !== kvaCenter && !fl.isMerged) {
-                    this.rows[row].descender = Math.max(this.rows[row].descender, tm.height - tm.baseline);
+					rowInfo.descender = Math.max(rowInfo.descender, tm.height - tm.baseline);
                 }
+
+				rowHeight = rowInfo.height;
 
                 // update row's height
-                if (!this.rows[row].isCustomHeight) {
-                    // Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
-                    if (!fMergedRows) {
-                        this.rows[row].heightReal = this.rows[row].height = Math.min(this.maxRowHeight, Math.max(this.rows[row].height, tm.height));
-                        if (!this.rows[row].isDefaultHeight) {
-                            this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
-                        }
-                        this.isChanged = true;
-                    }
-                }
+                if (!rowInfo.isCustomHeight) {
+					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
+					if (!fMergedRows) {
+						var newHeight = tm.height;
+						if (angle) {
+							if (textBound) {
+								newHeight = textBound.height;
+							}
+						}
 
-                if ((c.getAngle() || 0) && !this.rows[row].isCustomHeight) {
+						rowInfo.heightReal = rowInfo.height = Math.min(this.maxRowHeight, Math.max(rowInfo.height, newHeight));
+						if (rowHeight !== rowInfo.height) {
+							if (!rowInfo.isDefaultHeight) {
+								this.model.setRowHeight(rowInfo.height + this.height_1px, row, row);
+							}
 
-                    if (this.isChanged) {
+							if (angle) {
+								this._fetchCellCache(col, row).text.textBound   =
+									this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
+							}
 
-                        if (textBound) {
-
-                            if (this.rows[row].height < textBound.height) {
-
-                                this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
-                                rowHeight = this.rows[row].heightReal;
-
-                                if (!this.rows[row].isDefaultHeight) {
-                                    this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
-                                }
-
-                                this._fetchCellCache(col, row).text.textBound   =
-                                    this.stringRender.getTransformBound(c.getAngle(), 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
-                            }
-                            else {
-
-                                // если была автоподстройка по высоте, надо ее сбросить и оставить текущее значение высоты
-
-                                if (fMergedRows) {
-                                    this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
-
-                                    if (this.rows[row].isDefaultHeight) {
-                                        this.model.setRowHeight(this.rows[row].height, row, row);
-                                    }
-                                }
-                            }
-                        }
-
-                        this.isChanged = true;
-                    }
+							this.isChanged = true;
+						}
+					}
                 }
 
                 return mc ? mc.c2 : col;
@@ -9169,7 +9150,8 @@
 					isClearCell: isClearCell,
 					isHideCursor: isHideCursor,
 					saveValueCallback: function (val, flags, skipNLCheck) {
-						var oCellEdit = fl.isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
+						// ToDo уйти от обновления всей строки
+						var oCellEdit = fl.isMerged ? new asc_Range(0, mc.r1, gc_nMaxCol0, mc.r1) : new asc_Range(0, row, gc_nMaxCol0, row);
 						return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
 					}
 				});
