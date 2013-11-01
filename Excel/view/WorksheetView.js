@@ -1469,27 +1469,26 @@
 
 			// ----- Drawing for print -----
 			calcPagesPrint: function (pageOptions, printOnlySelection, indexWorksheet, layoutPageType) {
+				var range;
 				var maxCols = this.model.getColsCount();
 				var maxRows = this.model.getRowsCount();
 				var lastC = -1, lastR = -1;
 				var activeRange = printOnlySelection ? this.activeRange : null;
 
 				if (null === activeRange) {
+					range = asc_Range(0, 0, maxCols, maxRows);
+					this._prepareCellTextMetricsCache(range);
 					for (var c = 0; c < maxCols; ++c) {
 						for (var r = 0; r < maxRows; ++r) {
 							if (!this._isCellEmptyOrMergedOrBackgroundColorOrBorders(c, r)) {
 								var ct = this._getCellTextCache(c, r);
-								if (ct === undefined) {
-									// Мы печатаем и могут быть невидимые области, попробуем добавить текст и взять его снова
-									this._addCellTextToCache (c, r);
-									ct = this._getCellTextCache(c, r);
-								}
+								if (undefined == ct)
+									continue;
+
 								var rightSide = 0;
-								if (ct !== undefined) {
-									var isMerged = ct.flags.isMerged, isWrapped = ct.flags.wrapText;
-									if (!isMerged && !isWrapped)
-										rightSide = ct.sideR;
-								}
+								var isMerged = ct.flags.isMerged, isWrapped = ct.flags.wrapText;
+								if (!isMerged && !isWrapped)
+									rightSide = ct.sideR;
 
 								lastC = Math.max(lastC, c + rightSide);
 								lastR = Math.max(lastR, r);
@@ -1509,6 +1508,8 @@
 				else {
 					maxCols = activeRange.c2 + 1;
 					maxRows = activeRange.r2 + 1;
+					range = asc_Range(0, 0, maxCols, maxRows);
+					this._prepareCellTextMetricsCache(range);
 				}
 
 				var pageMargins, pageSetup, pageGridLines, pageHeadings;
@@ -1712,72 +1713,56 @@
 					drawingCtx.EndPage();
 				} else {
 					drawingCtx.BeginPage (printPagesData.pageWidth, printPagesData.pageHeight);
-					drawingCtx.AddClipRect (printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop, printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
+					drawingCtx.AddClipRect (printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop,
+						printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
                     var offsetCols = printPagesData.startOffsetPt;
-
 					var range = printPagesData.pageRange;
-					for (var row = range.r1; row <= range.r2; ++row) {
-						var rangeTmpRow = asc_Range(range.c1, row, range.c2, row);
+					var offsetX = this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols;
+					var offsetY = this.rows[range.r1].top - printPagesData.topFieldInPt;
 
-                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+					var tmpVisibleRange = this.visibleRange;
+					// Сменим visibleRange для прохождения проверок отрисовки
+					this.visibleRange = range;
 
-						// Рисуем сетку
-						if (printPagesData.pageGridLines) {
-							this._drawGrid(drawingCtx, rangeTmpRow, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, printPagesData.pageWidth / vector_koef, printPagesData.pageHeight / vector_koef);
-						}
+					if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
-                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-
-                        // Рисуем строку для печати
-						var mergedCells = {};
-						$.extend (mergedCells,
-							this._drawRowBG(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, null),
-							this._drawRowText(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt));
-
-                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-
-                        // draw merged cells at last stage to fix cells background issue
-						for (var i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
-							var mc = mergedCells[i];
-							this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, mc);
-							this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
-
-                            if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-                        }
-
-                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-
-                        // Отрисовываем бордеры
-						this._drawCellsBorders (drawingCtx, range, /*mergedCellsStage*/undefined, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt);
-
-                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
-                    }
-
+					// Нужно отрисовать заголовки
 					if (printPagesData.pageHeadings) {
-						// Нужно отрисовать заголовки
-						this._drawColumnHeaders (drawingCtx, range.c1, range.c2, /*style*/ undefined, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, printPagesData.topFieldInPt - this.cellsTop);
-						this._drawRowHeaders (drawingCtx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - this.cellsLeft, this.rows[range.r1].top - printPagesData.topFieldInPt);
+						this._drawColumnHeaders(drawingCtx, range.c1, range.c2, /*style*/ undefined,
+							offsetX, printPagesData.topFieldInPt - this.cellsTop);
+						this._drawRowHeaders(drawingCtx, range.r1, range.r2, /*style*/ undefined,
+							printPagesData.leftFieldInPt - this.cellsLeft, offsetY);
 					}
 
-                    if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+					if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
-                    // Отрисовываем картинки и графики (для этого должны выставить видимую область)
-					// Сохраняем копию и на время меняем область (стоит рисовать от входных параметров функции, а не от методов класса)
-					var tmpVisibleRange = this.visibleRange.clone(true);
-					this.visibleRange.c1 = range.c1;
-					this.visibleRange.c2 = range.c2;
-					this.visibleRange.r1 = range.r1;
-					this.visibleRange.r2 = range.r2;
+					// Рисуем сетку
+					if (printPagesData.pageGridLines) {
+						this._drawGrid(drawingCtx, range, offsetX, offsetY,
+							printPagesData.pageWidth / vector_koef, printPagesData.pageHeight / vector_koef);
+					}
+
+					if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+					// Отрисовываем ячейки
+					this._drawCells(drawingCtx, range, offsetX, offsetY);
+
+					if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+					// Отрисовываем бордеры
+					this._drawCellsBorders(drawingCtx, range, /*mergedCellsStage*/undefined, offsetX, offsetY);
+
+                    if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
 					var drawingPrintOptions = {
 						ctx: drawingCtx,
 						printPagesData: printPagesData
 					};
 					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
-					this.visibleRange = tmpVisibleRange.clone(true);
+					this.visibleRange = tmpVisibleRange;
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
@@ -1795,7 +1780,7 @@
 				this._drawColumnHeaders(/*drawingCtx*/ undefined);
 				this._drawRowHeaders(/*drawingCtx*/ undefined);
 				this._drawGrid(/*drawingCtx*/ undefined);
-				this._drawCells();
+				this._drawCells(/*drawingCtx*/undefined);
 				this._drawCellsBorders(/*drawingCtx*/undefined);
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
@@ -2139,41 +2124,49 @@
 			},
 
 			/** Рисует ячейки таблицы */
-			_drawCells: function (range) {
+			_drawCells: function (drawingCtx, range, offsetX, offsetY) {
 				if (range === undefined) {
 					range = this.visibleRange;
 				}
 
 				this._prepareCellTextMetricsCache(range);
 
-				var ctx  = this.drawingCtx;
-				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+				offsetX = (undefined === offsetX) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetX;
+				offsetY = (undefined === offsetY) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetY;
 				var mergedCells = {}, mc, i;
-				// set clipping rect to cells area
-				ctx.save()
+
+				if (!drawingCtx) {
+					// set clipping rect to cells area
+					ctx.save()
 						.beginPath()
 						.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
 						.clip();
+				}
+
 				for (var row = range.r1; row <= range.r2; ++row) {
 					$.extend( mergedCells,
-					          this._drawRowBG(/*drawingCtx*/undefined, row, range.c1, range.c2, offsetX, offsetY, null),
-					          this._drawRowText(/*drawingCtx*/undefined, row, range.c1, range.c2, offsetX, offsetY) );
+					          this._drawRowBG(drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null),
+					          this._drawRowText(drawingCtx, row, range.c1, range.c2, offsetX, offsetY) );
 				}
 				// draw merged cells at last stage to fix cells background issue
 				for (i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
 					mc = mergedCells[i];
-					this._drawRowBG(/*drawingCtx*/undefined, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
-					this._drawCellText(/*drawingCtx*/undefined, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
+					this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
+					this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
 				}
-				// restore canvas' original clipping range
-				ctx.restore();
+
+				if (!drawingCtx) {
+					// restore canvas' original clipping range
+					ctx.restore();
+				}
 			},
 
 			/** Рисует фон ячеек в строке */
 			_drawRowBG: function (drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell) {
 				if (this.rows[row].height < this.height_1px && null === oMergedCell) {return {};}
 
+				var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
 				for (var mergedCells = {}, col = colStart; col <= colEnd; ++col) {
 					if (this.cols[col].width < this.width_1px && null === oMergedCell) {continue;}
 
@@ -2181,7 +2174,6 @@
 					var c = this._getVisibleCell(col, row);
 					if (!c) {continue;}
 
-					var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
 					var bg = c.getFill();
 					if(null != bg)
 						bg = bg.getRgb();
@@ -2277,17 +2269,8 @@
             /** Рисует текст ячейки */
             _drawCellText: function (drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, drawMergedCells) {
                 var ct = this._getCellTextCache(col, row);
-                if (ct === undefined) {
-                    if (drawingCtx) {
-                        // Мы печатаем и могут быть невидимые области, попробуем добавить текст и взять его снова
-                        this._addCellTextToCache (col, row);
-                        ct = this._getCellTextCache(col, row);
-                        if (ct === undefined)
-                            return null;
-                    }
-                    else
-                        return null;
-                }
+                if (ct === undefined)
+                    return null;
 
                 var isMerged = ct.flags.isMerged, range = undefined, isWrapped = ct.flags.wrapText;
                 var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
@@ -2324,7 +2307,7 @@
                 var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
                 var xb1, yb1, wb, hb, bound, colLeft, colRight, i;
-                var txtRotX, txtRotW, clipUse = false;;
+                var txtRotX, txtRotW, clipUse = false;
 
                 if (drawingCtx) {
 
@@ -4773,13 +4756,13 @@
 							var r_ = asc_Range(c2, r1_, c2, r2_);
 							if (r2_ >= r1_) {
 								this._drawGrid(/*drawingCtx*/ undefined, r_);
-								this._drawCells(r_);
+								this._drawCells(/*drawingCtx*/undefined, r_);
 								this._drawCellsBorders(/*drawingCtx*/undefined, r_);
 							}
 						}
 					}
 					this._drawGrid(/*drawingCtx*/ undefined, range);
-					this._drawCells(range);
+					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
@@ -4846,7 +4829,7 @@
 					var range = asc_Range(c1, r1, c2, r2);
 					this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
 					this._drawGrid(/*drawingCtx*/ undefined, range);
-					this._drawCells(range);
+					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();

@@ -3233,9 +3233,9 @@ function DrawingObjects() {
 								
 				drawingCtx.clearRect( x1, y1, w, h );
 				drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
-				worksheet._drawGrid(undefined, r_);
-				worksheet._drawCells(r_);
-				worksheet._drawCellsBorders(undefined, r_);
+				worksheet._drawGrid(/*drawingCtx*/undefined, r_);
+				worksheet._drawCells(/*drawingCtx*/undefined, r_);
+				worksheet._drawCellsBorders(/*drawingCtx*/undefined, r_);
 			}
 		}
 	}
