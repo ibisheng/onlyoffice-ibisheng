@@ -333,7 +333,7 @@ _selectChars:yA
 StartTrackImage:iib
 addRecalcIndex:kya
 _onChangeSelection:BVa
-vAxisTitle:Bc
+vAxisTitle:zc
 asc_setSize:V3a
 chartType:QD
 Start_TrackTable:lib
@@ -837,7 +837,7 @@ reNotFormula:Wab
 sldLayoutLst:bw
 txDef:wIa
 CodeName:gfa
-objectLocker:Fc
+objectLocker:Gc
 changeSelectionStartPointRightClick:m5a
 CurrentFont:p0
 Set_RulerState_HdrFtr:Uhb
@@ -1496,7 +1496,7 @@ _key_text_size:MR
 Is_RealContent:bn
 charstrings_len:Yka
 WriteClrScheme:ava
-Seek2:zc
+Seek2:Ac
 sync_TblPropCallback:Pub
 doubleDecodeLE754:D6a
 insertUngroupedObjects:pqb
@@ -3279,7 +3279,7 @@ asc_getCanBranding:pZa
 asc_putLinejoin:qza
 ChunkHeapSize:i0
 AddPageSelection:Y_
-Val:Ac
+Val:Bc
 recalculateColors:UZ
 asc_checkChartInterval:GYa
 paneHeight:MZ
@@ -3675,7 +3675,7 @@ asc_mapAscServerErrorToAscError:lza
 copyText:Sr
 ctPathCommandMoveTo:g6a
 asc_getSeveralChartTypes:o0a
-limit:Ec
+limit:Fc
 GetDefaultFont:ksa
 dxf:nc
 setDocId:pcb
@@ -5404,7 +5404,7 @@ ImageTop:WM
 _asc_open:vTa
 getValueWithoutFormat:Xc
 nWidth:Jt
-hAxisTitle:Gc
+hAxisTitle:Ec
 oFormulaExt:sr
 fVertAdvance:iY
 argumentsCurrent:dj
