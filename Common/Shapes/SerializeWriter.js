@@ -3391,7 +3391,7 @@ function CBinaryFileWriter()
         __name = __name.replace(/>/g, "_");
         __name = __name.replace(/</g, "_");
         __name = __name.replace(/"/g, "_");
-        __name = __name.replace(/'/, "_");
+        __name = __name.replace(/'/g, "_");
         oThis._WriteString2(1, __name);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
