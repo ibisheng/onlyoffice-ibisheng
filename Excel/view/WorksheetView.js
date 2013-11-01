@@ -1070,7 +1070,7 @@
 				var commentList = [];	// для отправки за один раз
 				for(var i = 0, length = this.model.aComments.length;  i < length; ++i)
 				{
-					var comment = this.model.aComments[i];
+					var comment = { "Id": this.model.aComments[i].asc_getId(), "Comment": this.model.aComments[i] };
 					this.cellCommentator.addCommentSerialize(comment);
 					commentList.push(comment);
 					// Если, например, перемещаем лист

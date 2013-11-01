@@ -2391,7 +2391,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if ( _this.wb ) {
 					for (var i = 0; i < _this.wb.model.aWorksheets.length; i++) {
 						for (var j = 0; j < _this.wb.model.aWorksheets[i].aComments.length; j++) {
-							comments.push(_this.wb.model.aWorksheets[i].aComments[j]);
+							comments.push( { "Id": _this.wb.model.aWorksheets[i].aComments[j].asc_getId(), "Comment": _this.wb.model.aWorksheets[i].aComments[j] } );
 						}
 					}
 				}
