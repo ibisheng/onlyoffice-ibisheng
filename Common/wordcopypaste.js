@@ -3307,7 +3307,7 @@ PasteProcessor.prototype =
                         aImagesToDownload.push(i);
                     if(aImagesToDownload.length > 0)
                     {
-                        var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+                        var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
                         sendCommand( this.api, function(incomeObject){
                             if(incomeObject && "imgurls" == incomeObject.type)
                             {
@@ -3534,7 +3534,7 @@ PasteProcessor.prototype =
                                 aImagesToDownload.push(i);
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
                                 sendCommand( this.api, function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -3761,7 +3761,7 @@ PasteProcessor.prototype =
                                 aImagesToDownload.push(i);
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
                                 sendCommand( this.api, function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -3860,7 +3860,7 @@ PasteProcessor.prototype =
                             var oPrepeareImages = new Object();
                             if(aImagesToDownload.length > 0)
                             {
-                                var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+                                var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
                                 sendCommand( this.api, function(incomeObject){
                                     if(incomeObject && "imgurls" == incomeObject.type)
                                     {
@@ -4126,7 +4126,7 @@ PasteProcessor.prototype =
 			var oPrepeareImages = new Object();
 			if(aImagesToDownload.length > 0)
 			{
-				var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+				var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
 				sendCommand( this.api, function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
