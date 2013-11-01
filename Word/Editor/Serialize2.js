@@ -4413,6 +4413,16 @@ function BinaryFileReader(doc, openParams)
 			else
 				numPr.NumId = 0;
 		}
+		var styles = this.Document.Styles.Style;
+        var stDefault = this.Document.Styles.Default;
+		//запоминаем имена стилей, которые были изначально в нашем документе, чтобы потом подменить их
+		var aStartDocStylesNames = {};
+		for(var stId in styles)
+		{
+			var style = styles[stId];
+			if(style && style.Name)
+				aStartDocStylesNames[style.Name.toLowerCase().replace(/\s/g,"")] = style;
+		}
 		//стили
 		for(var i in this.oReadResult.styles)
 		{
@@ -4421,57 +4431,50 @@ function BinaryFileReader(doc, openParams)
 			var oNewId = elem.param;
 		    if(g_nCurFileVersion < 2)
                 oNewStyle.qFormat = true;
-            var styles = this.Document.Styles.Style;
-            var stDefault = this.Document.Styles.Default;
             //такой код для сранения имен есть в DrawingDocument.js
             // как только меняется DrawingDocument - меняется и код здесь.
-            var sNewStyleName = oNewStyle.Name.toLowerCase().replace(" ", "");
+            var sNewStyleName = oNewStyle.Name.toLowerCase().replace(/\s/g,"");
+			var oStartDocStyle = aStartDocStylesNames[sNewStyleName];
             //Удаляем стили с тем же именем
-            for(var stId in styles)
+            if(oStartDocStyle)
             {
-                var stObj = styles[stId];
-                var sStyleName = stObj.Name.toLowerCase().replace(" ", "");
-                if(sStyleName == sNewStyleName)
+				var stId = oStartDocStyle.Get_Id();
+                oNewStyle.Name = oStartDocStyle.Name;
+                for(var stId2 in styles)
                 {
-                    oNewStyle.Name = stObj.Name;
-                    for(var stId2 in styles)
-                    {
-                        var stObj2 = styles[stId2];
-                        if (stObj2.BasedOn == stId)
-                            stObj2.BasedOn = oNewId.id;
-                        if (stObj2.Next == stId)
-                            stObj2.Next = oNewId.id;
-                    }
-                    if(stDefault.Paragraph == stId)
-                        stDefault.Paragraph = oNewId.id;
-                    if(stDefault.Numbering == stId)
-                        stDefault.Numbering = oNewId.id;
-                    if(stDefault.Table == stId)
-                        stDefault.Table = oNewId.id;
-                    for(var j = 0, length2 = stDefault.Headings.length; j < length2; ++j)
-                    {
-                        var sHeading = stDefault.Headings[j];
-                        if(sHeading == stId)
-                            stDefault.Headings[j] = oNewId.id;
-                    }
-                    if(stDefault.ParaList == stId)
-                        stDefault.ParaList = oNewId.id;
-                    if(stDefault.Header == stId)
-                        stDefault.Header = oNewId.id;
-                    if(stDefault.Footer == stId)
-                        stDefault.Footer = oNewId.id;
-					if(stDefault.Hyperlink == stId)
-                        stDefault.Hyperlink = oNewId.id;
-                    delete styles[stId];
-
-                    break;
+                    var stObj2 = styles[stId2];
+                    if (stObj2.BasedOn == stId)
+                        stObj2.BasedOn = oNewId.id;
+                    if (stObj2.Next == stId)
+                        stObj2.Next = oNewId.id;
                 }
+                if(stDefault.Paragraph == stId)
+                    stDefault.Paragraph = oNewId.id;
+                if(stDefault.Numbering == stId)
+                    stDefault.Numbering = oNewId.id;
+                if(stDefault.Table == stId)
+                    stDefault.Table = oNewId.id;
+                for(var j = 0, length2 = stDefault.Headings.length; j < length2; ++j)
+                {
+                    var sHeading = stDefault.Headings[j];
+                    if(sHeading == stId)
+                        stDefault.Headings[j] = oNewId.id;
+                }
+                if(stDefault.ParaList == stId)
+                    stDefault.ParaList = oNewId.id;
+                if(stDefault.Header == stId)
+                    stDefault.Header = oNewId.id;
+                if(stDefault.Footer == stId)
+                    stDefault.Footer = oNewId.id;
+				if(stDefault.Hyperlink == stId)
+                    stDefault.Hyperlink = oNewId.id;
+                delete styles[stId];
             }
-            if("Header" == oNewStyle.Name)
+            if("header" == sNewStyleName)
                 stDefault.Header = oNewId.id;
-            if("Footer" == oNewStyle.Name)
+            if("footer" == sNewStyleName)
                 stDefault.Footer = oNewId.id;
-			if("Hyperlink" == oNewStyle.Name)
+			if("hyperlink" == sNewStyleName)
                 stDefault.Hyperlink = oNewId.id;
             if(true == oNewId.def)
             {
