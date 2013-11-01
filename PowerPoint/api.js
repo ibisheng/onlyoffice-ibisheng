@@ -52,6 +52,9 @@ function asc_docs_api(name)
 	this.DocInfo = null;
     this.bNoSendComments = false;
 
+    this.isApplyChangesOnOpen = false;
+    this.isApplyChangesOnOpenEnabled = true;
+
     this.IsSupportEmptyPresentation = true;
         
     this.ShowParaMarks = false;
@@ -3730,13 +3733,22 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     {
         if(this.LoadedObject)
         {
-
             if(this.LoadedObject === 1)
             {
-                this.bNoSendComments = true;
-                CollaborativeEditing.Apply_Changes();
-                CollaborativeEditing.Release_Locks();
-                this.bNoSendComments = false;
+                if (this.isApplyChangesOnOpenEnabled)
+                {
+                    if (CollaborativeEditing.m_bUse == true)
+                    {
+                        this.isApplyChangesOnOpen = true;
+                        this.bNoSendComments = true;
+                        CollaborativeEditing.Apply_Changes();
+                        CollaborativeEditing.Release_Locks();
+                        this.bNoSendComments = false;
+
+                        this.isApplyChangesOnOpenEnabled = false;
+                        return;
+                    }
+                }
             }
             this.WordControl.m_oLogicDocument.RecalculateAfterOpen();
             var presentation = this.WordControl.m_oLogicDocument;
@@ -3913,6 +3925,12 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 asc_docs_api.prototype.pre_SaveCallback = function()
 {
     CollaborativeEditing.OnEnd_Load_Objects();
+
+    if (this.isApplyChangesOnOpen)
+    {
+        this.isApplyChangesOnOpen = false;
+        this.OpenDocumentEndCallback();
+    }
 }
 
 asc_docs_api.prototype.initEvents2MobileAdvances = function()
