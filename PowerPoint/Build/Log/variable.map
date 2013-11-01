@@ -1414,7 +1414,7 @@ _ph_summ__tx:U4
 asc_CTextFontFamily:AH
 EHint$hintDefault:ES
 TT_Gasp:en
-JSCompiler_StaticMethods__ExecuteTable:sf
+JSCompiler_StaticMethods__ExecuteTable:qf
 CGroupShape:ec
 historyitem_Table_DocNext:qW
 FT_UnitVector:nt
@@ -2093,7 +2093,7 @@ FileHandler:Cg
 c_oSer_OMathBottomNodesType$ZeroDesc:RQ
 CTextFontFamily:X5
 FT_ENCODING_MS_SYMBOL:Py
-cff_face_done:Uw
+cff_face_done:Vw
 getFontInfo:rX
 c_oSer_BasicChartType$BarDerection:cJ
 c_oSer_ChartLegendLayoutType$XMode:QI
@@ -2932,7 +2932,7 @@ L 59:Ld
 nSldLtTClipArtAndTx:O1
 L 58:Lk
 L 57:xg
-L 56:rf
+L 56:sf
 L 55:jm
 L 54:Rj
 L 53:gg
@@ -2963,7 +2963,7 @@ JSCompiler_StaticMethods__read_rPr:Ne
 L 40:Ad
 ft_bitmap_glyph_init:Xl
 TT_Post_NamesRec:ln
-L 43:qf
+L 43:rf
 L 42:De
 HSLToRGB:P2
 STATES_ID_POLY_LINE_ADD:zF
