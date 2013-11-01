@@ -2506,6 +2506,9 @@ function CDemonstrationManager(htmlpage)
     this.HtmlPage   = htmlpage;
     this.Transition = new CTransitionAnimation(htmlpage);
 
+    this.DivWidth = 0;
+    this.DivHeight = 0;
+
     this.MainDivId          = "";
     this.DemonstrationDiv   = null;
     this.DivEndPresentation = null;
@@ -2707,6 +2710,9 @@ function CDemonstrationManager(htmlpage)
         var _width  = this.DemonstrationDiv.clientWidth;
         var _height = this.DemonstrationDiv.clientHeight;
 
+        this.DivWidth = _width;
+        this.DivHeight = _height;
+
         this.Mode = true;
         this.Canvas = document.createElement('canvas');
         this.Canvas.setAttribute("style", "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:2;background-color:#000000;");
@@ -2730,6 +2736,9 @@ function CDemonstrationManager(htmlpage)
 
         if (false === is_play_mode)
             this.IsPlayMode = false;
+
+        this.SlideIndexes[0] = -1;
+        this.SlideIndexes[1] = -1;
 
         this.StartSlide(true, true);
     }
@@ -3108,5 +3117,33 @@ function CDemonstrationManager(htmlpage)
 
     this.Resize = function()
     {
+        if (!this.Mode)
+            return;
+
+        var _width  = this.DemonstrationDiv.clientWidth;
+        var _height = this.DemonstrationDiv.clientHeight;
+
+        if (_width == this.DivWidth && _height == this.DivHeight)
+            return;
+
+        this.DivWidth = _width;
+        this.DivHeight = _height;
+
+        this.Canvas.width = _width;
+        this.Canvas.height = _height;
+
+        this.Transition.CalculateRectDemonstration();
+
+        this.SlideIndexes[0] = -1;
+        this.SlideIndexes[1] = -1;
+
+        if (this.Overlay)
+        {
+            this.Overlay.width = this.Canvas.width;
+            this.Overlay.height = this.Canvas.height;
+        }
+
+        if (this.SlideNum < this.SlidesCount)
+            this.StartSlide(false, false);
     }
 }
