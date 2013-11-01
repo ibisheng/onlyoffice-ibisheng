@@ -1397,7 +1397,12 @@ CShapeDrawer.prototype =
                             rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                         }
                         if (rgba)
+                        {
+                            if (this.UniFill != null && this.UniFill.transparent != null && this.Graphics.ClearMode !== true)
+                                rgba.A = this.UniFill.transparent;
+                            
                             this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
+                        }
                     }
                 }
             }
