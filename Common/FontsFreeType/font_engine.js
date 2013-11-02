@@ -25978,11 +25978,6 @@ function TT_RunIns(exc)
         exc.step_ins = true;
         exc.error    = 0;
 
-        if (exc.opcode == 196 && exc.IP == 288 && ins_counter == 304)
-        {
-            console.log("123");
-        }
-
         Instruct_Dispatch[exc.opcode](exc, exc.stack, exc.args);
  
         var bSuiteLabel = false;
