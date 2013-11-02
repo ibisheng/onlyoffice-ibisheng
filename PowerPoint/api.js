@@ -4263,43 +4263,11 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
 {
     var bg = slide.cSld.Bg;
     var obj = new CAscSlideProps();
-/*    if (null == bg)
-    {
-        obj.Background = new CAscFill();
-        obj.Background.type = c_oAscFill.FILL_TYPE_NOFILL;
-    }
-    else
-    {
-        var RGBA = {R:0, G:0, B:0, A:255};
-        var _back_fill = null;
 
-        var _layout = slide.Layout;
-        var _master = _layout.Master;
-        var _theme = _master.Theme;
+    var bgFill = null;
+    if (slide.cSld && slide.cSld.Bg && slide.cSld.Bg.bgPr)
+        bgFill = slide.cSld.Bg.bgPr.Fill;
 
-        if (null != bg.bgPr)
-        {
-            _back_fill = bg.bgPr.Fill;
-        }
-        else if (bg.bgRef != null)
-        {
-            bg.bgRef.Color.Calculate(_theme, slide, _layout, _master, RGBA);
-            RGBA = bg.bgRef.Color.RGBA;
-            _back_fill = _theme.themeElements.fmtScheme.GetFillStyle(bg.bgRef.idx);
-        }
-
-        if (_back_fill != null)
-            _back_fill.calculate(_theme, slide, _layout, _master, RGBA);
-
-        obj.Background = CreateAscFill(_back_fill);
-
-        if (_back_fill != null && _back_fill.fill != null && _back_fill.fill.type == FILL_TYPE_BLIP)
-        {
-            this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(_back_fill.fill.RasterImageId);
-        }
-    }   */
-
-    var bgFill = slide.backgroundFill;
     if(!bgFill)
     {
         obj.Background = new CAscFill();
