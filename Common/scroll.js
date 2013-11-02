@@ -12,6 +12,39 @@ var ScrollOverType = {
     ACTIVE:2
 };
 
+function GetClientWidth(elem)
+{
+    var _w = elem.clientWidth;
+    if (0 != _w)
+        return _w;
+
+    var _string_w = "" + elem.style.width;
+    if (-1 < _string_w.indexOf("%"))
+        return 0;
+
+    var _intVal = parseInt(_string_w);
+    if (!isNaN(_intVal) && 0 < _intVal)
+        return _intVal;
+
+    return 0;
+}
+function GetClientHeight(elem)
+{
+    var _w = elem.clientHeight;
+    if (0 != _w)
+        return _w;
+
+    var _string_w = "" + elem.style.height;
+    if (-1 < _string_w.indexOf("%"))
+        return 0;
+
+    var _intVal = parseInt(_string_w);
+    if (!isNaN(_intVal) && 0 < _intVal)
+        return _intVal;
+
+    return 0;
+}
+
 function CArrowDrawer() {
     // размер квадратика в пикселах
     this.Size = 16;
@@ -459,12 +492,19 @@ ScrollObject.prototype = {
         }
     },
     Repos:function ( settings, bIsHorAttack, bIsVerAttack ) {
-        this._setDimension( this.canvas.parentNode.clientHeight, this.canvas.parentNode.clientWidth );
-        this.maxScrollY = this.canvas.parentNode.firstElementChild.clientHeight - settings.screenH > 0 ? this.canvas.parentNode.firstElementChild.clientHeight - settings.screenH : 0;
-        this.maxScrollX = this.canvas.parentNode.firstElementChild.clientWidth - settings.screenW > 0 ? this.canvas.parentNode.firstElementChild.clientWidth - settings.screenW : 0;
 
-        this.isVerticalScroll = this.canvas.parentNode.firstElementChild.clientHeight / Math.max(this.canvasH, 1) > 1 || this.isVerticalScroll || (true === bIsVerAttack);
-        this.isHorizontalScroll = this.canvas.parentNode.firstElementChild.clientWidth / Math.max(this.canvasW, 1) > 1 || this.isHorizontalScroll || (true === bIsHorAttack);
+        var _parentClientW = GetClientWidth(this.canvas.parentNode);
+        var _parentClientH = GetClientHeight(this.canvas.parentNode);
+
+        var _firstChildW = GetClientWidth(this.canvas.parentNode.firstElementChild);
+        var _firstChildH = GetClientHeight(this.canvas.parentNode.firstElementChild);
+
+        this._setDimension( _parentClientH, _parentClientW );
+        this.maxScrollY = _firstChildH - settings.screenH > 0 ? _firstChildH - settings.screenH : 0;
+        this.maxScrollX = _firstChildW - settings.screenW > 0 ? _firstChildW - settings.screenW : 0;
+
+        this.isVerticalScroll   = _firstChildH / Math.max(this.canvasH, 1) > 1 || this.isVerticalScroll || (true === bIsVerAttack);
+        this.isHorizontalScroll = _firstChildW / Math.max(this.canvasW, 1) > 1 || this.isHorizontalScroll || (true === bIsHorAttack);
         this._setScrollerHW();
 
         this.paneHeight = this.canvasH - this.arrowPosition * 2;
