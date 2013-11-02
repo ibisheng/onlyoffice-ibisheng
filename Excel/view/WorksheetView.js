@@ -2574,7 +2574,6 @@
 					for (var isMerged = false, hasHideCol = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
 						if (this.cols[col].width < this.width_1px) {hasHideCol = true; continue;}
 						var isFirstCol = col === range.c1;
-						var isLastCol  = col === range.c2;
 
 						if (!mergedCellsStage) {
 							// ToDo возможно можно оптимизировать
@@ -2675,7 +2674,7 @@
 								drawVerticalBorder.call(this, lb, tb, tbPrev, bb, bbPrev, x1, y1, y2);
 							}
 						}
-						if (!mergedCellsStage || isLastCol) {
+						if (!mergedCellsStage || col === range.c2) {
 							// draw right border
 							drawVerticalBorder.call(this, rb, tb, tbNext, bb, bbNext, x2, y1, y2);
 						}
