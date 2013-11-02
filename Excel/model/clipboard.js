@@ -1191,8 +1191,10 @@
 							res = c_oAscBorderStyles.Thin;
 						else if (1 < nBorderWidth && nBorderWidth <= 2)
 							res = c_oAscBorderStyles.Medium;
-						else
+						else if (2 < nBorderWidth && nBorderWidth <= 3)
 							res = c_oAscBorderStyles.Thick;
+						else
+							res = c_oAscBorderStyles.None;
 						break;
 					case "dashed":
 						if (0 < nBorderWidth && nBorderWidth <= 1)

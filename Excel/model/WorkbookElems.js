@@ -649,7 +649,6 @@ BorderProp.prototype = {
 			case c_oAscBorderStyles.MediumDashDot:
 			case c_oAscBorderStyles.MediumDashDotDot:
 			case c_oAscBorderStyles.MediumDashed:
-			case c_oAscBorderStyles.None:
 			case c_oAscBorderStyles.SlantDashDot:
 				this.w = c_oAscBorderWidth.Medium;
 				break;
