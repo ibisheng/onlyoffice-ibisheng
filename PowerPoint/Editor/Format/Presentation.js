@@ -6284,6 +6284,7 @@ CPresentation.prototype =
     {
         History.Add(this, {Type: historyitem_Presenattion_AddSlide, Pos: pos, Id: slide.Get_Id()});
         this.Slides.splice(pos, 0, slide);
+        slide.setSlideSize(this.Width, this.Height);
         editor.WordControl.m_oLogicDocument.recalcMap[slide.Id] = slide;
 
     },
