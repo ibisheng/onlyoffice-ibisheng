@@ -1497,6 +1497,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					t.asyncServerIdEndLoaded ();
 				};
 				this.CoAuthoringApi.onSetIndexUser				= function (e) {
+                    g_oIdCounter.Set_UserId("" + e);
 				};
 				this.CoAuthoringApi.onStartCoAuthoring			= function (isStartEvent) {
 					t.startCollaborationEditing();

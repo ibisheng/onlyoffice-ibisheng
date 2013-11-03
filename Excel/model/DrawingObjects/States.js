@@ -445,15 +445,24 @@ function NullState(drawingObjectsController, drawingObjects)
             var selected_objects = this.drawingObjectsController.selectedObjects;
             if(selected_objects.length === 1 && selected_objects[0].isShape())
             {
-                if(isRealNumber(e.charCode))
-                {
-                    selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
-                    this.drawingObjects.showDrawingObjects(true);
-                    this.drawingObjectsController.updateSelectionState();
-                    this.drawingObjects.OnUpdateOverlay();
+                this.drawingObjects.objectLocker.reset();
+                this.drawingObjects.objectLocker.addObjectId(selected_objects[0].Get_Id());
 
-                }
+                var drawingObjects = this.drawingObjects;
+                var text_object = selected_objects[0];
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                        drawingObjects.showDrawingObjects(true);
+                        text_object.updateSelectionState(drawingObjects.drawingDocument);
+                    }
+                };
+
+                //worksheet.collaborativeEditing.onEndCheckLock(callback);
+                this.drawingObjects.objectLocker.checkObjects(callback);
             }
         }
 

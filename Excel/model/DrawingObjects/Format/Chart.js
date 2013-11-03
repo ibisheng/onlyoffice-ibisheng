@@ -472,7 +472,7 @@ CChartAsGroup.prototype =
 
     setChart: function(chart, isCollaborative)
     {
-		var sheetId = this.drawingObjects.getWorksheet().model.Id;
+		var sheetId = this.drawingObjects.getWorksheet() ? this.drawingObjects.getWorksheet().model.Id : null;
 		
 		if ( !(isCollaborative === true) ) {
 			History.Create_NewPoint();
@@ -2105,29 +2105,122 @@ CChartAsGroup.prototype =
 
     readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
     {
-        this.group = group;
+        this.setGroup(group);
+        this.setDrawingObjects(drawingObjects);
         this.drawingObjects = drawingObjects;
         if(r.GetBool())
         {
-            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
+            this.chartTitle.drawingObjects = drawingObjects;
             this.chartTitle.readFromBinary(r);
         }
 
         if(r.GetBool())
         {
-            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
+            this.vAxisTitle.drawingObjects = drawingObjects;
             this.vAxisTitle.readFromBinary(r);
         }
         if(r.GetBool())
         {
-            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
+            this.hAxisTitle.drawingObjects = drawingObjects;
             this.hAxisTitle.readFromBinary(r);
         }
-		this.chart = new asc_CChart();
+        this.setAscChart(new asc_CChart());
         this.chart.Read_FromBinary2(r, false);
-        this.spPr.Read_FromBinary2(r);
+        this.setChart(this.chart, true);
+        //this.spPr.Read_FromBinary2(r);
+        //*********************
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+        var Reader = r;
+        var offX, offY, extX, extY, flipH, flipV, rot;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            geometry.Init(5, 5);
+            this.setGeometry(geometry);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            // this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            //this.setUniLine(ln);
+        }
+
+
+        //***********************************
         if(isRealNumber(x) && isRealNumber(y))
             this.spPr.xfrm.setPosition(x, y);
+        this.init();
     },
 
 

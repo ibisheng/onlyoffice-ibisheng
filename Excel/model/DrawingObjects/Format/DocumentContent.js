@@ -231,7 +231,7 @@ CDocumentContent.prototype =
     setDrawingDocument: function(drawingDocument)
     {
         var oldValue = isRealObject(this.DrawingDocument) && isRealObject(this.DrawingDocument.drawingObjects) ? this.DrawingDocument.drawingObjects.getWorksheet().model.getId() : null;
-        var newValue = isRealObject(drawingDocument) && isRealObject(drawingDocument.drawingObjects) ? drawingDocument.drawingObjects.getWorksheet().model.getId() : null;
+        var newValue = isRealObject(drawingDocument) && isRealObject(drawingDocument.drawingObjects) && drawingDocument.drawingObjects.getWorksheet() ? drawingDocument.drawingObjects.getWorksheet().model.getId() : null;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddDrawingDocument, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.DrawingDocument = drawingDocument;
