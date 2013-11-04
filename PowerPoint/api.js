@@ -4261,6 +4261,9 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
 
 asc_docs_api.prototype.sync_slidePropCallback = function(slide)
 {
+    if (!slide)
+        return;
+
     var bg = slide.cSld.Bg;
     var obj = new CAscSlideProps();
 
