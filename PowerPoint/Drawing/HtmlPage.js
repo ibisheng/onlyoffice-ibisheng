@@ -2937,16 +2937,13 @@ function CEditorPage(api)
         this.Thumbnails.LockMainObjType = false;
     }
 
-    this.GetVerticalScrollTo = function(y, page)
+    this.GetVerticalScrollTo = function(y)
     {
         var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
-
-        var lYPos = page * this.m_oLogicDocument.Height * dKoef;
-        lYPos += y * dKoef;
-        return lYPos;
+        return 5 + y * dKoef;
     }
 
-    this.GetHorizontalScrollTo = function(x, page)
+    this.GetHorizontalScrollTo = function(x)
     {
         var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
         return 5 + dKoef * x;

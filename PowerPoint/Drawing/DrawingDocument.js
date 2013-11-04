@@ -1950,8 +1950,93 @@ function CDrawingDocument()
             return;
         }
 
+        /// detect need scrolling
+        var targetSize = Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var pos = null;
+        var __x = x;
+        var __y = y;
+        if (!this.TextMatrix)
+        {
+            pos = this.ConvertCoordsToCursor(x, y);
+        }
+        else
+        {
+            __x = this.TextMatrix.TransformPointX(x, y);
+            __y = this.TextMatrix.TransformPointY(x, y);
+
+            pos = this.ConvertCoordsToCursor(__x, __y);
+        }
+
+        var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
+        var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
+        if (this.m_oWordControl.bIsRetinaSupport)
+        {
+            _ww >>= 1;
+            _hh >>= 1;
+        }
+
+        var boxX = 0;
+        var boxY = 0;
+        var boxR = _ww - 2;
+        var boxB = _hh - targetSize;
+
+        var nValueScrollHor = 0;
+        if (pos.X < boxX)
+        {
+            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(__x - 5);
+        }
+        if (pos.X > boxR)
+        {
+            var _mem = __x + 5 - g_dKoef_pix_to_mm * _ww * 100 / this.m_oWordControl.m_nZoomValue;
+            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(_mem);
+        }
+
+        var nValueScrollVer = 0;
+        if (pos.Y < boxY)
+        {
+            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(__y - 5);
+        }
+        if (pos.Y > boxB)
+        {
+            var _mem = __y + targetSize + 5 - g_dKoef_pix_to_mm * _hh * 100 / this.m_oWordControl.m_nZoomValue;
+            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem);
+        }
+        /// ---------------------
+
         this.m_dTargetX = x;
         this.m_dTargetY = y;
+
+        /// check scroll
+        var isNeedScroll = false;
+        if (0 != nValueScrollHor)
+        {
+            isNeedScroll = true;
+            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - _ww);
+            this.m_oWordControl.m_oScrollHorApi.scrollToX(temp >> 0, false);
+        }
+        if (0 != nValueScrollVer)
+        {
+            isNeedScroll = true;
+            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - _hh);
+
+            if (temp > this.m_oWordControl.SlideScrollMAX)
+                temp = this.m_oWordControl.SlideScrollMAX - 1;
+            if (temp < this.m_oWordControl.SlideScrollMIN)
+                temp = this.m_oWordControl.SlideScrollMIN;
+
+            this.m_oWordControl.m_oScrollVerApi.scrollToY(temp >> 0, false);
+        }
+
+        if (true == isNeedScroll)
+        {
+            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+            this.m_oWordControl.OnScroll();
+            return;
+        }
+        /// ------------
+
         this.CheckTargetDraw(x, y);
     }
 
