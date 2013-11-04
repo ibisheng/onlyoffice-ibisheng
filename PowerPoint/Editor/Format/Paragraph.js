@@ -114,9 +114,11 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.SpellChecker = new CParaSpellChecker();
 
-   //this.folHlinkColor = {};
-   //this.folHlinkColor.unifill = unifill;
-   //this.folHlinkColor.Color = {r:128, g:0, b:151};
+    this.folHlinkColor = new CUniFill();
+    this.folHlinkColor.fill = new CSolidFill();
+    this.folHlinkColor.fill.color = new CUniColor();
+    this.folHlinkColor.fill.color.color = new CSchemeColor();
+    this.folHlinkColor.Color = {r:128, g:0, b:151};
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -7159,10 +7161,16 @@ Paragraph.prototype =
     {
         // Создаем текстовую настройку для гиперссылки
         var Hyperlink_end = new ParaHyperlinkEnd();
+        var unifill = new CUniFill();
+        unifill.fill = new CSolidFill();
+        unifill.fill.color = new CUniColor();
+        unifill.fill.color.color = new CSchemeColor();
+        unifill.fill.color.color.id = 11;
         var TextPrObj =
         {
             Color      : { r : 0, g : 0, b : 255 },
-            Underline  : true
+            Underline  : true,
+            unifill    : unifill
         };
         var TextPr = new CTextPr();
         TextPr.Set_FromObject( TextPrObj );
