@@ -4422,6 +4422,9 @@ function CDrawingDocument(drawingObjects)
 
     this.InitGuiCanvasShape = function(div_id)
     {
+        if (this.GuiCanvasFillTextureParentId == div_id && null != this.GuiCanvasFillTexture)
+            return;
+
         if (null != this.GuiCanvasFillTexture)
         {
             var _div_elem = document.getElementById(this.GuiCanvasFillTextureParentId);
