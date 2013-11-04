@@ -1983,23 +1983,21 @@ function CDrawingDocument()
         var nValueScrollHor = 0;
         if (pos.X < boxX)
         {
-            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(__x - 5);
+            nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxX) >> 0;
         }
         if (pos.X > boxR)
         {
-            var _mem = __x + 5 - g_dKoef_pix_to_mm * _ww * 100 / this.m_oWordControl.m_nZoomValue;
-            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(_mem);
+            nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxR) >> 0;
         }
 
         var nValueScrollVer = 0;
         if (pos.Y < boxY)
         {
-            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(__y - 5);
+            nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxY) >> 0;
         }
         if (pos.Y > boxB)
         {
-            var _mem = __y + targetSize + 5 - g_dKoef_pix_to_mm * _hh * 100 / this.m_oWordControl.m_nZoomValue;
-            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem);
+            nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxB) >> 0;
         }
         /// ---------------------
 
@@ -2012,21 +2010,25 @@ function CDrawingDocument()
         {
             isNeedScroll = true;
             this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - _ww);
-            this.m_oWordControl.m_oScrollHorApi.scrollToX(temp >> 0, false);
+
+            if (nValueScrollHor > this.m_oWordControl.m_dScrollX_max)
+                nValueScrollHor = this.m_oWordControl.m_dScrollX_max;
+            if (0 > nValueScrollHor)
+                nValueScrollHor = 0;
+
+            this.m_oWordControl.m_oScrollHorApi.scrollToX(nValueScrollHor, false);
         }
         if (0 != nValueScrollVer)
         {
             isNeedScroll = true;
             this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - _hh);
 
-            if (temp > this.m_oWordControl.SlideScrollMAX)
-                temp = this.m_oWordControl.SlideScrollMAX - 1;
-            if (temp < this.m_oWordControl.SlideScrollMIN)
-                temp = this.m_oWordControl.SlideScrollMIN;
+            if (nValueScrollVer > this.m_oWordControl.SlideScrollMAX)
+                nValueScrollVer = this.m_oWordControl.SlideScrollMAX - 1;
+            if (this.m_oWordControl.SlideScrollMIN > nValueScrollVer)
+                nValueScrollVer = this.m_oWordControl.SlideScrollMIN;
 
-            this.m_oWordControl.m_oScrollVerApi.scrollToY(temp >> 0, false);
+            this.m_oWordControl.m_oScrollVerApi.scrollToY(nValueScrollVer, false);
         }
 
         if (true == isNeedScroll)

@@ -646,8 +646,8 @@ CTextBody.prototype =
             {
                 if(graphics.IsNoSupportTextDraw)
                 {
-                    var _h2 = this.content2.XLimit;
-                    var _w2 = this.content2.Get_SummaryHeight();
+                    var _w2 = this.content2.XLimit;
+                    var _h2 = this.content2.Get_SummaryHeight();
                     graphics.rect(this.content2.X, this.content2.Y, _w2, _h2);
                 }
 
@@ -659,8 +659,8 @@ CTextBody.prototype =
         {
             if(graphics.IsNoSupportTextDraw)
             {
-                var _h = this.content.XLimit;
-                var _w = this.content.Get_SummaryHeight();
+                var _w = this.content.XLimit;
+                var _h = this.content.Get_SummaryHeight();
                 graphics.rect(this.content.X, this.content.Y, _w, _h);
             }
 

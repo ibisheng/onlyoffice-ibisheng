@@ -3074,7 +3074,18 @@ CShape.prototype =
             if(this.txBody)
             {
                 graphics.SetIntegerGrid(false);
-                graphics.transform3(this.transform);
+
+                var transform_text;
+                if((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2!=null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
+                {
+                    transform_text = this.transformText2;
+                }
+                else if(this.txBody.content)
+                {
+                    transform_text = this.transformText;
+                }
+
+                graphics.transform3(transform_text);
                 this.txBody.draw(graphics);
                 graphics.SetIntegerGrid(true);
             }
