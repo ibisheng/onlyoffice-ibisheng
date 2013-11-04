@@ -2262,7 +2262,7 @@
 				}
 				
 				//при вставке ошибка в MS Excel может возникать как в случае автофильтров, так и в случае форматированных таблиц
-				if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop) && autoFilter)
+				if((DeleteCellsAndShiftLeft || DeleteCellsAndShiftTop || InsertCellsAndShiftDown || InsertCellsAndShiftRight) && autoFilter)
 				{
 					tableRange = this._refToRange(autoFilter.Ref);
 					//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
@@ -2273,47 +2273,11 @@
 							result = 'changeAutoFilter';
 						}	
 					}
-					/*else
-					{
-						//проверка на то, что хотим сдвинуть часть отфильтрованного диапазона
-						if(InsertCellsAndShiftRight)
-						{
-							//если данный фильтр находится справа
-							if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
-							{
-								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
-								return false;
-							}	
-						}
-						else
-						{
-							//если данный фильтр находится внизу
-							if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
-							{
-								ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeError, c_oAscError.Level.NoCritical);
-								return false;
-							}	
-							
-						}
-					}
-					
-					//если сдвигаем данный фильтр
-					if(DeleteCellsAndShiftLeft && tableRange.c1 > activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
-					{
+					//если выделенная область находится до а/ф
+					if(activeCells.c2 < tableRange.c1 && activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2)
 						result = 'changeAutoFilter';
-					}
-					else if(DeleteCellsAndShiftTop && tableRange.r1 > activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
-					{
+					else if(activeCells.r2 < tableRange.r1 && activeCells.c1 <= tableRange.c1 && activeCells.c2 >= tableRange.c2)
 						result = 'changeAutoFilter';
-					}
-					else if(InsertCellsAndShiftRight && tableRange.c1 >= activeCells.c1 && tableRange.r1 >= activeCells.r1 && tableRange.r2 <= activeCells.r2)
-					{
-						result = 'changeAutoFilter';
-					}
-					else if(InsertCellsAndShiftDown && tableRange.r1 >= activeCells.r1 && tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)
-					{
-						result = 'changeAutoFilter';
-					}*/
 				}
 				return result;
 			},
