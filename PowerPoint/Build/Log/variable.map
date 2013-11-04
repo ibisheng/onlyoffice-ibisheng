@@ -508,7 +508,7 @@ c_oSer_sts$Style_semiHidden:DL
 c_oAscContextMenuTypes$Main:y_
 JSCompiler_StaticMethods_Set_WrappingType:bD
 historyitem_Drawing_DrawingType:nD
-JSCompiler_StaticMethods_Set_DocumentOrientation:W_
+JSCompiler_StaticMethods_Set_DocumentOrientation:X_
 c_oAscSlideTransitionParams$Fade_Smoothly:Si
 c_oAscChartType$pie:kK
 nSldLtTTwoColTx:k2
@@ -713,7 +713,7 @@ c_oSer_OMathBottomNodesType$LimLoc:sQ
 ft_service_list_lookup:sl
 Document_Recalculate_Page:p_
 WRAPPING_TYPE_THROUGH:UC
-JSCompiler_StaticMethods_Set_DocumentMargin:FV
+JSCompiler_StaticMethods_Set_DocumentMargin:GV
 reColor:wU
 TYPE_TRACK_GROUP_PASSIVE:pG
 c_oSer_MathPrType$BrkBin:kP
@@ -829,7 +829,7 @@ c_oAscChartType$line:hK
 EChartLegendPos$chartlegendposTop:JJ
 JSCompiler_StaticMethods_Internal_Add_Row:He
 JSCompiler_StaticMethods_WriteBefore:aT
-documentUrl:G5
+documentUrl:H5
 CParagraphTabs:F6
 c_oSer_ChartSeriesType$Marker:mJ
 tt_cmap12_char_index:yr
@@ -961,7 +961,7 @@ FT_Var_Named_Style:Tm
 FT_NEXT_SHORT:Dl
 CMetafile:TU
 ResizeInGroupState:tG
-para_End:Jc
+para_End:Kc
 c_oSerProp_pPrType$Tab_Item:eM
 fontstyle_mask_regular:yz
 T1_Get_Multi_Master:ay
@@ -1120,7 +1120,7 @@ c_oSer_OMathBottomNodesType$CSp:iQ
 c_oAscSlideTransitionParams$Param_Left:Xi
 GX_AVarSegmentRec:$u
 c_oSer_ClrSchemeMappingType$Accent6:FP
-JSCompiler_StaticMethods_OnKeyDown:V_
+JSCompiler_StaticMethods_OnKeyDown:W_
 FT_FACE_FIND_SERVICE:tl
 c_oSer_st$Styles:pL
 c_oSer_ClrSchemeMappingType$Accent3:CP
@@ -1409,7 +1409,7 @@ JSCompiler_StaticMethods_updateCoordinatesAfterInternalResize:KE
 StartTrackNewShapeState:dG
 JSCompiler_StaticMethods_Internal_Get_Cell_ByStartGridCol:yW
 _callbacks:R5
-HitInLine:z0
+HitInLine:A0
 _ph_summ__tx:X4
 asc_CTextFontFamily:CH
 EHint$hintDefault:GS
@@ -1666,7 +1666,7 @@ JSCompiler_StaticMethods_getGradientPoints:z3
 c_oAscSlideTransitionParams$Fade_Through_Black:Ti
 fntStyleInd_none:s4
 TT_CallRec:mt
-JSCompiler_StaticMethods_RGB2HSL:i4
+JSCompiler_StaticMethods_RGB2HSL:j4
 CalculateAhXYList:O2
 FT_ENCODING_NONE:Qy
 tt_face_load_maxp:xq
@@ -1719,7 +1719,7 @@ char9:Nz
 CBulletTypeface:gk
 charA:Iz
 c_oSerBorderType$Value:aI
-CorrectUniStroke:x0
+CorrectUniStroke:y0
 JSCompiler_StaticMethods_AddHandleXY:Fj
 c_oAscVertAlignJc$Top:b5
 CreateGeometry:Xe
@@ -2364,7 +2364,7 @@ c_oAscYAlign$Bottom:UV
 FT_Request_Size:uy
 CLang:JB
 BULLET_TYPE_COLOR_CLRTX:dk
-JSCompiler_StaticMethods_Search_Start:U_
+JSCompiler_StaticMethods_Search_Start:V_
 tt_cmap0_char_next:cr
 WRAPPING_TYPE_TOP_AND_BOTTOM:WC
 CTableStylePr:ci
@@ -2877,7 +2877,7 @@ ParaHyperlinkEnd:ff
 pararecalc_0_None:WZ
 L 39:xg
 L 38:nd
-L 37:Kc
+L 37:Jc
 locktype_None:QA
 PS_PrivateRec:zo
 L 32:La
@@ -2926,7 +2926,7 @@ JSCompiler_StaticMethods_Set_CellInfo:vW
 CDocOpenProgress:L5
 c_oSerProp_pPrType$PageBreakBefore:XL
 tt_face_load_bhed:wq
-TRACK_CIRCLE_RADIUS:y0
+TRACK_CIRCLE_RADIUS:z0
 T1_Loader:Zx
 AscBrowser$isWebkit:la
 JSCompiler_StaticMethods_changeCurrentState:$E
