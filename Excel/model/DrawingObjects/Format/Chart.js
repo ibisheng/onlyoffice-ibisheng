@@ -2109,6 +2109,12 @@ CChartAsGroup.prototype =
         this.setGroup(group);
         this.setDrawingObjects(drawingObjects);
         this.drawingObjects = drawingObjects;
+        if(isRealObject(this.chartTitle))
+            this.chartTitle.drawingObjects = drawingObjects;
+        if(isRealObject(this.hAxisTitle))
+            this.hAxisTitle.drawingObjects = drawingObjects;
+        if(isRealObject(this.vAxisTitle))
+            this.vAxisTitle.drawingObjects = drawingObjects;
         if(r.GetBool())
         {
             this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
