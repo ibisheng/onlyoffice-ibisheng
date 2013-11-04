@@ -1151,6 +1151,7 @@ asc_docs_api.prototype.OpenTestDocumentViewer = function()
 
 asc_docs_api.prototype.OpenDocument = function(url, gObject)
 {
+    this.isOnlyReaderMode = false;
     this.InitViewer();
     this.LoadedObject = null;
     this.DocumentType = 1;
