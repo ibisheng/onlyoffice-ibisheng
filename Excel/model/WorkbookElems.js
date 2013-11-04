@@ -446,9 +446,9 @@ Font.prototype =
 				g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip && this.repeat == font.repeat;
 		if(bRes)
 		{
-			if(null == this.scheme && null == font.scheme)
+			if(EFontScheme.fontschemeNone == this.scheme && EFontScheme.fontschemeNone == font.scheme)
 				bRes = this.fn == font.fn;
-			else if(null != this.scheme && null != font.scheme)
+			else if(EFontScheme.fontschemeNone != this.scheme && EFontScheme.fontschemeNone != font.scheme)
 				bRes = this.scheme == font.scheme;
 			else
 				bRes = false;
@@ -1506,15 +1506,20 @@ StyleManager.prototype =
             oRes.oldVal = xfs.font.fn;
 		else
 			oRes.oldVal = g_oDefaultFont.fn;
+		//todo undo для scheme
         if(null == val)
         {
             if(null != xfs && null != xfs.font)
+			{
                 xfs.font.fn = g_oDefaultFont.fn;
+				xfs.font.scheme = EFontScheme.fontschemeNone;
+			}
         }
         else
         {
             xfs = this._prepareSetFont(oItemWithXfs);
             xfs.font.fn = val;
+			xfs.font.scheme = EFontScheme.fontschemeNone;
         }
 		return oRes;
 	},
