@@ -1565,17 +1565,16 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 	this.ReadChartTitle = function(type, length, chartTitlePptx, chartTitleHeader)
     {
 		var res = c_oSerConstants.ReadOk;
-		if ( c_oSer_ChartTitlePptxType.TxPptx === type || c_oSer_ChartTitlePptxType.TxPrPptx === type)
+		if ( c_oSer_ChartTitlePptxType.TxPptx === type )
+		{
+			var oPPTXContentLoader = new CPPTXContentLoader();
+			oPPTXContentLoader.ReadTextBody(null, this.stream,  chartTitlePptx);
+			chartTitleHeader.bDefaultTitle = false;
+		}
+		else if ( c_oSer_ChartTitlePptxType.TxPrPptx === type)
 		{
             var oPPTXContentLoader = new CPPTXContentLoader();
-            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  chartTitlePptx);
-            if(c_oSer_ChartTitlePptxType.TxPptx === type)
-			{
-                chartTitlePptx.txBody = textBody;
-				chartTitleHeader.bDefaultTitle = false;
-			}
-            else
-                chartTitlePptx.txPr = textBody;
+            oPPTXContentLoader.ReadTextBodyTxPr(null, this.stream,  chartTitlePptx);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1610,7 +1609,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         {
 			var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
 			var oPPTXContentLoader = new CPPTXContentLoader();
-            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+            var textBody = oPPTXContentLoader.ReadTextBodyTxPr(null, this.stream,  oTempTitle);
             // var font = this.ParsePptxParagraph(textBody);
             // if(null != font)
                 // this.chart.legend.font = font;
@@ -1640,7 +1639,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         {
             var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
 			var oPPTXContentLoader = new CPPTXContentLoader();
-            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+            var textBody = oPPTXContentLoader.ReadTextBodyTxPr(null, this.stream,  oTempTitle);
             //oLegendEntry.oTxPr = this.ParsePptxParagraph(textBody);
         }
         else
@@ -1765,7 +1764,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			//настройки цифр линейки.
             var oTxPr = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
             var oPPTXContentLoader = new CPPTXContentLoader();
-            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTxPr);
+            var textBody = oPPTXContentLoader.ReadTextBodyTxPr(null, this.stream,  oTxPr);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -2031,7 +2030,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		{
 			var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
 			var oPPTXContentLoader = new CPPTXContentLoader();
-            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+            var textBody = oPPTXContentLoader.ReadTextBodyTxPr(null, this.stream,  oTempTitle);
 			//oOutput.TxPrPptx = this.ParsePptxParagraph(textBody);
 		}
 		else if ( c_oSer_ChartSeriesDataLabelsType.ShowCatName === type )
