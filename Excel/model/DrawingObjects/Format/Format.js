@@ -930,9 +930,9 @@ CRGBColor.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
-        var RGBA = {R:0, G:0, B:0, A:255};
-        WriteObjectLong(Writer, RGBA);
-        this.setColor(((RGBA.R << 16) & 0xFF0000) + ((RGBA.G << 8) & 0xFF00) + RGBA.B);
+       // var RGBA = {R:0, G:0, B:0, A:255};
+        WriteObjectLong(Writer, this.RGBA);
+        //this.setColor(((RGBA.R << 16) & 0xFF0000) + ((RGBA.G << 8) & 0xFF00) + RGBA.B);
     },
 
     Read_FromBinary2 : function(Reader)
