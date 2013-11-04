@@ -2067,8 +2067,161 @@ DrawingObjectsController.prototype =
 	// layers
 	setGraphicObjectLayer: function(layerType)
 	{
+        this.checkSelectedObjectsAndCallback(this.setGraphicObjectLayerCallBack, [layerType]);
 		//oAscDrawingLayerType
-	}
+	},
+
+
+    setGraphicObjectLayerCallBack: function(layerType)
+    {
+        History.Create_NewPoint();
+        switch (layerType)
+        {
+            case 0:
+            {
+                this.bringToFront();
+                break;
+            }
+            case 1:
+            {
+                this.sendToBack();
+                break;
+            }
+            case 2:
+            {
+                this.bringForward();
+                break;
+            }
+            case 3:
+            {
+                this.bringBackward();
+            }
+        }
+    },
+
+    bringToFront : function()
+    {
+        var state = this.curState;
+        var sp_tree = this.drawingObjects.getDrawingObjects();
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                var selected = [];
+                for(var i = 0; i < sp_tree.length; ++i)
+                {
+                    if(sp_tree[i].graphicObject.selected)
+                    {
+                        selected.push(sp_tree[i].graphicObject);
+                    }
+                }
+                for(var i = sp_tree.length-1; i > -1 ; --i)
+                {
+                    if(sp_tree[i].selected)
+                    {
+                        sp_tree[i].graphicObject.deleteDrawingBase();
+                    }
+                }
+                for(i = 0; i < selected.length; ++i)
+                {
+                    selected[i].addToDrawingObjects(sp_tree.length);
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+        }
+        this.drawingObjects.showDrawingObjects(true);
+
+    },
+
+    bringForward : function()
+    {
+        var state = this.curState;
+        var sp_tree = this.drawingObjects.getDrawingObjects();
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                for(var i = sp_tree.length - 1;i > -1; --i)
+                {
+                    var sp = sp_tree[i].graphicObject;
+                    if(sp.selected && i < sp_tree.length - 1 && !sp_tree[i+1].graphicObject.selected)
+                    {
+                        sp.deleteDrawingBase();
+                        sp.addToDrawingObjects(i+1);
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+        }
+        this.drawingObjects.showDrawingObjects(true);
+    },
+
+    sendToBack : function()
+    {
+        var state = this.curState;
+        var sp_tree = this.drawingObjects.getDrawingObjects();
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                var  j = 0;
+                for(var i = 0; i < sp_tree.length; ++i)
+                {
+                    if(sp_tree[i].graphicObject.selected)
+                    {
+                        var object = sp_tree[i].graphicObject;
+                        object.deleteDrawingBase();
+                        object.addToDrawingObjects(j);
+                        ++j;
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+        }
+        this.drawingObjects.showDrawingObjects(true);
+
+    },
+
+
+    bringBackward : function()
+    {
+        var state = this.curState;
+        var sp_tree = this.drawingObjects.getDrawingObjects();
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                for(var i = 0;i < sp_tree.length; ++i)
+                {
+                    var sp = sp_tree[i].graphicObject;
+                    if(sp.selected && i > 0 && !sp_tree[i-1].graphicObject.selected)
+                    {
+                        sp.deleteDrawingBase();
+                        sp.addToDrawingObjects(i-1);
+                    }
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+        }
+        this.drawingObjects.showDrawingObjects(true);
+
+    }
 };
 
 //-----------------------------------------------------------------------------------
@@ -2897,4 +3050,91 @@ function DeleteSelectedObjects(controller)
         selected_objects[i].deleteDrawingBase();
     }
     controller.resetSelection();
+}
+
+
+function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
+
+    var _this = drawingObjects;
+    var  worksheet = drawingObjects.getWorksheet();
+    if ( imageUrl && !_this.isViewerMode() ) {
+
+        var _image =  asc["editor"].ImageLoader.LoadImage(imageUrl, 1);
+        var isOption = options && options.cell;
+
+        function calculateObjectMetrics(object, width, height) {
+            // Обработка картинок большого разрешения
+            var metricCoeff = 1;
+
+            var coordsFrom = _this.coordsManager.calculateCoords(object.from);
+            var realTopOffset = coordsFrom.y;
+            var realLeftOffset = coordsFrom.x;
+
+            var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 0); 	// по ширине
+            if (areaWidth < width) {
+                metricCoeff = width / areaWidth;
+
+                width = areaWidth;
+                height /= metricCoeff;
+            }
+
+            var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 0); 	// по высоте
+            if (areaHeight < height) {
+                metricCoeff = height / areaHeight;
+
+                height = areaHeight;
+                width /= metricCoeff;
+            }
+
+            var cellTo = _this.coordsManager.calculateCell(realLeftOffset + width, realTopOffset + height);
+            object.to.col = cellTo.col;
+            object.to.colOff = cellTo.colOff;
+            object.to.row = cellTo.row;
+            object.to.rowOff = cellTo.rowOff;
+
+            worksheet._trigger("reinitializeScroll");
+        }
+
+        function addImageObject(_image) {
+
+            if ( !_image.Image ) {
+                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+            }
+            else {
+
+                var drawingObject = _this.createDrawingObject();
+                drawingObject.worksheet = worksheet;
+
+                drawingObject.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
+                drawingObject.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
+
+                // Проверяем начальные координаты при вставке
+                while ( !worksheet.cols[drawingObject.from.col] ) {
+                    worksheet.expandColsOnScroll(true);
+                }
+                worksheet.expandColsOnScroll(true); 	// для colOff
+
+                while ( !worksheet.rows[drawingObject.from.row] ) {
+                    worksheet.expandRowsOnScroll(true);
+                }
+                worksheet.expandRowsOnScroll(true); 	// для rowOff
+
+                calculateObjectMetrics(drawingObject, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
+
+                var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
+                var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
+                drawingObject.graphicObject = new CImageShape(drawingObject, _this);
+                drawingObject.graphicObject.initDefault( drawingObjects.convertMetric(coordsFrom.x, 0, 3), drawingObjects.convertMetric(coordsFrom.y, 0, 3), drawingObjects.convertMetric(coordsTo.x - coordsFrom.x, 0, 3), drawingObjects.convertMetric(coordsTo.y - coordsFrom.y, 0, 3), _image.src );
+               // drawingObject.graphicObject.select(_this.controller);
+                drawingObject.graphicObject.setDrawingObjects(_this);
+                //drawingObject.graphicObject.addToDrawingObjects();
+                return drawingObject;
+            }
+        }
+        if (null != _image)
+        {
+            return addImageObject(_image);
+        }
+    }
+    return null;
 }

@@ -4116,7 +4116,7 @@ function SplineBezierState(drawingObjectsController, drawingObjects)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4163,7 +4163,7 @@ function SplineBezierState33(drawingObjectsController, drawingObjects, startX, s
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return  {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4221,7 +4221,7 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4320,7 +4320,7 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4429,7 +4429,7 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4546,7 +4546,7 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4596,7 +4596,7 @@ function PolyLineAddState(drawingObjectsController, drawingObjects)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4661,7 +4661,7 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4707,7 +4707,7 @@ function AddPolyLine2State(drawingObjectsController, drawingObjects)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4760,7 +4760,7 @@ function AddPolyLine2State2(drawingObjectsController, drawingObjects, x, y, poly
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
@@ -4856,7 +4856,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return null/*TODO*/;
+        return {objectId: "1_1", cursorType: "crosshair"};
     };
 
     this.drawSelection = function(drawingDocument)
