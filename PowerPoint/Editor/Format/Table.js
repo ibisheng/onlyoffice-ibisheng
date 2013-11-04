@@ -12652,6 +12652,7 @@ CTable.prototype =
 
         this.Internal_Recalculate_1();
         this.Internal_OnContentRecalculate( true, 0, this.Index );
+        editor.WordControl.m_oLogicDocument.Recalculate();
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 
