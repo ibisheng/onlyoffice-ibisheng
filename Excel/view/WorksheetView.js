@@ -7118,6 +7118,7 @@
 								//загрузка шрифтов, в случае удачи на callback вставляем текст
 								t._loadFonts(val.fontsNew, function () {
 									pasteLocal();
+                                    var a_drawings = [];
 									if (val.addImages && val.addImages.length != 0) {
 										var api = asc["editor"];
 										var aImagesSync = [];
@@ -7178,13 +7179,35 @@
 														else
 															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
 														Drawing.drawingObjects = t.objectRender;
-														Drawing.addToDrawingObjects();
+                                                        a_drawings.push(Drawing);
+														//Drawing.addToDrawingObjects();
 													} else if (0 != src.indexOf("file://")) {
-														t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+                                                        var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
+                                                        if(drawing && drawing.graphicObject)
+                                                            a_drawings.push(drawing.graphicObject);
 													}
 												}
 											}
+
+                                            t.objectRender.objectLocker.reset();
+
+                                            function callbackUngroupedObjects(result) {
+                                                if ( result ) {
+                                                    for (var j = 0; j < a_drawings.length; ++j) {
+                                                        a_drawings[j].recalculateTransform();
+                                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                                                        a_drawings[j].addToDrawingObjects();
+                                                        a_drawings[j].select( t.objectRender.controller);
+                                                    }
+                                                }
+                                            }
+                                            for(var j = 0; j < a_drawings.length; ++j)
+                                            {
+                                                t.objectRender.objectLocker.addObjectId(a_drawings[j].Get_Id());
+                                            }
+                                            t.objectRender.objectLocker.checkObjects(callbackUngroupedObjects);
 										};
+
 										api.ImageLoader.LoadDocumentImages(aImagesSync);
 									}
 								});
