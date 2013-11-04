@@ -1580,10 +1580,14 @@ DrawingObjectsController.prototype =
                 var pr = shape_props.ShapeProperties;
                 if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
                 {
+                    if(asc && asc["editor"])
+                        this.drawingObjects.drawingDocument.InitGuiCanvasShape(asc["editor"].shapeElementId)
                     this.drawingObjects.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
                 }
                 else
                 {
+                    if(asc && asc["editor"])
+                        this.drawingObjects.drawingDocument.InitGuiCanvasShape(asc["editor"].shapeElementId)
                     this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
                 }
 				shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
