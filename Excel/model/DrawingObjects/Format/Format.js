@@ -1201,6 +1201,7 @@ CUniColor.prototype =
 
     Read_FromBinary2 : function(Reader)
     {
+
         var flag =  Reader.GetBool();
         if(flag)
         {
@@ -1902,14 +1903,14 @@ CSolidFill.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
-        Writer.WriteBool(typeof this.color === "object" && this.color !== null)
+        //Writer.WriteBool(typeof this.color === "object" && this.color !== null)
         if(typeof this.color === "object" && this.color !== null)
             this.color.Write_ToBinary2(Writer);
     },
 
     Read_FromBinary2 : function(Reader)
     {
-        if(Reader.GetBool())
+        //if(Reader.GetBool())
         {
             this.setColor(new CUniColor());
             this.color.Read_FromBinary2(Reader);
