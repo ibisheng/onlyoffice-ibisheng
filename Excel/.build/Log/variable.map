@@ -391,7 +391,7 @@ UndoRedoDataMoveToLineTo:DR
 cff_parse_integer:hu
 TrackNewShapeState:p2
 CreateAscStroke:a9
-numbering_numfmt_LowerRoman:r4
+numbering_numfmt_LowerRoman:s4
 JSCompiler_StaticMethods_setGuideValue:gY
 historyitem_Chart_yAxisIsGrid:Bf
 DefinedName:VL
@@ -1102,7 +1102,7 @@ ParaEnd:Gi
 g_memory:qj
 T1_FontRec:xm
 cff_isoadobe_charset:pu
-JSCompiler_StaticMethods_GetSerializeArray:JO
+JSCompiler_StaticMethods_GetSerializeArray:KO
 SplineForDrawer:j8
 ChartRender:Rd
 JSCompiler_StaticMethods_finishAdd:RQ
