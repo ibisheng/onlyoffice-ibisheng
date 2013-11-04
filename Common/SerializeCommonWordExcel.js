@@ -1483,6 +1483,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 					}
 				}
 			}
+			if(c_oAscChartType.hbar == this.chartType)
+			{
+				var oTemp = xAxis;
+				xAxis = yAxis;
+				yAxis = oTemp;
+			}
 			//выставляем начальные значения как у Excel
 			this.chart.xAxis.bShow = this.chart.yAxis.bShow = false;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid = false;
@@ -1509,12 +1515,6 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			var bTemp = this.chart.xAxis.bGrid;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid;
 			this.chart.yAxis.bGrid = bTemp;
-			if(c_oAscChartType.hbar == this.chartType)
-			{
-				var oTemp = this.chart.xAxis;
-				this.chart.xAxis = this.chart.yAxis;
-				this.chart.yAxis = oTemp;
-			}
 			if ( xAxis )
             {
                 if(this.chartAsGroup.addXAxis)
