@@ -2319,7 +2319,17 @@ Woorksheet.prototype.clone=function(sNewId){
         }
         var binary = w.pos + ";" + w.GetBase64Memory();
         var stream = CreateBinaryReader(binary, 0, binary.length);
-        var drawingObjects = new DrawingObjects();
+        var drawingObjects;
+        if(this.Drawings[0] && this.Drawings[0].graphicObject && this.Drawings[0].graphicObject.drawingObjects)
+        {
+            drawingObjects = this.Drawings[0].graphicObject.drawingObjects;
+        }
+        else
+        {
+            drawingObjects = new DrawingObjects();
+            drawingObjects.drawingDocument = new CDrawingDocument(drawingObjects);
+        }
+        //drawingObjects.init(new WorksheetView());
         for(var i = 0; i < this.Drawings.length; ++i)
         {
             var obj = null;
