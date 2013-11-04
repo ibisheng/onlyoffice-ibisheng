@@ -6554,6 +6554,86 @@ function BinaryPPTYLoader()
         return txbody;
     }
 
+    this.ReadTextBodyTxPr = function(shape)
+    {
+        var txbody;
+
+        if(shape.txPr)
+            txbody = shape.txPr;
+        else
+        {
+            shape.txPr = new CTextBody(shape);
+            txbody = shape.txPr;
+        }
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetULong() + 4;
+
+        while (s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch (_at)
+            {
+                case 0:
+                {
+                    shape.setBodyPr(this.ReadBodyPr());
+                    break;
+                }
+                case 1:
+                {
+                    txbody.setLstStyle(this.ReadTextListStyle());
+                    break;
+                }
+                case 2:
+                {
+                    s.Skip2(4);
+                    var _c = s.GetULong();
+                    /*if(History != null)
+                     {
+                     History.TurnOff();
+                     }*/
+                    if(!txbody.content)
+                        txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0);
+                    if(_c>0)
+                    {
+                        txbody.content.Internal_Content_RemoveAll();
+                    }
+
+                    var _last_field_type = false;
+                    for (var i = 0; i < _c; i++)
+                    {
+                        s.Skip2(1); // type
+                        var _paragraph = this.ReadParagraph(txbody.content);
+                        _paragraph.Set_Parent(txbody.content);
+                        txbody.content.Internal_Content_Add(txbody.content.Content.length, _paragraph);
+                        if(_paragraph.f_type != undefined || _paragraph.f_text != undefined || _paragraph.f_id != undefined)
+                        {
+                            _last_field_type = true;
+                        }
+                    }
+
+                    if(_last_field_type)
+                    {
+                        txbody.textFieldFlag = true;
+                    }
+                    /*if(History != null)
+                     {
+                     History.TurnOn();
+                     }*/
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+
+        s.Seek2(_end_rec);
+        return txbody;
+    }
+
     this.ReadTextBody2 = function(content)
     {
         var s = this.stream;
