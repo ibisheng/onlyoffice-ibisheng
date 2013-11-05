@@ -1124,10 +1124,10 @@ c_oSerProp_pPrType$Spacing_LineRule:XZ
 TT_Round_Off:Tx
 EChartBasicTypes$chartbasicBubbleChart:Hn
 check_type1_format:BC
-recalcresult_CurPage:hU
+recalcresult_CurPage:iU
 FORMULA_TYPE_VALUE:pO
 JSCompiler_StaticMethods_scrollByX:f8
-JSCompiler_StaticMethods_scrollByY:g8
+JSCompiler_StaticMethods_scrollByY:h8
 T1_Parse_Glyph_And_Get_Char_String:vC
 IS_PS_SPACE:At
 SFNT_HeaderRec:Nr
@@ -1643,7 +1643,7 @@ JSCompiler_StaticMethods_Set_TableBorder_InsideV:Yd
 JSCompiler_StaticMethods_Set_Inline:uX
 FT_Glyph_Class:Ax
 tt_size_run_prep:ty
-JSCompiler_StaticMethods_Numbering_Remove:Hf
+JSCompiler_StaticMethods_Numbering_Remove:If
 tt_face_load_hmtx:qv
 c_oAscServerError$ConvertReadFile:Tg
 numbering_numfmt_UpperLetter:Sa
@@ -1713,7 +1713,7 @@ chartCanvas:Mo
 CBinaryFileWriter:Ha
 ParaDrawing:Sb
 g_nCurFileVersion:qY
-CHyperlinkProperty:IU
+CHyperlinkProperty:JU
 c_oSer_OMathBottomNodesType$CGpRule:c3
 EndArrow:uj
 TT_HoriHeader:es
@@ -1785,7 +1785,7 @@ L 8:p
 L 7:h
 L 6:g
 L 5:f
-c_oAscMouseMoveDataTypes$Hyperlink:HU
+c_oAscMouseMoveDataTypes$Hyperlink:IU
 L 4:e
 historyitem_InitShape:tK
 historyitem_SetXfrmShape:XK
@@ -2391,7 +2391,7 @@ JSCompiler_StaticMethods_Get_Index_ById:cS
 FT_CreateVectorArray:pr
 JSCompiler_StaticMethods_Remove_Comment:IQ
 check_MouseUpEvent:z8
-JSCompiler_StaticMethods_handleEvents:r9
+JSCompiler_StaticMethods_handleEvents:s9
 STATES_ID_MOVE_CHART_TITLE:MF
 JSCompiler_StaticMethods_getTitleType:KO
 JSCompiler_StaticMethods_Internal_CompileParaPr:BU
@@ -2851,7 +2851,7 @@ c_oSer_OMathContentType$Mr:A4
 tt_face_init:vA
 getMinValueArray:dp
 JSCompiler_StaticMethods_Get_After:sX
-c_oSer_OMathContentType$Mc:u4
+c_oSer_OMathContentType$Mc:w4
 JSCompiler_StaticMethods_Internal_FindWordStart:$U
 JSCompiler_StaticMethods_Internal_UpdatePages:gS
 CParagraphFrame:n$
@@ -3176,7 +3176,7 @@ L 24:W
 L 50:Cv
 JSCompiler_StaticMethods_Get_LineDropCapWidth:oU
 tt_size_reset:FA
-recalcresult_PrevPage:iU
+recalcresult_PrevPage:jU
 LineEndType$None:dM
 JSCompiler_StaticMethods_Clear_Additional:TQ
 rx_array:sh
@@ -3403,7 +3403,7 @@ SPH_ScaleRule:dy
 L 92:uo
 c_oSer_OMathBottomNodesType$Chr:d3
 L 91:Ev
-L 94:If
+L 94:Hf
 nSldLtTObjTx:YM
 L 93:xs
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:mQ
