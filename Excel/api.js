@@ -720,7 +720,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				else
 				{
 					if( this.isMobileVersion )
-						window.open("../Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
+						window.open("../../../sdk/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
 					else
 						getFile(url);
 				}

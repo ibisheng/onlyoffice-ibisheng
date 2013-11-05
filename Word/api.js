@@ -2691,7 +2691,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner)
 	else
 	{
 		if( this.isMobileVersion )
-			window.open("/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
+			window.open("../../../sdk/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
 		else
 			getFile(url);
 	}	
