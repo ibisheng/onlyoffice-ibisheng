@@ -1830,17 +1830,23 @@ DrawingObjectsController.prototype =
 
                         if (ArrGlyph[i].isShape() || ArrGlyph[i].isImage())
                         {
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(ArrGlyph[i].Id, new UndoRedoDataShapeRecalc()), null);
                             ArrGlyph[i].setExtents(result_width, result_height);
                             ArrGlyph[i].setXfrm(null, null, result_width, result_height, null, null, null);
                             ArrGlyph[i].recalculateTransform();
                             ArrGlyph[i].calculateContent();
                             ArrGlyph[i].calculateTransformTextMatrix();
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(ArrGlyph[i].Id, new UndoRedoDataShapeRecalc()), null);
+
                         }
 						else if (ArrGlyph[i].isChart())
 						{
-							ArrGlyph[i].setExtents(result_width, result_height);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(ArrGlyph[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            ArrGlyph[i].setExtents(result_width, result_height);
 							ArrGlyph[i].recalculate();
-						}
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(ArrGlyph[i].Id, new UndoRedoDataShapeRecalc()), null);
+
+                        }
                     }
 
                     else if (ArrGlyph[i].isImage() && typeof props.ImageUrl === "string")
