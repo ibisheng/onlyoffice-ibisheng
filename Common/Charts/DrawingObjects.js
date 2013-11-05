@@ -735,7 +735,7 @@ asc_CChart.prototype = {
 			
 			Writer.WriteString2(this.series[i].FormatCode);
 			Writer.WriteBool(this.series[i].isHidden);
-			//Writer.WriteBool(this.series[i].bShowValue);
+			Writer.WriteBool(this.series[i].bShowValue);
 		}
 		
 		// Theme Colors
@@ -837,7 +837,7 @@ asc_CChart.prototype = {
 			
 			seria.FormatCode = Reader.GetString2();
 			seria.isHidden = Reader.GetBool();
-			//seria.bShowValue = Reader.GetBool();
+			seria.bShowValue = Reader.GetBool();
 			
 			this.series.push(seria);
 		}		
@@ -1503,6 +1503,7 @@ function asc_CChartSeria() {
 	this.OutlineColor = null;
 	this.FormatCode = "";
 	this.isHidden = false;
+	this.bShowValue = false;
 }
 
 asc_CChartSeria.prototype = {
