@@ -5061,7 +5061,8 @@ function BinaryPPTYLoader()
 
     this.ReadCell = function(cell)
     {
-        cell.Content.Content.splice(0, cell.Content.Content.length);
+       // cell.Content.Content.splice(0, cell.Content.Content.length);
+        cell.Content.Internal_Content_RemoveAll();
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -6665,6 +6666,7 @@ function BinaryPPTYLoader()
                     {
                         History.TurnOff();
                     }*/
+
 
                     for (var i = 0; i < _c; i++)
                     {
