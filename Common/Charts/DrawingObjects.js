@@ -3016,10 +3016,10 @@ function DrawingObjects() {
 				shapeOverlayCtx.m_oContext.clearRect( mmToPx(boundsChecker.Bounds.min_x) + scrollOffset.getX(), mmToPx(boundsChecker.Bounds.min_y) + scrollOffset.getY(), mmToPx(_w), mmToPx(_h) );
 			}
 		}
-		if ( !_this.selectedGraphicObjectsExists() ) {
+		/*if ( !_this.selectedGraphicObjectsExists() ) {
 			worksheet.cleanSelection();
-			worksheet._drawSelectionRange(worksheet.activeRange);
-		}
+			worksheet._drawSelectionRange();
+		}*/
 		
 		// Clip
 		_this.clipGraphicsCanvas(shapeOverlayCtx);
