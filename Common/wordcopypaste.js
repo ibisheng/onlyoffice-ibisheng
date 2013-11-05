@@ -124,6 +124,13 @@ function Editor_Copy_Button(api, bCut)
         delete document.body.style["user-select"];
         document.body.style["-webkit-user-select"] = "text";
 
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+            }
+        }
+
         if (null != api.WordControl.m_oLogicDocument)
         {
             var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
@@ -137,7 +144,10 @@ function Editor_Copy_Button(api, bCut)
         var selection = window.getSelection();
         var rangeToSelect = document.createRange();
         rangeToSelect.selectNodeContents (ElemToSelect);
-        selection.removeAllRanges ();
+
+        if (ElemToSelect.childElementCount !== 0)
+            selection.removeAllRanges ();
+
         selection.addRange(rangeToSelect);
 
         document.execCommand("copy");
@@ -150,6 +160,14 @@ function Editor_Copy_Button(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+                return false;
+            }
+        }
 
         if(true == bCut)
         {
@@ -2314,6 +2332,13 @@ function Editor_Paste_Button(api)
         delete document.body.style["user-select"];
         document.body.style["-webkit-user-select"] = "text";
 
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+            }
+        }
+
         var pastebin = Editor_Paste_GetElem(api, true);
 
         pastebin.style.display  = "block";
@@ -2338,6 +2363,14 @@ function Editor_Paste_Button(api)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+                return false;
+            }
+        }
 
 		History.Create_NewPoint();
         Editor_Paste(api, false);
