@@ -22,11 +22,11 @@
             "src": [
                 "../Common/Build/License.js",
                 "../Common/Merge/NodejsEnv.js",
-				"../Common/browser.js",
+                "../Common/browser.js",
                 "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
-				"../Common/apiCommon.js",
+                "../Common/apiCommon.js",
                 "../Common/spellcheckapisettings.js",
                 "../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
@@ -39,7 +39,7 @@
                 "../Common/Shapes/Serialize.js",
                 "../Common/Shapes/SerializeWriter.js",
                 "../Common/SerializeCommonWordExcel.js",
-				"../Common/trackFile.js",
+                "../Common/trackFile.js",
                 "../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../Common/Charts/libraries/OfficeExcel.common.annotate.js",
                 "../Common/Charts/libraries/OfficeExcel.common.context.js",
@@ -118,7 +118,7 @@
                 "../Word/Drawing/Hit.js",
                 "../Word/Drawing/ColorArray.js",
                 "../Word/Drawing/Overlay.js",
-				"../Word/Drawing/HatchPattern.js",
+                "../Word/Drawing/HatchPattern.js",
                 "../Word/Drawing/ShapeDrawer.js",
                 "../Word/Drawing/Metafile.js",
                 "../Word/Drawing/DrawingDocument.js",
@@ -135,7 +135,7 @@
                 "../Word/api-all.js",
                 "../Word/merge/api_merge.js",
                 "../Word/Build/Log/apiExport.js",
-				"../Word/document/empty.js",
+                "../Word/document/empty.js",
                 "../Excel/graphics/DrawingContextWord.js"
             ],
             "dst": "../Word/sdk-all.js",
@@ -144,7 +144,7 @@
                 "../Word/Drawing/scrolls/jquery.min.js",
                 "../Common/3rdparty/Underscore/underscore-min.js",
                 "../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
-				"../Common/3rdparty/XRegExp/xregexp-all-min.js"
+                "../Common/3rdparty/XRegExp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../Word/Build/Log",
@@ -194,8 +194,8 @@
                         "../Fonts/native/*.TTF",
                         "../Fonts/native/*.TTC",
                         "../Fonts/native/*.OTF",
-						"../Fonts/native/*.bin",
-						"../Fonts/native/*.BIN"
+                        "../Fonts/native/*.bin",
+                        "../Fonts/native/*.BIN"
                     ]
                 }
             },
@@ -214,7 +214,8 @@
                     "<%= pkg.menu_path %>/Common/": [
                         "../Common/docscoapisettings.js",
                         "../Common/commonDefines.js",
-						"../Common/apiCommon.js"
+                        "../Common/apiCommon.js",
+                        "../Common/downloaderfiles.js"
                     ]
                 }
             },
