@@ -499,7 +499,10 @@
 				delete doc.body.style["user-select"];
 				doc.body.style["-webkit-user-select"] = "text";
 				doc.body.style.MozUserSelect = "text";
-						
+				
+				var _interval_time = 0;
+				if($.browser["mozilla"])
+					_interval_time = 10;	
 				// ждем выполнения
 				window.setTimeout(
 						function() {
@@ -521,7 +524,7 @@
 							if($.browser["mozilla"])
 								t._getStylesSelect();
 						},
-						0);
+						_interval_time);
 			},
 			
 			pasteAsTextButton: function (callback) {
