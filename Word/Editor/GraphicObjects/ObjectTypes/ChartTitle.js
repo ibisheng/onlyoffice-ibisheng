@@ -828,7 +828,14 @@ CChartTitle.prototype =
             pageIndex = 0;
         }
 
+        if (graphics.CheckUseFonts2 !== undefined)
+            graphics.CheckUseFonts2(this.transformText);
+
         this.txBody.draw(graphics, pageIndex);
+
+        if (graphics.UncheckUseFonts2 !== undefined)
+            graphics.UncheckUseFonts2();
+        
         graphics.reset();
         graphics.SetIntegerGrid(true);
 
