@@ -1024,7 +1024,19 @@ function asc_CCellCommentator(currentSheet) {
 	}
 	
 	_this.resetLastSelectedId = function() {
+		_this.cleanLastSelection();
 		_this.lastSelectedId = null;
+	}
+	
+	_this.cleanLastSelection = function() {
+		if ( _this.lastSelectedId ) {
+			var lastComment = _this.asc_findComment(_this.lastSelectedId);
+			if ( lastComment ) {
+				var lastMetrics = _this.getCellMetrics(lastComment.nCol, lastComment.nRow);
+				if ( lastMetrics.result )
+					_this.overlayCtx.clearRect(_this.pxToPt(lastMetrics.left), _this.pxToPt(lastMetrics.top), _this.pxToPt(lastMetrics.width), _this.pxToPt(lastMetrics.height));
+			}
+		}
 	}
 
 	_this.calcCommentsCoords = function(bSave) {
@@ -1309,10 +1321,12 @@ asc_CCellCommentator.prototype = {
 	asc_selectComment: function(id, bMove) {
 
 		var _this = this;
-		_this.lastSelectedId = null;
 		var comment = _this.asc_findComment(id);
 
 		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
+			
+			// Чистим предыдущий селект
+			_this.cleanLastSelection();
 			_this.lastSelectedId = id;
 			
 			var col = comment.asc_getCol();
