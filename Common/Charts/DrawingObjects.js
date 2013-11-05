@@ -4495,8 +4495,7 @@ function DrawingObjects() {
 		if ( bRedraw ) {
 			worksheet._checkSelectionShape();
 			_this.sendGraphicObjectProps();
-			_this.showDrawingObjectsEx(true);
-			worksheet._drawSelectionRange(worksheet.activeRange);
+			_this.showDrawingObjects(true);
 		}
 		
         return position;
