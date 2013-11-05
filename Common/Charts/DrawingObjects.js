@@ -1530,8 +1530,10 @@ asc_CChartSeria.prototype = {
 
 	asc_getOutlineColor: function() { return this.OutlineColor; },
 	asc_setOutlineColor: function(color) {
-		if ( color instanceof CUniColor )
+		if ( color instanceof CUniColor ) {
 			this.OutlineColor = color.createDuplicate();
+			this.OutlineColor.isCustom = color.isCustom;
+		}
 	},
 	
 	asc_getFormatCode: function() { return this.FormatCode; },
