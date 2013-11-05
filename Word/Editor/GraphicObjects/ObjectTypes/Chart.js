@@ -2869,16 +2869,28 @@ CChartAsGroup.prototype =
             this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.readFromBinary(r);
         }
+        else
+        {
+            this.addTitle(null);
+        }
 
         if(r.GetBool())
         {
             this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.readFromBinary(r);
         }
+        else
+        {
+            this.addYAxis(null);
+        }
         if(r.GetBool())
         {
             this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.readFromBinary(r);
+        }
+        else
+        {
+            this.addXAxis(null);
         }
 
 

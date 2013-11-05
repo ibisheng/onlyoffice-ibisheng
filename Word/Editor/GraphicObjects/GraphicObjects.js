@@ -3207,6 +3207,11 @@ CGraphicObjects.prototype =
                 return new CParaPr();
 
             }
+            //case STATES_ID_CHART_TITLE_TEXT:
+            //{
+            //    var parapr = this.curState.title.getParagraphParaPr();
+            //    return parapr ? parapr : new CParaPr();
+            //}
             default:
             {
                 var result = null;
@@ -3253,6 +3258,11 @@ CGraphicObjects.prototype =
                 }
                 return new CTextPr();
             }
+            //case STATES_ID_CHART_TITLE_TEXT:
+            //{
+            //    var parapr = this.curState.title.getParagraphTextPr();
+            //    return parapr ? parapr : new CTextPr();
+            //}
             default:
             {
                 var result = null;

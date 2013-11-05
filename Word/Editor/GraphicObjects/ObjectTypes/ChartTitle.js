@@ -136,6 +136,24 @@ CChartTitle.prototype =
         this.txBody.recalculateCurPos();
     },
 
+    getParagraphParaPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_ParaPr();
+        }
+        return null;
+    },
+
+    getParagraphTextPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_TextPr();
+        }
+        return null;
+    },
+
     getStyles: function()
     {
         var styles = new CStyles();
