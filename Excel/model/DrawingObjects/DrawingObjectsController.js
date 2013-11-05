@@ -1407,10 +1407,10 @@ DrawingObjectsController.prototype =
 
                         shape_props.fromGroup = true;
                         shape_props.ShapeProperties = new asc_CShapeProperty();
-                         shape_props.ShapeProperties.type = c_obj.getPresetGeom();
-                         shape_props.ShapeProperties.fill = c_obj.getFill();
-                         shape_props.ShapeProperties.stroke = c_obj.getStroke();
-                         shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+                        shape_props.ShapeProperties.type = c_obj.getPresetGeom();
+                        shape_props.ShapeProperties.fill = c_obj.getFill();
+                        shape_props.ShapeProperties.stroke = c_obj.getStroke();
+                        shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
                         shape_props.ShapeProperties.paddings = c_obj.getPaddings();
                         shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
                         shape_props.ShapeProperties.canFill = c_obj.canFill();

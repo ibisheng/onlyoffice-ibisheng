@@ -1781,6 +1781,7 @@ function asc_CShapeProperty() {
     this.stroke = null;
     this.paddings = null;
     this.canFill = true;
+	this.canChangeArrows = false;
 }
 
 asc_CShapeProperty.prototype = {
@@ -1793,8 +1794,10 @@ asc_CShapeProperty.prototype = {
 	asc_putStroke: function(v) { this.stroke = v; },
     asc_getPaddings: function() { return this.paddings; },
     asc_putPaddings: function(v) { this.paddings = v; },
-    asc_getCanFill: function(){return this.canFill;},
-    asc_putCanFill: function(v){this.canFill = v;}
+    asc_getCanFill: function() { return this.canFill; },
+    asc_putCanFill: function(v) { this.canFill = v; },
+	asc_getCanChangeArrows: function() { return this.canChangeArrows; },
+	asc_setCanChangeArrows: function(v) { this.canChangeArrows = v; }
 }
 
 //{ asc_CShapeProperty export
@@ -1812,6 +1815,8 @@ prot["asc_getPaddings"] = prot.asc_getPaddings;
 prot["asc_putPaddings"] = prot.asc_putPaddings;
 prot["asc_getCanFill"] = prot.asc_getCanFill;
 prot["asc_putCanFill"] = prot.asc_putCanFill;
+prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
+prot["asc_setCanChangeArrows"] = prot.asc_setCanChangeArrows;
 //}
 
 //-----------------------------------------------------------------------------------
