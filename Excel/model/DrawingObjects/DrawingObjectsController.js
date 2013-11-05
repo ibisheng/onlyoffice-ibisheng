@@ -1592,6 +1592,7 @@ DrawingObjectsController.prototype =
                 }
 				shape_props.ShapeProperties.fill = CreateAscFillEx(shape_props.ShapeProperties.fill);
 				shape_props.ShapeProperties.stroke = CreateAscStrokeEx(shape_props.ShapeProperties.stroke);
+                shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
             }
             else
             {
