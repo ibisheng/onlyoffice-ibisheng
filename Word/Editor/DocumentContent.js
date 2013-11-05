@@ -6020,6 +6020,9 @@ CDocumentContent.prototype =
                             End = Temp;
                         }
 
+                        Start = Math.max( 0, Start );
+                        End   = Math.min( this.Content.length - 1, End );
+
                         for ( var Index = Start; Index <= End; Index++ )
                         {
                             this.Content[Index].Selection_Remove();
