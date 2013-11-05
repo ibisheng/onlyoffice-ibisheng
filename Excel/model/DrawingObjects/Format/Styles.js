@@ -5004,6 +5004,7 @@ CTextPr.prototype =
         if ( Flags & 2097152 )
             this.Lang.Read_FromBinary( Reader );
 
+        //var t = Reader.GetString2();
         if(Reader.GetBool())
         {
             this.unifill = new CUniFill();
@@ -5297,7 +5298,7 @@ CParaTabs.prototype =
         // Double : Pos
 
         var Count = Reader.GetLong();
-        this.Tabs = new Array( Count );
+        this.Tabs = new Array(/* Count*/ );
 
         for ( var Index = 0; Index < Count; Index++ )
         {
