@@ -3252,6 +3252,16 @@ CGraphicObjects.prototype = {
                 }
                 break;
             }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    History.Create_NewPoint();
+                    this.State.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
+                    this.updateSelectionState();
+                }
+                break;
+            }
 
         }
     },
