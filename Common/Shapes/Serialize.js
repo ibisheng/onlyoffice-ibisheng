@@ -4834,6 +4834,8 @@ function BinaryPPTYLoader()
         else if (_chart != null)
         {
             _chart.spPr.xfrm = _xfrm;
+            _chart.setAscChart(_chart.chart);
+            _chart.setSpPr(_chart.spPr);
             return _chart;
         }
 
