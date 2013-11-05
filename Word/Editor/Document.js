@@ -10887,7 +10887,7 @@ CDocument.prototype =
             {
                 // Double : Default Tab
 
-                Writer.WriteDouble( Data.Old );
+                Writer.WriteDouble( Data.New );
 
                 break;
             }
