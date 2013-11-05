@@ -1395,7 +1395,7 @@ c_oSerFillTypes$PatternFill:RD
 tt_find_sbit_image:Oo
 UndoRedoData_RowProp:tP
 _strcmp_data:Hj
-JSCompiler_StaticMethods_getAlignHorizontal:jA
+JSCompiler_StaticMethods_getAlignHorizontal:iA
 cff_get_advances:nv
 c_oSerSharedStringTypes$RPr:fE
 ParaNumbering:Mi
@@ -1938,7 +1938,7 @@ CChartLegend:W3
 tt_service_gx_multi_masters:zt
 _cff_check_points:cv
 Ins_SHZ:rs
-numbering_numfmt_Decimal:q4
+numbering_numfmt_Decimal:r4
 c_oSerTableTypes$CalcChain:WC
 c_oAscChartType$bar:ge
 fonthint_Default:k5
@@ -2680,7 +2680,7 @@ JSCompiler_StaticMethods_getBorderFull:lA
 create_t1_field:In
 JSCompiler_StaticMethods_setSelectionState:tS
 JSCompiler_StaticMethods__scrollV:JS
-gUndoInsDelCellsFlag:uA
+gUndoInsDelCellsFlag:tA
 c_oSer_ConditionalFormattingRule$TimePeriod:LI
 g_oTextMeasurer:M5
 L 141:Zp
