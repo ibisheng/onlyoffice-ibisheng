@@ -1378,7 +1378,18 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
     this.drawSelection = function(drawingDocument)
     {
+        var selected_title;
+        if(this.chart.chartTitle && this.chart.chartTitle.selected)
+            selected_title = this.chart.chartTitle;
+        else if(this.chart.hAxisTitle && this.chart.hAxisTitle.selected)
+            selected_title = this.chart.hAxisTitle;
+        else if(this.chart.vAxisTitle && this.chart.vAxisTitle.selected)
+            selected_title = this.chart.vAxisTitle;
         drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chart.transform, 0, 0, this.chart.extX, this.chart.extY, false);
+        if(selected_title)
+        {
+            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_title.transform, 0, 0, selected_title.extX, selected_title.extY, false);
+        }
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1608,7 +1619,8 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
-        //this.textObject.updateSelectionState(drawingDocument);
+
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.transform, 0, 0, this.textObject.extX, this.textObject.extY, false);
     };
 
     this.isPointInDrawingObjects = function(x, y)

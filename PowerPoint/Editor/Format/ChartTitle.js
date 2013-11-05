@@ -239,8 +239,12 @@ CChartTitle.prototype =
         if(!isRealObject(this.txBody))
             this.txBody = new CTextBody(this);
         this.txBody.content.Paragraph_Add(paraItem, false);
-        this.txBody.content.RecalculateCurPos();
+       // this.txBody.content.RecalculateCurPos();
 
+        this.recalculatePosExt();
+        this.txBody.content.RecalculateCurPos();
+        return;
+        this.txBody.recalculateCurPos();
         var old_cx = this.x + this.extX*0.5;
         var old_cy = this.y + this.extY*0.5;
         switch (this.type)
@@ -300,6 +304,7 @@ CChartTitle.prototype =
         this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.recalculateTransform();
         this.calculateTransformTextMatrix();
+
         return;
 
         var title = this;
@@ -418,6 +423,70 @@ CChartTitle.prototype =
             title_width = this.chartTitle.extX;
             title_height =  this.drawingObjects.convertMetric(7, 0, 3) + this.chartTitle.extY;
         } */
+    },
+
+    recalculatePosExt: function()
+    {
+        var old_cx = this.x + this.extX*0.5;
+        var old_cy = this.y + this.extY*0.5;
+        switch (this.type)
+        {
+            case CHART_TITLE_TYPE_TITLE:
+            case  CHART_TITLE_TYPE_H_AXIS:
+            {
+                var max_title_width = this.chartGroup.extX*0.8;
+                var title_width = this.txBody.getRectWidth(max_title_width);
+                this.extX = title_width;
+                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width);
+
+                this.x = old_cx - this.extX*0.5;
+                if(this.x + this.extX > this.chartGroup.extX)
+                    this.x = this.chartGroup.extX - this.extX;
+                if(this.x < 0)
+                    this.x = 0;
+
+                this.y = old_cy - this.extY*0.5;
+                if(this.y + this.extY > this.chartGroup.extY)
+                    this.y = this.chartGroup.extY - this.extY;
+                if(this.y < 0)
+                    this.y = 0;
+
+                if(isRealObject(this.layout) && isRealNumber(this.layout.x))
+                    this.layout.setX(this.x/this.chartGroup.extX);
+
+                break;
+            }
+            case CHART_TITLE_TYPE_V_AXIS:
+            {
+                var max_title_height = this.chartGroup.extY*0.8;
+
+                var body_pr = this.txBody.getBodyPr();
+                this.extY = this.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
+                this.extX = this.txBody.getRectHeight(this.chartGroup.extX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
+                this.spPr.geometry.Recalculate(this.extX, this.extY);
+
+                this.x = old_cx - this.extX*0.5;
+                if(this.x + this.extX > this.chartGroup.extX)
+                    this.x = this.chartGroup.extX - this.extX;
+                if(this.x < 0)
+                    this.x = 0;
+
+                this.y = old_cy - this.extY*0.5;
+                if(this.y + this.extY > this.chartGroup.extY)
+                    this.y = this.chartGroup.extY - this.extY;
+                if(this.y < 0)
+                    this.y = 0;
+
+                if(isRealObject(this.layout) && isRealNumber(this.layout.y))
+                    this.layout.setY(this.y/this.chartGroup.extY);
+                break;
+            }
+        }
+
+        this.spPr.geometry.Recalculate(this.extX, this.extY);
+        this.recalculateTransform();
+        this.calculateTransformTextMatrix();
+        this.calculateContent();
     },
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection)
