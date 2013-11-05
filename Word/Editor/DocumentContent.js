@@ -4171,48 +4171,80 @@ CDocumentContent.prototype =
                         {
                             if ( 0 === NumInfo.SubType )
                             {
-                                // Если мы просто нажимаем добавить маркированный список, тогда мы пытаемся
-                                // присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
-                                // есть список, и этот список маркированный)
-
-                                // Проверяем предыдущий элемент
-                                var Prev = this.Content[StartPos - 1];
-                                var NumId  = null;
-                                var NumLvl = 0;
-
-                                if ( "undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType() )
+                                var NumPr = Item.Numbering_Get();
+                                if ( undefined != ( NumPr = Item.Numbering_Get() ) )
                                 {
-                                    var PrevNumPr = Prev.Numbering_Get();
-                                    if ( undefined != PrevNumPr && true === this.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Bullet ) )
+                                    var AbstractNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
+                                    if ( false === this.Numbering.Check_Format( NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet ) )
                                     {
-                                        NumId  = PrevNumPr.NumId;
-                                        NumLvl = PrevNumPr.Lvl;
+                                        AbstractNum.Create_Default_Bullet();
+
+                                        // Добавлять нумерацию к параграфу не надо, т.к. она уже в
+                                        // нем записана
+
+                                        // Нам нужно пересчитать все изменения, начиная с первого
+                                        // элемента, использующего данную нумерацию
+                                        FirstChange = 0;
+                                        var bFirstChange = false;
+                                        for ( var Index = 0; Index < this.Content.length; Index++ )
+                                        {
+                                            if ( true === this.Content[Index].Numbering_IsUse( NumPr.NumId, NumPr.Lvl ) )
+                                            {
+                                                if ( false === bFirstChange )
+                                                {
+                                                    FirstChange = Index;
+                                                    bFirstChange = true;
+                                                }
+                                                this.Content[Index].Recalc_CompileParaPr();
+                                            }
+                                        }
                                     }
                                 }
-
-                                // Предыдущий параграф не содержит списка, либо список не того формата
-                                // создаем новую нумерацию (стандартную маркированный список)
-                                if ( null === NumId )
+                                else
                                 {
-                                    NumId  = this.Numbering.Create_AbstractNum();
-                                    NumLvl = 0;
+                                    // Если мы просто нажимаем добавить маркированный список, тогда мы пытаемся
+                                    // присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
+                                    // есть список, и этот список маркированный)
 
-                                    this.Numbering.Get_AbstractNum( NumId ).Create_Default_Bullet();
-                                }
+                                    // Проверяем предыдущий элемент
+                                    var Prev = this.Content[StartPos - 1];
+                                    var NumId  = null;
+                                    var NumLvl = 0;
 
-                                if ( type_Paragraph === Item.GetType() )
-                                {
-                                    var OldNumPr = Item.Numbering_Get();
-                                    if (undefined != OldNumPr)
-                                        Item.Numbering_Add( NumId, OldNumPr.Lvl );
+                                    if ( "undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType() )
+                                    {
+                                        var PrevNumPr = Prev.Numbering_Get();
+                                        if ( undefined != PrevNumPr && true === this.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Bullet ) )
+                                        {
+                                            NumId  = PrevNumPr.NumId;
+                                            NumLvl = PrevNumPr.Lvl;
+                                        }
+                                    }
+
+                                    // Предыдущий параграф не содержит списка, либо список не того формата
+                                    // создаем новую нумерацию (стандартную маркированный список)
+                                    if ( null === NumId )
+                                    {
+                                        NumId  = this.Numbering.Create_AbstractNum();
+                                        NumLvl = 0;
+
+                                        this.Numbering.Get_AbstractNum( NumId ).Create_Default_Bullet();
+                                    }
+
+                                    if ( type_Paragraph === Item.GetType() )
+                                    {
+                                        var OldNumPr = Item.Numbering_Get();
+                                        if (undefined != OldNumPr)
+                                            Item.Numbering_Add( NumId, OldNumPr.Lvl );
+                                        else
+                                            Item.Numbering_Add( NumId, NumLvl );
+                                    }
                                     else
                                         Item.Numbering_Add( NumId, NumLvl );
-                                }
-                                else
-                                    Item.Numbering_Add( NumId, NumLvl );
 
-                                // Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-                                FirstChange = this.CurPos.ContentPos - 1;
+                                    // Нам нужно пересчитать все изменения, начиная с предыдущего элемента
+                                    FirstChange = this.CurPos.ContentPos - 1;
+                                }
                             }
                             else
                             {
@@ -4319,48 +4351,80 @@ CDocumentContent.prototype =
                         {
                             if ( 0 === NumInfo.SubType )
                             {
-                                // Если мы просто нажимаем добавить нумерованный список, тогда мы пытаемся
-                                // присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
-                                // есть список, и этот список нумерованный)
-
-                                // Проверяем предыдущий элемент
-                                var Prev = this.Content[StartPos - 1];
-                                var NumId  = null;
-                                var NumLvl = 0;
-
-                                if ( "undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType() )
+                                var NumPr = Item.Numbering_Get();
+                                if ( undefined != ( NumPr = Item.Numbering_Get() ) )
                                 {
-                                    var PrevNumPr = Prev.Numbering_Get();
-                                    if ( undefined != PrevNumPr && true === this.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Decimal ) )
+                                    var AbstractNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
+                                    if ( false === this.Numbering.Check_Format( NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal ) )
                                     {
-                                        NumId  = PrevNumPr.NumId;
-                                        NumLvl = PrevNumPr.Lvl;
+                                        AbstractNum.Create_Default_Numbered();
+
+                                        // Добавлять нумерацию к параграфу не надо, т.к. она уже в
+                                        // нем записана
+
+                                        // Нам нужно пересчитать все изменения, начиная с первого
+                                        // элемента, использующего данную нумерацию
+                                        FirstChange = 0;
+                                        var bFirstChange = false;
+                                        for ( var Index = 0; Index < this.Content.length; Index++ )
+                                        {
+                                            if ( true === this.Content[Index].Numbering_IsUse( NumPr.NumId, NumPr.Lvl ) )
+                                            {
+                                                if ( false === bFirstChange )
+                                                {
+                                                    FirstChange = Index;
+                                                    bFirstChange = true;
+                                                }
+                                                this.Content[Index].Recalc_CompileParaPr();
+                                            }
+                                        }
                                     }
                                 }
-
-                                // Предыдущий параграф не содержит списка, либо список не того формата
-                                // создаем новую нумерацию (стандартную маркированный список)
-                                if ( null === NumId )
+                                else
                                 {
-                                    NumId  = this.Numbering.Create_AbstractNum();
-                                    NumLvl = 0;
+                                    // Если мы просто нажимаем добавить нумерованный список, тогда мы пытаемся
+                                    // присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
+                                    // есть список, и этот список нумерованный)
 
-                                    this.Numbering.Get_AbstractNum( NumId ).Create_Default_Numbered();
-                                }
+                                    // Проверяем предыдущий элемент
+                                    var Prev = this.Content[StartPos - 1];
+                                    var NumId  = null;
+                                    var NumLvl = 0;
 
-                                if ( type_Paragraph === Item.GetType() )
-                                {
-                                    var OldNumPr = Item.Numbering_Get();
-                                    if( undefined != ( OldNumPr ) )
-                                        Item.Numbering_Add( NumId, OldNumPr.Lvl );
+                                    if ( "undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType() )
+                                    {
+                                        var PrevNumPr = Prev.Numbering_Get();
+                                        if ( undefined != PrevNumPr && true === this.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Decimal ) )
+                                        {
+                                            NumId  = PrevNumPr.NumId;
+                                            NumLvl = PrevNumPr.Lvl;
+                                        }
+                                    }
+
+                                    // Предыдущий параграф не содержит списка, либо список не того формата
+                                    // создаем новую нумерацию (стандартную маркированный список)
+                                    if ( null === NumId )
+                                    {
+                                        NumId  = this.Numbering.Create_AbstractNum();
+                                        NumLvl = 0;
+
+                                        this.Numbering.Get_AbstractNum( NumId ).Create_Default_Numbered();
+                                    }
+
+                                    if ( type_Paragraph === Item.GetType() )
+                                    {
+                                        var OldNumPr = Item.Numbering_Get();
+                                        if( undefined != ( OldNumPr ) )
+                                            Item.Numbering_Add( NumId, OldNumPr.Lvl );
+                                        else
+                                            Item.Numbering_Add( NumId, NumLvl );
+                                    }
                                     else
                                         Item.Numbering_Add( NumId, NumLvl );
-                                }
-                                else
-                                    Item.Numbering_Add( NumId, NumLvl );
 
-                                // Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-                                FirstChange = this.CurPos.ContentPos - 1;
+                                    // Нам нужно пересчитать все изменения, начиная с предыдущего элемента
+                                    FirstChange = this.CurPos.ContentPos - 1;
+                                }
                             }
                             else
                             {
