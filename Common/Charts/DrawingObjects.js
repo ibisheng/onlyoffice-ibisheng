@@ -2724,16 +2724,13 @@ function DrawingObjects() {
 	_this.cloneDrawingObject = function(obj) {
 
 		var copyObject = _this.createDrawingObject();
-		
-		copyObject.worksheet = worksheet;
 
 		copyObject.Type = obj.Type;
 		copyObject.Pos.X = obj.Pos.X;
 		copyObject.Pos.Y = obj.Pos.Y;
 		copyObject.ext.cx = obj.ext.cx;
 		copyObject.ext.cy = obj.ext.cy;
-		copyObject.imageUrl = obj.imageUrl;
-
+		
 		copyObject.from.col = obj.from.col;
 		copyObject.from.colOff = obj.from.colOff;
 		copyObject.from.row = obj.from.row;
