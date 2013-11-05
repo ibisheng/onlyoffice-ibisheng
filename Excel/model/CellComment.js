@@ -1033,8 +1033,10 @@ function asc_CCellCommentator(currentSheet) {
 			var lastComment = _this.asc_findComment(_this.lastSelectedId);
 			if ( lastComment ) {
 				var lastMetrics = _this.getCellMetrics(lastComment.nCol, lastComment.nRow);
-				if ( lastMetrics.result )
-					_this.overlayCtx.clearRect(_this.pxToPt(lastMetrics.left), _this.pxToPt(lastMetrics.top), _this.pxToPt(lastMetrics.width), _this.pxToPt(lastMetrics.height));
+				if ( lastMetrics.result ) {
+					var extraOffset = 1;
+					_this.overlayCtx.clearRect(_this.pxToPt(lastMetrics.left), _this.pxToPt(lastMetrics.top), _this.pxToPt(lastMetrics.width - extraOffset), _this.pxToPt(lastMetrics.height - extraOffset));
+				}
 			}
 		}
 	}
@@ -1322,11 +1324,13 @@ asc_CCellCommentator.prototype = {
 
 		var _this = this;
 		var comment = _this.asc_findComment(id);
+		
+		// Чистим предыдущий селект
+		_this.cleanLastSelection();
+		_this.lastSelectedId = null;
 
 		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
 			
-			// Чистим предыдущий селект
-			_this.cleanLastSelection();
 			_this.lastSelectedId = id;
 			
 			var col = comment.asc_getCol();
