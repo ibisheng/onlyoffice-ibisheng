@@ -842,6 +842,7 @@ CAccent.prototype.draw = function()
 
 function CAccent()
 {
+    this. type = null;
     this.loc = LOCATION_TOP;
     CCharacter.call(this);
 }
@@ -869,38 +870,54 @@ CAccent.prototype.init = function(props)
     
     if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
     {
+        this.type = ACCENT_CIRCUMFLEX;
+
         accent = new CCircumflex();
         accent.setTurn(TURN_0);
     }
     else if(code === 0x30C || type === ACCENT_COMB_CARON)
     {
+        this.type = ACCENT_COMB_CARON;
+
         accent = new CCircumflex();
         accent.setTurn(TURN_MIRROR_0);
     }
     else if(code === 0x332 || type === ACCENT_LINE)
     {
+        this.type = ACCENT_LINE;
+
         accent = new CLine();
     }
     else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
     {
+        this.type = ACCENT_DOUBLE_LINE;
+
         accent = new CDoubleLine();
     }
     else if(code === 0x303 || type === ACCENT_TILDE)
     {
+        this.type = ACCENT_TILDE;
+
         accent = new CTilde();
     }
     else if(code === 0x306 || type === ACCENT_BREVE)
     {
+        this.type = ACCENT_BREVE;
+
         accent = new CBreve();
         accent.setTurn(TURN_MIRROR_0);
     }
     else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
     {
+        this.type = ACCENT_INVERT_BREVE;
+
         accent = new CBreve();
         accent.setTurn(TURN_0);
     }
     else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
     {
+        this.type = ACCENT_ARROW_LEFT;
+
         glyph = new CCombiningArrow();
         props =
         {
@@ -912,6 +929,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
     {
+        this.type = ACCENT_ARROW_RIGHT;
+
         glyph = new CCombiningArrow();
         props =
         {
@@ -923,6 +942,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
     {
+        this.type = ACCENT_ARROW_LR;
+
         glyph = new CCombining_LR_Arrow();
         props =
         {
@@ -934,6 +955,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
     {
+        this.type = ACCENT_HALF_ARROW_LEFT;
+
         glyph = new CCombiningHalfArrow();
         props =
         {
@@ -945,6 +968,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
     {
+        this.type = ACCENT_HALF_ARROW_RIGHT;
+
         glyph = new CCombiningHalfArrow();
         props =
         {
@@ -957,6 +982,8 @@ CAccent.prototype.init = function(props)
     ///// group characters /////
     else if(code === 0x2190 || type === ARROW_LEFT)
     {
+        this.type = ARROW_LEFT;
+
         glyph = new CSingleArrow();
 
         props =
@@ -968,6 +995,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x2192 || type === ARROW_RIGHT)
     {
+        this.type = ARROW_RIGHT;
+
         glyph = new CSingleArrow();
         props =
         {
@@ -978,6 +1007,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x2194 || type === ARROW_LR)
     {
+        this.type = ARROW_LR;
+
         glyph = new CLeftRightArrow();
         props =
         {
@@ -988,6 +1019,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
     {
+        this.type = DOUBLE_LEFT_ARROW;
+
         glyph = new CDoubleArrow();
         props =
         {
@@ -998,6 +1031,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
     {
+        this.type = DOUBLE_RIGHT_ARROW;
+
         glyph = new CDoubleArrow();
         props =
         {
@@ -1008,6 +1043,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
     {
+        this.type = DOUBLE_ARROW_LR;
+
         glyph = new CLR_DoubleArrow();
         props =
         {
@@ -1019,6 +1056,7 @@ CAccent.prototype.init = function(props)
     /////
     else
     {
+        this.type = ACCENT_SIGN;
         accent = new CSign();
         var props = 
         {
@@ -1041,4 +1079,11 @@ CAccent.prototype.getCenter = function()
         center = this.elements[0][0].size.center;
 
     return center;
+}
+CAccent.prototype.getProps = function()
+{
+    var prps = {};
+
+
+
 }

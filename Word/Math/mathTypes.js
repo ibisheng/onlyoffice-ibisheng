@@ -78,6 +78,7 @@ var DOUBLE_LEFT_ARROW           = 21;
 var DOUBLE_RIGHT_ARROW          = 22;
 var DOUBLE_ARROW_LR             = 23;
 
+
 var TURN_0                      =  0;
 var TURN_180                    =  1;
 var TURN_MIRROR_0               =  2;
@@ -108,7 +109,7 @@ var ACCENT_ARROW_RIGHT          = 15;
 var ACCENT_ARROW_LR             = 16;
 var ACCENT_HALF_ARROW_LEFT      = 17;
 var ACCENT_HALF_ARROW_RIGHT     = 18;
-var ACCENT_TEXT                 = 19;
+var ACCENT_SIGN                 = 19;
 
 var BASEJC_CENTER               =  0;
 var BASEJC_TOP                  =  1;
