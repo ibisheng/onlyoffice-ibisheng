@@ -6756,6 +6756,7 @@ CTextPr.prototype =
             this.Lang.Write_ToBinary( Writer );
             Flags |= 2097152;
         }
+        Writer.WriteBool(false);
 
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
@@ -6866,6 +6867,7 @@ CTextPr.prototype =
         // Lang
         if ( Flags & 2097152 )
             this.Lang.Read_FromBinary( Reader );
+        Reader.GetBool();
     },
 
     Check_NeedRecalc : function()

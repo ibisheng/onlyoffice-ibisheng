@@ -3724,7 +3724,6 @@ CGraphicObjects.prototype =
 
     groupSelectedObjects: function()
     {
-
         if(this.selectionInfo.selectionArray.length > 0)
         {
             var page_num =  this.selectionInfo.selectionArray[0].pageIndex;
@@ -4600,7 +4599,7 @@ CGraphicObjects.prototype =
 
             case STATES_ID_CHART_TITLE_TEXT:
             {
-                //this.curState.textObject.remove()
+                this.curState.title.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
                 break;
             }
             default :

@@ -129,6 +129,13 @@ CChartTitle.prototype =
         this.bodyPr = bodyPr;
     },
 
+    remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+    {
+        this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+        this.recalculatePosExt();
+        this.txBody.recalculateCurPos();
+    },
+
     getStyles: function()
     {
         var styles = new CStyles();
@@ -964,9 +971,9 @@ CChartTitle.prototype =
             this.layout.writeToBinary(w);
         w.WriteBool(this.overlay);
         this.spPr.Write_ToBinary2(w);
-        w.WriteBool(isRealObject(this.txPr));
-        if(isRealObject(this.txPr))
-            this.txPr.writeToBinary(w);
+        //w.WriteBool(isRealObject(this.txPr));
+        //if(isRealObject(this.txPr))
+        //    this.txPr.writeToBinary(w);
 
         w.WriteBool(isRealObject(this.txBody));
         if(isRealObject(this.txBody))
@@ -983,11 +990,11 @@ CChartTitle.prototype =
         }
         this.overlay = r.GetBool();
         this.spPr.Read_FromBinary2(r);
-        if(r.GetBool())
-        {
-            this.txPr = new CTextBody(this);
-            this.txPr.readFromBinary(r);
-        }
+        //if(r.GetBool())
+        //{
+        //    this.txPr = new CTextBody(this);
+        //    this.txPr.readFromBinary(r);
+        //}
 
         if(r.GetBool())
         {
