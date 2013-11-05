@@ -1596,6 +1596,8 @@ function CMobileTouchManager()
         this.ScrollH = this.HtmlPage.m_dScrollX;
         this.ScrollV = this.HtmlPage.m_dScrollY;
 
+        this.MoveAfterDown = false;
+
         if (e.touches && 2 == e.touches.length)
         {
             this.Mode = MobileTouchMode.Zoom;
@@ -1725,6 +1727,11 @@ function CMobileTouchManager()
             {
                 this.iScroll._end(e);
                 this.Mode = MobileTouchMode.None;
+
+                if (!this.MoveAfterDown)
+                {
+                    this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+                }
                 break;
             }
             case MobileTouchMode.Zoom:
