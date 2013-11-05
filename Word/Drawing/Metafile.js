@@ -945,7 +945,7 @@ CMetafile.prototype =
 
         this.Memory.WriteByte(g_nodeAttributeStart);
 
-        if (gradFill.path != null)
+        if (gradFill.path != null && (gradFill.lin == null || gradFill.lin == undefined))
         {
             this.Memory.WriteByte(1);
             this.Memory.WriteByte(gradFill.path);
