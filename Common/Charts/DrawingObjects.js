@@ -4479,8 +4479,10 @@ function DrawingObjects() {
 			}
 		}
 		
-		if ( bRedraw )
+		if ( bRedraw ) {
+			worksheet._checkSelectionShape();
 			_this.showDrawingObjects(true);
+		}
 		
         return position;
 	};
