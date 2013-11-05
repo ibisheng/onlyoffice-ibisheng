@@ -3936,6 +3936,12 @@ CPresentation.prototype =
         return bRetValue;
     },
 
+    Set_DocumentDefaultTab: function(DTab)
+    {
+        History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
+        Default_Tab_Stop = DTab;
+    },
+
     OnKeyPress : function(e)
     {
         if ( true === editor.isViewMode )
@@ -5448,6 +5454,12 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Document_DefaultTab:
+            {
+                Default_Tab_Stop = Data.Old;
+
+                break;
+            }
             case historyitem_Presenattion_AddSlide:
             {
                 this.Slides.splice(Data.Pos, 1);
@@ -5520,6 +5532,12 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Document_DefaultTab:
+            {
+                Default_Tab_Stop = Data.New;
+
+                break;
+            }
             case historyitem_Presenattion_AddSlide:
             {
                 this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
@@ -6640,6 +6658,14 @@ CPresentation.prototype =
 
         switch ( Type )
         {
+            case historyitem_Document_DefaultTab:
+            {
+                // Double : Default Tab
+
+                Writer.WriteDouble( Data.New );
+
+                break;
+            }
             case historyitem_Presenattion_RemoveSlide:
             case historyitem_Presenattion_AddSlide:
             {
@@ -6786,6 +6812,14 @@ CPresentation.prototype =
                 var id = Reader.GetString2();
                 this.slideMasters.splice(pos, 0, g_oTableId.Get_ById(id));
                 this.bGoToPage = true;
+                break;
+            }
+            case historyitem_Document_DefaultTab:
+            {
+                // Double : Default Tab
+
+                Default_Tab_Stop = Reader.GetDouble();
+
                 break;
             }
         }
