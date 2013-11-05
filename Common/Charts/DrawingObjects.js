@@ -2989,6 +2989,8 @@ function DrawingObjects() {
 
     _this.OnUpdateOverlay = function(bFull) {
         
+		// TODO Сократить вызовы
+		
         var overlay = trackOverlay;
 		var ctx = overlay.m_oContext;
 		var drDoc = this.drawingDocument;
@@ -3007,6 +3009,10 @@ function DrawingObjects() {
 				var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
 				shapeOverlayCtx.m_oContext.clearRect( mmToPx(boundsChecker.Bounds.min_x) + scrollOffset.getX(), mmToPx(boundsChecker.Bounds.min_y) + scrollOffset.getY(), mmToPx(_w), mmToPx(_h) );
 			}
+		}
+		if ( !_this.selectedGraphicObjectsExists() ) {
+			worksheet.cleanSelection();
+			worksheet._drawSelectionRange(worksheet.activeRange);
 		}
 		
 		// Clip
