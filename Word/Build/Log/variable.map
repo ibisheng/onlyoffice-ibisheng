@@ -878,7 +878,7 @@ c_oSer_sts$Style_RowPr:EZ
 _strncmp:Gq
 CRasterDataInfo:OD
 CImgProperty:xe
-FT_Glyph_Metrics:vs
+FT_Glyph_Metrics:us
 flowobject_Table:Mb
 c_oAscMouseMoveLockedObjectType$Footer:MV
 JSCompiler_StaticMethods__MouseHoverOnArrowUp:n9
@@ -1244,7 +1244,7 @@ GX_AVarSegmentRec:Pz
 historyitem_SetCahrtLayout:aP
 c_oSer_ClrSchemeMappingType$Accent6:E2
 FT_FACE_FIND_SERVICE:nq
-c_oSer_st$Styles:oZ
+c_oSer_st$Styles:nZ
 c_oSer_ClrSchemeMappingType$Accent3:B2
 c_oSer_OMathContentType$LimUpp:t4
 c_oSer_ClrSchemeMappingType$Accent2:A2
@@ -1450,7 +1450,7 @@ partition_bezier4:dK
 c_oSer_OMathBottomNodesType$CGp:d3
 LineEndType$Oval:gM
 JSCompiler_StaticMethods_updatePosition3:DT
-c_oSer_st$DefrPr:nZ
+c_oSer_st$DefrPr:mZ
 c_oSer_sts$Style_BasedOn:sZ
 JSCompiler_StaticMethods_startChangeChildSizes:yL
 tt_cmap14_done:zw
@@ -1953,7 +1953,7 @@ JSCompiler_StaticMethods_calculateAbsToRel:aJ
 JSCompiler_StaticMethods_getXfrmExtX:BT
 JSCompiler_StaticMethods_getXfrmExtY:CT
 BinaryOtherTableWriter:T5
-ComparisonByZIndexSimple:gF
+ComparisonByZIndexSimple:fF
 JSCompiler_StaticMethods_pointInObjInDocContent:xG
 c_oSer_OMathBottomNodesType$BegChr:c3
 global_hatch_names:x7
@@ -2178,7 +2178,7 @@ STATES_ID_GROUP:Qb
 asc_ajax:K$
 c_oAscError$ID$No:gh
 c_oSer_ChartSeriesType$Order:en
-c_oSerNumTypes$lvl_Format:QY
+c_oSerNumTypes$lvl_Format:PY
 StartAddTextRect:jG
 JSCompiler_StaticMethods_Set_ContentPos:HT
 CContextMenuData:G$
@@ -2378,7 +2378,7 @@ JSCompiler_StaticMethods_Set_Lvl_Numbered_8:Ef
 c_oSerImageType2$DistR:R0
 JSCompiler_StaticMethods_Set_Lvl_Numbered_7:xV
 JSCompiler_StaticMethods_Set_Lvl_Numbered_9:Df
-JSCompiler_StaticMethods_setZIndex:fF
+JSCompiler_StaticMethods_setZIndex:eF
 g_dKoef_twips_to_mm:XQ
 Ins_MD:rz
 Ins_SFVTL:dz
@@ -2875,7 +2875,7 @@ JSCompiler_StaticMethods_AddRoundRect:m7
 JSCompiler_StaticMethods__BordersToStyle:mb
 FONT_TYPE_ADDITIONAL_CUT:oE
 ParaNewLine:Ge
-FT_Set_Transform:vD
+FT_Set_Transform:uD
 CAscTableStyle:t8
 cff_parse_fixed:cB
 TT_CMapRec:Rv
@@ -3087,7 +3087,7 @@ c_oSerPropLenType$Short:ul
 nSldLtTVertTitleAndTxOverChart:qN
 t1_service_multi_masters:$C
 APPROXIMATE_EPSILON:OJ
-c_oSerNumTypes$lvl_Jc:RY
+c_oSerNumTypes$lvl_Jc:QY
 search_HdrFtr_Odd:UV
 JSCompiler_StaticMethods_Internal_CorrectAnchorPos:GU
 SignType$Null:Lh
