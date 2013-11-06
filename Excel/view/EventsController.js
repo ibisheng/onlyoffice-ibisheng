@@ -258,11 +258,17 @@
 				}
 
 				if (t.isCellEditMode) {if (!t.handlers.trigger("stopCellEditing")) {return true;}}
-
+				
+				var coord = t._getCoordinates(event);
+				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
+				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) )
+					return;
+				
 				setTimeout(function () {
 					t.isCellEditMode = true;
 					var coord = t._getCoordinates(event);
 					t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, isCoord, function (resized) {
+						
 						if (resized) {
 							// Мы изменяли размеры колонки/строки, не редактируем ячейку
 							t.isCellEditMode = false;
@@ -1112,10 +1118,13 @@
 					if ( event.metaKey )
 						event.ctrlKey = true;
 					
-					asc["editor"].isStartAddShape = true;
-					
 					this.clickCounter.mouseDownEvent(coord.x, coord.y);
 					event.ClickCount = this.clickCounter.clickCount;
+					
+					if ( (event.ClickCount == 2) && asc["editor"].isStartAddShape ) 
+						this.isDblClickInMouseDown = true;
+					
+					asc["editor"].isStartAddShape = true;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 
 					if ( t.isCellEditMode )
