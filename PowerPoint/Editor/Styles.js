@@ -5099,6 +5099,7 @@ CTextPr.prototype =
             Flags |= 2097152;
         }
 
+        //Writer.WriteString2("tets");
         Writer.WriteBool(isRealObject(this.unifill));
         if(isRealObject(this.unifill))
         {
@@ -5307,6 +5308,10 @@ CTextPr.prototype =
 
         if ( undefined != this.RFonts.CS )
             AllFonts[this.RFonts.CS.Name] = true;
+        if(this.FontFamily && typeof this.FontFamily.Name === "string")
+        {
+            AllFonts[this.FontFamily.Name] = true;
+        }
     },
 
     Document_CreateFontMap : function(FontMap)

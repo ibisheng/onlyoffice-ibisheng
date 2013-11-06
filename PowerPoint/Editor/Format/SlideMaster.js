@@ -713,6 +713,14 @@ MasterSlide.prototype =
         this.Id = r.GetString2();
     },
 
+    getAllFonts: function(fonts)
+    {
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
+                this.cSld.spTree[i].getAllFonts(fonts);
+        }
+    },
     Save_Changes: function(data, w)
     {
         w.WriteLong(data.Type);

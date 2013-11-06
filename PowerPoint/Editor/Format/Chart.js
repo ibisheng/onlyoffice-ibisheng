@@ -61,8 +61,22 @@ function CChartAsGroup(parent)
 CChartAsGroup.prototype =
 {
 
-    getAllFonts: function()
-    {},
+    getAllFonts: function(fonts)
+    {
+        fonts["Calibri"] = true;
+        if(this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content)
+        {
+            this.chartTitle.txBody.content.Document_Get_AllFontNames(fonts);
+        }
+        if(this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content)
+        {
+            this.hAxisTitle.txBody.content.Document_Get_AllFontNames(fonts);
+        }
+        if(this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content)
+        {
+            this.vAxisTitle.txBody.content.Document_Get_AllFontNames(fonts);
+        }
+    },
 
     getSearchResults: function()
     {
@@ -2138,6 +2152,8 @@ CChartAsGroup.prototype =
         this.init();
         this.recalculate();
     },
+
+
 
     copy: function(parent, group)
     {

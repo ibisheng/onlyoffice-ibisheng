@@ -853,6 +853,14 @@ SlideLayout.prototype =
         this.Id = r.GetString2();
     },
 
+    getAllFonts: function(fonts)
+    {
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
+                this.cSld.spTree[i].getAllFonts(fonts);
+        }
+    },
 
 
     Refresh_RecalcData: function()

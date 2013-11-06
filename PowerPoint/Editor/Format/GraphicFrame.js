@@ -69,6 +69,22 @@ CGraphicFrame.prototype =
         return sp;
     },
 
+    getAllFonts: function(fonts)
+    {
+        if(this.graphicObject)
+        {
+            for(var i = 0; i < this.graphicObject.Content.length; ++i)
+            {
+                var row = this.graphicObject.Content[i];
+                var cells = row.Content;
+                for(var j = 0; j < cells.length;++j)
+                {
+                    cells[j].Content.Document_Get_AllFontNames(fonts);
+                }
+            }
+        }
+    },
+
     isSimpleObject: function()
     {
         return true;

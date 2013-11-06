@@ -3420,14 +3420,15 @@ PasteProcessor.prototype =
                     var p_height = stream.GetULong()/100000;
                     var kw = presentation.Width/p_width;
                     var kh = presentation.Height/p_height;
+                    var fonts = [];
                     switch(first_string)
                     {
                         case "TeamLab1":
                         {
                             var shape = this.ReadPresentationText(stream);
-                            var fonts = [];
+                            var font_map = {};
                             var images = [];
-                            shape.getAllFonts(fonts);
+                            shape.getAllFonts(font_map);
                             if(shape.getAllImages)
                                 shape.getAllImages(images);
                             var presentation = editor.WordControl.m_oLogicDocument;
@@ -3485,6 +3486,9 @@ PasteProcessor.prototype =
                                                 var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                                                 var h = shape.txBody.getRectHeight(2000, w);
                                                 shape.setXfrm((presentation.Width - w)/2, (presentation.Height - h)/2, w, h, null, null, null);
+                                                shape.getAllFonts(font_map);
+                                                for(var i in font_map)
+                                                    fonts.push(new CFont(i, 0, "", 0));
                                                 editor.WordControl.m_oLogicDocument.recalcMap[shape.Id] = shape;
                                             }
                                             break;
@@ -3508,12 +3512,12 @@ PasteProcessor.prototype =
                             var arr_shapes = objects.arrShapes;
                             var presentation = editor.WordControl.m_oLogicDocument;
                             oThis = this;
-                            var fonts = [];
+                            var font_map = {};
                             var images = [];
                             for(var i = 0; i < arr_shapes.length; ++i)
                             {
                                 if(arr_shapes[i].getAllFonts)
-                                    arr_shapes[i].getAllFonts(fonts);
+                                    arr_shapes[i].getAllFonts(font_map);
                                 if(arr_shapes[i].getAllImages)
                                     arr_shapes[i].getAllImages(images);
                             }
@@ -3562,6 +3566,8 @@ PasteProcessor.prototype =
                                 }
                             }
 
+                            for(var i in font_map)
+                                fonts.push(new CFont(i, 0, "", 0));
                             var aImagesToDownload = [];
                             for(var i in oImagesToDownload)
                                 aImagesToDownload.push(i);
@@ -3752,15 +3758,25 @@ PasteProcessor.prototype =
 
                             var presentation = editor.WordControl.m_oLogicDocument;
                             oThis = this;
-                            var fonts = [];
+                            var font_map = {};
                             var images = [];
                             for(var i = 0; i < arr_slides.length; ++i)
                             {
                                 if(arr_slides[i].getAllFonts)
-                                    arr_slides[i].getAllFonts(fonts);
+                                    arr_slides[i].getAllFonts(font_map);
                                 if(arr_slides[i].getAllImages)
                                     arr_slides[i].getAllImages(images);
                             }
+
+                            for(var i = 0; i < arr_layouts.length; ++i)
+                            {
+                                if(arr_layouts[i].getAllFonts)
+                                    arr_layouts[i].getAllFonts(font_map);
+                                if(arr_layouts[i].getAllImages)
+                                    arr_layouts[i].getAllImages(images);
+                            }
+                            for(var i in font_map)
+                                fonts.push(new CFont(i, 0, "", 0));
                             var paste_callback = function()
                             {
                                 if(false == oThis.bNested)

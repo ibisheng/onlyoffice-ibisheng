@@ -1233,6 +1233,7 @@ CSolidFill.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
+
         this.color.Write_ToBinary2(Writer);
     },
 
