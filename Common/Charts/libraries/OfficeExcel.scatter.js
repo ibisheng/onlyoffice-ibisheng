@@ -408,13 +408,6 @@
 
         
         /**
-        * This function enables resizing
-        */
-        if (this._otherProps._resizable) {
-            OfficeExcel.AllowResizing(this);
-        }
-        
-        /**
         * Fire the OfficeExcel ondraw event
         */
         OfficeExcel.FireCustomEvent(this, 'ondraw');

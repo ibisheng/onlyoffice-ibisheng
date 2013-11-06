@@ -428,10 +428,6 @@
         } else if (this._otherProps._filled && this._otherProps._filled_range)
             alert('[LINE] You must have only two sets of data for a filled range chart');
 
-        // Resizing
-        if (this._otherProps._resizable)
-            OfficeExcel.AllowResizing(this);
-
         // Adjustments
         if (this._otherProps._adjustable)
             OfficeExcel.AllowAdjusting(this);

@@ -490,13 +490,6 @@
         }
 
         OfficeExcel.NoShadow(this);
-        
-        /**
-        * This function enables resizing
-        */
-        if (this._otherProps._resizable) {
-            OfficeExcel.AllowResizing(this);
-        }
 
 
         /**
