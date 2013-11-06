@@ -9804,7 +9804,7 @@ function MoveInGroup(graphicObjects, group, startX, startY)
             else
             {
                 var near_pos = this.group.parent.Parent.Get_NearestPos(this.group.pageIndex, this.group.absOffsetX, this.group.absOffsetY, true, this.group.parent);
-                this.group.parent.OnEnd_ChangeFlow(this.group.absOffsetX, this.group.absOffsetY, this.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, null, true, true);
+                this.group.parent.OnEnd_ChangeFlow(this.group.absOffsetX, this.group.absOffsetY, this.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, near_pos, true, true);
             }
         }
         this.graphicObjects.arrTrackObjects.length = 0;
