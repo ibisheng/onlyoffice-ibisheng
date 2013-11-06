@@ -2570,7 +2570,6 @@ WordShape.prototype =
             this.spPr.ln = _new_line;
             this.calculateLine();
 
-
         }
         historyData.old_geometryPreset = isRealObject(this.spPr.geometry) ? this.spPr.geometry.preset : null;
         historyData.new_geometryPreset = _final_preset;
@@ -5483,6 +5482,7 @@ WordShape.prototype =
                 {
                     this.spPr.ln = new CLn();
                     this.spPr.ln.Read_FromBinary2(reader);
+                    this.calculateLine();
                 }
                 this.spPr.geometry = CreateGeometry(reader.GetString2());
                 this.spPr.geometry.Init(100, 100);
