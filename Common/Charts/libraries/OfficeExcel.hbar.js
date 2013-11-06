@@ -369,13 +369,6 @@
         OfficeExcel.DrawInGraphLabels(this);
         
         /**
-        * If the canvas is annotatable, do install the event handlers
-        */
-        if (this._otherProps._annotatable) {
-            OfficeExcel.Annotate(this);
-        }
-        
-        /**
         * This function enables resizing
         */
         if (this._otherProps._resizable) {

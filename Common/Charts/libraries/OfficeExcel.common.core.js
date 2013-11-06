@@ -1974,9 +1974,6 @@
             context.fill();
         }
 
-        if (OfficeExcel.ClearAnnotations)
-            OfficeExcel.ClearAnnotations(canvas.id);
-
         OfficeExcel.FireCustomEvent(canvas.__object__, 'onclear');
     }
 

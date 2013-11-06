@@ -394,10 +394,6 @@
         // Draw crosschairs
         OfficeExcel.DrawCrosshairs(this);
 
-        // If the canvas is annotatable, do install the event handlers
-        if (this._otherProps._annotatable)
-            OfficeExcel.Annotate(this);
-
         // Redraw the lines if a filled range is on the cards
         if (this._otherProps._filled && this._otherProps._filled_range && this.data.length == 2) {
 
