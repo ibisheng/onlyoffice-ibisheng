@@ -4615,8 +4615,8 @@ CCharacter.prototype.setOperator = function(operator)
 {
     this.operator = operator;
     //var tPrp = this.getTxtPrp();
-    var tPrp = this.getPrpToControlLetter();
-    this.operator.setTxtPrp(tPrp);
+    //var tPrp = this.getPrpToControlLetter();
+    //this.operator.setTxtPrp(tPrp);
 
     this.setDimension(1, 1);
     this.setContent();

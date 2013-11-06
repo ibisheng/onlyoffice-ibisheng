@@ -67,7 +67,8 @@ CMathRunPrp.prototype =
         return this.runPrp;
     },
     draw: function() {},
-    setPosition: function() {}
+    setPosition: function() {},
+	relate: function() {}
 }
 
 
@@ -441,7 +442,7 @@ CMathContent.prototype =
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
 
             mathElem.relate(this);
-            mathElem.setComposition(this.Composition);
+            //mathElem.setComposition(this.Composition);
 
             var ctrPrp = new CTextPr();
 
@@ -487,6 +488,9 @@ CMathContent.prototype =
     {
         var element = new mathElem(obj);
         obj.relate(this);
+		
+		if(obj.typeObj === MATH_COMP)
+			obj.setComposition(this.Composition);
 
         this.content.push(element);
         this.CurPos++;

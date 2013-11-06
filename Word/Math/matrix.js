@@ -4,6 +4,8 @@ function CMathMatrix()
     this.lineGapRow = 1;
     this.gaps = null;
     this.plcHide = false;
+	this.row = 0;
+	this.column = 0;
 
     this.spaceRow =
     {
@@ -464,6 +466,7 @@ CMathMatrix.prototype.baseJustification = function(type)
 ////
 function CEqArray()
 {
+	this.row = 0;
     CMathMatrix.call(this);
 }
 extend(CEqArray, CMathMatrix);
