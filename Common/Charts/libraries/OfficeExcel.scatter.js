@@ -415,14 +415,6 @@
         }
         
         /**
-        * This bit shows the mini zoom window if requested
-        */
-        if (this._zoom._mode == 'thumbnail' || this._zoom._mode == 'area') {
-            OfficeExcel.ShowZoomWindow(this);
-        }
-
-        
-        /**
         * This function enables resizing
         */
         if (this._otherProps._resizable) {
@@ -453,7 +445,7 @@
 		{
 			if('auto' == this._otherProps._ylabels_count)
 			{
-				//определяем куда ставить ось
+				//РѕРїСЂРµРґРµР»СЏРµРј РєСѓРґР° СЃС‚Р°РІРёС‚СЊ РѕСЃСЊ
 				var numNull = this._otherProps._background_grid_autofit_numvlines;
 				/*var arrTemp = [];
 				var k = 0;
@@ -522,7 +514,7 @@
 				} 
 				else if('auto' == this._otherProps._ylabels_count)
 				{
-					//определяем куда ставить ось
+					//РѕРїСЂРµРґРµР»СЏРµРј РєСѓРґР° СЃС‚Р°РІРёС‚СЊ РѕСЃСЊ
 					var numNull = this._otherProps._background_grid_autofit_numhlines;
 					/*var arrTemp = []
 					var k = 0;
@@ -1534,7 +1526,7 @@
 
 					var xPos = this.coords[i][j][0];
 					var yPos = this.coords[i][j][1];
-					//для вычисления среднего
+					//РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ СЃСЂРµРґРЅРµРіРѕ
 					/*var summ = 0;
 					if(typeof this.coords[i][j][0] == "object")
 					{
@@ -1842,7 +1834,7 @@
 							OfficeExcel.numToFormatText(OfficeExcel.num_round(y_val),formatTrue),
                             'center',
                             'center',
-                            false,//рамка
+                            false,//СЂР°РјРєР°
                             null,
                             'rgba(255, 255, 255, 0.7)', bold, null, textOptions);
             }

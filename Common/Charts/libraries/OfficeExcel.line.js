@@ -432,14 +432,6 @@
         } else if (this._otherProps._filled && this._otherProps._filled_range)
             alert('[LINE] You must have only two sets of data for a filled range chart');
 
-        // Zoom
-        if (this._zoom._mode == 'thumbnail')
-            OfficeExcel.ShowZoomWindow(this);
-
-        // Zoom mode
-        if (this._zoom._mode == 'area')
-            OfficeExcel.ZoomArea(this);
-
         // Resizing
         if (this._otherProps._resizable)
             OfficeExcel.AllowResizing(this);
@@ -473,7 +465,7 @@
         
 		if('auto' == this._otherProps._ylabels_count && this._otherProps._xaxispos)
 		{
-			//определяем куда ставить ось
+			//РѕРїСЂРµРґРµР»СЏРµРј РєСѓРґР° СЃС‚Р°РІРёС‚СЊ РѕСЃСЊ
 			var numNull = this._otherProps._background_grid_autofit_numhlines;
 			var arrTemp = []
 			var k = 0;

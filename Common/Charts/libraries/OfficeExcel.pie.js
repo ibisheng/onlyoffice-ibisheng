@@ -497,13 +497,6 @@
         if (this._otherProps._annotatable) {
             OfficeExcel.Annotate(this);
         }
-        
-        /**
-        * This bit shows the mini zoom window if requested
-        */
-        if (this._zoom._mode == 'thumbnail' || this._zoom._mode == 'area') {
-            OfficeExcel.ShowZoomWindow(this);
-        }
 
         
         /**

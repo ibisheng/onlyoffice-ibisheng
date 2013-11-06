@@ -110,7 +110,7 @@
 
         this.scale = OfficeExcel.getScale(this.max, this);
          
-        //определяем куда ставить ось
+        //РѕРїСЂРµРґРµР»СЏРµРј РєСѓРґР° СЃС‚Р°РІРёС‚СЊ РѕСЃСЊ
         var numNull = this._otherProps._background_grid_autofit_numhlines;
         var arrTemp = []
         if(typeof(this.data[0]) == 'object')
@@ -374,14 +374,6 @@
         if (this._otherProps._annotatable) {
             OfficeExcel.Annotate(this);
         }
-        
-        /**
-        * This bit shows the mini zoom window if requested
-        */
-        if (this._zoom._mode == 'thumbnail' || this._zoom._mode == 'area') {
-            OfficeExcel.ShowZoomWindow(this);
-        }
-
         
         /**
         * This function enables resizing
