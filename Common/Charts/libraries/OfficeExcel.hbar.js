@@ -355,12 +355,6 @@
             }
         }
 
-        /**
-        * Setup the context menu if required
-        */
-        if (this._otherProps._contextmenu) {
-            OfficeExcel.ShowContext(this);
-        }
 
 
         /**

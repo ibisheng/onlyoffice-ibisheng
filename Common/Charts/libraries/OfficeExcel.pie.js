@@ -216,14 +216,6 @@
         * Draw the labels
         */
         this.DrawLabels(isFormatCell);
-        
-        
-        /**
-        * Setup the context menu if required
-        */
-        if (this._otherProps._contextmenu) {
-            OfficeExcel.ShowContext(this);
-        }
 
         /**
         * Install the clickand mousemove event listeners

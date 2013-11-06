@@ -261,14 +261,6 @@
 
 
         /**
-        * Setup the context menu if required
-        */
-        if (this._otherProps._contextmenu) {
-            OfficeExcel.ShowContext(this);
-        }
-
-
-        /**
         * Install the clickand mousemove event listeners
         */
         OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);

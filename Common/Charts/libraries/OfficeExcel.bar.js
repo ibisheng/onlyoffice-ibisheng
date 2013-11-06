@@ -164,14 +164,6 @@
         if (this._otherProps._key.length) {
             OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }
-        
-        
-        /**
-        * Setup the context menu if required
-        */
-        if (this._otherProps._contextmenu) {
-            OfficeExcel.ShowContext(this);
-        }
 
 
         /**

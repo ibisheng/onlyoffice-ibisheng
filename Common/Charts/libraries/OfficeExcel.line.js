@@ -193,9 +193,6 @@
                     this.scale[4] = Number(this.scale[4]).toFixed(this._otherProps._scale_decimals);
                 }
             }
-        // ContextMenu
-        if (this._otherProps._contextmenu)
-            OfficeExcel.ShowContext(this);
 
         // Reset coords
         this.coords = [];
