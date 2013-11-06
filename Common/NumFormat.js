@@ -2511,8 +2511,7 @@ var oGeneralEditFormatCache = new GeneralEditFormatCache();
 function FormatParser()
 {
     this.rx_percent = new RegExp("^([+-]?)(\\d+\\.?\\d*|\\.\\d+)%$");
-    this.rx_date = new RegExp("^ *((\\d{1,2}) *[/-] *(\\d{1,2}) *[/-] *(\\d{2,4}))? *((\\d{1,2}) *: *(\\d{1,2})? *(: *(\\d{1,2})?)? *(AM|PM)?)?$");
-    this.rx_date2 = new RegExp("^ *((\\d{1,2}) *[/-])? *(\\w{3}) *([/-]|[/-](\\w{2,4}))?$");
+    this.rx_date = new RegExp("^ *(((\\d{1,2}) *[/-])? *(\\d{1,2}|[A-Za-z]{3,9}) *([/-]|[/-] *(\\d{2,4}))?)? *((\\d{1,2}) *: *(\\d{1,2})? *(: *(\\d{1,2})?)? *(AM|PM)?)?$");
 	
 	this.rx_currency = new RegExp("^([+-]?)([$€£¥])?(\\d+\\.?\\d*|\\.\\d+)(р.)?$");
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -2563,16 +2562,68 @@ FormatParser.prototype =
 	parseDate : function(value)
 	{
 		var res = null;
-        match = value.match(this.rx_date);
+        var match = null;
         if(null != (match = value.match(this.rx_date)) )
         {
-            var d = match[3];
-            var m = match[2];
-            var y = match[4];
-            var h = match[6];
-            var min = match[7];
-            var s = match[9];
-            var ampm = match[10];
+			var d = match[3];
+			var m = match[4];
+            var y = match[6];
+            var h = match[8];
+            var min = match[9];
+            var s = match[11];
+            var ampm = match[12];
+			var bMonthFirst = true;
+			var bMonthLetter = false;
+			var sMonthDateFormat = "";
+			if(null != m)
+			{
+				//меняем текст месяца на число
+				if(m - 0 != m)
+				{
+					var aArraysToCheck = [{arr: monthCut, format: "mmm"}, {arr: month, format: "mmmm"}];
+					for(var i in aArraysToCheck)
+					{
+						var aArrayTemp = aArraysToCheck[i];
+						for(var j = 0, length = aArrayTemp.arr.length; j < length; j++)
+						{
+							if(aArrayTemp.arr[j].toLowerCase() == m.toLowerCase())
+							{
+								m = j + 1;
+								bMonthLetter = true;
+								var sMonthFormat = aArrayTemp.format;
+								if(null != d)
+								{
+									if (null != y){
+										if(y < 100)
+											sMonthDateFormat = "d/" + sMonthFormat +"/yy";
+										else
+											sMonthDateFormat = "d/" + sMonthFormat +"/yyyy";
+									}
+									else
+										sMonthDateFormat = "d/" + sMonthFormat;
+								}
+								else if(null != y)
+								{
+									if(y < 100)
+										sMonthDateFormat = sMonthFormat +"/yy";
+									else
+										sMonthDateFormat = sMonthFormat +"/yyyy";
+								}
+								break;
+							}
+						}
+						if(bMonthLetter)
+							break;
+					}
+				}
+				if(bMonthFirst && false == bMonthLetter && null != d && null != m)
+				{
+					var temp = d;
+					d = m;
+					m = temp;
+				}
+			}
+			
             var bDate = false;
             var bTime = false;
             var nDay;
@@ -2591,17 +2642,24 @@ FormatParser.prototype =
 				nYear = 1899;
 			}
             var nHour = 0;
-            var nHour = 0;
             var nMinute = 0;
             var nSecond = 0;
             var dValue = 0;
 			var bValidDate = true;
-            if(null != d && null != m && null != y)
+            if(null != m && (null != d || null != y))
             {
                 bDate = true;
-                var nDay = d - 0;
-                var nMounth = m - 1;
-                var nYear = y - 0;
+				var oNowDate = new Date();
+				if(null != d)
+					nDay = d - 0;
+				else
+					nDay = 1;
+                nMounth = m - 1;
+				if(null != y)
+					nYear = y - 0;
+				else
+					nYear = oNowDate.getFullYear();
+                
                 if(nYear < 100)
                     nYear = 2000 + nYear;
 				//проверяем дату на валидность
@@ -2640,9 +2698,19 @@ FormatParser.prototype =
 				{
 					var sFormat;
 					if(true == bDate && true == bTime)
-						sFormat = "m/d/yyyy h:mm:ss AM/PM";
+					{
+						if(bMonthLetter)
+							sFormat = sMonthDateFormat + " h:mm:ss AM/PM";
+						else
+							sFormat = "m/d/yyyy h:mm:ss AM/PM";
+					}
 					else if(true == bDate)
-						sFormat = "m/d/yyyy";
+					{
+						if(bMonthLetter)
+							sFormat = sMonthDateFormat;
+						else
+							sFormat = "m/d/yyyy";
+					}
 					else
 					{
 						if(dValue > 1)
@@ -2656,107 +2724,6 @@ FormatParser.prototype =
 				}
             }
         }
-		else if( null != (match = this.rx_date2.exec(value)) ){
-			
-			var sDD = match[2],
-				sMM = match[3],
-				sYY = match[5],
-				nDay,
-				nMounth,
-				nYear,
-				sFormat,
-				bValidDate = false;
-				
-			if(g_bDate1904)
-			{
-				nDay = 1;
-				nMounth = 0;
-				nYear = 1904;
-			}
-			else
-			{
-				nDay = 31;
-				nMounth = 11;
-				nYear = 1899;
-			}
-				
-			if (undefined != sDD)
-			{
-				if (undefined != sYY){
-					if( sYY.length == 4)
-						sFormat = "d-mmm-yyyy";
-					else
-						sFormat = "d-mmm-yy";
-				}
-				else
-					sFormat = "d-mmm";
-			}
-			else if (undefined != sYY){
-				if( sYY.length == 4)
-					sFormat = "mmm-yyyy";
-				else
-					sFormat = "mmm-yy";
-			}
-			else
-				return res;
-			
-			var nDD = 1;
-			if (undefined != sDD)
-				nDD = parseInt(sDD);
-
-			var nMM = 0;
-			switch( sMM.toLowerCase() ){
-				case "jan": nMM = 1; break;
-				case "feb": nMM = 2; break;
-				case "mar": nMM = 3; break;
-				case "apr": nMM = 4; break;
-				case "may": nMM = 5; break;
-				case "jun": nMM = 6; break;
-				case "jul": nMM = 7; break;
-				case "aug": nMM = 8; break;
-				case "sep": nMM = 9; break;
-				case "oct": nMM = 10; break;
-				case "nov": nMM = 11; break;
-				case "dec": nMM = 12; break;
-				default:
-					return res;
-			}
-			
-			var nYY = -1;
-			if (undefined != sYY)
-				nYY = parseInt(sYY);
-			else 
-				nYY = new Date().getFullYear();
-				
-			if( 0 <= nDD && 0 < nMM && 0 <= nYY )
-            {
-                nDay = nDD - 0;
-                nMounth = nMM - 1;
-                nYear = nYY - 0;
-                if(nYear < 100)
-                    nYear = 2000 + nYear;
-				//проверяем дату на валидность
-				bValidDate = this.isValidDate(nYear, nMounth, nDay);
-            }
-			if(true == bValidDate)
-            {
-				if(g_bDate1904)
-					dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1904,0,1,0,0,0)).getTime()) / (86400 * 1000);
-				else
-				{
-					if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
-						dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1899,11,30,0,0,0)).getTime()) / (86400 * 1000);
-					else if(1900 == nYear && 2 == nMounth && 29 == nDay)
-						dValue = 60;
-					else
-						dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1899,11,31,0,0,0)).getTime()) / (86400 * 1000);
-				}
-                if(dValue > 0)
-				{
-					res = {format: sFormat, value: dValue, bDateTime: true};
-				}
-            }
-		}
 		return res;
 	},
 	isValidDate : function(nYear, nMounth, nDay)
