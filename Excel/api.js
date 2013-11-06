@@ -877,7 +877,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									if("getsettings" == rdata["c"] || "open" == rdata["c"] || "chopen" == rdata["c"] || "create" == rdata["c"])
 										nErrorLevel = c_oAscError.Level.Critical;
 									result = {returnCode: nErrorLevel, val:parseInt(incomeObject["data"])};
-									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
+									oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(parseInt(incomeObject["data"])), nErrorLevel);
 									if(callback)
 										callback(result);
 									break;
@@ -3142,7 +3142,41 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 if (undefined != window['appBridge']) {
                     window['appBridge']['dummyCommandLoadDocumentFromDisk'] ();
                 }
-            }
+            },
+			asc_mapAscServerErrorToAscError: function(nServerError)
+			{
+				var nRes = c_oAscError.ID.Unknown;
+				switch(nServerError)
+				{
+					case c_oAscServerError.NoError : nRes = c_oAscError.ID.No;break;
+					case c_oAscServerError.TaskQueue :
+					case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
+					case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
+					case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
+					case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword;break;
+					case c_oAscServerError.ConvertUnknownFormat :
+					case c_oAscServerError.ConvertReadFile :
+					case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
+					case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize;break;
+					case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt;break;
+					case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount;break;
+					case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey;break;
+					case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt;break;
+					case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire;break;
+					case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed;break;
+					case c_oAscServerError.Storage :
+					case c_oAscServerError.StorageFileNoFound :
+					case c_oAscServerError.StorageRead :
+					case c_oAscServerError.StorageWrite :
+					case c_oAscServerError.StorageRemoveDir :
+					case c_oAscServerError.StorageCreateDir :
+					case c_oAscServerError.StorageGetInfo :
+					case c_oAscServerError.Upload :
+					case c_oAscServerError.ReadRequestStream :
+					case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
+				}
+				return nRes;
+			}
 		};
 
 		function asc_ajax(obj){
@@ -3234,40 +3268,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			init(obj);
 		};
-		function asc_mapAscServerErrorToAscError(nServerError)
-		{
-			var nRes = c_oAscError.ID.Unknown;
-			switch(nServerError)
-			{
-				case c_oAscServerError.NoError : nRes = c_oAscError.ID.No;break;
-				case c_oAscServerError.TaskQueue :
-				case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
-				case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
-				case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
-				case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword;break;
-				case c_oAscServerError.ConvertUnknownFormat :
-				case c_oAscServerError.ConvertReadFile :
-				case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
-				case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize;break;
-				case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt;break;
-				case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount;break;
-				case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey;break;
-				case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt;break;
-				case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire;break;
-				case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed;break;
-				case c_oAscServerError.Storage :
-				case c_oAscServerError.StorageFileNoFound :
-				case c_oAscServerError.StorageRead :
-				case c_oAscServerError.StorageWrite :
-				case c_oAscServerError.StorageRemoveDir :
-				case c_oAscServerError.StorageCreateDir :
-				case c_oAscServerError.StorageGetInfo :
-				case c_oAscServerError.Upload :
-				case c_oAscServerError.ReadRequestStream :
-				case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
-			}
-			return nRes;
-		}
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -3462,7 +3462,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_decreaseFontSize"] = prot.asc_decreaseFontSize;
 
 		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
-		prot["asc_mapAscServerErrorToAscError"] = asc_mapAscServerErrorToAscError;
+		prot["asc_mapAscServerErrorToAscError"] = prot.asc_mapAscServerErrorToAscError;
 
 		prot["asc_selectFunction"] = prot.asc_selectFunction;
 		prot["asc_insertHyperlink"] = prot.asc_insertHyperlink;
