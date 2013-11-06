@@ -3876,6 +3876,7 @@ function CDelimiter()
     this.sepOper = new COperator (-1);
     this.shape = DELIMITER_SHAPE_CENTERED;
     this.grow = true;
+	this.column = 0;
 
     CSubMathBase.call(this);
 }
