@@ -83,7 +83,7 @@ CGraphicObjects.prototype =
                     }
                     if(bAddHistory)
                     {
-                        if(obj instanceof WordShape || obj instanceof WordImage )
+                        if(obj instanceof WordShape || obj instanceof WordImage || obj instanceof WordGroupShapes)
                         {
                             History.Add(obj, {Type: historyitem_CalculateAfterCopyInGroup});
                         }

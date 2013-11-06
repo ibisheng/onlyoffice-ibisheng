@@ -4348,6 +4348,11 @@ WordGroupShapes.prototype =
                 }
                 break;
             }
+            case historyitem_CalculateAfterCopyInGroup:
+            {
+                this.calculateAfterOpen10();
+                break;
+            }
         }
         if(b_history_is_on)
         {
