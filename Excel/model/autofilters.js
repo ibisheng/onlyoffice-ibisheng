@@ -716,10 +716,10 @@
 										var idCellNext = new CellAddress(mainAdjacentCells.r2, col, 0);
 										curCell = ws.model.getCell( idCell ).getCells();
 										result[n] = {
-											x: ws.cols[col].left,
-											y: ws.rows[mainAdjacentCells.r1].top,
-											width: ws.cols[col].width,
-											height: ws.rows[mainAdjacentCells.r1].height,
+											x: ws.cols[col] ? ws.cols[col].left : null,
+											y: ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].top : null,
+											width: ws.cols[col] ? ws.cols[col].width : null,
+											height: ws.rows[mainAdjacentCells.r1] ? ws.rows[mainAdjacentCells.r1].height : null,
 											id: idCell.getID(),
 											idNext: idCellNext.getID()
 										};
@@ -731,10 +731,10 @@
 									var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
 									var idCellNext = new CellAddress(activeCells.r2, activeCells.c2, 0);
 									result[0] = {
-										x: ws.cols[activeCells.c1].left,
-										y: ws.rows[activeCells.r1].top,
-										width: ws.cols[activeCells.c1].width,
-										height: ws.rows[activeCells.c1].height,
+										x: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null,
+										y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
+										width: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null,
+										height: ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null,
 										id: idCell.getID(),
 										idNext: idCellNext.getID()
 									}
@@ -746,10 +746,10 @@
 										var idCell = new CellAddress(activeCells.r1, activeCells.c1, 0);
 										var idCellNext = new CellAddress(activeCells.r2 + 1, activeCells.c2, 0);
 										result[0] = {
-											x: ws.cols[activeCells.c1].left,
-											y: ws.rows[activeCells.r1].top,
-											width: ws.cols[activeCells.c1].width,
-											height: ws.rows[activeCells.c1].height,
+											x: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].left : null,
+											y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
+											width: ws.cols[activeCells.c1] ? ws.cols[activeCells.c1].width : null,
+											height: ws.rows[activeCells.c1] ? ws.rows[activeCells.c1].height : null,
 											id: idCell.getID(),
 											idNext: idCellNext.getID()
 										}
@@ -779,10 +779,10 @@
 									var idCell = new CellAddress(activeCells.r1, col, 0);
 									var idCellNext = new CellAddress(activeCells.r2, col, 0);
 									result[n] = {
-										x: ws.cols[col].left,
-										y: ws.rows[activeCells.r1].top,
-										width: ws.cols[col].width,
-										height: ws.rows[activeCells.r1].height,
+										x: ws.cols[col] ? ws.cols[col].left : null,
+										y: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].top : null,
+										width: ws.cols[col] ? ws.cols[col].width : null,
+										height: ws.rows[activeCells.r1] ? ws.rows[activeCells.r1].height : null,
 										id: idCell.getID(),
 										idNext: idCellNext.getID()
 									};
