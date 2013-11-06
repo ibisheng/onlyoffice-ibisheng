@@ -710,6 +710,10 @@ function CPPTXContentWriter()
     {
         this.BinaryFileWriter.Start_UseFullUrl(origin);
     }
+    this.Start_UseDocumentOrigin = function(origin)
+    {
+        this.BinaryFileWriter.Start_UseDocumentOrigin(origin);
+    }
     this.End_UseFullUrl = function()
     {
         return this.BinaryFileWriter.End_UseFullUrl();

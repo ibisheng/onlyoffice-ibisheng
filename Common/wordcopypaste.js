@@ -354,6 +354,7 @@ function CopyProcessor(api, ElemToSelect)
     this.oCurHyperlinkElem = null;
     this.oPresentationWriter = new CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl(documentOrigin + editor.DocumentUrl);
+    this.oPresentationWriter.Start_UseDocumentOrigin(documentOrigin);
 };
 CopyProcessor.prototype =
 {

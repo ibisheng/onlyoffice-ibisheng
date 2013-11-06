@@ -76,6 +76,7 @@ function CBinaryFileWriter()
 
     this.IsUseFullUrl = false;
     this.DocumentOrigin = "";
+    this.PresentationThemesOrigin = "";
 
     var oThis = this;
 
@@ -84,6 +85,11 @@ function CBinaryFileWriter()
         this.IsUseFullUrl = true;
         this.DocumentOrigin = origin;
     };
+
+    this.Start_UseDocumentOrigin = function(origin)
+    {
+        this.PresentationThemesOrigin = origin + "/presentationthemes/";
+    }
 
     this.End_UseFullUrl = function()
     {
@@ -2076,8 +2082,10 @@ function CBinaryFileWriter()
                 if (oThis.IsUseFullUrl)
                 {
                     if ((0 == _src.indexOf("theme")) && window.editor)
-                        _src = window.editor.ThemeLoader.ThemesUrl + _src;
-                    if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:"))
+                    {
+                        _src = oThis.PresentationThemesOrigin + _src;
+                    }
+                    else if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:"))
                         _src = oThis.DocumentOrigin + "media/" + _src;
                 }
 
