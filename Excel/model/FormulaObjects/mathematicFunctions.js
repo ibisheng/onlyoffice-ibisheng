@@ -3100,17 +3100,18 @@ cFormulaFunction.Mathematic = {
             }
             valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
             if ( arg0 instanceof cArea ) {
-                var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c1 = arg2.getRange().first.getCol0(), i = 0;
-                arg0.foreach2(function(c){
-                    if ( matching( c, valueForSearching, oper ) ) {
-                        var r1 = r + i,
-                        r2 = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                        if ( r2.getValue() instanceof cNumber ) {
-                            _sum += r2.getValue().getValue();
+                var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix0, valMatrix2;
+                for ( var i = 0; i < arg0Matrix.length; i++ ) {
+                    for ( var j = 0; j < arg0Matrix[i].length; j++ ) {
+                        valMatrix0 = arg0Matrix[i][j];
+                        valMatrix2 = arg2Matrix[i][j]?arg2Matrix[i][j]:new cEmpty();
+                        if ( matching( valMatrix0 , valueForSearching, oper ) ) {
+                            if ( valMatrix2 instanceof cNumber ) {
+                                _sum += valMatrix2.getValue();
+                            }
                         }
                     }
-                    i++;
-                })
+                }
             }
             else {
                 val = arg0.getValue();
