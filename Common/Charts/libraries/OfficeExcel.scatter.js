@@ -761,11 +761,7 @@
                     else
                         var x    = this._chartGutter._left + ((i) * interval);
 
-                    if (typeof(this._otherProps._xscale_formatter) == 'function') {
-                        var text = this._otherProps._xscale_formatter(this, num);
-                    } else {
-                        var text = xScale[i];
-                    }
+                    var text = xScale[i];
 
                     OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + offsetY, OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
                 }
@@ -799,14 +795,10 @@
                 var num  = ( (this._otherProps._xmax - this._otherProps._xmin) * ((i+1) / numXLabels)) + this._otherProps._xmin;
                 var x    = this._chartGutter._left + ((i+1) * interval);
 
-                if (typeof(this._otherProps._xscale_formatter) == 'function') {
-                    var text = this._otherProps._xscale_formatter(this, num);
-                } else {
-                    var text = OfficeExcel.number_format(this,
-                                                    num.toFixed(this._otherProps._scale_decimals),
-                                                    units_pre_x,
-                                                    units_post_x);
-                }
+                var text = OfficeExcel.number_format(this,
+                                                num.toFixed(this._otherProps._scale_decimals),
+                                                units_pre_x,
+                                                units_post_x);
 
                 OfficeExcel.Text(context, font, text_size, x, y, text, 'center', 'center', false, null, null, bold, null, textOptions);
             }

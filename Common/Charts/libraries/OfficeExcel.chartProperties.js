@@ -86,9 +86,6 @@ OfficeExcel.OtherProps = function()
     this._labels_above = false;
     this._labels_above_size = null;
     this._labels_above_angle = null;
-    this._labels_sticks = false;
-    this._labels_sticks_length = 7;
-    this._labels_sticks_color = '#aaa';
     this._labels_specific_align = 'left';
 
     this._background_barcolor1 = 'rgba(0,0,0,0)';
@@ -151,7 +148,6 @@ OfficeExcel.OtherProps = function()
     this._xscale_units_pre = '';
     this._xscale_units_post = '';
     this._xscale_numlabels = 10;
-    this._xscale_formatter = null;
 
     this._boxplot = false;
 }

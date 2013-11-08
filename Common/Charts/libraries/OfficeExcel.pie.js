@@ -118,24 +118,6 @@
             this.context.stroke();
         }*/
 
-
-        /**
-        * Draw label sticks
-        */
-        if (this._otherProps._labels_sticks) {
-            
-            this.DrawSticks();
-            
-            // Redraw the border going around the Pie chart if the stroke style is NOT white
-            var strokeStyle = this._otherProps._strokecolor;
-            var isWhite     = strokeStyle == 'white' || strokeStyle == '#fff' || strokeStyle == '#fffffff' || strokeStyle == 'rgb(255,255,255)' || strokeStyle == 'rgba(255,255,255,0)';
-
-            if (!isWhite) {
-               // Again (?)
-              this.DrawBorders();
-           }
-        }
-
         /**
         * Draw the labels
         */
@@ -343,15 +325,6 @@
                     var explosion_offsetx = 0;
                     var explosion_offsety = 0;
                 }
-                
-                /**
-                * Allow for the label sticks
-                */
-                if (this._otherProps._labels_sticks) {
-                    explosion_offsetx += (Math.cos(angle) * this._otherProps._labels_sticks_length);
-                    explosion_offsety += (Math.sin(angle) * this._otherProps._labels_sticks_length);
-                }
-
 
                 context.fillStyle = this._otherProps._text_color;
 				if(this.catNameLabels && typeof this.catNameLabels[0][lNum] == "string")
@@ -364,7 +337,7 @@
                 OfficeExcel.Text(context,
                             this._otherProps._text_font,
                             text_size,
-                            centerx + explosion_offsetx + ((this.radius - 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
+                            centerx + explosion_offsetx + ((this.radius - 10)* Math.cos(a)),
                             this.centery + explosion_offsety + (((this.radius - 10) * Math.sin(a))),
                             OfficeExcel.numToFormatText(curLabel,isFormatCellTrue),
                             vAlignment,
@@ -372,59 +345,6 @@
             }
             
             context.fill();
-        }
-    }
-
-
-    /**
-    * This function draws the pie chart sticks (for the labels)
-    */
-    OfficeExcel.Pie.prototype.DrawSticks = function ()
-    {
-        var context  = this.context;
-        var offset   = this._otherProps._linewidth / 2;
-        var exploded = this._otherProps._exploded;
-        var sticks   = this._otherProps._labels_sticks;
-
-        for (var i=0; i<this.angles.length; ++i) {
-
-            if (typeof(sticks) == 'object' && !sticks[i]) {
-                continue;
-            }
-
-            var radians = this.angles[i][1] - this.angles[i][0];
-
-            context.beginPath();
-            context.strokeStyle = this._otherProps._labels_sticks_color;
-            context.lineWidth   = 1;
-
-            var midpoint = (this.angles[i][0] + (radians / 2));
-
-            if (typeof(exploded) == 'object' && exploded[i]) {
-                var extra = exploded[i];
-            } else if (typeof(exploded) == 'number') {
-                var extra = exploded;
-            } else {
-                var extra = 0;
-            }
-
-            context.lineJoin = 'round';
-            context.lineWidth = 1;
-
-            context.arc(this.centerx,
-                        this.centery,
-                        this.radius + this._otherProps._labels_sticks_length + extra,
-                        midpoint,
-                        midpoint + 0.001,
-                        0);
-            context.arc(this.centerx,
-                        this.centery,
-                        this.radius + extra,
-                        midpoint,
-                        midpoint + 0.001,
-                        0);
-
-            context.stroke();
         }
     }
 
