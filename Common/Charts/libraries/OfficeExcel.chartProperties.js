@@ -85,8 +85,6 @@ OfficeExcel.OtherProps = function()
     this._labels = [];
     this._labels_above = false;
     this._labels_above_size = null;
-    this._labels_above_angle = null;
-    this._labels_specific_align = 'left';
 
     this._background_barcolor1 = 'rgba(0,0,0,0)';
     this._background_barcolor2 = 'rgba(0,0,0,0)';

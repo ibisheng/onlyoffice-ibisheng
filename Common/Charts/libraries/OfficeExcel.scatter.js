@@ -832,21 +832,7 @@
                 
                 if (typeof(labels[i]) == 'object') {
                 
-                    if (this._otherProps._labels_specific_align == 'center') {
-                        var rightEdge = 0;
-    
-                        if (labels[i+1] && labels[i+1][1]) {
-                            rightEdge = labels[i+1][1];
-                        } else {
-                            rightEdge = this._otherProps._xmax;
-                        }
-                        
-                        var offset = (rightEdge - labels[i][1]) / 2;
-    
-                    } else {
-                        var offset = 0;
-                    }
-                
+                    var offset = 0;
     
                     OfficeExcel.Text(context,
                                 font,
@@ -855,7 +841,7 @@
                                 yPos,
                                 String(labels[i][0]),
                                 valign,
-                                angle != 0 ? 'right' : (this._otherProps._labels_specific_align == 'center' ? 'center' : 'left'),
+                                angle != 0 ? 'right' : 'left',
                                 null,
                                 angle, null, bold, null, textOptions
                                );
