@@ -1396,13 +1396,6 @@
 			_onMouseDblClick: function (event) {
 				var t = this;
 				var coord = t._getCoordinates(event);
-				
-				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
-					event.ClickCount = 2;
-					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
-					return;
-				}
 			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;

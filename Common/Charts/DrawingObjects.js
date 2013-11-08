@@ -5283,10 +5283,12 @@ function ClickCounter() {
 			_this.clickCount = 1;
 		
 		if ( _this.log ) {
+			console.log("-----");
 			console.log("x: " + (_this.x === x));
 			console.log("y: " + (_this.y === y));
 			console.log("Time: " + (currTime - _this.time));
 			console.log("Count: " + _this.clickCount);
+			console.log("");
 		}
 			
 		_this.time = currTime;
@@ -5541,6 +5543,13 @@ function readFromBinaryParagraphContent(r)
         Element.Read_FromBinary(r);
 
     return Element;
+}
+
+function CreateParagraphContent(s)
+{
+    if(s != " ")
+        return new ParaText(s);
+    return new ParaSpace(1);
 }
 
 function getTextString(docContent)
