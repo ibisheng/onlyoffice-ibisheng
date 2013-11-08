@@ -782,13 +782,6 @@
             var valign = 'top';
             var halign = 'center';
 
-            if (this._otherProps._xlabels_inside) {
-                yOffset = -5;
-                bordered = true;
-                bgcolor  = this._otherProps._xlabels_inside_color;
-                valign = 'bottom';
-            }
-
             if (this._otherProps._xaxispos == 'top') {
                 valign = 'bottom';
                 yOffset += 2;
@@ -839,7 +832,6 @@
                                 font,
                                 text_size,
                                 labelX - diffWidth,
-                                //(this._otherProps._xaxispos == 'top') ? this._chartGutter._top - yOffset - (this._otherProps._xlabels_inside ? -22 : 0) : (this.canvas.height - this._chartGutter._bottom) + yOffset,
                                 this.nullPositionOX + yOffset*scaleFactor + diffHeight,
                                 String(this._otherProps._labels[i]),
                                 valign,
@@ -854,7 +846,7 @@
                                 font,
                                 text_size,
                                 labelX,
-                                (this._otherProps._xaxispos == 'top') ? this._chartGutter._top - yOffset - (this._otherProps._xlabels_inside ? -22 : 0) : (this.canvas.height - this._chartGutter._bottom) + yOffset,
+                                (this._otherProps._xaxispos == 'top') ? this._chartGutter._top - yOffset : (this.canvas.height - this._chartGutter._bottom) + yOffset,
                                 //this.nullPositionOX + 20,
                                 String(this._otherProps._labels[i]),
                                 valign,

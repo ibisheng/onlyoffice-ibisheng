@@ -54,8 +54,6 @@ OfficeExcel.OtherProps = function()
 
     this._xlabels = true;
     this._xlabels_offset = 0;
-    this._xlabels_inside = false;
-    this._xlabels_inside_color = 'rgba(255,255,255,0.5)';
 
     this._ylabels = true;
     this._ylabels_count = 5;
