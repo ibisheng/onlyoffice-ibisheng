@@ -2748,13 +2748,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     OfficeExcel.GetWidth=function(obj){return obj.canvas.width;}
 
     /**
-    * This resets the canvas. Keep in mind that any translate() that has been performed will also be reset.
-    * 
-    * @param object canvas The canvas
-    */
-    OfficeExcel.Reset=function(canvas){canvas.width = canvas.width;}
-
-    /**
     * This function skirts the annoying canvas anti-aliasing
     * 
     * @param object obj The object

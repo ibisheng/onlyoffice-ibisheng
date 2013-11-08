@@ -159,7 +159,6 @@ OfficeExcel.OtherProps = function()
 
     this._key = [];
     this._key_background = 'white';
-    this._key_position = 'graph';
     this._key_position_x = null;
     this._key_position_y = null;
     this._key_position_gutter_boxed = true;

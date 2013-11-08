@@ -1,16 +1,9 @@
     OfficeExcel.DrawKey = function (obj, key, colors)
     {
-        var canvas  = obj.canvas;
         var context = obj.context;
         context.lineWidth = 1;
 
         context.beginPath();
-
-        /**
-        * Key positioned in the gutter
-        */
-        var keypos   = obj._otherProps._key_position;
-        var textsize = obj._otherProps._text_size;
 
         /**
         * Account for null values in the key
@@ -27,23 +20,7 @@
         key    = key_non_null;
         colors = colors_non_null;
 
-
-
-        if (keypos && keypos == 'gutter') {
-    
-            OfficeExcel.DrawKey_gutter(obj, key, colors);
-
-
-        /**
-        * In-graph style key
-        */
-        } else if (keypos && keypos == 'graph') {
-
-            OfficeExcel.DrawKey_graph(obj, key, colors);
-        
-        } else {
-            alert('[COMMON] (' + obj.id + ') Unknown key position: ' + keypos);
-        }
+		OfficeExcel.DrawKey_graph(obj, key, colors);
     }
 
     /**
@@ -400,160 +377,6 @@
             }
 
         context.fill();
-    }
-
-    /**
-    * This does the actual drawing of the key when it's in the gutter
-    * 
-    * @param object obj The graph object
-    * @param array  key The key items to draw
-    * @param array colors An aray of colors that the key will use
-    */
-    OfficeExcel.DrawKey_gutter = function (obj, key, colors)
-    {
-        var canvas      = obj.canvas;
-        var context     = obj.context;
-        var text_size   = typeof(obj._otherProps._key_text_size) == 'number' ? obj._otherProps._key_text_size : obj._otherProps._text_size;
-        var text_font   = obj._otherProps._text_font;
-        
-        var gutterLeft   = obj._chartGutter._left;
-        var gutterRight  = obj._chartGutter._right;
-        var gutterTop    = obj._chartGutter._top;
-        var gutterBottom = obj._chartGutter._bottom;
-
-        var hpos        = OfficeExcel.GetWidth(obj) / 2;
-        var vpos        = (gutterTop / 2) - 5;
-        var title       = obj._chartTitle._text;
-        var blob_size   = text_size; // The blob of color
-        var hmargin      = 8; // This is the size of the gaps between the blob of color and the text
-        var vmargin      = 4; // This is the vertical margin of the key
-        var fillstyle   = obj._otherProps._key_background;
-        var strokestyle = 'black';
-        var length      = 0;
-
-
-
-        // Need to work out the length of the key first
-        context.font = text_size + 'pt ' + text_font;
-        for (i=0; i<key.length; ++i) {
-            length += hmargin;
-            length += blob_size;
-            length += hmargin;
-            length += context.measureText(key[i]).width;
-        }
-        length += hmargin;
-
-
-
-
-        /**
-        * Work out hpos since in the Pie it isn't necessarily dead center
-        */
-        if (obj.type == 'pie') {
-            if (obj._otherProps._align == 'left') {
-                var hpos = obj.radius + gutterLeft;
-                
-            } else if (obj._otherProps._align == 'right') {
-                var hpos = obj.canvas.width - obj.radius - gutterRight;
-
-            } else {
-                hpos = canvas.width / 2;
-            }
-        }
-
-
-
-
-
-        /**
-        * This makes the key centered
-        */  
-        hpos -= (length / 2);
-
-
-        /**
-        * Override the horizontal/vertical positioning
-        */
-        if (typeof(obj._otherProps._key_position_x) == 'number') {
-            hpos = obj._otherProps._key_position_x;
-        }
-        if (typeof(obj._otherProps._key_position_y) == 'number') {
-            vpos = obj._otherProps._key_position_y;
-        }
-
-
-
-        /**
-        * Draw the box that the key sits in
-        */
-        if (obj._otherProps._key_position_gutter_boxed) {
-
-            context.beginPath();
-                context.fillStyle = fillstyle;
-                context.strokeStyle = strokestyle;
-
-                if (obj._otherProps._key_rounded) {
-                    OfficeExcel.strokedCurvyRect(context, hpos, vpos - vmargin, length, text_size + vmargin + vmargin)
-                    // Odd... OfficeExcel.filledCurvyRect(context, hpos, vpos - vmargin, length, text_size + vmargin + vmargin);
-                } else {
-                    context.strokeRect(hpos, vpos - vmargin, length, text_size + vmargin + vmargin);
-                    context.fillRect(hpos, vpos - vmargin, length, text_size + vmargin + vmargin);
-                }
-                
-            context.stroke();
-            context.fill();
-        }
-
-
-        /**
-        * Draw the blobs of color and the text
-        */
-
-        // Custom colors for the key
-        if (obj._otherProps._key_colors) {
-            colors = obj._otherProps._key_colors;
-        }
-
-        for (var i=0, pos=hpos; i<key.length; ++i) {
-            pos += hmargin;
-            
-            // Draw the blob of color - line
-            if (obj._otherProps._key_color_shape =='line') {
-                
-                context.beginPath();
-                    context.strokeStyle = colors[i];
-                    context.moveTo(pos, vpos + (blob_size / 2));
-                    context.lineTo(pos + blob_size, vpos + (blob_size / 2));
-                context.stroke();
-                
-            // Circle
-            } else if (obj._otherProps._key_color_shape == 'circle') {
-                
-                context.beginPath();
-                    context.fillStyle = colors[i];
-                    context.moveTo(pos, vpos + (blob_size / 2));
-                    context.arc(pos + (blob_size / 2), vpos + (blob_size / 2), (blob_size / 2), 0, 6.28, 0);
-                context.fill();
-
-
-            } else {
-
-                context.beginPath();
-                    context.fillStyle = colors[i];
-                    context.fillRect(pos, vpos, blob_size, blob_size);
-                context.fill();
-            }
-
-            pos += blob_size;
-            
-            pos += hmargin;
-
-            context.beginPath();
-                context.fillStyle = 'black';
-                OfficeExcel.Text(context, text_font, text_size, pos, vpos + text_size - 1, key[i]);
-            context.fill();
-            pos += context.measureText(key[i]).width;
-        }
     }
     
     /**

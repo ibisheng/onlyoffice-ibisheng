@@ -1422,7 +1422,6 @@ function drawChart(chart, arrValues, width, height, options) {
 		
 	
 	// *****Легенда******
-	bar._otherProps._key_position = 'graph';
 	bar._otherProps._key = [];
 	bar._otherProps._key_halign = chart.legend.position;
 			
