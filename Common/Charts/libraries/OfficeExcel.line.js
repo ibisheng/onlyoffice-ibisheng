@@ -1465,24 +1465,6 @@
                 penUp = false;
             }
         }
-
-        /**
-        * If two colors are specified instead of one, go over the up bits
-        */
-        if (this._otherProps._colors_alternate && typeof(color) == 'object' && color[0] && color[1]) {
-            for (var i = 1; i < len; ++i) {
-
-                var prevX = coords[i - 1][0];
-                var prevY = coords[i - 1][1];
-
-                this.context.beginPath();
-                this.context.strokeStyle = color[coords[i][1] < prevY ? 0 : 1];
-                this.context.lineWidth = this._otherProps._linewidth;
-                this.context.moveTo(prevX, prevY);
-                this.context.lineTo(coords[i][0], coords[i][1]);
-                this.context.stroke();
-            }
-        }
     }
 
     // Returns the linewidth
