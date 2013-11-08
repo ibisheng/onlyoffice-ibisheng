@@ -1592,18 +1592,7 @@ function drawChart(chart, arrValues, width, height, options) {
 
 	var axis;
 	calcGutter(axis,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
-	
-	if (chart.xAxis.title && !chart.margins)
-	{
-		bar._xAxisTitle._vpos = bar.canvas.height - 23 - legendTop;
-		bar._xAxisTitle._hpos = bar._chartGutter._left + (bar.canvas.width - bar._chartGutter._left - bar._chartGutter._right ) / 2 ;
-	}
-	
-	if (chart.yAxis.title && !chart.margins)
-	{
-		bar._yAxisTitle._vpos = bar._chartGutter._top + (bar.canvas.height - bar._chartGutter._top - bar._chartGutter._bottom) / 2 ;
-		bar._yAxisTitle._hpos = 23 + keyLeft;
-	}
+
 	bar.arrFormatAdobeLabels = chart.arrFormatAdobeLabels;
 	//bar._otherProps._labels
 	if(bar._otherProps._labels.length && typeof bar._otherProps._labels[0] == 'object')

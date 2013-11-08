@@ -28,12 +28,6 @@
 
         // Chart gutter
         this._chartGutter   = new OfficeExcel.Gutter();
-        // Chart Title
-        this._chartTitle    = new OfficeExcel.Title();
-        // xAxis Title
-        this._xAxisTitle    = new OfficeExcel.Title();
-        // yAxis Title
-        this._yAxisTitle    = new OfficeExcel.Title();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
         

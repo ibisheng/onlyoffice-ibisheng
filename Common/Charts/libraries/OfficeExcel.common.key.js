@@ -67,7 +67,6 @@
 
         var hpos        = obj._otherProps._yaxispos == 'right' ? gutterLeft + 10 : OfficeExcel.GetWidth(obj) - gutterRight - 10;
         var vpos        = gutterTop + 10;
-        var title       = obj._chartTitle._text;
         var blob_size   = text_size; // The blob of color
         var hmargin      = 8; // This is the size of the gaps between the blob of color and the text
         var vmargin      = 4; // This is the vertical margin of the key
