@@ -49,7 +49,6 @@ OfficeExcel.OtherProps = function()
     this._scale_formatter = null;
 
     this._colors = ['rgb(0,0,255)', '#0f0', '#00f', '#ff0', '#0ff', '#0f0'];
-    this._colors_sequential = false;
 
     this._radius = null;
 

@@ -411,7 +411,6 @@
         var hmargin       = this._otherProps._hmargin;
         var strokeStyle   = this._otherProps._strokecolor;
         var colors        = this._otherProps._colors;
-        var sequentialColorIndex = 0;
 		
 		var bold = this._otherProps._labels_above_bold;
 		var textOptions = 
@@ -476,13 +475,6 @@
                     // Set the fill color
                     this.context.strokeStyle = strokeStyle;
                     this.context.fillStyle = colors[0];
-                    
-                    /**
-                    * Sequential colors
-                    */
-                    if (this._otherProps._colors_sequential) {
-                        this.context.fillStyle = colors[i];
-                    }
 
                     if (variant == 'sketch') {
 
@@ -493,13 +485,6 @@
                         this.context.beginPath();
 
                         this.context.strokeStyle = colors[0];
-
-                        /**
-                        * Sequential colors
-                        */
-                        if (this._otherProps._colors_sequential) {
-                            this.context.strokeStyle = colors[i];
-                        }
 
                         // Left side
                         this.context.moveTo(x + hmargin + 2, y + height - 2);
@@ -574,13 +559,6 @@
                         // Set the colour for the dots
                         this.context.fillStyle = this._otherProps._colors[0];
 
-                        /**
-                        * Sequential colors
-                        */
-                        if (this._otherProps._colors_sequential) {
-                            this.context.fillStyle = colors[i];
-                        }
-
                         this.context.stroke();
                         this.context.fill();
                     
@@ -644,16 +622,6 @@
                         // Set the fill and stroke colors
                         this.context.strokeStyle = strokeStyle;
                         this.context.fillStyle   = colors[j];
-                        
-                        /**
-                        * Sequential colors
-                        */
-                        if (this._otherProps._colors_sequential && colors[sequentialColorIndex]) {
-                            this.context.fillStyle = colors[sequentialColorIndex++];
-                        } else if (this._otherProps._colors_sequential) {
-                            this.context.fillStyle = colors[sequentialColorIndex - 1];
-                        }
-                        
                         
                         var individualBarWidth = (width - (2 * hmargin)) / this.data[i].length;
                         var height;
@@ -1295,7 +1263,6 @@
 			var hmargin       = this._otherProps._hmargin;
 			var strokeStyle   = this._otherProps._strokecolor;
 			var colors        = this._otherProps._colors;
-			var sequentialColorIndex = 0;
 			var startX;
 			var startY;
 			var individualBarWidth;

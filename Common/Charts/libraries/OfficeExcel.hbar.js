@@ -553,11 +553,6 @@
                     // Set the fill color
                     this.context.strokeStyle = this._otherProps._strokecolor;
                     this.context.fillStyle = this._otherProps._colors[0];
-                    
-                    // Sequential colors
-                    if (this._otherProps._colors_sequential) {
-                        this.context.fillStyle = this._otherProps._colors[colorIdx++];
-                    }
 
                     this.context.strokeRect(barX, this._chartGutter._top + (i * height) + this._otherProps._vmargin, barWidth, barHeight);
                     this.context.fillRect(barX, this._chartGutter._top + (i * height) + this._otherProps._vmargin, barWidth, barHeight);
@@ -581,15 +576,6 @@
 						if(this._otherProps._colors[j])
 							this.context.fillStyle = this._otherProps._colors[j];
 
-                        // Sequential colors
-                        if (this._otherProps._colors_sequential) {
-                            this.context.fillStyle = this._otherProps._colors[colorIdx++];
-                        }
-
-                        
-                        
-                        
-                        
                         var width;
                         if('auto' == this._otherProps._ylabels_count)
                         {
