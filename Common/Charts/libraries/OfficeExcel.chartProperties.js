@@ -144,10 +144,6 @@ OfficeExcel.OtherProps = function()
     this._filled_range = false;
     this._filled_accumulative = true;
 
-    this._backdrop = false;
-    this._backdrop_size = 30;
-    this._backdrop_alpha = 0.2;
-
     this._grouping = 'grouped';
 
     this._xaxis = true;

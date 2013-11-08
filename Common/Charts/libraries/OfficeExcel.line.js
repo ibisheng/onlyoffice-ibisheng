@@ -1296,11 +1296,6 @@
 
         this.context.stroke();
 
-
-        if (this._otherProps._backdrop) {
-            this.DrawBackdrop(lineCoords, color);
-        }
-
         // Now redraw the lines with the correct line width
         if(!this._otherProps._filled)
             this.RedrawLine(lineCoords, color, linewidth);
@@ -1646,30 +1641,6 @@
                 this.context.stroke();
             }
         }
-    }
-
-    /**
-    * Draw the backdrop
-    */
-    OfficeExcel.Line.prototype.DrawBackdrop = function (coords, color)
-    {
-        var size = this._otherProps._backdrop_size;
-        this.context.lineWidth = size;
-        this.context.globalAlpha = this._otherProps._backdrop_alpha;
-        this.context.strokeStyle = color;
-        this.context.lineJoin = 'miter';
-
-        this.context.beginPath();
-            this.context.moveTo(coords[0][0], coords[0][1]);
-            for (var j=1; j<coords.length; ++j) {
-                this.context.lineTo(coords[j][0], coords[j][1]);
-            }
-
-        this.context.stroke();
-
-        // Reset the alpha value
-        this.context.globalAlpha = 1;
-        this.context.lineJoin = 'round';
     }
 
     // Returns the linewidth
