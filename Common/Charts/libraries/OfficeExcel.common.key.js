@@ -40,16 +40,10 @@
         var gutterLeft   = obj._chartGutter._left;
         var gutterRight  = obj._chartGutter._right;
         var gutterTop    = obj._chartGutter._top;
-        var gutterBottom = obj._chartGutter._bottom;
 
         var hpos        = obj._otherProps._yaxispos == 'right' ? gutterLeft + 10 : OfficeExcel.GetWidth(obj) - gutterRight - 10;
         var vpos        = gutterTop + 10;
         var blob_size   = text_size; // The blob of color
-        var hmargin      = 8; // This is the size of the gaps between the blob of color and the text
-        var vmargin      = 4; // This is the vertical margin of the key
-        var fillstyle    = obj._otherProps._key_background;
-        var strokestyle  = '#333';
-        var height       = 0;
         var width        = 0;
 		var scale = 1;
 		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
@@ -180,29 +174,11 @@
 
         // Draw the box that the key resides in
         context.beginPath();
-            context.fillStyle   = obj._otherProps._key_background;
+            context.fillStyle   = 'white';
             context.strokeStyle = 'black';
         if('radar' == obj.type)
         {
             colors = obj._otherProps._strokecolor
-        }
-        if (arguments[3] != false) {
-
-            context.lineWidth = typeof(obj._otherProps._key_linewidth) == 'number' ? obj._otherProps._key_linewidth : 1;
-
-            // The older square rectangled key
-            if (obj._otherProps._key_rounded == true) {
-                context.beginPath();
-                    context.strokeStyle = strokestyle;
-                    OfficeExcel.strokedCurvyRect(context, AA(this, hpos), AA(this, vpos), width - 5, 5 + ( (text_size + 5) * OfficeExcel.getKeyLength(key)),4);
-        
-                context.stroke();
-                context.fill();
-            } 
-            else if(null != obj._otherProps._key_rounded) {
-                context.strokeRect(AA(this, hpos), AA(this, vpos), width - 5, 5 + ( (text_size + 5) * OfficeExcel.getKeyLength(key)));
-                context.fillRect(AA(this, hpos), AA(this, vpos), width - 5, 5 + ( (text_size + 5) * OfficeExcel.getKeyLength(key)));
-            }
         }
 
         context.beginPath();
@@ -377,22 +353,4 @@
             }
 
         context.fill();
-    }
-    
-    /**
-    * Returns the key length, but accounts for null values
-    * 
-    * @param array key The key elements
-    */
-    OfficeExcel.getKeyLength = function (key)
-    {
-        var len = 0;
-
-        for (var i=0; i<key.length; ++i) {
-            if (key[i] != null) {
-                ++len;
-            }
-        }
-
-        return len;
     }

@@ -1782,19 +1782,3 @@
 			}
 		}
 	}
-
-    /**
-    * This function can be used when the canvas is clicked on (or similar - depending on the event)
-    * to retrieve the relevant Y coordinate for a particular value.
-    * 
-    * @param int value The value to get the Y coordinate for
-    */
-    OfficeExcel.Bar.prototype.getYCoord = function (value)
-    {
-        var yCoord;
-
-        yCoord = ((value - this.min) / (this.max - this.min)) * this.grapharea;
-        yCoord = this.canvas.height - this._chartGutter._bottom - yCoord;
-        
-        return yCoord;
-    }

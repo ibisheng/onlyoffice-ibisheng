@@ -1505,9 +1505,6 @@ function drawChart(chart, arrValues, width, height, options) {
 				bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
 		}
 	}
-		
-	// без рамки
-	bar._otherProps._key_rounded = null;
 
 	if (bar._otherProps._filled != true && bar.type != 'bar' && bar.type != 'hbar' && bar.type != 'pie')
 		bar._otherProps._key_color_shape = 'line';
@@ -1752,8 +1749,6 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 		bar._otherProps._xmax = countGraph.length;
 		bar._otherProps._key_colors = keyColors;
 	}
-	//для того, чтобы не строить рамку вокруг легенды
-	bar._otherProps._key_rounded = null;
 	if (bar._otherProps._filled != true)
 		bar._otherProps._key_color_shape = 'line';
 }
@@ -1769,10 +1764,9 @@ function DrawPieChart(chartCanvas, chartSubType, data, chart) {
 	bar._otherProps._ylabels_count = 'auto';
 	bar._otherProps._colors = ['steelblue', 'IndianRed', 'Silver'];
 	bar._chartGutter._left = 45;
-	bar._chartGutter._right = 90;;
+	bar._chartGutter._right = 90;
 	bar._chartGutter._top = 13;
 	bar._chartGutter._bottom = 30;
-	bar._otherProps._key_rounded = null;
 }
 
 function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
@@ -2056,9 +2050,6 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	}
 	else
 		bar._otherProps._vmargin = (((bar.canvas.height - (bar._chartGutter._top + bar._chartGutter._bottom)) * 0.3) / bar.data.length) / bar.data[0].length;
-
-	//для того, чтобы не строить рамку вокруг легенды
-	bar._otherProps._key_rounded = null;
 }
 
 function findPrevValue(originalData, num, max) {
