@@ -54,7 +54,6 @@
         for (i=0; i<key.length; ++i) {
             width = Math.max(width, context.measureText(key[i]).width);
         }
-        var textWidth = width;
         
         width += 5;
         width += blob_size;

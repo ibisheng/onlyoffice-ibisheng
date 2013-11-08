@@ -78,39 +78,15 @@
                 this.max = this._otherProps._ymax;
                 this.min = this._otherProps._ymin ? this._otherProps._ymin : 0;
 
-                /*this.scale = [
-                              (((this.max - this.min) * (1/5)) + this.min).toFixed(this._otherProps._scale_decimals),
-                              (((this.max - this.min) * (2/5)) + this.min).toFixed(this._otherProps._scale_decimals),
-                              (((this.max - this.min) * (3/5)) + this.min).toFixed(this._otherProps._scale_decimals),
-                              (((this.max - this.min) * (4/5)) + this.min).toFixed(this._otherProps._scale_decimals),
-                              this.max.toFixed(this._otherProps._scale_decimals)
-                             ];*/
-
-                // Check for negative values
-                if (!this._otherProps._outofbounds) {
-                    for (var dataset = 0; dataset < this.data.length; ++dataset) {
-                        for (var datapoint = 0; datapoint < this.data[dataset].length; ++datapoint) {
-                            // Check for negative values
-                            this.hasnegativevalues = (this.data[dataset][datapoint] < 0) || this.hasnegativevalues;
-                        }
+                for (var dataset = 0; dataset < this.data.length; ++dataset) {
+                    for (var datapoint = 0; datapoint < this.data[dataset].length; ++datapoint) {
+                        // Check for negative values
+                        this.hasnegativevalues = (this.data[dataset][datapoint] < 0) || this.hasnegativevalues;
                     }
                 }
-
             } else {
 
                 this.min = this._otherProps._ymin ? this._otherProps._ymin : 0;
-
-                // Work out the max Y value
-                //for (var dataset = 0; dataset < this.data.length; ++dataset) {
-                    //for (var datapoint = 0; datapoint < this.data[dataset].length; ++datapoint) {
-
-                        this.max = max;
-
-                        // Check for negative values
-                        /*if (!this._otherProps._outofbounds)
-                            this.hasnegativevalues = (this.data[dataset][datapoint] < 0) || this.hasnegativevalues;*/
-                    //}
-               // }
 
                 this.scale = OfficeExcel.getScale(Math.abs(parseFloat(this.max)),this,min,max);
                 //this.max   = this.scale[4] ? this.scale[4] : 0;
@@ -958,8 +934,8 @@
 
 
             if (   lineData[i] == null
-                || (this._otherProps._xaxispos == 'bottom' && lineData[i] < this.min && !this._otherProps._outofbounds)
-                ||  (this._otherProps._xaxispos == 'center' && lineData[i] < (-1 * this.max) && !this._otherProps._outofbounds)) {
+                || (this._otherProps._xaxispos == 'bottom' && lineData[i] < this.min)
+                ||  (this._otherProps._xaxispos == 'center' && lineData[i] < (-1 * this.max))) {
 
                 yPos = null;
             }
@@ -1072,7 +1048,7 @@
                     this.context.lineTo(xPos, lineCoords[i - 1][1]);
                 }
 
-                if ((yPos >= this._chartGutter._top && yPos <= (this.canvas.height - this._chartGutter._bottom)) || this._otherProps._outofbounds ) {
+                if (yPos >= this._chartGutter._top && yPos <= (this.canvas.height - this._chartGutter._bottom)) {
 
                     if (isLast && this._otherProps._filled && !this._otherProps._filled_range && this._otherProps._yaxispos == 'right') {
                         xPos -= 1;
@@ -1177,7 +1153,7 @@
     OfficeExcel.Line.prototype.DrawTick = function (lineData, xPos, yPos, color, prevX, prevY, tickmarks, index)
     {
         // If the yPos is null - no tick
-        if ((yPos == null || yPos > (this.canvas.height - this._chartGutter._bottom) || yPos < this._chartGutter._top) && !this._otherProps._outofbounds)
+        if (yPos == null || yPos > (this.canvas.height - this._chartGutter._bottom) || yPos < this._chartGutter._top)
             return;
 
         this.context.beginPath();
@@ -1417,8 +1393,7 @@
             }
 
 
-            if ((
-                   (i == 0 && coords[i])
+            if ((i == 0 && coords[i])
                /*|| (yPos < this._chartGutter._top)
                 || (prevY < this._chartGutter._top)*/
 				|| yPos == ''
@@ -1428,7 +1403,7 @@
                 || (i > 0 && prevY > (height - this._chartGutter._bottom))
                 || prevY == null
                 || penUp == true
-               ) && (!this._otherProps._outofbounds || yPos == null || prevY == null) ) {
+               ) {
 
                 if (OfficeExcel.isOld() && yPos == null) {
                     // ...?

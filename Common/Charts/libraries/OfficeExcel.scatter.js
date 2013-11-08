@@ -1294,8 +1294,6 @@
         var context    = this.context;
         var size       = this._otherProps._labels_above_size;
         var font       = this._otherProps._text_font;
-        var units_pre  = this._otherProps._units_pre;
-        var units_post = this._otherProps._units_post;
 		var bold 	   = this._otherProps._labels_above_bold;
 		var textOptions =
 		{
@@ -1309,8 +1307,7 @@
 
         for (var _set=0; _set<this.coords.length; ++_set) {
             for (var point=0; point<this.coords[_set].length; ++point) {
-                
-                var x_val = this.data[_set][point][0];
+
                 var y_val = this.data[_set][point][1];
                 var formatTrue = format;
 				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[_set] && this.arrFormatAdobeLabels[_set][point] && this.arrFormatAdobeLabels[_set][point][1])

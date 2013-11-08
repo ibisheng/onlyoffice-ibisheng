@@ -15,8 +15,6 @@ OfficeExcel.OtherProps = function()
     this._ymin = 0;
     this._ymax = 0;
 
-    this._outofbounds = false;
-
     this._noaxes = false;
     this._noxaxis = false;
     this._noyaxis = false;
