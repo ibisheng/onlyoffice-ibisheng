@@ -1748,12 +1748,6 @@
                 }
             }
 
-            /*if (obj._otherProps._background_grid_border && obj._otherProps._background_grid_vlines) {
-                // Make sure a rectangle, the same colour as the grid goes around the graph
-                context.strokeStyle = obj._otherProps._background_grid_color;
-                context.strokeRect(AA(this, gutterLeft), AA(this, gutterTop), OfficeExcel.GetWidth(obj) - gutterLeft - gutterRight, OfficeExcel.GetHeight(obj) - gutterTop - gutterBottom);
-            }*/
-
         context.stroke();
 
         context.stroke();

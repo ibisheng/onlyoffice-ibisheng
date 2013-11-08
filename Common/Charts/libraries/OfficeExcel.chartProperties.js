@@ -100,7 +100,6 @@ OfficeExcel.OtherProps = function()
     this._background_grid_vsize = 20;
     this._background_grid_hlines = true;
     this._background_grid_vlines = true;
-    this._background_grid_border = true;
     this._background_grid_autofit = true;
     this._background_grid_autofit_numhlines = 5;
     this._background_grid_autofit_numvlines = 20;
