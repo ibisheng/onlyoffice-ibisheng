@@ -18,18 +18,8 @@
     */
     OfficeExcel.getScale = function (max, obj, minVal, maxVal,yminVal,ymaxVal)
     {
-        /**
-        * Special case for 0
-        */
-        /*if (max == 0 && obj != undefined && obj.type != 'scatter') {
-            return ['0.2', '0.4', '0.6', '0.8', '1.0'];
-        }*/
-
         var original_max = max;
 
-        /**
-        * Manually do decimals
-        */
         var mainObj = obj;
         if(undefined == mainObj)
             mainObj = bar;
@@ -71,8 +61,6 @@
                 }
                 else
                 {
-                    //min = Math.min.apply(null, arrNew);
-                    //max = Math.max.apply(null, arrNew);
 					min = minVal;
                     max = maxVal;
                 }
@@ -143,9 +131,6 @@
                             massRes = OfficeExcel.array_reverse(massRes);
                             mainObj._otherProps._ymax = massRes[massRes.length - 1];
                             mainObj._otherProps._ymin = 0;
-                            /*massRes = [10,20,30,40,50,60,70,80,90,100];
-                            mainObj._otherProps._ymax = 100;
-                            mainObj._otherProps._ymin = 0;*/
                         }
                         else
                         {
@@ -190,13 +175,6 @@
                    
    
                     return OfficeExcel.array_exp(massRes);
-                /*}
-                else if(min < 0 && max < 0)
-                {
-                    
-                }*/
-                
-                
             }
             else if('scatter' == mainObj.type || 'hbar' == mainObj.type)
             {
@@ -255,43 +233,14 @@
                     }
                     else if(undefined != max && true == max)
                     {
-                        /*var arrTemp = []
-                        var k = 0;
-                        for (var j=0; j < mainObj.data.length; j++) {
-                            for (var i=0; i<mainObj.data[j].length; i++)
-                            {
-                                if(typeof(mainObj.data[j][i]) == 'object')
-                                {
-                                    arrTemp[k] = mainObj.data[j][i][0];
-                                    k++;
-                                }
-                            }
-                        }
-                        min = Math.min.apply(null, arrTemp);
-                        max = Math.max.apply(null, arrTemp);*/
 						min  = minVal;
 						max  =  maxVal;
                         trueOX = true;
                     }
                     else
                     {
-                        /*var arrTemp = [];
-                        var k = 0;
-                        for (var j=0; j < mainObj.data.length; j++) {
-                            for (var i=0; i<mainObj.data[j].length; i++)
-                            {
-                                if(typeof(mainObj.data[j][i]) == 'object')
-                                {
-                                    arrTemp[k] = mainObj.data[j][i][1];
-                                    k++;
-                                }
-                            }
-                        }
-                        min = Math.min.apply(null, arrTemp);
-                        max = Math.max.apply(null, arrTemp);*/
 						min = yminVal;
 						max = ymaxVal;
-						
                     }
 					if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
 						return [0,0.2,0.4,0.6,0.8,1,1.2];
@@ -411,7 +360,6 @@
                 }
                 else if(max > 0 && min < 0)
                 {
-                    //mainObj._otherProps._xaxispos = 'center';
                     stepOY = (max + Math.abs(min))/4;
                     axisXMax = max;
                     axisXMin = min;
@@ -425,8 +373,6 @@
                         greaterNull = Math.abs((Math.abs(max) + Math.abs(min)))/6;
                         arrForRealDiff = [1.51515151,3.03030303,7.57575757]
                     }
-                   
-                    //greaterNull = (max - min)/8;
                 }
                 
                 
@@ -506,8 +452,7 @@
 					}
                     
                     greaterNull = greaterNull/greaterNullNum;
-                    //if(axisXMin == 0)
-                    //{
+
                          if(1 < greaterNull && arrForRealDiff[0] >= greaterNull)
                             greaterNull = 1;
                         else if(arrForRealDiff[0] < greaterNull && arrForRealDiff[1] >= greaterNull)
@@ -516,10 +461,8 @@
                             greaterNull = 5;
                         else if(arrForRealDiff[2] < greaterNull && 10 >= greaterNull)
                             greaterNull = 10;
-                   // }
                    
                     greaterNull = greaterNull*greaterNullNum;
-                    //console.log(greaterNull)
                     stepOY = greaterNull;
                 }
                 
@@ -604,29 +547,19 @@
 
                 
                 
-                
-                
-                
                 //возвращаем массив
                 var varMin = axisXMinTest*numPowOY;
                 var massRes = [];
                 var tempKoff = 100000000000;
                 varMin = OfficeExcel.num_round(varMin);
-                /*for (var k=0; k <= 11; k++) {
-                    massRes[k] = varMin + (k)*(stepOY);
-                    if(massRes[k] > axisXMax)
-                    {
-                        break;
-                    }
-                        
-                }*/
+ 
+ 
                 var lengthNum;
                 if(!trueOX)
                 {
                     
                     if(chackBelowNull)
                     {
-                        //varMin = varMin - stepOY;
                         if(min == varMin && !checkIsMaxMin && min != 0 )
                             varMin = varMin - stepOY ;
 						varMin = varMin/degreeNum;
@@ -643,8 +576,6 @@
                             }
                         
                         }
-                        //if(massRes[0] == max)
-                            
                         if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
                             massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
                         
@@ -687,7 +618,6 @@
                 {
                     if(chackBelowNull)
                     {
-                        //varMin = varMin - stepOY;
                         if(min == varMin && !checkIsMaxMin && min != 0)
                             varMin = varMin - stepOY ; 
                         if(undefined != varMin.toString().split('.')[1])
@@ -719,7 +649,6 @@
                         
                         mainObj._otherProps._xmax = -massRes[0];
                         mainObj._otherProps._xmin = -massRes[massRes.length - 1];
-                        //mainObj.max = -massRes[0];
                     }
                     else
                     {
@@ -756,12 +685,7 @@
                         mainObj._otherProps._xmax = massRes[massRes.length - 1];
                         mainObj._otherProps._xmin = massRes[0];
                         mainObj._otherProps._xmax = massRes[massRes.length - 1];
-                //this._otherProps._xmin = xScale[0] - (xScale[1]-xScale[0]);
-                //this.xmin = this._otherProps._ymin;
                     }
-                   
-                    //mainObj._otherProps._ymax = massRes[massRes.length - 1];
-                    //mainObj._otherProps._ymin = massRes[0];
                 }
                 if('hbar' == mainObj.type)
                 {
@@ -810,24 +734,6 @@
                     }
                     else
                     {
-                         /*if(typeof(mainObj.data[0]) == 'object')
-                        {
-                            var arrMin = [];
-                            var arrMax = [];
-                            for (var j=0; j < mainObj.data.length; j++) {
-                                min = Math.min.apply(null, mainObj.data[j]);
-                                max = Math.max.apply(null, mainObj.data[j]);
-                                arrMin[j] = min;
-                                arrMax[j] = max;
-                            }
-                            min = Math.min.apply(null, arrMin);
-                            max = Math.max.apply(null, arrMax);
-                        }
-                        else
-                        {
-                            min = Math.min.apply(null, mainObj.data);
-                            max = Math.max.apply(null, mainObj.data);
-                        }*/
 						min = minVal;
 						max = maxVal;
                     }
@@ -928,16 +834,12 @@
                 }
                 else if(max > 0 && min < 0)
                 {
-                    //mainObj._otherProps._xaxispos = 'center';
                     stepOY = (max + Math.abs(min))/4;
                     axisXMax = max + 0.05 * (max - min);
                     axisXMin = min + 0.05 * (min - max);
                     greaterNull = (Math.abs(max) + Math.abs(min))/6;
                     arrForRealDiff = [1.51515151,3.03030303,7.57575757]
-                    //greaterNull = (max - min)/8;
                 }
-                
-                
                 
                 
                 //приведение к первому порядку для дальнейших вычислений
@@ -1115,10 +1017,7 @@
                         axisXMinTest = OfficeExcel.num_round(axisXMinTest);
                     }
                 }
-
-                
-                
-                
+    
                 
                 
                 //возвращаем массив
@@ -1333,18 +1232,6 @@
 					tmp *= -1; 
 				arr = tmp + "E+" + exp;
 			}
-			/*else if(Math.abs(arr) < minDig && Math.abs(arr) > 0)
-			{
-				var tmp = Math.abs(arr);
-				var exp = 0;
-				while (tmp < 9) {
-					exp += 1;
-					tmp *= 10;
-				}
-				if(arr < 0)
-					tmp *= -1; 
-				arr = tmp + "E-" + exp;
-			}*/
 		}
 		else
 		{
@@ -1365,18 +1252,6 @@
 						tmp *= -1; 
 					arr[i] = tmp + "E+" + exp;
 				}
-				/*else if(Math.abs(arr[i]) < minDig && Math.abs(arr[i]) > 0)
-				{
-					var tmp = Math.abs(arr[i]);
-					var exp = 0;
-					while (tmp < 9) {
-						exp += 1;
-						tmp *= 10;
-					}
-					if(arr[i] < 0)
-						tmp *= -1; 
-					arr[i] = tmp + "E-" + exp;
-				}*/
 			}
 		}
 		return arr;
@@ -1958,118 +1833,6 @@
         }
     }
 
-
-    /**
-    * Draws the title of the graph
-    * 
-    * @param object  canvas The canvas object
-    * @param string  text   The title to write
-    * @param integer gutter The size of the gutter
-    * @param integer        The center X point (optional - if not given it will be generated from the canvas width)
-    * @param integer        Size of the text. If not given it will be 14
-    */
-    OfficeExcel.DrawTitle = function (canvas, text, gutterTop)
-    {
-
-		var obj          = canvas.__object__;
-		if(obj._chartTitle._text == '')
-			return;
-        var context      = canvas.getContext('2d');
-        var gutterLeft   = obj._chartGutter._left;
-        var gutterRight  = obj._chartGutter._right;
-        var gutterBottom = obj._chartGutter._bottom;
-        var size         = arguments[4] ? arguments[4] : 12;
-        var bold         = obj._chartTitle._bold;
-        var centerx      = (arguments[3] ? arguments[3] : ((obj.canvas.width - gutterLeft - gutterRight) / 2) + gutterLeft);
-        var keypos       = obj._otherProps._key_position;
-        var vpos         = obj._chartTitle._vpos;
-        var hpos         = obj._chartTitle._hpos;
-        var bgcolor      = obj._chartTitle._background;
-		var textOptions =
-		{
-			color: obj._chartTitle._color,
-			underline: obj._chartTitle._underline,
-			italic: obj._chartTitle._italic
-		}		
-		
-
-        // Account for 3D effect by faking the key position
-        if (obj.type == 'bar' && obj._otherProps._variant == '3d') {
-            keypos = 'gutter';
-        }
-
-        context.beginPath();
-        context.fillStyle = obj._otherProps._text_color ? obj._otherProps._text_color : 'black';
-
-        /**
-        * Vertically center the text if the key is not present
-        */
-        if (keypos && keypos != 'gutter') {
-            var vCenter = 'center';
-
-        } else if (!keypos) {
-            var vCenter = 'center';
-
-        } else {
-            var vCenter = 'bottom';
-        }
-
-        // if chart title vPos does not equal 0.5, use that
-        if (typeof(vpos) == 'number') {
-            if (obj._otherProps._xaxispos == 'top')
-                vpos = vpos * gutterBottom + gutterTop + (obj.canvas.height - gutterTop - gutterBottom);
-            else
-                vpos = vpos * gutterTop;
-        } else {
-            vpos = gutterTop - size - 5;
-
-            if (obj._otherProps._xaxispos == 'top') {
-                vpos = obj.canvas.height  - gutterBottom + size + 5;
-            }
-        }
-
-        // if chart title hPos is a number, use that. It's multiplied with the (entire) canvas width
-        if (typeof(hpos) == 'number') {
-            centerx = hpos * canvas.width;
-        }
-        
-        // Set the colour
-        if (typeof(obj._chartTitle._color != null)) {
-            var oldColor = context.fillStyle
-            var newColor = obj._chartTitle._color;
-            context.fillStyle = newColor ? newColor : 'black';
-        }
-        
-        /**
-        * Default font is Verdana
-        */
-        var font = obj._otherProps._text_font;
-
-        // Get chat title font
-        if (typeof(obj._chartTitle._font) == 'string')
-            font = obj._chartTitle._font;
-
-        /**
-        * Draw the title itself
-        */
-        if('auto' == obj._otherProps._ylabels_count)
-        {
-            vpos = obj._chartTitle._vpos;
-            vCenter = 'bottom';
-        }
-		var props = calculatePosiitionObjects("title");
-		if(props)
-		{
-			centerx = props.x;
-			vpos = props.y;
-		}
-        OfficeExcel.Text(context, font, size, centerx, vpos, text, null, null, bgcolor != null, null, bgcolor, bold, null, textOptions);
-        
-        // Reset the fill colour
-        context.fillStyle = oldColor;
-    }
-
-
     /**
     * This function returns the mouse position in relation to the canvas
     * 
@@ -2155,121 +1918,6 @@
         if (variant == '3d') {
             context.save();
             context.translate(10, -5);
-        }
-
-        // X axis title
-        if (typeof(obj._xAxisTitle._text) == 'string' && obj._xAxisTitle._text.length) {
-        
-            var size = obj._otherProps._text_size + 2;
-            var font = obj._otherProps._text_font;
-            var bold = obj._xAxisTitle._bold;
-			var textOptions =
-			{
-				color: obj._xAxisTitle._color,
-				underline: obj._xAxisTitle._underline,
-				italic: obj._xAxisTitle._italic
-			}			
-			
-            if (typeof(obj._xAxisTitle._size) == 'number')
-                size = obj._xAxisTitle._size;
-
-            if (typeof(obj._xAxisTitle._font) == 'string')
-                font = obj._xAxisTitle._font;
-            
-            var hpos = ((obj.canvas.width - obj._chartGutter._left - obj._chartGutter._right) / 2) + obj._chartGutter._left;
-            var vpos = obj.canvas.height - obj._chartGutter._bottom + 25;
-            
-            if (typeof(obj._xAxisTitle._vpos) == 'number') {
-                vpos = obj.canvas.height - (gutterBottom * obj._xAxisTitle._vpos);
-            }
-            if (obj._xAxisTitle._vpos != 'null')
-                vpos = obj._xAxisTitle._vpos
-            if (obj._xAxisTitle._hpos != 'null')
-                hpos = obj._xAxisTitle._hpos
-			var props = calculatePosiitionObjects("xAxisTitle");
-			hpos = props.x;
-			vpos = props.y;
-            context.beginPath();
-            OfficeExcel.Text(context,
-                        font,
-                        size,
-                        hpos,
-                        vpos,
-                        obj._xAxisTitle._text,
-                        null,
-                        null,
-                        false,
-                        false,
-                        false,
-                        bold,
-						null,
-						textOptions);
-            context.fill();
-        }
-
-        // Y axis title
-        if (typeof(obj._yAxisTitle._text) == 'string' && obj._yAxisTitle._text.length) {
-
-            var size            = obj._otherProps._text_size + 2;
-            var font            = obj._otherProps._text_font;
-            var angle           = 270;
-            var bold = obj._yAxisTitle._bold;
-			var textOptions =
-			{
-				color: obj._yAxisTitle._color,
-				underline: obj._yAxisTitle._underline,
-				italic: obj._yAxisTitle._italic
-			}			
-			
-            var hpos;
-            var vpos = ((obj.canvas.height - obj._chartGutter._top - obj._chartGutter._bottom) / 2) + obj._chartGutter._top;
-
-            if (typeof(obj._yAxisTitle._hpos) == 'number') {
-                hpos = obj._yAxisTitle._hpos * obj._chartGutter._left;
-            } else {
-                hpos = ((obj._chartGutter._left - 25) / obj._chartGutter._left) * obj._chartGutter._left;
-            }
-
-            if (typeof(obj._yAxisTitle._size) == 'number')
-                size = obj._yAxisTitle._size;
-
-            if (typeof(obj._yAxisTitle._font) == 'string')
-                font = obj._yAxisTitle._font;
-
-            if (obj._otherProps._title_yaxis_align == 'right' || obj._otherProps._title_yaxis_position == 'right') {
-                angle = 90;
-                hpos = obj._yAxisTitle._hpos ? obj._yAxisTitle._hpos * obj._chartGutter._right :
-                                                                     obj.canvas.width - obj._chartGutter._right + obj._otherProps._text_size + 5;
-            } else
-                hpos = hpos;
-			
-            if(obj._yAxisTitle._angle != 'null' && obj._yAxisTitle._angle != undefined)
-                angle = obj._yAxisTitle._angle;
-            if (obj._yAxisTitle._vpos != 'null')
-                vpos = obj._yAxisTitle._vpos;
-            if (obj._yAxisTitle._hpos != 'null')
-                hpos = obj._yAxisTitle._hpos;
-			
-			var props = calculatePosiitionObjects("yAxisTitle");
-			hpos = props.x;
-			vpos = props.y;
-			
-            context.beginPath();
-            OfficeExcel.Text(context,
-                font,
-                size,
-                hpos,
-                vpos,
-                obj._yAxisTitle._text,
-                'center',
-                null,//change with center
-                false,
-                angle,
-                false,
-                bold,
-				null,
-				textOptions);
-            context.fill();
         }
 
         obj.context.beginPath();
@@ -2398,20 +2046,6 @@
         // If it's a bar and 3D variant, translate
         if (variant == '3d') {
             context.restore();
-        }
-
-        // Draw the title if one is set
-        if ( typeof(obj._chartTitle._text) == 'string' && obj._chartTitle._text != '') {
-
-            if (obj.type == 'gantt') {
-                gutterTop -= 10;
-            }
-
-            OfficeExcel.DrawTitle(canvas,
-                obj._chartTitle._text,
-                gutterTop,
-                null,
-                obj._chartTitle._size ? obj._chartTitle._size : obj._otherProps._text_size + 2);
         }
 
         context.stroke();

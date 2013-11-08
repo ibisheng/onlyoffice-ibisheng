@@ -83,15 +83,6 @@
         
         //Draw Area
         OfficeExcel.background.DrawArea(this);
-        /**
-        * Draw the title
-        */
-
-        OfficeExcel.DrawTitle(this.canvas,
-            this._chartTitle._text,
-            (this.canvas.height / 2) - this.radius - 5,
-            this.centerx,
-            this._chartTitle._size ? this._chartTitle._size : this._otherProps._text_size + 2);
 
         /**
         * The total of the array of values
