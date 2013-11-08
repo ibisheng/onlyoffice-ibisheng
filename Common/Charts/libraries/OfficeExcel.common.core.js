@@ -1120,7 +1120,7 @@
                 return [0.2,0.4,0.6,0.8, Number(1).toFixed(1)];
 
             } else if (max >= 0.1) {
-                return obj._otherProps._scale_round ? [0.2,0.4,0.6,0.8,1] : [0.1,0.2,0.3,0.4,0.5];
+                return [0.1,0.2,0.3,0.4,0.5];
 
             } else {
 
@@ -1163,13 +1163,6 @@
         // Custom if the max is greater than 5 and less than 10
         if (max < 10) {
             topValue = (Number(original_max) <= 5 ? 5 : 10);
-        }
-        
-        /**
-        * Added 02/11/2010 to create "nicer" scales
-        */
-        if (obj && typeof(obj._otherProps._scale_round) == 'boolean' && obj._otherProps._scale_round) {
-            topValue = 10 * interval;
         }
 
         return [topValue * 0.2, topValue * 0.4, topValue * 0.6, topValue * 0.8, topValue];

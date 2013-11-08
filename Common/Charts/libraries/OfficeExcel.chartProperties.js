@@ -37,8 +37,7 @@ OfficeExcel.OtherProps = function()
 
     this._units_pre = '';
     this._units_post = '';
-
-    this._scale_round = false;
+	
     this._scale_decimals = 0;
     this._scale_point = '.';
     this._scale_thousand = ',';
