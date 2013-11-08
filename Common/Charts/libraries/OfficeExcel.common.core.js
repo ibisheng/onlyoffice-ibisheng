@@ -1110,9 +1110,6 @@
                 }
                 return OfficeExcel.array_exp(massRes);
             }
-          
-            
-            
         }
         
         if (max <= 1) {
@@ -1461,14 +1458,8 @@
         }
     }
 
-    /**
-    * This function draws the background for the bar chart, line chart and scatter chart.
-    * 
-    * @param  object obj The graph object
-    */
     OfficeExcel.background.Draw = function (obj)
     {
-        var canvas       = obj.canvas;
         var context      = obj.context;
         var height       = 0;
         var gutterLeft   = obj._chartGutter._left;
@@ -1504,28 +1495,6 @@
             // If autofit is specified, use the .numhlines and .numvlines along with the width to work
             // out the hsize and vsize
             if (obj._otherProps._background_grid_autofit) {
-
-                /**
-                * Align the grid to the tickmarks
-                */
-                if (obj._otherProps._background_grid_autofit_align) {
-                    // Align the horizontal lines
-                    obj._otherProps._background_grid_autofit_numhlines = obj._otherProps._ylabels_count;
-
-                    // Align the vertical lines for the line
-                    if (obj.type == 'line') {
-                        if (obj._otherProps._labels && obj._otherProps._labels.length) {
-                            obj._otherProps._background_grid_autofit_numvlines = obj._otherProps._labels.length - 1;
-                        } else {
-                            obj._otherProps._background_grid_autofit_numvlines = obj.data[0].length - 1;
-                        }
-
-                    // Align the vertical lines for the bar
-                    } else if (obj.type == 'bar' && obj._otherProps._labels && obj._otherProps._labels.length) {
-                        obj._otherProps._background_grid_autofit_numvlines = obj._otherProps._labels.length;
-                    }
-                }
-
                 var vsize = ((obj.canvas.width - gutterLeft - gutterRight)) / obj._otherProps._background_grid_autofit_numvlines;
                 var hsize = (obj.canvas.height - gutterTop - gutterBottom) / (obj._otherProps._background_grid_autofit_numhlines);
 				if(vsize > -1 && vsize < 1)
@@ -1542,13 +1511,7 @@
 
             // Draw the horizontal lines
             if (obj._otherProps._background_grid_hlines) {
-                height = (OfficeExcel.GetHeight(obj) - gutterBottom - gutterTop)
-                //for (y = gutterTop; y <= (height + gutterTop); y+=obj._otherProps._background_grid_hsize) {
-                    /*for (n = y; n < y + obj._otherProps._background_grid_hsize; n+=(obj._otherProps._background_grid_hsize/5)) {
-                        context.moveTo(gutterLeft, AA(this, n));
-                        context.lineTo(OfficeExcel.GetWidth(obj) - gutterRight, AA(this,n));
-                    }*/
-                height = (OfficeExcel.GetHeight(obj) - gutterBottom - gutterTop)
+                height = (OfficeExcel.GetHeight(obj) - gutterBottom - gutterTop);
                 for (y = gutterTop; y <= height + gutterTop + 1; y+=obj._otherProps._background_grid_hsize) {
 					if((y + obj._otherProps._background_grid_hsize) > (height + gutterTop + 1))
 					{
@@ -1564,14 +1527,6 @@
 					}
                 
                 }
-           // }
-            /*if (obj._otherProps._background_grid_hlines) {
-                height = (OfficeExcel.GetHeight(obj) - gutterBottom)
-                for (y=gutterTop; y<height; y+=obj._otherProps._background_grid_hsize) {
-                    context.moveTo(gutterLeft, AA(this, y));
-                    context.lineTo(OfficeExcel.GetWidth(obj) - gutterRight, AA(this, y));
-                }
-            }*/
         }
             
             
@@ -1594,42 +1549,6 @@
             }
 
         context.stroke();
-
-        context.stroke();
-        
-        if(obj._otherProps._background_grid_hlines_interim)
-        {
-            var n = 0;
-            context.strokeStyle = obj._otherProps._background_grid_hlines_interim_color;
-            for (y = gutterTop; y < (height + gutterTop); y+=(obj._otherProps._background_grid_hsize/5)) {
-            
-                if(n%5 != 0 && n != 0)
-                {
-                    context.moveTo(gutterLeft, AA(this, y));
-                    context.lineTo(OfficeExcel.GetWidth(obj) - gutterRight, AA(this, y));
-                    context.stroke();
-                }
-                n++;
-            }
-            context.stroke();
-        }
-        
-  
-         if(obj._otherProps._background_grid_vlines_interim)
-        {
-            var n = 0;
-            context.strokeStyle = obj._otherProps._background_grid_vlines_interim_color;
-            var width = (obj.canvas.width - gutterRight)
-            for (x=gutterLeft; x < width + gutterLeft; x+=obj._otherProps._background_grid_vsize/2) {
-                if(n%2 != 0 && n != 0)
-                {
-                    context.moveTo(AA(this, x), gutterTop);
-                    context.lineTo(AA(this, x), obj.canvas.height - gutterBottom);
-                }
-                n++;
-            }
-            context.stroke();
-        }
         }
     }
 

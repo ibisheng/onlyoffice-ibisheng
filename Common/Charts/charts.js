@@ -1863,9 +1863,6 @@ function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 		bar._otherProps._type = 'accumulative';
 	if (bar._otherProps._autoGrouping == 'stackedPer') {
 		for (var j = 0; j < (data.length); j++) {
-			var maxVal = 0;
-			var minVal = 0;
-
 			var summ = 0;
 			for (var i = 0; i < data[j].length; i++) {
 				summ += Math.abs(data[j][i]);
@@ -1958,7 +1955,6 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 		}
 
 		var tempData = data;
-		var firstData = data;
 
 		for (var j = 0; j < (data.length); j++) {
 			for (var i = 0; i < (data[j].length); i++) {

@@ -49,98 +49,45 @@
         // Reset the maximum value
         this.max = 0;
 
-        // Work out the maximum Y value
-        if (this._otherProps._ymax && 'auto' != this._otherProps._ylabels_count) {
+        var i = 0;
+        var j = 0;
+        if('auto' == this._otherProps._ylabels_count && undefined != this._otherProps._ymax)
+            this.max = this._otherProps._ymax;
+        else
+        {
+             for (i=0; i<this.data.length; ++i) {
+                for (j=0; j<this.data[i].length; ++j) {
+                    this.max = Math.max(this.max, typeof(this.data[i][j][1]) == 'object' ? OfficeExcel.array_max(this.data[i][j][1]) : Math.abs(this.data[i][j][1]));
+                }
+            }
+        }
 
-            this.scale = [];
-            this.max   = this._otherProps._ymax;
-            this.min   = this._otherProps._ymin ? this._otherProps._ymin : 0;
-
-            this.scale[0] = ((this.max - this.min) * (1/5)) + this.min;
-            this.scale[1] = ((this.max - this.min) * (2/5)) + this.min;
-            this.scale[2] = ((this.max - this.min) * (3/5)) + this.min;
-            this.scale[3] = ((this.max - this.min) * (4/5)) + this.min;
-            this.scale[4] = ((this.max - this.min) * (5/5)) + this.min;
-
-            var decimals = this._otherProps._scale_decimals;
-
-            this.scale = [
-                          Number(this.scale[0]).toFixed(decimals),
-                          Number(this.scale[1]).toFixed(decimals),
-                          Number(this.scale[2]).toFixed(decimals),
-                          Number(this.scale[3]).toFixed(decimals),
-                          Number(this.scale[4]).toFixed(decimals)
-                         ];
-
-        } else {
-
-            var i = 0;
-            var j = 0;
-            if('auto' == this._otherProps._ylabels_count && undefined != this._otherProps._ymax)
-                this.max = this._otherProps._ymax;
+        if(this.scale == undefined)
+            this.scale = OfficeExcel.getScale(this.max, this);
+        if('auto' == this._otherProps._ylabels_count)
+        {
+            var lengSc = this.scale.length;
+            //this.max = this.scale[lengSc -1];
+            //this.min = this._otherProps._ymin;
+            this._otherProps._background_grid_autofit_numhlines = lengSc-1;
+            this._otherProps._numyticks = lengSc -1;
+            var conX = true;
+            if(this._otherProps._type == 'burse2')
+                xScale = this._otherProps._labels;
             else
             {
-                 for (i=0; i<this.data.length; ++i) {
-                    for (j=0; j<this.data[i].length; ++j) {
-                        this.max = Math.max(this.max, typeof(this.data[i][j][1]) == 'object' ? OfficeExcel.array_max(this.data[i][j][1]) : Math.abs(this.data[i][j][1]));
-                    }
-                }
-            }
-           
-            if(this.scale == undefined)
-                this.scale = OfficeExcel.getScale(this.max, this);
-            if('auto' == this._otherProps._ylabels_count)
-            {
-                var lengSc = this.scale.length;
-                //this.max = this.scale[lengSc -1];
-                //this.min = this._otherProps._ymin;
-                this._otherProps._background_grid_autofit_numhlines = lengSc-1;
-                this._otherProps._numyticks = lengSc -1;
-                var conX = true;
-                if(this._otherProps._type == 'burse2')
-                    xScale = this._otherProps._labels;
+                if(this.xScale == undefined)
+                    xScale = OfficeExcel.getScale(conX, this);
                 else
-                {
-                    if(this.xScale == undefined)
-                        xScale = OfficeExcel.getScale(conX, this);
-                    else
-                        xScale = this.xScale;
-                }
-                    
-                this.xScale = xScale;
-                if(this._otherProps._type == 'burse2')
-                    this._otherProps._background_grid_autofit_numvlines = xScale.length;
-                else
-                    this._otherProps._background_grid_autofit_numvlines = xScale.length - 1;
-                this._otherProps._numxticks = xScale.length;
+                    xScale = this.xScale;
             }
+
+            this.xScale = xScale;
+            if(this._otherProps._type == 'burse2')
+                this._otherProps._background_grid_autofit_numvlines = xScale.length;
             else
-            {
-                this.max   = this.scale[4];
-                this.min   = this._otherProps._ymin ? this._otherProps._ymin : 0;
-
-                if (this.min) {
-                    this.scale[0] = ((this.max - this.min) * (1/5)) + this.min;
-                    this.scale[1] = ((this.max - this.min) * (2/5)) + this.min;
-                    this.scale[2] = ((this.max - this.min) * (3/5)) + this.min;
-                    this.scale[3] = ((this.max - this.min) * (4/5)) + this.min;
-                    this.scale[4] = ((this.max - this.min) * (5/5)) + this.min;
-                }
-
-
-                if (typeof(this._otherProps._scale_decimals) == 'number') {
-                    var decimals = this._otherProps._scale_decimals;
-        
-                    this.scale = [
-                                  Number(this.scale[0]).toFixed(decimals),
-                                  Number(this.scale[1]).toFixed(decimals),
-                                  Number(this.scale[2]).toFixed(decimals),
-                                  Number(this.scale[3]).toFixed(decimals),
-                                  Number(this.scale[4]).toFixed(decimals)
-                                 ];
-                }
-            }
-            
+                this._otherProps._background_grid_autofit_numvlines = xScale.length - 1;
+            this._otherProps._numxticks = xScale.length;
         }
 
         this.grapharea = this.canvas.height - this._chartGutter._top - this._chartGutter._bottom;
@@ -270,13 +217,6 @@
 					//context.moveTo(this._chartGutter._left, AA(this, this.canvas.height - this._chartGutter._bottom - nullPosition));
 					//context.lineTo(this.canvas.width - this._chartGutter._right, AA(this, this.canvas.height - this._chartGutter._bottom - nullPosition));
 			}
-			else if (this._otherProps._yaxispos == 'left') {
-				context.moveTo(AA(this, this._chartGutter._left), this._chartGutter._top);
-				context.lineTo(AA(this, this._chartGutter._left), OfficeExcel.GetHeight(this) - this._chartGutter._bottom);
-			} else {
-				context.moveTo(AA(this, OfficeExcel.GetWidth(this) - this._chartGutter._right), this._chartGutter._top);
-				context.lineTo(AA(this, OfficeExcel.GetWidth(this) - this._chartGutter._right), OfficeExcel.GetHeight(this) - this._chartGutter._bottom);
-			}
 		}
 
         // Draw the X axis
@@ -336,11 +276,6 @@
 					context.moveTo(this._chartGutter._left, AA(this, this.canvas.height - this._chartGutter._bottom - nullPosition));
 					context.lineTo(this.canvas.width - this._chartGutter._right, AA(this, this.canvas.height - this._chartGutter._bottom - nullPosition));
 					this.nullPositionOY = this.canvas.height - this._chartGutter._bottom - nullPosition;
-				}
-				else 
-				{
-					context.moveTo(this._chartGutter._left, AA(this, this.canvas.height - this._chartGutter._bottom));
-					context.lineTo(this.canvas.width - this._chartGutter._right, AA(this, this.canvas.height - this._chartGutter._bottom));
 				}
 			}
 		}
@@ -427,60 +362,12 @@
 			}
 
             if (this._otherProps._xaxispos == 'center') {
-
-
-                /**
-                * Specific Y labels
-                */
-                 if('auto' == numYLabels)
+                if('auto' == numYLabels)
                 {
                      for (var i=0; i<this.scale.length; ++i) {
                         OfficeExcel.Text(context,font,text_size,this.nullPositionOX - 10,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText(this.scale[this.scale.length -1 - i],isformatCellScOy),null,align,bounding,null,bgcolor, bold, null, textOptions);
                     }
                 }
-                else
-                {
-                    if (numYLabels == 1 || numYLabels == 3 || numYLabels == 5) {
-                        // Draw the top halves labels
-                        OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                        
-                        
-                        if (numYLabels >= 5) {
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (1/10) ), OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (3/10) ), OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
-                        }
-            
-                        if (numYLabels >= 3) {
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (2/10) ), OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (4/10) ), OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                        }
-                        
-                        // Draw the bottom halves labels
-                        if (numYLabels >= 3) {
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (1/10) ) + this.halfGraphHeight, '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (3/10) ) + this.halfGraphHeight, '-' + OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                        }
-            
-                        if (numYLabels == 5) {
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (2/10) ) + this.halfGraphHeight, '-' + OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) * (4/10) ) + this.halfGraphHeight, '-' + OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                        }
-            
-                        OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (5/10) ) + this.halfGraphHeight, '-' + OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                    
-                    } else if (numYLabels == 10) {
-                        // 10 Y labels
-                        var interval = (this.grapharea / numYLabels) / 2;
-                    
-                        for (var i=0; i<numYLabels; ++i) {
-                            OfficeExcel.Text(context, font, text_size, xPos,this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (i/20) ),OfficeExcel.number_format(this,(this.max - (this.max * (i/10))).toFixed(this._otherProps._scale_decimals),units_pre, units_post),'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos,this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (i/20) ) + (this.grapharea / 2) + (this.grapharea / 20),'-' + OfficeExcel.number_format(this, ((this.max * (i/10)) + (this.max * (1/10))).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                        }
-
-                    }
-        
-                }
-
             } 
             else if (this._otherProps._xaxispos == 'top' && 'auto' == numYLabels)
             {
@@ -520,32 +407,6 @@
                          //OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (4/5) ), this.scale[this.scale.length -1 - i], 'center', align, boxed);
                     }
                 }
-                else
-                {
-                    if (numYLabels == 1 || numYLabels == 3 || numYLabels == 5) {
-                        OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
-            
-                        if (numYLabels >= 5) {
-							OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (1/5) ), OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-                            OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (3/5) ), OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-						}
-            
-                        if (numYLabels >= 3) {
-							OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (2/5) ), OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-							OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (4/5) ), OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
-						}
-                    } else if (numYLabels == 10) {
-                    	// 10 Y labels
-                    	for (var i=0; i<numYLabels; ++i) {
-							OfficeExcel.Text(context, font, text_size, xPos,this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (i/10) ),OfficeExcel.number_format(this, (this.max - ((this.max - this.min) * (i/10))).toFixed((this._otherProps._scale_decimals)), units_pre, units_post),'center', align, boxed, null, bold, null, textOptions);
-						}
-                    }
-                    
-                    if (this._otherProps._ymin) {
-                        OfficeExcel.Text(context, font, text_size, xPos, this.canvas.height - this._chartGutter._bottom,OfficeExcel.number_format(this, this._otherProps._ymin.toFixed(this._otherProps._scale_decimals), units_pre, units_post),'center', align, boxed, null, bold, null, textOptions);
-                    }
-                }
-
             }
         }
 

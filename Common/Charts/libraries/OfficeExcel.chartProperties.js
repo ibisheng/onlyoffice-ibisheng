@@ -55,7 +55,7 @@ OfficeExcel.OtherProps = function()
     this._xlabels = true;
 
     this._ylabels = true;
-    this._ylabels_count = 5;
+    this._ylabels_count = 'auto';
 
     this._labels = [];
     this._labels_above = false;
@@ -73,7 +73,6 @@ OfficeExcel.OtherProps = function()
     this._background_grid_autofit = true;
     this._background_grid_autofit_numhlines = 5;
     this._background_grid_autofit_numvlines = 20;
-    this._background_grid_autofit_align = false;
     this._background_vbars = null;
     this._background_hbars = null;
 
@@ -87,11 +86,8 @@ OfficeExcel.OtherProps = function()
 
     this._fillstyle = null;
 
-    this._smallxticks = 3;
-    this._largexticks = 5;
     this._smallyticks = 3;
     this._ticksize = 3;
-    this._tickdirection = -1;
 
     this._tickmarks = null; // can be reverse
     this._tickmarks_dot_color = 'white';
