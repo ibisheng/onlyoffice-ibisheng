@@ -179,10 +179,6 @@
         
         //Draw Area
 		OfficeExcel.background.DrawArea(this);
-        
-        // Draw 3D
-        if (this._otherProps._variant == '3d')
-            OfficeExcel.Draw3DAxes(this);
 
         // Progressively Draw the chart
         OfficeExcel.background.Draw (this);

@@ -1777,15 +1777,8 @@
         var gutterRight  = obj._chartGutter._right;
         var gutterTop    = obj._chartGutter._top;
         var gutterBottom = obj._chartGutter._bottom;
-        var variant      = obj._otherProps._variant;
         
         context.fillStyle = obj._otherProps._text_color;
-        
-        // If it's a bar and 3D variant, translate
-        if (variant == '3d') {
-            context.save();
-            context.translate(10, -5);
-        }
 
         obj.context.beginPath();
 
@@ -1909,11 +1902,6 @@
             }*/
 
         context.stroke();
-
-        // If it's a bar and 3D variant, translate
-        if (variant == '3d') {
-            context.restore();
-        }
 
         context.stroke();
         
@@ -2337,46 +2325,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
                 }
             }
         }
-    }
-
-
-    /**
-    * Draws the3D axes/background
-    */
-    OfficeExcel.Draw3DAxes = function (obj)
-    {
-        var gutterLeft    = obj._chartGutter._left;
-        var gutterRight   = obj._chartGutter._right;
-        var gutterTop     = obj._chartGutter._top;
-        var gutterBottom  = obj._chartGutter._bottom;
-
-        var context = obj.context;
-        var canvas  = obj.canvas;
-
-        context.strokeStyle = '#aaa';
-        context.fillStyle = '#ddd';
-
-        // Draw the vertical left side
-        context.beginPath();
-            context.moveTo(gutterLeft, gutterTop);
-            context.lineTo(gutterLeft + 10, gutterTop - 5);
-            context.lineTo(gutterLeft + 10, canvas.height - gutterBottom - 5);
-            context.lineTo(gutterLeft, canvas.height - gutterBottom);
-        context.closePath();
-        
-        context.stroke();
-        context.fill();
-
-        // Draw the bottom floor
-        context.beginPath();
-            context.moveTo(gutterLeft, canvas.height - gutterBottom);
-            context.lineTo(gutterLeft + 10, canvas.height - gutterBottom - 5);
-            context.lineTo(canvas.width - gutterRight + 10,  canvas.height - gutterBottom - 5);
-            context.lineTo(canvas.width - gutterRight, canvas.height - gutterBottom);
-        context.closePath();
-        
-        context.stroke();
-        context.fill();
     }
 
     // Compatibility canvas browser

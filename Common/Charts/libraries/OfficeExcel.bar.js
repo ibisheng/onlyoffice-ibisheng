@@ -469,13 +469,6 @@
         }
 
         var variant = this._otherProps._variant;
-        
-        /**
-        * Draw the 3D axes is necessary
-        */
-        if (variant == '3d') {
-            OfficeExcel.Draw3DAxes(this);
-        }
 
         /**
         * Get the variant once, and draw the bars, be they regular, stacked or grouped
@@ -599,68 +592,10 @@
                         this.context.stroke();
 
                     // Regular bar
-                    } else if (variant == 'bar' || variant == '3d' || variant == 'bevel') {
+                    } else if (variant == 'bar') {
                     
                         this.context.strokeRect(x + hmargin, y, barWidth, height);
                         this.context.fillRect(x + hmargin, y, barWidth, height);
-
-                        // 3D effect
-                        if (variant == '3d') {
-
-                            var prevStrokeStyle = this.context.strokeStyle;
-                            var prevFillStyle   = this.context.fillStyle;
-
-                            // Draw the top
-                            this.context.beginPath();
-                                this.context.moveTo(x + hmargin, y);
-                                this.context.lineTo(x + hmargin + 10, y - 5);
-                                this.context.lineTo(x + hmargin + 10 + barWidth, y - 5);
-                                this.context.lineTo(x + hmargin + barWidth, y);
-                            this.context.closePath();
-
-                            this.context.stroke();
-                            this.context.fill();
-
-                            // Draw the right hand side
-                            this.context.beginPath();
-                                this.context.moveTo(x + hmargin + barWidth, y);
-                                this.context.lineTo(x + hmargin + barWidth + 10, y - 5);
-                                this.context.lineTo(x + hmargin + barWidth + 10, y + height - 5);
-                                this.context.lineTo(x + hmargin + barWidth, y + height);
-                            this.context.closePath();
-    
-                            this.context.stroke();                        
-                            this.context.fill();
-
-                            // Draw the darker top section
-                            this.context.beginPath();                            
-                                this.context.fillStyle = 'rgba(255,255,255,0.3)';
-                                this.context.moveTo(x + hmargin, y);
-                                this.context.lineTo(x + hmargin + 10, y - 5);
-                                this.context.lineTo(x + hmargin + 10 + barWidth, y - 5);
-                                this.context.lineTo(x + hmargin + barWidth, y);
-                                this.context.lineTo(x + hmargin, y);
-                            this.context.closePath();
-    
-                            this.context.stroke();
-                            this.context.fill();
-
-                            // Draw the darker right side section
-                            this.context.beginPath();
-                                this.context.fillStyle = 'rgba(0,0,0,0.4)';
-                                this.context.moveTo(x + hmargin + barWidth, y);
-                                this.context.lineTo(x + hmargin + barWidth + 10, y - 5);
-                                this.context.lineTo(x + hmargin + barWidth + 10, y - 5 + height);
-                                this.context.lineTo(x + hmargin + barWidth, y + height);
-                                this.context.lineTo(x + hmargin + barWidth, y);
-                            this.context.closePath();
-
-                            this.context.stroke();
-                            this.context.fill();
-
-                            this.context.strokeStyle = prevStrokeStyle;
-                            this.context.fillStyle   = prevFillStyle;
-                        }
 
                         // This bit draws the text labels that appear above the bars if requested
                         if (this._otherProps._labels_above) {
@@ -673,11 +608,6 @@
 
                             if (this._otherProps._xaxispos == 'top') {
                                 yPos = this._chartGutter._top + height + 6 + (typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 4);
-                            }
-
-                            // Account for variant=3d
-                            if (this._otherProps._variant == '3d') {
-                                yPos -= 5;
                             }
 
                             this.context.fillStyle = this._otherProps._text_color;
@@ -847,69 +777,6 @@
                             var startX = x;
                         }
 
-                        /**
-                        * Stacked 3D effect
-                        */
-                        if (variant == '3d') {
-
-                            var prevFillStyle = this.context.fillStyle;
-                            var prevStrokeStyle = this.context.strokeStyle;
-
-    
-                            // Draw the top side
-                            if (j == 0) {
-                                this.context.beginPath();
-                                    this.context.moveTo(startX + hmargin, y);
-                                    this.context.lineTo(startX + 10 + hmargin, y - 5);
-                                    this.context.lineTo(startX + 10 + barWidth + hmargin, y - 5);
-                                    this.context.lineTo(startX + barWidth + hmargin, y);
-                                this.context.closePath();
-                                
-                                this.context.fill();
-                                this.context.stroke();
-                            }
-
-                            // Draw the side section
-                            this.context.beginPath();
-                                this.context.moveTo(startX + barWidth + hmargin, y);
-                                this.context.lineTo(startX + barWidth + hmargin + 10, y - 5);
-                                this.context.lineTo(startX + barWidth + + hmargin + 10, y - 5 + height);
-                                this.context.lineTo(startX + barWidth + hmargin , y + height);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-
-                            // Draw the darker top side
-                            if (j == 0) {
-                                this.context.fillStyle = 'rgba(255,255,255,0.3)';
-                                this.context.beginPath();
-                                    this.context.moveTo(startX + hmargin, y);
-                                    this.context.lineTo(startX + 10 + hmargin, y - 5);
-                                    this.context.lineTo(startX + 10 + barWidth + hmargin, y - 5);
-                                    this.context.lineTo(startX + barWidth + hmargin, y);
-                                this.context.closePath();
-                                
-                                this.context.fill();
-                                this.context.stroke();
-                            }
-
-                            // Draw the darker side section
-                            this.context.fillStyle = 'rgba(0,0,0,0.4)';
-                            this.context.beginPath();
-                                this.context.moveTo(startX + barWidth + hmargin, y);
-                                this.context.lineTo(startX + barWidth + hmargin + 10, y - 5);
-                                this.context.lineTo(startX + barWidth + + hmargin + 10, y - 5 + height);
-                                this.context.lineTo(startX + barWidth + hmargin , y + height);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-
-                            this.context.strokeStyle = prevStrokeStyle;
-                            this.context.fillStyle = prevFillStyle;
-                        }
-
                         y += height;
                     }
 
@@ -921,7 +788,7 @@
                                     this._otherProps._labels_above_font,
                                     typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,
                                     startX + (barWidth / 2) + this._otherProps._hmargin,
-                                    startY - 4 - (this._otherProps._variant == '3d' ? 5 : 0),
+                                    startY - 4,
                                     String(this._otherProps._units_pre + OfficeExcel.array_sum(this.data[i]).toFixed(this._otherProps._labels_above_decimals) + this._otherProps._units_post),
                                     this._otherProps._labels_above_angle ? 'bottom' : null,
                                     this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
@@ -1037,67 +904,6 @@
                             this.context.fillRect(startX, startY, individualBarWidth, height);
                         }
                         y += height;
-
-
-
-                        /**
-                        * Grouped 3D effect
-                        */
-                        if (variant == '3d') {
-                            var prevFillStyle = this.context.fillStyle;
-                            var prevStrokeStyle = this.context.strokeStyle;
-                            
-                            // Draw the top side
-                            this.context.beginPath();
-                                this.context.moveTo(startX, startY);
-                                this.context.lineTo(startX + 10, startY - 5);
-                                this.context.lineTo(startX + 10 + individualBarWidth, startY - 5);
-                                this.context.lineTo(startX + individualBarWidth, startY);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-                            
-                            // Draw the side section
-                            this.context.beginPath();
-                                this.context.moveTo(startX + individualBarWidth, startY);
-                                this.context.lineTo(startX + individualBarWidth + 10, startY - 5);
-                                this.context.lineTo(startX + individualBarWidth + 10, startY - 5 + height);
-                                this.context.lineTo(startX + individualBarWidth , startY + height);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-
-
-                            // Draw the darker top side
-                            this.context.fillStyle = 'rgba(255,255,255,0.3)';
-                            this.context.beginPath();
-                                this.context.moveTo(startX, startY);
-                                this.context.lineTo(startX + 10, startY - 5);
-                                this.context.lineTo(startX + 10 + individualBarWidth, startY - 5);
-                                this.context.lineTo(startX + individualBarWidth, startY);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-                            
-                            // Draw the darker side section
-                            this.context.fillStyle = 'rgba(0,0,0,0.4)';
-                            this.context.beginPath();
-                                this.context.moveTo(startX + individualBarWidth, startY);
-                                this.context.lineTo(startX + individualBarWidth + 10, startY - 5);
-                                this.context.lineTo(startX + individualBarWidth + 10, startY - 5 + height);
-                                this.context.lineTo(startX + individualBarWidth , startY + height);
-                            this.context.closePath();
-                            
-                            this.context.fill();
-                            this.context.stroke();
-
-                            this.context.strokeStyle = prevStrokeStyle;
-                            this.context.fillStyle   = prevFillStyle;
-                        }
-
 						
 						var formatCellTrue = formatCell;
 						if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i])
@@ -1693,7 +1499,7 @@
 				OfficeExcel.Text(this.context,
 							this._otherProps._labels_above_font,
 							typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
-							startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
+							startY - 2,
 							//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
 							value,
 							null,
