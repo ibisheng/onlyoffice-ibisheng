@@ -50,7 +50,6 @@ OfficeExcel.OtherProps = function()
 
     this._colors = ['rgb(0,0,255)', '#0f0', '#00f', '#ff0', '#0ff', '#0f0'];
     this._colors_sequential = false;
-    this._colors_reverse = false;
     this._colors_alternate = null;
 
     this._radius = null;
