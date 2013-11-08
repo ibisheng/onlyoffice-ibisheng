@@ -34,12 +34,6 @@
         this._xAxisTitle    = new OfficeExcel.Title();
         // yAxis Title
         this._yAxisTitle    = new OfficeExcel.Title();
-        // Chart shadow
-        this._shadow        = new OfficeExcel.Shadow();
-        // zoom
-        this._zoom          = new OfficeExcel.chartZoom();
-        // Tooltip
-        this._tooltip       = new OfficeExcel.Tooltips();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
         
@@ -57,12 +51,6 @@
                 this.stackedOrGrouped = true;
             }
         }
-
-
-        /**
-        * Set the .getShape commonly named method
-        */
-        this.getShape = this.getBar;
     }
 
 
@@ -71,17 +59,6 @@
     */
     OfficeExcel.HBar.prototype.Draw = function (xmin,xmax,ymin,ymax,isSkip,isFormatCell)
     {
-        /**
-        * Fire the onbeforedraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'onbeforedraw');
-
-
-        /**
-        * Clear all of this canvases event handlers (the ones installed by OfficeExcel)
-        */
-        //OfficeExcel.ClearEventListeners(this.id);
-
         /**
         * Stop the coords array from growing uncontrollably
         */
@@ -174,9 +151,6 @@
         // Progressively Draw the chart
         OfficeExcel.background.Draw(this);
         
-
-        //getNullPosition(this);
-        
         this.Drawbars(isFormatCell);
         this.DrawAxes();
         this.DrawLabels(isFormatCell);
@@ -187,186 +161,10 @@
             OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }
 
-
-        /**
-        * Install the clickand mousemove event listeners
-        */
-        OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
-        OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
-        /**
-        * Install the event handlers for tooltips
-        */
-        if (this._tooltip._tooltips) {
-
-            // Need to register this object for redrawing
-            OfficeExcel.Register(this);
-            
-            OfficeExcel.PreLoadTooltipImages(this);
-
-            /**
-            * Install the window onclick handler
-            */
-            window.onclick = function ()
-            {
-                OfficeExcel.Redraw();
-            }
-
-
-
-            /**
-            * If the cursor is over a hotspot, change the cursor to a hand
-            */
-            //this.canvas.onmousemove = function (e)
-            var canvas_onmousemove_func = function (e)
-            {
-                e = OfficeExcel.FixEventObject(e);
-
-                var canvas = document.getElementById(this.id);
-                var obj = canvas.__object__;
-                var bar = obj.getBar(e);
-
-                /**
-                * Get the mouse X/Y coordinates
-                */
-                var mouseCoords = OfficeExcel.getMouseXY(e);
-
-                if (bar) {
-
-                    
-                    var left   = bar[0];
-                    var top    = bar[1];
-                    var width  = bar[2];
-                    var height = bar[3];
-                    var idx    = bar[4];
-                    var text   = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, idx);
-
-                    if (!text) {
-                        return;
-                    }
-
-                    canvas.style.cursor = 'pointer';
-                    
-                    /**
-                    * Show the tooltip if the event is onmousemove
-                    */
-                    if (obj._tooltip._event == 'onmousemove') {
-                    
-                        var tooltipObj = OfficeExcel.Registry.Get('chart.tooltip');
-
-                        if (text) {
-                            if (!tooltipObj || tooltipObj.__index__ != idx) {
-                            
-                                OfficeExcel.HideTooltip();
-                                OfficeExcel.Redraw();
-
-                                obj.context.beginPath();
-                                obj.context.strokeStyle = obj._otherProps._highlight_stroke;
-                                obj.context.fillStyle   = obj._otherProps._highlight_fill;
-                                obj.context.strokeRect(left, top, width, height);
-                                obj.context.fillRect(left, top, width, height);
-
-                                OfficeExcel.Tooltip(canvas, text, e.pageX, e.pageY, idx);
-                            }
-                            return;
-                        }
-                    }
-                }
-                
-                if (!bar) {
-                    canvas.style.cursor = 'default';
-                }
-            }
-            this.canvas.addEventListener('mousemove', canvas_onmousemove_func, false);
-            OfficeExcel.AddEventListener(this.id, 'mousemove', canvas_onmousemove_func);
-
-
-            /**
-            * Install the onclick event handler for the tooltips
-            */
-            //this.canvas.onclick = function (e)
-            var canvas_onclick_func = function (e)
-            {
-                e = OfficeExcel.FixEventObject(e);
-
-                //var canvas = document.getElementById(this.id);
-                var canvas = e.target;
-                var obj = canvas.__object__;
-                var bar = obj.getBar(e);
-
-                /**
-                * Redraw the graph first, in effect resetting the graph to as it was when it was first drawn
-                * This "deselects" any already selected bar
-                */
-                OfficeExcel.Redraw();
-
-                /**
-                * Get the mouse X/Y coordinates
-                */
-                var mouseCoords = OfficeExcel.getMouseXY(e);
-                
-                /*******************************************************
-                * Only do this if a bar is being hovered over
-                *******************************************************/
-                if (bar) {
-                    
-                    var left   = bar[0];
-                    var top    = bar[1];
-                    var width  = bar[2];
-                    var height = bar[3];
-                    var idx    = bar[4];
-
-                    text = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, idx);
-                    
-                    if (!text) {
-                        return;
-                    }
-
-                    /**
-                    * Show a tooltip if it's defined
-                    */
-                    if (String(text).length && text != null) {
-
-                        obj.context.beginPath();
-                        obj.context.strokeStyle = obj._otherProps._highlight_stroke;
-                        obj.context.fillStyle   = obj._otherProps._highlight_fill;
-                        obj.context.strokeRect(left, top, width, height);
-                        obj.context.fillRect(left, top, width, height);
-    
-                        obj.context.stroke();
-                        obj.context.fill();
-
-                        OfficeExcel.Tooltip(canvas, text, e.pageX, e.pageY, idx);
-                    }
-                }
-
-                /**
-                * Stop the event bubbling
-                */
-                e.stopPropagation();
-            }
-            this.canvas.addEventListener('click', canvas_onclick_func, false);
-            OfficeExcel.AddEventListener(this.id,'click', canvas_onclick_func);
-
-            // This resets the bar graph
-            if (OfficeExcel.Registry.Get('chart.tooltip')) {
-                OfficeExcel.Registry.Get('chart.tooltip').style.display = 'none';
-                OfficeExcel.Registry.Set('chart.tooltip', null)
-            }
-        }
-
-
-
         /**
         * Draw "in graph" labels
         */
         OfficeExcel.DrawInGraphLabels(this);
-
-
-        /**
-        * Fire the OfficeExcel ondraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
     
     /**
@@ -771,16 +569,6 @@
             }
 
             /**
-            * Turn on the shadow if need be
-            */
-            if (this._shadow._visible) {
-                this.context.shadowColor   = this._shadow._color;
-                this.context.shadowBlur    = this._shadow._blur;
-                this.context.shadowOffsetX = this._shadow._offset_x;
-                this.context.shadowOffsetY = this._shadow._offset_y;
-            }
-
-            /**
             * Draw the bar
             */
             this.context.beginPath();
@@ -881,13 +669,6 @@
                 } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'grouped') {
 
                     for (j=0; j<this.data[i].length; ++j) {
-
-                        /**
-                        * Turn on the shadow if need be
-                        */
-                        if (this._shadow._visible)
-                            OfficeExcel.SetShadow(this, this._shadow._color, this._shadow._offset_x, this._shadow._offset_y, this._shadow._blur);
-
                         // Set the fill/stroke colors
                         this.context.strokeStyle = this._otherProps._strokecolor;
 						if(this._otherProps._colors[j])
@@ -990,13 +771,6 @@
 
         this.context.fill();
         this.context.stroke();
-
-
-
-        /**
-        * Now the bars are stroke()ed, turn off the shadow
-        */
-        OfficeExcel.NoShadow(this);
         
         this.RedrawBars(isFormatCell);
     }
@@ -1022,24 +796,11 @@
 			color: this._otherProps._labels_above_color,
 			underline: this._otherProps._labels_above_underline,
 			italic: this._otherProps._labels_above_italic
-		}	
+		};
 
-        OfficeExcel.NoShadow(this);
         this.context.strokeStyle = this._otherProps._strokecolor;
 
         for (var i=0; i<coords.length; ++i) {
-
-            if (this._shadow._visible) {
-                this.context.beginPath();
-                    this.context.strokeStyle = this._otherProps._strokecolor;
-                    this.context.fillStyle = coords[i][4];
-                    this.context.lineWidth = 1;
-                    this.context.strokeRect(coords[i][0], coords[i][1], coords[i][2], coords[i][3]);
-                    this.context.fillRect(coords[i][0], coords[i][1], coords[i][2], coords[i][3]);
-                this.context.fill();
-                this.context.stroke();
-            }
-
             /**
             * Draw labels "above" the bar
             */
@@ -1047,7 +808,6 @@
 
                 this.context.fillStyle   = color;
                 this.context.strokeStyle = 'black';
-                OfficeExcel.NoShadow(this);
 
                 var border = (coords[i][0] + coords[i][2] + 7 + this.context.measureText(this._otherProps._units_pre + this.coords[i][5] + this._otherProps._units_post).width) > OfficeExcel.GetWidth(this) ? true : false;
 				var textLabel = this.coords[i][5];
@@ -1080,41 +840,7 @@
                             border ? 'rgba(255,255,255,0.9)' : null, bold, null, textOptions);
             }
         }
-    }
-    
-    
-    /*******************************************************
-    * This function can be used to get the appropriate bar information (if any)
-    * 
-    * @param  e Event object
-    * @return   Appriate bar information (if any)
-    *******************************************************/
-    OfficeExcel.HBar.prototype.getBar = function (e)
-    {
-        var obj         = e.target.__object__;
-        var canvas      = obj.canvas;
-        var context     = obj.context;
-        var mouseCoords = OfficeExcel.getMouseXY(e);
-
-        /**
-        * Loop through the bars determining if the mouse is over a bar
-        */
-        for (var i=0,len=obj.coords.length; i<len; i++) {
-
-            var mouseX = mouseCoords[0];  // In relation to the canvas
-            var mouseY = mouseCoords[1];  // In relation to the canvas
-            var left   = obj.coords[i][0];
-            var top    = obj.coords[i][1];
-            var width  = obj.coords[i][2];
-            var height = obj.coords[i][3];
-            var idx    = i;
-
-            if (mouseX >= left && mouseX <= (left + width) && mouseY >= top && mouseY <= (top + height) ) {
-                return [left, top, width, height, idx];
-            }
-        }
-    }
-
+	}
 
     /**
     * When you click on the chart, this method can return the X value at that point. It works for any point on the
@@ -1161,53 +887,3 @@
 
         return value;
     }
-function getNullPosition(obj)
-{
-    var numNull = obj._otherProps._background_grid_autofit_numhlines;
-    var arrTemp = [];
-    if(undefined == obj.scale)
-        return;
-    if(typeof(obj.data[0]) == 'object')
-    {
-        var arrMin = [];
-        var arrMax = [];
-        for (var j=0; j < obj.data.length; j++) {
-            min = Math.min.apply(null, obj.data[j]);
-            max = Math.max.apply(null, obj.data[j]);
-            arrMin[j] = min;
-            arrMax[j] = max;
-        }
-        min = Math.min.apply(null, arrMin);
-        max = Math.max.apply(null, arrMax);
-    }
-    else
-    {
-        min = Math.min.apply(null, obj.data);
-        max = Math.max.apply(null, obj.data);
-    }
-    if(min >= 0 && max >= 0)
-    {
-        numNull = 0;
-    }
-    else if(min <= 0 && max <= 0)
-    {
-        numNull = obj._otherProps._background_grid_autofit_numhlines;
-    }
-    else
-    {
-        for (var i=0; i<obj.scale.length; i++)
-        {
-            if(obj.scale[i] == 0)
-            {
-                numNull = i + 1;
-                break;
-            }
-        }
-    }
-    var nullPosition;
-    if(0 == numNull)
-        nullPosition = 0;
-    else
-        nullPosition =  (obj.canvas.width - obj._chartGutter._left - obj._chartGutter._right)/(obj._otherProps._background_grid_autofit_numhlines)*numNull;
-    obj.nullPositionOX = obj._chartGutter._left + nullPosition;
-}

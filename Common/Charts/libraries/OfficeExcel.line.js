@@ -11,7 +11,6 @@
         this.max               = 0;
         this.coords            = [];
         this.coords2           = [];
-        this.coordsKey         = [];
         this.hasnegativevalues = false;
         this.isOfficeExcel     = true;
 		this.data = data;
@@ -32,12 +31,6 @@
         this._xAxisTitle    = new OfficeExcel.Title();
         // yAxis Title
         this._yAxisTitle    = new OfficeExcel.Title();
-        // Chart shadow
-        this._shadow        = new OfficeExcel.Shadow();
-        // zoom
-        this._zoom          = new OfficeExcel.chartZoom();
-        // Tooltip
-        this._tooltip       = new OfficeExcel.Tooltips();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
 
@@ -85,25 +78,6 @@
             this.__bar__.Draw();
             return;
         }
-
-        // MUST be the SECOND thing done!
-        /*if (typeof(this._otherProps._background_image) == 'string' && !this.__background_image__) {
-            OfficeExcel.DrawBackgroundImage(this);
-            return;
-        }*/
-        if (typeof(this._otherProps._background_image) == 'string' && !this.__background_image__) {
-            OfficeExcel.DrawBackgroundImage1(this,mainBackground);
-            return;
-        }
-        if (this.__bar__ && this._tooltip._highlight) {
-            //this._tooltip._highlight = false;
-        }
-
-        // Fire onbeforedraw
-        OfficeExcel.FireCustomEvent(this, 'onbeforedraw');
-
-        // Clear all Listeners
-        //OfficeExcel.ClearEventListeners(this.id);
 
         // Reset the data back to that which was initially supplied
         this.data = OfficeExcel.array_clone(this.original_data);
@@ -226,31 +200,11 @@
         // Draw Axes
         if (this._otherProps._axesontop == false)
             this.DrawAxes(min,max);
-        
-        // Shadow Color
-        var shadowColor = this._shadow._color;
 
         for (var i = 0, j = 0; i < this.data.length; ++i, ++j) {
             this.context.beginPath();
 
-            // Shadow
-            if (this._shadow._visible && !this._otherProps._filled) {
-                // Shadow Color
-                if (typeof(shadowColor) == 'object' && shadowColor[i - 1])
-                    this.context.shadowColor = shadowColor[i];
-                else if (typeof(shadowColor) == 'object')
-                    this.context.shadowColor = shadowColor[0];
-                else if (typeof(shadowColor) == 'string')
-                    this.context.shadowColor = shadowColor;
-
-                this.context.shadowBlur    = this._shadow._blur;
-                this.context.shadowOffsetX = this._shadow._offset_x;
-                this.context.shadowOffsetY = this._shadow._offset_y;
-
-            } else if (this._otherProps._filled && this._shadow._visible)
-                alert('[LINE] Shadows are not permitted when the line is filled');
-
-            // Draw line
+			// Draw line
             var fill = null;
             if (this._otherProps._fillstyle) {
                 if (typeof(this._otherProps._fillstyle) == 'object' && this._otherProps._fillstyle[j])
@@ -333,7 +287,6 @@
                                             this.coords2[i][j][0],
                                             this.coords2[i][j][1],
                                             this.context.strokeStyle,
-                                            false,
                                             j == 0 ? 0 : this.coords2[i][j - 1][0],
                                             j == 0 ? 0 : this.coords2[i][j - 1][1],
                                             tickmarks,
@@ -345,26 +298,6 @@
                 this.context.stroke();
                 this.context.fill();
             }
-        }
-
-        // Install mouse listeners
-        OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
-        OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
-        // Install tooltips
-        if (this._tooltip._tooltips && (this._tooltip._tooltips.length || typeof(this._tooltip._tooltips) == 'function')) {
-
-            // Register to redraw
-            if (this._tooltip._highlight)
-                OfficeExcel.Register(this);
-
-            OfficeExcel.PreLoadTooltipImages(this);
-
-            OfficeExcel.InstallLineTooltipEventListeners(this);
-
-            // If there's a bar, install bar listeners
-            if (this.__bar__)
-                OfficeExcel.InstallBarTooltipEventListeners(this.__bar__);
         }
 
         // Draw Axes if on top
@@ -387,9 +320,6 @@
 
         // Draw in graph labels
         OfficeExcel.DrawInGraphLabels(this);
-
-        // Draw crosschairs
-        OfficeExcel.DrawCrosshairs(this);
 
         // Redraw the lines if a filled range is on the cards
         if (this._otherProps._filled && this._otherProps._filled_range && this.data.length == 2) {
@@ -428,9 +358,6 @@
         // Adjustments
         if (this._otherProps._adjustable)
             OfficeExcel.AllowAdjusting(this);
-
-        // Ondraw event
-        OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
     
@@ -441,9 +368,6 @@
         // Don't draw the axes?
         if (this._otherProps._noaxes)
             return;
-
-        // Turn any shadow off
-        OfficeExcel.NoShadow(this);
 
         this.context.lineWidth   = 1;
         this.context.lineCap = 'butt';
@@ -669,9 +593,6 @@
 		var scaleFactor = 1;
 		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
 			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
-
-        // Turn off any shadow
-        OfficeExcel.NoShadow(this);
 
         // This needs to be here
         var font      = this._otherProps._ylabels_font;
@@ -1163,13 +1084,6 @@
     // Draws the line
     OfficeExcel.Line.prototype.DrawLine = function (lineData, color, fill, linewidth, tickmarks, index)
     {
-        // This facilitates the Rise animation (the Y value only)
-        if (this._otherProps._animation_unfold_y && this._otherProps._animation_factor != 1) {
-            for (var i=0; i<lineData.length; ++i) {
-                lineData[i] *= this._otherProps._animation_factor;
-            }
-        }
-
         var penUp = false;
         var yPos  = null;
         var xPos  = 0;
@@ -1257,14 +1171,6 @@
                 xPos = this._otherProps._hmargin + this._chartGutter._left;
             }
 
-            if (this._otherProps._animation_unfold_x) {
-                xPos *= this._otherProps._animation_factor;
-
-                if (xPos < this._chartGutter._left) {
-                    xPos = this._chartGutter._left;
-                }
-            }
-
             /**
             * Add the coords to an array
             */
@@ -1284,13 +1190,6 @@
 
         // Store the coords in another format, indexed by line number
         this.coords2[index] = lineCoords;
-
-        /**
-        * For IE only: Draw the shadow ourselves as ExCanvas doesn't produce shadows
-        */
-        if (OfficeExcel.isOld() && this._shadow._visible) {
-            this.DrawIEShadow(lineCoords, this.context.shadowColor);
-        }
 
         /**
         * Now draw the actual line [FORMERLY SECOND]
@@ -1438,24 +1337,6 @@
 
         }
 
-        /**
-        * FIXME this may need removing when Chrome is fixed
-        * SEARCH TAGS: CHROME SHADOW BUG
-        */
-        if (navigator.userAgent.match(/Chrome/) && this._shadow._visible && this._otherProps._chromefix && this._shadow._blur > 0) {
-
-            for (var i=lineCoords.length - 1; i>=0; --i) {
-                if (
-                       typeof(lineCoords[i][1]) != 'number'
-                    || (typeof(lineCoords[i+1]) == 'object' && typeof(lineCoords[i+1][1]) != 'number')
-                   ) {
-                    this.context.moveTo(lineCoords[i][0],lineCoords[i][1]);
-                } else {
-                    this.context.lineTo(lineCoords[i][0],lineCoords[i][1]);
-                }
-            }
-        }
-
         this.context.stroke();
 
 
@@ -1496,7 +1377,7 @@
                 var prevX = (i <= 0 ? null : lineCoords[i - 1][0]);
                 var prevY = (i <= 0 ? null : lineCoords[i - 1][1]);
 
-                this.DrawTick(lineData, lineCoords[i][0], lineCoords[i][1], color, false, prevX, prevY, tickmarks, i);
+                this.DrawTick(lineData, lineCoords[i][0], lineCoords[i][1], color, prevX, prevY, tickmarks, i);
 
                 // Draws tickmarks on the stepped bits of stepped charts. Takend out 14th July 2010
                 //
@@ -1513,7 +1394,7 @@
 
 
     // Draws a tick
-    OfficeExcel.Line.prototype.DrawTick = function (lineData, xPos, yPos, color, isShadow, prevX, prevY, tickmarks, index)
+    OfficeExcel.Line.prototype.DrawTick = function (lineData, xPos, yPos, color, prevX, prevY, tickmarks, index)
     {
         // If the yPos is null - no tick
         if ((yPos == null || yPos > (this.canvas.height - this._chartGutter._bottom) || yPos < this._chartGutter._top) && !this._otherProps._outofbounds || !this._otherProps._line_visible)
@@ -1524,8 +1405,8 @@
         var offset   = 0;
 
         this.context.lineWidth   = this._otherProps._tickmarks_linewidth ? this._otherProps._tickmarks_linewidth : this._otherProps._linewidth;
-        this.context.strokeStyle = isShadow ? this._shadow._color : this.context.strokeStyle;
-        this.context.fillStyle   = isShadow ? this._shadow._color : this.context.strokeStyle;
+        this.context.strokeStyle = this.context.strokeStyle;
+        this.context.fillStyle   = this.context.strokeStyle;
 
         if (   tickmarks == 'circle'
             || tickmarks == 'filledcircle'
@@ -1536,9 +1417,9 @@
                 this.context.arc(xPos + offset, yPos + offset, this._otherProps._ticksize, 0, 360 / (180 / Math.PI), false);
 
                 if (tickmarks == 'filledcircle') {
-                    this.context.fillStyle = isShadow ? this._shadow._color : this.context.strokeStyle;
+                    this.context.fillStyle = this.context.strokeStyle;
                 } else {
-                    this.context.fillStyle = isShadow ? this._shadow._color : 'white';
+                    this.context.fillStyle = 'white';
                 }
 
                 this.context.stroke();
@@ -1585,7 +1466,7 @@
             this.context.beginPath();
 
                 if (tickmarks == 'filledtriangle') {
-                    this.context.fillStyle = isShadow ? this._shadow._color : this.context.strokeStyle;
+                    this.context.fillStyle = this.context.strokeStyle;
                 } else {
                     this.context.fillStyle = 'white';
                 }
@@ -1638,11 +1519,11 @@
 
             // Fillrect
             if (tickmarks == 'filledsquare' || tickmarks == 'filledendsquare') {
-                this.context.fillStyle = isShadow ? this._shadow._color : this.context.strokeStyle;
+                this.context.fillStyle = this.context.strokeStyle;
                 this.context.fillRect(xPos - this._otherProps._ticksize, yPos - this._otherProps._ticksize, this._otherProps._ticksize * 2, this._otherProps._ticksize * 2);
 
             } else if (tickmarks == 'square' || tickmarks == 'endsquare') {
-                this.context.fillStyle = isShadow ? this._shadow._color : 'white';
+                this.context.fillStyle = 'white';
                 this.context.fillRect((xPos - this._otherProps._ticksize) + 1, (yPos - this._otherProps._ticksize) + 1, (this._otherProps._ticksize * 2) - 2, (this._otherProps._ticksize * 2) - 2);
             }
 
@@ -1822,32 +1703,6 @@
     }
 
     /**
-    * This function is used by MSIE only to manually draw the shadow
-    *
-    * @param array coords The coords for the line
-    */
-    OfficeExcel.Line.prototype.DrawIEShadow = function (coords, color)
-    {
-        var offsetx = this._shadow._offset_x;
-        var offsety = this._shadow._offset_y;
-
-        this.context.lineWidth   = this._otherProps._linewidth;
-        this.context.strokeStyle = color;
-        this.context.beginPath();
-
-        for (var i=0; i<coords.length; ++i) {
-            if (i == 0) {
-                this.context.moveTo(coords[i][0] + offsetx, coords[i][1] + offsety);
-            } else {
-                this.context.lineTo(coords[i][0] + offsetx, coords[i][1] + offsety);
-            }
-        }
-
-        this.context.stroke();
-    }
-
-
-    /**
     * Draw the backdrop
     */
     OfficeExcel.Line.prototype.DrawBackdrop = function (coords, color)
@@ -1869,7 +1724,6 @@
         // Reset the alpha value
         this.context.globalAlpha = 1;
         this.context.lineJoin = 'round';
-        OfficeExcel.NoShadow(this);
     }
 
     // Returns the linewidth
@@ -1888,54 +1742,6 @@
             alert('[LINE] Error! linewidth should be a single number or an array of one or more numbers');
         }
     }
-
-
-    /**
-    * The getPoint() method - used to get the point the mouse is currently over, if any
-    *
-    * @param object e The event object
-    * @param object   OPTIONAL You can pass in the bar object instead of the
-    *                          function getting it from the canvas
-    */
-    OfficeExcel.Line.prototype.getPoint = function (e)
-    {
-        var canvas  = e.target;
-        var obj     = canvas.__object__;
-        var context = obj.context;
-        var mouseXY = OfficeExcel.getMouseXY(e);
-        var mouseX  = mouseXY[0];
-        var mouseY  = mouseXY[1];
-
-        // This facilitates you being able to pass in the bar object as a parameter instead of
-        // the function getting it from the object
-        if (arguments[1]) {
-            obj = arguments[1];
-        }
-
-        for (var i=0; i<obj.coords.length; ++i) {
-
-            var xCoord = obj.coords[i][0];
-            var yCoord = obj.coords[i][1];
-
-            // Do this if the hotspot is triggered by the X coord AND the Y coord
-            if (   obj._tooltip._hotspot_xonly == false
-                && mouseX <= (xCoord + 5)
-                && mouseX >= (xCoord - 5)
-                && mouseY <= (yCoord + 5)
-                && mouseY >= (yCoord - 5)
-               ) {
-
-                    return [obj, xCoord, yCoord, i];
-
-            } else if (    obj._tooltip._hotspot_xonly == true
-                        && mouseX <= (xCoord + 5)
-                        && mouseX >= (xCoord - 5)) {
-
-                        return [obj, xCoord, yCoord, i];
-            }
-        }
-    }
-
 
     // Draws the above line labels
     OfficeExcel.Line.prototype.DrawAboveLabels = function (format)

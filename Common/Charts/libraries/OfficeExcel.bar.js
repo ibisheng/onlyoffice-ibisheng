@@ -31,12 +31,6 @@
         this._xAxisTitle    = new OfficeExcel.Title();
         // yAxis Title
         this._yAxisTitle    = new OfficeExcel.Title();
-        // Chart shadow
-        this._shadow        = new OfficeExcel.Shadow();
-        // zoom
-        this._zoom          = new OfficeExcel.chartZoom();
-        // Tooltip
-        this._tooltip       = new OfficeExcel.Tooltips();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
 
@@ -60,11 +54,6 @@
         
         // Used to store the coords of the bars
         this.coords = [];
-
-        /**
-        * Set the .getShape commonly named method
-        */
-        this.getShape = this.getBar;
     }
 
     /**
@@ -76,21 +65,6 @@
         this.scale = OfficeExcel.getScale(this.max, this,min,max);
 		this._otherProps._background_grid_autofit_numhlines = this.scale.length;
         this._otherProps._numyticks = this.scale.length;
-		// MUST be the first thing done!
-        if (typeof(this._otherProps._background_image) == 'string' && !this.__background_image__) {
-            OfficeExcel.DrawBackgroundImage(this);
-            return;
-        }
-
-        /**
-        * Fire the onbeforedraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'onbeforedraw');
-
-        /**
-        * Clear all of this canvases event handlers (the ones installed by OfficeExcel)
-        */
-        //OfficeExcel.ClearEventListeners(this.id);
 
         /**
         * Convert any null values to 0. Won't make any difference to the bar (as opposed to the line chart)
@@ -103,17 +77,6 @@
 
 
         // Cache this in a class variable as it's used rather a lot
-
-        /**
-        * Check for tooltips and alert the user that they're not supported with pyramid charts
-        */
-        if (   (this._otherProps._variant == 'pyramid' || this._otherProps._variant == 'dot')
-            && typeof(this._tooltip._tooltips) == 'object'
-            && this._tooltip._tooltips
-            && this._tooltip._tooltips.length > 0) {
-
-            alert('[BAR] (' + this.id + ') Sorry, tooltips are not supported with dot or pyramid charts');
-        }
 
         /**
         * Stop the coords array from growing uncontrollably
@@ -133,16 +96,6 @@
         
         // Progressively Draw the chart
         OfficeExcel.background.Draw(this);
-
-
-
-
-        /**
-        * Install the clickand mousemove event listeners
-        */
-        OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
-        OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
 
         //If it's a sketch chart variant, draw the axes first
         if (this._otherProps._variant == 'sketch') {
@@ -203,13 +156,6 @@
         if (this._otherProps._labels_ingraph) {
             OfficeExcel.DrawInGraphLabels(this);
         }
-        
-        /**
-        * Draw crosschairs
-        */
-        if (this._otherProps._crosshairs) {
-            OfficeExcel.DrawCrosshairs(this);
-        }
 
 
 
@@ -219,12 +165,6 @@
         if (this._otherProps._adjustable) {
             OfficeExcel.AllowAdjusting(this);
         }
-
-
-        /**
-        * Fire the OfficeExcel ondraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
     
@@ -552,11 +492,6 @@
         var width         = (this.canvas.width - this._chartGutter._left - this._chartGutter._right ) / this.data.length;
         var orig_height   = height;
         var hmargin       = this._otherProps._hmargin;
-        var shadow        = this._shadow._visible;
-        var shadowColor   = this._shadow._color;
-        var shadowBlur    = this._shadow._blur;
-        var shadowOffsetX = this._shadow._offset_x;
-        var shadowOffsetY = this._shadow._offset_y;
         var strokeStyle   = this._otherProps._strokecolor;
         var colors        = this._otherProps._colors;
         var sequentialColorIndex = 0;
@@ -611,16 +546,6 @@
             if (height < 0) {
                 y += height;
                 height = Math.abs(height);
-            }
-
-            /**
-            * Turn on the shadow if need be
-            */
-            if (shadow) {
-                this.context.shadowColor   = shadowColor;
-                this.context.shadowBlur    = shadowBlur;
-                this.context.shadowOffsetX = shadowOffsetX;
-                this.context.shadowOffsetY = shadowOffsetY;
             }
 
             /**
@@ -682,10 +607,6 @@
                     // Regular bar
                     } else if (variant == 'bar' || variant == '3d' || variant == 'glass' || variant == 'bevel') {
                     
-                        if (OfficeExcel.isOld() && shadow) {
-                            this.DrawIEShadow([x + hmargin, y, barWidth, height]);
-                        }
-                        
                         if (variant == 'glass') {
                             OfficeExcel.filledCurvyRect(this.context, x + hmargin, y, barWidth, height, 3, this.data[i] > 0, this.data[i] > 0, this.data[i] < 0, this.data[i] < 0);
                             OfficeExcel.strokedCurvyRect(this.context, x + hmargin, y, barWidth, height, 3, this.data[i] > 0, this.data[i] > 0, this.data[i] < 0, this.data[i] < 0);
@@ -771,12 +692,6 @@
 
                         // This bit draws the text labels that appear above the bars if requested
                         if (this._otherProps._labels_above) {
-
-                            // Turn off any shadow
-                            if (shadow) {
-                                OfficeExcel.NoShadow(this);
-                            }
-
                             var yPos = y - 3;
 
                             // Account for negative bars
@@ -904,7 +819,6 @@
                     }
                     
                     var barWidth     = width - (2 * hmargin);
-                    var redrawCoords = [];// Necessary to draw if the shadow is enabled
                     var startY       = 0;
                     var dataset      = this.data[i];
 
@@ -952,11 +866,6 @@
                         */
                         this.coords.push([x + hmargin, y, width - (2 * hmargin), height]);
 
-                        // MSIE shadow
-                        if (OfficeExcel.isOld() && shadow) {
-                            this.DrawIEShadow([x + hmargin, y, width - (2 * hmargin), height + 1]);
-                        }
-
                         this.context.strokeRect(x + hmargin, y, width - (2 * hmargin), height);
                         this.context.fillRect(x + hmargin, y, width - (2 * hmargin), height);
 
@@ -964,13 +873,6 @@
                         if (j == 0) {
                             var startY = y;
                             var startX = x;
-                        }
-
-                        /**
-                        * Store the redraw coords if the shadow is enabled
-                        */
-                        if (shadow) {
-                            redrawCoords.push([x + hmargin, y, width - (2 * hmargin), height, this.context.fillStyle]);
                         }
 
                         /**
@@ -1042,15 +944,12 @@
                     // This bit draws the text labels that appear above the bars if requested
                     if (this._otherProps._labels_above) {
 
-                        // Turn off any shadow
-                        OfficeExcel.NoShadow(this);
-
                         this.context.fillStyle = this._otherProps._text_color;
                         OfficeExcel.Text(this.context,
                                     this._otherProps._labels_above_font,
                                     typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,
                                     startX + (barWidth / 2) + this._otherProps._hmargin,
-                                    startY - (this._shadow._visible && this._shadow._offset_y < 0 ? 7 : 4) - (this._otherProps._variant == '3d' ? 5 : 0),
+                                    startY - 4 - (this._otherProps._variant == '3d' ? 5 : 0),
                                     String(this._otherProps._units_pre + OfficeExcel.array_sum(this.data[i]).toFixed(this._otherProps._labels_above_decimals) + this._otherProps._units_post),
                                     this._otherProps._labels_above_angle ? 'bottom' : null,
                                     this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
@@ -1059,45 +958,11 @@
 									null,
 									bold,
 									textOptions);
-                      
-                        // Turn any shadow back on
-                        if (shadow) {
-                            this.context.shadowColor   = shadowColor;
-                            this.context.shadowBlur    = shadowBlur;
-                            this.context.shadowOffsetX = shadowOffsetX;
-                            this.context.shadowOffsetY = shadowOffsetY;
-                        }
-                    }
-                    
-
-                    /**
-                    * Redraw the bars if the shadow is enabled due to hem being drawn from the bottom up, and the
-                    * shadow spilling over to higher up bars
-                    */
-                    if (shadow) {
-
-                        OfficeExcel.NoShadow(this);
-
-                        for (k=0; k<redrawCoords.length; ++k) {
-                            this.context.strokeStyle = strokeStyle;
-                            this.context.fillStyle = redrawCoords[k][4];
-                            this.context.strokeRect(redrawCoords[k][0], redrawCoords[k][1], redrawCoords[k][2], redrawCoords[k][3]);
-                            this.context.fillRect(redrawCoords[k][0], redrawCoords[k][1], redrawCoords[k][2], redrawCoords[k][3]);
-
-                            this.context.stroke();
-                            this.context.fill();
-                        }
-                        
-                        // Reset the redraw coords to be empty
-                        redrawCoords = [];
                     }
                 /**
                 * Grouped bar
                 */
                 } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'grouped') {
-
-                    
-                    var redrawCoords = [];
                     this.context.lineWidth = this._otherProps._linewidth;
 
                     for (j=0; j<this.data[i].length; ++j) {
@@ -1158,14 +1023,6 @@
                             var startY = this.canvas.height - this._chartGutter._bottom - height;
                             var height = Math.abs(height);
                         }
-
-                        /**
-                        * Draw MSIE shadow
-                        */
-                        if (OfficeExcel.isOld() && shadow) {
-                            this.DrawIEShadow([startX, startY, individualBarWidth, height]);
-                        }
-
                         
                         if(this._otherProps._type == 'accumulative' || this._otherProps._autoGrouping == 'stackedPer')
                         {
@@ -1277,59 +1134,11 @@
 						if(this.catNameLabels && this.catNameLabels[i] && this.catNameLabels[i][j])
 							catName = this.catNameLabels[i][j];
 						this.coords.push([startX, startY, individualBarWidth, height, formatCellTrue, this.firstData[i][j], catName]);
-							
-                        // Facilitate shadows going to the left
-                        if (this._shadow._visible) {
-                            redrawCoords.push([startX, startY, individualBarWidth, height, this.context.fillStyle]);
-                        }
-                    }
-                    
-                    /**
-                    * Redraw the bar if shadows are going to the left
-                    */
-                    if (redrawCoords.length) {
-
-                        OfficeExcel.NoShadow(this);
-                        
-                        this.context.lineWidth = this._otherProps._linewidth;
-
-                        this.context.beginPath();
-                            for (var j=0; j<redrawCoords.length; ++j) {
-
-                                this.context.fillStyle   = redrawCoords[j][4];
-                                this.context.strokeStyle = this._otherProps._strokecolor;
-
-                                this.context.fillRect(redrawCoords[j][0], redrawCoords[j][1], redrawCoords[j][2], redrawCoords[j][3]);
-                                this.context.strokeRect(redrawCoords[j][0], redrawCoords[j][1], redrawCoords[j][2], redrawCoords[j][3]);
-                            }
-                        this.context.fill();
-                        this.context.stroke();
-
-                        redrawCoords = [];
                     }
                 }
 
             this.context.closePath();
 			}
-        }
-
-        /**
-        * Turn off any shadow
-        */
-        OfficeExcel.NoShadow(this);
-
-
-        /**
-        * Install the onclick event handler
-        */
-        if (this._tooltip._tooltips) {
-        
-            // Need to register this object for redrawing
-            OfficeExcel.Register(this);
-            
-            OfficeExcel.PreLoadTooltipImages(this);
-
-            OfficeExcel.InstallBarTooltipEventListeners(this);
         }
     }
 
@@ -1862,83 +1671,6 @@
         this.context.stroke();
     }
 
-
-    /**
-    * This function is used by MSIE only to manually draw the shadow
-    * 
-    * @param array coords The coords for the bar
-    */
-    OfficeExcel.Bar.prototype.DrawIEShadow = function (coords)
-    {
-        var prevFillStyle = this.context.fillStyle;
-        var offsetx       = this._shadow._offset_x;
-        var offsety       = this._shadow._offset_y;
-        
-        this.context.lineWidth = this._otherProps._linewidth;
-        this.context.fillStyle = this._shadow._color;
-        this.context.beginPath();
-        
-        // Draw shadow here
-        this.context.fillRect(coords[0] + offsetx, coords[1] + offsety, coords[2], coords[3]);
-
-        this.context.fill();
-        
-        // Change the fillstyle back to what it was
-        this.context.fillStyle = prevFillStyle;
-    }
-
-
-    /**
-    * Not used by the class during creating the graph, but is used by event handlers
-    * to get the coordinates (if any) of the selected bar
-    * 
-    * @param object e The event object
-    * @param object   OPTIONAL You can pass in the bar object instead of the
-    *                          function getting it from the canvas
-    */
-    OfficeExcel.Bar.prototype.getBar = function (e)
-    {
-        var canvas = e.target;
-        var obj    = e.target.__object__;
-        
-        if (obj.__bar__) {
-            obj = obj.__bar__;
-        }
-        
-        var mouseCoords = OfficeExcel.getMouseXY(e);
-        
-        // This facilitates you being able to pass in the bar object as a parameter instead of
-        // the function getting it from the object
-        if (arguments[1]) {
-            obj = arguments[1];
-        }
-
-        /**
-        * Loop through the bars determining if the mouse is over a bar
-        */
-        for (var i=0; i<obj.coords.length; i++) {
-
-            var mouseX = mouseCoords[0];
-            var mouseY = mouseCoords[1];
-
-            var left   = obj.coords[i][0];
-            var top    = obj.coords[i][1];
-            var width  = obj.coords[i][2];
-            var height = obj.coords[i][3];
-
-            if (   mouseX >= left
-                && mouseX <= left + width
-                && mouseY >= top
-                && mouseY <= top + height) {
-                
-                return [obj, left, top, width, height, i];
-            }
-        }
-        
-        return null;
-    }
-
-
     /**
     * When you click on the chart, this method can return the Y value at that point. It works for any point on the
     * chart (that is inside the gutters) - not just points within the Bars.
@@ -2001,11 +1733,6 @@
 			var xaxispos      = this._otherProps._xaxispos;
 			var width         = (this.canvas.width - this._chartGutter._left - this._chartGutter._right ) / this.data.length;
 			var hmargin       = this._otherProps._hmargin;
-			var shadow        = this._shadow._visible;
-			var shadowColor   = this._shadow._color;
-			var shadowBlur    = this._shadow._blur;
-			var shadowOffsetX = this._shadow._offset_x;
-			var shadowOffsetY = this._shadow._offset_y;
 			var strokeStyle   = this._otherProps._strokecolor;
 			var colors        = this._otherProps._colors;
 			var sequentialColorIndex = 0;
@@ -2025,10 +1752,6 @@
 			{
 				
 				this.context.strokeStyle = 'rgba(0,0,0,0)';
-				// Turn off any shadow
-				if (shadow) {
-					OfficeExcel.NoShadow(this);
-				}
 				startX = this.coords[i][0];
 				startY = this.coords[i][1];
 				individualBarWidth = this.coords[i][2];
@@ -2062,14 +1785,6 @@
 							bold,
 							null,
 							textOptions);
-			  
-				// Turn any shadow back on
-				if (shadow) {
-					this.context.shadowColor   = shadowColor;
-					this.context.shadowBlur    = shadowBlur;
-					this.context.shadowOffsetX = shadowOffsetX;
-					this.context.shadowOffsetY = shadowOffsetY;
-				}
 			}
 		}
 	}

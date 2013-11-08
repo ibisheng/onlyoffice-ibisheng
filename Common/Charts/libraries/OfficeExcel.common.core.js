@@ -1,10 +1,6 @@
 ﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {isOfficeExcel:true,type:'common'};
 
-    OfficeExcel.Registry       = {};
-    OfficeExcel.Registry.store = [];
-    OfficeExcel.Registry.store['chart.event.handlers'] = [];
     OfficeExcel.background     = {};
-    OfficeExcel.objects        = [];
     OfficeExcel.Resizing       = {};
     OfficeExcel.events         = [];
     
@@ -1456,19 +1452,6 @@
         return obj != null && obj.constructor.toString().indexOf('Array') != -1;
     }
 
-
-    /**
-    * Converts degrees to radians
-    * 
-    * @param  int degrees The number of degrees
-    * @return float       The number of radians
-    */
-    OfficeExcel.degrees2Radians = function (degrees)
-    {
-        return degrees * (Math.PI / 180);
-    }
-
-
     /**
     * This function draws an angled line. The angle is cosidered to be clockwise
     * 
@@ -1973,8 +1956,6 @@
 
             context.fill();
         }
-
-        OfficeExcel.FireCustomEvent(canvas.__object__, 'onclear');
     }
 
 
@@ -2149,135 +2130,6 @@
         } while (obj && obj.tagName.toLowerCase() != 'body');
 
         return [x, y];
-    }
-
-
-    /**
-    * Registers a graph object (used when the canvas is redrawn)
-    * 
-    * @param object obj The object to be registered
-    */
-    OfficeExcel.Register = function (obj)
-    {
-        var key = obj.id + '_' + obj.type;
-
-        OfficeExcel.objects[key] = obj;
-    }
-
-
-    /**
-    * Causes all registered objects to be redrawn
-    * 
-    * @param string   An optional string indicating which canvas is not to be redrawn
-    * @param string An optional color to use to clear the canvas
-    */
-    OfficeExcel.Redraw = function ()
-    {
-        for (i in OfficeExcel.objects) {
-            // TODO FIXME Maybe include more intense checking for whether the object is an OfficeExcel object, eg obj.isOfficeExcel == true ...?
-            if (
-                   typeof(i) == 'string'
-                && typeof(OfficeExcel.objects[i]) == 'object'
-                && typeof(OfficeExcel.objects[i].type) == 'string'
-                && OfficeExcel.objects[i].isOfficeExcel)  {
-
-                if (!arguments[0] || arguments[0] != OfficeExcel.objects[i].id) {
-                    OfficeExcel.Clear(OfficeExcel.objects[i].canvas, arguments[1] ? arguments[1] : null);
-                    OfficeExcel.objects[i].Draw();
-                }
-            }
-        }
-    }
-
-
-    /**
-    * Loosly mimicks the PHP function print_r();
-    */
-    OfficeExcel.pr = function (obj)
-    {
-        var str = '';
-        var indent = (arguments[2] ? arguments[2] : '');
-
-        switch (typeof(obj)) {
-            case 'number':
-                if (indent == '') {
-                    str+= 'Number: '
-                }
-                str += String(obj);
-                break;
-            
-            case 'string':
-                if (indent == '') {
-                    str+= 'String (' + obj.length + '):'
-                }
-                str += '"' + String(obj) + '"';
-                break;
-
-            case 'object':
-                // In case of null
-                if (obj == null) {
-                    str += 'null';
-                    break;
-                }
-
-                str += 'Object\n' + indent + '(\n';
-                for (var i in obj) {
-                    if (typeof(i) == 'string' || typeof(i) == 'number') {
-                        str += indent + ' ' + i + ' => ' + OfficeExcel.pr(obj[i], true, indent + '    ') + '\n';
-                    }
-                }
-                
-                var str = str + indent + ')';
-                break;
-            
-            case 'function':
-                str += obj;
-                break;
-            
-            case 'boolean':
-                str += 'Boolean: ' + (obj ? 'true' : 'false');
-                break;
-        }
-
-        /**
-        * Finished, now either return if we're in a recursed call, or alert()
-        * if we're not.
-        */
-        if (arguments[1]) {
-            return str;
-        } else {
-            alert(str);
-        }
-    }
-
-
-    /**
-    * The OfficeExcel registry Set() function
-    * 
-    * @param  string name  The name of the key
-    * @param  mixed  value The value to set
-    * @return mixed        Returns the same value as you pass it
-    */
-    OfficeExcel.Registry.Set = function (name, value)
-    {
-        // Store the setting
-        OfficeExcel.Registry.store[name] = value;
-        
-        // Don't really need to do this, but ho-hum
-        return value;
-    }
-
-
-    /**
-    * The OfficeExcel registry Get() function
-    * 
-    * @param  string name The name of the particular setting to fetch
-    * @return mixed       The value if exists, null otherwise
-    */
-    OfficeExcel.Registry.Get = function (name)
-    {
-        //return OfficeExcel.Registry.store[name] == null ? null : OfficeExcel.Registry.store[name];
-        return OfficeExcel.Registry.store[name];
     }
 
 
@@ -2601,56 +2453,6 @@
     }
 
 
-    /**
-    * Returns the day number for a particular date. Eg 1st February would be 32
-    * 
-    * @param   object obj A date object
-    * @return  int        The day number of the given date
-    */
-    OfficeExcel.GetDays = function (obj)
-    {
-        var year  = obj.getFullYear();
-        var days  = obj.getDate();
-        var month = obj.getMonth();
-        
-        if (month == 0) return days;
-        if (month >= 1) days += 31; 
-        if (month >= 2) days += 28;
-
-            // Leap years. Crude, but if this code is still being used
-            // when it stops working, then you have my permission to shoot
-            // me. Oh, you won't be able to - I'll be dead...
-            if (year >= 2008 && year % 4 == 0) days += 1;
-
-        if (month >= 3) days += 31;
-        if (month >= 4) days += 30;
-        if (month >= 5) days += 31;
-        if (month >= 6) days += 30;
-        if (month >= 7) days += 31;
-        if (month >= 8) days += 31;
-        if (month >= 9) days += 30;
-        if (month >= 10) days += 31;
-        if (month >= 11) days += 30;
-        
-        return days;
-    }
-
-    /**
-    * Debug short name functions
-    */
-    function pd(variable) {OfficeExcel.pr(variable);}
-    function p(variable) {OfficeExcel.pr(variable);}
-    function a(variable) {alert(variable);}
-    
-    /**
-    * A shortcut for console.log - as used by Firebug and Chromes console
-    */
-    function cl (variable)
-    {
-        return console.log(variable);
-    }
-
-
     // Makes a clone of an array
     OfficeExcel.array_clone = function (obj)
     {
@@ -2918,11 +2720,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
             }
         }
 
-        /**
-        * Turn off any shadow
-        */
-        OfficeExcel.NoShadow(obj);
-
         if (labels_processed && labels_processed.length > 0) {
 
             for (var i=0; i<labels_processed.length; ++i) {
@@ -3052,217 +2849,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
 
 
     /**
-    * This function "fills in" key missing properties that various implementations lack
-    * 
-    * @param object e The event object
-    */
-    OfficeExcel.FixEventObject = function (e)
-    {
-        if (OfficeExcel.isIE8()) {
-            
-            var e = event;
-
-            e.pageX  = (event.clientX + document.body.scrollLeft);
-            e.pageY  = (event.clientY + document.body.scrollTop);
-            e.target = event.srcElement;
-            
-            if (!document.body.scrollTop && document.documentElement.scrollTop) {
-                e.pageX += parseInt(document.documentElement.scrollLeft);
-                e.pageY += parseInt(document.documentElement.scrollTop);
-            }
-        }
-
-        // This is mainly for FF which doesn't provide offsetX
-        if (typeof(e.offsetX) == 'undefined' && typeof(e.offsetY) == 'undefined') {
-            var coords = OfficeExcel.getMouseXY(e);
-            e.offsetX = coords[0];
-            e.offsetY = coords[1];
-        }
-        
-        // Any browser that doesn't implement stopPropagation() (MSIE)
-        if (!e.stopPropagation) {
-            e.stopPropagation = function () {window.event.cancelBubble = true;}
-        }
-        
-        return e;
-    }
-
-
-    /**
-    * Draw crosshairs if enabled
-    * 
-    * @param object obj The graph object (from which we can get the context and canvas as required)
-    */
-    OfficeExcel.DrawCrosshairs = function (obj)//показывает позицию на графике
-    {
-        /*if (obj._otherProps._crosshairs) {
-            var canvas  = obj.canvas;
-            var context = obj.context;
-            
-            var crosshairs_mousemove = function (e)
-            {
-                var e       = OfficeExcel.FixEventObject(e);
-                var canvas  = obj.canvas;
-                var context = obj.context;
-                var width   = canvas.width;
-                var height  = canvas.height;
-                var adjustments = obj._tooltip._coords_adjust;
-                
-                var gutterLeft   = obj._chartGutter._left;
-                var gutterRight  = obj._chartGutter._right;
-                var gutterTop    = obj._chartGutter._top;
-                var gutterBottom = obj._chartGutter._bottom;
-    
-                var mouseCoords = OfficeExcel.getMouseXY(e);
-                var x = mouseCoords[0];
-                var y = mouseCoords[1];
-
-                if (typeof(adjustments) == 'object' && adjustments[0] && adjustments[1]) {
-                    x = x - adjustments[0];
-                    y = y - adjustments[1];
-                }
-
-                OfficeExcel.Clear(canvas);
-                obj.Draw();
-
-                if (   x >= gutterLeft
-                    && y >= gutterTop
-                    && x <= (width - gutterRight)
-                    && y <= (height - gutterBottom)
-                   ) {
-
-                    var linewidth = obj._otherProps._crosshairs_linewidth;
-                    context.lineWidth = linewidth ? linewidth : 1;
-
-                    context.beginPath();
-                    context.strokeStyle = obj._otherProps._crosshairs_color;
-
-                    // Draw a top vertical line
-                    if (obj._otherProps._crosshairs_vline) {
-                        context.moveTo(AA(this, x), AA(this, gutterTop));
-                        context.lineTo(AA(this, x), AA(this, height - gutterBottom));
-                    }
-
-                    // Draw a horizontal line
-                    if (obj._otherProps._crosshairs_hline) {
-                        context.moveTo(AA(this, gutterLeft), AA(this, y));
-                        context.lineTo(AA(this, width - gutterRight), AA(this, y));
-                    }
-
-                    context.stroke();
-                    
-                    
-					//Need to show the coords?                    if (obj._otherProps._crosshairs_coords) {
-                        if (obj.type == 'scatter') {
-
-                            var xCoord = (((x - obj._chartGutter._left) / (obj.canvas.width - gutterLeft - gutterRight)) * (obj._otherProps._xmax - obj._otherProps._xmin)) + obj._otherProps._xmin;
-                                xCoord = xCoord.toFixed(obj._otherProps._scale_decimals);
-                            var yCoord = obj.max - (((y - obj._chartGutter._top) / (obj.canvas.height - gutterTop - gutterBottom)) * obj.max);
-
-                            if (obj.type == 'scatter' && obj._otherProps._xaxispos == 'center') {
-                                yCoord = (yCoord - (obj.max / 2)) * 2;
-                            }
-
-                            yCoord = yCoord.toFixed(obj._otherProps._scale_decimals);
-
-                            var div    = OfficeExcelExcel.Registry.Get('chart.coordinates.coords.div');
-                            var mouseCoords = OfficeExcel.getMouseXY(e);
-                            var canvasXY = OfficeExcel.getCanvasXY(canvas);
-                            
-                            if (!div) {
-
-                                div = document.createElement('DIV');
-                                div.__object__     = obj;
-                                div.style.position = 'absolute';
-                                div.style.backgroundColor = 'white';
-                                div.style.border = '1px solid black';
-                                div.style.fontFamily = 'Arial, Verdana, sans-serif';
-                                div.style.fontSize = '10pt'
-                                div.style.padding = '2px';
-                                div.style.opacity = 1;
-                                div.style.WebkitBorderRadius = '3px';
-                                div.style.borderRadius = '3px';
-                                div.style.MozBorderRadius = '3px';
-                                document.body.appendChild(div);
-                                
-                                OfficeExcel.Registry.Set('chart.coordinates.coords.div', div);
-                            }
-                            
-                            // Convert the X/Y pixel coords to correspond to the scale
-                            div.style.opacity = 1;
-                            div.style.display = 'inline';
-
-                            if (!obj._otherProps._crosshairs_coords_fixed) {
-                                div.style.left = Math.max(2, (e.pageX - div.offsetWidth - 3)) + 'px';
-                                div.style.top = Math.max(2, (e.pageY - div.offsetHeight - 3))  + 'px';
-                            } else {
-                                div.style.left = canvasXY[0] + gutterLeft + 3 + 'px';
-                                div.style.top  = canvasXY[1] + gutterTop + 3 + 'px';
-                            }
-
-                            div.innerHTML = '<span style="color: #666">' + obj._otherProps._crosshairs_coords_labels_x + ':</span> ' + xCoord + '<br><span style="color: #666">' + obj._otherProps._crosshairs_coords_labels_y + ':</span> ' + yCoord;
-                            
-                            canvas.addEventListener('mouseout', OfficeExcel.HideCrosshairCoords, false);
-
-                            obj.canvas.__crosshairs_labels__ = div;
-                            obj.canvas.__crosshairs_x__ = xCoord;
-                            obj.canvas.__crosshairs_y__ = yCoord;
-
-                        } else {
-                            alert('[OfficeExcel] Showing crosshair coordinates is only supported on the Scatter chart');
-                        }
-                    }
-
-					//Fire the oncrosshairs custom event                    OfficeExcel.FireCustomEvent(obj, 'oncrosshairs');
-
-                } else {
-                    OfficeExcel.HideCrosshairCoords();
-                }
-            }
-            canvas.addEventListener('mousemove', crosshairs_mousemove, false);
-            OfficeExcel.AddEventListener(obj.id, 'mousemove', crosshairs_mousemove);
-        }*/
-    }
-
-    /**
-    * Thisz function hides the crosshairs coordinates
-    */
-    OfficeExcel.HideCrosshairCoords = function ()
-    {
-        /*var div = OfficeExcel.Registry.Get('chart.coordinates.coords.div');
-
-        if (   div
-            && div.style.opacity == 1
-            && div.__object__._otherProps._crosshairs_coords_fadeout
-           ) {
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.9;}, 50);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.8;}, 100);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.7;}, 150);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.6;}, 200);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.5;}, 250);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.4;}, 300);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.3;}, 350);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.2;}, 400);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0.1;}, 450);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.opacity = 0;}, 500);
-            setTimeout(function() {OfficeExcel.Registry.Get('chart.coordinates.coords.div').style.display = 'none';}, 550);
-        }*/
-    }
-
-
-    /**
-    * Trims the right hand side of a string. Removes SPACE, TAB
-    * CR and LF.
-    * 
-    * @param string str The string to trim
-    */
-    OfficeExcel.rtrim = function (str)
-    {
-        return str.replace(/( |\n|\r|\t)+$/, '');
-    }
-
-
-    /**
     * Draws the3D axes/background
     */
     OfficeExcel.Draw3DAxes = function (obj)
@@ -3299,33 +2885,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         
         context.stroke();
         context.fill();
-    }
-
-    // Turns off any shadow
-    OfficeExcel.NoShadow = function (obj)
-    {
-        obj.context.shadowColor   = 'rgba(0,0,0,0)';
-        obj.context.shadowBlur    = 0;
-        obj.context.shadowOffsetX = 0;
-        obj.context.shadowOffsetY = 0;
-    }
-    
-    
-    /**
-    * Sets the four shadow properties - a shortcut function
-    * 
-    * @param object obj     Your graph object
-    * @param string color   The shadow color
-    * @param number offsetx The shadows X offset
-    * @param number offsety The shadows Y offset
-    * @param number blur    The blurring effect applied to the shadow
-    */
-    OfficeExcel.SetShadow = function (obj, color, offsetx, offsety, blur)
-    {
-        obj.context.shadowColor   = color;
-        obj.context.shadowOffsetX = offsetx;
-        obj.context.shadowOffsetY = offsety;
-        obj.context.shadowBlur    = blur;
     }
 
     // Compatibility canvas browser
@@ -3378,39 +2937,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         }
     }
 
-
-
-    /**
-    * This is a function that can be used to run code asynchronously, which can
-    * be used to speed up the loading of you pages.
-    * 
-    * @param string func This is the code to run. It can also be a function pointer.
-    *                    The front page graphs show this function in action. Basically
-    *                   each graphs code is made in a function, and that function is
-    *                   passed to this function to run asychronously.
-    */
-    OfficeExcel.Async = function (func)
-    {
-        //return setTimeout(func, arguments[1] ? arguments[1] : 1);
-    }
-
-
-    /**
-    * A custom random number function
-    * 
-    * @param number min The minimum that the number should be
-    * @param number max The maximum that the number should be
-    * @param number    How many decimal places there should be. Default for this is 0
-    */
-    OfficeExcel.random = function (min, max)
-    {
-        var dp = arguments[2] ? arguments[2] : 0;
-        var r = Math.random();
-        
-        return Number((((max - min) * r) + min).toFixed(dp));
-    }
-
-    OfficeExcel.degrees2Radians=function(degrees){return degrees*(PI/180);}
     /**
     * Draws a rectangle with curvy corners
     * 
@@ -3548,111 +3074,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         context.fill();
     }
 
-
-    /**
-    * A crude timing function
-    * 
-    * @param string label The label to use for the time
-    */
-    OfficeExcel.Timer = function (label)
-    {
-        var d = new Date();
-
-        // This uses the Firebug console
-        console.log(label + ': ' + d.getSeconds() + '.' + d.getMilliseconds());
-    }
-
-
-    /**
-    * Hides the palette if it's visible
-    */
-    OfficeExcel.HidePalette = function ()
-    {
-        var div = OfficeExcel.Registry.Get('palette');
-
-        if (typeof(div) == 'object' && div) {
-            div.style.visibility = 'hidden';
-            div.style.display    = 'none';
-            OfficeExcel.Registry.Set('palette', null);
-        }
-    }
-
-
-    /**
-    * Hides the zoomed canvas
-    */
-    OfficeExcel.HideZoomedCanvas = function ()
-    {
-        /*var interval = 15;
-        var frames   = 10;
-
-        if (typeof(__zoomedimage__) == 'object') {
-            obj = __zoomedimage__.obj;
-        } else {
-            return;
-        }
-
-        if (obj._zoom._fade_out) {
-            for (var i=frames,j=1; i>=0; --i, ++j) {
-                if (typeof(__zoomedimage__) == 'object') {
-                    setTimeout("__zoomedimage__.style.opacity = " + String(i / 10), j * interval);
-                }
-            }
-
-            if (typeof(__zoomedbackground__) == 'object') {
-                setTimeout("__zoomedbackground__.style.opacity = " + String(i / frames), j * interval);
-            }
-        }
-
-        if (typeof(__zoomedimage__) == 'object') {
-            setTimeout("__zoomedimage__.style.display = 'none'", obj._zoom._fade_out ? (frames * interval) + 10 : 0);
-        }
-
-        if (typeof(__zoomedbackground__) == 'object') {
-            setTimeout("__zoomedbackground__.style.display = 'none'", obj._zoom._fade_out ? (frames * interval) + 10 : 0);
-        }*/
-    }
-
-
-    /**
-    * Adds an event handler
-    * 
-    * @param object obj   The graph object
-    * @param string event The name of the event, eg ontooltip
-    * @param object func  The callback function
-    */
-    OfficeExcel.AddCustomEventListener = function (obj, name, func)
-    {
-        if (typeof(OfficeExcel.events[obj.id]) == 'undefined') {
-            OfficeExcel.events[obj.id] = [];
-        }
-
-        OfficeExcel.events[obj.id].push([obj, name, func]);
-        
-        return OfficeExcel.events[obj.id].length - 1;
-    }
-
-    // Fire events
-    OfficeExcel.FireCustomEvent = function (obj, name)
-    {
-        if (obj && obj.isOfficeExcel) {
-            var id = obj.id;
-    
-            if (   typeof(id) == 'string'
-                && typeof(OfficeExcel.events) == 'object'
-                && typeof(OfficeExcel.events[id]) == 'object'
-                && OfficeExcel.events[id].length > 0) {
-    
-                for(var j=0; j<OfficeExcel.events[id].length; ++j) {
-                    if (OfficeExcel.events[id][j] && OfficeExcel.events[id][j][1] == name) {
-                        OfficeExcel.events[id][j][2](obj);
-                    }
-                }
-            }
-        }
-    }
-
-
     // Checks the browser for traces of MSIE8
     OfficeExcel.isIE8 = function ()
     {
@@ -3663,86 +3084,11 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
     {
         return navigator.userAgent.indexOf('MSIE 7') > 0;
     }
-    // Checks the browser for traces of MSIE9
-    OfficeExcel.isIE9 = function ()
-    {
-        return navigator.userAgent.indexOf('MSIE 9') > 0;
-    }
 
     // Checks the browser for traces of MSIE9
     OfficeExcel.isOld = function ()
     {
         return OfficeExcel.isIE7() || OfficeExcel.isIE8();
-    }
-
-    // Checks the browser for traces of MSIE9
-    OfficeExcel.isIE9up = function ()
-    {
-        navigator.userAgent.match(/MSIE (\d+)/);
-
-        return Number(RegExp.$1) >= 9;
-    }
-
-    //Clear all Listeners
-    OfficeExcel.ClearEventListeners = function (id)
-    {
-        for (var i = 0; i < OfficeExcel.Registry.Get('chart.event.handlers').length; ++i) {
-
-            var el = OfficeExcel.Registry.Get('chart.event.handlers')[i];
-            if (el && (el[0] == id || el[0] == ('window_' + id))) {
-                if (el[0].substring(0, 7) == 'window_')
-                    window.removeEventListener(el[1], el[2], false);
-                else {
-                    if (document.getElementById(id)) {
-                        document.getElementById(id).removeEventListener(el[1], el[2], false);
-                    }
-                }
-                
-                OfficeExcel.Registry.Get('chart.event.handlers')[i] = null;
-            }
-        }
-    }
-
-
-    /**
-    * 
-    */
-    OfficeExcel.AddEventListener = function (id, e, func)
-    {
-        var type = arguments[3] ? arguments[3] : 'unknown';
-
-        OfficeExcel.Registry.Get('chart.event.handlers').push([id, e, func, type]);
-    }
-
-
-    /**
-    * This function suggests a gutter size based on the widest left label. Given that the bottom
-    * labels may be longer, this may be a little out.
-    * 
-    * @param object obj  The graph object
-    * @param array  data An array of graph data
-    * @return int        A suggested gutter setting
-    */
-    OfficeExcel.getGutterSuggest = function (obj, data)
-    {
-        var str = OfficeExcel.number_format(obj, OfficeExcel.array_max(OfficeExcel.getScale(OfficeExcel.array_max(data), obj)), obj._otherProps._units_pre, obj._otherProps._units_post);
-
-        // Take into account the HBar
-        if (obj.type == 'hbar') {
-
-            var str = '';
-            var len = 0;
-
-            for (var i=0; i<obj._otherProps._labels.length; ++i) {
-                str = (obj._otherProps._labels.length > str.length ? obj._otherProps._labels[i] : str);
-            }
-        }
-
-        obj.context.font = obj._otherProps._text_size + 'pt ' + obj._otherProps._text_font;
-
-        len = obj.context.measureText(str).width + 5;
-
-        return (obj.type == 'hbar' ? len / 3 : len);
     }
 
 
@@ -3761,156 +3107,11 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         return ret;
     }
 
-
-    /**
-    * If you prefer, you can use the SetConfig() method to set the configuration information
-    * for your chart. You may find that setting the configuration this way eases reuse.
-    * 
-    * @param object obj    The graph object
-    * @param object config The graph configuration information
-    */
-    OfficeExcel.SetConfig = function (obj, c)
-    {
-        for (i in c) {
-            if (typeof(i) == 'string') {
-                obj.Set(i, c[i]);
-            }
-        }
-        
-        return obj;
-    }
-
-
     /**
     * These are older functions that were used before the move to seperate gutter settings
     */
     OfficeExcel.GetHeight=function(obj){return obj.canvas.height;}
     OfficeExcel.GetWidth=function(obj){return obj.canvas.width;}
-
-
-    /**
-    * Clears all the custom event listeners that have been registered
-    * 
-    * @param    string Limits the clearing to this object ID
-    */
-    OfficeExcel.RemoveAllCustomEventListeners = function ()
-    {
-        var id = arguments[0];
-
-        if (id && OfficeExcel.events[id]) {
-            OfficeExcel.events[id] = [];
-        } else {
-            OfficeExcel.events = [];
-        }
-    }
-
-
-    /**
-    * Clears a particular custom event listener
-    * 
-    * @param object obj The graph object
-    * @param number i   This is the index that is return by .AddCustomEventListener()
-    */
-    OfficeExcel.RemoveCustomEventListener = function (obj, i)
-    {
-        if (   typeof(OfficeExcel.events) == 'object'
-            && typeof(OfficeExcel.events[obj.id]) == 'object'
-            && typeof(OfficeExcel.events[obj.id][i]) == 'object') {
-            
-            OfficeExcel.events[obj.id][i] = null;
-        }
-    }
-
-
-    
-    OfficeExcel.DrawBackgroundImage1 = function (obj)
-    {
-        var img = new Image();
-        img.__object__  = obj;
-        img.__canvas__  = obj.canvas;
-        img.__context__ = obj.context;
-        img.src         = obj._otherProps._background_image;
-        img.onload = function ()
-        {
-            var obj = this.__object__;
-            obj.context.drawImage(this, 0, 0, obj.canvas.width, obj.canvas.height);
-            obj.__background_image__ = true;
-            obj.Draw();
-        }
-    }
-    
-    
-    
-    
-    // Draw the background
-    OfficeExcel.DrawBackgroundImage = function (obj)
-    {
-        var img = new Image();
-        img.__object__  = obj;
-        img.__canvas__  = obj.canvas;
-        img.__context__ = obj.context;
-        img.src         = obj._otherProps._background_image;
-        
-        obj.__background_image__ = img;
-
-        img.onload = function ()
-        {
-            var obj = this.__object__;
-            
-            var gutterLeft   = obj._chartGutter._left;
-            var gutterRight  = obj._chartGutter._right;
-            var gutterTop    = obj._chartGutter._top;
-            var gutterBottom = obj._chartGutter._bottom;
-            var stretch      = obj._otherProps._background_image_stretch;
-            var align        = obj._otherProps._background_image_align;
-
-            var x;
-            var y;
-
-            if (typeof(align) == 'string') {
-                if (align.indexOf('right') != -1)
-                    x = obj.canvas.width - this.width - gutterRight;
-                else
-                    x = gutterLeft;
-
-                if (align.indexOf('bottom') != -1)
-                    y = obj.canvas.height - this.height - gutterBottom;
-                else
-                    y = gutterTop;
-            } else {
-                x = gutterLeft;
-                y = gutterTop;
-            }
-            
-            // X/Y coords take precedence over the align
-            x = typeof(obj._otherProps._background_image_x) == 'number' ? obj._otherProps._background_image_x : x;
-            y = typeof(obj._otherProps._background_image_y) == 'number' ? obj._otherProps._background_image_y : y;
-            
-            var w = stretch ? obj.canvas.width - gutterLeft - gutterRight : this.width;
-            var h = stretch ? obj.canvas.height - gutterTop - gutterBottom : this.height;
-
-            OfficeExcel.Clear(obj.canvas);
-
-            obj.context.drawImage(this, x, y, w, h);
-            
-            
-            
-            // Draw the graph
-            obj.Draw();
-        }
-        
-        img.onerror = function ()
-        {
-            var obj = this.__canvas__.__object__;
-
-            // Show an error alert
-            alert('[ERROR] There was an error with the background image that you specified: ' + img.src);
-            
-            // Draw the graph, because the onload doesn't fire
-            obj.Draw();
-        }
-    }
-
 
     /**
     * This resets the canvas. Keep in mind that any translate() that has been performed will also be reset.
@@ -3933,70 +3134,20 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         return (newvalue - value) >= 0 ? newvalue : Math.floor(value);
     }
 
-    OfficeExcel.InstallUserClickListener = function (obj, func)
-    {
-        if (typeof(func) == 'function') {
-            function UserClickListener (e)
-            {
-                var obj   = e.target.__object__;
-                var shape = obj.getShape(e);
-
-                if (shape) {
-                    func(e, shape);
-                }
-            }
-            obj.canvas.addEventListener('click', UserClickListener, false);
-            OfficeExcel.AddEventListener(obj.id, 'click', UserClickListener);
-        }
-    }
-
-    OfficeExcel.InstallUserMousemoveListener = function (obj, func)
-    {
-        if (typeof(func) == 'function') {
-            function UserMousemoveHandler (e)
-            {
-                var obj   = e.target.__object__;
-                var shape = obj.getShape(e);
-                
-                /**
-                * This bit saves the current pointer style if there isn't one already saved
-                */
-                if (shape && typeof(func) == 'function') {
-                    if (obj._otherProps._events_mousemove_revertto == null) {
-                        obj._otherProps._events_mousemove_revertto = e.target.style.cursor;
-                    }
-                    func(e, shape)
-
-                } else if (typeof(obj._otherProps._events_mousemove_revertto) == 'string') {
-
-                    e.target.style.cursor = obj._otherProps._events_mousemove_revertto;
-                    obj._otherProps._events_mousemove_revertto = null;
-                }
-            }
-            obj.canvas.addEventListener('mousemove', UserMousemoveHandler, false);
-            OfficeExcel.AddEventListener(obj.id, 'mousemove', UserMousemoveHandler);
-        }
-    }
 	OfficeExcel.background.DrawArea = function (obj)
     {
         // Don't draw the axes?
         if (obj._otherProps._noaxes)
             return;
 
-        // Turn any shadow off
-        OfficeExcel.NoShadow(obj);
-
         obj.context.lineWidth   = 1;
         obj.context.lineCap = 'butt';
         obj.context.strokeStyle = obj._otherProps._axis_color;
         obj.context.fillStyle = 'yellow';
         obj.context.beginPath();
-        if (typeof(obj._otherProps._background_image) == 'string')
-            obj.context.fillStyle = "inherit";
-        else
-            obj.context.fillStyle = obj._otherProps._background_image_color;
-	
-			obj.context.fillRect(0,0,obj.canvas.width,obj.canvas.height)
+        obj.context.fillStyle = obj._otherProps._background_image_color;
+
+		obj.context.fillRect(0,0,obj.canvas.width,obj.canvas.height);
 		
 		// border
 		if ( !g_bChartPreview && obj._otherProps._area_border ) {

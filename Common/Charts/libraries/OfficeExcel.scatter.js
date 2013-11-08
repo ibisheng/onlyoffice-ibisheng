@@ -33,12 +33,6 @@
         this._xAxisTitle    = new OfficeExcel.Title();
         // yAxis Title
         this._yAxisTitle    = new OfficeExcel.Title();
-        // Chart shadow
-        this._shadow        = new OfficeExcel.Shadow();
-        // zoom
-        this._zoom          = new OfficeExcel.chartZoom();
-        // Tooltip
-        this._tooltip       = new OfficeExcel.Tooltips();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
 
@@ -62,12 +56,6 @@
             alert('[SCATTER] No canvas support');
             return;
         }
-
-
-        /**
-        * Set the .getShape commonly named method
-        */
-        this.getShape = this.getPoint;
     }
 
     /**
@@ -75,40 +63,10 @@
     */
     OfficeExcel.Scatter.prototype.Draw = function (min,max,ymin,ymax,isSkip,isFormatCell,isformatCellScOy)
     {
-        // MUST be the first thing done!
-        if (typeof(this._otherProps._background_image) == 'string' && !this.__background_image__) {
-            OfficeExcel.DrawBackgroundImage(this);
-            return;
-        }
         var xScale;
-        /**
-        * Fire the onbeforedraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'onbeforedraw');
-
-        /**
-        * Clear all of this canvases event handlers (the ones installed by OfficeExcel)
-        */
-        //OfficeExcel.ClearEventListeners(this.id);
-
-        // Go through all the data points and see if a tooltip has been given
-        this._tooltip._tooltips = false;
-        this.hasTooltips = false;
-        var overHotspot  = false;
 
         // Reset the coords array
         this.coords = [];
-
-        if (!OfficeExcel.isOld()) {
-            for (var i=0; i<this.data.length; ++i) {
-                for (var j =0;j<this.data[i].length; ++j) {
-                    if (this.data[i][j] && this.data[i][j][3] && typeof(this.data[i][j][3]) == 'string' && this.data[i][j][3].length) {
-                        this._tooltip._tooltips = [1];
-                        this.hasTooltips = true;
-                    }
-                }
-            }
-        }
 
         // Reset the maximum value
         this.max = 0;
@@ -239,17 +197,8 @@
         for(i=0; i<this.data.length; ++i) {
             this.DrawMarks(i);
 
-            // Set the shadow
-            this.context.shadowColor   = this._otherProps._line_shadow_color;
-            this.context.shadowOffsetX = this._otherProps._line_shadow_offsetx;
-            this.context.shadowOffsetY = this._otherProps._line_shadow_offsety;
-            this.context.shadowBlur    = this._otherProps._line_shadow_blur;
-            
             if(this._otherProps._type != 'burse2')
 				this.DrawLine(i);
-
-            // Turn the shadow off
-            OfficeExcel.NoShadow(this);
         }
 
 
@@ -258,119 +207,6 @@
                 this.DrawMarks(i); // Call this again so the tickmarks appear over the line
             }
         }
-
-
-        /**
-        * Install the clickand mousemove event listeners
-        */
-        OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
-        OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
-        /**
-        * Install the event handler for tooltips
-        */
-        if (this.hasTooltips) {
-
-            /**
-            * Register all charts
-            */
-            OfficeExcel.Register(this);
-            
-            OfficeExcel.PreLoadTooltipImages(this);
-
-            var overHotspot = false;
-
-            var canvas_onmousemove_func = function (e)
-            {
-                e = OfficeExcel.FixEventObject(e);
-
-                var canvas      = e.target;
-                var obj         = canvas.__object__;
-                var context     = obj.context;
-                var mouseCoords = OfficeExcel.getMouseXY(e);
-                var point       = obj.getPoint(e);
-                var overHotspot = false;
-
-                if (point) {
-
-                    var __dataset__ = point[2];
-                    var __index__   = point[3];
-                    var __text__    = point[4];
-                    var overHotspot = true;
-                    
-                    /**
-                    * Get the tooltip text
-                    */
-                    var text = OfficeExcel.parseTooltipText(obj.data[__dataset__][__index__], 3);
-
-
-
-                    if (point[4]) {
-
-                        if (
-                            !OfficeExcel.Registry.Get('chart.tooltip') ||
-                            OfficeExcel.Registry.Get('chart.tooltip').__text__ != __text__ ||
-                            OfficeExcel.Registry.Get('chart.tooltip').__index__ != __index__ ||
-                            OfficeExcel.Registry.Get('chart.tooltip').__dataset__ != __dataset__
-                           ) {
-
-                            if (obj._tooltip._highlight) {
-                                OfficeExcel.Redraw();
-                            }
-
-                            /**
-                            * Show the tooltip
-                            */
-                            if (text) {
-                                canvas.style.cursor = 'pointer';
-                                OfficeExcel.Tooltip(canvas, text, e.pageX, e.pageY, __index__);
-                                OfficeExcel.Registry.Get('chart.tooltip').__text__ = obj.data[__dataset__][__index__][3];
-                            } 
-
-                            OfficeExcel.Registry.Get('chart.tooltip').__index__ = __index__;
-                            
-                            if (OfficeExcel.Registry.Get('chart.tooltip')) {
-                                OfficeExcel.Registry.Get('chart.tooltip').__dataset__ = __dataset__;
-                            }
-
-
-
-                            /**
-                            * Draw a circle around the mark. Also highlight the boxplot if necessary
-                            */
-                            if (obj._tooltip._highlight && typeof(point[0]) == 'object') {
-                                context.beginPath();
-                                context.strokeStyle = 'black';
-                                context.fillStyle = 'rgba(255,255,255,0.5)';
-                                context.strokeRect(point[0][0], point[1][0], point[0][1], point[1][1]);
-                                context.fillRect(point[0][0], point[1][0], point[0][1], point[1][1]);
-                                context.stroke();
-                                context.fill();
-
-                            } else if (obj._tooltip._highlight && typeof(point[0]) == 'number') {
-                                context.beginPath();
-                                context.fillStyle = 'rgba(255,255,255,0.5)';
-                                context.arc(point[0], point[1], 3, 0, 6.28, 0);
-                                context.fill();
-                            }
-                        // Just change the mouse pointer
-                        } else if (point[4] && text) {
-                            e.target.style.cursor = 'pointer';
-                        }
-                    }
-                }
-
-                /**
-                * Reset the pointer
-                */
-                if (!overHotspot || !point[4]) {
-                    canvas.style.cursor = 'default';
-                }
-            }
-            this.canvas.addEventListener('mousemove', canvas_onmousemove_func, false);
-            OfficeExcel.AddEventListener(this.id, 'mousemove', canvas_onmousemove_func);
-        }
-        
         
         /**
         * Draw the key if necessary
@@ -391,18 +227,6 @@
         * Draw the "in graph" labels, using the member function, NOT the shared function in OfficeExcel.common.core.js
         */
         this.DrawInGraphLabels(this);
-
-
-        /**
-        * Draw crosschairs
-        */
-        OfficeExcel.DrawCrosshairs(this);
-
-        
-        /**
-        * Fire the OfficeExcel ondraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
     /**
@@ -583,40 +407,16 @@
         */
 		if(!this._otherProps._noxaxis)
 		{
-			 if('auto' == this._otherProps._ylabels_count)
+			var x = this._chartGutter._left;
+			var yStart = this.nullPositionOY;
+			var yEnd   = this.nullPositionOY + 5;
+			for (var j=0; j <= this._otherProps._background_grid_autofit_numvlines; j++)
 			{
-				var x = this._chartGutter._left;
-				var yStart = this.nullPositionOY;
-				var yEnd   = this.nullPositionOY + 5;
-				for (var j=0; j <= this._otherProps._background_grid_autofit_numvlines; j++) 
-				{
-					var newX = x + ((this.canvas.width - this._chartGutter._right - this._chartGutter._left)/(this._otherProps._background_grid_autofit_numvlines))*j;
-					if(j == this._otherProps._background_grid_autofit_numvlines)
-						newX = this.canvas.width - this._chartGutter._right;
-					this.context.moveTo(AA(this, newX), yStart);
-					this.context.lineTo(AA(this, newX), yEnd);
-				}
-			}
-			else if (this._otherProps._xticks && this._otherProps._xaxis) {
-				var x  = 0;
-				var y  =  (this._otherProps._xaxispos == 'center') ? this._chartGutter._top + (this.grapharea / 2): (this.canvas.height - this._chartGutter._bottom);
-				this.xTickGap = (this.Get('chart.labels') && this.Get('chart.labels').length) ? ((this.canvas.width - this.gutterLeft - this.gutterRight ) / this.Get('chart.labels').length) : (this.canvas.width - this.gutterLeft - this.gutterRight) / 10;
-
-
-				for (x =  (this._chartGutter._left + (this._otherProps._yaxispos == 'left' ? this.xTickGap : 0) );
-					 x <= (this.canvas.width - this._chartGutter._right - (this._otherProps._yaxispos == 'left' ? -1 : 1));
-					 x += this.xTickGap) {
-
-					if (this._otherProps._yaxispos == 'left' && this._otherProps._noendxtick == true && x == (this.canvas.width - this._chartGutter._right) ) {
-						continue;
-					} else if (this._otherProps._yaxispos == 'right' && this._otherProps._noendxtick == true && x == this._chartGutter._left) {
-						continue;
-					}
-
-					context.moveTo(AA(this, x), y - (this._otherProps._xaxispos == 'center' ? 3 : 0));
-					context.lineTo(AA(this, x), y + 3);
-				}
-
+				var newX = x + ((this.canvas.width - this._chartGutter._right - this._chartGutter._left)/(this._otherProps._background_grid_autofit_numvlines))*j;
+				if(j == this._otherProps._background_grid_autofit_numvlines)
+					newX = this.canvas.width - this._chartGutter._right;
+				this.context.moveTo(AA(this, newX), yStart);
+				this.context.lineTo(AA(this, newX), yEnd);
 			}
 		}
         context.stroke();
@@ -1653,11 +1453,6 @@
             }
         }
 
-        /**
-        * Turn off any shadow
-        */
-        OfficeExcel.NoShadow(obj);
-
         if (labels_processed && labels_processed.length > 0) {
 
             var i=0;
@@ -1709,66 +1504,6 @@
             }
         }
     }
-
-
-    /**
-    * This function makes it much easier to get the (if any) point that is currently being hovered over.
-    * 
-    * @param object e The event object
-    */
-    OfficeExcel.Scatter.prototype.getPoint = function (e)
-    {
-        var canvas      = e.target;
-        var obj         = canvas.__object__;
-        var context     = obj.context;
-        var mouseXY     = OfficeExcel.getMouseXY(e);
-        var mouseX      = mouseXY[0];
-        var mouseY      = mouseXY[1];
-        var overHotspot = false;
-        var offset = obj._tooltip._hotspot;
-
-        for (var _set=0; _set<obj.coords.length; ++_set) {
-            for (var i=0; i<obj.coords[_set].length; ++i) {
-
-                var xCoord = obj.coords[_set][i][0];
-                var yCoord = obj.coords[_set][i][1];
-
-                if (typeof(yCoord) == 'number') {
-                    if (mouseX <= (xCoord + offset) &&
-                        mouseX >= (xCoord - offset) &&
-                        mouseY <= (yCoord + offset) &&
-                        mouseY >= (yCoord - offset)) {
-                        
-                        return [xCoord, yCoord, _set, i, obj.data[_set][i][3]];
-                    }
-                } else {
-
-                    var mark = obj.data[_set][i];
-
-
-                    /**
-                    * Determine the width
-                    */
-                    var width = obj._otherProps._boxplot_width;
-                    
-                    if (typeof(mark[1][7]) == 'number') {
-                        width = mark[1][7];
-                    }
-
-                    if (   typeof(xCoord) == 'object'
-                        && mouseX > xCoord[0]
-                        && mouseX < xCoord[1]
-                        && mouseY < yCoord[3]
-                        && mouseY > yCoord[1]
-                        ) {
-
-                        return [[xCoord[0], xCoord[1] - xCoord[0]], [yCoord[1], yCoord[3] - yCoord[1]], _set, i, obj.data[_set][i][3]];
-                    }
-                }
-            }
-        }
-    }
-
 
     /**
     * Draws the above line labels

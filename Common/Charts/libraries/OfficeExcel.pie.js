@@ -32,12 +32,6 @@
         this._xAxisTitle    = new OfficeExcel.Title();
         // yAxis Title
         this._yAxisTitle    = new OfficeExcel.Title();
-        // Chart shadow
-        this._shadow        = new OfficeExcel.Shadow();
-        // zoom
-        this._zoom          = new OfficeExcel.chartZoom();
-        // Tooltip
-        this._tooltip       = new OfficeExcel.Tooltips();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
 
@@ -47,12 +41,6 @@
         for (var i=0,len=data.length; i<len; i++) {
             this.total += data[i];
         }
-
-
-        /**
-        * Set the .getShape commonly named method
-        */
-        this.getShape = this.getSegment;
     }
 
     /**
@@ -60,17 +48,6 @@
     */
     OfficeExcel.Pie.prototype.Draw = function (min,max,ymin,ymax,isSkip,isFormatCell)
     {
-        /**
-        * Fire the onbeforedraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'onbeforedraw');
-
-        /**
-        * Clear all of this canvases event handlers (the ones installed by OfficeExcel)
-        */
-        //OfficeExcel.ClearEventListeners(this.id);
-
-
         this.radius           = this._otherProps._radius ? this._otherProps._radius : this.getRadius();
         // this.centerx now defined below
         this.centery          = ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) / 2) + this._chartGutter._top;
@@ -117,30 +94,6 @@
             this._chartTitle._size ? this._chartTitle._size : this._otherProps._text_size + 2);
 
         /**
-        * Draw the shadow if required
-        */
-        if (this._shadow._visible && 0) {
-        
-            var offsetx = document.all ? this._shadow._offset_x : 0;
-            var offsety = document.all ? this._shadow._offset_y : 0;
-
-            this.context.beginPath();
-            this.context.fillStyle = this._shadow._color;
-
-            this.context.shadowColor   = this._shadow._color;
-            this.context.shadowBlur    = this._shadow._blur;
-            this.context.shadowOffsetX = this._shadow._offset_x;
-            this.context.shadowOffsetY = this._shadow._offset_y;
-            
-            this.context.arc(this.centerx + offsetx, this.centery + offsety, this.radius, 0, 6.28, 0);
-            
-            this.context.fill();
-            
-            // Now turn off the shadow
-            OfficeExcel.NoShadow(this);
-        }
-
-        /**
         * The total of the array of values
         */
         this.total = OfficeExcel.array_sum(this.data);
@@ -153,18 +106,12 @@
             this.DrawSegment(angle,this._otherProps._colors[i],i == (this.data.length - 1), i);
         }
 
-        OfficeExcel.NoShadow(this);
-
 
         /**
         * Redraw the seperating lines
         */
         this.DrawBorders();
 
-        /**
-        * Now draw the segments again with shadow turned off. This is always performed,
-        * not just if the shadow is on.
-        */
 		//TODO граница между секторами круговой диаграммы - в следующей версии нужно зачитывать из xml
         /*for (var i=0; i<this.angles.length; i++) {
     
@@ -206,7 +153,7 @@
             var strokeStyle = this._otherProps._strokecolor;
             var isWhite     = strokeStyle == 'white' || strokeStyle == '#fff' || strokeStyle == '#fffffff' || strokeStyle == 'rgb(255,255,255)' || strokeStyle == 'rgba(255,255,255,0)';
 
-            if (!isWhite || (isWhite && this._shadow._visible)) {
+            if (!isWhite) {
                // Again (?)
               this.DrawBorders();
            }
@@ -216,245 +163,6 @@
         * Draw the labels
         */
         this.DrawLabels(isFormatCell);
-
-        /**
-        * Install the clickand mousemove event listeners
-        */
-        OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
-        OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
-        /**
-        * Tooltips
-        */
-        if (this._tooltip._tooltips && this._tooltip._tooltips.length) {
-
-            /**
-            * Register this object for redrawing
-            */
-            OfficeExcel.Register(this);
-            
-            OfficeExcel.PreLoadTooltipImages(this);
-        
-            /**
-            * The onclick event
-            */
-            //this.canvas.onclick = function (e)
-            var canvas_onclick_func = function (e)
-            {
-                OfficeExcel.HideZoomedCanvas();
-
-                e = OfficeExcel.FixEventObject(e);
-
-                var mouseCoords = OfficeExcel.getMouseXY(e);
-
-                var canvas  = e.target;
-                var context = canvas.getContext('2d');
-                var obj     = e.target.__object__;
-
-
-
-                /**
-                * If it's actually a donut make sure the hyp is bigger
-                * than the size of the hole in the middle
-                */
-                if (obj._otherProps._variant == 'donut' && Math.abs(hyp) < (obj.radius / 2)) {
-                    return;
-                }
-
-                /**
-                * The angles for each segment are stored in "angles",
-                * so go through that checking if the mouse position corresponds
-                */
-                var isDonut = obj._otherProps._variant == 'donut';
-                var hStyle  = obj._otherProps._highlight_style;
-                var segment = obj.getSegment(e);
-
-
-                if (segment) {
-
-                    var x     = mouseCoords[0] - segment[0];
-                    var y     = mouseCoords[1] - segment[1];
-                    var theta = Math.atan(y / x); // RADIANS
-                    var hyp   = y / Math.sin(theta);
-
-
-                    if (   OfficeExcel.Registry.Get('chart.tooltip')
-                        && segment[5] == OfficeExcel.Registry.Get('chart.tooltip').__index__
-                        && OfficeExcel.Registry.Get('chart.tooltip').__canvas__.__object__.id == obj.id) {
-
-                        return;
-
-                    } else {
-                        OfficeExcel.Redraw();
-                    }
-
-                    /**
-                    * If a tooltip is defined, show it
-                    */
-    
-                    /**
-                    * Get the tooltip text
-                    */
-                    var text = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, segment[5]);
-    
-                    if (text) {
-                        OfficeExcel.Tooltip(canvas, text, e.pageX, e.pageY, segment[5]);
-                    }
-
-
-                    /**
-                    * Do the highlighting
-                    */
-                    if (text) {
-                        if (hStyle == '2d') {
-                            
-                            obj.highlight_segment(segment);
-    
-                        } else if (hStyle == 'explode') {
-    
-                            
-                           obj.Explode(segment[5], 25);
-    
-                            setTimeout(function () {obj._otherProps._exploded = [];}, document.all ? 1000 : 500);
-                            
-                            e.stopPropagation();
-                            e.cancelBubble = true;
-                            //return false;
-    
-                        } else {
-    
-                            context.lineWidth = 2;
-    
-                            /**
-                            * Draw a white segment where the one that has been clicked on was
-                            */
-                            context.fillStyle = 'white';
-                            context.strokeStyle = 'white';
-                            context.beginPath();
-                                //context.moveTo(segment[0], segment[1]);
-                                context.arc(segment[0], segment[1], segment[2], obj.angles[segment[5]][0], obj.angles[segment[5]][1], false);
-                                obj._otherProps._variant == 'donut' ? context.arc(segment[0], segment[1], segment[2] / 2, obj.angles[segment[5]][1], obj.angles[segment[5]][0], true) : context.lineTo(segment[0], segment[1]);
-                            context.stroke();
-                            context.fill();
-    
-                            context.lineWidth = 1;
-    
-                            context.shadowColor   = '#666';
-                            context.shadowBlur    = 3;
-                            context.shadowOffsetX = 3;
-                            context.shadowOffsetY = 3;
-    
-                            // Draw the new segment
-                            context.beginPath();
-                                context.fillStyle   = obj._otherProps._colors[segment[5]];
-                                context.strokeStyle = obj._otherProps._strokecolor;
-                                context.arc(segment[0] - 3, segment[1] - 3, segment[2], obj.angles[segment[5]][0], obj.angles[segment[5]][1], false);
-                                obj._otherProps._variant == 'donut' ? context.arc(segment[0] - 3, segment[1] - 3, segment[2] / 2, obj.angles[segment[5]][1], obj.angles[segment[5]][0], true) : context.lineTo(segment[0], segment[1]);
-                            context.closePath();
-                            
-                            context.stroke();
-                            context.fill();
-                            
-                            // Turn off the shadow
-                            OfficeExcel.NoShadow(obj);
-                            
-                            /**
-                            * If a border is defined, redraw that
-                            */
-                            if (obj._otherProps._border) {
-                                context.beginPath();
-                                context.strokeStyle = obj._otherProps._border_color;
-                                context.lineWidth = 5;
-                                context.arc(segment[0] - 3, segment[1] - 3, obj.radius - 2, obj.angles[i][0], obj.angles[i][1], 0);
-                                context.stroke();
-                            }
-                        }
-                    }
-
-
-                    /**
-                    * Need to redraw the key?
-                    */
-                    if (obj._otherProps._key && obj._otherProps._key.length && obj._otherProps._key_position == 'graph') {
-                        OfficeExcel.DrawKey(obj, obj._otherProps._key, obj._otherProps._colors);
-                    }
-
-                    e.stopPropagation();
-
-                    return;
-                } else if (obj._tooltip._event == 'onclick') {
-                    OfficeExcel.Redraw();
-                }
-            }
-            var event_name = this._tooltip._event == 'onmousemove' ? 'mousemove' : 'click';
-
-            this.canvas.addEventListener(event_name, canvas_onclick_func, false);
-            OfficeExcel.AddEventListener(this.id, event_name, canvas_onclick_func);
-
-
-
-
-
-
-            /**
-            * The onmousemove event for changing the cursor
-            */
-            //this.canvas.onmousemove = function (e)
-            var canvas_onmousemove_func = function (e)
-            {
-                OfficeExcel.HideZoomedCanvas();
-
-                e = OfficeExcel.FixEventObject(e);
-                
-                var obj     = e.target.__object__;
-                var segment = obj.getSegment(e);
-
-                if (segment) {
-                    var text = OfficeExcel.parseTooltipText(obj._tooltip._tooltips, segment[5]);
-                    
-                    if (text) {
-                        e.target.style.cursor = 'pointer';
-                        return;
-                    }
-                }
-
-                /**
-                * Put the cursor back to null
-                */
-                e.target.style.cursor = 'default';
-            }
-            this.canvas.addEventListener('mousemove', canvas_onmousemove_func, false);
-            OfficeExcel.AddEventListener(this.id, 'mousemove', canvas_onmousemove_func);
-
-
-
-
-
-
-
-
-
-            /**
-            * The window onclick function
-            */
-            var window_onclick_func = function (e)
-            {
-                // Taken out on 02/10/11
-                //OfficeExcel.HideZoomedCanvas();
-
-                e = OfficeExcel.FixEventObject(e);
-
-                OfficeExcel.Redraw();
-
-                /**
-                * Put the cursor back to null
-                */
-                //e.target.style.cursor = 'default';
-            }
-            window.addEventListener('click', window_onclick_func, false);
-            OfficeExcel.AddEventListener('window_' + this.id, 'click', window_onclick_func);
-        }
-
 
         /**
         * If a border is pecified, draw it
@@ -480,14 +188,6 @@
         if (this._otherProps._key != null) {
             OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }
-
-        OfficeExcel.NoShadow(this);
-
-
-        /**
-        * Fire the OfficeExcel ondraw event
-        */
-        OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
 
@@ -517,9 +217,6 @@
             context.fillStyle   = color;
             context.strokeStyle = this._otherProps._strokecolor;
             context.lineWidth   = 0;
-            
-            if (this._shadow._visible)
-                OfficeExcel.SetShadow(this, this._shadow._color,this._shadow._offset_x, this._shadow._offset_y, this._shadow._blur);
 
             /**
             * Exploded segments
@@ -608,11 +305,6 @@
 			centerx  = (this.canvas.width + this._chartGutter._left)/2;
 		if(centerx <= (this.radius + 14) || (this.canvas.width - (this.radius*2) - this._chartGutter._left) <= 14)
 			centerx = this.centerx;
-		
-        /**
-        * Turn the shadow off
-        */
-        OfficeExcel.NoShadow(this);
         
         context.fillStyle = 'black';
         context.beginPath();
@@ -759,86 +451,6 @@
         }
     }
 
-
-    /**
-    * The (now Pie chart specific) getSegment function
-    * 
-    * @param object e The event object
-    */
-    OfficeExcel.Pie.prototype.getSegment = function (e)
-    {
-        OfficeExcel.FixEventObject(e);
-
-        // The optional arg provides a way of allowing some accuracy (pixels)
-        var accuracy = arguments[1] ? arguments[1] : 0;
-
-        var obj         = e.target.__object__;
-        var canvas      = obj.canvas;
-        var context     = obj.context;
-        var mouseCoords = OfficeExcel.getMouseXY(e);
-        var r           = obj.radius;
-        var angles      = obj.angles;
-        var ret         = [];
-
-        for (var i=0; i<angles.length; ++i) {
-
-            var x     = mouseCoords[0] - angles[i][2];
-            var y     = mouseCoords[1] - angles[i][3];
-            var theta = Math.atan(y / x); // RADIANS
-            var hyp   = y / Math.sin(theta);
-            var hyp   = (hyp < 0) ? hyp + accuracy : hyp - accuracy;
-
-
-            /**
-            * Account for the correct quadrant
-            */
-            if (x < 0 && y >= 0) {
-                theta += Math.PI;
-            } else if (x < 0 && y < 0) {
-                theta += Math.PI;
-            }
-
-            if (theta > (2 * Math.PI)) {
-                theta -= (2 * Math.PI);
-            }
-
-            if (theta >= angles[i][0] && theta < angles[i][1]) {
-
-                hyp = Math.abs(hyp);
-
-                if (!hyp || (obj.radius && hyp > obj.radius) ) {
-                    return null;
-                }
-
-                if (obj.type == 'pie' && obj._otherProps._variant == 'donut' && (hyp > obj.radius || hyp < (obj.radius / 2) ) ) {
-                    return null;
-                }
-
-
-
-                ret[0] = angles[i][2];
-                ret[1] = angles[i][3];
-                ret[2] = obj.radius;
-                ret[3] = angles[i][0] - (2 * Math.PI);
-                ret[4] = angles[i][1];
-                ret[5] = i;
-
-
-                
-                if (ret[3] < 0) ret[3] += (2 * Math.PI);
-                if (ret[4] > (2 * Math.PI)) ret[4] -= (2 * Math.PI);
-                
-                ret[3] = ret[3];
-                ret[4] = ret[4];
-
-                return ret;
-            }
-        }
-        
-        return null;
-    }
-
-
     OfficeExcel.Pie.prototype.DrawBorders = function ()
     {
         if (this._otherProps._linewidth > 0) {
@@ -874,54 +486,4 @@
     OfficeExcel.Pie.prototype.getRadius = function ()
     {
         return Math.min(this.canvas.height - this._chartGutter._top - this._chartGutter._bottom, this.canvas.width - this._chartGutter._left - this._chartGutter._right) / 2;
-    }
-
-
-    /**
-    * A programmatic explode function
-    * 
-    * @param object obj   The chart object
-    * @param number index The zero-indexed number of the segment
-    * @param number size  The size (in pixels) of the explosion
-    */
-    OfficeExcel.Pie.prototype.Explode = function (index, size)
-    {
-        var obj = this;
-        
-        this._otherProps._exploded = [];
-        this._otherProps._exploded[index] = 0;
-
-        for (var o=0; o<size; ++o) {
-            setTimeout(
-                function ()
-                {
-                    obj._otherProps._exploded[index] += 1;
-                    OfficeExcel.Clear(obj.canvas);
-                    obj.Draw();
-                }, o * (document.all ? 25 : 16.666));
-        }
-    }
-
-
-    /**
-    * This function highlights a segment
-    * 
-    * @param array segment The segment information that is returned by the pie.getSegment(e) function
-    */
-    OfficeExcel.Pie.prototype.highlight_segment = function (segment)
-    {
-        var context = this.context;
-
-        context.beginPath();
-    
-        context.strokeStyle = this._otherProps._highlight_style_2d_stroke;
-        context.fillStyle   = this._otherProps._highlight_style_2d_fill;
-    
-        context.moveTo(segment[0], segment[1]);
-        context.arc(segment[0], segment[1], segment[2], this.angles[segment[5]][0], this.angles[segment[5]][1], 0);
-        context.lineTo(segment[0], segment[1]);
-        context.closePath();
-        
-        context.stroke();
-        context.fill();
     }
