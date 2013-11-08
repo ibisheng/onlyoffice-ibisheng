@@ -39,13 +39,6 @@
         this.centery          = ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) / 2) + this._chartGutter._top;
         this.subTotal         = 0;
         this.angles           = [];
-
-        /**
-        * Allow the specification of a custom centery
-        */
-        if (typeof(this._otherProps._centery) == 'number') {
-            this.centery = this._otherProps._centery;
-        }
         
         /**
         * Alignment (Pie is center aligned by default) Only if centerx is not defined - donut defines the centerx
@@ -58,13 +51,6 @@
         
         } else {
             this.centerx = this.canvas.width / 2;
-        }
-        
-        /**
-        * Allow the specification of a custom centerx
-        */
-        if (typeof(this._otherProps._centerx) == 'number') {
-            this.centerx = this._otherProps._centerx;
         }
         
         //Draw Area
@@ -123,27 +109,6 @@
         */
         this.DrawLabels(isFormatCell);
 
-        /**
-        * If a border is pecified, draw it
-        */
-        if (this._otherProps._border) {
-            this.context.beginPath();
-            this.context.lineWidth = 5;
-            this.context.strokeStyle = this._otherProps._border_color;
-
-            this.context.arc(this.centerx,
-                             this.centery,
-                             this.radius - 2,
-                             0,
-                             6.28,
-                             0);
-
-            this.context.stroke();
-        }
-        
-        /**
-        * Draw the kay if desired
-        */
         if (this._otherProps._key != null) {
             OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }

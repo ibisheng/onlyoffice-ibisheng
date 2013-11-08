@@ -54,12 +54,7 @@ OfficeExcel.OtherProps = function()
 
     this._segments = [];
 
-    this._centerx = null;
-    this._centery = null;
-
-    this._border = false;
 	this._area_border = true;	// граница для всей области диаграммы
-    this._border_color = 'rgba(255,255,255,0.5)';
 
     this._align = 'center';
 
