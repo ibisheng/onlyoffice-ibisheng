@@ -3476,13 +3476,13 @@ function CBinaryFileWriter()
 
         oThis.StartRecord(0);
 
-        oThis.WriteRecord3(0, _part.TableCellPr.TableCellBorders.Left, oThis.WriteTableCellBorderLineStyle);
-        oThis.WriteRecord3(1, _part.TableCellPr.TableCellBorders.Right, oThis.WriteTableCellBorderLineStyle);
-        oThis.WriteRecord3(2, _part.TableCellPr.TableCellBorders.Top, oThis.WriteTableCellBorderLineStyle);
-        oThis.WriteRecord3(3, _part.TableCellPr.TableCellBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteTableCellBorderLineStyle2(0, _part.TableCellPr.TableCellBorders.Left);
+        oThis.WriteTableCellBorderLineStyle2(1, _part.TableCellPr.TableCellBorders.Right);
+        oThis.WriteTableCellBorderLineStyle2(2, _part.TableCellPr.TableCellBorders.Top);
+        oThis.WriteTableCellBorderLineStyle2(3, _part.TableCellPr.TableCellBorders.Bottom);
 
-        oThis.WriteRecord3(4, _part.TablePr.TableBorders.InsideH, oThis.WriteTableCellBorderLineStyle);
-        oThis.WriteRecord3(5, _part.TablePr.TableBorders.InsideV, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteTableCellBorderLineStyle2(4, _part.TableCellPr.TableCellBorders.InsideH);
+        oThis.WriteTableCellBorderLineStyle2(5, _part.TableCellPr.TableCellBorders.InsideV);
 
         oThis.EndRecord();
 
@@ -3570,9 +3570,23 @@ function CBinaryFileWriter()
 
     this.WriteTableCellBorder = function(_border)
     {
+        if (_border.Value == border_None)
+        {
+            oThis.StartRecord(0);
+            oThis.WriteUChar(g_nodeAttributeStart);
+            oThis.WriteUChar(g_nodeAttributeEnd);
+
+            var _unifill = new CUniFill();
+            _unifill.fill = new CNoFill();
+            oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+
+            oThis.EndRecord();
+            return;
+        }
+
         var bIsFill = false;
         var bIsSize = false;
-        if (_border.unifill !== undefined && _border.unifill != null)
+        if ((_border.unifill !== undefined && _border.unifill != null) || _border.Color instanceof CDocumentColor)
         {
             bIsFill = true;
         }
@@ -3591,17 +3605,71 @@ function CBinaryFileWriter()
             }
             oThis.WriteUChar(g_nodeAttributeEnd);
 
+            // TODO: потом переделать по-нормальному
+            if (!_border.unifill && _border.Color instanceof CDocumentColor)
+            {
+                var _unifill = new CUniFill();
+                _unifill.fill = new CSolidFill();
+                _unifill.fill.color.color = new CRGBColor();
+
+                _unifill.fill.color.color.RGBA.R = _border.Color.r;
+                _unifill.fill.color.color.RGBA.G = _border.Color.g;
+                _unifill.fill.color.color.RGBA.B = _border.Color.b;
+
+                oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+            }
+
             oThis.WriteRecord2(0, _border.unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
         }
     }
+
+    this.WriteTableCellBorderLineStyle2 = function(rec_type, _border)
+    {
+        if (!_border)
+        {
+            oThis.StartRecord(rec_type);
+
+            oThis.StartRecord(0);
+            oThis.WriteUChar(g_nodeAttributeStart);
+            oThis.WriteUChar(g_nodeAttributeEnd);
+
+            var _unifill = new CUniFill();
+            _unifill.fill = new CNoFill();
+            oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+
+            oThis.EndRecord();
+
+            oThis.EndRecord();
+            return;
+        }
+        else
+        {
+            oThis.WriteRecord3(rec_type, _border, oThis.WriteTableCellBorderLineStyle);
+        }
+    }
+
     this.WriteTableCellBorderLineStyle = function(_border)
     {
+        if (_border.Value == border_None)
+        {
+            oThis.StartRecord(0);
+            oThis.WriteUChar(g_nodeAttributeStart);
+            oThis.WriteUChar(g_nodeAttributeEnd);
+
+            var _unifill = new CUniFill();
+            _unifill.fill = new CNoFill();
+            oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+
+            oThis.EndRecord();
+            return;
+        }
+
         var bIsFill = false;
         var bIsSize = false;
         var bIsLnRef = false;
-        if (_border.unifill !== undefined && _border.unifill != null)
+        if ((_border.unifill !== undefined && _border.unifill != null) || _border.Color instanceof CDocumentColor)
         {
             bIsFill = true;
         }
@@ -3619,6 +3687,20 @@ function CBinaryFileWriter()
                 oThis._WriteInt2(3, (_border.Size * 36000) >> 0);
             }
             oThis.WriteUChar(g_nodeAttributeEnd);
+
+            // TODO: потом переделать по-нормальному
+            if (!_border.unifill && _border.Color instanceof CDocumentColor)
+            {
+                var _unifill = new CUniFill();
+                _unifill.fill = new CSolidFill();
+                _unifill.fill.color.color = new CRGBColor();
+
+                _unifill.fill.color.color.RGBA.R = _border.Color.r;
+                _unifill.fill.color.color.RGBA.G = _border.Color.g;
+                _unifill.fill.color.color.RGBA.B = _border.Color.b;
+
+                oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
+            }
 
             oThis.WriteRecord2(0, _border.unifill, oThis.WriteUniFill);
 

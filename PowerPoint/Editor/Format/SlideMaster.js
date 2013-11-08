@@ -406,7 +406,7 @@ MasterSlide.prototype =
     changeBackground: function(bg)
     {
         History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
-        this.cSld.Bg = bg.createFullCopy();
+        this.cSld.Bg = bg;
         this.recalcInfo.recalculateBackground = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },

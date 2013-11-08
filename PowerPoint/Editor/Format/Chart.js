@@ -609,6 +609,35 @@ CChartAsGroup.prototype =
         this.setExtents(new_ext_x, new_ext_y);
     },
 
+    checkNotNullTransform: function()
+    {
+        if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+            return true;
+        if(this.isPlaceholder())
+        {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind)
+            {
+                case SLIDE_KIND:
+                {
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
+                        return true;
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+
+                case LAYOUT_KIND:
+                {
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+            }
+        }
+        return false;
+    },
+
     setRotate: function(rot)
     {
         var xfrm = this.spPr.xfrm;
@@ -832,7 +861,7 @@ CChartAsGroup.prototype =
             var title_str = chart.header.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addTitle(chart_title);
@@ -849,7 +878,7 @@ CChartAsGroup.prototype =
             var title_str = this.chart.xAxis.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addXAxis(chart_title);
@@ -861,7 +890,7 @@ CChartAsGroup.prototype =
             var title_str = this.chart.yAxis.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addYAxis(chart_title);
@@ -1352,7 +1381,7 @@ CChartAsGroup.prototype =
                 this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
 
                 for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {
@@ -1388,7 +1417,7 @@ CChartAsGroup.prototype =
                 var title_str = "X Axis";
                 this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
                 for(var i in title_str)
-                    this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {
@@ -1430,7 +1459,7 @@ CChartAsGroup.prototype =
                 this.vAxisTitle.setBodyPr(body_pr);
 
                 for(var i in title_str)
-                    this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {
@@ -2760,6 +2789,8 @@ CChartAsGroup.prototype =
         this.Id = r.GetString2();
     }
 };
+
+
 
 window["Asc"].CChartAsGroup = CChartAsGroup;
 window["Asc"]["CChartAsGroup"] = CChartAsGroup;

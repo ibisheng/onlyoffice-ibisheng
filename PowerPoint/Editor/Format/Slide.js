@@ -1036,14 +1036,14 @@ Slide.prototype =
     setSlideSize: function(w, h)
     {
         History.Add(this, {Type: historyitem_SetSlideSizes, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
-        this.w = w;
-        this.h = h;
+        this.Width = w;
+        this.Height = h;
     },
 
     changeBackground: function(bg)
     {
         History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
-        this.cSld.Bg = bg.createFullCopy();
+        this.cSld.Bg = bg;
         this.recalcInfo.recalculateBackground = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },

@@ -165,16 +165,13 @@ function CShape(parent)
 CShape.prototype =
 {
 
-    getAllImages: function(images)
-    {
-        if(this.spPr.Fill && this.spPr.Fill.fill instanceof  CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string")
-        {
+    getAllImages: function (images) {
+        if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
             images[_getFullImageSrc(this.spPr.Fill.fill.RasterImageId)] = true;
         }
     },
 
-    recalcAll: function()
-    {
+    recalcAll: function () {
         this.recalcInfo =
         {
             recalculateContent: true,
@@ -192,15 +189,13 @@ CShape.prototype =
             recalculateGroupHierarchy: true,
             recalculateTextStyles: [true, true, true, true, true, true, true, true, true]
         };
-        if(this.txBody)
-        {
+        if (this.txBody) {
             this.txBody.recalcAll();
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    recalcAllColors: function()
-    {
+    recalcAllColors: function () {
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateBrush = true;
         this.recalcInfo.recalculatePen = true;
@@ -208,84 +203,78 @@ CShape.prototype =
         this.recalcInfo.recalculateFill = true;
         this.recalcInfo.recalculateLine = true;
         this.recalcInfo.recalculateTextStyles = [true, true, true, true, true, true, true, true, true];
-        if(this.txBody)
-        {
+        if (this.txBody) {
             this.txBody.recalcColors();
         }
     },
 
-    Get_Id: function()
-    {
+    Get_Id: function () {
         return this.Id;
     },
 
-    getType: function()
-    {
+    getType: function () {
         return DRAWING_OBJECT_TYPE_SHAPE;
     },
 
-    getAllFonts: function(fonts)
-    {
-        if(this.txBody)
-        {
+    getAllFonts: function (fonts) {
+        if (this.txBody) {
             this.txBody.content.Document_Get_AllFontNames(fonts);
+            delete fonts["+mj-lt"];
+            delete fonts["+mn-lt"];
+            delete fonts["+mj-ea"];
+            delete fonts["+mn-ea"];
+            delete fonts["+mj-cs"];
+            delete fonts["+mn-cs"];
         }
     },
 
 
-    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom, arrowsCount)
-    {
+    initDefault: function (x, y, extX, extY, flipH, flipV, presetGeom, arrowsCount) {
         this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
         this.setPresetGeometry(presetGeom);
         this.setDefaultStyle();
-        if(arrowsCount === 1 || arrowsCount === 2)
-        {
-            switch (arrowsCount)
-            {
+        if (arrowsCount === 1 || arrowsCount === 2) {
+            switch (arrowsCount) {
                 case 1:
-                {
-                    var ln = new CLn();
-                    ln.tailEnd = new EndArrow();
-                    ln.tailEnd.type = LineEndType.Arrow;
-                    ln.tailEnd.len = LineEndSize.Mid;
-                    break;
-                }
+                    {
+                        var ln = new CLn();
+                        ln.tailEnd = new EndArrow();
+                        ln.tailEnd.type = LineEndType.Arrow;
+                        ln.tailEnd.len = LineEndSize.Mid;
+                        break;
+                    }
                 case 2:
-                {
-                    var ln = new CLn();
-                    ln.tailEnd = new EndArrow();
-                    ln.tailEnd.type = LineEndType.Arrow;
-                    ln.tailEnd.len = LineEndSize.Mid;
-                    ln.headEnd = new EndArrow();
-                    ln.headEnd.type = LineEndType.Arrow;
-                    ln.headEnd.len = LineEndSize.Mid;
-                    break;
-                }
+                    {
+                        var ln = new CLn();
+                        ln.tailEnd = new EndArrow();
+                        ln.tailEnd.type = LineEndType.Arrow;
+                        ln.tailEnd.len = LineEndSize.Mid;
+                        ln.headEnd = new EndArrow();
+                        ln.headEnd.type = LineEndType.Arrow;
+                        ln.headEnd.len = LineEndSize.Mid;
+                        break;
+                    }
             }
             this.setLine(ln);
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    Hyperlink_CanAdd: function(bCheck)
-    {
-        if(this.txBody)
+    Hyperlink_CanAdd: function (bCheck) {
+        if (this.txBody)
             return this.txBody.content.Hyperlink_CanAdd(bCheck);
         return false;
     },
 
-    Hyperlink_Check: function(bCheck)
-    {
-        if(this.txBody)
+    Hyperlink_Check: function (bCheck) {
+        if (this.txBody)
             return this.txBody.content.Hyperlink_Check(bCheck);
         return false;
     },
 
 
-    Hyperlink_Add : function(HyperProps)
-    {
-        if(this.txBody)
-        {
+    Hyperlink_Add: function (HyperProps) {
+        if (this.txBody) {
             this.txBody.content.Hyperlink_Add(HyperProps);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -293,10 +282,8 @@ CShape.prototype =
         }
     },
 
-    Hyperlink_Modify : function(HyperProps)
-    {
-        if(this.txBody)
-        {
+    Hyperlink_Modify: function (HyperProps) {
+        if (this.txBody) {
             this.txBody.content.Hyperlink_Modify(HyperProps);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -304,10 +291,8 @@ CShape.prototype =
         }
     },
 
-    Hyperlink_Remove : function()
-    {
-        if(this.txBody)
-        {
+    Hyperlink_Remove: function () {
+        if (this.txBody) {
             this.txBody.content.Hyperlink_Remove();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -316,19 +301,15 @@ CShape.prototype =
     },
 
 
-    Get_SelectedText: function(bClearText)
-    {
-        if(this.txBody)
-        {
+    Get_SelectedText: function (bClearText) {
+        if (this.txBody) {
             return this.txBody.content.Get_SelectedText(bClearText);
         }
         return null;
     },
 
-    pointInSelectedText: function(x, y)
-    {
-        if(this.txBody)
-        {
+    pointInSelectedText: function (x, y) {
+        if (this.txBody) {
             var tx = this.invertTransformText.TransformPointX(x, y);
             var ty = this.invertTransformText.TransformPointY(x, y);
             return this.txBody.content.Selection_Check(tx, ty, this.parent.num);
@@ -336,41 +317,34 @@ CShape.prototype =
         return false;
     },
 
-    getTextPr: function()
-    {
-        if(this.txBody)
-        {
+    getTextPr: function () {
+        if (this.txBody) {
             return this.txBody.content.Get_Paragraph_TextPr();
         }
         return new CTextPr();
     },
 
-    getParaPr: function()
-    {
-        if(this.txBody)
-        {
+    getParaPr: function () {
+        if (this.txBody) {
             return this.txBody.content.Get_Paragraph_ParaPr();
         }
         return new CParaPr();
     },
 
 
-    Paragraph_ClearFormatting: function()
-    {
-        if(this.txBody)
-        {
+    Paragraph_ClearFormatting: function () {
+        if (this.txBody) {
             return this.txBody.content.Paragraph_ClearFormatting();
         }
     },
 
 
-    initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
-    {
+    initDefaultTextRect: function (x, y, extX, extY, flipH, flipV) {
         this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
         this.setPresetGeometry("rect");
         this.setDefaultTextRectStyle();
         var uni_fill = new CUniFill();
-        uni_fill.fill =(new CSolidFill());
+        uni_fill.fill = (new CSolidFill());
         uni_fill.fill.color = (new CUniColor());
         uni_fill.fill.color.color = (new CSchemeColor());
         uni_fill.fill.color.color.id = (12);
@@ -380,7 +354,7 @@ CShape.prototype =
         ln.w = (6350);
         ln.Fill = new CUniFill();
         ln.Fill.fill = (new CSolidFill());
-        ln.Fill.fill.color  = (new CUniColor());
+        ln.Fill.fill.color = (new CUniColor());
         ln.Fill.fill.color.color = (new CPrstColor());
         ln.Fill.fill.color.color.id = ("black");
         this.setLine(ln);
@@ -389,88 +363,100 @@ CShape.prototype =
     },
 
 
-    setParent: function(parent)
-    {
-        History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});
+    setParent: function (parent) {
+        History.Add(this, { Type: historyitem_SetShapeParent, Old: this.parent, New: parent });
         this.parent = parent;
     },
 
-    setUniFill: function(fill)
-    {
-        this.spPr.Fill =fill;
+    setUniFill: function (fill) {
+        this.spPr.Fill = fill;
     },
 
-    setUniLine: function(ln)
-    {
+    setUniLine: function (ln) {
         this.spPr.ln = ln;
     },
 
-    setPresetGeometry: function(preset)
-    {
+    setPresetGeometry: function (preset) {
         var old_geometry = this.spPr.geometry;
         this.spPr.geometry = CreateGeometry(preset);
         this.spPr.geometry.Init(5, 5);
-        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: this.spPr.geometry});
+        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: this.spPr.geometry });
 
     },
 
-    setDefaultStyle: function()
-    {
+    setDefaultStyle: function () {
 
         this.setStyle(CreateDefaultShapeStyle());
     },
 
-    setDefaultTextRectStyle: function()
-    {
+    setDefaultTextRectStyle: function () {
         this.setStyle(CreateDefaultTextRectStyle());
     },
 
-    isShape: function()
-    {
+    isShape: function () {
         return true;
     },
 
-    isImage: function()
-    {
+    isImage: function () {
         return false;
     },
 
 
-    isChart: function()
-    {
+    isChart: function () {
         return false;
     },
 
 
-    isGroup: function()
-    {
+    isGroup: function () {
         return false;
     },
 
-    getHierarchy: function()
-    {
-        if(this.recalcInfo.recalculateShapeHierarchy)
-        {
+    checkNotNullTransform: function () {
+        if (this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+            return true;
+        if (this.isPlaceholder()) {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind) {
+                case SLIDE_KIND:
+                    {
+                        var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                        if (placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
+                            return true;
+                        placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                        return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                    }
+
+                case LAYOUT_KIND:
+                    {
+                        var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                        return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                    }
+            }
+        }
+        return false;
+    },
+
+    getHierarchy: function () {
+        if (this.recalcInfo.recalculateShapeHierarchy) {
             this.compiledHierarchy.length = 0;
             var hierarchy = this.compiledHierarchy;
-            if(this.isPlaceholder())
-            {
+            if (this.isPlaceholder()) {
                 var ph_type = this.getPlaceholderType();
                 var ph_index = this.getPlaceholderIndex();
-                switch (this.parent.kind)
-                {
+                switch (this.parent.kind) {
                     case SLIDE_KIND:
-                    {
-                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
-                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
-                        break;
-                    }
+                        {
+                            hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
+                            hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                            break;
+                        }
 
                     case LAYOUT_KIND:
-                    {
-                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
-                        break;
-                    }
+                        {
+                            hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                            break;
+                        }
                 }
             }
             this.recalcInfo.recalculateShapeHierarchy = true;
@@ -478,51 +464,39 @@ CShape.prototype =
         return this.compiledHierarchy;
     },
 
-    getCompiledStyle: function()
-    {
-        if(this.recalcInfo.recalculateStyle)
-        {
+    getCompiledStyle: function () {
+        if (this.recalcInfo.recalculateStyle) {
             this.compiledStyle = null;
-            if(this.isPlaceholder())
-            {
-                if(isRealObject(this.style))
-                {
+            if (this.isPlaceholder()) {
+                if (isRealObject(this.style)) {
                     this.compiledStyle = this.style.createDuplicate();
                 }
-                else
-                {
+                else {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].style))
-                        {
+                    for (var i = 0; i < hierarchy.length; ++i) {
+                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].style)) {
                             this.compiledStyle = hierarchy[i].style.createDuplicate();
                             break;
                         }
                     }
                 }
             }
-            else
-            {
-                if(isRealObject(this.style))
+            else {
+                if (isRealObject(this.style))
                     this.compiledStyle = this.style.createDuplicate();
             }
-            if(isRealObject(this.compiledStyle))
-            {
+            if (isRealObject(this.compiledStyle)) {
                 var parents = this.getParentObjects();
-                if(isRealObject(this.compiledStyle.fillRef)
-                    && isRealObject(this.compiledStyle.fillRef.Color))
-                {
+                if (isRealObject(this.compiledStyle.fillRef)
+                    && isRealObject(this.compiledStyle.fillRef.Color)) {
                     this.compiledStyle.fillRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
                 }
-                if(isRealObject(this.compiledStyle.lnRef)
-                    && isRealObject(this.compiledStyle.lnRef.Color))
-                {
+                if (isRealObject(this.compiledStyle.lnRef)
+                    && isRealObject(this.compiledStyle.lnRef.Color)) {
                     this.compiledStyle.lnRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
                 }
-                if(isRealObject(this.compiledStyle.fontRef)
-                    && isRealObject(this.compiledStyle.fontRef.Color))
-                {
+                if (isRealObject(this.compiledStyle.fontRef)
+                    && isRealObject(this.compiledStyle.fontRef.Color)) {
                     this.compiledStyle.fontRef.Color.Calculate(parents.theme, parents.slide, parents.layout, parents.master);
                 }
             }
@@ -531,30 +505,28 @@ CShape.prototype =
         return this.compiledStyle;
     },
 
-    getPaddings: function()
-    {
+    getPaddings: function () {
         var paddings = null;
         var shape = this;
-        if(shape.txBody)
-        {
+        if (shape.txBody) {
             var body_pr = shape.txBody.bodyPr;
             paddings = new CPaddings();
-            if(typeof body_pr.lIns === "number")
+            if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
             else
                 paddings.Left = 2.54;
 
-            if(typeof body_pr.tIns === "number")
+            if (typeof body_pr.tIns === "number")
                 paddings.Top = body_pr.tIns;
             else
                 paddings.Top = 1.27;
 
-            if(typeof body_pr.rIns === "number")
+            if (typeof body_pr.rIns === "number")
                 paddings.Right = body_pr.rIns;
             else
                 paddings.Right = 2.54;
 
-            if(typeof body_pr.bIns === "number")
+            if (typeof body_pr.bIns === "number")
                 paddings.Bottom = body_pr.bIns;
             else
                 paddings.Bottom = 1.27;
@@ -562,57 +534,49 @@ CShape.prototype =
         return paddings;
     },
 
-    getParentObjects: function()
-    {
-        var parents = {slide: null, layout: null, master: null, theme: null};
-        switch (this.parent.kind)
-        {
+    getParentObjects: function () {
+        var parents = { slide: null, layout: null, master: null, theme: null };
+        switch (this.parent.kind) {
             case SLIDE_KIND:
-            {
-                parents.slide = this.parent;
-                parents.layout = this.parent.Layout;
-                parents.master = this.parent.Layout.Master;
-                parents.theme = this.parent.Layout.Master.Theme;
-                parents.presentation = this.parent.Layout.Master.presentation;
-                break;
-            }
+                {
+                    parents.slide = this.parent;
+                    parents.layout = this.parent.Layout;
+                    parents.master = this.parent.Layout.Master;
+                    parents.theme = this.parent.Layout.Master.Theme;
+                    parents.presentation = this.parent.Layout.Master.presentation;
+                    break;
+                }
             case LAYOUT_KIND:
-            {
-                parents.layout = this.parent;
-                parents.master = this.parent.Master;
-                parents.theme = this.parent.Master.Theme;
-                parents.presentation = this.parent.Master.presentation;
-                break;
-            }
+                {
+                    parents.layout = this.parent;
+                    parents.master = this.parent.Master;
+                    parents.theme = this.parent.Master.Theme;
+                    parents.presentation = this.parent.Master.presentation;
+                    break;
+                }
             case MASTER_KIND:
-            {
-                parents.master = this.parent;
-                parents.theme = this.parent.Theme;
-                parents.presentation = this.parent.presentation;
-                break;
-            }
+                {
+                    parents.master = this.parent;
+                    parents.theme = this.parent.Theme;
+                    parents.presentation = this.parent.presentation;
+                    break;
+                }
         }
         return parents;
     },
 
-    getCompiledFill: function()
-    {
-        if(this.recalcInfo.recalculateFill)
-        {
+    getCompiledFill: function () {
+        if (this.recalcInfo.recalculateFill) {
             this.compiledFill = null;
-            if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill))
-            {
-                if(this.spPr.Fill.fill instanceof CGradFill && this.spPr.Fill.fill.colors.length === 0)
-                {
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill)) {
+                if (this.spPr.Fill.fill instanceof CGradFill && this.spPr.Fill.fill.colors.length === 0) {
                     History.TurnOff();
                     var parent_objects = this.getParentObjects();
                     var theme = parent_objects.theme;
                     var fmt_scheme = theme.themeElements.fmtScheme;
                     var fill_style_lst = fmt_scheme.fillStyleLst;
-                    for(var i = fill_style_lst.length - 1; i > -1; --i)
-                    {
-                        if(fill_style_lst[i] && fill_style_lst[i].fill instanceof CGradFill)
-                        {
+                    for (var i = fill_style_lst.length - 1; i > -1; --i) {
+                        if (fill_style_lst[i] && fill_style_lst[i].fill instanceof CGradFill) {
                             this.spPr.Fill = fill_style_lst[i].createDuplicate();
                             break;
                         }
@@ -621,33 +585,25 @@ CShape.prototype =
                 }
                 this.compiledFill = this.spPr.Fill.createDuplicate();
             }
-            else if(isRealObject(this.group))
-            {
+            else if (isRealObject(this.group)) {
                 var group_compiled_fill = this.group.getCompiledFill();
-                if(isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill))
-                {
+                if (isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill)) {
                     this.compiledFill = group_compiled_fill.createDuplicate();
                 }
-                else
-                {
+                else {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill))
-                        {
+                    for (var i = 0; i < hierarchy.length; ++i) {
+                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill)) {
                             this.compiledFill = hierarchy[i].spPr.Fill.createDuplicate();
                             break;
                         }
                     }
                 }
             }
-            else
-            {
+            else {
                 var hierarchy = this.getHierarchy();
-                for(var i = 0; i < hierarchy.length; ++i)
-                {
-                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill))
-                    {
+                for (var i = 0; i < hierarchy.length; ++i) {
+                    if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealObject(hierarchy[i].spPr.Fill.fill)) {
                         this.compiledFill = hierarchy[i].spPr.Fill.createDuplicate();
                         break;
                     }
@@ -658,62 +614,46 @@ CShape.prototype =
         return this.compiledFill;
     },
 
-    getMargins :  function()
-    {
-        if(this.txBody)
-        {
+    getMargins: function () {
+        if (this.txBody) {
             return this.txBody.getMargins()
         }
-        else
-        {
+        else {
             return null;
         }
     },
 
-    Document_UpdateRulersState : function(margins)
-    {
-        if(this.txBody && this.txBody.content)
-        {
+    Document_UpdateRulersState: function (margins) {
+        if (this.txBody && this.txBody.content) {
             this.txBody.content.Document_UpdateRulersState(this.parent.num, this.getMargins());
         }
     },
 
-    getCompiledLine: function()
-    {
-        if(this.recalcInfo.recalculateLine)
-        {
+    getCompiledLine: function () {
+        if (this.recalcInfo.recalculateLine) {
             this.compiledLine = null;
-            if(isRealObject(this.spPr) && isRealObject(this.spPr.ln) && isRealObject(this.spPr.ln))
-            {
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.ln) && isRealObject(this.spPr.ln)) {
                 this.compiledLine = this.spPr.ln.createDuplicate();
             }
-            else if(isRealObject(this.group))
-            {
+            else if (isRealObject(this.group)) {
                 var group_compiled_line = this.group.getCompiledLine();
-                if(isRealObject(group_compiled_line) && isRealObject(group_compiled_line.fill))
-                {
+                if (isRealObject(group_compiled_line) && isRealObject(group_compiled_line.fill)) {
                     this.compiledLine = group_compiled_line.createDuplicate();
                 }
-                else
-                {
+                else {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.ln))
-                        {
+                    for (var i = 0; i < hierarchy.length; ++i) {
+                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.ln)) {
                             this.compiledLine = hierarchy[i].spPr.ln.createDuplicate();
                             break;
                         }
                     }
                 }
             }
-            else
-            {
+            else {
                 var hierarchy = this.getHierarchy();
-                for(var i = 0; i < hierarchy.length; ++i)
-                {
-                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.ln))
-                    {
+                for (var i = 0; i < hierarchy.length; ++i) {
+                    if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.ln)) {
                         this.compiledLine = hierarchy[i].spPr.ln.createDuplicate();
                         break;
                     }
@@ -724,27 +664,20 @@ CShape.prototype =
         return this.compiledLine;
     },
 
-    getCompiledTransparent: function()
-    {
-        if(this.recalcInfo.recalculateTransparent)
-        {
+    getCompiledTransparent: function () {
+        if (this.recalcInfo.recalculateTransparent) {
             this.compiledTransparent = null;
-            if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealNumber(this.spPr.Fill.transparent))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealNumber(this.spPr.Fill.transparent))
                 this.compiledTransparent = this.spPr.Fill.transparent;
-            else if(isRealObject(this.group))
-            {
+            else if (isRealObject(this.group)) {
                 var group_transparent = this.group.getCompiledTransparent();
-                if(isRealNumber(group_transparent))
-                {
+                if (isRealNumber(group_transparent)) {
                     this.compiledTransparent = group_transparent;
                 }
-                else
-                {
+                else {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
-                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent))
-                        {
+                    for (var i = 0; i < hierarchy.length; ++i) {
+                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
                             this.compiledTransparent = this.spPr.Fill.transparent;
                             break;
                         }
@@ -752,13 +685,10 @@ CShape.prototype =
                     }
                 }
             }
-            else
-            {
+            else {
                 var hierarchy = this.getHierarchy();
-                for(var i = 0; i < hierarchy.length; ++i)
-                {
-                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent))
-                    {
+                for (var i = 0; i < hierarchy.length; ++i) {
+                    if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
                         this.compiledTransparent = this.spPr.Fill.transparent;
                         break;
                     }
@@ -770,113 +700,90 @@ CShape.prototype =
         return this.compiledTransparent;
     },
 
-    isPlaceholder: function()
-    {
+    isPlaceholder: function () {
         return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
     },
 
-    setNvSpPr: function(pr)
-    {
-        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
+    setNvSpPr: function (pr) {
+        History.Add(this, { Type: historyitem_SetSetNvSpPr, oldPr: this.nvSpPr, newPr: pr });
         this.nvSpPr = pr;
-        if(this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id))
-        {
-            if(pr.cNvPr.id > this.parent.maxId)
-            {
-                this.parent.maxId = pr.cNvPr.id+1;
+        if (this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id)) {
+            if (pr.cNvPr.id > this.parent.maxId) {
+                this.parent.maxId = pr.cNvPr.id + 1;
             }
         }
     },
 
-    setTextBody: function(txBody)
-    {
-        History.Add(this, {Type: historyitem_SetTextBody, oldPr: this.txBody, newPr: txBody});
+    setTextBody: function (txBody) {
+        History.Add(this, { Type: historyitem_SetTextBody, oldPr: this.txBody, newPr: txBody });
         this.txBody = txBody;
     },
 
-    setSpPr: function(spPr)
-    {
-        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+    setSpPr: function (spPr) {
+        History.Add(this, { Type: historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr });
         this.spPr = spPr;
     },
 
-    setStyle: function(style)
-    {
-        History.Add(this, {Type:historyitem_SetSetStyle, oldPr: this.style, newPr:style});
+    setStyle: function (style) {
+        History.Add(this, { Type: historyitem_SetSetStyle, oldPr: this.style, newPr: style });
         this.style = style;
     },
 
-    setGroup: function(group)
-    {
-        History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
+    setGroup: function (group) {
+        History.Add(this, { Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group });
         this.group = group;
     },
 
-    getPlaceholderType: function()
-    {
+    getPlaceholderType: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
     },
 
-    getPlaceholderIndex: function()
-    {
+    getPlaceholderIndex: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
-    getPhType: function()
-    {
+    getPhType: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
     },
 
-    getPhIndex: function()
-    {
+    getPhIndex: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
     },
 
 
-    recalculateContent: function()
-    {
-        if(this.txBody)
-        {
+    recalculateContent: function () {
+        if (this.txBody) {
             this.txBody.calculateContent();
         }
     },
 
-    setTextVerticalAlign: function(align)
-    {
-        if(this.txBody)
-        {
+    setTextVerticalAlign: function (align) {
+        if (this.txBody) {
             this.txBody.bodyPr.anchor = align;
             this.recalculateContent();
             this.recalculateTransformText();
         }
     },
-    setPaddings: function(paddings)
-    {
-        if(paddings)
-        {
-            if(this.txBody)
-            {
+    setPaddings: function (paddings) {
+        if (paddings) {
+            if (this.txBody) {
                 var old_body_pr = this.txBody.bodyPr.createDuplicate();
-                if(isRealNumber(paddings.Left))
-                {
+                if (isRealNumber(paddings.Left)) {
                     this.txBody.bodyPr.lIns = paddings.Left;
                 }
 
-                if(isRealNumber(paddings.Top))
-                {
+                if (isRealNumber(paddings.Top)) {
                     this.txBody.bodyPr.tIns = paddings.Top;
                 }
 
-                if(isRealNumber(paddings.Right))
-                {
+                if (isRealNumber(paddings.Right)) {
                     this.txBody.bodyPr.rIns = paddings.Right;
                 }
-                if(isRealNumber(paddings.Bottom))
-                {
+                if (isRealNumber(paddings.Bottom)) {
                     this.txBody.bodyPr.bIns = paddings.Bottom;
                 }
                 var new_body_pr = this.txBody.bodyPr.createDuplicate();
-                History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+                History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
                 this.txBody.recalcInfo.recalculateBodyPr = true;
                 this.recalculateContent();
                 this.recalculateTransformText();
@@ -884,62 +791,52 @@ CShape.prototype =
         }
     },
 
-    setBodyPr: function(bodyPr)
-    {
+    setBodyPr: function (bodyPr) {
         var old_body_pr = this.txBody.bodyPr;
         this.txBody.bodyPr = bodyPr;
         var new_body_pr = this.txBody.bodyPr.createDuplicate();
-        History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+        History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
         this.txBody.recalcInfo.recalculateBodyPr = true;
     },
 
-    recalculate: function()
-    {
-        if(this.recalcInfo.recalculateBrush)
-        {
+    recalculate: function () {
+        if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;
         }
 
-        if(this.recalcInfo.recalculatePen)
-        {
+        if (this.recalcInfo.recalculatePen) {
             this.recalculatePen();
             this.recalcInfo.recalculatePen = false;
         }
-        if(this.recalcInfo.recalculateTransform)
-        {
+        if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
             this.recalcInfo.recalculateTransform = false;
         }
 
-        if(this.recalcInfo.recalculateGeometry)
-        {
+        if (this.recalcInfo.recalculateGeometry) {
             this.recalculateGeometry();
             this.recalcInfo.recalculateGeometry = false;
         }
 
-        if(this.recalcInfo.recalculateContent)
-        {
-            if(this.txBody)
+        if (this.recalcInfo.recalculateContent) {
+            if (this.txBody)
                 this.txBody.recalcInfo.recalculateContent2 = true;
             this.recalculateContent();
         }
 
-        if(this.recalcInfo.recalculateTransformText)
-        {
+        if (this.recalcInfo.recalculateTransformText) {
             this.recalculateTransformText();
         }
-        if(this.recalcInfo.recalculateCursorTypes)
-        {
+        if (this.recalcInfo.recalculateCursorTypes) {
             this.recalculateCursorTypes();
             this.recalcInfo.recalculateCursorTypes = false;
         }
 
     },
 
-    recalculateTransformText: function()
-    {
-        if(this.txBody === null)
+    recalculateTransformText: function () {
+        if (this.txBody === null)
             return;
         this.transformText.Reset();
         var _text_transform = this.transformText;
@@ -949,32 +846,28 @@ CShape.prototype =
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
-        if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-        {
+        if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
             var _rect = this.spPr.geometry.rect;
             _l = _rect.l + _body_pr.lIns;
             _t = _rect.t + _body_pr.tIns;
             _r = _rect.r - _body_pr.rIns;
             _b = _rect.b - _body_pr.bIns;
         }
-        else
-        {
+        else {
             _l = _body_pr.lIns;
             _t = _body_pr.tIns;
             _r = this.extX - _body_pr.rIns;
             _b = this.extY - _body_pr.bIns;
         }
 
-        if(_l >= _r)
-        {
-            var _c = (_l + _r)*0.5;
+        if (_l >= _r) {
+            var _c = (_l + _r) * 0.5;
             _l = _c - 0.01;
             _r = _c + 0.01;
         }
 
-        if(_t >= _b)
-        {
-            _c = (_t + _b)*0.5;
+        if (_t >= _b) {
+            _c = (_t + _b) * 0.5;
             _t = _c - 0.01;
             _b = _c + 0.01;
         }
@@ -1002,272 +895,239 @@ CShape.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if(_body_pr.upright ===  false)
-        {
-            if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-            {
-                if(/*_content_height < _text_rect_height*/true)
-                {
-                    switch (_body_pr.anchor)
-                    {
-                        case 0 ://b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_height - _content_height;
-                            break;
-                        }
-                        case 1 :    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case  2 : //dist
-                        {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case  3 ://just
-                        {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case 4 ://t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+        if (_body_pr.upright === false) {
+            if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+                if (/*_content_height < _text_rect_height*/true) {
+                    switch (_body_pr.anchor) {
+                        case 0: //b
+                            { // (Text Anchor Enum ( Bottom ))
+                                _vertical_shift = _text_rect_height - _content_height;
+                                break;
+                            }
+                        case 1:    //ctr
+                            {// (Text Anchor Enum ( Center ))
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 2: //dist
+                            {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 3: //just
+                            {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 4: //t
+                            {//Top
+                                _vertical_shift = 0;
+                                break;
+                            }
                     }
 
                 }
-                else
-                {
+                else {
                     _vertical_shift = 0;
 
                     //_vertical_shift =  _text_rect_height - _content_height;
                     /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_height - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     } */
+                    {
+                    _vertical_shift =  _text_rect_height - _content_height;
+                    }
+                    else
+                    {
+                    _vertical_shift = 0;
+                    } */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-                if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
-                {
+                if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     var alpha = Math.atan2(_dy_t, _dx_t);
                     global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                 }
-                else
-                {
+                else {
                     alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI-alpha);
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                 }
             }
-            else
-            {
-                if(/*_content_height < _text_rect_width*/true)
-                {
-                    switch (_body_pr.anchor)
-                    {
-                        case 0 ://b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_width - _content_height;
-                            break;
-                        }
-                        case 1 :    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case  2 : //dist
-                        {// (Text Anchor Enum ( Distributed ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case  3 ://just
-                        {// (Text Anchor Enum ( Justified ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case 4 ://t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+            else {
+                if (/*_content_height < _text_rect_width*/true) {
+                    switch (_body_pr.anchor) {
+                        case 0: //b
+                            { // (Text Anchor Enum ( Bottom ))
+                                _vertical_shift = _text_rect_width - _content_height;
+                                break;
+                            }
+                        case 1:    //ctr
+                            {// (Text Anchor Enum ( Center ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 2: //dist
+                            {// (Text Anchor Enum ( Distributed ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 3: //just
+                            {// (Text Anchor Enum ( Justified ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 4: //t
+                            {//Top
+                                _vertical_shift = 0;
+                                break;
+                            }
                     }
                 }
-                else
-                {
+                else {
                     _vertical_shift = 0;
                     /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_width - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     }  */
-                }
-                global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-                var  _alpha;
-                _alpha = Math.atan2(_dy_t, _dx_t);
-                if(_body_pr.vert === nVertTTvert)
-                {
-                    if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
                     {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI*0.5);
-                        global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
+                    _vertical_shift =  _text_rect_width - _content_height;
                     }
                     else
                     {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI*0.5-_alpha);
+                    _vertical_shift = 0;
+                    }  */
+                }
+                global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
+                var _alpha;
+                _alpha = Math.atan2(_dy_t, _dx_t);
+                if (_body_pr.vert === nVertTTvert) {
+                    if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5);
+                        global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
+                    }
+                    else {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                     }
                 }
-                else
-                {
-                    if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
-                    {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI*1.5);
+                else {
+                    if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lb, _t_y_lb);
                     }
-                    else
-                    {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*0.5-_alpha);
+                    else {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rb, _t_y_rb);
                     }
                 }
             }
         }
-        else
-        {
+        else {
             var _full_rotate = this.getFullRotate();
             var _full_flip = this.getFullFlip();
 
-            var _hc = this.extX*0.5;
-            var _vc = this.extY*0.5;
+            var _hc = this.extX * 0.5;
+            var _vc = this.extY * 0.5;
             var _transformed_shape_xc = this.transform.TransformPointX(_hc, _vc);
             var _transformed_shape_yc = this.transform.TransformPointY(_hc, _vc);
 
 
             var _content_width, content_height2;
-            if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
+            if ((_full_rotate >= 0 && _full_rotate < Math.PI * 0.25)
+                || (_full_rotate > 3 * Math.PI * 0.25 && _full_rotate < 5 * Math.PI * 0.25)
+                || (_full_rotate > 7 * Math.PI * 0.25 && _full_rotate < 2 * Math.PI)) {
+                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
-                else
-                {
+                else {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
                 }
             }
-            else
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
+            else {
+                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
 
                 }
-                else
-                {
+                else {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
             }
 
-            if(/*_content_height < content_height2*/true)
-            {
-                switch (_body_pr.anchor)
-                {
-                    case 0 ://b
-                    { // (Text Anchor Enum ( Bottom ))
-                        _vertical_shift = content_height2 - _content_height;
-                        break;
-                    }
-                    case 1 :    //ctr
-                    {// (Text Anchor Enum ( Center ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  2 : //dist
-                    {// (Text Anchor Enum ( Distributed ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  3 ://just
-                    {// (Text Anchor Enum ( Justified ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case 4 ://t
-                    {//Top
-                        _vertical_shift = 0;
-                        break;
-                    }
+            if (/*_content_height < content_height2*/true) {
+                switch (_body_pr.anchor) {
+                    case 0: //b
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = content_height2 - _content_height;
+                            break;
+                        }
+                    case 1:    //ctr
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 2: //dist
+                        {// (Text Anchor Enum ( Distributed ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 3: //just
+                        {// (Text Anchor Enum ( Justified ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 4: //t
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                 }
             }
-            else
-            {
+            else {
                 _vertical_shift = 0;
                 /*if(_body_pr.anchor === 0)
-                 {
-                 _vertical_shift =  content_height2 - _content_height;
-                 }
-                 else
-                 {
-                 _vertical_shift = 0;
-                 } */
+                {
+                _vertical_shift =  content_height2 - _content_height;
+                }
+                else
+                {
+                _vertical_shift = 0;
+                } */
             }
 
-            var _text_rect_xc = _l + (_r - _l)*0.5;
-            var _text_rect_yc = _t + (_b - _t)*0.5;
+            var _text_rect_xc = _l + (_r - _l) * 0.5;
+            var _text_rect_yc = _t + (_b - _t) * 0.5;
 
             var _vx = _text_rect_xc - _hc;
             var _vy = _text_rect_yc - _vc;
 
             var _transformed_text_xc, _transformed_text_yc;
-            if(!_full_flip.flipH)
-            {
+            if (!_full_flip.flipH) {
                 _transformed_text_xc = _transformed_shape_xc + _vx;
             }
-            else
-            {
+            else {
                 _transformed_text_xc = _transformed_shape_xc - _vx;
             }
 
-            if(!_full_flip.flipV)
-            {
+            if (!_full_flip.flipV) {
                 _transformed_text_yc = _transformed_shape_yc + _vy;
             }
-            else
-            {
+            else {
                 _transformed_text_yc = _transformed_shape_yc - _vy;
             }
 
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-            if(_body_pr.vert === nVertTTvert)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*0.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
+            if (_body_pr.vert === nVertTTvert) {
+                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
+                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5);
+                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
             }
-            if(_body_pr.vert === nVertTTvert270)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*1.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
+            if (_body_pr.vert === nVertTTvert270) {
+                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
+                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
+                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
             }
-            global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width*0.5,  _transformed_text_yc - content_height2*0.5);
+            global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
             var body_pr = this.bodyPr;
             var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
@@ -1285,11 +1145,10 @@ CShape.prototype =
         this.recalculateTransformText2();
     },
 
-    recalculateTransformText2: function()
-    {
-        if(this.txBody === null)
+    recalculateTransformText2: function () {
+        if (this.txBody === null)
             return;
-        if(!this.txBody.content2)
+        if (!this.txBody.content2)
             return;
         this.transformText2.Reset();
         var _text_transform = this.transformText2;
@@ -1299,32 +1158,28 @@ CShape.prototype =
         var _l, _t, _r, _b;
 
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
-        if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-        {
+        if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
             var _rect = this.spPr.geometry.rect;
             _l = _rect.l + _body_pr.lIns;
             _t = _rect.t + _body_pr.tIns;
             _r = _rect.r - _body_pr.rIns;
             _b = _rect.b - _body_pr.bIns;
         }
-        else
-        {
+        else {
             _l = _body_pr.lIns;
             _t = _body_pr.tIns;
             _r = this.extX - _body_pr.rIns;
             _b = this.extY - _body_pr.bIns;
         }
 
-        if(_l >= _r)
-        {
-            var _c = (_l + _r)*0.5;
+        if (_l >= _r) {
+            var _c = (_l + _r) * 0.5;
             _l = _c - 0.01;
             _r = _c + 0.01;
         }
 
-        if(_t >= _b)
-        {
-            _c = (_t + _b)*0.5;
+        if (_t >= _b) {
+            _c = (_t + _b) * 0.5;
             _t = _c - 0.01;
             _b = _c + 0.01;
         }
@@ -1352,281 +1207,246 @@ CShape.prototype =
         var _vertical_shift;
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
-        if(_body_pr.upright ===  false)
-        {
-            if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-            {
-                if(/*_content_height < _text_rect_height*/true)
-                {
-                    switch (_body_pr.anchor)
-                    {
-                        case 0 ://b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_height - _content_height;
-                            break;
-                        }
-                        case 1 :    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case  2 : //dist
-                        {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case  3 ://just
-                        {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
-                            _vertical_shift = (_text_rect_height - _content_height)*0.5;
-                            break;
-                        }
-                        case 4 ://t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+        if (_body_pr.upright === false) {
+            if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+                if (/*_content_height < _text_rect_height*/true) {
+                    switch (_body_pr.anchor) {
+                        case 0: //b
+                            { // (Text Anchor Enum ( Bottom ))
+                                _vertical_shift = _text_rect_height - _content_height;
+                                break;
+                            }
+                        case 1:    //ctr
+                            {// (Text Anchor Enum ( Center ))
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 2: //dist
+                            {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 3: //just
+                            {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
+                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                                break;
+                            }
+                        case 4: //t
+                            {//Top
+                                _vertical_shift = 0;
+                                break;
+                            }
                     }
 
                 }
-                else
-                {
+                else {
                     _vertical_shift = 0;
 
                     //_vertical_shift =  _text_rect_height - _content_height;
                     /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_height - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     } */
+                    {
+                    _vertical_shift =  _text_rect_height - _content_height;
+                    }
+                    else
+                    {
+                    _vertical_shift = 0;
+                    } */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-                if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
-                {
+                if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     var alpha = Math.atan2(_dy_t, _dx_t);
                     global_MatrixTransformer.RotateRadAppend(_text_transform, -alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                 }
-                else
-                {
+                else {
                     alpha = Math.atan2(_dy_t, _dx_t);
-                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI-alpha);
+                    global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI - alpha);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
                 }
             }
-            else
-            {
-                if(/*_content_height < _text_rect_width*/true)
-                {
-                    switch (_body_pr.anchor)
-                    {
-                        case 0 ://b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = _text_rect_width - _content_height;
-                            break;
-                        }
-                        case 1 :    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case  2 : //dist
-                        {// (Text Anchor Enum ( Distributed ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case  3 ://just
-                        {// (Text Anchor Enum ( Justified ))
-                            _vertical_shift = (_text_rect_width - _content_height)*0.5;
-                            break;
-                        }
-                        case 4 ://t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+            else {
+                if (/*_content_height < _text_rect_width*/true) {
+                    switch (_body_pr.anchor) {
+                        case 0: //b
+                            { // (Text Anchor Enum ( Bottom ))
+                                _vertical_shift = _text_rect_width - _content_height;
+                                break;
+                            }
+                        case 1:    //ctr
+                            {// (Text Anchor Enum ( Center ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 2: //dist
+                            {// (Text Anchor Enum ( Distributed ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 3: //just
+                            {// (Text Anchor Enum ( Justified ))
+                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                                break;
+                            }
+                        case 4: //t
+                            {//Top
+                                _vertical_shift = 0;
+                                break;
+                            }
                     }
                 }
-                else
-                {
+                else {
                     _vertical_shift = 0;
                     /*if(_body_pr.anchor === 0)
-                     {
-                     _vertical_shift =  _text_rect_width - _content_height;
-                     }
-                     else
-                     {
-                     _vertical_shift = 0;
-                     }  */
-                }
-                global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-                var  _alpha;
-                _alpha = Math.atan2(_dy_t, _dx_t);
-                if(_body_pr.vert === nVertTTvert)
-                {
-                    if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
                     {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI*0.5);
-                        global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
+                    _vertical_shift =  _text_rect_width - _content_height;
                     }
                     else
                     {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI*0.5-_alpha);
+                    _vertical_shift = 0;
+                    }  */
+                }
+                global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
+                var _alpha;
+                _alpha = Math.atan2(_dy_t, _dx_t);
+                if (_body_pr.vert === nVertTTvert) {
+                    if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5);
+                        global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
+                    }
+                    else {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lt, _t_y_lt);
                     }
                 }
-                else
-                {
-                    if(_dx_lt_rb*_dy_t - _dy_lt_rb*_dx_t <= 0)
-                    {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI*1.5);
+                else {
+                    if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 1.5);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_lb, _t_y_lb);
                     }
-                    else
-                    {
-                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*0.5-_alpha);
+                    else {
+                        global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5 - _alpha);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rb, _t_y_rb);
                     }
                 }
             }
-            if(isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect))
-            {
+            if (isRealObject(this.spPr.geometry) && isRealObject(this.spPr.geometry.rect)) {
                 var rect = this.spPr.geometry.rect;
-                this.clipRect = {x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t};
+                this.clipRect = { x: rect.l, y: rect.t, w: rect.r - rect.l, h: rect.b - rect.t };
             }
-            else
-            {
-                this.clipRect = {x: 0, y: 0, w: this.extX, h: this.extY};
+            else {
+                this.clipRect = { x: 0, y: 0, w: this.extX, h: this.extY };
             }
         }
-        else
-        {
+        else {
             var _full_rotate = this.getFullRotate();
             var _full_flip = this.getFullFlip();
 
-            var _hc = this.extX*0.5;
-            var _vc = this.extY*0.5;
+            var _hc = this.extX * 0.5;
+            var _vc = this.extY * 0.5;
             var _transformed_shape_xc = this.transform.TransformPointX(_hc, _vc);
             var _transformed_shape_yc = this.transform.TransformPointY(_hc, _vc);
 
 
             var _content_width, content_height2;
-            if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
-                || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
-                || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
+            if ((_full_rotate >= 0 && _full_rotate < Math.PI * 0.25)
+                || (_full_rotate > 3 * Math.PI * 0.25 && _full_rotate < 5 * Math.PI * 0.25)
+                || (_full_rotate > 7 * Math.PI * 0.25 && _full_rotate < 2 * Math.PI)) {
+                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
-                else
-                {
+                else {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
                 }
             }
-            else
-            {
-                if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
-                {
+            else {
+                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
 
                 }
-                else
-                {
+                else {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
             }
 
-            if(/*_content_height < content_height2*/true)
-            {
-                switch (_body_pr.anchor)
-                {
-                    case 0 ://b
-                    { // (Text Anchor Enum ( Bottom ))
-                        _vertical_shift = content_height2 - _content_height;
-                        break;
-                    }
-                    case 1 :    //ctr
-                    {// (Text Anchor Enum ( Center ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  2 : //dist
-                    {// (Text Anchor Enum ( Distributed ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case  3 ://just
-                    {// (Text Anchor Enum ( Justified ))
-                        _vertical_shift = (content_height2 - _content_height)*0.5;
-                        break;
-                    }
-                    case 4 ://t
-                    {//Top
-                        _vertical_shift = 0;
-                        break;
-                    }
+            if (/*_content_height < content_height2*/true) {
+                switch (_body_pr.anchor) {
+                    case 0: //b
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = content_height2 - _content_height;
+                            break;
+                        }
+                    case 1:    //ctr
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 2: //dist
+                        {// (Text Anchor Enum ( Distributed ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 3: //just
+                        {// (Text Anchor Enum ( Justified ))
+                            _vertical_shift = (content_height2 - _content_height) * 0.5;
+                            break;
+                        }
+                    case 4: //t
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                 }
             }
-            else
-            {
+            else {
                 _vertical_shift = 0;
                 /*if(_body_pr.anchor === 0)
-                 {
-                 _vertical_shift =  content_height2 - _content_height;
-                 }
-                 else
-                 {
-                 _vertical_shift = 0;
-                 } */
+                {
+                _vertical_shift =  content_height2 - _content_height;
+                }
+                else
+                {
+                _vertical_shift = 0;
+                } */
             }
 
-            var _text_rect_xc = _l + (_r - _l)*0.5;
-            var _text_rect_yc = _t + (_b - _t)*0.5;
+            var _text_rect_xc = _l + (_r - _l) * 0.5;
+            var _text_rect_yc = _t + (_b - _t) * 0.5;
 
             var _vx = _text_rect_xc - _hc;
             var _vy = _text_rect_yc - _vc;
 
             var _transformed_text_xc, _transformed_text_yc;
-            if(!_full_flip.flipH)
-            {
+            if (!_full_flip.flipH) {
                 _transformed_text_xc = _transformed_shape_xc + _vx;
             }
-            else
-            {
+            else {
                 _transformed_text_xc = _transformed_shape_xc - _vx;
             }
 
-            if(!_full_flip.flipV)
-            {
+            if (!_full_flip.flipV) {
                 _transformed_text_yc = _transformed_shape_yc + _vy;
             }
-            else
-            {
+            else {
                 _transformed_text_yc = _transformed_shape_yc - _vy;
             }
 
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-            if(_body_pr.vert === nVertTTvert)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*0.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
+            if (_body_pr.vert === nVertTTvert) {
+                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
+                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5);
+                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
             }
-            if(_body_pr.vert === nVertTTvert270)
-            {
-                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width*0.5, - content_height2*0.5);
-                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI*1.5);
-                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width*0.5,  content_height2*0.5);
+            if (_body_pr.vert === nVertTTvert270) {
+                global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
+                global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
+                global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
             }
-            global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width*0.5,  _transformed_text_yc - content_height2*0.5);
+            global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width * 0.5, _transformed_text_yc - content_height2 * 0.5);
 
             var body_pr = this.bodyPr;
             var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
@@ -1643,18 +1463,15 @@ CShape.prototype =
         this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
     },
 
-    copy: function(sp)
-    {
-        if(!(sp instanceof CShape))
+    copy: function (sp) {
+        if (!(sp instanceof CShape))
             sp = new CShape();
         sp.setSpPr(this.spPr.createDuplicate());
         sp.setStyle(this.style);
-        if(this.nvSpPr)
-        {
+        if (this.nvSpPr) {
             sp.setNvSpPr(this.nvSpPr.createDuplicate());
         }
-        if(isRealObject(this.txBody))
-        {
+        if (isRealObject(this.txBody)) {
             var txBody = new CTextBody(sp);
             this.txBody.copy(txBody);
             sp.setTextBody(txBody);
@@ -1663,13 +1480,11 @@ CShape.prototype =
         return sp;
     },
 
-    copy2: function(sp)
-    {
+    copy2: function (sp) {
         sp.setSpPr(this.spPr.createDuplicate());
         sp.setStyle(this.style);
         sp.setNvSpPr(this.nvSpPr);
-        if(isRealObject(this.txBody))
-        {
+        if (isRealObject(this.txBody)) {
             var txBody = new CTextBody(sp);
             this.txBody.copy(txBody);
             sp.setTextBody(txBody);
@@ -1680,84 +1495,73 @@ CShape.prototype =
         }
     },
 
-    Get_Styles: function(level)
-    {
-        if(this.recalcInfo.recalculateTextStyles[level])
-        {
+    Get_Styles: function (level) {
+        if (this.recalcInfo.recalculateTextStyles[level]) {
             this.recalculateTextStyles(level);
             this.recalcInfo.recalculateTextStyles[level] = false;
         }
         return this.compiledStyles[level];
     },
 
-    Set_CurrentElement: function()
-    {},
+    Set_CurrentElement: function ()
+    { },
 
-    recalculateTextStyles: function(level)
-    {
+    recalculateTextStyles: function (level) {
         var parent_objects = this.getParentObjects();
         var default_style = new CStyle("defaultStyle", null, null, null);
-        if(isRealObject(parent_objects.presentation.defaultTextStyle)
-            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
-        {
+        if (isRealObject(parent_objects.presentation.defaultTextStyle)
+            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
             var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
             default_style.ParaPr = default_ppt_style.pPr.Copy();
             default_style.TextPr = default_ppt_style.rPr.Copy();
         }
 
         var master_style = new CStyle("masterStyele", null, null, null);
-        if(isRealObject(parent_objects.master.txStyles))
-        {
+        if (isRealObject(parent_objects.master.txStyles)) {
             var master_ppt_styles;
-            if(this.isPlaceholder())
-            {
-                switch(this.getPlaceholderType())
-                {
-                    case phType_ctrTitle :
-                    case phType_title :
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.titleStyle;
-                        break;
-                    }
-                    case phType_body :
-                    case phType_subTitle :
-                    case phType_obj :
-                    case null :
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
-                        break;
-                    }
-                    default :
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.otherStyle;
-                        break;
-                    }
+            if (this.isPlaceholder()) {
+                switch (this.getPlaceholderType()) {
+                    case phType_ctrTitle:
+                    case phType_title:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.titleStyle;
+                            break;
+                        }
+                    case phType_body:
+                    case phType_subTitle:
+                    case phType_obj:
+                    case null:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
+                            break;
+                        }
+                    default:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                            break;
+                        }
                 }
             }
-            else
-            {
+            else {
                 master_ppt_styles = parent_objects.master.txStyles.otherStyle;
             }
 
-            if(isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels[level]))
-            {
+            if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels[level])) {
                 var master_ppt_style = master_ppt_styles.levels[level];
-                master_style.ParaPr =  master_ppt_style.pPr.Copy();
-                master_style.TextPr =  master_ppt_style.rPr.Copy();
+                master_style.ParaPr = master_ppt_style.pPr.Copy();
+                master_style.TextPr = master_ppt_style.rPr.Copy();
             }
         }
 
         var hierarchy = this.getHierarchy();
         var hierarchy_styles = [];
-        for(var i = 0; i < hierarchy.length; ++i)
-        {
+        for (var i = 0; i < hierarchy.length; ++i) {
             var hierarchy_shape = hierarchy[i];
-            if(isRealObject(hierarchy_shape)
+            if (isRealObject(hierarchy_shape)
                 && isRealObject(hierarchy_shape.txBody)
                 && isRealObject(hierarchy_shape.txBody.lstStyle)
                 && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
-                && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level]))
-            {
+                && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level])) {
                 var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
                 var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
                 hierarchy_style.ParaPr = hierarchy_ppt_style.pPr.Copy();
@@ -1767,98 +1571,84 @@ CShape.prototype =
         }
 
         var ownStyle;
-        if(isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle[level]))
-        {
+        if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle[level])) {
             ownStyle = new CStyle("ownStyle", null, null, null);
             var own_ppt_style = this.txBody.lstStyle[level];
             ownStyle.ParaPr = own_ppt_style.pPr.Copy();
             ownStyle.TextPr = own_ppt_style.rPr.Copy();
         }
         var shape_text_style;
-        if(isRealObject(this.style) && isRealObject(this.style.fontRef))
-        {
+        if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
             shape_text_style = new CStyle("shapeTextStyle", null, null, null);
-            switch  (this.style.fontRef.idx)
-            {
-                case fntStyleInd_major :
-                {
-                    shape_text_style.TextPr.FontFamily = {Name : getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme) };
-                    break;
-                }
-                case fntStyleInd_minor :
-                {
-                    shape_text_style.TextPr.FontFamily = {Name : getFontInfo("+mn-lt")(parent_objects.theme.themeElements.fontScheme) };
-                    break;
-                }
-                default :
-                {
-                    break;
-                }
+            switch (this.style.fontRef.idx) {
+                case fntStyleInd_major:
+                    {
+                        shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme) };
+                        break;
+                    }
+                case fntStyleInd_minor:
+                    {
+                        shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mn-lt")(parent_objects.theme.themeElements.fontScheme) };
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
             }
 
-            if(this.style.fontRef.Color!=null && this.style.fontRef.Color.color != null)
-            {
+            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
                 var unifill = new CUniFill();
                 unifill.fill = new CSolidFill();
                 unifill.fill.color = this.style.fontRef.Color;
                 shape_text_style.TextPr.unifill = unifill;
             }
-            else
-            {
+            else {
                 shape_text_style.TextPr.unifill = null;
             }
         }
-        var Styles = new  CStyles();
+        var Styles = new CStyles();
 
         var isPlaceholder = this.isPlaceholder();
-        if(isPlaceholder)
-        {
-            if(default_style)
-            {
+        if (isPlaceholder) {
+            if (default_style) {
                 Styles.Style[Styles.Id] = default_style;
                 default_style.BasedOn = null;
                 ++Styles.Id;
             }
 
-            if(master_style)
-            {
+            if (master_style) {
                 Styles.Style[Styles.Id] = master_style;
-                master_style.BasedOn = Styles.Id-1;
+                master_style.BasedOn = Styles.Id - 1;
                 ++Styles.Id;
             }
         }
-        else
-        {
-            if(master_style)
-            {
+        else {
+            if (master_style) {
                 Styles.Style[Styles.Id] = master_style;
                 master_style.BasedOn = null;
                 ++Styles.Id;
             }
 
-            if(default_style)
-            {
+            if (default_style) {
                 Styles.Style[Styles.Id] = default_style;
-                default_style.BasedOn = Styles.Id-1;
+                default_style.BasedOn = Styles.Id - 1;
                 ++Styles.Id;
             }
         }
 
-        for(var i = hierarchy_styles.length -1; i > -1; --i)
-        {
+        for (var i = hierarchy_styles.length - 1; i > -1; --i) {
 
-            if(hierarchy_styles[i])
-            {
+            if (hierarchy_styles[i]) {
                 Styles.Style[Styles.Id] = hierarchy_styles[i];
-                hierarchy_styles[i].BasedOn = Styles.Id-1;
+                hierarchy_styles[i].BasedOn = Styles.Id - 1;
                 ++Styles.Id;
             }
         }
 
-        if(shape_text_style)
-        {
+        if (shape_text_style) {
             Styles.Style[Styles.Id] = shape_text_style;
-            shape_text_style.BasedOn = Styles.Id-1;
+            shape_text_style.BasedOn = Styles.Id - 1;
             ++Styles.Id;
         }
 
@@ -1866,32 +1656,26 @@ CShape.prototype =
         return Styles;
     },
 
-    recalculateBrush: function()
-    {
+    recalculateBrush: function () {
         var compiled_style = this.getCompiledStyle();
-        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        var RGBA = { R: 0, G: 0, B: 0, A: 255 };
         var parents = this.getParentObjects();
-        if(isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
-        {
-            RGBA =  compiled_style.fillRef.Color.RGBA;
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef)) {
+            RGBA = compiled_style.fillRef.Color.RGBA;
             this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx);
-            if(isRealObject(this.brush))
-            {
-                if(isRealObject(compiled_style.fillRef.Color.color)
+            if (isRealObject(this.brush)) {
+                if (isRealObject(compiled_style.fillRef.Color.color)
                     && isRealObject(this.brush)
                     && isRealObject(this.brush.fill)
-                    && this.brush.fill.type === FILL_TYPE_SOLID)
-                {
+                    && this.brush.fill.type === FILL_TYPE_SOLID) {
                     this.brush.fill.color = compiled_style.fillRef.Color.createDuplicate();
                 }
             }
-            else
-            {
+            else {
                 this.brush = new CUniFill();
             }
         }
-        else
-        {
+        else {
             this.brush = new CUniFill();
         }
 
@@ -1900,33 +1684,27 @@ CShape.prototype =
         this.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
     },
 
-    recalculatePen: function()
-    {
+    recalculatePen: function () {
         var compiled_style = this.getCompiledStyle();
-        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        var RGBA = { R: 0, G: 0, B: 0, A: 255 };
         var parents = this.getParentObjects();
-        if(isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.lnRef))
-        {
-            RGBA =  compiled_style.lnRef.Color.RGBA;
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.lnRef)) {
+            RGBA = compiled_style.lnRef.Color.RGBA;
             this.pen = parents.theme.getLnStyle(compiled_style.lnRef.idx);
-            if(isRealObject(this.pen))
-            {
-                if(isRealObject(compiled_style.lnRef.Color.color)
+            if (isRealObject(this.pen)) {
+                if (isRealObject(compiled_style.lnRef.Color.color)
                     && isRealObject(this.pen)
                     && isRealObject(this.pen.Fill)
                     && isRealObject(this.pen.Fill.fill)
-                    && this.pen.Fill.fill.type === FILL_TYPE_SOLID)
-                {
+                    && this.pen.Fill.fill.type === FILL_TYPE_SOLID) {
                     this.pen.Fill.fill.color = compiled_style.lnRef.Color.createDuplicate();
                 }
             }
-            else
-            {
+            else {
                 this.pen = new CLn();
             }
         }
-        else
-        {
+        else {
             this.pen = new CLn();
         }
 
@@ -1934,11 +1712,9 @@ CShape.prototype =
         this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
     },
 
-    isEmptyPlaceholder : function()
-    {
-        if(this.isPlaceholder())
-        {
-            if(this.nvSpPr.nvPr.ph.type == phType_title
+    isEmptyPlaceholder: function () {
+        if (this.isPlaceholder()) {
+            if (this.nvSpPr.nvPr.ph.type == phType_title
                 || this.nvSpPr.nvPr.ph.type == phType_ctrTitle
                 || this.nvSpPr.nvPr.ph.type == phType_body
                 || this.nvSpPr.nvPr.ph.type == phType_subTitle
@@ -1947,59 +1723,46 @@ CShape.prototype =
                 || this.nvSpPr.nvPr.ph.type == phType_ftr
                 || this.nvSpPr.nvPr.ph.type == phType_hdr
                 || this.nvSpPr.nvPr.ph.type == phType_sldNum
-                || this.nvSpPr.nvPr.ph.type == phType_sldImg)
-            {
-                if(this.txBody)
-                {
-                    if(this.txBody.content)
-                    {
+                || this.nvSpPr.nvPr.ph.type == phType_sldImg) {
+                if (this.txBody) {
+                    if (this.txBody.content) {
                         return this.txBody.content.Is_Empty();
                     }
                     return true;
                 }
                 return true;
             }
-            if(this.nvSpPr.nvPr.ph.type == phType_chart
-                || this.nvSpPr.nvPr.ph.type == phType_media)
-            {
+            if (this.nvSpPr.nvPr.ph.type == phType_chart
+                || this.nvSpPr.nvPr.ph.type == phType_media) {
                 return true;
             }
-            if(this.nvSpPr.nvPr.ph.type == phType_pic)
-            {
+            if (this.nvSpPr.nvPr.ph.type == phType_pic) {
                 var _b_empty_text = true;
-                if(this.txBody)
-                {
-                    if(this.txBody.content)
-                    {
+                if (this.txBody) {
+                    if (this.txBody.content) {
                         _b_empty_text = this.txBody.content.Is_Empty();
                     }
                 }
                 return (_b_empty_text && (this.brush == null || this.brush.fill == null));
             }
         }
-        else
-        {
+        else {
             return false;
         }
     },
 
 
-    changeSize: function(kw, kh)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
+    changeSize: function (kw, kh) {
+        if (this.spPr.xfrm.isNotNull()) {
             var xfrm = this.spPr.xfrm;
-            this.setOffset(xfrm.offX*kw, xfrm.offY*kh);
-            this.setExtents(xfrm.extX*kw, xfrm.extY*kh);
+            this.setOffset(xfrm.offX * kw, xfrm.offY * kh);
+            this.setExtents(xfrm.extX * kw, xfrm.extY * kh);
         }
     },
 
-    recalculateTransform: function()
-    {
-        if(!isRealObject(this.group))
-        {
-            if(this.spPr.xfrm.isNotNull())
-            {
+    recalculateTransform: function () {
+        if (!isRealObject(this.group)) {
+            if (this.spPr.xfrm.isNotNull()) {
                 var xfrm = this.spPr.xfrm;
                 this.x = xfrm.offX;
                 this.y = xfrm.offY;
@@ -2009,16 +1772,12 @@ CShape.prototype =
                 this.flipH = xfrm.flipH === true;
                 this.flipV = xfrm.flipV === true;
             }
-            else
-            {
-                if(this.isPlaceholder())
-                {
+            else {
+                if (this.isPlaceholder()) {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
+                    for (var i = 0; i < hierarchy.length; ++i) {
                         var hierarchy_sp = hierarchy[i];
-                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
-                        {
+                        if (isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull()) {
                             var xfrm = hierarchy_sp.spPr.xfrm;
                             this.x = xfrm.offX;
                             this.y = xfrm.offY;
@@ -2030,8 +1789,7 @@ CShape.prototype =
                             break;
                         }
                     }
-                    if(i === hierarchy.length)
-                    {
+                    if (i === hierarchy.length) {
                         this.x = 0;
                         this.y = 0;
                         this.extX = 5;
@@ -2041,8 +1799,7 @@ CShape.prototype =
                         this.flipV = false;
                     }
                 }
-                else
-                {
+                else {
                     this.x = 0;
                     this.y = 0;
                     this.extX = 5;
@@ -2053,29 +1810,22 @@ CShape.prototype =
                 }
             }
         }
-        else
-        {
+        else {
             var xfrm;
-            if(this.spPr.xfrm.isNotNull())
-            {
+            if (this.spPr.xfrm.isNotNull()) {
                 xfrm = this.spPr.xfrm;
             }
-            else
-            {
-                if(this.isPlaceholder())
-                {
+            else {
+                if (this.isPlaceholder()) {
                     var hierarchy = this.getHierarchy();
-                    for(var i = 0; i < hierarchy.length; ++i)
-                    {
+                    for (var i = 0; i < hierarchy.length; ++i) {
                         var hierarchy_sp = hierarchy[i];
-                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
-                        {
+                        if (isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull()) {
                             xfrm = hierarchy_sp.spPr.xfrm;
                             break;
                         }
                     }
-                    if(i === hierarchy.length)
-                    {
+                    if (i === hierarchy.length) {
                         xfrm = new CXfrm();
                         xfrm.offX = 0;
                         xfrm.offX = 0;
@@ -2083,8 +1833,7 @@ CShape.prototype =
                         xfrm.extY = 5;
                     }
                 }
-                else
-                {
+                else {
                     xfrm = new CXfrm();
                     xfrm.offX = 0;
                     xfrm.offY = 0;
@@ -2093,57 +1842,49 @@ CShape.prototype =
                 }
             }
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            this.extX = scale_scale_coefficients.cx*xfrm.extX;
-            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.x = scale_scale_coefficients.cx * (xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy * (xfrm.offY - this.group.spPr.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx * xfrm.extX;
+            this.extY = scale_scale_coefficients.cy * xfrm.extY;
             this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
         this.transform.Reset();
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
+        var hc = this.extX * 0.5;
+        var vc = this.extY * 0.5;
         global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
-        if(this.flipH)
+        if (this.flipH)
             global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
-        if(this.flipV)
+        if (this.flipV)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
         global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
-        if(isRealObject(this.group))
-        {
+        if (isRealObject(this.group)) {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
 
     },
 
-    updateInterfaceTextState: function()
-    {
+    updateInterfaceTextState: function () {
         var _b_no_change_indent;
-        if(this.isPlaceholder())
-        {
+        if (this.isPlaceholder()) {
             var _ph_type = this.getPhType();
-            _b_no_change_indent = _ph_type === phType_title || _ph_type === phType_ctrTitle || _ph_type ===phType_chart
-                || _ph_type === phType_pic || _ph_type === phType_clipArt  || _ph_type === phType_dgm
+            _b_no_change_indent = _ph_type === phType_title || _ph_type === phType_ctrTitle || _ph_type === phType_chart
+                || _ph_type === phType_pic || _ph_type === phType_clipArt || _ph_type === phType_dgm
                 || _ph_type === phType_dgm;
         }
-        else
-        {
+        else {
             _b_no_change_indent = false;
         }
-        if(this.txBody !== null && typeof this.txBody === "object")
-        {
-            if(this.txBody.content !== null && typeof this.txBody.content === "object")
-            {
+        if (this.txBody !== null && typeof this.txBody === "object") {
+            if (this.txBody.content !== null && typeof this.txBody.content === "object") {
                 var _content = this.txBody.content;
-                if(typeof _content.Document_UpdateInterfaceState === "function")
-                {
+                if (typeof _content.Document_UpdateInterfaceState === "function") {
                     _content.Document_UpdateInterfaceState();
                 }
-                if(typeof _content.canIncreaseIndent === "function" && _b_no_change_indent === false)
-                {
+                if (typeof _content.canIncreaseIndent === "function" && _b_no_change_indent === false) {
                     editor.asc_fireCallback("asc_canIncreaseIndent", _content.canIncreaseIndent(true));
                     editor.asc_fireCallback("asc_canDecreaseIndent", _content.canIncreaseIndent(false));
                     return;
@@ -2154,125 +1895,107 @@ CShape.prototype =
         editor.asc_fireCallback("asc_canDecreaseIndent", false);
     },
 
-    getTransformMatrix: function()
-    {
-        if(this.recalcInfo.recalculateTransform)
-        {
+    getTransformMatrix: function () {
+        if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
             this.recalcInfo.recalculateTransform = false;
         }
         return this.transform;
     },
 
-    getTransform: function()
-    {
-        if(this.recalcInfo.recalculateTransform)
-        {
+    getTransform: function () {
+        if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
             this.recalcInfo.recalculateTransform = false;
         }
-        return {x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV};
+        return { x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV };
     },
 
-    getRotateTrackObject: function()
-    {
+    getRotateTrackObject: function () {
         return new RotateTrackShape(this);
     },
 
-    getResizeTrackObject: function(cardDirection)
-    {
+    getResizeTrackObject: function (cardDirection) {
         return new CResizeShapeTrack(this, cardDirection);
     },
 
-    getCardDirection: function(num)
-    {
+    getCardDirection: function (num) {
 
     },
 
-    getAngle: function(x, y)
-    {
+    getAngle: function (x, y) {
         var px = this.invertTransform.TransformPointX(x, y);
         var py = this.invertTransform.TransformPointY(x, y);
-        return Math.PI*0.5 + Math.atan2(px - this.extX*0.5, py - this.extY*0.5);
+        return Math.PI * 0.5 + Math.atan2(px - this.extX * 0.5, py - this.extY * 0.5);
     },
 
-    recalculateCursorTypes: function()
-    {
+    recalculateCursorTypes: function () {
         var transform_matrix = this.getTransformMatrix();
         var transform = this.getTransformMatrix();
-        var hc = transform.extX*0.5;
-        var vc = transform.extY*0.5;
+        var hc = transform.extX * 0.5;
+        var vc = transform.extY * 0.5;
         var xc = transform_matrix.TransformPointX(hc, vc);
         var yc = transform_matrix.TransformPointY(hc, vc);
         var xt = transform_matrix.TransformPointX(hc, 0);
         var yt = transform_matrix.TransformPointY(hc, 0);
-        var vx = xt-xc;
-        var vy = yc-yt;
-        var angle = Math.atan2(vy, vx)+Math.PI/8;
-        while(angle < 0)
-            angle += 2*Math.PI;
-        while(angle >= 2*Math.PI)
-            angle -= 2*Math.PI;
+        var vx = xt - xc;
+        var vy = yc - yt;
+        var angle = Math.atan2(vy, vx) + Math.PI / 8;
+        while (angle < 0)
+            angle += 2 * Math.PI;
+        while (angle >= 2 * Math.PI)
+            angle -= 2 * Math.PI;
 
         var xlt = transform_matrix.TransformPointX(0, 0);
         var ylt = transform_matrix.TransformPointY(0, 0);
-        var vx_lt = xlt-xc;
-        var vy_lt = yc-ylt;
-        var _index = Math.floor(angle/(Math.PI/4));
+        var vx_lt = xlt - xc;
+        var vy_lt = yc - ylt;
+        var _index = Math.floor(angle / (Math.PI / 4));
         var _index2, t;
-        if(vx_lt*vy-vx*vy_lt < 0) // нумерация якорьков по часовой стрелке
+        if (vx_lt * vy - vx * vy_lt < 0) // нумерация якорьков по часовой стрелке
         {
-            for(var i = 0; i<8; ++i)
-            {
-                t = i- _index + 17;
-                _index2 =  t - ((t/8) >> 0)*8;
+            for (var i = 0; i < 8; ++i) {
+                t = i - _index + 17;
+                _index2 = t - ((t / 8) >> 0) * 8;
                 this.cursorTypes[i] = DEFAULT_CURSOR_TYPES[_index2];
             }
         }
-        else
-        {
-            for(i = 0; i<8; ++i)
-            {
-                t = -i-_index+19;
-                _index2 = t - ((t/8) >> 0)*8;
+        else {
+            for (i = 0; i < 8; ++i) {
+                t = -i - _index + 19;
+                _index2 = t - ((t / 8) >> 0) * 8;
                 this.cursorTypes[i] = DEFAULT_CURSOR_TYPES[_index2];
             }
         }
         this.recalcInfo.recalculateCursorTypes = false;
     },
 
-    recalculateGeometry: function()
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    recalculateGeometry: function () {
+        if (isRealObject(this.spPr.geometry)) {
             var transform = this.getTransform();
             this.spPr.geometry.Recalculate(transform.extX, transform.extY);
         }
     },
-    drawAdjustments: function(drawingDocument)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    drawAdjustments: function (drawingDocument) {
+        if (isRealObject(this.spPr.geometry)) {
             this.spPr.geometry.drawAdjustments(drawingDocument, this.transform);
         }
     },
 
-    getCardDirectionByNum: function(num)
-    {
+    getCardDirectionByNum: function (num) {
         var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
         var full_flip_h = this.getFullFlipH();
         var full_flip_v = this.getFullFlipV();
         var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
-        if(same_flip)
-            return ((num - num_north) + CARD_DIRECTION_N + 8)%8;
+        if (same_flip)
+            return ((num - num_north) + CARD_DIRECTION_N + 8) % 8;
 
-        return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
+        return (CARD_DIRECTION_N - (num - num_north) + 8) % 8;
     },
 
-    getNumByCardDirection: function(cardDirection)
-    {
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
+    getNumByCardDirection: function (cardDirection) {
+        var hc = this.extX * 0.5;
+        var vc = this.extY * 0.5;
         var transform = this.getTransformMatrix();
         var y1, y3, y5, y7;
         y1 = transform.TransformPointY(hc, 0);
@@ -2283,99 +2006,91 @@ CShape.prototype =
         var north_number;
         var full_flip_h = this.getFullFlipH();
         var full_flip_v = this.getFullFlipV();
-        switch(Math.min(y1, y3, y5, y7))
-        {
+        switch (Math.min(y1, y3, y5, y7)) {
             case y1:
-            {
-                north_number = !full_flip_v ? 1 : 5;
-                break;
-            }
+                {
+                    north_number = !full_flip_v ? 1 : 5;
+                    break;
+                }
             case y3:
-            {
-                north_number = !full_flip_h ? 3 : 7;
-                break;
-            }
+                {
+                    north_number = !full_flip_h ? 3 : 7;
+                    break;
+                }
             case y5:
-            {
-                north_number = !full_flip_v ? 5 : 1;
-                break;
-            }
+                {
+                    north_number = !full_flip_v ? 5 : 1;
+                    break;
+                }
             default:
-            {
-                north_number = !full_flip_h ? 7 : 3;
-                break;
-            }
+                {
+                    north_number = !full_flip_h ? 7 : 3;
+                    break;
+                }
         }
         var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
 
-        if(same_flip)
-            return (north_number + cardDirection)%8;
-        return (north_number - cardDirection + 8)%8;
+        if (same_flip)
+            return (north_number + cardDirection) % 8;
+        return (north_number - cardDirection + 8) % 8;
     },
 
-    getResizeCoefficients: function(numHandle, x, y)
-    {
+    getResizeCoefficients: function (numHandle, x, y) {
         var cx, cy;
-        cx= this.extX > 0 ? this.extX : 0.01;
-        cy= this.extY > 0 ? this.extY : 0.01;
+        cx = this.extX > 0 ? this.extX : 0.01;
+        cy = this.extY > 0 ? this.extY : 0.01;
 
         var invert_transform = this.getInvertTransform();
         var t_x = invert_transform.TransformPointX(x, y);
         var t_y = invert_transform.TransformPointY(x, y);
 
-        switch(numHandle)
-        {
+        switch (numHandle) {
             case 0:
-                return {kd1: (cx-t_x)/cx, kd2: (cy-t_y)/cy};
+                return { kd1: (cx - t_x) / cx, kd2: (cy - t_y) / cy };
             case 1:
-                return {kd1: (cy-t_y)/cy, kd2: 0};
+                return { kd1: (cy - t_y) / cy, kd2: 0 };
             case 2:
-                return {kd1: (cy-t_y)/cy, kd2: t_x/cx};
+                return { kd1: (cy - t_y) / cy, kd2: t_x / cx };
             case 3:
-                return {kd1: t_x/cx, kd2: 0};
+                return { kd1: t_x / cx, kd2: 0 };
             case 4:
-                return {kd1: t_x/cx, kd2: t_y/cy};
+                return { kd1: t_x / cx, kd2: t_y / cy };
             case 5:
-                return {kd1: t_y/cy, kd2: 0};
+                return { kd1: t_y / cy, kd2: 0 };
             case 6:
-                return {kd1: t_y/cy, kd2:(cx-t_x)/cx};
+                return { kd1: t_y / cy, kd2: (cx - t_x) / cx };
             case 7:
-                return {kd1:(cx-t_x)/cx, kd2: 0};
+                return { kd1: (cx - t_x) / cx, kd2: 0 };
         }
-        return {kd1: 1, kd2: 1};
+        return { kd1: 1, kd2: 1 };
     },
 
 
-    select: function(drawingObjectsController)
-    {
+    select: function (drawingObjectsController) {
         this.selected = true;
         var selected_objects;
-        if(!isRealObject(this.group))
+        if (!isRealObject(this.group))
             selected_objects = drawingObjectsController.selectedObjects;
         else
             selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
+        for (var i = 0; i < selected_objects.length; ++i) {
+            if (selected_objects[i] === this)
                 break;
         }
-        if(i === selected_objects.length)
+        if (i === selected_objects.length)
             selected_objects.push(this);
     },
 
-    deselect: function(drawingObjectsController)
-    {
+    deselect: function (drawingObjectsController) {
         this.selected = false;
         this.addTextFlag = false;
         var selected_objects;
-        if(!isRealObject(this.group))
+        if (!isRealObject(this.group))
             selected_objects = drawingObjectsController.selectedObjects;
         else
             selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-            {
+        for (var i = 0; i < selected_objects.length; ++i) {
+            if (selected_objects[i] === this) {
                 selected_objects.splice(i, 1);
                 break;
             }
@@ -2383,27 +2098,22 @@ CShape.prototype =
         return this;
     },
 
-    getMainGroup: function()
-    {
-        if(!isRealObject(this.group))
+    getMainGroup: function () {
+        if (!isRealObject(this.group))
             return null;
 
         var cur_group = this.group;
-        while(isRealObject(cur_group.group))
+        while (isRealObject(cur_group.group))
             cur_group = cur_group.group;
         return cur_group;
     },
 
-    getGroupHierarchy: function()
-    {
-        if(this.recalcInfo.recalculateGroupHierarchy)
-        {
+    getGroupHierarchy: function () {
+        if (this.recalcInfo.recalculateGroupHierarchy) {
             this.groupHierarchy = [];
-            if(isRealObject(this.group))
-            {
+            if (isRealObject(this.group)) {
                 var parent_group_hierarchy = this.group.getGroupHierarchy();
-                for(var i = 0; i < parent_group_hierarchy.length; ++i)
-                {
+                for (var i = 0; i < parent_group_hierarchy.length; ++i) {
                     this.groupHierarchy.push(parent_group_hierarchy[i]);
                 }
                 this.groupHierarchy.push(this.group);
@@ -2413,24 +2123,20 @@ CShape.prototype =
         return this.groupHierarchy;
     },
 
-    hitToAdj: function(x, y)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    hitToAdj: function (x, y) {
+        if (isRealObject(this.spPr.geometry)) {
             var px, py;
             px = this.invertTransform.TransformPointX(x, y);
             py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitToAdj(px, py);
         }
-        return {hit: false, num: -1, polar: false};
+        return { hit: false, num: -1, polar: false };
     },
 
 
 
-    hitToPath: function(x, y)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    hitToPath: function (x, y) {
+        if (isRealObject(this.spPr.geometry)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInPath(this.drawingDocument.CanvasHitContext, px, py);
@@ -2438,10 +2144,8 @@ CShape.prototype =
         return false;
     },
 
-    hitToInnerArea: function(x, y)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    hitToInnerArea: function (x, y) {
+        if (isRealObject(this.spPr.geometry)) {
             var px = this.invertTransform.TransformPointX(x, y);
             var py = this.invertTransform.TransformPointY(x, y);
             return this.spPr.geometry.hitInInnerArea(this.drawingDocument.CanvasHitContext, px, py);
@@ -2449,10 +2153,8 @@ CShape.prototype =
         return false;
     },
 
-    hitToTextRect: function(x, y)
-    {
-        if(isRealObject(this.txBody))
-        {
+    hitToTextRect: function (x, y) {
+        if (isRealObject(this.txBody)) {
             var px = this.invertTransformText.TransformPointX(x, y);
             var py = this.invertTransformText.TransformPointY(x, y);
             return this.txBody.hitToRect(px, py);
@@ -2460,78 +2162,67 @@ CShape.prototype =
         return false;
     },
 
-    hitToBoundsRect: function(x, y)
-    {
+    hitToBoundsRect: function (x, y) {
         return false;
     },
 
-    hitInTextRect: function(x, y)
-    {
-        if(isRealObject(this.txBody))
-        {
+    hitInTextRect: function (x, y) {
+        if (isRealObject(this.txBody)) {
             var t_x, t_y;
             t_x = this.invertTransformText.TransformPointX(x, y);
             t_y = this.invertTransformText.TransformPointY(x, y);
-            return  t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight;
+            return t_x > 0 && t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight;
         }
         return false;
     },
 
-    setAdjustmentValue: function(ref1, value1, ref2, value2)
-    {
-        if(isRealObject(this.spPr.geometry))
-        {
+    setAdjustmentValue: function (ref1, value1, ref2, value2) {
+        if (isRealObject(this.spPr.geometry)) {
             var old_geometry = this.spPr.geometry.createDuplicate();
             this.spPr.geometry.setGuideValue(ref1, value1);
             this.spPr.geometry.setGuideValue(ref2, value2);
             var new_geometry = this.spPr.geometry.createDuplicate();
-            History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
+            History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
             this.recalcInfo.recalculateGeometry = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
 
-    updateCursorType: function(x, y, e)
-    {
-       var tx = this.invertTransformText.TransformPointX(x, y);
-       var ty = this.invertTransformText.TransformPointY(x, y);
-        var page_num = this.parent instanceof  Slide ? this.parent.num : 0;
+    updateCursorType: function (x, y, e) {
+        var tx = this.invertTransformText.TransformPointX(x, y);
+        var ty = this.invertTransformText.TransformPointY(x, y);
+        var page_num = this.parent instanceof Slide ? this.parent.num : 0;
         this.txBody.content.Update_CursorType(tx, ty, page_num)
     },
 
 
-    sendMouseData: function()
-    {
-        if ( true === this.Lock.Is_Locked() )
-        {
+    sendMouseData: function () {
+        if (true === this.Lock.Is_Locked()) {
             var MMData = new CMouseMoveData();
             var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
-            MMData.X_abs            = Coords.X - 5;
-            MMData.Y_abs            = Coords.Y;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
-            MMData.UserId           = this.Lock.Get_UserId();
-            MMData.HaveChanges      = this.Lock.Have_Changes();
+            MMData.X_abs = Coords.X - 5;
+            MMData.Y_abs = Coords.Y;
+            MMData.Type = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.UserId = this.Lock.Get_UserId();
+            MMData.HaveChanges = this.Lock.Have_Changes();
             MMData.LockedObjectType = 0;
-            editor.sync_MouseMoveCallback( MMData );
+            editor.sync_MouseMoveCallback(MMData);
         }
     },
 
-    selectionSetStart: function(e, x, y, slideIndex)
-    {
-        if(isRealObject(this.txBody))
-        {
+    selectionSetStart: function (e, x, y, slideIndex) {
+        if (isRealObject(this.txBody)) {
             this.addTextFlag = true;
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
             this.txBody.content.Selection_SetStart(tx, ty, 0, e);
+            this.txBody.content.RecalculateCurPos();
         }
     },
 
-    selectionSetEnd: function(e, x, y, slideIndex)
-    {
-        if(isRealObject(this.txBody))
-        {
+    selectionSetEnd: function (e, x, y, slideIndex) {
+        if (isRealObject(this.txBody)) {
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
@@ -2539,14 +2230,11 @@ CShape.prototype =
         }
     },
 
-    updateSelectionState: function()
-    {
-        if(isRealObject(this.txBody))
-        {
+    updateSelectionState: function () {
+        if (isRealObject(this.txBody)) {
             this.txBody.updateSelectionState(this.parent.presentation.DrawingDocument);
         }
-        else
-        {
+        else {
             this.parent.presentation.DrawingDocument.UpdateTargetTransform(null);
             this.parent.presentation.DrawingDocument.TargetEnd();
             this.parent.presentation.DrawingDocument.SelectEnabled(false);
@@ -2556,73 +2244,66 @@ CShape.prototype =
     },
 
 
-    setXfrm: function(offX, offY, extX, extY, rot, flipH, flipV)
-    {
-        if(this.spPr.xfrm.isNotNull())
-        {
-            if(isRealNumber(offX) && isRealNumber(offY))
+    setXfrm: function (offX, offY, extX, extY, rot, flipH, flipV) {
+        if (this.spPr.xfrm.isNotNull()) {
+            if (isRealNumber(offX) && isRealNumber(offY))
                 this.setOffset(offX, offY);
 
-            if(isRealNumber(extX) && isRealNumber(extY))
+            if (isRealNumber(extX) && isRealNumber(extY))
                 this.setExtents(extX, extY);
 
-            if(isRealNumber(rot))
+            if (isRealNumber(rot))
                 this.setRotate(rot);
 
-            if(isRealBool(flipH) && isRealBool(flipV))
+            if (isRealBool(flipH) && isRealBool(flipV))
                 this.setFlips(flipH, flipV);
         }
-        else
-        {
+        else {
             var transform = this.getTransform();
-            if(isRealNumber(offX) && isRealNumber(offY))
+            if (isRealNumber(offX) && isRealNumber(offY))
                 this.setOffset(offX, offY);
             else
                 this.setOffset(transform.x, transform.y);
 
-            if(isRealNumber(extX) && isRealNumber(extY))
+            if (isRealNumber(extX) && isRealNumber(extY))
                 this.setExtents(extX, extY);
             else
                 this.setExtents(transform.extX, transform.extY);
 
-            if(isRealNumber(rot))
+            if (isRealNumber(rot))
                 this.setRotate(rot);
             else
                 this.setRotate(transform.rot);
-            if(isRealBool(flipH) && isRealBool(flipV))
+            if (isRealBool(flipH) && isRealBool(flipV))
                 this.setFlips(flipH, flipV);
             else
                 this.setFlips(transform.flipH, transform.flipV);
         }
     },
 
-    normalize: function()
-    {
+    normalize: function () {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;
         var xfrm = this.spPr.xfrm;
-        if(!isRealObject(this.group))
-        {
+        if (!isRealObject(this.group)) {
             new_off_x = xfrm.offX;
             new_off_y = xfrm.offY;
             new_ext_x = xfrm.extX;
             new_ext_y = xfrm.extY;
         }
-        else
-        {
+        else {
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
-            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+            new_off_x = scale_scale_coefficients.cx * (xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy * (xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx * xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy * xfrm.extY;
         }
         this.setOffset(new_off_x, new_off_y);
         this.setExtents(new_ext_x, new_ext_y);
     },
 
-    setRotate: function(rot)
-    {
+    setRotate: function (rot) {
         var xfrm = this.spPr.xfrm;
-        History.Add(this, {Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot});
+        History.Add(this, { Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot });
 
         this.recalcInfo.recalculateTransform = true;
         this.recalcInfo.recalculateTransformText = true;
@@ -2631,9 +2312,8 @@ CShape.prototype =
 
     },
 
-    setOffset: function(offX, offY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
+    setOffset: function (offX, offY) {
+        History.Add(this, { Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY });
         this.spPr.xfrm.offX = offX;
         this.spPr.xfrm.offY = offY;
         this.recalcInfo.recalculateTransform = true;
@@ -2642,9 +2322,8 @@ CShape.prototype =
     },
 
 
-    setExtents: function(extX, extY)
-    {
-        History.Add(this, {Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY});
+    setExtents: function (extX, extY) {
+        History.Add(this, { Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY });
         this.spPr.xfrm.extX = extX;
         this.spPr.xfrm.extY = extY;
         this.recalcInfo.recalculateTransform = true;
@@ -2653,9 +2332,8 @@ CShape.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    setFlips: function(flipH, flipV)
-    {
-        History.Add(this, {Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV});
+    setFlips: function (flipH, flipV) {
+        History.Add(this, { Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV });
         this.spPr.xfrm.flipH = flipH;
         this.spPr.xfrm.flipV = flipV;
         this.recalcInfo.recalculateTransform = true;
@@ -2664,14 +2342,11 @@ CShape.prototype =
     },
 
 
-    check_bounds: function(checker)
-    {
-        if (this.spPr.geometry)
-        {
+    check_bounds: function (checker) {
+        if (this.spPr.geometry) {
             this.spPr.geometry.check_bounds(checker);
         }
-        else
-        {
+        else {
             checker._s();
             checker._m(0, 0);
             checker._l(this.extX, 0);
@@ -2683,15 +2358,12 @@ CShape.prototype =
     },
 
 
-    getBase64Img: function()
-    {
+    getBase64Img: function () {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
-    paragraphAdd: function(paraItem, bRecalculate)
-    {
-        if(!isRealObject(this.txBody))
-        {
+    paragraphAdd: function (paraItem, bRecalculate) {
+        if (!isRealObject(this.txBody)) {
             this.setTextBody(new CTextBody(this));
             this.recalculateContent();
 
@@ -2704,15 +2376,12 @@ CShape.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    addNewParagraph: function()
-    {
-        if(!isRealObject(this.txBody))
-        {
+    addNewParagraph: function () {
+        if (!isRealObject(this.txBody)) {
             this.addTextBody(new CTextBody(this));
             this.recalculateContent();
         }
-        else
-        {
+        else {
             this.txBody.content.Add_NewParagraph(false);
             //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2722,10 +2391,8 @@ CShape.prototype =
         }
     },
 
-    paragraphFormatPaste: function(CopyTextPr, CopyParaPr, Bool)
-    {
-        if(isRealObject(this.txBody))
-        {
+    paragraphFormatPaste: function (CopyTextPr, CopyParaPr, Bool) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
 
             this.recalcInfo.recalculateContent = true;
@@ -2735,10 +2402,8 @@ CShape.prototype =
 
     },
 
-    setParagraphAlign: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    setParagraphAlign: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphAlign(val);
             //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2747,10 +2412,8 @@ CShape.prototype =
         }
     },
 
-    applyAllAlign: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    applyAllAlign: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Set_ParagraphAlign(val);
             this.txBody.content.Set_ApplyToAll(false);
@@ -2760,10 +2423,8 @@ CShape.prototype =
         }
     },
 
-    setParagraphSpacing: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    setParagraphSpacing: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphSpacing(val);
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2772,10 +2433,8 @@ CShape.prototype =
         }
     },
 
-    setParagraphTabs: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    setParagraphTabs: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphTabs(val);
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2784,10 +2443,8 @@ CShape.prototype =
         }
     },
 
-    applyAllSpacing: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    applyAllSpacing: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Set_ParagraphSpacing(val);
             this.txBody.content.Set_ApplyToAll(false);
@@ -2797,10 +2454,8 @@ CShape.prototype =
         }
     },
 
-    setParagraphNumbering: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    setParagraphNumbering: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphNumbering(val);
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2809,10 +2464,8 @@ CShape.prototype =
         }
     },
 
-    applyAllNumbering: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    applyAllNumbering: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Set_ParagraphNumbering(val);
             this.txBody.content.Set_ApplyToAll(false);
@@ -2823,10 +2476,8 @@ CShape.prototype =
     },
 
 
-    setParagraphIndent: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    setParagraphIndent: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphIndent(val);
             this.txBody.bRecalculateNumbering = true;
             this.txBody.content.RecalculateCurPos();
@@ -2836,10 +2487,8 @@ CShape.prototype =
         }
     },
 
-    applyAllIndent: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    applyAllIndent: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Set_ParagraphIndent(val);
             this.txBody.content.Set_ApplyToAll(false);
@@ -2849,10 +2498,8 @@ CShape.prototype =
         }
     },
 
-    Paragraph_IncDecFontSize: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Paragraph_IncDecFontSize: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Paragraph_IncDecFontSize(val);
             this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
@@ -2861,10 +2508,8 @@ CShape.prototype =
         }
     },
 
-    Paragraph_IncDecFontSizeAll: function(val)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Paragraph_IncDecFontSizeAll: function (val) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Paragraph_IncDecFontSize(val);
             this.txBody.content.Set_ApplyToAll(false);
@@ -2874,90 +2519,72 @@ CShape.prototype =
         }
     },
 
-    Cursor_MoveToStartPos : function()
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveToStartPos: function () {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveToStartPos();
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveToEndPos : function()
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveToEndPos: function () {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveToEndPos();
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveLeft : function(AddToSelect, Word)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveLeft: function (AddToSelect, Word) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveLeft(AddToSelect, Word);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveRight : function(AddToSelect, Word)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveRight: function (AddToSelect, Word) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveRight(AddToSelect, Word);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveUp : function(AddToSelect)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveUp: function (AddToSelect) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveUp(AddToSelect);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveDown : function(AddToSelect)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveDown: function (AddToSelect) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveDown(AddToSelect);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveEndOfLine : function(AddToSelect)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveEndOfLine: function (AddToSelect) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveEndOfLine(AddToSelect);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveStartOfLine : function(AddToSelect)
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveStartOfLine: function (AddToSelect) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveStartOfLine(AddToSelect);
             this.txBody.content.RecalculateCurPos();
 
         }
     },
 
-    Cursor_MoveAt : function( X, Y, AddToSelect )
-    {
-        if(isRealObject(this.txBody))
-        {
+    Cursor_MoveAt: function (X, Y, AddToSelect) {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.Cursor_MoveAt(X, Y, AddToSelect);
             this.txBody.content.RecalculateCurPos();
 
@@ -2965,59 +2592,48 @@ CShape.prototype =
     },
 
 
-    addTextBody: function(txBody)
-    {
+    addTextBody: function (txBody) {
     },
 
-    recalculateCurPos: function()
-    {
-        if(isRealObject(this.txBody))
-        {
+    recalculateCurPos: function () {
+        if (isRealObject(this.txBody)) {
             this.txBody.content.RecalculateCurPos();
         }
     },
 
-    onParagraphChanged: function()
-    {
+    onParagraphChanged: function () {
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    isSimpleObject: function()
-    {
+    isSimpleObject: function () {
         return true;
     },
 
-    getCurDocumentContent: function()
-    {
-        if(this.txBody)
-        {
+    getCurDocumentContent: function () {
+        if (this.txBody) {
             return this.txBody.content;
         }
     },
 
-    getSearchResults : function(str, ownNum)//возвращает массив SelectionState'ов
+    getSearchResults: function (str, ownNum)//возвращает массив SelectionState'ов
     {
         var documentContentSelectionStates = this.txBody ? this.txBody.getSearchResults(str) : [];
-        if(documentContentSelectionStates.length > 0)
-        {
+        if (documentContentSelectionStates.length > 0) {
             var arrSelSt = [];
-            for(var i = 0; i < documentContentSelectionStates.length; ++i)
-            {
+            for (var i = 0; i < documentContentSelectionStates.length; ++i) {
 
                 var s = {};
-                if(!isRealObject(this.group))
-                {
+                if (!isRealObject(this.group)) {
                     s.id = STATES_ID_TEXT_ADD;
                     s.textObject = this;
                     s.textSelectionState = documentContentSelectionStates[i];
                 }
-                else
-                {
+                else {
                     s.id = STATES_ID_TEXT_ADD_IN_GROUP;
                     var group = this.group;
-                    while(group.group)
+                    while (group.group)
                         group = group.group;
                     s.group = group;
                     s.textObject = this;
@@ -3027,38 +2643,34 @@ CShape.prototype =
             }
             return arrSelSt;
         }
-        else
-        {
+        else {
             return null;
         }
     },
 
-    draw: function(graphics)
-    {
+    draw: function (graphics) {
         /*graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this.spPr.geometry);
         if(locktype_None != this.Lock.Get_Type())
-            graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+        graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
         graphics.reset();
         graphics.SetIntegerGrid(true);
 
 
         if (this.txBody /*&& /*!(graphics instanceof CSlideBoundsChecker))*/
-       // {
+        // {
         /*    graphics.SetIntegerGrid(false);
-            graphics.transform3(this.transformText);
-            this.txBody.draw(graphics);
-            graphics.reset();
-            graphics.SetIntegerGrid(true);
+        graphics.transform3(this.transformText);
+        this.txBody.draw(graphics);
+        graphics.reset();
+        graphics.SetIntegerGrid(true);
         }   */
-        if (graphics.IsSlideBoundsCheckerType === true)
-        {
+        if (graphics.IsSlideBoundsCheckerType === true) {
             graphics.transform3(this.transform);
-            if (null == this.geometry || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset))
-            {
+            if (null == this.geometry || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
                 graphics._s();
                 graphics._m(0, 0);
                 graphics._l(this.extX, 0);
@@ -3066,22 +2678,18 @@ CShape.prototype =
                 graphics._l(0, this.extY);
                 graphics._e();
             }
-            else
-            {
+            else {
                 this.geometry.check_bounds(graphics);
             }
 
-            if(this.txBody)
-            {
+            if (this.txBody) {
                 graphics.SetIntegerGrid(false);
 
                 var transform_text;
-                if((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2!=null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
-                {
+                if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
                     transform_text = this.transformText2;
                 }
-                else if(this.txBody.content)
-                {
+                else if (this.txBody.content) {
                     transform_text = this.transformText;
                 }
 
@@ -3094,8 +2702,7 @@ CShape.prototype =
             return;
         }
 
-        if(this.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill))
-        {
+        if (this.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
             graphics.SetIntegerGrid(false);
             graphics.transform3(this.transform, false);
 
@@ -3103,12 +2710,9 @@ CShape.prototype =
             shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
             shape_drawer.draw(this.spPr.geometry);
         }
-        if(this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)
-        {
-            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && !this.addTextFlag)
-            {
-                if (global_MatrixTransformer.IsIdentity2(this.transform))
-                {
+        if (this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true) {
+            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && !this.addTextFlag) {
+                if (global_MatrixTransformer.IsIdentity2(this.transform)) {
                     graphics.transform3(this.transform, false);
                     var tr = graphics.m_oFullTransform;
                     graphics.SetIntegerGrid(true);
@@ -3119,14 +2723,13 @@ CShape.prototype =
                     var _b = tr.TransformPointY(this.extX, this.extY);
 
                     graphics.m_oContext.lineWidth = 1;
-                    graphics.p_color(127,127,127,255);
+                    graphics.p_color(127, 127, 127, 255);
 
                     graphics._s();
                     editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(graphics.m_oContext, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2);
                     graphics.ds();
                 }
-                else
-                {
+                else {
                     graphics.transform3(this.transform, false);
                     var tr = graphics.m_oFullTransform;
                     graphics.SetIntegerGrid(true);
@@ -3147,19 +2750,18 @@ CShape.prototype =
                     var y4 = tr.TransformPointY(_r, _b) >> 0;
 
                     graphics.m_oContext.lineWidth = 1;
-                    graphics.p_color(127,127,127,255);
+                    graphics.p_color(127, 127, 127, 255);
 
                     graphics._s();
                     editor.WordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDash(graphics.m_oContext, x1, y1, x2, y2, x3, y3, x4, y4, 3, 1);
                     graphics.ds();
                 }
             }
-            else
-            {
+            else {
                 graphics.SetIntegerGrid(false);
                 graphics.p_width(70);
                 graphics.transform3(this.transform, false);
-                graphics.p_color(0,0,0,255);
+                graphics.p_color(0, 0, 0, 255);
                 graphics._s();
                 graphics._m(0, 0);
                 graphics._l(this.extX, 0);
@@ -3172,16 +2774,13 @@ CShape.prototype =
             }
         }
 
-        if(this.txBody)
-        {
+        if (this.txBody) {
             graphics.SetIntegerGrid(false);
             var transform_text;
-            if((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2!=null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2)
-            {
+            if ((!this.txBody.content || this.txBody.content.Is_Empty()) && this.txBody.content2 != null && !this.addTextFlag && (this.isEmptyPlaceholder ? this.isEmptyPlaceholder() : false) && this.transformText2) {
                 transform_text = this.transformText2;
             }
-            else if(this.txBody.content)
-            {
+            else if (this.txBody.content) {
                 transform_text = this.transformText;
             }
             graphics.transform3(transform_text);
@@ -3190,18 +2789,18 @@ CShape.prototype =
                 graphics.FreeFont();
 
             /*var _masrgins = this.getMargins();
-             graphics.reset();
-             graphics.SetIntegerGrid(false);
-             graphics.p_width(70);
-             graphics.transform3(this.TransformTextMatrix);
-             graphics.p_color(0,0,0,255);
-             graphics._s();
-             graphics._m(_masrgins.L*100, _masrgins.T*100);
-             graphics._l(_masrgins.R*100, _masrgins.T*100);
-             graphics._l(_masrgins.R*100, _masrgins.B*100);
-             graphics._l(_masrgins.L*100, _masrgins.B*100);
-             graphics._z();
-             graphics.ds();        */
+            graphics.reset();
+            graphics.SetIntegerGrid(false);
+            graphics.p_width(70);
+            graphics.transform3(this.TransformTextMatrix);
+            graphics.p_color(0,0,0,255);
+            graphics._s();
+            graphics._m(_masrgins.L*100, _masrgins.T*100);
+            graphics._l(_masrgins.R*100, _masrgins.T*100);
+            graphics._l(_masrgins.R*100, _masrgins.B*100);
+            graphics._l(_masrgins.L*100, _masrgins.B*100);
+            graphics._z();
+            graphics.ds();        */
 
             graphics.SetIntegerGrid(true);
         }
@@ -3210,24 +2809,23 @@ CShape.prototype =
 
         graphics.SetIntegerGrid(false);
 
-        if(locktype_None != this.Lock.Get_Type())
-            graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+        if (locktype_None != this.Lock.Get_Type())
+            graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
 
         graphics.reset();
         graphics.SetIntegerGrid(true);
     },
 
 
-    getRotateAngle: function(x, y)
-    {
+    getRotateAngle: function (x, y) {
         var transform = this.getTransformMatrix();
-        var rotate_distance =  this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
+        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
+        var hc = this.extX * 0.5;
+        var vc = this.extY * 0.5;
         var xc_t = transform.TransformPointX(hc, vc);
         var yc_t = transform.TransformPointY(hc, vc);
-        var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
-        var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
+        var rot_x_t = transform.TransformPointX(hc, -rotate_distance);
+        var rot_y_t = transform.TransformPointY(hc, -rotate_distance);
 
         var invert_transform = this.getInvertTransform();
         var rel_x = invert_transform.TransformPointX(x, y);
@@ -3242,145 +2840,122 @@ CShape.prototype =
         var flip_h = this.getFullFlipH();
         var flip_v = this.getFullFlipV();
         var same_flip = flip_h && flip_v || !flip_h && !flip_v;
-        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+        var angle = rel_x > this.extX * 0.5 ? Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y) : -Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y);
         return same_flip ? angle : -angle;
     },
 
 
-    getFullFlipH: function()
-    {
-        if(!isRealObject(this.group))
+    getFullFlipH: function () {
+        if (!isRealObject(this.group))
             return this.flipH;
         return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
 
-    getFullFlipV: function()
-    {
-        if(!isRealObject(this.group))
+    getFullFlipV: function () {
+        if (!isRealObject(this.group))
             return this.flipV;
         return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
 
-    getAspect: function(num)
-    {
+    getAspect: function (num) {
         var _tmp_x = this.extX != 0 ? this.extX : 0.1;
         var _tmp_y = this.extY != 0 ? this.extY : 0.1;
-        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
+        return num === 0 || num === 4 ? _tmp_x / _tmp_y : _tmp_y / _tmp_x;
     },
 
-    getFullRotate: function()
-    {
+    getFullRotate: function () {
         return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
-    getRectBounds: function()
-    {
+    getRectBounds: function () {
         var transform = this.getTransformMatrix();
         var w = this.extX;
         var h = this.extY;
-        var rect_points = [{x:0, y:0}, {x: w, y: 0}, {x: w, y: h}, {x: 0, y: h}];
+        var rect_points = [{ x: 0, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: 0, y: h}];
         var min_x, max_x, min_y, max_y;
         min_x = transform.TransformPointX(rect_points[0].x, rect_points[0].y);
         min_y = transform.TransformPointY(rect_points[0].x, rect_points[0].y);
         max_x = min_x;
         max_y = min_y;
         var cur_x, cur_y;
-        for(var i = 1; i < 4; ++i)
-        {
+        for (var i = 1; i < 4; ++i) {
             cur_x = transform.TransformPointX(rect_points[i].x, rect_points[i].y);
             cur_y = transform.TransformPointY(rect_points[i].x, rect_points[i].y);
-            if(cur_x < min_x)
+            if (cur_x < min_x)
                 min_x = cur_x;
-            if(cur_x > max_x)
+            if (cur_x > max_x)
                 max_x = cur_x;
 
-            if(cur_y < min_y)
+            if (cur_y < min_y)
                 min_y = cur_y;
-            if(cur_y > max_y)
+            if (cur_y > max_y)
                 max_y = cur_y;
         }
-        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+        return { minX: min_x, maxX: max_x, minY: min_y, maxY: max_y };
     },
 
-    getRectForGrouping: function()
-    {
+    getRectForGrouping: function () {
 
     },
 
-    getInvertTransform: function()
-    {
-        if(this.recalcInfo.recalculateTransform)
-        {
+    getInvertTransform: function () {
+        if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
             this.recalcInfo.recalculateTransform = true;
         }
         return this.invertTransform;
     },
 
-    getFullOffset: function()
-    {
-        if(!isRealObject(this.group))
-            return {offX: this.x, offY: this.y};
+    getFullOffset: function () {
+        if (!isRealObject(this.group))
+            return { offX: this.x, offY: this.y };
         var group_offset = this.group.getFullOffset();
-        return {offX: this.x + group_offset.offX, offY: this.y + group_offset.offY};
+        return { offX: this.x + group_offset.offX, offY: this.y + group_offset.offY };
     },
 
-    getPresetGeom: function()
-    {
-        if(this.spPr.geometry != null)
-        {
+    getPresetGeom: function () {
+        if (this.spPr.geometry != null) {
             return this.spPr.geometry.preset;
         }
-        else
-        {
+        else {
             return null;
         }
     },
 
-    getFill: function()
-    {
+    getFill: function () {
         return this.brush;
     },
 
-    getStroke: function()
-    {
+    getStroke: function () {
         return this.pen;
     },
 
 
-    canChangeArrows : function()
-    {
-        if(this.spPr.geometry == null)
-        {
+    canChangeArrows: function () {
+        if (this.spPr.geometry == null) {
             return false;
         }
         var _path_list = this.spPr.geometry.pathLst;
         var _path_index;
         var _path_command_index;
         var _path_command_arr;
-        for(_path_index = 0; _path_index < _path_list.length; ++_path_index)
-        {
+        for (_path_index = 0; _path_index < _path_list.length; ++_path_index) {
             _path_command_arr = _path_list[_path_index].ArrPathCommandInfo;
-            for(_path_command_index = 0; _path_command_index < _path_command_arr.length; ++ _path_command_index)
-            {
-                if(_path_command_arr[_path_command_index].id == 5)
-                {
+            for (_path_command_index = 0; _path_command_index < _path_command_arr.length; ++_path_command_index) {
+                if (_path_command_arr[_path_command_index].id == 5) {
                     break;
                 }
             }
-            if(_path_command_index == _path_command_arr.length)
-            {
+            if (_path_command_index == _path_command_arr.length) {
                 return true;
             }
         }
         return false;
     },
 
-    getParagraphParaPr: function()
-    {
-        if(this.txBody && this.txBody.content)
-        {
+    getParagraphParaPr: function () {
+        if (this.txBody && this.txBody.content) {
             var _result;
             this.txBody.content.Set_ApplyToAll(true);
             _result = this.txBody.content.Get_Paragraph_ParaPr();
@@ -3390,10 +2965,8 @@ CShape.prototype =
         return null;
     },
 
-    getParagraphTextPr: function()
-    {
-        if(this.txBody && this.txBody.content)
-        {
+    getParagraphTextPr: function () {
+        if (this.txBody && this.txBody.content) {
             var _result;
             this.txBody.content.Set_ApplyToAll(true);
             _result = this.txBody.content.Get_Paragraph_TextPr();
@@ -3404,11 +2977,9 @@ CShape.prototype =
     },
 
 
-    setVerticalAlign : function(align)
-    {
+    setVerticalAlign: function (align) {
 
-        if(this.txBody)
-        {
+        if (this.txBody) {
             var old_body_pr = this.txBody.bodyPr.createDuplicate();
             this.txBody.bodyPr.anchor = align;
             this.txBody.recalcInfo.recalculateBodyPr = true;
@@ -3416,196 +2987,174 @@ CShape.prototype =
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
             var new_body_pr = this.txBody.bodyPr.createDuplicate();
-            History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+            History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
             this.txBody.recalcInfo.recalculateBodyPr = true;
             this.recalculateContent();
             this.recalculateTransformText();
         }
     },
 
-    changePresetGeom : function(sPreset)
-    {
+    changePresetGeom: function (sPreset) {
         var _final_preset;
         var _old_line;
         var _new_line;
 
 
-        if(this.spPr.ln == null)
-        {
+        if (this.spPr.ln == null) {
             _old_line = null;
         }
-        else
-        {
+        else {
             _old_line = this.spPr.ln.createDuplicate();
         }
-        switch(sPreset)
-        {
+        switch (sPreset) {
             case "lineWithArrow":
-            {
-                _final_preset = "line";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "line";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
+                    break;
                 }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
             case "lineWithTwoArrows":
-            {
-                _final_preset = "line";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "line";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
 
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
+                    _new_line.headEnd = new EndArrow();
+                    _new_line.headEnd.type = LineEndType.Arrow;
+                    _new_line.headEnd.len = LineEndSize.Mid;
+                    _new_line.headEnd.w = LineEndSize.Mid;
+                    break;
+                }
             case "bentConnector5WithArrow":
-            {
-                _final_preset = "bentConnector5";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "bentConnector5";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
 
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
+                    break;
                 }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
             case "bentConnector5WithTwoArrows":
-            {
-                _final_preset = "bentConnector5";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "bentConnector5";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
 
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
+                    _new_line.headEnd = new EndArrow();
+                    _new_line.headEnd.type = LineEndType.Arrow;
+                    _new_line.headEnd.len = LineEndSize.Mid;
+                    _new_line.headEnd.w = LineEndSize.Mid;
+                    break;
+                }
             case "curvedConnector3WithArrow":
-            {
-                _final_preset = "curvedConnector3";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "curvedConnector3";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
 
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
+                    break;
                 }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
             case "curvedConnector3WithTwoArrows":
-            {
-                _final_preset = "curvedConnector3";
-                _arrow_flag = true;
-                if(_old_line == null)
                 {
-                    _new_line = new CLn();
+                    _final_preset = "curvedConnector3";
+                    _arrow_flag = true;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
 
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = new EndArrow();
+                    _new_line.tailEnd.type = LineEndType.Arrow;
+                    _new_line.tailEnd.len = LineEndSize.Mid;
+                    _new_line.tailEnd.w = LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
-            default  :
-            {
-                _final_preset = sPreset;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
+                    _new_line.headEnd = new EndArrow();
+                    _new_line.headEnd.type = LineEndType.Arrow;
+                    _new_line.headEnd.len = LineEndSize.Mid;
+                    _new_line.headEnd.w = LineEndSize.Mid;
+                    break;
                 }
-                else
+            default:
                 {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = null;
+                    _final_preset = sPreset;
+                    if (_old_line == null) {
+                        _new_line = new CLn();
+                    }
+                    else {
+                        _new_line = this.spPr.ln.createDuplicate();
+                    }
+                    _new_line.tailEnd = null;
 
-                _new_line.headEnd = null;
-                break;
-            }
+                    _new_line.headEnd = null;
+                    break;
+                }
         }
         var old_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
-        if(_final_preset!=null)
-        {
+        if (_final_preset != null) {
             this.spPr.geometry = CreateGeometry(_final_preset);
             this.spPr.geometry.Init(100, 100);
         }
-        else
-        {
+        else {
             this.spPr.geometry = null;
         }
         var new_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
-        if((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill))
-        {
+        if ((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill)) {
             var new_line2 = new CLn();
             new_line2.Fill = new CUniFill();
             new_line2.Fill.fill = new CSolidFill();
             new_line2.Fill.fill.color = new CUniColor();
             new_line2.Fill.fill.color.color = new CSchemeColor();
             new_line2.Fill.fill.color.color.id = 0;
-            if(isRealObject(_new_line))
-            {
+            if (isRealObject(_new_line)) {
                 new_line2.merge(_new_line);
             }
             this.setLine(new_line2);
@@ -3613,61 +3162,55 @@ CShape.prototype =
         else
             this.setLine(_new_line);
 
-        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
+        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
         this.recalcInfo.recalculateGeometry = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    setGeometry: function(geometry)
-    {
+    setGeometry: function (geometry) {
         var old_geometry = this.spPr.geometry;
         var new_geometry = geometry;
         this.spPr.geometry = geometry;
-        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
+        History.Add(this, { Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry });
         this.recalcInfo.recalculateGeometry = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    changeFill : function(unifill)
-    {
+    changeFill: function (unifill) {
 
         var old_fill = this.spPr.Fill ? this.spPr.Fill.createDuplicate() : null;
 
-        if(this.spPr.Fill == null )
-        {
+        if (this.spPr.Fill == null) {
             this.spPr.Fill = new CUniFill();
         }
         this.spPr.Fill = CorrectUniFill(unifill, this.spPr.Fill);
 
         var new_fill = this.spPr.Fill.createDuplicate();
-        History.Add(this, {Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill});
+        History.Add(this, { Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill });
 
         this.recalcInfo.recalculateFill = true;
         this.recalcInfo.recalculateBrush = true;
         this.recalcInfo.recalculateTransparent = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
-    setFill: function(fill)
-    {
+    setFill: function (fill) {
         var old_fill = this.spPr.Fill;
         this.spPr.Fill = fill;
 
         var new_fill = this.spPr.Fill.createDuplicate();
-        History.Add(this, {Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill});
+        History.Add(this, { Type: historyitem_SetShapeSetFill, oldFill: old_fill, newFill: new_fill });
     },
 
-    changeLine : function(line)
-    {
+    changeLine: function (line) {
         var old_line = this.spPr.ln ? this.spPr.ln.createDuplicate() : null;
-        if(!isRealObject(this.spPr.ln))
-        {
+        if (!isRealObject(this.spPr.ln)) {
             this.spPr.ln = new CLn();
         }
         this.spPr.ln = CorrectUniStroke(line, this.spPr.ln);
         var new_line = this.spPr.ln.createDuplicate();
 
 
-        History.Add(this, {Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line});
+        History.Add(this, { Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line });
 
         this.recalcInfo.recalculateLine = true;
         this.recalcInfo.recalculatePen = true;
@@ -3675,57 +3218,53 @@ CShape.prototype =
     },
 
 
-    setLine: function(line)
-    {
+    setLine: function (line) {
         var old_line = this.spPr.ln;
         var new_line = line;
         this.spPr.ln = line;
-        History.Add(this, {Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line});
+        History.Add(this, { Type: historyitem_SetShapeSetLine, oldLine: old_line, newLine: new_line });
 
         this.recalcInfo.recalculateLine = true;
         this.recalcInfo.recalculatePen = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-    transformPointRelativeShape: function(x, y)
-    {
+    transformPointRelativeShape: function (x, y) {
 
-        var _horizontal_center = this.extX*0.5;
-        var _vertical_enter = this.extY*0.5;
+        var _horizontal_center = this.extX * 0.5;
+        var _vertical_enter = this.extY * 0.5;
         var _sin = Math.sin(this.rot);
         var _cos = Math.cos(this.rot);
 
 
-        var _temp_x = x - (-_horizontal_center*_cos + _vertical_enter*_sin +this.x + _horizontal_center);
-        var _temp_y = y - (-_horizontal_center*_sin - _vertical_enter*_cos +this.y + _vertical_enter);
+        var _temp_x = x - (-_horizontal_center * _cos + _vertical_enter * _sin + this.x + _horizontal_center);
+        var _temp_y = y - (-_horizontal_center * _sin - _vertical_enter * _cos + this.y + _vertical_enter);
 
-        var _relative_x = _temp_x*_cos + _temp_y*_sin;
-        var _relative_y = -_temp_x*_sin + _temp_y*_cos;
+        var _relative_x = _temp_x * _cos + _temp_y * _sin;
+        var _relative_y = -_temp_x * _sin + _temp_y * _cos;
 
-        if(this.absFlipH)
+        if (this.absFlipH)
             _relative_x = this.extX - _relative_x;
 
-        if(this.absFlipV)
+        if (this.absFlipV)
             _relative_y = this.extY - _relative_y;
 
-        return {x: _relative_x, y: _relative_y};
+        return { x: _relative_x, y: _relative_y };
     },
 
-    hitToAdjustment: function(x, y)
-    {
+    hitToAdjustment: function (x, y) {
         var invert_transform = this.getInvertTransform();
         var t_x, t_y;
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
-        if(isRealObject(this.spPr.geometry))
+        if (isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitToAdj(t_x, t_y, this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE));
-        return {hit: false, adjPolarFlag: null, adjNum: null};
+        return { hit: false, adjPolarFlag: null, adjNum: null };
     },
 
 
 
-    hitToHandles: function(x, y)
-    {
+    hitToHandles: function (x, y) {
         var invert_transform = this.getInvertTransform();
         var t_x, t_y;
         t_x = invert_transform.TransformPointX(x, y);
@@ -3733,85 +3272,81 @@ CShape.prototype =
         var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
 
         var check_line = CheckObjectLine(this);
-        var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        var sqr_x = t_x * t_y, sqr_y = t_y * t_y;
+        if (Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 
-        var hc = this.extX*0.5;
+        var hc = this.extX * 0.5;
         var dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 1;
 
         dist_x = t_x - this.extX;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 2;
 
-        var vc = this.extY*0.5;
+        var vc = this.extY * 0.5;
         var dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_y = dist_y * dist_y;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 3;
 
         dist_y = t_y - this.extY;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
+        sqr_y = dist_y * dist_y;
+        if (Math.sqrt(sqr_x + sqr_y) < radius)
             return 4;
 
         dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 5;
 
         dist_x = t_x;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 6;
 
         dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_y = dist_y * dist_y;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 7;
 
-        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);;
+        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE); ;
         dist_y = t_y + rotate_distance;
-        sqr_y = dist_y*dist_y;
+        sqr_y = dist_y * dist_y;
         dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
+        sqr_x = dist_x * dist_x;
+        if (Math.sqrt(sqr_x + sqr_y) < radius && !check_line)
             return 8;
 
         return -1;
 
     },
 
-    hit: function(x, y)
-    {
+    hit: function (x, y) {
         return this.hitInInnerArea(x, y) || this.hitInPath(x, y) || this.hitInTextRect(x, y);
     },
 
-    hitInPath: function(x, y)
-    {
+    hitInPath: function (x, y) {
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
-        if(isRealObject(this.spPr.geometry))
+        if (isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitInPath(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
         else
             return this.hitInBoundingRect(x, y);
         return false;
     },
 
-    hitInInnerArea: function(x, y)
-    {
-        if(this.brush!=null && this.brush.fill!=null
-            && this.brush.fill.type!=FILL_TYPE_NOFILL)
-        {
+    hitInInnerArea: function (x, y) {
+        if (this.brush != null && this.brush.fill != null
+            && this.brush.fill.type != FILL_TYPE_NOFILL) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
-            if(isRealObject(this.spPr.geometry))
+            if (isRealObject(this.spPr.geometry))
                 return this.spPr.geometry.hitInInnerArea(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }
@@ -3819,103 +3354,86 @@ CShape.prototype =
     },
 
 
-    hitInBoundingRect: function(x, y)
-    {
+    hitInBoundingRect: function (x, y) {
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
         var _hit_context = this.getParentObjects().presentation.DrawingDocument.CanvasHitContext;
 
-        return !(CheckObjectLine(this))&&(HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
+        return !(CheckObjectLine(this)) && (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-         HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+         HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
     },
 
-    canRotate: function()
-    {
+    canRotate: function () {
         return true;
     },
 
-    canResize: function()
-    {
-        return true;//TODO
+    canResize: function () {
+        return true; //TODO
     },
 
-    canMove: function()
-    {
-        return true;//TODO
+    canMove: function () {
+        return true; //TODO
     },
 
-    canGroup: function()
-    {
-        return !this.isPlaceholder();//TODO
+    canGroup: function () {
+        return !this.isPlaceholder(); //TODO
     },
 
-    getBoundsInGroup: function()
-    {
+    getBoundsInGroup: function () {
         var r = this.rot;
-        if((r >= 0 && r < Math.PI*0.25)
-            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
-            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
-        {
-            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        if ((r >= 0 && r < Math.PI * 0.25)
+            || (r > 3 * Math.PI * 0.25 && r < 5 * Math.PI * 0.25)
+            || (r > 7 * Math.PI * 0.25 && r < 2 * Math.PI)) {
+            return { minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY };
         }
-        else
-        {
-            var hc = this.extX*0.5;
-            var vc = this.extY*0.5;
+        else {
+            var hc = this.extX * 0.5;
+            var vc = this.extY * 0.5;
             var xc = this.x + hc;
             var yc = this.y + vc;
-            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+            return { minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc };
         }
     },
 
 
-    canChangeAdjustments: function()
-    {
-        return true;//TODO
+    canChangeAdjustments: function () {
+        return true; //TODO
     },
 
-    createRotateTrack: function()
-    {
+    createRotateTrack: function () {
         return new RotateTrackShapeImage(this);
     },
 
-    createResizeTrack: function(cardDirection)
-    {
+    createResizeTrack: function (cardDirection) {
         return new ResizeTrackShapeImage(this, cardDirection);
     },
 
-    createMoveTrack: function()
-    {
+    createMoveTrack: function () {
         return new MoveShapeImageTrack(this);
     },
 
 
 
 
-    createRotateInGroupTrack: function()
-    {
+    createRotateInGroupTrack: function () {
         return new RotateTrackShapeImageInGroup(this);
     },
 
-    createResizeInGroupTrack: function(cardDirection)
-    {
+    createResizeInGroupTrack: function (cardDirection) {
         return new ResizeTrackShapeImageInGroup(this, cardDirection);
     },
 
-    createMoveInGroupTrack: function()
-    {
+    createMoveInGroupTrack: function () {
         return new MoveShapeImageTrackInGroup(this);
     },
 
-    applyAllTextProps: function(textPr)
-    {
-        if(this.txBody)
-        {
+    applyAllTextProps: function (textPr) {
+        if (this.txBody) {
             this.txBody.content.Set_ApplyToAll(true);
             this.txBody.content.Paragraph_Add(textPr);
             this.txBody.content.Set_ApplyToAll(false);
@@ -3925,10 +3443,8 @@ CShape.prototype =
         }
     },
 
-    remove: function(Count, bOnlyText, bRemoveOnlySelection)
-    {
-        if(this.txBody)
-        {
+    remove: function (Count, bOnlyText, bRemoveOnlySelection) {
+        if (this.txBody) {
             this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -3936,605 +3452,550 @@ CShape.prototype =
         }
     },
 
-    getTextSelectionState: function()
-    {
-        if(this.txBody)
-        {
+    getTextSelectionState: function () {
+        if (this.txBody) {
             return this.txBody.content.Get_SelectionState();
         }
         return [];
     },
 
-    setTextSelectionState: function(s)
-    {
-        if(this.txBody)
-        {
-            this.txBody.content.Set_SelectionState(s, s.length-1);
+    setTextSelectionState: function (s) {
+        if (this.txBody) {
+            this.txBody.content.Set_SelectionState(s, s.length - 1);
         }
     },
 
-    Refresh_RecalcData: function()
-    {
+    Refresh_RecalcData: function () {
 
     },
 
-    Undo: function(data)
-    {
+    Undo: function (data) {
 
-        switch(data.Type)
-        {
+        switch (data.Type) {
             case historyitem_SetShapeRot:
-            {
-                this.spPr.xfrm.rot = data.oldRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                this.spPr.xfrm.offX = data.oldOffsetX;
-                this.spPr.xfrm.offY = data.oldOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.oldExtentX;
-                this.spPr.xfrm.extY = data.oldExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.oldFlipH;
-                this.spPr.xfrm.flipV = data.oldFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if(isRealObject(data.oldFill))
                 {
-                    this.spPr.Fill = data.oldFill.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.Fill = null;
-                }
-
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if(isRealObject(data.oldLine))
-                {
-                    this.spPr.ln = data.oldLine.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if(isRealObject(data.oldGeometry))
-                {
-                    this.spPr.geometry = data.oldGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else
-                {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSetNvSpPr:
-            {
-                this.nvSpPr = data.oldPr;
-                break;
-            }
-            case historyitem_SetSetSpPr:
-            {
-                this.spPr = data.oldPr;
-                break;
-            }
-            case historyitem_SetSetStyle:
-            {
-                this.style = data.oldPr;
-                break;
-            }
-            case historyitem_SetTextBody:
-            {
-                this.txBody = data.oldPr;
-                break;
-            }
-            case historyitem_SetSpGroup:
-            {
-                this.group = data.oldPr;
-                break;
-            }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.Old;
-                break;
-            }
-        }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        if(!this.parent)
-        {
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
-        }
-    },
-
-    Redo: function(data)
-    {
-
-        switch(data.Type)
-        {
-            case historyitem_SetShapeRot:
-            {
-                this.spPr.xfrm.rot = data.newRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                this.spPr.xfrm.offX = data.newOffsetX;
-                this.spPr.xfrm.offY = data.newOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.newExtentX;
-                this.spPr.xfrm.extY = data.newExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.newFlipH;
-                this.spPr.xfrm.flipV = data.newFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if(isRealObject(data.newFill))
-                {
-                    this.spPr.Fill = data.newFill.createDuplicate();
-                }
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if(isRealObject(data.newLine))
-                {
-                    this.spPr.ln = data.newLine.createDuplicate();
-                }
-                else
-                {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if(isRealObject(data.newGeometry))
-                {
-                    this.spPr.geometry = data.newGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else
-                {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSetNvSpPr:
-            {
-                this.nvSpPr = data.newPr;
-                break;
-            }
-
-            case historyitem_SetSetSpPr:
-            {
-                this.spPr = data.newPr;
-                break;
-            }
-            case historyitem_SetSetStyle:
-            {
-                this.style = data.newPr;
-                break;
-            }
-
-            case historyitem_SetTextBody:
-            {
-                this.txBody = data.newPr;
-                break;
-            }
-
-            case historyitem_SetSpGroup:
-            {
-                this.group = data.newPr;
-                break;
-            }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.New;
-                break;
-            }
-        }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        if(!this.parent)
-        {
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
-        }
-    },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(historyitem_type_Shape);
-        w.WriteLong(data.Type);
-        var bool;
-        switch(data.Type)
-        {
-            case historyitem_SetShapeRot:
-            {
-                w.WriteDouble(data.newRot);
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                w.WriteDouble(data.newOffsetX);
-                w.WriteDouble(data.newOffsetY);
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                w.WriteDouble(data.newExtentX);
-                w.WriteDouble(data.newExtentY);
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                w.WriteBool(data.newFlipH);
-                w.WriteBool(data.newFlipV);
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                w.WriteBool(isRealObject(data.newFill));
-                if(isRealObject(data.newFill))
-                {
-                    data.newFill.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetLine:
-            {
-                w.WriteBool(isRealObject(data.newLine));
-                if(isRealObject(data.newLine))
-                {
-                    data.newLine.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetGeometry:
-            {
-                w.WriteBool(isRealObject(data.newGeometry));
-                if(isRealObject(data.newGeometry))
-                {
-                    data.newGeometry.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                data.newBodyPr.Write_ToBinary2(w);
-                break;
-            }
-
-            case historyitem_SetSetNvSpPr:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetSetSpPr:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetSetStyle:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetTextBody:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetSpGroup:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetShapeParent:
-            {
-                w.WriteBool(isRealObject(data.New));
-                if(isRealObject(data.New))
-                {
-                    w.WriteString2(data.New.Id);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() === historyitem_type_Shape)
-        {
-            switch(r.GetLong())
-            {
-                case historyitem_SetShapeRot:
-                {
-                    this.spPr.xfrm.rot = r.GetDouble();
+                    this.spPr.xfrm.rot = data.oldRot;
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     break;
                 }
-                case historyitem_SetShapeOffset:
+            case historyitem_SetShapeOffset:
                 {
-                    this.spPr.xfrm.offX = r.GetDouble();
-                    this.spPr.xfrm.offY = r.GetDouble();
+                    this.spPr.xfrm.offX = data.oldOffsetX;
+                    this.spPr.xfrm.offY = data.oldOffsetY;
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     break;
                 }
 
-                case historyitem_SetShapeExtents:
+            case historyitem_SetShapeExtents:
                 {
-                    this.spPr.xfrm.extX = r.GetDouble();
-                    this.spPr.xfrm.extY = r.GetDouble();
+                    this.spPr.xfrm.extX = data.oldExtentX;
+                    this.spPr.xfrm.extY = data.oldExtentY;
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateGeometry = true;
-
                     break;
                 }
-                case historyitem_SetShapeFlips:
+            case historyitem_SetShapeFlips:
                 {
-                    this.spPr.xfrm.flipH = r.GetBool();
-                    this.spPr.xfrm.flipV = r.GetBool();
+                    this.spPr.xfrm.flipH = data.oldFlipH;
+                    this.spPr.xfrm.flipV = data.oldFlipV;
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
                     break;
                 }
-
-                case historyitem_SetShapeSetFill:
+            case historyitem_SetShapeSetFill:
                 {
-                    if(r.GetBool())
-                    {
-                        this.spPr.Fill = new CUniFill();
-                        this.spPr.Fill.Read_FromBinary2(r);
+                    if (isRealObject(data.oldFill)) {
+                        this.spPr.Fill = data.oldFill.createDuplicate();
                     }
-                    if(this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
-                        && typeof  this.spPr.Fill.fill.RasterImageId === "string")
-                    {
-                        CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
+                    else {
+                        this.spPr.Fill = null;
                     }
+
                     this.recalcInfo.recalculateFill = true;
                     this.recalcInfo.recalculateBrush = true;
                     this.recalcInfo.recalculateTransparent = true;
+
                     break;
                 }
-                case historyitem_SetShapeSetLine:
+            case historyitem_SetShapeSetLine:
                 {
-                    if(r.GetBool())
-                    {
-                        this.spPr.ln = new CLn();
-                        this.spPr.ln.Read_FromBinary2(r);
+                    if (isRealObject(data.oldLine)) {
+                        this.spPr.ln = data.oldLine.createDuplicate();
                     }
+                    else {
+                        this.spPr.ln = null;
+                    }
+
                     this.recalcInfo.recalculateLine = true;
                     this.recalcInfo.recalculatePen = true;
+                    editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
                     break;
                 }
-                case historyitem_SetShapeSetGeometry:
+            case historyitem_SetShapeSetGeometry:
                 {
-                    if(r.GetBool())
-                    {
-                        this.spPr.geometry = new Geometry();
-                        this.spPr.geometry.Read_FromBinary2(r);
+                    if (isRealObject(data.oldGeometry)) {
+                        this.spPr.geometry = data.oldGeometry.createDuplicate();
                         this.spPr.geometry.Init(5, 5);
                     }
-                    else
-                    {
+                    else {
                         this.spPr.geometry = null;
                     }
                     this.recalcInfo.recalculateGeometry = true;
                     break;
                 }
-                case historyitem_SetShapeBodyPr:
+            case historyitem_SetShapeBodyPr:
                 {
-                    this.txBody.bodyPr = new CBodyPr();
-                    this.txBody.bodyPr.Read_FromBinary2(r);
+                    this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
                     this.txBody.recalcInfo.recalculateBodyPr = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateTransformText = true;
                     break;
                 }
+            case historyitem_SetSetNvSpPr:
+                {
+                    this.nvSpPr = data.oldPr;
+                    break;
+                }
+            case historyitem_SetSetSpPr:
+                {
+                    this.spPr = data.oldPr;
+                    break;
+                }
+            case historyitem_SetSetStyle:
+                {
+                    this.style = data.oldPr;
+                    break;
+                }
+            case historyitem_SetTextBody:
+                {
+                    this.txBody = data.oldPr;
+                    break;
+                }
+            case historyitem_SetSpGroup:
+                {
+                    this.group = data.oldPr;
+                    break;
+                }
+            case historyitem_SetShapeParent:
+                {
+                    this.parent = data.Old;
+                    break;
+                }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        if (!this.parent) {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
+    },
+
+    Redo: function (data) {
+
+        switch (data.Type) {
+            case historyitem_SetShapeRot:
+                {
+                    this.spPr.xfrm.rot = data.newRot;
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+            case historyitem_SetShapeOffset:
+                {
+                    this.spPr.xfrm.offX = data.newOffsetX;
+                    this.spPr.xfrm.offY = data.newOffsetY;
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+
+            case historyitem_SetShapeExtents:
+                {
+                    this.spPr.xfrm.extX = data.newExtentX;
+                    this.spPr.xfrm.extY = data.newExtentY;
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateGeometry = true;
+                    break;
+                }
+            case historyitem_SetShapeFlips:
+                {
+                    this.spPr.xfrm.flipH = data.newFlipH;
+                    this.spPr.xfrm.flipV = data.newFlipV;
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    break;
+                }
+            case historyitem_SetShapeSetFill:
+                {
+                    if (isRealObject(data.newFill)) {
+                        this.spPr.Fill = data.newFill.createDuplicate();
+                    }
+                    this.recalcInfo.recalculateFill = true;
+                    this.recalcInfo.recalculateBrush = true;
+                    this.recalcInfo.recalculateTransparent = true;
+
+                    break;
+                }
+            case historyitem_SetShapeSetLine:
+                {
+                    if (isRealObject(data.newLine)) {
+                        this.spPr.ln = data.newLine.createDuplicate();
+                    }
+                    else {
+                        this.spPr.ln = null;
+                    }
+
+                    this.recalcInfo.recalculateLine = true;
+                    this.recalcInfo.recalculatePen = true;
+                    break;
+                }
+            case historyitem_SetShapeSetGeometry:
+                {
+                    if (isRealObject(data.newGeometry)) {
+                        this.spPr.geometry = data.newGeometry.createDuplicate();
+                        this.spPr.geometry.Init(5, 5);
+                    }
+                    else {
+                        this.spPr.geometry = null;
+                    }
+                    this.recalcInfo.recalculateGeometry = true;
+                    break;
+                }
+            case historyitem_SetShapeBodyPr:
+                {
+                    this.txBody.bodyPr = data.newBodyPr.createDuplicate();
+                    this.txBody.recalcInfo.recalculateBodyPr = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+            case historyitem_SetSetNvSpPr:
+                {
+                    this.nvSpPr = data.newPr;
+                    break;
+                }
+
+            case historyitem_SetSetSpPr:
+                {
+                    this.spPr = data.newPr;
+                    break;
+                }
+            case historyitem_SetSetStyle:
+                {
+                    this.style = data.newPr;
+                    break;
+                }
+
+            case historyitem_SetTextBody:
+                {
+                    this.txBody = data.newPr;
+                    break;
+                }
+
+            case historyitem_SetSpGroup:
+                {
+                    this.group = data.newPr;
+                    break;
+                }
+            case historyitem_SetShapeParent:
+                {
+                    this.parent = data.New;
+                    break;
+                }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        if (!this.parent) {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
+    },
+
+    Save_Changes: function (data, w) {
+        w.WriteLong(historyitem_type_Shape);
+        w.WriteLong(data.Type);
+        var bool;
+        switch (data.Type) {
+            case historyitem_SetShapeRot:
+                {
+                    w.WriteDouble(data.newRot);
+                    break;
+                }
+            case historyitem_SetShapeOffset:
+                {
+                    w.WriteDouble(data.newOffsetX);
+                    w.WriteDouble(data.newOffsetY);
+                    break;
+                }
+
+            case historyitem_SetShapeExtents:
+                {
+                    w.WriteDouble(data.newExtentX);
+                    w.WriteDouble(data.newExtentY);
+                    break;
+                }
+            case historyitem_SetShapeFlips:
+                {
+                    w.WriteBool(data.newFlipH);
+                    w.WriteBool(data.newFlipV);
+                    break;
+                }
+            case historyitem_SetShapeSetFill:
+                {
+                    w.WriteBool(isRealObject(data.newFill));
+                    if (isRealObject(data.newFill)) {
+                        data.newFill.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+
+            case historyitem_SetShapeSetLine:
+                {
+                    w.WriteBool(isRealObject(data.newLine));
+                    if (isRealObject(data.newLine)) {
+                        data.newLine.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+
+            case historyitem_SetShapeSetGeometry:
+                {
+                    w.WriteBool(isRealObject(data.newGeometry));
+                    if (isRealObject(data.newGeometry)) {
+                        data.newGeometry.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+            case historyitem_SetShapeBodyPr:
+                {
+                    data.newBodyPr.Write_ToBinary2(w);
+                    break;
+                }
+
+            case historyitem_SetSetNvSpPr:
+                {
+                    w.WriteBool(isRealObject(data.newPr));
+                    if (isRealObject(data.newPr)) {
+                        data.newPr.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+
+            case historyitem_SetSetSpPr:
+                {
+                    w.WriteBool(isRealObject(data.newPr));
+                    if (isRealObject(data.newPr)) {
+                        data.newPr.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+            case historyitem_SetSetStyle:
+                {
+                    w.WriteBool(isRealObject(data.newPr));
+                    if (isRealObject(data.newPr)) {
+                        data.newPr.Write_ToBinary2(w);
+                    }
+                    break;
+                }
+
+            case historyitem_SetTextBody:
+                {
+                    w.WriteBool(isRealObject(data.newPr));
+                    if (isRealObject(data.newPr)) {
+                        w.WriteString2(data.newPr.Get_Id());
+                    }
+                    break;
+                }
+            case historyitem_SetSpGroup:
+                {
+                    w.WriteBool(isRealObject(data.newPr));
+                    if (isRealObject(data.newPr)) {
+                        w.WriteString2(data.newPr.Get_Id());
+                    }
+                    break;
+                }
+            case historyitem_SetShapeParent:
+                {
+                    w.WriteBool(isRealObject(data.New));
+                    if (isRealObject(data.New)) {
+                        w.WriteString2(data.New.Id);
+                    }
+                    break;
+                }
+        }
+    },
+
+    Load_Changes: function (r) {
+        if (r.GetLong() === historyitem_type_Shape) {
+            switch (r.GetLong()) {
+                case historyitem_SetShapeRot:
+                    {
+                        this.spPr.xfrm.rot = r.GetDouble();
+                        this.recalcInfo.recalculateTransform = true;
+                        this.recalcInfo.recalculateTransformText = true;
+                        break;
+                    }
+                case historyitem_SetShapeOffset:
+                    {
+                        this.spPr.xfrm.offX = r.GetDouble();
+                        this.spPr.xfrm.offY = r.GetDouble();
+                        this.recalcInfo.recalculateTransform = true;
+                        this.recalcInfo.recalculateTransformText = true;
+                        break;
+                    }
+
+                case historyitem_SetShapeExtents:
+                    {
+                        this.spPr.xfrm.extX = r.GetDouble();
+                        this.spPr.xfrm.extY = r.GetDouble();
+                        this.recalcInfo.recalculateTransform = true;
+                        this.recalcInfo.recalculateTransformText = true;
+                        this.recalcInfo.recalculateContent = true;
+                        this.recalcInfo.recalculateGeometry = true;
+
+                        break;
+                    }
+                case historyitem_SetShapeFlips:
+                    {
+                        this.spPr.xfrm.flipH = r.GetBool();
+                        this.spPr.xfrm.flipV = r.GetBool();
+                        this.recalcInfo.recalculateTransform = true;
+                        this.recalcInfo.recalculateTransformText = true;
+                        this.recalcInfo.recalculateContent = true;
+                        break;
+                    }
+
+                case historyitem_SetShapeSetFill:
+                    {
+                        if (r.GetBool()) {
+                            this.spPr.Fill = new CUniFill();
+                            this.spPr.Fill.Read_FromBinary2(r);
+                        }
+                        if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
+                        && typeof this.spPr.Fill.fill.RasterImageId === "string") {
+                            CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
+                        }
+                        this.recalcInfo.recalculateFill = true;
+                        this.recalcInfo.recalculateBrush = true;
+                        this.recalcInfo.recalculateTransparent = true;
+                        break;
+                    }
+                case historyitem_SetShapeSetLine:
+                    {
+                        if (r.GetBool()) {
+                            this.spPr.ln = new CLn();
+                            this.spPr.ln.Read_FromBinary2(r);
+                        }
+                        this.recalcInfo.recalculateLine = true;
+                        this.recalcInfo.recalculatePen = true;
+                        break;
+                    }
+                case historyitem_SetShapeSetGeometry:
+                    {
+                        if (r.GetBool()) {
+                            this.spPr.geometry = new Geometry();
+                            this.spPr.geometry.Read_FromBinary2(r);
+                            this.spPr.geometry.Init(5, 5);
+                        }
+                        else {
+                            this.spPr.geometry = null;
+                        }
+                        this.recalcInfo.recalculateGeometry = true;
+                        break;
+                    }
+                case historyitem_SetShapeBodyPr:
+                    {
+                        this.txBody.bodyPr = new CBodyPr();
+                        this.txBody.bodyPr.Read_FromBinary2(r);
+                        this.txBody.recalcInfo.recalculateBodyPr = true;
+                        this.recalcInfo.recalculateContent = true;
+                        this.recalcInfo.recalculateTransformText = true;
+                        break;
+                    }
 
                 case historyitem_SetSetNvSpPr:
-                {
-                    if(r.GetBool())
                     {
-                        this.nvSpPr = new UniNvPr();
-                        this.nvSpPr.Read_FromBinary2(r);
+                        if (r.GetBool()) {
+                            this.nvSpPr = new UniNvPr();
+                            this.nvSpPr.Read_FromBinary2(r);
+                        }
+                        else {
+                            this.nvSpPr = null;
+                        }
+                        break;
                     }
-                    else
-                    {
-                        this.nvSpPr = null;
-                    }
-                    break;
-                }
                 case historyitem_SetSetSpPr:
-                {
+                    {
 
-                    this.spPr = new CSpPr();
-                    if(r.GetBool())
-                    {
-                        this.spPr.Read_FromBinary2(r);
+                        this.spPr = new CSpPr();
+                        if (r.GetBool()) {
+                            this.spPr.Read_FromBinary2(r);
+                        }
+                        break;
                     }
-                    break;
-                }
                 case historyitem_SetSetStyle:
-                {
-                    if(r.GetBool())
                     {
-                        this.style = new CShapeStyle();
-                        this.style.Read_FromBinary2(r);
+                        if (r.GetBool()) {
+                            this.style = new CShapeStyle();
+                            this.style.Read_FromBinary2(r);
+                        }
+                        else {
+                            this.style = null;
+                        }
+                        break;
                     }
-                    else
-                    {
-                        this.style = null;
-                    }
-                    break;
-                }
 
                 case historyitem_SetTextBody:
-                {
-                    if(r.GetBool())
                     {
-                        this.txBody = g_oTableId.Get_ById(r.GetString2());
+                        if (r.GetBool()) {
+                            this.txBody = g_oTableId.Get_ById(r.GetString2());
+                        }
+                        else {
+                            this.txBody = null;
+                        }
+                        break;
                     }
-                    else
-                    {
-                        this.txBody = null;
-                    }
-                    break;
-                }
                 case historyitem_SetSpGroup:
-                {
-                    if(r.GetBool())
                     {
-                        this.group = g_oTableId.Get_ById(r.GetString2());
+                        if (r.GetBool()) {
+                            this.group = g_oTableId.Get_ById(r.GetString2());
+                        }
+                        else {
+                            this.group = null;
+                        }
+                        break;
                     }
-                    else
-                    {
-                        this.group = null;
-                    }
-                    break;
-                }
 
                 case historyitem_SetShapeParent:
-                {
-                    if(r.GetBool())
                     {
-                        this.parent = g_oTableId.Get_ById(r.GetString2());
+                        if (r.GetBool()) {
+                            this.parent = g_oTableId.Get_ById(r.GetString2());
+                        }
+                        break;
                     }
-                    break;
-                }
 
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-            if(!this.parent)
-            {
+            if (!this.parent) {
                 delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
             }
         }
     },
 
-    Write_ToBinary2: function(w)
-    {
+    Write_ToBinary2: function (w) {
         w.WriteLong(historyitem_type_Shape);
         w.WriteString2(this.Id);
     },
 
-    Read_FromBinary2: function(r)
-    {
+    Read_FromBinary2: function (r) {
         this.Id = r.GetString2();
     },
 
-    Load_LinkData: function(linkData)
-    {
+    Load_LinkData: function (linkData) {
         this.parent = g_oTableId.Get_ById(linkData.parent);
     }
 };

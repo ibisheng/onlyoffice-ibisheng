@@ -557,7 +557,7 @@ SlideLayout.prototype =
     changeBackground: function(bg)
     {
         History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
-        this.cSld.Bg = bg.createFullCopy();
+        this.cSld.Bg = bg;
     },
 
     setCSldName: function(name)

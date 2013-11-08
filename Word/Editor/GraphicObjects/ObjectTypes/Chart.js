@@ -752,7 +752,7 @@ CChartAsGroup.prototype =
             var title_str = chart.header.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addTitle(chart_title);
@@ -769,7 +769,7 @@ CChartAsGroup.prototype =
             var title_str = this.chart.xAxis.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addXAxis(chart_title);
@@ -781,7 +781,7 @@ CChartAsGroup.prototype =
             var title_str = this.chart.yAxis.title;
             for(var i in title_str)
             {
-                tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
             }
             chart_title.setTextBody(tx_body);
             this.addYAxis(chart_title);
@@ -1261,7 +1261,7 @@ CChartAsGroup.prototype =
                 }
                 //this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
                 for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {
@@ -1363,7 +1363,7 @@ CChartAsGroup.prototype =
 
                 }
                 for(var i in title_str)
-                    this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {
@@ -1469,7 +1469,7 @@ CChartAsGroup.prototype =
                 this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
 
                 for(var i in title_str)
-                    this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+                    this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
             }
             else
             {

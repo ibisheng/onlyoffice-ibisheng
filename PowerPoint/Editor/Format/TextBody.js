@@ -766,7 +766,7 @@ CTextBody.prototype =
             var par = dc.Content[i];
             for(var i = 0; i < par.Content.length; ++i)
             {
-                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty) && par.Content[i].Copy)
+                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty || par.Content[i] instanceof ParaNumbering) && par.Content[i].Copy)
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }

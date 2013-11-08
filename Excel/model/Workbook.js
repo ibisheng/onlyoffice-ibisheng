@@ -4001,8 +4001,9 @@ Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDele
 		var n = objForRebuldFormula.move[id].node;
 		var _sn = n.getSlaveEdges2();
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell(), cellName = cell.getName();
+			var cell = _sn[_id].returnCell(), cellName;
 			if( undefined == cell ) { continue; }
+            cellName = cell.getName();
 			if( cell.formulaParsed ){
 				cell.formulaParsed.shiftCells( objForRebuldFormula.move[id].offset, oBBox, n, this.Id, objForRebuldFormula.move[id].toDelete );
 				cell.setFormula(cell.formulaParsed.assemble());

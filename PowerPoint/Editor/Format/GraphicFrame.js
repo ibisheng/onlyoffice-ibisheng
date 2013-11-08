@@ -82,6 +82,12 @@ CGraphicFrame.prototype =
                     cells[j].Content.Document_Get_AllFontNames(fonts);
                 }
             }
+            delete fonts["+mj-lt"];
+            delete fonts["+mn-lt"];
+            delete fonts["+mj-ea"];
+            delete fonts["+mn-ea"];
+            delete fonts["+mj-cs"];
+            delete fonts["+mn-cs"];
         }
     },
 
@@ -259,6 +265,35 @@ CGraphicFrame.prototype =
     Get_Id: function()
     {
         return this.Id;
+    },
+
+    checkNotNullTransform: function()
+    {
+        if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+            return true;
+        if(this.isPlaceholder())
+        {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind)
+            {
+                case SLIDE_KIND:
+                {
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
+                        return true;
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+
+                case LAYOUT_KIND:
+                {
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+            }
+        }
+        return false;
     },
 
     getHierarchy: function()
@@ -799,7 +834,7 @@ CGraphicFrame.prototype =
                 }
             }
             this.graphicObject.Selection_SetStart(tx, ty, 0, e);
-
+            this.graphicObject.RecalculateCurPos();
             return
 
         }

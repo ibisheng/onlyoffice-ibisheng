@@ -365,7 +365,7 @@ CChartAsGroup.prototype =
 					var title_str = api.chartTranslate.title;
 					this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
 					for(var i in title_str)
-						this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+						this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 					this.chart.header.title = this.chartTitle.txBody.content.getTextString();
 				}
 				else
@@ -400,7 +400,7 @@ CChartAsGroup.prototype =
 					var title_str = api.chartTranslate.xAxis;;
 					this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
 					for(var i in title_str)
-						this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+						this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 						
 					this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
 				}
@@ -440,7 +440,7 @@ CChartAsGroup.prototype =
 					this.vAxisTitle.txBody.setVert(90);
 
 					for(var i in title_str)
-						this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+						this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 						
 					this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
 				}
@@ -535,7 +535,7 @@ CChartAsGroup.prototype =
                     var title_str = chart.header.title;
                     for(var i in title_str)
                     {
-                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                        tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
                     }
                     chart_title.setTextBody(tx_body);
                     this.addTitle(chart_title);
@@ -570,7 +570,7 @@ CChartAsGroup.prototype =
                     var title_str = this.chart.xAxis.title;
                     for(var i in title_str)
                     {
-                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                        tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
                     }
                     chart_title.setTextBody(tx_body);
                     this.addXAxis(chart_title);
@@ -615,7 +615,7 @@ CChartAsGroup.prototype =
                     var title_str = this.chart.yAxis.title;
                     for(var i in title_str)
                     {
-                        tx_body.content.Paragraph_Add(new ParaText(title_str[i]));
+                        tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
                     }
                     chart_title.setTextBody(tx_body);
                     this.addYAxis(chart_title);
@@ -732,7 +732,7 @@ CChartAsGroup.prototype =
             this.addTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
             this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
             for(var i in title_string)
-                this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
+                this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_string[i]), false);
         }
 
         if(isRealObject(this.chart.xAxis) && this.chart.xAxis.bShow)
@@ -745,7 +745,7 @@ CChartAsGroup.prototype =
             this.addXAxis(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
             this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
             for(var i in title_string)
-                this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
+                this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_string[i]), false);
 
 
             //this.chart.xAxis.bDefaultTitle = false;
@@ -763,7 +763,7 @@ CChartAsGroup.prototype =
             this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
             for(var i in title_string)
-                this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
+                this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_string[i]), false);
         }
 
         this.init();

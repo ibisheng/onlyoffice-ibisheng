@@ -494,6 +494,35 @@ CImageShape.prototype =
 
     },
 
+    checkNotNullTransform: function()
+    {
+        if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
+            return true;
+        if(this.isPlaceholder())
+        {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind)
+            {
+                case SLIDE_KIND:
+                {
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
+                        return true;
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+
+                case LAYOUT_KIND:
+                {
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
+            }
+        }
+        return false;
+    },
+
     getHierarchy: function()
     {
         if(this.recalcInfo.recalculateShapeHierarchy)

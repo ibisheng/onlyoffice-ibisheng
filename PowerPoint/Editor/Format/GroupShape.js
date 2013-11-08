@@ -691,6 +691,35 @@ CGroupShape.prototype =
         return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.idx : null;
     },
 
+    checkNotNullTransform: function()
+    {
+        if(this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())
+            return true;
+        if(this.isPlaceholder())
+        {
+            var ph_type = this.getPlaceholderType();
+            var ph_index = this.getPlaceholderIndex();
+            switch (this.parent.kind)
+            {
+                case SLIDE_KIND:
+                {
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup())
+                        return true;
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
+                }
+
+                case LAYOUT_KIND:
+                {
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
+                }
+            }
+        }
+        return false;
+    },
+
     getHierarchy: function()
     {
         this.compiledHierarchy = [];
