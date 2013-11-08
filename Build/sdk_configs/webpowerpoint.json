@@ -60,7 +60,6 @@
 
                 "../Common/Charts/libraries/OfficeExcel.common.core.js",
                 "../Common/Charts/libraries/OfficeExcel.common.key.js",
-                "../Common/Charts/libraries/OfficeExcel.common.tooltips.js",
 
                 "../Common/Charts/libraries/OfficeExcel.bar.js",
                 "../Common/Charts/libraries/OfficeExcel.bipolar.js",
