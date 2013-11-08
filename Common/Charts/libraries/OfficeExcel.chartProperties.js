@@ -37,7 +37,7 @@ OfficeExcel.OtherProps = function()
 
     this._units_pre = '';
     this._units_post = '';
-	
+
     this._scale_decimals = 0;
     this._scale_point = '.';
     this._scale_thousand = ',';
@@ -47,8 +47,6 @@ OfficeExcel.OtherProps = function()
     this._radius = null;
 
     this._exploded = 0;
-
-    this._segments = [];
 
 	this._area_border = true;	// граница для всей области диаграммы
 

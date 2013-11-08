@@ -197,10 +197,6 @@
         //this.context.stroke();
         this.context.fill();
 
-        /**
-        * Calculate the segment angle
-        */
-        this._otherProps._segments.push([subTotal, subTotal + radians]);
         this.subTotal += radians;
     }
 
