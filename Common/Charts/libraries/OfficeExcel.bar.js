@@ -883,27 +883,6 @@
             }
             else
             {
-                  /**
-                * Draw specific Y labels here so that the local variables can be reused
-                */
-                if (typeof(this._otherProps._ylabels_specific) == 'object' && this._otherProps._ylabels_specific) {
-                    
-                    var labels = OfficeExcel.array_reverse(this._otherProps._ylabels_specific);
-                    var grapharea = OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom;
-
-                    for (var i=0; i<labels.length; ++i) {
-                        
-                        var y = this._chartGutter._top + (grapharea * (i / labels.length)) + (grapharea / labels.length);
-                        
-                        OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
-                    }
-
-                    return;
-                }
-
-                
-            
-                    
                 // 1(ish) label
                 if (numYLabels == 3 || numYLabels == 5) {
                     OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
@@ -988,43 +967,6 @@
             var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
             var align = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
             var boxed = false;
-
-            /**
-            * Draw specific Y labels here so that the local variables can be reused
-            */
-            if (typeof(this._otherProps._ylabels_specific) == 'object' && this._otherProps._ylabels_specific) {
-
-                var labels = this._otherProps._ylabels_specific;
-                var grapharea = this.canvas.height - this._chartGutter._top - this._chartGutter._bottom;
-
-                // Draw the top halves labels
-                for (var i=0; i<labels.length; ++i) {
-
-                    var y = this._chartGutter._top + ((grapharea / 2) / labels.length) * i;
-                    
-                    OfficeExcel.Text(context, font, text_size, xpos, y, String(labels[i]), 'center', align, boxed, null, null, bold, null, textOptions);
-                }
-
-                // Draw the bottom halves labels
-                for (var i=labels.length-1; i>=0; --i) {
-                    var y = this._chartGutter._top  + (grapharea * ( (i+1) / (labels.length * 2) )) + (grapharea / 2);
-
-                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[labels.length - i - 1], 'center', align, boxed, null, null, bold, null, textOptions);
-                }
-
-                return;
-            }
-
-
-
-
-
-
-
-
-
-
-
 
             if (numYLabels == 3 || numYLabels == 5) {
                 OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed);
@@ -1126,25 +1068,8 @@
             var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
             var boxed = false;
             
-            /**
-            * Draw specific Y labels here so that the local variables can be reused
-            */
-            if (this._otherProps._ylabels_specific && typeof(this._otherProps._ylabels_specific) == 'object') {
-                
-                var labels = this._otherProps._ylabels_specific;
-                var grapharea = this.canvas.height - this._chartGutter._top - this._chartGutter._bottom;
-
-                for (var i=0; i<labels.length; ++i) {
-                    var y = this._chartGutter._top + (grapharea * (i / labels.length));
-                    
-                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
-                }
-
-                return;
-            }
-
             // 1 label
-             if('auto' == numYLabels)
+            if('auto' == numYLabels)
             {
                  for (var i=0; i<this.scale.length; ++i) {
                     var stepY;

@@ -440,37 +440,6 @@
                 }
                 else
                 {
-                    if (typeof(this._otherProps._ylabels_specific) == 'object' && this._otherProps._ylabels_specific != null && this._otherProps._ylabels_specific.length) {
-
-                        var labels = this._otherProps._ylabels_specific;
-                        
-                        if (this._otherProps._ymin > 0) {
-                            labels = [];
-                            for (var i=0; i<(this._otherProps._ylabels_specific.length - 1); ++i) {
-                                labels.push(this._otherProps._ylabels_specific[i]);
-                            }
-                        }
-
-                        for (var i=0; i<labels.length; ++i) {
-                            var y = this._chartGutter._top + (i * (this.grapharea / (labels.length * 2) ) );
-                            OfficeExcel.Text(context, font, text_size, xPos, y, labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
-                        }
-                        
-                        var reversed_labels = OfficeExcel.array_reverse(labels);
-                    
-                        for (var i=0; i<reversed_labels.length; ++i) {
-                            var y = this._chartGutter._top + (this.grapharea / 2) + ((i+1) * (this.grapharea / (labels.length * 2) ) );
-                            OfficeExcel.Text(context,font, text_size, xPos, y, reversed_labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
-                        }
-
-                        if (this._otherProps._ymin > 0) {
-                            OfficeExcel.Text(context, font, text_size, xPos, (this.grapharea / 2) + this._chartGutter._top, this._otherProps._ylabels_specific[this._otherProps._ylabels_specific.length - 1], 'center', align, boxed, null, bold, null, textOptions);
-                        }
-
-                        return;
-                    }
-
-
                     if (numYLabels == 1 || numYLabels == 3 || numYLabels == 5) {
                         // Draw the top halves labels
                         OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
@@ -553,31 +522,6 @@
                 }
                 else
                 {
-                    if (typeof(this._otherProps._ylabels_specific) == 'object' && this._otherProps._ylabels_specific) {
-
-                        var labels = this._otherProps._ylabels_specific;
-                        
-                        // Lose the last label
-                        if (this._otherProps._ymin > 0) {
-                            labels = [];
-                            for (var i=0; i<(this._otherProps._ylabels_specific.length - 1); ++i) {
-                                labels.push(this._otherProps._ylabels_specific[i]);
-                            }
-                        }
-
-                        for (var i=0; i<labels.length; ++i) {
-                            var y = this._chartGutter._top + (i * (this.grapharea / labels.length) );
-                            
-                            OfficeExcel.Text(context, font, text_size, xPos, y, labels[i], 'center', align, boxed, null, bold, null, textOptions);
-                        }
-
-                        if (this._otherProps._ymin > 0) {
-                            OfficeExcel.Text(context, font, text_size, xPos, this.canvas.height - this._chartGutter._bottom, this._otherProps._ylabels_specific[this._otherProps._ylabels_specific.length - 1], 'center', align, boxed, null,bold, null, textOptions);
-                        }
-
-                        return;
-                    }
-
                     if (numYLabels == 1 || numYLabels == 3 || numYLabels == 5) {
                         OfficeExcel.Text(context, font, text_size, xPos, this._chartGutter._top, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
             

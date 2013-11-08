@@ -464,7 +464,7 @@
 		}		
 
         // Draw the Y axis labels
-        if (this._otherProps._ylabels && this._otherProps._ylabels_specific == null) {
+        if (this._otherProps._ylabels) {
 
             var units_pre  = this._otherProps._units_pre;
             var units_post = this._otherProps._units_post;
@@ -658,75 +658,6 @@
                 OfficeExcel.Text(context,font,text_size,xpos,this._otherProps._xaxispos == 'top' ? this._chartGutter._top + this.halfTextHeight: (this.canvas.height - this._chartGutter._bottom + this.halfTextHeight),this._otherProps._units_pre + '0' + this._otherProps._units_post,null, align, bounding, null, bgcolor, bold, null, textOptions);
             }
 
-        } else if (this._otherProps._ylabels && typeof(this._otherProps._ylabels_specific) == 'object') {
-
-            // A few things
-            var gap      = this.grapharea / this._otherProps._ylabels_specific.length;
-            var halign   = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
-            var bounding = false;
-            var bgcolor  = null;
-            var ymin     = this._otherProps._ymin != null && this._otherProps._ymin;
-
-            // Figure out the X coord based on the position of the axis
-            if (this._otherProps._yaxispos == 'left') {
-                var x = this._chartGutter._left - 5;
-
-            } else if (this._otherProps._yaxispos == 'right') {
-                var x = this.canvas.width - this._chartGutter._right + 5;
-            }
-
-
-            // Draw the labels
-            if (this._otherProps._xaxispos == 'center') {
-
-                // Draw the top halfs labels
-                for (var i=0; i<this._otherProps._ylabels_specific.length; ++i) {
-                    var y = this._chartGutter._top + (this.grapharea / ((this._otherProps._ylabels_specific.length ) * 2) * i);
-
-                    if (ymin && ymin > 0) {
-                        var y  = ((this.grapharea / 2) / (this._otherProps._ylabels_specific.length - (ymin ? 1 : 0)) ) * i;
-                            y += this._chartGutter._top;
-                    }
-
-                    OfficeExcel.Text(context, font, text_size,x,y,String(this._otherProps._ylabels_specific[i]), 'center', halign, bounding, 0, bgcolor, bold, null, textOptions);
-                }
-
-                // Now reverse the labels and draw the bottom half
-                var reversed_labels = OfficeExcel.array_reverse(this._otherProps._ylabels_specific);
-
-                // Draw the bottom halfs labels
-                for (var i=0; i<reversed_labels.length; ++i) {
-                    var y = (this.grapharea / 2) + this._chartGutter._top + ((this.grapharea / (reversed_labels.length * 2) ) * (i + 1));
-
-                    if (ymin && ymin > 0) {
-                        var y  = ((this.grapharea / 2) / (reversed_labels.length - (ymin ? 1 : 0)) ) * i;
-                            y += this._chartGutter._top;
-                            y += (this.grapharea / 2);
-                    }
-
-                    OfficeExcel.Text(context, font, text_size,x,y,String(reversed_labels[i]), 'center', halign, bounding, 0, bgcolor, bold, null, textOptions);
-                }
-
-            } else if (this._otherProps._xaxispos == 'top') {
-
-                // Reverse the labels and draw
-                var reversed_labels = OfficeExcel.array_reverse(this._otherProps._ylabels_specific);
-
-                // Draw the bottom halfs labels
-                for (var i=0; i<reversed_labels.length; ++i) {
-
-                    var y = ((this.grapharea / (reversed_labels.length - (ymin ? 1 : 0)) ) * (i + (ymin ? 0 : 1)));
-                        y = y + this._chartGutter._top;
-
-                    OfficeExcel.Text(context, font, text_size,x,y,String(reversed_labels[i]), 'center', halign, bounding, 0, bgcolor, bold, null, textOptions);
-                }
-
-            } else {
-                for (var i=0; i<this._otherProps._ylabels_specific.length; ++i) {
-                    var y = this._chartGutter._top + ((this.grapharea / (this._otherProps._ylabels_specific.length - (ymin ? 1 : 0) )) * i);
-                    OfficeExcel.Text(context, font, text_size,x,y,String(this._otherProps._ylabels_specific[i]), 'center', halign, bounding, 0, bgcolor, bold, null, textOptions);
-                }
-            }
         }
 
         // Draw the X axis labels
