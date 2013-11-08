@@ -228,15 +228,6 @@
 			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
 
         /**
-        * Set the units to blank if they're to be used for ingraph labels only
-        */
-        if (this._otherProps._units_ingraph) {
-            units_pre  = '';
-            units_post = '';
-        }
-
-
-        /**
         * Draw the X axis labels
         */
         if (this._otherProps._xlabels) {
