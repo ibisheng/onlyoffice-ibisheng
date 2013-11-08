@@ -473,25 +473,7 @@
 
             var numYLabels = this._otherProps._ylabels_count;
             var bounding   = false;
-            var bgcolor    = this._otherProps._ylabels_inside ? this._otherProps._ylabels_inside_color : null;	
-
-
-            /**
-            * If the Y labels are inside the Y axis, invert the alignment
-            */
-            if (this._otherProps._ylabels_inside == true && align == 'left') {
-                xpos -= 10;
-                align = 'right';
-                bounding = true;
-
-
-            } else if (this._otherProps._ylabels_inside == true && align == 'right') {
-                xpos += 10;
-                align = 'left';
-                bounding = true;
-            }
-
-
+            var bgcolor    = null;
 
             if (this._otherProps._xaxispos == 'center') {
                 var half = this.grapharea / 2;
@@ -689,22 +671,8 @@
             if (this._otherProps._yaxispos == 'left') {
                 var x = this._chartGutter._left - 5;
 
-                if (this._otherProps._ylabels_inside) {
-                    x += 10;
-                    halign   = 'left';
-                    bounding = true;
-                    bgcolor  = 'rgba(255,255,255,0.5)';
-                }
-
             } else if (this._otherProps._yaxispos == 'right') {
                 var x = this.canvas.width - this._chartGutter._right + 5;
-
-                if (this._otherProps._ylabels_inside) {
-                    x -= 10;
-                    halign = 'right';
-                    bounding = true;
-                    bgcolor  = 'rgba(255,255,255,0.5)';
-                }
             }
 
 

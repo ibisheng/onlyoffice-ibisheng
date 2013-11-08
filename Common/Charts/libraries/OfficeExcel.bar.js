@@ -854,14 +854,8 @@
 				underline: this._otherProps._ylabels_underline
 			}
 
-            if (this._otherProps._ylabels_inside == true) {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left + 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right - 5;
-                var align = this._otherProps._yaxispos == 'left' ? 'left' : 'right';
-                var boxed = true;
-            } else {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : this.canvas.width - this._chartGutter._right + 5;
-                var boxed = false;
-            }
+            var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : this.canvas.width - this._chartGutter._right + 5;
+            var boxed = false;
             
              if('auto' == numYLabels)
             {
@@ -987,23 +981,13 @@
             var units_pre  = this._otherProps._units_pre;
             var units_post = this._otherProps._units_post;
             var context = this.context;
-            var align   = '';
-            var xpos    = 0;
-            var boxed   = false;
 
             this.context.fillStyle = this._otherProps._text_color;
             this.context.strokeStyle = 'black';
 
-            if (this._otherProps._ylabels_inside == true) {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left + 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right - 5;
-                var align = this._otherProps._yaxispos == 'left' ? 'left' : 'right';
-                var boxed = true;
-            } else {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
-                var align = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
-                var boxed = false;
-            }
-
+            var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
+            var align = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
+            var boxed = false;
 
             /**
             * Draw specific Y labels here so that the local variables can be reused
@@ -1139,14 +1123,8 @@
 				underline: this._otherProps._xlabels_underline
 			}
 
-            if (this._otherProps._ylabels_inside == true) {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left + 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right - 5;
-                var align = this._otherProps._yaxispos == 'left' ? 'left' : 'right';
-                var boxed = true;
-            } else {
-                var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
-                var boxed = false;
-            }
+            var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right + 5;
+            var boxed = false;
             
             /**
             * Draw specific Y labels here so that the local variables can be reused

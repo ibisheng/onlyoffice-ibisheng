@@ -399,16 +399,11 @@
         this.context.fillStyle = this._otherProps._text_color;
         var font       = this._otherProps._ylabels_font;
         var xMin       = this._otherProps._xmin;
-        var xMax       = this._otherProps._xmax;
-        var yMax       = this.scale[this.scale.length - 1];
-        var yMin       = this._otherProps._ymin;
         var text_size  = this._otherProps._ylabels_size;
         var units_pre  = this._otherProps._units_pre;
         var units_post = this._otherProps._units_post;
         var numYLabels = this._otherProps._ylabels_count;
-        var inside     = this._otherProps._ylabels_inside;
         var context    = this.context;
-        var canvas     = this.canvas;
         var boxed      = false;
 
         this.halfTextHeight = text_size / 2;
@@ -429,19 +424,7 @@
 				color: this._otherProps._ylabels_color,
 				underline: this._otherProps._ylabels_underline,
 				italic: this._otherProps._ylabels_italic
-			}	
-			
-            if (inside) {
-                if (this._otherProps._yaxispos == 'left') {
-                    xPos  = this._chartGutter._left + 5;
-                    align = 'left';
-                    boxed = true;
-                } else {
-                    xPos  = this.canvas.width - this._chartGutter._right - 5;
-                    align = 'right';
-                    boxed = true;
-                }
-            }
+			}
 
             if (this._otherProps._xaxispos == 'center') {
 
@@ -560,23 +543,6 @@
                 var xPos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left - 5 : this.canvas.width - this._chartGutter._right + 5;
                 var align = this._otherProps._yaxispos == 'right' ? 'left' : 'right';
 
-                if (inside) {
-                    if (this._otherProps._yaxispos == 'left') {
-                        xPos  = this._chartGutter._left + 5;
-                        align = 'left';
-                        boxed = true;
-                    } else {
-                        xPos  = this.canvas.width - this._chartGutter._right - 5;
-                        align = 'right';
-                        boxed = true;
-                    }
-                }
-                /**
-                * Specific Y labels
-                */
-                
-                
-                
                 if('auto' == numYLabels)
                 {
                      align = 'right';

@@ -56,8 +56,6 @@ OfficeExcel.OtherProps = function()
 
     this._ylabels = true;
     this._ylabels_count = 5;
-    this._ylabels_inside = false;
-    this._ylabels_inside_color = null;
     this._ylabels_specific = null;
 
     this._labels = [];
