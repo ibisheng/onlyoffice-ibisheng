@@ -1794,6 +1794,9 @@ function CDrawingDocument()
     this.max_PageAddSelection = -1;
     this.IsShowSelectAttack = false;
 
+    this.InlineTextTrackEnabled = false;
+    this.InlineTextTrack = null;
+
     this.AutoShapesTrack = null;
     this.AutoShapesTrackLockPageNum = -1;
 
@@ -5235,6 +5238,16 @@ function CDrawingDocument()
             return true;
         }
 
+        if (this.InlineTextTrackEnabled)
+        {
+            this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+
+            oWordControl.ShowOverlay();
+            oWordControl.OnUpdateOverlay();
+            oWordControl.EndUpdateOverlay();
+            return true;
+        }
+
         if (this.FrameRect.IsActive)
         {
             if (!this.FrameRect.IsTracked && this.FrameRect.PageIndex == pos.Page)
@@ -5327,6 +5340,17 @@ function CDrawingDocument()
             }
             oWordControl.OnUpdateOverlay();
 
+            oWordControl.EndUpdateOverlay();
+            return true;
+        }
+
+        if (this.InlineTextTrackEnabled)
+        {
+            this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+            this.EndTrackText();
+
+            oWordControl.ShowOverlay();
+            oWordControl.OnUpdateOverlay();
             oWordControl.EndUpdateOverlay();
             return true;
         }
@@ -5608,6 +5632,20 @@ function CDrawingDocument()
                 this.DrawHorAnchor(_anchor.Page, _anchor.Pos, true);
         }
         this.HorVerAnchors.splice(0, this.HorVerAnchors.length);
+    }
+
+    // track text (inline)
+    this.StartTrackText = function()
+    {
+        this.InlineTextTrackEnabled = true;
+        this.InlineTextTrack = null;
+    }
+    this.EndTrackText = function()
+    {
+        this.InlineTextTrackEnabled = false;
+
+        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack);
+        this.InlineTextTrack = null;
     }
 }
 

@@ -2795,6 +2795,11 @@ function CEditorPage(api)
                 drDoc.DrawFrameTrack(overlay);
             }
 
+            if (drDoc.InlineTextTrackEnabled && null != drDoc.InlineTextTrack)
+            {
+                drDoc.AutoShapesTrack.DrawInlineMoveCursor(drDoc.InlineTextTrack.X, drDoc.InlineTextTrack.Y, drDoc.InlineTextTrack.Height, drDoc.InlineTextTrack.transform);
+            }
+
             drDoc.DrawHorVerAnchor();
         }
         else
