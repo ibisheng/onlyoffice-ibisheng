@@ -1701,10 +1701,6 @@
         RegExp.$1   = '';
         var i,j;
 
-if (typeof(obj._otherProps._scale_formatter) == 'function') {
-    return obj._otherProps._scale_formatter(obj, num);
-}
-
         // Ignore the preformatted version of "1e-2"
         if (String(num).indexOf('e') > 0) {
             return String(prepend + String(num) + append);

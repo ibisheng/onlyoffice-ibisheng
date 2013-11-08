@@ -45,7 +45,6 @@ OfficeExcel.OtherProps = function()
     this._scale_decimals = 0;
     this._scale_point = '.';
     this._scale_thousand = ',';
-    this._scale_formatter = null;
 
     this._colors = ['rgb(0,0,255)', '#0f0', '#00f', '#ff0', '#0ff', '#0f0'];
 

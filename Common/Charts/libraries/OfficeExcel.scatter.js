@@ -689,11 +689,7 @@
                     var num  = ( (this._otherProps._xmax - this._otherProps._xmin) * ((i+1) / numXLabels)) + this._otherProps._xmin;
                     var x    = this._chartGutter._left + ((i) * interval);
 
-                    if (typeof(this._otherProps._scale_formatter) == 'function') {
-                        var text = this._otherProps._scale_formatter(this, num);
-                    } else {
-                        var text = scale[i];
-                    }
+                    var text = scale[i];
 					if(text == 0)
 						OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + offsetY,OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
 					else
