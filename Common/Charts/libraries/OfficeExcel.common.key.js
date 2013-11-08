@@ -23,13 +23,6 @@
 		OfficeExcel.DrawKey_graph(obj, key, colors);
     }
 
-    /**
-    * This does the actual drawing of the key when it's in the graph
-    * 
-    * @param object obj The graph object
-    * @param array  key The key items to draw
-    * @param array colors An aray of colors that the key will use
-    */
     OfficeExcel.DrawKey_graph = function (obj, key, colors)
     {
         var canvas      = obj.canvas;

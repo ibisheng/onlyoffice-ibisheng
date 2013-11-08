@@ -80,7 +80,6 @@ OfficeExcel.OtherProps = function()
     this._ylabels_inside = false;
     this._ylabels_inside_color = null;
     this._ylabels_specific = null;
-    this._ylabels_invert = false;
 
     this._labels = [];
     this._labels_above = false;

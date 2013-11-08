@@ -614,20 +614,7 @@
                 }
                 else
                 {
-                      var scale = OfficeExcel.array_reverse(this.scale);
-
-                    /**
-                    * Accommodate reversing the Y labels
-                    */
-                    if (this._otherProps._ylabels_invert) {
-
-                        scale = OfficeExcel.array_reverse(scale);
-
-                        this.context.translate(0, this.grapharea * -0.2);
-                        if (typeof(this._otherProps._ymin) == null) {
-                            this._otherProps._ymin = 0;
-                        }
-                    }
+					var scale = OfficeExcel.array_reverse(this.scale);
 
                     if (numYLabels == 1 || numYLabels == 3 || numYLabels == 5) {
                         OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight + ((1/5) * (this.grapharea ) ), '-' + OfficeExcel.number_format(this, scale[4], units_pre, units_post), null, align, bounding, null, bgcolor, bold, null, textOptions);
@@ -654,33 +641,14 @@
 
                     }
 
-
-                    /**
-                    * Accommodate translating back after reversing the labels
-                    */
-                    if (this._otherProps._ylabels_invert) {
-                        this.context.translate(0, 0 - (this.grapharea * -0.2));
-                    }
-
                     if (typeof(this._otherProps._ymin) == 'number') {
-                        OfficeExcel.Text(context,font,text_size,xpos,this._otherProps._ylabels_invert ? this.canvas.height - this._chartGutter._bottom : this._chartGutter._top,'-' + OfficeExcel.number_format(this, this._otherProps._ymin.toFixed(this._otherProps._scale_decimals), units_pre, units_post),'center',align,bounding,null,bgcolor, bold, null, textOptions);
+                        OfficeExcel.Text(context,font,text_size,xpos, this._chartGutter._top,'-' + OfficeExcel.number_format(this, this._otherProps._ymin.toFixed(this._otherProps._scale_decimals), units_pre, units_post),'center',align,bounding,null,bgcolor, bold, null, textOptions);
                     }
                     }
 
               
 
             } else {
-
-                /**
-                * Accommodate reversing the Y labels
-                */
-                if (this._otherProps._ylabels_invert) {
-                    this.scale = OfficeExcel.array_reverse(this.scale);
-                    this.context.translate(0, this.grapharea * 0.2);
-                    if (typeof(this._otherProps._ymin) == null) {
-                        this._otherProps._ymin = 0;
-                    }
-                }
 
                 if('auto' == numYLabels)
                 {
@@ -718,17 +686,8 @@
 
                 }
 
-                /**
-                * Accommodate translating back after reversing the labels
-                */
-                if (this._otherProps._ylabels_invert) {
-                    this.context.translate(0, 0 - (this.grapharea * 0.2));
-                }
-
                 if (typeof(this._otherProps._ymin) == 'number' || typeof(this._otherProps._ymin) == 'string' && this._otherProps._ymin.search('E') != -1) {
-					OfficeExcel.Text(context,font,text_size,xpos - 5,this._otherProps._ylabels_invert ? this._chartGutter._top : this.canvas.height - this._chartGutter._bottom,OfficeExcel.numToFormatText(this._otherProps._ymin.toString(),isFormatCell) + units_post,'center',align,bounding,null,bgcolor, bold, null, textOptions);
-                    //OfficeExcel.Text(context,font,text_size,xpos - 5,this._otherProps._ylabels_invert ? this._chartGutter._top : this.canvas.height - this._chartGutter._bottom,OfficeExcel.number_format(this, this._otherProps._ymin, units_pre, units_post),'center',align,bounding,null,bgcolor);
-                    //OfficeExcel.Text(context,font,text_size,xpos - 5,this._otherProps._ylabels_invert ? this._chartGutter._top : this.canvas.height - this._chartGutter._bottom,OfficeExcel.number_format(this, this._otherProps._ymin.toFixed(this._otherProps._scale_decimals), units_pre, units_post),'center',align,bounding,null,bgcolor);
+					OfficeExcel.Text(context,font,text_size,xpos - 5,this.canvas.height - this._chartGutter._bottom,OfficeExcel.numToFormatText(this._otherProps._ymin.toString(),isFormatCell) + units_post,'center',align,bounding,null,bgcolor, bold, null, textOptions);
                 }
             }
 
@@ -995,12 +954,6 @@
                 yPos = Math.round(yPos);
             }
 
-            if (this._otherProps._ylabels_invert) {
-                yPos -= this._chartGutter._bottom;
-                yPos -= this._chartGutter._top;
-                yPos = this.canvas.height - yPos;
-            }
-
             // Make adjustments depending on the X axis position
             if (this._otherProps._xaxispos == 'center') {
                 yPos = (yPos - this._chartGutter._bottom - this._chartGutter._top) / 2;
@@ -1012,13 +965,6 @@
 
                 yPos = (this.grapharea / (this.max - this.min)) * (Math.abs(data_point) - this.min);
                 yPos += this._chartGutter._top;
-
-                if (this._otherProps._ylabels_invert) {
-                    yPos -= this._chartGutter._top;
-                    yPos  = this.grapharea - yPos;
-                    yPos += this._chartGutter._top;
-                }
-
             } else if (this._otherProps._xaxispos == 'bottom') {
                 // TODO
                 yPos -= this._chartGutter._bottom; // Without this the line is out of place due to the gutter
