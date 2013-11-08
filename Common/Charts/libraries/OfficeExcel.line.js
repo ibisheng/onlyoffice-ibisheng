@@ -172,8 +172,7 @@
             OfficeExcel.DrawBars(this);
 
         // Draw Axes
-        if (this._otherProps._axesontop == false)
-            this.DrawAxes(min,max);
+        this.DrawAxes(min,max);
 
         for (var i = 0, j = 0; i < this.data.length; ++i, ++j) {
             this.context.beginPath();
@@ -271,10 +270,6 @@
                 this.context.fill();
             }
         }
-
-        // Draw Axes if on top
-        if (this._otherProps._axesontop)
-            this.DrawAxes(min,max);
 
         // Draw the labels
         this.DrawLabels(isFormatCell);

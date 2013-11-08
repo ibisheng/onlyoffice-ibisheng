@@ -138,8 +138,6 @@ OfficeExcel.OtherProps = function()
     this._noendxtick = false;
     this._noendytick = true;
 
-    this._axesontop = false;
-
     this._filled = false;
     this._filled_range = false;
     this._filled_accumulative = true;
