@@ -746,7 +746,7 @@
         */
         if (typeof(labels) == 'object' && labels && this._otherProps._xlabels) {
 
-            var yOffset = 13 + Number(this._otherProps._xlabels_offset);
+            var yOffset = 13;
 
             /**
             * Text angle

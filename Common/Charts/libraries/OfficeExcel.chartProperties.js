@@ -53,7 +53,6 @@ OfficeExcel.OtherProps = function()
     this._align = 'center';
 
     this._xlabels = true;
-    this._xlabels_offset = 0;
 
     this._ylabels = true;
     this._ylabels_count = 5;
