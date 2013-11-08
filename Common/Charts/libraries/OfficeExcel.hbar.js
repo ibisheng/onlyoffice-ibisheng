@@ -218,7 +218,6 @@
     OfficeExcel.HBar.prototype.DrawLabels = function (isFormatCell)
     {
         var context    = this.context;
-        var canvas     = this.canvas;
         var units_pre  = this._otherProps._units_pre;
         var units_post = this._otherProps._units_post;
         var text_size  = this._otherProps._xlabels_size;

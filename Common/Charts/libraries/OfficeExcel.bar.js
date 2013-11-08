@@ -729,7 +729,6 @@
     OfficeExcel.Bar.prototype.DrawLabels = function (isFormatCell)
     {
         var context    = this.context;
-        var text_angle = this._otherProps._text_angle;
         var labels     = this._otherProps._labels;
 		var scaleFactor = 1;
 		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
@@ -754,17 +753,6 @@
             */
             var angle  = 0;
             var halign = 'center';
-
-            if (text_angle > 0) {
-                angle  = -1 * text_angle;
-                halign   = 'right';
-                yOffset -= 5;
-                
-                if (this._otherProps._xaxispos == 'top') {
-                    halign   = 'left';
-                    yOffset += 5;
-                }
-            }
 
             // Draw the X axis labels
             context.fillStyle = this._otherProps._text_color;
@@ -806,10 +794,10 @@
 						diffHeight = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.cos(angle*Math.PI/180) - 10) : 0;
 						OfficeExcel.Text(context, font,
                                       text_size,
-                                      x + (this._otherProps._text_angle == 90 ? 0 : 0) - diffWidth,
+                                      x - diffWidth,
                                       this.nullPositionOX + yOffset*scaleFactor + diffHeight,
                                       String(labels[i++]),
-                                      (this._otherProps._text_angle == 90 ? 'center' : null),
+                                      null,
                                       halign,
                                       null,
                                       angle,
@@ -822,10 +810,10 @@
                     {
                          OfficeExcel.Text(context, font,
                                       text_size,
-                                      x + (this._otherProps._text_angle == 90 ? 0 : 0),
+                                      x,
                                       this._otherProps._xaxispos == 'top' ? this._chartGutter._top - yOffset + text_size  - 1: (OfficeExcel.GetHeight(this) - this._chartGutter._bottom) + yOffset,
                                       String(labels[i++]),
-                                      (this._otherProps._text_angle == 90 ? 'center' : null),
+                                      null,
                                       halign,
                                       null,
                                        angle,

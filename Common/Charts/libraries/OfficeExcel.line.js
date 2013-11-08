@@ -817,17 +817,6 @@
                 valign = 'bottom';
                 yOffset += 2;
             }
-
-            if (typeof(this._otherProps._text_angle) == 'number' && this._otherProps._text_angle > 0) {
-                angle   = -1 * this._otherProps._text_angle;
-                valign  = 'center';
-                halign  = 'right';
-                yOffset = 10;
-
-                if (this._otherProps._xaxispos == 'top') {
-                    yOffset = 10;
-                }
-            }
             
             if(this._otherProps._xaxispos == 'top' && 'auto' == this._otherProps._ylabels_count)
                 yOffset = 20;
@@ -866,9 +855,6 @@
                         labelX = this._chartGutter._left + this._otherProps._hmargin;
                     }
 
-                    if (this._otherProps._xaxispos == 'top' && this._otherProps._text_angle > 0) {
-                        halign = 'left';
-                    }
                     if('auto' == this._otherProps._ylabels_count)
                     {
                         diffWidth = axisOxAngleOptions ? (axisOxAngleOptions[i]*Math.sin(angle*Math.PI/180))/(4) : 0;

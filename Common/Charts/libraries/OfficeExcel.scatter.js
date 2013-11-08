@@ -793,13 +793,6 @@
             var valign = null;
             var halign = 'center';
     
-            if (this._otherProps._text_angle > 0) {
-                angle  = -1 * this._otherProps._text_angle;
-                valign = 'center';
-                halign = 'right';
-                yPos -= 10;
-            }
-    
             for (i=0; i<labels.length; ++i) {
                 
                 if (typeof(labels[i]) == 'object') {

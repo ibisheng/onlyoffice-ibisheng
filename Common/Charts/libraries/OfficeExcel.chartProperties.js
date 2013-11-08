@@ -34,7 +34,6 @@ OfficeExcel.OtherProps = function()
     this._text_color = 'black';
     this._text_font = 'Arial';
     this._text_size = 10;
-    this._text_angle = 0;
 
     this._axis_color = 'black';
 
