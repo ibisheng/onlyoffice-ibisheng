@@ -501,6 +501,9 @@ CMathContent.prototype =
     {
         var elem = new mathElem(obj);
 
+        if(obj.typeObj === MATH_COMP)
+            obj.setComposition(this.Composition);
+
         var bDef = typeof(shift) !== "undefined" && shift !== null;
         var bNum = shift === shift - 0;
         var bCont = bNum ? ( this.CurPos + shift >= 0 && this.CurPos + shift < this.content.length) : false;
@@ -526,6 +529,15 @@ CMathContent.prototype =
     setComposition: function(Composition)
     {
         this.Composition = Composition;
+    },
+    setReferenceComp: function(Comp) // отличие от setComposition: ссылка на общую формулу передается всем элементам контента
+    {
+        this.Composition = Comp;
+        for(var i = 0; i < this.content.length; i++)
+        {
+            if(this.content[i].value.type == MATH_COMP)
+                this.contetn[i].value.setReferenceComp(Comp);
+        }
     },
     createEquation: function(ind)
     {
@@ -4374,9 +4386,11 @@ CMathContent.prototype =
             }
             else if(order == -2)
             {
-                this.setStart_Selection(this.CurPos + 1);
+                /*this.setStart_Selection(this.CurPos + 1);
                 this.setEnd_Selection(this.CurPos - 1);
-                this.selection.active = false;
+                this.selection.active = false;*/
+
+                this.removeFormula(this.CurPos);
 
                 SelectContent = this;
                 CurrContent   = null; // т.к. пришли из другого контента
@@ -4393,14 +4407,223 @@ CMathContent.prototype =
         var currType = this.content[this.CurPos].value.typeObj,
             prevType = this.CurPos > 1 ? this.content[this.CurPos - 1].value.typeObj : null,
             prev2_Type = this.CurPos > 2 ? this.content[this.CurPos - 2].value.typeObj : null,
+            nextType = this.CurPos + 1 < this.content.length ? this.content[this.CurPos + 1].value.typeObj : null,
+            next2_Type = this.CurPos + 2 < this.content.length ? this.content[this.CurPos + 2].value.typeObj : null,
+            next3_Type = this.CurPos + 3 < this.content.length ? this.content[this.CurPos + 3].value.typeObj : null;
+
+        var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_EMPTY && this.CurPos == 1) && bMEDirect,
+            bReverseEnd = this.CurPos == this.content.length - 1 && bMEReverse;
+        var bNotRemove = bDirectlyBegin || bReverseEnd;
+
+        var bMEDirect = order == 1,
+            bMEReverse = order == -1;
+
+        // directly
+
+        var bDirectly_CurrComp = bMEDirect && currType == MATH_EMPTY && prevType == MATH_COMP  ,
+            bDirectly_RPrpComp = bMEDirect && currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP;
+
+        // reverse
+
+        var bReverseComp = bMEReverse && nextType == MATH_COMP && next2_Type == MATH_EMPTY;
+
+        //
+
+        var bRemoveFormula = (bDirectly_CurrComp|| bDirectly_RPrpComp || bReverseComp) && !bSelect;
+
+
+        // NB !
+        // учесть случаи :
+        // 1. если нажата delete и справа стоят RunPrp
+        // 2. если все текстовые элементы удалили из Run, нужно удалить RunPrp (delete и backspace)
+
+
+        if(bRemoveFormula)
+        {
+            var pos;
+            if(bMEReverse)
+                pos = this.CurPos + 1;
+            else if(bDirectly_CurrComp)
+                pos = this.CurPos - 1;
+            else if(bDirectly_RPrpComp)
+                pos = this.CurPos - 2;
+
+            this.removeFormula(pos);
+
+           /* var start, end;
+
+            if(bDirectly_CurrComp) // directly, only composition
+            {
+                start = this.CurPos;
+                end = this.CurPos - 2;
+            }
+            else if(bReverseComp && !bAfterRPrp) // reverse, only composition
+            {
+                start = this.CurPos;
+                end = this.CurPos + 2;
+            }
+            else // composition + RunPrp(after)
+            {
+                var bSelectRunPrp = false;
+
+                var bDirectlySearch = prev3_Type === MATH_TEXT && bDirectly_RPrpComp, // перед мат. объектом текст, а после RunPrp
+                    bReverseSeach = currType === MATH_TEXT && bMEReverse && bAfterRPrp;
+
+                if(bDirectlySearch || bReverseSeach)
+                {
+                    var shift;
+                    if(bMEDirect)
+                        shift = 3;
+                    else
+                        shift = 0;
+
+                    for(var i = this.CurPos - shift; i > 0; i--)
+                    {
+                        if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                        {
+                            currRPrp = this.content[this.CurPos + shift].value;
+                            prevRPrp = this.content[i].value;
+                            bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                            break;
+                        }
+                    }
+                }
+
+                if(bMEDirect)
+                {
+                    if(bSelectRunPrp)
+                    {
+                        start = this.CurPos;
+                        end = this.CurPos - 3;
+                    }
+                    else
+                    {
+                        start = this.CurPos - 1;
+                        end = this.CurPos - 3;
+                    }
+                }
+                else
+                {
+                    if(bSelectRunPrp)
+                    {
+                        start = this.CurPos - 1;
+                        end = this.CurPos + 2;
+                    }
+                    else
+                    {
+                        start = this.CurPos - 1;
+                        end = this.CurPos + 1;
+                    }
+                }
+
+            }
+
+            this.setStart_Selection(start);
+            this.setEnd_Selection(end);
+            this.selection.active = false;*/
+
+        }
+        // TO DO
+        // переделать !
+        // можно проще, как для случая с формулой
+        else if(!bNotRemove)
+        {
+            var start, end;
+
+            var bDirRPrp = currType === MATH_RUN_PRP && bMEDirect,
+                bRevRPrp = nextType === MATH_RUN_PRP && bMEReverse;
+
+            if(bDirRPrp) // проверку на начало прошли
+            {
+                start = this.CurPos - 1;
+                end = this.CurPos;
+            }
+            else if(bRevRPrp) // на всякий случай, может получится, что после удаления элемента, стоим после RunPrp
+            {
+                start = this.CurPos + 2;
+                end = this.CurPos + 3;
+            }
+            else if(bSelect)
+            {
+                start = this.selection.startPos;
+                end = this.selection.endPos;
+                var tmp;
+
+                if(start > end)
+                {
+                    tmp = start;
+                    start = end;
+                    end = tmp;
+                }
+            }
+            else if(bMEReverse)
+            {
+                if(nextType == MATH_RUN_PRP && next3_Type !== MATH_TEXT) //единственная буква в Run
+                {
+                    start = this.CurPos;
+                    end = this.CurPos + 2;
+                }
+                else
+                {
+                    start = this.CurPos + 1;
+                    end = this.CurPos + 2;
+                }
+            }
+            else
+            {
+                if(prevType == MATH_RUN_PRP && nextType !== MATH_TEXT) //единственная буква в Run
+                {
+                    start = this.CurPos - 1;
+                    end = this.CurPos + 1;
+                }
+                else
+                {
+                    start = this.CurPos;
+                    end = this.CurPos + 1;
+                }
+
+            }
+
+            items = this.content.splice(start, end - start);
+
+            if(!TEST)
+            {
+                History.Create_NewPoint();
+                //items = this.content.splice(start, end - start);
+                History.Add(this, {Type: historyitem_Math_RemoveItem, Items: items, Pos: start});
+            }
+
+            if(bSelect)
+                this.CurPos = this.selection.startPos - 1;
+            else if(bMEDirect)
+                this.CurPos -= end - start;
+
+
+            this.setStart_Selection(this.CurPos);
+            this.selection.active = false;
+
+            bDelete = true;
+        }
+
+
+        return {bDelete: bDelete, items: items};
+    },
+    old_remove_internal: function(order)
+    {
+        var bDelete = false;
+        var bSelect = this.selection.startPos !== this.selection.endPos;
+        var currType = this.content[this.CurPos].value.typeObj,
+            prevType = this.CurPos > 1 ? this.content[this.CurPos - 1].value.typeObj : null,
+            prev2_Type = this.CurPos > 2 ? this.content[this.CurPos - 2].value.typeObj : null,
             prev3_Type = this.CurPos > 3 ? this.content[this.CurPos - 3].value.typeObj : null,
             nextType = this.CurPos + 1 < this.content.length ? this.content[this.CurPos + 1].value.typeObj : null,
             next2_Type = this.CurPos + 2 < this.content.length ? this.content[this.CurPos + 2].value.typeObj : null,
             next3_Type = this.CurPos + 3 < this.content.length ? this.content[this.CurPos + 3].value.typeObj : null;
 
-        var bDirBeginning = this.CurPos == 0 || (currType == MATH_EMPTY && this.CurPos == 1) && bMEDirect,
+        var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_EMPTY && this.CurPos == 1) && bMEDirect,
             bReverseEnd = this.CurPos == this.content.length - 1 && bMEReverse;
 
+        var bNotRemove = bDirectlyBegin || bReverseEnd;
 
         // directly
 
@@ -4504,7 +4727,7 @@ CMathContent.prototype =
             this.selection.active = false;
 
         }
-        else if( !bDirBeginning && !bReverseEnd )
+        else if(!bNotRemove)
         {
             var start, end;
 
@@ -4581,7 +4804,62 @@ CMathContent.prototype =
 
         return {bDelete: bDelete, items: items};
     },
-    old_remove_internal: function(order)
+    removeFormula: function(pos)
+    {
+        var result = false;
+
+        var currType = this.content[pos].value.typeObj,
+            prevType   = pos > 1 ? this.content[pos - 1].value.typeObj : null,
+            nextType   = pos + 1 < this.content.length ? this.content[pos + 1].value.typeObj : null,
+            next2_Type = pos + 2 < this.content.length ? this.content[pos + 2].value.typeObj : null;
+
+        var bMFormula  = currType == MATH_COMP && nextType == MATH_EMPTY;
+        var bAfterRPrp = next2_Type == MATH_RUN_PRP,
+            bPrevTxt = prevType == MATH_TEXT;
+
+        var bRemoveRPrp = bAfterRPrp && bPrevTxt;
+
+        if(bMFormula)
+        {
+            var start, end;
+            var bSelectRunPrp = false;
+
+            if(bRemoveRPrp)
+            {
+                for(var i = pos - 1; i > 0; i--)
+                {
+                    if(this.content[i].value.typeObj === MATH_RUN_PRP)
+                    {
+                        currRPrp = this.content[pos+2].value;
+                        prevRPrp = this.content[i].value;
+                        bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                        break;
+                    }
+                }
+            }
+
+            if(bSelectRunPrp)
+            {
+                start = pos - 1;
+                end   = pos + 2;
+            }
+            else
+            {
+                start = pos - 1;
+                end   = pos + 1;
+            }
+
+            this.setStart_Selection(start);
+            this.setEnd_Selection(end);
+            this.selection.active = false;
+
+
+            result = true;
+        }
+
+        return result;
+    },
+    old_old_remove_internal: function(order)
     {
          //var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
          var bMEDirect = order == 1 && currType === MATH_EMPTY, // работает, если только в конце формулы стоим или после идет еще одна формула
@@ -5024,14 +5302,15 @@ CMathContent.prototype =
             }
             else if(this.content[1].value.typeObj === MATH_COMP)
             {
-                var ctrPrp = this.content[1].value.getCtrPrp();
+                //var ctrPrp = this.content[1].value.getCtrPrp();
+                var ctrPrp = this.content[1].value.getCtrPrp_2();// иначе зациклимся на getCtrPrp
                 txtPrp.Merge(ctrPrp);
             }
         }
 
         return txtPrp;
     },
-    old_checkRunPrp: function()
+    old_old_checkRunPrp: function()
     {
         var bEmpty = this.IsEmpty(),
             OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP;
@@ -5060,7 +5339,7 @@ CMathContent.prototype =
 
         }
     },
-    checkRunPrp: function()
+    old_checkRunPrp: function()
     {
         var bEmpty = this.IsEmpty(),
             OnlyRunPrp = this.content.length == 2 && this.content[1].value.typeObj == MATH_RUN_PRP,
@@ -5188,7 +5467,7 @@ CMathContent.prototype =
         var rPrp = new CTextPr();
         rPrp.Italic = flag;
 
-        if(bEmpty)
+        if(this.IsEmpty())
         {
             this.addRunPrp(rPrp);
         }
@@ -5198,6 +5477,46 @@ CMathContent.prototype =
             {
                 if(this.content[i].value.typeObj == MATH_RUN_PRP)
                     this.content[i].value.Merge(rPrp);
+            }
+        }
+    },
+    addRPrpForSelect: function(rPrp)
+    {
+        var start = this.selection.startPos,
+            end = this.selection.endPos;
+
+        if(start > end)
+        {
+            var temp = start;
+            start = end;
+            end = temp;
+        }
+
+        for(var i = start; i < end; i++)
+        {
+            var obj = this.content[i].value;
+            if(obj.typeObj == MATH_RUN_PRP)
+            {
+                obj.Merge(rPrp);
+            }
+            else if(obj.typeObj == MATH_COMP)
+            {
+                obj.addRPrp(rPrp);
+            }
+        }
+    },
+    addRPrp: function(rPrp)
+    {
+        for(var i = 0; i < this.content.length; i++)
+        {
+            var obj = this.content[i].value;
+            if(obj.typeObj == MATH_RUN_PRP)
+            {
+                obj.Merge(rPrp);
+            }
+            else if(obj.typeObj == MATH_COMP)
+            {
+                obj.addRPrp(rPrp);
             }
         }
     },
@@ -5453,19 +5772,9 @@ CMathContent.prototype =
         return content;
 
     },
-
     IsEmpty:    function()
     {
         return this.content.length == 1;
-    },
-    setReferenceComp: function(Comp)
-    {
-        this.Composition = Comp;
-        for(var i = 0; i < this.content.length; i++)
-        {
-            if(this.content[i].value.type == MATH_COMP)
-                this.contetn[i].value.setReferenceComp(Comp);
-        }
     }
 }
 //todo
@@ -5858,7 +6167,7 @@ CMathComposition.prototype =
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
         }
     },
-    SetTxtPrp: function(txtPrp)
+    old_SetTxtPrp: function(txtPrp)
     {
         this.SelectContent.changeTxtPrp(txtPrp, false);
         //this.SelectContent.setTxtPrp(txtPrp, false);
@@ -6108,7 +6417,7 @@ CMathComposition.prototype =
         this.CreateEquation2(indef);
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        //this.Root.Resize();
         this.UpdatePosition();
     },
     RecalculateComposition: function()

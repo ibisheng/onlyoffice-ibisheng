@@ -129,8 +129,7 @@ CNary.prototype.init = function(props)
 }
 CNary.prototype.setDistance = function()
 {
-    //this.dW = this.getTxtPrp().FontSize/36*2.45;
-    this.dW = this.getPrpToControlLetter().FontSize/36*2.45;
+    this.dW = this.getCtrPrp().FontSize/36*2.45;
 }
 CNary.prototype.getBase = function()
 {
@@ -325,7 +324,7 @@ CNaryUndOvr.prototype.init = function(sign)
 CNaryUndOvr.prototype.recalculateSize = function()
 {
     //var zetta = this.getTxtPrp().FontSize* 25.4/96;
-    var zetta = this.getPrpToControlLetter().FontSize* 25.4/96;
+    var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.gapTop = zetta*0.25;
     this.gapBottom = zetta*0.1;
 
@@ -419,7 +418,6 @@ CNaryUndOvr.prototype.getUpperIterator = function()
 function CNaryOperator(flip)
 {
     this.Composition = null;
-    this.TxtPrp = new CMathTextPrp();
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
@@ -434,7 +432,7 @@ CNaryOperator.prototype.draw = function(pGraphics)
         YY = new Array();
 
     //var textScale = this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale = this.getPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale = this.getCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
     // g_dKoef_px_to_mm = 25.4/96
 
@@ -497,22 +495,14 @@ CNaryOperator.prototype.Resize = function()
 {
     this.recalculateSize();
 }
-CNaryOperator.prototype.setTxtPrp = function(txtPrp)
-{
-    this.TxtPrp.Merge(txtPrp);
-}
 CNaryOperator.prototype.setComposition = function(Compos)
 {
     this.Composition = Compos;
 }
-CNaryOperator.prototype.getPrpToControlLetter = function()
+CNaryOperator.prototype.getCtrPrp = function()
 {
-    return this.Parent.getPrpToControlLetter();
+    return this.Parent.getCtrPrp();
 }
-/*CNaryOperator.prototype.getTxtPrp = function()
-{
-    return this.TxtPrp;
-}*/
 
 function CSigma()
 {
@@ -630,7 +620,7 @@ CSigma.prototype.getCoord = function()
 
 
     //var textScale =  this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale =  this.getPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var h1 = Y[0] - Y[21],
@@ -702,7 +692,7 @@ CSigma.prototype.calculateSizeGlyph = function()
     // пока размер не меняем в зависимости от высоты аргумента
 
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width = 8.997900390624999*betta,
         _height = 11.994444444444444*betta;
@@ -834,7 +824,7 @@ CProduct.prototype.getCoord = function()
 
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.getPrpToControlLetter().FontSize/850, // 1000 pt
+    var textScale = this.getCtrPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var h1 = Y[9],
@@ -865,7 +855,7 @@ CProduct.prototype.getCoord = function()
 CProduct.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width = 10.312548828125*betta,
         _height = 11.994444444444444*betta;
@@ -908,28 +898,28 @@ CUnion.prototype.getCoord = function()
     var X = new Array(),
         Y = new Array();
 
-    X[0] = 49526.184566929136; Y[0] = 127087.84; 
-    X[1] = 33974.37429971653; Y[1] = 127877.20000000001; 
-    X[2] = 25226.481024409448; Y[2] = 120034.20000000001; 
-    X[3] = 15996.016171708661; Y[3] = 113190.09; 
-    X[4] = 15301.25; Y[4] = 95025.84; 
-    X[5] = 15301.25; Y[5] = 0; 
-    X[6] = 7100; Y[6] = 0; 
-    X[7] = 7100; Y[7] = 94775.84; 
-    X[8] = 7100; Y[8] = 117815.09; 
-    X[9] = 21524.90275275591; Y[9] = 127165.84; 
-    X[10] = 31605.36420585827; Y[10] = 135801.88; 
-    X[11] = 49526.184566929136; Y[11] = 135775.84; 
-    X[12] = 67447.00492800001; Y[12] = 135801.88; 
-    X[13] = 77527.46638110236; Y[13] = 127165.84; 
-    X[14] = 91952.36913385827; Y[14] = 117815.09; 
-    X[15] = 91952.36913385827; Y[15] = 94775.84; 
-    X[16] = 91952.36913385827; Y[16] = 0; 
-    X[17] = 83751.11913385827; Y[17] = 0; 
-    X[18] = 83751.11913385827; Y[18] = 95025.84; 
-    X[19] = 83056.35296214961; Y[19] = 113190.09; 
-    X[20] = 73825.88810944883; Y[20] = 120034.20000000001; 
-    X[21] = 65077.99483414174; Y[21] = 127877.20000000001; 
+    X[0] = 49526.184566929136; Y[0] = 127087.84;
+    X[1] = 33974.37429971653; Y[1] = 127877.20000000001;
+    X[2] = 25226.481024409448; Y[2] = 120034.20000000001;
+    X[3] = 15996.016171708661; Y[3] = 113190.09;
+    X[4] = 15301.25; Y[4] = 95025.84;
+    X[5] = 15301.25; Y[5] = 0;
+    X[6] = 7100; Y[6] = 0;
+    X[7] = 7100; Y[7] = 94775.84;
+    X[8] = 7100; Y[8] = 117815.09;
+    X[9] = 21524.90275275591; Y[9] = 127165.84;
+    X[10] = 31605.36420585827; Y[10] = 135801.88;
+    X[11] = 49526.184566929136; Y[11] = 135775.84;
+    X[12] = 67447.00492800001; Y[12] = 135801.88;
+    X[13] = 77527.46638110236; Y[13] = 127165.84;
+    X[14] = 91952.36913385827; Y[14] = 117815.09;
+    X[15] = 91952.36913385827; Y[15] = 94775.84;
+    X[16] = 91952.36913385827; Y[16] = 0;
+    X[17] = 83751.11913385827; Y[17] = 0;
+    X[18] = 83751.11913385827; Y[18] = 95025.84;
+    X[19] = 83056.35296214961; Y[19] = 113190.09;
+    X[20] = 73825.88810944883; Y[20] = 120034.20000000001;
+    X[21] = 65077.99483414174; Y[21] = 127877.20000000001;
     X[22] = 49526.184566929136; Y[22] = 127087.84;
 
     return {X: X, Y: Y};
@@ -937,7 +927,7 @@ CUnion.prototype.getCoord = function()
 CUnion.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
     this.gap = 0.93*betta;
 
     var _width = 9.38*betta,
@@ -1056,7 +1046,7 @@ CLogicalOr.prototype.getCoord = function()
     X[7] = 0; Y[7] = 0;
 
     //var textScale = this.getTxtPrp().FontSize/850, // 1000 pt
-    var textScale = this.getPrpToControlLetter().FontSize/850, // 1000 pt
+    var textScale = this.getCtrPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var w1 = X[1],
@@ -1088,7 +1078,7 @@ CLogicalOr.prototype.getCoord = function()
 CLogicalOr.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width = 9.6159*betta,
         _height = 11.994444444444444*betta;
@@ -1318,7 +1308,7 @@ CIntegral.prototype.old_drawPath = function(XX, YY)
 CIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -1359,7 +1349,7 @@ CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width = 14.2296*betta,
         _height = 13.7*betta;
@@ -1410,7 +1400,7 @@ CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY)
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width = 18.925368*betta,
         _height = 13.7*betta;
@@ -1652,46 +1642,46 @@ old_CCircle.prototype.calculate_drawPath = function(XX, YY)
 
 function CCircle()
 {
-    
+
 }
 CCircle.prototype.getCoord = function()
 {
     var X = new Array(),
         Y = new Array();
 
-    X[0] = 18345.98; Y[0] = 0; 
-    X[1] = 25288.35; Y[1] = 1008.1; 
-    X[2] = 27622.45; Y[2] = 2601.85; 
-    X[3] = 29991.4; Y[3] = 4194.75; 
-    X[4] = 31723.7; Y[4] = 6460.85; 
-    X[5] = 33456.85; Y[5] = 8726.95; 
-    X[6] = 34411.4; Y[6] = 11542.15; 
-    X[7] = 35366.8; Y[7] = 14357.35; 
-    X[8] = 35366.8; Y[8] = 17472.6; 
-    X[9] = 35366.8; Y[9] = 21155.65; 
-    X[10] = 34180.2; Y[10] = 24201.2; 
-    X[11] = 32994.45; Y[11] = 27245.9; 
-    X[12] = 30905.15; Y[12] = 29495; 
-    X[13] = 28816.7; Y[13] = 31743.25; 
-    X[14] = 25949.65; Y[14] = 33159.35; 
-    X[15] = 23294.25; Y[15] = 34469.2; 
-    X[16] = 17035.7; Y[16] = 34770.53; 
-    X[17] = 17035.7; Y[17] = 34770.53; 
-    X[18] = 10029.15; Y[18] = 33832.55; 
-    X[19] = 7655.1; Y[19] = 32203.1; 
-    X[20] = 5209.65; Y[20] = 30539.65; 
-    X[21] = 3525.8; Y[21] = 28309.25; 
-    X[22] = 1842.8; Y[22] = 26078; 
-    X[23] = 921.4; Y[23] = 23334.2; 
-    X[24] = 0; Y[24] = 20589.55; 
-    X[25] = 0; Y[25] = 17509.15; 
-    X[26] = 0; Y[26] = 14003.75; 
-    X[27] = 1133.05; Y[27] = 10959.05; 
-    X[28] = 2266.1; Y[28] = 7913.5; 
-    X[29] = 4318.85; Y[29] = 5576.85; 
-    X[30] = 6372.45; Y[30] = 3240.2; 
-    X[31] = 9275.2; Y[31] = 1752.7; 
-    X[32] = 11930.6; Y[32] = 407.15; 
+    X[0] = 18345.98; Y[0] = 0;
+    X[1] = 25288.35; Y[1] = 1008.1;
+    X[2] = 27622.45; Y[2] = 2601.85;
+    X[3] = 29991.4; Y[3] = 4194.75;
+    X[4] = 31723.7; Y[4] = 6460.85;
+    X[5] = 33456.85; Y[5] = 8726.95;
+    X[6] = 34411.4; Y[6] = 11542.15;
+    X[7] = 35366.8; Y[7] = 14357.35;
+    X[8] = 35366.8; Y[8] = 17472.6;
+    X[9] = 35366.8; Y[9] = 21155.65;
+    X[10] = 34180.2; Y[10] = 24201.2;
+    X[11] = 32994.45; Y[11] = 27245.9;
+    X[12] = 30905.15; Y[12] = 29495;
+    X[13] = 28816.7; Y[13] = 31743.25;
+    X[14] = 25949.65; Y[14] = 33159.35;
+    X[15] = 23294.25; Y[15] = 34469.2;
+    X[16] = 17035.7; Y[16] = 34770.53;
+    X[17] = 17035.7; Y[17] = 34770.53;
+    X[18] = 10029.15; Y[18] = 33832.55;
+    X[19] = 7655.1; Y[19] = 32203.1;
+    X[20] = 5209.65; Y[20] = 30539.65;
+    X[21] = 3525.8; Y[21] = 28309.25;
+    X[22] = 1842.8; Y[22] = 26078;
+    X[23] = 921.4; Y[23] = 23334.2;
+    X[24] = 0; Y[24] = 20589.55;
+    X[25] = 0; Y[25] = 17509.15;
+    X[26] = 0; Y[26] = 14003.75;
+    X[27] = 1133.05; Y[27] = 10959.05;
+    X[28] = 2266.1; Y[28] = 7913.5;
+    X[29] = 4318.85; Y[29] = 5576.85;
+    X[30] = 6372.45; Y[30] = 3240.2;
+    X[31] = 9275.2; Y[31] = 1752.7;
+    X[32] = 11930.6; Y[32] = 407.15;
     X[33] = 18345.98; Y[33] = 0;
 
 
@@ -1706,7 +1696,7 @@ CCircle.prototype.getCoord = function()
         H = Y[16];
 
     return {X: X, Y: Y, W: W, H: H};
-    
+
 }
 CCircle.prototype.drawPath = function(pGraphics, XX, YY)
 {
@@ -1721,13 +1711,13 @@ CCircle.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14]);
     pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16]);
 
-    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19]); 
-    pGraphics._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21]); 
-    pGraphics._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23]); 
-    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25]); 
-    pGraphics._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27]); 
-    pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29]); 
-    pGraphics._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31]); 
+    pGraphics._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19]);
+    pGraphics._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21]);
+    pGraphics._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23]);
+    pGraphics._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25]);
+    pGraphics._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27]);
+    pGraphics._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29]);
+    pGraphics._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31]);
     pGraphics._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33]);
     pGraphics.ds();
 
@@ -2002,48 +1992,48 @@ CSurface.prototype.getCoord = function()
     var X = new Array(),
         Y = new Array();
 
-    X[0] = 24855.55; Y[0] = 312.82; 
-    X[1] = 27995.71; Y[1] = 0; 
-    X[2] = 31359.09; Y[2] = 0; 
-    X[3] = 36162.79; Y[3] = 0; 
-    X[4] = 40559.9; Y[4] = 694.89; 
-    X[5] = 43954.72; Y[5] = 1285.5; 
-    X[6] = 47349.55; Y[6] = 1876.11; 
-    X[7] = 50600.44; Y[7] = 2814.59; 
-    X[8] = 54054.17; Y[8] = 4639.82; 
-    X[9] = 57507.91; Y[9] = 6464.21; 
-    X[10] = 59945.63; Y[10] = 10061.28; 
-    X[11] = 62383.35; Y[11] = 13658.35; 
-    X[12] = 62383.35; Y[12] = 18871.27; 
-    X[13] = 62383.35; Y[13] = 24154.26; 
-    X[14] = 59945.63; Y[14] = 27752.16; 
-    X[15] = 57507.91; Y[15] = 31349.23; 
-    X[16] = 53481.95; Y[16] = 33468.93; 
-    X[17] = 49936.09; Y[17] = 35345.88; 
-    X[18] = 45688.68; Y[18] = 36318.56; 
-    X[19] = 42330.61; Y[19] = 36884.98; 
-    X[20] = 38972.54; Y[20] = 37451.41; 
-    X[21] = 34242.37; Y[21] = 37799.27; 
-    X[22] = 31359.98; Y[22] = 37799.27; 
-    X[23] = 27369.45; Y[23] = 37799.27; 
-    X[24] = 22565.76; Y[24] = 37347.13; 
-    X[25] = 19337.9; Y[25] = 36774.04; 
-    X[26] = 16110.04; Y[26] = 36200.94; 
-    X[27] = 11723.56; Y[27] = 35018.88; 
-    X[28] = 9068.82; Y[28] = 33663.3; 
-    X[29] = 6377.76; Y[29] = 32273.53; 
-    X[30] = 4312.96; Y[30] = 30188.03; 
-    X[31] = 2249.05; Y[31] = 28101.69; 
-    X[32] = 1124.08; Y[32] = 25286.27; 
-    X[33] = 0; Y[33] = 22470.84; 
-    X[34] = 0; Y[34] = 18959.69; 
-    X[35] = 0; Y[35] = 13745.94; 
-    X[36] = 2490.87; Y[36] = 10130.52; 
-    X[37] = 4982.63; Y[37] = 6515.1; 
-    X[38] = 8967.84; Y[38] = 4394.56; 
-    X[39] = 12806.01; Y[39] = 2378.3; 
-    X[40] = 17529.98; Y[40] = 1370.59; 
-    X[41] = 21192.77; Y[41] = 841.7; 
+    X[0] = 24855.55; Y[0] = 312.82;
+    X[1] = 27995.71; Y[1] = 0;
+    X[2] = 31359.09; Y[2] = 0;
+    X[3] = 36162.79; Y[3] = 0;
+    X[4] = 40559.9; Y[4] = 694.89;
+    X[5] = 43954.72; Y[5] = 1285.5;
+    X[6] = 47349.55; Y[6] = 1876.11;
+    X[7] = 50600.44; Y[7] = 2814.59;
+    X[8] = 54054.17; Y[8] = 4639.82;
+    X[9] = 57507.91; Y[9] = 6464.21;
+    X[10] = 59945.63; Y[10] = 10061.28;
+    X[11] = 62383.35; Y[11] = 13658.35;
+    X[12] = 62383.35; Y[12] = 18871.27;
+    X[13] = 62383.35; Y[13] = 24154.26;
+    X[14] = 59945.63; Y[14] = 27752.16;
+    X[15] = 57507.91; Y[15] = 31349.23;
+    X[16] = 53481.95; Y[16] = 33468.93;
+    X[17] = 49936.09; Y[17] = 35345.88;
+    X[18] = 45688.68; Y[18] = 36318.56;
+    X[19] = 42330.61; Y[19] = 36884.98;
+    X[20] = 38972.54; Y[20] = 37451.41;
+    X[21] = 34242.37; Y[21] = 37799.27;
+    X[22] = 31359.98; Y[22] = 37799.27;
+    X[23] = 27369.45; Y[23] = 37799.27;
+    X[24] = 22565.76; Y[24] = 37347.13;
+    X[25] = 19337.9; Y[25] = 36774.04;
+    X[26] = 16110.04; Y[26] = 36200.94;
+    X[27] = 11723.56; Y[27] = 35018.88;
+    X[28] = 9068.82; Y[28] = 33663.3;
+    X[29] = 6377.76; Y[29] = 32273.53;
+    X[30] = 4312.96; Y[30] = 30188.03;
+    X[31] = 2249.05; Y[31] = 28101.69;
+    X[32] = 1124.08; Y[32] = 25286.27;
+    X[33] = 0; Y[33] = 22470.84;
+    X[34] = 0; Y[34] = 18959.69;
+    X[35] = 0; Y[35] = 13745.94;
+    X[36] = 2490.87; Y[36] = 10130.52;
+    X[37] = 4982.63; Y[37] = 6515.1;
+    X[38] = 8967.84; Y[38] = 4394.56;
+    X[39] = 12806.01; Y[39] = 2378.3;
+    X[40] = 17529.98; Y[40] = 1370.59;
+    X[41] = 21192.77; Y[41] = 841.7;
     X[42] = 24855.55; Y[42] = 312.82;
 
 
@@ -2082,24 +2072,24 @@ CSurface.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._m(XX[0], YY[0]);
     pGraphics._l(XX[0], YY[0]);
     pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
-    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
-    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
     pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
     pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
-    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
-    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
-    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
-    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
+    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
     pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
     pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
     pGraphics._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] );
-    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
+    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
     pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
     pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
-    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
+    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
     pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
     pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
-    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
+    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] );
     pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
     pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
     pGraphics.ds();
@@ -2114,56 +2104,56 @@ CVolume.prototype.getCoord = function()
     var X = new Array(),
         Y = new Array();
 
-    X[0] = 24086.6; Y[0] = 1584.99; 
-    X[1] = 25878.03; Y[1] = 1268.19; 
-    X[2] = 30642.29; Y[2] = 669.24; 
-    X[3] = 35139.13; Y[3] = 104.94; 
-    X[4] = 43028.74; Y[4] = 0; 
-    X[5] = 46945.61; Y[5] = 59.9; 
-    X[6] = 50862.49; Y[6] = 119.79; 
-    X[7] = 57135.73; Y[7] = 330.66; 
-    X[8] = 61811.92; Y[8] = 923.67; 
-    X[9] = 65955.41; Y[9] = 1411.74; 
-    X[10] = 68883.14; Y[10] = 2040.39; 
-    X[11] = 72891.84; Y[11] = 3159.09; 
-    X[12] = 76900.55; Y[12] = 4277.79; 
-    X[13] = 82700.15; Y[13] = 6485.49; 
-    X[14] = 86547.22; Y[14] = 10342.53; 
-    X[15] = 90394.28; Y[15] = 14199.57; 
-    X[16] = 90394.28; Y[16] = 19211.94; 
-    X[17] = 90394.28; Y[17] = 24750.99; 
-    X[18] = 86653.54; Y[18] = 28554.57; 
-    X[19] = 82913.87; Y[19] = 32358.15; 
-    X[20] = 79268.72; Y[20] = 33795.63; 
-    X[21] = 76154.12; Y[21] = 35057.88; 
-    X[22] = 74484.05; Y[22] = 35583.57; 
-    X[23] = 70409.29; Y[23] = 36523.08; 
-    X[24] = 66334.54; Y[24] = 37462.59; 
-    X[25] = 64662.32; Y[25] = 37742.76; 
-    X[26] = 60137.56; Y[26] = 38336.76; 
-    X[27] = 55689.05; Y[27] = 38896.11; 
-    X[28] = 47782.26; Y[28] = 39001.05; 
-    X[29] = 44054.41; Y[29] = 38969.37; 
-    X[30] = 40326.55; Y[30] = 38937.69; 
-    X[31] = 36744.76; Y[31] = 38832.75; 
-    X[32] = 32133.01; Y[32] = 38481.3; 
-    X[33] = 27597.5; Y[33] = 38130.84; 
-    X[34] = 21918.19; Y[34] = 37007.19; 
-    X[35] = 17870.29; Y[35] = 35901.36; 
-    X[36] = 13822.38; Y[36] = 34795.53; 
-    X[37] = 13593.62; Y[37] = 34726.23; 
-    X[38] = 13365.93; Y[38] = 34620.3; 
-    X[39] = 9226.73; Y[39] = 33113.52; 
-    X[40] = 6246.38; Y[40] = 30888; 
-    X[41] = 3266.03; Y[41] = 28662.48; 
-    X[42] = 1632.48; Y[42] = 25789.5; 
-    X[43] = 0; Y[43] = 22915.53; 
-    X[44] = 0; Y[44] = 19201.05; 
-    X[45] = 0; Y[45] = 14329.26; 
-    X[46] = 3746.11; Y[46] = 10456.38; 
-    X[47] = 7493.3; Y[47] = 6583.5; 
-    X[48] = 13503.4; Y[48] = 4341.15; 
-    X[49] = 18795; Y[49] = 2963.07; 
+    X[0] = 24086.6; Y[0] = 1584.99;
+    X[1] = 25878.03; Y[1] = 1268.19;
+    X[2] = 30642.29; Y[2] = 669.24;
+    X[3] = 35139.13; Y[3] = 104.94;
+    X[4] = 43028.74; Y[4] = 0;
+    X[5] = 46945.61; Y[5] = 59.9;
+    X[6] = 50862.49; Y[6] = 119.79;
+    X[7] = 57135.73; Y[7] = 330.66;
+    X[8] = 61811.92; Y[8] = 923.67;
+    X[9] = 65955.41; Y[9] = 1411.74;
+    X[10] = 68883.14; Y[10] = 2040.39;
+    X[11] = 72891.84; Y[11] = 3159.09;
+    X[12] = 76900.55; Y[12] = 4277.79;
+    X[13] = 82700.15; Y[13] = 6485.49;
+    X[14] = 86547.22; Y[14] = 10342.53;
+    X[15] = 90394.28; Y[15] = 14199.57;
+    X[16] = 90394.28; Y[16] = 19211.94;
+    X[17] = 90394.28; Y[17] = 24750.99;
+    X[18] = 86653.54; Y[18] = 28554.57;
+    X[19] = 82913.87; Y[19] = 32358.15;
+    X[20] = 79268.72; Y[20] = 33795.63;
+    X[21] = 76154.12; Y[21] = 35057.88;
+    X[22] = 74484.05; Y[22] = 35583.57;
+    X[23] = 70409.29; Y[23] = 36523.08;
+    X[24] = 66334.54; Y[24] = 37462.59;
+    X[25] = 64662.32; Y[25] = 37742.76;
+    X[26] = 60137.56; Y[26] = 38336.76;
+    X[27] = 55689.05; Y[27] = 38896.11;
+    X[28] = 47782.26; Y[28] = 39001.05;
+    X[29] = 44054.41; Y[29] = 38969.37;
+    X[30] = 40326.55; Y[30] = 38937.69;
+    X[31] = 36744.76; Y[31] = 38832.75;
+    X[32] = 32133.01; Y[32] = 38481.3;
+    X[33] = 27597.5; Y[33] = 38130.84;
+    X[34] = 21918.19; Y[34] = 37007.19;
+    X[35] = 17870.29; Y[35] = 35901.36;
+    X[36] = 13822.38; Y[36] = 34795.53;
+    X[37] = 13593.62; Y[37] = 34726.23;
+    X[38] = 13365.93; Y[38] = 34620.3;
+    X[39] = 9226.73; Y[39] = 33113.52;
+    X[40] = 6246.38; Y[40] = 30888;
+    X[41] = 3266.03; Y[41] = 28662.48;
+    X[42] = 1632.48; Y[42] = 25789.5;
+    X[43] = 0; Y[43] = 22915.53;
+    X[44] = 0; Y[44] = 19201.05;
+    X[45] = 0; Y[45] = 14329.26;
+    X[46] = 3746.11; Y[46] = 10456.38;
+    X[47] = 7493.3; Y[47] = 6583.5;
+    X[48] = 13503.4; Y[48] = 4341.15;
+    X[49] = 18795; Y[49] = 2963.07;
     X[50] = 24086.6; Y[50] = 1584.99;
 
     /*var min_y = 23530,
@@ -2207,30 +2197,30 @@ CVolume.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._s();
     pGraphics._m(XX[0], YY[0]);
-    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] ); 
-    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] ); 
-    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] ); 
-    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] ); 
-    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] ); 
-    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] ); 
-    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] ); 
-    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] ); 
-    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] ); 
-    pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] ); 
-    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] ); 
-    pGraphics._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] ); 
-    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] ); 
-    pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] ); 
-    pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] ); 
-    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] ); 
-    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] ); 
-    pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] ); 
-    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] ); 
-    pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] ); 
-    pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] ); 
-    pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] ); 
-    pGraphics._c(XX[44], YY[44], XX[45], YY[45], XX[46], YY[46] ); 
-    pGraphics._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] ); 
+    pGraphics._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
+    pGraphics._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
+    pGraphics._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
+    pGraphics._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    pGraphics._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
+    pGraphics._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    pGraphics._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
+    pGraphics._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
+    pGraphics._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
+    pGraphics._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
+    pGraphics._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
+    pGraphics._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24] );
+    pGraphics._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
+    pGraphics._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
+    pGraphics._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
+    pGraphics._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
+    pGraphics._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34] );
+    pGraphics._c(XX[34], YY[34], XX[35], YY[35], XX[36], YY[36] );
+    pGraphics._c(XX[36], YY[36], XX[37], YY[37], XX[38], YY[38] );
+    pGraphics._c(XX[38], YY[38], XX[39], YY[39], XX[40], YY[40] );
+    pGraphics._c(XX[40], YY[40], XX[41], YY[41], XX[42], YY[42] );
+    pGraphics._c(XX[42], YY[42], XX[43], YY[43], XX[44], YY[44] );
+    pGraphics._c(XX[44], YY[44], XX[45], YY[45], XX[46], YY[46] );
+    pGraphics._c(XX[46], YY[46], XX[47], YY[47], XX[48], YY[48] );
     pGraphics._c(XX[48], YY[48], XX[49], YY[49], XX[50], YY[50] );
     pGraphics.ds();
 }
@@ -2804,27 +2794,27 @@ _old_CContourIntegral.prototype.drawPath = function(XX, YY)
 {
 
     MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]); 
-    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]); 
-    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6]); 
-    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8]); 
-    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10]); 
-    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12]); 
-    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14]); 
+    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2]);
+    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4]);
+    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6]);
+    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8]);
+    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10]);
+    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12]);
+    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14]);
     MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16]);
     MathControl.pGraph.df();
 
     MathControl.pGraph.b_color1(255, 255, 255, 255);
     MathControl.pGraph._s();
     MathControl.pGraph._m(XX[16], YY[16]);
-    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18]); 
-    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20]); 
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22]); 
-    MathControl.pGraph._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24]); 
-    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26]); 
-    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28]); 
-    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30]); 
-    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32]); 
+    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18]);
+    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20]);
+    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22]);
+    MathControl.pGraph._c(XX[22], YY[22], XX[23], YY[23], XX[24], YY[24]);
+    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26]);
+    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28]);
+    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30]);
+    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32]);
     MathControl.pGraph._c(XX[32], YY[32], XX[33], YY[33], XX[34], YY[34]);
 }
 
@@ -2845,14 +2835,14 @@ CContourIntegral.prototype.draw = function(pGraphics)
 
     var integr = new CIntegral();
     coord2 = integr.getCoord();
-    
+
     var XX = coord2.X,
         YY = coord2.Y,
         WW = coord2.W,
         HH = coord2.H;
 
     //var textScale =  this.getTxtPrp().FontSize/850;// 1000 pt
-    var textScale =  this.getPrpToControlLetter().FontSize/850;// 1000 pt
+    var textScale =  this.getCtrPrp().FontSize/850;// 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
     var shX = (WW - W)*alpha/2,
@@ -2897,7 +2887,7 @@ CContourIntegral.prototype.draw = function(pGraphics)
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -3357,7 +3347,7 @@ CSurfaceIntegral.prototype.draw = function(pGraphics)
 
 
     //var textScale =  this.getTxtPrp().FontSize/850; // 1000 pt
-    var textScale =  this.getPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3404,7 +3394,7 @@ CSurfaceIntegral.prototype.draw = function(pGraphics)
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width =  14.2296*betta,
         _height = 13.7*betta;
@@ -3933,7 +3923,7 @@ CVolumeIntegral.prototype.draw = function(pGraphics)
         HH = coord2.H;
 
 
-    var textScale =  this.getPrpToControlLetter().FontSize/850; // 1000 pt
+    var textScale =  this.getCtrPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3980,7 +3970,7 @@ CVolumeIntegral.prototype.draw = function(pGraphics)
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
     //var betta = this.getTxtPrp().FontSize/36;
-    var betta = this.getPrpToControlLetter().FontSize/36;
+    var betta = this.getCtrPrp().FontSize/36;
 
     var _width =  18.925368*betta,
         _height = 13.7*betta;

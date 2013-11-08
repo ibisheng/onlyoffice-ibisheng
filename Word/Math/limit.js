@@ -99,8 +99,7 @@ CLimit.prototype.getIterator = function()
 }
 CLimit.prototype.setDistance = function()
 {
-    //this.dH = 0.03674768518518519*this.getTxtPrp().FontSize;
-    this.dH = 0.03674768518518519*this.getPrpToControlLetter().FontSize;
+    this.dH = 0.03674768518518519*this.getCtrPrp().FontSize;
 }
 
 
@@ -157,8 +156,7 @@ CMathFunc.prototype.init = function()
 }
 CMathFunc.prototype.setDistance = function()
 {
-    //this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
-    this.dW = this.getPrpToControlLetter().FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.getCtrPrp().FontSize/6*g_dKoef_pt_to_mm;
 }
 CMathFunc.prototype.getFName = function()
 {

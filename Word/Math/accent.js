@@ -17,6 +17,7 @@
 function CCircumflex()
 {
     //this.incline = 0;
+    this.Parent = null;
     this.turn = TURN_0;
 }
 CCircumflex.prototype.setTurn = function(turn)
@@ -25,7 +26,7 @@ CCircumflex.prototype.setTurn = function(turn)
 }
 CCircumflex.prototype.fixSize = function(mesure, bIncl)
 {
-    var alpha = this.txtPrp.FontSize/36;
+    var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
@@ -77,9 +78,9 @@ CCircumflex.prototype.draw = function(pGraphics)
     var x = this.pos.x,
         y = this.pos.y;
 
-    var fontSize = this.txtPrp.FontSize;
-
+    var fontSize = this.Parent.getCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
+
     penW *= 96/25.4;
 
     // g_dKoef_px_to_mm = 25.4/96
@@ -173,23 +174,24 @@ CCircumflex.prototype.draw = function(pGraphics)
     pGraphics.SetIntegerGrid(intGrid);
 
 }
-CCircumflex.prototype.setTxtPrp = function(txtPrp)
-{
-    this.txtPrp = txtPrp;
-}
 CCircumflex.prototype.setPosition = function(pos)
 {
     this.pos = pos;
+}
+CCircumflex.prototype.relate = function(parent)
+{
+    this.Parent = parent;
 }
 
 
 function CLine()
 {
     this.PEN_W = 0.04;
+    this.Parent = null;
 }
 CLine.prototype.fixSize = function(measure)
 {
-    var alpha = this.txtPrp.FontSize/36;
+    var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
@@ -200,7 +202,8 @@ CLine.prototype.fixSize = function(measure)
 }
 CLine.prototype.draw = function(pGraphics)
 {
-    var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
     //var penY = penW/2*25.4/96; //для того чтобы линии совпадали (для одинарной и двойной черты)
@@ -227,18 +230,19 @@ CLine.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CLine.prototype.setTxtPrp = function(txtPrp)
+CLine.prototype.relate = function(parent)
 {
-    this.txtPrp = txtPrp;
+    this.Parent = parent;
 }
 
 function CDoubleLine()
 {
     this.PEN_W = 0.04;
+    this.Parent = null;
 }
 CDoubleLine.prototype.fixSize = function(measure)
 {
-    var alpha = this.txtPrp.FontSize/36;
+    var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
@@ -251,13 +255,10 @@ CDoubleLine.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CDoubleLine.prototype.setTxtPrp = function(txtPrp)
-{
-    this.txtPrp = txtPrp;
-}
 CDoubleLine.prototype.draw = function(pGraphics)
 {
-    var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    var fontSize = this.Parent.getCtrPrp().FontSize;
+    var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
 
     //var penY = penW/2*25.4/96; //для того чтобы линии совпадали (для одинарной и двойной черты)
@@ -282,13 +283,17 @@ CDoubleLine.prototype.draw = function(pGraphics)
     pGraphics.ds();
 
 }
+CDoubleLine.prototype.relate = function(parent)
+{
+    this.Parent = parent;
+}
 
 function CTilde()
 {
 }
 CTilde.prototype.fixSize = function()
 {
-    var betta = this.txtPrp.FontSize/36;
+    var betta = this.Parent.getCtrPrp().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
@@ -332,8 +337,7 @@ CTilde.prototype.draw = function(pGraphics)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.txtPrp.FontSize;
-
+    var fontSize = this.Parent.getCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -383,9 +387,9 @@ CTilde.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CTilde.prototype.setTxtPrp = function(txtPrp)
+CTilde.prototype.relate = function(parent)
 {
-    this.txtPrp = txtPrp;
+    this.Parent = parent;
 }
 
 function CBreve()
@@ -398,7 +402,7 @@ CBreve.prototype.setTurn = function(tturn)
 }
 CBreve.prototype.fixSize = function()
 {
-    var betta = this.txtPrp.FontSize/36;
+    var betta = this.Parent.getCtrPrp().FontSize/36;
 
     var width =  4.2333333333333325*betta;
     var height = 2.469444444444445*betta;
@@ -442,8 +446,7 @@ CBreve.prototype.draw = function(pGraphics)
     var XX = new Array(),
         YY = new Array();
 
-    var fontSize = this.txtPrp.FontSize;
-
+    var fontSize = this.Parent.getCtrPrp().FontSize;
     var textScale = fontSize/1000, // 1000 pt
         alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
 
@@ -500,15 +503,16 @@ CBreve.prototype.draw = function(pGraphics)
     pGraphics.SetIntegerGrid(intGrid);
 
 }
-CBreve.prototype.setTxtPrp = function(txtPrp)
+CBreve.prototype.relate = function(parent)
 {
-    this.txtPrp = txtPrp;
+    this.Parent = parent;
 }
 
 function CSign()
 {
     this.sign = new CMathText();
     this.type = null;
+    this.Parent = null;
 }
 CSign.prototype.setSign = function(props)
 {
@@ -575,7 +579,7 @@ CSign.prototype.fixSize = function(bIncline)
 {
     this.sign.recalculateSize();
 
-    this.dH = 0.7*this.txtPrp.FontSize/36;
+    this.dH = 0.7*this.Parent.getCtrPrp().FontSize/36;
 
     var height = this.sign.size.height + this.dH,
         width = this.sign.size.widthG;
@@ -589,10 +593,9 @@ CSign.prototype.draw = function(pGraphics)
 {
     this.sign.draw(pGraphics);
 }
-CSign.prototype.setTxtPrp = function(txtPrp)
+CSign.prototype.relate = function(parent)
 {
-    this.txtPrp = txtPrp;
-    //this.sign.setTxtPrp(txtPrp);
+    this.Parent = parent;
 }
 
 function old_CAccent()
@@ -1083,7 +1086,4 @@ CAccent.prototype.getCenter = function()
 CAccent.prototype.getProps = function()
 {
     var prps = {};
-
-
-
 }

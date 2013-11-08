@@ -80,6 +80,9 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
 
     },
+
+
+    ///////// RunPrp, CtrPrp
     setCtrPrp: function(runPrp)
     {
         this.CtrPrp.Merge(runPrp); // only runPrp for paragraph
@@ -89,9 +92,19 @@ CMathBase.prototype =
         var ctrPrp = new CTextPr();
         ctrPrp.Merge(DEFAULT_RUN_PRP);
         ctrPrp.Merge(this.CtrPrp);
+        ctrPrp.Merge(this.Composition.GetFirstPrp() );
         return ctrPrp;
     },
-    getPrpToControlLetter: function()
+    getCtrPrp_2: function()
+    {
+        var ctrPrp = new CTextPr();
+        ctrPrp.Merge(DEFAULT_RUN_PRP);
+        ctrPrp.Merge(this.CtrPrp);
+
+        return ctrPrp;
+    },
+    // getPrpToControlLetter => getCtrPrp
+    old_getPrpToControlLetter: function()
     {
         var rPrp = new CTextPr();
         //rPrp.Merge(DEFAULT_RUN_PRP);
@@ -100,6 +113,18 @@ CMathBase.prototype =
 
         return rPrp;
     },
+    addRPrp: function(rPrp)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if( !this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].addRPrp(rPrp);
+            }
+    },
+    /////////
+
+
     setComposition: function(composition)
     {
         this.Composition = composition;

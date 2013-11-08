@@ -48,8 +48,7 @@ CFraction.prototype.getCenter = function()
 
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {
-        //var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 /2;
-        var penW = this.getPrpToControlLetter().FontSize* 25.4/96 * 0.08 /2;
+        var penW = this.getCtrPrp().FontSize* 25.4/96 * 0.08 /2;
         center = this.elements[0][0].size.height + penW;
     }
     else if(this.type == SKEWED_FRACTION)
@@ -74,7 +73,7 @@ CFraction.prototype.draw = function(pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(pGraphics)
 {
-    var ctrPrp = this.getPrpToControlLetter();
+    var ctrPrp = this.getCtrPrp();
     var penW = ctrPrp.FontSize* this.reduct* 25.4/96 * 0.08;
 
     var x1 = this.pos.x,
@@ -94,8 +93,8 @@ CFraction.prototype.drawBarFraction = function(pGraphics)
 }
 CFraction.prototype.drawSkewedFraction = function(pGraphics)
 {
-    var ctrPrp = this.getPrpToControlLetter();
-    //var fontSize = this.getTxtPrp().FontSize;
+    var ctrPrp = this.getCtrPrp();
+
     var penW = ctrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     var gap = this.gapSlash/2 - penW/7.5;
@@ -199,7 +198,7 @@ CFraction.prototype.drawLinearFraction = function(pGraphics)
         x2 = this.pos.x + this.elements[0][0].size.width + shift,
         y2 = this.pos.y + this.size.center + desc;
 
-    var ctrPrp = this.getPrpToControlLetter();
+    var ctrPrp = this.getCtrPrp();
     var penW = ctrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     pGraphics.SetFont(ctrPrp);
@@ -248,7 +247,7 @@ CFraction.prototype.recalculateSize = function()
 }
 CFraction.prototype.recalculateSkewed = function()
 {
-    var ctrPrp = this.getPrpToControlLetter();
+    var ctrPrp = this.getCtrPrp();
     this.gapSlash = 5.011235894097222 * ctrPrp.FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
@@ -260,7 +259,7 @@ CFraction.prototype.recalculateLinear = function()
 {
     var H = this.elements[0][0].size.center + this.elements[0][1].size.height - this.elements[0][1].size.center;
     //var txtPrp = this.getTxtPrp();
-    var ctrPrp = this.getPrpToControlLetter();
+    var ctrPrp = this.getCtrPrp();
 
     var gap = 5.011235894097222*ctrPrp.FontSize/36;
 
@@ -393,6 +392,7 @@ CNumerator.prototype.recalculateSize = function()
     var arg = this.elements[0][0].size;
     //var txtPrp = this.getTxtPrp();
     //txtPrp.FontSize *= this.Parent.reduct;
+
     var ctrPrp = this.getCtrPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
@@ -454,6 +454,7 @@ CDenominator.prototype.recalculateSize = function()
     var arg = this.elements[0][0].size;
     /*var txtPrp = this.getTxtPrp();
     txtPrp.FontSize *= this.Parent.reduct;*/
+
     var ctrPrp = this.getCtrPrp();
 
     var gap = 7.832769097222222 * ctrPrp.FontSize/36,

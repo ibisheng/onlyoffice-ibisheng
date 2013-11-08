@@ -4,8 +4,7 @@ function CMathMatrix()
     this.lineGapRow = 1;
     this.gaps = null;
     this.plcHide = false;
-	this.row = 0;
-	this.column = 0;
+
 
     this.spaceRow =
     {
@@ -28,6 +27,11 @@ function CMathMatrix()
         row: new Array(),
         column: new Array()
     };
+
+    ////  special for "read"  ////
+    this.row = 0;
+    this.column = 0;
+    ////
 
     CMathBase.call(this);
 }
@@ -161,8 +165,7 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 }
 CMathMatrix.prototype.recalculateSize = function()
 {
-    //var txtPrp = this.getTxtPrp();
-    var txtPrp = this.getPrpToControlLetter();
+    var txtPrp = this.getCtrPrp();
 
     var interval = this.getLineGap(txtPrp);
     this.gaps.column[0] = 0;
@@ -466,7 +469,6 @@ CMathMatrix.prototype.baseJustification = function(type)
 ////
 function CEqArray()
 {
-	this.row = 0;
     CMathMatrix.call(this);
 }
 extend(CEqArray, CMathMatrix);
