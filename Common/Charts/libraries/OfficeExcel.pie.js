@@ -133,8 +133,6 @@
 			centerx  = (this.canvas.width + this._chartGutter._left)/2;
 		if(centerx <= (this.radius + 14) || (this.canvas.width - (this.radius*2) - this._chartGutter._left) <= 14)
 			centerx = this.centerx;
-			
-            radians  = radians * this._otherProps._effect_roundrobin_multiplier;
 
         context.beginPath();
 

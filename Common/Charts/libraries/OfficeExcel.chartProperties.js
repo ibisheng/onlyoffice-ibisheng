@@ -52,8 +52,6 @@ OfficeExcel.OtherProps = function()
 
     this._align = 'center';
 
-    this._effect_roundrobin_multiplier = 1;
-
     this._xlabels = true;
     this._xlabels_offset = 0;
     this._xlabels_inside = false;
