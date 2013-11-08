@@ -1919,22 +1919,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         return OfficeExcel.isIE7() || OfficeExcel.isIE8();
     }
 
-
-    /**
-    * A basic Array shift gunction
-    * 
-    * @param  object The numerical array to work on
-    * @return        The new array
-    */
-    OfficeExcel.array_shift = function (arr)
-    {
-        var ret = [];
-        
-        for (var i=1; i<arr.length; ++i) ret.push(arr[i]);
-        
-        return ret;
-    }
-
     /**
     * These are older functions that were used before the move to seperate gutter settings
     */
