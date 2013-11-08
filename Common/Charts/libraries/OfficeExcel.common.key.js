@@ -127,7 +127,7 @@
 			}
 		}
 		
-		heigthTextKey = 24;
+		var heigthTextKey = 24;
 		if(key && key.length != 0)
 		{
 			var props = getMaxPropertiesText(drwContext,font,bar._otherProps._key);
@@ -135,12 +135,6 @@
 		}
 		
         var heightKeyVer = key.length*heigthTextKey;
-		
-        var heightKey = 24;
-        var widthKey = textWidth*key.length + key.length*30 + 11*(key.length-1);
-        //var widthKeyVer = textWidth + 30;
-        var widthKeyVer = 61;
-        //var margin = obj._chartGutter._top - 14;
         
         if (typeof(obj._otherProps._key_halign) == 'string') {
             if (obj._otherProps._key_halign == 'left') {

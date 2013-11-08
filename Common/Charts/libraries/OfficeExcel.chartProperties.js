@@ -75,9 +75,6 @@ OfficeExcel.OtherProps = function()
     this._colors_reverse = false;
     this._colors_alternate = null;
 
-    this._title_yaxis_align = 'left';
-    this._title_yaxis_position = 'left';
-
     this._radius = null;
 
     this._exploded = 0;

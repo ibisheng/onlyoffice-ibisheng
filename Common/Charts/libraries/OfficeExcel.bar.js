@@ -599,15 +599,10 @@
                         this.context.stroke();
 
                     // Regular bar
-                    } else if (variant == 'bar' || variant == '3d' || variant == 'glass' || variant == 'bevel') {
+                    } else if (variant == 'bar' || variant == '3d' || variant == 'bevel') {
                     
-                        if (variant == 'glass') {
-                            OfficeExcel.filledCurvyRect(this.context, x + hmargin, y, barWidth, height, 3, this.data[i] > 0, this.data[i] > 0, this.data[i] < 0, this.data[i] < 0);
-                            OfficeExcel.strokedCurvyRect(this.context, x + hmargin, y, barWidth, height, 3, this.data[i] > 0, this.data[i] > 0, this.data[i] < 0, this.data[i] < 0);
-                        } else {
-                            this.context.strokeRect(x + hmargin, y, barWidth, height);
-                            this.context.fillRect(x + hmargin, y, barWidth, height);
-                        }
+                        this.context.strokeRect(x + hmargin, y, barWidth, height);
+                        this.context.fillRect(x + hmargin, y, barWidth, height);
 
                         // 3D effect
                         if (variant == '3d') {
@@ -665,23 +660,6 @@
 
                             this.context.strokeStyle = prevStrokeStyle;
                             this.context.fillStyle   = prevFillStyle;
-                        
-                        // Glass variant
-                        } else if (variant == 'glass') {
- 
-                            var grad = this.context.createLinearGradient(
-                                                                         x + hmargin,
-                                                                         y,
-                                                                         x + hmargin + (barWidth / 2),
-                                                                         y
-                                                                        );
-                            grad.addColorStop(0, 'rgba(255,255,255,0.9)');
-                            grad.addColorStop(1, 'rgba(255,255,255,0.5)');
-
-                            this.context.beginPath();
-                            this.context.fillStyle = grad;
-                            this.context.fillRect(x + hmargin + 2,y + (this.data[i] > 0 ? 2 : 0),(barWidth / 2) - 2,height - 2);
-                            this.context.fill();
                         }
 
                         // This bit draws the text labels that appear above the bars if requested
