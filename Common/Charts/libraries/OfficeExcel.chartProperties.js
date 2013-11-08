@@ -132,12 +132,8 @@ OfficeExcel.OtherProps = function()
     this._key_halign = 'right';
     this._key_text_size = 10;
 
-    this._noendxtick = false;
-    this._noendytick = true;
-
     this._filled = false;
     this._filled_range = false;
-    this._filled_accumulative = true;
 
     this._xaxis = true;
 

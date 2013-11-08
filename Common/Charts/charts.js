@@ -1800,9 +1800,6 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 	bar.firstData = copyData;
 	bar._otherProps._ylabels_count = 'auto';
 
-	//обводка графика для поверхностной диаграммы
-	bar._otherProps._filled_accumulative = false;
-
 	if (bar._otherProps._filled != true) {
 		bar._chartGutter._left = 35;
 		bar._chartGutter._bottom = 35;

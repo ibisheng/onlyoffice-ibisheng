@@ -353,25 +353,11 @@
 
 			for (y=this._chartGutter._top,countTick = 0; y <= this.canvas.height - this._chartGutter._bottom + 1 + (this._otherProps._xaxispos == 'center' ? 1 : 0) ; y+=(graphHeight / numyticks),countTick++) {
 
-				// This is here to accomodate the X axis being at the center
-				//if (y == (this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) / 2)) ) continue;
 				if(countTick == numyticks)
 					y = this.canvas.height - this._chartGutter._bottom;
-			   // if (this._otherProps._yaxispos == 'left') {
-					context.moveTo(this.nullPositionOX, AA(this, y));
-					context.lineTo(this.nullPositionOX - 3, AA(this, y));
-				/*} else {
-					context.moveTo(this.nullPositionOX +3, AA(this, y));
-					context.lineTo(this.nullPositionOX, AA(this, y));
-				}*/
-				
-				/**
-				* Draw an extra tick if the X axis isn't being shown
-				*/
-				if (this._otherProps._xaxis == false && this._otherProps._noendytick == false) {
-					this.context.moveTo(this._chartGutter._left, AA(this, this.canvas.height - this._chartGutter._bottom));
-					this.context.lineTo(this._chartGutter._left - 3, AA(this, this.canvas.height - this._chartGutter._bottom));
-				}
+
+				context.moveTo(this.nullPositionOX, AA(this, y));
+				context.lineTo(this.nullPositionOX - 3, AA(this, y));
 			}
 		}
 

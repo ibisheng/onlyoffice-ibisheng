@@ -288,25 +288,17 @@
 				yEnd = AA(this, yEnd);
 				
 				//////////////// X TICKS ////////////////
-				var noEndXTick = this._otherProps._noendxtick;
 
 				for (x=this._chartGutter._left + (yaxispos == 'left' ? xTickGap : 0); x<this.canvas.width - this._chartGutter._right + (yaxispos == 'left' ? 5 : 0); x+=xTickGap) {
 
-					if (yaxispos == 'left' && !noEndXTick && x > this._chartGutter._left) {
+					if (yaxispos == 'left' && x > this._chartGutter._left) {
 						this.context.moveTo(AA(this, x), yStart);
 						this.context.lineTo(AA(this, x), yEnd);
 					
-					} else if (yaxispos == 'left' && noEndXTick && x > this._chartGutter._left && x < (this.canvas.width - this._chartGutter._right) ) {
+					} else if (yaxispos == 'right' && x < (this.canvas.width - this._chartGutter._right)) {
 						this.context.moveTo(AA(this, x), yStart);
 						this.context.lineTo(AA(this, x), yEnd);
 					
-					} else if (yaxispos == 'right' && x < (this.canvas.width - this._chartGutter._right) && !noEndXTick) {
-						this.context.moveTo(AA(this, x), yStart);
-						this.context.lineTo(AA(this, x), yEnd);
-					
-					} else if (yaxispos == 'right' && x < (this.canvas.width - this._chartGutter._right) && x > (this._chartGutter._left) && noEndXTick) {
-						this.context.moveTo(AA(this, x), yStart);
-						this.context.lineTo(AA(this, x), yEnd);
 					}
 				}
 				

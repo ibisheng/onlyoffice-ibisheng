@@ -71,18 +71,6 @@
         // Reset max
         this.max = 0;
 
-        if (this._otherProps._filled && !this._otherProps._filled_range && this.data.length > 1 && this._otherProps._filled_accumulative) {
-
-            var accumulation = [];
-
-            for (var _set = 0; _set < this.data.length; ++_set) {
-                for (var point = 0; point < this.data[_set].length; ++point) {
-                    this.data[_set][point] = Number(accumulation[point] ? accumulation[point] : 0) + this.data[_set][point];
-                    accumulation[point] = this.data[_set][point];
-                }
-            }
-        }
-
         // Max y
         //if('auto' != this._otherProps._ylabels_count)
             if (this._otherProps._ymax && this.scale) {
@@ -210,65 +198,6 @@
 			}
 
             this.context.stroke();
-        }
-
-        /**
-        * If the line is filled re-stroke the lines
-        */
-        if (this._otherProps._filled && this._otherProps._filled_accumulative) {
-
-            for (var i=0; i<this.coords2.length; ++i) {
-
-                this.context.beginPath();
-                this.context.lineWidth = this.GetLineWidth(i);
-                this.context.strokeStyle = this._otherProps._colors[i];
-
-                for (var j=0; j<this.coords2[i].length; ++j) {
-
-                    if (j == 0 || this.coords2[i][j][1] == null || (this.coords2[i][j - 1] && this.coords2[i][j - 1][1] == null)) {
-                        this.context.moveTo(this.coords2[i][j][0], this.coords2[i][j][1]);
-                    } else {
-                        if (this._otherProps._stepped) {
-                            this.context.lineTo(this.coords2[i][j][0], this.coords2[i][j - 1][1]);
-                        }
-                        this.context.lineTo(this.coords2[i][j][0], this.coords2[i][j][1]);
-                    }
-                }
-
-                this.context.stroke();
-                // No fill!
-            }
-
-            //Redraw the tickmarks
-            if (this._otherProps._tickmarks) {
-
-                this.context.beginPath();
-
-                this.context.fillStyle = 'white';
-
-                for (var i = 0; i < this.coords2.length; ++i) {
-                    this.context.beginPath();
-                    this.context.strokeStyle = this._otherProps._colors[i];
-                    for (var j = 0; j < this.coords2[i].length; ++j) {
-                        if (typeof(this.coords2[i][j]) == 'object' && typeof(this.coords2[i][j][0]) == 'number' && typeof(this.coords2[i][j][1]) == 'number') {
-
-                            var tickmarks = typeof(this._otherProps._tickmarks) == 'object' ? this._otherProps._tickmarks[i] : this._otherProps._tickmarks;
-
-                            this.DrawTick ( this.coords2[i][j],
-                                            this.coords2[i][j][0],
-                                            this.coords2[i][j][1],
-                                            this.context.strokeStyle,
-                                            j == 0 ? 0 : this.coords2[i][j - 1][0],
-                                            j == 0 ? 0 : this.coords2[i][j - 1][1],
-                                            tickmarks,
-                                            j);
-                        }
-                    }
-                }
-
-                this.context.stroke();
-                this.context.fill();
-            }
         }
 
         // Draw the labels
@@ -431,14 +360,6 @@
 
 					if (this._otherProps._yaxispos == 'right' && x >= (this.canvas.width - this._chartGutter._right - 1) )
 						break;
-
-					// If the last tick is not desired...
-					if (this._otherProps._noendxtick) {
-						if (this._otherProps._yaxispos == 'left' && x >= (this.canvas.width - this._chartGutter._right))
-							break;
-						else if (this._otherProps._yaxispos == 'right' && x == this._chartGutter._left)
-							continue;
-					}
 
 					var yStart = this._otherProps._xaxispos == 'center' ? (this._chartGutter._top + (this.grapharea / 2)) - 3 : this.canvas.height - this._chartGutter._bottom;
 					var yEnd = this._otherProps._xaxispos == 'center' ? yStart + 6 : this.canvas.height - this._chartGutter._bottom - (x % 60 == 0 ? this._otherProps._largexticks * this._otherProps._tickdirection : this._otherProps._smallxticks * this._otherProps._tickdirection);
@@ -1252,35 +1173,15 @@
         */
         if (this._otherProps._filled && !this._otherProps._filled_range) {
 
-            // Is this needed ??
-            var fillStyle = this._otherProps._fillstyle;
+            if (this._otherProps._xaxispos == 'top') {
+				this.context.lineTo(xPos, this._chartGutter._top +  1);
+				this.context.lineTo(lineCoords[0][0],this._chartGutter._top + 1);
+			} else if (typeof(lineCoords[i - 1][1]) == 'number') {
+				var yPosition = this.nullPositionOX;
 
-            /**
-            * Draw the bottom edge of the filled bit using either the X axis or the prevlinedata,
-            * depending on the index of the line. The first line uses the X axis, and subsequent
-            * lines use the prevLineCoords array
-            */
-            if (index > 0 && this._otherProps._filled_accumulative) {
-
-                this.context.lineTo(xPos, prevLineCoords ? prevLineCoords[i - 1][1] : (this.canvas.height - this._chartGutter._bottom - 1 + (this._otherProps._xaxispos == 'center' ? (this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) / 2 : 0)));
-
-                for (var k=(i - 1); k>=0; --k) {
-                    this.context.lineTo(k == 0 ? prevLineCoords[k][0] + 1: prevLineCoords[k][0], prevLineCoords[k][1]);
-                }
-            } else {
-
-                // Draw a line down to the X axis
-                if (this._otherProps._xaxispos == 'top') {
-                    this.context.lineTo(xPos, this._chartGutter._top +  1);
-                    this.context.lineTo(lineCoords[0][0],this._chartGutter._top + 1);
-                } else if (typeof(lineCoords[i - 1][1]) == 'number') {
-
-                    var yPosition = this.nullPositionOX;
-					
-                    this.context.lineTo(xPos,yPosition);
-                    this.context.lineTo(lineCoords[0][0],yPosition);
-                }
-            }
+				this.context.lineTo(xPos,yPosition);
+				this.context.lineTo(lineCoords[0][0],yPosition);
+			}
 
             this.context.fillStyle = fill;
 
