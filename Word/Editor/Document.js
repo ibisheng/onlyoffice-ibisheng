@@ -6957,8 +6957,14 @@ CDocument.prototype =
         var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage, this );
         var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
 
+        // Сначала посмотрим, попалили мы в текстовый селект
+        if ( true === this.Selection_Check( X, Y, this.CurPage, true ) )
+        {
+            // Начинаем передвижение текста
+            //this.DrawingDocument.S
+        }
         // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
-        if ( true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ) )
+        else if ( true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ) )
         {
             // Если был селект, тогда убираем его
             if ( true === this.Selection.Use )
@@ -7466,6 +7472,11 @@ CDocument.prototype =
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
+    },
+
+    On_DragTextEnd : function(NearPos)
+    {
+
     },
 
     Document_SelectNumbering : function(NumPr)
