@@ -84,7 +84,6 @@ OfficeExcel.OtherProps = function()
 
     this._labels = [];
     this._labels_above = false;
-    this._labels_above_decimals = 0;
     this._labels_above_size = null;
     this._labels_above_angle = null;
     this._labels_sticks = false;
@@ -141,8 +140,6 @@ OfficeExcel.OtherProps = function()
     this._filled = false;
     this._filled_range = false;
     this._filled_accumulative = true;
-
-    this._grouping = 'grouped';
 
     this._xaxis = true;
 

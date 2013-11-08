@@ -1415,7 +1415,6 @@
                             size,
                             x_pos,
                             y_pos - 5 - size,
-                            //x_val.toFixed(this._otherProps._labels_above_decimals) + ', ' + y_val.toFixed(this._otherProps._labels_above_decimals),
 							OfficeExcel.numToFormatText(OfficeExcel.num_round(y_val),formatTrue),
                             'center',
                             'center',

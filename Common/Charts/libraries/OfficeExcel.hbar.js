@@ -34,13 +34,12 @@
         this.coords = [];
         this.max    = 0;
 
-         var grouping = this._otherProps._grouping;
-
+		var value = 0;
         for (i=0; i<this.data.length; ++i) {
             if (typeof(this.data[i]) == 'object') {
-                var value = grouping == 'grouped' ? Number(OfficeExcel.array_max(this.data[i], true)) : Number(OfficeExcel.array_sum(this.data[i])) ;
+                value = Number(OfficeExcel.array_max(this.data[i], true));
             } else {
-                var value = Number(Math.abs(this.data[i]));
+                value = Number(Math.abs(this.data[i]));
             }
 
             this.max = Math.max(Math.abs(this.max), Math.abs(value));
@@ -574,50 +573,7 @@
                 /**
                 * Stacked bar chart
                 */
-                } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'stacked') {
-
-					var barHeight = height - (2 * vmargin);
-                    for (j=0; j<this.data[i].length; ++j) {
-                    
-
-                        // Set the fill/stroke colors
-                        this.context.strokeStyle = this._otherProps._strokecolor;
-                        this.context.fillStyle = this._otherProps._colors[j];
-                        
-
-                        // Sequential colors
-                        if (this._otherProps._colors_sequential) {
-                            this.context.fillStyle = this._otherProps._colors[colorIdx++];
-                        }
-                        
-
-                        var width = (((this.data[i][j]) / (this.max))) * this.graphwidth;
-                        var totalWidth = (OfficeExcel.array_sum(this.data[i]) / this.max) * this.graphwidth;
-
-                        this.context.strokeRect(x, this._chartGutter._top + this._otherProps._vmargin + (this.graphheight / this.data.length) * i, width, height - (2 * vmargin) );
-                        this.context.fillRect(x, this._chartGutter._top + this._otherProps._vmargin + (this.graphheight / this.data.length) * i, width, height - (2 * vmargin) );
-
-                        /**
-                        * Store the coords for tooltips
-                        */
-
-                        // The last property of this array is a boolean which tells you whether the value is the last or not
-                        this.coords.push([x,
-                                          y + vmargin,
-                                          width,
-                                          height - (2 * vmargin),
-                                          this.context.fillStyle,
-                                          OfficeExcel.array_sum(this.data[i]),
-                                          j == (this.data[i].length - 1)
-                                         ]);
-
-                        x += width;
-                    }
-
-                /**
-                * A grouped bar chart
-                */
-                } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'grouped') {
+                } else if (typeof(this.data[i]) == 'object') {
 
                     for (j=0; j<this.data[i].length; ++j) {
                         // Set the fill/stroke colors

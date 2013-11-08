@@ -76,8 +76,7 @@
             
         }
 		
-		if(this._otherProps._grouping == 'grouped')
-			this.DrawAboveLabels(isFormatCell);
+		this.DrawAboveLabels(isFormatCell);
 
         this.DrawLabels(isFormatCell);
 
@@ -368,20 +367,6 @@
         } else {
         
             this.min = this._otherProps._ymin;
-        
-            /*for (i=0; i<this.data.length; ++i) {
-                if (typeof(this.data[i]) == 'object') {
-                    var value = this._otherProps._grouping == 'grouped' ? Number(OfficeExcel.array_max(this.data[i], true)) : Number(OfficeExcel.array_sum(this.data[i])) ;
-
-                } else {
-                    var value = Number(this.data[i]);
-                }
-
-                this.max = Math.max(Math.abs(this.max), Math.abs(value));
-            }
-
-            this.scale = OfficeExcel.getScale(this.max, this);*/
-            //this.max   = this.scale[4];
             if('auto' == this._otherProps._ylabels_count)
             {
                 var lengSc = this.scale.length;
@@ -659,82 +644,7 @@
 
                     this.coords.push([x + hmargin, y, width - (2 * hmargin), height]);
 
-
-                /**
-                * Stacked bar
-                */
-                } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'stacked') {
-                    
-                    var barWidth     = width - (2 * hmargin);
-                    var startY       = 0;
-                    var dataset      = this.data[i];
-
-                    for (j=0; j<dataset.length; ++j) {
-
-                        /**
-                        * Set the fill and stroke colors
-                        */
-                        this.context.strokeStyle = strokeStyle
-                        this.context.fillStyle = colors[j];
-    
-                        if (this._otherProps._colors_reverse) {
-                            this.context.fillStyle = colors[this.data[i].length - j - 1];
-                        }
-                        
-                        if (this._otherProps._colors_sequential && colors[sequentialColorIndex]) {
-                            this.context.fillStyle = colors[sequentialColorIndex++];
-                        } else if (this._otherProps._colors_sequential) {
-                            this.context.fillStyle = colors[sequentialColorIndex - 1];
-                        }
-
-                        var height = (dataset[j] / this.max) * (this.canvas.height - this._chartGutter._top - this._chartGutter._bottom );
-
-                        // If the X axis pos is in the center, we need to half the  height
-                        if (xaxispos == 'center') {
-                            height /= 2;
-                        }
-
-                        var totalHeight = (OfficeExcel.array_sum(dataset) / this.max) * (this.canvas.height - hmargin - this._chartGutter._top - this._chartGutter._bottom);
-
-                        /**
-                        * Store the coords for tooltips
-                        */
-                        this.coords.push([x + hmargin, y, width - (2 * hmargin), height]);
-
-                        this.context.strokeRect(x + hmargin, y, width - (2 * hmargin), height);
-                        this.context.fillRect(x + hmargin, y, width - (2 * hmargin), height);
-
-                        
-                        if (j == 0) {
-                            var startY = y;
-                            var startX = x;
-                        }
-
-                        y += height;
-                    }
-
-                    // This bit draws the text labels that appear above the bars if requested
-                    if (this._otherProps._labels_above) {
-
-                        this.context.fillStyle = this._otherProps._text_color;
-                        OfficeExcel.Text(this.context,
-                                    this._otherProps._labels_above_font,
-                                    typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,
-                                    startX + (barWidth / 2) + this._otherProps._hmargin,
-                                    startY - 4,
-                                    String(this._otherProps._units_pre + OfficeExcel.array_sum(this.data[i]).toFixed(this._otherProps._labels_above_decimals) + this._otherProps._units_post),
-                                    this._otherProps._labels_above_angle ? 'bottom' : null,
-                                    this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
-                                    null,
-                                    this._otherProps._labels_above_angle,
-									null,
-									bold,
-									textOptions);
-                    }
-                /**
-                * Grouped bar
-                */
-                } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'grouped') {
+                } else if (typeof(this.data[i]) == 'object') {
                     this.context.lineWidth = this._otherProps._linewidth;
 
                     for (j=0; j<this.data[i].length; ++j) {
