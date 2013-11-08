@@ -1,25 +1,13 @@
     if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
-    /**
-    * The horizontal bar chart constructor. The horizontal bar is a minor variant
-    * on the bar chart. If you have big labels, this may be useful as there is usually
-    * more space available for them.
-    * 
-    * @param object canvas The canvas object
-    * @param array  data   The chart data
-    */
     OfficeExcel.HBar = function (chartCanvas, data)
     {
-        // Get the canvas and context objects
-        this.id                = null;
-        this.canvas            = chartCanvas ? chartCanvas : document.getElementById(id);
-        this.context           = this.canvas.getContext ? this.canvas.getContext("2d") : null;
+        this.canvas            = chartCanvas;
+        this.context           = (this.canvas && this.canvas.getContext) ? this.canvas.getContext("2d") : null;
         this.canvas.__object__ = this;
         this.data              = data;
         this.type              = 'hbar';
         this.coords            = [];
-        this.isOfficeExcel          = true;
-
 
         /**
         * Compatibility with older browsers
@@ -32,19 +20,6 @@
         this._otherProps    = new OfficeExcel.OtherProps();
         
         this.max = 0;
-        this.stackedOrGrouped  = false;
-
-        // Check for support
-        if (!this.canvas) {
-            alert('[HBAR] No canvas support');
-            return;
-        }
-
-        for (i=0; i<this.data.length; ++i) {
-            if (typeof(this.data[i]) == 'object') {
-                this.stackedOrGrouped = true;
-            }
-        }
     }
 
 
@@ -58,14 +33,6 @@
         */
         this.coords = [];
         this.max    = 0;
-
-        /**
-        * Check for xmin in stacked charts
-        */
-        if (this._otherProps._xmin > 0 && this._otherProps._grouping == 'stacked') {
-            alert('[HBAR] Using xmin is not supported with stacked charts, resetting xmin to zero');
-            this.__otherProps._xmin = 0;
-        }
 
          var grouping = this._otherProps._grouping;
 
@@ -609,12 +576,7 @@
                 */
                 } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'stacked') {
 
-                    if (this._otherProps._yaxispos == 'center') {
-                        alert('[HBAR] You can\'t have a stacked chart with the Y axis in the center, change it to grouped');
-                    }
-
-                    var barHeight = height - (2 * vmargin);
-
+					var barHeight = height - (2 * vmargin);
                     for (j=0; j<this.data[i].length; ++j) {
                     
 
@@ -770,10 +732,6 @@
     */
     OfficeExcel.HBar.prototype.RedrawBars = function (format)
     {
-        if (this._otherProps._noredraw) {
-            return;
-        }
-
         var coords = this.coords;
 
         var font   = this._otherProps._labels_above_font;

@@ -10,13 +10,6 @@ OfficeExcel.Gutter = function()
 
 OfficeExcel.OtherProps = function()
 {
-    this._curvy = false;
-    this._curvy_factor = 0.25; // should be 0 - 0.5
-
-    this._noredraw = false;
-
-    this._adjustable = false;
-
     this._xmin = 0;
     this._xmax = 0;
     this._ymin = 0;
@@ -115,8 +108,6 @@ OfficeExcel.OtherProps = function()
     this._background_grid_autofit_align = false;
     this._background_vbars = null;
     this._background_hbars = null;
-
-    this._line_visible = true;
 
     this._variant = null;
 

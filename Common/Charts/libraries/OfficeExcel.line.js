@@ -2,23 +2,15 @@
 
     OfficeExcel.Line = function (chartCanvas, data)
     {
-        // Get the canvas and context objects
-        this.id                = null;
-        this.canvas            = chartCanvas ? chartCanvas : document.getElementById(id);
-        this.context           = this.canvas.getContext ? this.canvas.getContext("2d") : null;
+        this.canvas            = chartCanvas;
+        this.context           = (this.canvas && this.canvas.getContext) ? this.canvas.getContext("2d") : null;
         this.canvas.__object__ = this;
         this.type              = 'line';
         this.max               = 0;
         this.coords            = [];
         this.coords2           = [];
         this.hasnegativevalues = false;
-        this.isOfficeExcel     = true;
 		this.data = data;
-        // Check for support
-        if (!this.canvas) {
-            alert('[LINE] Fatal error: no canvas support');
-            return;
-        }
 
         // Compatibility canvas browser
         OfficeExcel.CanvasBrowserCompat(this.context);
@@ -168,14 +160,6 @@
         this.grapharea      = this.canvas.height - this._chartGutter._top - this._chartGutter._bottom;
         this.halfgrapharea  = this.grapharea / 2;
         this.halfTextHeight = this._otherProps._text_size / 2;
-
-        // Check the combination of the X axis position and if there any negative values
-        //
-        // 19th Dec 2010 - removed for Opera since it can be reported incorrectly whn there
-        // are multiple graphs on the page
-        if ('auto' != this._otherProps._ylabels_count && this._otherProps._xaxispos == 'bottom' && this.hasnegativevalues && navigator.userAgent.indexOf('Opera') == -1) {
-            alert('[LINE] You have negative values and the X axis is at the bottom. This is not good...');
-        }
         
         //Draw Area
 		OfficeExcel.background.DrawArea(this);
@@ -201,8 +185,6 @@
                     fill = this._otherProps._fillstyle[j];
                 else if (typeof(this._otherProps._fillstyle) == 'string')
                     fill = this._otherProps._fillstyle;
-                else
-                    alert('[LINE] Warning: fillstyle must be either a string or an array with the same number of elements as you have sets of data');
             } else if (this._otherProps._filled)
                 fill = this._otherProps._colors[j];
 
@@ -339,12 +321,7 @@
             }
 
             this.context.stroke();
-        } else if (this._otherProps._filled && this._otherProps._filled_range)
-            alert('[LINE] You must have only two sets of data for a filled range chart');
-
-        // Adjustments
-        if (this._otherProps._adjustable)
-            OfficeExcel.AllowAdjusting(this);
+        }
     }
 
     
@@ -678,8 +655,6 @@
                         '-' + OfficeExcel.number_format(this, (this.scale[4] - ((this.scale[4] / numYLabels) * (numYLabels - i - 1))).toFixed((this._otherProps._scale_decimals)),units_pre, units_post), null, align, bounding, null, bgcolor, bold, null, textOptions);
                     }
 
-                    } else {
-                        alert('[LINE SCALE] The number of Y labels must be 1/3/5/10');
                     }
                     if (typeof(this._otherProps._ymin) == 'number') {
                     OfficeExcel.Text(context, font, text_size, xpos, this.canvas.height / 2, OfficeExcel.number_format(this, this._otherProps._ymin.toFixed(this._otherProps._scale_decimals), units_pre, units_post), 'center', align, bounding, null, bgcolor, bold, null, textOptions);
@@ -761,8 +736,6 @@
                             OfficeExcel.Text(context,font,text_size,xpos,(2 * interval) + this._chartGutter._top + this.halfTextHeight + ((i/10) * (this.grapharea) ),'-' + OfficeExcel.number_format(this,(scale[0] - (((scale[0] - this.min) / numYLabels) * (numYLabels - i - 1))).toFixed((this._otherProps._scale_decimals)),units_pre,units_post),null,align,bounding,null,bgcolor, bold, null, textOptions);
                         }
 
-                    } else {
-                        alert('[LINE SCALE] The number of Y labels must be 1/3/5/10');
                     }
 
 
@@ -827,10 +800,7 @@
                         OfficeExcel.Text(context,font,text_size,xpos,this._chartGutter._top + this.halfTextHeight + ((i/10) * (this.grapharea) ),OfficeExcel.number_format(this,((((this.scale[4] - this.min) / numYLabels) * (numYLabels - i)) + this.min).toFixed((this._otherProps._scale_decimals)),units_pre,units_post),null,align,bounding,null,bgcolor, bold, null, textOptions);
                     }
 
-                } else {
-                    alert('[LINE SCALE] The number of Y labels must be 1/3/5/10');
                 }
-
 
                 /**
                 * Accommodate translating back after reversing the labels
@@ -1384,7 +1354,7 @@
     OfficeExcel.Line.prototype.DrawTick = function (lineData, xPos, yPos, color, prevX, prevY, tickmarks, index)
     {
         // If the yPos is null - no tick
-        if ((yPos == null || yPos > (this.canvas.height - this._chartGutter._bottom) || yPos < this._chartGutter._top) && !this._otherProps._outofbounds || !this._otherProps._line_visible)
+        if ((yPos == null || yPos > (this.canvas.height - this._chartGutter._bottom) || yPos < this._chartGutter._top) && !this._otherProps._outofbounds)
             return;
 
         this.context.beginPath();
@@ -1604,19 +1574,8 @@
     // Redraws the line with the correct line width etc
     OfficeExcel.Line.prototype.RedrawLine = function (coords, color, linewidth)
     {
-        if (this._otherProps._noredraw)
-            return;
-
         this.context.strokeStyle = (typeof(color) == 'object' && color ? color[0] : color);
         this.context.lineWidth = linewidth;
-
-        if (!this._otherProps._line_visible)
-            this.context.strokeStyle = 'rgba(0,0,0,0)';
-
-        if (this._otherProps._curvy) {
-            this.DrawCurvyLine(coords, !this._otherProps._line_visible ? 'rgba(0,0,0,0)' : color, linewidth);
-            return;
-        }
 
         this.context.beginPath();
 
@@ -1725,8 +1684,6 @@
                 return linewidth[i];
             else
                 return linewidth[0];
-
-            alert('[LINE] Error! linewidth should be a single number or an array of one or more numbers');
         }
     }
 
@@ -1774,67 +1731,4 @@
         }
 
         context.fill();
-    }
-
-
-    /**
-    * Draw a curvy line. This isn't 100% accurate but may be more to your tastes
-    */
-    OfficeExcel.Line.prototype.DrawCurvyLine = function (coords, color, linewidth)
-    {
-        var co = this.context;
-
-        // Now calculate the halfway point
-        co.beginPath();
-
-            co.strokeStyle = color;
-            co.lineWidth   = linewidth;
-
-            for (var i=0; i<coords.length; ++i) {
-
-                var factor  = this._otherProps._curvy_factor;
-
-                if (coords[i] && typeof(coords[i][1]) == 'number' && coords[i + 1] && typeof(coords[i + 1][1]) == 'number') {
-
-                    var coordX  = coords[i][0];
-                    var coordY  = coords[i][1];
-                    var nextX   = coords[i + 1][0];
-                    var nextY   = coords[i + 1][1];
-                    var prevX   = coords[i - 1] ? coords[i - 1][0] : null;
-                    var prevY   = coords[i - 1] ? coords[i - 1][1] : null;
-                    var offsetX = (coords[i + 1][0] - coords[i][0]) * factor;
-                    var offsetY = (coords[i + 1][1] - coords[i][1]) * factor;
-
-
-                    if (i == 0) {
-                        co.moveTo(coordX, coordY);
-                        co.lineTo(nextX - offsetX, nextY - offsetY);
-
-                    } else if (nextY == null) {
-                        co.lineTo(coordX, coordY);
-
-                    } else if (prevY == null) {
-                        co.moveTo(coordX, coordY);
-
-                    } else if (coordY == null) {
-                        co.moveTo(nextX, nextY);
-
-
-                    } else {
-
-                        co.quadraticCurveTo(coordX, coordY, coordX + offsetX, coordY + offsetY);
-
-                        if (nextY) {
-                            co.lineTo(nextX - offsetX, nextY - offsetY);
-                        } else {
-                            co.lineTo(coordX, coordY);
-                        }
-                    }
-
-                } else if (typeof(coords[i][1]) == 'number') {
-                    co.lineTo(coords[i][0], coords[i][1]);
-                }
-            }
-
-        co.stroke();
     }

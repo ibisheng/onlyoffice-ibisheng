@@ -1,22 +1,12 @@
 ﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
-    /**
-    * The bar chart constructor
-    * 
-    * @param object canvas The canvas object
-    * @param array  data   The chart data
-    */
     OfficeExcel.Bar = function (chartCanvas, data)
     {
-        // Get the canvas and context objects
-        this.id                = null;
-        this.canvas            = chartCanvas ? chartCanvas : document.getElementById(id);
-        this.context           = this.canvas.getContext ? this.canvas.getContext("2d") : null;
+        this.canvas            = chartCanvas;
+        this.context           = (this.canvas && this.canvas.getContext) ? this.canvas.getContext("2d") : null;
         this.canvas.__object__ = this;
         this.type              = 'bar';
         this.max               = 0;
-        this.stackedOrGrouped  = false;
-        this.isOfficeExcel          = true;
 
         /**
         * Compatibility with older browsers
@@ -27,21 +17,6 @@
         this._chartGutter   = new OfficeExcel.Gutter();
         // Other Props
         this._otherProps    = new OfficeExcel.OtherProps();
-
-        // Check for support
-        if (!this.canvas) {
-            alert('[BAR] No canvas support');
-            return;
-        }
-
-        /**
-        * Determine whether the chart will contain stacked or grouped bars
-        */
-        for (i=0; i<data.length; ++i) {
-            if (typeof(data[i]) == 'object') {
-                this.stackedOrGrouped = true;
-            }
-        }
 
         // Store the data
         this.data = data;
@@ -121,11 +96,6 @@
         if (line) {
         
             line.__bar__ = this;
-            
-            // Check the X axis positions
-            if (this._otherProps._xaxispos != line._otherProps._xaxispos) {
-                alert("[BAR] Using different X axis positions when combining the Bar and Line is not advised");
-            }
 
             line._chartGutter = this._chartGutter;
 
@@ -141,13 +111,6 @@
 
             // The boolean is used to specify that the Line chart .Draw() method is being called by the Bar chart
             line.Draw(true);
-        }
-
-        /**
-        * This function enables adjusting
-        */
-        if (this._otherProps._adjustable) {
-            OfficeExcel.AllowAdjusting(this);
         }
     }
 
@@ -692,10 +655,6 @@
                         this.context.stroke();
                         
                         this.context.lineWidth = 1;
-
-                    // Unknown variant type
-                    } else {
-                        alert('[BAR] Warning! Unknown variant: ' + variant);
                     }
 
                     this.coords.push([x + hmargin, y, width - (2 * hmargin), height]);
@@ -705,28 +664,12 @@
                 * Stacked bar
                 */
                 } else if (typeof(this.data[i]) == 'object' && this._otherProps._grouping == 'stacked') {
-                
-                    if (this.min) {
-                        alert("[ERROR] Stacked Bar charts with a Y min are not supported");
-                    }
                     
                     var barWidth     = width - (2 * hmargin);
                     var startY       = 0;
                     var dataset      = this.data[i];
 
                     for (j=0; j<dataset.length; ++j) {
-
-                        // Stacked bar chart and X axis pos in the middle - poitless since negative values are not permitted
-                        if (xaxispos == 'center') {
-                            alert("[BAR] It's pointless having the X axis position at the center on a stacked bar chart.");
-                            return;
-                        }
-
-                        // Negative values not permitted for the stacked chart
-                        if (this.data[i][j] < 0) {
-                            alert('[BAR] Negative values are not permitted with a stacked bar chart. Try a grouped one instead.');
-                            return;
-                        }
 
                         /**
                         * Set the fill and stroke colors

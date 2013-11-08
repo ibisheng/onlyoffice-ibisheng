@@ -1,4 +1,4 @@
-﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {isOfficeExcel:true,type:'common'};
+﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {type:'common'};
 
     OfficeExcel.background     = {};
     OfficeExcel.Resizing       = {};
@@ -2111,11 +2111,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
             // If start point plus height is less than negative max, use the negative max plus the start point
             if (hbars[i][0] + hbars[i][1] < (-1 * obj.max) ) {
                 hbars[i][1] = -1 * (obj.max + hbars[i][0]);
-            }
-
-            // If the X axis is at the bottom, and a negative max is given, warn the user
-            if (obj._otherProps._xaxispos == 'bottom' && (hbars[i][0] < 0 || (hbars[i][1] + hbars[i][1] < 0)) ) {
-                alert('[' + obj.type.toUpperCase() + ' (ID: ' + obj.id + ') BACKGROUND HBARS] You have a negative value in one of your background hbars values, whilst the X axis is in the center');
             }
 
             var ystart = (obj.grapharea - ((hbars[i][0] / obj.max) * obj.grapharea));

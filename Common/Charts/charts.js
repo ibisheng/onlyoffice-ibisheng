@@ -516,13 +516,6 @@ function ChartPreviewManager() {
 	}
 }
 
-function OnFormatText(command) {
-	frames.message.document.designMode = 'On';
-	frames.message.focus();
-	frames.message.document.execCommand(command, 0, 0);
-	alert(frames.message.document.body.innerHTML);
-}
-
 //-----------------------------------------------------------------------------------
 // Calculate
 //-----------------------------------------------------------------------------------

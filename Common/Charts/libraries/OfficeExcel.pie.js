@@ -1,23 +1,15 @@
     if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
-    /**
-    * The pie chart constructor
-    * 
-    * @param data array The data to be represented on the pie chart
-    */
     OfficeExcel.Pie = function (chartCanvas, data)
     {
-        this.id                = null;
-        this.canvas            = chartCanvas ? chartCanvas : document.getElementById(id);
-        this.context           = this.canvas.getContext("2d");
+        this.canvas            = chartCanvas;
+        this.context           = (this.canvas && this.canvas.getContext) ? this.canvas.getContext("2d") : null;
         this.canvas.__object__ = this;
         this.total             = 0;
         this.subTotal          = 0;
         this.angles            = [];
         this.data              = data;
         this.type              = 'pie';
-        this.isOfficeExcel          = true;
-
 
         /**
         * Compatibility with older browsers

@@ -1,24 +1,14 @@
     if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
-    /**
-    * The scatter graph constructor
-    * 
-    * @param object canvas The cxanvas object
-    * @param array  data   The chart data
-    */
     OfficeExcel.Scatter = function (chartCanvas, data)
     {
-        // Get the canvas and context objects
-        this.id                = null;
-        this.canvas            = chartCanvas ? chartCanvas : document.getElementById(id);
+        this.canvas            = chartCanvas;
         this.canvas.__object__ = this;
-        this.context           = this.canvas.getContext ? this.canvas.getContext("2d") : null;
+        this.context           = (this.canvas && this.canvas.getContext) ? this.canvas.getContext("2d") : null;
         this.max               = 0;
         this.coords            = [];
         this.data              = [];
         this.type              = 'scatter';
-        this.isOfficeExcel          = true;
-
 
         /**
         * Compatibility with older browsers
@@ -43,12 +33,6 @@
             for (var i=1; i<arguments.length; ++i) {
                 this.data[i - 1] = arguments[i];
             }
-        }
-
-        // Check for support
-        if (!this.canvas) {
-            alert('[SCATTER] No canvas support');
-            return;
         }
     }
 
@@ -556,8 +540,6 @@
                             OfficeExcel.Text(context, font, text_size, xPos,this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (i/20) ) + (this.grapharea / 2) + (this.grapharea / 20),'-' + OfficeExcel.number_format(this, ((this.max * (i/10)) + (this.max * (1/10))).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed, null, bold, null, textOptions);
                         }
 
-                    } else {
-                        alert('[SCATTER SCALE] Number of Y labels can be 1/3/5/10 only');
                     }
         
                 }
@@ -685,8 +667,6 @@
                                 OfficeExcel.Text(context, font, text_size, xPos,this._chartGutter._top + ((this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) * (i/10) ),OfficeExcel.number_format(this, (this.max - ((this.max - this.min) * (i/10))).toFixed((this._otherProps._scale_decimals)), units_pre, units_post),'center', align, boxed, null, bold, null, textOptions);
                             }
                         }
-                    } else {
-                        alert('[SCATTER SCALE] Number of Y labels can be 1/3/5/10 only');
                     }
                     
                     if (this._otherProps._ymin) {
@@ -1247,8 +1227,6 @@
             /**
             * Unknown tickmark type
             */
-            } else {
-                alert('[SCATTER] (' + this.id + ') Unknown tickmark style: ' + tickmarks );
             }
         }
 
@@ -1368,8 +1346,6 @@
             } else {
                 return linewidth[0];
             }
-
-            alert('[SCATTER] Error! linewidth should be a single number or an array of one or more numbers');
         }
     }
 
