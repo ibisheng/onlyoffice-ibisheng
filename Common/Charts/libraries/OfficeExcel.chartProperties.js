@@ -124,7 +124,6 @@ OfficeExcel.OtherProps = function()
     this._tickdirection = -1;
 
     this._tickmarks = null; // can be reverse
-    this._tickmarks_linewidth = null;
     this._tickmarks_dot_color = 'white';
 
     this._key = [];

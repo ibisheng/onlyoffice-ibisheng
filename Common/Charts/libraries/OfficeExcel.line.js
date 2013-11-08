@@ -1351,7 +1351,7 @@
 
         var offset   = 0;
 
-        this.context.lineWidth   = this._otherProps._tickmarks_linewidth ? this._otherProps._tickmarks_linewidth : this._otherProps._linewidth;
+        this.context.lineWidth   = this._otherProps._linewidth;
         this.context.strokeStyle = this.context.strokeStyle;
         this.context.fillStyle   = this.context.strokeStyle;
 
