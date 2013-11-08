@@ -154,18 +154,6 @@
             }
         }
 
-
-        /**
-        * Specific location coordinates
-        */
-        if (typeof(obj._otherProps._key_position_x) == 'number') {
-            hpos = obj._otherProps._key_position_x;
-        }
-        
-        if (typeof(obj._otherProps._key_position_y) == 'number') {
-            vpos = obj._otherProps._key_position_y;
-        }
-
         // Draw the box that the key resides in
         context.beginPath();
             context.fillStyle   = 'white';

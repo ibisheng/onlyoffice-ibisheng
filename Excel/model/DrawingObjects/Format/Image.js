@@ -493,7 +493,7 @@ CImageShape.prototype =
             this.chart.height = this.drawingDocument.GetDotsPerMM(this.extY);
 
             var chartRender = new ChartRender();
-            var chartBase64 = chartRender.insertChart(this.chart, null, this.chart.width, this.chart.height);
+            var chartBase64 = chartRender.insertChart(this.chart, this.chart.width, this.chart.height);
             this.chart.img = chartBase64;
             this.setRasterImage(this.chart.img);
             editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.chart.img);
@@ -503,7 +503,7 @@ CImageShape.prototype =
             var chartRender = new ChartRender();
             var width_pix = this.drawingDocument.GetDotsPerMM(this.absExtX);
             var heght_pix = this.drawingDocument.GetDotsPerMM(this.absExtY);
-            var chartBase64 = chartRender.insertChart(this.chart, null, width_pix, heght_pix);
+            var chartBase64 = chartRender.insertChart(this.chart, width_pix, heght_pix);
             if ( !chartBase64 )
                 return;
 

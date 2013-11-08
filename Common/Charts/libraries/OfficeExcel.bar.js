@@ -1642,59 +1642,6 @@
         this.context.fill();
         this.context.stroke();
     }
-
-    /**
-    * When you click on the chart, this method can return the Y value at that point. It works for any point on the
-    * chart (that is inside the gutters) - not just points within the Bars.
-    * 
-    * EITHER:
-    * 
-    * @param object arg The event object
-    * 
-    * OR:
-    * 
-    * @param object arg A two element array containing the X and Y coordinates
-    */
-    OfficeExcel.Bar.prototype.getValue = function (arg)
-    {
-        if (arg.length == 2) {
-            var mouseX = arg[0];
-            var mouseY = arg[1];
-        } else {
-            var mouseCoords = OfficeExcel.getMouseXY(arg);
-            var mouseX      = mouseCoords[0];
-            var mouseY      = mouseCoords[1];
-        }
-
-        if (   mouseY < this._chartGutter._top
-            || mouseY > (this.canvas.height - this._chartGutter._bottom)
-            || mouseX < this._chartGutter._left
-            || mouseX > (this.canvas.width - this._chartGutter._right)
-           ) {
-            return null;
-        }
-        
-        if (this._otherProps._xaxispos == 'center') {
-            var value = (((this.grapharea / 2) - (mouseY - this._chartGutter._top)) / this.grapharea) * (this.max - this.min)
-            value *= 2;
-            
-            if (value >= 0) {
-                value += this.min;
-            } else {
-                value -= this.min;
-            }
-
-        } else if (this._otherProps._xaxispos == 'top') {
-            var value = ((this.grapharea - (mouseY - this._chartGutter._top)) / this.grapharea) * (this.max - this.min)
-            value = this.max - value;
-            value = Math.abs(value) * -1;
-        } else {
-            var value = ((this.grapharea - (mouseY - this._chartGutter._top)) / this.grapharea) * (this.max - this.min)
-            value += this.min;
-        }
-
-        return value;
-    }
 	
 	OfficeExcel.Bar.prototype.DrawAboveLabels = function (isFormatCell)
     {

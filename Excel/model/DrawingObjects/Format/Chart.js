@@ -1299,7 +1299,7 @@ CChartAsGroup.prototype =
 
         if ( !this.chart.range.intervalObject )
             this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
+        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
         this.brush.fill.RasterImageId = "";
         this.updateDrawingBaseCoordinates();
         //this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
@@ -1646,7 +1646,7 @@ CChartAsGroup.prototype =
 
         if ( !this.chart.range.intervalObject )
             this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
+        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
         this.brush.fill.RasterImageId = "";
         //this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
     },

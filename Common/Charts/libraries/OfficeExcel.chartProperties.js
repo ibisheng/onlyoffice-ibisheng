@@ -155,8 +155,6 @@ OfficeExcel.OtherProps = function()
     this._tickmarks_dot_color = 'white';
 
     this._key = [];
-    this._key_position_x = null;
-    this._key_position_y = null;
     this._key_color_shape = 'square';
     this._key_colors = null;
     this._key_halign = 'right';

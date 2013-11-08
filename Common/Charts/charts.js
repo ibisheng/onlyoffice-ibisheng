@@ -6,9 +6,8 @@ function ChartRender(options) {
 
     this.options = options;
 	
-	this.insertChart = function(chart, activeWorkSheet, width, height, isNewChart, bChartPreview) {
+	this.insertChart = function(chart, width, height, bChartPreview) {
 	
-		var chartBase64 = null;
 		if ( bChartPreview )
 			g_bChartPreview = true;
 		else
@@ -28,12 +27,8 @@ function ChartRender(options) {
 		$(chartCanvas).css('height', height);
 		$(chartCanvas)[0].height = height;
 		$(chartCanvas)[0].width = width;
-		
-		//if ( insertChart(chart, activeWorkSheet, width, height, isNewChart) )
-		//	chartBase64 = chartCanvas.toDataURL();
-		
-		//return chartBase64;
-		insertChart(chart, activeWorkSheet, width, height, isNewChart, this.options);
+
+		insertChart(chart, this.options);
         var ret  = chartCanvas;
         chartCanvas = null;
         return ret;
@@ -463,17 +458,17 @@ function ChartPreviewManager() {
 						
 						chart.subType = c_oAscChartSubType.normal;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
+						var chartBase64 = chartRender.insertChart( chart, preview_w, preview_h, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.normal][style] = chartBase64;
 						
 						chart.subType = c_oAscChartSubType.stacked;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
+						var chartBase64 = chartRender.insertChart( chart, preview_w, preview_h, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.stacked][style] = chartBase64;
 						
 						chart.subType = c_oAscChartSubType.stackedPer;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
+						var chartBase64 = chartRender.insertChart( chart, preview_w, preview_h, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.stackedPer][style] = chartBase64;
 					
 						break;
@@ -484,7 +479,7 @@ function ChartPreviewManager() {
 					
 						chart.subType = c_oAscChartSubType.normal;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
+						var chartBase64 = chartRender.insertChart( chart, preview_w, preview_h, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.normal][style] = chartBase64;
 						
 						break;
@@ -929,13 +924,12 @@ function formulaToRange(formula, worksheet) {
 	return range;
 }
 
-function insertChart(chart, activeWorkSheet, width, height, isNewChart, options) {
+function insertChart(chart, options) {
 	var isSeries = false;
 	var formatCell = 'General';
 	var formatCellScOy = 'General';
 	var defaultFormat = 'General';
 	var isDateTimeFormat;
-	var catNameFormat;
 	
 	var api_doc = window["editor"];
 	var api_sheet = window["Asc"]["editor"];
@@ -1267,7 +1261,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	if(newArr != undefined)
 	{
 		chart.arrFormatAdobeLabels = newAdobeLabels;
-		drawChart(chart, newArr, width, height, options);
+		drawChart(chart, newArr, options);
 	}	
 	else
 	{
@@ -1281,7 +1275,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				chart.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
 				if(catNameLabels && catNameLabels.length)
 					chart.catNameLabels = arrReverse(catNameLabels);
-				drawChart(chart, arrValuesRev, width, height, options);
+				drawChart(chart, arrValuesRev, options);
 			}
 			else
 			{
@@ -1289,7 +1283,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
 				if(catNameLabels && catNameLabels.length)
 					chart.catNameLabels = catNameLabels;
-				drawChart(chart, arrValues, width, height, options);
+				drawChart(chart, arrValues, options);
 			}
 		}
 		else
@@ -1300,13 +1294,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				{
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabelsRev;
-					drawChart(chart, arrValuesRev, width, height);
+					drawChart(chart, arrValuesRev);
 				}
 				else
 				{
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
-					drawChart(chart, arrValues, width, height, options);
+					drawChart(chart, arrValues, options);
 				}
 			}
 			else
@@ -1315,14 +1309,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				{
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
-					drawChart(chart, arrValues, width, height, options);
+					drawChart(chart, arrValues, options);
 				}
 				else
 				{
 					//chart.isSkip = isSkipRev;
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabelsRev;
-					drawChart(chart, arrValuesRev, width, height, options);
+					drawChart(chart, arrValuesRev, options);
 				}
 			}
 		}
@@ -1344,7 +1338,7 @@ function arrReverse(arr) {
 	return newarr;
 }
 
-function drawChart(chart, arrValues, width, height, options) {
+function drawChart(chart, arrValues, options) {
 
 	var data = arrValues;
 	var api_doc = window["editor"];
@@ -1429,7 +1423,7 @@ function drawChart(chart, arrValues, width, height, options) {
 	var curColor;
 	var rgba;
 	if(chart.type == 'Pie' || chart.type == 'Bar' || chart.type == 'HBar')
-		legendCnt = data[0].length
+		legendCnt = data[0].length;
 	if(chart.type == "Stock")
 		legendCnt = 4;
 	//если есть объект series
@@ -1562,24 +1556,6 @@ function drawChart(chart, arrValues, width, height, options) {
 			bar._otherProps._labels_above = true;
 		else
 			bar._otherProps._labels_above = false;
-	}
-	
-	if (chart.xAxis.title && !chart.margins) {
-		var legendTop = 0;
-		var widthXtitle =  bar.context.measureText(chart.xAxis.title).width;
-		if(chart.legend.position == 'bottom')
-			legendTop = 30;
-		bar._xAxisTitle._text = chart.xAxis.title;
-	}
-
-	if (chart.yAxis.title && !chart.margins) {
-		var widthYtitle =  bar.context.measureText(chart.yAxis.title).width;
-		bar._yAxisTitle._text = chart.yAxis.title;
-		bar._yAxisTitle._align = 'rev';
-		var keyLeft = 0;
-		if (bar._otherProps._key_halign == 'left')
-			keyLeft = 70;
-		bar._yAxisTitle._angle = 'null';
 	}
 
 	// Основная сетка	

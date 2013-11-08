@@ -1764,43 +1764,6 @@
     }
 
     /**
-    * This function returns the mouse position in relation to the canvas
-    * 
-    * @param object e The event object.
-    */
-    OfficeExcel.getMouseXY = function (e)
-    {
-        var obj = (OfficeExcel.isIE8() ? event.srcElement : e.target);
-        var x;
-        var y;
-        
-        if (OfficeExcel.isIE8()) e = event;
-
-        // Browser with offsetX and offsetY
-        if (typeof(e.offsetX) == 'number' && typeof(e.offsetY) == 'number') {
-            x = e.offsetX;
-            y = e.offsetY;
-
-        // FF and other
-        } else {
-            x = 0;
-            y = 0;
-
-            while (obj != document.body && obj) {
-                x += obj.offsetLeft;
-                y += obj.offsetTop;
-
-                obj = obj.offsetParent;
-            }
-
-            x = e.pageX - x;
-            y = e.pageY - y;
-        }
-
-        return [x, y];
-    }
-
-    /**
     * This function draws the background for the bar chart, line chart and scatter chart.
     * 
     * @param  object obj The graph object
@@ -2464,79 +2427,6 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
                 return this.attachEvent('on' + ev, func);
             }
         }
-    }
-
-    /**
-    * Draws a filled rectangle with curvy corners
-    * 
-    * @param context object The context
-    * @param x       number The X coordinate (top left of the square)
-    * @param y       number The Y coordinate (top left of the square)
-    * @param w       number The width of the rectangle
-    * @param h       number The height of the rectangle
-    * @param         number The radius of the curved corners
-    * @param         boolean Whether the top left corner is curvy
-    * @param         boolean Whether the top right corner is curvy
-    * @param         boolean Whether the bottom right corner is curvy
-    * @param         boolean Whether the bottom left corner is curvy
-    */
-    OfficeExcel.filledCurvyRect = function (context, x, y, w, h)
-    {
-        // The corner radius
-        var r = arguments[5] ? arguments[5] : 3;
-
-        // The corners
-        var corner_tl = (arguments[6] || arguments[6] == null) ? true : false;
-        var corner_tr = (arguments[7] || arguments[7] == null) ? true : false;
-        var corner_br = (arguments[8] || arguments[8] == null) ? true : false;
-        var corner_bl = (arguments[9] || arguments[9] == null) ? true : false;
-
-        context.beginPath();
-
-            // First draw the corners
-
-            // Top left corner
-            if (corner_tl) {
-                context.moveTo(x + r, y + r);
-                context.arc(x + r, y + r, r, Math.PI, 1.5 * Math.PI, false);
-            } else {
-                context.fillRect(x, y, r, r);
-            }
-
-            // Top right corner
-            if (corner_tr) {
-                context.moveTo(x + w - r, y + r);
-                context.arc(x + w - r, y + r, r, 1.5 * Math.PI, 0, false);
-            } else {
-                context.moveTo(x + w - r, y);
-                context.fillRect(x + w - r, y, r, r);
-            }
-
-
-            // Bottom right corner
-            if (corner_br) {
-                context.moveTo(x + w - r, y + h - r);
-                context.arc(x + w - r, y - r + h, r, 0, Math.PI / 2, false);
-            } else {
-                context.moveTo(x + w - r, y + h - r);
-                context.fillRect(x + w - r, y + h - r, r, r);
-            }
-
-            // Bottom left corner
-            if (corner_bl) {
-                context.moveTo(x + r, y + h - r);
-                context.arc(x + r, y - r + h, r, Math.PI / 2, Math.PI, false);
-            } else {
-                context.moveTo(x, y + h - r);
-                context.fillRect(x, y + h - r, r, r);
-            }
-
-            // Now fill it in
-            context.fillRect(x + r, y, w - r - r, h);
-            context.fillRect(x, y + r, r + 1, h - r - r);
-            context.fillRect(x + w - r - 1, y + r, r + 1, h - r - r);
-
-        context.fill();
     }
 
     // Checks the browser for traces of MSIE8
