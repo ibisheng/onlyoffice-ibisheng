@@ -727,6 +727,8 @@ function CCollaborativeEditing()
             RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.Odd );
 
         LogicDocument.Reset_RecalculateCache();
+
+        LogicDocument.DrawingObjects.calculateAfterOpen();
         LogicDocument.Recalculate( false, false, RecalculateData );
         LogicDocument.Document_UpdateSelectionState();
         LogicDocument.Document_UpdateInterfaceState();
