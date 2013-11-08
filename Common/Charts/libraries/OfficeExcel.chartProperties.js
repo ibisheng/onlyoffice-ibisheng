@@ -1,20 +1,5 @@
 if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
-OfficeExcel.Title = function()
-{
-    this._text = '';
-
-    this._background = null;
-    this._color = null;
-
-    this._hpos = null;
-    this._vpos = null;
-
-    this._bold = true;
-    this._font = null;
-    this._size = null;
-};
-
 OfficeExcel.Gutter = function()
 {
     this._left      = 25;
@@ -105,7 +90,6 @@ OfficeExcel.OtherProps = function()
     this._ylabels_invert = false;
 
     this._labels = [];
-    this._labels_ingraph = null;
     this._labels_above = false;
     this._labels_above_decimals = 0;
     this._labels_above_size = null;

@@ -154,11 +154,6 @@
         if (this._otherProps._key.length) {
             OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }
-
-        /**
-        * Draw "in graph" labels
-        */
-        OfficeExcel.DrawInGraphLabels(this);
     }
     
     /**

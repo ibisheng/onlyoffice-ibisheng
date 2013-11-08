@@ -308,9 +308,6 @@
         if (this._otherProps._labels_above)
             this.DrawAboveLabels(isFormatCell);
 
-        // Draw in graph labels
-        OfficeExcel.DrawInGraphLabels(this);
-
         // Redraw the lines if a filled range is on the cards
         if (this._otherProps._filled && this._otherProps._filled_range && this.data.length == 2) {
 

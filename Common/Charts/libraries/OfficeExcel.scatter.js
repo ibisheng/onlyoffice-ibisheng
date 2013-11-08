@@ -216,11 +216,6 @@
         if (this._otherProps._labels_above) {
             this.DrawAboveLabels(isformatCellScOy);
         }
-
-        /**
-        * Draw the "in graph" labels, using the member function, NOT the shared function in OfficeExcel.common.core.js
-        */
-        this.DrawInGraphLabels(this);
     }
 
     /**
@@ -1402,99 +1397,6 @@
                     context.fillStyle = vbars[i][2];
                     context.fillRect(startX, this._chartGutter._top, width, (OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom));
                 context.fill();
-            }
-        }
-    }
-
-
-
-
-
-    /**
-    * Draws in-graph labels.
-    * 
-    * @param object obj The graph object
-    */
-    OfficeExcel.Scatter.prototype.DrawInGraphLabels = function (obj)
-    {
-        var canvas  = obj.canvas;
-        var context = obj.context;
-        var labels  = obj._otherProps._labels_ingraph;
-        var labels_processed = [];
-
-        // Defaults
-        var fgcolor   = 'black';
-        var bgcolor   = 'white';
-        var direction = 1;
-
-        if (!labels) {
-            return;
-        }
-
-        /**
-        * Preprocess the labels array. Numbers are expanded
-        */
-        for (var i=0; i<labels.length; ++i) {
-            if (typeof(labels[i]) == 'number') {
-                for (var j=0; j<labels[i]; ++j) {
-                    labels_processed.push(null);
-                }
-            } else if (typeof(labels[i]) == 'string' || typeof(labels[i]) == 'object') {
-                labels_processed.push(labels[i]);
-            
-            } else {
-                labels_processed.push('');
-            }
-        }
-
-        if (labels_processed && labels_processed.length > 0) {
-
-            var i=0;
-
-            for (var _set=0; _set<obj.coords.length; ++_set) {
-                for (var point = 0; point<obj.coords[_set].length; ++point) {
-                    if (labels_processed[i]) {
-                        var x = obj.coords[_set][point][0];
-                        var y = obj.coords[_set][point][1];
-                        var length = typeof(labels_processed[i][4]) == 'number' ? labels_processed[i][4] : 25;
-                            
-                        var text_x = x;
-                        var text_y = y - 5 - length;
-
-                        context.moveTo(x, y - 5);
-                        context.lineTo(x, y - 5 - length);
-                        
-                        context.stroke();
-                        context.beginPath();
-                        
-                        // This draws the arrow
-                        context.moveTo(x, y - 5);
-                        context.lineTo(x - 3, y - 10);
-                        context.lineTo(x + 3, y - 10);
-                        context.closePath();
-
-
-                        context.beginPath();
-                            
-                            // Fore ground color
-                            context.fillStyle = (typeof(labels_processed[i]) == 'object' && typeof(labels_processed[i][1]) == 'string') ? labels_processed[i][1] : 'black';
-
-                            OfficeExcel.Text(context,
-                                        obj._otherProps._text_font,
-                                        obj._otherProps._text_size,
-                                        text_x,
-                                        text_y,
-                                        (typeof(labels_processed[i]) == 'object' && typeof(labels_processed[i][0]) == 'string') ? labels_processed[i][0] : labels_processed[i],
-                                        'bottom',
-                                        'center',
-                                        true,
-                                        null,
-                                        (typeof(labels_processed[i]) == 'object' && typeof(labels_processed[i][2]) == 'string') ? labels_processed[i][2] : 'white');
-                        context.fill();
-                    }
-                    
-                    i++;
-                }
             }
         }
     }

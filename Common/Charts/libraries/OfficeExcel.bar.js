@@ -143,16 +143,6 @@
             line.Draw(true);
         }
 
-
-        /**
-        * Draw "in graph" labels
-        */
-        if (this._otherProps._labels_ingraph) {
-            OfficeExcel.DrawInGraphLabels(this);
-        }
-
-
-
         /**
         * This function enables adjusting
         */
