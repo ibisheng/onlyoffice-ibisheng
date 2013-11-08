@@ -1,9 +1,6 @@
 ﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {type:'common'};
 
     OfficeExcel.background     = {};
-    OfficeExcel.Resizing       = {};
-    OfficeExcel.events         = [];
-    
 
     HALFPI = (Math.PI / 2);
     PI     = Math.PI;
@@ -1927,7 +1924,7 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
 
     /**
     * This function skirts the annoying canvas anti-aliasing
-    * 
+    *
     * @param object obj The object
     * @param number value The number to round
     */
