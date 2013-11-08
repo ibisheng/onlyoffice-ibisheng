@@ -1272,27 +1272,6 @@
 		num =  Math.round(num*floatKoff)/floatKoff ;
 		return num;
 	}
-	
-    /**
-    * Returns the maximum value which is in an array
-    * 
-    * @param  array arr The array
-    * @param  int   len The length to pad the array to
-    * @param  mixed     The value to use to pad the array (optional)
-    */
-    OfficeExcel.array_pad = function (arr, len)
-    {
-        if (arr.length < len) {
-            var val = arguments[2] ? arguments[2] : null;
-            
-            for (var i=arr.length; i<len; ++i) {
-                arr[i] = val;
-            }
-        }
-        
-        return arr;
-    }
-
 
     /**
     * An array sum function
@@ -1314,55 +1293,6 @@
         return sum;
     }
 
-
-
-    /**
-    * A simple is_array() function
-    * 
-    * @param  mixed obj The object you want to check
-    * @return bool      Whether the object is an array or not
-    */
-    OfficeExcel.is_array = function (obj)
-    {
-        return obj != null && obj.constructor.toString().indexOf('Array') != -1;
-    }
-
-    /**
-    * This function draws an angled line. The angle is cosidered to be clockwise
-    * 
-    * @param obj ctxt   The context object
-    * @param int x      The X position
-    * @param int y      The Y position
-    * @param int angle  The angle in RADIANS
-    * @param int length The length of the line
-    */
-    OfficeExcel.lineByAngle = function (context, x, y, angle, length)
-    {
-        context.arc(x, y, length, angle, angle, false);
-        context.lineTo(x, y);
-        context.arc(x, y, length, angle, angle, false);
-    }
-
-
-    /**
-    * This is a useful function which is basically a shortcut for drawing left, right, top and bottom alligned text.
-    * 
-    * @param object context The context
-    * @param string font    The font
-    * @param int    size    The size of the text
-    * @param int    x       The X coordinate
-    * @param int    y       The Y coordinate
-    * @param string text    The text to draw
-    * @parm  string         The vertical alignment. Can be null. "center" gives center aligned  text, "top" gives top aligned text.
-    *                       Anything else produces bottom aligned text. Default is bottom.
-    * @param  string        The horizontal alignment. Can be null. "center" gives center aligned  text, "right" gives right aligned text.
-    *                       Anything else produces left aligned text. Default is left.
-    * @param  bool          Whether to show a bounding box around the text. Defaults not to
-    * @param int            The angle that the text should be rotate at (IN DEGREES)
-    * @param string         Background color for the text
-    * @param bool           Whether the text is bold or not
-    * @param bool           Whether the bounding box has a placement indicator
-    */
 	OfficeExcel.Text = function (context, font, size, x, y, text)
     {
 		var drwContext = OfficeExcel.drawingCtxCharts;
@@ -1869,32 +1799,6 @@
 
         return [x, y];
     }
-    
-    
-    /**
-    * This function returns a two element array of the canvas x/y position in
-    * relation to the page
-    * 
-    * @param object canvas
-    */
-    OfficeExcel.getCanvasXY = function (canvas)
-    {
-        var x   = 0;
-        var y   = 0;
-        var obj = canvas;
-
-        do {
-
-            x += obj.offsetLeft;
-            y += obj.offsetTop;
-
-            obj = obj.offsetParent;
-
-        } while (obj && obj.tagName.toLowerCase() != 'body');
-
-        return [x, y];
-    }
-
 
     /**
     * This function draws the background for the bar chart, line chart and scatter chart.
@@ -2134,16 +2038,7 @@
 			return "";
 		return aFormatedValue[0].text;
     }	
-	
-    /**
-    * Formats a number with thousand seperators so it's easier to read
-    * 
-    * @param  integer num The number to format
-    * @param  string      The (optional) string to prepend to the string
-    * @param  string      The (optional) string to ap
-    * pend to the string
-    * @return string      The formatted number
-    */
+
     OfficeExcel.number_format = function (obj, num)
     {
         var i;
