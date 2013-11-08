@@ -220,7 +220,7 @@ CTextBody.prototype =
         var Doc = this.content;
         if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
         {
-           drawingDocument.UpdateTargetTransform(this.shape.transformText);
+            drawingDocument.UpdateTargetTransform(this.shape.transformText);
             drawingDocument.TargetEnd();
             drawingDocument.SelectEnabled(true);
             drawingDocument.SelectClear();
@@ -636,9 +636,9 @@ CTextBody.prototype =
     draw: function(graphics)
     {
         /*if(this.content.Is_Empty() && isRealObject(this.phContent))
-            this.content2.Draw(graphics);
-        else
-            this.content.Draw(0, graphics);  */
+         this.content2.Draw(graphics);
+         else
+         this.content.Draw(0, graphics);  */
 
         if((!this.content || this.content.Is_Empty()) && this.content2!=null && !this.shape.addTextFlag && (this.shape.isEmptyPlaceholder ? this.shape.isEmptyPlaceholder() : false))
         {
@@ -914,13 +914,13 @@ CTextBody.prototype =
             var par = this.content.Content[i];
             for(var j = 0; j < par.Lines.length; ++j)
             {
-                if(par.Lines[j].Ranges[0].W + 1> max_width)
+                if(par.Lines[j].Ranges[0].W + 1 > max_width)
                 {
-                    max_width = par.Lines[j].Ranges[0].W;
+                    max_width = par.Lines[j].Ranges[0].W + 1;
                 }
             }
         }
-        return max_width + r_ins + l_ins;
+        return max_width + 1 + r_ins + l_ins;
     },
 
     getRectHeight: function(maxHeight, width)

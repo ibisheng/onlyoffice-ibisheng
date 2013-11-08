@@ -78,7 +78,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     };
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
-                             // True, если ячейка попадает в выделение по ячейкам.
+    // True, если ячейка попадает в выделение по ячейкам.
 
     this.TurnOffRecalc = false;
 
@@ -159,12 +159,12 @@ CDocumentContent.prototype =
 
     Get_PageFields : function(PageIndex)
     {
-            var Y      = this.Pages[PageIndex].Y ;
-            var YLimit = this.Pages[PageIndex].YLimit;
-            var X      = this.Pages[PageIndex].X;
-            var XLimit = this.Pages[PageIndex].XLimit;
+        var Y      = this.Pages[PageIndex].Y ;
+        var YLimit = this.Pages[PageIndex].YLimit;
+        var X      = this.Pages[PageIndex].X;
+        var XLimit = this.Pages[PageIndex].XLimit;
 
-            return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit };
+        return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit };
     },
 
     Get_EmptyHeight : function()
@@ -267,18 +267,35 @@ CDocumentContent.prototype =
 
     recalcColors: function()
     {
-        if(this.Parent instanceof  CTextBody)
+        var textPropsForRecalc;
+        if(this.Parent instanceof CTextBody)
+        {
+            textPropsForRecalc = this.Parent.textPropsForRecalc;
+        }
+        else
+        {
+            if(this.Parent instanceof CTableCell
+                && this.Parent.Row
+                && this.Parent.Row.Table
+                && this.Parent.Row.Table.Parent
+                && this.Parent.Row.Table.Parent.textPropsForRecalc)
+            {
+                textPropsForRecalc = this.Parent.textPropsForRecalc;
+            }
+        }
+        if(Array.isArray(textPropsForRecalc))
         {
             for(var i = 0; i < this.Content.length; ++i)
             {
                 var  p = this.Content[i];
                 if(p.CompiledPr.Pr.TextPr)
-                    this.Parent.textPropsForRecalc.push({Value:p.CompiledPr.Pr.TextPr});
+                    textPropsForRecalc.push({Value:p.CompiledPr.Pr.TextPr});
+                textPropsForRecalc.push({Value:{unifill:p.folHlinkColor}});
                 for(var j = 0; j < p.Content.length; ++j)
                 {
                     if(p.Content[j].Type === para_TextPr && p.Content[j].Value.unifill)
                     {
-                        this.Parent.textPropsForRecalc.push(p.Content[j]);
+                        textPropsForRecalc.push(p.Content[j]);
                     }
                 }
             }
@@ -573,6 +590,7 @@ CDocumentContent.prototype =
         if(paragraph !== undefined)
         {
             _cur_paragraph = paragraph;
+            _cur_paragraph.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
             _cur_paragraph.Remove_PresentationNumbering();
             if(_cur_paragraph.GetType() != type_Paragraph)
             {
@@ -981,6 +999,7 @@ CDocumentContent.prototype =
         for(_par_index = 0;  _par_index < _content_length; ++_par_index)
         {
             _cur_paragraph = this.Content[_par_index];
+            _cur_paragraph.RecalcInfo.Recalc_0_Type = pararecalc_0_All;
             if(_cur_paragraph.GetType() != type_Paragraph)
             {
                 continue;
@@ -1301,6 +1320,16 @@ CDocumentContent.prototype =
         }
     },
 
+
+    recalc0AllContent: function()
+    {
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            this.Content[i].RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+            this.Content[i].Recalc_CompiledPr();
+        }
+    },
+
     Recalculate_ : function(bForceRecalc, LastChangeIndex)
     {
         if ( true === this.TurnOffRecalc || true === editor.WordControl.m_oLogicDocument.TurnOffRecalc )
@@ -1315,7 +1344,7 @@ CDocumentContent.prototype =
         var OldPages  = this.Pages.length;
         var OldBottom = new Array();
         for ( var Index = 0; Index < OldPages; Index++ )
-              OldBottom[Index] = this.Pages[Index].Bounds.Bottom;
+            OldBottom[Index] = this.Pages[Index].Bounds.Bottom;
 
         var Old_FlowObjects = new Array();
         for ( var Index = 0; Index < this.Pages.length; Index++ )
@@ -1354,7 +1383,7 @@ CDocumentContent.prototype =
             // Пересчитываем элемент
             var Element = this.Content[Index];
             Element.Set_DocumentIndex( Index );
-            
+
             if ( Index >= LastChangeIndex )
             {
                 Element.TurnOff_RecalcEvent();
@@ -2584,7 +2613,7 @@ CDocumentContent.prototype =
             }
         }
     },
-    
+
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
         if ( true === this.ApplyToAll )
@@ -4034,7 +4063,7 @@ CDocumentContent.prototype =
             return false;
         else if ( false != this.Selection.Use || 0 != this.CurPos.ContentPos )
             return false;
-        
+
         var Item = this.Content[0];
         return Item.Cursor_IsStart( bOnlyPara );
     },
@@ -4907,7 +4936,7 @@ CDocumentContent.prototype =
     {
         var Styles = this.Parent.Get_Styles();
         var StyleId = Styles.Get_StyleIdByName( Name );
-        
+
         if ( true === this.ApplyToAll )
         {
             for ( var Index = 0; Index < this.Content.length; Index++ )
@@ -5823,136 +5852,136 @@ CDocumentContent.prototype =
 
     Get_Paragraph_ParaPr : function()
     {
-       /* var Result_ParaPr = new CParaPr();
+        /* var Result_ParaPr = new CParaPr();
 
-        if ( true === this.ApplyToAll )
-        {
-            var StartPr, Pr;
-            if ( type_Paragraph == this.Content[0].GetType() )
-            {
-                StartPr   = this.Content[0].Get_CompiledPr2().ParaPr;
-                Pr        = StartPr.Copy();
-                Pr.Locked = this.Content[0].Lock.Is_Locked();
-            }
-            else if ( type_Table == this.Content[0].GetType() )
-            {
-                StartPr   = this.Content[0].Get_Paragraph_ParaPr();
-                Pr        = StartPr.Copy();
-                Pr.Locked = StartPr.Locked;
-            }
+         if ( true === this.ApplyToAll )
+         {
+         var StartPr, Pr;
+         if ( type_Paragraph == this.Content[0].GetType() )
+         {
+         StartPr   = this.Content[0].Get_CompiledPr2().ParaPr;
+         Pr        = StartPr.Copy();
+         Pr.Locked = this.Content[0].Lock.Is_Locked();
+         }
+         else if ( type_Table == this.Content[0].GetType() )
+         {
+         StartPr   = this.Content[0].Get_Paragraph_ParaPr();
+         Pr        = StartPr.Copy();
+         Pr.Locked = StartPr.Locked;
+         }
 
-            for ( var Index = 1; Index < this.Content.length; Index++ )
-            {
-                var Item = this.Content[Index];
+         for ( var Index = 1; Index < this.Content.length; Index++ )
+         {
+         var Item = this.Content[Index];
 
-                var TempPr;
-                if ( type_Paragraph == Item.GetType() )
-                {
-                    TempPr        = Item.Get_CompiledPr2(false).ParaPr.Copy();
-                    TempPr.Locked = Item.Lock.Is_Locked();
-                }
-                else if ( type_Table == Item.GetType() )
-                {
-                    TempPr = Item.Get_Paragraph_ParaPr();
-                }
+         var TempPr;
+         if ( type_Paragraph == Item.GetType() )
+         {
+         TempPr        = Item.Get_CompiledPr2(false).ParaPr.Copy();
+         TempPr.Locked = Item.Lock.Is_Locked();
+         }
+         else if ( type_Table == Item.GetType() )
+         {
+         TempPr = Item.Get_Paragraph_ParaPr();
+         }
 
-                Pr = Pr.Compare(TempPr);
-            }
+         Pr = Pr.Compare(TempPr);
+         }
 
-            if ( Pr.Ind.Left == UnknownValue )
-                Pr.Ind.Left = StartPr.Ind.Left;
+         if ( Pr.Ind.Left == UnknownValue )
+         Pr.Ind.Left = StartPr.Ind.Left;
 
-            if ( Pr.Ind.Right == UnknownValue )
-                Pr.Ind.Right = StartPr.Ind.Right;
+         if ( Pr.Ind.Right == UnknownValue )
+         Pr.Ind.Right = StartPr.Ind.Right;
 
-            if ( Pr.Ind.FirstLine == UnknownValue )
-                Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+         if ( Pr.Ind.FirstLine == UnknownValue )
+         Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
-            Result_ParaPr = Pr;
-            Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
+         Result_ParaPr = Pr;
+         Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
 
-            return Result_ParaPr;
-        }
+         return Result_ParaPr;
+         }
 
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.LogicDocument.DrawingObjects.getParagraphParaPr();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if ( EndPos < StartPos )
-                {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos   = Temp;
-                }
+         if ( docpostype_DrawingObjects === this.CurPos.Type )
+         return this.LogicDocument.DrawingObjects.getParagraphParaPr();
+         else //if ( docpostype_Content === this.CurPos.Type )
+         {
+         if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
+         {
+         var StartPos = this.Selection.StartPos;
+         var EndPos   = this.Selection.EndPos;
+         if ( EndPos < StartPos )
+         {
+         var Temp = StartPos;
+         StartPos = EndPos;
+         EndPos   = Temp;
+         }
 
-                var StartPr, Pr;
-                if ( type_Paragraph == this.Content[StartPos].GetType() )
-                {
-                    StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
-                    Pr        = StartPr.Copy();
-                    Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
-                }
-                else if ( type_Table == this.Content[StartPos].GetType() )
-                {
-                    StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
-                    Pr        = StartPr.Copy();
-                    Pr.Locked = StartPr.Locked;
-                }
+         var StartPr, Pr;
+         if ( type_Paragraph == this.Content[StartPos].GetType() )
+         {
+         StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
+         Pr        = StartPr.Copy();
+         Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
+         }
+         else if ( type_Table == this.Content[StartPos].GetType() )
+         {
+         StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
+         Pr        = StartPr.Copy();
+         Pr.Locked = StartPr.Locked;
+         }
 
-                for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
-                {
-                    var Item = this.Content[Index];
+         for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+         {
+         var Item = this.Content[Index];
 
-                    var TempPr;
-                    if ( type_Paragraph == Item.GetType() )
-                    {
-                        TempPr        = Item.Get_CompiledPr2(false).ParaPr;
-                        TempPr.Locked = Item.Lock.Is_Locked();
-                    }
-                    else if ( type_Table == Item.GetType() )
-                    {
-                        TempPr = Item.Get_Paragraph_ParaPr();
-                    }
+         var TempPr;
+         if ( type_Paragraph == Item.GetType() )
+         {
+         TempPr        = Item.Get_CompiledPr2(false).ParaPr;
+         TempPr.Locked = Item.Lock.Is_Locked();
+         }
+         else if ( type_Table == Item.GetType() )
+         {
+         TempPr = Item.Get_Paragraph_ParaPr();
+         }
 
-                    Pr = Pr.Compare(TempPr);
-                }
+         Pr = Pr.Compare(TempPr);
+         }
 
-                if ( undefined === Pr.Ind.Left )
-                    Pr.Ind.Left = StartPr.Ind.Left;
+         if ( undefined === Pr.Ind.Left )
+         Pr.Ind.Left = StartPr.Ind.Left;
 
-                if ( undefined === Pr.Ind.Right )
-                    Pr.Ind.Right = StartPr.Ind.Right;
+         if ( undefined === Pr.Ind.Right )
+         Pr.Ind.Right = StartPr.Ind.Right;
 
-                if ( undefined === Pr.Ind.FirstLine )
-                    Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+         if ( undefined === Pr.Ind.FirstLine )
+         Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
-                Result_ParaPr = Pr;
-                Result_ParaPr.CanAddTable = ( true === Locked ? false : true );
-            }
-            else
-            {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Paragraph == Item.GetType() )
-                {
-                    var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
-                    var Locked = Item.Lock.Is_Locked();
+         Result_ParaPr = Pr;
+         Result_ParaPr.CanAddTable = ( true === Locked ? false : true );
+         }
+         else
+         {
+         var Item = this.Content[this.CurPos.ContentPos];
+         if ( type_Paragraph == Item.GetType() )
+         {
+         var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
+         var Locked = Item.Lock.Is_Locked();
 
-                    Result_ParaPr         = ParaPr.Copy();
-                    Result_ParaPr.Locked  = Locked;
-                    Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
-                }
-                else if ( type_Table == Item.GetType() )
-                {
-                    Result_ParaPr = Item.Get_Paragraph_ParaPr();
-                }
-            }
+         Result_ParaPr         = ParaPr.Copy();
+         Result_ParaPr.Locked  = Locked;
+         Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+         }
+         else if ( type_Table == Item.GetType() )
+         {
+         Result_ParaPr = Item.Get_Paragraph_ParaPr();
+         }
+         }
 
-            return Result_ParaPr;
-        } */
+         return Result_ParaPr;
+         } */
         var Result_ParaPr = new CParaPr();
 
         if ( true === this.ApplyToAll )
@@ -7433,7 +7462,7 @@ CDocumentContent.prototype =
 
                         Item.Internal_Selection_UpdateCells();
                     }
-                    
+
                     break;
             }
         }
@@ -8070,7 +8099,7 @@ CDocumentContent.prototype =
 
         if ( "undefined" == typeof(NextObj) )
             NextObj = null;
-        
+
         for ( var Index = 0; Index < Count; Index++ )
             this.Content[Position + Index].PreDelete();
 

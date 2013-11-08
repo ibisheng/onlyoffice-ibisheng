@@ -220,8 +220,8 @@ CChartAsGroup.prototype =
         var bin =  w.pos + ";" + w.GetBase64Memory();
 
         var new_chart_data = new asc_CChart(this.chart);
-       /* var r = CreateBinaryReader(bin, 0, bin.length);
-        new_chart_data.Read_FromBinary2(r);   */
+        /* var r = CreateBinaryReader(bin, 0, bin.length);
+         new_chart_data.Read_FromBinary2(r);   */
 
         if(chart.styleId != null)
             new_chart_data.asc_setStyleId(chart.styleId);
@@ -1107,7 +1107,7 @@ CChartAsGroup.prototype =
         t_y = invert_transform.TransformPointY(x, y);
         var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
 
-        var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
+        var sqr_x = t_x*t_x, sqr_y = t_y*t_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 
@@ -1490,7 +1490,7 @@ CChartAsGroup.prototype =
         if(is_on)
             History.TurnOn();
 
-     //   this.recalculate();
+        //   this.recalculate();
 
     },
 

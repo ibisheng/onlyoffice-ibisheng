@@ -236,24 +236,24 @@ CShape.prototype =
         if (arrowsCount === 1 || arrowsCount === 2) {
             switch (arrowsCount) {
                 case 1:
-                    {
-                        var ln = new CLn();
-                        ln.tailEnd = new EndArrow();
-                        ln.tailEnd.type = LineEndType.Arrow;
-                        ln.tailEnd.len = LineEndSize.Mid;
-                        break;
-                    }
+                {
+                    var ln = new CLn();
+                    ln.tailEnd = new EndArrow();
+                    ln.tailEnd.type = LineEndType.Arrow;
+                    ln.tailEnd.len = LineEndSize.Mid;
+                    break;
+                }
                 case 2:
-                    {
-                        var ln = new CLn();
-                        ln.tailEnd = new EndArrow();
-                        ln.tailEnd.type = LineEndType.Arrow;
-                        ln.tailEnd.len = LineEndSize.Mid;
-                        ln.headEnd = new EndArrow();
-                        ln.headEnd.type = LineEndType.Arrow;
-                        ln.headEnd.len = LineEndSize.Mid;
-                        break;
-                    }
+                {
+                    var ln = new CLn();
+                    ln.tailEnd = new EndArrow();
+                    ln.tailEnd.type = LineEndType.Arrow;
+                    ln.tailEnd.len = LineEndSize.Mid;
+                    ln.headEnd = new EndArrow();
+                    ln.headEnd.type = LineEndType.Arrow;
+                    ln.headEnd.len = LineEndSize.Mid;
+                    break;
+                }
             }
             this.setLine(ln);
         }
@@ -419,19 +419,19 @@ CShape.prototype =
             var ph_index = this.getPlaceholderIndex();
             switch (this.parent.kind) {
                 case SLIDE_KIND:
-                    {
-                        var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
-                        if (placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
-                            return true;
-                        placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
-                        return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                    }
+                {
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    if (placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
+                        return true;
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
 
                 case LAYOUT_KIND:
-                    {
-                        var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
-                        return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
-                    }
+                {
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
+                }
             }
         }
         return false;
@@ -446,17 +446,17 @@ CShape.prototype =
                 var ph_index = this.getPlaceholderIndex();
                 switch (this.parent.kind) {
                     case SLIDE_KIND:
-                        {
-                            hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
-                            hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
-                            break;
-                        }
+                    {
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                        break;
+                    }
 
                     case LAYOUT_KIND:
-                        {
-                            hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
-                            break;
-                        }
+                    {
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                        break;
+                    }
                 }
             }
             this.recalcInfo.recalculateShapeHierarchy = true;
@@ -538,29 +538,29 @@ CShape.prototype =
         var parents = { slide: null, layout: null, master: null, theme: null };
         switch (this.parent.kind) {
             case SLIDE_KIND:
-                {
-                    parents.slide = this.parent;
-                    parents.layout = this.parent.Layout;
-                    parents.master = this.parent.Layout.Master;
-                    parents.theme = this.parent.Layout.Master.Theme;
-                    parents.presentation = this.parent.Layout.Master.presentation;
-                    break;
-                }
+            {
+                parents.slide = this.parent;
+                parents.layout = this.parent.Layout;
+                parents.master = this.parent.Layout.Master;
+                parents.theme = this.parent.Layout.Master.Theme;
+                parents.presentation = this.parent.Layout.Master.presentation;
+                break;
+            }
             case LAYOUT_KIND:
-                {
-                    parents.layout = this.parent;
-                    parents.master = this.parent.Master;
-                    parents.theme = this.parent.Master.Theme;
-                    parents.presentation = this.parent.Master.presentation;
-                    break;
-                }
+            {
+                parents.layout = this.parent;
+                parents.master = this.parent.Master;
+                parents.theme = this.parent.Master.Theme;
+                parents.presentation = this.parent.Master.presentation;
+                break;
+            }
             case MASTER_KIND:
-                {
-                    parents.master = this.parent;
-                    parents.theme = this.parent.Theme;
-                    parents.presentation = this.parent.presentation;
-                    break;
-                }
+            {
+                parents.master = this.parent;
+                parents.theme = this.parent.Theme;
+                parents.presentation = this.parent.presentation;
+                break;
+            }
         }
         return parents;
     },
@@ -900,30 +900,30 @@ CShape.prototype =
                 if (/*_content_height < _text_rect_height*/true) {
                     switch (_body_pr.anchor) {
                         case 0: //b
-                            { // (Text Anchor Enum ( Bottom ))
-                                _vertical_shift = _text_rect_height - _content_height;
-                                break;
-                            }
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = _text_rect_height - _content_height;
+                            break;
+                        }
                         case 1:    //ctr
-                            {// (Text Anchor Enum ( Center ))
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 2: //dist
-                            {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 3: //just
-                            {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 4: //t
-                            {//Top
-                                _vertical_shift = 0;
-                                break;
-                            }
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                     }
 
                 }
@@ -932,13 +932,13 @@ CShape.prototype =
 
                     //_vertical_shift =  _text_rect_height - _content_height;
                     /*if(_body_pr.anchor === 0)
-                    {
-                    _vertical_shift =  _text_rect_height - _content_height;
-                    }
-                    else
-                    {
-                    _vertical_shift = 0;
-                    } */
+                     {
+                     _vertical_shift =  _text_rect_height - _content_height;
+                     }
+                     else
+                     {
+                     _vertical_shift = 0;
+                     } */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
@@ -956,42 +956,42 @@ CShape.prototype =
                 if (/*_content_height < _text_rect_width*/true) {
                     switch (_body_pr.anchor) {
                         case 0: //b
-                            { // (Text Anchor Enum ( Bottom ))
-                                _vertical_shift = _text_rect_width - _content_height;
-                                break;
-                            }
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = _text_rect_width - _content_height;
+                            break;
+                        }
                         case 1:    //ctr
-                            {// (Text Anchor Enum ( Center ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 2: //dist
-                            {// (Text Anchor Enum ( Distributed ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Distributed ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 3: //just
-                            {// (Text Anchor Enum ( Justified ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Justified ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 4: //t
-                            {//Top
-                                _vertical_shift = 0;
-                                break;
-                            }
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                     }
                 }
                 else {
                     _vertical_shift = 0;
                     /*if(_body_pr.anchor === 0)
-                    {
-                    _vertical_shift =  _text_rect_width - _content_height;
-                    }
-                    else
-                    {
-                    _vertical_shift = 0;
-                    }  */
+                     {
+                     _vertical_shift =  _text_rect_width - _content_height;
+                     }
+                     else
+                     {
+                     _vertical_shift = 0;
+                     }  */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 var _alpha;
@@ -1056,42 +1056,42 @@ CShape.prototype =
             if (/*_content_height < content_height2*/true) {
                 switch (_body_pr.anchor) {
                     case 0: //b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = content_height2 - _content_height;
-                            break;
-                        }
+                    { // (Text Anchor Enum ( Bottom ))
+                        _vertical_shift = content_height2 - _content_height;
+                        break;
+                    }
                     case 1:    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Center ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 2: //dist
-                        {// (Text Anchor Enum ( Distributed ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Distributed ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 3: //just
-                        {// (Text Anchor Enum ( Justified ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Justified ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 4: //t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+                    {//Top
+                        _vertical_shift = 0;
+                        break;
+                    }
                 }
             }
             else {
                 _vertical_shift = 0;
                 /*if(_body_pr.anchor === 0)
-                {
-                _vertical_shift =  content_height2 - _content_height;
-                }
-                else
-                {
-                _vertical_shift = 0;
-                } */
+                 {
+                 _vertical_shift =  content_height2 - _content_height;
+                 }
+                 else
+                 {
+                 _vertical_shift = 0;
+                 } */
             }
 
             var _text_rect_xc = _l + (_r - _l) * 0.5;
@@ -1212,30 +1212,30 @@ CShape.prototype =
                 if (/*_content_height < _text_rect_height*/true) {
                     switch (_body_pr.anchor) {
                         case 0: //b
-                            { // (Text Anchor Enum ( Bottom ))
-                                _vertical_shift = _text_rect_height - _content_height;
-                                break;
-                            }
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = _text_rect_height - _content_height;
+                            break;
+                        }
                         case 1:    //ctr
-                            {// (Text Anchor Enum ( Center ))
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 2: //dist
-                            {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Distributed )) TODO: пока выравнивание  по центру. Переделать!
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 3: //just
-                            {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
-                                _vertical_shift = (_text_rect_height - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Justified )) TODO: пока выравнивание  по центру. Переделать!
+                            _vertical_shift = (_text_rect_height - _content_height) * 0.5;
+                            break;
+                        }
                         case 4: //t
-                            {//Top
-                                _vertical_shift = 0;
-                                break;
-                            }
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                     }
 
                 }
@@ -1244,13 +1244,13 @@ CShape.prototype =
 
                     //_vertical_shift =  _text_rect_height - _content_height;
                     /*if(_body_pr.anchor === 0)
-                    {
-                    _vertical_shift =  _text_rect_height - _content_height;
-                    }
-                    else
-                    {
-                    _vertical_shift = 0;
-                    } */
+                     {
+                     _vertical_shift =  _text_rect_height - _content_height;
+                     }
+                     else
+                     {
+                     _vertical_shift = 0;
+                     } */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
@@ -1268,42 +1268,42 @@ CShape.prototype =
                 if (/*_content_height < _text_rect_width*/true) {
                     switch (_body_pr.anchor) {
                         case 0: //b
-                            { // (Text Anchor Enum ( Bottom ))
-                                _vertical_shift = _text_rect_width - _content_height;
-                                break;
-                            }
+                        { // (Text Anchor Enum ( Bottom ))
+                            _vertical_shift = _text_rect_width - _content_height;
+                            break;
+                        }
                         case 1:    //ctr
-                            {// (Text Anchor Enum ( Center ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Center ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 2: //dist
-                            {// (Text Anchor Enum ( Distributed ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Distributed ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 3: //just
-                            {// (Text Anchor Enum ( Justified ))
-                                _vertical_shift = (_text_rect_width - _content_height) * 0.5;
-                                break;
-                            }
+                        {// (Text Anchor Enum ( Justified ))
+                            _vertical_shift = (_text_rect_width - _content_height) * 0.5;
+                            break;
+                        }
                         case 4: //t
-                            {//Top
-                                _vertical_shift = 0;
-                                break;
-                            }
+                        {//Top
+                            _vertical_shift = 0;
+                            break;
+                        }
                     }
                 }
                 else {
                     _vertical_shift = 0;
                     /*if(_body_pr.anchor === 0)
-                    {
-                    _vertical_shift =  _text_rect_width - _content_height;
-                    }
-                    else
-                    {
-                    _vertical_shift = 0;
-                    }  */
+                     {
+                     _vertical_shift =  _text_rect_width - _content_height;
+                     }
+                     else
+                     {
+                     _vertical_shift = 0;
+                     }  */
                 }
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 var _alpha;
@@ -1375,42 +1375,42 @@ CShape.prototype =
             if (/*_content_height < content_height2*/true) {
                 switch (_body_pr.anchor) {
                     case 0: //b
-                        { // (Text Anchor Enum ( Bottom ))
-                            _vertical_shift = content_height2 - _content_height;
-                            break;
-                        }
+                    { // (Text Anchor Enum ( Bottom ))
+                        _vertical_shift = content_height2 - _content_height;
+                        break;
+                    }
                     case 1:    //ctr
-                        {// (Text Anchor Enum ( Center ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Center ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 2: //dist
-                        {// (Text Anchor Enum ( Distributed ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Distributed ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 3: //just
-                        {// (Text Anchor Enum ( Justified ))
-                            _vertical_shift = (content_height2 - _content_height) * 0.5;
-                            break;
-                        }
+                    {// (Text Anchor Enum ( Justified ))
+                        _vertical_shift = (content_height2 - _content_height) * 0.5;
+                        break;
+                    }
                     case 4: //t
-                        {//Top
-                            _vertical_shift = 0;
-                            break;
-                        }
+                    {//Top
+                        _vertical_shift = 0;
+                        break;
+                    }
                 }
             }
             else {
                 _vertical_shift = 0;
                 /*if(_body_pr.anchor === 0)
-                {
-                _vertical_shift =  content_height2 - _content_height;
-                }
-                else
-                {
-                _vertical_shift = 0;
-                } */
+                 {
+                 _vertical_shift =  content_height2 - _content_height;
+                 }
+                 else
+                 {
+                 _vertical_shift = 0;
+                 } */
             }
 
             var _text_rect_xc = _l + (_r - _l) * 0.5;
@@ -1523,23 +1523,23 @@ CShape.prototype =
                 switch (this.getPlaceholderType()) {
                     case phType_ctrTitle:
                     case phType_title:
-                        {
-                            master_ppt_styles = parent_objects.master.txStyles.titleStyle;
-                            break;
-                        }
+                    {
+                        master_ppt_styles = parent_objects.master.txStyles.titleStyle;
+                        break;
+                    }
                     case phType_body:
                     case phType_subTitle:
                     case phType_obj:
                     case null:
-                        {
-                            master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
-                            break;
-                        }
+                    {
+                        master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
+                        break;
+                    }
                     default:
-                        {
-                            master_ppt_styles = parent_objects.master.txStyles.otherStyle;
-                            break;
-                        }
+                    {
+                        master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                        break;
+                    }
                 }
             }
             else {
@@ -1582,19 +1582,19 @@ CShape.prototype =
             shape_text_style = new CStyle("shapeTextStyle", null, null, null);
             switch (this.style.fontRef.idx) {
                 case fntStyleInd_major:
-                    {
-                        shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme) };
-                        break;
-                    }
+                {
+                    shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme) };
+                    break;
+                }
                 case fntStyleInd_minor:
-                    {
-                        shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mn-lt")(parent_objects.theme.themeElements.fontScheme) };
-                        break;
-                    }
+                {
+                    shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mn-lt")(parent_objects.theme.themeElements.fontScheme) };
+                    break;
+                }
                 default:
-                    {
-                        break;
-                    }
+                {
+                    break;
+                }
             }
 
             if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
@@ -2008,25 +2008,25 @@ CShape.prototype =
         var full_flip_v = this.getFullFlipV();
         switch (Math.min(y1, y3, y5, y7)) {
             case y1:
-                {
-                    north_number = !full_flip_v ? 1 : 5;
-                    break;
-                }
+            {
+                north_number = !full_flip_v ? 1 : 5;
+                break;
+            }
             case y3:
-                {
-                    north_number = !full_flip_h ? 3 : 7;
-                    break;
-                }
+            {
+                north_number = !full_flip_h ? 3 : 7;
+                break;
+            }
             case y5:
-                {
-                    north_number = !full_flip_v ? 5 : 1;
-                    break;
-                }
+            {
+                north_number = !full_flip_v ? 5 : 1;
+                break;
+            }
             default:
-                {
-                    north_number = !full_flip_h ? 7 : 3;
-                    break;
-                }
+            {
+                north_number = !full_flip_h ? 7 : 3;
+                break;
+            }
         }
         var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
 
@@ -2650,24 +2650,24 @@ CShape.prototype =
 
     draw: function (graphics) {
         /*graphics.SetIntegerGrid(false);
-        graphics.transform3(this.transform, false);
-        var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this, graphics);
-        shape_drawer.draw(this.spPr.geometry);
-        if(locktype_None != this.Lock.Get_Type())
-        graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
-        graphics.reset();
-        graphics.SetIntegerGrid(true);
+         graphics.transform3(this.transform, false);
+         var shape_drawer = new CShapeDrawer();
+         shape_drawer.fromShape(this, graphics);
+         shape_drawer.draw(this.spPr.geometry);
+         if(locktype_None != this.Lock.Get_Type())
+         graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+         graphics.reset();
+         graphics.SetIntegerGrid(true);
 
 
-        if (this.txBody /*&& /*!(graphics instanceof CSlideBoundsChecker))*/
+         if (this.txBody /*&& /*!(graphics instanceof CSlideBoundsChecker))*/
         // {
         /*    graphics.SetIntegerGrid(false);
-        graphics.transform3(this.transformText);
-        this.txBody.draw(graphics);
-        graphics.reset();
-        graphics.SetIntegerGrid(true);
-        }   */
+         graphics.transform3(this.transformText);
+         this.txBody.draw(graphics);
+         graphics.reset();
+         graphics.SetIntegerGrid(true);
+         }   */
         if (graphics.IsSlideBoundsCheckerType === true) {
             graphics.transform3(this.transform);
             if (null == this.geometry || !graphics.IsShapeNeedBounds(this.spPr.geometry.preset)) {
@@ -2789,18 +2789,18 @@ CShape.prototype =
                 graphics.FreeFont();
 
             /*var _masrgins = this.getMargins();
-            graphics.reset();
-            graphics.SetIntegerGrid(false);
-            graphics.p_width(70);
-            graphics.transform3(this.TransformTextMatrix);
-            graphics.p_color(0,0,0,255);
-            graphics._s();
-            graphics._m(_masrgins.L*100, _masrgins.T*100);
-            graphics._l(_masrgins.R*100, _masrgins.T*100);
-            graphics._l(_masrgins.R*100, _masrgins.B*100);
-            graphics._l(_masrgins.L*100, _masrgins.B*100);
-            graphics._z();
-            graphics.ds();        */
+             graphics.reset();
+             graphics.SetIntegerGrid(false);
+             graphics.p_width(70);
+             graphics.transform3(this.TransformTextMatrix);
+             graphics.p_color(0,0,0,255);
+             graphics._s();
+             graphics._m(_masrgins.L*100, _masrgins.T*100);
+             graphics._l(_masrgins.R*100, _masrgins.T*100);
+             graphics._l(_masrgins.R*100, _masrgins.B*100);
+             graphics._l(_masrgins.L*100, _masrgins.B*100);
+             graphics._z();
+             graphics.ds();        */
 
             graphics.SetIntegerGrid(true);
         }
@@ -3008,135 +3008,135 @@ CShape.prototype =
         }
         switch (sPreset) {
             case "lineWithArrow":
-                {
-                    _final_preset = "line";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-                    break;
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
             case "lineWithTwoArrows":
-                {
-                    _final_preset = "line";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
 
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-
-                    _new_line.headEnd = new EndArrow();
-                    _new_line.headEnd.type = LineEndType.Arrow;
-                    _new_line.headEnd.len = LineEndSize.Mid;
-                    _new_line.headEnd.w = LineEndSize.Mid;
-                    break;
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
             case "bentConnector5WithArrow":
-                {
-                    _final_preset = "bentConnector5";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
 
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-                    break;
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
             case "bentConnector5WithTwoArrows":
-                {
-                    _final_preset = "bentConnector5";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
 
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-
-                    _new_line.headEnd = new EndArrow();
-                    _new_line.headEnd.type = LineEndType.Arrow;
-                    _new_line.headEnd.len = LineEndSize.Mid;
-                    _new_line.headEnd.w = LineEndSize.Mid;
-                    break;
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
             case "curvedConnector3WithArrow":
-                {
-                    _final_preset = "curvedConnector3";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
 
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-                    break;
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
             case "curvedConnector3WithTwoArrows":
-                {
-                    _final_preset = "curvedConnector3";
-                    _arrow_flag = true;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if (_old_line == null) {
+                    _new_line = new CLn();
 
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = new EndArrow();
-                    _new_line.tailEnd.type = LineEndType.Arrow;
-                    _new_line.tailEnd.len = LineEndSize.Mid;
-                    _new_line.tailEnd.w = LineEndSize.Mid;
-
-                    _new_line.headEnd = new EndArrow();
-                    _new_line.headEnd.type = LineEndType.Arrow;
-                    _new_line.headEnd.len = LineEndSize.Mid;
-                    _new_line.headEnd.w = LineEndSize.Mid;
-                    break;
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
             default:
-                {
-                    _final_preset = sPreset;
-                    if (_old_line == null) {
-                        _new_line = new CLn();
-                    }
-                    else {
-                        _new_line = this.spPr.ln.createDuplicate();
-                    }
-                    _new_line.tailEnd = null;
-
-                    _new_line.headEnd = null;
-                    break;
+            {
+                _final_preset = sPreset;
+                if (_old_line == null) {
+                    _new_line = new CLn();
                 }
+                else {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = null;
+
+                _new_line.headEnd = null;
+                break;
+            }
         }
         var old_geometry = isRealObject(this.spPr.geometry) ? this.spPr.geometry : null;
         if (_final_preset != null) {
@@ -3272,7 +3272,7 @@ CShape.prototype =
         var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
 
         var check_line = CheckObjectLine(this);
-        var sqr_x = t_x * t_y, sqr_y = t_y * t_y;
+        var sqr_x = t_x * t_x, sqr_y = t_y * t_y;
         if (Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 
@@ -3365,7 +3365,7 @@ CShape.prototype =
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-         HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+            HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
     },
 
     canRotate: function () {
@@ -3473,119 +3473,119 @@ CShape.prototype =
 
         switch (data.Type) {
             case historyitem_SetShapeRot:
-                {
-                    this.spPr.xfrm.rot = data.oldRot;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.rot = data.oldRot;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
             case historyitem_SetShapeOffset:
-                {
-                    this.spPr.xfrm.offX = data.oldOffsetX;
-                    this.spPr.xfrm.offY = data.oldOffsetY;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.offX = data.oldOffsetX;
+                this.spPr.xfrm.offY = data.oldOffsetY;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
 
             case historyitem_SetShapeExtents:
-                {
-                    this.spPr.xfrm.extX = data.oldExtentX;
-                    this.spPr.xfrm.extY = data.oldExtentY;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateGeometry = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.extX = data.oldExtentX;
+                this.spPr.xfrm.extY = data.oldExtentY;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeFlips:
-                {
-                    this.spPr.xfrm.flipH = data.oldFlipH;
-                    this.spPr.xfrm.flipV = data.oldFlipV;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.flipH = data.oldFlipH;
+                this.spPr.xfrm.flipV = data.oldFlipV;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                this.recalcInfo.recalculateContent = true;
+                break;
+            }
             case historyitem_SetShapeSetFill:
-                {
-                    if (isRealObject(data.oldFill)) {
-                        this.spPr.Fill = data.oldFill.createDuplicate();
-                    }
-                    else {
-                        this.spPr.Fill = null;
-                    }
-
-                    this.recalcInfo.recalculateFill = true;
-                    this.recalcInfo.recalculateBrush = true;
-                    this.recalcInfo.recalculateTransparent = true;
-
-                    break;
+            {
+                if (isRealObject(data.oldFill)) {
+                    this.spPr.Fill = data.oldFill.createDuplicate();
                 }
+                else {
+                    this.spPr.Fill = null;
+                }
+
+                this.recalcInfo.recalculateFill = true;
+                this.recalcInfo.recalculateBrush = true;
+                this.recalcInfo.recalculateTransparent = true;
+
+                break;
+            }
             case historyitem_SetShapeSetLine:
-                {
-                    if (isRealObject(data.oldLine)) {
-                        this.spPr.ln = data.oldLine.createDuplicate();
-                    }
-                    else {
-                        this.spPr.ln = null;
-                    }
+            {
+                if (isRealObject(data.oldLine)) {
+                    this.spPr.ln = data.oldLine.createDuplicate();
+                }
+                else {
+                    this.spPr.ln = null;
+                }
 
-                    this.recalcInfo.recalculateLine = true;
-                    this.recalcInfo.recalculatePen = true;
-                    editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-                    break;
-                }
+                this.recalcInfo.recalculateLine = true;
+                this.recalcInfo.recalculatePen = true;
+                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+                break;
+            }
             case historyitem_SetShapeSetGeometry:
-                {
-                    if (isRealObject(data.oldGeometry)) {
-                        this.spPr.geometry = data.oldGeometry.createDuplicate();
-                        this.spPr.geometry.Init(5, 5);
-                    }
-                    else {
-                        this.spPr.geometry = null;
-                    }
-                    this.recalcInfo.recalculateGeometry = true;
-                    break;
+            {
+                if (isRealObject(data.oldGeometry)) {
+                    this.spPr.geometry = data.oldGeometry.createDuplicate();
+                    this.spPr.geometry.Init(5, 5);
                 }
+                else {
+                    this.spPr.geometry = null;
+                }
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeBodyPr:
-                {
-                    this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
-                    this.txBody.recalcInfo.recalculateBodyPr = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
             case historyitem_SetSetNvSpPr:
-                {
-                    this.nvSpPr = data.oldPr;
-                    break;
-                }
+            {
+                this.nvSpPr = data.oldPr;
+                break;
+            }
             case historyitem_SetSetSpPr:
-                {
-                    this.spPr = data.oldPr;
-                    break;
-                }
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
             case historyitem_SetSetStyle:
-                {
-                    this.style = data.oldPr;
-                    break;
-                }
+            {
+                this.style = data.oldPr;
+                break;
+            }
             case historyitem_SetTextBody:
-                {
-                    this.txBody = data.oldPr;
-                    break;
-                }
+            {
+                this.txBody = data.oldPr;
+                break;
+            }
             case historyitem_SetSpGroup:
-                {
-                    this.group = data.oldPr;
-                    break;
-                }
+            {
+                this.group = data.oldPr;
+                break;
+            }
             case historyitem_SetShapeParent:
-                {
-                    this.parent = data.Old;
-                    break;
-                }
+            {
+                this.parent = data.Old;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         if (!this.parent) {
@@ -3597,117 +3597,117 @@ CShape.prototype =
 
         switch (data.Type) {
             case historyitem_SetShapeRot:
-                {
-                    this.spPr.xfrm.rot = data.newRot;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.rot = data.newRot;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
             case historyitem_SetShapeOffset:
-                {
-                    this.spPr.xfrm.offX = data.newOffsetX;
-                    this.spPr.xfrm.offY = data.newOffsetY;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.offX = data.newOffsetX;
+                this.spPr.xfrm.offY = data.newOffsetY;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
 
             case historyitem_SetShapeExtents:
-                {
-                    this.spPr.xfrm.extX = data.newExtentX;
-                    this.spPr.xfrm.extY = data.newExtentY;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateGeometry = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.extX = data.newExtentX;
+                this.spPr.xfrm.extY = data.newExtentY;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeFlips:
-                {
-                    this.spPr.xfrm.flipH = data.newFlipH;
-                    this.spPr.xfrm.flipV = data.newFlipV;
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    break;
-                }
+            {
+                this.spPr.xfrm.flipH = data.newFlipH;
+                this.spPr.xfrm.flipV = data.newFlipV;
+                this.recalcInfo.recalculateTransform = true;
+                this.recalcInfo.recalculateTransformText = true;
+                this.recalcInfo.recalculateContent = true;
+                break;
+            }
             case historyitem_SetShapeSetFill:
-                {
-                    if (isRealObject(data.newFill)) {
-                        this.spPr.Fill = data.newFill.createDuplicate();
-                    }
-                    this.recalcInfo.recalculateFill = true;
-                    this.recalcInfo.recalculateBrush = true;
-                    this.recalcInfo.recalculateTransparent = true;
-
-                    break;
+            {
+                if (isRealObject(data.newFill)) {
+                    this.spPr.Fill = data.newFill.createDuplicate();
                 }
+                this.recalcInfo.recalculateFill = true;
+                this.recalcInfo.recalculateBrush = true;
+                this.recalcInfo.recalculateTransparent = true;
+
+                break;
+            }
             case historyitem_SetShapeSetLine:
-                {
-                    if (isRealObject(data.newLine)) {
-                        this.spPr.ln = data.newLine.createDuplicate();
-                    }
-                    else {
-                        this.spPr.ln = null;
-                    }
+            {
+                if (isRealObject(data.newLine)) {
+                    this.spPr.ln = data.newLine.createDuplicate();
+                }
+                else {
+                    this.spPr.ln = null;
+                }
 
-                    this.recalcInfo.recalculateLine = true;
-                    this.recalcInfo.recalculatePen = true;
-                    break;
-                }
+                this.recalcInfo.recalculateLine = true;
+                this.recalcInfo.recalculatePen = true;
+                break;
+            }
             case historyitem_SetShapeSetGeometry:
-                {
-                    if (isRealObject(data.newGeometry)) {
-                        this.spPr.geometry = data.newGeometry.createDuplicate();
-                        this.spPr.geometry.Init(5, 5);
-                    }
-                    else {
-                        this.spPr.geometry = null;
-                    }
-                    this.recalcInfo.recalculateGeometry = true;
-                    break;
+            {
+                if (isRealObject(data.newGeometry)) {
+                    this.spPr.geometry = data.newGeometry.createDuplicate();
+                    this.spPr.geometry.Init(5, 5);
                 }
+                else {
+                    this.spPr.geometry = null;
+                }
+                this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
             case historyitem_SetShapeBodyPr:
-                {
-                    this.txBody.bodyPr = data.newBodyPr.createDuplicate();
-                    this.txBody.recalcInfo.recalculateBodyPr = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
+            {
+                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
             case historyitem_SetSetNvSpPr:
-                {
-                    this.nvSpPr = data.newPr;
-                    break;
-                }
+            {
+                this.nvSpPr = data.newPr;
+                break;
+            }
 
             case historyitem_SetSetSpPr:
-                {
-                    this.spPr = data.newPr;
-                    break;
-                }
+            {
+                this.spPr = data.newPr;
+                break;
+            }
             case historyitem_SetSetStyle:
-                {
-                    this.style = data.newPr;
-                    break;
-                }
+            {
+                this.style = data.newPr;
+                break;
+            }
 
             case historyitem_SetTextBody:
-                {
-                    this.txBody = data.newPr;
-                    break;
-                }
+            {
+                this.txBody = data.newPr;
+                break;
+            }
 
             case historyitem_SetSpGroup:
-                {
-                    this.group = data.newPr;
-                    break;
-                }
+            {
+                this.group = data.newPr;
+                break;
+            }
             case historyitem_SetShapeParent:
-                {
-                    this.parent = data.New;
-                    break;
-                }
+            {
+                this.parent = data.New;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         if (!this.parent) {
@@ -3721,111 +3721,111 @@ CShape.prototype =
         var bool;
         switch (data.Type) {
             case historyitem_SetShapeRot:
-                {
-                    w.WriteDouble(data.newRot);
-                    break;
-                }
+            {
+                w.WriteDouble(data.newRot);
+                break;
+            }
             case historyitem_SetShapeOffset:
-                {
-                    w.WriteDouble(data.newOffsetX);
-                    w.WriteDouble(data.newOffsetY);
-                    break;
-                }
+            {
+                w.WriteDouble(data.newOffsetX);
+                w.WriteDouble(data.newOffsetY);
+                break;
+            }
 
             case historyitem_SetShapeExtents:
-                {
-                    w.WriteDouble(data.newExtentX);
-                    w.WriteDouble(data.newExtentY);
-                    break;
-                }
+            {
+                w.WriteDouble(data.newExtentX);
+                w.WriteDouble(data.newExtentY);
+                break;
+            }
             case historyitem_SetShapeFlips:
-                {
-                    w.WriteBool(data.newFlipH);
-                    w.WriteBool(data.newFlipV);
-                    break;
-                }
+            {
+                w.WriteBool(data.newFlipH);
+                w.WriteBool(data.newFlipV);
+                break;
+            }
             case historyitem_SetShapeSetFill:
-                {
-                    w.WriteBool(isRealObject(data.newFill));
-                    if (isRealObject(data.newFill)) {
-                        data.newFill.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newFill));
+                if (isRealObject(data.newFill)) {
+                    data.newFill.Write_ToBinary2(w);
                 }
+                break;
+            }
 
             case historyitem_SetShapeSetLine:
-                {
-                    w.WriteBool(isRealObject(data.newLine));
-                    if (isRealObject(data.newLine)) {
-                        data.newLine.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newLine));
+                if (isRealObject(data.newLine)) {
+                    data.newLine.Write_ToBinary2(w);
                 }
+                break;
+            }
 
             case historyitem_SetShapeSetGeometry:
-                {
-                    w.WriteBool(isRealObject(data.newGeometry));
-                    if (isRealObject(data.newGeometry)) {
-                        data.newGeometry.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newGeometry));
+                if (isRealObject(data.newGeometry)) {
+                    data.newGeometry.Write_ToBinary2(w);
                 }
+                break;
+            }
             case historyitem_SetShapeBodyPr:
-                {
-                    data.newBodyPr.Write_ToBinary2(w);
-                    break;
-                }
+            {
+                data.newBodyPr.Write_ToBinary2(w);
+                break;
+            }
 
             case historyitem_SetSetNvSpPr:
-                {
-                    w.WriteBool(isRealObject(data.newPr));
-                    if (isRealObject(data.newPr)) {
-                        data.newPr.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if (isRealObject(data.newPr)) {
+                    data.newPr.Write_ToBinary2(w);
                 }
+                break;
+            }
 
             case historyitem_SetSetSpPr:
-                {
-                    w.WriteBool(isRealObject(data.newPr));
-                    if (isRealObject(data.newPr)) {
-                        data.newPr.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if (isRealObject(data.newPr)) {
+                    data.newPr.Write_ToBinary2(w);
                 }
+                break;
+            }
             case historyitem_SetSetStyle:
-                {
-                    w.WriteBool(isRealObject(data.newPr));
-                    if (isRealObject(data.newPr)) {
-                        data.newPr.Write_ToBinary2(w);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if (isRealObject(data.newPr)) {
+                    data.newPr.Write_ToBinary2(w);
                 }
+                break;
+            }
 
             case historyitem_SetTextBody:
-                {
-                    w.WriteBool(isRealObject(data.newPr));
-                    if (isRealObject(data.newPr)) {
-                        w.WriteString2(data.newPr.Get_Id());
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if (isRealObject(data.newPr)) {
+                    w.WriteString2(data.newPr.Get_Id());
                 }
+                break;
+            }
             case historyitem_SetSpGroup:
-                {
-                    w.WriteBool(isRealObject(data.newPr));
-                    if (isRealObject(data.newPr)) {
-                        w.WriteString2(data.newPr.Get_Id());
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if (isRealObject(data.newPr)) {
+                    w.WriteString2(data.newPr.Get_Id());
                 }
+                break;
+            }
             case historyitem_SetShapeParent:
-                {
-                    w.WriteBool(isRealObject(data.New));
-                    if (isRealObject(data.New)) {
-                        w.WriteString2(data.New.Id);
-                    }
-                    break;
+            {
+                w.WriteBool(isRealObject(data.New));
+                if (isRealObject(data.New)) {
+                    w.WriteString2(data.New.Id);
                 }
+                break;
+            }
         }
     },
 
@@ -3833,150 +3833,150 @@ CShape.prototype =
         if (r.GetLong() === historyitem_type_Shape) {
             switch (r.GetLong()) {
                 case historyitem_SetShapeRot:
-                    {
-                        this.spPr.xfrm.rot = r.GetDouble();
-                        this.recalcInfo.recalculateTransform = true;
-                        this.recalcInfo.recalculateTransformText = true;
-                        break;
-                    }
+                {
+                    this.spPr.xfrm.rot = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
                 case historyitem_SetShapeOffset:
-                    {
-                        this.spPr.xfrm.offX = r.GetDouble();
-                        this.spPr.xfrm.offY = r.GetDouble();
-                        this.recalcInfo.recalculateTransform = true;
-                        this.recalcInfo.recalculateTransformText = true;
-                        break;
-                    }
+                {
+                    this.spPr.xfrm.offX = r.GetDouble();
+                    this.spPr.xfrm.offY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
 
                 case historyitem_SetShapeExtents:
-                    {
-                        this.spPr.xfrm.extX = r.GetDouble();
-                        this.spPr.xfrm.extY = r.GetDouble();
-                        this.recalcInfo.recalculateTransform = true;
-                        this.recalcInfo.recalculateTransformText = true;
-                        this.recalcInfo.recalculateContent = true;
-                        this.recalcInfo.recalculateGeometry = true;
+                {
+                    this.spPr.xfrm.extX = r.GetDouble();
+                    this.spPr.xfrm.extY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateGeometry = true;
 
-                        break;
-                    }
+                    break;
+                }
                 case historyitem_SetShapeFlips:
-                    {
-                        this.spPr.xfrm.flipH = r.GetBool();
-                        this.spPr.xfrm.flipV = r.GetBool();
-                        this.recalcInfo.recalculateTransform = true;
-                        this.recalcInfo.recalculateTransformText = true;
-                        this.recalcInfo.recalculateContent = true;
-                        break;
-                    }
+                {
+                    this.spPr.xfrm.flipH = r.GetBool();
+                    this.spPr.xfrm.flipV = r.GetBool();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    break;
+                }
 
                 case historyitem_SetShapeSetFill:
-                    {
-                        if (r.GetBool()) {
-                            this.spPr.Fill = new CUniFill();
-                            this.spPr.Fill.Read_FromBinary2(r);
-                        }
-                        if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
+                {
+                    if (r.GetBool()) {
+                        this.spPr.Fill = new CUniFill();
+                        this.spPr.Fill.Read_FromBinary2(r);
+                    }
+                    if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
                         && typeof this.spPr.Fill.fill.RasterImageId === "string") {
-                            CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
-                        }
-                        this.recalcInfo.recalculateFill = true;
-                        this.recalcInfo.recalculateBrush = true;
-                        this.recalcInfo.recalculateTransparent = true;
-                        break;
+                        CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
                     }
+                    this.recalcInfo.recalculateFill = true;
+                    this.recalcInfo.recalculateBrush = true;
+                    this.recalcInfo.recalculateTransparent = true;
+                    break;
+                }
                 case historyitem_SetShapeSetLine:
-                    {
-                        if (r.GetBool()) {
-                            this.spPr.ln = new CLn();
-                            this.spPr.ln.Read_FromBinary2(r);
-                        }
-                        this.recalcInfo.recalculateLine = true;
-                        this.recalcInfo.recalculatePen = true;
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.spPr.ln = new CLn();
+                        this.spPr.ln.Read_FromBinary2(r);
                     }
+                    this.recalcInfo.recalculateLine = true;
+                    this.recalcInfo.recalculatePen = true;
+                    break;
+                }
                 case historyitem_SetShapeSetGeometry:
-                    {
-                        if (r.GetBool()) {
-                            this.spPr.geometry = new Geometry();
-                            this.spPr.geometry.Read_FromBinary2(r);
-                            this.spPr.geometry.Init(5, 5);
-                        }
-                        else {
-                            this.spPr.geometry = null;
-                        }
-                        this.recalcInfo.recalculateGeometry = true;
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.spPr.geometry = new Geometry();
+                        this.spPr.geometry.Read_FromBinary2(r);
+                        this.spPr.geometry.Init(5, 5);
                     }
+                    else {
+                        this.spPr.geometry = null;
+                    }
+                    this.recalcInfo.recalculateGeometry = true;
+                    break;
+                }
                 case historyitem_SetShapeBodyPr:
-                    {
-                        this.txBody.bodyPr = new CBodyPr();
-                        this.txBody.bodyPr.Read_FromBinary2(r);
-                        this.txBody.recalcInfo.recalculateBodyPr = true;
-                        this.recalcInfo.recalculateContent = true;
-                        this.recalcInfo.recalculateTransformText = true;
-                        break;
-                    }
+                {
+                    this.txBody.bodyPr = new CBodyPr();
+                    this.txBody.bodyPr.Read_FromBinary2(r);
+                    this.txBody.recalcInfo.recalculateBodyPr = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
 
                 case historyitem_SetSetNvSpPr:
-                    {
-                        if (r.GetBool()) {
-                            this.nvSpPr = new UniNvPr();
-                            this.nvSpPr.Read_FromBinary2(r);
-                        }
-                        else {
-                            this.nvSpPr = null;
-                        }
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.nvSpPr = new UniNvPr();
+                        this.nvSpPr.Read_FromBinary2(r);
                     }
+                    else {
+                        this.nvSpPr = null;
+                    }
+                    break;
+                }
                 case historyitem_SetSetSpPr:
-                    {
+                {
 
-                        this.spPr = new CSpPr();
-                        if (r.GetBool()) {
-                            this.spPr.Read_FromBinary2(r);
-                        }
-                        break;
+                    this.spPr = new CSpPr();
+                    if (r.GetBool()) {
+                        this.spPr.Read_FromBinary2(r);
                     }
+                    break;
+                }
                 case historyitem_SetSetStyle:
-                    {
-                        if (r.GetBool()) {
-                            this.style = new CShapeStyle();
-                            this.style.Read_FromBinary2(r);
-                        }
-                        else {
-                            this.style = null;
-                        }
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.style = new CShapeStyle();
+                        this.style.Read_FromBinary2(r);
                     }
+                    else {
+                        this.style = null;
+                    }
+                    break;
+                }
 
                 case historyitem_SetTextBody:
-                    {
-                        if (r.GetBool()) {
-                            this.txBody = g_oTableId.Get_ById(r.GetString2());
-                        }
-                        else {
-                            this.txBody = null;
-                        }
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.txBody = g_oTableId.Get_ById(r.GetString2());
                     }
+                    else {
+                        this.txBody = null;
+                    }
+                    break;
+                }
                 case historyitem_SetSpGroup:
-                    {
-                        if (r.GetBool()) {
-                            this.group = g_oTableId.Get_ById(r.GetString2());
-                        }
-                        else {
-                            this.group = null;
-                        }
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.group = g_oTableId.Get_ById(r.GetString2());
                     }
+                    else {
+                        this.group = null;
+                    }
+                    break;
+                }
 
                 case historyitem_SetShapeParent:
-                    {
-                        if (r.GetBool()) {
-                            this.parent = g_oTableId.Get_ById(r.GetString2());
-                        }
-                        break;
+                {
+                    if (r.GetBool()) {
+                        this.parent = g_oTableId.Get_ById(r.GetString2());
                     }
+                    break;
+                }
 
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;

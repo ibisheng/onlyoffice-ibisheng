@@ -81,7 +81,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     this.TurnOffRecalcEvent = false;
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
-                             // True, если ячейка попадает в выделение по ячейкам.
+    // True, если ячейка попадает в выделение по ячейкам.
 
     this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
     if ( false === g_oIdCounter.m_bLoad )
@@ -118,6 +118,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     this.folHlinkColor.fill = new CSolidFill();
     this.folHlinkColor.fill.color = new CUniColor();
     this.folHlinkColor.fill.color.color = new CSchemeColor();
+    this.folHlinkColor.fill.color.color.id = 10;
     this.folHlinkColor.Color = {r:128, g:0, b:151};
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -128,6 +129,10 @@ Paragraph.prototype =
     setPresentationBullet: function (bullet) {
         History.Add(this, { Type: historyitem_Paragraph_PresentationBullet, oldPr: this.bullet, newPr: bullet });
         this.bullet = bullet;
+        //if(this.Parent)
+        //{
+        //    this.Parent.recalc0AllContent();
+        //}
     },
 
     GetType: function () {
@@ -271,29 +276,29 @@ Paragraph.prototype =
         return this.CopyPr_Open(OtherParagraph);
 
         /*
-        var bHistory = History.Is_On();
-        History.TurnOff();
+         var bHistory = History.Is_On();
+         History.TurnOff();
 
-        OtherParagraph.X      = this.X;
-        OtherParagraph.XLimit = this.XLimit;
+         OtherParagraph.X      = this.X;
+         OtherParagraph.XLimit = this.XLimit;
 
-        if ( "undefined" != typeof(OtherParagraph.NumPr) )
-        OtherParagraph.Numbering_Remove();
+         if ( "undefined" != typeof(OtherParagraph.NumPr) )
+         OtherParagraph.Numbering_Remove();
 
-        var NumPr = this.Numbering_Get();
-        if ( null != NumPr  )
-        {
-        OtherParagraph.Numbering_Add( NumPr.NumId, NumPr.Lvl );
-        }
+         var NumPr = this.Numbering_Get();
+         if ( null != NumPr  )
+         {
+         OtherParagraph.Numbering_Add( NumPr.NumId, NumPr.Lvl );
+         }
 
-        // Копируем прямые настройки параграфа в конце, потому что, например, нумерация может
-        // их изменить.
-        OtherParagraph.Pr = Common_CopyObj( this.Pr );
-        OtherParagraph.Style_Add( this.Style_Get(), true );
+         // Копируем прямые настройки параграфа в конце, потому что, например, нумерация может
+         // их изменить.
+         OtherParagraph.Pr = Common_CopyObj( this.Pr );
+         OtherParagraph.Style_Add( this.Style_Get(), true );
 
-        if ( true === bHistory )
-        History.TurnOn();
-        */
+         if ( true === bHistory )
+         History.TurnOn();
+         */
     },
 
     // Копируем свойства параграфа при открытии и копировании
@@ -607,27 +612,27 @@ Paragraph.prototype =
 
     Internal_Get_ParaPos_By_Pos: function (ContentPos) {
         /*
-        var CurLine = this.Lines.length - 1;
-        for ( ; CurLine > 0; CurLine-- )
-        {
-        if ( this.Lines[CurLine].StartPos <= ContentPos )
-        break;
-        }
+         var CurLine = this.Lines.length - 1;
+         for ( ; CurLine > 0; CurLine-- )
+         {
+         if ( this.Lines[CurLine].StartPos <= ContentPos )
+         break;
+         }
 
-        var CurRange = this.Lines[CurLine].Ranges.length - 1;
-        for ( ; CurRange > 0; CurRange-- )
-        {
-        if ( this.Lines[CurLine].Ranges[CurRange].StartPos <= ContentPos )
-        break;
-        }
+         var CurRange = this.Lines[CurLine].Ranges.length - 1;
+         for ( ; CurRange > 0; CurRange-- )
+         {
+         if ( this.Lines[CurLine].Ranges[CurRange].StartPos <= ContentPos )
+         break;
+         }
 
-        var CurPage = this.Pages.length - 1;
-        for ( ; CurPage > 0; CurPage-- )
-        {
-        if ( this.Pages[CurPage].StartLine <= CurLine )
-        break;
-        }
-        */
+         var CurPage = this.Pages.length - 1;
+         for ( ; CurPage > 0; CurPage-- )
+         {
+         if ( this.Pages[CurPage].StartLine <= CurLine )
+         break;
+         }
+         */
 
         var _ContentPos = ContentPos;
 
@@ -761,45 +766,45 @@ Paragraph.prototype =
             switch (Item.Type) {
                 case para_Text:
                 case para_Space:
-                    {
-                        Item.Measure(g_oTextMeasurer, CurTextPr);
-                        break;
-                    }
+                {
+                    Item.Measure(g_oTextMeasurer, CurTextPr);
+                    break;
+                }
                 case para_Drawing:
                 case para_PageNum:
                 case para_Tab:
                 case para_NewLine:
-                    {
-                        Item.Measure(g_oTextMeasurer);
+                {
+                    Item.Measure(g_oTextMeasurer);
 
-                        break;
-                    }
+                    break;
+                }
                 case para_TextPr:
-                    {
-                        CurTextPr = this.Internal_CalculateTextPr(Pos);
-                        g_oTextMeasurer.SetTextPr(CurTextPr);
-                        g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-                        TextDescent = Math.abs(g_oTextMeasurer.GetDescender());
-                        TextHeight = g_oTextMeasurer.GetHeight();
-                        TextAscent = TextHeight - TextDescent;
-                        TextAscent2 = g_oTextMeasurer.GetAscender();
+                {
+                    CurTextPr = this.Internal_CalculateTextPr(Pos);
+                    g_oTextMeasurer.SetTextPr(CurTextPr);
+                    g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+                    TextDescent = Math.abs(g_oTextMeasurer.GetDescender());
+                    TextHeight = g_oTextMeasurer.GetHeight();
+                    TextAscent = TextHeight - TextDescent;
+                    TextAscent2 = g_oTextMeasurer.GetAscender();
 
-                        break;
-                    }
+                    break;
+                }
                 case para_End:
-                    {
-                        var bEndCell = false;
-                        if (null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent())
-                            bEndCell = true;
+                {
+                    var bEndCell = false;
+                    if (null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent())
+                        bEndCell = true;
 
-                        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-                        EndTextPr.Merge(this.TextPr.Value);
-                        g_oTextMeasurer.SetTextPr(EndTextPr);
-                        Item.Measure(g_oTextMeasurer, bEndCell);
-                        g_oTextMeasurer.SetTextPr(CurTextPr);
+                    var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                    EndTextPr.Merge(this.TextPr.Value);
+                    g_oTextMeasurer.SetTextPr(EndTextPr);
+                    Item.Measure(g_oTextMeasurer, bEndCell);
+                    g_oTextMeasurer.SetTextPr(CurTextPr);
 
-                        break;
-                    }
+                    break;
+                }
             }
 
             Item.TextAscent = TextAscent;
@@ -1001,93 +1006,93 @@ Paragraph.prototype =
 
                                 switch (NumJc) {
                                     case align_Right:
-                                        {
-                                            NumberingItem.WidthVisible = 0;
-                                            break;
-                                        }
+                                    {
+                                        NumberingItem.WidthVisible = 0;
+                                        break;
+                                    }
                                     case align_Center:
-                                        {
-                                            NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
-                                            X += NumberingItem.WidthNum / 2;
-                                            break;
-                                        }
+                                    {
+                                        NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
+                                        X += NumberingItem.WidthNum / 2;
+                                        break;
+                                    }
                                     case align_Left:
                                     default:
-                                        {
-                                            NumberingItem.WidthVisible = NumberingItem.WidthNum;
-                                            X += NumberingItem.WidthNum;
-                                            break;
-                                        }
+                                    {
+                                        NumberingItem.WidthVisible = NumberingItem.WidthNum;
+                                        X += NumberingItem.WidthNum;
+                                        break;
+                                    }
                                 }
 
                                 switch (NumSuff) {
                                     case numbering_suff_Nothing:
-                                        {
-                                            // Ничего не делаем
-                                            break;
-                                        }
+                                    {
+                                        // Ничего не делаем
+                                        break;
+                                    }
                                     case numbering_suff_Space:
-                                        {
-                                            var OldTextPr = g_oTextMeasurer.GetTextPr();
-                                            g_oTextMeasurer.SetTextPr(NumTextPr);
-                                            g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-                                            NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
-                                            g_oTextMeasurer.SetTextPr(OldTextPr);
-                                            break;
-                                        }
+                                    {
+                                        var OldTextPr = g_oTextMeasurer.GetTextPr();
+                                        g_oTextMeasurer.SetTextPr(NumTextPr);
+                                        g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
+                                        NumberingItem.WidthSuff = g_oTextMeasurer.Measure(" ").Width;
+                                        g_oTextMeasurer.SetTextPr(OldTextPr);
+                                        break;
+                                    }
                                     case numbering_suff_Tab:
-                                        {
-                                            var NewX = null;
-                                            var PageStart = this.Parent.Get_PageContentStartPos(this.PageNum + CurPage);
+                                    {
+                                        var NewX = null;
+                                        var PageStart = this.Parent.Get_PageContentStartPos(this.PageNum + CurPage);
 
-                                            // Если у данного параграфа есть табы, тогда ищем среди них
-                                            var TabsCount = ParaPr.Tabs.Get_Count();
+                                        // Если у данного параграфа есть табы, тогда ищем среди них
+                                        var TabsCount = ParaPr.Tabs.Get_Count();
 
-                                            // Добавим в качестве таба левую границу
-                                            var TabsPos = new Array();
-                                            var bCheckLeft = true;
-                                            for (var Index = 0; Index < TabsCount; Index++) {
-                                                var Tab = ParaPr.Tabs.Get(Index);
-                                                var TabPos = Tab.Pos + PageStart.X;
+                                        // Добавим в качестве таба левую границу
+                                        var TabsPos = new Array();
+                                        var bCheckLeft = true;
+                                        for (var Index = 0; Index < TabsCount; Index++) {
+                                            var Tab = ParaPr.Tabs.Get(Index);
+                                            var TabPos = Tab.Pos + PageStart.X;
 
-                                                if (true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left) {
-                                                    TabsPos.push(PageStart.X + ParaPr.Ind.Left);
-                                                    bCheckLeft = false;
-                                                }
-
-                                                if (tab_Clear != Tab.Value)
-                                                    TabsPos.push(TabPos);
-                                            }
-
-                                            if (true === bCheckLeft)
+                                            if (true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left) {
                                                 TabsPos.push(PageStart.X + ParaPr.Ind.Left);
-
-                                            TabsCount++;
-
-                                            for (var Index = 0; Index < TabsCount; Index++) {
-                                                var TabPos = TabsPos[Index];
-
-                                                if (X < TabPos) {
-                                                    NewX = TabPos;
-                                                    break;
-                                                }
+                                                bCheckLeft = false;
                                             }
 
-                                            // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-                                            if (null === NewX) {
-                                                if (X < PageStart.X + ParaPr.Ind.Left)
-                                                    NewX = PageStart.X + ParaPr.Ind.Left;
-                                                else {
-                                                    NewX = this.X;
-                                                    while (X >= NewX)
-                                                        NewX += Default_Tab_Stop;
-                                                }
-                                            }
-
-                                            NumberingItem.WidthSuff = NewX - X;
-
-                                            break;
+                                            if (tab_Clear != Tab.Value)
+                                                TabsPos.push(TabPos);
                                         }
+
+                                        if (true === bCheckLeft)
+                                            TabsPos.push(PageStart.X + ParaPr.Ind.Left);
+
+                                        TabsCount++;
+
+                                        for (var Index = 0; Index < TabsCount; Index++) {
+                                            var TabPos = TabsPos[Index];
+
+                                            if (X < TabPos) {
+                                                NewX = TabPos;
+                                                break;
+                                            }
+                                        }
+
+                                        // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
+                                        if (null === NewX) {
+                                            if (X < PageStart.X + ParaPr.Ind.Left)
+                                                NewX = PageStart.X + ParaPr.Ind.Left;
+                                            else {
+                                                NewX = this.X;
+                                                while (X >= NewX)
+                                                    NewX += Default_Tab_Stop;
+                                            }
+                                        }
+
+                                        NumberingItem.WidthSuff = NewX - X;
+
+                                        break;
+                                    }
                                 }
 
                                 NumberingItem.Width = NumberingItem.WidthNum;
@@ -1116,197 +1121,125 @@ Paragraph.prototype =
 
                 switch (Item.Type) {
                     case para_Text:
-                        {
-                            bStartWord = true;
+                    {
+                        bStartWord = true;
 
-                            // При проверке, убирается ли слово, мы должны учитывать ширину
-                            // предшевствующих пробелов.
+                        // При проверке, убирается ли слово, мы должны учитывать ширину
+                        // предшевствующих пробелов.
 
-                            if (LineTextAscent < TextAscent)
-                                LineTextAscent = TextAscent;
+                        if (LineTextAscent < TextAscent)
+                            LineTextAscent = TextAscent;
 
-                            if (LineTextAscent2 < TextAscent2)
-                                LineTextAscent2 = TextAscent2;
+                        if (LineTextAscent2 < TextAscent2)
+                            LineTextAscent2 = TextAscent2;
 
-                            if (LineTextDescent < TextDescent)
-                                LineTextDescent = TextDescent;
+                        if (LineTextDescent < TextDescent)
+                            LineTextDescent = TextDescent;
 
-                            if (LineAscent < TextAscent + Item.YOffset)
-                                LineAscent = TextAscent + Item.YOffset;
+                        if (LineAscent < TextAscent + Item.YOffset)
+                            LineAscent = TextAscent + Item.YOffset;
 
-                            if (LineDescent < TextDescent - Item.YOffset)
-                                LineDescent = TextDescent - Item.YOffset;
+                        if (LineDescent < TextDescent - Item.YOffset)
+                            LineDescent = TextDescent - Item.YOffset;
 
-                            if (!bWord) {
-                                // Слово только началось. Делаем следующее:
-                                // 1) Если до него на строке ничего не было и данная строка не
-                                //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
-                                // 2) В противном случае, проверяем убирается ли слово в промежутке.
+                        if (!bWord) {
+                            // Слово только началось. Делаем следующее:
+                            // 1) Если до него на строке ничего не было и данная строка не
+                            //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
+                            // 2) В противном случае, проверяем убирается ли слово в промежутке.
 
-                                // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-                                var LetterLen = Item.Width;
-                                if (!bFirstItemOnLine || false === this.Internal_Check_Ranges(CurLine, CurRange)) {
-                                    if (X + nSpaceLen + LetterLen > XEnd) {
-                                        if (RangesCount == CurRange) {
-                                            bNewLine = true;
-                                            Pos--;
-                                        }
-                                        else {
-                                            bNewRange = true;
-                                            Pos--;
-                                        }
-                                    }
-                                }
-
-                                if (!bNewLine && !bNewRange) {
-                                    nWordStartPos = Pos;
-                                    nWordLen = Item.Width;
-                                    bWord = true;
-
-                                    this.Lines[CurLine].Words++;
-
-                                    if (!bNewRange)
-                                        this.Lines[CurLine].Ranges[CurRange].Words++;
-                                }
-                            }
-                            else {
-                                var LetterLen = Item.Width;
-                                if (X + nSpaceLen + nWordLen + LetterLen > XEnd) {
-                                    if (bFirstItemOnLine) {
-                                        // Слово оказалось единственным элементом в промежутке, и, все равно,
-                                        // не умещается целиком. Делаем следующее:
-                                        //
-                                        // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
-                                        //    текущей позиции.
-                                        // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
-                                        //    ставим перенос внутри строки в начале слова.
-                                        // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
-                                        //    строки в начале слова.
-
-                                        if (false === this.Internal_Check_Ranges(CurLine, CurRange)) {
-                                            Pos = nWordStartPos - 1;
-
-                                            if (RangesCount != CurRange)
-                                                bNewRange = true;
-                                            else
-                                                bNewLine = true;
-                                        }
-                                        else {
-                                            bEmptyLine = false;
-
-                                            X += nWordLen;
-
-                                            Pos--;
-
-                                            if (RangesCount != CurRange)
-                                                bNewRange = true;
-                                            else
-                                                bNewLine = true;
-                                        }
+                            // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
+                            var LetterLen = Item.Width;
+                            if (!bFirstItemOnLine || false === this.Internal_Check_Ranges(CurLine, CurRange)) {
+                                if (X + nSpaceLen + LetterLen > XEnd) {
+                                    if (RangesCount == CurRange) {
+                                        bNewLine = true;
+                                        Pos--;
                                     }
                                     else {
-                                        // Слово не убирается в промежутке. Делаем следующее:
-                                        // 1) Если у нас строка без вырезов или текущей вырез последний,
-                                        //    тогда ставим перенос строки в начале слова.
-                                        // 2) Если строка с вырезами и вырез не последний, ставим
-                                        //    перенос внутри строки в начале слова.
-
-                                        Pos = nWordStartPos;
-
-                                        if (RangesCount == CurRange) {
-                                            Pos--;
-
-                                            bNewLine = true;
-                                            this.Lines[CurLine].Words--;
-                                            this.Lines[CurLine].Ranges[CurRange].Words--;
-                                        }
-                                        else // if ( 0 != RangesCount && RangesCount != CurRange )
-                                        {
-                                            Pos--;
-
-                                            bNewRange = true;
-                                            this.Lines[CurLine].Ranges[CurRange].Words--;
-                                        }
+                                        bNewRange = true;
+                                        Pos--;
                                     }
                                 }
+                            }
 
-                                if (!bNewLine && !bNewRange) {
-                                    nWordLen += LetterLen;
+                            if (!bNewLine && !bNewRange) {
+                                nWordStartPos = Pos;
+                                nWordLen = Item.Width;
+                                bWord = true;
 
-                                    // Если текущий символ, например, дефис, тогда на нем заканчивается слово
-                                    if (true === Item.SpaceAfter) {
-                                        // Добавляем длину пробелов до слова
-                                        X += nSpaceLen;
+                                this.Lines[CurLine].Words++;
 
-                                        // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
+                                if (!bNewRange)
+                                    this.Lines[CurLine].Ranges[CurRange].Words++;
+                            }
+                        }
+                        else {
+                            var LetterLen = Item.Width;
+                            if (X + nSpaceLen + nWordLen + LetterLen > XEnd) {
+                                if (bFirstItemOnLine) {
+                                    // Слово оказалось единственным элементом в промежутке, и, все равно,
+                                    // не умещается целиком. Делаем следующее:
+                                    //
+                                    // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
+                                    //    текущей позиции.
+                                    // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
+                                    //    ставим перенос внутри строки в начале слова.
+                                    // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
+                                    //    строки в начале слова.
+
+                                    if (false === this.Internal_Check_Ranges(CurLine, CurRange)) {
+                                        Pos = nWordStartPos - 1;
+
+                                        if (RangesCount != CurRange)
+                                            bNewRange = true;
+                                        else
+                                            bNewLine = true;
+                                    }
+                                    else {
+                                        bEmptyLine = false;
+
                                         X += nWordLen;
 
-                                        // Пробелы перед первым словом в строке не считаем
-                                        if (this.Lines[CurLine].Words > 1)
-                                            this.Lines[CurLine].Spaces += nSpacesCount;
+                                        Pos--;
 
-                                        if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                            this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                                        if (RangesCount != CurRange)
+                                            bNewRange = true;
+                                        else
+                                            bNewLine = true;
+                                    }
+                                }
+                                else {
+                                    // Слово не убирается в промежутке. Делаем следующее:
+                                    // 1) Если у нас строка без вырезов или текущей вырез последний,
+                                    //    тогда ставим перенос строки в начале слова.
+                                    // 2) Если строка с вырезами и вырез не последний, ставим
+                                    //    перенос внутри строки в начале слова.
 
-                                        bWord = false;
-                                        bFirstItemOnLine = false;
-                                        bEmptyLine = false;
-                                        nSpaceLen = 0;
-                                        nWordLen = 0;
-                                        nSpacesCount = 0;
+                                    Pos = nWordStartPos;
+
+                                    if (RangesCount == CurRange) {
+                                        Pos--;
+
+                                        bNewLine = true;
+                                        this.Lines[CurLine].Words--;
+                                        this.Lines[CurLine].Ranges[CurRange].Words--;
+                                    }
+                                    else // if ( 0 != RangesCount && RangesCount != CurRange )
+                                    {
+                                        Pos--;
+
+                                        bNewRange = true;
+                                        this.Lines[CurLine].Ranges[CurRange].Words--;
                                     }
                                 }
                             }
 
-                            break;
-                        }
-                    case para_Space:
-                        {
-                            bFirstItemOnLine = false;
+                            if (!bNewLine && !bNewRange) {
+                                nWordLen += LetterLen;
 
-                            var SpaceLen = Item.Width;
-                            if (bWord) {
-                                // Добавляем длину пробелов до слова
-                                X += nSpaceLen;
-
-                                // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
-                                X += nWordLen;
-
-                                // Пробелы перед первым словом в строке не считаем
-                                if (this.Lines[CurLine].Words > 1)
-                                    this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-
-                                bWord = false;
-                                bEmptyLine = false;
-                                nSpaceLen = 0;
-                                nWordLen = 0;
-                                nSpacesCount = 1;
-                            }
-                            else
-                                nSpacesCount++;
-
-                            // На пробеле не делаем перенос. Перенос строки или внутристрочный
-                            // перенос делаем при добавлении любого непробельного символа
-                            nSpaceLen += SpaceLen;
-
-                            break;
-                        }
-                    case para_Drawing:
-                        {
-                            if (true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) {
-                                if (true != Item.Is_Inline())
-                                    Item.Set_DrawingType(drawing_Inline);
-
-                                if (true === bStartWord)
-                                    bFirstItemOnLine = false;
-
-                                // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
-                                // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
-                                // данный элемент убирается
-                                if (bWord || nWordLen > 0) {
+                                // Если текущий символ, например, дефис, тогда на нем заканчивается слово
+                                if (true === Item.SpaceAfter) {
                                     // Добавляем длину пробелов до слова
                                     X += nSpaceLen;
 
@@ -1321,136 +1254,60 @@ Paragraph.prototype =
                                         this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
 
                                     bWord = false;
-                                    nSpaceLen = 0;
-                                    nSpacesCount = 0;
-                                    nWordLen = 0;
-                                }
-
-                                if (X + nSpaceLen + Item.Width > XEnd && (false === bFirstItemOnLine || false === this.Internal_Check_Ranges(CurLine, CurRange))) {
-                                    if (RangesCount == CurRange) {
-                                        bNewLine = true;
-                                        Pos--;
-                                    }
-                                    else {
-                                        bNewRange = true;
-                                        Pos--;
-                                    }
-                                }
-                                else {
-                                    // Добавляем длину пробелов до слова
-                                    X += nSpaceLen;
-
-                                    if (LineAscent < Item.Height + Item.YOffset)
-                                        LineAscent = Item.Height + Item.YOffset;
-
-                                    if (Item.Height + Item.YOffset > this.Lines[CurLine].Metrics.Ascent)
-                                        this.Lines[CurLine].Metrics.Ascent = Item.Height + Item.YOffset;
-
-                                    if (-Item.YOffset > this.Lines[CurLine].Metrics.Descent)
-                                        this.Lines[CurLine].Metrics.Descent = -Item.YOffset;
-
-                                    X += Item.Width;
-
                                     bFirstItemOnLine = false;
                                     bEmptyLine = false;
-
-                                    this.Lines[CurLine].Words++;
-                                    this.Lines[CurLine].Ranges[CurRange].Words++;
-
-                                    // Пробелы перед первым словом в строке не считаем
-                                    if (this.Lines[CurLine].Words > 1)
-                                        this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                    if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                        this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-                                }
-
-                                nSpaceLen = 0;
-                                nSpacesCount = 0;
-                            }
-                            else {
-                                // Основная обработка происходит в Internal_Recalculate_2. Здесь обрабатывается единственный случай,
-                                // когда после второго пересчета с уже добавленной картинкой оказывается, что место в параграфе, где
-                                // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
-
-                                var LogicDocument = this.Parent;
-                                var DrawingObjects = LogicDocument.DrawingObjects;
-
-                                if (Item === LogicDocument.RecalcInfo.FlowObject && true === LogicDocument.RecalcInfo.FlowObjectPageBreakBefore) {
-                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    LogicDocument.RecalcInfo.FlowObject = null;
-
-                                    // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
-                                    // если нет, тогда в начале текущей строки.
-
-                                    if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage) {
-                                        // Мы должны из соответствующих FlowObjects удалить все Flow-объекты, идущие до этого места в параграфе
-                                        for (var TempPos = StartPos; TempPos < Pos; TempPos++) {
-                                            var TempItem = this.Content[TempPos];
-                                            if (para_Drawing === TempItem.Type && drawing_Anchor === TempItem.DrawingType && true === TempItem.Use_TextWrap()) {
-                                                DrawingObjects.removeById(TempItem.PageNum, TempItem.Get_Id());
-                                            }
-                                        }
-
-                                        this.Internal_Content_Add(StartPos, new ParaPageBreakRenderer());
-
-                                        this.Pages[CurPage].Set_EndLine(-1);
-                                        if (0 === CurLine) {
-                                            this.Lines[-1] = new CParaLine(0);
-                                            this.Lines[-1].Set_EndPos(LineStart_Pos - 1, this);
-                                        }
-
-                                        RecalcResult = recalcresult_NextPage;
-                                        return;
-                                    }
-                                    else {
-                                        if (CurLine != this.Pages[CurPage].FirstLine) {
-                                            this.Internal_Content_Add(LineStart_Pos, new ParaPageBreakRenderer());
-
-                                            this.Pages[CurPage].Set_EndLine(CurLine - 1);
-                                            if (0 === CurLine) {
-                                                this.Lines[-1] = new CParaLine(0);
-                                                this.Lines[-1].Set_EndPos(LineStart_Pos - 1, this);
-                                            }
-
-                                            RecalcResult = recalcresult_NextPage;
-                                            bBreak = true;
-                                            break;
-                                        }
-                                        else {
-                                            Pos--;
-                                            bNewLine = true;
-                                            bForceNewPage = true;
-                                        }
-                                    }
-
-                                    // Если до этого было слово, тогда не надо проверять убирается ли оно
-                                    if (bWord || nWordLen > 0) {
-                                        // Добавляем длину пробелов до слова
-                                        X += nSpaceLen;
-
-                                        // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
-                                        X += nWordLen;
-
-                                        // Пробелы перед первым словом в строке не считаем
-                                        if (this.Lines[CurLine].Words > 1)
-                                            this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                        if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                            this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-
-                                        bWord = false;
-                                        nSpaceLen = 0;
-                                        nSpacesCount = 0;
-                                        nWordLen = 0;
-                                    }
+                                    nSpaceLen = 0;
+                                    nWordLen = 0;
+                                    nSpacesCount = 0;
                                 }
                             }
-
-                            break;
                         }
-                    case para_PageNum:
-                        {
+
+                        break;
+                    }
+                    case para_Space:
+                    {
+                        bFirstItemOnLine = false;
+
+                        var SpaceLen = Item.Width;
+                        if (bWord) {
+                            // Добавляем длину пробелов до слова
+                            X += nSpaceLen;
+
+                            // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
+                            X += nWordLen;
+
+                            // Пробелы перед первым словом в строке не считаем
+                            if (this.Lines[CurLine].Words > 1)
+                                this.Lines[CurLine].Spaces += nSpacesCount;
+
+                            if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+
+                            bWord = false;
+                            bEmptyLine = false;
+                            nSpaceLen = 0;
+                            nWordLen = 0;
+                            nSpacesCount = 1;
+                        }
+                        else
+                            nSpacesCount++;
+
+                        // На пробеле не делаем перенос. Перенос строки или внутристрочный
+                        // перенос делаем при добавлении любого непробельного символа
+                        nSpaceLen += SpaceLen;
+
+                        break;
+                    }
+                    case para_Drawing:
+                    {
+                        if (true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) {
+                            if (true != Item.Is_Inline())
+                                Item.Set_DrawingType(drawing_Inline);
+
+                            if (true === bStartWord)
+                                bFirstItemOnLine = false;
+
                             // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                             // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
                             // данный элемент убирается
@@ -1474,25 +1331,7 @@ Paragraph.prototype =
                                 nWordLen = 0;
                             }
 
-                            if (true === bStartWord)
-                                bFirstItemOnLine = false;
-
-                            if (LineTextAscent < TextAscent)
-                                LineTextAscent = TextAscent;
-
-                            if (LineTextAscent2 < TextAscent2)
-                                LineTextAscent2 = TextAscent2;
-
-                            if (LineTextDescent < TextDescent)
-                                LineTextDescent = TextDescent;
-
-                            if (LineAscent < TextAscent + Item.YOffset)
-                                LineAscent = TextAscent + Item.YOffset;
-
-                            if (LineDescent < TextDescent - Item.YOffset)
-                                LineDescent = TextDescent - Item.YOffset;
-
-                            if (X + nSpaceLen + Item.Width > XEnd && (false === bFirstItemOnLine || RangesCount > 0)) {
+                            if (X + nSpaceLen + Item.Width > XEnd && (false === bFirstItemOnLine || false === this.Internal_Check_Ranges(CurLine, CurRange))) {
                                 if (RangesCount == CurRange) {
                                     bNewLine = true;
                                     Pos--;
@@ -1506,7 +1345,17 @@ Paragraph.prototype =
                                 // Добавляем длину пробелов до слова
                                 X += nSpaceLen;
 
+                                if (LineAscent < Item.Height + Item.YOffset)
+                                    LineAscent = Item.Height + Item.YOffset;
+
+                                if (Item.Height + Item.YOffset > this.Lines[CurLine].Metrics.Ascent)
+                                    this.Lines[CurLine].Metrics.Ascent = Item.Height + Item.YOffset;
+
+                                if (-Item.YOffset > this.Lines[CurLine].Metrics.Descent)
+                                    this.Lines[CurLine].Metrics.Descent = -Item.YOffset;
+
                                 X += Item.Width;
+
                                 bFirstItemOnLine = false;
                                 bEmptyLine = false;
 
@@ -1523,20 +1372,389 @@ Paragraph.prototype =
 
                             nSpaceLen = 0;
                             nSpacesCount = 0;
-
-                            break;
                         }
+                        else {
+                            // Основная обработка происходит в Internal_Recalculate_2. Здесь обрабатывается единственный случай,
+                            // когда после второго пересчета с уже добавленной картинкой оказывается, что место в параграфе, где
+                            // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
+
+                            var LogicDocument = this.Parent;
+                            var DrawingObjects = LogicDocument.DrawingObjects;
+
+                            if (Item === LogicDocument.RecalcInfo.FlowObject && true === LogicDocument.RecalcInfo.FlowObjectPageBreakBefore) {
+                                LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
+                                LogicDocument.RecalcInfo.FlowObject = null;
+
+                                // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
+                                // если нет, тогда в начале текущей строки.
+
+                                if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage) {
+                                    // Мы должны из соответствующих FlowObjects удалить все Flow-объекты, идущие до этого места в параграфе
+                                    for (var TempPos = StartPos; TempPos < Pos; TempPos++) {
+                                        var TempItem = this.Content[TempPos];
+                                        if (para_Drawing === TempItem.Type && drawing_Anchor === TempItem.DrawingType && true === TempItem.Use_TextWrap()) {
+                                            DrawingObjects.removeById(TempItem.PageNum, TempItem.Get_Id());
+                                        }
+                                    }
+
+                                    this.Internal_Content_Add(StartPos, new ParaPageBreakRenderer());
+
+                                    this.Pages[CurPage].Set_EndLine(-1);
+                                    if (0 === CurLine) {
+                                        this.Lines[-1] = new CParaLine(0);
+                                        this.Lines[-1].Set_EndPos(LineStart_Pos - 1, this);
+                                    }
+
+                                    RecalcResult = recalcresult_NextPage;
+                                    return;
+                                }
+                                else {
+                                    if (CurLine != this.Pages[CurPage].FirstLine) {
+                                        this.Internal_Content_Add(LineStart_Pos, new ParaPageBreakRenderer());
+
+                                        this.Pages[CurPage].Set_EndLine(CurLine - 1);
+                                        if (0 === CurLine) {
+                                            this.Lines[-1] = new CParaLine(0);
+                                            this.Lines[-1].Set_EndPos(LineStart_Pos - 1, this);
+                                        }
+
+                                        RecalcResult = recalcresult_NextPage;
+                                        bBreak = true;
+                                        break;
+                                    }
+                                    else {
+                                        Pos--;
+                                        bNewLine = true;
+                                        bForceNewPage = true;
+                                    }
+                                }
+
+                                // Если до этого было слово, тогда не надо проверять убирается ли оно
+                                if (bWord || nWordLen > 0) {
+                                    // Добавляем длину пробелов до слова
+                                    X += nSpaceLen;
+
+                                    // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
+                                    X += nWordLen;
+
+                                    // Пробелы перед первым словом в строке не считаем
+                                    if (this.Lines[CurLine].Words > 1)
+                                        this.Lines[CurLine].Spaces += nSpacesCount;
+
+                                    if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                                        this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+
+                                    bWord = false;
+                                    nSpaceLen = 0;
+                                    nSpacesCount = 0;
+                                    nWordLen = 0;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case para_PageNum:
+                    {
+                        // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
+                        // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
+                        // данный элемент убирается
+                        if (bWord || nWordLen > 0) {
+                            // Добавляем длину пробелов до слова
+                            X += nSpaceLen;
+
+                            // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
+                            X += nWordLen;
+
+                            // Пробелы перед первым словом в строке не считаем
+                            if (this.Lines[CurLine].Words > 1)
+                                this.Lines[CurLine].Spaces += nSpacesCount;
+
+                            if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+
+                            bWord = false;
+                            nSpaceLen = 0;
+                            nSpacesCount = 0;
+                            nWordLen = 0;
+                        }
+
+                        if (true === bStartWord)
+                            bFirstItemOnLine = false;
+
+                        if (LineTextAscent < TextAscent)
+                            LineTextAscent = TextAscent;
+
+                        if (LineTextAscent2 < TextAscent2)
+                            LineTextAscent2 = TextAscent2;
+
+                        if (LineTextDescent < TextDescent)
+                            LineTextDescent = TextDescent;
+
+                        if (LineAscent < TextAscent + Item.YOffset)
+                            LineAscent = TextAscent + Item.YOffset;
+
+                        if (LineDescent < TextDescent - Item.YOffset)
+                            LineDescent = TextDescent - Item.YOffset;
+
+                        if (X + nSpaceLen + Item.Width > XEnd && (false === bFirstItemOnLine || RangesCount > 0)) {
+                            if (RangesCount == CurRange) {
+                                bNewLine = true;
+                                Pos--;
+                            }
+                            else {
+                                bNewRange = true;
+                                Pos--;
+                            }
+                        }
+                        else {
+                            // Добавляем длину пробелов до слова
+                            X += nSpaceLen;
+
+                            X += Item.Width;
+                            bFirstItemOnLine = false;
+                            bEmptyLine = false;
+
+                            this.Lines[CurLine].Words++;
+                            this.Lines[CurLine].Ranges[CurRange].Words++;
+
+                            // Пробелы перед первым словом в строке не считаем
+                            if (this.Lines[CurLine].Words > 1)
+                                this.Lines[CurLine].Spaces += nSpacesCount;
+
+                            if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                        }
+
+                        nSpaceLen = 0;
+                        nSpacesCount = 0;
+
+                        break;
+                    }
                     case para_Tab:
-                        {
+                    {
+                        if (-1 != pLastTab.Value) {
+                            var TempTabX = X;
+
+                            if (bWord || nWordLen > 0)
+                                TempTabX += nSpaceLen + nWordLen;
+
+                            var TabItem = pLastTab.Item;
+                            var TabStartX = pLastTab.X;
+                            var TabRangeW = TempTabX - TabStartX;
+                            var TabValue = pLastTab.Value;
+                            var TabPos = pLastTab.TabPos;
+
+                            var TabCalcW = 0;
+                            if (tab_Right === TabValue)
+                                TabCalcW = Math.max(TabPos - (TabStartX + TabRangeW), 0);
+                            else if (tab_Center === TabValue)
+                                TabCalcW = Math.max(TabPos - (TabStartX + TabRangeW / 2), 0);
+
+                            if (X + TabCalcW > XEnd)
+                                TabCalcW = XEnd - X;
+
+                            TabItem.Width = TabCalcW;
+                            TabItem.WidthVisible = TabCalcW;
+
+                            pLastTab.Value = -1;
+
+                            X += TabCalcW;
+                        }
+
+                        // Добавляем длину пробелов до слова
+                        X += nSpaceLen;
+
+                        // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
+                        X += nWordLen;
+
+                        bWord = false;
+                        nSpaceLen = 0;
+                        nWordLen = 0;
+
+
+                        nSpacesCount = 0;
+                        this.Lines[CurLine].Ranges[CurRange].Spaces = 0;
+                        this.Lines[CurLine].Ranges[CurRange].TabPos = Pos;
+
+                        var PageStart = this.Parent.Get_PageContentStartPos(this.PageNum + CurPage);
+
+                        // Если у данного параграфа есть табы, тогда ищем среди них
+                        var TabsCount = ParaPr.Tabs.Get_Count();
+
+                        // Добавим в качестве таба левую границу
+                        var TabsPos = new Array();
+                        var bCheckLeft = true;
+                        for (var Index = 0; Index < TabsCount; Index++) {
+                            var Tab = ParaPr.Tabs.Get(Index);
+                            var TabPos = Tab.Pos + PageStart.X;
+
+                            if (true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left) {
+                                TabsPos.push(PageStart.X + ParaPr.Ind.Left);
+                                bCheckLeft = false;
+                            }
+
+                            if (tab_Clear != Tab.Value)
+                                TabsPos.push(Tab);
+                        }
+
+                        if (true === bCheckLeft)
+                            TabsPos.push(PageStart.X + ParaPr.Ind.Left);
+
+                        TabsCount = TabsPos.length;
+
+                        var Tab = null;
+                        for (var Index = 0; Index < TabsCount; Index++) {
+                            var TempTab = TabsPos[Index];
+
+                            if (X < TempTab.Pos + PageStart.X) {
+                                Tab = TempTab;
+                                break;
+                            }
+                        }
+
+                        var NewX = null;
+
+                        // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
+                        if (null === Tab) {
+                            if (X < PageStart.X + ParaPr.Ind.Left)
+                                NewX = PageStart.X + ParaPr.Ind.Left;
+                            else {
+                                NewX = this.X;
+                                while (X >= NewX)
+                                    NewX += Default_Tab_Stop;
+                            }
+                        }
+                        else {
+                            // Если таб левый, тогда мы сразу смещаемся к нему
+                            if (tab_Left === Tab.Value) {
+                                NewX = Tab.Pos + PageStart.X;
+                            }
+                            else {
+                                pLastTab.TabPos = Tab.Pos + PageStart.X;
+                                pLastTab.Value = Tab.Value;
+                                pLastTab.X = X;
+                                pLastTab.Item = Item;
+
+                                Item.Width = 0;
+                                Item.WidthVisible = 0;
+                            }
+                        }
+
+                        if (null != NewX) {
+                            if (NewX > XEnd && (false === bFirstItemOnLine || RangesCount > 0)) {
+                                nWordLen = NewX - X;
+                            }
+                            else {
+                                Item.Width = NewX - X;
+                                Item.WidthVisible = NewX - X;
+
+                                X = NewX;
+
+                                this.Lines[CurLine].Words++;
+                                this.Lines[CurLine].Ranges[CurRange].Words++;
+
+                                // Пробелы перед первым словом в строке не считаем
+                                if (this.Lines[CurLine].Words > 1)
+                                    this.Lines[CurLine].Spaces += nSpacesCount;
+
+                                if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                                    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                            }
+                        }
+
+                        // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
+                        // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
+                        if (RangesCount === CurRange) {
+                            if (true === bStartWord) {
+                                bFirstItemOnLine = false;
+                                bEmptyLine = false;
+                            }
+
+                            nWordStartPos = Pos;
+                        }
+
+                        nSpacesCount = 0;
+                        bStartWord = true;
+                        bWord = true;
+                        nWordStartPos = Pos;
+
+                        break;
+                    }
+                    case para_TextPr:
+                    {
+                        break;
+                    }
+                    case para_NewLine:
+                    {
+                        if (break_Page === Item.BreakType) {
+                            // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
+                            //if ( !(this.Parent instanceof CDocument) )
+                            {
+                                this.Internal_Content_Remove(Pos);
+                                Pos--;
+                                break;
+                            }
+
+                            bNewPage = true;
+                            bNewLine = true;
+
+                            bBreakPageLine = true;
+                        }
+                        else {
+                            if (RangesCount === CurRange) {
+                                bNewLine = true;
+                            }
+                            else // if ( 0 != RangesCount && RangesCount != CurRange )
+                            {
+                                bNewRange = true;
+                            }
+
+                            bEmptyLine = false;
+                        }
+
+                        X += nWordLen;
+
+                        if (bWord && this.Lines[CurLine].Words > 1)
+                            this.Lines[CurLine].Spaces += nSpacesCount;
+
+                        if (bWord && this.Lines[CurLine].Ranges[CurRange].Words > 1)
+                            this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+
+                        if (bWord) {
+                            bEmptyLine = false;
+                            bWord = false;
+                            X += nSpaceLen;
+                            nSpaceLen = 0;
+                        }
+
+                        break;
+                    }
+                    case para_End:
+                    {
+                        if (true === bWord) {
+                            bFirstItemOnLine = false;
+                            bEmptyLine = false;
+                        }
+
+                        // false === bExtendBoundToBottom, потому что это уже делалось для PageBreak
+                        if (false === bExtendBoundToBottom) {
+                            X += nWordLen;
+
+                            if (bWord) {
+                                this.Lines[CurLine].Spaces += nSpacesCount;
+                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                            }
+
+                            if (bWord) {
+                                X += nSpaceLen;
+                                nSpaceLen = 0;
+                            }
+
                             if (-1 != pLastTab.Value) {
-                                var TempTabX = X;
-
-                                if (bWord || nWordLen > 0)
-                                    TempTabX += nSpaceLen + nWordLen;
-
                                 var TabItem = pLastTab.Item;
                                 var TabStartX = pLastTab.X;
-                                var TabRangeW = TempTabX - TabStartX;
+                                var TabRangeW = X - TabStartX;
                                 var TabValue = pLastTab.Value;
                                 var TabPos = pLastTab.TabPos;
 
@@ -1556,226 +1774,13 @@ Paragraph.prototype =
 
                                 X += TabCalcW;
                             }
-
-                            // Добавляем длину пробелов до слова
-                            X += nSpaceLen;
-
-                            // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
-                            X += nWordLen;
-
-                            bWord = false;
-                            nSpaceLen = 0;
-                            nWordLen = 0;
-
-
-                            nSpacesCount = 0;
-                            this.Lines[CurLine].Ranges[CurRange].Spaces = 0;
-                            this.Lines[CurLine].Ranges[CurRange].TabPos = Pos;
-
-                            var PageStart = this.Parent.Get_PageContentStartPos(this.PageNum + CurPage);
-
-                            // Если у данного параграфа есть табы, тогда ищем среди них
-                            var TabsCount = ParaPr.Tabs.Get_Count();
-
-                            // Добавим в качестве таба левую границу
-                            var TabsPos = new Array();
-                            var bCheckLeft = true;
-                            for (var Index = 0; Index < TabsCount; Index++) {
-                                var Tab = ParaPr.Tabs.Get(Index);
-                                var TabPos = Tab.Pos + PageStart.X;
-
-                                if (true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left) {
-                                    TabsPos.push(PageStart.X + ParaPr.Ind.Left);
-                                    bCheckLeft = false;
-                                }
-
-                                if (tab_Clear != Tab.Value)
-                                    TabsPos.push(Tab);
-                            }
-
-                            if (true === bCheckLeft)
-                                TabsPos.push(PageStart.X + ParaPr.Ind.Left);
-
-                            TabsCount = TabsPos.length;
-
-                            var Tab = null;
-                            for (var Index = 0; Index < TabsCount; Index++) {
-                                var TempTab = TabsPos[Index];
-
-                                if (X < TempTab.Pos + PageStart.X) {
-                                    Tab = TempTab;
-                                    break;
-                                }
-                            }
-
-                            var NewX = null;
-
-                            // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-                            if (null === Tab) {
-                                if (X < PageStart.X + ParaPr.Ind.Left)
-                                    NewX = PageStart.X + ParaPr.Ind.Left;
-                                else {
-                                    NewX = this.X;
-                                    while (X >= NewX)
-                                        NewX += Default_Tab_Stop;
-                                }
-                            }
-                            else {
-                                // Если таб левый, тогда мы сразу смещаемся к нему
-                                if (tab_Left === Tab.Value) {
-                                    NewX = Tab.Pos + PageStart.X;
-                                }
-                                else {
-                                    pLastTab.TabPos = Tab.Pos + PageStart.X;
-                                    pLastTab.Value = Tab.Value;
-                                    pLastTab.X = X;
-                                    pLastTab.Item = Item;
-
-                                    Item.Width = 0;
-                                    Item.WidthVisible = 0;
-                                }
-                            }
-
-                            if (null != NewX) {
-                                if (NewX > XEnd && (false === bFirstItemOnLine || RangesCount > 0)) {
-                                    nWordLen = NewX - X;
-                                }
-                                else {
-                                    Item.Width = NewX - X;
-                                    Item.WidthVisible = NewX - X;
-
-                                    X = NewX;
-
-                                    this.Lines[CurLine].Words++;
-                                    this.Lines[CurLine].Ranges[CurRange].Words++;
-
-                                    // Пробелы перед первым словом в строке не считаем
-                                    if (this.Lines[CurLine].Words > 1)
-                                        this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                    if (this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                        this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-                                }
-                            }
-
-                            // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
-                            // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
-                            if (RangesCount === CurRange) {
-                                if (true === bStartWord) {
-                                    bFirstItemOnLine = false;
-                                    bEmptyLine = false;
-                                }
-
-                                nWordStartPos = Pos;
-                            }
-
-                            nSpacesCount = 0;
-                            bStartWord = true;
-                            bWord = true;
-                            nWordStartPos = Pos;
-
-                            break;
                         }
-                    case para_TextPr:
-                        {
-                            break;
-                        }
-                    case para_NewLine:
-                        {
-                            if (break_Page === Item.BreakType) {
-                                // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
-                                //if ( !(this.Parent instanceof CDocument) )
-                                {
-                                    this.Internal_Content_Remove(Pos);
-                                    Pos--;
-                                    break;
-                                }
 
-                                bNewPage = true;
-                                bNewLine = true;
+                        bNewLine = true;
+                        bEnd = true;
 
-                                bBreakPageLine = true;
-                            }
-                            else {
-                                if (RangesCount === CurRange) {
-                                    bNewLine = true;
-                                }
-                                else // if ( 0 != RangesCount && RangesCount != CurRange )
-                                {
-                                    bNewRange = true;
-                                }
-
-                                bEmptyLine = false;
-                            }
-
-                            X += nWordLen;
-
-                            if (bWord && this.Lines[CurLine].Words > 1)
-                                this.Lines[CurLine].Spaces += nSpacesCount;
-
-                            if (bWord && this.Lines[CurLine].Ranges[CurRange].Words > 1)
-                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-
-                            if (bWord) {
-                                bEmptyLine = false;
-                                bWord = false;
-                                X += nSpaceLen;
-                                nSpaceLen = 0;
-                            }
-
-                            break;
-                        }
-                    case para_End:
-                        {
-                            if (true === bWord) {
-                                bFirstItemOnLine = false;
-                                bEmptyLine = false;
-                            }
-
-                            // false === bExtendBoundToBottom, потому что это уже делалось для PageBreak
-                            if (false === bExtendBoundToBottom) {
-                                X += nWordLen;
-
-                                if (bWord) {
-                                    this.Lines[CurLine].Spaces += nSpacesCount;
-                                    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-                                }
-
-                                if (bWord) {
-                                    X += nSpaceLen;
-                                    nSpaceLen = 0;
-                                }
-
-                                if (-1 != pLastTab.Value) {
-                                    var TabItem = pLastTab.Item;
-                                    var TabStartX = pLastTab.X;
-                                    var TabRangeW = X - TabStartX;
-                                    var TabValue = pLastTab.Value;
-                                    var TabPos = pLastTab.TabPos;
-
-                                    var TabCalcW = 0;
-                                    if (tab_Right === TabValue)
-                                        TabCalcW = Math.max(TabPos - (TabStartX + TabRangeW), 0);
-                                    else if (tab_Center === TabValue)
-                                        TabCalcW = Math.max(TabPos - (TabStartX + TabRangeW / 2), 0);
-
-                                    if (X + TabCalcW > XEnd)
-                                        TabCalcW = XEnd - X;
-
-                                    TabItem.Width = TabCalcW;
-                                    TabItem.WidthVisible = TabCalcW;
-
-                                    pLastTab.Value = -1;
-
-                                    X += TabCalcW;
-                                }
-                            }
-
-                            bNewLine = true;
-                            bEnd = true;
-
-                            break;
-                        }
+                        break;
+                    }
                 }
 
                 if (bBreak) {
@@ -2040,13 +2045,13 @@ Paragraph.prototype =
                 if (true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit) && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent()))) && false === bBreakPageLineEmpty) {
                     // Проверим висячую строку
                     /*if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
-                    {
-                    this.Parent.RecalcInfo.WidowControlParagraph = this;
-                    this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
-                    RecalcResult = recalcresult_CurPage;
-                    break;
-                    }
-                    else*/
+                     {
+                     this.Parent.RecalcInfo.WidowControlParagraph = this;
+                     this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
+                     RecalcResult = recalcresult_CurPage;
+                     break;
+                     }
+                     else*/
                     {
                         // Неразрывные абзацы не учитываются в таблицах
                         if (true === ParaPr.KeepLines && null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage) {
@@ -2338,12 +2343,12 @@ Paragraph.prototype =
                             }
 
                             /*if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine )
-                            {
-                            this.Parent.RecalcInfo.WidowControlParagraph = this;
-                            this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
-                            RecalcResult = recalcresult_PrevPage;
-                            break;
-                            }  */
+                             {
+                             this.Parent.RecalcInfo.WidowControlParagraph = this;
+                             this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
+                             RecalcResult = recalcresult_PrevPage;
+                             break;
+                             }  */
                         }
 
                         if (true === bEnd && true === bExtendBoundToBottom) {
@@ -2512,58 +2517,58 @@ Paragraph.prototype =
             case align_Right: X = Math.max(Range.X + RangeWidth - Range.W, Range.X); break;
             case align_Center: X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
             case align_Justify:
-                {
-                    X = Range.X;
+            {
+                X = Range.X;
 
-                    if (1 == Range.Words) {
-                        if (1 == RangesCount && this.Lines.length > 1) {
-                            // Подсчитаем количество букв в слове
-                            var LettersCount = 0;
-                            var TempPos = StartPos;
-                            var LastW = 0;
+                if (1 == Range.Words) {
+                    if (1 == RangesCount && this.Lines.length > 1) {
+                        // Подсчитаем количество букв в слове
+                        var LettersCount = 0;
+                        var TempPos = StartPos;
+                        var LastW = 0;
 
-                            var __CurLine = CurLine;
-                            var __CurRange = CurRange;
+                        var __CurLine = CurLine;
+                        var __CurRange = CurRange;
 
-                            while (this.Content[TempPos].Type != para_End) {
-                                var __Item = this.Content[TempPos];
-                                if (undefined != __Item.CurPage) {
-                                    if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
-                                        break;
-                                }
-
-                                if (para_Text == this.Content[TempPos].Type) {
-                                    LettersCount++;
-                                    LastW = this.Content[TempPos].Width;
-                                }
-
-                                TempPos++;
+                        while (this.Content[TempPos].Type != para_End) {
+                            var __Item = this.Content[TempPos];
+                            if (undefined != __Item.CurPage) {
+                                if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
+                                    break;
                             }
 
-                            // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                            if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
-                                JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                            if (para_Text == this.Content[TempPos].Type) {
+                                LettersCount++;
+                                LastW = this.Content[TempPos].Width;
+                            }
+
+                            TempPos++;
                         }
-                        else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
-                            // Ничего не делаем (выравниваем текст по левой границе)
-                        }
-                        else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
-                            X = Range.X + RangeWidth - Range.W;
-                        }
-                        else {
-                            X = Range.X + (RangeWidth - Range.W) / 2;
-                        }
+
+                        // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
+                        if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
+                            JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                    }
+                    else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
+                        // Ничего не делаем (выравниваем текст по левой границе)
+                    }
+                    else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
+                        X = Range.X + RangeWidth - Range.W;
                     }
                     else {
-                        // Последний промежуток последней строки не надо растягивать по ширине.
-                        if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
-                            JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
-                        else
-                            JustifySpace = 0;
+                        X = Range.X + (RangeWidth - Range.W) / 2;
                     }
-
-                    break;
                 }
+                else {
+                    // Последний промежуток последней строки не надо растягивать по ширине.
+                    if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
+                        JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
+                    else
+                        JustifySpace = 0;
+                }
+
+                break;
+            }
             default: X = Range.X; break;
         }
 
@@ -2596,58 +2601,58 @@ Paragraph.prototype =
                         case align_Right: X = Math.max(Range.X + RangeWidth - Range.W, Range.X); break;
                         case align_Center: X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
                         case align_Justify:
-                            {
-                                X = Range.X;
+                        {
+                            X = Range.X;
 
-                                if (1 == Range.Words) {
-                                    if (1 == RangesCount && this.Lines.length > 1) {
-                                        // Подсчитаем количество букв в слове
-                                        var LettersCount = 0;
-                                        var TempPos = ItemNum + 1;
-                                        var LastW = 0;
+                            if (1 == Range.Words) {
+                                if (1 == RangesCount && this.Lines.length > 1) {
+                                    // Подсчитаем количество букв в слове
+                                    var LettersCount = 0;
+                                    var TempPos = ItemNum + 1;
+                                    var LastW = 0;
 
-                                        var __CurLine = CurLine;
-                                        var __CurRange = CurRange;
+                                    var __CurLine = CurLine;
+                                    var __CurRange = CurRange;
 
-                                        while (this.Content[TempPos].Type != para_End) {
-                                            var __Item = this.Content[TempPos];
-                                            if (undefined != __Item.CurPage) {
-                                                if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
-                                                    break;
-                                            }
-
-                                            if (para_Text == this.Content[TempPos].Type) {
-                                                LettersCount++;
-                                                LastW = this.Content[TempPos].Width;
-                                            }
-
-                                            TempPos++;
+                                    while (this.Content[TempPos].Type != para_End) {
+                                        var __Item = this.Content[TempPos];
+                                        if (undefined != __Item.CurPage) {
+                                            if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
+                                                break;
                                         }
 
-                                        // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                                        if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
-                                            JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                                        if (para_Text == this.Content[TempPos].Type) {
+                                            LettersCount++;
+                                            LastW = this.Content[TempPos].Width;
+                                        }
+
+                                        TempPos++;
                                     }
-                                    else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
-                                        // Ничего не делаем (выравниваем текст по левой границе)
-                                    }
-                                    else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
-                                        X = Range.X + RangeWidth - Range.W;
-                                    }
-                                    else {
-                                        X = Range.X + (RangeWidth - Range.W) / 2;
-                                    }
+
+                                    // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
+                                    if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
+                                        JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                                }
+                                else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
+                                    // Ничего не делаем (выравниваем текст по левой границе)
+                                }
+                                else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
+                                    X = Range.X + RangeWidth - Range.W;
                                 }
                                 else {
-                                    // Последний промежуток последней строки не надо растягивать по ширине.
-                                    if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
-                                        JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
-                                    else
-                                        JustifySpace = 0;
+                                    X = Range.X + (RangeWidth - Range.W) / 2;
                                 }
-
-                                break;
                             }
+                            else {
+                                // Последний промежуток последней строки не надо растягивать по ширине.
+                                if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
+                                    JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
+                                else
+                                    JustifySpace = 0;
+                            }
+
+                            break;
+                        }
                         default: X = Range.X; break;
                     }
 
@@ -2666,58 +2671,58 @@ Paragraph.prototype =
                         case align_Right: X = Math.max(Range.X + RangeWidth - Range.W, Range.X); break;
                         case align_Center: X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
                         case align_Justify:
-                            {
-                                X = Range.X;
+                        {
+                            X = Range.X;
 
-                                if (1 == Range.Words) {
-                                    if (1 == RangesCount && this.Lines.length > 1) {
-                                        // Подсчитаем количество букв в слове
-                                        var LettersCount = 0;
-                                        var TempPos = ItemNum + 1;
-                                        var LastW = 0;
+                            if (1 == Range.Words) {
+                                if (1 == RangesCount && this.Lines.length > 1) {
+                                    // Подсчитаем количество букв в слове
+                                    var LettersCount = 0;
+                                    var TempPos = ItemNum + 1;
+                                    var LastW = 0;
 
-                                        var __CurLine = CurLine;
-                                        var __CurRange = CurRange;
+                                    var __CurLine = CurLine;
+                                    var __CurRange = CurRange;
 
-                                        while (this.Content[TempPos].Type != para_End) {
-                                            var __Item = this.Content[TempPos];
-                                            if (undefined != __Item.CurPage) {
-                                                if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
-                                                    break;
-                                            }
-
-                                            if (para_Text == this.Content[TempPos].Type) {
-                                                LettersCount++;
-                                                LastW = this.Content[TempPos].Width;
-                                            }
-
-                                            TempPos++;
+                                    while (this.Content[TempPos].Type != para_End) {
+                                        var __Item = this.Content[TempPos];
+                                        if (undefined != __Item.CurPage) {
+                                            if (__CurLine != __Item.CurLine || __CurRange != __Item.Range)
+                                                break;
                                         }
 
-                                        // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
-                                        if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
-                                            JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                                        if (para_Text == this.Content[TempPos].Type) {
+                                            LettersCount++;
+                                            LastW = this.Content[TempPos].Width;
+                                        }
+
+                                        TempPos++;
                                     }
-                                    else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
-                                        // Ничего не делаем (выравниваем текст по левой границе)
-                                    }
-                                    else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
-                                        X = Range.X + RangeWidth - Range.W;
-                                    }
-                                    else {
-                                        X = Range.X + (RangeWidth - Range.W) / 2;
-                                    }
+
+                                    // Либо слово целиком занимает строку, либо не целиком, но разница очень мала
+                                    if (RangeWidth - Range.W <= 0.05 * RangeWidth && LettersCount > 1)
+                                        JustifyWord = (RangeWidth - Range.W) / (LettersCount - 1);
+                                }
+                                else if (0 == CurRange || (CurLine == this.Lines.length - 1 && CurRange == this.Lines[CurLine].Ranges.length - 1)) {
+                                    // Ничего не делаем (выравниваем текст по левой границе)
+                                }
+                                else if (CurRange == this.Lines[CurLine].Ranges.length - 1) {
+                                    X = Range.X + RangeWidth - Range.W;
                                 }
                                 else {
-                                    // Последний промежуток последней строки не надо растягивать по ширине.
-                                    if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
-                                        JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
-                                    else
-                                        JustifySpace = 0;
+                                    X = Range.X + (RangeWidth - Range.W) / 2;
                                 }
-
-                                break;
                             }
+                            else {
+                                // Последний промежуток последней строки не надо растягивать по ширине.
+                                if (Range.Spaces > 0 && (CurLine != this.Lines.length - 1 || CurRange != this.Lines[CurLine].Ranges.length - 1))
+                                    JustifySpace = (RangeWidth - Range.W) / Range.Spaces;
+                                else
+                                    JustifySpace = 0;
+                            }
+
+                            break;
+                        }
                         default: X = Range.X; break;
                     }
 
@@ -2737,184 +2742,184 @@ Paragraph.prototype =
 
             switch (Item.Type) {
                 case para_Text:
-                    {
-                        bFirstLineItem = false;
-                        if (CurLine != this.Lines.length - 1 && JustifyWord > 0)
-                            Item.WidthVisible = Item.Width + JustifyWord;
-                        else
-                            Item.WidthVisible = Item.Width;
+                {
+                    bFirstLineItem = false;
+                    if (CurLine != this.Lines.length - 1 && JustifyWord > 0)
+                        Item.WidthVisible = Item.Width + JustifyWord;
+                    else
+                        Item.WidthVisible = Item.Width;
 
-                        X += Item.WidthVisible;
-                        LastW = Item.WidthVisible;
+                    X += Item.WidthVisible;
+                    LastW = Item.WidthVisible;
 
-                        break;
-                    }
+                    break;
+                }
                 case para_Space:
-                    {
-                        if (!bFirstLineItem && CurLine != this.Lines.length - 1 && SpacesCounter > 0 && (ItemNum > this.Lines[CurLine].Ranges[CurRange].SpacePos)) {
-                            Item.WidthVisible = Item.Width + JustifySpace;
-                            SpacesCounter--;
-                        }
-                        else
-                            Item.WidthVisible = Item.Width;
+                {
+                    if (!bFirstLineItem && CurLine != this.Lines.length - 1 && SpacesCounter > 0 && (ItemNum > this.Lines[CurLine].Ranges[CurRange].SpacePos)) {
+                        Item.WidthVisible = Item.Width + JustifySpace;
+                        SpacesCounter--;
+                    }
+                    else
+                        Item.WidthVisible = Item.Width;
+
+                    X += Item.WidthVisible;
+                    LastW = Item.WidthVisible;
+
+                    break;
+                }
+                case para_Drawing:
+                {
+                    var DrawingObjects = this.Parent.DrawingObjects;
+                    var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
+                    var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
+
+                    var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
+                    var ColumnEndX = (0 === CurPage ? this.X_ColumnEnd : this.Pages[CurPage].XLimit);
+
+                    var Top_Margin = Y_Top_Margin;
+                    var Bottom_Margin = Y_Bottom_Margin;
+                    var Page_H = Page_Height;
+
+                    if (true === this.Parent.Is_TableCellContent() && true == Item.Use_TextWrap()) {
+                        Top_Margin = 0;
+                        Bottom_Margin = 0;
+                        Page_H = 0;
+                    }
+
+                    if (true != Item.Use_TextWrap()) {
+                        PageFields.X = X_Left_Field;
+                        PageFields.Y = Y_Top_Field;
+                        PageFields.XLimit = X_Right_Field;
+                        PageFields.YLimit = Y_Bottom_Field;
+
+                        PageLimits.X = 0;
+                        PageLimits.Y = 0;
+                        PageLimits.XLimit = Page_Width;
+                        PageLimits.YLimit = Page_Height;
+                    }
+
+                    if (true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) {
+                        Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                        bFirstLineItem = false;
 
                         X += Item.WidthVisible;
                         LastW = Item.WidthVisible;
-
-                        break;
                     }
-                case para_Drawing:
-                    {
-                        var DrawingObjects = this.Parent.DrawingObjects;
-                        var PageLimits = this.Parent.Get_PageLimits(this.PageNum + CurPage);
-                        var PageFields = this.Parent.Get_PageFields(this.PageNum + CurPage);
+                    else {
+                        // У нас Flow-объект. Если он с обтеканием, тогда мы останавливаем пересчет и
+                        // запоминаем текущий объект. В функции Internal_Recalculate_2 пересчитываем
+                        // его позицию и сообщаем ее внешнему классу.
 
-                        var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[CurPage].X);
-                        var ColumnEndX = (0 === CurPage ? this.X_ColumnEnd : this.Pages[CurPage].XLimit);
+                        if (true === Item.Use_TextWrap()) {
+                            var LogicDocument = this.Parent;
+                            var Page_abs = this.Get_StartPage_Absolute() + CurPage;
 
-                        var Top_Margin = Y_Top_Margin;
-                        var Bottom_Margin = Y_Bottom_Margin;
-                        var Page_H = Page_Height;
+                            if (null === LogicDocument.RecalcInfo.FlowObject) {
+                                // Обновляем позицию объекта
+                                Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
 
-                        if (true === this.Parent.Is_TableCellContent() && true == Item.Use_TextWrap()) {
-                            Top_Margin = 0;
-                            Bottom_Margin = 0;
-                            Page_H = 0;
-                        }
+                                LogicDocument.RecalcInfo.FlowObject = Item;
+                                return recalcresult_CurPage;
+                            }
+                            else if (Item === LogicDocument.RecalcInfo.FlowObject) {
+                                // Если мы находимся с таблице, тогда делаем как Word, не пересчитываем предыдущую страницу,
+                                // даже если это необходимо. Такое поведение нужно для точного определения рассчиталась ли
+                                // данная страница окончательно или нет. Если у нас будет ветка с переходом на предыдущую страницу,
+                                // тогда не рассчитав следующую страницу мы о конечном рассчете текущей страницы не узнаем.
 
-                        if (true != Item.Use_TextWrap()) {
-                            PageFields.X = X_Left_Field;
-                            PageFields.Y = Y_Top_Field;
-                            PageFields.XLimit = X_Right_Field;
-                            PageFields.YLimit = Y_Bottom_Field;
+                                // Если данный объект нашли, значит он уже был рассчитан и нам надо проверить номер страницы
+                                if (Item.PageNum === Page_abs) {
+                                    // Все нормально, можно продолжить пересчет
+                                    LogicDocument.RecalcInfo.FlowObject = null;
+                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
+                                }
+                                else if (true === this.Parent.Is_TableCellContent()) {
+                                    // Картинка не на нужной странице, но так как это таблица
+                                    // мы не персчитываем заново текущую страницу, а не предыдущую
 
-                            PageLimits.X = 0;
-                            PageLimits.Y = 0;
-                            PageLimits.XLimit = Page_Width;
-                            PageLimits.YLimit = Page_Height;
-                        }
-
-                        if (true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) {
-                            Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
-                            bFirstLineItem = false;
-
-                            X += Item.WidthVisible;
-                            LastW = Item.WidthVisible;
-                        }
-                        else {
-                            // У нас Flow-объект. Если он с обтеканием, тогда мы останавливаем пересчет и
-                            // запоминаем текущий объект. В функции Internal_Recalculate_2 пересчитываем
-                            // его позицию и сообщаем ее внешнему классу.
-
-                            if (true === Item.Use_TextWrap()) {
-                                var LogicDocument = this.Parent;
-                                var Page_abs = this.Get_StartPage_Absolute() + CurPage;
-
-                                if (null === LogicDocument.RecalcInfo.FlowObject) {
                                     // Обновляем позицию объекта
                                     Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
 
                                     LogicDocument.RecalcInfo.FlowObject = Item;
+                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
                                     return recalcresult_CurPage;
                                 }
-                                else if (Item === LogicDocument.RecalcInfo.FlowObject) {
-                                    // Если мы находимся с таблице, тогда делаем как Word, не пересчитываем предыдущую страницу,
-                                    // даже если это необходимо. Такое поведение нужно для точного определения рассчиталась ли
-                                    // данная страница окончательно или нет. Если у нас будет ветка с переходом на предыдущую страницу,
-                                    // тогда не рассчитав следующую страницу мы о конечном рассчете текущей страницы не узнаем.
-
-                                    // Если данный объект нашли, значит он уже был рассчитан и нам надо проверить номер страницы
-                                    if (Item.PageNum === Page_abs) {
-                                        // Все нормально, можно продолжить пересчет
-                                        LogicDocument.RecalcInfo.FlowObject = null;
-                                        LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    }
-                                    else if (true === this.Parent.Is_TableCellContent()) {
-                                        // Картинка не на нужной странице, но так как это таблица
-                                        // мы не персчитываем заново текущую страницу, а не предыдущую
-
-                                        // Обновляем позицию объекта
-                                        Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
-
-                                        LogicDocument.RecalcInfo.FlowObject = Item;
-                                        LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                        return recalcresult_CurPage;
-                                    }
-                                    else {
-                                        LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = true;
-                                        DrawingObjects.removeById(Item.PageNum, Item.Get_Id());
-                                        return recalcresult_PrevPage;
-                                    }
-                                }
                                 else {
-                                    // Либо данный элемент уже обработан, либо будет обработан в будущем
+                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = true;
+                                    DrawingObjects.removeById(Item.PageNum, Item.Get_Id());
+                                    return recalcresult_PrevPage;
                                 }
-
-                                continue;
                             }
                             else {
-                                // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
-                                Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
-                                continue;
+                                // Либо данный элемент уже обработан, либо будет обработан в будущем
                             }
+
+                            continue;
                         }
-
-
-                        break;
+                        else {
+                            // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
+                            Item.Update_Position(X, Y, this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
+                            continue;
+                        }
                     }
+
+
+                    break;
+                }
                 case para_PageNum:
-                    {
-                        bFirstLineItem = false;
-                        X += Item.WidthVisible;
-                        LastW = Item.WidthVisible;
+                {
+                    bFirstLineItem = false;
+                    X += Item.WidthVisible;
+                    LastW = Item.WidthVisible;
 
-                        break;
-                    }
+                    break;
+                }
                 case para_Tab:
-                    {
-                        X += Item.WidthVisible;
+                {
+                    X += Item.WidthVisible;
 
-                        break;
-                    }
+                    break;
+                }
                 case para_TextPr:
-                    {
-                        break;
-                    }
+                {
+                    break;
+                }
                 case para_End:
-                    {
-                        X += Item.Width;
-                        break;
-                    }
+                {
+                    X += Item.Width;
+                    break;
+                }
                 case para_NewLine:
-                    {
-                        X += Item.WidthVisible;
-                        break;
-                    }
+                {
+                    X += Item.WidthVisible;
+                    break;
+                }
 
                 case para_CommentStart:
-                    {
-                        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+                {
+                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
 
-                        var CommentId = Item.Id;
-                        var CommentY = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
-                        var CommentH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                    var CommentId = Item.Id;
+                    var CommentY = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                    var CommentH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                        DocumentComments.Set_StartInfo(CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id);
+                    DocumentComments.Set_StartInfo(CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id);
 
-                        break;
-                    }
+                    break;
+                }
 
                 case para_CommentEnd:
-                    {
-                        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+                {
+                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
 
-                        var CommentId = Item.Id;
-                        var CommentY = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
-                        var CommentH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                    var CommentId = Item.Id;
+                    var CommentY = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                    var CommentH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                        DocumentComments.Set_EndInfo(CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id);
-                        break;
-                    }
+                    DocumentComments.Set_EndInfo(CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id);
+                    break;
+                }
             }
         }
 
@@ -2968,15 +2973,15 @@ Paragraph.prototype =
                         var TargetY = Y - Ascender - CurTextPr.Position;
                         switch (CurTextPr.VertAlign) {
                             case vertalign_SubScript:
-                                {
-                                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                                    break;
-                                }
+                            {
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                                break;
+                            }
                             case vertalign_SuperScript:
-                                {
-                                    TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                                    break;
-                                }
+                            {
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                                break;
+                            }
                         }
 
                         var Page_Abs = this.Get_StartPage_Absolute() + CurPage;
@@ -2996,15 +3001,15 @@ Paragraph.prototype =
 
                     switch (CurTextPr.VertAlign) {
                         case vertalign_SubScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                                break;
-                            }
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                            break;
+                        }
                         case vertalign_SuperScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                                break;
-                            }
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                            break;
+                        }
                     }
 
                     return { X: X, Y: TargetY, Height: Height, Internal: { Line: CurLine, Page: CurPage, Range: CurRange} };
@@ -3021,18 +3026,18 @@ Paragraph.prototype =
                 case para_TextPr:
                 case para_End:
                 case para_NewLine:
-                    {
-                        X += Item.WidthVisible;
-                        break;
-                    }
+                {
+                    X += Item.WidthVisible;
+                    break;
+                }
                 case para_Drawing:
-                    {
-                        if (drawing_Inline != Item.DrawingType)
-                            break;
-
-                        X += Item.WidthVisible;
+                {
+                    if (drawing_Inline != Item.DrawingType)
                         break;
-                    }
+
+                    X += Item.WidthVisible;
+                    break;
+                }
             }
         }
 
@@ -3086,8 +3091,8 @@ Paragraph.prototype =
             return false;
 
         if (false === Pr1.Brd.Top.Compare(Pr2.Brd.Top) || false === Pr1.Brd.Bottom.Compare(Pr2.Brd.Bottom) ||
-             false === Pr1.Brd.Left.Compare(Pr2.Brd.Left) || false === Pr1.Brd.Right.Compare(Pr2.Brd.Right) ||
-             false === Pr1.Brd.Between.Compare(Pr2.Brd.Between))
+            false === Pr1.Brd.Left.Compare(Pr2.Brd.Left) || false === Pr1.Brd.Right.Compare(Pr2.Brd.Right) ||
+            false === Pr1.Brd.Between.Compare(Pr2.Brd.Between))
             return false;
 
         return true;
@@ -3096,8 +3101,8 @@ Paragraph.prototype =
     // Проверяем не пустые ли границы
     Internal_Is_NullBorders: function (Borders) {
         if (border_None != Borders.Top.Value || border_None != Borders.Bottom.Value ||
-             border_None != Borders.Left.Value || border_None != Borders.Right.Value ||
-             border_None != Borders.Between.Value)
+            border_None != Borders.Left.Value || border_None != Borders.Right.Value ||
+            border_None != Borders.Between.Value)
             return false;
 
         return true;
@@ -3217,36 +3222,36 @@ Paragraph.prototype =
 
         // Если параграф начинается с новой страницы
         /* if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument )
-        {
-        // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
-        // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
-        // тогда мы должны пересчитать предыдущую страницу, с учетом того, что предыдущий параграф
-        // надо начать с новой страницы.
-        var Curr = this.Get_DocumentPrev();
-        while ( null != Curr && type_Paragraph === Curr.GetType() )
-        {
-        var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
-        if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext )
-        {
-        break;
-        }
-        else
-        {
-        var Prev = Curr.Get_DocumentPrev();
-        if ( null === Prev || type_Paragraph != Prev.GetType() )
-        break;
+         {
+         // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
+         // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
+         // тогда мы должны пересчитать предыдущую страницу, с учетом того, что предыдущий параграф
+         // надо начать с новой страницы.
+         var Curr = this.Get_DocumentPrev();
+         while ( null != Curr && type_Paragraph === Curr.GetType() )
+         {
+         var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
+         if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext )
+         {
+         break;
+         }
+         else
+         {
+         var Prev = Curr.Get_DocumentPrev();
+         if ( null === Prev || type_Paragraph != Prev.GetType() )
+         break;
 
-        var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
-        if ( false === PrevKeepNext )
-        {
-        this.Parent.RecalcInfo.KeepNextParagraph = Curr;
-        return recalcresult_PrevPage;
-        }
-        else
-        Curr = Prev;
-        }
-        }
-        }     */
+         var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
+         if ( false === PrevKeepNext )
+         {
+         this.Parent.RecalcInfo.KeepNextParagraph = Curr;
+         return recalcresult_PrevPage;
+         }
+         else
+         Curr = Prev;
+         }
+         }
+         }     */
 
         // Пересчет параграфа:
         //  1. Сначала рассчитаем новые переносы строк, при этом подсчитав количество
@@ -3291,145 +3296,145 @@ Paragraph.prototype =
 
             switch (Item.Type) {
                 case para_Text:
-                    {
-                        if (false === bWord) {
-                            bWord = true;
-                            nWordLen = Item.Width;
-                        }
-                        else {
-                            nWordLen += Item.Width;
-
-                            if (true === Item.SpaceAfter) {
-                                if (nMinWidth < nWordLen)
-                                    nMinWidth = nWordLen;
-
-                                bWord = false;
-                                nWordLen = 0;
-                            }
-                        }
-
-                        if (nSpaceLen > 0) {
-                            nCurMaxWidth += nSpaceLen;
-                            nSpaceLen = 0;
-                        }
-
-                        nCurMaxWidth += Item.Width;
-
-                        break;
+                {
+                    if (false === bWord) {
+                        bWord = true;
+                        nWordLen = Item.Width;
                     }
-
-                case para_Space:
-                    {
-                        if (true === bWord) {
-                            if (nMinWidth < nWordLen)
-                                nMinWidth = nWordLen;
-
-                            bWord = false;
-                            nWordLen = 0;
-                        }
-
-                        // Мы сразу не добавляем ширину пробелов к максимальной ширине, потому что
-                        // пробелы, идущие в конце параграфа или перед переносом строки(явным), не
-                        // должны учитываться.
-                        nSpaceLen += Item.Width;
-
-                        break;
-                    }
-
-                case para_Drawing:
-                    {
-                        if (true === bWord) {
-                            if (nMinWidth < nWordLen)
-                                nMinWidth = nWordLen;
-
-                            bWord = false;
-                            nWordLen = 0;
-                        }
-
-                        if ((true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) && Item.Width > nMinWidth)
-                            nMinWidth = Item.Width;
-
-                        if (nSpaceLen > 0) {
-                            nCurMaxWidth += nSpaceLen;
-                            nSpaceLen = 0;
-                        }
-
-                        nCurMaxWidth += Item.Width;
-
-                        break;
-                    }
-
-                case para_PageNum:
-                    {
-                        if (true === bWord) {
-                            if (nMinWidth < nWordLen)
-                                nMinWidth = nWordLen;
-
-                            bWord = false;
-                            nWordLen = 0;
-                        }
-
-                        if (Item.Width > nMinWidth)
-                            nMinWidth = Item.Width;
-
-                        if (nSpaceLen > 0) {
-                            nCurMaxWidth += nSpaceLen;
-                            nSpaceLen = 0;
-                        }
-
-                        nCurMaxWidth += Item.Width;
-
-                        break;
-                    }
-
-                case para_Tab:
-                    {
+                    else {
                         nWordLen += Item.Width;
 
+                        if (true === Item.SpaceAfter) {
+                            if (nMinWidth < nWordLen)
+                                nMinWidth = nWordLen;
+
+                            bWord = false;
+                            nWordLen = 0;
+                        }
+                    }
+
+                    if (nSpaceLen > 0) {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_Space:
+                {
+                    if (true === bWord) {
                         if (nMinWidth < nWordLen)
                             nMinWidth = nWordLen;
 
                         bWord = false;
                         nWordLen = 0;
-
-                        if (nSpaceLen > 0) {
-                            nCurMaxWidth += nSpaceLen;
-                            nSpaceLen = 0;
-                        }
-
-                        nCurMaxWidth += Item.Width;
-
-                        break;
                     }
+
+                    // Мы сразу не добавляем ширину пробелов к максимальной ширине, потому что
+                    // пробелы, идущие в конце параграфа или перед переносом строки(явным), не
+                    // должны учитываться.
+                    nSpaceLen += Item.Width;
+
+                    break;
+                }
+
+                case para_Drawing:
+                {
+                    if (true === bWord) {
+                        if (nMinWidth < nWordLen)
+                            nMinWidth = nWordLen;
+
+                        bWord = false;
+                        nWordLen = 0;
+                    }
+
+                    if ((true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape()) && Item.Width > nMinWidth)
+                        nMinWidth = Item.Width;
+
+                    if (nSpaceLen > 0) {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_PageNum:
+                {
+                    if (true === bWord) {
+                        if (nMinWidth < nWordLen)
+                            nMinWidth = nWordLen;
+
+                        bWord = false;
+                        nWordLen = 0;
+                    }
+
+                    if (Item.Width > nMinWidth)
+                        nMinWidth = Item.Width;
+
+                    if (nSpaceLen > 0) {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
+
+                case para_Tab:
+                {
+                    nWordLen += Item.Width;
+
+                    if (nMinWidth < nWordLen)
+                        nMinWidth = nWordLen;
+
+                    bWord = false;
+                    nWordLen = 0;
+
+                    if (nSpaceLen > 0) {
+                        nCurMaxWidth += nSpaceLen;
+                        nSpaceLen = 0;
+                    }
+
+                    nCurMaxWidth += Item.Width;
+
+                    break;
+                }
 
                 case para_NewLine:
-                    {
-                        if (nMinWidth < nWordLen)
-                            nMinWidth = nWordLen;
+                {
+                    if (nMinWidth < nWordLen)
+                        nMinWidth = nWordLen;
 
-                        bWord = false;
-                        nWordLen = 0;
+                    bWord = false;
+                    nWordLen = 0;
 
-                        nSpaceLen = 0;
+                    nSpaceLen = 0;
 
-                        if (nCurMaxWidth > nMaxWidth)
-                            nMaxWidth = nCurMaxWidth;
+                    if (nCurMaxWidth > nMaxWidth)
+                        nMaxWidth = nCurMaxWidth;
 
-                        nCurMaxWidth = 0;
+                    nCurMaxWidth = 0;
 
-                        break;
-                    }
+                    break;
+                }
 
                 case para_End:
-                    {
-                        if (nMinWidth < nWordLen)
-                            nMinWidth = nWordLen;
+                {
+                    if (nMinWidth < nWordLen)
+                        nMinWidth = nWordLen;
 
-                        if (nCurMaxWidth > nMaxWidth)
-                            nMaxWidth = nCurMaxWidth;
+                    if (nCurMaxWidth > nMaxWidth)
+                        nMaxWidth = nCurMaxWidth;
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
 
@@ -3515,16 +3520,16 @@ Paragraph.prototype =
     Internal_Draw_1: function (CurPage, pGraphics, Pr) {
         // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
         /* if ( locktype_None != this.Lock.Get_Type() )
-        {
-        if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
-        {
-        var X_min = -1 + Math.min( this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
-        var Y_top = this.Pages[CurPage].Bounds.Top;
-        var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
+         {
+         if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
+         {
+         var X_min = -1 + Math.min( this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
+         var Y_top = this.Pages[CurPage].Bounds.Top;
+         var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-        pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
-        }
-        }    */
+         pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
+         }
+         }    */
     },
 
     Internal_Draw_2: function (CurPage, pGraphics, Pr) {
@@ -3651,71 +3656,71 @@ Paragraph.prototype =
                         case para_Drawing:
                         case para_Tab:
                         case para_Text:
-                            {
-                                if (para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType)
-                                    break;
+                        {
+                            if (para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType)
+                                break;
 
+
+                            if (highlight_None != CurTextPr.HighLight)
+                                aHigh.Add(Y0, Y1, X, X + Item.WidthVisible, 0, CurTextPr.HighLight.r, CurTextPr.HighLight.g, CurTextPr.HighLight.b);
+
+                            if (true === bSearchResult)
+                                aFind.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
+                            else if (CollaborativeChanges > 0)
+                                aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
+
+                            if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType)
+                                X += Item.WidthVisible;
+
+                            break;
+                        }
+                        case para_Space:
+                        {
+                            // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
+                            if (Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2) {
 
                                 if (highlight_None != CurTextPr.HighLight)
                                     aHigh.Add(Y0, Y1, X, X + Item.WidthVisible, 0, CurTextPr.HighLight.r, CurTextPr.HighLight.g, CurTextPr.HighLight.b);
-
-                                if (true === bSearchResult)
-                                    aFind.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
-                                else if (CollaborativeChanges > 0)
-                                    aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
-
-                                if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType)
-                                    X += Item.WidthVisible;
-
-                                break;
                             }
-                        case para_Space:
-                            {
-                                // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                                if (Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2) {
 
-                                    if (highlight_None != CurTextPr.HighLight)
-                                        aHigh.Add(Y0, Y1, X, X + Item.WidthVisible, 0, CurTextPr.HighLight.r, CurTextPr.HighLight.g, CurTextPr.HighLight.b);
-                                }
+                            if (true === bSearchResult)
+                                aFind.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
+                            else if (CollaborativeChanges > 0)
+                                aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
 
-                                if (true === bSearchResult)
-                                    aFind.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
-                                else if (CollaborativeChanges > 0)
-                                    aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
+                            X += Item.WidthVisible;
 
-                                X += Item.WidthVisible;
-
-                                break;
-                            }
+                            break;
+                        }
                         case para_TextPr:
-                            {
-                                CurTextPr = this.Internal_CalculateTextPr(Pos);
-                                break;
-                            }
+                        {
+                            CurTextPr = this.Internal_CalculateTextPr(Pos);
+                            break;
+                        }
                         case para_End:
-                            {
-                                if (CollaborativeChanges > 0)
-                                    aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
+                        {
+                            if (CollaborativeChanges > 0)
+                                aColl.Add(Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0);
 
-                                X += Item.Width;
-                                break;
-                            }
+                            X += Item.Width;
+                            break;
+                        }
                         case para_NewLine:
-                            {
-                                X += Item.WidthVisible;
-                                break;
-                            }
+                        {
+                            X += Item.WidthVisible;
+                            break;
+                        }
                         case para_CollaborativeChangesStart:
-                            {
-                                CollaborativeChanges++;
-                                break;
-                            }
+                        {
+                            CollaborativeChanges++;
+                            break;
+                        }
 
                         case para_CollaborativeChangesEnd:
-                            {
-                                CollaborativeChanges--;
-                                break;
-                            }
+                        {
+                            CollaborativeChanges--;
+                            break;
+                        }
 
 
                     }
@@ -3913,7 +3918,10 @@ Paragraph.prototype =
         pGraphics.SetTextPr(CurTextPr);
 
         if (true === bVisitedHyperlink)
-            pGraphics.b_color1(128, 0, 151, 255);
+        {
+            var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+            pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
+        }
         else
             pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -3947,17 +3955,17 @@ Paragraph.prototype =
 
                 switch (CurTextPr.VertAlign) {
                     case vertalign_SubScript:
-                        {
-                            Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                    {
+                        Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
-                            break;
-                        }
+                        break;
+                    }
                     case vertalign_SuperScript:
-                        {
-                            Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                    {
+                        Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
-                            break;
-                        }
+                        break;
+                    }
                 }
 
                 if (Pos === this.Numbering.Pos) {
@@ -4051,7 +4059,10 @@ Paragraph.prototype =
                         // Восстановим настройки
                         pGraphics.SetTextPr(CurTextPr);
                         if (true === bVisitedHyperlink)
-                            pGraphics.b_color1(128, 0, 151, 255);
+                        {
+                            var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+                            pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
                         else
                             pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                     }
@@ -4075,89 +4086,95 @@ Paragraph.prototype =
                     case para_Drawing:
                     case para_Tab:
                     case para_Text:
-                        {
-                            if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType) {
-                                bFirstLineItem = false;
+                    {
+                        if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType) {
+                            bFirstLineItem = false;
 
-                                if (para_PageNum != Item.Type)
-                                    Item.Draw(X, Y - Item.YOffset, pGraphics);
-                                else
-                                    Item.Draw(X, Y - Item.YOffset, pGraphics, this.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc);
-
-                                X += Item.WidthVisible;
-                            }
-
-                            // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
-                            if (para_Drawing === Item.Type && drawing_Inline === Item.DrawingType) {
-                                pGraphics.SetTextPr(CurTextPr);
-                                pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                                pGraphics.p_color(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                            }
-
-                            break;
-                        }
-                    case para_Space:
-                        {
-                            Item.Draw(X, Y - Item.YOffset, pGraphics);
-
-                            X += Item.WidthVisible;
-
-                            break;
-                        }
-                    case para_TextPr:
-                        {
-                            CurTextPr = this.Internal_CalculateTextPr(Pos);
-                            pGraphics.SetTextPr(CurTextPr);
-
-                            if (true === bVisitedHyperlink)
-                                pGraphics.b_color1(128, 0, 151, 255);
+                            if (para_PageNum != Item.Type)
+                                Item.Draw(X, Y - Item.YOffset, pGraphics);
                             else
-                                pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                                Item.Draw(X, Y - Item.YOffset, pGraphics, this.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc);
 
-                            break;
-                        }
-                    case para_End:
-                        {
-                            // Выставляем настройки для символа параграфа
-                            var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-                            EndTextPr.Merge(this.TextPr.Value);
-
-                            pGraphics.SetTextPr(EndTextPr);
-                            pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
-
-                            bEnd = true;
-                            var bEndCell = false;
-                            if (null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent())
-                                bEndCell = true;
-
-                            Item.Draw(X, Y - Item.YOffset, pGraphics, bEndCell);
-                            X += Item.Width;
-                            break;
-                        }
-                    case para_NewLine:
-                        {
-                            Item.Draw(X, Y - Item.YOffset, pGraphics);
                             X += Item.WidthVisible;
-                            break;
                         }
+
+                        // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
+                        if (para_Drawing === Item.Type && drawing_Inline === Item.DrawingType) {
+                            pGraphics.SetTextPr(CurTextPr);
+                            pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            pGraphics.p_color(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                        }
+
+                        break;
+                    }
+                    case para_Space:
+                    {
+                        Item.Draw(X, Y - Item.YOffset, pGraphics);
+
+                        X += Item.WidthVisible;
+
+                        break;
+                    }
+                    case para_TextPr:
+                    {
+                        CurTextPr = this.Internal_CalculateTextPr(Pos);
+                        pGraphics.SetTextPr(CurTextPr);
+
+                        if (true === bVisitedHyperlink)
+                        {
+                            var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+                            pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
+                        }
+                        else
+                            pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+                        break;
+                    }
+                    case para_End:
+                    {
+                        // Выставляем настройки для символа параграфа
+                        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                        EndTextPr.Merge(this.TextPr.Value);
+
+                        pGraphics.SetTextPr(EndTextPr);
+                        pGraphics.b_color1(EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+
+                        bEnd = true;
+                        var bEndCell = false;
+                        if (null === this.Get_DocumentNext() && true === this.Parent.Is_TableCellContent())
+                            bEndCell = true;
+
+                        Item.Draw(X, Y - Item.YOffset, pGraphics, bEndCell);
+                        X += Item.Width;
+                        break;
+                    }
+                    case para_NewLine:
+                    {
+                        Item.Draw(X, Y - Item.YOffset, pGraphics);
+                        X += Item.WidthVisible;
+                        break;
+                    }
 
                     case para_HyperlinkStart:
+                    {
+                        bVisitedHyperlink = Item.Get_Visited();
+
+                        if (true === bVisitedHyperlink)
                         {
-                            bVisitedHyperlink = Item.Get_Visited();
-
-                            if (true === bVisitedHyperlink)
-                                pGraphics.b_color1(128, 0, 151, 255);
-                            else
-                                pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                            break;
+                            var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+                            pGraphics.b_color1(RGBA.R, RGBA.G, RGBA.B, 255);
                         }
-                    case para_HyperlinkEnd:
-                        {
-                            bVisitedHyperlink = false;
+                        else
                             pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                            break;
-                        }
+
+                        break;
+                    }
+                    case para_HyperlinkEnd:
+                    {
+                        bVisitedHyperlink = false;
+                        pGraphics.b_color1(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                        break;
+                    }
                 }
 
                 Y = TempY;
@@ -4180,7 +4197,10 @@ Paragraph.prototype =
         // Выставляем цвет обводки
         var CurColor;
         if (true === bVisitedHyperlink)
-            CurColor = new CDocumentColor(128, 0, 151);
+        {
+            var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+            CurColor = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+        }
         else
             CurColor = new CDocumentColor(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b);
 
@@ -4218,101 +4238,107 @@ Paragraph.prototype =
                     switch (Item.Type) {
                         case para_End:
                         case para_NewLine:
-                            {
-                                X += Item.WidthVisible;
+                        {
+                            X += Item.WidthVisible;
 
-                                break;
-                            }
+                            break;
+                        }
 
                         case para_PageNum:
                         case para_Drawing:
                         case para_Tab:
                         case para_Text:
-                            {
-                                if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType) {
-                                    if (true === CurTextPr.DStrikeout)
-                                        aDStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
-                                    else if (true === CurTextPr.Strikeout)
-                                        aStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+                        {
+                            if (para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType) {
+                                if (true === CurTextPr.DStrikeout)
+                                    aDStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+                                else if (true === CurTextPr.Strikeout)
+                                    aStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
 
-                                    if (true === CurTextPr.Underline)
-                                        aUnderline.Add(Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+                                if (true === CurTextPr.Underline)
+                                    aUnderline.Add(Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
 
-                                    //if ( true != this.SpellChecker.Check_Spelling(Pos) )
-                                    //  aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
-
-                                    X += Item.WidthVisible;
-                                }
-
-                                break;
-                            }
-                        case para_Space:
-                            {
-                                // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                                if (Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2) {
-                                    if (true === CurTextPr.DStrikeout)
-                                        aDStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
-                                    else if (true === CurTextPr.Strikeout)
-                                        aStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
-
-                                    if (true === CurTextPr.Underline)
-                                        aUnderline.Add(Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
-                                }
+                                //if ( true != this.SpellChecker.Check_Spelling(Pos) )
+                                //  aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
 
                                 X += Item.WidthVisible;
-
-                                break;
                             }
+
+                            break;
+                        }
+                        case para_Space:
+                        {
+                            // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
+                            if (Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2) {
+                                if (true === CurTextPr.DStrikeout)
+                                    aDStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+                                else if (true === CurTextPr.Strikeout)
+                                    aStrikeout.Add(Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+
+                                if (true === CurTextPr.Underline)
+                                    aUnderline.Add(Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b);
+                            }
+
+                            X += Item.WidthVisible;
+
+                            break;
+                        }
                         case para_TextPr:
+                        {
+                            CurTextPr = this.Internal_CalculateTextPr(Pos);
+
+                            // Выставляем цвет обводки
+                            if (true === bVisitedHyperlink)
                             {
-                                CurTextPr = this.Internal_CalculateTextPr(Pos);
-
-                                // Выставляем цвет обводки
-                                if (true === bVisitedHyperlink)
-                                    CurColor.Set(128, 0, 151, 255);
-                                else
-                                    CurColor.Set(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                                switch (CurTextPr.VertAlign) {
-                                    case vertalign_SubScript:
-                                        {
-                                            Y = LineY - vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                                            break;
-                                        }
-                                    case vertalign_SuperScript:
-                                        {
-                                            Y = LineY - vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                                            break;
-                                        }
-                                    default:
-                                        {
-                                            Y = LineY;
-                                            break;
-                                        }
-                                }
-
-                                break;
+                                var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+                                CurColor.Set(RGBA.R, RGBA.G, RGBA.B, 255);
                             }
-                        case para_HyperlinkStart:
-                            {
-                                bVisitedHyperlink = Item.Get_Visited();
-
-                                // Выставляем цвет обводки
-                                if (true === bVisitedHyperlink)
-                                    CurColor.Set(128, 0, 151, 255);
-                                else
-                                    CurColor.Set(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-
-                                break;
-                            }
-                        case para_HyperlinkEnd:
-                            {
-                                bVisitedHyperlink = false;
+                            else
                                 CurColor.Set(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                                break;
+
+                            switch (CurTextPr.VertAlign) {
+                                case vertalign_SubScript:
+                                {
+                                    Y = LineY - vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+
+                                    break;
+                                }
+                                case vertalign_SuperScript:
+                                {
+                                    Y = LineY - vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+
+                                    break;
+                                }
+                                default:
+                                {
+                                    Y = LineY;
+                                    break;
+                                }
                             }
+
+                            break;
+                        }
+                        case para_HyperlinkStart:
+                        {
+                            bVisitedHyperlink = Item.Get_Visited();
+
+                            // Выставляем цвет обводки
+                            if (true === bVisitedHyperlink)
+                            {
+                                var RGBA = this.folHlinkColor.fill.color.color.RGBA;
+                                CurColor.Set(RGBA.R, RGBA.G, RGBA.B, 255);
+                            }
+                            else
+                                CurColor.Set(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+                            break;
+                        }
+                        case para_HyperlinkEnd:
+                        {
+                            bVisitedHyperlink = false;
+                            CurColor.Set(CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            break;
+                        }
                     }
                 }
 
@@ -4677,7 +4703,21 @@ Paragraph.prototype =
                     this.Set_Ind({ FirstLine: 0, Left: Math.max(Pr.Ind.Left, Pr.Ind.Left + Pr.Ind.FirstLine) }, false);
                 }
                 else if (numbering_presentationnumfrmt_None != this.PresentationPr.Bullet.Get_Type()) {
-                    this.Remove_PresentationNumbering();
+
+                    var bullet = new CBullet();
+                    bullet.bulletType = new CBulletType();
+                    bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+                    this.setPresentationBullet(bullet);
+                    //this.Remove_PresentationNumbering();
+                    if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                    {
+                        this.Parent.Parent.bRecalculateNumbering = true;
+                    }
+                    else if(this.Parent && this.Parent.Parent instanceof CTableCell
+                        && this.Parent.Parent.Row.Table && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                    {
+                        this.Parent.Parent.Row.Table.Parent.recalcInfo.recalculateNumbering = true;
+                    }
                 }
                 else if (align_Right === Pr.Jc) {
                     this.Set_Align(align_Center);
@@ -4854,7 +4894,7 @@ Paragraph.prototype =
             var CurTextPr = this.Content[Pos.LetterPos].Value;
             TextPr.Merge(CurTextPr);
         }
-        if (TextPr.RFonts && TextPr.RFonts.Ascii && typeof TextPr.RFonts.Ascii.Name === "string") 
+        if (TextPr.RFonts && TextPr.RFonts.Ascii && typeof TextPr.RFonts.Ascii.Name === "string")
         {
             TextPr.FontFamily = {};
             TextPr.FontFamily.Name = TextPr.RFonts.Ascii.Name;
@@ -4926,34 +4966,34 @@ Paragraph.prototype =
 
         switch (Item.Type) {
             case para_Text:
-                {
-                    this.Internal_Content_Add(CurPos, Item);
-                    break;
-                }
+            {
+                this.Internal_Content_Add(CurPos, Item);
+                break;
+            }
             case para_Space:
-                {
-                    this.Internal_Content_Add(CurPos, Item);
-                    break;
-                }
+            {
+                this.Internal_Content_Add(CurPos, Item);
+                break;
+            }
             case para_TextPr:
-                {
-                    this.Internal_AddTextPr(Item.Value);
-                    break;
-                }
+            {
+                this.Internal_AddTextPr(Item.Value);
+                break;
+            }
             case para_HyperlinkStart:
-                {
-                    this.Internal_AddHyperlink(Item);
-                    break;
-                }
+            {
+                this.Internal_AddHyperlink(Item);
+                break;
+            }
             case para_PageNum:
             case para_Tab:
             case para_Drawing:
             default:
-                {
-                    this.Internal_Content_Add(CurPos, Item);
+            {
+                this.Internal_Content_Add(CurPos, Item);
 
-                    break;
-                }
+                break;
+            }
         }
 
         if (para_TextPr != Item.Type)
@@ -6075,11 +6115,11 @@ Paragraph.prototype =
             var bSpace = false;
 
             if (para_TextPr === Type || para_Space === Type || para_HyperlinkStart === Type ||
-                 para_HyperlinkEnd === Type || para_Tab === Type || para_Empty === Type ||
-                 para_CommentStart === Type || para_CommentEnd === Type ||
-                 para_CollaborativeChangesEnd === Type || para_CollaborativeChangesStart === Type ||
+                para_HyperlinkEnd === Type || para_Tab === Type || para_Empty === Type ||
+                para_CommentStart === Type || para_CommentEnd === Type ||
+                para_CollaborativeChangesEnd === Type || para_CollaborativeChangesStart === Type ||
                 (para_Text === Type && true === Item.Is_NBSP())
-               )
+                )
                 bSpace = true;
 
             if (true === bSpace) {
@@ -6110,10 +6150,10 @@ Paragraph.prototype =
                 var Item = this.Content[TempPos]
                 var TempType = Item.Type;
                 if (!(true != Item.Is_RealContent() || para_TextPr === TempType ||
-                        (para_Text === TempType && true != Item.Is_NBSP() && ((true === bPunctuation && true === Item.Is_Punctuation()) || (false === bPunctuation && false === Item.Is_Punctuation()))) ||
-                        para_CommentStart === TempType || para_CommentEnd === TempType || para_HyperlinkEnd === TempType || para_HyperlinkEnd === TempType
-                      )
-                   )
+                    (para_Text === TempType && true != Item.Is_NBSP() && ((true === bPunctuation && true === Item.Is_Punctuation()) || (false === bPunctuation && false === Item.Is_Punctuation()))) ||
+                    para_CommentStart === TempType || para_CommentEnd === TempType || para_HyperlinkEnd === TempType || para_HyperlinkEnd === TempType
+                    )
+                    )
                     break;
                 else
                     LetterPos = TempPos;
@@ -6141,10 +6181,10 @@ Paragraph.prototype =
             var bText = false;
 
             if (para_TextPr === Type ||
-                 para_HyperlinkStart === Type || para_HyperlinkEnd === Type ||
-                 para_Empty === Type || (para_Text === Type && true != Item.Is_NBSP() && (true === bFirst || (bFirstPunctuation === Item.Is_Punctuation()))) ||
-                 para_CommentStart === Type || para_CommentEnd === Type ||
-                 para_CollaborativeChangesEnd === Type || para_CollaborativeChangesStart === Type
+                para_HyperlinkStart === Type || para_HyperlinkEnd === Type ||
+                para_Empty === Type || (para_Text === Type && true != Item.Is_NBSP() && (true === bFirst || (bFirstPunctuation === Item.Is_Punctuation()))) ||
+                para_CommentStart === Type || para_CommentEnd === Type ||
+                para_CollaborativeChangesEnd === Type || para_CollaborativeChangesStart === Type
                 )
                 bText = true;
 
@@ -6182,10 +6222,10 @@ Paragraph.prototype =
                 var Item = this.Content[TempPos]
                 var TempType = Item.Type;
                 if (!(true != Item.Is_RealContent() || para_TextPr === TempType || para_Space === this.Content[LetterPos].Type ||
-                        (para_Text === this.Content[LetterPos].Type && true === this.Content[LetterPos].Is_NBSP()) ||
-                        para_CommentStart === TempType || para_CommentEnd === TempType || para_HyperlinkEnd === TempType || para_HyperlinkEnd === TempType
-                      )
-                   )
+                    (para_Text === this.Content[LetterPos].Type && true === this.Content[LetterPos].Is_NBSP()) ||
+                    para_CommentStart === TempType || para_CommentEnd === TempType || para_HyperlinkEnd === TempType || para_HyperlinkEnd === TempType
+                    )
+                    )
                     break;
                 else
                     LetterPos = TempPos;
@@ -6692,22 +6732,22 @@ Paragraph.prototype =
 
                     switch (NumJc) {
                         case align_Right:
-                            {
-                                NumX0 -= NumberingItem.WidthNum;
-                                break;
-                            }
+                        {
+                            NumX0 -= NumberingItem.WidthNum;
+                            break;
+                        }
                         case align_Center:
-                            {
-                                NumX0 -= NumberingItem.WidthNum / 2;
-                                NumX1 += NumberingItem.WidthNum / 2;
-                                break;
-                            }
+                        {
+                            NumX0 -= NumberingItem.WidthNum / 2;
+                            NumX1 += NumberingItem.WidthNum / 2;
+                            break;
+                        }
                         case align_Left:
                         default:
-                            {
-                                NumX1 += NumberingItem.WidthNum;
-                                break;
-                            }
+                        {
+                            NumX1 += NumberingItem.WidthNum;
+                            break;
+                        }
                     }
 
                     if (X >= NumX0 && X <= NumX1)
@@ -6719,17 +6759,17 @@ Paragraph.prototype =
 
             switch (Item.Type) {
                 case para_Drawing:
-                    {
-                        if (Item.DrawingType != drawing_Inline) {
-                            bCheck = false;
-                            TempDx = 0;
-                        }
-                        else {
-                            TempDx = Item.WidthVisible;
-                            bCheck = true;
-                        }
-                        break;
+                {
+                    if (Item.DrawingType != drawing_Inline) {
+                        bCheck = false;
+                        TempDx = 0;
                     }
+                    else {
+                        TempDx = Item.WidthVisible;
+                        bCheck = true;
+                    }
+                    break;
+                }
                 case para_PageNum:
                 case para_Text:
 
@@ -7085,20 +7125,20 @@ Paragraph.prototype =
                     var Item = this.Content[Pos];
                     switch (Item.Type) {
                         case para_HyperlinkStart:
-                            {
-                                if (true === bHyper)
-                                    return false;
+                        {
+                            if (true === bHyper)
+                                return false;
 
-                                bHyper = true;
+                            bHyper = true;
 
-                                break;
-                            }
+                            break;
+                        }
                         case para_HyperlinkEnd:
-                            {
-                                bHyper = true;
+                        {
+                            bHyper = true;
 
-                                break;
-                            }
+                            break;
+                        }
                         case para_End:
                             return false;
                     }
@@ -7156,190 +7196,190 @@ Paragraph.prototype =
         if (true === this.Selection.Use) {
             switch (this.Selection.Flag) {
                 case selectionflag_Common:
-                    {
-                        /*
-                        var PNum = 0;
-                        if ( "number" == typeof(g_CurPage) )
-                        {
-                        PNum = g_CurPage - this.PageNum;
-                        }
-                        else
-                        PNum = 0;
-                        */
+                {
+                    /*
+                     var PNum = 0;
+                     if ( "number" == typeof(g_CurPage) )
+                     {
+                     PNum = g_CurPage - this.PageNum;
+                     }
+                     else
+                     PNum = 0;
+                     */
 
-                        // Делаем подсветку
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos = this.Selection.EndPos;
+                    // Делаем подсветку
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos = this.Selection.EndPos;
 
-                        if (StartPos > EndPos) {
-                            var Temp = EndPos;
-                            EndPos = StartPos;
-                            StartPos = Temp;
-                        }
+                    if (StartPos > EndPos) {
+                        var Temp = EndPos;
+                        EndPos = StartPos;
+                        StartPos = Temp;
+                    }
 
-                        // Найдем линию, с которой начинается селект, и посчитаем начальный сдвиг
-                        var CurLine = 0;
-                        var CurRange = 0;
-                        var StartX = 0;
-                        var Pos, Item;
-                        for (Pos = StartPos - 1; Pos >= 0; Pos--) {
-                            Item = this.Content[Pos];
-                            if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered)
-                                CurLine++;
-                            else if (0 == CurLine && Item.Type == para_InlineBreak)
-                                CurRange++;
+                    // Найдем линию, с которой начинается селект, и посчитаем начальный сдвиг
+                    var CurLine = 0;
+                    var CurRange = 0;
+                    var StartX = 0;
+                    var Pos, Item;
+                    for (Pos = StartPos - 1; Pos >= 0; Pos--) {
+                        Item = this.Content[Pos];
+                        if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered)
+                            CurLine++;
+                        else if (0 == CurLine && Item.Type == para_InlineBreak)
+                            CurRange++;
 
-                            if (0 == CurLine && 0 == CurRange) {
-                                if ("undefined" != typeof (Item.Width))
-                                    StartX += Item.WidthVisible;
-                            }
-                        }
-
-                        var PNum = 0;
-                        for (; PNum < this.Pages.length; PNum++) {
-                            if (PNum == this.Pages.length - 1)
-                                break;
-
-                            if (CurLine < this.Pages[PNum + 1].FirstLine)
-                                break;
-                        }
-
-                        StartX += this.Lines[CurLine].Ranges[CurRange].XVisible;
-
-                        if (this.Pages[PNum].FirstLine > CurLine) {
-                            CurLine = this.Pages[PNum].FirstLine;
-                            CurRange = 0;
-                            StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-
-
-                            var PageBreak = PNum;
-                            StartPos = 0;
-                            while (PageBreak > 0 && StartPos < this.Content.length) {
-                                Item = this.Content[StartPos];
-                                if (para_PageBreakRendered == Item.Type || (para_NewLine === Item.Type && break_Page === Item.BreakType && true === Item.Flags.NewLine))
-                                    PageBreak--;
-
-                                StartPos++;
-                            }
-                        }
-
-                        var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                        var H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                        var W = 0;
-
-                        for (Pos = StartPos; Pos < EndPos; Pos++) {
-                            Item = this.Content[Pos];
+                        if (0 == CurLine && 0 == CurRange) {
                             if ("undefined" != typeof (Item.Width))
-                                W += Item.WidthVisible;
+                                StartX += Item.WidthVisible;
+                        }
+                    }
 
-                            if (Item.Type == para_FlowObjectAnchor) {
-                                Item.FlowObject.Select_This();
-                            }
+                    var PNum = 0;
+                    for (; PNum < this.Pages.length; PNum++) {
+                        if (PNum == this.Pages.length - 1)
+                            break;
 
-                            if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered || Item.Type == para_InlineBreak || Pos == EndPos - 1) {
-                                this.DrawingDocument.AddPageSelection(StartPage + PNum, StartX, StartY, W, H);
+                        if (CurLine < this.Pages[PNum + 1].FirstLine)
+                            break;
+                    }
 
-                                /*
-                                var Div = document.createElement("div");
-                                Div.id                    = "" + this.Id + "_" + Pos;
-                                Div.style.position        = "absolute";
-                                Div.style.backgroundColor = "#36C";
-                                Div.style.borderTop       = "0px solid #36C";
-                                Div.style.borderBottom    = "0px solid #36C";
-                                Div.style.opacity         = 0.20;
-                                Div.style["-moz-opacity"] = 0.20;
-                                Div.style.filter          = "alpha(opacity=20)";
-                                Div.style.zIndex          = 20;
-                                Div.style.top             = StartY + 100;
-                                Div.style.left            = StartX + 50;
-                                Div.style.width           = W;
-                                Div.style.height          = H;
-                                Div.style.cursor          = "Text";
-                                Div.tabIndex              = 1;
+                    StartX += this.Lines[CurLine].Ranges[CurRange].XVisible;
 
-                                Div.onfocus      = new Function("Canvas.Focus(); FocusCanv = true;");
-                                Div.onclick      = new Function("e", "if (!e) e = event; Canvas.Focus(); Actions_CanvasClick(e);");
-                                Div.onmousemove  = new Function("e", "if (!e) e = event; Actions_CanvasOnMove(e);");
-                                Div.onmouseup    = new Function("e", "if (!e) e = event; Actions_CanvasMouseUp(e); Canvas.Focus();");
-                                Div.onmousedown  = new Function("e", "if (!e) e = event; Actions_CanvasMouseDown(e); Canvas.Focus();");
+                    if (this.Pages[PNum].FirstLine > CurLine) {
+                        CurLine = this.Pages[PNum].FirstLine;
+                        CurRange = 0;
+                        StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
 
-                                document.body.appendChild( Div );
-                                TempSelectIds.push( Div.id );
-                                */
 
-                                if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered) {
-                                    CurLine++;
-                                    if (PNum < this.Pages.length - 1 && CurLine == this.Pages[PNum + 1].FirstLine)
-                                        PNum++;
+                        var PageBreak = PNum;
+                        StartPos = 0;
+                        while (PageBreak > 0 && StartPos < this.Content.length) {
+                            Item = this.Content[StartPos];
+                            if (para_PageBreakRendered == Item.Type || (para_NewLine === Item.Type && break_Page === Item.BreakType && true === Item.Flags.NewLine))
+                                PageBreak--;
 
-                                    CurRange = 0;
-                                    if (CurLine < this.Lines.length) {
-                                        StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                                        StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                                        H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                            StartPos++;
+                        }
+                    }
 
-                                        W = 0;
-                                    }
-                                }
-                                else if (Item.Type == para_InlineBreak) {
-                                    CurRange++;
+                    var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                    var H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                    var W = 0;
+
+                    for (Pos = StartPos; Pos < EndPos; Pos++) {
+                        Item = this.Content[Pos];
+                        if ("undefined" != typeof (Item.Width))
+                            W += Item.WidthVisible;
+
+                        if (Item.Type == para_FlowObjectAnchor) {
+                            Item.FlowObject.Select_This();
+                        }
+
+                        if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered || Item.Type == para_InlineBreak || Pos == EndPos - 1) {
+                            this.DrawingDocument.AddPageSelection(StartPage + PNum, StartX, StartY, W, H);
+
+                            /*
+                             var Div = document.createElement("div");
+                             Div.id                    = "" + this.Id + "_" + Pos;
+                             Div.style.position        = "absolute";
+                             Div.style.backgroundColor = "#36C";
+                             Div.style.borderTop       = "0px solid #36C";
+                             Div.style.borderBottom    = "0px solid #36C";
+                             Div.style.opacity         = 0.20;
+                             Div.style["-moz-opacity"] = 0.20;
+                             Div.style.filter          = "alpha(opacity=20)";
+                             Div.style.zIndex          = 20;
+                             Div.style.top             = StartY + 100;
+                             Div.style.left            = StartX + 50;
+                             Div.style.width           = W;
+                             Div.style.height          = H;
+                             Div.style.cursor          = "Text";
+                             Div.tabIndex              = 1;
+
+                             Div.onfocus      = new Function("Canvas.Focus(); FocusCanv = true;");
+                             Div.onclick      = new Function("e", "if (!e) e = event; Canvas.Focus(); Actions_CanvasClick(e);");
+                             Div.onmousemove  = new Function("e", "if (!e) e = event; Actions_CanvasOnMove(e);");
+                             Div.onmouseup    = new Function("e", "if (!e) e = event; Actions_CanvasMouseUp(e); Canvas.Focus();");
+                             Div.onmousedown  = new Function("e", "if (!e) e = event; Actions_CanvasMouseDown(e); Canvas.Focus();");
+
+                             document.body.appendChild( Div );
+                             TempSelectIds.push( Div.id );
+                             */
+
+                            if ((Item.Type == para_NewLine && true === Item.Is_NewLine()) || Item.Type == para_NewLineRendered) {
+                                CurLine++;
+                                if (PNum < this.Pages.length - 1 && CurLine == this.Pages[PNum + 1].FirstLine)
+                                    PNum++;
+
+                                CurRange = 0;
+                                if (CurLine < this.Lines.length) {
                                     StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                                    StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                                    H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
                                     W = 0;
                                 }
                             }
-                        }
-
-                        this.Selection_Clear();
-                        break;
-                    }
-                case selectionflag_Numbering:
-                    {
-                        var ParaNum = null;
-
-                        var PNum = 0;
-                        var CurRange = 0;
-                        for (; PNum < this.Pages.length; PNum++) {
-                            if (PNum == this.Pages.length - 1)
-                                break;
-
-                            if (0 < this.Pages[PNum + 1].FirstLine)
-                                break;
-                        }
-
-                        for (var Index = 0; Index < this.Content.length; Index++) {
-                            if (para_Numbering == this.Content[Index].Type) {
-                                ParaNum = this.Content[Index];
-                                break;
-                            }
-                            else if (para_InlineBreak == this.Content[Index].Type)
+                            else if (Item.Type == para_InlineBreak) {
                                 CurRange++;
+                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                                W = 0;
+                            }
                         }
-
-                        var NumPr = this.Numbering_Get();
-                        var SelectX = this.Lines[0].Ranges[CurRange].XVisible;
-                        var SelectW = ParaNum.WidthVisible;
-                        var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
-                        switch (NumJc) {
-                            case align_Center:
-                                SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
-                                SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
-                                break;
-                            case align_Right:
-                                SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum;
-                                SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
-                                break;
-                            case align_Left:
-                            default:
-                                SelectX = this.Lines[0].Ranges[CurRange].XVisible;
-                                SelectW = ParaNum.WidthVisible;
-                                break;
-                        }
-
-                        this.DrawingDocument.AddPageSelection(StartPage + PNum, SelectX, this.Lines[0].Top + this.Pages[PNum].Y, SelectW, this.Lines[0].Bottom - this.Lines[0].Top);
-
-                        break;
                     }
+
+                    this.Selection_Clear();
+                    break;
+                }
+                case selectionflag_Numbering:
+                {
+                    var ParaNum = null;
+
+                    var PNum = 0;
+                    var CurRange = 0;
+                    for (; PNum < this.Pages.length; PNum++) {
+                        if (PNum == this.Pages.length - 1)
+                            break;
+
+                        if (0 < this.Pages[PNum + 1].FirstLine)
+                            break;
+                    }
+
+                    for (var Index = 0; Index < this.Content.length; Index++) {
+                        if (para_Numbering == this.Content[Index].Type) {
+                            ParaNum = this.Content[Index];
+                            break;
+                        }
+                        else if (para_InlineBreak == this.Content[Index].Type)
+                            CurRange++;
+                    }
+
+                    var NumPr = this.Numbering_Get();
+                    var SelectX = this.Lines[0].Ranges[CurRange].XVisible;
+                    var SelectW = ParaNum.WidthVisible;
+                    var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
+                    switch (NumJc) {
+                        case align_Center:
+                            SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
+                            break;
+                        case align_Right:
+                            SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
+                            break;
+                        case align_Left:
+                        default:
+                            SelectX = this.Lines[0].Ranges[CurRange].XVisible;
+                            SelectW = ParaNum.WidthVisible;
+                            break;
+                    }
+
+                    this.DrawingDocument.AddPageSelection(StartPage + PNum, SelectX, this.Lines[0].Top + this.Pages[PNum].Y, SelectW, this.Lines[0].Bottom - this.Lines[0].Top);
+
+                    break;
+                }
             }
         }
     },
@@ -7504,137 +7544,137 @@ Paragraph.prototype =
 
         switch (this.Selection.Flag) {
             case selectionflag_Common:
-                {
-                    // Делаем подсветку
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos = this.Selection.EndPos;
+            {
+                // Делаем подсветку
+                var StartPos = this.Selection.StartPos;
+                var EndPos = this.Selection.EndPos;
 
-                    if (StartPos > EndPos) {
-                        var Temp = EndPos;
-                        EndPos = StartPos;
-                        StartPos = Temp;
-                    }
+                if (StartPos > EndPos) {
+                    var Temp = EndPos;
+                    EndPos = StartPos;
+                    StartPos = Temp;
+                }
 
-                    var _StartLine = this.Pages[CurPage].StartLine;
-                    var _EndLine = this.Pages[CurPage].EndLine;
+                var _StartLine = this.Pages[CurPage].StartLine;
+                var _EndLine = this.Pages[CurPage].EndLine;
 
-                    if (StartPos > this.Lines[_EndLine].EndPos + 1 || EndPos < this.Lines[_StartLine].StartPos)
-                        return;
-                    else {
-                        StartPos = Math.max(StartPos, this.Lines[_StartLine].StartPos);
-                        EndPos = Math.min(EndPos, (_EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos + 1 : this.Content.length - 1));
-                    }
+                if (StartPos > this.Lines[_EndLine].EndPos + 1 || EndPos < this.Lines[_StartLine].StartPos)
+                    return;
+                else {
+                    StartPos = Math.max(StartPos, this.Lines[_StartLine].StartPos);
+                    EndPos = Math.min(EndPos, (_EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos + 1 : this.Content.length - 1));
+                }
 
 
-                    // Найдем линию, с которой начинается селект
-                    var StartParaPos = this.Internal_Get_ParaPos_By_Pos(StartPos);
-                    var CurLine = StartParaPos.Line;
-                    var CurRange = StartParaPos.Range;
-                    var PNum = StartParaPos.Page;
+                // Найдем линию, с которой начинается селект
+                var StartParaPos = this.Internal_Get_ParaPos_By_Pos(StartPos);
+                var CurLine = StartParaPos.Line;
+                var CurRange = StartParaPos.Range;
+                var PNum = StartParaPos.Page;
 
-                    // Найдем начальный сдвиг в данном отрезке
-                    var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                    var Pos, Item;
+                // Найдем начальный сдвиг в данном отрезке
+                var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var Pos, Item;
 
-                    if (this.Numbering.Pos === this.Lines[CurLine].Ranges[CurRange].StartPos || (this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos && this.Numbering.Pos <= StartPos))
-                        StartX += this.Numbering.WidthVisible;
+                if (this.Numbering.Pos === this.Lines[CurLine].Ranges[CurRange].StartPos || (this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos && this.Numbering.Pos <= StartPos))
+                    StartX += this.Numbering.WidthVisible;
 
-                    for (Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++) {
-                        Item = this.Content[Pos];
+                for (Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++) {
+                    Item = this.Content[Pos];
 
-                        if (undefined != Item.WidthVisible && (para_Drawing != Item.Type || drawing_Inline === Item.DrawingType))
-                            StartX += Item.WidthVisible;
-                    }
+                    if (undefined != Item.WidthVisible && (para_Drawing != Item.Type || drawing_Inline === Item.DrawingType))
+                        StartX += Item.WidthVisible;
+                }
 
-                    if (this.Pages[PNum].StartLine > CurLine) {
-                        CurLine = this.Pages[PNum].StartLine;
-                        CurRange = 0;
-                        StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                        StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
-                    }
+                if (this.Pages[PNum].StartLine > CurLine) {
+                    CurLine = this.Pages[PNum].StartLine;
+                    CurRange = 0;
+                    StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
+                }
 
-                    var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                    var H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+                var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                var H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                    var W = 0;
+                var W = 0;
 
-                    for (Pos = StartPos; Pos < EndPos; Pos++) {
-                        Item = this.Content[Pos];
+                for (Pos = StartPos; Pos < EndPos; Pos++) {
+                    Item = this.Content[Pos];
 
-                        if (undefined != Item.CurPage) {
-                            if (CurLine < Item.CurLine) {
-                                this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-
-                                CurLine = Item.CurLine;
-                                CurRange = Item.CurRange;
-
-                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                                StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                                H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                                W = 0;
-                            }
-                            else if (CurRange < Item.CurRange) {
-                                this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-
-                                CurRange = Item.CurRange;
-                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                                W = 0;
-                            }
-                        }
-
-                        if (undefined != Item.WidthVisible) {
-                            if (para_Drawing != Item.Type || drawing_Inline === Item.DrawingType)
-                                W += Item.WidthVisible;
-                            else
-                                Item.Draw_Selection();
-                        }
-
-                        if (Pos == EndPos - 1) {
+                    if (undefined != Item.CurPage) {
+                        if (CurLine < Item.CurLine) {
                             this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+
+                            CurLine = Item.CurLine;
+                            CurRange = Item.CurRange;
+
+                            StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                            H = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                            W = 0;
+                        }
+                        else if (CurRange < Item.CurRange) {
+                            this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+
+                            CurRange = Item.CurRange;
+                            StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            W = 0;
                         }
                     }
 
-                    break;
-                }
-            case selectionflag_Numbering:
-                {
-                    var ParaNum = this.Numbering;
-                    var NumberingPos = this.Numbering.Pos;
-                    if (-1 === NumberingPos)
-                        break;
-
-                    var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
-                    if (ParaNumPos.Page != CurPage)
-                        break;
-
-                    var CurRange = ParaNumPos.Range;
-                    var CurLine = ParaNumPos.Line;
-
-                    var NumPr = this.Numbering_Get();
-                    var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                    var SelectW = ParaNum.WidthVisible;
-                    var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
-                    switch (NumJc) {
-                        case align_Center:
-                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
-                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
-                            break;
-                        case align_Right:
-                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
-                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
-                            break;
-                        case align_Left:
-                        default:
-                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                            SelectW = ParaNum.WidthVisible;
-                            break;
+                    if (undefined != Item.WidthVisible) {
+                        if (para_Drawing != Item.Type || drawing_Inline === Item.DrawingType)
+                            W += Item.WidthVisible;
+                        else
+                            Item.Draw_Selection();
                     }
 
-                    this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
-
-                    break;
+                    if (Pos == EndPos - 1) {
+                        this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+                    }
                 }
+
+                break;
+            }
+            case selectionflag_Numbering:
+            {
+                var ParaNum = this.Numbering;
+                var NumberingPos = this.Numbering.Pos;
+                if (-1 === NumberingPos)
+                    break;
+
+                var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
+                if (ParaNumPos.Page != CurPage)
+                    break;
+
+                var CurRange = ParaNumPos.Range;
+                var CurLine = ParaNumPos.Line;
+
+                var NumPr = this.Numbering_Get();
+                var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var SelectW = ParaNum.WidthVisible;
+                var NumJc = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].Jc;
+                switch (NumJc) {
+                    case align_Center:
+                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
+                        SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
+                        break;
+                    case align_Right:
+                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
+                        SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
+                        break;
+                    case align_Left:
+                    default:
+                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                        SelectW = ParaNum.WidthVisible;
+                        break;
+                }
+
+                this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
+
+                break;
+            }
         }
     },
 
@@ -7748,12 +7788,12 @@ Paragraph.prototype =
                     case para_Numbering:
                     case para_PresentationNumbering:
                     case para_PageNum:
-                        {
-                            if (true === bClearText)
-                                return null;
+                    {
+                        if (true === bClearText)
+                            return null;
 
-                            break;
-                        }
+                        break;
+                    }
 
                     case para_Text: Str += Item.Value; break;
                     case para_Space:
@@ -8381,9 +8421,9 @@ Paragraph.prototype =
         var lvl = this.PresentationPr.Level;
         var Styles = this.Parent.Get_Styles(lvl, true);
         /* var paragraphStyle = new CStyle("paragraphStyle", Styles.Id-1, null, null);
-        paragraphStyle.TextPr = this.rPr;
-        paragraphStyle.ParaPr = this.Pr;
-        Styles.Style[Styles.Id] = paragraphStyle;         */
+         paragraphStyle.TextPr = this.rPr;
+         paragraphStyle.ParaPr = this.Pr;
+         Styles.Style[Styles.Id] = paragraphStyle;         */
         return Styles;
     },
 
@@ -9352,20 +9392,20 @@ Paragraph.prototype =
                         case para_Numbering:
                         case para_PresentationNumbering:
                         case para_PageNum:
-                            {
-                                Str = null;
-                                bBreak = true;
-                                break;
-                            }
+                        {
+                            Str = null;
+                            bBreak = true;
+                            break;
+                        }
 
                         case para_Text: Str += Item.Value; break;
                         case para_Space:
                         case para_Tab: Str += " "; break;
                         case para_HyperlinkEnd:
-                            {
-                                bBreak = true;
-                                break;
-                            }
+                        {
+                            bBreak = true;
+                            break;
+                        }
 
                         case para_HyperlinkStart:
                             return;
@@ -9403,20 +9443,20 @@ Paragraph.prototype =
                         case para_Numbering:
                         case para_PresentationNumbering:
                         case para_PageNum:
-                            {
-                                Str = null;
-                                bBreak = true;
-                                break;
-                            }
+                        {
+                            Str = null;
+                            bBreak = true;
+                            break;
+                        }
 
                         case para_Text: Str += Item.Value; break;
                         case para_Space:
                         case para_Tab: Str += " "; break;
                         case para_HyperlinkEnd:
-                            {
-                                bBreak = true;
-                                break;
-                            }
+                        {
+                            bBreak = true;
+                            break;
+                        }
 
                         case para_HyperlinkStart:
                             return;
@@ -9590,363 +9630,376 @@ Paragraph.prototype =
 
         switch (Type) {
             case historyitem_Paragraph_AddItem:
-                {
-                    var StartPos = this.Internal_Get_RealPos(Data.Pos);
-                    var EndPos = this.Internal_Get_RealPos(Data.EndPos);
+            {
+                var StartPos = this.Internal_Get_RealPos(Data.Pos);
+                var EndPos = this.Internal_Get_RealPos(Data.EndPos);
 
-                    this.Content.splice(StartPos, EndPos - StartPos + 1);
+                this.Content.splice(StartPos, EndPos - StartPos + 1);
 
-                    for (var Pos = 0; Pos < this.Content.length; Pos++) {
-                        if (this.Content[Pos].Type == para_TextPr) {
-                            var Item = this.Content[Pos];
-                            if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
-                                if (this.Parent && this.Parent.Parent instanceof CTextBody) {
-                                    this.Parent.Parent.textPropsForRecalc.push(Item);
-                                }
-                                if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
-                                    this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
-                                }
+                for (var Pos = 0; Pos < this.Content.length; Pos++) {
+                    if (this.Content[Pos].Type == para_TextPr) {
+                        var Item = this.Content[Pos];
+                        if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
+                            if (this.Parent && this.Parent.Parent instanceof CTextBody) {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                             }
                         }
                     }
-                    break;
                 }
+                break;
+            }
 
             case historyitem_Paragraph_RemoveItem:
-                {
-                    var Pos = this.Internal_Get_RealPos(Data.Pos);
+            {
+                var Pos = this.Internal_Get_RealPos(Data.Pos);
 
-                    var Array_start = this.Content.slice(0, Pos);
-                    var Array_end = this.Content.slice(Pos);
+                var Array_start = this.Content.slice(0, Pos);
+                var Array_end = this.Content.slice(Pos);
 
-                    this.Content = Array_start.concat(Data.Items, Array_end);
+                this.Content = Array_start.concat(Data.Items, Array_end);
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Numbering:
-                {
-                    var Old = Data.Old;
-                    if (undefined != Old)
-                        this.Pr.NumPr = Old;
-                    else
-                        this.Pr.NumPr = undefined;
+            {
+                var Old = Data.Old;
+                if (undefined != Old)
+                    this.Pr.NumPr = Old;
+                else
+                    this.Pr.NumPr = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Align:
-                {
-                    this.Pr.Jc = Data.Old;
+            {
+                this.Pr.Jc = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_First:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaSpacing();
 
-                    this.Pr.Ind.FirstLine = Data.Old;
+                this.Pr.Ind.FirstLine = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Left:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaSpacing();
 
-                    this.Pr.Ind.Left = Data.Old;
+                this.Pr.Ind.Left = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Right:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaSpacing();
 
-                    this.Pr.Ind.Right = Data.Old;
+                this.Pr.Ind.Right = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_ContextualSpacing:
-                {
-                    this.Pr.ContextualSpacing = Data.Old;
+            {
+                this.Pr.ContextualSpacing = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepLines:
-                {
-                    this.Pr.KeepLines = Data.Old;
+            {
+                this.Pr.KeepLines = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepNext:
-                {
-                    this.Pr.KeepNext = Data.Old;
+            {
+                this.Pr.KeepNext = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PageBreakBefore:
-                {
-                    this.Pr.PageBreakBefore = Data.Old;
+            {
+                this.Pr.PageBreakBefore = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Line:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.Line = Data.Old;
+                this.Pr.Spacing.Line = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_LineRule:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.LineRule = Data.Old;
+                this.Pr.Spacing.LineRule = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Before:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.Before = Data.Old;
+                this.Pr.Spacing.Before = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_After:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.After = Data.Old;
+                this.Pr.Spacing.After = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_AfterAutoSpacing:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.AfterAutoSpacing = Data.Old;
+                this.Pr.Spacing.AfterAutoSpacing = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.BeforeAutoSpacing = Data.Old;
+                this.Pr.Spacing.BeforeAutoSpacing = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Value:
-                {
-                    if (undefined != Data.Old && undefined === this.Pr.Shd)
-                        this.Pr.Shd = new CDocumentShd();
+            {
+                if (undefined != Data.Old && undefined === this.Pr.Shd)
+                    this.Pr.Shd = new CDocumentShd();
 
-                    if (undefined != Data.Old)
-                        this.Pr.Shd.Value = Data.Old;
+                if (undefined != Data.Old)
+                    this.Pr.Shd.Value = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Color:
-                {
-                    if (undefined != Data.Old && undefined === this.Pr.Shd)
-                        this.Pr.Shd = new CDocumentShd();
+            {
+                if (undefined != Data.Old && undefined === this.Pr.Shd)
+                    this.Pr.Shd = new CDocumentShd();
 
-                    if (undefined != Data.Old)
-                        this.Pr.Shd.Color = Data.Old;
+                if (undefined != Data.Old)
+                    this.Pr.Shd.Color = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_WidowControl:
-                {
-                    this.Pr.WidowControl = Data.Old;
+            {
+                this.Pr.WidowControl = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Tabs:
-                {
-                    this.Pr.Tabs = Data.Old;
+            {
+                this.Pr.Tabs = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PStyle:
-                {
-                    var Old = Data.Old;
-                    if (undefined != Old)
-                        this.Pr.PStyle = Old;
-                    else
-                        this.Pr.PStyle = undefined;
+            {
+                var Old = Data.Old;
+                if (undefined != Old)
+                    this.Pr.PStyle = Old;
+                else
+                    this.Pr.PStyle = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_DocNext:
-                {
-                    this.Next = Data.Old;
-                    break;
-                }
+            {
+                this.Next = Data.Old;
+                break;
+            }
 
             case historyitem_Paragraph_DocPrev:
-                {
-                    this.Prev = Data.Old;
-                    break;
-                }
+            {
+                this.Prev = Data.Old;
+                break;
+            }
 
             case historyitem_Paragraph_Parent:
-                {
-                    this.Parent = Data.Old;
-                    break;
-                }
+            {
+                this.Parent = Data.Old;
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Between:
-                {
-                    this.Pr.Brd.Between = Data.Old;
+            {
+                this.Pr.Brd.Between = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Bottom:
-                {
-                    this.Pr.Brd.Bottom = Data.Old;
+            {
+                this.Pr.Brd.Bottom = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Left:
-                {
-                    this.Pr.Brd.Left = Data.Old;
+            {
+                this.Pr.Brd.Left = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Right:
-                {
-                    this.Pr.Brd.Right = Data.Old;
+            {
+                this.Pr.Brd.Right = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Top:
-                {
-                    this.Pr.Brd.Top = Data.Old;
+            {
+                this.Pr.Brd.Top = Data.Old;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Pr:
-                {
-                    var Old = Data.Old;
-                    if (undefined != Old)
-                        this.Pr = Old;
-                    else
-                        this.Pr = new CParaPr();
+            {
+                var Old = Data.Old;
+                if (undefined != Old)
+                    this.Pr = Old;
+                else
+                    this.Pr = new CParaPr();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Bullet:
-                {
-                    this.PresentationPr.Bullet = Data.Old;
-                    break;
-                }
+            {
+                this.PresentationPr.Bullet = Data.Old;
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Level:
-                {
-                    this.PresentationPr.Level = Data.Old;
-                    break;
-                }
+            {
+                this.PresentationPr.Level = Data.Old;
+                break;
+            }
 
             case historyitem_Paragraph_FramePr:
-                {
-                    this.Pr.FramePr = Data.Old;
-                    this.CompiledPr.NeedRecalc = true;
-                    break;
-                }
+            {
+                this.Pr.FramePr = Data.Old;
+                this.CompiledPr.NeedRecalc = true;
+                break;
+            }
 
             case historyitem_Paragraph_PresentationBullet:
+            {
+                this.bullet = Data.oldPr;
+                if(this.Parent && this.Parent.Parent instanceof CTextBody)
                 {
-                    this.bullet = Data.oldPr;
-                    break;
+                    this.Parent.Parent.bRecalculateNumbering = true;
                 }
+                else if(this.Parent && this.Parent.Parent instanceof CTableCell
+                    && this.Parent.Parent.Row.Table && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                {
+                    this.Parent.Parent.Row.Table.Parent.recalcInfo.recalculateNumbering = true;
+                }
+                //if(this.Parent)
+                //{
+                //    this.Parent.recalc0AllContent();
+                //}
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -9961,364 +10014,377 @@ Paragraph.prototype =
 
         switch (Type) {
             case historyitem_Paragraph_AddItem:
-                {
-                    var Pos = this.Internal_Get_RealPos(Data.Pos);
+            {
+                var Pos = this.Internal_Get_RealPos(Data.Pos);
 
-                    var Array_start = this.Content.slice(0, Pos);
-                    var Array_end = this.Content.slice(Pos);
+                var Array_start = this.Content.slice(0, Pos);
+                var Array_end = this.Content.slice(Pos);
 
-                    this.Content = Array_start.concat(Data.Items, Array_end);
+                this.Content = Array_start.concat(Data.Items, Array_end);
 
-                    for (var Pos = 0; Pos < this.Content.length; Pos++) {
-                        if (this.Content[Pos].Type == para_TextPr) {
-                            var Item = this.Content[Pos];
-                            if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
-                                if (this.Parent && this.Parent.Parent instanceof CTextBody) {
-                                    this.Parent.Parent.textPropsForRecalc.push(Item);
-                                }
-                                if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
-                                    this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
-                                }
+                for (var Pos = 0; Pos < this.Content.length; Pos++) {
+                    if (this.Content[Pos].Type == para_TextPr) {
+                        var Item = this.Content[Pos];
+                        if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
+                            if (this.Parent && this.Parent.Parent instanceof CTextBody) {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                             }
                         }
                     }
-                    break;
-
                 }
+                break;
+
+            }
 
             case historyitem_Paragraph_RemoveItem:
-                {
-                    var StartPos = this.Internal_Get_RealPos(Data.Pos);
-                    var EndPos = this.Internal_Get_RealPos(Data.EndPos);
+            {
+                var StartPos = this.Internal_Get_RealPos(Data.Pos);
+                var EndPos = this.Internal_Get_RealPos(Data.EndPos);
 
-                    this.Content.splice(StartPos, EndPos - StartPos + 1);
+                this.Content.splice(StartPos, EndPos - StartPos + 1);
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Numbering:
-                {
-                    var New = Data.New;
-                    if (undefined != New)
-                        this.Pr.NumPr = New;
-                    else
-                        this.Pr.NumPr = undefined;
+            {
+                var New = Data.New;
+                if (undefined != New)
+                    this.Pr.NumPr = New;
+                else
+                    this.Pr.NumPr = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Align:
-                {
-                    this.Pr.Jc = Data.New;
+            {
+                this.Pr.Jc = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_First:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    this.Pr.Ind.FirstLine = Data.New;
+                this.Pr.Ind.FirstLine = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Left:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    this.Pr.Ind.Left = Data.New;
+                this.Pr.Ind.Left = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Right:
-                {
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+            {
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    this.Pr.Ind.Right = Data.New;
+                this.Pr.Ind.Right = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_ContextualSpacing:
-                {
-                    this.Pr.ContextualSpacing = Data.New;
+            {
+                this.Pr.ContextualSpacing = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepLines:
-                {
-                    this.Pr.KeepLines = Data.New;
+            {
+                this.Pr.KeepLines = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepNext:
-                {
-                    this.Pr.KeepNext = Data.New;
+            {
+                this.Pr.KeepNext = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PageBreakBefore:
-                {
-                    this.Pr.PageBreakBefore = Data.New;
+            {
+                this.Pr.PageBreakBefore = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Line:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.Line = Data.New;
+                this.Pr.Spacing.Line = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_LineRule:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.LineRule = Data.New;
+                this.Pr.Spacing.LineRule = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Before:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.Before = Data.New;
+                this.Pr.Spacing.Before = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_After:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.After = Data.New;
+                this.Pr.Spacing.After = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_AfterAutoSpacing:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.AfterAutoSpacing = Data.New;
+                this.Pr.Spacing.AfterAutoSpacing = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
-                {
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+            {
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    this.Pr.Spacing.BeforeAutoSpacing = Data.New;
+                this.Pr.Spacing.BeforeAutoSpacing = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Value:
-                {
-                    if (undefined != Data.New && undefined === this.Pr.Shd)
-                        this.Pr.Shd = new CDocumentShd();
+            {
+                if (undefined != Data.New && undefined === this.Pr.Shd)
+                    this.Pr.Shd = new CDocumentShd();
 
-                    if (undefined != Data.New)
-                        this.Pr.Shd.Value = Data.New;
+                if (undefined != Data.New)
+                    this.Pr.Shd.Value = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Color:
-                {
-                    if (undefined != Data.New && undefined === this.Pr.Shd)
-                        this.Pr.Shd = new CDocumentShd();
+            {
+                if (undefined != Data.New && undefined === this.Pr.Shd)
+                    this.Pr.Shd = new CDocumentShd();
 
-                    if (undefined != Data.New)
-                        this.Pr.Shd.Color = Data.New;
+                if (undefined != Data.New)
+                    this.Pr.Shd.Color = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_WidowControl:
-                {
-                    this.Pr.WidowControl = Data.New;
+            {
+                this.Pr.WidowControl = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Tabs:
-                {
-                    this.Pr.Tabs = Data.New;
+            {
+                this.Pr.Tabs = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PStyle:
-                {
-                    var New = Data.New;
-                    if (undefined != New)
-                        this.Pr.PStyle = New;
-                    else
-                        this.Pr.PStyle = undefined;
+            {
+                var New = Data.New;
+                if (undefined != New)
+                    this.Pr.PStyle = New;
+                else
+                    this.Pr.PStyle = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_DocNext:
-                {
-                    this.Next = Data.New;
-                    break;
-                }
+            {
+                this.Next = Data.New;
+                break;
+            }
 
             case historyitem_Paragraph_DocPrev:
-                {
-                    this.Prev = Data.New;
-                    break;
-                }
+            {
+                this.Prev = Data.New;
+                break;
+            }
 
             case historyitem_Paragraph_Parent:
-                {
-                    this.Parent = Data.New;
-                    break;
-                }
+            {
+                this.Parent = Data.New;
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Between:
-                {
-                    this.Pr.Brd.Between = Data.New;
+            {
+                this.Pr.Brd.Between = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Bottom:
-                {
-                    this.Pr.Brd.Bottom = Data.New;
+            {
+                this.Pr.Brd.Bottom = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Left:
-                {
-                    this.Pr.Brd.Left = Data.New;
+            {
+                this.Pr.Brd.Left = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Right:
-                {
-                    this.Pr.Brd.Right = Data.New;
+            {
+                this.Pr.Brd.Right = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Top:
-                {
-                    this.Pr.Brd.Top = Data.New;
+            {
+                this.Pr.Brd.Top = Data.New;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Pr:
-                {
-                    var New = Data.New;
-                    if (undefined != New)
-                        this.Pr = New;
-                    else
-                        this.Pr = new CParaPr();
+            {
+                var New = Data.New;
+                if (undefined != New)
+                    this.Pr = New;
+                else
+                    this.Pr = new CParaPr();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Bullet:
-                {
-                    this.PresentationPr.Bullet = Data.New;
-                    break;
-                }
+            {
+                this.PresentationPr.Bullet = Data.New;
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Level:
-                {
-                    this.PresentationPr.Level = Data.New;
-                    break;
-                }
+            {
+                this.PresentationPr.Level = Data.New;
+                break;
+            }
 
             case historyitem_Paragraph_FramePr:
-                {
-                    this.Pr.FramePr = Data.New;
-                    this.CompiledPr.NeedRecalc = true;
-                    break;
-                }
+            {
+                this.Pr.FramePr = Data.New;
+                this.CompiledPr.NeedRecalc = true;
+                break;
+            }
 
             case historyitem_Paragraph_PresentationBullet:
+            {
+                this.bullet = Data.newPr;
+                if(this.Parent && this.Parent.Parent instanceof CTextBody)
                 {
-                    this.bullet = Data.newPr;
-                    break;
+                    this.Parent.Parent.bRecalculateNumbering = true;
                 }
+                else if(this.Parent && this.Parent.Parent instanceof CTableCell
+                    && this.Parent.Parent.Row.Table && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                {
+                    this.Parent.Parent.Row.Table.Parent.recalcInfo.recalculateNumbering = true;
+                }
+                //if(this.Parent)
+                //{
+                //    this.Parent.recalc0AllContent();
+                //}
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -10401,41 +10467,41 @@ Paragraph.prototype =
         switch (Type) {
             case historyitem_Paragraph_AddItem:
             case historyitem_Paragraph_RemoveItem:
-                {
-                    for (CurPage = this.Pages.length - 1; CurPage > 0; CurPage--) {
-                        if (Data.Pos > this.Lines[this.Pages[CurPage].StartLine].StartPos)
-                            break;
-                    }
+            {
+                for (CurPage = this.Pages.length - 1; CurPage > 0; CurPage--) {
+                    if (Data.Pos > this.Lines[this.Pages[CurPage].StartLine].StartPos)
+                        break;
+                }
 
-                    for (var Pos = 0; Pos < this.Content.length; Pos++) {
-                        if (this.Content[Pos].Type == para_TextPr) {
-                            var Item = this.Content[Pos];
-                            if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
-                                if (this.Parent && this.Parent.Parent instanceof CTextBody) {
-                                    this.Parent.Parent.textPropsForRecalc.push(Item);
-                                }
-                                if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
-                                    this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
-                                }
+                for (var Pos = 0; Pos < this.Content.length; Pos++) {
+                    if (this.Content[Pos].Type == para_TextPr) {
+                        var Item = this.Content[Pos];
+                        if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
+                            if (this.Parent && this.Parent.Parent instanceof CTextBody) {
+                                this.Parent.Parent.textPropsForRecalc.push(Item);
+                            }
+                            if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
+                                this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                             }
                         }
                     }
-                    this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-                    bNeedRecalc = true;
-                    break;
                 }
+                this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+                bNeedRecalc = true;
+                break;
+            }
             case historyitem_Paragraph_Numbering:
             case historyitem_Paragraph_PStyle:
             case historyitem_Paragraph_Pr:
             case historyitem_Paragraph_PresentationPr_Bullet:
             case historyitem_Paragraph_PresentationPr_Level:
-                {
-                    this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-                    this.Recalc_CompiledPr();
-                    this.Recalc_CompileParaPr();
-                    bNeedRecalc = true;
-                    break;
-                }
+            {
+                this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+                this.Recalc_CompiledPr();
+                this.Recalc_CompileParaPr();
+                bNeedRecalc = true;
+                break;
+            }
 
             case historyitem_Paragraph_Align:
             case historyitem_Paragraph_Ind_First:
@@ -10460,18 +10526,18 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Right:
             case historyitem_Paragraph_Borders_Top:
                 //case historyitem_Paragraph_FramePr:
-                {
-                    bNeedRecalc = true;
-                    break;
-                }
+            {
+                bNeedRecalc = true;
+                break;
+            }
             case historyitem_Paragraph_Shd_Value:
             case historyitem_Paragraph_Shd_Color:
             case historyitem_Paragraph_DocNext:
             case historyitem_Paragraph_DocPrev:
-                {
-                    // Пересчитывать этот элемент не надо при таких изменениях
-                    break;
-                }
+            {
+                // Пересчитывать этот элемент не надо при таких изменениях
+                break;
+            }
         }
 
         if (true === bNeedRecalc) {
@@ -10510,85 +10576,85 @@ Paragraph.prototype =
             case changestype_Document_Content:
             case changestype_Document_Content_Add:
             case changestype_Image_Properties:
-                {
-                    this.Lock.Check(this.Get_Id());
-                    break;
-                }
+            {
+                this.Lock.Check(this.Get_Id());
+                break;
+            }
             case changestype_Remove:
-                {
-                    // Если у нас нет выделения, и курсор стоит в начале, мы должны проверить в том же порядке, в каком
-                    // идут проверки при удалении в команде Internal_Remove_Backward.
-                    if (true != this.Selection.Use && true == this.Cursor_IsStart()) {
-                        var Pr = this.Get_CompiledPr2(false).ParaPr;
-                        if (undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001) {
-                            // Надо проверить только текущий параграф, а это будет сделано далее
-                        }
-                        else {
-                            var Prev = this.Get_DocumentPrev();
-                            if (null != Prev && type_Paragraph === Prev.GetType())
-                                Prev.Lock.Check(Prev.Get_Id());
-                        }
+            {
+                // Если у нас нет выделения, и курсор стоит в начале, мы должны проверить в том же порядке, в каком
+                // идут проверки при удалении в команде Internal_Remove_Backward.
+                if (true != this.Selection.Use && true == this.Cursor_IsStart()) {
+                    var Pr = this.Get_CompiledPr2(false).ParaPr;
+                    if (undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001) {
+                        // Надо проверить только текущий параграф, а это будет сделано далее
                     }
-                    // Если есть выделение, и знак параграфа попал в выделение ( и параграф выделен не целиком )
-                    else if (true === this.Selection.Use) {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos = this.Selection.EndPos;
-
-                        if (StartPos > EndPos) {
-                            var Temp = EndPos;
-                            EndPos = StartPos;
-                            StartPos = Temp;
-                        }
-
-                        if (EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos()) {
-                            var Next = this.Get_DocumentNext();
-                            if (null != Next && type_Paragraph === Next.GetType())
-                                Next.Lock.Check(Next.Get_Id());
-                        }
+                    else {
+                        var Prev = this.Get_DocumentPrev();
+                        if (null != Prev && type_Paragraph === Prev.GetType())
+                            Prev.Lock.Check(Prev.Get_Id());
                     }
-
-                    this.Lock.Check(this.Get_Id());
-
-                    break;
                 }
-            case changestype_Delete:
-                {
-                    // Если у нас нет выделения, и курсор стоит в конце, мы должны проверить следующий элемент
-                    if (true != this.Selection.Use && true === this.Cursor_IsEnd()) {
+                // Если есть выделение, и знак параграфа попал в выделение ( и параграф выделен не целиком )
+                else if (true === this.Selection.Use) {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos = this.Selection.EndPos;
+
+                    if (StartPos > EndPos) {
+                        var Temp = EndPos;
+                        EndPos = StartPos;
+                        StartPos = Temp;
+                    }
+
+                    if (EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos()) {
                         var Next = this.Get_DocumentNext();
                         if (null != Next && type_Paragraph === Next.GetType())
                             Next.Lock.Check(Next.Get_Id());
                     }
-                    // Если есть выделение, и знак параграфа попал в выделение и параграф выделен не целиком
-                    else if (true === this.Selection.Use) {
-                        var StartPos = this.Selection.StartPos;
-                        var EndPos = this.Selection.EndPos;
+                }
 
-                        if (StartPos > EndPos) {
-                            var Temp = EndPos;
-                            EndPos = StartPos;
-                            StartPos = Temp;
-                        }
+                this.Lock.Check(this.Get_Id());
 
-                        if (EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos()) {
-                            var Next = this.Get_DocumentNext();
-                            if (null != Next && type_Paragraph === Next.GetType())
-                                Next.Lock.Check(Next.Get_Id());
-                        }
+                break;
+            }
+            case changestype_Delete:
+            {
+                // Если у нас нет выделения, и курсор стоит в конце, мы должны проверить следующий элемент
+                if (true != this.Selection.Use && true === this.Cursor_IsEnd()) {
+                    var Next = this.Get_DocumentNext();
+                    if (null != Next && type_Paragraph === Next.GetType())
+                        Next.Lock.Check(Next.Get_Id());
+                }
+                // Если есть выделение, и знак параграфа попал в выделение и параграф выделен не целиком
+                else if (true === this.Selection.Use) {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos = this.Selection.EndPos;
+
+                    if (StartPos > EndPos) {
+                        var Temp = EndPos;
+                        EndPos = StartPos;
+                        StartPos = Temp;
                     }
 
-                    this.Lock.Check(this.Get_Id());
-
-                    break;
+                    if (EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos()) {
+                        var Next = this.Get_DocumentNext();
+                        if (null != Next && type_Paragraph === Next.GetType())
+                            Next.Lock.Check(Next.Get_Id());
+                    }
                 }
+
+                this.Lock.Check(this.Get_Id());
+
+                break;
+            }
             case changestype_Document_SectPr:
             case changestype_Table_Properties:
             case changestype_Table_RemoveCells:
             case changestype_HdrFtr:
-                {
-                    CollaborativeEditing.Add_CheckLock(true);
-                    break;
-                }
+            {
+                CollaborativeEditing.Add_CheckLock(true);
+                break;
+            }
         }
     },
 
@@ -10606,77 +10672,77 @@ Paragraph.prototype =
 
         switch (Type) {
             case historyitem_Paragraph_AddItem:
-                {
-                    // Long     : Количество элементов
-                    // Array of :
-                    //  {
-                    //    Long     : Позиция
-                    //    Variable : Элемент
-                    //  }
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Элемент
+                //  }
 
-                    var bArray = Data.UseArray;
-                    var Count = Data.Items.length;
+                var bArray = Data.UseArray;
+                var Count = Data.Items.length;
 
-                    Writer.WriteLong(Count);
+                Writer.WriteLong(Count);
 
-                    for (var Index = 0; Index < Count; Index++) {
-                        if (true === bArray)
-                            Writer.WriteLong(Data.PosArray[Index]);
-                        else
-                            Writer.WriteLong(Data.Pos + Index);
+                for (var Index = 0; Index < Count; Index++) {
+                    if (true === bArray)
+                        Writer.WriteLong(Data.PosArray[Index]);
+                    else
+                        Writer.WriteLong(Data.Pos + Index);
 
-                        Data.Items[Index].Write_ToBinary(Writer);
-                    }
-
-                    break;
+                    Data.Items[Index].Write_ToBinary(Writer);
                 }
+
+                break;
+            }
 
             case historyitem_Paragraph_RemoveItem:
-                {
-                    // Long          : Количество удаляемых элементов
-                    // Array of Long : позиции удаляемых элементов
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
 
-                    var bArray = Data.UseArray;
-                    var Count = Data.Items.length;
+                var bArray = Data.UseArray;
+                var Count = Data.Items.length;
 
-                    var StartPos = Writer.GetCurPosition();
-                    Writer.Skip(4);
-                    var RealCount = Count;
+                var StartPos = Writer.GetCurPosition();
+                Writer.Skip(4);
+                var RealCount = Count;
 
-                    for (var Index = 0; Index < Count; Index++) {
-                        if (true === bArray) {
-                            if (false === Data.PosArray[Index])
-                                RealCount--;
-                            else
-                                Writer.WriteLong(Data.PosArray[Index]);
-                        }
+                for (var Index = 0; Index < Count; Index++) {
+                    if (true === bArray) {
+                        if (false === Data.PosArray[Index])
+                            RealCount--;
                         else
-                            Writer.WriteLong(Data.Pos);
+                            Writer.WriteLong(Data.PosArray[Index]);
                     }
-
-                    var EndPos = Writer.GetCurPosition();
-                    Writer.Seek(StartPos);
-                    Writer.WriteLong(RealCount);
-                    Writer.Seek(EndPos);
-
-                    break;
+                    else
+                        Writer.WriteLong(Data.Pos);
                 }
+
+                var EndPos = Writer.GetCurPosition();
+                Writer.Seek(StartPos);
+                Writer.WriteLong(RealCount);
+                Writer.Seek(EndPos);
+
+                break;
+            }
 
             case historyitem_Paragraph_Numbering:
-                {
-                    // Bool : IsUndefined
-                    // Если false
-                    //   Variable : NumPr (CNumPr)
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Variable : NumPr (CNumPr)
 
-                    if (undefined === Data.New)
-                        Writer.WriteBool(true);
-                    else {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-
-                    break;
+                if (undefined === Data.New)
+                    Writer.WriteBool(true);
+                else {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+
+                break;
+            }
 
             case historyitem_Paragraph_Ind_First:
             case historyitem_Paragraph_Ind_Left:
@@ -10684,41 +10750,41 @@ Paragraph.prototype =
             case historyitem_Paragraph_Spacing_Line:
             case historyitem_Paragraph_Spacing_Before:
             case historyitem_Paragraph_Spacing_After:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === Data.New) {
-                        Writer.WriteBool(true);
-                    }
-                    else {
-                        Writer.WriteBool(false);
-                        Writer.WriteDouble(Data.New);
-                    }
-
-                    break;
+                if (undefined === Data.New) {
+                    Writer.WriteBool(true);
                 }
+                else {
+                    Writer.WriteBool(false);
+                    Writer.WriteDouble(Data.New);
+                }
+
+                break;
+            }
 
             case historyitem_Paragraph_Align:
             case historyitem_Paragraph_Spacing_LineRule:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Long : Value
+                // Если false
+                // Long : Value
 
-                    if (undefined === Data.New) {
-                        Writer.WriteBool(true);
-                    }
-                    else {
-                        Writer.WriteBool(false);
-                        Writer.WriteLong(Data.New);
-                    }
-
-                    break;
+                if (undefined === Data.New) {
+                    Writer.WriteBool(true);
                 }
+                else {
+                    Writer.WriteBool(false);
+                    Writer.WriteLong(Data.New);
+                }
+
+                break;
+            }
 
             case historyitem_Paragraph_ContextualSpacing:
             case historyitem_Paragraph_KeepLines:
@@ -10727,178 +10793,178 @@ Paragraph.prototype =
             case historyitem_Paragraph_Spacing_AfterAutoSpacing:
             case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
             case historyitem_Paragraph_WidowControl:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (undefined === Data.New) {
-                        Writer.WriteBool(true);
-                    }
-                    else {
-                        Writer.WriteBool(false);
-                        Writer.WriteBool(Data.New);
-                    }
-
-                    break;
+                if (undefined === Data.New) {
+                    Writer.WriteBool(true);
                 }
+                else {
+                    Writer.WriteBool(false);
+                    Writer.WriteBool(Data.New);
+                }
+
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Value:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Byte : Value
+                // Если false
+                // Byte : Value
 
-                    var New = Data.New;
-                    if (undefined != New) {
-                        Writer.WriteBool(false);
-                        Writer.WriteByte(Data.New);
-                    }
-                    else
-                        Writer.WriteBool(true);
-
-                    break;
+                var New = Data.New;
+                if (undefined != New) {
+                    Writer.WriteBool(false);
+                    Writer.WriteByte(Data.New);
                 }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Color:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Variable : Color (CDocumentColor)
+                // Если false
+                // Variable : Color (CDocumentColor)
 
-                    var New = Data.New;
-                    if (undefined != New) {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-                    else
-                        Writer.WriteBool(true);
-
-                    break;
+                var New = Data.New;
+                if (undefined != New) {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
 
             case historyitem_Paragraph_Tabs:
-                {
-                    // Bool : IsUndefined
-                    // Есди false
-                    // Variable : CParaTabs
+            {
+                // Bool : IsUndefined
+                // Есди false
+                // Variable : CParaTabs
 
-                    if (undefined != Data.New) {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-                    else
-                        Writer.WriteBool(true);
-
-                    break;
+                if (undefined != Data.New) {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
 
             case historyitem_Paragraph_PStyle:
-                {
-                    // Bool : Удаляем ли
+            {
+                // Bool : Удаляем ли
 
-                    // Если false
-                    // String : StyleId
+                // Если false
+                // String : StyleId
 
-                    if (undefined != Data.New) {
-                        Writer.WriteBool(false);
-                        Writer.WriteString2(Data.New);
-                    }
-                    else
-                        Writer.WriteBool(true);
-
-                    break;
+                if (undefined != Data.New) {
+                    Writer.WriteBool(false);
+                    Writer.WriteString2(Data.New);
                 }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
 
             case historyitem_Paragraph_DocNext:
             case historyitem_Paragraph_DocPrev:
             case historyitem_Paragraph_Parent:
-                {
-                    // String : Id элемента
+            {
+                // String : Id элемента
 
-                    if (null != Data.New)
-                        Writer.WriteString2(Data.New.Get_Id());
-                    else
-                        Writer.WriteString2("");
+                if (null != Data.New)
+                    Writer.WriteString2(Data.New.Get_Id());
+                else
+                    Writer.WriteString2("");
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Between:
             case historyitem_Paragraph_Borders_Bottom:
             case historyitem_Paragraph_Borders_Left:
             case historyitem_Paragraph_Borders_Right:
             case historyitem_Paragraph_Borders_Top:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (undefined != Data.New) {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-                    else
-                        Writer.WriteBool(true);
-
-                    break;
+                if (undefined != Data.New) {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
 
             case historyitem_Paragraph_Pr:
-                {
-                    // Bool : удаляем ли
+            {
+                // Bool : удаляем ли
 
-                    if (undefined === Data.New)
-                        Writer.WriteBool(true);
-                    else {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-
-                    break;
+                if (undefined === Data.New)
+                    Writer.WriteBool(true);
+                else {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Bullet:
-                {
-                    // Variable : Bullet
-                    Data.New.Write_ToBinary(Writer);
+            {
+                // Variable : Bullet
+                Data.New.Write_ToBinary(Writer);
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Level:
-                {
-                    // Long : Level
-                    Writer.WriteLong(Data.New);
-                    break;
-                }
+            {
+                // Long : Level
+                Writer.WriteLong(Data.New);
+                break;
+            }
 
             case historyitem_Paragraph_FramePr:
-                {
-                    // Bool : IsUndefined
-                    // false ->
-                    //   Variable : CFramePr
+            {
+                // Bool : IsUndefined
+                // false ->
+                //   Variable : CFramePr
 
-                    if (undefined === Data.New)
-                        Writer.WriteBool(true);
-                    else {
-                        Writer.WriteBool(false);
-                        Data.New.Write_ToBinary(Writer);
-                    }
-
-                    break;
+                if (undefined === Data.New)
+                    Writer.WriteBool(true);
+                else {
+                    Writer.WriteBool(false);
+                    Data.New.Write_ToBinary(Writer);
                 }
+
+                break;
+            }
             case historyitem_Paragraph_PresentationBullet:
-                {
-                    Writer.WriteBool(isRealObject(Data.newPr));
-                    if (isRealObject(Data.newPr)) {
-                        Data.newPr.Write_ToBinary2(Writer);
-                    }
-                    break;
+            {
+                Writer.WriteBool(isRealObject(Data.newPr));
+                if (isRealObject(Data.newPr)) {
+                    Data.newPr.Write_ToBinary2(Writer);
                 }
+                break;
+            }
         }
 
         return Writer;
@@ -10917,635 +10983,648 @@ Paragraph.prototype =
 
         switch (Type) {
             case historyitem_Paragraph_AddItem:
-                {
-                    // Long     : Количество элементов
-                    // Array of :
-                    //  {
-                    //    Long     : Позиция
-                    //    Variable : Элемент
-                    //  }
+            {
+                // Long     : Количество элементов
+                // Array of :
+                //  {
+                //    Long     : Позиция
+                //    Variable : Элемент
+                //  }
 
-                    var Count = Reader.GetLong();
+                var Count = Reader.GetLong();
 
-                    for (var Index = 0; Index < Count; Index++) {
-                        var Pos = this.Internal_Get_RealPos(this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong()));
-                        var Element = ParagraphContent_Read_FromBinary(Reader);
+                for (var Index = 0; Index < Count; Index++) {
+                    var Pos = this.Internal_Get_RealPos(this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong()));
+                    var Element = ParagraphContent_Read_FromBinary(Reader);
 
-                        if (null != Element) {
-                            if (Element instanceof ParaCommentStart) {
-                                var Comment = g_oTableId.Get_ById(Element.Id);
-                                if (null != Comment)
-                                    Comment.Set_StartInfo(0, 0, 0, 0, this.Get_Id());
-                            }
-                            else if (Element instanceof ParaCommentEnd) {
-                                var Comment = g_oTableId.Get_ById(Element.Id);
-                                if (null != Comment)
-                                    Comment.Set_EndInfo(0, 0, 0, 0, this.Get_Id());
-                            }
-                            else if (Element instanceof ParaTextPr) {
-                                var Item = Element;
-                                if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
-                                    if (this.Parent && this.Parent.Parent instanceof CTextBody) {
-                                        this.Parent.Parent.textPropsForRecalc.push(Item);
-                                    }
+                    if (null != Element) {
+                        if (Element instanceof ParaCommentStart) {
+                            var Comment = g_oTableId.Get_ById(Element.Id);
+                            if (null != Comment)
+                                Comment.Set_StartInfo(0, 0, 0, 0, this.Get_Id());
+                        }
+                        else if (Element instanceof ParaCommentEnd) {
+                            var Comment = g_oTableId.Get_ById(Element.Id);
+                            if (null != Comment)
+                                Comment.Set_EndInfo(0, 0, 0, 0, this.Get_Id());
+                        }
+                        else if (Element instanceof ParaTextPr) {
+                            var Item = Element;
+                            if (isRealObject(Item.Value) && isRealObject(Item.Value.unifill)) {
+                                if (this.Parent && this.Parent.Parent instanceof CTextBody) {
+                                    this.Parent.Parent.textPropsForRecalc.push(Item);
+                                }
 
-                                    if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
-                                        this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
-                                    }
+                                if (this.Parent && this.Parent.Parent instanceof CTableCell && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame) {
+                                    this.Parent.Parent.Row.Table.Parent.textPropsForRecalc.push(Item);
                                 }
                             }
-
-                            // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
-                            this.Content.splice(Pos, 0, new ParaCollaborativeChangesEnd());
-                            this.Content.splice(Pos, 0, Element);
-                            this.Content.splice(Pos, 0, new ParaCollaborativeChangesStart());
-
-                            CollaborativeEditing.Add_ChangedClass(this);
                         }
+
+                        // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования
+                        this.Content.splice(Pos, 0, new ParaCollaborativeChangesEnd());
+                        this.Content.splice(Pos, 0, Element);
+                        this.Content.splice(Pos, 0, new ParaCollaborativeChangesStart());
+
+                        CollaborativeEditing.Add_ChangedClass(this);
                     }
-
-                    this.DeleteCollaborativeMarks = false;
-
-                    break;
                 }
+
+                this.DeleteCollaborativeMarks = false;
+
+                break;
+            }
 
             case historyitem_Paragraph_RemoveItem:
-                {
-                    // Long          : Количество удаляемых элементов
-                    // Array of Long : позиции удаляемых элементов
+            {
+                // Long          : Количество удаляемых элементов
+                // Array of Long : позиции удаляемых элементов
 
-                    var Count = Reader.GetLong();
+                var Count = Reader.GetLong();
 
-                    for (var Index = 0; Index < Count; Index++) {
-                        var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                for (var Index = 0; Index < Count; Index++) {
+                    var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
 
-                        // действие совпало, не делаем его
-                        if (false === ChangesPos)
-                            continue;
+                    // действие совпало, не делаем его
+                    if (false === ChangesPos)
+                        continue;
 
-                        var Pos = this.Internal_Get_RealPos(ChangesPos);
-                        this.Content.splice(Pos, 1);
-                    }
-
-                    break;
+                    var Pos = this.Internal_Get_RealPos(ChangesPos);
+                    this.Content.splice(Pos, 1);
                 }
+
+                break;
+            }
 
             case historyitem_Paragraph_Numbering:
-                {
-                    // Bool : IsUndefined
-                    // Если false
-                    //   Variable : NumPr (CNumPr)
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Variable : NumPr (CNumPr)
 
-                    if (true === Reader.GetBool())
-                        this.Pr.NumPr = undefined;
-                    else {
-                        this.Pr.NumPr = new CNumPr();
-                        this.Pr.NumPr.Read_FromBinary(Reader);
-                    }
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (true === Reader.GetBool())
+                    this.Pr.NumPr = undefined;
+                else {
+                    this.Pr.NumPr = new CNumPr();
+                    this.Pr.NumPr.Read_FromBinary(Reader);
                 }
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Align:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Long : Value
+                // Если false
+                // Long : Value
 
-                    if (true === Reader.GetBool())
-                        this.Pr.Jc = undefined;
-                    else
-                        this.Pr.Jc = Reader.GetLong();
+                if (true === Reader.GetBool())
+                    this.Pr.Jc = undefined;
+                else
+                    this.Pr.Jc = Reader.GetLong();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_First:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    if (true === Reader.GetBool())
-                        this.Pr.Ind.FirstLine = undefined;
-                    else
-                        this.Pr.Ind.FirstLine = Reader.GetDouble();
+                if (true === Reader.GetBool())
+                    this.Pr.Ind.FirstLine = undefined;
+                else
+                    this.Pr.Ind.FirstLine = Reader.GetDouble();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Left:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    if (true === Reader.GetBool())
-                        this.Pr.Ind.Left = undefined;
-                    else
-                        this.Pr.Ind.Left = Reader.GetDouble();
+                if (true === Reader.GetBool())
+                    this.Pr.Ind.Left = undefined;
+                else
+                    this.Pr.Ind.Left = Reader.GetDouble();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Ind_Right:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Ind)
-                        this.Pr.Ind = new CParaInd();
+                if (undefined === this.Pr.Ind)
+                    this.Pr.Ind = new CParaInd();
 
-                    if (true === Reader.GetBool())
-                        this.Pr.Ind.Right = undefined;
-                    else
-                        this.Pr.Ind.Right = Reader.GetDouble();
+                if (true === Reader.GetBool())
+                    this.Pr.Ind.Right = undefined;
+                else
+                    this.Pr.Ind.Right = Reader.GetDouble();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_ContextualSpacing:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (true === Reader.GetBool())
-                        this.Pr.ContextualSpacing = undefined;
-                    else
-                        this.Pr.ContextualSpacing = Reader.GetBool();
+                if (true === Reader.GetBool())
+                    this.Pr.ContextualSpacing = undefined;
+                else
+                    this.Pr.ContextualSpacing = Reader.GetBool();
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepLines:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (false === Reader.GetBool())
-                        this.Pr.KeepLines = Reader.GetBool();
-                    else
-                        this.Pr.KeepLines = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.KeepLines = Reader.GetBool();
+                else
+                    this.Pr.KeepLines = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_KeepNext:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (false === Reader.GetBool())
-                        this.Pr.KeepNext = Reader.GetLong();
-                    else
-                        this.Pr.KeepNext = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.KeepNext = Reader.GetLong();
+                else
+                    this.Pr.KeepNext = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PageBreakBefore:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (false === Reader.GetBool())
-                        this.Pr.PageBreakBefore = Reader.GetBool();
-                    else
-                        this.Pr.PageBreakBefore = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.PageBreakBefore = Reader.GetBool();
+                else
+                    this.Pr.PageBreakBefore = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Line:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.Line = Reader.GetDouble();
-                    else
-                        this.Pr.Spacing.Line = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.Line = Reader.GetDouble();
+                else
+                    this.Pr.Spacing.Line = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_LineRule:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Long : Value
+                // Если false
+                // Long : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.LineRule = Reader.GetLong();
-                    else
-                        this.Pr.Spacing.LineRule = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.LineRule = Reader.GetLong();
+                else
+                    this.Pr.Spacing.LineRule = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_Before:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.Before = Reader.GetDouble();
-                    else
-                        this.Pr.Spacing.Before = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.Before = Reader.GetDouble();
+                else
+                    this.Pr.Spacing.Before = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_After:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Double : Value
+                // Если false
+                // Double : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.After = Reader.GetDouble();
-                    else
-                        this.Pr.Spacing.After = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.After = Reader.GetDouble();
+                else
+                    this.Pr.Spacing.After = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_AfterAutoSpacing:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
-                    else
-                        this.Pr.Spacing.AfterAutoSpacing = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
+                else
+                    this.Pr.Spacing.AfterAutoSpacing = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (undefined === this.Pr.Spacing)
-                        this.Pr.Spacing = new CParaSpacing();
+                if (undefined === this.Pr.Spacing)
+                    this.Pr.Spacing = new CParaSpacing();
 
-                    if (false === Reader.GetBool())
-                        this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
-                    else
-                        this.Pr.Spacing.BeforeAutoSpacing = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
+                else
+                    this.Pr.Spacing.BeforeAutoSpacing = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Value:
-                {
-                    // Bool : IsUndefined
-                    // Если false
-                    // Byte : Value
+            {
+                // Bool : IsUndefined
+                // Если false
+                // Byte : Value
 
-                    if (false === Reader.GetBool()) {
-                        if (undefined === this.Pr.Shd)
-                            this.Pr.Shd = new CDocumentShd();
+                if (false === Reader.GetBool()) {
+                    if (undefined === this.Pr.Shd)
+                        this.Pr.Shd = new CDocumentShd();
 
-                        this.Pr.Shd.Value = Reader.GetByte();
-                    }
-                    else if (undefined != this.Pr.Shd)
-                        this.Pr.Shd.Value = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                    this.Pr.Shd.Value = Reader.GetByte();
                 }
+                else if (undefined != this.Pr.Shd)
+                    this.Pr.Shd.Value = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Shd_Color:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Variable : Color (CDocumentColor)
+                // Если false
+                // Variable : Color (CDocumentColor)
 
-                    if (false === Reader.GetBool()) {
-                        if (undefined === this.Pr.Shd)
-                            this.Pr.Shd = new CDocumentShd();
+                if (false === Reader.GetBool()) {
+                    if (undefined === this.Pr.Shd)
+                        this.Pr.Shd = new CDocumentShd();
 
-                        this.Pr.Shd.Color = new CDocumentColor(0, 0, 0);
-                        this.Pr.Shd.Color.Read_FromBinary(Reader);
-                    }
-                    else if (undefined != this.Pr.Shd)
-                        this.Pr.Shd.Color = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                    this.Pr.Shd.Color = new CDocumentColor(0, 0, 0);
+                    this.Pr.Shd.Color.Read_FromBinary(Reader);
                 }
+                else if (undefined != this.Pr.Shd)
+                    this.Pr.Shd.Color = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_WidowControl:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    // Если false
-                    // Bool : Value
+                // Если false
+                // Bool : Value
 
-                    if (false === Reader.GetBool())
-                        this.Pr.WidowControl = Reader.GetBool();
-                    else
-                        this.Pr.WidowControl = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.WidowControl = Reader.GetBool();
+                else
+                    this.Pr.WidowControl = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Tabs:
-                {
-                    // Bool : IsUndefined
-                    // Есди false
-                    // Variable : CParaTabs
+            {
+                // Bool : IsUndefined
+                // Есди false
+                // Variable : CParaTabs
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Tabs = new CParaTabs();
-                        this.Pr.Tabs.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Tabs = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Tabs = new CParaTabs();
+                    this.Pr.Tabs.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Tabs = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_PStyle:
-                {
-                    // Bool : Удаляем ли
+            {
+                // Bool : Удаляем ли
 
-                    // Если false
-                    // String : StyleId
+                // Если false
+                // String : StyleId
 
-                    if (false === Reader.GetBool())
-                        this.Pr.PStyle = Reader.GetString2();
-                    else
-                        this.Pr.PStyle = undefined;
+                if (false === Reader.GetBool())
+                    this.Pr.PStyle = Reader.GetString2();
+                else
+                    this.Pr.PStyle = undefined;
 
-                    this.CompiledPr.NeedRecalc = true;
+                this.CompiledPr.NeedRecalc = true;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_DocNext:
-                {
-                    // String : Id элемента
+            {
+                // String : Id элемента
 
-                    this.Next = g_oTableId.Get_ById(Reader.GetString2());
+                this.Next = g_oTableId.Get_ById(Reader.GetString2());
 
-                    break;
-                }
+                break;
+            }
             case historyitem_Paragraph_DocPrev:
-                {
-                    // String : Id элемента
+            {
+                // String : Id элемента
 
-                    this.Prev = g_oTableId.Get_ById(Reader.GetString2());
+                this.Prev = g_oTableId.Get_ById(Reader.GetString2());
 
-                    break;
-                }
+                break;
+            }
             case historyitem_Paragraph_Parent:
-                {
-                    // String : Id элемента
+            {
+                // String : Id элемента
 
-                    this.Parent = g_oTableId.Get_ById(Reader.GetString2());
+                this.Parent = g_oTableId.Get_ById(Reader.GetString2());
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Between:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Brd.Between = new CDocumentBorder();
-                        this.Pr.Brd.Between.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Brd.Between = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Brd.Between = new CDocumentBorder();
+                    this.Pr.Brd.Between.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Brd.Between = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Bottom:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Brd.Bottom = new CDocumentBorder();
-                        this.Pr.Brd.Bottom.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Brd.Bottom = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Brd.Bottom = new CDocumentBorder();
+                    this.Pr.Brd.Bottom.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Brd.Bottom = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Left:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Brd.Left = new CDocumentBorder();
-                        this.Pr.Brd.Left.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Brd.Left = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Brd.Left = new CDocumentBorder();
+                    this.Pr.Brd.Left.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Brd.Left = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Right:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Brd.Right = new CDocumentBorder();
-                        this.Pr.Brd.Right.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Brd.Right = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Brd.Right = new CDocumentBorder();
+                    this.Pr.Brd.Right.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Brd.Right = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Borders_Top:
-                {
-                    // Bool : IsUndefined
-                    // если false
-                    //  Variable : Border (CDocumentBorder)
+            {
+                // Bool : IsUndefined
+                // если false
+                //  Variable : Border (CDocumentBorder)
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.Brd.Top = new CDocumentBorder();
-                        this.Pr.Brd.Top.Read_FromBinary(Reader);
-                    }
-                    else
-                        this.Pr.Brd.Top = undefined;
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.Brd.Top = new CDocumentBorder();
+                    this.Pr.Brd.Top.Read_FromBinary(Reader);
                 }
+                else
+                    this.Pr.Brd.Top = undefined;
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_Pr:
-                {
-                    // Bool : IsUndefined
+            {
+                // Bool : IsUndefined
 
-                    if (true === Reader.GetBool())
-                        this.Pr = new CParaPr();
-                    else {
-                        this.Pr = new CParaPr();
-                        this.Pr.Read_FromBinary(Reader);
-                    }
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (true === Reader.GetBool())
+                    this.Pr = new CParaPr();
+                else {
+                    this.Pr = new CParaPr();
+                    this.Pr.Read_FromBinary(Reader);
                 }
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Bullet:
-                {
-                    // Variable : Bullet
+            {
+                // Variable : Bullet
 
-                    var Bullet = new CPresentationBullet();
-                    Bullet.Read_FromBinary(Reader);
-                    this.PresentationPr.Bullet = Bullet;
+                var Bullet = new CPresentationBullet();
+                Bullet.Read_FromBinary(Reader);
+                this.PresentationPr.Bullet = Bullet;
 
-                    break;
-                }
+                break;
+            }
 
             case historyitem_Paragraph_PresentationPr_Level:
-                {
-                    // Long : Level
-                    this.PresentationPr.Level = Reader.GetLong();
-                    break;
-                }
+            {
+                // Long : Level
+                this.PresentationPr.Level = Reader.GetLong();
+                break;
+            }
 
             case historyitem_Paragraph_FramePr:
-                {
-                    // Bool : IsUndefined
-                    // false ->
-                    //   Variable : CFramePr
+            {
+                // Bool : IsUndefined
+                // false ->
+                //   Variable : CFramePr
 
-                    if (false === Reader.GetBool()) {
-                        this.Pr.FramePr = new CFramePr();
-                        this.Pr.FramePr.Read_FromBinary(Reader);
-                    }
-                    else {
-                        this.Pr.FramePr = undefined;
-                    }
-
-                    this.CompiledPr.NeedRecalc = true;
-
-                    break;
+                if (false === Reader.GetBool()) {
+                    this.Pr.FramePr = new CFramePr();
+                    this.Pr.FramePr.Read_FromBinary(Reader);
                 }
+                else {
+                    this.Pr.FramePr = undefined;
+                }
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
 
             case historyitem_Paragraph_PresentationBullet:
-                {
-                    if (Reader.GetBool()) {
-                        this.bullet = new CBullet();
-                        this.bullet.Read_FromBinary2(Reader);
-                    }
-                    else {
-                        this.bullet = undefined;
-                    }
-                    break;
+            {
+                if (Reader.GetBool()) {
+                    this.bullet = new CBullet();
+                    this.bullet.Read_FromBinary2(Reader);
                 }
+                else {
+                    this.bullet = undefined;
+                }
+                if(this.Parent && this.Parent.Parent instanceof CTextBody)
+                {
+                    this.Parent.Parent.bRecalculateNumbering = true;
+                }
+                else if(this.Parent && this.Parent.Parent instanceof CTableCell
+                    && this.Parent.Parent.Row.Table && this.Parent.Parent.Row.Table.Parent instanceof CGraphicFrame)
+                {
+                    this.Parent.Parent.Row.Table.Parent.recalcInfo.recalculateNumbering = true;
+                }
+                //if(this.Parent)
+                //{
+                //    this.Parent.recalc0AllContent();
+                //}
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);

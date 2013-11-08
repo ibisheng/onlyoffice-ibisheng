@@ -1453,7 +1453,7 @@ CGroupShape.prototype =
         t_y = invert_transform.TransformPointY(x, y);
         var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
 
-        var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
+        var sqr_x = t_x*t_x, sqr_y = t_y*t_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 

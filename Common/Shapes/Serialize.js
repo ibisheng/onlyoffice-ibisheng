@@ -1436,7 +1436,7 @@ function BinaryPPTYLoader()
                         _mod.name = s.GetString2();
                         var _find = _mod.name.indexOf(":");
                         if (_find >= 0 && _find < (_mod.name.length - 1))
-                        _mod.name = _mod.name.substring(_find + 1);
+                            _mod.name = _mod.name.substring(_find + 1);
                     }
                     else if (1 == _type)
                         _mod.val = s.GetLong();
@@ -4306,7 +4306,7 @@ function BinaryPPTYLoader()
 
     this.ReadGraphicObject = function()
     {
-		var s = this.stream;
+        var s = this.stream;
         var _type = s.GetUChar();
         var _object = null;
 
@@ -4737,10 +4737,10 @@ function BinaryPPTYLoader()
         var _end_rec = _rec_start + s.GetULong() + 4;
 
         var _graphic_frame = new CGraphicFrame(this.TempMainObject);
-       /* if (null != this.TempGroupObject)
-            _graphic_frame.Container = this.TempGroupObject;
-        else
-            _graphic_frame.Container = _graphic_frame.parent.elementsManipulator;   */
+        /* if (null != this.TempGroupObject)
+         _graphic_frame.Container = this.TempGroupObject;
+         else
+         _graphic_frame.Container = _graphic_frame.parent.elementsManipulator;   */
 
         this.TempGroupObject = _graphic_frame;
 
@@ -5063,7 +5063,7 @@ function BinaryPPTYLoader()
 
     this.ReadCell = function(cell)
     {
-       // cell.Content.Content.splice(0, cell.Content.Content.length);
+        // cell.Content.Content.splice(0, cell.Content.Content.length);
         cell.Content.Internal_Content_RemoveAll();
         var s = this.stream;
 
@@ -5157,7 +5157,7 @@ function BinaryPPTYLoader()
         var _end_rec = _rec_start + s.GetULong() + 4;
 
         props.TableCellMar = new Object();
-       props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
+        props.TableCellMar.Top    = new CTableMeasurement(tblwidth_Mm, 1.27);
         props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, 2.54);
         props.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Mm, 1.27);
         props.TableCellMar.Right  = new CTableMeasurement(tblwidth_Mm, 2.54);
@@ -5186,7 +5186,7 @@ function BinaryPPTYLoader()
                         props.TableCellMar = {}
                     props.TableCellMar.Top = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
 
-                  //  props.TableCellMar.Top.W = s.GetULong() / 36000;
+                    //  props.TableCellMar.Top.W = s.GetULong() / 36000;
                     break;
                 }
                 case 2:
@@ -5194,7 +5194,7 @@ function BinaryPPTYLoader()
                     if(props.TableCellMar == null)
                         props.TableCellMar = {}
                     props.TableCellMar.Right   = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
-                   // props.TableCellMar.Right.W = s.GetULong() / 36000;
+                    // props.TableCellMar.Right.W = s.GetULong() / 36000;
                     break;
                 }
                 case 3:
@@ -6513,9 +6513,9 @@ function BinaryPPTYLoader()
                     s.Skip2(4);
                     var _c = s.GetULong();
                     /*if(History != null)
-                    {
-                        History.TurnOff();
-                    }*/
+                     {
+                     History.TurnOff();
+                     }*/
                     if(!txbody.content)
                         txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0);
                     if(_c>0)
@@ -6541,9 +6541,9 @@ function BinaryPPTYLoader()
                         txbody.textFieldFlag = true;
                     }
                     /*if(History != null)
-                    {
-                        History.TurnOn();
-                    }*/
+                     {
+                     History.TurnOn();
+                     }*/
                     break;
                 }
                 default:
@@ -6665,9 +6665,9 @@ function BinaryPPTYLoader()
                     var _c = s.GetULong();
 
                     /*if(History != null)
-                    {
-                        History.TurnOff();
-                    }*/
+                     {
+                     History.TurnOff();
+                     }*/
 
 
                     for (var i = 0; i < _c; i++)
@@ -6678,9 +6678,9 @@ function BinaryPPTYLoader()
                     }
 
                     /*if(History != null)
-                    {
-                        History.TurnOn();
-                    }*/
+                     {
+                     History.TurnOn();
+                     }*/
                     break;
                 }
                 default:
@@ -6704,6 +6704,22 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
+        var textPropsForRecalc;
+        if(DocumentContent.Parent instanceof CTextBody)
+        {
+            textPropsForRecalc = DocumentContent.Parent.textPropsForRecalc;
+        }
+        else
+        {
+            if(DocumentContent.Parent instanceof CTableCell
+                && DocumentContent.Parent.Row
+                && DocumentContent.Parent.Row.Table
+                && DocumentContent.Parent.Row.Table.Parent
+                && DocumentContent.Parent.Row.Table.Parent.textPropsForRecalc)
+            {
+                textPropsForRecalc = DocumentContent.Parent.textPropsForRecalc;
+            }
+        }
         while (s.cur < _end_rec)
         {
             var _at = s.GetUChar();
@@ -6812,9 +6828,11 @@ function BinaryPPTYLoader()
                                         _run.unifill = unifill;
                                         _run.Underline = true;
                                         var tx_pr = new ParaTextPr(_run);
-                                        if(DocumentContent.Parent && DocumentContent.Parent.textPropsForRecalc)
+
+
+                                        if(textPropsForRecalc)
                                         {
-                                            DocumentContent.Parent.textPropsForRecalc.push(tx_pr)
+                                            textPropsForRecalc.push(tx_pr)
                                         }
                                         par.Internal_Content_Add( EndPos++, tx_pr);
 
@@ -6827,9 +6845,9 @@ function BinaryPPTYLoader()
                                     {
 
                                         var tx_pr = new ParaTextPr(_run);
-                                        if(DocumentContent.Parent && DocumentContent.Parent.textPropsForRecalc)
+                                        if(textPropsForRecalc)
                                         {
-                                            DocumentContent.Parent.textPropsForRecalc.push(tx_pr)
+                                            textPropsForRecalc.push(tx_pr)
                                         }
                                         par.Internal_Content_Add( EndPos++, tx_pr);
                                     }
@@ -6841,12 +6859,12 @@ function BinaryPPTYLoader()
                                     {
                                         par.Internal_Content_Add( EndPos++, new ParaTab());
                                     }
-									else if (_text[j] == '\n')
-									{
-										par.Internal_Content_Add( EndPos++, new ParaNewLine( break_Line ));
-									}
-									else if (_text[j] == '\r')
-										;
+                                    else if (_text[j] == '\n')
+                                    {
+                                        par.Internal_Content_Add( EndPos++, new ParaNewLine( break_Line ));
+                                    }
+                                    else if (_text[j] == '\r')
+                                        ;
                                     else if (_text[j] != ' ')
                                     {
                                         par.Internal_Content_Add( EndPos++, new ParaText(_text[j]));
@@ -6877,7 +6895,7 @@ function BinaryPPTYLoader()
                                         break;
 
                                     if (0 == _at)
-                                       var f_id = s.GetString2();
+                                        var f_id = s.GetString2();
                                     else if (1 == _at)
                                         var f_type = s.GetString2();
                                     else
@@ -6924,9 +6942,9 @@ function BinaryPPTYLoader()
                                         _run.unifill = unifill;
                                         _run.Underline = true;
                                         var tx_pr = new ParaTextPr(_run);
-                                        if(DocumentContent.Parent && DocumentContent.Parent.textPropsForRecalc)
+                                        if(textPropsForRecalc)
                                         {
-                                            DocumentContent.Parent.textPropsForRecalc.push(tx_pr)
+                                            textPropsForRecalc.push(tx_pr)
                                         }
                                         par.Internal_Content_Add( EndPos++, tx_pr);
 
@@ -6938,9 +6956,9 @@ function BinaryPPTYLoader()
                                     else
                                     {
                                         var tx_pr = new ParaTextPr(_run);
-                                        if(DocumentContent.Parent && DocumentContent.Parent.textPropsForRecalc)
+                                        if(textPropsForRecalc)
                                         {
-                                            DocumentContent.Parent.textPropsForRecalc.push(tx_pr)
+                                            textPropsForRecalc.push(tx_pr)
                                         }
                                         par.Internal_Content_Add( EndPos++, tx_pr);
                                     }
@@ -6971,11 +6989,15 @@ function BinaryPPTYLoader()
         if(par.IsEmpty() && endRunPr)
         {
             var tx_pr = new ParaTextPr(endRunPr);
-            if(DocumentContent.Parent && DocumentContent.Parent.textPropsForRecalc)
+            if(textPropsForRecalc)
             {
-                DocumentContent.Parent.textPropsForRecalc.push(tx_pr)
+                textPropsForRecalc.push(tx_pr)
             }
             par.Internal_Content_Add( EndPos++, tx_pr);
+        }
+        if(textPropsForRecalc)
+        {
+            textPropsForRecalc.push({Value:{unifill:par.folHlinkColor}});
         }
         return par;
     }

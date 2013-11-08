@@ -813,7 +813,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_GROUP:
             case STATES_ID_TEXT_ADD_IN_GROUP:
-           // case STATES_ID_TEXT_ADD_IN_GROUP:
+                // case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 if(this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
                 {
@@ -1128,8 +1128,11 @@ CGraphicObjects.prototype = {
                         SubType: -1
                     }
                 };
-                editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
-                editor.UpdateParagraphProp(_empty_para_pr);
+                editor.sync_ParaSpacingLine( _empty_para_pr.Spacing );
+                editor.Update_ParaInd(_empty_para_pr.Ind);
+                editor.sync_PrAlignCallBack(_empty_para_pr.Jc);
+                editor.sync_ParaStyleName(_empty_para_pr.StyleName);
+                editor.sync_ListType(_empty_para_pr.ListType);
             }
 
             if(text_props != null)
@@ -1195,7 +1198,7 @@ CGraphicObjects.prototype = {
         switch(this.State.id)
         {
             case STATES_ID_NULL:
-            //case STATES_ID_TEXT_ADD:
+                //case STATES_ID_TEXT_ADD:
                 // case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 var shapes = by_types.shapes;
@@ -2116,8 +2119,10 @@ CGraphicObjects.prototype = {
         image.setGeometry( CreateGeometry("rect"));
         image.spPr.geometry.Init(5, 5);
         image.setXfrm((this.slide.presentation.Width - W)/2, (this.slide.presentation.Height - H)/2, W, H, null, null, null);
-        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, image) === false)
+        if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, image) === false)
         {
+            this.resetSelectionState();
+            image.select(this);
             this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, image);
             editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
         }
@@ -2380,9 +2385,9 @@ CGraphicObjects.prototype = {
                                 if(_tmp_sel_state.textSelectionState != undefined)
                                 {
                                     /*if(_prev_sel_state != undefined && _tmp_sel_state.textObject != _prev_sel_state.textObject)
-                                    {
-                                        return _arr_sel_states[_pos_sel_state];
-                                    }*/
+                                     {
+                                     return _arr_sel_states[_pos_sel_state];
+                                     }*/
                                     var _text_sel_state = _tmp_sel_state.textSelectionState;
                                     if(b_table && isRealNumber(cur_row) && isRealNumber(cur_cell))
                                     {
@@ -2573,7 +2578,7 @@ CGraphicObjects.prototype = {
                                             }
                                         }
                                     }
-                                    }
+                                }
 
 
                                 _prev_sel_state = _tmp_sel_state;
@@ -3353,7 +3358,7 @@ CGraphicObjects.prototype = {
                 break;
             }
         }
-       // this.updateSelectionState()
+        // this.updateSelectionState()
     },
 
     recalculateCurPos: function()
@@ -3392,16 +3397,16 @@ CGraphicObjects.prototype = {
     {
         this.State.onMouseUp(e, x, y);
         this.slide.presentation.Document_UpdateInterfaceState();
-       /* if(this.State.id === STATES_ID_NULL)
-        { */
-            if(this.selectedObjects.length > 0)
-            {
-                var _data = new CContextMenuData();
-                _data.Type = c_oAscContextMenuTypes.Main;
-                _data.X_abs = e.X;
-                _data.Y_abs = e.Y;
-                editor.sync_ContextMenuCallback(_data);
-            }
+        /* if(this.State.id === STATES_ID_NULL)
+         { */
+        if(this.selectedObjects.length > 0)
+        {
+            var _data = new CContextMenuData();
+            _data.Type = c_oAscContextMenuTypes.Main;
+            _data.X_abs = e.X;
+            _data.Y_abs = e.Y;
+            editor.sync_ContextMenuCallback(_data);
+        }
         //}
     },
 
