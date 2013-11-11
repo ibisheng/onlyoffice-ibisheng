@@ -17,7 +17,14 @@
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
+var Test_Time = null;
+var bool_Test_Shift = false;
+var bool_Test_Ctr = false;
+var bool_Test_V = false;
+
+
 var TEST = true;
+var TEST_2 = true;
 
 var  DEFAULT_RUN_PRP =
 {
@@ -533,10 +540,10 @@ CMathContent.prototype =
     setReferenceComp: function(Comp) // отличие от setComposition: ссылка на общую формулу передается всем элементам контента
     {
         this.Composition = Comp;
-        for(var i = 0; i < this.content.length; i++)
+        for(var i = 1; i < this.content.length; i++)
         {
-            if(this.content[i].value.type == MATH_COMP)
-                this.contetn[i].value.setReferenceComp(Comp);
+            if(this.content[i].value.typeObj == MATH_COMP)
+                this.content[i].value.setReferenceComp(Comp);
         }
     },
     createEquation: function(ind)
@@ -4230,10 +4237,18 @@ CMathContent.prototype =
     },
     update_widthContent: function()
     {
-        for(var i = 1; i <this.content.length; i++)
+        try
         {
-            this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
+            for(var i = 1; i <this.content.length; i++)
+            {
+                this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
+            }
         }
+        catch(e)
+        {
+            console.log("Don't work update_widthContent");
+        }
+
     },
     update_Cursor: function()
     {
@@ -5075,6 +5090,10 @@ CMathContent.prototype =
             StartIndSelect++; // start+1 ... end
             this.selection.startPos = StartIndSelect;
             this.selection.endPos   = StartIndSelect;
+
+            if(TEST_2)
+                if(this.selection.startPos === 3)
+                    var temp;
         }
         else // один CEmpty
         {
@@ -5108,8 +5127,17 @@ CMathContent.prototype =
 
         var widthSelect = 0;
 
-        for(var j = start; j < end ; j++)
-            widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
+
+        try
+        {
+            for(var j = start; j < end ; j++)
+                widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
+        }
+        catch(e)
+        {
+            console.log("Don't work update_widthContent");
+        }
+
 
         if( widthSelect != 0)
         {
@@ -6359,6 +6387,12 @@ CMathComposition.prototype =
             }
         }
 
+        if(e.CtrlKey == true  && e.KeyCode == 81)
+        {
+            simulatorRead();
+            return false;
+        }
+
         return false;
     },
     OnKeyPress: function(e)
@@ -6391,6 +6425,7 @@ CMathComposition.prototype =
 
             return true;
         }
+
 
         return false;
     },
