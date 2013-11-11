@@ -9,6 +9,11 @@ var XRegExp=(function(i){var k="xregexp",t,j={astral:false,natives:false},y={exe
  * Steven Levithan � 2012 MIT License
  */
 (function(b){var a=b.prototype;a.apply=function(d,c){return this.test(c[0])};a.call=function(c,d){return this.test(d)};a.forEach=function(d,e,c){return b.forEach(d,this,e,c)};a.globalize=function(){return b.globalize(this)};a.match=function(d,c){return b.match(d,this,c)};a.xexec=function(d,e,c){return b.exec(d,this,e,c)};a.xtest=function(d,e,c){return b.test(d,this,e,c)}}(XRegExp));/*!
+ * XRegExp.matchRecursive 3.0.0-pre
+ * <http://xregexp.com/>
+ * Steven Levithan � 2009-2012 MIT License
+ */
+(function(a){function b(d,e,f,c){return{name:d,value:e,start:f,end:c}}a.matchRecursive=function(p,f,s,h,e){h=h||"";e=e||{};var q=h.indexOf("g")>-1,u=h.indexOf("y")>-1,c=h.replace(/y/g,""),v=e.escapeChar,k=e.valueNames,i=[],d=0,j=0,n=0,l=0,m,g,o,r,t;f=a(f,c);s=a(s,c);if(v){if(v.length>1){throw new Error("Cannot use more than one escape character")}v=a.escape(v);t=new RegExp("(?:"+v+"[\\S\\s]|(?:(?!"+a.union([f,s]).source+")[^"+v+"])+)+",h.replace(/[^im]+/g,""))}while(true){if(v){n+=(a.exec(p,t,n,"sticky")||[""])[0].length}o=a.exec(p,f,n);r=a.exec(p,s,n);if(o&&r){if(o.index<=r.index){r=null}else{o=null}}if(o||r){j=(o||r).index;n=j+(o||r)[0].length}else{if(!d){break}}if(u&&!d&&j>l){break}if(o){if(!d){m=j;g=n}++d}else{if(r&&d){if(!--d){if(k){if(k[0]&&m>l){i.push(b(k[0],p.slice(l,m),l,m))}if(k[1]){i.push(b(k[1],p.slice(m,g),m,g))}if(k[2]){i.push(b(k[2],p.slice(g,j),g,j))}if(k[3]){i.push(b(k[3],p.slice(j,n),j,n))}}else{i.push(p.slice(g,j))}l=n;if(!q){break}}}else{throw new Error("Unbalanced delimiter found in string")}}if(j===n){++n}}if(q&&!u&&k&&k[0]&&p.length>l){i.push(b(k[0],p.slice(l),l,p.length))}return i}}(XRegExp));/*!
  * XRegExp Unicode Base 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan � 2008-2012 MIT License
