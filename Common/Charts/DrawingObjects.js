@@ -603,6 +603,12 @@ asc_CChart.prototype = {
 			}
 		}
 		
+		// Colors
+		var seriaUniColors = _t.generateUniColors(revSeries.length);
+		for (var i = 0; i < revSeries.length; i++) {
+			revSeries[i].OutlineColor = seriaUniColors[i];
+		}
+		
 		return revSeries;
 	},
 	
@@ -634,13 +640,12 @@ asc_CChart.prototype = {
 		
 		var aInfo = [];
 		function legendInfo() { return { text: null, color: null, marker: null } };
-		var aColors = generateColors(this.series.length, arrBaseColors, true);
 		
 		for ( var i = 0; i < this.series.length; i++ ) {
 		
 			var info = new legendInfo();
 			info.text = this.series[i].asc_getTitle();
-			info.color = aColors[i];
+			info.color = this.series[i].asc_getOutlineColor();
 			info.marker = c_oAscLegendMarkerType.Line;
 			aInfo.push(info);
 		}

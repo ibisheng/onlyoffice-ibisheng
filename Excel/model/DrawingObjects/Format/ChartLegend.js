@@ -79,7 +79,7 @@ CChartLegend.prototype =
         this.setStartValues();
         return;
         var chart = this.chartGroup.chart;
-        var chart_legend = chart.getLegendInfo();
+        var chart_legend = chart.getLegendInfo();	// ¬с€ неоходима€ информаци€ дл€ построени€ легенды находитс€ в массиве серий
         if(chart_legend.length > 0)
         {
             var shape_type = chart_legend[0].marker === c_oAscLegendMarkerType.Line ? "line" : "rect";
@@ -110,7 +110,6 @@ CChartLegend.prototype =
                 cur_legend_entry.brush.fill.color.color.RGBA = {R:legend_entry_obj.color.R, G:legend_entry_obj.color.G, B:legend_entry_obj.color.B, A:255}
             }
         }
-
     },
 
     draw: function(graphics)
@@ -135,7 +134,7 @@ CChartLegend.prototype =
         g_oTableId.m_bTurnOff = true;
 
         var chart = this.chartGroup.chart;
-        var legend_info = chart.getLegendInfo();
+        var legend_info = chart.getLegendInfo();	// ¬с€ неоходима€ информаци€ дл€ построени€ легенды находитс€ в массиве серий
         this.calculatedEntry.length = 0;
         if(legend_info.length > 0)
         {
