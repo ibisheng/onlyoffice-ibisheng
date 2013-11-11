@@ -850,7 +850,7 @@ CGraphicObjects.prototype = {
                         paddings: _current_object.getPaddings(),
                         w:_current_object.extX,
                         h:_current_object.extY,
-                        canFill: _current_object.spPr.geometry && _current_object.spPr.geometry.canFill()
+                        canFill: !_current_object.spPr.geometry || _current_object.spPr.geometry.canFill()
                     };
 
                     if(shape_props === null)
@@ -930,7 +930,7 @@ CGraphicObjects.prototype = {
                             paddings: _current_object.getPaddings(),
                             w:_current_object.extX,
                             h:_current_object.extY,
-                            canFill: _current_object.spPr.geometry && _current_object.spPr.geometry.canFill()
+                            canFill: !_current_object.spPr.geometry || _current_object.spPr.geometry.canFill()
                         };
 
                         if(shape_props === null)
