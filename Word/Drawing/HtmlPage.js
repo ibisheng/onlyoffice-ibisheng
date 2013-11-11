@@ -2797,7 +2797,14 @@ function CEditorPage(api)
 
             if (drDoc.InlineTextTrackEnabled && null != drDoc.InlineTextTrack)
             {
+                var _oldPage = drDoc.AutoShapesTrack.PageIndex;
+                var _oldCurPageInfo = drDoc.AutoShapesTrack.CurrentPageInfo;
+
+                drDoc.AutoShapesTrack.PageIndex = drDoc.InlineTextTrackPage;
                 drDoc.AutoShapesTrack.DrawInlineMoveCursor(drDoc.InlineTextTrack.X, drDoc.InlineTextTrack.Y, drDoc.InlineTextTrack.Height, drDoc.InlineTextTrack.transform);
+
+                drDoc.AutoShapesTrack.PageIndex = _oldPage;
+                drDoc.AutoShapesTrack.CurrentPageInfo = _oldCurPageInfo;
             }
 
             drDoc.DrawHorVerAnchor();

@@ -1796,6 +1796,7 @@ function CDrawingDocument()
 
     this.InlineTextTrackEnabled = false;
     this.InlineTextTrack = null;
+    this.InlineTextTrackPage = -1;
 
     this.AutoShapesTrack = null;
     this.AutoShapesTrackLockPageNum = -1;
@@ -5241,6 +5242,7 @@ function CDrawingDocument()
         if (this.InlineTextTrackEnabled)
         {
             this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+            this.InlineTextTrackPage = pos.Page;
 
             oWordControl.ShowOverlay();
             oWordControl.OnUpdateOverlay();
@@ -5347,6 +5349,7 @@ function CDrawingDocument()
         if (this.InlineTextTrackEnabled)
         {
             this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+            this.InlineTextTrackPage = pos.Page;
             this.EndTrackText();
 
             oWordControl.ShowOverlay();
@@ -5639,6 +5642,7 @@ function CDrawingDocument()
     {
         this.InlineTextTrackEnabled = true;
         this.InlineTextTrack = null;
+        this.InlineTextTrackPage = -1;
     }
     this.EndTrackText = function()
     {
@@ -5646,6 +5650,7 @@ function CDrawingDocument()
 
         this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
+        this.InlineTextTrackPage = -1;
     }
 }
 
