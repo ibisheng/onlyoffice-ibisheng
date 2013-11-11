@@ -6,6 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+
+function CTableCell()
+{};
+
 var g_mouse_event_type_down  = 0;
 var g_mouse_event_type_move  = 1;
 var g_mouse_event_type_up    = 2;
