@@ -283,6 +283,36 @@ asc_CChart.prototype = {
 	asc_getSeria: function(index) { return (index < this.series.length) ? this.series[index] : null; },
 	asc_setSeria: function(seriaObj) { if (seriaObj) this.series.push(seriaObj); },
 	asc_removeSeries: function() { this.series = []; },
+
+	_generateColorPart: function (val, percent) {
+		// 	Negative outputs are shades, and positive outputs are tints.
+		if ( percent >= 0 )
+			return Math.min( 255, ((255 - val) * percent + val) >> 0 );
+		else
+			return Math.max( 0, (val * (1 + percent)) >> 0 );
+	},
+	_generateColor: function (oColor, percent) {
+		return new CColor(this._generateColorPart(oColor.r, percent),
+			this._generateColorPart(oColor.g, percent), this._generateColorPart(oColor.b, percent));
+	},
+
+	_generateColors: function (countColors, arrayBaseColors) {
+		var arrayColors = [];
+		var countBase = arrayBaseColors.length;
+		var needCreate = parseInt(countColors / countBase) + 1;
+
+		for (var i = 0; i < needCreate; i++) {
+			for (var j = 0; j < countBase; j++) {
+				// Для равномерного затухания: percent = i / needCreate
+				var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) / 100.0;		// ECMA-376 Part 1
+				var color = this._generateColor(arrayBaseColors[j], percent);
+
+				arrayColors.push( color );
+			}
+		}
+		arrayColors.splice(countColors, arrayColors.length - countColors);
+		return arrayColors;
+	},
 	
 	initDefault: function() {
 	
@@ -293,7 +323,6 @@ asc_CChart.prototype = {
 	
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
-		var api = api_sheet ? api_sheet : api_doc;
 		
 		this.bChartEditor = true;
 		this.header.title = "2012 Olympics Medal Standings";
@@ -623,11 +652,10 @@ asc_CChart.prototype = {
 				api.chartStyleManager.init();
 				
 			var baseColors = api.chartStyleManager.getBaseColors( parseInt(this.styleId) );
-			var colors = generateColors(count, baseColors, true);
+			var colors = this._generateColors(count, baseColors);
 			
 			for ( var i = 0; i < colors.length; i++ ) {
-				var rgbColor = new RGBColor(colors[i]);
-				var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
+				var uniColor = CreateUniColorRGB(colors[i].r, colors[i].g, colors[i].b);
 				uniColor.isCustom = true;
 				uniColors.push(uniColor);
 			}
@@ -661,7 +689,7 @@ asc_CChart.prototype = {
     },
 	
 	Write_ToBinary2: function(Writer) {
-		
+		var i, j;
 		Writer.WriteLong(CLASS_TYPE_CHART_DATA);
 		Writer.WriteString2( this.Id );
 		
@@ -703,11 +731,11 @@ asc_CChart.prototype = {
 		
 		// Series
 		Writer.WriteLong( this.series.length );
-		for (var i = 0; i < this.series.length; i++) {
+		for (i = 0; i < this.series.length; i++) {
 			
 			Writer.WriteString2(this.series[i].Val.Formula);
 			Writer.WriteLong(this.series[i].Val.NumCache.length);
-			for (var j = 0; j < this.series[i].Val.NumCache.length; j++) {
+			for (j = 0; j < this.series[i].Val.NumCache.length; j++) {
 				Writer.WriteString2( (this.series[i].Val.NumCache[j].numFormatStr != undefined) ? this.series[i].Val.NumCache[j].numFormatStr : "General" );
 				Writer.WriteBool( (this.series[i].Val.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].Val.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].Val.NumCache[j].val);
@@ -716,7 +744,7 @@ asc_CChart.prototype = {
 			
 			Writer.WriteString2(this.series[i].xVal.Formula);
 			Writer.WriteLong(this.series[i].xVal.NumCache.length);
-			for (var j = 0; j < this.series[i].xVal.NumCache.length; j++) {
+			for (j = 0; j < this.series[i].xVal.NumCache.length; j++) {
 				Writer.WriteString2( (this.series[i].xVal.NumCache[j].numFormatStr != undefined) ? this.series[i].xVal.NumCache[j].numFormatStr : "General" );
 				Writer.WriteBool( (this.series[i].xVal.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].xVal.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].xVal.NumCache[j].val);
@@ -725,7 +753,7 @@ asc_CChart.prototype = {
 			
 			Writer.WriteString2(this.series[i].Cat.Formula);
 			Writer.WriteLong(this.series[i].Cat.NumCache.length);
-			for (var j = 0; j < this.series[i].Cat.NumCache.length; j++) {
+			for (j = 0; j < this.series[i].Cat.NumCache.length; j++) {
 				Writer.WriteString2( (this.series[i].Cat.NumCache[j].numFormatStr != undefined) ? this.series[i].Cat.NumCache[j].numFormatStr : "General" );
 				Writer.WriteBool( (this.series[i].Cat.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].Cat.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].Cat.NumCache[j].val);
@@ -745,13 +773,13 @@ asc_CChart.prototype = {
 		
 		// Theme Colors
 		Writer.WriteLong( this.themeColors.length );
-		for (var i = 0; i < this.themeColors.length; i++) {
-			Writer.WriteString2(this.themeColors[i]);
+		for (i = 0; i < this.themeColors.length; i++) {
+			this.themeColors[i].writeToBinaryLong(Writer);
 		}
 	},
 	
 	Read_FromBinary2: function(Reader, noReadId) {
-		
+		var i, j;
 		Reader.GetLong();
 
         var Id = Reader.GetString2();
@@ -797,13 +825,13 @@ asc_CChart.prototype = {
 		// Series
 		this.series = [];
 		var seriesCount = Reader.GetLong();
-		for (var i = 0; i < seriesCount; i++) {
+		for (i = 0; i < seriesCount; i++) {
 		
 			var seria = new asc_CChartSeria();
 			
 			seria.Val.Formula = Reader.GetString2();
 			var numCacheCount = Reader.GetLong();
-			for (var j = 0; j < numCacheCount; j++) {
+			for (j = 0; j < numCacheCount; j++) {
 				var item = {};
 				item.numFormatStr = Reader.GetString2();
 				item.isDateTimeFormat = Reader.GetBool();
@@ -814,7 +842,7 @@ asc_CChart.prototype = {
 			
 			seria.xVal.Formula = Reader.GetString2();
 			numCacheCount = Reader.GetLong();
-			for (var j = 0; j < numCacheCount; j++) {
+			for (j = 0; j < numCacheCount; j++) {
 				var item = {};
 				item.numFormatStr = Reader.GetString2();
 				item.isDateTimeFormat = Reader.GetBool();
@@ -825,7 +853,7 @@ asc_CChart.prototype = {
 			
 			seria.Cat.Formula = Reader.GetString2();
 			numCacheCount = Reader.GetLong();
-			for (var j = 0; j < numCacheCount; j++) {
+			for (j = 0; j < numCacheCount; j++) {
 				var item = {};
 				item.numFormatStr = Reader.GetString2();
 				item.isDateTimeFormat = Reader.GetBool();
@@ -848,10 +876,13 @@ asc_CChart.prototype = {
 		}		
 		
 		// Theme Colors
+		var oColor;
 		this.themeColors = [];
 		var themeColorsCount = Reader.GetLong();
-		for (var i = 0; i < themeColorsCount; i++) {
-			this.themeColors.push(Reader.GetString2());
+		for (i = 0; i < themeColorsCount; i++) {
+			oColor = new CRGBColor();
+			oColor.readFromBinaryLong(Reader);
+			this.themeColors.push(oColor);
 		}
 	},
 	
@@ -3802,8 +3833,8 @@ function DrawingObjects() {
 				api.GuiControlColorsMap = [];
 				for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
 					
-					var color = new RGBColor( graphicObject.chart.themeColors[i] );
-					api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
+					var color = graphicObject.chart.themeColors[i];
+					api.GuiControlColorsMap.push(new CColor(color.RGBA.R, color.RGBA.G, color.RGBA.B));
 				}
 				api.chartStyleManager.init();
 				api.chartPreviewManager.init();

@@ -48,8 +48,6 @@
                 "../Common/Charts/libraries/OfficeExcel.pie.js",
                 "../Common/Charts/libraries/OfficeExcel.scatter.js",
                 "../Common/Charts/libraries/OfficeExcel.chartProperties.js",
-                "../Common/Charts/libraries/hsv.js",
-                "../Common/Charts/libraries/rgbcolor.js",
                 "../Common/Charts/charts.js",
                 "../Common/Charts/DrawingObjects.js",
                 "../Common/FontsFreeType/font_engine.js",

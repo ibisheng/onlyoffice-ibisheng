@@ -85,17 +85,17 @@ function ChartStyleManager() {
 			return arr_colors;
 		};
 		
-		_this.colorMap[1] = [ "#555555", "#9E9E9E", "#727272", "#464646", "#838383", "#C1C1C1" ];
-		_this.colorMap[2] = [ themeColors[4].get_hex(), themeColors[5].get_hex(), themeColors[6].get_hex(), themeColors[7].get_hex(), themeColors[8].get_hex(), themeColors[9].get_hex() ];	
-		_this.colorMap[3] = [ themeColors[4].get_hex() ];
-		_this.colorMap[4] = [ themeColors[5].get_hex() ];
-		_this.colorMap[5] = [ themeColors[6].get_hex() ];
-		_this.colorMap[6] = [ themeColors[7].get_hex() ];
-		_this.colorMap[7] = [ themeColors[8].get_hex() ];
-		_this.colorMap[8] = [ themeColors[9].get_hex() ];
+		_this.colorMap[1] = [ new CColor(85, 85, 85), new CColor(158, 158, 158), new CColor(114, 114, 114), new CColor(70, 70, 70), new CColor(131, 131, 131), new CColor(193, 193, 193) ];
+		_this.colorMap[2] = [ themeColors[4], themeColors[5], themeColors[6], themeColors[7], themeColors[8], themeColors[9] ];
+		_this.colorMap[3] = [ themeColors[4] ];
+		_this.colorMap[4] = [ themeColors[5] ];
+		_this.colorMap[5] = [ themeColors[6] ];
+		_this.colorMap[6] = [ themeColors[7] ];
+		_this.colorMap[7] = [ themeColors[8] ];
+		_this.colorMap[8] = [ themeColors[9] ];
 		
 		for (var i = 0; i < themeColors.length; i++) {
-			_this.baseColors.push(themeColors[i].get_hex());
+			_this.baseColors.push(themeColors[i]);
 		}
 		
 		bReady = true;

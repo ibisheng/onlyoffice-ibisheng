@@ -94,8 +94,6 @@
                 "../Common/Charts/libraries/OfficeExcel.pie.js",
                 "../Common/Charts/libraries/OfficeExcel.scatter.js",
                 "../Common/Charts/libraries/OfficeExcel.chartProperties.js",
-                "../Common/Charts/libraries/hsv.js",
-                "../Common/Charts/libraries/rgbcolor.js",
                 "../Excel/model/DrawingObjects/DrawingObjectsController.js",
                 "../Excel/model/DrawingObjects/States.js",
                 "../Excel/model/DrawingObjects/Format/GroupShape.js",
