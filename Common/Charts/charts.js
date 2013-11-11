@@ -35,8 +35,6 @@ function ChartRender(options) {
 	}
 }
 
-var arrBaseColors = [];
-
 function ChartStyleManager() {
 	
 	var _this = this;
@@ -929,8 +927,7 @@ function insertChart(chart, options) {
 	var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
 	if ( !styleManager.isReady() )
 		styleManager.init(options);
-	
-	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
+
 	var arrFormatAdobeLabels = [];
 	var catNameLabels = [];
 	
