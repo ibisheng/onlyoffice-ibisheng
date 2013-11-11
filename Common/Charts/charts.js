@@ -1346,72 +1346,8 @@ function drawChart(chart, arrValues, options) {
 	
 	if(OfficeExcel.drawingCtxCharts)
 		OfficeExcel.drawingCtxCharts.setCanvas(chartCanvas);
-	// По типу
-	switch (chart.type) {
-		case c_oAscChartType.line:
-			DrawLineChart(chartCanvas, chart.subType, false, data,chart);
-			break;
-		case c_oAscChartType.bar:
-			DrawBarChart(chartCanvas, chart.subType, data,chart);
-			break;
-		case c_oAscChartType.hbar:
-			DrawHBarChart(chartCanvas, chart.subType, data,chart);
-			break;
-		case c_oAscChartType.area:
-			DrawLineChart(chartCanvas, chart.subType, chart.type, data,chart);
-			break;
-		case c_oAscChartType.pie:
-			DrawPieChart(chartCanvas, chart.subType, data[0],chart);
-			break;
-		case c_oAscChartType.scatter:
-			DrawScatterChart(chartCanvas, chart.subType, data,chart);
-			break;
-		case c_oAscChartType.stock:
-			DrawScatterChart(chartCanvas, chart.type, data,chart);
-			break;
-	}
-	
-	if(!chart.yAxis.bShow)
-	{
-		bar._otherProps._ylabels  = false;
-		bar._otherProps._noyaxis = true;
-	}
-	if(!chart.xAxis.bShow)
-	{
-		bar._otherProps._xlabels  = false;
-		bar._otherProps._noxaxis = true;
-	}
-	// Цвета и шрифты
-	bar._otherProps._axis_color = 'grey';
-	bar._otherProps._background_grid_color = 'graytext';
-
-	
-	var lengthOfSeries;
-	if(chart.reSeries && chart.reSeries.length != 0 && window["Asc"]["editor"])
-	{
-			lengthOfSeries = chart.reSeries.length;
-	}
-	else
-	{
-		if('Line' == chart.type || 'Area' == chart.type)
-			lengthOfSeries = data.length;
-		else if(chart.type == 'HBar')
-			lengthOfSeries = data[0].length;
-		else
-			lengthOfSeries = data[0].length;
-	}
-
-	//check default title
-	if((!chart.yAxis.title || chart.yAxis.title == null || chart.yAxis.title == undefined || chart.yAxis.title == '') && chart.yAxis.bDefaultTitle)
-		chart.yAxis.title = defaultYTitle;
-	if((!chart.xAxis.title || chart.xAxis.title == null || chart.xAxis.title == undefined || chart.xAxis.title == '') && chart.xAxis.bDefaultTitle)
-		chart.xAxis.title = defaultXTitle;
-		
-	
-	// *****Легенда******
-	bar._otherProps._key = [];
-	bar._otherProps._key_halign = chart.legend.position;
 			
+	//***colors***
 	var legendCnt = (chart.type == "Scatter") ? data.length : data.length;
 	var curColor;
 	var rgba;
@@ -1426,7 +1362,9 @@ function drawChart(chart, arrValues, options) {
 	var slide;
 	var layout;
 	var masterSlide;
-	
+	var colorsArr = [];
+	var keyArr = [];
+
 	if(options)
 	{
 		theme  = options.theme;
@@ -1454,10 +1392,9 @@ function drawChart(chart, arrValues, options) {
 	if(chart.reSeries && chart.reSeries.length != 0 && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor) && theme)
 	{
 		var uniColors;
-		bar._otherProps._colors = [];
 		for (var j = 0; j < chart.reSeries.length; j++) {
 			if(chart.reSeries[j].TxCache.Tx)
-				bar._otherProps._key[j] = chart.reSeries[j].TxCache.Tx;
+				keyArr[j] = chart.reSeries[j].TxCache.Tx;
 			if(chart.reSeries[j].OutlineColor)
 			{
 				if(options)
@@ -1466,32 +1403,75 @@ function drawChart(chart, arrValues, options) {
 					chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
 				rgba = chart.reSeries[j].OutlineColor.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
-				bar._otherProps._colors[j] = curColor;
+				colorsArr[j] = curColor;
 			}
 			else
 			{
 				uniColors = !uniColors ? chart.generateUniColors(chart.reSeries.length): uniColors;
 				rgba = uniColors[j].color.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
-				bar._otherProps._colors[j] = curColor;
+				colorsArr[j] = curColor;
 			}
 		}
 	}
-	if((chart.reSeries && chart.reSeries[0]) && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor))
+	
+	// По типу
+	switch (chart.type) {
+		case c_oAscChartType.line:
+			DrawLineChart(chartCanvas, chart.subType, false, data,chart);
+			break;
+		case c_oAscChartType.bar:
+			DrawBarChart(chartCanvas, chart.subType, data,chart);
+			break;
+		case c_oAscChartType.hbar:
+			DrawHBarChart(chartCanvas, chart.subType, data,chart);
+			break;
+		case c_oAscChartType.area:
+			DrawLineChart(chartCanvas, chart.subType, chart.type, data,chart);
+			break;
+		case c_oAscChartType.pie:
+			DrawPieChart(chartCanvas, chart.subType, data[0],chart);
+			break;
+		case c_oAscChartType.scatter:
+			DrawScatterChart(chartCanvas, chart.subType, data,chart, colorsArr);
+			break;
+		case c_oAscChartType.stock:
+			DrawScatterChart(chartCanvas, chart.type, data,chart, colorsArr);
+			break;
+	}
+	// *****Легенда******
+	bar._otherProps._key = [];
+	bar._otherProps._key_halign = chart.legend.position;
+	if(colorsArr && colorsArr.length)
 	{
-		if(!chart.reSeries[0].TxCache.Tx)
-		{
-			for (var j = 0; j < legendCnt; j++) {
-				bar._otherProps._key[j] = 'Series' + (j + 1);
-			}
-		}
-		if(!chart.reSeries[0].OutlineColor)
-		{
-			bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
-			if(chart.type == 'HBar')
-				bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
-		}
+		bar._otherProps._colors = colorsArr;
+	};
+	
+	if(keyArr && keyArr.length)
+	{
+		bar._otherProps._key = keyArr;
+	};
+	
+	if(!chart.yAxis.bShow)
+	{
+		bar._otherProps._ylabels  = false;
+		bar._otherProps._noyaxis = true;
 	}
+	if(!chart.xAxis.bShow)
+	{
+		bar._otherProps._xlabels  = false;
+		bar._otherProps._noxaxis = true;
+	}
+	// Цвета и шрифты
+	bar._otherProps._axis_color = 'grey';
+	bar._otherProps._background_grid_color = 'graytext';
+
+	//check default title
+	if((!chart.yAxis.title || chart.yAxis.title == null || chart.yAxis.title == undefined || chart.yAxis.title == '') && chart.yAxis.bDefaultTitle)
+		chart.yAxis.title = defaultYTitle;
+	if((!chart.xAxis.title || chart.xAxis.title == null || chart.xAxis.title == undefined || chart.xAxis.title == '') && chart.xAxis.bDefaultTitle)
+		chart.xAxis.title = defaultXTitle;
+		
 
 	if (bar._otherProps._filled != true && bar.type != 'bar' && bar.type != 'hbar' && bar.type != 'pie')
 		bar._otherProps._key_color_shape = 'line';
@@ -1596,9 +1576,9 @@ function drawChart(chart, arrValues, options) {
 // Chart types
 //-----------------------------------------------------------------------------------
 
-function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
+function DrawScatterChart(chartCanvas, chartSubType, data, chart, colorsArr) {
 	
-	var colors = generateColors(data.length * data[0].length, arrBaseColors);
+	var colors = colorsArr;
 	for (var i = 0; i < data.length; i++) {
 		if(typeof(data[i][0]) == 'object')
 		{
