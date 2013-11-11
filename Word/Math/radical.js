@@ -167,13 +167,15 @@ CSignRadical.prototype.relate = function(parent)
 
 function CRadical()
 {
+    this.type = SQUARE_RADICAL; // default
     this.signRadical = null;
     CMathBase.call(this);
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
-    this.type = props.type;
+    if( typeof(props.type) !== "undefined" && props.type !== null)
+        this.type = props.type;
 
     this.setDimension(1, 1);
     this.setContent();
