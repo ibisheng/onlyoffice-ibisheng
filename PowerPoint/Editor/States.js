@@ -2442,8 +2442,15 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                     if(false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined )) {
                         var graphicObject = gr_obj;
                         graphicObject.chart.themeColors = [];
+						
+						var oColor, oNewColor;
                         for (var i = 0; i < editor.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
-                            graphicObject.chart.themeColors.push( editor.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
+							oColor = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap[i];
+							oNewColor = new CRGBColor();
+							oNewColor.RGBA.R = oColor.r;
+							oNewColor.RGBA.G = oColor.g;
+							oNewColor.RGBA.B = oColor.b;
+                            graphicObject.chart.themeColors.push( oNewColor );
                         }
                         editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }

@@ -4786,9 +4786,15 @@ asc_docs_api.prototype.asc_getChartObject = function()
 {
     this.isChartEditor = true;		// Для совместного редактирования
 
+	var oColor, oNewColor;
     var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
     for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
-        graphicObject.chart.themeColors.push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
+		oColor = this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i];
+		oNewColor = new CRGBColor();
+		oNewColor.RGBA.R = oColor.r;
+		oNewColor.RGBA.G = oColor.g;
+		oNewColor.RGBA.B = oColor.b;
+        graphicObject.chart.themeColors.push( oNewColor );
     }
     return graphicObject;
 }
