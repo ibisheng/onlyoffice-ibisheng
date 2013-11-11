@@ -157,7 +157,7 @@ CTextBody.prototype =
                 this.content.Set_StartPage(old_start_page);
             }
 
-         //   this.content.Draw(this.shape.pageIndex, graphics);
+            //   this.content.Draw(this.shape.pageIndex, graphics);
         }
 
         else
@@ -170,7 +170,7 @@ CTextBody.prototype =
     {
         if(this.shape && typeof this.shape.getStyles === "function")
             return this.shape.getStyles();
-       return editor.WordControl.m_oLogicDocument.Get_Styles();
+        return editor.WordControl.m_oLogicDocument.Get_Styles();
     },
 
     Get_Numbering: function()
@@ -211,10 +211,11 @@ CTextBody.prototype =
         return this.shape.getTheme();
     },
 
-    paragraphAdd: function(paraItem)
+    paragraphAdd: function(paraItem, noRecalc)
     {
         this.content.Paragraph_Add(paraItem);
-        this.content.Recalculate_Page(0, true );
+        if(!(noRecalc === true))
+            this.content.Recalculate_Page(0, true );
         this.content.RecalculateCurPos();
         if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
         {
@@ -381,11 +382,11 @@ CTextBody.prototype =
         var Doc = this.content;
         var dd = editor.WordControl.m_oLogicDocument.DrawingDocument;
         if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
-           dd.UpdateTargetTransform(this.shape.transformText);
-           dd.TargetEnd();
-           dd.SelectEnabled(true);
-           dd.SelectClear();
-           dd.SelectShow();
+            dd.UpdateTargetTransform(this.shape.transformText);
+            dd.TargetEnd();
+            dd.SelectEnabled(true);
+            dd.SelectClear();
+            dd.SelectShow();
         }
         else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
         {
@@ -524,13 +525,13 @@ CTextBody.prototype =
             var par = this.content.Content[i];
             for(var j = 0; j < par.Lines.length; ++j)
             {
-                if(par.Lines[j].Ranges[0].W + 1> max_width)
+                if(par.Lines[j].Ranges[0].W > max_width)
                 {
                     max_width = par.Lines[j].Ranges[0].W;
                 }
             }
         }
-        return max_width + r_ins + l_ins;
+        return max_width + 2 + r_ins + l_ins;
     },
 
     getRectHeight: function(maxHeight, width)

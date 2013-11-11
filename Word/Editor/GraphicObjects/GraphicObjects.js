@@ -5,8 +5,8 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.drawingDocument = drawingDocument;
 
     this.graphicPages = [];
-   // for(var _page_index = 0; _page_index < /*document.Pages.length*/100; ++_page_index)//TODO:
-     //   this.graphicPages[_page_index] = new CGraphicPage(_page_index, this); */
+    // for(var _page_index = 0; _page_index < /*document.Pages.length*/100; ++_page_index)//TODO:
+    //   this.graphicPages[_page_index] = new CGraphicPage(_page_index, this); */
 
     this.startTrackPos =
     {
@@ -279,69 +279,69 @@ CGraphicObjects.prototype =
     {
         var chart_props, shape_props, image_props;
         /*switch(this.curState.id)
-        {
-            case STATES_ID_GROUP:
-            {
-                var  props = {};
-                props.fromGroup = true;
-                var s_arr = this.curState.group.selectionInfo.selectionArray;
-                for(var i = 0; i < s_arr.length; ++i)
-                {
-                    if(s_arr[i].isImage() && s_arr[i].chart == null && props.ImageUrl !== null)
-                    {
-                        if(props.ImageUrl === undefined)
-                            props.ImageUrl = s_arr[i].getImageUrl();
-                        else
-                        {
-                            if(props.ImageUrl !== s_arr[i].getImageUrl())
-                            {
-                                props.ImageUrl = null;
-                            }
-                        }
-                    }
-                    if(s_arr[i].isShape())
-                    {
-                        if(props.ShapeProperties === undefined)
-                        {
-                            props.ShapeProperties =
-                            {
-                                type: s_arr[i].getPresetGeom(),
-                                fill: s_arr[i].getFill(),
-                                stroke: s_arr[i].getStroke(),
-                                canChangeArrows: s_arr[i].canChangeArrows()
-                            }
-                        }
-                        else
-                        {
-                            var ShapeProperties =
-                            {
-                                type: s_arr[i].getPresetGeom(),
-                                fill: s_arr[i].getFill(),
-                                stroke: s_arr[i].getStroke(),
-                                canChangeArrows: s_arr[i].canChangeArrows()
-                            };
-                            props.ShapeProperties = CompareShapeProperties(ShapeProperties, props.ShapeProperties);
-                        }
-                    }
-                }
-                if(s_arr.length === 1 && s_arr[0].isImage() && s_arr[0].chart != null)
-                {
-                    props.ChartProperties = s_arr[0].chart;
-                }
-                return props;
-            }
-            default :
-            {
-                var pr;
-                var sel_arr = this.selectionInfo.selectionArray;
-                for(var index = 0; index < sel_arr.length; ++index)
-                {
-                    pr = sel_arr[index].Get_Props(pr);
-                }
-                return pr;
-            }
+         {
+         case STATES_ID_GROUP:
+         {
+         var  props = {};
+         props.fromGroup = true;
+         var s_arr = this.curState.group.selectionInfo.selectionArray;
+         for(var i = 0; i < s_arr.length; ++i)
+         {
+         if(s_arr[i].isImage() && s_arr[i].chart == null && props.ImageUrl !== null)
+         {
+         if(props.ImageUrl === undefined)
+         props.ImageUrl = s_arr[i].getImageUrl();
+         else
+         {
+         if(props.ImageUrl !== s_arr[i].getImageUrl())
+         {
+         props.ImageUrl = null;
+         }
+         }
+         }
+         if(s_arr[i].isShape())
+         {
+         if(props.ShapeProperties === undefined)
+         {
+         props.ShapeProperties =
+         {
+         type: s_arr[i].getPresetGeom(),
+         fill: s_arr[i].getFill(),
+         stroke: s_arr[i].getStroke(),
+         canChangeArrows: s_arr[i].canChangeArrows()
+         }
+         }
+         else
+         {
+         var ShapeProperties =
+         {
+         type: s_arr[i].getPresetGeom(),
+         fill: s_arr[i].getFill(),
+         stroke: s_arr[i].getStroke(),
+         canChangeArrows: s_arr[i].canChangeArrows()
+         };
+         props.ShapeProperties = CompareShapeProperties(ShapeProperties, props.ShapeProperties);
+         }
+         }
+         }
+         if(s_arr.length === 1 && s_arr[0].isImage() && s_arr[0].chart != null)
+         {
+         props.ChartProperties = s_arr[0].chart;
+         }
+         return props;
+         }
+         default :
+         {
+         var pr;
+         var sel_arr = this.selectionInfo.selectionArray;
+         for(var index = 0; index < sel_arr.length; ++index)
+         {
+         pr = sel_arr[index].Get_Props(pr);
+         }
+         return pr;
+         }
 
-        }        */
+         }        */
         switch(this.curState.id)
         {
             case STATES_ID_GROUP:
@@ -676,10 +676,10 @@ CGraphicObjects.prototype =
             if(chart_props.ShapeProperties)
                 chart_props.ShapeProperties = CreateAscShapePropFromProp(chart_props.ShapeProperties);
 
-           /* if(chart_props.ChartProperties)
-            {
-                chart_props.ChartProperties = chart_props.ChartProperties.serializeChart();
-            }          */
+            /* if(chart_props.ChartProperties)
+             {
+             chart_props.ChartProperties = chart_props.ChartProperties.serializeChart();
+             }          */
             ret.push(chart_props);
         }
         return ret;
@@ -1121,9 +1121,9 @@ CGraphicObjects.prototype =
                 {
                     var para_drawing = gr_objects[i];
 
-                   /* para_drawing.GraphicObj.setAbsoluteTransform(null, null,this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
-                    para_drawing.GraphicObj.setXfrm(null, null, this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
-                    para_drawing.GraphicObj.calculateAfterResize();      */
+                    /* para_drawing.GraphicObj.setAbsoluteTransform(null, null,this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
+                     para_drawing.GraphicObj.setXfrm(null, null, this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
+                     para_drawing.GraphicObj.calculateAfterResize();      */
                     para_drawing.GraphicObj.chartModify(chart);
                     para_drawing.GraphicObj.setPageIndex(para_drawing.PageNum);
                     if(para_drawing.Is_Inline())
@@ -1181,7 +1181,7 @@ CGraphicObjects.prototype =
         g_oTableId.m_bTurnOff = true;
         ret.setAscChart(new asc_CChart());
         g_oTableId.m_bTurnOff = false;
-		ret.chart.initDefault();
+        ret.chart.initDefault();
         ret.setChart(ret.chart);
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;
@@ -1390,7 +1390,7 @@ CGraphicObjects.prototype =
                 var ArrGlyph = this.selectionInfo.selectionArray;
                 for(var i = 0;  i< ArrGlyph.length; ++i)
                 {
-   //                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : ArrGlyph[i].Parent, CheckType : changestype_Paragraph_Content} ))
+                    //                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : ArrGlyph[i].Parent, CheckType : changestype_Paragraph_Content} ))
                     {
                         var cur_page_index = ArrGlyph[i].pageIndex;
                         for(var j = 0; j < arr_pages.length; ++j)
@@ -1472,7 +1472,7 @@ CGraphicObjects.prototype =
                                 ArrGlyph[i].setXfrm(null, null, props.Width, props.Height, null, null, null);
                                 ArrGlyph[i].setAbsoluteTransform(null, null, props.Width, props.Height, null, null, null);
                                 if(ArrGlyph[i].spPr.geometry)
-                                   ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
+                                    ArrGlyph[i].spPr.geometry.Recalculate(props.Width, props.Height);
                                 b_change_diagram = true;
                             }
                         }
@@ -2255,6 +2255,19 @@ CGraphicObjects.prototype =
 
     documentUpdateSelectionState: function()
     {
+        if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            this.curState.textObject.updateSelectionState();
+        }
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        {
+            this.curState.title.updateSelectionState();
+        }
+        else
+        {
+            this.drawingDocument.SelectClear();
+            this.drawingDocument.TargetEnd();
+        }
         this.updateSelectionState();
     },
 
@@ -2271,14 +2284,14 @@ CGraphicObjects.prototype =
             case STATES_ID_TEXT_ADD:
             {
                 this.curState.textObject.GraphicObj.documentUpdateRulersState();
-               // this.curState.textObject.GraphicObj.textBoxContent.Document_UpdateRulersState(0);
+                // this.curState.textObject.GraphicObj.textBoxContent.Document_UpdateRulersState(0);
                 break;
             }
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 this.curState.textObject.documentUpdateRulersState();
 
-               // this.curState.textObject.textBoxContent.Document_UpdateRulersState(0);
+                // this.curState.textObject.textBoxContent.Document_UpdateRulersState(0);
                 break;
             }
             case STATES_ID_GROUP:
@@ -2305,7 +2318,7 @@ CGraphicObjects.prototype =
     documentUpdateInterfaceState: function()
     {
         var flag = false;
-        if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
         {
             flag = true;
         }
@@ -3207,11 +3220,11 @@ CGraphicObjects.prototype =
                 return new CParaPr();
 
             }
-            //case STATES_ID_CHART_TITLE_TEXT:
-            //{
-            //    var parapr = this.curState.title.getParagraphParaPr();
-            //    return parapr ? parapr : new CParaPr();
-            //}
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                var parapr = this.curState.title.getParagraphParaPr();
+                return parapr ? parapr : new CParaPr();
+            }
             default:
             {
                 var result = null;
@@ -3258,11 +3271,11 @@ CGraphicObjects.prototype =
                 }
                 return new CTextPr();
             }
-            //case STATES_ID_CHART_TITLE_TEXT:
-            //{
-            //    var parapr = this.curState.title.getParagraphTextPr();
-            //    return parapr ? parapr : new CTextPr();
-            //}
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                var parapr = this.curState.title.getParagraphTextPr();
+                return parapr ? parapr : new CTextPr();
+            }
             default:
             {
                 var result = null;
@@ -3751,8 +3764,8 @@ CGraphicObjects.prototype =
             var gr_pos = this.getNewGroupPos();
             var near_pos = this.document.Get_NearestPos(this.selectionInfo.selectionArray[0].PageNum, gr_pos.x, gr_pos.y, true, null);
 
-           // if( /*this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false
-         //       && */false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            // if( /*this.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false
+            //       && */false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
             {
                 History.Create_NewPoint();
                 var _selection_objects = this.selectionInfo.selectionArray;
@@ -4074,6 +4087,12 @@ CGraphicObjects.prototype =
                     this.document.Recalculate();
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                if(typeof this.curState.title.cursorMoveLeft === "function")
+                    this.curState.title.cursorMoveLeft(AddToSelect, Word);
+                break;
+            }
         }
     },
 
@@ -4128,6 +4147,12 @@ CGraphicObjects.prototype =
                 }
                 if(b_recalc)
                     this.document.Recalculate();
+                break;
+            }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                if(typeof this.curState.title.cursorMoveRight === "function")
+                    this.curState.title.cursorMoveRight(AddToSelect, Word);
                 break;
             }
         }
@@ -4186,6 +4211,12 @@ CGraphicObjects.prototype =
                     this.document.Recalculate();
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                if(typeof this.curState.title.cursorMoveUp === "function")
+                    this.curState.title.cursorMoveUp(AddToSelect);
+                break;
+            }
         }
     },
 
@@ -4241,6 +4272,12 @@ CGraphicObjects.prototype =
                     this.document.Recalculate();
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                if(typeof this.curState.title.cursorMoveDown === "function")
+                    this.curState.title.cursorMoveDown(AddToSelect);
+                break;
+            }
         }
     },
 
@@ -4261,6 +4298,12 @@ CGraphicObjects.prototype =
             }
             case STATES_ID_GROUP:
             {
+                break;
+            }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                if(typeof this.curState.title.cursorMoveEndOfLine === "function")
+                    this.curState.title.cursorMoveEndOfLine(AddToSelect);
                 break;
             }
             default :
@@ -4414,7 +4457,7 @@ CGraphicObjects.prototype =
             case STATES_ID_GROUP:
             {
                 var group = this.curState.group;
-               // if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : group.parent.Parent, CheckType : changestype_Paragraph_Content} ) )
+                // if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : group.parent.Parent, CheckType : changestype_Paragraph_Content} ) )
                 {
                     History.Add(group, {Type: historyitem_GroupRecalculate});
                     var sel_arr = group.selectionInfo.selectionArray;
@@ -4643,7 +4686,7 @@ CGraphicObjects.prototype =
                     this.curState.updateAnchorPos();
                     this.selectionDraw();
                 }
-               //
+                //
             }
         }
     },
@@ -5284,12 +5327,12 @@ CGraphicObjects.prototype =
             }
         }
         /*else
-        {
-            var page_index = docContent.StartPage;
-            var page = this.graphicPages[page_index];
-            arr = [page.beforeTextObjects, page.inlineObjects, page.wrappingObjects, page.behindDocObjects];
-            tables = page.flowTables;
-        }   */
+         {
+         var page_index = docContent.StartPage;
+         var page = this.graphicPages[page_index];
+         arr = [page.beforeTextObjects, page.inlineObjects, page.wrappingObjects, page.behindDocObjects];
+         tables = page.flowTables;
+         }   */
 
         return false;
     },
@@ -5337,7 +5380,7 @@ CGraphicObjects.prototype =
                         if(isRealObject(group_sel_arr[0])
                             && typeof group_sel_arr[0].hitToAdj === "function")
                         {
-                             var hit_to_adj = group_sel_arr[0].hitToAdj(tx, ty);
+                            var hit_to_adj = group_sel_arr[0].hitToAdj(tx, ty);
                             if(isRealObject(hit_to_adj) && hit_to_adj.hit === true)
                             {
                                 return true;
@@ -5786,6 +5829,7 @@ CGraphicObjects.prototype =
 
     updateSelectionState: function()
     {
+        return;
         if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
             this.curState.textObject.updateSelectionState();
@@ -5921,8 +5965,8 @@ CGraphicObjects.prototype =
     {
         if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
-          //  var check_object = this.curState.id === STATES_ID_TEXT_ADD ? this.curState.textObject : this.curState.group.parent;
-           // if(check_object && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : check_object.Parent, CheckType : changestype_Paragraph_Content} ))
+            //  var check_object = this.curState.id === STATES_ID_TEXT_ADD ? this.curState.textObject : this.curState.group.parent;
+            // if(check_object && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : check_object.Parent, CheckType : changestype_Paragraph_Content} ))
             {
                 this.curState.textObject.addNewParagraph(bRecalculate);
                 this.drawingDocument.OnRecalculatePage(this.curState.textObject.pageIndex, this.document.Pages[this.curState.textObject.pageIndex]);
@@ -6257,7 +6301,7 @@ CGraphicObjects.prototype =
                     for(var sel_index = 0; sel_index < selected_array.length; ++sel_index)
                     {
                         //if(/*false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[sel_index].Parent, CheckType : changestype_Paragraph_Content} )*/)
-                            selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
+                        selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
                     }
 
                     /* this.drawingDocument.OnRecalculatePage(0, this.document.Pages[0]);//TODO:
@@ -6266,7 +6310,7 @@ CGraphicObjects.prototype =
                 else
                 {
                     if(selected_array.length === 1 && typeof selected_array[0].GraphicObj.isShape === "function" && selected_array[0].GraphicObj.isShape()
-                       && !CheckLinePreset(selected_array[0].GraphicObj.getPresetGeom())/* && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[0].Parent, CheckType : changestype_Paragraph_Content} )*/)
+                        && !CheckLinePreset(selected_array[0].GraphicObj.getPresetGeom())/* && false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[0].Parent, CheckType : changestype_Paragraph_Content} )*/)
                     {
                         this.changeCurrentState(new TextAddState(this, selected_array[0]));
                         selected_array[0].paragraphAdd(paraItem, bRecalculate);
@@ -6314,7 +6358,7 @@ CGraphicObjects.prototype =
                             }
                         }
                         if(isRealObject(parent) && isRealObject(parent.Parent)
-                            /*&& false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} )*/)
+                        /*&& false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} )*/)
                         {
                             this.changeCurrentState(new TextAddInGroup(this, selected_array[0], cur_state.group));
                             selected_array[0].paragraphAdd(paraItem, bRecalculate);

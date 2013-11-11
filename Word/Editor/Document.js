@@ -9779,7 +9779,7 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var drawin_objects = this.DrawingObjects;
-            if(drawin_objects.curState.id === STATES_ID_TEXT_ADD || drawin_objects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            if(drawin_objects.curState.id === STATES_ID_TEXT_ADD || drawin_objects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP || drawin_objects.curState.id === STATES_ID_CHART_TITLE_TEXT)
             {
                 this.Interface_Update_DrawingPr();
                 this.DrawingObjects.documentUpdateInterfaceState();

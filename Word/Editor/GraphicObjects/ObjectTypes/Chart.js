@@ -11,7 +11,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-   // this.chart = new asc_CChart();
+    // this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -41,7 +41,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     this.pageIndex = -1;
 
     this.selectedObjects =
-    [];
+        [];
     this.selected = false;
     this.mainGroup = null;
     this.Id = g_oIdCounter.Get_NewId();
@@ -53,10 +53,10 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
 
 CChartAsGroup.prototype =
 {
-	asc_getChart: function()
-	{
-		return this.chart;
-	},
+    asc_getChart: function()
+    {
+        return this.chart;
+    },
 
 
     setAscChart: function(chart)
@@ -81,7 +81,7 @@ CChartAsGroup.prototype =
         this.recalculate();
         this.recalculateTransform();
     },
-	
+
     getArrayWrapPolygons: function()
     {
         if(this.spPr.geometry)
@@ -468,18 +468,18 @@ CChartAsGroup.prototype =
         return OtherProps;
     },
 
-	syncAscChart: function() {
-		
-		if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
-			this.chart.asc_getHeader().asc_setTitle(this.chartTitle.txBody.content.getTextString());
-		}
-		if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
-			this.chart.asc_getYAxis().asc_setTitle(this.vAxisTitle.txBody.content.getTextString());
-		}
-		if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
-			this.chart.asc_getXAxis().asc_setTitle(this.hAxisTitle.txBody.content.getTextString());
-		}
-	},
+    syncAscChart: function() {
+
+        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
+            this.chart.asc_getHeader().asc_setTitle(this.chartTitle.txBody.content.getTextString());
+        }
+        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
+            this.chart.asc_getYAxis().asc_setTitle(this.vAxisTitle.txBody.content.getTextString());
+        }
+        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
+            this.chart.asc_getXAxis().asc_setTitle(this.hAxisTitle.txBody.content.getTextString());
+        }
+    },
 
     setDrawingObjects: function(drawingObjects)
     {
@@ -495,7 +495,7 @@ CChartAsGroup.prototype =
     addToDrawingObjects: function()
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-		this.select(this.drawingObjects.controller);
+        this.select(this.drawingObjects.controller);
         this.drawingObjects.addGraphicObject(this);
     },
 
@@ -519,18 +519,18 @@ CChartAsGroup.prototype =
         xfrm = this.spPr.xfrm;
         if(!isRealObject(this.group))
         {
-        /*    if(isRealObject(this.parent))
-            {
-                var ext = this.parent.Extent;
-                this.absExtX = ext.W;
-                this.absExtY = ext.H;
-            }
-            else
-            {     */
-                //this.absOffsetX = 0;
-                //this.absOffsetY = 0;
-                this.absExtX = xfrm.extX;
-                this.absExtY = xfrm.extY;
+            /*    if(isRealObject(this.parent))
+             {
+             var ext = this.parent.Extent;
+             this.absExtX = ext.W;
+             this.absExtY = ext.H;
+             }
+             else
+             {     */
+            //this.absOffsetX = 0;
+            //this.absOffsetY = 0;
+            this.absExtX = xfrm.extX;
+            this.absExtY = xfrm.extY;
             //}
         }
         else
@@ -608,118 +608,118 @@ CChartAsGroup.prototype =
         this.spPr.xfrm = xfrm;
     },
 
-   /* init: function()
-    {
-        var is_on = History.Is_On();
-        if(is_on)
-            History.TurnOff();
-        if(isRealObject(this.chartTitle))
-        {
-            this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
-            if(this.chartTitle.isEmpty())
-            {
-                var title_str = "Chart Title";
-                this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-                for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+    /* init: function()
+     {
+     var is_on = History.Is_On();
+     if(is_on)
+     History.TurnOff();
+     if(isRealObject(this.chartTitle))
+     {
+     this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
+     if(this.chartTitle.isEmpty())
+     {
+     var title_str = "Chart Title";
+     this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
+     for(var i in title_str)
+     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
 
-            }
-            else
-            {
-                var content = this.chartTitle.txBody.content;
-                content.Parent = this.chartTitle.txBody;
-                content.DrawingDocument = this.drawingDocument;
-                for(var i = 0; i < content.Content.length; ++i)
-                {
-                    content.Content[i].DrawingDocument = this.drawingDocument;
-                    content.Content[i].Parent = content;
-                }
-            }
-            var content2 =  this.chartTitle.txBody.content.Content;
-            for(var i = 0; i < content2.length; ++i)
-            {
-                content2[i].Pr.PStyle = 3;
-            }
-          //  this.chart.header.title = this.chartTitle.txBody.content.getTextString();
-        }
+     }
+     else
+     {
+     var content = this.chartTitle.txBody.content;
+     content.Parent = this.chartTitle.txBody;
+     content.DrawingDocument = this.drawingDocument;
+     for(var i = 0; i < content.Content.length; ++i)
+     {
+     content.Content[i].DrawingDocument = this.drawingDocument;
+     content.Content[i].Parent = content;
+     }
+     }
+     var content2 =  this.chartTitle.txBody.content.Content;
+     for(var i = 0; i < content2.length; ++i)
+     {
+     content2[i].Pr.PStyle = 3;
+     }
+     //  this.chart.header.title = this.chartTitle.txBody.content.getTextString();
+     }
 
-        if(isRealObject(this.hAxisTitle))
-        {
-            this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
-            this.hAxisTitle.drawingObjects = this.drawingObjects;
-            if(this.hAxisTitle.isEmpty())
-            {
-                var title_str = "X Axis";
-                this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-                for(var i in title_str)
-                    this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-            }
-            else
-            {
-                var content = this.hAxisTitle.txBody.content;
-                content.Parent = this.hAxisTitle.txBody;
-                content.DrawingDocument = this.drawingDocument;
-                for(var i = 0; i < content.Content.length; ++i)
-                {
-                    content.Content[i].DrawingDocument = this.drawingDocument;
-                    content.Content[i].Parent = content;
-                }
-            }
-            var content2 =  this.hAxisTitle.txBody.content.Content;
-            for(var i = 0; i < content2.length; ++i)
-            {
-                content2[i].Pr.PStyle = 3;
-            }
+     if(isRealObject(this.hAxisTitle))
+     {
+     this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
+     this.hAxisTitle.drawingObjects = this.drawingObjects;
+     if(this.hAxisTitle.isEmpty())
+     {
+     var title_str = "X Axis";
+     this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+     for(var i in title_str)
+     this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+     }
+     else
+     {
+     var content = this.hAxisTitle.txBody.content;
+     content.Parent = this.hAxisTitle.txBody;
+     content.DrawingDocument = this.drawingDocument;
+     for(var i = 0; i < content.Content.length; ++i)
+     {
+     content.Content[i].DrawingDocument = this.drawingDocument;
+     content.Content[i].Parent = content;
+     }
+     }
+     var content2 =  this.hAxisTitle.txBody.content.Content;
+     for(var i = 0; i < content2.length; ++i)
+     {
+     content2[i].Pr.PStyle = 3;
+     }
 
-          //  this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
-        }
+     //  this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
+     }
 
-        if(isRealObject(this.vAxisTitle))
-        {
-            this.chart.xAxis.title = "";
-            this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
-            this.vAxisTitle.drawingObjects = this.drawingObjects;
-            if(this.vAxisTitle.isEmpty())
-            {
-                var title_str = "Y Axis";
-                this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+     if(isRealObject(this.vAxisTitle))
+     {
+     this.chart.xAxis.title = "";
+     this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
+     this.vAxisTitle.drawingObjects = this.drawingObjects;
+     if(this.vAxisTitle.isEmpty())
+     {
+     var title_str = "Y Axis";
+     this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
 
-                for(var i in title_str)
-                    this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+     for(var i in title_str)
+     this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
 
-                this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
-                this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
-                this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
-            }
-            else
-            {
-                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+     this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
+     this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+     this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
+     }
+     else
+     {
+     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
 
-                var content = this.vAxisTitle.txBody.content;
-                content.Parent = this.vAxisTitle.txBody;
-                content.DrawingDocument = this.drawingDocument;
-                for(var i = 0; i < content.Content.length; ++i)
-                {
-                    content.Content[i].DrawingDocument = this.drawingDocument;
-                    content.Content[i].Parent = content;
-                }
-                content.Set_ApplyToAll(true);
-                content.Set_ParagraphAlign(align_Center);
-                content.Set_ApplyToAll(false);
-            }
-            var content2 =  this.vAxisTitle.txBody.content.Content;
-            for(var i = 0; i < content2.length; ++i)
-            {
-                content2[i].Pr.PStyle = 3;
-            }
-          //  this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
-        }
+     var content = this.vAxisTitle.txBody.content;
+     content.Parent = this.vAxisTitle.txBody;
+     content.DrawingDocument = this.drawingDocument;
+     for(var i = 0; i < content.Content.length; ++i)
+     {
+     content.Content[i].DrawingDocument = this.drawingDocument;
+     content.Content[i].Parent = content;
+     }
+     content.Set_ApplyToAll(true);
+     content.Set_ParagraphAlign(align_Center);
+     content.Set_ApplyToAll(false);
+     }
+     var content2 =  this.vAxisTitle.txBody.content.Content;
+     for(var i = 0; i < content2.length; ++i)
+     {
+     content2[i].Pr.PStyle = 3;
+     }
+     //  this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
+     }
 
-        if(is_on)
-            History.TurnOn();
-        //this.recalculate();
-    },   */
+     if(is_on)
+     History.TurnOn();
+     //this.recalculate();
+     },   */
 
     calculateAfterOpen: function()
     {
@@ -1008,7 +1008,8 @@ CChartAsGroup.prototype =
             var max_title_width = this.absExtX*0.8;
             var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
             this.chartTitle.extX = title_width;
-            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.absExtY, title_width);
+            var bodyPr = this.chartTitle.txBody.getBodyPr();
+            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
             this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
             if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
             {
@@ -1046,7 +1047,8 @@ CChartAsGroup.prototype =
             var max_title_widh = this.absExtX*0.8;
             var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
             this.hAxisTitle.extX = title_width;
-            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.absExtY, title_width);
+            var bodyPr = this.hAxisTitle.txBody.getBodyPr();
+            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
             this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
         }
 
@@ -1177,10 +1179,10 @@ CChartAsGroup.prototype =
         };
 
         /*if ( !this.chart.range.intervalObject )
-            this.drawingObjects.intervalToIntervalObject(this.chart);           */
+         this.drawingObjects.intervalToIntervalObject(this.chart);           */
         if(!(updateImage === false))
         {
-            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
+            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
             this.brush.fill.RasterImageId = "";
             //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
         }
@@ -1223,7 +1225,7 @@ CChartAsGroup.prototype =
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
             if (this.chartTitle.txBody)
                 this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
-           //this.chartTitle.drawingObjects = this.drawingObjects;
+            //this.chartTitle.drawingObjects = this.drawingObjects;
             if(this.chartTitle.isEmpty())
             {
                 var title_str = "Chart Title";
@@ -1317,7 +1319,7 @@ CChartAsGroup.prototype =
             this.chartTitle.txBody.content.Set_ApplyToAll(true);
             this.chartTitle.txBody.content.Set_ParagraphAlign(align_Center);
             this.chartTitle.txBody.content.Set_ApplyToAll(false);
-           // this.chart.header.title = this.chartTitle.txBody.content.getTextString();TODO
+            // this.chart.header.title = this.chartTitle.txBody.content.getTextString();TODO
         }
 
         if(isRealObject(this.hAxisTitle))
@@ -1421,7 +1423,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle.txBody.content.Set_ApplyToAll(true);
             this.hAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
             this.hAxisTitle.txBody.content.Set_ApplyToAll(false);
-           // this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();   TODO
+            // this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();   TODO
         }
 
         if(isRealObject(this.vAxisTitle))

@@ -140,7 +140,8 @@ CChartTitle.prototype =
     {
         if(this.txBody)
         {
-            return this.txBody.content.Get_Paragraph_ParaPr();
+            var ret =  this.txBody.content.Get_Paragraph_ParaPr();
+            ret.PStyle = undefined;
         }
         return null;
     },
@@ -197,11 +198,11 @@ CChartTitle.prototype =
     //recalculate
 
     /*recalculateTransform: function()
-    {
-        this.recalculateAfterTextAdd();
-        this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
-    },*/
+     {
+     this.recalculateAfterTextAdd();
+     this.transform.Reset();
+     global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+     },*/
 
 
     setDefaultText: function(val)
@@ -258,78 +259,17 @@ CChartTitle.prototype =
     {
         if(!isRealObject(this.txBody))
             this.txBody = new CTextBody(this);
-        this.txBody.paragraphAdd(paraItem);
-
-        //var old_cx = this.x + this.extX*0.5;
-        //var old_cy = this.y + this.extY*0.5;
+        this.txBody.paragraphAdd(paraItem,true);
         this.recalculatePosExt();
         this.txBody.recalculateCurPos();
-        return;
-        switch (this.type)
-        {
-            case CHART_TITLE_TYPE_TITLE:
-            case  CHART_TITLE_TYPE_H_AXIS:
-            {
-                var max_title_width = this.chartGroup.absExtX*0.8;
-                var title_width = this.txBody.getRectWidth(max_title_width);
-                this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.extY, title_width);
-
-                this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.absExtX)
-                    this.x = this.chartGroup.absExtX - this.extX;
-                if(this.x < 0)
-                    this.x = 0;
-
-                this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.absExtY)
-                    this.y = this.chartGroup.absExtY - this.extY;
-                if(this.y < 0)
-                    this.y = 0;
-
-                if(isRealObject(this.layout) && isRealNumber(this.layout.x))
-                    this.layout.setX(this.x/this.chartGroup.absExtX);
-
-                break;
-            }
-            case CHART_TITLE_TYPE_V_AXIS:
-            {
-                var max_title_height = this.chartGroup.absExtY*0.8;
-
-                var body_pr = this.txBody.getBodyPr();
-                this.extY = this.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-                this.extX = this.txBody.getRectHeight(this.chartGroup.absExtX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
-                this.spPr.geometry.Recalculate(this.extX, this.extY);
-
-                this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.absExtX)
-                    this.x = this.chartGroup.absExtX - this.extX;
-                if(this.x < 0)
-                    this.x = 0;
-
-                this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.absExtY)
-                    this.y = this.chartGroup.absExtY - this.extY;
-                if(this.y < 0)
-                    this.y = 0;
-
-                if(isRealObject(this.layout) && isRealNumber(this.layout.y))
-                    this.layout.setY(this.y/this.chartGroup.absExtY);
-                break;
-            }
-        }
-
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
-        this.recalculateTransform();
-        this.calculateTransformTextMatrix();
-        return;
-
     },
 
     recalculatePosExt: function()
     {
         var old_cx = this.x + this.extX*0.5;
         var old_cy = this.y + this.extY*0.5;
+
+        var bodyPr = this.txBody.getBodyPr();
         switch (this.type)
         {
             case CHART_TITLE_TYPE_TITLE:
@@ -338,7 +278,7 @@ CChartTitle.prototype =
                 var max_title_width = this.chartGroup.absExtX*0.8;
                 var title_width = this.txBody.getRectWidth(max_title_width);
                 this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.chartGroup.absExtY, title_width);
+                this.extY = this.txBody.getRectHeight(this.chartGroup.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
 
                 this.x = old_cx - this.extX*0.5;
                 if(this.x + this.extX > this.chartGroup.absExtX)
@@ -386,8 +326,8 @@ CChartTitle.prototype =
 
         this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.recalculateTransform();
-        this.calculateTransformTextMatrix();
         this.calculateContent();
+        this.calculateTransformTextMatrix();
     },
 
     updateSelectionState: function(drawingDocument)
@@ -399,6 +339,70 @@ CChartTitle.prototype =
     {
         if(this.txBody)
             this.txBody.recalculateCurPos();
+    },
+
+
+    cursorMoveLeft: function(AddToSelect, Word)
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveLeft(AddToSelect, Word);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+    },
+
+    cursorMoveRight: function(AddToSelect, Word)
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveRight(AddToSelect, Word);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+    },
+
+
+    cursorMoveUp: function(AddToSelect)
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveUp(AddToSelect);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+    },
+
+    cursorMoveDown: function(AddToSelect)
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveDown(AddToSelect);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+    },
+
+    cursorMoveEndOfLine: function(AddToSelect)
+    {
+
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveEndOfLine(AddToSelect);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+
+    },
+
+    cursorMoveStartOfLine: function(AddToSelect)
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            this.txBody.content.Cursor_MoveStartOfLine(AddToSelect);
+            this.recalculateCurPos();
+            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
     },
 
     drawTextSelection: function()
@@ -853,39 +857,39 @@ CChartTitle.prototype =
 
         if (graphics.UncheckUseFonts2 !== undefined)
             graphics.UncheckUseFonts2();
-        
+
         graphics.reset();
         graphics.SetIntegerGrid(true);
 
-       /* graphics.SetIntegerGrid(false);
-        graphics.transform3(this.transform);
-        graphics.p_width(500);
-        graphics._m(0, 0);
-        graphics._l(this.extX, 0);
-        graphics._l(this.extX, this.extY);
-        graphics._l(0, this.extY);
-        graphics._z();
-        graphics.ds();
-        graphics.reset();
-        graphics.SetIntegerGrid(true);     */
+        /* graphics.SetIntegerGrid(false);
+         graphics.transform3(this.transform);
+         graphics.p_width(500);
+         graphics._m(0, 0);
+         graphics._l(this.extX, 0);
+         graphics._l(this.extX, this.extY);
+         graphics._l(0, this.extY);
+         graphics._z();
+         graphics.ds();
+         graphics.reset();
+         graphics.SetIntegerGrid(true);     */
     },
 
 
-   /* selectionSetStart: function(e, x, y, pageIndex)
-    {
-        var t_x, t_y;
-        t_x = this.invertTransformText.TransformPointX(x, y);
-        t_y = this.invertTransformText.TransformPointY(x, y);
-        this.txBody.selectionSetStart(e, t_x, t_y, pageIndex);
-    },
+    /* selectionSetStart: function(e, x, y, pageIndex)
+     {
+     var t_x, t_y;
+     t_x = this.invertTransformText.TransformPointX(x, y);
+     t_y = this.invertTransformText.TransformPointY(x, y);
+     this.txBody.selectionSetStart(e, t_x, t_y, pageIndex);
+     },
 
-    selectionSetEnd: function(e, x, y, pageIndex)
-    {
-        var t_x, t_y;
-        t_x = this.invertTransformText.TransformPointX(x, y);
-        t_y = this.invertTransformText.TransformPointY(x, y);
-        this.txBody.selectionSetEnd(e, t_x, t_y, pageIndex);
-    },*/
+     selectionSetEnd: function(e, x, y, pageIndex)
+     {
+     var t_x, t_y;
+     t_x = this.invertTransformText.TransformPointX(x, y);
+     t_y = this.invertTransformText.TransformPointY(x, y);
+     this.txBody.selectionSetEnd(e, t_x, t_y, pageIndex);
+     },*/
 
     selectionSetStart: function(event, x, y, pageIndex)
     {

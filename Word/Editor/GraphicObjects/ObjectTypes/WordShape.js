@@ -3798,6 +3798,8 @@ WordShape.prototype =
     {
         if(this.textBoxContent && this.transformText)
         {
+            if(!this.hitToTextRect(x, y))
+                return false;
             var t = global_MatrixTransformer.Invert(this.transformText);
             var t_x = t.TransformPointX(x, y);
             var t_y = t.TransformPointY(x, y);
