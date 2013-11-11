@@ -2385,9 +2385,36 @@ function CorrectUniColorEx(asc_color, unicolor) {
             if (ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
 
+            var __mods = g_oThemeColorsDefaultMods;
+
+            var _editor = window["Asc"]["editor"];
+            if (_editor && _editor.wbModel)
+            {
+                var _theme = _editor.wbModel.theme;
+                var _clrMap = _editor.wbModel.clrSchemeMap;
+
+                if (_theme && _clrMap)
+                {
+                    var _schemeClr = new CSchemeColor();
+                    _schemeClr.id = array_colors_types[_id];
+
+                    var _rgba = {R:0, G:0, B:0, A:255};
+                    _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
+
+                    var __r = _schemeClr.RGBA.R;
+                    var __g = _schemeClr.RGBA.G;
+                    var __b = _schemeClr.RGBA.B;
+
+                    if (__r > 200 && __g > 200 && __b > 200)
+                        __mods = g_oThemeColorsDefaultMods1;
+                    else if (__r < 40 && __g < 40 && __b < 40)
+                        __mods = g_oThemeColorsDefaultMods2;
+                }
+            }
+
             if (1 <= _pos && _pos <= 5)
             {
-                var _mods = g_oThemeColorsDefaultMods[_pos - 1];
+                var _mods = __mods[_pos - 1];
                 var _ind = 0;
                 for (var k in _mods)
                 {
