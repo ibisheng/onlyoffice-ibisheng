@@ -1139,8 +1139,8 @@ function BinaryChartWriter(memory)
 				this.memory.WriteString2(TxCache.Tx);
 			}
 		}
-		if(null != seria.Marker)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Marker, function(){oThis.WriteSeriesMarkers(seria.Marker);});
+		if(c_oAscChartType.line == chart.type)
+			this.bs.WriteItem(c_oSer_ChartSeriesType.Marker, function(){oThis.WriteSeriesMarkers({Symbol: EChartSymbol.chartsymbolNone});});
 		if(null != nIndex)
 			this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
 		if(null != seria.bShowValue)
