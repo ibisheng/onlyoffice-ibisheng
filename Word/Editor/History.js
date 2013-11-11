@@ -765,7 +765,7 @@ CHistory.prototype =
             var Class = Point.Items[0].Class;
             var Count = Point.Items.length;
 
-            // Выполняем все действия в прямом порядке
+            // Смотрим, чтобы класс, в котором произошли все изменения был один и тот же
             for ( var Index = 1; Index < Count; Index++ )
             {
                 var Item = Point.Items[Index];
@@ -774,7 +774,7 @@ CHistory.prototype =
                     return null;
             }
 
-            if ( Class instanceof Paragraph)
+            if ( Class instanceof Paragraph && Class.Is_SimpleChanges(Point.Items) )
                 return Class;
         }
 

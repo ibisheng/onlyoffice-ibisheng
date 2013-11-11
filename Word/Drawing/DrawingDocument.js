@@ -5644,7 +5644,7 @@ function CDrawingDocument()
     {
         this.InlineTextTrackEnabled = false;
 
-        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack);
+        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
     }
 }

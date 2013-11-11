@@ -6635,10 +6635,10 @@ CDocumentContent.prototype =
         this.Selection_SetEnd( _X, _Y, PageNum + this.StartPage, _MouseEvent );
     },
 
-    Selection_Check : function( X, Y, Page_Abs )
+    Selection_Check : function( X, Y, Page_Abs, NearPos )
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs );
+            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs, NearPos );
         else //if ( docpostype_Content === this.CurPos.Type )
         {
             if ( true === this.Selection.Use )
@@ -6656,15 +6656,28 @@ CDocumentContent.prototype =
                             End   = this.Selection.StartPos;
                         }
 
-                        var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs );
-                        if ( ContentPos > Start && ContentPos < End )
-                            return true;
-                        else if ( ContentPos < Start || ContentPos > End )
-                            return false;
-                        else
-                            return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs );
+                        if ( undefined !== NearPos )
+                        {
+                            for ( var Index = Start; Index <= End; Index++ )
+                            {
+                                if ( true === this.Content[Index].Selection_Check( 0, 0, 0, NearPos ) )
+                                    return true;
+                            }
 
-                        return false;
+                            return false;
+                        }
+                        else
+                        {
+                            var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs );
+                            if ( ContentPos > Start && ContentPos < End )
+                                return true;
+                            else if ( ContentPos < Start || ContentPos > End )
+                                return false;
+                            else
+                                return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs, NearPos );
+
+                            return false;
+                        }
                     }
                     case selectionflag_Numbering : return false;
                 }

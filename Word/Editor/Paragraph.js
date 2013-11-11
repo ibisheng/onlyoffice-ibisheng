@@ -125,6 +125,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.SpellChecker = new CParaSpellChecker();
 
+    this.NearPosArray = new Array();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -187,7 +189,7 @@ Paragraph.prototype =
         var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0);
 
         // Копируем настройки
-		Para.Set_Pr(this.Pr.Copy());
+	    Para.Set_Pr(this.Pr.Copy());
 
         Para.TextPr.Set_Value( this.TextPr.Value );
 
@@ -403,6 +405,13 @@ Paragraph.prototype =
                 this.SearchResults[CurSearch].EndPos++;
         }
 
+        for ( var Id in this.NearPosArray )
+        {
+            var NearPos = this.NearPosArray[Id];
+            if ( NearPos.ContentPos >= Pos )
+                NearPos.ContentPos++;
+        }
+
         // Передвинем все метки слов для проверки орфографии
         this.SpellChecker.Update_OnAdd( this, Pos, Item );
     },
@@ -425,6 +434,13 @@ Paragraph.prototype =
 
             if ( this.SearchResults[CurSearch].EndPos >= Pos )
                 this.SearchResults[CurSearch].EndPos++;
+        }
+
+        for ( var Id in this.NearPosArray )
+        {
+            var NearPos = this.NearPosArray[Id];
+            if ( NearPos.ContentPos >= Pos )
+                NearPos.ContentPos++;
         }
     },
 
@@ -510,6 +526,13 @@ Paragraph.prototype =
 
             if ( this.SearchResults[CurSearch].EndPos > Pos )
                 this.SearchResults[CurSearch].EndPos--;
+        }
+
+        for ( var Id in this.NearPosArray )
+        {
+            var NearPos = this.NearPosArray[Id];
+            if ( NearPos.ContentPos > Pos )
+                NearPos.ContentPos--;
         }
 
         this.Content.splice( Pos, 1 );
@@ -644,6 +667,16 @@ Paragraph.prototype =
             }
         }
 
+        for ( var Id in this.NearPosArray )
+        {
+            var NearPos = this.NearPosArray[Id];
+
+            if ( NearPos.ContentPos > Pos + Count )
+                NearPos.ContentPos -= Count;
+            else if ( NearPos.ContentPos > Pos )
+                NearPos.ContentPos = Math.max( 0 , Pos );
+        }
+
         this.Content.splice( Pos, Count );
 
         // Комментарии удаляем после, чтобы не нарушить позиции
@@ -707,7 +740,7 @@ Paragraph.prototype =
                 break;
         }
         */
-
+       
         var _ContentPos = ContentPos;
 
         while ( undefined === this.Content[_ContentPos].CurPage )
@@ -3691,6 +3724,9 @@ Paragraph.prototype =
 
     Recalculate_Page : function(_PageIndex)
     {
+        // Сбрасываем массив NearPos
+        this.NearPosArray = new Array();
+
         // Во время пересчета сбрасываем привязку курсора к строке.
         this.CurPos.Line = -1;
 
@@ -3776,6 +3812,11 @@ Paragraph.prototype =
         var RecalcResult = ( recalcresult_NextElement != RecalcResult_2 ? RecalcResult_2 : RecalcResult_1 );
 
         return RecalcResult;
+    },
+
+    Is_SimpleChanges : function(DataArray)
+    {
+        return false;
     },
 
     RecalculateCurPos : function()
@@ -6613,6 +6654,12 @@ Paragraph.prototype =
         this.Set_ContentPos( this.Internal_GetEndPos(), true, -1 );
     },
 
+    Cursor_MoveToNearPos : function(NearPos)
+    {
+        this.Selection.Use = false;
+        this.Set_ContentPos( NearPos.ContentPos, true, -1 );
+    },
+
     Cursor_MoveUp_To_LastRow : function(X, Y, AddToSelect)
     {
         this.CurPos.RealX = X;
@@ -8460,26 +8507,36 @@ Paragraph.prototype =
         }
     },
 
-    Selection_Check : function(X, Y, Page_Abs)
+    Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
-        var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-        if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
-            return false;
-
-        var Start = this.Selection.StartPos;
-        var End   = this.Selection.EndPos;
-
-        if ( Start > End )
+        if ( NearPos !== undefined  )
         {
-            Start = this.Selection.EndPos;
-            End   = this.Selection.StartPos;
+            if ( true === this.Selection.Use && NearPos.Paragraph === this && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos )
+                return true;
+
+            return false;
         }
+        else
+        {
+            var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
+            if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
+                return false;
 
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
-        if ( -1 != ContentPos.Pos && Start <= ContentPos.Pos && End >= ContentPos.Pos )
-            return true;
+            var Start = this.Selection.StartPos;
+            var End   = this.Selection.EndPos;
 
-        return false;
+            if ( Start > End )
+            {
+                Start = this.Selection.EndPos;
+                End   = this.Selection.StartPos;
+            }
+
+            var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
+            if ( -1 != ContentPos.Pos && Start <= ContentPos.Pos && End >= ContentPos.Pos )
+                return true;
+
+            return false;
+        }
     },
 
     Selection_CalculateTextPr : function()
@@ -8641,6 +8698,52 @@ Paragraph.prototype =
     Get_SelectedElementsInfo : function(Info)
     {
         Info.Set_Paragraph( this );
+    },
+
+    Get_SelectedContent : function(DocContent)
+    {
+        if ( true !== this.Selection.Use )
+            return;
+
+        var StartPos = this.Selection.StartPos;
+        var EndPos   = this.Selection.EndPos;
+        if ( StartPos > EndPos )
+        {
+            StartPos = this.Selection.EndPos;
+            EndPos   = this.Selection.StartPos;
+        }
+
+        // Если выделен параграф целиком, тогда просто его копируем
+        if ( StartPos <= 0 && EndPos >= this.Content.length - 2 )
+        {
+            DocContent.Set_Inline( false );
+            DocContent.Add( this.Copy() );
+            return;
+        }
+
+        var Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0);
+
+        // Копируем настройки
+        Para.Set_Pr(this.Pr.Copy());
+        Para.TextPr.Set_Value( this.TextPr.Value );
+        Para.Internal_Content_Remove2(0, Para.Content.length);
+
+        var StartTextPr = this.Internal_GetTextPr( StartPos );
+        Para.Internal_Content_Add( Para.Content.length, new ParaTextPr( StartTextPr ), false );
+
+        // Копируем содержимое параграфа
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item     = this.Content[Pos];
+            var ItemType = Item.Type;
+            if ( true === Item.Is_RealContent() && para_End !== ItemType && para_Empty !== ItemType )
+                Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
+        }
+
+        Para.Internal_Content_Add( Para.Content.length, new ParaEnd(), false );
+        Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
+
+        DocContent.Add( Para );
     },
 
     // Проверяем пустой ли параграф
@@ -10025,6 +10128,11 @@ Paragraph.prototype =
             this.Internal_CorrectAnchorPos( Result, Drawing, PageNum - this.PageNum );
 
         return Result;
+    },
+
+    Check_NearestPos : function(NearPos)
+    {
+        this.NearPosArray.push( NearPos );
     },
 
     Get_Layout : function(ContentPos, Drawing)
@@ -12515,6 +12623,16 @@ Paragraph.prototype =
                 return true;
         }
         return false;
+    },
+
+    Is_SimpleChanges : function(DataArray)
+    {
+        // Здесь мы проверяем можно ли пересчитать только данный параграф
+        var Count = DataArray.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+
+        }
     },
 
 //-----------------------------------------------------------------------------------

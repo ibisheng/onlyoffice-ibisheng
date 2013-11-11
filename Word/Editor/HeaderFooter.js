@@ -959,11 +959,11 @@ CHeaderFooter.prototype =
         return this.Content.Selection_Is_TableBorderMove();
     },
 
-    Selection_Check : function(X, Y, Page_Abs)
+    Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
         var HdrFtrPage = this.Content.Get_StartPage_Absolute();
         if ( HdrFtrPage === Page_Abs  )
-            return this.Content.Selection_Check( X, Y, Page_Abs );
+            return this.Content.Selection_Check( X, Y, Page_Abs, NearPos );
 
         return false;
     },
@@ -2648,10 +2648,10 @@ CHeaderFooterController.prototype =
         return false;
     },
 
-    Selection_Check : function(X, Y, Page_Abs)
+    Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Check( X, Y, Page_Abs );
+            return this.CurHdrFtr.Selection_Check( X, Y, Page_Abs, NearPos );
     },
 
     // Селектим весь параграф

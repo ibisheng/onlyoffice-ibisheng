@@ -1,8 +1,8 @@
 /**
- * User: Ilja.Kirillov
- * Date: 20.12.11
- * Time: 14:36
- */
+* User: Ilja.Kirillov
+* Date: 20.12.11
+* Time: 14:36
+*/
 
 // TODO: При расчете таблиц есть один баг, который надо будет поправить в будущем:
 //       при разбиении строки на страницы возможен вариант, когда у каких-то ячеек
@@ -2725,7 +2725,7 @@ CTable.prototype =
 
                             var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
                             NearestPos.Paragraph.Split( NewParagraph, NearestPos.ContentPos );
-                            NewDocContent.Internal_Content_Add( NewIndex + 1, NewParagraph );
+                            NewDocContent.Internal_Content_Add(NewIndex + 1, NewParagraph);                            
 
                             // Если все происходило в одном классе-документе, тогда проверяем индексы
                             if ( NewDocContent === OldDocContent && NewIndex + 1 <= OldIndex )
@@ -7683,30 +7683,50 @@ CTable.prototype =
 
     },
 
-    Selection_Check : function(X, Y, Page_Abs)
+    Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
-        var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-
-        if ( PageIndex < 0 || PageIndex >= this.Pages.length )
-            return false;
-
-        var CellPos = this.Internal_GetCellByXY( X, Y, PageIndex );
-        if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+        if ( undefined != NearPos  )
         {
-            for (var Index = 0; Index < this.Selection.Data.length; Index++ )
+            if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
             {
-                var CurPos = this.Selection.Data[Index];
-
-                if ( CurPos.Cell === CellPos.Cell && CurPos.Row === CellPos.Row )
-                    return true;
+                for (var Index = 0; Index < this.Selection.Data.length; Index++ )
+                {
+                    var CurPos = this.Selection.Data[Index];
+                    var CurCell = this.Content[CurPos.Row].Get_Cell( CurPos.Cell );
+                    if ( true === CurCell.Content.Selection_Check( 0, 0, 0, NearPos ) )
+                        return true;
+                }
             }
+            else
+                return this.CurCell.Content.Selection_Check( 0, 0, 0, NearPos );
 
             return false;
         }
-        else if ( CellPos.Cell === this.CurCell.Index && CellPos.Row === this.CurCell.Row.Index )
-            return this.CurCell.Content.Selection_Check( X, Y, Page_Abs );
+        else
+        {
+            var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
 
-        return false;
+            if ( PageIndex < 0 || PageIndex >= this.Pages.length )
+                return false;
+
+            var CellPos = this.Internal_GetCellByXY( X, Y, PageIndex );
+            if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+            {
+                for (var Index = 0; Index < this.Selection.Data.length; Index++ )
+                {
+                    var CurPos = this.Selection.Data[Index];
+
+                    if ( CurPos.Cell === CellPos.Cell && CurPos.Row === CellPos.Row )
+                        return true;
+                }
+
+                return false;
+            }
+            else if ( CellPos.Cell === this.CurCell.Index && CellPos.Row === this.CurCell.Row.Index )
+                return this.CurCell.Content.Selection_Check( X, Y, Page_Abs, undefined );
+
+            return false;
+        }
     },
 
     Selection_IsEmpty : function(bCheckHidden)

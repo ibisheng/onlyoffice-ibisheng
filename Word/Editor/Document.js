@@ -62,6 +62,33 @@ var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжи
 
 var StartTime;
 
+function CSelectedContent()
+{
+    this.Inline   = true;
+    this.Elements = new Array();
+}
+
+CSelectedContent.prototype =
+{
+    Reset : function()
+    {
+        this.Inline   = true;
+        this.Elements = new Array();
+    },
+
+    Add : function(Element)
+    {
+        this.Elements.push( Element );
+        if ( Element.length > 1 )
+            this.Inline = false;
+    },
+
+    Set_Inline : function(bValue)
+    {
+        this.Inline = bValue;
+    }
+};
+
 function Document_Recalculate_Page()
 {
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -6958,10 +6985,10 @@ CDocument.prototype =
         var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
 
         // Сначала посмотрим, попалили мы в текстовый селект
-        if ( true === this.Selection_Check( X, Y, this.CurPage, true ) )
+        if ( true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
         {
             // Начинаем передвижение текста
-            //this.DrawingDocument.S
+            this.DrawingDocument.StartTrackText();
         }
         // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
         else if ( true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ) )
@@ -7390,13 +7417,13 @@ CDocument.prototype =
     },
 
     // Проверяем попали ли мы в селект
-    Selection_Check : function(X, Y, Page_Abs)
+    Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Selection_Check( X, Y, Page_Abs );
+            return this.HdrFtr.Selection_Check( X, Y, Page_Abs, NearPos );
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs );
+            return this.DrawingObjects.selectionCheck( X, Y, Page_Abs, NearPos );
         else //if ( docpostype_Content === this.CurPos.Type )
         {
             if ( true === this.Selection.Use )
@@ -7414,15 +7441,28 @@ CDocument.prototype =
                             End   = this.Selection.StartPos;
                         }
 
-                        var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs );
-                        if ( ContentPos > Start && ContentPos < End )
-                            return true;
-                        else if ( ContentPos < Start || ContentPos > End )
-                            return false;
-                        else
-                            return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs );
+                        if ( undefined !== NearPos )
+                        {
+                            for ( var Index = Start; Index <= End; Index++ )
+                            {
+                                if ( true === this.Content[Index].Selection_Check( 0, 0, 0, NearPos ) )
+                                    return true;
+                            }
 
-                        return false;
+                            return false;
+                        }
+                        else
+                        {
+                            var ContentPos = this.Internal_GetContentPosByXY( X, Y, Page_Abs, NearPos );
+                            if ( ContentPos > Start && ContentPos < End )
+                                return true;
+                            else if ( ContentPos < Start || ContentPos > End )
+                                return false;
+                            else
+                                return this.Content[ContentPos].Selection_Check( X, Y, Page_Abs, undefined );
+
+                            return false;
+                        }
                     }
                     case selectionflag_Numbering : return false;
                 }
@@ -7474,9 +7514,189 @@ CDocument.prototype =
         this.Document_UpdateRulersState();
     },
 
-    On_DragTextEnd : function(NearPos)
+    On_DragTextEnd : function(NearPos, bCopy)
     {
+        // Сначала нам надо проверить попадаем ли мы обратно в выделенный текст, если да, тогда ничего не делаем,
+        // а если нет, тогда удаляем выделенный текст и вставляем его в заданное место.
 
+        if ( true === this.Selection_Check( 0, 0, 0, NearPos ) )
+        {
+            // Нам надо снять селект и поставить курсор в то место, где была ближайшая позиция
+            var Paragraph = NearPos.Paragraph;
+            Paragraph.Cursor_MoveToNearPos( NearPos );
+            Paragraph.Document_SetThisElementCurrent();
+
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
+        }
+        else
+        {
+            NearPos.Paragraph.Check_NearestPos( NearPos );
+
+            // Получим копию выделенной части документа, которую надо перенести в новое место, одновременно с этим
+            // удаляем эту выделенную часть (если надо).
+
+            var DocContent = new CSelectedContent();
+            var Para = NearPos.Paragraph;
+            var Elements = DocContent.Elements;
+            Elements.push( Para );
+            if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : Elements, CheckType : changestype_Paragraph_Content } ) )
+            {
+                Elements.splice( Elements.length - 1, 1 );
+
+                History.Create_NewPoint();
+
+                this.Get_SelectedContent( DocContent, true === bCopy ? false : true );
+
+                // Выделение вывствляется внутри функции Insert_Content
+                if ( undefined != Para.Parent  )
+                {
+                    Para.Parent.Insert_Content( DocContent, NearPos );
+
+                    this.Recalculate();
+
+                    this.Document_UpdateSelectionState();
+                    this.Document_UpdateInterfaceState();
+                    this.Document_UpdateRulersState();
+                }
+            }
+        }
+    },
+
+    Get_SelectedContent : function(DocContent, bDelete)
+    {
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+            return this.HdrFtr.Get_SelectedContent(DocContent, bDelete);
+        //else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        //    return this.DrawingObjects.Get_SelectedContent(DocContent, bDelete);
+        else
+        {
+            if ( true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common )
+                return [];
+
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            for ( var Index = StartPos; Index <= EndPos; Index++ )
+            {
+                this.Content[Index].Get_SelectedContent( DocContent );
+            }
+
+            if ( true === bDelete )
+            {
+                this.Remove(1, false, false, false);
+            }
+        }
+    },
+
+    Insert_Content : function(SelectedContent, NearPos)
+    {
+        var DocContent = SelectedContent.Elements;
+
+        var CountDocContent = DocContent.length;
+        if ( CountDocContent <= 0 )
+            return;
+
+        var Para = NearPos.Paragraph;
+        // Сначала найдем номер элемента, начиная с которого мы будем производить вставку
+        var DstIndex = -1;
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            if ( this.Content[Index] === Para )
+            {
+                DstIndex = Index;
+                break;
+            }
+        }
+
+        if ( -1 === DstIndex )
+            return;
+
+        if ( true === SelectedContent.Inline && type_Paragraph === SelectedContent.Elements[0].GetType() )
+        {
+            // Нам нужно в заданный параграф вставить выделенный текст
+            var NewPara = SelectedContent.Elements[0];
+            var ContentPos = NearPos.ContentPos;
+            var NewElementsCount = NewPara.Content.length;
+            var InsertedCount = 0;
+
+            var OldTextPr = Para.Internal_GetTextPr( ContentPos );
+
+            for ( var Index = 0; Index < NewElementsCount; Index++ )
+            {
+                var Item = NewPara.Content[Index];
+                var ItemType = Item.Type;
+                if ( para_Empty !== ItemType && para_End !== ItemType )
+                {
+                    Para.Internal_Content_Add( ContentPos + InsertedCount, Item, false );
+                    InsertedCount++;
+                }
+            }
+
+            Para.Internal_Content_Add( ContentPos + InsertedCount, new ParaTextPr(OldTextPr), false );
+            InsertedCount++;
+
+            Para.Selection.Use      = true;
+            Para.Selection.StartPos = NearPos.ContentPos;
+            Para.Selection.EndPos   = NearPos.ContentPos + InsertedCount;
+
+            this.Selection.Use      = true;
+            this.Selection.StartPos = DstIndex;
+            this.Selection.EndPos   = DstIndex;
+        }
+        else
+        {
+            var bConcat = ( type_Table === DocContent[0].GetType() ? false : true );
+
+            // Нам надо разделить наш параграф в заданной позиции, если позиция в
+            // начале или конце параграфа, тогда делить не надо
+            Para.Cursor_MoveToNearPos( NearPos );
+            if ( true === Para.Cursor_IsEnd() )
+            {
+            }
+            else if ( true === Para.Cursor_IsStart() )
+            {
+                bConcat = false;
+                DstIndex--;
+            }
+            else
+            {
+                // Создаем новый параграф
+                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+                Para.Split( NewParagraph );
+                this.Internal_Content_Add( DstIndex + 1, NewParagraph );
+            }
+
+            var StartIndex = 0;
+            if ( true === bConcat )
+            {
+                Para.Concat( DocContent[0] );
+                StartIndex++;
+
+                Para.Selection.Use = true;
+                Para.Selection.StartPos = NearPos.ContentPos;
+                Para.Selection.EndPos   = Para.Content.length - 1;
+            }
+            else
+                DstIndex++;
+
+            for ( var Index = StartIndex; Index < CountDocContent; Index++ )
+            {
+                this.Internal_Content_Add( DstIndex + StartIndex, DocContent[StartIndex] );
+                this.Content[DstIndex + StartIndex].Select_All();
+            }
+
+            this.Selection.Use      = true;
+            this.Selection.StartPos = DstIndex;
+            this.Selection.EndPos   = DstIndex + CountDocContent - 1;
+        }
     },
 
     Document_SelectNumbering : function(NumPr)
@@ -8600,7 +8820,7 @@ CDocument.prototype =
             }
 
             // Проверяем попалили мы в селект
-            if ( false === this.Selection_Check( X, Y, PageIndex ) )
+            if ( false === this.Selection_Check( X, Y, PageIndex, undefined ) )
             {
                 this.CurPage = PageIndex;
 
