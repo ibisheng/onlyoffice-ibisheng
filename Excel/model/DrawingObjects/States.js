@@ -1516,7 +1516,10 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
     {
         this.chartState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.curState.id !== STATES_ID_CHART_TEXT_ADD || this.drawingObjectsController.curState.textObject !== this.textObject)
+        {
             this.chart.recalculate();
+            this.drawingObjects.showDrawingObjects(true);
+        }
     };
 
     this.onMouseMove = function(e, x, y)

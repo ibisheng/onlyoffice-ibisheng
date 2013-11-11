@@ -367,6 +367,7 @@ CChartAsGroup.prototype =
 					for(var i in title_str)
 						this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 					this.chart.header.title = this.chartTitle.txBody.content.getTextString();
+                    this.chart.header.bDefaultTitle = false;
 				}
 				else
 				{
@@ -397,12 +398,13 @@ CChartAsGroup.prototype =
             {
 				if(this.chart.xAxis && this.chart.xAxis.bDefaultTitle)
 				{
-					var title_str = api.chartTranslate.xAxis;;
+					var title_str = api.chartTranslate.xAxis;
 					this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
 					for(var i in title_str)
 						this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 						
 					this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
+                    this.chart.xAxis.bDefaultTitle = false;
 				}
 				else
 				{
@@ -443,6 +445,7 @@ CChartAsGroup.prototype =
 						this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
 						
 					this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
+                    this.chart.yAxis.bDefaultTitle = false;
 				}
 				else
 				{
@@ -465,7 +468,6 @@ CChartAsGroup.prototype =
 				this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
             }
         }
-
         this.recalculate();
     },
 
@@ -528,7 +530,7 @@ CChartAsGroup.prototype =
 			this.chart.header.title = chart.header.title;
             if(!(isCollaborative === true))
             {
-                if(typeof  this.chart.header.title === "string")
+                if(typeof  this.chart.header.title === "string" && this.chart.header.title.length > 0)
                 {
                     var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
                     var tx_body = new CTextBody(chart_title);
@@ -563,7 +565,7 @@ CChartAsGroup.prototype =
 			this.chart.xAxis.title = chart.xAxis.title;
             if(!(isCollaborative === true))
             {
-                if(typeof  this.chart.xAxis.title === "string" )
+                if(typeof  this.chart.xAxis.title === "string" && this.chart.xAxis.title.length > 0)
                 {
                     var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
                     var tx_body = new CTextBody(chart_title);
@@ -607,11 +609,12 @@ CChartAsGroup.prototype =
 			this.chart.yAxis.title = chart.yAxis.title;
             if(!(isCollaborative === true))
             {
-                if(typeof  this.chart.yAxis.title === "string" )
+                if(typeof  this.chart.yAxis.title === "string" && this.chart.yAxis.title.length > 0)
                 {
 
                     var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
                     var tx_body = new CTextBody(chart_title);
+                    tx_body.setVert(90);
                     var title_str = this.chart.yAxis.title;
                     for(var i in title_str)
                     {
@@ -762,6 +765,7 @@ CChartAsGroup.prototype =
 
             this.addYAxis(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
             this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+            this.vAxisTitle.txBody.setVert(90);
             for(var i in title_string)
                 this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_string[i]), false);
         }
@@ -1121,8 +1125,9 @@ CChartAsGroup.prototype =
         {
             var max_title_width = this.extX*0.8;
             var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
+            var bodyPr = this.chartTitle.txBody.getBodyPr();
             this.chartTitle.extX = title_width;
-            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width);
+            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width - (bodyPr.rIns + bodyPr.lIns));
             this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
             if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
             {
@@ -1161,9 +1166,10 @@ CChartAsGroup.prototype =
         if(isRealObject(this.hAxisTitle))
         {
             var max_title_widh = this.extX*0.8;
+            var bodyPr = this.hAxisTitle.txBody.getBodyPr();
             var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
             this.hAxisTitle.extX = title_width;
-            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width);
+            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width - (bodyPr.rIns + bodyPr.lIns));
             this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
 
         }

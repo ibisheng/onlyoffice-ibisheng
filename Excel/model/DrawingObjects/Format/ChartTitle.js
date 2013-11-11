@@ -689,6 +689,7 @@ CChartTitle.prototype =
     {
         var old_cx = this.x + this.extX*0.5;
         var old_cy = this.y + this.extY*0.5;
+        var  bodyPr = this.txBody.getBodyPr();
         switch (this.type)
         {
             case CHART_TITLE_TYPE_TITLE:
@@ -697,7 +698,7 @@ CChartTitle.prototype =
                 var max_title_width = this.chartGroup.extX*0.8;
                 var title_width = this.txBody.getRectWidth(max_title_width);
                 this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width);
+                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width - (bodyPr.rIns + bodyPr.lIns));
 
                 this.x = old_cx - this.extX*0.5;
                 if(this.x + this.extX > this.chartGroup.extX)
