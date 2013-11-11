@@ -1113,7 +1113,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                     this.drawingObjectsController.clearPreTrackObjects();
                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
-                    this.drawingObjects.OnUpdateOverlay();
+                    this.drawingObjectsController.updateSelectionState();
+                   // this.drawingObjects.OnUpdateOverlay();
                     return;
                 }
             }
@@ -1134,7 +1135,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
                 this.drawingObjectsController.addPreTrackObject(this.chart.createResizeTrack(card_direction));
                 this.drawingObjectsController.changeCurrentState(new PreResizeState(this.drawingObjectsController, this.drawingObjects, this.chart, card_direction));
-                this.drawingObjects.OnUpdateOverlay();
+                this.drawingObjectsController.updateSelectionState();
+                //this.drawingObjects.OnUpdateOverlay();
                 return;
             }
         }
@@ -1150,7 +1152,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
             this.drawingObjectsController.addPreTrackObject(this.chart.createMoveTrack());
             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, this.chart, true, false));
-            this.drawingObjects.OnUpdateOverlay();
+            this.drawingObjectsController.updateSelectionState();
+           // this.drawingObjects.OnUpdateOverlay();
             return;
         }
 
@@ -1177,7 +1180,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                     }
                     this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                    this.drawingObjects.OnUpdateOverlay();
+                    this.drawingObjectsController.updateSelectionState();
+                    //this.drawingObjects.OnUpdateOverlay();
                     return;
                 }
                 else if(hit_in_text_rect)
@@ -1201,7 +1205,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         if(!(e.CtrlKey || e.ShiftKey))
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
-                        this.drawingObjects.OnUpdateOverlay();
+                        this.drawingObjectsController.updateSelectionState();
+                        //this.drawingObjects.OnUpdateOverlay();
                         for(var j = 0; j < selected_objects.length; ++j)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
@@ -1240,7 +1245,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     this.drawingObjectsController.clearPreTrackObjects();
                                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
-                                    this.drawingObjects.OnUpdateOverlay();
+                                    this.drawingObjectsController.updateSelectionState();
+                                    //this.drawingObjects.OnUpdateOverlay();
                                     return;
                                 }
                             }
@@ -1262,7 +1268,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                         this.drawingObjectsController.clearPreTrackObjects();
                                         this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                         this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
-                                        this.drawingObjects.OnUpdateOverlay();
+                                        this.drawingObjectsController.updateSelectionState();
+                                        //this.drawingObjects.OnUpdateOverlay();
                                     }
                                     return;
                                 }
@@ -1277,12 +1284,13 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
-                        this.drawingObjects.OnUpdateOverlay();
                         for(var j = 0; j < selected_objects.length; ++j)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                         }
                         this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
+                        this.drawingObjectsController.updateSelectionState();
+                        //this.drawingObjects.OnUpdateOverlay();
                         return;
                     }
                 }
@@ -1332,7 +1340,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                 this.drawingObjectsController.clearPreTrackObjects();
                                 this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
                                 this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
-                                this.drawingObjects.OnUpdateOverlay();
+                                this.drawingObjectsController.updateSelectionState();
+                                //this.drawingObjects.OnUpdateOverlay();
                                 return;
                             }
                             this.drawingObjectsController.clearPreTrackObjects();
@@ -1341,7 +1350,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                             if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                                 this.drawingObjectsController.resetSelection();
                             cur_drawing.select(this.drawingObjectsController);
-                            this.drawingObjects.OnUpdateOverlay();
+                            this.drawingObjectsController.updateSelectionState();
+                            //this.drawingObjects.OnUpdateOverlay();
                             for(var j = 0; j < selected_objects.length; ++j)
                             {
                                 this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
@@ -1360,7 +1370,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         this.chart.resetSelection(this.drawingObjectsController);
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjectsController.updateSelectionState();
+        //this.drawingObjects.OnUpdateOverlay();
     };
 
     this.onMouseMove = function(e, x, y)
@@ -1578,7 +1589,10 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
     {
         this.chartState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.State.id !== STATES_ID_CHART_TEXT_ADD || this.drawingObjectsController.State.textObject !== this.textObject)
+        {
             this.chart.recalculate();
+            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        }
     };
 
     this.onMouseMove = function(e, x, y)

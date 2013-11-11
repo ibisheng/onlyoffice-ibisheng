@@ -914,13 +914,13 @@ CTextBody.prototype =
             var par = this.content.Content[i];
             for(var j = 0; j < par.Lines.length; ++j)
             {
-                if(par.Lines[j].Ranges[0].W + 1 > max_width)
+                if(par.Lines[j].Ranges[0].W  > max_width)
                 {
-                    max_width = par.Lines[j].Ranges[0].W + 1;
+                    max_width = par.Lines[j].Ranges[0].W;
                 }
             }
         }
-        return max_width + 1 + r_ins + l_ins;
+        return max_width + 2 + r_ins + l_ins;
     },
 
     getRectHeight: function(maxHeight, width)

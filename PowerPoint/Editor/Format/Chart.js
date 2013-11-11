@@ -1164,7 +1164,8 @@ CChartAsGroup.prototype =
                 var max_title_width = this.extX*0.8;
                 var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
                 this.chartTitle.extX = title_width;
-                this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width);
+                var body_pr = this.chartTitle.txBody.getBodyPr();
+                this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width - (body_pr.rIns + body_pr.lIns));
                 this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
                 if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
                 {
@@ -1199,10 +1200,11 @@ CChartAsGroup.prototype =
 
             if(isRealObject(this.hAxisTitle))
             {
-                var max_title_widh = this.extX*0.8;
+                var max_title_width = this.extX*0.8;
+                var body_pr = this.hAxisTitle.txBody.getBodyPr();
                 var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
                 this.hAxisTitle.extX = title_width;
-                this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width);
+                this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width - (body_pr.rIns + body_pr.lIns));
                 this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
             }
 
@@ -1702,6 +1704,19 @@ CChartAsGroup.prototype =
     canMove: function()
     {
         return true;//TODO
+    },
+
+
+    createRotateInGroupTrack: function () {
+        return new RotateTrackShapeImageInGroup(this);
+    },
+
+    createResizeInGroupTrack: function (cardDirection) {
+        return new ResizeTrackShapeImageInGroup(this, cardDirection);
+    },
+
+    createMoveInGroupTrack: function () {
+        return new MoveShapeImageTrackInGroup(this);
     },
 
     createMoveTrack: function()
@@ -2500,6 +2515,16 @@ CChartAsGroup.prototype =
             {
                 w.WriteDouble(data.newOffsetX);
                 w.WriteDouble(data.newOffsetY);
+                w.WriteBool(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument));
+                if(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument))
+                {
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
+                }
                 break;
             }
 
@@ -2507,6 +2532,16 @@ CChartAsGroup.prototype =
             {
                 w.WriteDouble(data.newExtentX);
                 w.WriteDouble(data.newExtentY);
+                w.WriteBool(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument));
+                if(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument))
+                {
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
+                }
                 break;
             }
             case historyitem_SetShapeFlips:
@@ -2614,6 +2649,20 @@ CChartAsGroup.prototype =
                 {
                     this.spPr.xfrm.offX = r.GetDouble();
                     this.spPr.xfrm.offY = r.GetDouble();
+                    if(r.GetBool())
+                    {
+                        var p_width = r.GetDouble();
+                        var p_height = r.GetDouble();
+                        if(isRealObject(editor)
+                            && isRealObject(editor.WordControl)
+                            && isRealObject(editor.WordControl.m_oLogicDocument))
+                        {
+                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
+                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
+                            this.spPr.xfrm.offX*=kw;
+                            this.spPr.xfrm.offY*=kh;
+                        }
+                    }
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     break;
@@ -2623,6 +2672,20 @@ CChartAsGroup.prototype =
                 {
                     this.spPr.xfrm.extX = r.GetDouble();
                     this.spPr.xfrm.extY = r.GetDouble();
+                    if(r.GetBool())
+                    {
+                        var p_width = r.GetDouble();
+                        var p_height = r.GetDouble();
+                        if(isRealObject(editor)
+                            && isRealObject(editor.WordControl)
+                            && isRealObject(editor.WordControl.m_oLogicDocument))
+                        {
+                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
+                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
+                            this.spPr.xfrm.extX*=kw;
+                            this.spPr.xfrm.extY*=kh;
+                        }
+                    }
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;

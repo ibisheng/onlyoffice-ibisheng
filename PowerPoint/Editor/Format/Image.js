@@ -1431,6 +1431,16 @@ CImageShape.prototype =
             {
                 w.WriteDouble(data.newOffsetX);
                 w.WriteDouble(data.newOffsetY);
+                w.WriteBool(isRealObject(editor)
+                && isRealObject(editor.WordControl)
+                && isRealObject(editor.WordControl.m_oLogicDocument));
+                if(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument))
+                {
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
+                }
                 break;
             }
 
@@ -1438,6 +1448,16 @@ CImageShape.prototype =
             {
                 w.WriteDouble(data.newExtentX);
                 w.WriteDouble(data.newExtentY);
+                w.WriteBool(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument));
+                if(isRealObject(editor)
+                    && isRealObject(editor.WordControl)
+                    && isRealObject(editor.WordControl.m_oLogicDocument))
+                {
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
+                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
+                }
                 break;
             }
             case historyitem_SetShapeFlips:
@@ -1538,6 +1558,20 @@ CImageShape.prototype =
                 {
                     this.spPr.xfrm.offX = r.GetDouble();
                     this.spPr.xfrm.offY = r.GetDouble();
+                    if(r.GetBool())
+                    {
+                        var p_width = r.GetDouble();
+                        var p_height = r.GetDouble();
+                        if(isRealObject(editor)
+                            && isRealObject(editor.WordControl)
+                            && isRealObject(editor.WordControl.m_oLogicDocument))
+                        {
+                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
+                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
+                            this.spPr.xfrm.offX*=kw;
+                            this.spPr.xfrm.offY*=kh;
+                        }
+                    }
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     break;
@@ -1547,6 +1581,20 @@ CImageShape.prototype =
                 {
                     this.spPr.xfrm.extX = r.GetDouble();
                     this.spPr.xfrm.extY = r.GetDouble();
+                    if(r.GetBool())
+                    {
+                        var p_width = r.GetDouble();
+                        var p_height = r.GetDouble();
+                        if(isRealObject(editor)
+                            && isRealObject(editor.WordControl)
+                            && isRealObject(editor.WordControl.m_oLogicDocument))
+                        {
+                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
+                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
+                            this.spPr.xfrm.extX*=kw;
+                            this.spPr.xfrm.extY*=kh;
+                        }
+                    }
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;

@@ -644,6 +644,18 @@ CHistory.prototype =
             Class.Add_ContentChanges( ContentChanges );
             CollaborativeEditing.Add_NewDC( Class );
         }
+
+        //switch(Data.Type)
+        //{
+        //    case historyitem_SetShapeOffset:
+        //    case historyitem_SetShapeExtents:
+        //    case historyitem_SetShapeChildOffset:
+        //    case historyitem_SetShapeChildExtents:
+        //    {
+        //        CollaborativeEditing.AddPosExtChanges(Item);
+        //        break;
+        //    }
+        //}
     },
 
     Internal_RecalcData_Clear : function()

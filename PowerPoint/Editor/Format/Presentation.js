@@ -6784,7 +6784,8 @@ CPresentation.prototype =
                 {
                     History.TurnOff();
                 }
-
+                CollaborativeEditing.ScaleX = kw;
+                CollaborativeEditing.ScaleY = kh;
                 for(var i = 0; i < this.slideMasters.length; ++i)
                 {
                     this.slideMasters[i].changeSize(kw, kh);

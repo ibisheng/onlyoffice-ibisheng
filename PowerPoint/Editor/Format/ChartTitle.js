@@ -96,6 +96,23 @@ CChartTitle.prototype =
         return this.chartGroup.getParentObjects();
     },
 
+
+    updateInterfaceTextState: function () {
+        var _b_no_change_indent;
+
+        _b_no_change_indent = false;
+        if (this.txBody !== null && typeof this.txBody === "object") {
+            if (this.txBody.content !== null && typeof this.txBody.content === "object") {
+                var _content = this.txBody.content;
+                if (typeof _content.Document_UpdateInterfaceState === "function") {
+                    _content.Document_UpdateInterfaceState();
+                }
+            }
+        }
+        editor.asc_fireCallback("asc_canIncreaseIndent", false);
+        editor.asc_fireCallback("asc_canDecreaseIndent", false);
+    },
+
     isPlaceholder: function()
     {
         return false;

@@ -490,7 +490,15 @@ function CCollaborativeEditing()
 
     this.m_aChangedClasses = {}; // Массив(ассоциативный) классов, в которых есть изменения выделенные цветом
 
+    this.PosExtChanges = [];
+    this.ScaleX = null;
+    this.ScaleY = null;
+
+    this.dSzX = 1;
+    this.dSzY = 1;
+
     this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
+
 
     var oThis = this;
 
@@ -628,7 +636,7 @@ function CCollaborativeEditing()
 
         // Пересчитываем позиции
        this.Refresh_DCChanges();
-
+       this.RefreshPosExtChanges();
         // Генерируем свои изменения (ненужные точки предварительно удаляем)
         History.Clear_Redo();
         var aChanges = new Array();
@@ -1083,6 +1091,65 @@ function CCollaborativeEditing()
 
         this.Clear_DCChanges();
     };
+
+    this.AddPosExtChanges = function(Item)
+    {
+        this.PosExtChanges.push(Item);
+    };
+
+    this.RefreshPosExtChanges = function()
+    {
+       if(this.ScaleX !== null && this.ScaleY !== null)
+       {
+           var Binary_Writer = History.BinaryWriter;
+           for(var i = 0; i < this.PosExtChanges.length; ++i)
+           {
+
+               var changes = this.PosExtChanges[i];
+               var data = changes.Data;
+               var valueX = null, valueY = null;
+               switch(data.Type)
+               {
+                   case historyitem_SetShapeOffset:
+                   case historyitem_SetShapeChildOffset:
+                   {
+                       valueX = data.newOffsetX;
+                       valueY = data.newOffsetY;
+                       break;
+                   }
+                   case historyitem_SetShapeExtents:
+                   case historyitem_SetShapeChildExtents:
+                   {
+                       valueX = data.newExtentX;
+                       valueY = data.newExtentY;
+                       break;
+                   }
+               }
+               if(valueX !== null && valueY !== null)
+               {
+                   var Binary_Pos = Binary_Writer.GetCurPosition();
+                   if(changes.Class instanceof CGraphicFrame)
+                   {
+                       Binary_Writer.WriteLong(historyitem_type_GraphicFrame);
+                   }
+                   else
+                   {
+                       Binary_Writer.WriteLong(historyitem_type_Shape);
+                   }
+                   Binary_Writer.WriteLong(data.Type);
+                   Binary_Writer.WriteDouble(valueX*this.ScaleX);
+                   Binary_Writer.WriteDouble(valueY*this.ScaleY);
+                   var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
+                   changes.Binary.Pos = Binary_Pos;
+                   changes.Binary.Len = Binary_Len;
+               }
+           }
+       }
+        this.PosExtChanges.length = 0;
+        this.ScaleX = null;
+        this.ScaleY = null;
+    };
+
 //-----------------------------------------------------------------------------------
 // Функции для работы с отметками изменений
 //-----------------------------------------------------------------------------------

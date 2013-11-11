@@ -814,6 +814,8 @@ CGraphicObjects.prototype = {
             case STATES_ID_GROUP:
             case STATES_ID_TEXT_ADD_IN_GROUP:
                 // case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+            case STATES_ID_CHART:
             {
                 if(this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
                 {
@@ -1063,7 +1065,7 @@ CGraphicObjects.prototype = {
         }
 
         editor.sync_slidePropCallback(this.slide);
-        if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP || this.State.id === STATES_ID_CHART_TEXT_ADD)
         {
 
             if(image_props !== null)
