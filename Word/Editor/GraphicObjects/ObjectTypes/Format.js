@@ -727,6 +727,19 @@ function CRGBColor()
 
 CRGBColor.prototype =
 {
+    writeToBinaryLong: function(w)
+    {
+        w.WriteLong(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
+    },
+
+    readFromBinaryLong: function(r)
+    {
+        var RGB = r.GetLong();
+        this.RGBA.R = (RGB >> 16) & 0xFF;
+        this.RGBA.G = (RGB >> 8) & 0xFF;
+        this.RGBA.B = RGB & 0xFF;
+    },
+
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
