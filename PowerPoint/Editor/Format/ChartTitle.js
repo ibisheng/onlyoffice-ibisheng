@@ -239,196 +239,15 @@ CChartTitle.prototype =
         if(!isRealObject(this.txBody))
             this.txBody = new CTextBody(this);
         this.txBody.content.Paragraph_Add(paraItem, false);
-       // this.txBody.content.RecalculateCurPos();
-
         this.recalculatePosExt();
         this.txBody.content.RecalculateCurPos();
-        return;
-        this.txBody.recalculateCurPos();
-        var old_cx = this.x + this.extX*0.5;
-        var old_cy = this.y + this.extY*0.5;
-        switch (this.type)
-        {
-            case CHART_TITLE_TYPE_TITLE:
-            case  CHART_TITLE_TYPE_H_AXIS:
-            {
-                var max_title_width = this.chartGroup.extX*0.8;
-                var title_width = this.txBody.getRectWidth(max_title_width);
-                this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.extY, title_width);
-
-                this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.extX)
-                    this.x = this.chartGroup.extX - this.extX;
-                if(this.x < 0)
-                    this.x = 0;
-
-                this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.extY)
-                    this.y = this.chartGroup.extY - this.extY;
-                if(this.y < 0)
-                    this.y = 0;
-
-                if(isRealObject(this.layout) && isRealNumber(this.layout.x))
-                    this.layout.setX(this.x/this.chartGroup.extX);
-
-                break;
-            }
-            case CHART_TITLE_TYPE_V_AXIS:
-            {
-                var max_title_height = this.chartGroup.extY*0.8;
-
-                var body_pr = this.txBody.getBodyPr();
-                this.extY = this.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-                this.extX = this.txBody.getRectHeight(this.chartGroup.extX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
-                this.spPr.geometry.Recalculate(this.extX, this.extY);
-
-                this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.extX)
-                    this.x = this.chartGroup.extX - this.extX;
-                if(this.x < 0)
-                    this.x = 0;
-
-                this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.extY)
-                    this.y = this.chartGroup.extY - this.extY;
-                if(this.y < 0)
-                    this.y = 0;
-
-                if(isRealObject(this.layout) && isRealNumber(this.layout.y))
-                    this.layout.setY(this.y/this.chartGroup.extY);
-                break;
-            }
-        }
-
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
-        this.recalculateTransform();
-        this.calculateTransformTextMatrix();
-
-        return;
-
-        var title = this;
-        var tx_body = title.txBody;
-        var body_pr = tx_body.bodyPr;
-
-       /* body_pr.rIns = 0.3;
-        body_pr.lIns = 0.3;
-        body_pr.tIns = 0.3;
-        body_pr.bIns = 0;     */
-
-       /* var paragraphs = tx_body.content.Content;
-        tx_body.content.DrawingDocument = this.drawingObjects.drawingDocument;
-        for(var i = 0; i < paragraphs.length; ++i)
-        {
-            paragraphs[i].DrawingDocument = this.drawingObjects.drawingDocument;
-            paragraphs[i].Pr.Jc = align_Center;
-            paragraphs[i].Pr.Spacing.After = 0;
-            paragraphs[i].Pr.Spacing.Before = 0;
-        }
-        paragraphs[0].Pr.Spacing.Before = 0.75;     */
-
-        var title_height, title_width;
-      //  if(!(isRealObject(title.layout) && title.layout.isManual))
-        {
-            var max_content_width = this.chartGroup.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-            tx_body.content.Reset(0, 0, max_content_width, 20000);
-            tx_body.content.Recalculate_Page(0, true);
-            var result_width;
-            if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-            {
-                if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                {
-                    tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                    tx_body.content.Recalculate_Page(0, true);
-                }
-                result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-            }
-            else
-            {
-                var width = 0;
-                for(var i = 0; i < tx_body.content.Content.length; ++i)
-                {
-                    var par = tx_body.content.Content[i];
-                    for(var j = 0; j < par.Lines.length; ++j)
-                    {
-                        if(par.Lines[j].Ranges[0].W > width)
-                            width = par.Lines[j].Ranges[0].W;
-                    }
-                }
-                result_width = width + body_pr.rIns + body_pr.lIns;
-            }
-            this.extX = result_width;
-            this.extY = tx_body.content.Get_SummaryHeight();
-            this.x = (this.chartGroup.extX - this.extX)*0.5;
-            this.y = this.drawingObjects.convertMetric(7, 0, 3);
-            this.transform.Reset();
-            global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
-            global_MatrixTransformer.MultiplyAppend(this.transform, this.chartGroup.transform);
-
-            this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-            this.calculateTransformTextMatrix();
-
-            title_width = this.extX;
-            title_height = this.y + this.extY;
-
-        }
-      /*  else
-        {
-            var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-            tx_body.content.Reset(0, 0, max_content_width, 20000);
-            tx_body.content.Recalculate_Page(0, true);
-            var result_width;
-            if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-            {
-                if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                {
-                    tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                    tx_body.content.Recalculate_Page(0, true);
-                }
-                result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-            }
-            else
-            {
-                var width = 0;
-                for(var i = 0; i < tx_body.content.Content.length; ++i)
-                {
-                    var par = tx_body.content.Content[i];
-                    for(var j = 0; j < par.Lines.length; ++j)
-                    {
-                        if(par.Lines[j].Ranges[0].W > width)
-                            width = par.Lines[j].Ranges[0].W;
-                    }
-                }
-                result_width = width + body_pr.rIns + body_pr.lIns;
-            }
-            this.chartTitle.extX = result_width;
-            this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-
-            if(this.chartTitle.layout.xMode === LAYOUT_MODE_EDGE)
-                this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-            else
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-
-            if(this.chartTitle.layout.yMode === LAYOUT_MODE_EDGE)
-                this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-            else
-                this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-
-            this.chartTitle.transform.Reset();
-            global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-            global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-            this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-            this.chartTitle.calculateTransformTextMatrix();
-
-            title_width = this.chartTitle.extX;
-            title_height =  this.drawingObjects.convertMetric(7, 0, 3) + this.chartTitle.extY;
-        } */
     },
 
     recalculatePosExt: function()
     {
         var old_cx = this.x + this.extX*0.5;
         var old_cy = this.y + this.extY*0.5;
+        var body_pr = this.txBody.getBodyPr();
         switch (this.type)
         {
             case CHART_TITLE_TYPE_TITLE:
@@ -437,7 +256,7 @@ CChartTitle.prototype =
                 var max_title_width = this.chartGroup.extX*0.8;
                 var title_width = this.txBody.getRectWidth(max_title_width);
                 this.extX = title_width;
-                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width);
+                this.extY = this.txBody.getRectHeight(this.chartGroup.extY, title_width - (body_pr.rIns + body_pr.lIns));
 
                 this.x = old_cx - this.extX*0.5;
                 if(this.x + this.extX > this.chartGroup.extX)
@@ -460,7 +279,6 @@ CChartTitle.prototype =
             {
                 var max_title_height = this.chartGroup.extY*0.8;
 
-                var body_pr = this.txBody.getBodyPr();
                 this.extY = this.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
                 this.extX = this.txBody.getRectHeight(this.chartGroup.extX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
                 this.spPr.geometry.Recalculate(this.extX, this.extY);

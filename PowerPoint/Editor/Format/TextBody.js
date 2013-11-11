@@ -468,7 +468,7 @@ CTextBody.prototype =
                 var EndPos = 0;
                 for(var key = 0 ; key <  text.length; ++key)
                 {
-                    par.Internal_Content_Add( EndPos++, new ParaText(text[key]));
+                    par.Internal_Content_Add( EndPos++, CreateParaContentFromString(text[key]));
                 }
                 if(this.content && this.content.Content[0] )
                 {
@@ -934,3 +934,23 @@ CTextBody.prototype =
         return content_height + t_ins + b_ins;
     }
 };
+
+function CreateParaContentFromString(str)
+{
+    if (str == '\t')
+    {
+        return new ParaTab();
+    }
+    else if (str == '\n')
+    {
+        return new ParaNewLine( break_Line );
+    }
+    else if (str != ' ')
+    {
+        return new ParaText(str);
+    }
+    else
+    {
+        return new ParaSpace(1);
+    }
+}
