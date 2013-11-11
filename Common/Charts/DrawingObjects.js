@@ -4463,6 +4463,7 @@ function DrawingObjects() {
 	
 		if ( _this.controller.canGroup() ) {
             _this.controller.createGroup(null);
+			worksheet.setSelectionShape(true);
 		}
 	}
 	
@@ -4470,6 +4471,7 @@ function DrawingObjects() {
 	
 		if ( _this.controller.canUnGroup() ) {
 			_this.controller.unGroup();
+			worksheet.setSelectionShape(true);
 			api.isStartAddShape = false;
 		}
 	}
