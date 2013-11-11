@@ -12,13 +12,16 @@
 		<link rel="stylesheet" type="text/css" href="menu/styles/MenuStyle.css" />
 		<link rel="stylesheet" type="text/css" href="menu/styles/clickmenu.css" />
 		<link rel="stylesheet" type="text/css" href="menu/styles/docStyles.css" />
-		<link rel="stylesheet" type="text/css" href="menu/js/jquery-ui.css"/>
+		<link rel="stylesheet" type="text/css" href="menu/js/jquery-ui.css"/> 
 		<link rel="stylesheet" type="text/css" href="menu/styles/jquery-custom.css" />
 		<link rel="stylesheet" type="text/css" href="menu/js/ui.spinner.css" />
 		<script type="text/javascript" src="menu/js/jquery-1.6.1.min.js"></script>
 		<script type="text/javascript" src="menu/js/jquery.clickmenu.js"></script>
 		<script type="text/javascript" src="menu/js/jquery-ui-1.8.13.custom.min.js"></script>
 		<script type="text/javascript" src="menu/js/ui.spinner.min.js"></script>
+		
+		<script type="text/javascript" src="../Common/browser.js"></script>
+		
 		<script src="../Common/downloaderfiles.js"></script>
 		<script src="../Common/docscoapisettings.js"></script>
 		<script src="../Common/docscoapicommon.js"></script>
@@ -34,6 +37,8 @@
 		<script type="text/javascript" src="../Common/CommonDefines.js"></script>
 		<script type="text/javascript" src="../Common/NumFormat.js"></script>
 		<script type="text/javascript" src="../Common/editorscommon.js"></script>
+		
+		<script type="text/javascript" src="../Common/trackFile.js"></script>
 
 		<!-- For chart editor -->
 		<script type="text/javascript" src="../Excel/apiDefines.js"></script>
@@ -41,12 +46,8 @@
 		<script type="text/javascript" src="../Common/Charts/charts.js"></script>
 		<script type="text/javascript" src="../Common/SerializeCommonWordExcel.js"></script>
 		<script src="../Common/Charts/libraries/OfficeExcel.common.core.js"></script>
-		<script src="../Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
-		<script src="../Common/Charts/libraries/OfficeExcel.common.context.js"></script>
-		<script src="../Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
 		<script src="../Common/Charts/libraries/OfficeExcel.common.key.js"></script>
-		<script src="../Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
-		<script src="../Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+		<script src="../Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
 		<script src="../Common/Charts/libraries/OfficeExcel.bar.js"></script>
 		<script src="../Common/Charts/libraries/OfficeExcel.hbar.js"></script>
 		<script src="../Common/Charts/libraries/OfficeExcel.line.js"></script>
@@ -77,37 +78,20 @@
 
         <script src="../Common/FontsFreeType/FontFile.js"></script>
         <script src="../Common/FontsFreeType/FontManager.js"></script>
-
+		
 		<script src="../Common/apiCommon.js"></script>
-
+		
         <script src="Drawing/Externals.js"></script>
         <script src="Drawing/AllFonts.js"></script>
         <!--<script src="Drawing/GlobalLoaders.js"></script>-->
 
         <!---->
         <script src="Math/docfiles/GlobalLoaders.js"></script>
-        <!--<script type="text/javascript" src="Math/docfiles/main_menu.js"></script>-->
         <script type="text/javascript" src="Math/docfiles/Document.js"></script>
         <script type="text/javascript" src="Math/drawingBracket.js"></script>
-        <!--<script type="text/javascript" src="Math/docfiles/DrawingDocument.js"></script>-->
         <!---->
 
         <script type="text/javascript" src="Drawing/translations.js"></script>
-        <script type="text/javascript" src="Drawing/Graphics.js"></script>
-        <script type="text/javascript" src="Drawing/ArcTo.js"></script>
-        <script type="text/javascript" src="Drawing/Hit.js"></script>
-        <script type="text/javascript" src="Drawing/ColorArray.js"></script>
-        <script type="text/javascript" src="Drawing/Overlay.js"></script>
-        <script type="text/javascript" src="Drawing/ShapeDrawer.js"></script>
-        <script type="text/javascript" src="Drawing/Metafile.js"></script>
-        <script type="text/javascript" src="Drawing/DrawingDocument.js"></script>
-        <script type="text/javascript" src="Drawing/GraphicsEvents.js"></script>
-        <script type="text/javascript" src="Drawing/scrolls/iscroll.js"></script>
-        <script type="text/javascript" src="Drawing/WorkEvents.js"></script>
-        <script type="text/javascript" src="Drawing/Controls.js"></script>
-        <script type="text/javascript" src="Drawing/Rulers.js"></script>
-        <script type="text/javascript" src="Drawing/HtmlPage.js"></script>
-        <script type="text/javascript" src="Drawing/documentrenderer.js"></script>
 
         <script type="text/javascript" src="Editor/GraphicObjects/GraphicObjects.js"></script>
         <script type="text/javascript" src="Editor/GraphicObjects/GraphicPage.js"></script>
@@ -128,7 +112,13 @@
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/GroupTracks.js"></script>
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/Path.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/Chart.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartLayout.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartLegend.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartTitle.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/TextBody.js"></script>
 
+        <script type="text/javascript" src="Drawing/Metafile.js"></script>
         <script type="text/javascript" src="Editor/CollaborativeEditing.js"></script>
         <script type="text/javascript" src="Editor/Comments.js"></script>
         <script type="text/javascript" src="Editor/History.js"></script>
@@ -150,16 +140,32 @@
         <script type="text/javascript" src="Editor/FontClassification.js"></script>
         <script type="text/javascript" src="Editor/Spelling.js"></script>
 
-
+		<script type="text/javascript" src="Drawing/HatchPattern.js"></script>
+        <script type="text/javascript" src="Drawing/Graphics.js"></script>
+        <script type="text/javascript" src="Drawing/ArcTo.js"></script>
+        <script type="text/javascript" src="Drawing/Hit.js"></script>
+        <script type="text/javascript" src="Drawing/ColorArray.js"></script>
+        <script type="text/javascript" src="Drawing/Overlay.js"></script>
+        <script type="text/javascript" src="Drawing/ShapeDrawer.js"></script>
+        <script type="text/javascript" src="Drawing/DrawingDocument.js"></script>
+        <script type="text/javascript" src="Drawing/GraphicsEvents.js"></script>
+        <script type="text/javascript" src="Drawing/scrolls/iscroll.js"></script>
+        <script type="text/javascript" src="Drawing/WorkEvents.js"></script>
+        <script type="text/javascript" src="Drawing/Controls.js"></script>
+        <script type="text/javascript" src="Drawing/Rulers.js"></script>
+        <script type="text/javascript" src="Drawing/HtmlPage.js"></script>
+        <script type="text/javascript" src="Drawing/documentrenderer.js"></script>
 		<script type="text/javascript" src="apiDefines.js"></script>
         <script type="text/javascript" src="apiCommon.js"></script>
-		<script type="text/javascript" src="document/empty.js"></script>
 		<!--<script type="text/javascript" src="api.js"></script>-->
+		<script type="text/javascript" src="document/empty.js"></script>
         <script type="text/javascript" src="../Common/scroll.js"></script>
 
         <!---->
         <script type="text/javascript" src="Math/docfiles/api.js"></script>
         <!---->
+
+		<script type="text/javascript" src="Editor/CollaborativeEditing.js"></script>
 
         <script type="text/javascript" src="../Common/Shapes/EditorSettings.js"></script>
         <script type="text/javascript" src="../Common/Shapes/Serialize.js"></script>
@@ -192,10 +198,11 @@
         <script type="text/javascript" src = "Math/drawingUnion.js"></script>
         <script type="text/javascript" src = "Math/borderBox.js"></script>
 
+        <!---->
 
 		<!--for charts-->
 		<script type="text/javascript" src="../Excel/graphics/DrawingContextWord.js"></script>
-
+		
     </head>
     <body id="id_body" class="block_elem" style="-moz-user-select:none;-khtml-user-select:none;user-select:none;width:100%;height:100%;background-color:#B0B0B0;overflow:hidden;position:fixed;" UNSELECTABLE="on">
 		<div id="id_menu" class="block_elem" style="width:100%;height:21mm;background-color:#F4F5F6;">
@@ -204,7 +211,7 @@
 				<td id="logo" class="logo" > <img src ='menu/img/tmdocs_logo.png'/></td>
 				<td id="header" colspan="2">
 					<div id="id_doc_info" class="block_elem" style="font-family:Arial;font-size:10pt;color:#fff;">
-
+					
 						<div id="id_info" class="block_elem" style="font-family:Arial;font-size:10pt;color:#fff;width:861px;"></div>
 						<div id="id_doc_info_spinner" class="block_elem" style="font-family:Arial;font-size:10pt;right:0;color:#fff;"></div>
 					</div>
@@ -229,15 +236,15 @@
 							SaveAs
 							<span class="MenuArrow">&#9658;</span>
 							<ul>
-							<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li>
-							<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li>
-							<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li>
-							<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li>
-							<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li>
-							<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li>
-							<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li>
-							<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li>
-							</ul>
+							<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li> 
+							<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li> 
+							<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li> 
+							<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li> 
+							<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li> 
+							<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li> 
+							<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li> 
+							<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li> 
+							</ul> 
 						</li>
 						<li id ="saveAsFile" class="SubItem" style="display:none;">
 							<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
@@ -298,7 +305,7 @@
 								<p class="MenubarIcon MenubarFindReplace">&nbsp;</p>
 								FindAndReplace
 							</li>
-						</ul>
+						</ul> 
 					</li>
 					<li class="item">Insert
 						<ul class="margin_top_10">
@@ -334,7 +341,7 @@
 								<p class="MenubarIcon MenubarTable">&nbsp;</p>
 								Table
 							</li>
-						</ul>
+						</ul> 
 					</li>
 					<li class="item">Format
 						<ul class="margin_top_10">
@@ -616,7 +623,7 @@
 			<td id="menuButtonHolder" style="vertical-align:middle;">
 				<ul id="menuButton" style="width:108px;">
 					<li class="item main" style="margin-left: 22px;width:50px;">
-
+					
 						<span>Menu</span>
 						<ul class="positionmenubatton">
 							<li id ="mnuOpenFile" class="SubItem" style="display:none;">
@@ -633,15 +640,15 @@
 								SaveAs
 								<span class="MenuArrow">&#9658;</span>
 								<ul>
-								<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li>
-								<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li>
-								<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li>
-								<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li>
-								<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li>
-								<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li>
-								<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li>
-								<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li>
-								</ul>
+								<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li> 
+								<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li> 
+								<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li> 
+								<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li> 
+								<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li> 
+								<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li> 
+								<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li> 
+								<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li> 
+								</ul> 
 							</li>
 							<li id ="saveAsFile" class="SubItem" style="display:none;">
 								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
@@ -691,7 +698,7 @@
 										<p class="MenubarIcon MenubarFindReplace">&nbsp;</p>
 										FindAndReplace
 									</li>
-								</ul>
+								</ul> 
 							</li>
 							<li class="SubItem">Insert
 								<span class="MenuArrow">&#9658;</span>
@@ -728,7 +735,7 @@
 										<p class="MenubarIcon MenubarTable">&nbsp;</p>
 										Table
 									</li>
-								</ul>
+								</ul> 
 							</li>
 							<li class="SubItem">Format
 								<span class="MenuArrow">&#9658;</span>
@@ -1198,13 +1205,13 @@
 				</div>
 			</td>
 			<td id="td_numberedlist" class="ToolbarIconOut iconToolbar" title="Numbered">
-
+				
 				<div id="numberedlist" class="ToolbarButtonCaption lstSelector1" style="padding: 0;">
 					<img class="toolbarImg align_numbered" src="menu/img/spacer.gif"/>
 				</div>
 				<div id="td_lst" class="lstPicker1" style="display: inline-block;height: 21px;margin-left: 0px;">
 					<div class="ToolbarDropDown"></div>
-				</div>
+				</div>	
 			</td>
 			<td id="td_bulletedlist" class="ToolbarIconOut  iconToolbar" title="Bulleted">
 				<div id="bulletedlist" class="ToolbarButtonCaption lstSelector2" style="padding: 0;">
@@ -1213,7 +1220,7 @@
 				<div id="td_mrk" class="lstPicker2" style="display: inline-block;height: 21px;margin-left: 0px;">
 					<div class="ToolbarDropDown"></div>
 				</div>
-
+				
 			</td>
 			<td id="td_multilist" class="ToolbarIconOut  iconToolbar" title="Bulleted">
 				<div id="multilist" class="ToolbarButtonCaption lstSelector2" style="padding: 0;">
@@ -1224,13 +1231,13 @@
 				</div>
 			</td>
 			<td id="td_headertitle" class="ToolbarIconOut iconToolbar" title="Numbered">
-
+				
 				<div id="headertitle" class="ToolbarButtonCaption htSelector1" style="padding: 0;">
 					<img class="toolbarImg headertitle" src="menu/img/spacer.gif"/>
 				</div>
 				<div id="td_ht" class="htPicker1" style="display: inline-block;height: 21px;margin-left: 0px;">
 					<div class="ToolbarDropDown"></div>
-				</div>
+				</div>	
 			</td>
 			<td id="td_outdent" class="ToolbarIconOut selectableIcon iconToolbar" title="DecreaseIndent">
 				<img class="ToolbarIcon2 ToolbarDecrease" src="menu/img/spacer.gif"/>
@@ -1319,7 +1326,7 @@
 			<td id="td_formatmodel" class="ToolbarIconOut selectableIcon iconToolbar" title="Formating model">
 				<img class="toolbarImg" style="height: 16px;margin-left: 5px;margin-top: 4px;width: 16px;background-position:-1120px 50%;" src="menu/img/spacer.gif"/>
 			</td>
-
+			
 			</tr>
 			</table>
 			</td></tr>
@@ -1364,7 +1371,7 @@
 						}
 					}
 				}, false);
-
+				
                 window.onresize = function()
                 {
                     if (false === editor.bInit_word_control)
@@ -1644,12 +1651,12 @@
 	</tr><tr>
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ffff00;" title="RGB (255, 255, 0)"></div></td>
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ff00;" title="RGB (0, 255, 0)"></div></td>
-	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ffff;" title="RGB (0, 255, 255)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ffff;" title="RGB (0, 255, 255)"></div></td>	
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff00ff;" title="RGB (255, 0, 255)"></div></td>
 	</tr><tr>
 	<td class="colorSelect1 bordered"><div  class="colorHighlight" style="background-color:#0000ff;" title="RGB (0, 0, 255)"></div></td>
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff0000;" title="RGB (255, 0, 0)"></div></td>
-	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00008b;" title="RGB (0, 0, 139)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00008b;" title="RGB (0, 0, 139)"></div></td>	
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#008b8b;" title="RGB (0, 139, 139)"></div></td>
 	</tr><tr>
 	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#006400;" title="RGB (0, 100, 0)"></div></td>
@@ -1768,20 +1775,20 @@
 	<td colspan="10" id="dialogNewColorOpen" class="bordered" style="text-align:center; vertical-align:middle;"><div style="background-color:none;cursor:pointer;">New color</div></td>
 	</tr></table>
 	<div id="colorSelectorHover" style="display:none;position:fixed;z-index:100;height:20px;width:20px;"><img src="menu/img/colorSelectorHover.png"/></div>
-</div>
+</div>		
 <div id="listSelect" class="options hidden">
 	<table class="listTable"><tr>
 	<td class="listSelected bordered" type="listType1"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -2px"  ></div></td>
 	<td class="listSelected bordered" type="listType2"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -2px" ></div></td>
 	<td class="listSelected bordered" type="listType3"><div class="listWatch" style="background: url('menu/img/numberlist.png') -170px -2px" ></div></td>
-	</tr><tr>
+	</tr><tr>                                                
 	<td class="listSelected bordered" type="listType4"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -86px" ></div></td>
 	<td class="listSelected bordered" type="listType5"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -86px" ></div></td>
 	<td class="listSelected bordered" type="listType6"><div class="listWatch" style="background: url('menu/img/numberlist.png') -170px -86px" ></div></td>
-	</tr><tr>
+	</tr><tr>                                                
 	<td class="listSelected bordered" type="listType7"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -170px" ></div></td>
 	<td class="listSelected bordered" type="listType8"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -170px" ></div></td>
-
+	
 	</tr></table>
 </div>
 <div id="markerSelect" class="options hidden">
@@ -1789,11 +1796,11 @@
 	<td class="markerSelected bordered" type="markerType1"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -2px -2px"  ></div></td>
 	<td class="markerSelected bordered" type="markerType2"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -50px -2px" ></div></td>
 	<td class="markerSelected bordered" type="markerType3"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -98px -2px" ></div></td>
-	</tr><tr>
+	</tr><tr>                                                
 	<td class="markerSelected bordered" type="markerType4"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -146px -2px" ></div></td>
 	<td class="markerSelected bordered" type="markerType5"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -194px -2px" ></div></td>
 	<td class="markerSelected bordered" type="markerType6"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -242px -2px" ></div></td>
-	</tr><tr>
+	</tr><tr>                                                
 	<td class="markerSelected bordered" type="markerType7"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -2px -50px" ></div></td>
 	<td class="markerSelected bordered" type="markerType8"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -50px -50px" ></div></td>
 	</tr></table>
@@ -1865,7 +1872,7 @@
 			<div id="gradientSelectHolder" style="position:absolute;width:9px;height:128px;left:160px;">
 				<div id="gradSelecter" style="position:absolute;background: url('menu/img/marker2.png') no-repeat scroll 0 0 transparent;height:11px;margin:-6px 0 0 -8px;overflow: hidden;width: 25px;"></div>
 			</div>
-
+			
 		</div>
 	</div>
 
@@ -2414,17 +2421,32 @@
     </div>
     <!---->
 
-	<div id="prUsersDrag"	style="display:none;width:200px;background-color:#fff;top:215px;right:50px;z-index:100;position:absolute;border: 4px ridge silver;cursor:move;">
-		<div style="float:left;width:180px;text-align: center;cursor:move;">
-		<b>Users</b>
-		</div>
+    <div id="prUsersDrag"	style="display:none;width:200px;background-color:#fff;top:215px;right:50px;z-index:100;position:absolute;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:180px;text-align: center;cursor:move;">
+            <b>Users</b>
+        </div>
         <div style="float:left;cursor:default;width:20px;height:20px;" onmousemove="this.style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="this.style.backgroundColor = 'RGB(255, 255, 255)' " onmousedown="if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType ) {CollaborativeEditing.Clear_CollaborativeMarks();} CollaborativeEditing.Apply_Changes(); setTimeout(function() {CollaborativeEditing.Send_Changes();}, 100);">
             <img style="margin: 2px 3px" src="menu/img/savechanges.png" title="Save Changes" />
         </div>
     </div>
-	<div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
-		<div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
-		</div>
+    <div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
+        </div>
+    </div>
+    <div id="prChatDrag"	style="display:none;width:300px;background-color:#fff;top:415px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:300px;text-align: center;cursor:move;">
+            <b>Chat</b>
+            <input id="prAddMessage" type="button" value="Add Messsage"/>
+        </div>
+    </div>
+    <div id="prChat"		style="display:none;width:300px;background-color:#fff;top:445px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:300px;text-align: center;cursor:move;" id="messagesView">
+        </div>
+    </div>
+
+    <div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+    <div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
+    </div>
 	</div>
 	<div id="prChatDrag"	style="display:none;width:300px;background-color:#fff;top:415px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
 		<div style="float:left;width:300px;text-align: center;cursor:move;">
@@ -2973,7 +2995,7 @@
 			<br/>
 			<input id="hafOE" type="checkbox"/> Different Odd and Even Pages
 		</div>
-
+		
 	</div>
 
         <!---->
