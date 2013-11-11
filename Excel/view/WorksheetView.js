@@ -5828,10 +5828,12 @@
 				return this.isSelectOnShape;
 			},
 			setSelectionShape: function (isSelectOnShape) {
-				this.isSelectOnShape = isSelectOnShape;
-				// отправляем евент для получения свойств картинки, шейпа или группы
-				this._trigger("selectionNameChanged", this.getSelectionName());
-				this._trigger("selectionChanged", this.getSelectionInfo());
+				if (this.isSelectOnShape !== isSelectOnShape) {
+					this.isSelectOnShape = isSelectOnShape;
+					// отправляем евент для получения свойств картинки, шейпа или группы
+					this._trigger("selectionNameChanged", this.getSelectionName());
+					this._trigger("selectionChanged", this.getSelectionInfo());
+				}
 			},
 
 			setSelection: function (range, validRange) {
