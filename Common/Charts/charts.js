@@ -1731,7 +1731,6 @@ function DrawPieChart(chartCanvas, chartSubType, data, chart) {
 	//bar._otherProps._exploded = 15;
 	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
-	bar._otherProps._colors = ['steelblue', 'IndianRed', 'Silver'];
 	bar._chartGutter._left = 45;
 	bar._chartGutter._right = 90;
 	bar._chartGutter._top = 13;
@@ -1986,7 +1985,6 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	bar._otherProps._background_grid_color = 'graytext';
 	bar._otherProps._background_barcolor1 = 'white';
 	bar._otherProps._background_barcolor2 = 'white';
-	bar._otherProps._colors = ['steelblue', 'IndianRed', 'green'];
 	var tempMas = [];
 	for (var i = 0; i < data.length; i++) {
 		tempMas[data.length - i - 1] = i + 1;
