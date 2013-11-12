@@ -1,4 +1,4 @@
-(	/**
+п»ї(	/**
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
@@ -11,7 +11,7 @@
 		var prot;
 		
 		/**
-		 * Класс asc_CAscEditorPermissions для прав редакторов
+		 * РљР»Р°СЃСЃ asc_CAscEditorPermissions РґР»СЏ РїСЂР°РІ СЂРµРґР°РєС‚РѕСЂРѕРІ
 		 * -----------------------------------------------------------------------------
 		 *
 		 * @constructor
