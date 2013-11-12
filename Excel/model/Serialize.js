@@ -1391,6 +1391,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 	this.oFillMap = null;
 	this.oBorderMap = null;
 	this.oNumMap = null;
+	this.oBinaryWorksheetsTableWriter = oBinaryWorksheetsTableWriter;
 	if(null != oBinaryWorksheetsTableWriter)
 	{
 		this.aDxfs = oBinaryWorksheetsTableWriter.aDxfs;
@@ -1416,8 +1417,6 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
         this.bs.WriteItem(c_oSerStylesTypes.Fills, function(){oThis.WriteFills();});
         //fonts
         this.bs.WriteItem(c_oSerStylesTypes.Fonts, function(){oThis.WriteFonts();});
-        //numfmts
-        this.bs.WriteItem(c_oSerStylesTypes.NumFmts, function(){oThis.WriteNumFmts();});
 		//CellStyleXfs
 		this.bs.WriteItem(c_oSerStylesTypes.CellStyleXfs, function(){oThis.WriteCellStyleXfs();});
         //cellxfs
@@ -1428,9 +1427,20 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 
 		if(null != wb.TableStyles)
 			this.bs.WriteItem(c_oSerStylesTypes.TableStyles, function(){oThis.WriteTableStyles(wb.TableStyles);});		
-		
+		//Dxfs пишется после TableStyles, потому что Dxfs может пополниться при записи TableStyles
 		if(null != this.aDxfs && this.aDxfs.length > 0)
-			this.bs.WriteItem(c_oSerStylesTypes.Dxfs, function(){oThis.WriteDxfs(oThis.aDxfs);});
+		{
+			var oDxfsNumFormatToId = {};
+			for(var i = 0, length = this.aDxfs.length; i < length; i++)
+			{
+				var dxf = this.aDxfs[i];
+				if(dxf && dxf.num)
+					oDxfsNumFormatToId[dxf.num.f] = this.oBinaryWorksheetsTableWriter.getNumIdByFormat(dxf.num);
+			}
+			this.bs.WriteItem(c_oSerStylesTypes.Dxfs, function(){oThis.WriteDxfs(oThis.aDxfs, oDxfsNumFormatToId);});
+		}
+		//numfmts пишется в конце потому что они могут пополниться при записи Dxfs
+        this.bs.WriteItem(c_oSerStylesTypes.NumFmts, function(){oThis.WriteNumFmts();});
     };
     this.WriteBorders = function()
     {
@@ -1834,13 +1844,13 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
             this.memory.WriteBool(align.wrap);
         }
     };
-	this.WriteDxfs = function(Dxfs)
+	this.WriteDxfs = function(Dxfs, oDxfsNumFormatToId)
     {
 		var oThis = this;
 		for(var i = 0, length = Dxfs.length; i < length; ++i)
-			this.bs.WriteItem(c_oSerStylesTypes.Dxf, function(){oThis.WriteDxf(Dxfs[i]);});
+			this.bs.WriteItem(c_oSerStylesTypes.Dxf, function(){oThis.WriteDxf(Dxfs[i], oDxfsNumFormatToId);});
 	};
-	this.WriteDxf = function(Dxf)
+	this.WriteDxf = function(Dxf, oDxfsNumFormatToId)
     {
 		var oThis = this;
 		if(null != Dxf.align)
@@ -1851,8 +1861,12 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 			this.bs.WriteItem(c_oSer_Dxf.Fill, function(){oThis.WriteFill(Dxf.fill);});
 		if(null != Dxf.font)
 			this.bs.WriteItem(c_oSer_Dxf.Font, function(){oThis.WriteFont(Dxf.font);});
-		if(null != Dxf.num)
-			this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum(Dxf.num);});
+		if(null != Dxf.num && null != oDxfsNumFormatToId)
+		{
+			var numId = oDxfsNumFormatToId[Dxf.num.f];
+			if(null != numId)
+				this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum({id: numId, f: Dxf.num.f});});
+		}
 	};
 	this.WriteCellStyles = function (cellStyles) {
 		var oThis = this;
@@ -2806,24 +2820,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			sStyle.val += "|" + sStyle.borderid.toString();
 
 			if(null != xfs.num)
-			{
-				//стандартные форматы не записываем в map, на них можно ссылаться по id
-				var nStandartId = aStandartNumFormatsId[xfs.num.f];
-				if(null == nStandartId)
-				{
-					var sHash = this._getStringFromObjWithProperty(xfs.num);
-					var elem = this.oNumMap[sHash];
-					if(null == elem)
-					{
-						sStyle.numid = this.nNumMapIndex++;
-						this.oNumMap[sHash] = {index: sStyle.numid, val: xfs.num};
-					}
-					else
-						sStyle.numid = elem.index;
-				}
-				else
-					sStyle.numid = nStandartId;
-			}
+				sStyle.numid = this.getNumIdByFormat(xfs.num);
 			sStyle.val += "|" + sStyle.numid.toString();
 
 			if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultAlignAbs))
@@ -2833,6 +2830,27 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 
 		return sStyle;
 	};
+	this.getNumIdByFormat = function(num)
+	{
+		var numid = null;
+		//стандартные форматы не записываем в map, на них можно ссылаться по id
+		var nStandartId = aStandartNumFormatsId[num.f];
+		if(null == nStandartId)
+		{
+			var sHash = this._getStringFromObjWithProperty(num);
+			var elem = this.oNumMap[sHash];
+			if(null == elem)
+			{
+				numid = this.nNumMapIndex++;
+				this.oNumMap[sHash] = {index: numid, val: num};
+			}
+			else
+				numid = elem.index;
+		}
+		else
+			numid = nStandartId;
+		return numid;
+	}
 	this.prepareXfs = function(xfs)
 	{
 		var nXfsId = 0;
