@@ -367,9 +367,15 @@ function GenerateMapId(api, name, style, size)
         }
     }
 
+    var _ext = "";
+    if (bNeedBold)
+        _ext += "nbold";
+    if (bNeedItalic)
+        _ext += "nitalic";
+
     // index != -1 (!!!)
     var fontfile = api.FontLoader.fontFiles[index];
-    return fontfile.Id + faceIndex + size;
+    return fontfile.Id + faceIndex + size + _ext;
 }
 
 function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndexI, indexB, faceIndexB, indexBI, faceIndexBI)
@@ -747,7 +753,13 @@ CFontInfo.prototype =
             }
         }
 
-        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize);
+        var _ext = "";
+        if (bNeedBold)
+            _ext += "nbold";
+        if (bNeedItalic)
+            _ext += "nitalic";
+
+        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize, _ext);
 
         if (!pFontFile)
             pFontFile = fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic);

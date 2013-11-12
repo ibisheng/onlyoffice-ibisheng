@@ -664,9 +664,11 @@ function CFontFilesCache()
     this.m_lCurrentSize = 0;
     this.Fonts = {};
 
-    this.LockFont = function(stream_index, fontName, faceIndex, fontSize)
+    this.LockFont = function(stream_index, fontName, faceIndex, fontSize, _ext)
     {
         var key = fontName + faceIndex + fontSize;
+        if (undefined !== _ext)
+            key += _ext;
         var pFontFile = this.Fonts[key];
         if (pFontFile)
             return pFontFile;
