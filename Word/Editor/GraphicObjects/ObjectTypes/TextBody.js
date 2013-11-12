@@ -59,10 +59,6 @@ CTextBody.prototype =
     {
         return false;
     },
-    Get_Id: function()
-    {
-        return this.Id;
-    },
 
 
 
@@ -103,8 +99,33 @@ CTextBody.prototype =
             var styles = new CStyles();
             var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-            var TextPr = {FontFamily:{}}
+            var TextPr = {FontFamily:{}};
             TextPr.FontFamily.Name = "Calibri";
+            TextPr.FontFamily.Index = -1;
+            TextPr.RFonts = {};
+            TextPr.RFonts.Ascii =
+            {
+                Name  : "Calibri",
+                Index : -1
+            };
+
+            TextPr.RFonts.EastAsia =
+            {
+                Name  : "Calibri",
+                Index : -1
+            };
+
+            TextPr.RFonts.HAnsi =
+            {
+                Name  : "Calibri",
+                Index : -1
+            };
+
+            TextPr.RFonts.CS =
+            {
+                Name  : "Calibri",
+                Index : -1
+            };
             TextPr.Bold = true;
             if(this.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                 TextPr.FontSize = 18;
@@ -513,35 +534,50 @@ CTextBody.prototype =
 
     getRectWidth: function(maxWidth)
     {
-        var body_pr = this.getBodyPr();
-        var r_ins = body_pr.rIns;
-        var l_ins = body_pr.lIns;
-        var max_content_width = maxWidth - r_ins - l_ins;
-        this.content.Reset(0, 0, max_content_width, 20000);
-        this.content.Recalculate_Page(0, true);
-        var max_width = 0;
-        for(var i = 0; i < this.content.Content.length; ++i)
+        try
         {
-            var par = this.content.Content[i];
-            for(var j = 0; j < par.Lines.length; ++j)
+            var body_pr = this.getBodyPr();
+            var r_ins = body_pr.rIns;
+            var l_ins = body_pr.lIns;
+            var max_content_width = maxWidth - r_ins - l_ins;
+            this.content.Reset(0, 0, max_content_width, 20000);
+            this.content.Recalculate_Page(0, true);
+            var max_width = 0;
+            for(var i = 0; i < this.content.Content.length; ++i)
             {
-                if(par.Lines[j].Ranges[0].W > max_width)
+                var par = this.content.Content[i];
+                for(var j = 0; j < par.Lines.length; ++j)
                 {
-                    max_width = par.Lines[j].Ranges[0].W;
+                    if(par.Lines[j].Ranges[0].W > max_width)
+                    {
+                        max_width = par.Lines[j].Ranges[0].W;
+                    }
                 }
             }
+            return max_width + 2 + r_ins + l_ins;
         }
-        return max_width + 2 + r_ins + l_ins;
+        catch(e)
+        {
+            return 0;
+        }
     },
 
     getRectHeight: function(maxHeight, width)
     {
-        this.content.Reset(0, 0, width, 20000);
-        this.content.Recalculate_Page(0, true);
-        var content_height = this.getSummaryHeight();
-        var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
-        var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
-        return content_height + t_ins + b_ins;
+        try
+        {
+
+            this.content.Reset(0, 0, width, 20000);
+            this.content.Recalculate_Page(0, true);
+            var content_height = this.getSummaryHeight();
+            var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
+            var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
+            return content_height + t_ins + b_ins;
+        }
+        catch(e)
+        {
+            return 0;
+        }
     },
 
     Refresh_RecalcData2: function()

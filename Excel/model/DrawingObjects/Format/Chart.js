@@ -430,7 +430,7 @@ CChartAsGroup.prototype =
 
         if(isRealObject(this.vAxisTitle) && isRealObject(this.vAxisTitle.txBody)&& isRealObject(this.vAxisTitle.txBody.content))
         {
-            this.chart.xAxis.title = "";
+            //this.chart.xAxis.title = "";
             this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
             this.vAxisTitle.drawingObjects = this.drawingObjects;
             if(this.vAxisTitle.isEmpty())
@@ -596,6 +596,25 @@ CChartAsGroup.prototype =
 			{
 				this.addXAxis(null)
 			}
+            else
+            {
+                if(typeof  this.chart.xAxis.title === "string" && this.chart.xAxis.title.length > 0)
+                {
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    var title_str = this.chart.xAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addXAxis(chart_title);
+                }
+                else
+                {
+                    this.addXAxis(null);
+                }
+            }
 		}
 		
 		if ( (this.chart.xAxis.bGrid != chart.xAxis.bGrid) || (isCollaborative === true) ) {
@@ -642,6 +661,27 @@ CChartAsGroup.prototype =
 			{
 				this.addYAxis(null)
 			}
+            else
+            {
+                if(typeof  this.chart.yAxis.title === "string" && this.chart.yAxis.title.length > 0)
+                {
+
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var tx_body = new CTextBody(chart_title);
+                    tx_body.setVert(90);
+                    var title_str = this.chart.yAxis.title;
+                    for(var i in title_str)
+                    {
+                        tx_body.content.Paragraph_Add(CreateParagraphContent(title_str[i]));
+                    }
+                    chart_title.setTextBody(tx_body);
+                    this.addYAxis(chart_title);
+                }
+                else
+                {
+                    this.addYAxis(null);
+                }
+            }
 		}
 		
 		if ( (this.chart.yAxis.bGrid != chart.yAxis.bGrid) || (isCollaborative === true) ) {
@@ -773,6 +813,7 @@ CChartAsGroup.prototype =
         this.init();
         this.addToDrawingObjects();
 		this.setChart(this.chart, true);
+        this.recalculate();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 

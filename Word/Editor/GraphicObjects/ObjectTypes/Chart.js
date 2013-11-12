@@ -1001,191 +1001,199 @@ CChartAsGroup.prototype =
 
     recalculate: function(updateImage)
     {
-        this.recalculatePosExt();
-        this.recalculateTransform();
-        if(isRealObject(this.chartTitle))
+
+        try
         {
-            var max_title_width = this.absExtX*0.8;
-            var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
-            this.chartTitle.extX = title_width;
-            var bodyPr = this.chartTitle.txBody.getBodyPr();
-            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
-            this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
-            if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
+            this.recalculatePosExt();
+            this.recalculateTransform();
+            if(isRealObject(this.chartTitle))
             {
-                this.chartTitle.x = this.absExtX*this.chartTitle.layout.x;
-                if(this.chartTitle.x + this.chartTitle.extX > this.absExtX)
-                    this.chartTitle.x = this.absExtX - this.chartTitle.extX;
-                if(this.chartTitle.x < 0)
-                    this.chartTitle.x = 0;
-            }
-            else
-            {
-                this.chartTitle.x = (this.absExtX - this.chartTitle.extX)*0.5;
+                var max_title_width = this.absExtX*0.8;
+                var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
+                this.chartTitle.extX = title_width;
+                var bodyPr = this.chartTitle.txBody.getBodyPr();
+                this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
+                this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
+                if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
+                {
+                    this.chartTitle.x = this.absExtX*this.chartTitle.layout.x;
+                    if(this.chartTitle.x + this.chartTitle.extX > this.absExtX)
+                        this.chartTitle.x = this.absExtX - this.chartTitle.extX;
+                    if(this.chartTitle.x < 0)
+                        this.chartTitle.x = 0;
+                }
+                else
+                {
+                    this.chartTitle.x = (this.absExtX - this.chartTitle.extX)*0.5;
+                }
+
+                if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.y))
+                {
+                    this.chartTitle.y = this.absExtY*this.chartTitle.layout.y;
+                    if(this.chartTitle.y + this.chartTitle.extY > this.absExtY)
+                        this.chartTitle.y = this.absExtY - this.chartTitle.extY;
+                    if(this.chartTitle.y < 0)
+                        this.chartTitle.y = 0;
+                }
+                else
+                {
+                    this.chartTitle.y = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
+                }
+
+                this.chartTitle.recalculateTransform();
+                this.chartTitle.calculateContent();
+                this.chartTitle.calculateTransformTextMatrix();
             }
 
-            if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.y))
+            if(isRealObject(this.hAxisTitle))
             {
-                this.chartTitle.y = this.absExtY*this.chartTitle.layout.y;
-                if(this.chartTitle.y + this.chartTitle.extY > this.absExtY)
-                    this.chartTitle.y = this.absExtY - this.chartTitle.extY;
-                if(this.chartTitle.y < 0)
-                    this.chartTitle.y = 0;
-            }
-            else
-            {
-                this.chartTitle.y = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
+                var max_title_widh = this.absExtX*0.8;
+                var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
+                this.hAxisTitle.extX = title_width;
+                var bodyPr = this.hAxisTitle.txBody.getBodyPr();
+                this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
+                this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
             }
 
-            this.chartTitle.recalculateTransform();
-            this.chartTitle.calculateContent();
-            this.chartTitle.calculateTransformTextMatrix();
-        }
+            if(isRealObject(this.vAxisTitle))
+            {
+                var max_title_height = this.absExtY*0.8;
+                var body_pr = this.vAxisTitle.txBody.getBodyPr();
+                this.vAxisTitle.extY = this.vAxisTitle.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
+                this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.absExtX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
+                this.vAxisTitle.spPr.geometry.Recalculate(this.vAxisTitle.extX, this.vAxisTitle.extY);
 
-        if(isRealObject(this.hAxisTitle))
-        {
-            var max_title_widh = this.absExtX*0.8;
-            var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
-            this.hAxisTitle.extX = title_width;
-            var bodyPr = this.hAxisTitle.txBody.getBodyPr();
-            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.absExtY, title_width - (bodyPr.rIns + bodyPr.lIns));
-            this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
-        }
+            }
+            var lInd, tInd, rInd, bInd;
+            tInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
+            lInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
+            rInd = 0;
+            bInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
+            if(isRealObject(this.vAxisTitle))
+            {
+                if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
+                {
+                    this.vAxisTitle.x = this.absExtX*this.vAxisTitle.layout.x;
+                    if(this.vAxisTitle.x + this.vAxisTitle.extX > this.absExtX)
+                        this.vAxisTitle.x = this.absExtX - this.vAxisTitle.extX;
+                    if(this.vAxisTitle.x < 0)
+                        this.vAxisTitle.x = 0;
+                }
+                else
+                {
+                    this.vAxisTitle.x = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
+                }
 
-        if(isRealObject(this.vAxisTitle))
-        {
-            var max_title_height = this.absExtY*0.8;
-            var body_pr = this.vAxisTitle.txBody.getBodyPr();
-            this.vAxisTitle.extY = this.vAxisTitle.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-            this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.absExtX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
-            this.vAxisTitle.spPr.geometry.Recalculate(this.vAxisTitle.extX, this.vAxisTitle.extY);
+                if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
+                {
+                    this.vAxisTitle.y = this.absExtY*this.vAxisTitle.layout.y;
+                    if(this.vAxisTitle.y + this.vAxisTitle.extY > this.absExtY)
+                        this.vAxisTitle.y = this.absExtY - this.vAxisTitle.extY;
+                    if(this.vAxisTitle.y < 0)
+                        this.vAxisTitle.y = 0;
+                }
+                else
+                {
+                    this.vAxisTitle.y = (this.absExtY - this.vAxisTitle.extY)*0.5;
+                    if(this.vAxisTitle.y < tInd)
+                        this.vAxisTitle.y = tInd;
+                }
+                this.vAxisTitle.recalculateTransform();
+                this.vAxisTitle.calculateContent();
+                this.vAxisTitle.calculateTransformTextMatrix();
+            }
+            if(isRealObject(this.hAxisTitle))
+            {
 
-        }
-        var lInd, tInd, rInd, bInd;
-        tInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
-        lInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
-        rInd = 0;
-        bInd = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
-        if(isRealObject(this.vAxisTitle))
-        {
-            if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
-            {
-                this.vAxisTitle.x = this.absExtX*this.vAxisTitle.layout.x;
-                if(this.vAxisTitle.x + this.vAxisTitle.extX > this.absExtX)
-                    this.vAxisTitle.x = this.absExtX - this.vAxisTitle.extX;
-                if(this.vAxisTitle.x < 0)
-                    this.vAxisTitle.x = 0;
-            }
-            else
-            {
-                this.vAxisTitle.x = editor.WordControl.m_oDrawingDocument.GetMMPerDot(7);
-            }
+                if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.x))
+                {
+                    this.hAxisTitle.x = this.absExtX*this.hAxisTitle.layout.x;
+                    if(this.hAxisTitle.x + this.hAxisTitle.extX > this.absExtX)
+                        this.hAxisTitle.x = this.absExtX - this.hAxisTitle.extX;
+                    if(this.hAxisTitle.x < 0)
+                        this.hAxisTitle.x = 0;
+                }
+                else
+                {
+                    this.hAxisTitle.x = ((this.absExtX - rInd) - (lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                    if(this.hAxisTitle.x < lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25))
+                        this.hAxisTitle.x = lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                }
 
-            if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
-            {
-                this.vAxisTitle.y = this.absExtY*this.vAxisTitle.layout.y;
-                if(this.vAxisTitle.y + this.vAxisTitle.extY > this.absExtY)
-                    this.vAxisTitle.y = this.absExtY - this.vAxisTitle.extY;
-                if(this.vAxisTitle.y < 0)
-                    this.vAxisTitle.y = 0;
-            }
-            else
-            {
-                this.vAxisTitle.y = (this.absExtY - this.vAxisTitle.extY)*0.5;
-                if(this.vAxisTitle.y < tInd)
-                    this.vAxisTitle.y = tInd;
-            }
-            this.vAxisTitle.recalculateTransform();
-            this.vAxisTitle.calculateContent();
-            this.vAxisTitle.calculateTransformTextMatrix();
-        }
-        if(isRealObject(this.hAxisTitle))
-        {
-
-            if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.x))
-            {
-                this.hAxisTitle.x = this.absExtX*this.hAxisTitle.layout.x;
-                if(this.hAxisTitle.x + this.hAxisTitle.extX > this.absExtX)
-                    this.hAxisTitle.x = this.absExtX - this.hAxisTitle.extX;
-                if(this.hAxisTitle.x < 0)
-                    this.hAxisTitle.x = 0;
-            }
-            else
-            {
-                this.hAxisTitle.x = ((this.absExtX - rInd) - (lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
-                if(this.hAxisTitle.x < lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25))
-                    this.hAxisTitle.x = lInd + editor.WordControl.m_oDrawingDocument.GetMMPerDot(25);
+                if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
+                {
+                    this.hAxisTitle.y = this.absExtY*this.hAxisTitle.layout.y;
+                    if(this.hAxisTitle.y + this.hAxisTitle.extY > this.absExtY)
+                        this.hAxisTitle.y = this.absExtY - this.hAxisTitle.extY;
+                    if(this.hAxisTitle.y < 0)
+                        this.hAxisTitle.y = 0;
+                }
+                else
+                {
+                    this.hAxisTitle.y = this.absExtY - bInd;
+                }
+                this.hAxisTitle.recalculateTransform();
+                this.hAxisTitle.calculateContent();
+                this.hAxisTitle.calculateTransformTextMatrix();
             }
 
-            if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
+            var title_margin = {w:0, h: 0}, key = {w:0, h: 0}, xAxisTitle = {w:0, h: 0}, yAxisTitle = {w:0, h: 0};
+            if(isRealObject(this.chartTitle))
             {
-                this.hAxisTitle.y = this.absExtY*this.hAxisTitle.layout.y;
-                if(this.hAxisTitle.y + this.hAxisTitle.extY > this.absExtY)
-                    this.hAxisTitle.y = this.absExtY - this.hAxisTitle.extY;
-                if(this.hAxisTitle.y < 0)
-                    this.hAxisTitle.y = 0;
-            }
-            else
-            {
-                this.hAxisTitle.y = this.absExtY - bInd;
-            }
-            this.hAxisTitle.recalculateTransform();
-            this.hAxisTitle.calculateContent();
-            this.hAxisTitle.calculateTransformTextMatrix();
-        }
-
-        var title_margin = {w:0, h: 0}, key = {w:0, h: 0}, xAxisTitle = {w:0, h: 0}, yAxisTitle = {w:0, h: 0};
-        if(isRealObject(this.chartTitle))
-        {
-            if(!this.chartTitle.overlay)
-            {
-                title_margin = {
-                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extX),
-                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extY)
+                if(!this.chartTitle.overlay)
+                {
+                    title_margin = {
+                        w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extX),
+                        h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.chartTitle.extY)
+                    }
                 }
             }
-        }
 
-        if(isRealObject(this.hAxisTitle))
-        {
-            if(!this.hAxisTitle.overlay)
+            if(isRealObject(this.hAxisTitle))
             {
-                xAxisTitle = {
-                    w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
-                    h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
+                if(!this.hAxisTitle.overlay)
+                {
+                    xAxisTitle = {
+                        w: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
+                        h: 7+editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
+                    }
                 }
             }
-        }
 
-        if(isRealObject(this.vAxisTitle))
-        {
-            if(!this.vAxisTitle.overlay)
+            if(isRealObject(this.vAxisTitle))
             {
-                yAxisTitle = {
-                    w:  7 + editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
-                    h: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
+                if(!this.vAxisTitle.overlay)
+                {
+                    yAxisTitle = {
+                        w:  7 + editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
+                        h: editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
+                    }
                 }
             }
+
+            this.chart.margins =
+            {
+                key: key,
+
+                xAxisTitle: xAxisTitle,
+
+                yAxisTitle: yAxisTitle,
+                title: title_margin
+            };
+
+            /*if ( !this.chart.range.intervalObject )
+             this.drawingObjects.intervalToIntervalObject(this.chart);           */
+            if(!(updateImage === false))
+            {
+                this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
+                this.brush.fill.RasterImageId = "";
+                //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
+            }
+
         }
+        catch(e)
+        {}
 
-        this.chart.margins =
-        {
-            key: key,
-
-            xAxisTitle: xAxisTitle,
-
-            yAxisTitle: yAxisTitle,
-            title: title_margin
-        };
-
-        /*if ( !this.chart.range.intervalObject )
-         this.drawingObjects.intervalToIntervalObject(this.chart);           */
-        if(!(updateImage === false))
-        {
-            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
-            this.brush.fill.RasterImageId = "";
-            //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
-        }
     },
 
     getBase64Img: function()
@@ -1235,8 +1243,32 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
                     TextPr.Bold = true;
                     if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
@@ -1273,13 +1305,37 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
                     TextPr.Bold = true;
                     if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
                     else
                         TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
 
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
@@ -1337,13 +1393,37 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
                     TextPr.Bold = true;
                     if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
                     else
                         TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
 
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
@@ -1379,13 +1459,37 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
                     TextPr.Bold = true;
                     if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
                     else
                         TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
 
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
@@ -1428,7 +1532,7 @@ CChartAsGroup.prototype =
 
         if(isRealObject(this.vAxisTitle))
         {
-            this.chart.xAxis.title = "";
+           //this.chart.xAxis.title = "";
             this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
 
             //  this.vAxisTitle.drawingObjects = this.drawingObjects;
@@ -1442,13 +1546,37 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
                     TextPr.Bold = true;
                     if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
                     else
                         TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
 
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
@@ -1484,13 +1612,37 @@ CChartAsGroup.prototype =
                     var styles = new CStyles();
                     var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-                    var TextPr = {FontFamily:{}}
+                    var TextPr = {FontFamily:{}};
                     TextPr.FontFamily.Name = "Calibri";
                     TextPr.Bold = true;
                     if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
                         TextPr.FontSize = 18;
                     else
                         TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
 
                     default_legend_style.TextPr.Set_FromObject(TextPr);
                     default_legend_style.ParaPr.Spacing.After = 0;
@@ -2618,6 +2770,11 @@ CChartAsGroup.prototype =
                 this.recalculatePosExt();
                 this.init();
                 this.recalculate();
+                if(this.parent)
+                {
+                    this.recalcAllTitles();
+                    editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(this.parent);
+                }
                 break;
             }
         }
@@ -2741,6 +2898,36 @@ CChartAsGroup.prototype =
                 else
                     this.parent = g_oTableId.Get_ById(data.newParent);
                 break;
+            }
+        }
+    },
+
+
+    recalcAllTitles: function()
+    {
+        if(this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content)
+        {
+            var content = this.chartTitle.txBody.content.Content;
+            for(var i = 0; i < content.length; ++i)
+            {
+                content[i].RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+            }
+        }
+
+        if(this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content)
+        {
+            var content = this.hAxisTitle.txBody.content.Content;
+            for(var i = 0; i < content.length; ++i)
+            {
+                content[i].RecalcInfo.Recalc_0_Type = pararecalc_0_All;
+            }
+        }
+        if(this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content)
+        {
+            var content = this.vAxisTitle.txBody.content.Content;
+            for(var i = 0; i < content.length; ++i)
+            {
+                content[i].RecalcInfo.Recalc_0_Type = pararecalc_0_All;
             }
         }
     },

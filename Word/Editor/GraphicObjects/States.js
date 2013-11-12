@@ -396,51 +396,9 @@ function NullState(graphicObjects)
             }
             else
             {
-                if(e.CtrlKey || e.ShiftKey)
+                if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
                 {
-                    if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
-                        return;
-                    if(_current_graphic_object.selected === false)
-                    {
-                        _current_graphic_object.select(pageIndex);
-                        _common_selection_array.push(_current_graphic_object);
-                        _common_selection_array.sort(ComparisonByZIndex);
-
-
-                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-
-                    }
-
-                    this.graphicObjects.arrPreTrackObjects.length = 0;
-                    for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                    {
-                        if(_common_selection_array[_sel_index].pageIndex === pageIndex)
-                        {
-                            _current_graphic_object = _common_selection_array[_sel_index];
-                            this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object,  _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                        }
-                    }
-                    if(_common_selection_array.length === 1)
-                    {
-                        var pre_track = _common_selection_array[0];
-                        pre_track.calculateOffset();
-                        var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                        var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                        this.anchorPos = pre_track.Get_AnchorPos();
-                        this.anchorPos.Page = pageIndex;
-
-                    }
-                    this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                    this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, true, false));
                     return;
-                }
-                else
-                {
-                    if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
-                    {
-                        return;
-                    }
                 }
 
             }

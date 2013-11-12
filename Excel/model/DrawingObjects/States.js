@@ -1515,6 +1515,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
     this.onMouseDown = function(e, x, y)
     {
         this.chartState.onMouseDown(e, x, y);
+        this.drawingObjects.OnUpdateOverlay();
         if(this.drawingObjectsController.curState.id !== STATES_ID_CHART_TEXT_ADD || this.drawingObjectsController.curState.textObject !== this.textObject)
         {
             this.chart.recalculate();

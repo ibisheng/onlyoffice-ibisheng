@@ -3181,6 +3181,7 @@ PasteProcessor.prototype =
                 //var oFontItem = this.oFonts[font_family];
 				font_family = font_family.replace(/"/g, '');
 				font_family = font_family.replace(/'/g, '');
+                font_family = font_family.split(",")[0];
                 if(null != font_family)
                 {
                     rPr.RFonts.Ascii = {Name: font_family, Index: -1};

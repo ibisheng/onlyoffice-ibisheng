@@ -131,6 +131,12 @@ CChartTitle.prototype =
 
         default_legend_style.TextPr.themeFont = "Calibri";
         default_legend_style.TextPr.Bold = true;
+        default_legend_style.TextPr.FontFamily = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts = new CRFonts();
+        default_legend_style.TextPr.RFonts.Ascii    = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.EastAsia = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.HAnsi    = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.CS       = { Name : "Calibri", Index : -1 };
         if(this.getTitleType() === CHART_TITLE_TYPE_TITLE)
             default_legend_style.TextPr.FontSize = 18;
         else

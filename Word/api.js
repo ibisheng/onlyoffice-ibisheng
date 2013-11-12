@@ -7212,11 +7212,31 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
 	if ( isObject(chartBinary) )
 	{
 		var binary = chartBinary["binary"];
-        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+
+        History.Create_NewPoint();
+        var Drawing = new ParaDrawing( null, null, null, this.WordControl.m_oDrawingDocument, this );
+        var Image = new CChartAsGroup(Drawing, this, this.WordControl.m_oDrawingDocument, null);
+        Drawing.Set_GraphicObject(Image);
+        Image.initFromBinary(binary);
+        var font_map = {};
+        Image.documentGetAllFontNames(font_map);
+        var aPrepareFonts = [];
+        for(var i in font_map)
+            aPrepareFonts.push(new CFont(i, 0, "", 0));
+        var document = this.WordControl.m_oLogicDocument;
+        var paste_callback = function ()
         {
-            History.Create_NewPoint();
-            this.WordControl.m_oLogicDocument.Add_InlineImage( null, null, null, binary );
-        }
+            if ( false === document.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            {
+                document.Add_InlineImage( null, null, null, Drawing );
+            }
+            else
+            {
+                document.Document_Undo();
+            }
+        };
+        this.pre_Paste(aPrepareFonts, [], paste_callback);
+
 	}
 }
 

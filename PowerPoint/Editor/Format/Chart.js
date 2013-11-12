@@ -1153,8 +1153,7 @@ CChartAsGroup.prototype =
 
     recalculate: function(updateImage)
     {
-        try
-        {
+
 
             var parents = this.getParentObjects();
             this.recalculatePosExt();
@@ -1344,9 +1343,7 @@ CChartAsGroup.prototype =
                 this.brush.fill.RasterImageId = "";
                 //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
             }
-        }
-        catch(e)
-        {}
+
     },
 
     getBase64Img: function()
@@ -1447,7 +1444,7 @@ CChartAsGroup.prototype =
 
         if(isRealObject(this.vAxisTitle))
         {
-            this.chart.xAxis.title = "";
+            //this.chart.xAxis.title = "";
             this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
             this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
 

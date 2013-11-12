@@ -2610,11 +2610,24 @@ CGraphicObjects.prototype = {
         var pos_y = (p.Height - chart.spPr.xfrm.extY)/2;
         if(isRealNumber(pos_x) && isRealNumber(pos_y))
             chart.setXfrm(pos_x, pos_y, null, null, null, null, null);
-        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, chart) === false)
+
+        var font_map = {};
+        chart.getAllFonts(font_map);
+        var aPrepareFonts = [];
+        for(var i in font_map)
+            aPrepareFonts.push(new CFont(i, 0, "", 0));
+        var oThis = this;
+        var paste_callback = function ()
         {
-            this.slide.addToSpTreeToPos(this.slide.cSld.spTree, chart);
-            editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
-        }
+            if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, chart) === false)
+            {
+                oThis.slide.addToSpTreeToPos(oThis.slide.cSld.spTree, chart);
+                editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
+                editor.WordControl.m_oLogicDocument.Recalculate();
+            }
+        };
+        editor.pre_Paste(aPrepareFonts, [], paste_callback);
+
     },
 
     editChart: function(binary)

@@ -1790,18 +1790,19 @@ CDocument.prototype =
             var Item = this.Content[this.CurPos.ContentPos];
             if ( type_Paragraph == Item.GetType() )
             {
-                var Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this );
-                var Image;
-                var bChart = false;
-                if(!(typeof Chart === "string"))
-                    Image = new WordImage( Drawing, this, this.DrawingDocument, null );
+                var Drawing;
+                if(!isRealObject(Chart))
+                {
+                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this );
+                    var Image = new WordImage( Drawing, this, this.DrawingDocument, null );
+                    Drawing.Set_GraphicObject(Image);
+
+                    Image.init( Img, W, H, Chart );
+                }
                 else
                 {
-                    Image = new CChartAsGroup(Drawing, this, this.DrawingDocument, null)
-                    bChart = true;
+                    Drawing = Chart;
                 }
-                Drawing.Set_GraphicObject(Image);
-
                 if ( true === bFlow )
                 {
                     Drawing.Set_DrawingType( drawing_Anchor );
@@ -1810,13 +1811,6 @@ CDocument.prototype =
                     Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
                     Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0);
                     Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0);
-                }
-
-                if(!bChart)
-                    Image.init( Img, W, H, Chart );
-                else
-                {
-                    Image.initFromBinary(Chart);
                 }
                 this.Paragraph_Add( Drawing );
                 this.Select_DrawingObject( Drawing.Get_Id() );

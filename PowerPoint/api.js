@@ -4807,7 +4807,7 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
     if ( isObject(chartBinary) )
     {
         var binary = chartBinary["binary"];
-        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
+        //if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
         {
             History.Create_NewPoint();
             this.WordControl.m_oLogicDocument.addChart(binary);

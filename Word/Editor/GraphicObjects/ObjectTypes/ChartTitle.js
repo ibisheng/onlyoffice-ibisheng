@@ -74,6 +74,7 @@ CChartTitle.prototype =
     {
         if(this.txBody && this.txBody.content)
         {
+            AllFonts["Calibri"] = true;
             this.txBody.content.Document_Get_AllFontNames(AllFonts);
         }
     },
