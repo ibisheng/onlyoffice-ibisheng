@@ -22,31 +22,6 @@ CAscTexture.prototype.get_image = function() { return this.Image; }
 
 // ---------------------------------------------------------------
 
-function CColor (r,g,b){
-    this.r = (undefined == r) ? 0 : r;
-    this.g = (undefined == g) ? 0 : g;
-    this.b = (undefined == b) ? 0 : b;
-}
-CColor.prototype.get_r = function(){return this.r}
-CColor.prototype.put_r = function(v){this.r = v; this.hex = undefined;}
-CColor.prototype.get_g = function(){return this.g;}
-CColor.prototype.put_g = function(v){this.g = v; this.hex = undefined;}
-CColor.prototype.get_b = function(){return this.b;}
-CColor.prototype.put_b = function(v){this.b = v; this.hex = undefined;}
-CColor.prototype.get_hex = function()
-{
-	if(!this.hex)
-	{
-		var r = this.r.toString(16);
-		var g = this.g.toString(16);
-		var b = this.b.toString(16);
-		this.hex = ( r.length == 1? "0" + r: r) +
-					( g.length == 1? "0" + g: g) +
-					( b.length == 1? "0" + b: b);
-	}
-	return this.hex;
-}
-
 // цвет. может быть трех типов:
 // COLOR_TYPE_SRGB   : // value - не учитывается
 // COLOR_TYPE_PRST   : // value - имя стандартного цвета (map_prst_color)

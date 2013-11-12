@@ -839,19 +839,15 @@
 
 				// Fill cell
 				var bg = oStyle.getFill();
-				if(null != bg)
-					bg = bg.getRgb();
-				var oColor = bg !== null ? asc.numberToCSSColor(bg) : "#FFFFFF";
+				var oColor = bg !== null ? bg : new CColor(255, 255, 255);
 				oGraphics.save().beginPath().setFillStyle(oColor);
 				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
 				oGraphics.fill();
 
-				var bc;
-				var t = this;
+
 				var drawBorder = function (b, x1, y1, x2, y2) {
 					if (null != b && c_oAscBorderStyles.None !== b.s) {
-						bc = asc.numberToCSSColor(b.c.getRgb());
-						oGraphics.setStrokeStyle(bc);
+						oGraphics.setStrokeStyle(b.c);
 
 						// ToDo поправить
 						oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
@@ -867,9 +863,7 @@
 
 				// Draw text
 				var fc = oStyle.getFontColor();
-				if(null != fc)
-					fc = fc.getRgb();
-				var oFontColor = fc !== null ? asc.numberToCSSColor(fc) : "#000000";
+				var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
 				var format = oStyle.getFont();
 				// Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
 				var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs,

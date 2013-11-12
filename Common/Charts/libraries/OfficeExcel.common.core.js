@@ -1360,7 +1360,7 @@
 			if(arguments[13] && arguments[13].color)
 				context.setFillStyle(arguments[13].color);
 			else
-				context.setFillStyle("#000000");
+				context.setFillStyle(new CColor(0, 0, 0));
 			x = x/(scale);
 			y = y/(scale);
 			// Rotate the canvas if need be

@@ -46,7 +46,7 @@ function RgbColor(rgb)
 {
 	this.Properties = {
 		rgb : 0
-	}
+	};
 	this.rgb = rgb;
 }
 RgbColor.prototype =
@@ -96,15 +96,18 @@ RgbColor.prototype =
 	getB : function()
 	{
 		return this.rgb & 0xff;
+	},
+	getA : function () {
+		return 1;
 	}
-}
+};
 function ThemeColor()
 {
 	this.Properties = {
 		rgb: 0,
 		theme: 1,
 		tint: 2
-	}
+	};
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
@@ -175,6 +178,9 @@ ThemeColor.prototype =
 	{
 		return this.rgb & 0xff;
 	},
+	getA : function () {
+		return 1;
+	},
 	rebuild : function(theme)
 	{
 		var nRes = 0;
@@ -217,7 +223,7 @@ ThemeColor.prototype =
 		}
 		this.rgb = nRes;
 	}
-}
+};
 function CorrectAscColor(asc_color)
 {
 	if (null == asc_color)
@@ -2953,7 +2959,6 @@ CCellValue.prototype =
 					}
 				}
 			}
-			oNewItem.format.c = oNewItem.format.getRgbOrNull();
 			oNewItem.format.skip = false;
 			oNewItem.format.repeat = false;
 			aResult.push(oNewItem);
@@ -2989,7 +2994,6 @@ CCellValue.prototype =
 							}
 						}
 					}
-					oNewItem.format.c = oNewItem.format.getRgbOrNull();
 					aResult.push(oNewItem);
 				}
 			}

@@ -461,9 +461,9 @@ var c_oAscChartStyle = {
     Accent6: 8
 };
  
-var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
-var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";
-var c_oAscCoAuthoringLockTablePropertiesBorderColor	= "rgba(255,144,0,1)";
+var c_oAscCoAuthoringMeBorderColor					= new CColor(22, 156, 0);
+var c_oAscCoAuthoringOtherBorderColor				= new CColor(238, 53, 37);
+var c_oAscCoAuthoringLockTablePropertiesBorderColor	= new CColor(255, 144, 0);
 var c_oAscCoAuthoringDottedWidth					= 2;
 var c_oAscCoAuthoringDottedDistance					= 2;
 

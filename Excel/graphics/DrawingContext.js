@@ -531,7 +531,8 @@ function DrawingContext(settings) {
 	/** @type FontProperties */
 	this.font = settings !== undefined && settings.font !== undefined ? settings.font : new FontProperties("Arial", 11);
 
-	this.fillColor = {r: 255, g: 255, b: 255, a: 255};
+	// CColor
+	this.fillColor = new CColor(255, 255, 255);
     return this;
 }
 
@@ -764,10 +765,17 @@ DrawingContext.prototype = {
 		return this.ctx.lineJoin;
 	},
 
+	/**
+	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @returns {DrawingContext}
+	 */
 	setFillStyle: function (val) {
-		var c = parseColor(val);
-		this.fillColor = {r: c.r, g: c.g, b: c.b, a: asc_floor(c.a * 255)};
-		this.ctx.fillStyle = c.rgba;
+		var _r = val.getR();
+		var _g = val.getG();
+		var _b = val.getB();
+		var _a = val.getA();
+		this.fillColor = new CColor(_r, _g, _b, _a);
+		this.ctx.fillStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
 		return this;
 	},
 
@@ -776,8 +784,16 @@ DrawingContext.prototype = {
 		return this;
 	},
 
+	/**
+	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @returns {DrawingContext}
+	 */
 	setStrokeStyle: function (val) {
-		this.ctx.strokeStyle = val;
+		var _r = val.getR();
+		var _g = val.getG();
+		var _b = val.getB();
+		var _a = val.getA();
+		this.ctx.strokeStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
 		return this;
 	},
 

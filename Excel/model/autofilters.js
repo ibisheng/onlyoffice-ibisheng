@@ -234,6 +234,8 @@
 		function AutoFilters(currentSheet) {
 			if ( !(this instanceof AutoFilters) ) {return new AutoFilters();}
 			this.worksheet = currentSheet;
+
+			this.m_oColor = new CColor(120, 120, 120);
 			return this;
 		}
 
@@ -3086,7 +3088,7 @@
 					.beginPath()
 					.moveTo(x, y)
 					.lineTo(x, y1)
-					.setStrokeStyle('#787878')
+					.setStrokeStyle(this.m_oColor)
 					.stroke();
 				
 				ws.drawingCtx
@@ -3095,7 +3097,7 @@
 					.lineTo(x, y1 + meanLine)
 					.lineTo(x  - halfSize, y1)
 					.lineTo(x ,y1)
-					.setFillStyle('#787878')
+					.setFillStyle(this.m_oColor)
 					.fill();
 			},
 			
@@ -3119,7 +3121,7 @@
 					.lineTo(x + size,y)
 					.lineTo(x + halfSize,y + meanLine)
 					.lineTo(x , y)
-					.setFillStyle('#787878')
+					.setFillStyle(this.m_oColor)
 					.fill();
 			},
 

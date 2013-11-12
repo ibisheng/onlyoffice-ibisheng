@@ -1433,7 +1433,7 @@ function asc_CChartFont(object) {
 
     this.name = bCopy ? object.name : "Calibri";
     this.size = bCopy ? object.size : 10;
-    this.color = bCopy ? object.color : "#000000";
+    this.color = bCopy ? object.color : new CColor(0, 0, 0);
 
     this.bold = bCopy ? object.bold : 0;
     this.italic = bCopy ? object.italic : 0;
@@ -3275,11 +3275,6 @@ function DrawingObjects() {
 				var y2 = worksheet.rows[r_.r2 + 1].top - offsetY;
 				var w = x2 - x1;
 				var h = y2 - y1;
-				
-				/*overlayCtx.beginPath();
-				overlayCtx.setStrokeStyle("#ff0000");
-				overlayCtx.rect( x1, y1, w, h );
-				overlayCtx.stroke();*/
 								
 				drawingCtx.clearRect( x1, y1, w, h );
 				drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
@@ -4946,13 +4941,8 @@ function DrawingObjects() {
 
 	_this.selectDrawingObjectRange = function(id) {
 
-		var strokeColor = "#ff0000";
+		var strokeColor = new CColor(255, 0, 0);
 		worksheet.arrActiveChartsRanges = [];
-		
-		function getRandomColor() {
-			var r = function () { return Math.floor(Math.random() * 256) };
-			return "rgb(" + r() + "," + r() + "," + r() + ")";
-		}
 		
 		var bRaise = false;
 		for (var i = 0; i < aObjects.length; i++) {

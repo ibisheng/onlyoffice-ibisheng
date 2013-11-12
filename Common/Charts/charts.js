@@ -2007,7 +2007,7 @@ function findPrevValue(originalData, num, max) {
 
 function setFontChart(chart)
 {
-	var defaultColor = "#000000"
+	var defaultColor = new CColor(0, 0, 0);
 	var defaultFont = "Arial";
 	var defaultSize = "10";
 	

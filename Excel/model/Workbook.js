@@ -828,6 +828,8 @@ function DependencyGraph(wb) {
 		
 		if( rc.length == 0 )
 			return;
+
+		var color = new CColor(0, 0, 255);
 		
 		function draw_arrow(context, fromx, fromy, tox, toy) {
 			var headlen = 9;
@@ -852,8 +854,8 @@ function DependencyGraph(wb) {
 				.lineTo(
 					_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
 					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
-				.setStrokeStyle("#0000FF")
-				.setFillStyle("#0000FF")
+				.setStrokeStyle(color)
+				.setFillStyle(color)
 				.stroke()
 				.fill()
 				.closePath()
@@ -877,7 +879,7 @@ function DependencyGraph(wb) {
 				if( m2.apl > 0 && m2.apt >0)
 					ctx.save()
 						.setLineWidth(1)
-						.setStrokeStyle("#0000FF")
+						.setStrokeStyle(color)
 						.rect( _cc.pxToPt(m2.l),_cc.pxToPt(m2.t),_cc.pxToPt(m2.w-1),_cc.pxToPt(m2.h-1) )
 						.stroke()
 						.restore();
@@ -894,7 +896,7 @@ function DependencyGraph(wb) {
 						.arc(_cc.pxToPt(Math.floor(m2.apl)),
 							_cc.pxToPt(Math.floor(m2.apt)),
 							3,0, 2 * Math.PI, false,-0.5,-0.5)
-						.setFillStyle("#0000FF")
+						.setFillStyle(color)
 						.fill()
 						.closePath()
 						.restore();

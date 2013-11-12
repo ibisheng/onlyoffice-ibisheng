@@ -22,7 +22,6 @@
 		var asc_floor   = asc.floor;
 		var asc_ceil    = asc.ceil;
 		var asc_round   = asc.round;
-		var asc_n2css   = asc.numberToCSSColor;
 		var asc_n2Color   = asc.numberToAscColor;
 		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
@@ -144,7 +143,7 @@
 			/** @type {String} */
 			this.s = style !== undefined ? style : c_oAscBorderStyles.None;
 			/** @type {Number} */
-			this.c = color !== undefined ? color.getRgb() : 0;
+			this.c = color !== undefined ? color : new CColor(0, 0, 0);
 			/** @type {Number} */
 			this.w = width !== undefined ? width : 0;
 			/** @type {Boolean} */
@@ -161,49 +160,26 @@
 			}
 			this.header = {
 				style: [
-				// Old header colors
-				/*{ // kHeaderDefault
-					background: "#DFE3E8",
-					border: "#B1B5BA",
-					color: "#363636"
-				},
-				{ // kHeaderActive
-					background: "#FFDD62",
-					border: "#C28A30",
-					color: "#363636"
-				},
-				{ // kHeaderHighlighted
-					background: "#FFEDA9",
-					border: "#E8BF3A",
-					color: "#656A70"
-				},
-				{ // kHeaderSelected
-					background: "#AAAAAA",
-					border: "#75777A",
-					color: "#363636"
-				}*/
-
-
-				// New header colors
+				// Header colors
 				{ // kHeaderDefault
-					background: "#F4F4F4",
-					border: "#D5D5D5",
-					color: "#363636"
+					background: new CColor(244, 244, 244),
+					border: new CColor(213, 213, 213),
+					color: new CColor(54, 54, 54)
 				},
 				{ // kHeaderActive
-					background: "#C1C1C1",
-					border: "#929292",
-					color: "#363636"
+					background: new CColor(193, 193, 193),
+					border: new CColor(146, 146, 146),
+					color: new CColor(54, 54, 54)
 				},
 				{ // kHeaderHighlighted
-					background: "#DFDFDF",
-					border: "#AFAFAF",
-					color: "#656A70"
+					background: new CColor(223, 223, 223),
+					border: new CColor(175, 175, 175),
+					color: new CColor(101, 106, 112)
 				},
 				{ // kHeaderSelected
-					background: "#AAAAAA",
-					border: "#75777A",
-					color: "#363636"
+					background: new CColor(170, 170, 170),
+					border: new CColor(117, 119, 122),
+					color: new CColor(54, 54, 54)
 				}
 				],
 				cornerColor: "#C1C1C1"
@@ -212,30 +188,21 @@
 				fontName: "Calibri",
 				fontSize: 11,
 				defaultState: {
-					background: "#FFF",
-					border: "#DADCDD",
+					background: new CColor(255, 255, 255),
+					border: new CColor(218, 220, 221),
 					color: "#000",
 					colorNumber : 0
 				},
 				padding: 2/*px horizontal padding*/
 			};
-			this.activeCellBorderColor			= "rgba(105,119,62,0.7)";
-			this.activeCellBackground			= "rgba(157,185,85,.2)";
+			this.activeCellBorderColor			= new CColor(105, 119, 62, 0.7);
+			this.activeCellBackground			= new CColor(157, 185, 85, 0.2);
 
-			//this.activeCellBorderColor			= "rgba(0,0,255,.5)";
-			//this.activeCellBackground			= "rgba(190,190,255,.5)";
-			// this.formulaRangeBorderColor		= "rgba(0,0,255,1)";
-				this.formulaRangeBorderColor		= [	"rgba(0,53,214,1)",
-														"rgba(216,0,0,1)",
-														"rgba(214,160,0,1)",
-														"rgba(107,214,0,1)",
-														"rgba(0,214,53,1)",
-														"rgba(0,214,214,1)",
-														"rgba(107,0,214,1)",
-														"rgba(214,0,160,1)" ];
+			this.formulaRangeBorderColor		= [	new CColor(0, 53, 214) , new CColor(216, 0, 0) , new CColor(214, 160, 0),
+													new CColor(107, 214, 0), new CColor(0, 214, 53), new CColor(0, 214, 214),
+													new CColor(107, 0, 214), new CColor(214, 0, 160)];
 			// Цвет заливки границы выделения области автозаполнения
-			this.fillHandleBorderColorSelect	= "rgba(255,255,255,1)";
-			//this.fillHandleBorderColorSelect	= "rgba(255,255,0,1)";
+			this.fillHandleBorderColorSelect	= new CColor(255, 255, 0, 1);
 			return this;
 		}
 
@@ -2174,8 +2141,6 @@
 					if (!c) {continue;}
 
 					var bg = c.getFill();
-					if(null != bg)
-						bg = bg.getRgb();
 					var mc = null;
 					var mwidth = 0, mheight = 0;
 
@@ -2200,7 +2165,7 @@
 								if (c2) {
 									var bg2 = c2.getFill();
 									if (bg2 !== null) {
-										ctx.setFillStyle(asc_n2css(bg2.getRgb()))
+										ctx.setFillStyle(bg2)
 												.fillRect(
 														this.cols[col + 1].left - offsetX - this.width_1px,
 														this.rows[row].top - offsetY - this.height_1px,
@@ -2212,7 +2177,7 @@
 								if (c3) {
 									var bg3 = c3.getFill();
 									if (bg3 !== null) {
-										ctx.setFillStyle(asc_n2css(bg3.getRgb()))
+										ctx.setFillStyle(bg3)
 												.fillRect(
 														this.cols[col].left - offsetX - this.width_1px,
 														this.rows[row + 1].top - offsetY - this.height_1px,
@@ -2229,7 +2194,7 @@
 					var y = this.rows[row].top - (bg !== null ? this.height_1px : 0);
 					var w = this.cols[col].width + this.width_1px * (bg !== null ? +1 : -1) + mwidth;
 					var h = this.rows[row].height + this.height_1px * (bg !== null ? +1 : -1) + mheight;
-					var color = bg !== null ? asc_n2css(bg) : this.settings.cells.defaultState.background;
+					var color = bg !== null ? bg : this.settings.cells.defaultState.background;
 					ctx.setFillStyle(color)
 							.fillRect(x - offsetX, y - offsetY, w, h);
 				}
@@ -2517,8 +2482,7 @@
 					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
-							color = asc_n2css(bc);
-							ctx.setStrokeStyle(color);
+							ctx.setStrokeStyle(bc);
 						}
 						ctx.setLineWidth(border.w)
 							.beginPath()
@@ -2531,8 +2495,7 @@
 					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
-							color = asc_n2css(bc);
-							ctx.setStrokeStyle(color);
+							ctx.setStrokeStyle(bc);
 						}
 						ctx.setLineWidth(border.w)
 							.beginPath()
@@ -2545,8 +2508,7 @@
 					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
-							color = asc_n2css(bc);
-							ctx.setStrokeStyle(color);
+							ctx.setStrokeStyle(bc);
 						}
 						ctx.setLineWidth(border.w)
 							.beginPath()
@@ -2948,7 +2910,7 @@
 				}
 
 				if (null !== this.activeMoveRange) {
-					ctx.setStrokeStyle("rgba(0,0,0,1)")
+					ctx.setStrokeStyle(new CColor(0, 0, 0))
 						.setLineWidth(1)
 						.beginPath();
 					var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(this.visibleRange);
@@ -4226,6 +4188,8 @@
 				ctx.clear();
 				this._drawSelection();
 
+				var color = new CColor(0, 0, 255);
+
 				function draw_arrow(context, fromx, fromy, tox, toy) {
 					var headlen = 9,
 						showArrow = tox > that.getCellLeft(0, 0) && toy > that.getCellTop(0, 0),
@@ -4258,8 +4222,8 @@
 								_cc.pxToPt(toy - headlen * Math.sin(angle - _a)));
 						
 					context
-						.setStrokeStyle("#0000FF")
-						.setFillStyle("#0000FF")
+						.setStrokeStyle(color)
+						.setFillStyle(color)
 						.stroke()
 						.fill()
 						.closePath()
@@ -4381,11 +4345,11 @@
 								.arc(_cc.pxToPt(Math.floor(nodeCellMetrics.apl)),
 									_cc.pxToPt(Math.floor(nodeCellMetrics.apt)),
 									3,0, 2 * Math.PI, false,-0.5,-0.5)
-								.setFillStyle("#0000FF")
+								.setFillStyle(color)
 								.fill()
 								.closePath()
 								.setLineWidth(1)
-								.setStrokeStyle("#0000FF")
+								.setStrokeStyle(color)
 								.rect( _cc.pxToPt(nodeCellMetrics.l),_cc.pxToPt(nodeCellMetrics.t),_cc.pxToPt(nodeCellMetrics.w-1),_cc.pxToPt(nodeCellMetrics.h-1) )
 								.stroke()
 								.restore();
@@ -9148,9 +9112,6 @@
 				t.arrActiveFormulaRanges = [];
 				
 				var oFontColor = c.getFontcolor();
-				if(null != oFontColor)
-					oFontColor = oFontColor.getRgb();
-					
 				// Скрываем окно редактирования комментария
 				this.model.workbook.handlers.trigger("asc_onHideComment");
 					
@@ -9163,7 +9124,7 @@
 					fragments: fragments !== undefined ? fragments : c.getValueForEdit2(),
 					flags: fl,
 					font: new asc_FP(c.getFontname(), c.getFontsize()),
-					background: bg !== null ? asc_n2css(bg) : t.settings.cells.defaultState.background,
+					background: bg !== null ? bg : t.settings.cells.defaultState.background,
 					hasBackground: bg !== null,
 					textColor: oFontColor || t.settings.cells.defaultState.color,
 					cursorPos: cursorPos,

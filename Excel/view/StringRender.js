@@ -16,7 +16,6 @@
 		 */
 		var asc = window["Asc"];
 		var asc_calcnpt = asc.calcNearestPt;
-		var asc_n2css   = asc.numberToCSSColor;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_typeof  = asc.typeOf;
 		var asc_round   = asc.round;
@@ -146,11 +145,8 @@
 				if ( asc_typeof(str) === "string" ) {
 					this.fragments.push({text: str, format: {}});
 				} else {
-					for (var i = 0, c, fmt; i < str.length; ++i) {
-						fmt = str[i].format;
-						c = fmt.c;
-						if (asc_typeof(c) === "number") {fmt.c = asc_n2css(c);}
-						this.fragments.push({text: str[i].text, format: fmt});
+					for (var i = 0; i < str.length; ++i) {
+						this.fragments.push({text: str[i].text, format: str[i].format});
 					}
 				}
 				this.flags = flags;
@@ -970,12 +966,7 @@
                                 f_ = f;
                                 this.fontNeedUpdate = false;
                             }
-							var fillStyle;
-							if(null != p.c && null != p.c.getRgb)
-								fillStyle = p.c.getRgb();
-							else
-								fillStyle = p.c || textColor;
-							ctx.setFillStyle(fillStyle);
+							ctx.setFillStyle(p.c || textColor);
 							p_ = p;
 						}
 						if (p.skip > 0) {

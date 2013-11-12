@@ -28,7 +28,6 @@
 		var asc_DC = asc.DrawingContext;
 		var asc_TR = asc.CellTextRender;
 		var asc_FP = asc.FontProperties;
-		var asc_parsecolor = asc.parseColor;
 		var asc_incDecFonSize = asc.incDecFonSize;
 
 
@@ -137,12 +136,12 @@
 			constructor: CellEditor,
 
 			defaults: {
-				background  : "#fff",
+				background  : new CColor(255, 255, 255),
 				font        : new asc_FP("Calibri", 11),
 				padding     : 2,
-				selectColor : "rgba(190,190,255,.5)",
+				selectColor : new CColor(190, 190, 255, 0.5),
 				textAlign   : kLeftAlign,
-				textColor   : "#000",
+				textColor   : new CColor(0, 0, 0),
 
 				canvasZindex  : "1000",
 				blinkInterval : 500,
@@ -1565,7 +1564,7 @@
 						break;
 					case "fa": format.va = val; break;
 					case "c":
-						format.c = asc.numberToCSSColor(val.getRgb());
+						format.c = val;
 						formatAdditional.theme = null;
 						formatAdditional.tint = null;
 						if(val instanceof ThemeColor)

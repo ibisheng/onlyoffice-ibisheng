@@ -506,10 +506,8 @@ function asc_CCellCommentator(currentSheet) {
 
 	// Drawing settings
 	_this.bShow = true;
-	_this.commentIconColor = "#FF9000";
-	_this.commentBorderColor = "#C7C7C7";
-	_this.commentTextColor = "#000000";
-	_this.commentFillColor = "#FFFF00";
+	_this.commentIconColor = new CColor(255, 144, 0);
+	_this.commentFillColor = new CColor(255, 255, 0);
 	_this.commentBorderWidth = 1; // px
 	_this.commentPadding = 4; 	// px
 	_this.minAreaWidth = 160; 	// px

@@ -3,9 +3,6 @@ var g_fontManagerExcel = new CFontManager();
 g_fontManagerExcel.Initialize(true);
 
 var oldPpi = undefined;
-var lastColor = undefined,
-    lastResult = null,
-    reColor = /^\s*(?:#?([0-9a-f]{6})|#?([0-9a-f]{3})|rgba?\s*\(\s*((?:\d*\.?\d+)(?:\s*,\s*(?:\d*\.?\d+)){2,3})\s*\))\s*$/i;
 
 var asc_round = function round(x) {
 	var y = x + (x >= 0 ? .5 : -.4);
@@ -39,68 +36,6 @@ function getCvtRatio(fromUnits, toUnits, ppi) {
 		oldPpi = ppi;
 	}
 	return cvt[fromUnits][toUnits];
-}
-
-function parseColor(c) {
-	if (lastColor === c) {return lastResult;}
-
-	var bin, m, x, type, r, g, b, a, css, s, rgb, rgba;
-
-	if (asc_typeof(c) === "number") {
-
-		type = 4;
-		r = (c >> 16) & 0xFF;
-		g = (c >> 8) & 0xFF;
-		b = c & 0xFF;
-		a = 1;
-		bin = c;
-
-	} else {
-
-		m = reColor.exec(c);
-		if (!m) {return null;}
-
-		if (m[1]) {
-			x = [ m[1].slice(0, 2), m[1].slice(2, 4), m[1].slice(4) ];
-			type = 1;
-		} else if (m[2]) {
-			x = [ m[2].slice(0, 1), m[2].slice(1, 2), m[2].slice(2) ];
-			type = 0;
-		} else {
-			x = m[3].split(/\s*,\s*/i);
-			type = x.length === 3 ? 2 : 3;
-		}
-
-		r = parseInt(type !== 0 ? x[0] : x[0] + x[0], type < 2 ? 16 : 10);
-		g = parseInt(type !== 0 ? x[1] : x[1] + x[1], type < 2 ? 16 : 10);
-		b = parseInt(type !== 0 ? x[2] : x[2] + x[2], type < 2 ? 16 : 10);
-		a = type === 3 ? (asc_round(parseFloat(x[3]) * 100) * 0.01) : 1;
-		bin = (r << 16) | (g << 8) | b;
-
-	}
-
-	css = bin.toString(16);
-	while (css.length < 6) {css = "0" + css;}
-	css = "#" + css;
-
-	s = r + ", " + g + ", " + b;
-	rgb = "rgb(" + s + ")";
-	rgba = "rgba(" + s + ", " + a + ")";
-
-	lastColor = c;
-	lastResult = {
-		r: r,
-		g: g,
-		b: b,
-		a: a,
-		rgb:   rgb,
-		rgba:  rgba,
-		color: css,
-		origColor: type < 2 ? css : (type === 2 ? rgb : (type === 3 ? rgba : bin)),
-		origType:  type /* 0 = '#abc' form; 1 = '#aabbcc' form; 2 = 'rgb(r,g,b)' form; 3 = 'rgba(r,g,b,a)' form; 4 = 0xRRGGBB form */,
-		binary: bin
-	};
-	return lastResult;
 }
 
 function CDrawingContextWord()
@@ -249,11 +184,17 @@ CDrawingContextWord.prototype =
             d = Math.abs(fm.m_lDescender * factor);
         return new TextMetrics(w, b + d, l, b, d, this.font.FontSize, 0, wBB);
     },
-	
-	setFillStyle: function(val)
-    {
-        var c = parseColor(val);
-        this.Graphics.b_color1(c.r, c.g, c.b, (c.a * 255 + 0.5) >> 0);
+
+	/**
+	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @returns {CDrawingContextWord}
+	 */
+	setFillStyle: function (val) {
+		var _r = val.getR();
+		var _g = val.getG();
+		var _b = val.getB();
+		var _a = val.getA();
+        this.Graphics.b_color1(_r, _g, _b, (_a * 255 + 0.5) >> 0);
         return this;
     }
 

@@ -57,8 +57,6 @@ function CPdfPrinter(sUrlPath)
     ppiTest.remove();
 
     this.bIsSimpleCommands = false;
-
-    this.parseColor = window["Asc"].parseColor;
 }
 
 CPdfPrinter.prototype =
@@ -185,21 +183,34 @@ CPdfPrinter.prototype =
     {
         return "miter";
     },
-
+	/**
+	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @returns {CPdfPrinter}
+	 */
     setFillStyle : function(val)
     {
-        var c = this.parseColor(val);
-        this.DocumentRenderer.b_color1(c.r, c.g, c.b, (c.a * 255 + 0.5) >> 0);
+		var _r = val.getR();
+		var _g = val.getG();
+		var _b = val.getB();
+		var _a = val.getA();
+        this.DocumentRenderer.b_color1(_r, _g, _b, (_a * 255 + 0.5) >> 0);
         return this;
     },
     setFillPattern : function(val)
     {
         return this;
     },
+	/**
+	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @returns {CPdfPrinter}
+	 */
     setStrokeStyle : function(val)
     {
-        var c = this.parseColor(val);
-        this.DocumentRenderer.p_color(c.r, c.g, c.b, (c.a * 255 + 0.5) >> 0);
+		var _r = val.getR();
+		var _g = val.getG();
+		var _b = val.getB();
+		var _a = val.getA();
+        this.DocumentRenderer.p_color(_r, _g, _b, (_a * 255 + 0.5) >> 0);
         return this;
     },
     setLineWidth : function(val)
