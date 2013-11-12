@@ -1,5 +1,5 @@
 /** @define {boolean} */
-var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = false;
+var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = true;
 
 var bIsLocalFontsUse = false;
 
@@ -113,15 +113,10 @@ function CFontFileLoader(id)
         }
         scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
 
-        var _src = this.Id;
-        var _srcInd = _src.indexOf(".");
-        if (-1 != _srcInd)
-            _src = _src.substring(0, _srcInd);
-
         if (this.IsNeedAddJSToFontPath)
-            scriptElem.setAttribute('src', basePath + "js/" + _src + ".js");
+            scriptElem.setAttribute('src', basePath + "js/" + this.Id + ".js");
         else
-            scriptElem.setAttribute('src', basePath + _src + ".js");
+            scriptElem.setAttribute('src', basePath + this.Id + ".js");
         scriptElem.setAttribute('type','text/javascript');
         document.getElementsByTagName('head')[0].appendChild(scriptElem);
         return false;
@@ -129,10 +124,17 @@ function CFontFileLoader(id)
 
     this._callback_font_load = function()
     {
-        if (oThis.stream_index != -1)
-            oThis.Status = 0;
-        else
+        if (!window[oThis.Id])
             oThis.Status = 1;
+
+        var __font_data_idx = g_fonts_streams.length;
+        g_fonts_streams[__font_data_idx] = CreateFontData4(window[oThis.Id]);
+        oThis.SetStreamIndex(__font_data_idx);
+
+        oThis.Status = 0;
+
+        // удаляем строку
+        delete window[oThis.Id];
 
         if (null != oThis.callback)
             oThis.callback();
@@ -922,53 +924,6 @@ CFontInfo.prototype =
     }
 }
 
-function CImageLoader(id)
-{
-    this.Id         = id;
-    this.Status     = -1;  // -1 - notloaded, 0 - loaded, 1 - error, 2 - loading, 3 - imageloading
-    this.Image      = null;
-
-    var oThis = this;
-    this.CheckLoaded = function()
-    {
-        return (0 == oThis.Status || 1 == oThis.Status);
-    }
-    this.LoadImageAsync = function(basePath, _callback)
-    {
-        this.callback = _callback;
-        if (-1 != this.Status)
-            return true;
-
-        this.Status = 2;
-        var scriptElem = document.createElement('script');
-
-        if (scriptElem.readyState && false)
-        {
-            scriptElem.onreadystatechange = function () {
-                if (this.readyState == 'complete' || this.readyState == 'loaded')
-                {
-                    scriptElem.onreadystatechange = null;
-                    setTimeout(oThis._callback_font_load(), 0);
-                }
-            }
-        }
-        scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
-
-        scriptElem.setAttribute('src',basePath + this.Id + ".js");
-        scriptElem.setAttribute('type','text/javascript');
-        document.getElementsByTagName('head')[0].appendChild(scriptElem);
-        return false;
-    }
-
-    this._callback_font_load = function()
-    {
-        if (oThis.Status != 3)
-            oThis.Status = 1;
-
-        if (null != oThis.callback)
-            oThis.callback();
-    }
-}
 // здесь если type == FONT_TYPE_EMBEDDED, то thumbnail - это base64 картинка,
 // иначе - это позиция (y) в общем табнейле всех шрифтов (ADDITIONAL и STANDART)
 function CFont(name, id, type, thumbnail, style)
@@ -995,3 +950,337 @@ function CImage(src)
     this.Image  = null;
     this.Status = ImageLoadStatus.Complete;
 }
+
+// ALL_FONTS_PART -------------------------------------------------------------
+(function(document){
+
+    var __len_files = window["__fonts_files"].length;
+
+    window.g_font_files = new Array(__len_files);
+    for (var i = 0; i < __len_files; i++)
+    {
+        window.g_font_files[i] = new CFontFileLoader(window["__fonts_files"][i]);
+    }
+
+    var __len_infos = window["__fonts_infos"].length;
+
+    window.g_font_infos = new Array(__len_infos);
+    window.g_map_font_index = {};
+
+    for (var i = 0; i < __len_infos; i++)
+    {
+        var _info = window["__fonts_infos"][i];
+        window.g_font_infos[i] = new CFontInfo(_info[0], i, 0, _info[1], _info[2], _info[3], _info[4], _info[5], _info[6], _info[7], _info[8]);
+        window.g_map_font_index[_info[0]] = i;
+    }
+
+    // удаляем временные переменные
+    delete window["__fonts_files"];
+    delete window["__fonts_infos"];
+
+})(window.document);
+
+var charA = "A".charCodeAt(0);
+var charZ = "Z".charCodeAt(0);
+var chara = "a".charCodeAt(0);
+var charz = "z".charCodeAt(0);
+var char0 = "0".charCodeAt(0);
+var char9 = "9".charCodeAt(0);
+var charp = "+".charCodeAt(0);
+var chars = "/".charCodeAt(0);
+
+function DecodeBase64Char(ch)
+{
+    if (ch >= charA && ch <= charZ)
+        return ch - charA + 0;
+    if (ch >= chara && ch <= charz)
+        return ch - chara + 26;
+    if (ch >= char0 && ch <= char9)
+        return ch - char0 + 52;
+    if (ch == charp)
+        return 62;
+    if (ch == chars)
+        return 63;
+    return -1;
+}
+
+var b64_decode = new Array();
+for (var i = charA; i <= charZ; i++)
+    b64_decode[i] = i - charA + 0;
+for (var i = chara; i <= charz; i++)
+    b64_decode[i] = i - chara + 26;
+for (var i = char0; i <= char9; i++)
+    b64_decode[i] = i - char0 + 52;
+b64_decode[charp] = 62;
+b64_decode[chars] = 63;
+
+function DecodeBase64(imData, szSrc)
+{
+    var srcLen = szSrc.length;
+    var nWritten = 0;
+
+    var dstPx = imData.data;
+    var index = 0;
+
+    if (window.chrome)
+    {
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
+                if (nCh == -1)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+    else
+    {
+        var p = b64_decode;
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = p[szSrc.charCodeAt(index++)];
+                if (nCh == undefined)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+}
+
+function CreateFontData2(szSrc, dstLen)
+{
+    var srcLen = szSrc.length;
+    var nWritten = 0;
+
+    if (dstLen === undefined)
+        dstLen = srcLen;
+
+    var pointer = g_memory.Alloc(dstLen);
+    var stream = new FT_Stream(pointer.data, dstLen);
+    stream.obj = pointer.obj;
+
+    var dstPx = stream.data;
+    var index = 0;
+
+    if (window.chrome)
+    {
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
+                if (nCh == -1)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+    else
+    {
+        var p = b64_decode;
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = p[szSrc.charCodeAt(index++)];
+                if (nCh == undefined)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+
+    return stream;
+}
+
+function CreateFontData3(szSrc)
+{
+    var srcLen = szSrc.length;
+    var nWritten = 0;
+
+    var pointer = g_memory.Alloc(srcLen);
+    var stream = new FT_Stream(pointer.data, srcLen);
+    stream.obj = pointer.obj;
+
+    var dstPx = stream.data;
+    var index = 0;
+
+    while (index < srcLen)
+    {
+        dstPx[index] = (szSrc.charCodeAt(index) & 0xFF);
+        index++;
+    }
+
+    return stream;
+}
+
+function CreateFontData4(szSrc)
+{
+    var srcLen = szSrc.length;
+    var nWritten = 0;
+
+    var index = 0;
+    var dst_len = "";
+    while (true)
+    {
+        var _c = szSrc.charCodeAt(index);
+        if (_c == ";".charCodeAt(0))
+            break;
+
+        dst_len += String.fromCharCode(_c);
+        index++;
+    }
+
+    index++;
+    var dstLen = parseInt(dst_len);
+
+    var pointer = g_memory.Alloc(dstLen);
+    var stream = new FT_Stream(pointer.data, dstLen);
+    stream.obj = pointer.obj;
+
+    var dstPx = stream.data;
+
+    if (window.chrome)
+    {
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
+                if (nCh == -1)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+    else
+    {
+        var p = b64_decode;
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = p[szSrc.charCodeAt(index++)];
+                if (nCh == undefined)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+
+    return stream;
+}
+
+
+var g_fonts_streams = new Array();
+// сначала хотел писать "вытеснение" из этого мапа.
+// но тогда нужно хранить base64 строки. Это не круто. По памяти - даже
+// выигрыш будет. Не особо то шрифты жмутся lzw или deflate
+// поэтому лучше из памяти будем удалять base64 строки
+// ----------------------------------------------------------------------------
