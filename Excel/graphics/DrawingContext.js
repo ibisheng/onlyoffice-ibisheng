@@ -921,6 +921,7 @@ DrawingContext.prototype = {
     },
 	
 	fillText: function (text, x, y, maxWidth, charWidths, angle) {
+		var t = this;
 		function fillGlyph(pGlyph,fmgr) {
 			var nW = pGlyph.oBitmap.nWidth;
 			var nH = pGlyph.oBitmap.nHeight;
@@ -933,9 +934,9 @@ DrawingContext.prototype = {
 			if (window.g_isMobileVersion) {
 				// Special for iPad (5.1)
 
-				var _r = this.fillColor.r;
-				var _g = this.fillColor.g;
-				var _b = this.fillColor.b;
+				var _r = t.fillColor.r;
+				var _g = t.fillColor.g;
+				var _b = t.fillColor.b;
 
 				if (!_r && !_g && !_b) {
 					this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
@@ -958,7 +959,7 @@ DrawingContext.prototype = {
 					this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
 				}
 			} else {
-				pGlyph.oBitmap.oGlyphData.checkColor(this.fillColor.r, this.fillColor.g, this.fillColor.b, nW, nH);
+				pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
                 pGlyph.oBitmap.draw(this.ctx, nX, nY);
 			}
 		}
