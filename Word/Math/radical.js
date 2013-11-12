@@ -174,7 +174,7 @@ function CRadical()
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
-    if( typeof(props.type) !== "undefined" && props.type !== null)
+    if(typeof(props.type) !== "undefined" && props.type !== null)
         this.type = props.type;
 
     this.setDimension(1, 1);

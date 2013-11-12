@@ -43,6 +43,12 @@ CMathMatrix.prototype.old_init = function(countRow, countCol)
 }
 CMathMatrix.prototype.init = function(props)
 {
+    if(typeof(props.row) === "undefined" || props.row === null)
+        props.row = 1;
+
+    if(typeof(props.column) === "undefined" || props.column === null)
+        props.column = 1;
+
     this.setDimension(props.row, props.column);
     this.setContent();
 

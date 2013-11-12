@@ -855,8 +855,14 @@ CAccent.prototype.init = function(props)
     var code, accent;
     var type = props.chrType;
 
+    var bCode = false,
+        bType = typeof(type) !== "undefined" && type !== null;
+
     if(typeof(props.chr) === "string")
+    {
+        bCode = true;
         code = props.chr.charCodeAt(0);
+    }
 
     /*var bDot        = code === 0x307 || props.chr.type === ACCENT_ONE_DOT,
         b2Dots      = code === 0x308 || props.chr.type === ACCENT_TWO_DOTS,
@@ -1057,9 +1063,10 @@ CAccent.prototype.init = function(props)
         glyph.init(props);
     }
     /////
-    else
+    else if(bCode || bType)
     {
         this.type = ACCENT_SIGN;
+
         accent = new CSign();
         var props = 
         {
@@ -1067,6 +1074,13 @@ CAccent.prototype.init = function(props)
             code:   code
         };
         accent.setSign(props);
+    }
+    else
+    {
+        this.type = ACCENT_COMB_CARON;
+
+        accent = new CCircumflex();
+        accent.setTurn(TURN_MIRROR_0);
     }
 
     this.setOperator(accent);

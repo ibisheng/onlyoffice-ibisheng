@@ -133,13 +133,13 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].setComposition(composition);
     },
-    setReferenceComp: function(Comp)
+    setReferenceComposition: function(Comp)
     {
         this.Composition = Comp;
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setReferenceComp(Comp);
+                this.elements[i][j].setReferenceComposition(Comp);
     },
     /*old_getTxtPrp: function()
     {

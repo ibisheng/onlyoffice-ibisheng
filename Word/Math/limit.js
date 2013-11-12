@@ -48,12 +48,15 @@ old_CLogarithm.prototype.getArgument = function()
 
 function CLimit()
 {
+    this.type = LIMIT_LOW;
     CMathBase.call(this);
 }
 extend(CLimit, CMathBase);
 CLimit.prototype.init = function(props)
 {
-    this.type = props.type;
+    if( typeof(props.type) !== "undefined" && props.type !== null)
+        this.type = props.type;
+
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();

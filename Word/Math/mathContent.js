@@ -12,7 +12,15 @@
 
 //Bugs
 
-//При добавлении в началло контента элемента , он вставляется с размером шрифта 11, пос мотреть getCurrRunPrp
+//При добавлении в началло контента элемента , он вставляется с размером шрифта 11, посмотреть getCurrRunPrp
+// При удаление из начала контента элемента, у всех остальных автоматом 11 размер шрифта
+
+
+
+/// TODO (tomorrow)
+// 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
+// 2. Дефолтовые значения для delimiters
+// 3. Дописать тестовый пример(добавить операторы)
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
@@ -501,6 +509,11 @@ CMathContent.prototype =
 
         this.content.push(element);
         this.CurPos++;
+
+        if(obj.typeObj === MATH_COMP)
+            this.addElementToContent( new CEmpty() );
+
+
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
@@ -537,13 +550,13 @@ CMathContent.prototype =
     {
         this.Composition = Composition;
     },
-    setReferenceComp: function(Comp) // отличие от setComposition: ссылка на общую формулу передается всем элементам контента
+    setReferenceComposition: function(Comp) // отличие от setComposition: ссылка на общую формулу передается всем элементам контента
     {
         this.Composition = Comp;
         for(var i = 1; i < this.content.length; i++)
         {
             if(this.content[i].value.typeObj == MATH_COMP)
-                this.content[i].value.setReferenceComp(Comp);
+                this.content[i].value.setReferenceComposition(Comp);
         }
     },
     createEquation: function(ind)
@@ -748,7 +761,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_INTEGRAL,
-                    limLoc:     NARY_UndOvr,
+                    limLoc:         NARY_UndOvr,
                     subHide:        true,
                     supHide:        true
                 };
@@ -760,7 +773,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_INTEGRAL,
-                    limLoc:     NARY_SubSup
+                    limLoc:         NARY_SubSup
                 };
                 integr.init(props);
                 integr.fillPlaceholders();
@@ -1369,8 +1382,8 @@ CMathContent.prototype =
                 {
                     begChrType:      PARENTHESIS_LEFT,
                     endChrType:      PARENTHESIS_RIGHT,
-                    shapeType:      DELIMITER_SHAPE_MATH,
-                    column:        1
+                    shapeType:       DELIMITER_SHAPE_MATH,
+                    column:          1
 
                 };
                 delim.init(props);
@@ -1393,7 +1406,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_SIGMA,
-                    limLoc:     NARY_UndOvr
+                    limLoc:         NARY_UndOvr
                 };
                 sigma.init(props);
 
@@ -1409,7 +1422,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_PRODUCT,
-                    limLoc:     NARY_UndOvr
+                    limLoc:         NARY_UndOvr
                 };
                 product.init(props);
                 var iterUp = product.getUpperIterator();
@@ -1429,7 +1442,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_SIGMA,
-                    limLoc:     NARY_UndOvr,
+                    limLoc:         NARY_UndOvr,
                     subHide:        true
                 };
                 nary.init(props);
@@ -1465,7 +1478,7 @@ CMathContent.prototype =
                 var props =
                 {
                     signType:       NARY_UNION,
-                    limLoc:     NARY_UndOvr
+                    limLoc:         NARY_UndOvr
                 };
                 union.init(props);
 
@@ -1605,7 +1618,7 @@ CMathContent.prototype =
                 var props =
                 {
                     begChrType:    DELIMITER_DOUBLE_LINE,
-                    endChrType:     DELIMITER_DOUBLE_LINE,
+                    endChrType:    DELIMITER_DOUBLE_LINE,
                     shapeType:     DELIMITER_SHAPE_MATH,
                     column:        1
                 };
@@ -1617,7 +1630,7 @@ CMathContent.prototype =
                 var props =
                 {
                     begChrType:    BRACKET_SQUARE_LEFT,
-                    endChrType:     BRACKET_SQUARE_LEFT,
+                    endChrType:    BRACKET_SQUARE_LEFT,
                     shapeType:     DELIMITER_SHAPE_MATH,
                     column:        1
                 };
@@ -1629,7 +1642,7 @@ CMathContent.prototype =
                 var props =
                 {
                     begChrType:    BRACKET_SQUARE_RIGHT,
-                    endChrType:     BRACKET_SQUARE_RIGHT,
+                    endChrType:    BRACKET_SQUARE_RIGHT,
                     shapeType:     DELIMITER_SHAPE_MATH,
                     column:        1
                 };
@@ -1641,7 +1654,7 @@ CMathContent.prototype =
                 var props =
                 {
                     begChrType:    BRACKET_SQUARE_RIGHT,
-                    endChrType:     BRACKET_SQUARE_LEFT,
+                    endChrType:    BRACKET_SQUARE_LEFT,
                     shapeType:     DELIMITER_SHAPE_MATH,
                     column:        1
                 };
@@ -1653,7 +1666,7 @@ CMathContent.prototype =
                 var props =
                 {
                     begChrType:    WHITE_SQUARE_LEFT,
-                    endChrType:     WHITE_SQUARE_RIGHT,
+                    endChrType:    WHITE_SQUARE_RIGHT,
                     shapeType:     DELIMITER_SHAPE_MATH,
                     column:        1
                 };
@@ -6465,7 +6478,7 @@ CMathComposition.prototype =
     },
     SetReferenceComposition: function()
     {
-        this.Root.setReferenceComp(this);
+        this.Root.setReferenceComposition(this);
     }
 
 }
@@ -6499,3 +6512,6 @@ function CEmpty()
     this.relate     = function() {};
 
 }
+
+
+

@@ -3840,6 +3840,8 @@ CDelimiter.prototype.init = function(props)
     else if(props.shape == DELIMITER_SHAPE_CENTERED || props.shp == DELIMITER_SHAPE_CENTERED)
         this.shape = DELIMITER_SHAPE_CENTERED;
 
+    if(props.column === null || typeof(props.column) === "undefined" )
+        props.column = 1;
 
     this.setDimension(1, props.column);
     this.setContent();

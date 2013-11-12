@@ -503,6 +503,10 @@ CNaryOperator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
 }
+CNaryOperator.prototype.setReferenceComposition = function(Compos)
+{
+    this.Composition = Compos;
+}
 
 function CSigma()
 {
