@@ -212,7 +212,8 @@ var c_oAscSelectionType = {
 	RangeImage		: 5,
 	RangeChart		: 6,
 	RangeShape		: 7,
-	RangeShapeText	: 8
+	RangeShapeText	: 8,
+	RangeChartText	: 9
 };
 
 var c_oAscLegendMarkerType = {

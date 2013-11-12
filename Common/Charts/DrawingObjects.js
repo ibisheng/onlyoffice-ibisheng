@@ -5041,7 +5041,7 @@ function DrawingObjects() {
 			if ( obj.graphicObject.Id == id ) {
 				if ( obj.isChart() ) {
 					if ( _this.controller.curState.id == STATES_ID_CHART_TEXT_ADD )
-						return c_oAscSelectionType.RangeShapeText;
+						return c_oAscSelectionType.RangeChartText;
 					return c_oAscSelectionType.RangeChart;
 				}
 					
