@@ -94,7 +94,23 @@ function DependencyGraph(wb) {
 			nodeslength ++;
 			if( node.isArea && !areaNodes[node.nodeId] ){
 				areaNodes[node.nodeId] = node;
+                for( var id in nodes ){
+                    if( !nodes[id].isArea ){
+                        if( node.containCell(nodes[id]) ){
+                            node.addMasterEdge(nodes[id]);
+                            nodes[id].addSlaveEdge(node);
+                        }
+                    }
+                }
+                return;
 			}
+
+            for( var id2  in areaNodes ){
+                if( areaNodes[id2].containCell(node) ){
+                    areaNodes[id2].addMasterEdge(node);
+                    node.addSlaveEdge(areaNodes[id2]);
+                }
+            }
 		}
 	}
 	
@@ -252,18 +268,7 @@ function DependencyGraph(wb) {
 	
 	//сортировка по зависимым(ведомым) ячейкам. у объекта берем массив slaveEdges и по нему бегаем.
 	this.t_sort_slave = function(sheetId,cellId){
-	
-		for( var id in nodes ){
-			if( !nodes[id].isArea ){
-				for( var id2  in areaNodes ){
-					if( areaNodes[id2].containCell(nodes[id]) ){
-						areaNodes[id2].addMasterEdge(nodes[id]);
-						nodes[id].addSlaveEdge(areaNodes[id2]);
-					}
-				}
-			}
-		}
-	
+
 		function getFirstNode(sheetId,cellId) {
 			
 			var n = new Vertex(sheetId,cellId,thas.wb);
@@ -361,17 +366,6 @@ function DependencyGraph(wb) {
 	
 	//сортировка по ведущим ячейкам. у объекта берем массив masterEdges и по нему бегаем.
 	this.t_sort_master = function(sheetId,cellId){
-
-        for( var id in nodes ){
-            if( !nodes[id].isArea ){
-                for( var id2  in areaNodes ){
-                    if( areaNodes[id2].containCell(nodes[id]) ){
-                        areaNodes[id2].addMasterEdge(nodes[id]);
-                        nodes[id].addSlaveEdge(areaNodes[id2]);
-                    }
-                }
-            }
-        }
 
 		function getFirstNode(sheetId,cellId) {
 			
