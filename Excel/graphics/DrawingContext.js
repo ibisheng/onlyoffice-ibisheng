@@ -931,12 +931,12 @@ DrawingContext.prototype = {
 			var nX = asc_floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
 			var nY = asc_floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
 
+			var _r = t.fillColor.r;
+			var _g = t.fillColor.g;
+			var _b = t.fillColor.b;
+
 			if (window.g_isMobileVersion) {
 				// Special for iPad (5.1)
-
-				var _r = t.fillColor.r;
-				var _g = t.fillColor.g;
-				var _b = t.fillColor.b;
 
 				if (!_r && !_g && !_b) {
 					this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
