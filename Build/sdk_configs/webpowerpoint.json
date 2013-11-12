@@ -39,7 +39,6 @@
                 "../Word/Drawing/GlobalLoaders.js",
                 "../PowerPoint/Drawing/ThemeLoader.js",
                 "../PowerPoint/Editor/Format/CollaborativeEditing.js",
-                "../Common/FontsFreeType/FontExport.js",
                 "../PowerPoint/Editor/Styles.js",
                 "../PowerPoint/Editor/Format/ParagraphContent.js",
                 "../PowerPoint/Editor/Format/FontClassification.js",

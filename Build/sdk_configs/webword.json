@@ -56,7 +56,6 @@
                 "../Word/Drawing/Externals.js",
                 "../Word/Drawing/AllFonts.js",
                 "../Word/Drawing/GlobalLoaders.js",
-                "../Common/FontsFreeType/FontExport.js",
                 "../Word/Drawing/translations.js",
                 "../Word/Editor/GraphicObjects/GraphicObjects.js",
                 "../Word/Editor/GraphicObjects/GraphicPage.js",
