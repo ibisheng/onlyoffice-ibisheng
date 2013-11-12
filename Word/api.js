@@ -541,6 +541,9 @@ function asc_docs_api(name)
     this.isShowTableEmptyLine = true;
     this.isShowTableEmptyLineAttack = false;
 
+    this.isApplyChangesOnOpen = false;
+    this.isApplyChangesOnOpenEnabled = true;
+
     // CoAuthoring and Chat
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
@@ -6156,8 +6159,17 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             {
                 var Document = this.WordControl.m_oLogicDocument;
 
-                CollaborativeEditing.Apply_Changes();
-                CollaborativeEditing.Release_Locks();
+                if (this.isApplyChangesOnOpenEnabled)
+                {
+                    this.isApplyChangesOnOpenEnabled = false;
+                    if (CollaborativeEditing.m_bUse == true)
+                    {
+                        this.isApplyChangesOnOpen = true;
+                        CollaborativeEditing.Apply_Changes();
+                        CollaborativeEditing.Release_Locks();
+                        return;
+                    }
+                }
 
                 //Recalculate HdrFtr
                 if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
@@ -6404,6 +6416,12 @@ asc_docs_api.prototype.SyncLoadImages_callback = function()
 asc_docs_api.prototype.pre_SaveCallback = function()
 {
     CollaborativeEditing.OnEnd_Load_Objects();
+
+    if (this.isApplyChangesOnOpen)
+    {
+        this.isApplyChangesOnOpen = false;
+        this.OpenDocumentEndCallback();
+    }
 }
 
 asc_docs_api.prototype.initEvents2MobileAdvances = function()
