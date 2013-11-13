@@ -2931,6 +2931,7 @@ CCellValue.prototype =
 		var aResult = new Array();
 		if(null == sText && null == aText)
 			sText = "";
+		var color;
 		var cellfont;
 		var xfs = this.cell.getStyle();
 		if(null != xfs && null != xfs.font)
@@ -2941,13 +2942,11 @@ CCellValue.prototype =
 			var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
-			//todo
-			if(oNewItem.format.c instanceof ThemeColor)
+			color = oNewItem.format.c;
+			if(color instanceof ThemeColor)
 			{
-				oNewItem.theme = oNewItem.format.c.theme;
-				oNewItem.tint = oNewItem.format.c.tint;
 				//для посещенных гиперссылок
-				if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
+				if(g_nColorHyperlink == color.theme && null == color.tint)
 				{
 					var nRow = this.cell.oId.getRow0();
 					var nCol = this.cell.oId.getCol0();
@@ -2955,15 +2954,13 @@ CCellValue.prototype =
 					if(null != hyperlink && hyperlink.data.getVisited())
 					{
 						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
-						oNewItem.theme = g_nColorHyperlinkVisited;
 					}
 				}
 			}
 			oNewItem.format.skip = false;
 			oNewItem.format.repeat = false;
 			aResult.push(oNewItem);
-		}
-		else if(null != aText){
+		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
 				var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
 				var oCurtext = aText[i];
@@ -2976,13 +2973,11 @@ CCellValue.prototype =
 					if(null != oCurtext.format)
 						oCurFormat.set(oCurtext.format);
 					oNewItem.format = oCurFormat;
-					//todo
-					if(oNewItem.format.c instanceof ThemeColor)
+					color = oNewItem.format.c;
+					if(color instanceof ThemeColor)
 					{
-						oNewItem.theme = oNewItem.format.c.theme;
-						oNewItem.tint = oNewItem.format.c.tint;
 						//для посещенных гиперссылок
-						if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
+						if(g_nColorHyperlink == color.theme && null == color.tint)
 						{
 							var nRow = this.cell.oId.getRow0();
 							var nCol = this.cell.oId.getCol0();
@@ -2990,7 +2985,6 @@ CCellValue.prototype =
 							if(null != hyperlink && hyperlink.data.getVisited())
 							{
 								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
-								oNewItem.theme = g_nColorHyperlinkVisited;
 							}
 						}
 					}
@@ -3103,36 +3097,6 @@ CCellValue.prototype =
 				for(var i = 0, length = aVal.length; i < length; i++){
 					var item = aVal[i];
 					var format = item.format;
-					if(null != item.theme)
-						format.c = g_oColorManager.getThemeColor(item.theme, item.tint);
-					else if(null != format && null != format.c)
-					{
-						var color = format.c;
-						format.c = null;
-						if("string" == typeof(color))
-						{
-							//todo убрать это преобразование
-							//переводим обратно в число
-							if(0 == color.indexOf("#"))
-							{
-								var hex = color.substring(1);
-								if(hex.length == 3)
-									hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
-								if(hex.length == 6)
-								{
-									var r = parseInt("0x" + hex.substring(0,2));
-									var g = parseInt("0x" + hex.substring(2,4));
-									var b = parseInt("0x" + hex.substring(4,6));
-									format.c = new RgbColor(r << 16 | g <<  8 | b);
-								}
-							}
-						}
-						else if("number" == typeof(color))
-							format.c = new RgbColor(color);
-						else if(color instanceof RgbColor || color instanceof ThemeColor)
-							format.c = color;
-					}
-					
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
 					oNewElem.format = new Font();
