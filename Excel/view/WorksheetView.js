@@ -91,8 +91,6 @@
 		var kCurFillHandle	= "crosshair";
 		// Курсор для гиперссылки
 		var kCurHyperlink	= "pointer";
-		// Курсор для комментария
-		var kCurComment		= "cell";
 		// Курсор для перемещения области выделения
 		var kCurMove		= "move";
 		var kCurSEResize	= "se-resize";
@@ -2475,7 +2473,6 @@
 				var offsetX = (leftFieldInPt) ? leftFieldInPt : this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = (topFieldInPt) ? topFieldInPt : this.rows[this.visibleRange.r1].top - this.cellsTop;
 				var bc    = undefined; // cached border color
-				var color = undefined; // cached border color string
 
 				// ToDo в одну функцию
 				function drawBorderHor(border, x1, y, x2) {
@@ -2504,7 +2501,7 @@
 					}
 				}
 
-				function drawDiag(border, x1, y1, x2, y2) {
+				function drawDiagonal(border, x1, y1, x2, y2) {
 					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
 						if (bc !== border.c) {
 							bc = border.c;
@@ -2582,25 +2579,35 @@
 						var hasDD = dd.w > 0 && dd.s !== c_oAscBorderStyles.None;
 						var hasDU = du.w > 0 && du.s !== c_oAscBorderStyles.None;
 						if ( (hasDD || hasDU) && (!mergedCellsStage || row === range.r1 && col === range.c1) ) {
-							// ToDo bug merge cells
-							ctx.save()
+							var x2Diagonal = x2;
+							var y2Diagonal = y2;
+							if (mergedCellsStage) {
+								// Merge cells
+								x2Diagonal = this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px;
+								y2Diagonal = this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px;
+							}
+
+							// ToDo Clip diagonal borders
+							/*ctx.save()
 									.beginPath()
 									.rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
-									      y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
-									      this.cols[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
-									      this.rows[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
+										  y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
+										  this.cols[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
+										  this.rows[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
 									.clip();
+							*/
 							if (hasDD) {
 								// draw diagonal line l,t - r,b
-								drawDiag(dd, x1 - this.width_1px, y1 - this.height_1px, x2, y2);
+								drawDiagonal(dd, x1 - this.width_1px, y1 - this.height_1px, x2Diagonal, y2Diagonal);
 							}
 							if (hasDU) {
 								// draw diagonal line l,b - r,t
-								drawDiag(du, x1 - this.width_1px, y2, x2, y1 - this.height_1px);
+								drawDiagonal(du, x1 - this.width_1px, y2Diagonal, x2Diagonal, y1 - this.height_1px);
 							}
-							ctx.restore();
+							// ToDo Clip diagonal borders
+							//ctx.restore();
 							// canvas context has just been restored, so destroy border color cache
-							bc = undefined;
+							//bc = undefined;
 						}
 
 						function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
