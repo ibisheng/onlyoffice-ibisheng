@@ -4337,58 +4337,93 @@ function ChartState(graphicObjects, chart)
 
     this.updateCursorType = function(pageIndex, x, y, e, bTextFlag)
     {
-        this.id = STATES_ID_CHART;
-        this.graphicObjects = graphicObjects;
-        this.chart = chart;//ParaDrawing
-        this.graphicObjects.setStartTrackPos(x, y, pageIndex);
+        if(this.graphicObjects.document.CurPos.Type === docpostype_HdrFtr)
+        {
+            var hdr_ftr_state =  new NullStateHeaderFooter(this.graphicObjects);
+            return  hdr_ftr_state.updateCursorType(pageIndex, x, y, e, bTextFlag);
+        }
         var _graphic_pages = this.graphicObjects.graphicPages;
         var _common_selection_array = this.graphicObjects.selectionInfo.selectionArray;
-
-        var _translated_point;
-        var _translated_x;
-        var _translated_y;
-        var _cur_selected_gr_object = _common_selection_array[0];
-        if(_cur_selected_gr_object.pageIndex !== pageIndex)
+        if(_common_selection_array.length > 0)
         {
-            _translated_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, _cur_selected_gr_object.pageIndex);
-            _translated_x = _translated_point.X;
-            _translated_y = _translated_point.Y;
+            if(_common_selection_array.length === 1)
+            {
+                var _selected_gr_object = _common_selection_array[0];
+                var _translated_x;
+                var _translated_y;
+                if(_selected_gr_object.pageIndex !== pageIndex)
+                {
+                    var _translated_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, _selected_gr_object.pageIndex);
+                    _translated_x = _translated_point.X;
+                    _translated_y = _translated_point.Y;
+                }
+                else
+                {
+                    _translated_x = x;
+                    _translated_y = y;
+                }
+
+                var _hit_to_adj = _selected_gr_object.hitToAdj(_translated_x, _translated_y);
+                if(_hit_to_adj.hit === true)
+                {
+                    this.graphicObjects.drawingDocument.SetCursorType("crosshair");
+                    return true;
+                }
+            }
+            for(var _index = _common_selection_array.length -1; _index > -1; --_index)
+            {
+                var _cur_selected_gr_object = _common_selection_array[_index];
+                if(_cur_selected_gr_object.pageIndex !== pageIndex)
+                {
+                    _translated_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, _cur_selected_gr_object.pageIndex);
+                    _translated_x = _translated_point.X;
+                    _translated_y = _translated_point.Y;
+                }
+                else
+                {
+                    _translated_x = x;
+                    _translated_y = y;
+                }
+                var _hit_to_handle = _cur_selected_gr_object.hitToHandle(_translated_x, _translated_y);
+                if(_hit_to_handle.hit === true)
+                {
+                    this.graphicObjects.majorGraphicObject = _cur_selected_gr_object;
+                    this.graphicObjects.arrPreTrackObjects.length = 0;
+                    if(_hit_to_handle.handleRotate === false)
+                    {
+                        this.graphicObjects.drawingDocument.SetCursorType(_cur_selected_gr_object.getCursorTypeByNum(_hit_to_handle.handleNum));
+                    }
+                    else
+                    {
+                        this.graphicObjects.drawingDocument.SetCursorType("crosshair");
+                    }
+                    return true;
+                }
+            }
+        }
+
+        var graphic_arrays;
+        if(this.graphicObjects.document.CurPos.Type !== docpostype_HdrFtr)
+        {
+            var page = this.graphicObjects.graphicPages[pageIndex];
+            graphic_arrays = [page.beforeTextObjects, page.inlineObjects, page.wrappingObjects, page.behindDocObjects];
         }
         else
         {
-            _translated_x = x;
-            _translated_y = y;
-        }
-        var _hit_to_handle = _cur_selected_gr_object.hitToHandle(_translated_x, _translated_y);
-        if(_hit_to_handle.hit === true)
-        {
-            this.graphicObjects.majorGraphicObject = _cur_selected_gr_object;
-            this.graphicObjects.arrPreTrackObjects.length = 0;
-            var chart = _cur_selected_gr_object.GraphicObj;
-            if(chart.chartTitle)
-                chart.chartTitle.deselect();
-            if(chart.hAxisTitle)
-                chart.hAxisTitle.deselect();
-            if(chart.vAxisTitle)
-                chart.vAxisTitle.deselect();
-            var _card_direction = _cur_selected_gr_object.numberToCardDirection(_hit_to_handle.handleNum);
-            for(var _selected_index = 0; _selected_index < _common_selection_array.length; ++_selected_index)
+            var hdr_ftr_objects = this.graphicObjects.getHdrFtrObjectsByPageIndex(pageIndex);
+            if(isRealObject(hdr_ftr_objects))
             {
-                this.graphicObjects.arrPreTrackObjects.push(new CTrackHandleObject(_common_selection_array[_selected_index], _card_direction, _common_selection_array[_selected_index].pageIndex));
+                graphic_arrays = [hdr_ftr_objects.beforeTextArray, hdr_ftr_objects.inlineArray, hdr_ftr_objects.wrappingArray, hdr_ftr_objects.behindDocArray];
             }
-            this.graphicObjects.changeCurrentState(new PreResizeState(this.graphicObjects, _hit_to_handle.handleNum));
-            return;
-
         }
-
-        var _cur_page = _graphic_pages[pageIndex];
-        var beforeTextArray = _cur_page.beforeTextObjects;
-
-        for(var _object_index = beforeTextArray.length - 1; _object_index > -1; --_object_index)
+        if(isRealObject(graphic_arrays))
         {
-            var _current_graphic_object = beforeTextArray[_object_index];
-            if(!(_current_graphic_object.GraphicObj instanceof CChartAsGroup))
+            var _cur_page = _graphic_pages[pageIndex];
+            var beforeTextArray = graphic_arrays[0];
+
+            for(var _object_index = beforeTextArray.length - 1; _object_index > -1; --_object_index)
             {
+                var _current_graphic_object = beforeTextArray[_object_index];
                 var _hit = _current_graphic_object.hit(x, y);
                 var _hit_to_path = _current_graphic_object.hitToPath(x, y);
                 var _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
@@ -4398,108 +4433,19 @@ function ChartState(graphicObjects, chart)
                     this.graphicObjects.majorGraphicObject = _current_graphic_object;
                     if(!(e.CtrlKey || e.ShiftKey))
                     {
-                        if(_current_graphic_object.selected === false)
-                        {
-                            for(var _sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                _common_selection_array[_sel_index].deselect();
-                            _common_selection_array.length = 0;
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push( _current_graphic_object);
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-
-                            _common_selection_array.sort(ComparisonByZIndex);
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-                            this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object, _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track = _common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                            }
-
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, false));
-                            return;
-                        }
-                        else
-                        {
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                            {
-                                if(_common_selection_array[_sel_index].pageIndex === pageIndex)
-                                {
-                                    _current_graphic_object = _common_selection_array[_sel_index];
-                                    this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object, _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                                }
-                            }
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track =_common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                                this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            }
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, true));
-                            return;
-                        }
+                        this.graphicObjects.drawingDocument.SetCursorType("move");
                     }
                     else
                     {
-
                         if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
-                            return;
-                        if(_current_graphic_object.selected === false)
-                        {
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push(_current_graphic_object);
-                            _common_selection_array.sort(ComparisonByZIndex);
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-
-                        }
-
-                        this.graphicObjects.arrPreTrackObjects.length = 0;
-                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                        {
-                            if(_common_selection_array[_sel_index].pageIndex === pageIndex)
-                            {
-                                _current_graphic_object = _common_selection_array[_sel_index];
-                                this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object,  _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                            }
-                        }
-                        if(_common_selection_array.length === 1)
-                        {
-                            var pre_track = _common_selection_array[0];
-                            pre_track.calculateOffset();
-                            var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                            var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                            this.anchorPos = pre_track.Get_AnchorPos();
-                            this.anchorPos.Page = pageIndex;
-
-                        }
-                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                        this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, true, false));
-                        return;
+                            this.graphicObjects.drawingDocument.SetCursorType("default");
+                        else
+                            this.graphicObjects.drawingDocument.SetCursorType("move");
                     }
+                    return true;
                 }
                 else if(b_hit_to_text)
                 {
-                    for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                    {
-                        _common_selection_array[_sel_index].deselect();
-                    }
-                    _common_selection_array.length = 0;
-                    _common_selection_array.push(_current_graphic_object);
-                    _current_graphic_object.select(pageIndex);
                     if(!_current_graphic_object.isGroup())
                     {
                         var arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
@@ -4512,130 +4458,69 @@ function ChartState(graphicObjects, chart)
                                 this.graphicObjects.majorGraphicObject = cur_inline_object;
                                 if(!(e.CtrlKey || e.ShiftKey))
                                 {
-                                    if(cur_inline_object.selected === false)
-                                    {
-                                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                            _common_selection_array[_sel_index].deselect();
-                                        _common_selection_array.length = 0;
-                                        cur_inline_object.select(pageIndex);
-                                        _common_selection_array.push(cur_inline_object);
-                                    }
-
-
-
-                                    this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                    this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                    this.graphicObjects.drawingDocument.SetCursorType("move");
                                 }
                                 else
                                 {
                                     if(_common_selection_array.length === 0 ||
                                         _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                     {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                        this.graphicObjects.drawingDocument.SetCursorType("move");
                                     }
                                 }
-
-                                editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                return;
+                                return true;
                             }
                         }
-
-                        _current_graphic_object.selectionSetStart(x, y, e);
-                        this.graphicObjects.changeCurrentState(new TextAddState(this.graphicObjects, _current_graphic_object));
-
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
+                        var tmp2 = global_MatrixTransformer.Invert(_current_graphic_object.GraphicObj.transformText);
+                        var Xt = tmp2.TransformPointX(x, y);
+                        var Yt = tmp2.TransformPointY(x, y);
+                        _current_graphic_object.GraphicObj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                     }
                     else
                     {
-                        var sp = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
-                        if(typeof sp.getArrContentDrawingObjects === "function")
+                        var obj = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
+                        if(typeof obj.getArrContentDrawingObjects === "function")
                         {
-                            arr_inline_objects = sp.getArrContentDrawingObjects();
-                            for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                            arr_inline_objects = obj.getArrContentDrawingObjects();
+                            for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                             {
-                                cur_inline_object = arr_inline_objects[inline_index];
+                                var cur_inline_object = arr_inline_objects[inline_index];
                                 _hit = cur_inline_object.hit(x, y);
                                 if(_hit)
                                 {
                                     this.graphicObjects.majorGraphicObject = cur_inline_object;
                                     if(!(e.CtrlKey || e.ShiftKey))
                                     {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                                _common_selection_array[_sel_index].deselect();
-                                            _common_selection_array.length = 0;
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                        this.graphicObjects.drawingDocument.SetCursorType("move");
                                     }
                                     else
                                     {
                                         if(_common_selection_array.length === 0 ||
                                             _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                         {
-                                            if(cur_inline_object.selected === false)
-                                            {
-                                                cur_inline_object.select(pageIndex);
-                                                _common_selection_array.push(cur_inline_object);
-                                            }
-
-                                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
                                         }
                                     }
-
-                                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                    return;
+                                    return true;
                                 }
                             }
                         }
-
-                        sp.selectionSetStart(x, y, e);
-                        sp.select(pageIndex);
-                        _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
-                        this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
-
-
-                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
+                        tmp2 = global_MatrixTransformer.Invert(obj.transformText);
+                        Xt = tmp2.TransformPointX(x, y);
+                        Yt = tmp2.TransformPointY(x, y);
+                        obj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                     }
-                    return;
+                    return true;
                 }
             }
-            else
-            {
-                if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
-                {
-                    return;
-                }
-            }
-        }
 
-        var inline_objects = _cur_page.inlineObjects;
-        for(_object_index = inline_objects.length - 1; _object_index > -1; --_object_index)
-        {
-            _current_graphic_object = inline_objects[_object_index];
-            if(!_current_graphic_object.isShapeChild())
+            var inline_objects = graphic_arrays[1];
+            for(_object_index = inline_objects.length - 1; _object_index > -1; --_object_index)
             {
-                if(!(_current_graphic_object.GraphicObj instanceof CChartAsGroup))
-                {
 
+                _current_graphic_object = inline_objects[_object_index];
+                if(!_current_graphic_object.isShapeChild())
+                {
                     _hit = _current_graphic_object.hit(x, y);
                     _hit_to_path = _current_graphic_object.hitToPath(x, y);
                     _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
@@ -4645,648 +4530,285 @@ function ChartState(graphicObjects, chart)
                         this.graphicObjects.majorGraphicObject = _current_graphic_object;
                         if(!(e.CtrlKey || e.ShiftKey))
                         {
-                            var b_sel = _current_graphic_object.selected;
-                            if(_current_graphic_object.selected === false)
-                            {
-                                for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                    _common_selection_array[_sel_index].deselect();
-                                _common_selection_array.length = 0;
-                                _current_graphic_object.select(pageIndex);
-                                _common_selection_array.push(_current_graphic_object);
-                            }
-                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                            return;
+                            this.graphicObjects.drawingDocument.SetCursorType("move");
                         }
                         else
                         {
                             if(_common_selection_array.length === 0 ||
                                 _common_selection_array.length === 1 && _common_selection_array[0] === _current_graphic_object)
                             {
-                                b_sel = _current_graphic_object.selected;
-                                if(_current_graphic_object.selected === false)
-                                {
-                                    _current_graphic_object.select(pageIndex);
-                                    _common_selection_array.push(_current_graphic_object);
-                                }
-                                this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, _current_graphic_object.Get_Id(), false, b_sel));
-                                this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                this.graphicObjects.drawingDocument.SetCursorType("move");
                             }
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                            return;
+                            else
+                            {
+                                this.graphicObjects.drawingDocument.SetCursorType("default");
+                            }
                         }
+                        return true;
                     }
                     else if(b_hit_to_text)
                     {
-                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                        {
-                            _common_selection_array[_sel_index].deselect();
-                        }
-                        _common_selection_array.length = 0;
-                        _current_graphic_object.select(pageIndex);
-                        _common_selection_array.push(_current_graphic_object);
                         if(!_current_graphic_object.isGroup())
                         {
-
-                            arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
-                            for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                            var arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
+                            for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                             {
-                                cur_inline_object = arr_inline_objects[inline_index];
+                                var cur_inline_object = arr_inline_objects[inline_index];
                                 _hit = cur_inline_object.hit(x, y);
                                 if(_hit)
                                 {
                                     this.graphicObjects.majorGraphicObject = cur_inline_object;
                                     if(!(e.CtrlKey || e.ShiftKey))
                                     {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                                _common_selection_array[_sel_index].deselect();
-                                            _common_selection_array.length = 0;
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                        this.graphicObjects.drawingDocument.SetCursorType("move");
                                     }
                                     else
                                     {
                                         if(_common_selection_array.length === 0 ||
                                             _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                         {
-                                            if(cur_inline_object.selected === false)
-                                            {
-                                                cur_inline_object.select(pageIndex);
-                                                _common_selection_array.push(cur_inline_object);
-                                            }
-                                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
                                         }
                                     }
-
-
-                                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                    return;
+                                    return true;
                                 }
                             }
-                            _current_graphic_object.selectionSetStart(x, y, e);
-                            this.graphicObjects.changeCurrentState(new TextAddState(this.graphicObjects, _current_graphic_object));
+                            var tmp2 = global_MatrixTransformer.Invert(_current_graphic_object.GraphicObj.transformText);
+                            var Xt = tmp2.TransformPointX(x, y);
+                            var Yt = tmp2.TransformPointY(x, y);
+                            _current_graphic_object.GraphicObj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                         }
                         else
                         {
-                            sp = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
-                            if(typeof sp.getArrContentDrawingObjects === "function")
+                            var obj = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
+                            if(typeof obj.getArrContentDrawingObjects === "function")
                             {
-                                arr_inline_objects = sp.getArrContentDrawingObjects();
-                                for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                                arr_inline_objects = obj.getArrContentDrawingObjects();
+                                for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                                 {
-                                    cur_inline_object = arr_inline_objects[inline_index];
+                                    var cur_inline_object = arr_inline_objects[inline_index];
                                     _hit = cur_inline_object.hit(x, y);
                                     if(_hit)
                                     {
                                         this.graphicObjects.majorGraphicObject = cur_inline_object;
                                         if(!(e.CtrlKey || e.ShiftKey))
                                         {
-                                            if(cur_inline_object.selected === false)
-                                            {
-                                                for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                                    _common_selection_array[_sel_index].deselect();
-                                                _common_selection_array.length = 0;
-                                                cur_inline_object.select(pageIndex);
-                                                _common_selection_array.push(cur_inline_object);
-                                            }
-                                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
                                         }
                                         else
                                         {
                                             if(_common_selection_array.length === 0 ||
                                                 _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                             {
-                                                if(cur_inline_object.selected === false)
-                                                {
-                                                    cur_inline_object.select(pageIndex);
-                                                    _common_selection_array.push(cur_inline_object);
-                                                }
-                                                this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                                this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                                this.graphicObjects.drawingDocument.SetCursorType("move");
                                             }
                                         }
-
-
-                                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                        return;
+                                        return true;
                                     }
                                 }
                             }
-                            sp.selectionSetStart(x, y, e);
-                            sp.select(pageIndex);
-
-                            _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
-                            this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
+                            tmp2 = global_MatrixTransformer.Invert(obj.transformText);
+                            Xt = tmp2.TransformPointX(x, y);
+                            Yt = tmp2.TransformPointY(x, y);
+                            obj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                         }
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
-
-                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                        return;
+                        return true;
                     }
                 }
-                else
-                {
-                    if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
-                        return;
-                }
             }
-        }
 
-        var wrapping_array = _cur_page.wrappingObjects;
-        for(_object_index = wrapping_array.length - 1; _object_index > -1; --_object_index)
-        {
-            _current_graphic_object = wrapping_array[_object_index];
-
-            if(!(_current_graphic_object.GraphicObj instanceof CChartAsGroup))
+            if(!bTextFlag)
             {
-                _hit = _current_graphic_object.hit(x, y);
-                _hit_to_path = _current_graphic_object.hitToPath(x, y);
-                _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
-                b_hit_to_text = _current_graphic_object.isGroup() ? _hit_to_text_rect.hit : _hit_to_text_rect;
-                if((_hit && !b_hit_to_text) || _hit_to_path)
+                var wrapping_array = graphic_arrays[2];
+                for(var _object_index = wrapping_array.length - 1; _object_index > -1; --_object_index)
                 {
-                    this.graphicObjects.majorGraphicObject = _current_graphic_object;
-                    if(!(e.CtrlKey || e.ShiftKey))
+                    var _current_graphic_object = wrapping_array[_object_index];
+                    var _hit = _current_graphic_object.hit(x, y);
+                    var _hit_to_path = _current_graphic_object.hitToPath(x, y);
+                    var _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
+                    var b_hit_to_text = _current_graphic_object.isGroup() ? _hit_to_text_rect.hit : _hit_to_text_rect;
+                    if((_hit && !b_hit_to_text) || _hit_to_path)
                     {
-                        if(_current_graphic_object.selected === false)
+                        this.graphicObjects.majorGraphicObject = _current_graphic_object;
+                        if(!(e.CtrlKey || e.ShiftKey))
                         {
-                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                _common_selection_array[_sel_index].deselect();
-                            _common_selection_array.length = 0;
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push(_current_graphic_object);
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-                            this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track = _common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                            }
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, false));
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                            return;
+                            this.graphicObjects.drawingDocument.SetCursorType("move");
                         }
                         else
                         {
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-
-                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                            {
-                                if(_common_selection_array[_sel_index].pageIndex === pageIndex)
-                                {
-                                    _current_graphic_object = _common_selection_array[_sel_index];
-                                    this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object, _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                                }
-                            }
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track = _common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                            }
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, true));
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                            return;
+                            if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
+                                this.graphicObjects.drawingDocument.SetCursorType("default");
+                            else
+                                this.graphicObjects.drawingDocument.SetCursorType("move");
                         }
+                        return true;
                     }
-                    else
+                    else if(b_hit_to_text)
                     {
-
-                        if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
-                            return;
-                        if(_current_graphic_object.selected === false)
+                        if(!_current_graphic_object.isGroup())
                         {
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push(_current_graphic_object);
-                            _common_selection_array.sort(ComparisonByZIndex);
-                        }
-
-                        this.graphicObjects.arrPreTrackObjects.length = 0;
-                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                        {
-                            _current_graphic_object = _common_selection_array[_sel_index];
-                            this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object,  _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                        }
-                        if(_common_selection_array.length === 1)
-                        {
-                            var pre_track = _common_selection_array[0];
-                            pre_track.calculateOffset();
-                            var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                            var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                            this.anchorPos = pre_track.Get_AnchorPos();
-                            this.anchorPos.Page = pageIndex;
-                        }
-                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                        this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, true, false));
-
-
-                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                        return;
-                    }
-                }
-                else if(b_hit_to_text)
-                {
-                    for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                    {
-                        _common_selection_array[_sel_index].deselect();
-                    }
-                    _common_selection_array.length = 0;
-                    _current_graphic_object.select(pageIndex);
-                    _common_selection_array.push(_current_graphic_object);
-
-                    if(!_current_graphic_object.isGroup())
-                    {
-                        arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
-                        for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
-                        {
-                            cur_inline_object = arr_inline_objects[inline_index];
-                            _hit = cur_inline_object.hit(x, y);
-                            if(_hit)
+                            var arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
+                            for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                             {
-                                this.graphicObjects.majorGraphicObject = cur_inline_object;
-                                if(!(e.CtrlKey || e.ShiftKey))
-                                {
-                                    if(cur_inline_object.selected === false)
-                                    {
-                                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                            _common_selection_array[_sel_index].deselect();
-                                        _common_selection_array.length = 0;
-                                        cur_inline_object.select(pageIndex);
-                                        _common_selection_array.push(cur_inline_object);
-                                    }
-                                    this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                    this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                                }
-                                else
-                                {
-                                    if(_common_selection_array.length === 0 ||
-                                        _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
-                                    {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                                    }
-                                }
-
-
-                                editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                return;
-                            }
-                        }
-                        _current_graphic_object.selectionSetStart(x, y, e);
-                        this.graphicObjects.changeCurrentState(new TextAddState(this.graphicObjects, _current_graphic_object));
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
-                    }
-                    else
-                    {
-                        sp = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
-                        if(typeof sp.getArrContentDrawingObjects === "function")
-                        {
-                            arr_inline_objects = sp.getArrContentDrawingObjects();
-                            for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
-                            {
-                                cur_inline_object = arr_inline_objects[inline_index];
+                                var cur_inline_object = arr_inline_objects[inline_index];
                                 _hit = cur_inline_object.hit(x, y);
                                 if(_hit)
                                 {
                                     this.graphicObjects.majorGraphicObject = cur_inline_object;
                                     if(!(e.CtrlKey || e.ShiftKey))
                                     {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                                _common_selection_array[_sel_index].deselect();
-                                            _common_selection_array.length = 0;
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                        this.graphicObjects.drawingDocument.SetCursorType("move");
                                     }
                                     else
                                     {
                                         if(_common_selection_array.length === 0 ||
                                             _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                         {
-                                            if(cur_inline_object.selected === false)
-                                            {
-                                                cur_inline_object.select(pageIndex);
-                                                _common_selection_array.push(cur_inline_object);
-                                            }
-                                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
                                         }
                                     }
-
-
-                                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                    return;
+                                    return true;
                                 }
                             }
-                        }
-                        sp.selectionSetStart(x, y, e);
-
-                        _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(sp);
-                        sp.select(pageIndex);
-                        this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, sp, _current_graphic_object.GraphicObj));
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
-                    }
-
-
-                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                    return;
-                }
-            }
-            else
-            {
-                if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
-                {
-                    return;
-                }
-            }
-        }
-
-        var behind_array = _cur_page.behindDocObjects;
-        for(_object_index = behind_array.length - 1; _object_index > -1; --_object_index)
-        {
-            _current_graphic_object = behind_array[_object_index];
-            if(!(_current_graphic_object.GraphicObj instanceof CChartAsGroup))
-            {
-                _hit = _current_graphic_object.hit(x, y);
-                _hit_to_path = _current_graphic_object.hitToPath(x, y);
-                _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
-                b_hit_to_text = _current_graphic_object.isGroup() ? _hit_to_text_rect.hit : _hit_to_text_rect;
-                if((_hit && !b_hit_to_text) || _hit_to_path)
-                {
-                    this.graphicObjects.majorGraphicObject = _current_graphic_object;
-                    if(!(e.CtrlKey || e.ShiftKey))
-                    {
-                        if(_current_graphic_object.selected === false)
-                        {
-                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                _common_selection_array[_sel_index].deselect();
-                            _common_selection_array.length = 0;
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push(_current_graphic_object);
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-                            this.graphicObjects.arrPreTrackObjects[0] = new CTrackMoveObject(_current_graphic_object,   _current_graphic_object.absOffsetX - x ,  _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex);
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track = _common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                            }
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, false));
-
-
-                            editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                            editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                            return;
+                            var tmp2 = global_MatrixTransformer.Invert(_current_graphic_object.GraphicObj.transformText);
+                            var Xt = tmp2.TransformPointX(x, y);
+                            var Yt = tmp2.TransformPointY(x, y);
+                            _current_graphic_object.GraphicObj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                         }
                         else
                         {
-                            this.graphicObjects.arrPreTrackObjects.length = 0;
-
-                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
+                            var obj = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
+                            if(typeof obj.getArrContentDrawingObjects === "function")
                             {
-                                if(_common_selection_array[_sel_index].pageIndex === pageIndex)
+                                arr_inline_objects = obj.getArrContentDrawingObjects();
+                                for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                                 {
-                                    _current_graphic_object = _common_selection_array[_sel_index];
-                                    this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object, _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
+                                    var cur_inline_object = arr_inline_objects[inline_index];
+                                    _hit = cur_inline_object.hit(x, y);
+                                    if(_hit)
+                                    {
+                                        this.graphicObjects.majorGraphicObject = cur_inline_object;
+                                        if(!(e.CtrlKey || e.ShiftKey))
+                                        {
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
+                                        }
+                                        else
+                                        {
+                                            if(_common_selection_array.length === 0 ||
+                                                _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
+                                            {
+                                                this.graphicObjects.drawingDocument.SetCursorType("move");
+                                            }
+                                        }
+                                        return true;
+                                    }
                                 }
                             }
-                            if(_common_selection_array.length === 1)
-                            {
-                                var pre_track = _common_selection_array[0];
-                                pre_track.calculateOffset();
-                                var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                                var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                                this.anchorPos = pre_track.Get_AnchorPos();
-                                this.anchorPos.Page = pageIndex;
-                            }
-                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                            this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, false, true));
-                            return;
+                            tmp2 = global_MatrixTransformer.Invert(obj.transformText);
+                            Xt = tmp2.TransformPointX(x, y);
+                            Yt = tmp2.TransformPointY(x, y);
+                            obj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                         }
-                    }
-                    else
-                    {
-
-                        if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
-                            return;
-                        if(_current_graphic_object.selected === false)
-                        {
-                            _current_graphic_object.select(pageIndex);
-                            _common_selection_array.push(_current_graphic_object);
-                            _common_selection_array.sort(ComparisonByZIndex);
-                        }
-
-                        this.graphicObjects.arrPreTrackObjects.length = 0;
-                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                        {
-                            _current_graphic_object = _common_selection_array[_sel_index];
-                            this.graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(_current_graphic_object,  _current_graphic_object.absOffsetX - x, _current_graphic_object.absOffsetY - y, this.graphicObjects, pageIndex));
-                        }
-                        if(_common_selection_array.length === 1)
-                        {
-                            var pre_track = _common_selection_array[0];
-                            pre_track.calculateOffset();
-                            var boundsOffX = pre_track.absOffsetX - pre_track.boundsOffsetX ;
-                            var boundsOffY = pre_track.absOffsetY - pre_track.boundsOffsetY ;
-                            this.anchorPos = pre_track.Get_AnchorPos();
-                            this.anchorPos.Page = pageIndex;
-                        }
-                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                        this.graphicObjects.changeCurrentState(new PreMoveState(this.graphicObjects, true, false));
-
-
-                        editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                        editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                        return;
+                        return true;
                     }
                 }
-                else if(b_hit_to_text)
+
+                var behind_array = graphic_arrays[3];
+                for(var _object_index = behind_array.length - 1; _object_index > -1; --_object_index)
                 {
-                    for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
+                    var _current_graphic_object = behind_array[_object_index];
+                    var _hit = _current_graphic_object.hit(x, y);
+                    var _hit_to_path = _current_graphic_object.hitToPath(x, y);
+                    var _hit_to_text_rect = _current_graphic_object.hitToTextRect(x, y);
+                    var b_hit_to_text = _current_graphic_object.isGroup() ? _hit_to_text_rect.hit : _hit_to_text_rect;
+                    if((_hit && !b_hit_to_text) || _hit_to_path)
                     {
-                        _common_selection_array[_sel_index].deselect();
-                    }
-                    _common_selection_array.length = 0;
-                    _current_graphic_object.select(pageIndex);
-                    _common_selection_array.push(_current_graphic_object);
-
-                    if(!_current_graphic_object.isGroup())
-                    {
-                        arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
-                        for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                        this.graphicObjects.majorGraphicObject = _current_graphic_object;
+                        if(!(e.CtrlKey || e.ShiftKey))
                         {
-                            cur_inline_object = arr_inline_objects[inline_index];
-                            _hit = cur_inline_object.hit(x, y);
-                            if(_hit)
-                            {
-                                this.graphicObjects.majorGraphicObject = cur_inline_object;
-                                if(!(e.CtrlKey || e.ShiftKey))
-                                {
-                                    if(cur_inline_object.selected === false)
-                                    {
-                                        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                            _common_selection_array[_sel_index].deselect();
-                                        _common_selection_array.length = 0;
-                                        cur_inline_object.select(pageIndex);
-                                        _common_selection_array.push(cur_inline_object);
-                                    }
-                                    this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                    this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                                }
-                                else
-                                {
-                                    if(_common_selection_array.length === 0 ||
-                                        _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
-                                    {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
-                                    }
-                                }
-
-
-                                editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                return;
-                            }
+                            this.graphicObjects.drawingDocument.SetCursorType("move");
                         }
-                        _current_graphic_object.selectionSetStart(x, y, e);
-                        this.graphicObjects.changeCurrentState(new TextAddState(this.graphicObjects, _current_graphic_object));
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
-                    }
-                    else
-                    {
-                        sp = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
-                        if(typeof sp.getArrContentDrawingObjects === "function")
+                        else
                         {
-                            arr_inline_objects = sp.getArrContentDrawingObjects();
-                            for(inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                            if((_common_selection_array.length > 0 && _common_selection_array[0].Is_Inline()))
+                                this.graphicObjects.drawingDocument.SetCursorType("default");
+                            else
+                                this.graphicObjects.drawingDocument.SetCursorType("move");
+                        }
+                        return true;
+                    }
+                    else if(b_hit_to_text)
+                    {
+                        if(!_current_graphic_object.isGroup())
+                        {
+                            var arr_inline_objects = _current_graphic_object.getArrContentDrawingObjects();
+                            for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
                             {
-                                cur_inline_object = arr_inline_objects[inline_index];
+                                var cur_inline_object = arr_inline_objects[inline_index];
                                 _hit = cur_inline_object.hit(x, y);
                                 if(_hit)
                                 {
                                     this.graphicObjects.majorGraphicObject = cur_inline_object;
                                     if(!(e.CtrlKey || e.ShiftKey))
                                     {
-                                        if(cur_inline_object.selected === false)
-                                        {
-                                            for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-                                                _common_selection_array[_sel_index].deselect();
-                                            _common_selection_array.length = 0;
-                                            cur_inline_object.select(pageIndex);
-                                            _common_selection_array.push(cur_inline_object);
-                                        }
-                                        this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                        this.graphicObjects.drawingDocument.SetCursorType("move");
                                     }
                                     else
                                     {
                                         if(_common_selection_array.length === 0 ||
                                             _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
                                         {
-                                            if(cur_inline_object.selected === false)
-                                            {
-                                                cur_inline_object.select(pageIndex);
-                                                _common_selection_array.push(cur_inline_object);
-                                            }
-                                            this.graphicObjects.changeCurrentState(new PreMoveInlineObject(this.graphicObjects, cur_inline_object.Get_Id(), false, false));
-                                            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
                                         }
                                     }
-
-
-                                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                                    return;
+                                    return true;
                                 }
                             }
+                            var tmp2 = global_MatrixTransformer.Invert(_current_graphic_object.GraphicObj.transformText);
+                            var Xt = tmp2.TransformPointX(x, y);
+                            var Yt = tmp2.TransformPointY(x, y);
+                            _current_graphic_object.GraphicObj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
                         }
-                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].selectionSetStart(x, y, e);
-
-                        _current_graphic_object.GraphicObj.selectionInfo.selectionArray.push(_current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num]);
-                        _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num].select(pageIndex);
-                        this.graphicObjects.changeCurrentState(new TextAddInGroup(this.graphicObjects, _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num], _current_graphic_object.GraphicObj));
-                        if(e.ClickCount <= 1)
-                            this.graphicObjects.updateSelectionState();
+                        else
+                        {
+                            var obj = _current_graphic_object.GraphicObj.spTree[_hit_to_text_rect.num];
+                            if(typeof obj.getArrContentDrawingObjects === "function")
+                            {
+                                arr_inline_objects = obj.getArrContentDrawingObjects();
+                                for(var inline_index = 0; inline_index < arr_inline_objects.length; ++inline_index)
+                                {
+                                    var cur_inline_object = arr_inline_objects[inline_index];
+                                    _hit = cur_inline_object.hit(x, y);
+                                    if(_hit)
+                                    {
+                                        this.graphicObjects.majorGraphicObject = cur_inline_object;
+                                        if(!(e.CtrlKey || e.ShiftKey))
+                                        {
+                                            this.graphicObjects.drawingDocument.SetCursorType("move");
+                                        }
+                                        else
+                                        {
+                                            if(_common_selection_array.length === 0 ||
+                                                _common_selection_array.length === 1 && _common_selection_array[0] === cur_inline_object)
+                                            {
+                                                this.graphicObjects.drawingDocument.SetCursorType("move");
+                                            }
+                                        }
+                                        return true;
+                                    }
+                                }
+                            }
+                            tmp2 = global_MatrixTransformer.Invert(obj.transformText);
+                            Xt = tmp2.TransformPointX(x, y);
+                            Yt = tmp2.TransformPointY(x, y);
+                            obj.textBoxContent.Update_CursorType(Xt, Yt, pageIndex);
+                        }
+                        return true;
                     }
-
-
-                    editor.asc_fireCallback("asc_canGroup", this.graphicObjects.canGroup());
-                    editor.asc_fireCallback("asc_canUnGroup", this.graphicObjects.canUnGroup());
-                    return;
-                }
-            }
-            else
-            {
-                if(handleChart(_current_graphic_object, this.graphicObjects, x, y, e, pageIndex) === true)
-                {
-                    return;
                 }
             }
         }
 
-        for(_sel_index = 0; _sel_index < _common_selection_array.length; ++_sel_index)
-            _common_selection_array[_sel_index].deselect();
-        _common_selection_array.length = 0;
-        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
         return false;
     };
 }
