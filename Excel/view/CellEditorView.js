@@ -230,7 +230,6 @@
 				this.input.off("." + namespace);
 			},
 
-
 			/**
 			 * @param {Object} options
 			 *   cellX - cell x coord (pt)
@@ -341,7 +340,7 @@
 					first = t._findFragmentToInsertInto(t.cursorPos);
 					if (first) {
 						if (!t.newTextFormat) {
-							t.newTextFormat = t._cloneFormat(opt.fragments[first.index].format);
+							t.newTextFormat = opt.fragments[first.index].format.clone();
 						}
 						t._setFormatProperty(t.newTextFormat, prop, val);
 					}
@@ -606,7 +605,6 @@
 					this._draw();
 			},
 
-
 			// Private
 
 			_setOptions: function (options) {
@@ -802,7 +800,6 @@
 					this.handlers.trigger("updateEditorState", this.m_nEditorState);
 				}
 			},
-
 
 			// Rendering
 
@@ -1034,7 +1031,6 @@
 				}
 			},
 
-
 			// Cursor
 
 			showCursor: function () {
@@ -1192,7 +1188,6 @@
 				t._addChars(s2.slice(i1, i2), i1);
 			},
 
-
 			// Content
 
 			_getContentLeft: function () {
@@ -1338,7 +1333,6 @@
 				}
 			},
 
-
 			_selectChars: function (kind, pos) {
 				var t = this;
 				var begPos, endPos;
@@ -1369,7 +1363,6 @@
 				window.clearTimeout(t.selectionTimer);
 				t.selectionTimer = window.setTimeout(function () {doChangeSelection(coord);}, 0);
 			},
-
 
 			_findFragment: function (pos) {
 				var opt = this.options, i, begin, end;
@@ -1414,8 +1407,8 @@
 					Array.prototype.splice.apply(
 							opt.fragments,
 							[f.index, 1].concat([
-									{format: t._cloneFormat(fr.format), text: fr.text.slice(0, pos - f.begin)},
-									{format: t._cloneFormat(fr.format), text: fr.text.slice(pos - f.begin)}]));
+									{format: fr.format.clone(), text: fr.text.slice(0, pos - f.begin)},
+									{format: fr.format.clone(), text: fr.text.slice(pos - f.begin)}]));
 				}
 			},
 
@@ -1491,7 +1484,7 @@
 					{
 						var fr = opt.fragments[i];
 						var nextFr = opt.fragments[i + 1];
-					    if(t._isEqualFormats(fr.format, nextFr.format)) {
+					    if(fr.format.isEqual(nextFr.format)) {
 							opt.fragments.splice(i, 2, {format: fr.format, text: fr.text + nextFr.text});
 							continue;
 						}
@@ -1520,13 +1513,6 @@
 
 			_getFragmentsText: function (f) {
 				return f.length > 0 ? f.reduce(function(pv, cv){return pv + cv.text;}, "") : "";
-			},
-
-
-			_isEqualFormats: function (f1, f2) {
-				return f1.fn === f2.fn && f1.fs === f2.fs &&
-						f1.b === f2.b && f1.i === f2.i && f1.u === f2.u && f1.s === f2.s &&
-						f1.c === f2.c && f1.va === f2.va;
 			},
 
 			_setFormatProperty: function (format, prop, val) {
@@ -1561,11 +1547,6 @@
 				}
 				return val;
 			},
-
-			_cloneFormat: function (format) {
-				return asc_clone(format);
-			},
-
 
 			_performAction: function (list1, list2) {
 				var t = this, action, str, pos, len;
