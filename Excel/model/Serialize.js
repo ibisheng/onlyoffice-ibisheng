@@ -2383,11 +2383,11 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteBool(oCol.BestFit);
         }
-        if(null != oCol.Hidden)
+        if(null != oCol.hd)
         {
             this.memory.WriteByte(c_oSerWorksheetColTypes.Hidden);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteBool(oCol.Hidden);
+            this.memory.WriteBool(oCol.hd);
         }
         if(null != oCol.Max)
         {
