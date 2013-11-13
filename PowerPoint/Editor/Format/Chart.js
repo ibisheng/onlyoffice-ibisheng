@@ -897,29 +897,6 @@ CChartAsGroup.prototype =
         }
     },
 
-    addXAxis: function(title)
-    {
-        var oldValue = isRealObject(this.hAxisTitle) ? this.hAxisTitle.Get_Id() : null;
-        var newValue = isRealObject(title) ? title.Get_Id() : null;
-        this.hAxisTitle = title;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddXAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
-    },
-
-    addYAxis: function(title)
-    {
-        var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
-        var newValue = isRealObject(title) ? title.Get_Id() : null;
-        this.vAxisTitle = title;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddYAxis, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
-    },
-
-    addTitle: function(title)
-    {
-        var oldValue = isRealObject(this.chartTitle) ? this.chartTitle.Get_Id() : null;
-        var newValue = isRealObject(title) ? title.Get_Id() : null;
-        this.chartTitle = title;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddTitle, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(oldValue, newValue)), null);
-    },
     deleteDrawingBase: function()
     {
         var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
