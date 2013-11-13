@@ -2514,8 +2514,10 @@ function FormatParser()
     this.rx_date = new RegExp("^ *(((\\d{1,2}) *[/-])? *(\\d{1,2}|[A-Za-z]{3,9}) *([/-]|[/-] *(\\d{2,4}))?)? *((\\d{1,2}) *: *(\\d{1,2})? *(: *(\\d{1,2})?)? *(AM|PM)?)?$");
 	
 	this.rx_currency = new RegExp("^([+-]?)([$€£¥])?(\\d+\\.?\\d*|\\.\\d+)(р.)?$");
+    this.rx_date = new RegExp("[A-Za-z]{2,9}|\\d{1,4}|[\\/\\.\\-:,]| +", "g");
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.daysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	this.bFormatMonthFirst = true;
 };
 FormatParser.prototype =
 {
@@ -2559,168 +2561,330 @@ FormatParser.prototype =
 		}
         return res;
     },
+	_parseDateFromArray : function(match)
+	{
+		var res = null;
+		var bError = false;
+		var sPrevDelimiter = null;//разделители не могут идти 2 раза подряд(кроме пробелов)
+		var sTextMonth = null;//текстовое название месяца может встречаться только 1 раз
+		var sMonthFormat = "m";
+		var nMonthLetterIndex = -1;//текстовое название месяца может встречаться только на первой или второй позиции
+		var nTimeIndex = -1;
+		var sAmPm = null;
+		var nAmPmIndex = -1;//AmPm может встречать только 1 раз в конце
+		var aData = [];
+		for(var i = 0, length = match.length; i < length; i++)
+		{
+			var elem = match[i];
+			if(elem.length > 0)
+			{
+				var sFirst = elem[0];
+				if(("A" <= sFirst && sFirst <= "Z") || ("a" <= sFirst && sFirst <= "z"))
+				{
+					if(-1 == nAmPmIndex && ("AM" == elem || "PM" == elem))
+					{
+						sAmPm = elem;
+						nAmPmIndex = aData.length;
+					}
+					else if(null == sTextMonth)
+					{
+						sTextMonth = elem;
+						var aArraysToCheck = [{arr: monthCut, format: "mmm"}, {arr: month, format: "mmmm"}];
+						var bFound = false;
+						for(var index in aArraysToCheck)
+						{
+							var aArrayTemp = aArraysToCheck[index];
+							for(var j = 0, length2 = aArrayTemp.arr.length; j < length2; j++)
+							{
+								if(aArrayTemp.arr[j].toLowerCase() == elem.toLowerCase())
+								{
+									bFound = true;
+									aData.push(j + 1);
+									nMonthLetterIndex = aData.length - 1;
+									sMonthFormat = aArrayTemp.format;
+									break;
+								}
+							}
+							if(bFound)
+								break;
+						}
+						if(true != bFound)
+						{
+							bError = true;
+							break;
+						}
+					}
+					else
+					{
+						bError = true;
+						break;
+					}
+					sPrevDelimiter = null;
+				}
+				else if("0" <= sFirst && sFirst <= "9")
+				{
+					aData.push(elem - 0);
+					sPrevDelimiter = null;
+				}
+				else
+				{
+					if(" " != sFirst)
+					{
+						if(null == sPrevDelimiter && aData.length > 0)
+						{
+							if(":" == sFirst && -1 == nTimeIndex)
+								nTimeIndex = aData.length - 1;
+							sPrevDelimiter = sFirst;
+						}
+						else
+						{
+							bError = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		if(true != bError && (-1 == nMonthLetterIndex || nMonthLetterIndex <= 1) && aData.length <= 6 && (null == sAmPm || nAmPmIndex == aData.length))
+		{
+			res = {d: null, m: null, y: null, h: null, min: null, s: null, ampm: sAmPm, sDateFormat: null};
+			var aTime = null;
+			if(-1 != nTimeIndex)
+			{
+				aTime = aData.splice(nTimeIndex);
+				var nTimeLength = aTime.length;
+				if(nTimeLength > 0 && nTimeLength <= 3)
+				{
+					var aTimeRes = [null, null, null];
+					for(var i = 0, length = aTime.length; i < length; i++)
+						aTimeRes[i] = aTime[i];
+					res.h = aTimeRes[0];
+					res.min = aTimeRes[1];
+					res.s = aTimeRes[2];
+				}
+				else
+					bError = true;
+			}
+			var nDataLength = aData.length;
+			if(2 == nDataLength || nDataLength == 3)
+			{
+				var aDataRes = [null, null, null];
+				for(var i = 0, length = aData.length; i < length; i++)
+					aDataRes[i] = aData[i];
+				res.d = aDataRes[0];
+				res.m = aDataRes[1];
+				res.y = aDataRes[2];
+				//если пришло только 2 параметра даты, то решаем что есть что.
+				if(2 == nDataLength)
+				{
+					if(-1 != nMonthLetterIndex)
+					{
+						if(0 == nMonthLetterIndex)
+						{
+							var temp = res.m;
+							res.m = res.d;
+							res.d = temp;
+						}
+						//приоритет у формата d-mmm, но если он не подходит пробуем сделать mmm-yy
+						if(this.isValidDay((new Date()).getFullYear(), res.m - 1, res.d))
+							res.sDateFormat = "d-mmm";
+						else
+						{
+							//если текстовый месяц стоит первым, то второй параметр может быть как годом так и днем, если текстовый месяц стоит первым
+							if(0 == nMonthLetterIndex)
+							{
+								res.sDateFormat = "mmm-yy";
+								res.y = res.d;
+								res.d = null;
+							}
+							else
+								bError = true;
+						}
+					}
+					else
+					{
+						if(this.bFormatMonthFirst)
+						{
+							var temp = res.d;
+							res.d = res.m;
+							res.m = temp;
+						}
+						if(this.isValidDay((new Date()).getFullYear(), res.m - 1, res.d))
+							res.sDateFormat = "d-mmm";
+						else
+						{
+							res.sDateFormat = "mmm-yy";
+							res.y = res.d;
+							res.d = null;
+						}
+					}
+				}
+				else
+				{
+					if(-1 != nMonthLetterIndex)
+					{
+						res.sDateFormat = "d-mmm-yy";
+						if(0 == nMonthLetterIndex)
+						{
+							var temp = res.d;
+							res.d = res.m;
+							res.m = temp;
+						}
+					}
+					else
+					{
+						res.sDateFormat = "d/m/yyyy";
+						if(this.bFormatMonthFirst)
+						{
+							var temp = res.d;
+							res.d = res.m;
+							res.m = temp;
+						}
+					}
+				}
+				if(null == res.sDateFormat)
+					res.sDateFormat = "d/m/yyyy";
+				if(null != res.y)
+				{
+					if(res.y < 30)
+						res.y = 2000 + res.y;
+					else if(res.y < 100)
+						res.y = 1900 + res.y;
+				}
+			}
+			else if(nDataLength > 0)
+				bError = true;
+			if(bError)
+				res = null;
+		}
+		return res;
+	},
 	parseDate : function(value)
 	{
 		var res = null;
-        var match = null;
-        if(null != (match = value.match(this.rx_date)) )
-        {
-			var d = match[3];
-			var m = match[4];
-            var y = match[6];
-            var h = match[8];
-            var min = match[9];
-            var s = match[11];
-            var ampm = match[12];
-			var bMonthFirst = true;
-			var bMonthLetter = false;
-			var sMonthDateFormat = "";
-			if(null != m)
+		var match = value.match(this.rx_date);
+		if(null != match)
+		{
+			var oParsedDate = this._parseDateFromArray(match);
+			if(null != oParsedDate)
 			{
-				//меняем текст месяца на число
-				if(m - 0 != m)
-				{
-					var aArraysToCheck = [{arr: monthCut, format: "mmm"}, {arr: month, format: "mmmm"}];
-					for(var i in aArraysToCheck)
-					{
-						var aArrayTemp = aArraysToCheck[i];
-						for(var j = 0, length = aArrayTemp.arr.length; j < length; j++)
-						{
-							if(aArrayTemp.arr[j].toLowerCase() == m.toLowerCase())
-							{
-								m = j + 1;
-								bMonthLetter = true;
-								var sMonthFormat = aArrayTemp.format;
-								if(null != d)
-								{
-									if (null != y){
-										if(y < 100)
-											sMonthDateFormat = "d/" + sMonthFormat +"/yy";
-										else
-											sMonthDateFormat = "d/" + sMonthFormat +"/yyyy";
-									}
-									else
-										sMonthDateFormat = "d/" + sMonthFormat;
-								}
-								else if(null != y)
-								{
-									if(y < 100)
-										sMonthDateFormat = sMonthFormat +"/yy";
-									else
-										sMonthDateFormat = sMonthFormat +"/yyyy";
-								}
-								break;
-							}
-						}
-						if(bMonthLetter)
-							break;
-					}
-				}
-				if(bMonthFirst && false == bMonthLetter && null != d && null != m)
-				{
-					var temp = d;
-					d = m;
-					m = temp;
-				}
-			}
-			
-            var bDate = false;
-            var bTime = false;
-            var nDay;
-            var nMounth;
-            var nYear;
-			if(g_bDate1904)
-			{
-				nDay = 1;
-				nMounth = 0;
-				nYear = 1904;
-			}
-			else
-			{
-				nDay = 31;
-				nMounth = 11;
-				nYear = 1899;
-			}
-            var nHour = 0;
-            var nMinute = 0;
-            var nSecond = 0;
-            var dValue = 0;
-			var bValidDate = true;
-            if(null != m && (null != d || null != y))
-            {
-                bDate = true;
-				var oNowDate = new Date();
-				if(null != d)
-					nDay = d - 0;
-				else
-					nDay = 1;
-                nMounth = m - 1;
-				if(null != y)
-					nYear = y - 0;
-				else
-					nYear = oNowDate.getFullYear();
-                
-                if(nYear < 100)
-                    nYear = 2000 + nYear;
-				//проверяем дату на валидность
-				bValidDate = this.isValidDate(nYear, nMounth, nDay);
-            }
-            if(null != h)
-            {
-                bTime = true;
-                var nHour = h - 0;
-                if(null != ampm)
-                {
-                    //переводим 24
-                    nHour = nHour % 12;
-                    if("PM" == ampm)
-                        nHour += 12;
-                }
-                if(null != min)
-                    nMinute = min - 0;
-                if(null != s)
-                    nSecond = s - 0;    
-            }
-            if(true == bValidDate && (true == bDate || true == bTime))
-            {
+				var d = oParsedDate.d;
+				var m = oParsedDate.m;
+				var y = oParsedDate.y;
+				var h = oParsedDate.h;
+				var min = oParsedDate.min;
+				var s = oParsedDate.s;
+				var ampm = oParsedDate.ampm;
+				var sDateFormat = oParsedDate.sDateFormat;
+				
+				var bDate = false;
+				var bTime = false;
+				var nDay;
+				var nMounth;
+				var nYear;
 				if(g_bDate1904)
-					dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1904,0,1,0,0,0)).getTime()) / (86400 * 1000);
+				{
+					nDay = 1;
+					nMounth = 0;
+					nYear = 1904;
+				}
 				else
 				{
-					if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
-						dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,30,0,0,0)).getTime()) / (86400 * 1000);
-					else if(1900 == nYear && 2 == nMounth && 29 == nDay)
-						dValue = 60;
-					else
-						dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,31,0,0,0)).getTime()) / (86400 * 1000);
+					nDay = 31;
+					nMounth = 11;
+					nYear = 1899;
 				}
-                if(dValue > 0)
+				var nHour = 0;
+				var nMinute = 0;
+				var nSecond = 0;
+				var dValue = 0;
+				var bValidDate = true;
+				if(null != m && (null != d || null != y))
 				{
-					var sFormat;
-					if(true == bDate && true == bTime)
+					bDate = true;
+					var oNowDate = new Date();
+					if(null != d)
+						nDay = d - 0;
+					else
+						nDay = 1;
+					nMounth = m - 1;
+					if(null != y)
+						nYear = y - 0;
+					else
+						nYear = oNowDate.getFullYear();
+					
+					if(nYear < 30)
+						nYear = 2000 + res.y;
+					else if(nYear < 100)
+						nYear = 1900 + res.y;
+
+					//проверяем дату на валидность
+					bValidDate = this.isValidDate(nYear, nMounth, nDay);
+				}
+				if(null != h)
+				{
+					bTime = true;
+					var nHour = h - 0;
+					if(null != ampm)
 					{
-						if(bMonthLetter)
-							sFormat = sMonthDateFormat + " h:mm:ss AM/PM";
+						if(nHour <= 23)
+						{
+							//переводим 24
+							nHour = nHour % 12;
+							if("PM" == ampm)
+								nHour += 12;
+						}
 						else
-							sFormat = "m/d/yyyy h:mm:ss AM/PM";
+							bValidDate = false;
 					}
-					else if(true == bDate)
+					if(null != min)
 					{
-						if(bMonthLetter)
-							sFormat = sMonthDateFormat;
-						else
-							sFormat = "m/d/yyyy";
+						nMinute = min - 0;
+						if(nMinute > 59)
+							bValidDate = false;
 					}
+					if(null != s)
+					{
+						nSecond = s - 0;
+						if(nSecond > 59)
+							bValidDate = false;
+					}
+				}
+				if(true == bValidDate && (true == bDate || true == bTime))
+				{
+					if(g_bDate1904)
+						dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1904,0,1,0,0,0)).getTime()) / (86400 * 1000);
 					else
 					{
-						if(dValue > 1)
-							sFormat = "[h]:mm:ss";
-						else if(null != ampm)
-							sFormat = "h:mm:ss AM/PM";
+						if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
+							dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,30,0,0,0)).getTime()) / (86400 * 1000);
+						else if(1900 == nYear && 2 == nMounth && 29 == nDay)
+							dValue = 60;
 						else
-							sFormat = "h:mm:ss";
+							dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,31,0,0,0)).getTime()) / (86400 * 1000);
 					}
-					res = {format: sFormat, value: dValue, bDateTime: true};
+					if(dValue > 0)
+					{
+						var sFormat;
+						if(true == bDate && true == bTime)
+						{
+							sFormat = sDateFormat + " h:mm:ss";
+							if(null != ampm)
+								sFormat += " AM/PM";
+						}
+						else if(true == bDate)
+							sFormat = sDateFormat;
+						else
+						{
+							if(dValue > 1)
+								sFormat = "[h]:mm:ss";
+							else if(null != ampm)
+								sFormat = "h:mm:ss AM/PM";
+							else
+								sFormat = "h:mm:ss";
+						}
+						res = {format: sFormat, value: dValue, bDateTime: true};
+					}
 				}
             }
         }
@@ -2735,18 +2899,20 @@ FormatParser.prototype =
 			if(nMounth < 0 || nMounth > 11)
 				return false;
 			else
-			{
-				if(this.isLeapYear(nYear))
-				{
-					if(nDay <= 0 || nDay > this.daysLeap[nMounth])
-						return false;
-				}
-				else
-				{
-					if(nDay <= 0 || nDay > this.days[nMounth])
-						return false;
-				}
-			}
+				return this.isValidDay(nYear, nMounth, nDay);
+		}
+		return true;
+	},
+	isValidDay : function(nYear, nMounth, nDay){
+		if(this.isLeapYear(nYear))
+		{
+			if(nDay <= 0 || nDay > this.daysLeap[nMounth])
+				return false;
+		}
+		else
+		{
+			if(nDay <= 0 || nDay > this.days[nMounth])
+				return false;
 		}
 		return true;
 	},
