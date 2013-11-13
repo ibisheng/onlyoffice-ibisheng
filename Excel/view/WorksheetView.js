@@ -3631,12 +3631,12 @@
                 var dDigitsCount = 0;
                 var colWidth = 0;
                 var cellType = c.getType();
-                var isNumberFormat = (!cellType || CellValueType.Number === cellType);
+				fl.isNumberFormat = (!cellType || CellValueType.Number === cellType);
                 var numFormatStr = c.getNumFormatStr();
                 var pad = this.width_padding * 2 + this.width_1px;
                 var sstr, sfl, stm;
 
-                if (!this.cols[col].isCustomWidth && isNumberFormat && !fMergedColumns &&
+                if (!this.cols[col].isCustomWidth && fl.isNumberFormat && !fMergedColumns &&
                     (c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
                         c_oAscCanChangeColWidth.all === canChangeColWidth)) {
                     colWidth = this.cols[col].innerWidth;
@@ -3723,7 +3723,7 @@
 
 //  NOTE: надо сделать как в экселе если проекция строчки на Y больше высоты ячейки подставлять # и рисовать все по центру
 
-//                    if (isNumberFormat) {
+//                    if (fl.isNumberFormat) {
 //                        var prj = Math.abs(Math.sin(angle * Math.PI / 180.0) * tm.width);
 //                        if (prj > rowHeight) {
 //                            //if (maxW === undefined) {}
