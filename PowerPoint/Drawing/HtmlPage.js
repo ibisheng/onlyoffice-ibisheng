@@ -730,6 +730,12 @@ function CEditorPage(api)
         oWordControl.CheckZoom();
         oWordControl.CalculateDocumentSize();
         var lCurPage = oWordControl.m_oDrawingDocument.SlideCurrent;
+
+        if (oWordControl.m_oLogicDocument)
+        {
+            oWordControl.m_oLogicDocument.redrawCharts();
+        }
+
         this.GoToPage(lCurPage);
 
         if (-1 != lCurPage)
@@ -745,11 +751,6 @@ function CEditorPage(api)
         oWordControl.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, type);
         oWordControl.m_bIsUpdateTargetNoAttack = true;
         oWordControl.m_bIsRePaintOnScroll = true;
-
-        if (oWordControl.m_oLogicDocument)
-        {
-            oWordControl.m_oLogicDocument.redrawCharts();
-        }
 
         oWordControl.OnScroll();
 
