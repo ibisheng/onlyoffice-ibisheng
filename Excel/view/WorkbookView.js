@@ -73,6 +73,9 @@
 
 			this._lockDraw = false;
 
+			// Фонт, который выставлен в DrawingContext, он должен быть один на все DrawingContext-ы
+			this.m_oFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
+
 			// Теперь у нас 2 FontManager-а на весь документ + 1 для автофигур (а не на каждом листе свой)
 			this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
 			this.fmgrGraphics.push(new CFontManager());	// Для обычного
@@ -137,12 +140,14 @@
 						.attr("width", outer.width())
 						.attr("height", outer.height());
 
-				this.buffers.main		= asc_DC({canvas: this.canvas[0],			units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				this.buffers.main = asc_DC({canvas: this.canvas[0], units: 1/*pt*/,
+					fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+				this.buffers.overlay = asc_DC({canvas: this.canvasOverlay[0], units: 1/*pt*/,
+					fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				this.buffers.overlay.ctx.isOverlay = true;		// Для разруливания _activateOverlayCtx / _deactivateOverlayCtx
 				
-				this.drawingCtx			= this.buffers.main;
-				this.overlayCtx			= this.buffers.overlay;
+				this.drawingCtx = this.buffers.main;
+				this.overlayCtx = this.buffers.overlay;
 				
 				// Shapes
 				this.buffers.shapeCtx = new CGraphics();
@@ -153,7 +158,7 @@
 				this.buffers.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
 				this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
-				this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 
 				this.stringRender		= asc_SR(this.buffers.main);
 				this.stringRender.setDefaultFont(this.defaultFont);
@@ -345,7 +350,7 @@
 							}
 						});
 
-				this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics,
+				this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics, this.m_oFont,
 						/*handlers*/{
 							"closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
 							"updated"  : function () {self.handlers.trigger.apply(self.handlers,
@@ -974,7 +979,7 @@
 
 			getCellStyles: function () {
 				var oStylesPainter = new asc_CSP();
-				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.stringRender);
+				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.m_oFont, this.stringRender);
 				return oStylesPainter;
 			},
 

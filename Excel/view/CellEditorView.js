@@ -77,10 +77,11 @@
 		 * @param {Element} elem
 		 * @param {Element} input
 		 * @param {Array} fmgrGraphics
+		 * @param {FontProperties} oFont
 		 * @param {HandlersList} handlers
 		 * @param {Object} settings  See CellEditor.defaults
 		 */
-		function CellEditor(elem, input, fmgrGraphics, handlers, settings) {
+		function CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings) {
 			if ( !(this instanceof CellEditor) ) {return new CellEditor(elem, input, fmgrGraphics, handlers, settings);}
 
 			this.element = elem;
@@ -96,6 +97,7 @@
 			this.cursorTID = undefined;
 			this.cursorPos = 0;
 			this.topLineIndex = 0;
+			this.m_oFont = oFont;
 			this.fmgrGraphics = fmgrGraphics;
 			this.drawingCtx = undefined;
 			this.overlayCtx = undefined;
@@ -187,8 +189,8 @@
 				}
 
 				// create text render
-				t.drawingCtx = asc_DC({canvas: t.canvas[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-				t.overlayCtx = asc_DC({canvas: t.canvasOverlay[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				t.drawingCtx = asc_DC({canvas: t.canvas[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+				t.overlayCtx = asc_DC({canvas: t.canvasOverlay[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				t.textRender = asc_TR(t.drawingCtx);
 				t.textRender.setDefaultFont(t.settings.font.clone());
 

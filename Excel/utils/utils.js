@@ -778,11 +778,11 @@
 			asc_getDocStyles: function () { return this.docStyles; },
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
 			asc_getDocStylesImage: function () { return this.docStylesImage; },
-			generateStylesAll: function (cellStylesAll, fmgrGraphics, stringRenderer) {
-				this.generateDefaultStyles(cellStylesAll, fmgrGraphics, stringRenderer);
-				this.generateDocumentStyles(cellStylesAll, fmgrGraphics, stringRenderer);
+			generateStylesAll: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+				this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
+				this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
 			},
-			generateDefaultStyles: function (cellStylesAll, fmgrGraphics, stringRenderer) {
+			generateDefaultStyles: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
 				var nDefaultStylesCount = cellStylesAll.getDefaultStylesCount();
 				var cellStyles = cellStylesAll.DefaultStyles;
 				var nLength = cellStyles.length;
@@ -793,7 +793,7 @@
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
 
-				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
+				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle = null;
 				this.defaultStyles = [];
@@ -808,7 +808,7 @@
 
 				this.defaultStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
 			},
-			generateDocumentStyles: function (cellStylesAll, fmgrGraphics, stringRenderer) {
+			generateDocumentStyles: function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
 				var nDocumentStylesCount = cellStylesAll.getCustomStylesCount();
 				var cellStyles = cellStylesAll.CustomStyles;
 				var nLength = cellStyles.length;
@@ -819,7 +819,7 @@
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
 
-				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
+				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 				var oStyle = null;
 				this.docStyles = [];

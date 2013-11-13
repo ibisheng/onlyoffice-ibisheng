@@ -501,8 +501,7 @@ function DrawingContext(settings) {
 		return new DrawingContext(settings);
 	}
 
-	if (undefined !== settings)
-		this.setCanvas(settings.canvas);
+	this.setCanvas(settings.canvas);
 
 	var ppiTest =
 			$('<div style="position: absolute; width: 10in; height:10in; visibility:hidden; padding:0;"/>')
@@ -523,13 +522,15 @@ function DrawingContext(settings) {
 	this._1px_x = getCvtRatio(0/*px*/, 3/*mm*/, this.ppiX);
 	this._1px_y = getCvtRatio(0/*px*/, 3/*mm*/, this.ppiY);
 	this.units  = 3/*mm*/;
-	this.changeUnits( settings !== undefined && settings.units !== undefined ? settings.units : this.units );
+	this.changeUnits(undefined !== settings.units ? settings.units : this.units);
 
 	this.fmgrGraphics = undefined !== settings.fmgrGraphics ? settings.fmgrGraphics : null;
 	if (null === this.fmgrGraphics) {return null;}
 
 	/** @type FontProperties */
-	this.font = settings !== undefined && settings.font !== undefined ? settings.font : new FontProperties("Arial", 11);
+	this.font = undefined !== settings.font ? settings.font : null;
+	// Font должен быть передан (он общий для всех DrawingContext, т.к. может возникнуть ситуация как в баге http://bugzserver/show_bug.cgi?id=19784)
+	if (null === this.font) {return null;}
 
 	// CColor
 	this.fillColor = new CColor(255, 255, 255);
