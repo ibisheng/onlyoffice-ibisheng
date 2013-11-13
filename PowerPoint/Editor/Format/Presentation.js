@@ -5012,18 +5012,10 @@ CPresentation.prototype =
     Document_Get_AllFontNames : function()
     {
         var AllFonts = new Object();
-
-        /*this.HdrFtr.Document_Get_AllFontNames( AllFonts );
-        this.Numbering.Document_Get_AllFontNames( AllFonts );
-        this.Styles.Document_Get_AllFontNames( AllFonts );
-
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for(var i =0 ; i < this.Slides.length; ++i)
         {
-            var Element = this.Content[Index];
-            Element.Document_Get_AllFontNames( AllFonts );
+            this.Slides[i].getAllFonts(AllFonts)
         }
-                     */
         return AllFonts;
     },
 
