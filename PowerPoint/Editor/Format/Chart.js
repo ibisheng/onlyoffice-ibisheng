@@ -964,12 +964,20 @@ CChartAsGroup.prototype =
         }
         graphics.reset();
         graphics.SetIntegerGrid(true);
+
+
+        graphics.SaveGrState();
+
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.transform);
+        graphics.AddClipRect(-1, -1, this.extX + 1, this.extY + 1);
         if(this.chartTitle)
             this.chartTitle.draw(graphics, pageIndex);
         if(this.hAxisTitle)
             this.hAxisTitle.draw(graphics, pageIndex);
         if(this.vAxisTitle)
             this.vAxisTitle.draw(graphics, pageIndex);
+        graphics.RestoreGrState();
     },
 
     check_bounds: function(checker)
