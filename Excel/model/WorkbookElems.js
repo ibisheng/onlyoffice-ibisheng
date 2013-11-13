@@ -2939,7 +2939,7 @@ CCellValue.prototype =
 		else
 			cellfont = g_oDefaultFont;
 		if(null != sText){
-			var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
+			var oNewItem = {text: null, format: null, sFormula: null, sId: null};
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
 			color = oNewItem.format.c;
@@ -2962,7 +2962,7 @@ CCellValue.prototype =
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
-				var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
+				var oNewItem = {text: null, format: null, sFormula: null, sId: null};
 				var oCurtext = aText[i];
 				if(null != oCurtext.text)
 				{
