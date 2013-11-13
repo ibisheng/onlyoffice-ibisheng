@@ -702,7 +702,7 @@ function CCollaborativeEditing()
         editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
-        editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    //    editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     };
 
     this.Release_Locks = function()

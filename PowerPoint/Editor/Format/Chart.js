@@ -937,6 +937,13 @@ CChartAsGroup.prototype =
         var oldValue = isRealObject(this.vAxisTitle) ? this.vAxisTitle.Get_Id() : null;
         var newValue = isRealObject(title) ? title.Get_Id() : null;
         this.vAxisTitle = title;
+        if(this.vAxisTitle && this.vAxisTitle.txBody)
+        {
+            var body_pr = new CBodyPr();
+            body_pr.merge(this.vAxisTitle.txBody.bodyPr);
+            body_pr.vert = nVertTTvert270;
+            this.vAxisTitle.setBodyPr(body_pr);
+        }
         History.Add(this, {Type: historyitem_AutoShapes_AddYAxis, oldPr: oldValue, newPr: newValue});
     },
 
