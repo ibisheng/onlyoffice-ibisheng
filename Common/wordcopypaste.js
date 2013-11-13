@@ -1774,8 +1774,9 @@ CopyProcessor.prototype =
                     {
                         case STATES_ID_TEXT_ADD:
                         case STATES_ID_TEXT_ADD_IN_GROUP:
+                        case STATES_ID_CHART_TEXT_ADD:
                         {
-                            if(graphicObjects.State.textObject instanceof CShape)
+                            if(graphicObjects.State.textObject instanceof CShape || graphicObjects.State.textObject instanceof CChartTitle)
                             {
                                 this.oPresentationWriter.WriteString2("TeamLab1");
                                 this.oPresentationWriter.WriteString2(editor.DocumentUrl);
@@ -3476,10 +3477,11 @@ PasteProcessor.prototype =
                                     {
                                         case STATES_ID_TEXT_ADD:
                                         case STATES_ID_TEXT_ADD_IN_GROUP:
+                                        case STATES_ID_CHART_TEXT_ADD:
                                         {
                                             if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                                             {
-                                                var content = (slide.graphicObjects.State.textObject instanceof CShape) ? slide.graphicObjects.State.textObject.txBody.content : slide.graphicObjects.State.textObject.graphicObject.CurCell.Content;
+                                                var content = (slide.graphicObjects.State.textObject instanceof CShape || slide.graphicObjects.State.textObject instanceof CChartTitle) ? slide.graphicObjects.State.textObject.txBody.content : slide.graphicObjects.State.textObject.graphicObject.CurCell.Content;
                                                 oThis.insertInPlace2(content, shape.txBody.content.Content);
                                                 shape.txBody.content = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
                                                 shape.txBody.setDocContent(shape.txBody.content);
@@ -3495,7 +3497,9 @@ PasteProcessor.prototype =
                                                 }
                                                 slide.graphicObjects.State.textObject.recalcInfo.recalculateContent = true;
                                                 slide.graphicObjects.State.textObject.recalcInfo.recalculateTransformText = true;
-                                                editor.WordControl.m_oLogicDocument.recalcMap[slide.graphicObjects.State.textObject.Id] = slide.graphicObjects.State.textObject;
+
+                                                var recalc_object = !(slide.graphicObjects.State.textObject instanceof CChartTitle) ? slide.graphicObjects.State.textObject : slide.graphicObjects.State.textObject.chartGroup;
+                                                editor.WordControl.m_oLogicDocument.recalcMap[recalc_object.Id] = recalc_object;
                                             }
                                             break;
                                         }

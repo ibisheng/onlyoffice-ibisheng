@@ -124,6 +124,20 @@ CChartTitle.prototype =
     },
 
 
+    getTextSelectionState: function () {
+        if (this.txBody) {
+            return this.txBody.content.Get_SelectionState();
+        }
+        return [];
+    },
+
+    setTextSelectionState: function (s) {
+        if (this.txBody) {
+            this.txBody.content.Set_SelectionState(s, s.length - 1);
+        }
+    },
+
+
     Get_Styles: function()
     {
         var styles = new CStyles();

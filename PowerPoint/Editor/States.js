@@ -1036,7 +1036,7 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
     this.startX = startX;
     this.startY = startY;
     this.chartElement = chartElement;
-
+    this.chart = chartElement.chartGroup;
     this.onMouseDown = function(e, x, y)
     {
 

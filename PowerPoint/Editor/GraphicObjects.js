@@ -3307,6 +3307,10 @@ CGraphicObjects.prototype = {
                 break;
             }
             case STATES_ID_GROUP:
+            case STATES_ID_CHANGE_ADJ_IN_GROUP:
+            case STATES_ID_ROTATE_IN_GROUP:
+            case STATES_ID_RESIZE_IN_GROUP:
+            case STATES_ID_MOVE_IN_GROUP:
             {
                 s.id = STATES_ID_GROUP;
                 s.group = this.State.group;
@@ -3315,6 +3319,30 @@ CGraphicObjects.prototype = {
                 {
                     s.selectedObjects.push(this.State.group.selectedObjects[i]);
                 }
+                break;
+            }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                s.id = STATES_ID_CHART_TEXT_ADD;
+                s.chart = this.State.chart;
+                s.textObject = this.State.textObject;
+                s.textSelectionState = this.State.textObject.getTextSelectionState();
+                break;
+            }
+            case STATES_ID_CHART:
+            case STATES_ID_MOVE_INTERNAL_CHART_OBJECT:
+            {
+                s.id = STATES_ID_CHART;
+                s.chart = this.State.chart;
+                var selected_title;
+                var chart = this.State.chart;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                    selected_title = chart.chartTitle;
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                    selected_title = chart.hAxisTitle;
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                    selected_title = chart.vAxisTitle;
+                s.selectedTitle = selected_title;
                 break;
             }
             default :
@@ -3362,6 +3390,22 @@ CGraphicObjects.prototype = {
                     s.selectedObjects[i].select(s.group);
                 }
                 this.changeCurrentState(new GroupState(this, this.slide, s.group));
+                break;
+            }
+            case STATES_ID_CHART_TEXT_ADD:
+            {
+                s.chart.select(this);
+                s.textObject.select();
+                s.textObject.setTextSelectionState(s.textSelectionState);
+                this.changeCurrentState(new ChartTextAdd(this, this.slide, s.chart, s.textObject));
+                break;
+            }
+            case STATES_ID_CHART:
+            {
+                s.chart.select(this);
+                if(s.selectedTitle)
+                    s.selectedTitle.select();
+                this.changeCurrentState(new ChartState(this, this.slide, s.chart));
                 break;
             }
             default :
