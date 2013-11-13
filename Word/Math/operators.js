@@ -3823,6 +3823,15 @@ CDelimiter.prototype.init = function(props)
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
 
+    if(typeof(props.begChr) === "string" && props.begChr.length == 0)
+        props.begChrType = PARENTHESIS_LEFT;
+
+    if(typeof(props.endChr) === "string" && props.endChr.length == 0)
+        props.endChrType = PARENTHESIS_RIGHT;
+
+    if(typeof(props.endChr) === "string" && props.endChr.length == 0)
+        props.sepChrType = DELIMITER_LINE;
+
     var begGlyph = this.getGlyph(props.begChr, props.begChrType, LOCATION_LEFT);
     this.begOper = new COperator (begGlyph);
     this.begOper.relate(this);
@@ -4154,7 +4163,7 @@ CDelimiter.prototype.getBase = function(numb)
 CDelimiter.prototype.getGlyph = function(chr, type, location)
 {
     var operator;
-    var code = typeof(chr) === "string" ? chr.charCodeAt(0) : null;
+    var code = typeof(chr) === "string" && chr.length > 0 ? chr.charCodeAt(0) : null;
 
     if( code === 0x28 || type === PARENTHESIS_LEFT)
     {
@@ -4326,12 +4335,12 @@ CDelimiter.prototype.getGlyph = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === "" || type === BRACKET_EMPTY)
+    else if(type === BRACKET_EMPTY)
         operator = -1;
     else if(code !== null)
     {
         operator = new CMathText();
-        operator.add(code.charCodeAt(0));
+        operator.add(code);
     }
     else
         operator = -1;
@@ -4622,6 +4631,12 @@ CGroupCharacter.prototype.init = function(props)
 
     var type = props.chrType;
     var code = typeof(props.chr) === "string" ? props.chr.charCodeAt(0) : null;
+
+    if( typeof(type) === "undefined"|| type === null && code === null )
+    {
+        type = BRACKET_CURLY_BOTTOM;
+        this.loc = LOCATION_BOT;
+    }
 
     var glyph = this.getGlyph(code, type);
 

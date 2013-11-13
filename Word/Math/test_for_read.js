@@ -11,14 +11,14 @@ function simulatorRead()
     var ctrPrp = new CTextPr();
     ctrPrp.FontSize = 36;
 
-    addToContent_ForRead( MathComposition.Root, accent, props, ctrPrp );
+    addToContent_ForRead(MathComposition.Root, accent, props, ctrPrp);
 
     props =
     {
         type:   BAR_FRACTION
     };
     var fract = new CFraction();
-    addToContent_ForRead( accent.getBase(), fract, props );
+    addToContent_ForRead(accent.getBase(), fract, props);
 
     fract.getDenominator().fillPlaceholders();
     var content = fract.getNumerator();
@@ -27,7 +27,7 @@ function simulatorRead()
     {
         type:   SKEWED_FRACTION
     };
-    addToContent_ForRead( content, fract2, props );
+    addToContent_ForRead(content, fract2, props);
 
     var num1 = fract2.getNumerator();
     var den1 = fract2.getDenominator();
@@ -220,6 +220,23 @@ function simulatorRead()
 
     matrix.getElement(1,0).fillPlaceholders();
     matrix.getElement(2,0).fillPlaceholders();
+
+    var lastElem = matrix.getElement(3, 0);
+
+    lastElem.addTxt("w");
+
+    var oper = new CGroupCharacter();
+    props =
+    {
+        chrType:       DOUBLE_ARROW_LR,
+        location:      LOCATION_TOP
+    };
+
+    addToContent_ForRead(lastElem, oper, props);
+
+    oper.getBase().addTxt("a");
+
+    lastElem.addTxt("y");
 
     //////////////////////////////////////////////////////////////////
 

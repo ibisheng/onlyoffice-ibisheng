@@ -78,7 +78,7 @@ CNary.prototype.init = function(props)
     var arg = new CMathContent(),
         base;
 
-    if(this.limLoc === 0)
+    if(this.limLoc === NARY_UndOvr)
     {
         if(this.supHide && this.subHide)
         {
@@ -143,7 +143,6 @@ CNary.prototype.getLowerIterator = function()
 {
     return this.elements[0][0].getLowerIterator();
 }
-
 
 function old_CNary()
 {

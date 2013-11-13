@@ -1,7 +1,7 @@
 function CDegree()
 {
-    this.type = null;
-    this.shiftDegree = null;
+    this.type = DEGREE_SUPERSCRIPT ;
+    this.shiftDegree = 0;
     CMathBase.call(this);
 }
 extend(CDegree, CMathBase);
@@ -11,7 +11,9 @@ CDegree.prototype.init = function(props)
 }
 CDegree.prototype.init_2 = function(props, oBase)
 {
-    this.type = props.type;
+    if( typeof(props.type)!=="undefined"|| props.type !== null)
+        this.type = props.type;
+
     this.setDimension(1, 2);
 
     var oDegree = new CMathContent();
@@ -369,7 +371,7 @@ CIterators.prototype.getCtrPrp = function()
 
 function CDegreeSubSup()
 {
-    this.type = null;
+    this.type = DEGREE_SubSup;
     CSubMathBase.call(this);
 }
 extend(CDegreeSubSup, CSubMathBase);
@@ -380,7 +382,9 @@ CDegreeSubSup.prototype.init = function(props)
 }
 CDegreeSubSup.prototype.init_2 = function(props, oBase)
 {
-    this.type = props.type;
+    if( typeof(props.type)!=="undefined"|| props.type !== null)
+        this.type = props.type;
+
     this.setDimension(1, 2);
 
     var oIters = new CIterators();

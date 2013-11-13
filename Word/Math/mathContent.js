@@ -19,8 +19,7 @@
 
 /// TODO (tomorrow)
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
-// 2. Дефолтовые значения для delimiters
-// 3. Дописать тестовый пример(добавить операторы)
+// 2. Посмотреть дефолтовые значения для остальных мат. объектов
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
@@ -80,6 +79,11 @@ CMathRunPrp.prototype =
     getRunPrp: function()
     {
         return this.runPrp;
+    },
+    getMathRunPrp: function()
+    {
+        // заглушка
+
     },
     draw: function() {},
     setPosition: function() {},
@@ -457,6 +461,7 @@ CMathContent.prototype =
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
 
             mathElem.relate(this);
+            mathElem.setTypeElement(ind);
             //mathElem.setComposition(this.Composition);
 
             var ctrPrp = new CTextPr();
@@ -2490,7 +2495,7 @@ CMathContent.prototype =
                 {
                     chrType:        BRACKET_CURLY_TOP,
                     location:       LOCATION_TOP,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 delim.init(props);
                 delim.fillPlaceholders();
@@ -2936,7 +2941,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_LEFT,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -2953,7 +2958,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -2997,7 +3002,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_LEFT_ARROW,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3014,7 +3019,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_RIGHT_ARROW,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3048,7 +3053,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_LR,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3082,7 +3087,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        DOUBLE_ARROW_LR,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 arrow.fillPlaceholders();
@@ -3099,7 +3104,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 var base = arrow.getBase();
@@ -3117,7 +3122,7 @@ CMathContent.prototype =
                 var props =
                 {
                     chrType:        ARROW_RIGHT,
-                    vertJc:       VJUST_BOT
+                    vertJc:         VJUST_BOT
                 };
                 arrow.init(props);
                 var base = arrow.getBase();
@@ -5278,7 +5283,7 @@ CMathContent.prototype =
         this.content.length = 0;
         this.content = tmp;
     },
-    addRunPrpToContent_2: function(runPrp) // for "read"
+    /*addRunPrpToContent_2: function(runPrp) // for "read"
     {
         var rPrp = new CMathRunPrp();
         rPrp.Merge(runPrp);
@@ -5287,6 +5292,35 @@ CMathContent.prototype =
 
         this.content.push(element);
         this.CurPos++;
+    },*/
+    readContent: function()             // for "read"
+    {
+        var result = new Array();
+
+        for(var i=0; i < this.content.length; i++)
+        {
+            if(this.content[i].value.typeObj === MATH_RUN_PRP)
+            {
+                var run = new CRun();
+
+                run.setRunPrp(this.content[i].value);
+                run.setMathRunPrp(this.content[i].value);
+
+                while(this.content[i + 1].value.typeObj === MATH_TEXT)
+                {
+                    run.addLetter(this.content[i + 1].value);
+                    i++;
+                }
+
+                result.push(run);
+            }
+            else if(this.content[i].value.typeObj === MATH_COMP)
+            {
+                result.push(this.content[i].value);
+            }
+        }
+
+        return result;
     },
     getCurrRunPrp: function()
     {
@@ -6513,5 +6547,43 @@ function CEmpty()
 
 }
 
+function CRun()
+{
+    this.text = "";
+    this.runPrp = null;
+    this.mathRunPrp = null;
+}
+CRun.prototype =
+{
+    getText:    function()
+    {
+        return this.text;
+    },
+    getRunPrp:  function()
+    {
+        return this.runPrp;
+    },
+    getMathRunPrp:  function()
+    {
+        return this.mathRunPrp;
+    },
+    getTypeElement: function()
+    {
+        return MATH_RUN;
+    },
 
+
+    setRunPrp:  function(oRunPrp)
+    {
+        this.runPrp = oRunPrp.getRunPrp();
+    },
+    addLetter:  function(oMText)
+    {
+        this.text += String.fromCharCode(oMText.value);
+    },
+    setMathRunPrp:  function(oRunPrp)
+    {
+        this.mathRunPrp = oRunPrp.getMathRunPrp();
+    }
+}
 

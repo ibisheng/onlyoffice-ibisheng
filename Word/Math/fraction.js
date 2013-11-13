@@ -1,6 +1,6 @@
 function CFraction()
 {
-    this.type = null;
+    this.type = BAR_FRACTION;
     this.bHideBar = false;
     CMathBase.call(this);
 }
@@ -9,8 +9,6 @@ CFraction.prototype.init = function(props)
 {
     if( typeof(props.type) !== "undefined" && props.type !== null )
         this.type = props.type;
-    else
-        this.type = BAR_FRACTION;
 
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {

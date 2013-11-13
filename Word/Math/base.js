@@ -1,6 +1,8 @@
 function CMathBase()
 {
     this.typeObj = MATH_COMP;
+    this.typeElement  = null;   // для чтения
+
     // {align: {height: alpha, width: betta}}  alpha & betta коэффициенты в интервале от 0 до 1, либо CENTER
 
     CENTER = -1;
@@ -81,7 +83,6 @@ CMathBase.prototype =
 
     },
 
-
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(runPrp)
     {
@@ -123,7 +124,6 @@ CMathBase.prototype =
             }
     },
     /////////
-
 
     setComposition: function(composition)
     {
@@ -972,5 +972,14 @@ CMathBase.prototype =
 
         var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
         return content;
+    },
+
+    setTypeElement: function(type)
+    {
+        this.typeElement = type;
+    },
+    getTypeElement: function()
+    {
+        return this.typeElement;
     }
 }

@@ -15,6 +15,8 @@ var MATH_EQ_ARRAY               = 13;
 var MATH_BAR                    = 14;
 var MATH_PHANTOM                = 15;
 
+var MATH_RUN                    = 16;
+
 var BAR_FRACTION            	=  0;
 var SKEWED_FRACTION         	=  1;
 var LINEAR_FRACTION         	=  2;

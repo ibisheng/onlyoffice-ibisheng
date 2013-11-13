@@ -139,7 +139,7 @@ CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
 }
-CMathFunc.prototype.getFunction = function()
+CMathFunc.prototype.getFName = function()
 {
     return this.elements[0][0];
 }
