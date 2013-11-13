@@ -845,6 +845,15 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	//если очень маленький размер ширины диаграммы
 	if((bar._chartGutter._left + bar._chartGutter._right) >= (chartCanvas.width - 1))
 		bar._chartGutter._right += (chartCanvas.width - 1) - (bar._chartGutter._left + bar._chartGutter._right);
+
+	if(bar._chartGutter._left < 0 || isNaN(bar._chartGutter._left))
+		bar._chartGutter._left = 0;
+	if(bar._chartGutter._top < 0 || isNaN(bar._chartGutter._top))
+		bar._chartGutter._top = 0;
+	if(bar._chartGutter._bottom < 0 || isNaN(bar._chartGutter._bottom))
+		bar._chartGutter._bottom = 0;
+	if(bar._chartGutter._right < 0 || isNaN(bar._chartGutter._right))
+		bar._chartGutter._right = 0;
 }
 
 //-----------------------------------------------------------------------------------
