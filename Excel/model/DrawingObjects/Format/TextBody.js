@@ -1019,12 +1019,10 @@ CTextBody.prototype =
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateUndo, null, null,
                 new UndoRedoDataGraphicObjects(this.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 			var paste_processor = new PasteProcessor(this.curState.textObject.txBody.content);
+            paste_processor.txBody = this.curState.textObject.txBody;
+            paste_processor.drawingObjectsController = this;
+            paste_processor.drawingObjects = this.drawingObjects;
 			paste_processor.Start(node);
-			this.curState.textObject.txBody.OnContentRecalculate();
-
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateRedo, null, null,
-                new UndoRedoDataGraphicObjects(this.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-			this.drawingObjects.showDrawingObjects(true);
 		}
 	},
 
@@ -1854,7 +1852,7 @@ function PasteProcessor(content)
     this.bNested = true;//��� ���������� � ��������
     this.oFonts = new Object();
     this.oImages = new Object();
-
+     this.fontMap = {};
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
 
@@ -2400,7 +2398,26 @@ PasteProcessor.prototype =
                     }
                 }
                 History.TurnOn();
-                oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
+                var api = asc["editor"];
+                var arrFonts = [];
+                for(var key in oThis.fontMap)
+                    arrFonts.push(key);
+
+                var callback = function()
+                {
+                    oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
+
+                    oThis.drawingObjectsController.curState.textObject.txBody.OnContentRecalculate();
+
+                    History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateRedo, null, null,
+                        new UndoRedoDataGraphicObjects(oThis.drawingObjectsController.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                    oThis.drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                }
+                if(arrFonts.length > 0)
+                    api._loadFonts(arrFonts, callback);
+                else
+                    callback();
+                //oThis.insertInPlace2(content, arrShapes[0].txBody.content.Content);
                 node.blur();
                 node.style.display  = ELEMENT_DISPAY_STYLE;
 
@@ -3182,12 +3199,42 @@ PasteProcessor.prototype =
 				font_family = font_family.replace(/"/g, '');
 				font_family = font_family.replace(/'/g, '');
                 font_family = font_family.split(",")[0];
-                if(null != font_family)
+                var fonts_array = font_family.split(",");
+                var font_name = "Calibri";
+                var api = asc["editor"];
+                for(var i = 0; i < fonts_array.length; ++i)
                 {
-                    rPr.RFonts.Ascii = {Name: font_family, Index: -1};
-                    rPr.RFonts.HAnsi = {Name: font_family, Index: -1};
-                    rPr.RFonts.CS = {Name: font_family, Index: -1};
-                    rPr.RFonts.EastAsia = {Name: font_family, Index: -1};
+                    var fontName = fonts_array[i];
+                    if(api.FontLoader.map_font_index[fontName] != undefined)
+                    {
+                        font_name = fontName;
+                        break;
+                    }
+                    var arrName = fontName.toLowerCase().split(' ');
+                    var newFontName = '';
+                    for(var j = 0;j < arrName.length;j++)
+                    {
+                        arrName[j] = arrName[j].substr(0,1).toUpperCase() + arrName[j].substr(1).toLowerCase();
+                        if(j == arrName.length - 1)
+                            newFontName += arrName[j];
+                        else
+                            newFontName += arrName[j] + ' ';
+                    }
+                    if(api.FontLoader.map_font_index[newFontName] != undefined)
+                    {
+                        font_name = newFontName;
+                        break;
+                    }
+                }
+
+                this.fontMap[font_name] = true;
+
+                if(null != font_name)
+                {
+                    rPr.RFonts.Ascii = {Name: font_name, Index: -1};
+                    rPr.RFonts.HAnsi = {Name: font_name, Index: -1};
+                    rPr.RFonts.CS = {Name: font_name, Index: -1};
+                    rPr.RFonts.EastAsia = {Name: font_name, Index: -1};
                 }
 				else
 				{

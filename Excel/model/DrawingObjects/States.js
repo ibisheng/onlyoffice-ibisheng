@@ -458,6 +458,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
                         drawingObjects.showDrawingObjects(true);
                         text_object.updateSelectionState(drawingObjects.drawingDocument);
+                        drawingObjects.controller.changeCurrentState(new TextAddState(drawingObjects.controller, drawingObjects, text_object));
                     }
                 };
 
