@@ -2510,10 +2510,8 @@ var oGeneralEditFormatCache = new GeneralEditFormatCache();
 
 function FormatParser()
 {
-    this.rx_percent = new RegExp("^([+-]?)(\\d+\\.?\\d*|\\.\\d+)%$");
-    this.rx_date = new RegExp("^ *(((\\d{1,2}) *[/-])? *(\\d{1,2}|[A-Za-z]{3,9}) *([/-]|[/-] *(\\d{2,4}))?)? *((\\d{1,2}) *: *(\\d{1,2})? *(: *(\\d{1,2})?)? *(AM|PM)?)?$");
-	
-	this.rx_currency = new RegExp("^([+-]?)([$€£¥])?(\\d+\\.?\\d*|\\.\\d+)(р.)?$");
+	this.rx_thouthand = new RegExp("^ *([+-])? *([$€£¥])? *([+-])? *((\\d+(,\\d{3,})*|\\d*)\\.?\\d*) *(р.|%)? *$");
+	//добавлять запятую в качестве разделителя в rx_date надо осторожно, чтобы не было путаницу
     this.rx_date = new RegExp("[A-Za-z]{2,9}|\\d{1,4}|[\\/\\.\\-:,]| +", "g");
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.daysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -2523,44 +2521,65 @@ FormatParser.prototype =
 {
     parse : function(value)
     {
-        //format возращается пока только формально, т.к. еще нет списка поддерживаемых форматов
+		//числа вида "+100", "-100" сюда не приходят поэтому формат типа General возвращать не нужно.
         var res = null;
-        var match = value.match(this.rx_percent);
-        if(null != match)
-        {
-             var sSing1 = match[1];
-             var sV1 = match[2];
-             var dVal = parseFloat(sV1);
-             if ("-" == sSing1)
-                 dVal = -dVal;
-             dVal /= 100;
-             res = {format: "0.00%", value: dVal};
-        }
-        else
+		var match = value.match(this.rx_thouthand);
+		if(null != match)
 		{
-			match = value.match(this.rx_currency);
-			if(null != match)
+			var sSing1 = match[1];
+			var sSingCurrency = match[2];
+			var sSing2 = match[3];
+			var sVal = match[4];
+			var sSingRubOrPer = match[7];
+			var oVal = this._parseThouthand(sVal);
+			if(oVal && (null == sSing1 || null == sSing2))
 			{
-				var sSing1 = match[1];
-				var bRubble = false;
-				var sSing2 = match[2];
-				var sSing3 = match[4];
-				if("р." == sSing3)
-					bRubble = true;
-				var sV1 = match[3];
-				var dVal = parseFloat(sV1);
-				if ("-" == sSing1)
-					 dVal = -dVal;
-				if(bRubble)
-					res = {format: "#,##0.00р.", value: dVal};
-				else
-					res = {format: "\\" + sSing2 + "#,##0.00_);[Red](\\" + sSing2 + "#,##0.00)", value: dVal};
+				var dVal = oVal.number;
+				if ("-" == sSing1 || "-" == sSing2)
+					dVal = -dVal;
+				var sFracFormat = "";
+				if(parseInt(dVal) != dVal)
+					sFracFormat = ".00";
+				var sFormat = null;
+				if(null == sSingCurrency && null == sSingRubOrPer)
+				{
+					if(oVal.thouthand)
+						sFormat = "#,##0" + sFracFormat;
+				}
+				else if(null != sSingCurrency)
+					sFormat = "\\" + sSingCurrency + "#,##0" + sFracFormat + "_);[Red](\\" + sSingCurrency + "#,##0" + sFracFormat + ")";
+				else if(null != sSingRubOrPer)
+				{
+					if("%" == sSingRubOrPer)
+					{
+						dVal /= 100;
+						sFormat = "0" + sFracFormat + "%";
+					}
+					else
+						sFormat = "#,##0" + sFracFormat + "р.;[Red]-#,##0" + sFracFormat + "р.";
+				}
+				if(null != sFormat)
+					res = {format: sFormat, value: dVal};
 			}
-			else
-				res = this.parseDate(value);
 		}
+		if(null == res)
+			res = this.parseDate(value);
         return res;
     },
+	_parseThouthand : function(val)
+	{
+		var oRes = null;
+		var bThouthand = false;
+		if(-1 != val.indexOf(","))
+		{
+			val = val.replace(/,/g,'');
+			bThouthand = true;
+		}
+		var dNumber = parseFloat(val);
+		if(!isNaN(dNumber))
+			oRes = {number: dNumber, thouthand: bThouthand};
+		return oRes;
+	},
 	_parseDateFromArray : function(match)
 	{
 		var res = null;
@@ -2733,7 +2752,6 @@ FormatParser.prototype =
 					}
 					else
 					{
-						res.sDateFormat = "d/m/yyyy";
 						if(this.bFormatMonthFirst)
 						{
 							var temp = res.d;
@@ -2743,7 +2761,12 @@ FormatParser.prototype =
 					}
 				}
 				if(null == res.sDateFormat)
-					res.sDateFormat = "d/m/yyyy";
+				{
+					if(this.bFormatMonthFirst)
+						res.sDateFormat = "m/d/yyyy";
+					else
+						res.sDateFormat = "d/m/yyyy";
+				}
 				if(null != res.y)
 				{
 					if(res.y < 30)
