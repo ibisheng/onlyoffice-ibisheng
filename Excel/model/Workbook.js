@@ -7345,7 +7345,7 @@ Range.prototype.deleteCellsShiftLeft=function(){
 	return this._shiftLeftRight(true);
 };
 Range.prototype._shiftLeftRight=function(bLeft){
-    lockDraw(this.workbook);
+    lockDraw(this.worksheet.workbook);
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
@@ -7397,8 +7397,8 @@ Range.prototype._shiftLeftRight=function(bLeft){
 		this.worksheet.hyperlinkManager.shift(this.bbox, !bLeft, true);
 	}
 	History.EndTransaction();
-    buildRecalc(this.workbook);
-    unLockDraw(this.workbook);
+    buildRecalc(this.worksheet.workbook);
+    unLockDraw(this.worksheet.workbook);
 	return true;
 };
 Range.prototype._shiftUpDown=function(bUp){
