@@ -1137,10 +1137,12 @@ function getVertexId(sheetId, cellId){
 function lockDraw(wb){
     lc++;
 	wb.isNeedCacheClean = false;
-	arrRecalc = {};
+    if( lc == 0 ){
+        arrRecalc = {};
+    }
 }
 function unLockDraw(wb){
-    lc--;
+    lc>0?lc--:true;
 	if( lc == 0 ){
         wb.isNeedCacheClean = true;
         arrRecalc = {};
@@ -3794,7 +3796,6 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
-	lockDraw(this.workbook);
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, oBBox.r1), new UndoRedoData_BBox(oBBox));
 	History.TurnOff();
 	var nLeft = oBBox.c1;
@@ -3826,8 +3827,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 	
 	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);;
-	buildRecalc(this.workbook);
-	unLockDraw(this.workbook);
+
 		
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
@@ -7345,6 +7345,7 @@ Range.prototype.deleteCellsShiftLeft=function(){
 	return this._shiftLeftRight(true);
 };
 Range.prototype._shiftLeftRight=function(bLeft){
+    lockDraw(this.workbook);
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
 	var nRangeType = this._getRangeType(oBBox);
@@ -7396,6 +7397,8 @@ Range.prototype._shiftLeftRight=function(bLeft){
 		this.worksheet.hyperlinkManager.shift(this.bbox, !bLeft, true);
 	}
 	History.EndTransaction();
+    buildRecalc(this.workbook);
+    unLockDraw(this.workbook);
 	return true;
 };
 Range.prototype._shiftUpDown=function(bUp){
