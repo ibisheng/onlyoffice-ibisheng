@@ -2693,10 +2693,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner)
 	}
 	else
 	{
-		if( this.isMobileVersion )
-			window.open("../../../sdk/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
-		else
-			getFile(url);
+		getFile(url);
 	}	
 }
 asc_docs_api.prototype.startGetDocInfo = function(){

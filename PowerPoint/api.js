@@ -1396,10 +1396,7 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner){
 		editor.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
 	else
 	{
-		if( editor.isMobileVersion )
-			window.open("../../../sdk/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
-		else
-			getFile(url);
+		getFile(url);
 	}
 }
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
