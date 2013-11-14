@@ -609,8 +609,8 @@
 					}
 
 					// process 'repeat char' marker
-					if (dontCalcRepeatChars && p && p.repeat > 0) {
-						l.tw -= this._calcCharsWidth(i, i + p.repeat - 1);
+					if (dontCalcRepeatChars && p && p.repeat) {
+						l.tw -= this._calcCharsWidth(i, i + p.total);
 					}
 
 					// process 'new line' marker
@@ -631,63 +631,89 @@
 				return new asc_TM(TW, TH, 0, BL, 0, 0, CL);
 			},
 
+			_getRepeatCharPos: function () {
+				var charProp;
+				for (var i = 0; i < this.chars.length; ++i) {
+					charProp = this.charProps[i];
+					if (charProp && charProp.repeat)
+						return i;
+				}
+				return -1;
+			},
+
 			/**
 			 * @param {Number} maxWidth
 			 */
 			_insertRepeatChars: function (maxWidth) {
-				var self = this, width, w, pos;
+				var self = this, width, w, pos, charProp;
 
-				function getNextRepeatCharsPos(fromPos) {
-					for (var i = fromPos; i < self.chars.length; ++i) {
-						if (self.charProps[i] && self.charProps[i].repeat > 0) {return i;}
-					}
-					return -1;
-				}
-
-				function calcRepeatCharsWidth(pos) {
-					return self._calcCharsWidth(pos, pos + self.charProps[pos].repeat - 1);
-				}
-
-				function shiftCharProps(fromPos, delta) {
-					for (var i = self.chars.length - 1; i >= fromPos; --i) {
-						if (self.charProps[i]) {
-							var p = self.charProps[i];
+				function shiftCharPropsLeft(fromPos, delta) {
+					// delta - отрицательная
+					var length = self.charProps.length;
+					for (var i = fromPos; i < length; ++i) {
+						var p = self.charProps[i];
+						if (p) {
 							delete self.charProps[i];
 							self.charProps[i + delta] = p;
 						}
 					}
 				}
 
-				function insertRepeatChars(pos) {
-					if (self.charProps[pos].total === undefined) {
-						self.charProps[pos].total = self.charProps[pos].repeat;
-					} else {
-						var repeatCount = self.charProps[pos].repeat,
-						    repeatEnd = pos + self.charProps[pos].total;
-						self.chars = "" +
-								self.chars.slice(0, repeatEnd) +
-								self.chars.slice(pos, pos + repeatCount) +
-								self.chars.slice(repeatEnd);
-						self.charWidths = [].concat(
-								self.charWidths.slice(0, repeatEnd),
-								self.charWidths.slice(pos, pos + repeatCount),
-								self.charWidths.slice(repeatEnd));
-						self.charProps[pos].total += repeatCount;
-						shiftCharProps(pos + 1, repeatCount);
+				function shiftCharPropsRight(fromPos, delta) {
+					// delta - положительная
+					for (var i = self.charProps.length - 1; i >= fromPos; --i) {
+						var p = self.charProps[i];
+						if (p) {
+							delete self.charProps[i];
+							self.charProps[i + delta] = p;
+						}
 					}
 				}
 
-				width = this._calcTextMetrics(true).width;
-				pos = 0;
+				function insertRepeatChars() {
+					if (0 === charProp.total)
+						return;	// Символ уже изначально лежит в строке и в списке
+					var repeatEnd = pos + charProp.total;
+					self.chars = "" +
+						self.chars.slice(0, repeatEnd) +
+						self.chars.slice(pos, pos + 1) +
+						self.chars.slice(repeatEnd);
 
-				while (1) {
-					do {pos = getNextRepeatCharsPos(pos < 0 ? 0 : pos);} while (pos < 0);
-					w = calcRepeatCharsWidth(pos);
-					if (w + width > maxWidth) {break;}
-					insertRepeatChars(pos);
-					width += w;
-					++pos;
+					self.charWidths = [].concat(
+						self.charWidths.slice(0, repeatEnd),
+						self.charWidths.slice(pos, pos + 1),
+						self.charWidths.slice(repeatEnd));
+
+					shiftCharPropsRight(pos + 1, 1);
 				}
+
+				function removeRepeatChar() {
+					self.chars = "" +
+						self.chars.slice(0, pos) +
+						self.chars.slice(pos + 1);
+
+					self.charWidths = [].concat(
+						self.charWidths.slice(0, pos),
+						self.charWidths.slice(pos + 1));
+
+					delete self.charProps[pos];
+					shiftCharPropsLeft(pos + 1, -1);
+				}
+
+				width = this._calcTextMetrics(true).width;
+				pos = this._getRepeatCharPos();
+				if (-1 === pos)
+					return;
+				w = this._calcCharsWidth(pos, pos);
+				charProp = this.charProps[pos];
+
+				while (charProp.total * w + width + w <= maxWidth) {
+					insertRepeatChars();
+					charProp.total += 1;
+				}
+
+				if (0 === charProp.total)
+					removeRepeatChar();
 
 				this.lines = [];
 			},
@@ -810,7 +836,11 @@
 					}
 
 					if (fmt.repeat) {
-						charPropAt(pIndex).repeat = text.length;
+						if (hasRepeats)
+							throw "Repeat should occur no more than once";
+
+						charPropAt(pIndex).repeat = true;
+						charPropAt(pIndex).total = 0;
 						hasRepeats = true;
 					}
 
