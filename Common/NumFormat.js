@@ -2511,8 +2511,6 @@ var oGeneralEditFormatCache = new GeneralEditFormatCache();
 function FormatParser()
 {
 	this.rx_thouthand = new RegExp("^ *([+-])? *([$€£¥])? *([+-])? *((\\d+(,\\d{3,})*|\\d*)\\.?\\d*) *(р.|%)? *$");
-	//добавлять запятую в качестве разделителя в rx_date надо осторожно, чтобы не было путаницу
-    this.rx_date = new RegExp("[A-Za-z]{2,9}|\\d{1,4}|[\\/\\.\\-:,]| +", "g");
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.daysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.bFormatMonthFirst = true;
@@ -2785,8 +2783,61 @@ FormatParser.prototype =
 	parseDate : function(value)
 	{
 		var res = null;
-		var match = value.match(this.rx_date);
-		if(null != match)
+		var match = [];
+		var sCurValue = null;
+		var oCurDataType = null;
+		var oDataTypes = {letter: {id: 0, min: 2, max: 9}, digit: {id: 1, min: 1, max: 4}, delemiter: {id: 2, min: 1, max: 1}, space: {id: 3, min: null, max: null}};
+		for(var i = 0, length = value.length; i < length; i++)
+		{
+			var sChar = value[i];
+			var oDataType = null;
+			if("0" <= sChar && sChar <= "9")
+				oDataType = oDataTypes.digit;
+			else if(("A" <= sChar && sChar <= "Z") || ("a" <= sChar && sChar <= "z"))
+				oDataType = oDataTypes.letter;
+			else if(" " == sChar)
+				oDataType = oDataTypes.space;
+			//добавлять запятую в качестве разделителя надо осторожно, чтобы не было путаницы с разделителем тысяч
+			else if("/" == sChar || "." == sChar || "-" == sChar || ":" == sChar)
+				oDataType = oDataTypes.delemiter;
+			var bError = false;
+			if(null != oDataType)
+			{
+				if(null == oCurDataType)
+					sCurValue = sChar;
+				else
+				{
+					if(oCurDataType == oDataType)
+					{
+						if(null == oCurDataType.max || sCurValue.length < oCurDataType.max)
+							sCurValue += sChar;
+						else
+							bError = true;
+					}
+					else
+					{
+						if(null == oCurDataType.min || sCurValue.length >= oCurDataType.min)
+						{
+							match.push(sCurValue);
+							sCurValue = sChar;
+						}
+						else
+							bError = true;
+					}
+				}
+				oCurDataType = oDataType;
+			}
+			else
+				bError = true;
+			if(bError)
+			{
+				match = null;
+				break;
+			}
+		}
+		if(null != match && null != sCurValue)
+			match.push(sCurValue);
+		if(null != match && match.length > 0)
 		{
 			var oParsedDate = this._parseDateFromArray(match);
 			if(null != oParsedDate)
