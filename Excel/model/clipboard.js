@@ -2448,9 +2448,14 @@
 					}
 					if(t.lStorage[row] == undefined)
 						t.lStorage[row] = [];
+					var arrFragmentsTmp = cell.getValue2();
+					var arrFragments = [];
+					for (var i = 0; i < arrFragmentsTmp.length; ++i) {
+						arrFragments.push(arrFragmentsTmp[i].clone());
+					}
 					t.lStorage[row][col] = 
 					{
-						value2:  Asc.clone(cell.getValue2()),
+						value2: arrFragments,
 						borders: cell.getBorderFull(),
 						merge: cell.hasMerged(),
 						format: cell.getNumFormat(),

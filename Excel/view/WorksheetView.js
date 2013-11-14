@@ -7741,8 +7741,8 @@
 										range.setBold(newVal.value2[numStyle].format.b);
 										range.setItalic(newVal.value2[numStyle].format.i);
 										range.setStrikeout(newVal.value2[numStyle].format.s);
-										if(!isOneMerge && newVal.value2[numStyle].format && newVal.value2[numStyle].format.c != null && newVal.value2[numStyle].format.c != undefined)
-											range.setFontcolor(new RgbColor(asc_parsecolor(newVal.value2[numStyle].format.c).binary));
+										if(!isOneMerge && newVal.value2[numStyle].format && null != newVal.value2[numStyle].format.c)
+											range.setFontcolor(newVal.value2[numStyle].format.c);
 										range.setUnderline(newVal.value2[numStyle].format.u);
 										//range.setAlignVertical(currentObj.va);
 										range.setFontname(newVal.value2[numStyle].format.fn);
