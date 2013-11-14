@@ -3478,6 +3478,13 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 ParaDrawing.prototype =
 {
 
+    Get_SelectedContent: function(SelectedContent)
+    {
+        if(this.GraphicObj && this.GraphicObj.Get_SelectedContent)
+        {
+            this.GraphicObj.Get_SelectedContent(SelectedContent);
+        }
+    },
     Search_GetId : function(bNext, bCurrent)
     {
         if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.Search_GetId === "function")

@@ -2172,6 +2172,12 @@ WordShape.prototype =
         return this.wrapPolygon;
     },
 
+    Get_SelectedContent: function(SelectedContent)
+    {
+        if(this.textBoxContent)
+            this.textBoxContent.Get_SelectedContent(SelectedContent);
+    },
+
     drawAdjustments: function()
     {
         if(this.spPr.geometry !== null)

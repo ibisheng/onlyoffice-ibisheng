@@ -1948,6 +1948,22 @@ CGraphicObjects.prototype =
         return false;
     },
 
+
+    Get_SelectedContent: function(SelectedContent)
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(this.curState.textObject.Get_SelectedContent)
+                    this.curState.textObject.Get_SelectedContent(SelectedContent);
+                break;
+            }
+
+        }
+    },
+
     getCurrentPageAbsolute: function()
     {
         if(isRealObject(this.majorGraphicObject))
