@@ -1514,7 +1514,7 @@ CChartAsGroup.prototype =
 
     setPosition: function(x, y)
     {
-        if(this.spPr.xfrm)
+        if(!this.spPr.xfrm)
         {
             this.setXfrmObject(new CXfrm());
         }
