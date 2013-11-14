@@ -319,7 +319,7 @@
 
 					if (first && last) {
 						for (i = first.index; i <= last.index; ++i) {
-							var valTmp = t._setFormatProperty(elem.format, prop, val);
+							var valTmp = t._setFormatProperty(opt.fragments[i].format, prop, val);
 							// Только для горячих клавиш
 							if (null === val)
 								val = valTmp;
