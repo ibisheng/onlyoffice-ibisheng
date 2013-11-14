@@ -316,6 +316,32 @@ ColorManager.prototype =
 g_oColorManager = new ColorManager();
 
 /** @constructor */
+function Fragment(val) {
+	this.text = null;
+	this.format = null;
+	this.sFormula = null;
+	this.sId = null;
+	if (null != val) {
+		this.set(val);
+	}
+}
+Fragment.prototype = {
+	clone : function () {
+		return new Fragment(this);
+	},
+	set : function(oVal) {
+		if (null != oVal.text)
+			this.text = oVal.text;
+		if (null != oVal.format)
+			this.format = oVal.format;
+		if (null != oVal.sFormula)
+			this.sFormula = oVal.sFormula;
+		if (null != oVal.sId)
+			this.sId = oVal.sId;
+	}
+};
+
+/** @constructor */
 function Font(val)
 {
 	if(null == val)
@@ -2939,7 +2965,7 @@ CCellValue.prototype =
 		else
 			cellfont = g_oDefaultFont;
 		if(null != sText){
-			var oNewItem = {text: null, format: null, sFormula: null, sId: null};
+			var oNewItem = new Fragment();
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
 			color = oNewItem.format.c;
@@ -2962,13 +2988,12 @@ CCellValue.prototype =
 			aResult.push(oNewItem);
 		} else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
-				var oNewItem = {text: null, format: null, sFormula: null, sId: null};
+				var oNewItem = new Fragment();
 				var oCurtext = aText[i];
 				if(null != oCurtext.text)
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat = new Font();
 					oCurFormat.set(cellfont);
 					if(null != oCurtext.format)
 						oCurFormat.set(oCurtext.format);

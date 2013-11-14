@@ -8817,7 +8817,7 @@
 							v = c.getValueForEdit2().slice(0, 1);
 							// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
 							newValue = [];
-							newValue[0] = {text: cellValue, format: v[0].format.clone()};
+							newValue[0] = new Fragment({text: cellValue, format: v[0].format.clone()});
 
 							t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
 								/*isNotHistory*/true);
@@ -9115,6 +9115,13 @@
 				var oFontColor = c.getFontcolor();
 				// Скрываем окно редактирования комментария
 				this.model.workbook.handlers.trigger("asc_onHideComment");
+
+				if (fragments === undefined) {
+					var _fragmentsTmp = c.getValueForEdit2();
+					fragments = [];
+					for (var i = 0; i < _fragmentsTmp.length; ++i)
+						fragments.push(_fragmentsTmp[i].clone());
+				}
 					
 				editor.open({
 					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left,
@@ -9122,7 +9129,7 @@
 					leftSide: getLeftSide(!fl.isMerged ? col : mc.c1),
 					rightSide: getRightSide(!fl.isMerged ? col : mc.c2),
 					bottomSide: getBottomSide(!fl.isMerged ? row : mc.r2),
-					fragments: fragments !== undefined ? fragments : c.getValueForEdit2(),
+					fragments: fragments,
 					flags: fl,
 					font: new asc_FP(c.getFontname(), c.getFontsize()),
 					background: bg !== null ? bg : t.settings.cells.defaultState.background,
@@ -9154,7 +9161,7 @@
 				v = c.getValueForEdit2().slice(0, 1);
 				// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
 				copyValue = [];
-				copyValue[0] = {text: text, format: v[0].format.clone()};
+				copyValue[0] = new Fragment({text: text, format: v[0].format.clone()});
 
 				var bSuccess = t.openCellEditor(editor, 0, 0, /*isCoord*/false, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, /*isClearCell*/true,
 					/*isHideCursor*/false, activeRange);

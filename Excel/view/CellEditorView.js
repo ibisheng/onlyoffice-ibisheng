@@ -21,7 +21,6 @@
 		var asc_getcvt  = asc.getCvtRatio;
 		var asc_round   = asc.round;
 		var asc_search  = asc.search;
-		var asc_clone   = asc.clone;
 		var asc_lastidx = asc.lastIndexOf;
 
 		var asc_HL = asc.HandlersList;
@@ -1252,7 +1251,7 @@
 				}
 
 				if (t.newTextFormat) {
-					var oNewObj = {format: t.newTextFormat, text: str, theme: null, tint: null};
+					var oNewObj = new Fragment({format: t.newTextFormat, text: str});
 					t._addFragments([oNewObj], pos);
 					delete t.newTextFormat;
 				} else {
@@ -1409,8 +1408,8 @@
 					Array.prototype.splice.apply(
 							opt.fragments,
 							[f.index, 1].concat([
-									{format: fr.format.clone(), text: fr.text.slice(0, pos - f.begin)},
-									{format: fr.format.clone(), text: fr.text.slice(pos - f.begin)}]));
+									new Fragment({format: fr.format.clone(), text: fr.text.slice(0, pos - f.begin)}),
+									new Fragment({format: fr.format.clone(), text: fr.text.slice(pos - f.begin)})]));
 				}
 			},
 
@@ -1422,18 +1421,18 @@
 				if (!first || !last) {throw "Can not extract fragment of text";}
 
 				if (first.index === last.index) {
-					fr = asc_clone(opt.fragments[first.index]);
+					fr = opt.fragments[first.index].clone();
 					fr.text = fr.text.slice(startPos - first.begin, endPos - first.begin + 1);
 					res.push(fr);
 				} else {
-					fr = asc_clone(opt.fragments[first.index]);
+					fr = opt.fragments[first.index].clone();
 					fr.text = fr.text.slice(startPos - first.begin);
 					res.push(fr);
 					for (i = first.index + 1; i < last.index; ++i) {
-						fr = asc_clone(opt.fragments[i]);
+						fr = opt.fragments[i].clone();
 						res.push(fr);
 					}
-					fr = asc_clone(opt.fragments[last.index]);
+					fr = opt.fragments[last.index].clone();
 					fr.text = fr.text.slice(0, endPos - last.begin + 1);
 					res.push(fr);
 				}
@@ -1487,7 +1486,7 @@
 						var fr = opt.fragments[i];
 						var nextFr = opt.fragments[i + 1];
 					    if(fr.format.isEqual(nextFr.format)) {
-							opt.fragments.splice(i, 2, {format: fr.format, text: fr.text + nextFr.text});
+							opt.fragments.splice(i, 2, new Fragment({format: fr.format, text: fr.text + nextFr.text}));
 							continue;
 						}
 					}
