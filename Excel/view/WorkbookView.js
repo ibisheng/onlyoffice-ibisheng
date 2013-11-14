@@ -977,6 +977,11 @@
 				}
 			},
 
+			getTablePictures: function() {
+				var autoFilters = new asc.AutoFilters();
+				return autoFilters.getTablePictures(this.model, this.fmgrGraphics, this.m_oFont);
+			},
+
 			getCellStyles: function () {
 				var oStylesPainter = new asc_CSP();
 				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.m_oFont, this.stringRender);

@@ -1727,7 +1727,7 @@
 					History.TurnOff();
 			},
 			
-			getTablePictures: function(wb)
+			getTablePictures: function(wb, fmgrGraphics, oFont)
 			{
 				var canvas = document.createElement('canvas');
 				canvas.width = '61';
@@ -1747,7 +1747,7 @@
 								name: i,
 								displayName: customStyles[i].displayName,
 								type: 'custom',
-								image: this._drawSmallIconTable(canvas,customStyles[i])
+								image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
 							};
 							result[n] = new formatTablePictures(options);
 							n++;
@@ -1766,7 +1766,7 @@
 								name: i,
 								displayName: defaultStyles[i].displayName,
 								type: 'default',
-								image: this._drawSmallIconTable(canvas,defaultStyles[i])
+								image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
 							};
 							result[n] = new formatTablePictures(options);
 							n++;
@@ -5235,7 +5235,7 @@
 
 			},
 			
-			_drawSmallIconTable: function(canvas,style,tableParts)
+			_drawSmallIconTable: function(canvas, style, fmgrGraphics, oFont)
 			{
 				//for test
 				/*if(!document.getElementById('drawIcon'))
@@ -5255,20 +5255,21 @@
 				var canvas = document.getElementById('drawIcon');*/
 				
 				var ws = this.worksheet;
-				ctx = Asc.DrawingContext({canvas: canvas, units: 0/*px*/});
-								
+				var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*px*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
 				if(style == undefined)
 					style = 'TableStyleLight1';
 
+				var styleOptions;
 				if(typeof style == 'object')
 					styleOptions = style;
 				else
 					styleOptions = ws.model.workbook.TableStyles.AllStyles[style];
 				//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
 				var styleInfo = false;
+				var tableParts = undefined;
 				if(ws && tableParts)
 				{
-
 					styleInfo = {
 						ShowColumnStripes: tableParts.TableStyleInfo.ShowColumnStripes,
 						ShowFirstColumn: tableParts.TableStyleInfo.ShowFirstColumn,
@@ -5278,7 +5279,7 @@
 					}
 
 				}
-				
+
 				if(!styleInfo)
 				{
 					styleInfo = {
@@ -5633,8 +5634,7 @@
 					ctx.stroke();
 					ctx.closePath();  
 				}
-				var result = canvas.toDataURL();
-				return result;
+				return canvas.toDataURL();
 			},
 			
 			_dataFilterParse: function(data,val)

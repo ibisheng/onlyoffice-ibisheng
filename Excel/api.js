@@ -1648,8 +1648,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_sendWorkbookStyles: function () {
 				if(this.wbModel) {
 					// Отправка стилей форматированных таблиц
-					var autoFilters = new asc.AutoFilters();
-					var tablePictures = autoFilters.getTablePictures(this.wbModel);
+					var tablePictures = this.wb.getTablePictures();
 					var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
 					this.tablePictures = (false === bResult) ? tablePictures : null;
 
