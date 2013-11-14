@@ -3702,9 +3702,6 @@
                     }
                 }
                 var oFontColor = c.getFontcolor();
-                if(null != oFontColor)
-                    oFontColor = oFontColor.getRgb();
-
 				var rowInfo = this.rows[row];
                 var rowHeight = rowInfo.height;
                 var textBound = {};
@@ -9111,9 +9108,6 @@
 				}
 
 				bg = c.getFill();
-				if(null != bg)
-					bg = bg.getRgb();
-
 				t.isFormulaEditMode = false;
 				// Очищаем массив ячеек для текущей формулы
 				t.arrActiveFormulaRanges = [];
@@ -9145,8 +9139,6 @@
 						return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
 					}
 				});
-				// для отрисовки ранджей формулы
-				t._drawSelection();
 				return true;
 			},
 
