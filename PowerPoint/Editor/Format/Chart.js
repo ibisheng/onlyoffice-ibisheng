@@ -1145,8 +1145,10 @@ CChartAsGroup.prototype =
 
     recalculate: function(updateImage)
     {
-
-
+        try
+        {
+            if(!isRealObject(this.parent))
+                return;
             var parents = this.getParentObjects();
             this.recalculatePosExt();
             this.recalculateTransform();
@@ -1335,6 +1337,10 @@ CChartAsGroup.prototype =
                 this.brush.fill.RasterImageId = "";
                 //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
             }
+        }
+        catch(e)
+        {}
+
 
     },
 

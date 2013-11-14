@@ -1756,7 +1756,7 @@ CGraphicObjects.prototype = {
             if(selected_arr[i].chart != null)
                 return selected_arr[i];
         }
-
+        History.TurnOff();
         var ret = new CChartAsGroup();
         ret.setAscChart(new asc_CChart());
         var options = {};
@@ -1775,6 +1775,7 @@ CGraphicObjects.prototype = {
         ret.spPr.xfrm.offY = (presentation.Height - chart_height)/2;
         ret.spPr.xfrm.extX = chart_width;//this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
         ret.spPr.xfrm.extY = chart_height;//0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
+        History.TurnOn();
         return ret;
     },
 

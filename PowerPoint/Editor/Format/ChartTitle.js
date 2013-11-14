@@ -918,7 +918,8 @@ CChartTitle.prototype =
         var newLayout = layout ? layout.createDuplicate() : null;
         History.Add(this, {Type: historyitem_SetCahrtLayout, oldLayout: oldLayout, newLayout: newLayout});
         this.layout = layout;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+        if(this.chartGroup)
+            editor.WordControl.m_oLogicDocument.recalcMap[this.chartGroup.Id] = this.chartGroup;
     },
 
 
@@ -988,7 +989,8 @@ CChartTitle.prototype =
 
     onParagraphChanged: function()
     {
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+        if(this.chartGroup)
+            editor.WordControl.m_oLogicDocument.recalcMap[this.chartGroup.Id] = this.chartGroup;
     },
 
     writeToBinary: function(w)
@@ -1094,7 +1096,8 @@ CChartTitle.prototype =
                 break;
             }
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+        if(this.chartGroup)
+            editor.WordControl.m_oLogicDocument.recalcMap[this.chartGroup.Id] = this.chartGroup;
     },
 
     Redo: function(data)
@@ -1142,7 +1145,8 @@ CChartTitle.prototype =
                 break;
             }
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+        if(this.chartGroup)
+            editor.WordControl.m_oLogicDocument.recalcMap[this.chartGroup.Id] = this.chartGroup;
     },
 
     Refresh_RecalcData: function()
@@ -1289,7 +1293,8 @@ CChartTitle.prototype =
                 }
 
             }
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+            if(this.chartGroup)
+                editor.WordControl.m_oLogicDocument.recalcMap[this.chartGroup.Id] = this.chartGroup;
         }
     }
 };

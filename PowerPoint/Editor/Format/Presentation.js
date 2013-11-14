@@ -1287,6 +1287,7 @@ CPresentation.prototype =
     addChart: function(binary)
     {
         this.Slides[this.CurPage].graphicObjects.addChart(binary);
+        this.Document_UpdateUndoRedoState();
         this.Recalculate();
     },
 

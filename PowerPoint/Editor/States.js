@@ -1053,10 +1053,14 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 
     this.onMouseUp = function(e, x, y)
     {
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        {
+            History.Create_NewPoint();
+            this.drawingObjectsController.trackEnd();
+            editor.WordControl.m_oLogicDocument.Recalculate();
+        }
+
         this.drawingObjectsController.clearTrackObjects();
-        editor.WordControl.m_oLogicDocument.Recalculate();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
 
