@@ -212,6 +212,95 @@ CChartTitle.prototype =
         }
     },
 
+    setCellAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            var align_num = null;
+            switch(align)
+            {
+                case "left":
+                {
+                    align_num = align_Left;
+                    break;
+                }
+                case "right":
+                {
+                    align_num = align_Right;
+                    break;
+                }
+                case "center":
+                {
+                    align_num = align_Center;
+                    break;
+                }
+
+                case "justify":
+                {
+                    align_num = align_Justify;
+                    break;
+                }
+
+            }
+            if(isRealNumber(align_num))
+            {
+                this.txBody.content.Set_ParagraphAlign(align_num);
+                //this.calculateTransformTextMatrix();
+
+            }
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        }
+    },
+
+    setCellAllAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            var align_num = null;
+            switch(align)
+            {
+                case "left":
+                {
+                    align_num = align_Left;
+                    break;
+                }
+                case "right":
+                {
+                    align_num = align_Right;
+                    break;
+                }
+                case "center":
+                {
+                    align_num = align_Center;
+                    break;
+                }
+
+                case "justify":
+                {
+                    align_num = align_Justify;
+                    break;
+                }
+
+            }
+            if(isRealNumber(align_num))
+            {
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+                    new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                this.txBody.content.Set_ApplyToAll(true);
+                this.txBody.content.Set_ParagraphAlign(align_num);
+                this.txBody.content.Set_ApplyToAll(false);
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                this.recalculateCurPos();
+
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+                    new UndoRedoDataGraphicObjects(this.chartGroup.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            }
+        }
+    },
+
+
     setCellFontName: function (fontName) {
         if(isRealObject(this.txBody))
         {

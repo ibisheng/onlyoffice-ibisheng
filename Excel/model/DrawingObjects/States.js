@@ -310,6 +310,7 @@ function NullState(drawingObjectsController, drawingObjects)
         }
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjectsController.updateSelectionState();
         this.drawingObjects.OnUpdateOverlay();
 		asc["editor"].asc_endAddShape();
     };
@@ -1182,7 +1183,9 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         this.chart.resetSelection(this.drawingObjectsController);
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjectsController.updateSelectionState();
         this.drawingObjects.OnUpdateOverlay();
+        asc["editor"].asc_endAddShape();
     };
 
     this.onMouseMove = function(e, x, y)
@@ -1395,6 +1398,16 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         }
     };
 
+
+    this.setCellAlign = function(align)
+    {
+        var title = this.getSelectTitle();
+        if(title && typeof title.setCellAllAlign === "function")
+        {
+            title.setCellAllAlign(align);
+            this.drawingObjects.showDrawingObjects(true);
+        }
+    };
     // Уменьшение размера шрифта
     this.setCellFontSize = function (fontSize) {
         var title = this.getSelectTitle();
@@ -1621,6 +1634,15 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
         if(typeof this.textObject.setCellItalic === "function")
         {
             this.textObject.setCellItalic(isItalic);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+    this.setCellAlign = function(align)
+    {
+        if(typeof this.textObject.setCellAlign === "function")
+        {
+            this.textObject.setCellAlign(align);
             this.drawingObjects.showDrawingObjects(true);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
         }
