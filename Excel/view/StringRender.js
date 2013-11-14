@@ -910,7 +910,7 @@
 					if (align === "right") {
 						x_ = asc_calcnpt(x + maxWidth - self._calcLineWidth(startPos), ppix, -1/*px*/);
 					} else if (align === "center") {
-						x_ = asc_calcnpt(x + 0.5 * (maxWidth - self._calcLineWidth(startPos)), ppix, 0/*px*/);
+						x_ = asc_calcnpt(x + 0.5 * (maxWidth - asc_calcnpt(self._calcLineWidth(startPos), ppix)), ppix, 0/*px*/);
 					}
 					l.startX = x_;
 					return x_;
