@@ -2667,7 +2667,7 @@ CTable.prototype =
     {
         var oLogicDocument = editor.WordControl.m_oLogicDocument;
 
-        this.Document_SetThisElementCurrent();
+        this.Document_SetThisElementCurrent(false);
         this.Cursor_MoveToStartPos();
 
         if ( true != this.Is_Inline() )
@@ -2839,7 +2839,7 @@ CTable.prototype =
             }
         }
         editor.WordControl.m_oLogicDocument.Selection_Remove();
-        this.Document_SetThisElementCurrent();
+        this.Document_SetThisElementCurrent(true);
         this.Cursor_MoveToStartPos();
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
@@ -4744,9 +4744,9 @@ CTable.prototype =
         }
     },
 
-    Document_SetThisElementCurrent : function()
+    Document_SetThisElementCurrent : function(bUpdateStates)
     {
-        this.Parent.Set_CurrentElement( this.Index );
+        this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
     Set_Inline : function(Value)
@@ -7687,14 +7687,24 @@ CTable.prototype =
     {
         if ( undefined != NearPos  )
         {
-            if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+            if ( ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type ) || true === this.ApplyToAll )
             {
-                for (var Index = 0; Index < this.Selection.Data.length; Index++ )
+                var Cells_array = this.Internal_Get_SelectionArray();
+                for (var Index = 0; Index < Cells_array.length; Index++ )
                 {
-                    var CurPos = this.Selection.Data[Index];
+                    var CurPos = Cells_array[Index];
                     var CurCell = this.Content[CurPos.Row].Get_Cell( CurPos.Cell );
-                    if ( true === CurCell.Content.Selection_Check( 0, 0, 0, NearPos ) )
+                    var CellContent = CurCell.Content;
+
+                    CellContent.Set_ApplyToAll(true);
+
+                    if ( true === CellContent.Selection_Check( 0, 0, 0, NearPos ) )
+                    {
+                        CellContent.Set_ApplyToAll( false );
                         return true;
+                    }
+
+                    CellContent.Set_ApplyToAll( false );
                 }
             }
             else
@@ -7950,7 +7960,7 @@ CTable.prototype =
                 this.Selection.StartPos.Pos = { Row : Cell.Row.Index, Cell : Cell.Index };
                 this.Selection.EndPos.Pos   = { Row : Cell.Row.Index, Cell : Cell.Index };
 
-                this.Document_SetThisElementCurrent();
+                this.Document_SetThisElementCurrent(true);
 
                 editor.WordControl.m_oLogicDocument.Recalculate();
             }
@@ -8858,7 +8868,7 @@ CTable.prototype =
                 this.Selection.CurRow       = CurCell.Row.Index;
             }
 
-            this.Document_SetThisElementCurrent();
+            this.Document_SetThisElementCurrent(true);
         }
     },
 
@@ -8928,6 +8938,229 @@ CTable.prototype =
 
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             this.CurCell.Content.Get_SelectedElementsInfo( Info );
+    },
+
+    Get_SelectedContent : function(SelectedContent)
+    {
+        if ( true !== this.Selection.Use )
+            return;
+
+        if ( table_Selection_Cell === this.Selection.Type || true === this.ApplyToAll )
+        {
+            // Сначала проверим выделена ли таблица целиком, если да, тогда просто копируем ее.
+            if ( true === this.ApplyToAll )
+            {
+                SelectedContent.Add( new CSelectedElement(this.Copy(this.Parent), true) );
+                return;
+            }
+
+            var bAllSelected = true;
+            var SelectedCount = this.Selection.Data.length;
+
+            // Собираем информацию по строкам
+            var RowsInfoArray = new Array();
+
+            var RowsCount = this.Content.length;
+            for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+            {
+                var Row = this.Content[CurRow];
+                var CellsCount = Row.Get_CellsCount();
+
+                var CellsInfoArray = new Array();
+
+                var bSelectedRow = false;
+
+                CellsInfoArray.push( { GridSpan : Row.Get_Before().GridBefore, Cell : null, Selected : false } );
+
+                for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+                {
+                    var Cell     = Row.Get_Cell( CurCell );
+                    var GridSpan = Cell.Get_GridSpan();
+                    var VMerge   = Cell.Get_VMerge();
+
+                    var bSelected = false;
+                    if ( VMerge === vmerge_Restart )
+                    {
+                        // Ищем текущую ячейку среди выделенных
+
+                        for ( var Index = 0; Index < SelectedCount; Index++ )
+                        {
+                            var TempPos = this.Selection.Data[Index];
+                            if ( CurCell === TempPos.Cell && CurRow === TempPos.Row )
+                            {
+                                bSelected = true;
+                                break;
+                            }
+                            else if ( CurRow < TempPos.Row )
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Данная ячейка попала в вертикальное объединение, находим ячейку, с которой это объединение началось
+                        // и проверяем была ли она выделена (эту ячейку мы уже проверяли, т.к. она находится выше).
+
+                        var StartMergedCell = this.Internal_Get_StartMergedCell2( CurCell, CurRow );
+                        bSelected = RowsInfoArray[StartMergedCell.Row.Index].CellsInfoArray[StartMergedCell.Index + 1].Selected;
+                    }
+
+                    if ( false === bSelected )
+                        bAllSelected = false;
+                    else
+                        bSelectedRow = true;
+
+                    CellsInfoArray.push( { GridSpan : GridSpan, Cell : Cell, Selected : bSelected } );
+                }
+
+                CellsInfoArray.push( { GridSpan : Row.Get_After().GridAfter, Cell : null, Selected : false } );
+
+                RowsInfoArray.push( { CellsInfoArray : CellsInfoArray, Selected : bSelectedRow } );
+            }
+
+            if ( true === bAllSelected )
+            {
+                SelectedContent.Add( new CSelectedElement(this.Copy(this.Parent), true) );
+                return;
+            }
+
+
+            var TableGrid = this.Internal_Copy_Grid( this.TableGrid );
+
+            // Посчитаем сколько слева и справа пустых спанов
+            var MinBefore = -1;
+            var MinAfter  = -1;
+            for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+            {
+                var CellsInfoArray = RowsInfoArray[CurRow].CellsInfoArray;
+
+                if ( true !== RowsInfoArray[CurRow].Selected )
+                    continue;
+
+                var bBefore = true;
+                var BeforeGrid = 0, AfterGrid = 0;
+                var CellsInfoCount = CellsInfoArray.length;
+                for ( var CellIndex = 0, CurCell = 0; CellIndex < CellsInfoCount; CellIndex++ )
+                {
+                    var CellInfo = CellsInfoArray[CellIndex];
+                    if ( true === CellInfo.Selected )
+                    {
+                        bBefore = false;
+                    }
+                    else if ( true === bBefore )
+                    {
+                        BeforeGrid += CellInfo.GridSpan;
+                    }
+                    else
+                    {
+                        AfterGrid += CellInfo.GridSpan;
+                    }
+                }
+
+                if ( MinBefore > BeforeGrid || -1 === MinBefore )
+                    MinBefore = BeforeGrid;
+
+                if ( MinAfter > AfterGrid || -1 === MinAfter )
+                    MinAfter = AfterGrid;
+            }
+
+            for ( var CurRow = 0; CurRow < RowsCount; CurRow++ )
+            {
+                var CellsInfoArray = RowsInfoArray[CurRow].CellsInfoArray;
+
+                if ( true === RowsInfoArray[CurRow].Selected )
+                {
+                    CellsInfoArray[0].GridSpan -= MinBefore;
+                    CellsInfoArray[CellsInfoArray.length - 1].GridSpan -= MinAfter;
+                }
+            }
+
+            if ( MinAfter > 0 )
+                TableGrid.splice( TableGrid.length - MinAfter - 1, MinAfter );
+
+            if ( MinBefore > 0 )
+                TableGrid.splice( 0, MinBefore );
+
+            // Формируем новую таблицу, по выделенно части.
+            var Table = new CTable( this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid );
+
+            // Копируем настройки
+            Table.Set_TableStyle( this.TableStyle );
+            Table.Set_TableLook( this.TableLook.Copy() );
+            Table.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
+            Table.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
+            Table.Set_Distance( this.Distance.L, this.Distance.T, this.Distance.R, this.Distance.B );
+            Table.Set_Pr( this.Pr.Copy() );
+
+            // Копируем строки
+            for ( var CurRow = 0, CurRow2 = 0; CurRow < RowsCount; CurRow++ )
+            {
+                var RowInfo = RowsInfoArray[CurRow];
+                if ( true !== RowInfo.Selected )
+                    continue;
+
+                var CellsInfoArray = RowInfo.CellsInfoArray;
+
+                var Row = new CTableRow(Table, 0);
+
+                // Копируем настройки строки
+                Row.Set_Pr( this.Content[CurRow].Pr.Copy() );
+
+                var bMergedRow = true;
+                var bBefore = true;
+                var BeforeGrid = 0, AfterGrid = 0;
+                var CellsInfoCount = CellsInfoArray.length;
+                for ( var CellIndex = 0, CurCell = 0; CellIndex < CellsInfoCount; CellIndex++ )
+                {
+                    var CellInfo = CellsInfoArray[CellIndex];
+                    if ( true === CellInfo.Selected )
+                    {
+                        bBefore = false;
+
+                        // Добавляем ячейку
+                        Row.Content[CurCell] = CellInfo.Cell.Copy(Row);
+                        History.Add( Row, { Type : historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Row.Content[CurCell], CellInfo : {}  } } );
+                        CurCell++;
+
+                        var VMerge = CellInfo.Cell.Get_VMerge();
+                        if ( VMerge === vmerge_Restart )
+                            bMergedRow = false;
+                    }
+                    else if ( true === bBefore )
+                    {
+                        BeforeGrid += CellInfo.GridSpan;
+                    }
+                    else
+                    {
+                        AfterGrid += CellInfo.GridSpan;
+                    }
+                }
+
+                // Строку, составленную полностью из вертикально объединенных ячеек не добавляем
+                if ( true === bMergedRow )
+                    continue;
+
+                Row.Set_Before( BeforeGrid );
+                Row.Set_After( AfterGrid );
+
+                Row.Internal_ReIndexing();
+
+                // Добавляем строку в новую таблицу
+                Table.Content[CurRow2] = Row;
+                History.Add( Table, { Type : historyitem_Table_AddRow, Pos : Index, Item : { Row : Table.Content[CurRow2], TableRowsBottom : {}, RowsInfo : {} } } );
+                CurRow2++;
+            }
+
+            Table.Internal_ReIndexing(0);
+
+            if ( Table.Content.length > 0 && Table.Content[0].Get_CellsCount() > 0 )
+                Table.CurCell = Table.Content[0].Get_Cell(0);
+
+            SelectedContent.Add( new CSelectedElement(Table, false) );
+        }
+        else
+        {
+            this.CurCell.Content.Get_SelectedContent( SelectedContent );
+        }
     },
 
     Set_ParagraphAlign : function(Align)
@@ -17662,9 +17895,9 @@ CTable.prototype =
                 var Cell_s = this.Content[StartRow].Get_Cell( StartCell );
                 var Cell_e = this.Content[EndRow].Get_Cell( EndCell );
 
-                var GridCol_cs_start = this.Content[StartRow].Get_CellInfo( StartCell ).StartGridCol;
+                var GridCol_cs_start = this.Content[StartRow].Get_StartGridCol( StartCell );
                 var GridCol_cs_end   = Cell_s.Get_GridSpan() - 1 + GridCol_cs_start;
-                var GridCol_ce_start = this.Content[EndRow].Get_CellInfo( EndCell ).StartGridCol;
+                var GridCol_ce_start = this.Content[EndRow].Get_StartGridCol( EndCell );
                 var GridCol_ce_end   = Cell_e.Get_GridSpan() - 1 + GridCol_ce_start;
 
                 var GridCol_start = GridCol_cs_start;
@@ -18564,6 +18797,21 @@ CTableRow.prototype =
     Get_CellInfo : function(Index)
     {
         return this.CellsInfo[Index];
+    },
+
+    Get_StartGridCol : function(Index)
+    {
+        var Max = Math.min( this.Content.length - 1, Index - 1);
+        var CurGridCol = this.Get_Before().GridBefore;
+        for ( var CurCell = 0; CurCell <= Max; CurCell++ )
+        {
+            var Cell = this.Get_Cell( CurCell );
+            var GridSpan = Cell.Get_GridSpan();
+
+            CurGridCol += GridSpan;
+        }
+
+        return CurGridCol;
     },
 
     Remove_Cell : function(Index)
@@ -19728,7 +19976,7 @@ CTableCell.prototype =
         return this.Row.Table.Get_PageContentStartPos(PageNum + this.Content.StartPage, this.Row.Index, this.Index, true );
     },
 
-    Set_CurrentElement : function()
+    Set_CurrentElement : function(bUpdateStates)
     {
         var Table = this.Row.Table;
 
@@ -19747,7 +19995,7 @@ CTableCell.prototype =
         Table.CurCell = this;
 
         // Делаем таблицу текущим элементом в документе
-        Table.Document_SetThisElementCurrent();
+        Table.Document_SetThisElementCurrent(bUpdateStates);
     },
 
     Is_ThisElementCurrent : function()

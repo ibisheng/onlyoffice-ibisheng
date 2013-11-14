@@ -257,14 +257,19 @@ CHeaderFooter.prototype =
         return { X : X_Left_Field, Y : 0, XLimit : X_Right_Field, YLimit : 0 };
     },
 
-    Set_CurrentElement : function()
+    Set_CurrentElement : function(bUpdateStates)
     {
-        this.Parent.CurHdrFtr = this;
+        this.Parent.CurHdrFtr     = this;
+        this.Parent.WaitMouseDown = true;
+
         this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
 
-        this.LogicDocument.Document_UpdateInterfaceState();
-        this.LogicDocument.Document_UpdateRulersState();
-        this.LogicDocument.Document_UpdateSelectionState();
+        if ( true === bUpdateStates )
+        {
+            this.LogicDocument.Document_UpdateInterfaceState();
+            this.LogicDocument.Document_UpdateRulersState();
+            this.LogicDocument.Document_UpdateSelectionState();
+        }
     },
 
     Is_ThisElementCurrent : function()
@@ -540,6 +545,11 @@ CHeaderFooter.prototype =
     Get_SelectedElementsInfo : function(Info)
     {
         this.Content.Get_SelectedElementsInfo(Info);
+    },
+
+    Get_SelectedContent : function(SelectedContent)
+    {
+        this.Content.Get_SelectedContent( SelectedContent );
     },
 
     Set_BoundY2 : function(Value, bRecalculate)
@@ -2173,6 +2183,12 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             this.CurHdrFtr.Get_SelectedElementsInfo(Info);
+    },
+
+    Get_SelectedContent : function(SelectedContent)
+    {
+        if ( null != this.CurHdrFtr )
+            this.CurHdrFtr.Get_SelectedContent( SelectedContent );
     },
 
 //-----------------------------------------------------------------------------------

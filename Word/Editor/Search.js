@@ -91,7 +91,7 @@ CDocumentSearch.prototype =
                 Paragraph.Selection.EndPos   = SearchElement.EndPos;
                 Paragraph.CurPos.ContentPos  = SearchElement.StartPos;
 
-                Paragraph.Document_SetThisElementCurrent();
+                Paragraph.Document_SetThisElementCurrent(true);
             }
 
             this.CurId = Id;

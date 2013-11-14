@@ -4491,7 +4491,7 @@ ParaDrawing.prototype =
         if ( undefined != this.Parent && null != this.Parent )
         {
             this.Parent.Cursor_MoveTo_Drawing( this.Id, bBefore );
-            this.Parent.Document_SetThisElementCurrent();
+            this.Parent.Document_SetThisElementCurrent(true);
         }
     },
 
@@ -6696,6 +6696,8 @@ ParaDrawing.prototype =
         }
 
         var d = this.Distance;
+        c.Set_PositionH( this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value );
+        c.Set_PositionV( this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value );
         c.Set_Distance(d.L, d.T, d.R, d.B);
         c.setZIndex();
         c.Set_AllowOverlap(this.AllowOverlap);

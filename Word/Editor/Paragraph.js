@@ -182,6 +182,8 @@ Paragraph.prototype =
         History.Add( this, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
 
         this.Pr = oNewPr;
+
+        this.Recalc_CompiledPr();
 	},
 	
     Copy : function(Parent)
@@ -741,7 +743,7 @@ Paragraph.prototype =
         }
         */
        
-        var _ContentPos = ContentPos;
+        var _ContentPos = Math.max( 0, Math.min( ContentPos, this.Content.length - 1 ) );
 
         while ( undefined === this.Content[_ContentPos].CurPage )
         {
@@ -6727,7 +6729,7 @@ Paragraph.prototype =
 
     Set_ContentPos : function(Pos, bCorrectPos, Line)
     {
-        this.CurPos.ContentPos = Pos;
+        this.CurPos.ContentPos = Math.max( 0, Math.min( this.Content.length - 1, Pos ) );
         this.CurPos.Line       = ( undefined === Line ? -1 : Line );
 
         if ( false != bCorrectPos )
@@ -8227,7 +8229,7 @@ Paragraph.prototype =
 
                         this.Extend_ToPos( X );
                         this.Cursor_MoveToEndPos();
-                        this.Document_SetThisElementCurrent();
+                        this.Document_SetThisElementCurrent(true);
                         editor.WordControl.m_oLogicDocument.Recalculate();
                         return;
                     }
@@ -8511,7 +8513,7 @@ Paragraph.prototype =
     {
         if ( NearPos !== undefined  )
         {
-            if ( true === this.Selection.Use && NearPos.Paragraph === this && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos )
+            if ( NearPos.Paragraph === this && ( ( true === this.Selection.Use && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos ) || ( true === this.ApplyToAll )  ) )
                 return true;
 
             return false;
@@ -8713,11 +8715,13 @@ Paragraph.prototype =
             EndPos   = this.Selection.StartPos;
         }
 
+        var _StartPos = this.Internal_GetStartPos();
+        var _EndPos   = this.Internal_GetEndPos();
+
         // Если выделен параграф целиком, тогда просто его копируем
-        if ( StartPos <= 0 && EndPos >= this.Content.length - 2 )
+        if ( StartPos <= _StartPos && EndPos >= _EndPos )
         {
-            DocContent.Set_Inline( false );
-            DocContent.Add( this.Copy() );
+            DocContent.Add( new CSelectedElement( this.Copy(this.Parent), true ) );
             return;
         }
 
@@ -8743,7 +8747,7 @@ Paragraph.prototype =
         Para.Internal_Content_Add( Para.Content.length, new ParaEnd(), false );
         Para.Internal_Content_Add( Para.Content.length, new ParaEmpty(), false );
 
-        DocContent.Add( Para );
+        DocContent.Add( new CSelectedElement( Para, false ) );
     },
 
     // Проверяем пустой ли параграф
@@ -10980,9 +10984,9 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
 // Дополнительные функции
 //-----------------------------------------------------------------------------------
-    Document_SetThisElementCurrent : function()
+    Document_SetThisElementCurrent : function(bUpdateStates)
     {
-        this.Parent.Set_CurrentElement( this.Index );
+        this.Parent.Set_CurrentElement( this.Index, bUpdateStates );
     },
 
     Is_ThisElementCurrent : function()

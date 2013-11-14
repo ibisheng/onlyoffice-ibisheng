@@ -614,7 +614,7 @@ function CTableOutlineDr()
         var _table = _outline.Table;
 
         _table.Cursor_MoveToStartPos();
-        _table.Document_SetThisElementCurrent();
+        _table.Document_SetThisElementCurrent(true);
 
         if (!_table.Is_Inline())
         {
@@ -5144,7 +5144,7 @@ function CDrawingDocument()
             this.LockCursorType("move");
 
             this.TableOutlineDr.TableOutline.Table.Select_All();
-            this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent();
+            this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
 
             if (-1 == oWordControl.m_oTimerScrollSelect)
             {
