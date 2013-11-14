@@ -1747,7 +1747,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     if(_common_selection_array[_sel_index].pageIndex === pageIndex)
                     {
                         chart = _common_selection_array[_sel_index];
-                        graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(chart.parent,  chart.absOffsetX - x, chart.absOffsetY - y, graphicObjects, pageIndex));
+                        graphicObjects.arrPreTrackObjects.push(new CTrackMoveObject(chart,  chart.absOffsetX - x, chart.absOffsetY - y, graphicObjects, pageIndex));
                     }
                 }
                 if(_common_selection_array.length === 1)
