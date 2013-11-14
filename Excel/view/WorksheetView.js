@@ -200,7 +200,7 @@
 													new CColor(107, 214, 0), new CColor(0, 214, 53), new CColor(0, 214, 214),
 													new CColor(107, 0, 214), new CColor(214, 0, 160)];
 			// Цвет заливки границы выделения области автозаполнения
-			this.fillHandleBorderColorSelect	= new CColor(255, 255, 0, 1);
+			this.fillHandleBorderColorSelect	= new CColor(255, 255, 255, 1);
 			return this;
 		}
 
