@@ -3800,16 +3800,16 @@ WordShape.prototype =
             this.textBoxContent.Remove(Count, bOnlyText, bRemoveOnlySelection);
     },
 
-    selectionCheck: function(x, y, pageAbs)
+    selectionCheck: function(x, y, pageAbs, NearPos)
     {
         if(this.textBoxContent && this.transformText)
         {
-            if(!this.hitToTextRect(x, y))
+            if( undefined === NearPos && !this.hitToTextRect(x, y) )
                 return false;
             var t = global_MatrixTransformer.Invert(this.transformText);
             var t_x = t.TransformPointX(x, y);
             var t_y = t.TransformPointY(x, y);
-            return this.textBoxContent.Selection_Check(t_x, t_y, pageAbs);
+            return this.textBoxContent.Selection_Check(t_x, t_y, pageAbs, NearPos);
         }
         return false;
     },
@@ -4022,6 +4022,7 @@ WordShape.prototype =
             }
             else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
             {
+                this.document.RecalculateCurPos();
                 this.document.DrawingDocument.UpdateTargetTransform(this.transformText);
                 this.document.DrawingDocument.TargetShow();
                 this.document.DrawingDocument.SelectEnabled(false);

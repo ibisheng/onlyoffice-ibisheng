@@ -3176,7 +3176,7 @@ CGraphicObjects.prototype =
         return null;
     },
 
-    selectionCheck: function( X, Y, Page_Abs )
+    selectionCheck: function( X, Y, Page_Abs, NearPos )
     {
         switch (this.curState.id)
         {
@@ -3185,7 +3185,7 @@ CGraphicObjects.prototype =
                 var textObject = this.curState.textObject;
                 if(isRealObject(textObject) && isRealObject(textObject.GraphicObj) && typeof textObject.GraphicObj.selectionCheck === "function")
                 {
-                    return textObject.GraphicObj.selectionCheck(X, Y, Page_Abs);
+                    return textObject.GraphicObj.selectionCheck(X, Y, Page_Abs, NearPos);
                 }
                 break;
             }
@@ -3194,7 +3194,7 @@ CGraphicObjects.prototype =
                 textObject = this.curState.textObject;
                 if(isRealObject(textObject) &&  typeof textObject.selectionCheck === "function")
                 {
-                    return textObject.selectionCheck(X, Y, Page_Abs);
+                    return textObject.selectionCheck(X, Y, Page_Abs, NearPos);
                 }
                 break;
             }

@@ -6972,7 +6972,7 @@ CDocument.prototype =
         var bFlowTable   = (null === this.DrawingObjects.getTableByXY( X, Y, this.CurPage, this ) ? false : true);
 
         // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
-        if ( MouseEvent.ClickCount <= 1 && false === bTableBorder && true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
+        if ( MouseEvent.ClickCount <= 1 && false === bTableBorder && ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) ) && false === bFlowTable && true === this.Selection_Check( X, Y, this.CurPage, undefined ) )
         {
             // Начинаем передвижение текста
             this.DrawingDocument.StartTrackText();
@@ -7565,18 +7565,14 @@ CDocument.prototype =
 
                 // Если надо удаляем выделенную часть
                 if ( true !== bCopy )
-                {
                     this.Remove(1, false, false, false);
-                }
-                else
-                    this.Selection_Remove();
+
+                this.Selection_Remove();
 
                 // Выделение выставляется внутри функции Insert_Content
                 if ( undefined != Para.Parent  )
                 {
                     Para.Parent.Insert_Content( DocContent, NearPos );
-                    //Para.Parent.
-
 
                     this.Recalculate();
 
@@ -7748,6 +7744,8 @@ CDocument.prototype =
             this.Selection.StartPos = DstIndex;
             this.Selection.EndPos   = DstIndex + ElementsCount - 1;
         }
+
+        this.CurPos.Type = docpostype_Content;
     },
 
     Document_SelectNumbering : function(NumPr)
