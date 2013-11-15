@@ -121,6 +121,7 @@ function CMouseEventHandler()
     this.fromJQueryEvent = function(e)
     {
         this.ClickCount = isRealNumber(e.ClickCount) && e.ClickCount === 2 ? 2 : 1;
+		this.Button = e.which - 1;
         this.Type =  g_o_event_map[e.type];
         this.ShiftKey = e.shiftKey;
         this.IsLocked = true;
@@ -1986,6 +1987,11 @@ CShape.prototype =
         t_y = this.invertTransformText.TransformPointY(x, y);
         var event =  new CMouseEventHandler();
         event.fromJQueryEvent(e);
+		if(event.Button === g_mouse_button_right)
+		{
+			if(this.txBody.content.Selection_Check(t_x, t_y, 0))
+				return;
+		}
         this.txBody.selectionSetStart(event, t_x, t_y);
         this.txBody.content.RecalculateCurPos();
     },

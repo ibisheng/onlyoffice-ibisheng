@@ -1790,6 +1790,14 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onMouseUp = function(e, x, y)
     {
+		if(e.button === 2)
+		{
+			var invert_text_transform = this.textObject.invertTransformText;
+			var tx = invert_text_transform.TransformPointX(x, y);
+			var ty = invert_text_transform.TransformPointY(x, y);
+			if(this.textObject.txBody.content.Selection_Check(tx, ty, 0))
+				return;
+		}
         this.textObject.selectionSetEnd(e, x, y);
         this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
     };

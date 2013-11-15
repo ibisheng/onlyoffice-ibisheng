@@ -2124,7 +2124,7 @@ DrawingObjectsController.prototype =
                 }
                 for(var i = sp_tree.length-1; i > -1 ; --i)
                 {
-                    if(sp_tree[i].selected)
+                    if(sp_tree[i].graphicObject.selected)
                     {
                         sp_tree[i].graphicObject.deleteDrawingBase();
                     }
