@@ -34,6 +34,10 @@ function CTextBody(shape)
 }
 CTextBody.prototype =
 {
+	Get_TextBackGroundColor : function()
+    {
+        return undefined;
+    },
     Get_Id: function()
     {
         return this.Id;

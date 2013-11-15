@@ -86,6 +86,11 @@ WordShape.prototype =
         this.calculateFill();
         this.calculateLine();
     },
+	
+	Get_TextBackGroundColor : function()
+    {
+        return undefined;
+    },
 
     canFill: function()
     {
