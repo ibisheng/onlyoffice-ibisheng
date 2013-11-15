@@ -2519,7 +2519,6 @@ FormatParser.prototype =
 {
     parse : function(value)
     {
-		//числа вида "+100", "-100" сюда не приходят поэтому формат типа General возвращать не нужно.
         var res = null;
 		var match = value.match(this.rx_thouthand);
 		if(null != match)
