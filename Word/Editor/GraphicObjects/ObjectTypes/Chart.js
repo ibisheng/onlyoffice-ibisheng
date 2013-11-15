@@ -78,6 +78,7 @@ CChartAsGroup.prototype =
     calculateAfterOpen10: function()
     {
         this.init();
+        this.recalcAllTitles();
         this.recalculate();
         this.recalculateTransform();
     },
@@ -227,6 +228,7 @@ CChartAsGroup.prototype =
         {
             this.parent.bNeedUpdateWH = true;
         }
+        this.recalcAllTitles();
         this.recalculate();
     },
 
@@ -1192,7 +1194,9 @@ CChartAsGroup.prototype =
 
         }
         catch(e)
-        {}
+        {
+            this.recalc
+        }
 
     },
 
@@ -1222,8 +1226,11 @@ CChartAsGroup.prototype =
         if(isRealObject(this.parent))
         {
             var xfrm = this.spPr.xfrm;
-            xfrm.offX = 0;
-            xfrm.offY = 0;
+            if(!this.group)
+            {
+                xfrm.offX = 0;
+                xfrm.offY = 0;
+            }
             xfrm.extX = this.parent.Extent.W;
             xfrm.extY = this.parent.Extent.H;
         }
@@ -1933,6 +1940,7 @@ CChartAsGroup.prototype =
         }
         else
         {
+            this.recalcAllTitles();
             this.recalculate(true);
         }
     },
@@ -2768,6 +2776,8 @@ CChartAsGroup.prototype =
             case historyitem_AutoShapes_RecalculateAfterResize:
             {
                 this.recalculatePosExt();
+
+                this.recalcAllTitles();
                 this.init();
                 this.recalculate();
                 if(this.parent)

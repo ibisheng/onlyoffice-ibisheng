@@ -1153,7 +1153,7 @@ CGraphicObjects.prototype =
                     sel_arr[0].setXfrm(null, null, sel_arr[0].drawingDocument.GetMMPerDot(diagramm.width), sel_arr[0].drawingDocument.GetMMPerDot(diagramm.height), null, false, false);
                     sel_arr[0].calculateAfterResize(null, true);
                     sel_arr[0].chartModify(diagramm);
-                    editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(diagramm.img);
+                  //  editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(diagramm.img);
 
                     this.curState.group.updateSizes();
                     this.curState.group.recalculate();
