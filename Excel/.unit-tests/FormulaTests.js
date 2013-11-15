@@ -498,7 +498,7 @@
         strictEqual( oParser.calculate().getValue(), "1234567.5556" );
         oParser = new parserFormula( "FIXED(1234567)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "1,234,567" );
+        strictEqual( oParser.calculate().getValue(), "1,234,567.00" );
     } )
 
     test( "Test: \"REPLACE\"", function () {
@@ -597,7 +597,7 @@
 
         oParser = new parserFormula( "VALUE(\"$1,000\")", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+        strictEqual( oParser.calculate().getValue(), 1000 );
 
         oParser = new parserFormula( "VALUE(\"23-Mar-2002\")", "A2", ws );
         ok( oParser.parse() );
@@ -945,6 +945,46 @@
         oParser = new parserFormula( "PMT(0.08/12,10,10000,0,1)", "A2", ws );
         ok( oParser.parse() );
         ok( Math.abs( oParser.calculate().getValue() - pmt( 0.08 / 12, 10, 10000, 0, 1 ) ) < dif );
+
+    } )
+
+    test( "Test: \"NPER\"", function () {
+
+        function nper(rate,pmt,pv,fv,type){
+
+            if ( rate === undefined || rate === null )
+                rate = 0;
+
+            if ( pmt === undefined || pmt === null )
+                pmt = 0;
+
+            if ( pv === undefined || pv === null )
+                pv = 0;
+
+            if ( type === undefined || type === null )
+                type = 0;
+
+            if ( fv === undefined || fv === null )
+                fv = 0;
+
+            var res;
+            if ( rate != 0 ) {
+                res = (-fv * rate + pmt * (1 + rate * type)) / (rate * pv + pmt * (1 + rate * type))
+                res = Math.log( res ) / Math.log( 1+rate )
+            }
+            else {
+                res = (- pv - fv )/ pmt ;
+            }
+            return res;
+        }
+
+        oParser = new parserFormula( "NPER(0.12/12,-100,-1000,10000,1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000,10000,1) );
+
+        oParser = new parserFormula( "NPER(0.12/12,-100,-1000)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), nper(0.12/12,-100,-1000) );
 
     } )
 
