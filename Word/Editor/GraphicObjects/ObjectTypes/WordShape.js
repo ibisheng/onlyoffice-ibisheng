@@ -231,6 +231,11 @@ WordShape.prototype =
         return this.document.Get_TableStyleForPara();
     },
 
+    Get_TextBackGroundColor : function()
+    {
+        return undefined;
+    },
+
     Is_Cell: function()
     {
         return false;
