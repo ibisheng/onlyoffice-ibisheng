@@ -2556,8 +2556,9 @@ FormatParser.prototype =
 					else
 						sFormat = "#,##0" + sFracFormat + "р.;[Red]-#,##0" + sFracFormat + "р.";
 				}
-				if(null != sFormat)
-					res = {format: sFormat, value: dVal};
+				if(null == sFormat)
+					sFormat = "General";
+				res = {format: sFormat, value: dVal};
 			}
 		}
 		if(null == res)
