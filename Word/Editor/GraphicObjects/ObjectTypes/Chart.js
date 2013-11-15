@@ -1195,7 +1195,6 @@ CChartAsGroup.prototype =
         }
         catch(e)
         {
-            this.recalc
         }
 
     },
@@ -2303,7 +2302,43 @@ CChartAsGroup.prototype =
         }
     },
 
+    normalizeXfrm2: function(kw, kh)
+    {
+        var xfrm = this.spPr.xfrm;
+        xfrm.offX *= kw;
+        xfrm.offY *= kh;
+        xfrm.extX *= kw;
+        xfrm.extY *= kh;
+    },
 
+    calculateAfterOpenInGroup: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        var rot = xfrm.rot == null ? 0 : xfrm.rot;
+        var flip_h = xfrm.flipH == null ? false : xfrm.flipH;
+        var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
+        this.parent = new ParaDrawing(null, null, this, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
+        this.parent.Set_GraphicObject(this);
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, false);
+        if(this.spPr.geometry)
+            this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
+    },
+
+    calculateAfterOpenInGroup2: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        var rot = xfrm.rot == null ? 0 : xfrm.rot;
+        var flip_h = xfrm.flipH == null ? false : xfrm.flipH;
+        var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, false);
+        if(this.spPr.geometry)
+            this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
+    },
+
+    setGroupAfterOpen: function(group)
+    {
+        this.group = group;
+    },
 
     setMainGroup: function(group)
     {
