@@ -3699,7 +3699,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color :  { r : color.get_r(), g : color.get_g(), b : color.get_b() }  } ) );
+        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Color :  { r : color.get_r(), g : color.get_g(), b : color.get_b(), Auto : color.get_auto() }  } ) );
 
         if ( true === this.isMarkerFormat )
             this.sync_MarkerFormatCallback( false );
@@ -3779,7 +3779,7 @@ asc_docs_api.prototype.sync_ListType = function(NumPr){
 asc_docs_api.prototype.sync_TextColor = function(Color)
 {
     if ( undefined != Color )
-	    this.asc_fireCallback("asc_onTextColor", CreateAscColorCustom( Color.r, Color.g, Color.b ));
+	    this.asc_fireCallback("asc_onTextColor", CreateAscColorCustom( Color.r, Color.g, Color.b, Color.Auto ));
 }
 asc_docs_api.prototype.sync_TextHighLight = function(HighLight)
 {
@@ -5409,7 +5409,7 @@ asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProp
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         Paragraph.Replace_MisspelledWord( Word, ElemId );
         this.WordControl.m_oLogicDocument.Recalculate();
-        Paragraph.Document_SetThisElementCurrent();
+        Paragraph.Document_SetThisElementCurrent(true);
     }
 }
 

@@ -264,6 +264,11 @@ CDocumentContent.prototype =
         return this.Parent.Get_TableStyleForPara();
     },
 
+    Get_TextBackGroundColor : function()
+    {
+        return this.Parent.Get_TextBackGroundColor();
+    },
+
     Recalc_AllParagraphs_CompiledPr : function()
     {
         var Count = this.Content.length;

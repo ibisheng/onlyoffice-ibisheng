@@ -36,6 +36,8 @@ function CAscColor()
     this.b = 0;
     this.a = 255;
 
+    this.Auto = false;
+
     this.Mods = new Array();
     this.ColorSchemeId = -1;
 }
@@ -51,6 +53,8 @@ CAscColor.prototype.get_type = function(){return this.type;}
 CAscColor.prototype.put_type = function(v){this.type = v;}
 CAscColor.prototype.get_value = function(){return this.value;}
 CAscColor.prototype.put_value = function(v){this.value = v;}
+CAscColor.prototype.put_auto = function(v){this.Auto = v;}
+CAscColor.prototype.get_auto = function(){return this.Auto;}
 CAscColor.prototype.get_hex = function()
 {
 	if(!this.hex)
@@ -74,7 +78,7 @@ CAscColor.prototype.get_color = function()
 }
 // эта функция ДОЛЖНА минимизироваться
 
-function CreateAscColorCustom(r, g, b)
+function CreateAscColorCustom(r, g, b, auto)
 {
     var ret = new CAscColor();
     ret.type = c_oAscColor.COLOR_TYPE_SRGB;
@@ -82,6 +86,7 @@ function CreateAscColorCustom(r, g, b)
     ret.g = g;
     ret.b = b;
     ret.a = 255;
+    ret.Auto = ( undefined === auto ? false : auto );
     return ret;
 }
 

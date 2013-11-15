@@ -9050,6 +9050,11 @@ CDocument.prototype =
         return null;
     },
 
+    Get_TextBackGroundColor : function()
+    {
+        return undefined;
+    },
+
     Content_GetPrev : function(Id)
     {
         var Index = this.Internal_Content_Find( Id );

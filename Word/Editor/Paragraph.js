@@ -3500,7 +3500,28 @@ Paragraph.prototype =
             var Ascender  = Height - Descender;
 
             this.DrawingDocument.SetTargetSize( Height );
-            this.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+
+            if ( true === CurTextPr.Color.Auto )
+            {
+                // Выясним какая заливка у нашего текста
+                var Pr = this.Get_CompiledPr();
+                var BgColor = undefined;
+                if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+                {
+                    BgColor = Pr.ParaPr.Shd.Color;
+                }
+                else
+                {
+                    // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
+                    BgColor = this.Parent.Get_TextBackGroundColor();
+                }
+
+                // Определим автоцвет относительно заливки
+                var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+                this.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
+            }
+            else
+                this.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
 
             var TargetY = Y - Ascender - CurTextPr.Position;
             switch( CurTextPr.VertAlign )
@@ -4047,6 +4068,22 @@ Paragraph.prototype =
             pGraphics.AddClipRect( BoundsL, BoundsT, BoundsW, BoundsH );
         }
 
+        // Выясним какая заливка у нашего текста
+        var BgColor = undefined;
+        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+        {
+            BgColor = Pr.ParaPr.Shd.Color;
+        }
+        else
+        {
+            // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
+            BgColor = this.Parent.Get_TextBackGroundColor();
+        }
+
+        // Определим автоцвет относительно заливки
+        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+
+
         // 1 часть отрисовки :
         //    Рисуем слева от параграфа знак, если данный параграф зажат другим пользователем
         this.Internal_Draw_1( CurPage, pGraphics, Pr );
@@ -4064,11 +4101,11 @@ Paragraph.prototype =
 
         // 4 часть отрисовки :
         //    Рисуем сами элементы параграфа
-        this.Internal_Draw_4( CurPage, pGraphics, Pr );
+        this.Internal_Draw_4( CurPage, pGraphics, Pr, AutoColor );
 
         // 5 часть отрисовки :
         //    Рисуем различные подчеркивания и зачеркивания.
-        this.Internal_Draw_5( CurPage, pGraphics, Pr );
+        this.Internal_Draw_5( CurPage, pGraphics, Pr, AutoColor );
 
         // 6 часть отрисовки :
         //    Рисуем верхнюю, нижнюю и промежуточную границы
@@ -4554,7 +4591,7 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_4 : function(CurPage, pGraphics, Pr)
+    Internal_Draw_4 : function(CurPage, pGraphics, Pr, AutoColor)
     {
         var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
 
@@ -4571,6 +4608,8 @@ Paragraph.prototype =
 
         if ( true === bVisitedHyperlink )
             pGraphics.b_color1( 128, 0, 151, 255 );
+        else if ( true === CurTextPr.Color.Auto )
+            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
         else
             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -4653,7 +4692,10 @@ Paragraph.prototype =
                         else if ( align_Center === NumJc )
                             X_start = X - NumberingItem.WidthNum / 2;
 
-                        pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                        if ( true === NumTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        else
+                            pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
 
                         // Рисуется только сам символ нумерации
                         switch ( NumJc )
@@ -4704,7 +4746,12 @@ Paragraph.prototype =
                         }
 
                         if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
-                            pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                        {
+                            if ( true === NumTextPr.Color.Auto )
+                                pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            else
+                                pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                        }
 
                         if ( true === NumTextPr.Strikeout )
                             pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
@@ -4719,6 +4766,8 @@ Paragraph.prototype =
                         pGraphics.SetTextPr( CurTextPr );
                         if ( true === bVisitedHyperlink )
                             pGraphics.b_color1( 128, 0, 151, 255 );
+                        else if ( true === CurTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
                             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                     }
@@ -4762,8 +4811,17 @@ Paragraph.prototype =
                         if ( para_Drawing === Item.Type && drawing_Inline === Item.DrawingType )
                         {
                             pGraphics.SetTextPr( CurTextPr );
-                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
-                            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+                            if ( true === CurTextPr.Color.Auto )
+                            {
+                                pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            }
+                            else
+                            {
+                                pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                                pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            }
                         }
 
                         break;
@@ -4783,6 +4841,8 @@ Paragraph.prototype =
 
                         if ( true === bVisitedHyperlink )
                             pGraphics.b_color1( 128, 0, 151, 255 );
+                        else if ( true === CurTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
                             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -4794,7 +4854,11 @@ Paragraph.prototype =
                         var EndTextPr = Item.TextPr;
 
                         pGraphics.SetTextPr( EndTextPr );
-                        pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+
+                        if ( true === EndTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        else
+                            pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
 
                         bEnd = true;
                         var bEndCell = false;
@@ -4818,6 +4882,8 @@ Paragraph.prototype =
 
                         if ( true === bVisitedHyperlink )
                             pGraphics.b_color1( 128, 0, 151, 255 );
+                        else if ( true === CurTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
                         else
                             pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -4826,7 +4892,12 @@ Paragraph.prototype =
                     case para_HyperlinkEnd:
                     {
                         bVisitedHyperlink = false;
-                        pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+                        if ( true === CurTextPr.Color.Auto )
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        else
+                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
                         break;
                     }
                 }
@@ -4836,7 +4907,7 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_5 : function(CurPage, pGraphics, Pr)
+    Internal_Draw_5 : function(CurPage, pGraphics, Pr, AutoColor)
     {
         var _Page = this.Pages[CurPage];
         var StartPagePos = this.Lines[_Page.StartLine].StartPos;
@@ -4853,6 +4924,8 @@ Paragraph.prototype =
         var CurColor;
         if ( true === bVisitedHyperlink )
             CurColor = new CDocumentColor( 128, 0, 151 );
+        else if ( true === CurTextPr.Color.Auto )
+            CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
         else
             CurColor = new CDocumentColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
 
@@ -4961,6 +5034,8 @@ Paragraph.prototype =
                             // Выставляем цвет обводки
                             if ( true === bVisitedHyperlink )
                                 CurColor.Set( 128, 0, 151, 255 );
+                            else if ( true === CurTextPr.Color.Auto )
+                                CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
                             else
                                 CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -4994,6 +5069,8 @@ Paragraph.prototype =
                             // Выставляем цвет обводки
                             if ( true === bVisitedHyperlink )
                                 CurColor.Set( 128, 0, 151, 255 );
+                            else if ( true === CurTextPr.Color.Auto )
+                                CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
                             else
                                 CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
@@ -5002,7 +5079,12 @@ Paragraph.prototype =
                         case para_HyperlinkEnd:
                         {
                             bVisitedHyperlink = false;
-                            CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+                            if ( true === CurTextPr.Color.Auto )
+                                CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
+                            else
+                                CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
                             break;
                         }
                     }

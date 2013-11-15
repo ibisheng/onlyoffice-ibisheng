@@ -252,6 +252,11 @@ CHeaderFooter.prototype =
         return null;
     },
 
+    Get_TextBackGroundColor : function()
+    {
+        return undefined;
+    },
+
     Get_PageContentStartPos : function ()
     {
         return { X : X_Left_Field, Y : 0, XLimit : X_Right_Field, YLimit : 0 };

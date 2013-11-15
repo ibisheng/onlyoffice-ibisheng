@@ -2297,6 +2297,17 @@ CTable.prototype =
         return this.Parent.Get_Styles();
     },
 
+    Get_TextBackGroundColor : function()
+    {
+        // Сначала проверим заливку данной таблицы, если ее нет, тогда спрашиваем у родительского класса
+        var Shd = this.Get_Shd();
+
+        if ( shd_Nil !== Shd.Value )
+            return Shd.Color;
+
+        return this.Parent.Get_TextBackGroundColor();
+    },
+
     Get_Numbering : function()
     {
         return this.Parent.Get_Numbering();
@@ -19918,6 +19929,17 @@ CTableCell.prototype =
         var ParaPr = this.CompiledPr.ParaPr.Copy();
 
         return { TextPr : TextPr, ParaPr : ParaPr };
+    },
+
+    Get_TextBackGroundColor : function()
+    {
+        // Сначала проверим заливку данной ячейки, если ее нет, тогда спрашиваем у таблицы
+        var Shd = this.Get_Shd();
+
+        if ( shd_Nil !== Shd.Value )
+            return Shd.Color;
+
+        return this.Row.Table.Get_TextBackGroundColor();
     },
 
     Get_Numbering : function()
