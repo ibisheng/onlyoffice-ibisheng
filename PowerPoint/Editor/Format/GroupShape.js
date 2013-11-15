@@ -315,6 +315,8 @@ CGroupShape.prototype =
 
     getArrGraphicObjects: function()
     {
+		if(this.recalcInfo.recalculateArrGraphicObjects)
+			this.recalculateArrGraphicObjects();
         return this.arrGraphicObjects;
     },
 
