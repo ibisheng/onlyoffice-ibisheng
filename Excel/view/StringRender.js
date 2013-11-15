@@ -917,7 +917,7 @@
 				}
 
 				function computeWordDeltaX() {
-					if (align !== "justify") {return 0;}
+					if (align !== "justify" || n === self.lines.length - 1) {return 0;}
 					for (var i = l.beg, c = 0; i <= l.end; ++i) {
 						var p = self.charProps[i];
 						if (p && p.wrd) {++c;}
