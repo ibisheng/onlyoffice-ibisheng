@@ -13,6 +13,9 @@
 
 function CNary()
 {
+    this.type = null;
+    this.code = null;   // for "read"
+    this.grow = false;
     this.supHide = false;
     this.subHide = false;
     this.limLoc = NARY_SubSup;
@@ -21,13 +24,6 @@ function CNary()
 extend(CNary, CSubMathBase);
 CNary.prototype.init = function(props)
 {
-    /*if(props.limLoc == "undOvr" || props.limLocType == NARY_UndOvr)
-     this.limLoc = 0;
-     else if(props.limLoc === "subSup"|| props.limLocType == NARY_SubSup)
-     this.limLoc = 1;
-     else
-     this.limLoc = 1;*/
-
     if(props.limLoc == NARY_UndOvr)
         this.limLoc = NARY_UndOvr;
     else if(props.limLoc  == NARY_SubSup)
@@ -39,41 +35,112 @@ CNary.prototype.init = function(props)
     if(props.subHide === true || props.subHide === 1)
         this.subHide = true;
 
+    if(props.grow === true || props.grow === 1)
+        this.grow = true;
+
     this.setDimension(1, 2);
 
-    var signChr, sign;
+    var signCode, sign;
+    var bChr = false;
 
     if(typeof(props.chr) === "string")
-        signChr = props.chr.charCodeAt(0);
+    {
+        signCode = props.chr.charCodeAt(0);
+        bChr = true;
+    }
 
-    if(signChr == 0x222B || props.signType == NARY_INTEGRAL)
+    if(signCode == 0x222B || props.signType == NARY_INTEGRAL)
+    {
+        this.code = 0x222B;
+        this.type = NARY_INTEGRAL;
         sign = new CIntegral();
-    else if(signChr == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
+    }
+    else if(signCode == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
+    {
+        this.code = 0x222C;
+        this.type = NARY_DOUBLE_INTEGRAL;
         sign = new CDoubleIntegral();
-    else if(signChr == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
+    }
+    else if(signCode == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
+    {
+        this.code = 0x222D;
+        this.type = NARY_TRIPLE_INTEGRAL;
         sign = new CTripleIntegral();
-    else if(signChr == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
+    }
+    else if(signCode == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
+    {
+        this.code = 0x222E;
+        this.type = NARY_CONTOUR_INTEGRAL;
         sign = new CContourIntegral();
-    else if(signChr == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
+    }
+    else if(signCode == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
+    {
+        this.code = 0x222F;
+        this.type = NARY_SURFACE_INTEGRAL;
         sign = new CSurfaceIntegral();
-    else if(signChr == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
+    }
+    else if(signCode == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
+    {
+        this.code = 0x2230;
+        this.type = NARY_VOLUME_INTEGRAL;
         sign = new CVolumeIntegral();
-    else if(signChr ==0x2211 || props.signType == NARY_SIGMA)
+    }
+    else if(signCode == 0x2211 || props.signType == NARY_SIGMA)
+    {
+        this.code = 0x2211;
+        this.type = NARY_SIGMA;
         sign = new CSigma();
-    else if(signChr == 0x220F || props.signType == NARY_PRODUCT)
+    }
+    else if(signCode == 0x220F || props.signType == NARY_PRODUCT)
+    {
+        this.code = 0x220F;
+        this.type = NARY_PRODUCT;
         sign = new CProduct();
-    else if(signChr ==0x2210 || props.signType == NARY_COPRODUCT)
+    }
+    else if(signCode == 0x2210 || props.signType == NARY_COPRODUCT)
+    {
+        this.code = 0x2210;
+        this.type = NARY_COPRODUCT;
         sign = new CProduct(-1);
-    else if(signChr == 0x22C3 || props.signType == NARY_UNION)
+    }
+    else if(signCode == 0x22C3 || props.signType == NARY_UNION)
+    {
+        this.code = 0x22C3;
+        this.type = NARY_UNION;
         sign = new CUnion();
-    else if(signChr == 0x22C2 || props.signType == NARY_INTERSECTION)
+    }
+    else if(signCode == 0x22C2 || props.signType == NARY_INTERSECTION)
+    {
+        this.code = 0x22C2;
+        this.type = NARY_INTERSECTION;
         sign = new CUnion(-1);
-    else if(signChr == 0x22C1 || props.signType == NARY_LOGICAL_OR)
+    }
+    else if(signCode == 0x22C1 || props.signType == NARY_LOGICAL_OR)
+    {
+        this.code = 0x22C1;
+        this.type = NARY_LOGICAL_OR;
         sign  = new CLogicalOr();
-    else if(signChr == 0x22C0 || props.signType == NARY_LOGICAL_AND)
+    }
+    else if(signCode == 0x22C0 || props.signType == NARY_LOGICAL_AND)
+    {
+        this.code = 0x22C0;
+        this.type = NARY_LOGICAL_AND;
         sign  = new CLogicalOr(-1);
+    }
+    else if(bChr)
+    {
+        this.code = signCode;
+        this.type = NARY_TEXT_OPER;
+        sign = new CMathText();
+        sign.add(signCode);
+
+    }
     else
+    {
+        this.code = 0x222B;
+        this.type = NARY_INTEGRAL;
         sign = new CIntegral();
+    }
 
     var arg = new CMathContent(),
         base;
@@ -105,25 +172,25 @@ CNary.prototype.init = function(props)
         if( this.supHide && !this.subHide )
         {
             base = new CDegree();
-            props = {type: DEGREE_SUPERSCRIPT};
-            base.init_2(props, sign);
+            var prp = {type: DEGREE_SUPERSCRIPT};
+            base.init_2(prp, sign);
         }
         else if( !this.supHide && this.subHide )
         {
             base = new CDegree();
-            props = {type: DEGREE_SUBSCRIPT};
-            base.init_2(props, sign);
+            var prp = {type: DEGREE_SUBSCRIPT};
+            base.init_2(prp, sign);
         }
         else
         {
             base = new CDegreeSubSup();
-            props = {type: DEGREE_SubSup};
-            base.init_2(props, sign);
+            var prp = {type: DEGREE_SubSup};
+            base.init_2(prp, sign);
         }
     }
 
-    if(!this.supHide && !this.subHide)
-        base.setCtrPrp(this.CtrPrp); // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
+    /*if(!this.supHide && !this.subHide)
+     base.setCtrPrp(this.CtrPrp);*/      // выставляем аналогично как в CMathContent при добавлении элемента в addMComponent
 
     this.addMCToContent(base, arg);
 }
@@ -142,6 +209,18 @@ CNary.prototype.getUpperIterator = function()
 CNary.prototype.getLowerIterator = function()
 {
     return this.elements[0][0].getLowerIterator();
+}
+CNary.prototype.getPropsForWhite = function()
+{
+    var props = {};
+
+    props.limLoc = (this.limLoc == NARY_UndOvr) ? NARY_UndOvr : NARY_SubSup;
+    props.chr = String.fromCharCode(this.code);
+    props.supHide = this.supHide === true ? 1: 0;
+    props.subHide = this.subHide === true ? 1: 0;
+    props.grow = this.grow === true ? 1 : 0;
+
+    return props;
 }
 
 function old_CNary()
@@ -260,7 +339,7 @@ CNaryUnd.prototype.init = function(sign)
 }
 CNaryUnd.prototype.setDistance = function()
 {
-    var zetta = this.getTxtPrp().FontSize* 25.4/96;
+    var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.25;
 }
 CNaryUnd.prototype.getCenter = function()
@@ -289,7 +368,7 @@ CNaryOvr.prototype.init = function(sign)
 }
 CNaryOvr.prototype.setDistance = function()
 {
-    var zetta = this.getTxtPrp().FontSize* 25.4/96;
+    var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.1;
 }
 CNaryOvr.prototype.getCenter = function()
@@ -322,7 +401,6 @@ CNaryUndOvr.prototype.init = function(sign)
 }
 CNaryUndOvr.prototype.recalculateSize = function()
 {
-    //var zetta = this.getTxtPrp().FontSize* 25.4/96;
     var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.gapTop = zetta*0.25;
     this.gapBottom = zetta*0.1;
@@ -413,7 +491,6 @@ CNaryUndOvr.prototype.getUpperIterator = function()
 }
 
 
-
 function CNaryOperator(flip)
 {
     this.Composition = null;
@@ -421,6 +498,13 @@ function CNaryOperator(flip)
     this.sizeGlyph = null;
 }
 CNaryOperator.prototype.draw = function(pGraphics)
+{
+    if(this.typeObj == MATH_TEXT)
+        this.drawTextElem(pGraphics);
+    else
+        this.drawGlyph(pGraphics);
+}
+CNaryOperator.prototype.drawGlyph = function(pGraphics)
 {
     var coord = this.getCoord();
 
@@ -466,7 +550,18 @@ CNaryOperator.prototype.draw = function(pGraphics)
 
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
+}
+CNaryOperator.prototype.drawTextElem = function(pGraphics)
+{
+    pGraphics.b_color1(0,0,0,255);
+    var rPrp = new CTextPr();
+    rPrp.Merge( this.getCtrPrp() );
+    rPrp.Italic = false;
+    rPrp.Bold = false;
 
+    pGraphics.SetFont(rPrp);
+
+    CNaryOperator.superclass.call.draw(this, pGraphics);
 }
 CNaryOperator.prototype.IsJustDraw = function()
 {
@@ -1003,34 +1098,34 @@ CLogicalOr.prototype.old_getCoord = function()
 
 
     /* var w1 = X[7] - X[6],
-        w2 = X[1] - X[2],
-        w3 = X[4],
-        w4 = X[1];
+     w2 = X[1] - X[2],
+     w3 = X[4],
+     w4 = X[1];
 
-    var textScale = this.params.font.FontSize/850, // 1000 pt
-        alpha = textScale*25.4/96 /64;
+     var textScale = this.params.font.FontSize/850, // 1000 pt
+     alpha = textScale*25.4/96 /64;
 
-    var Height = this.size.height/alpha,
-        Width = (this.size.width - this.gap)/alpha - w2;
+     var Height = this.size.height/alpha,
+     Width = (this.size.width - this.gap)/alpha - w2;
 
-    var k1 = X[2]/(X[0] - w2);
+     var k1 = X[2]/(X[0] - w2);
 
-    var ww1 = Width*k1 - X[2],
-        ww2 = Width*(1- k1) - w1,
-        hh = Height - Y[2];
+     var ww1 = Width*k1 - X[2],
+     ww2 = Width*(1- k1) - w1,
+     hh = Height - Y[2];
 
-    X[1] += ww1;
-    X[2] += ww1;
-    X[5] += ww1;
+     X[1] += ww1;
+     X[2] += ww1;
+     X[5] += ww1;
 
-    X[6] += ww2 + X[1] - w4;
-    X[7] += ww2 + X[1] - w4;
-    X[0] += ww2 + X[1] - w4;
+     X[6] += ww2 + X[1] - w4;
+     X[7] += ww2 + X[1] - w4;
+     X[0] += ww2 + X[1] - w4;
 
 
-    Y[1] += hh;
-    Y[2] += hh;
-    Y[5] += hh;*/
+     Y[1] += hh;
+     Y[2] += hh;
+     Y[5] += hh;*/
 
     return {X: X, Y: Y};
 }
@@ -1169,11 +1264,11 @@ CIntegral.prototype.getCoord = function()
     X[43] = (X[42] + X[44])/2; Y[43] = (Y[44] + Y[42])/2;
 
     /*for(var i = 0; i < X.length; i++)
-    {
-        var k = i + 34;
-        var str = "X[" + k + "] = " + X[i] + "; Y[" + k + "] = " + Y[i] + ";";
-        console.log(str);
-    }*/
+     {
+     var k = i + 34;
+     var str = "X[" + k + "] = " + X[i] + "; Y[" + k + "] = " + Y[i] + ";";
+     console.log(str);
+     }*/
 
     var W = X[9],
         H = Y[27];
@@ -1185,49 +1280,49 @@ CIntegral.prototype.old_getCoord = function()
     var X = new Array(),
         Y = new Array();
 
-     X[0] = 20407; Y[0] = 65723;
-     X[1] = 20407; Y[1] = 60840;
-     X[2] = 20407; Y[2] = 37013;
-     X[3] = 24333; Y[3] = 18507;
-     X[4] = 28260; Y[4] = 0;
-     X[5] = 40590; Y[5] = 0;
-     X[6] = 42142; Y[6] = 0;
-     X[7] = 43604; Y[7] = 383;
-     X[8] = 45067; Y[8] = 765;
-     X[9] = 46215; Y[9] = 1305;
-     X[10] = 45180; Y[10] = 9225;
-     X[11] = 41760; Y[11] = 9225;
-     X[12] = 41512; Y[12] = 7335;
-     X[13] = 40724; Y[13] = 6064;
-     X[14] = 39937; Y[14] = 4793;
-     X[15] = 37935; Y[15] = 4793;
-     X[16] = 30465; Y[16] = 4793;
-     X[17] = 28406; Y[17] = 23086;
-     X[18] = 26347; Y[18] = 41378;
-     X[19] = 26347; Y[19] = 60840;
-     X[20] = 26347; Y[20] = 65723;
+    X[0] = 20407; Y[0] = 65723;
+    X[1] = 20407; Y[1] = 60840;
+    X[2] = 20407; Y[2] = 37013;
+    X[3] = 24333; Y[3] = 18507;
+    X[4] = 28260; Y[4] = 0;
+    X[5] = 40590; Y[5] = 0;
+    X[6] = 42142; Y[6] = 0;
+    X[7] = 43604; Y[7] = 383;
+    X[8] = 45067; Y[8] = 765;
+    X[9] = 46215; Y[9] = 1305;
+    X[10] = 45180; Y[10] = 9225;
+    X[11] = 41760; Y[11] = 9225;
+    X[12] = 41512; Y[12] = 7335;
+    X[13] = 40724; Y[13] = 6064;
+    X[14] = 39937; Y[14] = 4793;
+    X[15] = 37935; Y[15] = 4793;
+    X[16] = 30465; Y[16] = 4793;
+    X[17] = 28406; Y[17] = 23086;
+    X[18] = 26347; Y[18] = 41378;
+    X[19] = 26347; Y[19] = 60840;
+    X[20] = 26347; Y[20] = 65723;
 
-     X[21] = 26325; Y[21] = 65723;
+    X[21] = 26325; Y[21] = 65723;
 
-     X[22] = 26325; Y[22] = 99091;
-     X[23] = 21622; Y[23] = 115404;
-     X[24] = 16920; Y[24] = 131716;
-     X[25] = 5467; Y[25] = 131716;
-     X[26] = 4387; Y[26] = 131716;
-     X[27] = 2947; Y[27] = 131356;
-     X[28] = 1507; Y[28] = 130996;
-     X[29] = 0; Y[29] = 130276;
-     X[30] = 1147; Y[30] = 121388;
-     X[31] = 4770; Y[31] = 121388;
-     X[32] = 4927; Y[32] = 123773;
-     X[33] = 5782; Y[33] = 125135;
-     X[34] = 6637; Y[34] = 126496;
-     X[35] = 8775; Y[35] = 126496;
-     X[36] = 13365; Y[36] = 126496;
-     X[37] = 16886; Y[37] = 116506;
-     X[38] = 20407; Y[38] = 106516;
-     X[39] = 20407; Y[39] = 70606;
-     X[40] = 20407; Y[40] = 65723;
+    X[22] = 26325; Y[22] = 99091;
+    X[23] = 21622; Y[23] = 115404;
+    X[24] = 16920; Y[24] = 131716;
+    X[25] = 5467; Y[25] = 131716;
+    X[26] = 4387; Y[26] = 131716;
+    X[27] = 2947; Y[27] = 131356;
+    X[28] = 1507; Y[28] = 130996;
+    X[29] = 0; Y[29] = 130276;
+    X[30] = 1147; Y[30] = 121388;
+    X[31] = 4770; Y[31] = 121388;
+    X[32] = 4927; Y[32] = 123773;
+    X[33] = 5782; Y[33] = 125135;
+    X[34] = 6637; Y[34] = 126496;
+    X[35] = 8775; Y[35] = 126496;
+    X[36] = 13365; Y[36] = 126496;
+    X[37] = 16886; Y[37] = 116506;
+    X[38] = 20407; Y[38] = 106516;
+    X[39] = 20407; Y[39] = 70606;
+    X[40] = 20407; Y[40] = 65723;
 
     var shX = X[9]*0.025;
     for(var i = 0; i < 21; i++)
@@ -1431,48 +1526,48 @@ old_CContourIntegral.prototype.getCoord = function()
     var X = coord.X,
         Y = coord.Y;
 
-   /* X[41] = 35826; Y[41] = 44627;
-    X[42] = 39393; Y[42] = 42564;
-    X[43] = 41895; Y[43] = 39408;
-    X[44] = 44398; Y[44] = 36252;
-    X[45] = 45743; Y[45] = 32158;
-    X[46] = 47088; Y[46] = 28063;
-    X[47] = 47088; Y[47] = 23188;
-    X[48] = 47088; Y[48] = 19063;
-    X[49] = 45899; Y[49] = 15469;
-    X[50] = 44710; Y[50] = 11875;
-    X[51] = 42645; Y[51] = 8969;
-    X[52] = 40581; Y[52] = 6062;
-    X[53] = 37734; Y[53] = 3937;
-    X[54] = 34887; Y[54] = 1812;
-    X[55] = 30069; Y[55] = 125;
-    X[56] = 29882; Y[56] = 9937;
-    X[57] = 29882; Y[57] = 22938;
-    X[58] = 29882; Y[58] = 36252;
-    X[59] = 28882; Y[59] = 47314;
-    X[60] = 32698; Y[60] = 46502;
-    X[61] = 35826; Y[61] = 44627;
-    X[62] = 11504; Y[62] = 2625;
-    X[63] = 8003; Y[63] = 4625;
-    X[64] = 5439; Y[64] = 7750;
-    X[65] = 2876; Y[65] = 10875;
-    X[66] = 1438; Y[66] = 14938;
-    X[67] = 0; Y[67] = 19001;
-    X[68] = 0; Y[68] = 23813;
-    X[69] = 0; Y[69] = 27751;
-    X[70] = 1094; Y[70] = 31345;
-    X[71] = 2188; Y[71] = 34938;
-    X[72] = 4158; Y[72] = 37939;
-    X[73] = 6128; Y[73] = 40939;
-    X[74] = 9066; Y[74] = 43377;
-    X[75] = 11942; Y[75] = 45689;
-    X[76] = 16882; Y[76] = 46939;
-    X[77] = 17069; Y[77] = 40189;
-    X[78] = 17069; Y[78] = 32251;
-    X[79] = 17069; Y[79] = 13876;
-    X[80] = 18319; Y[80] = 0;
-    X[81] = 14631; Y[81] = 812;
-    X[82] = 11504; Y[82] = 2625;*/
+    /* X[41] = 35826; Y[41] = 44627;
+     X[42] = 39393; Y[42] = 42564;
+     X[43] = 41895; Y[43] = 39408;
+     X[44] = 44398; Y[44] = 36252;
+     X[45] = 45743; Y[45] = 32158;
+     X[46] = 47088; Y[46] = 28063;
+     X[47] = 47088; Y[47] = 23188;
+     X[48] = 47088; Y[48] = 19063;
+     X[49] = 45899; Y[49] = 15469;
+     X[50] = 44710; Y[50] = 11875;
+     X[51] = 42645; Y[51] = 8969;
+     X[52] = 40581; Y[52] = 6062;
+     X[53] = 37734; Y[53] = 3937;
+     X[54] = 34887; Y[54] = 1812;
+     X[55] = 30069; Y[55] = 125;
+     X[56] = 29882; Y[56] = 9937;
+     X[57] = 29882; Y[57] = 22938;
+     X[58] = 29882; Y[58] = 36252;
+     X[59] = 28882; Y[59] = 47314;
+     X[60] = 32698; Y[60] = 46502;
+     X[61] = 35826; Y[61] = 44627;
+     X[62] = 11504; Y[62] = 2625;
+     X[63] = 8003; Y[63] = 4625;
+     X[64] = 5439; Y[64] = 7750;
+     X[65] = 2876; Y[65] = 10875;
+     X[66] = 1438; Y[66] = 14938;
+     X[67] = 0; Y[67] = 19001;
+     X[68] = 0; Y[68] = 23813;
+     X[69] = 0; Y[69] = 27751;
+     X[70] = 1094; Y[70] = 31345;
+     X[71] = 2188; Y[71] = 34938;
+     X[72] = 4158; Y[72] = 37939;
+     X[73] = 6128; Y[73] = 40939;
+     X[74] = 9066; Y[74] = 43377;
+     X[75] = 11942; Y[75] = 45689;
+     X[76] = 16882; Y[76] = 46939;
+     X[77] = 17069; Y[77] = 40189;
+     X[78] = 17069; Y[78] = 32251;
+     X[79] = 17069; Y[79] = 13876;
+     X[80] = 18319; Y[80] = 0;
+     X[81] = 14631; Y[81] = 812;
+     X[82] = 11504; Y[82] = 2625;*/
 
     X[41] = 23876; Y[41] = 29743;
     X[42] = 26245; Y[42] = 28368;
@@ -1689,11 +1784,11 @@ CCircle.prototype.getCoord = function()
 
 
     /*
-    for(var i = 0; i < 34; i++)
-    {
-        var str = "X[" + i + "] = " + Math.round(X[i]*85)/100 + "; Y[" + i + "] = " + Math.round(Y[i]*85)/100 + ";";
-        console.log(str);
-    }*/
+     for(var i = 0; i < 34; i++)
+     {
+     var str = "X[" + i + "] = " + Math.round(X[i]*85)/100 + "; Y[" + i + "] = " + Math.round(Y[i]*85)/100 + ";";
+     console.log(str);
+     }*/
 
     var W = X[7],
         H = Y[16];
@@ -2054,17 +2149,17 @@ CSurface.prototype.getCoord = function()
 
 
     /*for(var i = 0; i < X.length; i++)
-    {
-        X[i] *= 1.03;
-        Y[i] *= 0.97;
+     {
+     X[i] *= 1.03;
+     Y[i] *= 0.97;
 
-        var xx = Math.round(X[i]*100)/100;
-        var yy = Math.round(Y[i]*100)/100;
+     var xx = Math.round(X[i]*100)/100;
+     var yy = Math.round(Y[i]*100)/100;
 
-        var str = "X[" + i + "] = " + xx + "; Y[" + i + "] = " + yy + ";";
-        console.log(str);
+     var str = "X[" + i + "] = " + xx + "; Y[" + i + "] = " + yy + ";";
+     console.log(str);
 
-    }*/
+     }*/
 
 
     return {X: X, Y: Y, W: W, H: H};
@@ -2160,34 +2255,34 @@ CVolume.prototype.getCoord = function()
     X[50] = 24086.6; Y[50] = 1584.99;
 
     /*var min_y = 23530,
-        ind_y;
+     ind_y;
 
-    for(var i = 0; i < X.length; i++)
-    {
+     for(var i = 0; i < X.length; i++)
+     {
 
-        if(Y[i] < min_y)
-        {
-            ind_y = i;
-            min_y = Y[i];
-        }
+     if(Y[i] < min_y)
+     {
+     ind_y = i;
+     min_y = Y[i];
+     }
 
-    }
+     }
 
-    for(var i = 0; i < 51; i++)
-    {
-        X[i] *= 1.074;
-        Y[i] *= 0.99;
-    }
-    var t = Y[ind_y];
+     for(var i = 0; i < 51; i++)
+     {
+     X[i] *= 1.074;
+     Y[i] *= 0.99;
+     }
+     var t = Y[ind_y];
 
-    for(var i = 0; i < 51; i++)
-    {
-        var yy = Math.round((Y[i] - t)*100)/100;
-        var xx = Math.round(X[i]*100)/100;
+     for(var i = 0; i < 51; i++)
+     {
+     var yy = Math.round((Y[i] - t)*100)/100;
+     var xx = Math.round(X[i]*100)/100;
 
-        var str = "X["+i+"] = " + xx + "; Y["+i+ "] = "+ yy + ";";
-        console.log(str);
-    }*/
+     var str = "X["+i+"] = " + xx + "; Y["+i+ "] = "+ yy + ";";
+     console.log(str);
+     }*/
 
 
     var W = X[15],
@@ -2367,14 +2462,14 @@ _old_CContourIntegral.prototype.calculate_getCoord = function()
         Y = new Array();
 
     /*X[0] = 40566; Y[0] = 9456;
-    X[1] = 36276; Y[1] = 9456;
-    X[2] = 35944; Y[2] = 7623;
-    X[3] = 34946; Y[3] = 6436;
-    X[4] = 33948; Y[4] = 5249;
-    X[5] = 32285; Y[5] = 5249;
-    X[6] = 27837; Y[6] = 5249;
-    X[7] = 26423; Y[7] = 12497;
-    X[8] = 25674; Y[8] = 16370;*/
+     X[1] = 36276; Y[1] = 9456;
+     X[2] = 35944; Y[2] = 7623;
+     X[3] = 34946; Y[3] = 6436;
+     X[4] = 33948; Y[4] = 5249;
+     X[5] = 32285; Y[5] = 5249;
+     X[6] = 27837; Y[6] = 5249;
+     X[7] = 26423; Y[7] = 12497;
+     X[8] = 25674; Y[8] = 16370;*/
 
     X[9] = 25341; Y[9] = 25660;
     X[10] = 29751; Y[10] = 26784;
@@ -2395,22 +2490,22 @@ _old_CContourIntegral.prototype.calculate_getCoord = function()
     X[25] = 23824; Y[25] = 66650;
 
     /*X[26] = 22865; Y[26] = 74065;
-    X[27] = 21074; Y[27] = 79730;
-    X[28] = 17160; Y[28] = 92352;
-    X[29] = 7205; Y[29] = 92352;
-    X[30] = 5205; Y[30] = 92352;
-    X[31] = 3706; Y[31] = 92019;
-    X[32] = 2207; Y[32] = 91686;
-    X[33] = 791; Y[33] = 90936;
-    X[34] = 1332; Y[34] = 82730;
-    X[35] = 5249; Y[35] = 82730;
-    X[36] = 5791; Y[36] = 84729;
-    X[37] = 6854; Y[37] = 86020;
-    X[38] = 7918; Y[38] = 87312;
-    X[39] = 9879; Y[39] = 87312;
-    X[40] = 14259; Y[40] = 87312;
-    X[41] = 15384; Y[41] = 78231;
-    X[42] = 15969; Y[42] = 73482;*/
+     X[27] = 21074; Y[27] = 79730;
+     X[28] = 17160; Y[28] = 92352;
+     X[29] = 7205; Y[29] = 92352;
+     X[30] = 5205; Y[30] = 92352;
+     X[31] = 3706; Y[31] = 92019;
+     X[32] = 2207; Y[32] = 91686;
+     X[33] = 791; Y[33] = 90936;
+     X[34] = 1332; Y[34] = 82730;
+     X[35] = 5249; Y[35] = 82730;
+     X[36] = 5791; Y[36] = 84729;
+     X[37] = 6854; Y[37] = 86020;
+     X[38] = 7918; Y[38] = 87312;
+     X[39] = 9879; Y[39] = 87312;
+     X[40] = 14259; Y[40] = 87312;
+     X[41] = 15384; Y[41] = 78231;
+     X[42] = 15969; Y[42] = 73482;*/
 
     X[43] = 16260; Y[43] = 66359;
     X[44] = 11799; Y[44] = 65401;
@@ -2481,58 +2576,58 @@ _old_CContourIntegral.prototype.calculate_getCoord = function()
 
 
     /* X[60] = 18826; Y[60] = 17621;
-    X[61] = 20574; Y[61] = 12372;
-    X[62] = 24698; Y[62] = 0;
-    X[63] = 34819; Y[63] = 0;
-    X[64] = 36277; Y[64] = 0;
-    X[65] = 38047; Y[65] = 396;
-    X[66] = 39817; Y[66] = 792;
-    X[67] = 41066; Y[67] = 1375;
-    X[68] = 40566; Y[68] = 9456;
+     X[61] = 20574; Y[61] = 12372;
+     X[62] = 24698; Y[62] = 0;
+     X[63] = 34819; Y[63] = 0;
+     X[64] = 36277; Y[64] = 0;
+     X[65] = 38047; Y[65] = 396;
+     X[66] = 39817; Y[66] = 792;
+     X[67] = 41066; Y[67] = 1375;
+     X[68] = 40566; Y[68] = 9456;
 
-    X[69] = 29000; Y[69] = 60069;
-    X[70] = 31369; Y[70] = 58694;
-    X[71] = 33032; Y[71] = 56591;
-    X[72] = 34696; Y[72] = 54487;
-    X[73] = 35590; Y[73] = 51759;
-    X[74] = 36484; Y[74] = 49030;
-    X[75] = 36484; Y[75] = 45781;
-    X[76] = 36484; Y[76] = 43031;
-    X[77] = 35694; Y[77] = 40636;
-    X[78] = 34904; Y[78] = 38241;
-    X[79] = 33532; Y[79] = 36304;
-    X[80] = 32160; Y[80] = 34367;
-    X[81] = 30268; Y[81] = 32951;
-    X[82] = 28377; Y[82] = 31534;
-    X[83] = 25176; Y[83] = 30409;
-    X[84] = 25051; Y[84] = 36949;
-    X[85] = 25051; Y[85] = 45614;
-    X[86] = 25051; Y[86] = 54487;
-    X[87] = 24384; Y[87] = 61860;
-    X[88] = 26920; Y[88] = 61318;
-    X[89] = 29000; Y[89] = 60069;
+     X[69] = 29000; Y[69] = 60069;
+     X[70] = 31369; Y[70] = 58694;
+     X[71] = 33032; Y[71] = 56591;
+     X[72] = 34696; Y[72] = 54487;
+     X[73] = 35590; Y[73] = 51759;
+     X[74] = 36484; Y[74] = 49030;
+     X[75] = 36484; Y[75] = 45781;
+     X[76] = 36484; Y[76] = 43031;
+     X[77] = 35694; Y[77] = 40636;
+     X[78] = 34904; Y[78] = 38241;
+     X[79] = 33532; Y[79] = 36304;
+     X[80] = 32160; Y[80] = 34367;
+     X[81] = 30268; Y[81] = 32951;
+     X[82] = 28377; Y[82] = 31534;
+     X[83] = 25176; Y[83] = 30409;
+     X[84] = 25051; Y[84] = 36949;
+     X[85] = 25051; Y[85] = 45614;
+     X[86] = 25051; Y[86] = 54487;
+     X[87] = 24384; Y[87] = 61860;
+     X[88] = 26920; Y[88] = 61318;
+     X[89] = 29000; Y[89] = 60069;
 
-    X[90] = 12798; Y[90] = 32076;
-    X[91] = 10463; Y[91] = 33409;
-    X[92] = 8752; Y[92] = 35492;
-    X[93] = 7042; Y[93] = 37574;
-    X[94] = 6083; Y[94] = 40282;
-    X[95] = 5124; Y[95] = 42990;
-    X[96] = 5124; Y[96] = 46197;
-    X[97] = 5124; Y[97] = 48821;
-    X[98] = 5854; Y[98] = 51217;
-    X[99] = 6584; Y[99] = 53612;
-    X[100] = 7897; Y[100] = 55612;
-    X[101] = 9211; Y[101] = 57611;
-    X[102] = 11172; Y[102] = 59236;
-    X[103] = 13091; Y[103] = 60777;
-    X[104] = 16386; Y[104] = 61610;
-    X[105] = 16511; Y[105] = 57111;
-    X[106] = 16511; Y[106] = 51821;
-    X[107] = 16511; Y[107] = 39574;
-    X[108] = 17344; Y[108] = 30326;
-    X[109] = 14883; Y[109] = 30868;
-    X[110] = 12798; Y[110] = 32076;*/
+     X[90] = 12798; Y[90] = 32076;
+     X[91] = 10463; Y[91] = 33409;
+     X[92] = 8752; Y[92] = 35492;
+     X[93] = 7042; Y[93] = 37574;
+     X[94] = 6083; Y[94] = 40282;
+     X[95] = 5124; Y[95] = 42990;
+     X[96] = 5124; Y[96] = 46197;
+     X[97] = 5124; Y[97] = 48821;
+     X[98] = 5854; Y[98] = 51217;
+     X[99] = 6584; Y[99] = 53612;
+     X[100] = 7897; Y[100] = 55612;
+     X[101] = 9211; Y[101] = 57611;
+     X[102] = 11172; Y[102] = 59236;
+     X[103] = 13091; Y[103] = 60777;
+     X[104] = 16386; Y[104] = 61610;
+     X[105] = 16511; Y[105] = 57111;
+     X[106] = 16511; Y[106] = 51821;
+     X[107] = 16511; Y[107] = 39574;
+     X[108] = 17344; Y[108] = 30326;
+     X[109] = 14883; Y[109] = 30868;
+     X[110] = 12798; Y[110] = 32076;*/
 
     //return {X: X, Y: Y};
 }
@@ -2633,11 +2728,11 @@ _old_CContourIntegral.prototype.getCoord = function()
 _old_CContourIntegral.prototype.old_drawPath = function(XX, YY)
 {
     /*MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
-    MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
-    MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );*/
+     MathControl.pGraph._l(XX[1], YY[1]);
+     MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
+     MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
+     MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
+     MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );*/
 
     XX[9] = XX[59] = (XX[9] + XX[59])/2;
     YY[9] = YY[59] = (YY[9] + YY[59])/2;
@@ -2656,15 +2751,15 @@ _old_CContourIntegral.prototype.old_drawPath = function(XX, YY)
     MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
 
     /*MathControl.pGraph._c(XX[25], YY[25], XX[26], YY[26], XX[27], YY[27] );
-    MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
-    MathControl.pGraph._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31] );
-    MathControl.pGraph._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33] );
-    MathControl.pGraph._l(XX[34], YY[34]);
-    MathControl.pGraph._l(XX[35], YY[35]);
-    MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
-    MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
-    MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
-    MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );*/
+     MathControl.pGraph._c(XX[27], YY[27], XX[28], YY[28], XX[29], YY[29] );
+     MathControl.pGraph._c(XX[29], YY[29], XX[30], YY[30], XX[31], YY[31] );
+     MathControl.pGraph._c(XX[31], YY[31], XX[32], YY[32], XX[33], YY[33] );
+     MathControl.pGraph._l(XX[34], YY[34]);
+     MathControl.pGraph._l(XX[35], YY[35]);
+     MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
+     MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
+     MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
+     MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );*/
 
     MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
     MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[47], YY[47] );
@@ -2676,10 +2771,10 @@ _old_CContourIntegral.prototype.old_drawPath = function(XX, YY)
     MathControl.pGraph._c(XX[57], YY[57], XX[58], YY[58], XX[59], YY[59] );
 
     /*MathControl.pGraph._c(XX[59], YY[59], XX[60], YY[60], XX[61], YY[61] );
-    MathControl.pGraph._c(XX[61], YY[61], XX[62], YY[62], XX[63], YY[63] );
-    MathControl.pGraph._c(XX[63], YY[63], XX[64], YY[64], XX[65], YY[65] );
-    MathControl.pGraph._c(XX[65], YY[65], XX[66], YY[66], XX[67], YY[67] );
-    MathControl.pGraph._l(XX[68], YY[68]);*/
+     MathControl.pGraph._c(XX[61], YY[61], XX[62], YY[62], XX[63], YY[63] );
+     MathControl.pGraph._c(XX[63], YY[63], XX[64], YY[64], XX[65], YY[65] );
+     MathControl.pGraph._c(XX[65], YY[65], XX[66], YY[66], XX[67], YY[67] );
+     MathControl.pGraph._l(XX[68], YY[68]);*/
     MathControl.pGraph.ds();
 
     //MathControl.pGraph.b_color1(255, 255, 255, 255);
@@ -2707,8 +2802,8 @@ _old_CContourIntegral.prototype.old_drawPath = function(XX, YY)
     MathControl.pGraph._c(XX[100], YY[100], XX[101], YY[101], XX[102], YY[102] );
     MathControl.pGraph._c(XX[102], YY[102], XX[103], YY[103], XX[104], YY[104] );
     /*MathControl.pGraph._c(XX[104], YY[104], XX[105], YY[105], XX[106], YY[106] );
-    MathControl.pGraph._c(XX[106], YY[106], XX[107], YY[107], XX[108], YY[108] );
-    MathControl.pGraph._c(XX[108], YY[108], XX[109], YY[109], XX[110], YY[110] );*/
+     MathControl.pGraph._c(XX[106], YY[106], XX[107], YY[107], XX[108], YY[108] );
+     MathControl.pGraph._c(XX[108], YY[108], XX[109], YY[109], XX[110], YY[110] );*/
     MathControl.pGraph.ds();
 
 }
@@ -3100,7 +3195,7 @@ old_CSurfaceIntegral.prototype.draw = function()
     MathControl.pGraph._s();
 
     // верхний значок интеграла (начало)
-     /*MathControl.pGraph._m(XX[0], YY[0]);
+    /*MathControl.pGraph._m(XX[0], YY[0]);
      MathControl.pGraph._l(XX[1], YY[1]);
 
      MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
@@ -3109,7 +3204,7 @@ old_CSurfaceIntegral.prototype.draw = function()
      MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
      MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );*/
 
-     // колечко начинается
+    // колечко начинается
 
     for(var i = 0; i < 42; i = i+2)
     {
@@ -3123,12 +3218,12 @@ old_CSurfaceIntegral.prototype.draw = function()
 
 
 
-     MathControl.pGraph._m(XX[10], YY[10]);
-     MathControl.pGraph._l(XX[10], YY[10]);
-     MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
-     MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
+    MathControl.pGraph._m(XX[10], YY[10]);
+    MathControl.pGraph._l(XX[10], YY[10]);
+    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    MathControl.pGraph._c(XX[12], YY[12], XX[13], YY[13], XX[14], YY[14] );
 
-     MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[33], YY[33] );
+    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[33], YY[33] );
 
     for(var i = 10; i < 16; i++)
     {
@@ -3140,11 +3235,11 @@ old_CSurfaceIntegral.prototype.draw = function()
     }
 
 
-     /////
+    /////
 
-     // верхний значок интеграла
-     //MathControl.pGraph._m(XX[14], YY[14]);
-     /*MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
+    // верхний значок интеграла
+    //MathControl.pGraph._m(XX[14], YY[14]);
+    /*MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
      MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
      MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
      MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
@@ -3159,18 +3254,18 @@ old_CSurfaceIntegral.prototype.draw = function()
 
 
      MathControl.pGraph._l(XX[14], YY[14]);*/
-     //////
+    //////
 
-     // колечко продолжается
+    // колечко продолжается
 
-     MathControl.pGraph._c(XX[33], YY[33], XX[34], YY[34], XX[35], YY[35] );
-     MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
-     MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
-     MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
-     MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );
-     MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
+    MathControl.pGraph._c(XX[33], YY[33], XX[34], YY[34], XX[35], YY[35] );
+    MathControl.pGraph._c(XX[35], YY[35], XX[36], YY[36], XX[37], YY[37] );
+    MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
+    MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
+    MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );
+    MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
 
-     MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[63], YY[63] );
+    MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[63], YY[63] );
 
     for(var i = 33; i < 47;  i++)
     {
@@ -3185,18 +3280,18 @@ old_CSurfaceIntegral.prototype.draw = function()
     // нижний значок интеграла
     /*MathControl.pGraph._m(XX[45], YY[45]);
 
-    MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[47], YY[47] );
-    MathControl.pGraph._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
-    MathControl.pGraph._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
-    MathControl.pGraph._c(XX[51], YY[51], XX[52], YY[52], XX[53], YY[53] );
-    MathControl.pGraph._l(XX[54], YY[54]);
-    MathControl.pGraph._l(XX[55], YY[55]);
-    MathControl.pGraph._c(XX[55], YY[55], XX[56], YY[56], XX[57], YY[57] );
-    MathControl.pGraph._c(XX[57], YY[57], XX[58], YY[58], XX[59], YY[59] );
-    MathControl.pGraph._c(XX[59], YY[59], XX[60], YY[60], XX[61], YY[61] );
-    MathControl.pGraph._c(XX[61], YY[61], XX[62], YY[62], XX[63], YY[63] );
+     MathControl.pGraph._c(XX[45], YY[45], XX[46], YY[46], XX[47], YY[47] );
+     MathControl.pGraph._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
+     MathControl.pGraph._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
+     MathControl.pGraph._c(XX[51], YY[51], XX[52], YY[52], XX[53], YY[53] );
+     MathControl.pGraph._l(XX[54], YY[54]);
+     MathControl.pGraph._l(XX[55], YY[55]);
+     MathControl.pGraph._c(XX[55], YY[55], XX[56], YY[56], XX[57], YY[57] );
+     MathControl.pGraph._c(XX[57], YY[57], XX[58], YY[58], XX[59], YY[59] );
+     MathControl.pGraph._c(XX[59], YY[59], XX[60], YY[60], XX[61], YY[61] );
+     MathControl.pGraph._c(XX[61], YY[61], XX[62], YY[62], XX[63], YY[63] );
 
-    MathControl.pGraph._l(XX[45], YY[45]);*/
+     MathControl.pGraph._l(XX[45], YY[45]);*/
     //////
 
 
@@ -3221,16 +3316,16 @@ old_CSurfaceIntegral.prototype.draw = function()
 
     // нижний значок интеграла
     /*MathControl.pGraph._m(XX[67], YY[67]);
-    MathControl.pGraph._c(XX[67], YY[67], XX[68], YY[68], XX[69], YY[69] );
-    MathControl.pGraph._c(XX[69], YY[69], XX[70], YY[70], XX[71], YY[71] );
-    MathControl.pGraph._c(XX[71], YY[71], XX[72], YY[72], XX[73], YY[73] );
-    MathControl.pGraph._c(XX[73], YY[73], XX[74], YY[74], XX[75], YY[75] );
-    MathControl.pGraph._l(XX[76], YY[76]);
-    MathControl.pGraph._l(XX[77], YY[77]);
-    MathControl.pGraph._c(XX[77], YY[77], XX[78], YY[78], XX[79], YY[79] );
-    MathControl.pGraph._c(XX[79], YY[79], XX[80], YY[80], XX[81], YY[81] );
-    MathControl.pGraph._c(XX[81], YY[81], XX[82], YY[82], XX[83], YY[83] );
-    MathControl.pGraph._c(XX[83], YY[83], XX[84], YY[84], XX[85], YY[85] );*/
+     MathControl.pGraph._c(XX[67], YY[67], XX[68], YY[68], XX[69], YY[69] );
+     MathControl.pGraph._c(XX[69], YY[69], XX[70], YY[70], XX[71], YY[71] );
+     MathControl.pGraph._c(XX[71], YY[71], XX[72], YY[72], XX[73], YY[73] );
+     MathControl.pGraph._c(XX[73], YY[73], XX[74], YY[74], XX[75], YY[75] );
+     MathControl.pGraph._l(XX[76], YY[76]);
+     MathControl.pGraph._l(XX[77], YY[77]);
+     MathControl.pGraph._c(XX[77], YY[77], XX[78], YY[78], XX[79], YY[79] );
+     MathControl.pGraph._c(XX[79], YY[79], XX[80], YY[80], XX[81], YY[81] );
+     MathControl.pGraph._c(XX[81], YY[81], XX[82], YY[82], XX[83], YY[83] );
+     MathControl.pGraph._c(XX[83], YY[83], XX[84], YY[84], XX[85], YY[85] );*/
 
     //////
 
@@ -3265,43 +3360,43 @@ old_CSurfaceIntegral.prototype.draw = function()
 
     //MathControl.pGraph._l(XX[10], YY[10]);
 
-     //////
+    //////
 
     // верхний значок интеграла (продолжение)
     /*MathControl.pGraph._c(XX[99], YY[99], XX[100], YY[100], XX[101], YY[101] );
-    MathControl.pGraph._c(XX[101], YY[101], XX[102], YY[102], XX[103], YY[103] );
-    MathControl.pGraph._c(XX[103], YY[103], XX[104], YY[104], XX[105], YY[105] );
-    MathControl.pGraph._c(XX[105], YY[105], XX[106], YY[106], XX[107], YY[107] );
-    MathControl.pGraph._l(XX[108], YY[108]);*/
+     MathControl.pGraph._c(XX[101], YY[101], XX[102], YY[102], XX[103], YY[103] );
+     MathControl.pGraph._c(XX[103], YY[103], XX[104], YY[104], XX[105], YY[105] );
+     MathControl.pGraph._c(XX[105], YY[105], XX[106], YY[106], XX[107], YY[107] );
+     MathControl.pGraph._l(XX[108], YY[108]);*/
 
 
     /*MathControl.pGraph._m(XX[109], YY[109]);
-    MathControl.pGraph._c(XX[109], YY[109], XX[110], YY[110], XX[111], YY[111] );
-    MathControl.pGraph._c(XX[111], YY[111], XX[112], YY[112], XX[113], YY[113] );
-    MathControl.pGraph._c(XX[113], YY[113], XX[114], YY[114], XX[115], YY[115] );
-    MathControl.pGraph._c(XX[115], YY[115], XX[116], YY[116], XX[117], YY[117] );
-    MathControl.pGraph._c(XX[117], YY[117], XX[118], YY[118], XX[119], YY[119] );
-    MathControl.pGraph._c(XX[119], YY[119], XX[120], YY[120], XX[121], YY[121] );
-    MathControl.pGraph._c(XX[121], YY[121], XX[122], YY[122], XX[123], YY[123] );
-    MathControl.pGraph._c(XX[123], YY[123], XX[124], YY[124], XX[125], YY[125] );
-    MathControl.pGraph._c(XX[125], YY[125], XX[126], YY[126], XX[127], YY[127] );
+     MathControl.pGraph._c(XX[109], YY[109], XX[110], YY[110], XX[111], YY[111] );
+     MathControl.pGraph._c(XX[111], YY[111], XX[112], YY[112], XX[113], YY[113] );
+     MathControl.pGraph._c(XX[113], YY[113], XX[114], YY[114], XX[115], YY[115] );
+     MathControl.pGraph._c(XX[115], YY[115], XX[116], YY[116], XX[117], YY[117] );
+     MathControl.pGraph._c(XX[117], YY[117], XX[118], YY[118], XX[119], YY[119] );
+     MathControl.pGraph._c(XX[119], YY[119], XX[120], YY[120], XX[121], YY[121] );
+     MathControl.pGraph._c(XX[121], YY[121], XX[122], YY[122], XX[123], YY[123] );
+     MathControl.pGraph._c(XX[123], YY[123], XX[124], YY[124], XX[125], YY[125] );
+     MathControl.pGraph._c(XX[125], YY[125], XX[126], YY[126], XX[127], YY[127] );
 
-    MathControl.pGraph._m(XX[128], YY[128]);
-    MathControl.pGraph._c(XX[128], YY[128], XX[129], YY[129], XX[130], YY[130] );
-    MathControl.pGraph._c(XX[130], YY[130], XX[131], YY[131], XX[132], YY[132] );
-    MathControl.pGraph._c(XX[132], YY[132], XX[133], YY[133], XX[134], YY[134] );
-    MathControl.pGraph._c(XX[134], YY[134], XX[135], YY[135], XX[136], YY[136] );
-    MathControl.pGraph._c(XX[136], YY[136], XX[137], YY[137], XX[138], YY[138] );
-    MathControl.pGraph._c(XX[138], YY[138], XX[139], YY[139], XX[140], YY[140] );
-    MathControl.pGraph._c(XX[140], YY[140], XX[141], YY[141], XX[142], YY[142] );
+     MathControl.pGraph._m(XX[128], YY[128]);
+     MathControl.pGraph._c(XX[128], YY[128], XX[129], YY[129], XX[130], YY[130] );
+     MathControl.pGraph._c(XX[130], YY[130], XX[131], YY[131], XX[132], YY[132] );
+     MathControl.pGraph._c(XX[132], YY[132], XX[133], YY[133], XX[134], YY[134] );
+     MathControl.pGraph._c(XX[134], YY[134], XX[135], YY[135], XX[136], YY[136] );
+     MathControl.pGraph._c(XX[136], YY[136], XX[137], YY[137], XX[138], YY[138] );
+     MathControl.pGraph._c(XX[138], YY[138], XX[139], YY[139], XX[140], YY[140] );
+     MathControl.pGraph._c(XX[140], YY[140], XX[141], YY[141], XX[142], YY[142] );
 
-    MathControl.pGraph._m(XX[143], YY[143]);
-    MathControl.pGraph._c(XX[143], YY[143], XX[144], YY[144], XX[145], YY[145] );
-    MathControl.pGraph._c(XX[145], YY[145], XX[146], YY[146], XX[147], YY[147] );
-    MathControl.pGraph._c(XX[147], YY[147], XX[148], YY[148], XX[149], YY[149] );
-    MathControl.pGraph._c(XX[149], YY[149], XX[150], YY[150], XX[151], YY[151] );
-    MathControl.pGraph._c(XX[151], YY[151], XX[152], YY[152], XX[153], YY[153] );
-    MathControl.pGraph._c(XX[153], YY[153], XX[154], YY[154], XX[155], YY[155] );*/
+     MathControl.pGraph._m(XX[143], YY[143]);
+     MathControl.pGraph._c(XX[143], YY[143], XX[144], YY[144], XX[145], YY[145] );
+     MathControl.pGraph._c(XX[145], YY[145], XX[146], YY[146], XX[147], YY[147] );
+     MathControl.pGraph._c(XX[147], YY[147], XX[148], YY[148], XX[149], YY[149] );
+     MathControl.pGraph._c(XX[149], YY[149], XX[150], YY[150], XX[151], YY[151] );
+     MathControl.pGraph._c(XX[151], YY[151], XX[152], YY[152], XX[153], YY[153] );
+     MathControl.pGraph._c(XX[153], YY[153], XX[154], YY[154], XX[155], YY[155] );*/
 
 
 
@@ -3644,7 +3739,7 @@ old_CVolumeIntegral.prototype.draw = function()
     for(var i = 0 ; i < X.length; i++)
     {
         /*XX[i] = this.pos.x + X[i]*alpha;
-        YY[i] = this.pos.y + Y[i]*alpha;*/
+         YY[i] = this.pos.y + Y[i]*alpha;*/
         XX[i] =  X[i];
         YY[i] =  Y[i];
     }
@@ -3662,12 +3757,12 @@ old_CVolumeIntegral.prototype.draw = function()
     // integral
 
     /*MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
-    MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
-    MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
-    MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
-    MathControl.pGraph._l(XX[10], YY[10]);*/
+     MathControl.pGraph._l(XX[1], YY[1]);
+     MathControl.pGraph._c(XX[1], YY[1], XX[2], YY[2], XX[3], YY[3] );
+     MathControl.pGraph._c(XX[3], YY[3], XX[4], YY[4], XX[5], YY[5] );
+     MathControl.pGraph._c(XX[5], YY[5], XX[6], YY[6], XX[7], YY[7] );
+     MathControl.pGraph._c(XX[7], YY[7], XX[8], YY[8], XX[9], YY[9] );
+     MathControl.pGraph._l(XX[10], YY[10]);*/
 
     // кольцо
 
@@ -3692,18 +3787,18 @@ old_CVolumeIntegral.prototype.draw = function()
     // integral
 
     /*
-    MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
-    MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
-    MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
-    MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
-    MathControl.pGraph._l(XX[23], YY[23]);
-    MathControl.pGraph._l(XX[24], YY[24]);
-    MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
-    MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
-    MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
-    MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
-    MathControl.pGraph._l(XX[33], YY[33]);
-    */
+     MathControl.pGraph._c(XX[14], YY[14], XX[15], YY[15], XX[16], YY[16] );
+     MathControl.pGraph._c(XX[16], YY[16], XX[17], YY[17], XX[18], YY[18] );
+     MathControl.pGraph._c(XX[18], YY[18], XX[19], YY[19], XX[20], YY[20] );
+     MathControl.pGraph._c(XX[20], YY[20], XX[21], YY[21], XX[22], YY[22] );
+     MathControl.pGraph._l(XX[23], YY[23]);
+     MathControl.pGraph._l(XX[24], YY[24]);
+     MathControl.pGraph._c(XX[24], YY[24], XX[25], YY[25], XX[26], YY[26] );
+     MathControl.pGraph._c(XX[26], YY[26], XX[27], YY[27], XX[28], YY[28] );
+     MathControl.pGraph._c(XX[28], YY[28], XX[29], YY[29], XX[30], YY[30] );
+     MathControl.pGraph._c(XX[30], YY[30], XX[31], YY[31], XX[32], YY[32] );
+     MathControl.pGraph._l(XX[33], YY[33]);
+     */
 
     // кольцо
 
@@ -3725,17 +3820,17 @@ old_CVolumeIntegral.prototype.draw = function()
     // integral
 
     /*MathControl.pGraph._c(XX[37], YY[37], XX[38], YY[38], XX[39], YY[39] );
-    MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
-    MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );
-    MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
-    MathControl.pGraph._l(XX[46], YY[46]);
-    MathControl.pGraph._l(XX[47], YY[47]);
-    MathControl.pGraph._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
-    MathControl.pGraph._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
-    MathControl.pGraph._c(XX[51], YY[51], XX[52], YY[52], XX[53], YY[53] );
-    MathControl.pGraph._c(XX[53], YY[53], XX[54], YY[54], XX[55], YY[55] );
-    MathControl.pGraph._l(XX[56], YY[56]);
-    MathControl.pGraph._c(XX[56], YY[56], XX[57], YY[57], XX[58], YY[58] );*/
+     MathControl.pGraph._c(XX[39], YY[39], XX[40], YY[40], XX[41], YY[41] );
+     MathControl.pGraph._c(XX[41], YY[41], XX[42], YY[42], XX[43], YY[43] );
+     MathControl.pGraph._c(XX[43], YY[43], XX[44], YY[44], XX[45], YY[45] );
+     MathControl.pGraph._l(XX[46], YY[46]);
+     MathControl.pGraph._l(XX[47], YY[47]);
+     MathControl.pGraph._c(XX[47], YY[47], XX[48], YY[48], XX[49], YY[49] );
+     MathControl.pGraph._c(XX[49], YY[49], XX[50], YY[50], XX[51], YY[51] );
+     MathControl.pGraph._c(XX[51], YY[51], XX[52], YY[52], XX[53], YY[53] );
+     MathControl.pGraph._c(XX[53], YY[53], XX[54], YY[54], XX[55], YY[55] );
+     MathControl.pGraph._l(XX[56], YY[56]);
+     MathControl.pGraph._c(XX[56], YY[56], XX[57], YY[57], XX[58], YY[58] );*/
 
     //кольцо
 
@@ -3761,16 +3856,16 @@ old_CVolumeIntegral.prototype.draw = function()
 
 
     /*MathControl.pGraph._c(XX[68], YY[68], XX[69], YY[69], XX[70], YY[70] );
-    MathControl.pGraph._c(XX[70], YY[70], XX[71], YY[71], XX[72], YY[72] );
-    MathControl.pGraph._c(XX[72], YY[72], XX[73], YY[73], XX[74], YY[74] );
-    MathControl.pGraph._c(XX[74], YY[74], XX[75], YY[75], XX[76], YY[76] );
-    MathControl.pGraph._l(XX[77], YY[77]);
-    MathControl.pGraph._l(XX[78], YY[78]);
-    MathControl.pGraph._c(XX[78], YY[78], XX[79], YY[79], XX[80], YY[80] );
-    MathControl.pGraph._c(XX[80], YY[80], XX[81], YY[81], XX[82], YY[82] );
-    MathControl.pGraph._c(XX[82], YY[82], XX[83], YY[83], XX[84], YY[84] );
-    MathControl.pGraph._c(XX[84], YY[84], XX[85], YY[85], XX[86], YY[86] );
-    MathControl.pGraph._l(XX[87], YY[87]);*/
+     MathControl.pGraph._c(XX[70], YY[70], XX[71], YY[71], XX[72], YY[72] );
+     MathControl.pGraph._c(XX[72], YY[72], XX[73], YY[73], XX[74], YY[74] );
+     MathControl.pGraph._c(XX[74], YY[74], XX[75], YY[75], XX[76], YY[76] );
+     MathControl.pGraph._l(XX[77], YY[77]);
+     MathControl.pGraph._l(XX[78], YY[78]);
+     MathControl.pGraph._c(XX[78], YY[78], XX[79], YY[79], XX[80], YY[80] );
+     MathControl.pGraph._c(XX[80], YY[80], XX[81], YY[81], XX[82], YY[82] );
+     MathControl.pGraph._c(XX[82], YY[82], XX[83], YY[83], XX[84], YY[84] );
+     MathControl.pGraph._c(XX[84], YY[84], XX[85], YY[85], XX[86], YY[86] );
+     MathControl.pGraph._l(XX[87], YY[87]);*/
 
     //кольцо
 
@@ -3791,17 +3886,17 @@ old_CVolumeIntegral.prototype.draw = function()
 
     // integral
 
-   /* MathControl.pGraph._c(XX[91], YY[91], XX[92], YY[92], XX[93], YY[93] );
-    MathControl.pGraph._c(XX[93], YY[93], XX[94], YY[94], XX[95], YY[95] );
-    MathControl.pGraph._c(XX[95], YY[95], XX[96], YY[96], XX[97], YY[97] );
-    MathControl.pGraph._c(XX[97], YY[97], XX[98], YY[98], XX[99], YY[99] );
-    MathControl.pGraph._l(XX[100], YY[100]);
-    MathControl.pGraph._l(XX[101], YY[101]);
-    MathControl.pGraph._c(XX[101], YY[101], XX[102], YY[102], XX[103], YY[103] );
-    MathControl.pGraph._c(XX[103], YY[103], XX[104], YY[104], XX[105], YY[105] );
-    MathControl.pGraph._c(XX[105], YY[105], XX[106], YY[106], XX[107], YY[107] );
-    MathControl.pGraph._c(XX[107], YY[107], XX[108], YY[108], XX[109], YY[109] );
-    MathControl.pGraph._l(XX[110], YY[110]);*/
+    /* MathControl.pGraph._c(XX[91], YY[91], XX[92], YY[92], XX[93], YY[93] );
+     MathControl.pGraph._c(XX[93], YY[93], XX[94], YY[94], XX[95], YY[95] );
+     MathControl.pGraph._c(XX[95], YY[95], XX[96], YY[96], XX[97], YY[97] );
+     MathControl.pGraph._c(XX[97], YY[97], XX[98], YY[98], XX[99], YY[99] );
+     MathControl.pGraph._l(XX[100], YY[100]);
+     MathControl.pGraph._l(XX[101], YY[101]);
+     MathControl.pGraph._c(XX[101], YY[101], XX[102], YY[102], XX[103], YY[103] );
+     MathControl.pGraph._c(XX[103], YY[103], XX[104], YY[104], XX[105], YY[105] );
+     MathControl.pGraph._c(XX[105], YY[105], XX[106], YY[106], XX[107], YY[107] );
+     MathControl.pGraph._c(XX[107], YY[107], XX[108], YY[108], XX[109], YY[109] );
+     MathControl.pGraph._l(XX[110], YY[110]);*/
 
     //кольцо
 
@@ -3824,16 +3919,16 @@ old_CVolumeIntegral.prototype.draw = function()
     // integral
 
     /*MathControl.pGraph._c(XX[114], YY[114], XX[115], YY[115], XX[116], YY[116] );
-    MathControl.pGraph._c(XX[116], YY[116], XX[117], YY[117], XX[118], YY[118] );
-    MathControl.pGraph._c(XX[118], YY[118], XX[119], YY[119], XX[120], YY[120] );
-    MathControl.pGraph._c(XX[120], YY[120], XX[121], YY[121], XX[122], YY[122] );
-    MathControl.pGraph._l(XX[123], YY[123]);
-    MathControl.pGraph._l(XX[124], YY[124]);
-    MathControl.pGraph._c(XX[124], YY[124], XX[125], YY[125], XX[126], YY[126] );
-    MathControl.pGraph._c(XX[126], YY[126], XX[127], YY[127], XX[128], YY[128] );
-    MathControl.pGraph._c(XX[128], YY[128], XX[129], YY[129], XX[130], YY[130] );
-    MathControl.pGraph._c(XX[130], YY[130], XX[131], YY[131], XX[132], YY[132] );
-    MathControl.pGraph._l(XX[133], YY[133]);*/
+     MathControl.pGraph._c(XX[116], YY[116], XX[117], YY[117], XX[118], YY[118] );
+     MathControl.pGraph._c(XX[118], YY[118], XX[119], YY[119], XX[120], YY[120] );
+     MathControl.pGraph._c(XX[120], YY[120], XX[121], YY[121], XX[122], YY[122] );
+     MathControl.pGraph._l(XX[123], YY[123]);
+     MathControl.pGraph._l(XX[124], YY[124]);
+     MathControl.pGraph._c(XX[124], YY[124], XX[125], YY[125], XX[126], YY[126] );
+     MathControl.pGraph._c(XX[126], YY[126], XX[127], YY[127], XX[128], YY[128] );
+     MathControl.pGraph._c(XX[128], YY[128], XX[129], YY[129], XX[130], YY[130] );
+     MathControl.pGraph._c(XX[130], YY[130], XX[131], YY[131], XX[132], YY[132] );
+     MathControl.pGraph._l(XX[133], YY[133]);*/
 
     //кольцо
 
@@ -3875,11 +3970,11 @@ old_CVolumeIntegral.prototype.draw = function()
     // integral
 
     /*MathControl.pGraph._c(XX[145], YY[145], XX[146], YY[146], XX[147], YY[147] );
-    MathControl.pGraph._c(XX[147], YY[147], XX[148], YY[148], XX[149], YY[149] );
-    MathControl.pGraph._c(XX[149], YY[149], XX[150], YY[150], XX[151], YY[151] );
-    MathControl.pGraph._c(XX[151], YY[151], XX[152], YY[152], XX[153], YY[153] );
-    MathControl.pGraph._c(XX[153], YY[153], XX[154], YY[154], XX[155], YY[155] );
-    MathControl.pGraph._l(XX[156], YY[156]);*/
+     MathControl.pGraph._c(XX[147], YY[147], XX[148], YY[148], XX[149], YY[149] );
+     MathControl.pGraph._c(XX[149], YY[149], XX[150], YY[150], XX[151], YY[151] );
+     MathControl.pGraph._c(XX[151], YY[151], XX[152], YY[152], XX[153], YY[153] );
+     MathControl.pGraph._c(XX[153], YY[153], XX[154], YY[154], XX[155], YY[155] );
+     MathControl.pGraph._l(XX[156], YY[156]);*/
 
     MathControl.pGraph.df();
 

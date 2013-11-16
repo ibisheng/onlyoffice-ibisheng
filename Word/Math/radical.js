@@ -168,14 +168,25 @@ CSignRadical.prototype.relate = function(parent)
 function CRadical()
 {
     this.type = SQUARE_RADICAL; // default
+    this.degHide = false;
     this.signRadical = null;
     CMathBase.call(this);
 }
 extend(CRadical, CMathBase);
 CRadical.prototype.init = function(props)
 {
-    if(typeof(props.type) !== "undefined" && props.type !== null)
-        this.type = props.type;
+    /*if(typeof(props.type) !== "undefined" && props.type !== null)
+        this.type = props.type;*/
+
+    /*if(props.type === SQUARE_RADICAL)
+        this.type = SQUARE_RADICAL;
+    else if(props.type === DEGREE_RADICAL)
+        this.type = DEGREE_RADICAL;*/
+
+    if(props.degHide === true && props.degHide === 1)
+        this.type = SQUARE_RADICAL;
+    else if(props.degHide == false && props.degHide === 0)
+        this.type = DEGREE_RADICAL;
 
     this.setDimension(1, 1);
     this.setContent();
@@ -416,11 +427,23 @@ CRadical.prototype.getBase = function()
 }
 CRadical.prototype.getDegree = function()
 {
-    var degree = null;
+    /*var degree = null;
     if(this.type == DEGREE_RADICAL)
         degree = this.elements[0][0];
+    else if(this.type = SQUARE_RADICAL)
+        degree = this.elements[0][0];*/
 
-    return degree;
+    // для стремной ситуации, когда руками в xml выставили в degHide true, а объект со степенью имеется. Возвращаем основание
+
+    return  this.elements[0][0];
+}
+CRadical.prototype.getPropsForWhite = function()
+{
+    var props = {};
+
+    props.degHide = this.type == SQUARE_RADICAL ? 1 : 0;
+
+    return props;
 }
 
 function old_CRadical()

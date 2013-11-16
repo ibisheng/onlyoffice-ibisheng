@@ -394,7 +394,12 @@ CMathText.prototype =
     setMText: function(flag)
     {
         this.bMText = flag;
-    }
+    },
+    // заглушка для текста (для n-арных операторов, когда выставляется текст вместо оператора)
+    setComposition: function() // заглушка
+    {},
+    setReferenceComposition: function() // заглушка
+    {}
 
     /*draw2: function()
      {

@@ -3623,13 +3623,13 @@ old_CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
 }
 
 
-function old_CSeparator()
+function old_old_CSeparator()
 {
     this.sepChr = 0x7C; // default
     CMathBase.call(this);
 }
-extend(old_CSeparator, CMathBase);
-old_CSeparator.prototype.init = function(sepChr, column)
+extend(old_old_CSeparator, CMathBase);
+old_old_CSeparator.prototype.init = function(sepChr, column)
 {
     if(sepChr !== "undefined" && sepChr !== null)
         this.sepChr = sepChr.charCodeAt(0);
@@ -3637,17 +3637,17 @@ old_CSeparator.prototype.init = function(sepChr, column)
     this.setDimension(1, column);
     this.setContent();
 }
-old_CSeparator.prototype.setDistance = function()
+old_old_CSeparator.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
 }
-old_CSeparator.prototype.draw = function()
+old_old_CSeparator.prototype.draw = function()
 {
     //if(this.sepChr == )
 
-    old_CSeparator.superclass.draw.call(this);
+    old_old_CSeparator.superclass.draw.call(this);
 }
-old_CSeparator.prototype.drawHorLine = function()
+old_old_CSeparator.prototype.drawHorLine = function()
 {
     var x = this.pos.x,
         y = this.pos.y;
@@ -3685,15 +3685,269 @@ old_CSeparator.prototype.drawHorLine = function()
 }
 
 
-function COperator(glyph)
+function COperator(type)
 {
-    this.glyph = glyph;
+    this.type = type;
+    this.glyph = -1;
+
+    this.code = null;
+    this.typeOper = null;
 
     this.pos = null;
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 }
+COperator.prototype.init = function(chr, type, location)
+{
+    var operator;
+    var code = typeof(chr) === "string" && chr.length > 0 ? chr.charCodeAt(0) : null;
+    var typeOper = null,
+        codeChr = null;
+
+    if( code === 0x28 || type === PARENTHESIS_LEFT)
+    {
+        codeChr = 0x28;
+        typeOper = PARENTHESIS_LEFT;
+
+        operator = new COperatorParenthesis();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if( code === 0x29 || type === PARENTHESIS_RIGHT)
+    {
+        codeChr = 0x29;
+        typeOper = PARENTHESIS_RIGHT;
+
+        operator = new COperatorParenthesis();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if( code == 0x7B || type === BRACKET_CURLY_LEFT)
+    {
+        codeChr = 0x7B;
+        typeOper = BRACKET_CURLY_LEFT;
+
+        operator = new COperatorBracket();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if( code === 0x7D || type === BRACKET_CURLY_RIGHT)
+    {
+        codeChr = 0x7D;
+        typeOper = BRACKET_CURLY_RIGHT;
+
+        operator = new COperatorBracket();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if( code === 0x5B || type === BRACKET_SQUARE_LEFT)
+    {
+        codeChr = 0x5B;
+        typeOper = BRACKET_SQUARE_LEFT;
+
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if( code === 0x5D || type === BRACKET_SQUARE_RIGHT)
+    {
+        codeChr = 0x5D;
+        typeOper = BRACKET_SQUARE_RIGHT;
+
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if( code === 0x3C || type === BRACKET_ANGLE_LEFT)
+    {
+        codeChr = 0x3C;
+        typeOper = BRACKET_ANGLE_LEFT;
+
+        operator = new COperatorAngleBracket();
+        var props =
+        {
+            location:   location,
+            //location:   DELIMITER_LOCATION_LEFT,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if( code === 0x3E || type === BRACKET_ANGLE_RIGHT)
+    {
+        codeChr = 0x3E;
+        typeOper = BRACKET_ANGLE_RIGHT;
+
+        operator = new COperatorAngleBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_RIGHT,
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x7C || type === DELIMITER_LINE)
+    {
+        codeChr = 0x7C;
+        typeOper = DELIMITER_LINE;
+
+        operator = new COperatorLine();
+        var props =
+        {
+            location:   location,
+            //location:   DELIMITER_LOCATION_LEFT,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x230A || type === HALF_SQUARE_LEFT)
+    {
+        codeChr = 0x230A;
+        typeOper = HALF_SQUARE_LEFT;
+
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x230B || type == HALF_SQUARE_RIGHT)
+    {
+        codeChr = 0x230B;
+        typeOper = HALF_SQUARE_RIGHT;
+
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2308 || type == HALF_SQUARE_LEFT_UPPER)
+    {
+        codeChr = 0x2308;
+        typeOper = HALF_SQUARE_LEFT_UPPER;
+
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2309 || type == HALF_SQUARE_RIGHT_UPPER)
+    {
+        codeChr = 0x2309;
+        typeOper = HALF_SQUARE_RIGHT_UPPER;
+
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_MIRROR_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x2016 || type == DELIMITER_DOUBLE_LINE)
+    {
+        codeChr = 0x2016;
+        typeOper = DELIMITER_DOUBLE_LINE;
+
+        operator = new COperatorDoubleLine();
+        var props =
+        {
+            location:   location,
+            //location:   DELIMITER_LOCATION_LEFT,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x27E6 || type == WHITE_SQUARE_LEFT)
+    {
+        codeChr = 0x27E6;
+        typeOper = WHITE_SQUARE_LEFT;
+
+        operator = new CWhiteSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x27E7 || type == WHITE_SQUARE_RIGHT)
+    {
+        codeChr = 0x27E7;
+        typeOper = WHITE_SQUARE_RIGHT;
+
+        operator = new CWhiteSquareBracket();
+        var props =
+        {
+            //location:   DELIMITER_LOCATION_LEFT,
+            location:   location,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(type === BRACKET_EMPTY)
+    {
+        typeOper = BRACKET_EMPTY;
+        operator = -1;
+    }
+    else if(code !== null)
+    {
+        operator = new CMathText();
+        operator.add(code);
+    }
+    else
+        operator = -1;
+
+    this.glyph = operator;
+    this.code = codeChr;
+    this.typeOper = typeOper;
+
+}
 COperator.prototype.draw = function(pGraphics)
+{
+    if(this.type === DELIM_OPERATOR)
+        this.drawOperator(pGraphics);
+    else if(this.type === DELIM_SEPARATOR)
+        this.drawSeparator(pGraphics);
+}
+COperator.prototype.drawOperator = function(pGraphics)
 {
     if(this.glyph !== -1)
     {
@@ -3708,6 +3962,26 @@ COperator.prototype.draw = function(pGraphics)
         }
 
         this.glyph.draw(pGraphics, X, Y);
+    }
+}
+COperator.prototype.drawSeparator = function(pGraphics)
+{
+    if(this.glyph !== -1)
+    {
+        var lng = this.coordGlyph.XX.length;
+
+        for(var i = 0; i < this.positions.length; i++)
+        {
+            var X = new Array(),
+                Y = new Array();
+            for(var j = 0; j < lng; j++)
+            {
+                X.push(this.positions[i].x + this.coordGlyph.XX[j]);
+                Y.push(this.positions[i].y + this.coordGlyph.YY[j]);
+            }
+
+            this.glyph.draw(pGraphics, X, Y);
+        }
     }
 }
 COperator.prototype.fixSize = function(measure)
@@ -3742,7 +4016,8 @@ COperator.prototype.fixSize = function(measure)
 }
 COperator.prototype.setPosition = function(pos)
 {
-    this.pos = pos;
+    this.pos = pos; // для оператора, это будет просто позиция
+                    // для сепаратора - массив позиций
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -3770,13 +4045,22 @@ COperator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
 }
+COperator.prototype.getChr = function(defaultCode)
+{
+    var chr = null; //если glyph не определен, то this.code = null
 
-function CSeparator(glyph)
+    if(this.code !== null)
+        chr = this.code == defaultCode ? "" : String.fromCharCode(this.code);
+
+    return chr;
+}
+
+function old_CSeparator(glyph)
 {
     COperator.call(this, glyph);
 }
-extend(CSeparator, COperator);
-CSeparator.prototype.draw = function(pGraphics)
+extend(old_CSeparator, COperator);
+old_CSeparator.prototype.draw = function(pGraphics)
 {
     if(this.glyph !== -1)
     {
@@ -3796,18 +4080,22 @@ CSeparator.prototype.draw = function(pGraphics)
         }
     }
 }
-CSeparator.prototype.setPosition = function(pos)
+old_CSeparator.prototype.setPosition = function(pos)
 {
     this.positions = pos;
 }
 
 function CDelimiter()
 {
-    this.begOper = new COperator (-1);
-    this.endOper = new COperator (-1);
-    this.sepOper = new COperator (-1);
+    this.begOper = new COperator (DELIM_OPERATOR);
+    this.endOper = new COperator (DELIM_OPERATOR);
+    this.sepOper = new COperator (DELIM_SEPARATOR);
+
     this.shape = DELIMITER_SHAPE_CENTERED;
     this.grow = true;
+
+    this.code = null;
+    this.typeOper = null;
 
     ////  special for "read"  ////
 	this.column = 0;
@@ -3832,16 +4120,14 @@ CDelimiter.prototype.init = function(props)
     if(typeof(props.endChr) === "string" && props.endChr.length == 0)
         props.sepChrType = DELIMITER_LINE;
 
-    var begGlyph = this.getGlyph(props.begChr, props.begChrType, LOCATION_LEFT);
-    this.begOper = new COperator (begGlyph);
+
+    this.begOper.init(props.begChr, props.begChrType, LOCATION_LEFT);
     this.begOper.relate(this);
 
-    var endGlyph = this.getGlyph(props.endChr, props.endChrType, LOCATION_RIGHT);
-    this.endOper = new COperator (endGlyph);
+    this.endOper.init(props.endChr, props.endChrType, LOCATION_RIGHT);
     this.endOper.relate(this);
 
-    var sepGlyph = this.getGlyph(props.sepChr, props.sepChrType, LOCATION_SEP);
-    this.sepOper = new CSeparator (sepGlyph);
+    this.endOper.init(props.sepChr, props.sepChrType, LOCATION_SEP);
     this.sepOper.relate(this);
 
     if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)
@@ -4127,19 +4413,6 @@ CDelimiter.prototype.draw = function(pGraphics)
     for(var j = 0; j < this.nCol; j++)
         this.elements[0][j].draw(pGraphics);
 }
-CDelimiter.prototype.drawOperator = function(pos, coord, glyph)
-{
-    var X = new Array(),
-        Y = new Array();
-    
-    for(var i = 0; i < coord.XX.length; i++)
-    {
-        X[i] = pos.x + coord.XX[i];
-        Y[i] = pos.y + coord.YY[i];
-    }
-    
-    glyph.drawGlyph(X, Y);
-}
 CDelimiter.prototype.align = function(element)
 {
     var align = 0;
@@ -4160,193 +4433,19 @@ CDelimiter.prototype.getBase = function(numb)
     return this.elements[0][numb];
 
 }
-CDelimiter.prototype.getGlyph = function(chr, type, location)
+CDelimiter.prototype.getPropsForWrite = function()
 {
-    var operator;
-    var code = typeof(chr) === "string" && chr.length > 0 ? chr.charCodeAt(0) : null;
+    var props = {};
 
-    if( code === 0x28 || type === PARENTHESIS_LEFT)
-    {
-        operator = new COperatorParenthesis();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if( code === 0x29 || type === PARENTHESIS_RIGHT)
-    {
-        operator = new COperatorParenthesis();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if( code == 0x7B || type === BRACKET_CURLY_LEFT)
-    {
-        operator = new COperatorBracket();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if( code === 0x7D || type === BRACKET_CURLY_RIGHT)
-    {
-        operator = new COperatorBracket();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if( code === 0x5B || type === BRACKET_SQUARE_LEFT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if( code === 0x5D || type === BRACKET_SQUARE_RIGHT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if( code === 0x3C || type === BRACKET_ANGLE_LEFT)
-    {
-        operator = new COperatorAngleBracket();
-        var props =
-        {
-            location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if( code === 0x3E || type === BRACKET_ANGLE_RIGHT)
-    {
-        operator = new COperatorAngleBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_RIGHT,
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if(code === 0x7C || type === DELIMITER_LINE)
-    {
-        operator = new COperatorLine();
-        var props =
-        {
-            location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x230A || type === HALF_SQUARE_LEFT)
-    {
-        operator = new CHalfSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x230B || type == HALF_SQUARE_RIGHT)
-    {
-        operator = new CHalfSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2308 || type == HALF_SQUARE_LEFT_UPPER)
-    {
-        operator = new CHalfSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_MIRROR_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2309 || type == HALF_SQUARE_RIGHT_UPPER)
-    {
-        operator = new CHalfSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_MIRROR_180
-        };
-        operator.init(props);
-    }
-    else if(code === 0x2016 || type == DELIMITER_DOUBLE_LINE)
-    {
-        operator = new COperatorDoubleLine();
-        var props =
-        {
-            location:   location,
-            //location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x27E6 || type == WHITE_SQUARE_LEFT)
-    {
-        operator = new CWhiteSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_0
-        };
-        operator.init(props);
-    }
-    else if(code === 0x27E7 || type == WHITE_SQUARE_RIGHT)
-    {
-        operator = new CWhiteSquareBracket();
-        var props =
-        {
-            //location:   DELIMITER_LOCATION_LEFT,
-            location:   location,
-            turn:       TURN_180
-        };
-        operator.init(props);
-    }
-    else if(type === BRACKET_EMPTY)
-        operator = -1;
-    else if(code !== null)
-    {
-        operator = new CMathText();
-        operator.add(code);
-    }
-    else
-        operator = -1;
+    props.grow = this.grow == true ? 1 : 0;
+    props.column = this.nCol;
+    props.shp = this.shape;
 
+    props.begChr = this.begOper.getChr(0x28); // PARENTHESIS_LEFT
+    props.endChr = this.endOper.getChr(0x29); // PARENTHESIS_RIGHT
+    props.sepChr = this.sepOper.getChr(0x7C); // DELIMITER_LINE
 
-    return operator;
+    return props;
 }
 
 

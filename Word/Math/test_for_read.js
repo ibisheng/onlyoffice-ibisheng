@@ -50,7 +50,8 @@ function simulatorRead()
     props =
     {
         begChrType:        PARENTHESIS_LEFT,
-        endChrType:        PARENTHESIS_RIGHT,
+        //endChrType:      PARENTHESIS_RIGHT,
+        endChr:             ")",
         sepChrType:        DELIMITER_LINE,
         column:            2
     };
@@ -109,7 +110,8 @@ function simulatorRead()
     var integral = new CNary();
     props =
     {
-        signType:       NARY_INTEGRAL,
+        //signType:       NARY_INTEGRAL,
+        chr:            "B",
         limLoc:         NARY_SubSup
     };
     integral.init(props);

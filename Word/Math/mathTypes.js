@@ -44,6 +44,7 @@ var NARY_UNION              	=  9;
 var NARY_INTERSECTION       	= 10;
 var NARY_LOGICAL_OR         	= 11;
 var NARY_LOGICAL_AND        	= 12;
+var NARY_TEXT_OPER              = 13;
 
 var NARY_UndOvr             	=  0;
 var NARY_SubSup             	=  1;
@@ -80,6 +81,9 @@ var DOUBLE_LEFT_ARROW           = 21;
 var DOUBLE_RIGHT_ARROW          = 22;
 var DOUBLE_ARROW_LR             = 23;
 
+var DELIM_OPERATOR              =  0;
+var DELIM_SEPARATOR             =  1;
+
 
 var TURN_0                      =  0;
 var TURN_180                    =  1;
@@ -112,6 +116,7 @@ var ACCENT_ARROW_LR             = 16;
 var ACCENT_HALF_ARROW_LEFT      = 17;
 var ACCENT_HALF_ARROW_RIGHT     = 18;
 var ACCENT_SIGN                 = 19;
+var ACCENT_TEXT                 = 20;
 
 var BASEJC_CENTER               =  0;
 var BASEJC_TOP                  =  1;

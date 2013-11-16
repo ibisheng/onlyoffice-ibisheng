@@ -597,6 +597,10 @@ CSign.prototype.relate = function(parent)
 {
     this.Parent = parent;
 }
+CSign.prototype.getCodeAccent = function()
+{
+    return this.sign.value;
+}
 
 function old_CAccent()
 {
@@ -845,7 +849,8 @@ CAccent.prototype.draw = function()
 
 function CAccent()
 {
-    this. type = null;
+    this.code = null;   // храним код буквы и тип здесь
+    this. type = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;
     CCharacter.call(this);
 }
@@ -880,6 +885,7 @@ CAccent.prototype.init = function(props)
     if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
     {
         this.type = ACCENT_CIRCUMFLEX;
+        this.code = 0x302;
 
         accent = new CCircumflex();
         accent.setTurn(TURN_0);
@@ -887,6 +893,7 @@ CAccent.prototype.init = function(props)
     else if(code === 0x30C || type === ACCENT_COMB_CARON)
     {
         this.type = ACCENT_COMB_CARON;
+        this.code = 0x30C;
 
         accent = new CCircumflex();
         accent.setTurn(TURN_MIRROR_0);
@@ -894,24 +901,28 @@ CAccent.prototype.init = function(props)
     else if(code === 0x332 || type === ACCENT_LINE)
     {
         this.type = ACCENT_LINE;
+        this.code = 0x332;
 
         accent = new CLine();
     }
     else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
     {
         this.type = ACCENT_DOUBLE_LINE;
+        this.code = 0x333;
 
         accent = new CDoubleLine();
     }
     else if(code === 0x303 || type === ACCENT_TILDE)
     {
         this.type = ACCENT_TILDE;
+        this.code = 0x303;
 
         accent = new CTilde();
     }
     else if(code === 0x306 || type === ACCENT_BREVE)
     {
         this.type = ACCENT_BREVE;
+        this.code = 0x306;
 
         accent = new CBreve();
         accent.setTurn(TURN_MIRROR_0);
@@ -919,6 +930,7 @@ CAccent.prototype.init = function(props)
     else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
     {
         this.type = ACCENT_INVERT_BREVE;
+        this.code = 0x311;
 
         accent = new CBreve();
         accent.setTurn(TURN_0);
@@ -926,141 +938,152 @@ CAccent.prototype.init = function(props)
     else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
     {
         this.type = ACCENT_ARROW_LEFT;
+        this.code = 0x20D6;
 
         glyph = new CCombiningArrow();
-        props =
+        var prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
         accent = new COperator(glyph);
     }
     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
     {
         this.type = ACCENT_ARROW_RIGHT;
+        this.code = 0x20D7;
 
         glyph = new CCombiningArrow();
-        props =
+        var prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        glyph.init(props);
+        glyph.init(prp);
         accent = new COperator(glyph);
     }
     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
     {
         this.type = ACCENT_ARROW_LR;
+        this.code = 0x20E1;
 
         glyph = new CCombining_LR_Arrow();
-        props =
+        var prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
         accent = new COperator(glyph);
     }
     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
     {
         this.type = ACCENT_HALF_ARROW_LEFT;
+        this.code = 0x20D0;
 
         glyph = new CCombiningHalfArrow();
-        props =
+        var prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
         accent = new COperator(glyph);
     }
     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
     {
         this.type = ACCENT_HALF_ARROW_RIGHT;
+        this.code = 0x20D1;
 
         glyph = new CCombiningHalfArrow();
-        props =
+        var prp =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        glyph.init(props);
+        glyph.init(prp);
         accent = new COperator(glyph);
     }
     ///// group characters /////
     else if(code === 0x2190 || type === ARROW_LEFT)
     {
         this.type = ARROW_LEFT;
+        this.code = 0x2190;
 
         glyph = new CSingleArrow();
 
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     else if(code === 0x2192 || type === ARROW_RIGHT)
     {
         this.type = ARROW_RIGHT;
+        this.code = 0x2192;
 
         glyph = new CSingleArrow();
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_180
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     else if(code === 0x2194 || type === ARROW_LR)
     {
         this.type = ARROW_LR;
+        this.code = 0x2194;
 
         glyph = new CLeftRightArrow();
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
     {
         this.type = DOUBLE_LEFT_ARROW;
+        this.code = 0x21D0;
 
         glyph = new CDoubleArrow();
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
     {
         this.type = DOUBLE_RIGHT_ARROW;
+        this.code = 0x21D2;
 
         glyph = new CDoubleArrow();
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_180
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
     {
         this.type = DOUBLE_ARROW_LR;
+        this.code = 0x21D4;
 
         glyph = new CLR_DoubleArrow();
-        props =
+        var prp =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        glyph.init(prp);
     }
     /////
     else if(bCode || bType)
@@ -1068,16 +1091,19 @@ CAccent.prototype.init = function(props)
         this.type = ACCENT_SIGN;
 
         accent = new CSign();
-        var props = 
+        var prp =
         {
             type:   type,
             code:   code
         };
-        accent.setSign(props);
+        accent.setSign(prp);
+
+        this.code = accent.getCodeAccent();
     }
     else
     {
         this.type = ACCENT_COMB_CARON;
+        this.code = 0x30C;
 
         accent = new CCircumflex();
         accent.setTurn(TURN_MIRROR_0);
@@ -1097,7 +1123,10 @@ CAccent.prototype.getCenter = function()
 
     return center;
 }
-CAccent.prototype.getProps = function()
+CAccent.prototype.getPropsForWrite = function()
 {
-    var prps = {};
+    var props = {};
+    props.chr = String.fromCharCode(this.code);
+
+    return props;
 }

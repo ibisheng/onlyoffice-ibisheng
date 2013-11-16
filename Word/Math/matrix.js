@@ -36,11 +36,6 @@ function CMathMatrix()
     CMathBase.call(this);
 }
 extend(CMathMatrix, CMathBase);
-CMathMatrix.prototype.old_init = function(countRow, countCol)
-{
-    this.setDimension(countRow, countCol);
-    this.setContent();
-}
 CMathMatrix.prototype.init = function(props)
 {
     if(typeof(props.row) === "undefined" || props.row === null)

@@ -18,16 +18,15 @@
 
 
 /// TODO (tomorrow)
+
+// !!! Проверить типы для groupCharacter, delimiters и accent
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
-// 2. Посмотреть дефолтовые значения для остальных мат. объектов
+// 2. Убрать ненужные(!!) setTxtPrp и getTxtPrp
+// 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
+// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выровнено как alignTop)
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
-
-var Test_Time = null;
-var bool_Test_Shift = false;
-var bool_Test_Ctr = false;
-var bool_Test_V = false;
 
 
 var TEST = true;
@@ -67,18 +66,19 @@ function mathElem(val)
 function CMathRunPrp()
 {
     this.typeObj = MATH_RUN_PRP;
-    this.runPrp = new CTextPr();
+    this.textPrp = new CTextPr();
+    this.mathRunPrp = null;
     this.size = {width: 0, height: 0, center: 0, ascent: 0};
 }
 CMathRunPrp.prototype =
 {
     Merge: function(rPrp)
     {
-        this.runPrp.Merge(rPrp);
+        this.textPrp.Merge(rPrp);
     },
-    getRunPrp: function()
+    getTextPrp: function()
     {
-        return this.runPrp;
+        return this.textPrp;
     },
     getMathRunPrp: function()
     {
@@ -518,7 +518,6 @@ CMathContent.prototype =
         if(obj.typeObj === MATH_COMP)
             this.addElementToContent( new CEmpty() );
 
-
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
@@ -535,9 +534,6 @@ CMathContent.prototype =
 
         if(!(bDef || bNum || bCont))
             shift = 0;
-
-        /*var runPrp = this.getRunPrp(this.CurPos);
-         element.setTxtPrp( runPrp );*/
 
         var tmp = this.content.splice(0, this.CurPos + 1 + shift );
         tmp.push(elem);
@@ -3579,7 +3575,6 @@ CMathContent.prototype =
         //placeholder.setTxtPrp(this.getTxtPrp());
 
         this.content.push( new mathElem( placeholder ) );
-
     },
 
     /////////   перемещение     //////////
@@ -4183,7 +4178,7 @@ CMathContent.prototype =
             }
             else if(type == MATH_RUN_PRP)
             {
-                var runPrp = this.content[i].value.getRunPrp();
+                var runPrp = this.content[i].value.getTextPrp();
 
                 var txtPrp = new CMathTextPrp();
                 txtPrp.Merge(DEFAULT_RUN_PRP);
@@ -4228,7 +4223,7 @@ CMathContent.prototype =
 
                     var rPrp = new CMathTextPrp();
                     rPrp.Merge(DEFAULT_RUN_PRP);
-                    rPrp.Merge( this.content[i].value.getRunPrp() );
+                    rPrp.Merge( this.content[i].value.getTextPrp() );
 
                     rPrp.Italic = false;
                     pGraphics.SetFont(rPrp);
@@ -4444,16 +4439,16 @@ CMathContent.prototype =
             next2_Type = this.CurPos + 2 < this.content.length ? this.content[this.CurPos + 2].value.typeObj : null,
             next3_Type = this.CurPos + 3 < this.content.length ? this.content[this.CurPos + 3].value.typeObj : null;
 
-        var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_EMPTY && this.CurPos == 1) && bMEDirect,
-            bReverseEnd = this.CurPos == this.content.length - 1 && bMEReverse;
-        var bNotRemove = bDirectlyBegin || bReverseEnd;
-
         var bMEDirect = order == 1,
             bMEReverse = order == -1;
 
+        var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_RUN_PRP && this.CurPos == 1) && bMEDirect, // Empty или RunPrp в начале, значит курсор в начале контента
+            bReverseEnd = this.CurPos == this.content.length - 1 && bMEReverse;
+        var bNotRemove = bDirectlyBegin || bReverseEnd && !bSelect;
+
         // directly
 
-        var bDirectly_CurrComp = bMEDirect && currType == MATH_EMPTY && prevType == MATH_COMP  ,
+        var bDirectly_CurrComp = bMEDirect && currType == MATH_EMPTY && prevType == MATH_COMP,
             bDirectly_RPrpComp = bMEDirect && currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP;
 
         // reverse
@@ -4566,17 +4561,7 @@ CMathContent.prototype =
             var bDirRPrp = currType === MATH_RUN_PRP && bMEDirect,
                 bRevRPrp = nextType === MATH_RUN_PRP && bMEReverse;
 
-            if(bDirRPrp) // проверку на начало прошли
-            {
-                start = this.CurPos - 1;
-                end = this.CurPos;
-            }
-            else if(bRevRPrp) // на всякий случай, может получится, что после удаления элемента, стоим после RunPrp
-            {
-                start = this.CurPos + 2;
-                end = this.CurPos + 3;
-            }
-            else if(bSelect)
+            if(bSelect)
             {
                 start = this.selection.startPos;
                 end = this.selection.endPos;
@@ -4588,6 +4573,17 @@ CMathContent.prototype =
                     start = end;
                     end = tmp;
                 }
+            }
+            else if(bDirRPrp) // проверку на начало прошли, не формула (иначе бы зашли в ветку с bRemoveFormula)
+            {                 // то есть стоим перед RunPrp, а слева текст и нет селекта
+
+                start = this.CurPos - 1;
+                end = this.CurPos;
+            }
+            else if(bRevRPrp) // на всякий случай, может получится, что после удаления элемента, стоим после RunPrp
+            {
+                start = this.CurPos + 2;
+                end = this.CurPos + 3;
             }
             else if(bMEReverse)
             {
@@ -4627,7 +4623,12 @@ CMathContent.prototype =
             }
 
             if(bSelect)
+            {
                 this.CurPos = this.selection.startPos - 1;
+
+                if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то поизиция курсор будет перед RunPrp, нужно после
+                    this.CurPos++;
+            }
             else if(bMEDirect)
                 this.CurPos -= end - start;
 
@@ -4850,7 +4851,8 @@ CMathContent.prototype =
         var bAfterRPrp = next2_Type == MATH_RUN_PRP,
             bPrevTxt = prevType == MATH_TEXT;
 
-        var bRemoveRPrp = bAfterRPrp && bPrevTxt;
+        var bRemoveRPrp = bAfterRPrp && bPrevTxt; // удалить RunPrp нужно только  в одном случае, если справо и слево текст, к которому применяются одни и те же RunPrp
+                                                  // здесь делаем только проверку, находится ли текст перед формулой, и идут ли RunPrp после формулы
 
         if(bMFormula)
         {
@@ -4863,9 +4865,9 @@ CMathContent.prototype =
                 {
                     if(this.content[i].value.typeObj === MATH_RUN_PRP)
                     {
-                        currRPrp = this.content[pos+2].value;
-                        prevRPrp = this.content[i].value;
-                        bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
+                        var currTPrp = this.content[pos+2].value.getTextPrp();
+                        var prevTPrp = this.content[i].value.getTextPrp();
+                        bSelectRunPrp = currTPrp.isEqual(currTPrp, prevTPrp);
                         break;
                     }
                 }
@@ -5303,7 +5305,7 @@ CMathContent.prototype =
             {
                 var run = new CRun();
 
-                run.setRunPrp(this.content[i].value);
+                run.setTxtPrp(this.content[i].value);
                 run.setMathRunPrp(this.content[i].value);
 
                 while(this.content[i + 1].value.typeObj === MATH_TEXT)
@@ -5344,7 +5346,7 @@ CMathContent.prototype =
 
                     if(obj.typeObj == MATH_RUN_PRP)
                     {
-                        runPrp.Merge(obj.getRunPrp());
+                        runPrp.Merge(obj.getTextPrp());
                         break;
                     }
                     else if(obj.typeObj == MATH_COMP)
@@ -5372,7 +5374,7 @@ CMathContent.prototype =
         {
             if(this.content[1].value.typeObj === MATH_RUN_PRP) // если первый объект - буква
             {
-                var runPrp = this.content[1].value.getRunPrp();
+                var runPrp = this.content[1].value.getTextPrp();
                 txtPrp.Merge(runPrp);
             }
             else if(this.content[1].value.typeObj === MATH_COMP)
@@ -5464,7 +5466,7 @@ CMathContent.prototype =
     verifyRPrp_MC: function(rPrp)
     {
         // добавляем RunPrp для текста, они будут такие же как и ctrPrp
-        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj == MATH_TEXT) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
+        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_RUN_PRP) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
         {
             var runPrp = Common_CopyObj(rPrp);
             this.addRunPrp(runPrp);
@@ -6550,7 +6552,7 @@ function CEmpty()
 function CRun()
 {
     this.text = "";
-    this.runPrp = null;
+    this.txtPrp = null;
     this.mathRunPrp = null;
 }
 CRun.prototype =
@@ -6561,7 +6563,7 @@ CRun.prototype =
     },
     getRunPrp:  function()
     {
-        return this.runPrp;
+        return this.txtPrp;
     },
     getMathRunPrp:  function()
     {
@@ -6573,9 +6575,9 @@ CRun.prototype =
     },
 
 
-    setRunPrp:  function(oRunPrp)
+    setTxtPrp:  function(oRunPrp)
     {
-        this.runPrp = oRunPrp.getRunPrp();
+        this.txtPrp = oRunPrp.getTextPrp();
     },
     addLetter:  function(oMText)
     {

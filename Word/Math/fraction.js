@@ -7,8 +7,17 @@ function CFraction()
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
-    if( typeof(props.type) !== "undefined" && props.type !== null )
-        this.type = props.type;
+    var bValid = typeof(props.type) !== "undefined" && props.type !== null;
+
+    if(bValid)
+    {
+        var bBar = props.type === BAR_FRACTION || props.type === NO_BAR_FRACTION,
+            bSkew = props.type === SKEWED_FRACTION,
+            bLin = props.type === LINEAR_FRACTION;
+
+        if(bBar || bSkew || bLin) // на всякий случай
+            this.type = props.type;
+    }
 
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
     {

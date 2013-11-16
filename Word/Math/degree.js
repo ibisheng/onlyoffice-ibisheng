@@ -11,8 +11,13 @@ CDegree.prototype.init = function(props)
 }
 CDegree.prototype.init_2 = function(props, oBase)
 {
-    if( typeof(props.type)!=="undefined"|| props.type !== null)
-        this.type = props.type;
+    /*if( typeof(props.type)!=="undefined"|| props.type !== null)
+        this.type = props.type;*/
+
+    if(props.type === DEGREE_SUPERSCRIPT)
+        this.type = DEGREE_SUPERSCRIPT;
+    else if(props.type === DEGREE_SUBSCRIPT)
+        this.type = DEGREE_SUBSCRIPT;
 
     this.setDimension(1, 2);
 
@@ -37,12 +42,12 @@ CDegree.prototype.recalculateSize = function()
 
     _width += this.dW;
 
-    if(this.type === DEGREE_SUPERSCRIPT )
+    if(this.type === DEGREE_SUPERSCRIPT)
     {
         this.shiftDegree = 0;
         _center = _height - (this.elements[0][0].size.height - this.elements[0][0].size.center);
     }
-    else if(this.type === DEGREE_SUBSCRIPT )
+    else if(this.type === DEGREE_SUBSCRIPT)
     {
         this.shiftDegree = _height - this.elements[0][1].size.height;
         _center = this.elements[0][0].size.center;
@@ -135,6 +140,13 @@ CDegree.prototype.getLowerIterator = function()
 CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
+}
+CDegree.prototype.getPropsForWrite = function()
+{
+    var props = {};
+    props.type = this.type;
+
+    return props;
 }
 
 function old_CDegreeOrdinary()
@@ -372,6 +384,7 @@ CIterators.prototype.getCtrPrp = function()
 function CDegreeSubSup()
 {
     this.type = DEGREE_SubSup;
+    this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
     CSubMathBase.call(this);
 }
 extend(CDegreeSubSup, CSubMathBase);
@@ -382,8 +395,18 @@ CDegreeSubSup.prototype.init = function(props)
 }
 CDegreeSubSup.prototype.init_2 = function(props, oBase)
 {
-    if( typeof(props.type)!=="undefined"|| props.type !== null)
-        this.type = props.type;
+    /*if( typeof(props.type)!=="undefined"|| props.type !== null)
+        this.type = props.type;*/
+
+    if(props.type === DEGREE_SubSup)
+        this.type = DEGREE_SubSup;
+    else if(props.type === DEGREE_PreSubSup)
+        this.type = DEGREE_PreSubSup;
+
+    if(props.alnScr === true || props.alnScr === 1)
+        this.alnScr = true;
+    else if(props.alnScr === false || props.alnScr === 0)
+        this.alnScr = false;
 
     this.setDimension(1, 2);
 
@@ -404,6 +427,7 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
         oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
     }
+
 }
 CDegreeSubSup.prototype.recalculateSize = function()
 {
@@ -456,6 +480,15 @@ CDegreeSubSup.prototype.getLowerIterator = function()
         iter = this.elements[0][0].getLowerIterator();
 
     return iter;
+}
+CDegreeSubSup.prototype.getPropsForWrite = function()
+{
+    var props = {};
+
+    props.type = this.type;
+    props.alnScr = this.alnScr;
+
+    return props;
 }
 
 //выяcнить: почему и с этой ф-ией и без нее работает всё ok...

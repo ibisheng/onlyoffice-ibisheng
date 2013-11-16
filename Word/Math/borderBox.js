@@ -305,7 +305,7 @@ CBar.prototype.init = function(props)
     var props =
     {
         location:    this.loc,
-        turn:       TURN_0
+        turn:        TURN_0
     };
     glyph.init(props);
 
