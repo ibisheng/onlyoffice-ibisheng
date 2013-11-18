@@ -1316,7 +1316,7 @@ CImageShape.prototype =
         r.GetBool();
         this.setXfrmObject(new CXfrm());
         var Reader = r;
-        var offX, offY, extX, extY, flipH, flipV, rot;
+        var offX, offY, extX, extY, flipH = null, flipV = null, rot = null;
         var flag = Reader.GetBool();
         if(flag)
             offX = Reader.GetDouble();
