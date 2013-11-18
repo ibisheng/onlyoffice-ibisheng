@@ -4506,7 +4506,11 @@ function BinaryPPTYLoader()
                             }
                             case 5:
                             {
-                                var _ret = this.ReadGrFrame();
+                                var _ret = null;
+                                if ("undefined" != typeof(CGraphicFrame))
+                                    _ret = this.ReadGrFrame();
+                                else
+                                    _ret = this.ReadChartDataInGroup(shape);
                                 if (null != _ret)
                                 {
                                     shape.addToSpTree(shape.spTree.length, _ret);
