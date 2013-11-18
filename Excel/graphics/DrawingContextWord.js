@@ -107,7 +107,7 @@ CDrawingContextWord.prototype =
         if (font.FontFamily.Index === undefined ||
             font.FontFamily.Index === null ||
             font.FontFamily.Index === -1) {
-            font.FontFamily.Index = g_map_font_index[font.FontFamily.Name];
+            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
         }
 
         italic = true === font.Italic;
@@ -127,14 +127,14 @@ CDrawingContextWord.prototype =
 
         if (angle && 0 != angle)
         {
-            r = g_font_infos[ font.FontFamily.Index ].LoadFont(
-                g_font_loader, fm, font.FontSize, fontStyle, this.Graphics.m_dDpiX, this.Graphics.m_dDpiY, this.Graphics.m_oTransform);
+            r = window.g_font_infos[ font.FontFamily.Index ].LoadFont(
+                window.g_font_loader, fm, font.FontSize, fontStyle, this.Graphics.m_dDpiX, this.Graphics.m_dDpiY, this.Graphics.m_oTransform);
 
         }
         else
         {
-            r = g_font_infos[ font.FontFamily.Index ].LoadFont(
-                g_font_loader, fm, font.FontSize, fontStyle, this.Graphics.m_dDpiX, this.Graphics.m_dDpiY);
+            r = window.g_font_infos[ font.FontFamily.Index ].LoadFont(
+                window.g_font_loader, fm, font.FontSize, fontStyle, this.Graphics.m_dDpiX, this.Graphics.m_dDpiY);
         }
 
         if (r === false) {

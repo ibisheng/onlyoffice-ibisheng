@@ -585,7 +585,7 @@ CFontInfo.prototype =
     LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
     {
         // сначала нужно проверить на обрезанный шрифт
-        var _embedded_cur = g_font_loader.embedded_cut_manager;
+        var _embedded_cur = window.g_font_loader.embedded_cut_manager;
         if (_embedded_cur.bIsCutFontsUse)
         {
             if (this.Type != FONT_TYPE_ADDITIONAL_CUT)
@@ -594,7 +594,7 @@ CFontInfo.prototype =
 
                 if (_font_info !== undefined)
                 {
-                    return _font_info.LoadFont(g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                    return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
                 }
             }
         }
@@ -749,7 +749,7 @@ CFontInfo.prototype =
 
             if (_font_info !== undefined)
             {
-                return _font_info.LoadFont(g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
             }
         }
 

@@ -1056,7 +1056,7 @@ CGraphics.prototype =
     },
     font : function(font_id,font_size,matrix)
     {
-        g_font_infos[g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.m_oFontManager, font_size, 0, this.m_dDpiX, this.m_dDpiY, /*matrix*/undefined);
+        window.g_font_infos[window.g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.m_oFontManager, font_size, 0, this.m_dDpiX, this.m_dDpiY, /*matrix*/undefined);
     },
     SetFont : function(font)
     {
@@ -1077,7 +1077,7 @@ CGraphics.prototype =
         };
 
         if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = g_map_font_index[font.FontFamily.Name];
+            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
 
         if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
             return;
@@ -1097,7 +1097,7 @@ CGraphics.prototype =
         this.m_oLastFont.SetUpSize = font.FontSize;
         this.m_oLastFont.SetUpStyle = oFontStyle;
 
-        g_font_infos[font.FontFamily.Index].LoadFont(g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        window.g_font_infos[font.FontFamily.Index].LoadFont(window.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
         var _mD = this.m_oLastFont.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1132,7 +1132,7 @@ CGraphics.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1148,7 +1148,7 @@ CGraphics.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
@@ -1164,7 +1164,7 @@ CGraphics.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1181,7 +1181,7 @@ CGraphics.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1207,7 +1207,7 @@ CGraphics.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_font_infos[_lastFont.SetUpIndex].LoadFont(g_font_loader, this.m_oFontManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, this.m_oFontManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
         }
         else
         {

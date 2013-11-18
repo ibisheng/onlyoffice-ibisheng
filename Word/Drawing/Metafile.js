@@ -1186,7 +1186,7 @@ CMetafile.prototype =
             return;
 
         if (font.FontFamily.Name == "" && 0 <= font.FontFamily.Index)
-            font.FontFamily.Name = g_font_infos[font.FontFamily.Index].Name;
+            font.FontFamily.Name = window.g_font_infos[font.FontFamily.Index].Name;
 
         var style = 0;
         if (font.Italic == true)

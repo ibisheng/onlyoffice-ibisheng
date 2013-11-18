@@ -684,22 +684,22 @@ function CDefaultFont()
     this.m_arrDefaultFont = new Array(4);
     this.SetDefaultFont = function(sFamilyName)
     {
-        var fontInfo = g_font_infos[map_font_index[sFamilyName]];
+        var fontInfo = window.g_font_infos[map_font_index[sFamilyName]];
         var font = null;
 
-        font = g_font_infos[fontInfo.indexR];
+        font = window.g_font_infos[fontInfo.indexR];
         this.m_arrDefaultFont[0] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexR);
         this.m_arrDefaultFont[0].UpdateStyles(false, false);
 
-        font = g_font_infos[fontInfo.indexB];
+        font = window.g_font_infos[fontInfo.indexB];
         this.m_arrDefaultFont[1] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexB);
         this.m_arrDefaultFont[1].UpdateStyles(true, false);
 
-        font = g_font_infos[fontInfo.indexI];
+        font = window.g_font_infos[fontInfo.indexI];
         this.m_arrDefaultFont[2] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexI);
         this.m_arrDefaultFont[2].UpdateStyles(false, true);
 
-        font = g_font_infos[fontInfo.indexBI];
+        font = window.g_font_infos[fontInfo.indexBI];
         this.m_arrDefaultFont[3] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexBI);
         this.m_arrDefaultFont[3].UpdateStyles(true, true);
     }

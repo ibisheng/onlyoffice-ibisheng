@@ -155,7 +155,7 @@ function CTextMeasurer()
         this.m_oFont = font;
 
         if (-1 == font.FontFamily.Index || undefined === font.FontFamily.Index || null == font.FontFamily.Index)
-            font.FontFamily.Index = g_map_font_index[font.FontFamily.Name];
+            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
 
         if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
             return;
@@ -178,7 +178,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            g_font_infos[_lastSetUp.SetUpIndex].LoadFont(g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
+            window.g_font_infos[_lastSetUp.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72);
         }
     }
 
@@ -201,7 +201,7 @@ function CTextMeasurer()
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -217,7 +217,7 @@ function CTextMeasurer()
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
@@ -233,7 +233,7 @@ function CTextMeasurer()
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -250,7 +250,7 @@ function CTextMeasurer()
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -276,7 +276,7 @@ function CTextMeasurer()
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_font_infos[_lastFont.SetUpIndex].LoadFont(g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
+            window.g_font_infos[_lastFont.SetUpIndex].LoadFont(window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72);
         }
     }
 
