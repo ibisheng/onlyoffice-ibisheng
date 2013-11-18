@@ -1090,9 +1090,10 @@ DrawingObjectsController.prototype =
 				if ( result ) {
 					for (var j = 0; j < ungrouped_sp_tree.length; ++j) {
 						ungrouped_sp_tree[j].recalculateTransform();
-						History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+						History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 						ungrouped_sp_tree[j].addToDrawingObjects(start_position + j);
 						ungrouped_sp_tree[j].select(_this);
+
 					}
 				}
 			}
