@@ -1347,7 +1347,7 @@ function drawChart(chart, arrValues, options) {
 	var defaultYTitle = api_sheet ? api_sheet.chartTranslate.yAxis : api_doc.chartTranslate.yAxis;
 	var defaultTitle = api_sheet ? api_sheet.chartTranslate.title : api_doc.chartTranslate.title;
 	
-	var inheritColor = "inherit";
+	var opacityColor = "rgba(255, 255, 255, 0)";
 	var defaultColor  = "white";
 	
 	if(OfficeExcel.drawingCtxCharts)
@@ -1564,9 +1564,9 @@ function drawChart(chart, arrValues, options) {
 	calcWidthGraph();	
 	if(options)
 	{
-		bar._otherProps._background_barcolor1 = inheritColor;
-		bar._otherProps._background_barcolor2 = inheritColor;
-		bar._otherProps._background_image_color = inheritColor;
+		bar._otherProps._background_barcolor1 = opacityColor;
+		bar._otherProps._background_barcolor2 = opacityColor;
+		bar._otherProps._background_image_color = opacityColor;
 	}
 	else
 		bar._otherProps._background_image_color = defaultColor;

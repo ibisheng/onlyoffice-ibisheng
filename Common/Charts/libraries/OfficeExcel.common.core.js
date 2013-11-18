@@ -1853,7 +1853,6 @@
         obj.context.lineWidth   = 1;
         obj.context.lineCap = 'butt';
         obj.context.strokeStyle = obj._otherProps._axis_color;
-        obj.context.fillStyle = 'yellow';
         obj.context.beginPath();
         obj.context.fillStyle = obj._otherProps._background_image_color;
 
