@@ -1533,8 +1533,8 @@ CGradFill.prototype =
         else
         {
             _ret.lin = new GradLin();
-            _ret.lin.angle = this.angle === fill.lin.angle ? fill.lin.angle : 5400000;
-            _ret.lin.scale = this.scale === fill.lin.scale ? fill.lin.scale : true;
+            _ret.lin.angle = this.lin && this.lin.angle === fill.lin.angle ? fill.lin.angle : 5400000;
+            _ret.lin.scale = this.lin && this.lin.scale === fill.lin.scale ? fill.lin.scale : true;
         }
         if(this.path == null || fill.path == null)
         {

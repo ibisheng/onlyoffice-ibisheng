@@ -1382,6 +1382,19 @@ CGs.prototype =
         duplicate.pos = this.pos;
         duplicate.color = this.color.createDuplicate();
         return duplicate;
+    },
+
+    compare: function(gs)
+    {
+        var compare_unicolor = this.color.compare(gs.color);
+        if(!isRealObject(compare_unicolor))
+        {
+            return null;
+        }
+        var ret = new CGs();
+        ret.color = compare_unicolor;
+        ret.pos = gs.pos === this.pos ? this.pos : 0;
+        return ret;
     }
 };
 
@@ -1584,19 +1597,37 @@ CGradFill.prototype =
         {
             return null;
         }
-       /* if(this.lin != fill.lin)
-            return _ret;
-        _ret.lin = this.lin;
-        if(this.path != fill.path)
-            return _ret;
-        _ret.path = this.path;
-        if(this.colors.length != fill.colors.length)
-            return _ret;   */
+        var _ret  = new CGradFill();
+        if(this.lin == null || fill.lin == null)
+            _ret.lin = null;
+        else
+        {
+            _ret.lin = new GradLin();
+            _ret.lin.angle = this.lin && this.lin.angle === fill.lin.angle ? fill.lin.angle : 5400000;
+            _ret.lin.scale = this.lin && this.lin.scale === fill.lin.scale ? fill.lin.scale : true;
+        }
+        if(this.path == null || fill.path == null)
+        {
+            _ret.path = null;
+        }
+        else
+        {
+            _ret.path = new GradPath();
+        }
 
-        if(!this.IsIdentical(fill))
-            return  _ret  = new CGradFill()
-
-        return this.createDuplicate();
+        if(this.colors.length === fill.colors.length )
+        {
+            for(var i = 0;  i < this.colors.length; ++i )
+            {
+                var compare_unicolor = this.colors[i].compare(fill.colors[i]);
+                if(!isRealObject(compare_unicolor))
+                {
+                    break;
+                }
+                _ret.colors[i] = compare_unicolor;
+            }
+        }
+        return _ret;
     }
 };
 
