@@ -2948,6 +2948,7 @@ function DrawingObjects() {
                 }
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
                 var old_len = aImagesSync.length;
+                drawingObject.graphicObject.initCharts();
                 drawingObject.graphicObject.recalculate(aImagesSync);
                 if(aImagesSync.length > old_len)
                     aObjectsSync[aObjectsSync.length] = drawingObject;

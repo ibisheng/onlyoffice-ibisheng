@@ -1,7 +1,7 @@
 
 function CChartAsGroup(drawingBase, drawingObjects)
 {
-    this.drawingBase = drawingBase;
+    this.drawingBase = drawingBase && drawingBase.updateAnchorPosition ?  drawingBase : null;
     this.drawingObjects = drawingObjects;
 
     this.chartTitle = null;

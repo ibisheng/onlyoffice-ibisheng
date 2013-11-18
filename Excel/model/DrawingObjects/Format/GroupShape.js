@@ -97,6 +97,13 @@ CGroupShape.prototype =
 			var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
 			History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
 			this.drawingObjects = drawingObjects;
+            for(var i = 0; i < this.spTree.length; ++i)
+            {
+                if(typeof this.spTree[i].setDrawingObjects === "function")
+                {
+                    this.spTree[i].setDrawingObjects(drawingObjects);
+                }
+            }
 		}
     },
 
@@ -455,6 +462,19 @@ CGroupShape.prototype =
 			graphics.reset();
 			graphics.SetIntegerGrid(true);
 		}
+    },
+
+    initCharts: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i] instanceof CChartAsGroup)
+            {
+                this.spTree[i].init();
+            }
+            if(this.spTree[i] instanceof CGroupShape)
+                this.spTree[i].initCharts();
+        }
     },
 
     recalculate: function(aImages)
