@@ -1316,12 +1316,6 @@
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( graphicsInfo && graphicsInfo.isGraphicObject )
 					this.clickCounter.mouseMoveEvent(coord.x, coord.y);
-					
-				if ( asc["editor"].isStartAddShape || ( !t.isSelectMode && !t.isResizeMode && graphicsInfo) ) {
-					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
-					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
-					return;
-				}
 
 				if (t.isSelectMode) {
 					t._changeSelection(event, /*isSelectMode*/true);
@@ -1348,6 +1342,12 @@
 				
 				if (t.isMoveResizeRange) {
 					t._moveResizeRangeHandle(event, t.targetInfo);
+					return true;
+				}
+
+				if (asc["editor"].isStartAddShape || graphicsInfo) {
+					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
+					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return true;
 				}
 
