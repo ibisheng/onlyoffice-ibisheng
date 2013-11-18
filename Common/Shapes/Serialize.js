@@ -4729,6 +4729,118 @@ function BinaryPPTYLoader()
         return shape;
     }
 
+    this.ReadChartDataInGroup = function(group)
+    {
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetULong() + 4;
+
+        this.TempGroupObject = group;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    var spid = s.GetString2();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        var _nvGraphicFramePr = null;
+        var _xfrm = null;
+        var _chart = null;
+
+        while (s.cur < _end_rec)
+        {
+            var _at = s.GetUChar();
+            switch (_at)
+            {
+                case 0:
+                {
+                    _nvGraphicFramePr = this.ReadNvUniProp();
+                    break;
+                }
+                case 1:
+                {
+                    _xfrm = this.ReadXfrm();
+                    break;
+                }
+                case 2:
+                {
+                    s.SkipRecord();
+                    break;
+                }
+                case 3:
+                {
+                    var _length = s.GetLong();
+                    var _pos = s.cur;
+
+                    _chart = new CChartAsGroup(this.TempGroupObject);
+                    if(g_oTableId)
+                        g_oTableId.m_bTurnOff = true;
+                    var chart = new asc_CChart();
+                    if(g_oTableId)
+                        g_oTableId.m_bTurnOff = false;
+
+                    var _stream = new FT_Stream2();
+                    _stream.data = s.data;
+                    _stream.pos = s.pos;
+                    _stream.cur = s.cur;
+                    _stream.size = s.size;
+
+                    var oBinary_ChartReader = new Binary_ChartReader(_stream, chart, _chart);
+                    oBinary_ChartReader.ReadExternal(_length);
+                    if (null != chart.range.interval && chart.range.interval.length > 0)
+                    {
+                        if (_xfrm)
+                        {
+                            if (_chart.setXfrm)
+                            {
+                                _chart.setXfrm(_xfrm.offX, _xfrm.offY, _xfrm.extX, _xfrm.extY, _xfrm.rot, _xfrm.flipH, _xfrm.flipV);
+                            }
+                            else
+                            {
+                                _chart.setPosition(_xfrm.offX, _xfrm.offY);
+                                _chart.setExtents(_xfrm.extX, _xfrm.extY);
+                            }
+                        }
+                        _chart.setAscChart(chart);
+                    }
+                    else
+                        _chart = null;
+
+
+                    s.Seek2(_pos + _length);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+
+        s.Seek2(_end_rec);
+
+        this.TempGroupObject = null;
+        if (_chart == null)
+            return null;
+
+        return _chart;
+    }
+
     this.ReadGrFrame = function()
     {
         var s = this.stream;

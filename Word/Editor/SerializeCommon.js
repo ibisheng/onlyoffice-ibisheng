@@ -525,7 +525,9 @@ function CPPTXContentLoader()
                             }
                             case 5:
                             {
-                                s.SkipRecord();
+                                var _chart = this.Reader.ReadChartDataInGroup(shape);
+                                if (null != _chart)
+                                    shape.addGraphicObject(_chart);
                                 break;
                             }
                             default:
@@ -731,42 +733,80 @@ function CPPTXContentWriter()
     }
 	this.WriteTextBody = function(memory, textBody)
     {
-        this.TreeDrawingIndex++;
-
-        this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+        if (this.BinaryFileWriter.UseContinueWriter)
+        {
+            this.BinaryFileWriter.ImData = memory.ImData;
+            this.BinaryFileWriter.data = memory.data;
+            this.BinaryFileWriter.len = memory.len;
+            this.BinaryFileWriter.pos = memory.pos;
+        }
+        else
+        {
+            this.TreeDrawingIndex++;
+            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+        }
 
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(0);
         _writer.WriteTxBody(textBody);
         _writer.EndRecord();
 
-        this.TreeDrawingIndex--;
+        if (this.BinaryFileWriter.UseContinueWriter)
+        {
+            memory.ImData = this.BinaryFileWriter.ImData;
+            memory.data = this.BinaryFileWriter.data;
+            memory.len = this.BinaryFileWriter.len;
+            memory.pos = this.BinaryFileWriter.pos;
+        }
+        else
+        {
+            this.TreeDrawingIndex--;
 
-        var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
-        memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
-        this.BinaryFileWriter.pos = oldPos;
+            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+            this.BinaryFileWriter.pos = oldPos;
 
-        this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+        }
     }
 	this.WriteSpPr = function(memory, spPr)
     {
-        this.TreeDrawingIndex++;
+        if (this.BinaryFileWriter.UseContinueWriter)
+        {
+            this.BinaryFileWriter.ImData = memory.ImData;
+            this.BinaryFileWriter.data = memory.data;
+            this.BinaryFileWriter.len = memory.len;
+            this.BinaryFileWriter.pos = memory.pos;
+        }
+        else
+        {
+            this.TreeDrawingIndex++;
+            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+            this.BinaryFileWriter.pos = 0;
+        }
 
-        this.arrayStackStarts.push(this.BinaryFileWriter.pos);
-
-        this.BinaryFileWriter.pos = 0;
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(0);
         _writer.WriteSpPr(spPr);
         _writer.EndRecord();
 
-        this.TreeDrawingIndex--;
+        if (this.BinaryFileWriter.UseContinueWriter)
+        {
+            memory.ImData = this.BinaryFileWriter.ImData;
+            memory.data = this.BinaryFileWriter.data;
+            memory.len = this.BinaryFileWriter.len;
+            memory.pos = this.BinaryFileWriter.pos;
+        }
+        else
+        {
+            this.TreeDrawingIndex--;
 
-        var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
-        memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
-        this.BinaryFileWriter.pos = oldPos;
+            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+            this.BinaryFileWriter.pos = oldPos;
 
-        this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+        }
     }
     this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams)
     {
@@ -1005,6 +1045,10 @@ function CPPTXContentWriter()
 				{
 					this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams);
 				}
+                else if ("undefined" !== typeof(CChartAsGroup) && elem instanceof CChartAsGroup)
+                {
+                    this.BinaryFileWriter.WriteChart(elem);
+                }
 
                 _writer.EndRecord(0);
             }

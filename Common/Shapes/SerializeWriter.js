@@ -74,6 +74,8 @@ function CBinaryFileWriter()
     this.pos = 0;
     this.Init();
 
+    this.UseContinueWriter = false;
+
     this.IsUseFullUrl = false;
     this.DocumentOrigin = "";
     this.PresentationThemesOrigin = "";
@@ -2580,6 +2582,8 @@ function CBinaryFileWriter()
         _memory.len = oThis.len;
         _memory.pos = oThis.pos;
 
+        oThis.UseContinueWriter = true;
+
         var oBinaryChartWriter = new BinaryChartWriter(_memory);
         oBinaryChartWriter.WriteChartContent(grObj);
 
@@ -2587,6 +2591,8 @@ function CBinaryFileWriter()
         oThis.data = _memory.data;
         oThis.len = _memory.len;
         oThis.pos = _memory.pos;
+
+        oThis.UseContinueWriter = false;
 
         _memory.ImData = null;
         _memory.data = null;
