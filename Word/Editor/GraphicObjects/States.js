@@ -5612,9 +5612,15 @@ function PreMoveState(graphicObjects, ctrlShiftFlag/*Р±С‹Р» Р»Рё РЅ
                 {
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
                         var graphicObject = gr_obj.GraphicObj;
+                        var oColor, oNewColor;
                         graphicObject.chart.themeColors = [];
                         for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
-                            graphicObject.chart.themeColors.push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
+                        	oColor = this.graphicObjects.drawingDocument.GuiControlColorsMap[i];
+                        	oNewColor = new CRGBColor();
+							oNewColor.RGBA.R = oColor.r;
+							oNewColor.RGBA.G = oColor.g;
+							oNewColor.RGBA.B = oColor.b;
+                            graphicObject.chart.themeColors.push(oNewColor);
                         }
                         editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }
@@ -10178,9 +10184,15 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
                     {
                         if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.group.parent.Parent, CheckType : changestype_Paragraph_Content} )) {
                             var chart = obj;
+                            var oColor, oNewColor;
                             chart["themeColors"] = [];
                             for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
-                                chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
+                            	oColor = this.graphicObjects.drawingDocument.GuiControlColorsMap[i];
+                            	oNewColor = new CRGBColor();
+								oNewColor.RGBA.R = oColor.r;
+								oNewColor.RGBA.G = oColor.g;
+								oNewColor.RGBA.B = oColor.b;
+                                chart["themeColors"].push(oNewColor);
                             }
                             editor.asc_fireCallback("asc_doubleClickOnChart", chart);
                         }
