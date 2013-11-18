@@ -1,4 +1,4 @@
-var STATES_ID_NULL = 0x00;
+﻿var STATES_ID_NULL = 0x00;
 var STATES_ID_PRE_CHANGE_ADJ = 0x01;
 var STATES_ID_PRE_MOVE = 0x02;
 var STATES_ID_PRE_MOVE_INLINE_OBJECT = 0x03;
@@ -5559,7 +5559,7 @@ function PreChangeAdjState(graphicObjects)
     }
 }
 
-function PreMoveState(graphicObjects, ctrlShiftFlag/*был ли нажат Ctrl при OnMouseDown*/, bSelectedMajorObject/*был ли заселекчен majorObject до OnMouseDown в NullState*/)
+function PreMoveState(graphicObjects, ctrlShiftFlag/*Р±С‹Р» Р»Рё РЅР°Р¶Р°С‚ Ctrl РїСЂРё OnMouseDown*/, bSelectedMajorObject/*Р±С‹Р» Р»Рё Р·Р°СЃРµР»РµРєС‡РµРЅ majorObject РґРѕ OnMouseDown РІ NullState*/)
 {
     this.id = STATES_ID_PRE_MOVE;
     this.graphicObjects = graphicObjects;
@@ -11159,7 +11159,7 @@ function SplineBezierState5(graphicObjects, startX, startY)
     }
 }
 
-//Состояния прия работе с полилиниями
+//РЎРѕСЃС‚РѕСЏРЅРёСЏ РїСЂРёСЏ СЂР°Р±РѕС‚Рµ СЃ РїРѕР»РёР»РёРЅРёСЏРјРё
 function PolyLineAddState(graphicObjects)
 {
     this.graphicObjects = graphicObjects;
