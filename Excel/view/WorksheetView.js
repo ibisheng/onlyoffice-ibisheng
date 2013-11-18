@@ -8451,7 +8451,11 @@
 					var lastHeight = null;
 					var filterButton = null;
 
+					t.cols[col].isCustomWidth = false;
+
 					for (row = 0; row < t.rows.length; ++row) {
+						// пересчет метрик текста
+						t._addCellTextToCache(col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all);
 						ct = t._getCellTextCache(col, row);
 						if (ct === undefined) {continue;}
 						if (ct.flags.isMerged) {
@@ -8460,11 +8464,6 @@
 							if (mc.c1 !== mc.c2)
 								continue;
 						}
-
-						// пересчет метрик текста
-						t.cols[col].isCustomWidth = false;
-						t._addCellTextToCache(col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all);
-						ct = t._getCellTextCache(col, row);
 
 						if (ct.metrics.height > t.maxRowHeight) {
 							// Запоминаем старую ширину (в случае, если у нас по высоте не уберется)
