@@ -2666,18 +2666,20 @@ CStyles.prototype =
     }
 };
 
-function CDocumentColor(r,g,b)
+function CDocumentColor(r,g,b, Auto)
 {
     this.r = r;
     this.g = g;
     this.b = b;
+
+    this.Auto = ( Auto === undefined ? false : Auto );
 }
 
 CDocumentColor.prototype =
 {
     Copy : function()
     {
-        return new CDocumentColor(this.r, this.g, this.b);
+        return new CDocumentColor(this.r, this.g, this.b, this.Auto);
     },
 
     Write_ToBinary : function(Writer)
@@ -2685,10 +2687,12 @@ CDocumentColor.prototype =
         // Byte : r
         // Byte : g
         // Byte : b
+        // Bool : Auto
 
         Writer.WriteByte( this.r );
         Writer.WriteByte( this.g );
         Writer.WriteByte( this.b );
+        Writer.WriteBool( this.Auto );
     },
 
     Read_FromBinary : function(Reader)
@@ -2696,25 +2700,39 @@ CDocumentColor.prototype =
         // Byte : r
         // Byte : g
         // Byte : b
+        // Bool : Auto
 
         this.r = Reader.GetByte();
         this.g = Reader.GetByte();
         this.b = Reader.GetByte();
+        this.Auto = Reader.GetBool();
     },
 
-    Set : function(r, g, b)
+    Set : function(r, g, b, Auto)
     {
         this.r = r;
         this.g = g;
         this.b = b;
+        this.Auto = ( Auto === undefined ? false : Auto );
     },
 
     Compare : function(Color)
     {
-        if ( this.r === Color.r &&  this.g === Color.g && this.b === Color.b )
+        if ( this.r === Color.r &&  this.g === Color.g && this.b === Color.b && ( this.Auto === Color.Auto || ( false === this.Auto && Color.Auto === undefined ) ) )
             return true;
 
         return false;
+    },
+
+    Check_BlackAutoColor : function()
+    {
+        // TODO: Коэффициенты подобраны опытным путем. В некоторых "пограничных" случаях
+        //       может быть несовпадение с Word (когда изменение на 1 одного из каналов
+        //       меняет цвет), чтобы такого не было надо более точно подобрать коэффициенты.
+        if ( 0.5 * this.r + this.g + 0.195 * this.b < 103 )
+            return false;
+
+        return true;
     }
 };
 
