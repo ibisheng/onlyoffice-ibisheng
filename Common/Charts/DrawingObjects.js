@@ -5501,7 +5501,7 @@ function readFromBinaryParagraph(p, r)
 function writeToBinaryParagraphContent(Element, w)
 {
     var ElementType = Element.Type;
-   // w.WriteLong(ElementType);
+    // w.WriteLong(ElementType);
     switch ( ElementType )
     {
         case para_TextPr            :
@@ -5509,6 +5509,14 @@ function writeToBinaryParagraphContent(Element, w)
         {
             w.WriteLong(ElementType);
             Element.Value.Write_ToBinary(w);
+            break;
+        }
+        case para_HyperlinkStart:
+        {
+            w.WriteLong( Element.Type );
+            w.WriteString2( Element.Id );
+            w.WriteString2( Element.Value );
+            w.WriteString2( Element.ToolTip );
             break;
         }
         case para_Text                  :
@@ -5549,6 +5557,14 @@ function readFromBinaryParagraphContent(r)
             Element.Value.Read_FromBinary(r);
             return Element;
         }
+        case para_HyperlinkStart:
+        {
+            Element = new ParaHyperlinkStart();
+            Element.Id  = r.GetString2();
+            Element.Value =  r.GetString2();
+            Element.ToolTip = r.GetString2();
+            return Element;
+        }
         case para_Text              : Element = new ParaText();              break;
         case para_Space             : Element = new ParaSpace();             break;
         case para_End               : Element = new ParaEnd();               break;
@@ -5572,6 +5588,7 @@ function readFromBinaryParagraphContent(r)
 
     return Element;
 }
+
 
 function CreateParagraphContent(s)
 {
