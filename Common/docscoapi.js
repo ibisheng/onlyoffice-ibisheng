@@ -234,6 +234,7 @@
         this._lockCallbacks = {};
 		this._saveLock = false;
 		this._saveCallback = [];
+		this.saveCallbackErrorTimeOutId = null;
         this._id = "";
 		this._indexuser = -1;
 		// Если пользователей больше 1, то совместно редактируем
@@ -338,9 +339,14 @@
 			// Мы еще не отработали старый callback и ждем ответа
 			return;
 		}
+
+		// Очищаем предыдущий таймер
+		if (null !== this.saveCallbackErrorTimeOutId)
+			clearTimeout(this.saveCallbackErrorTimeOutId);
+
 		// Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
 		if (-1 === this.get_state()) {
-			window.setTimeout(function () {
+			this.saveCallbackErrorTimeOutId = window.setTimeout(function () {
 				if (callback && _.isFunction(callback)) {
 					// Фиктивные вызовы
 					callback({error: "No connection"});
@@ -355,10 +361,12 @@
 				
 			//Set reconnectTimeout
 			window.setTimeout(function () {
-				if (t._saveCallback[indexCallback]) {
-					//Not signaled already
-					t._saveCallback[indexCallback]({error: "Timed out"});
+				t.saveCallbackErrorTimeOutId = null;
+				var oTmpCallback = t._saveCallback[indexCallback];
+				if (oTmpCallback) {
 					t._saveCallback[indexCallback] = null;
+					//Not signaled already
+					oTmpCallback({error: "Timed out"});
 				}
 			}, 5000);//5 sec to signal lock failure
 		}
@@ -543,9 +551,14 @@
 	DocsCoApi.prototype._onSaveLock = function (data) {
 		if (undefined != data["savelock"] && null != data["savelock"]) {
 			var indexCallback = this._saveCallback.length - 1;
-			if (this._saveCallback[indexCallback]) {
-				this._saveCallback[indexCallback] (data);
+			var oTmpCallback = this._saveCallback[indexCallback];
+			if (oTmpCallback) {
+				// Очищаем предыдущий таймер
+				if (null !== this.saveCallbackErrorTimeOutId)
+					clearTimeout(this.saveCallbackErrorTimeOutId);
+
 				this._saveCallback[indexCallback] = null;
+				oTmpCallback(data);
 			}
 		}
 	};
