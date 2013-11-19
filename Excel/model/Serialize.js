@@ -182,7 +182,8 @@ var c_oSerWorksheetPropTypes =
 {
     Name: 0,
     SheetId: 1,
-    State: 2
+    State: 2, 
+	Ref: 3
 };
 /** @enum */
 var c_oSerWorksheetColTypes =
@@ -931,16 +932,32 @@ var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
 
 /** @constructor */
-function BinaryTableWriter(memory, aDxfs)
+function BinaryTableWriter(memory, aDxfs, isCopyPaste)
 {
 	this.memory = memory;
 	this.aDxfs = aDxfs;
 	this.bs = new BinaryCommonWriter(this.memory);
+	this.isCopyPaste = isCopyPaste;
 	this.Write = function(aTables)
     {
 		var oThis = this;
 		for(var i = 0, length = aTables.length; i < length; ++i)
-			this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
+		{
+			var rangeTable = null;
+			//get range for copy/paste
+			if(this.isCopyPaste)
+			{
+				var parseRef = aTables[i].Ref.split(":");
+				if(parseRef[0] && parseRef[1])
+				{
+					var startRange = new CellAddress(parseRef[0]);
+					var endRange = new CellAddress(parseRef[1]);
+					rangeTable = Asc.Range(startRange.col - 1, startRange.row - 1, endRange.col - 1, endRange.row - 1);
+				}
+			}	
+			if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.r1 <= rangeTable.r1 && this.isCopyPaste.r2 >= rangeTable.r2 && this.isCopyPaste.c1 <= rangeTable.c1 && this.isCopyPaste.c2 >= rangeTable.c2))
+				this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
+		}
 	}
 	this.WriteTable = function(table)
 	{
@@ -2142,7 +2159,7 @@ function BinaryWorkbookTableWriter(memory, wb)
 			this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(LocalSheetId);});
     };
 };
-function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet)
+function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, isCopyPaste)
 {
     this.memory = memory;
     this.bs = new BinaryCommonWriter(this.memory);
@@ -2167,6 +2184,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 	this.nNumMapIndex = 0;
 	this.idWorksheet = idWorksheet;
 	this.oAllColXfsId = null;
+	this.isCopyPaste = isCopyPaste;
 	this._getCrc32FromObjWithProperty = function(val)
 	{
 		return Asc.crc32(this._getStringFromObjWithProperty(val));
@@ -2217,7 +2235,9 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oThis = this;
         for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
         {
-            var ws = this.wb.aWorksheets[i];
+            if(this.isCopyPaste && i != this.wb.nActive)
+				continue;
+			var ws = this.wb.aWorksheets[i];
 			if(null == this.idWorksheet || this.idWorksheet == ws.getId())
 				this.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, i);});
         }
@@ -2225,6 +2245,9 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
     this.WriteWorksheet = function(ws, index)
     {
         var oThis = this;
+		if(oThis.isCopyPaste)
+			ws.activeRange = (new CellAddress(oThis.isCopyPaste.r1, oThis.isCopyPaste.c1, 0)).getID() + ":" + (new CellAddress(oThis.isCopyPaste.r2, oThis.isCopyPaste.c2, 0)).getID();
+
         this.bs.WriteItem(c_oSerWorksheetsTypes.WorksheetProp, function(){oThis.WriteWorksheetProp(ws, index);});
         
         if(ws.aCols.length > 0 || null != ws.oAllCol)
@@ -2255,17 +2278,20 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		if ( ws.Drawings && (ws.Drawings.length) )
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
+		if(oThis.isCopyPaste)
+			window["Asc"]["editor"].wb._initCommentsToSave();
+			
 		if(ws.aComments.length > 0 && ws.aCommentsCoords.length > 0)
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function(){oThis.WriteComments(ws.aComments, ws.aCommentsCoords);});
 		
-		if(null != ws.AutoFilter)
+		if(null != ws.AutoFilter && !this.isCopyPaste)
 		{
 			var oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs);
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Autofilter, function(){oBinaryTableWriter.WriteAutoFilter(ws.AutoFilter);});
 		}
 		if(null != ws.TableParts && ws.TableParts.length > 0)
 		{
-			var oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs);
+			var oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
 			this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
 		}
     };
@@ -2290,6 +2316,13 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             else
                 this.memory.WriteByte(EVisibleType.visibleVisible);
         }
+		//activeRange
+		if(oThis.isCopyPaste && ws.activeRange)
+		{
+			this.memory.WriteByte(c_oSerWorksheetPropTypes.Ref);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.memory.WriteString2(ws.activeRange);
+		}
     };
     this.WriteWorksheetCols = function(ws)
     {
@@ -2573,8 +2606,9 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		//todo sort
         for(var i in oHyperlinks)
         {
-            var elem = oHyperlinks[i];
-            this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(elem.data);});
+			var elem = oHyperlinks[i];
+			if(!this.isCopyPaste || (this.isCopyPaste && elem && elem.bbox && this.isCopyPaste.r1 <= elem.bbox.r1 && this.isCopyPaste.r2 >= elem.bbox.r2 && this.isCopyPaste.c1 <= elem.bbox.c1 && this.isCopyPaste.c2 >= elem.bbox.c2))
+				this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(elem.data);});
         }
     };
     this.WriteHyperlink = function (oHyperlink) {
@@ -2605,10 +2639,13 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			var bbox = elem.bbox;
 			if(bbox.r1 != bbox.r2 || bbox.c1 != bbox.c2)
 			{
-				var oFirst = new CellAddress(bbox.r1, bbox.c1, 0);
-				var oLast = new CellAddress(bbox.r2, bbox.c2, 0);
-				this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
-				this.memory.WriteString2(oFirst.getID() + ":" + oLast.getID());
+				if(!this.isCopyPaste || (this.isCopyPaste && this.isCopyPaste.r1 <= bbox.r1 && this.isCopyPaste.r2 >= bbox.r2 && this.isCopyPaste.c1 <= bbox.c1 && this.isCopyPaste.c2 >= bbox.c2))
+				{
+					var oFirst = new CellAddress(bbox.r1, bbox.c1, 0);
+					var oLast = new CellAddress(bbox.r2, bbox.c2, 0);
+					this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
+					this.memory.WriteString2(oFirst.getID() + ":" + oLast.getID());
+				}
 			}
 		}
     };
@@ -2618,7 +2655,10 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         for(var i = 0, length = aDrawings.length; i < length; ++i)
         {
             var oDrawing = aDrawings[i];
-            this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
+			if(!this.isCopyPaste)
+				this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
+			else if(this.isCopyPaste && oDrawing.graphicObject.selected)//for copy/paste
+				this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
         }
     };
     this.WriteDrawing = function(oDrawing)
@@ -2687,8 +2727,16 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oThis = this;
 		//сортируем Row по индексам
 		var aIndexes = new Array();
-		for(var i in ws.aGCells)
-			aIndexes.push(i - 0);
+		if(oThis.isCopyPaste)
+		{
+			for(var i = oThis.isCopyPaste.r1; i <= oThis.isCopyPaste.r2; i++)
+				aIndexes.push(i);
+		}
+		else
+		{
+			for(var i in ws.aGCells)
+				aIndexes.push(i - 0);
+		}
 		aIndexes.sort(fSortAscending);
         for(var i = 0, length = aIndexes.length; i < length; ++i)
         {
@@ -2743,17 +2791,28 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
     {
         var oThis = this;
 		var aIndexes = new Array();
-		for(var i in aCells)
-			aIndexes.push(i - 0);
+		if(oThis.isCopyPaste)
+		{
+			for(var i = oThis.isCopyPaste.c1; i <= oThis.isCopyPaste.c2; i++)
+				aIndexes.push(i);
+		}
+		else
+		{
+			for(var i in aCells)
+				aIndexes.push(i - 0);
+		}
 		aIndexes.sort(fSortAscending);
         for(var i = 0, length = aIndexes.length; i < length; ++i)
         {
             var cell = aCells[aIndexes[i]];
 			//готовим ячейку к записи
-			var nXfsId = this.prepareXfs(cell.xfs);
-			if(0 != nXfsId || false == cell.isEmptyText())
-				this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
-        }
+			if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
+			{	
+				var nXfsId = this.prepareXfs(cell.xfs);
+				if(0 != nXfsId || false == cell.isEmptyText())
+					this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
+			};
+        };
     };
 	this.prepareXfsStyles = function () {
 		var styles = this.wb.CellStyles.CustomStyles;
@@ -3066,6 +3125,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		var oNewComments = new Object();
 		for(var i = 0, length = aComments.length; i < length; ++i)
 		{
+			if(this.isCopyPaste && !(aComments[i].nRow >= this.isCopyPaste.r1 && aComments[i].nRow <= this.isCopyPaste.r2 && aComments[i].nCol >= this.isCopyPaste.c1 && aComments[i].nCol <= this.isCopyPaste.c2))
+				continue;
 			var elem = aComments[i];
 			var nRow = elem.asc_getRow();
 			if(null == nRow)
@@ -3089,6 +3150,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		}
 		for(var i = 0, length = aCommentsCoords.length; i < length; ++i)
 		{
+			if(this.isCopyPaste && !(aCommentsCoords[i].nRow >= this.isCopyPaste.r1 && aCommentsCoords[i].nRow <= this.isCopyPaste.r2 && aCommentsCoords[i].nCol >= this.isCopyPaste.c1 && aCommentsCoords[i].nCol <= this.isCopyPaste.c2))
+				continue;
 			var elem = aCommentsCoords[i];
 			var nRow = elem.asc_getRow();
 			if(null == nRow)
@@ -3281,10 +3344,11 @@ function BinaryOtherTableWriter(memory, wb)
     };
 };
 /** @constructor */
-function BinaryFileWriter(wb)
+function BinaryFileWriter(wb, isCopyPaste)
 {
     this.Memory = new CMemory();
     this.wb = wb;
+	this.isCopyPaste = isCopyPaste;
     this.nLastFilePos = 0;
     this.nRealTableCount = 0;
     this.bs = new BinaryCommonWriter(this.Memory);
@@ -3324,10 +3388,11 @@ function BinaryFileWriter(wb)
 		var aBorders = new Array();
 		var aNums = new Array();
 		var aDxfs = new Array();
-		var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet);
+		var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, this.isCopyPaste);
         this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
         //OtherTable
-        this.WriteTable(c_oSerTableTypes.Other, new BinaryOtherTableWriter(this.Memory, this.wb));
+		if(!this.isCopyPaste)
+			this.WriteTable(c_oSerTableTypes.Other, new BinaryOtherTableWriter(this.Memory, this.wb));
         //Write SharedStrings
         this.WriteReserved(new BinarySharedStringsTableWriter(this.Memory, oSharedStrings), nSharedStringsPos);
 		//Write Styles
@@ -3338,6 +3403,8 @@ function BinaryFileWriter(wb)
         
         //seek в конец, потому что GetBase64Memory заканчивает запись на текущей позиции.
         this.Memory.Seek(this.nLastFilePos);
+		if(this.isCopyPaste)
+			return this.Memory.GetBase64Memory()
     }
     this.WriteTable = function(type, oTableSer)
     {
@@ -4917,7 +4984,7 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
     };
 };
 /** @constructor */
-function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs, oMediaArray)
+function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs, oMediaArray, isCopyPaste)
 {
     this.stream = stream;
     this.wb = wb;
@@ -4929,12 +4996,15 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 	this.aMerged = new Array();
 	this.aHyperlinks = new Array();
 	this.oPPTXContentLoader = new CPPTXContentLoader();
+	this.isCopyPaste = isCopyPaste;
     this.Read = function()
     {
         var oThis = this;
         return this.bcr.ReadTable(function(t, l){
                 return oThis.ReadWorksheetsContent(t,l);
             });
+		if(this.isCopyPaste)
+			return this.isCopyPaste;
     };
     this.ReadWorksheetsContent = function(type, length)
     {
@@ -4966,6 +5036,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 					hyperlink.Ref.setHyperlinkOpen(hyperlink);
 			}
             oNewWorksheet.init();
+			if(this.isCopyPaste)
+				return oNewWorksheet;
             this.wb.aWorksheets.push(oNewWorksheet);
 			this.wb.aWorksheetsById[oNewWorksheet.getId()] = oNewWorksheet;
         }
@@ -5159,6 +5231,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
                 case EVisibleType.visibleVisible: oWorksheet.bHidden = false;break;
             }
         }
+		else if(c_oSerWorksheetPropTypes.Ref == type)
+			oWorksheet.activeRange = this.stream.GetString2LE(length);
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -6272,10 +6346,11 @@ function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
     };
 };
 /** @constructor */
-function BinaryFileReader(sUrlPath)
+function BinaryFileReader(sUrlPath, isCopyPaste)
 {
     this.stream;
     this.sUrlPath = sUrlPath;
+	this.isCopyPaste = isCopyPaste;
     this.getbase64DecodedData = function(szSrc, stream)
     {
 		var nType = 0;
@@ -6397,11 +6472,17 @@ function BinaryFileReader(sUrlPath)
     {
         this.stream = this.getbase64DecodedData(data);
 		History.TurnOff();
-        this.ReadFile(wb);
+		if(this.isCopyPaste)
+			return this.ReadFile(wb)
+		else
+			this.ReadFile(wb);
 
-		ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
-		ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
-		wb.TableStyles.concatStyles();
+		if(!this.isCopyPaste)
+		{
+			ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
+			ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
+			wb.TableStyles.concatStyles();
+		}
 		History.TurnOn();
     };
     this.ReadFile = function(wb)
@@ -6421,6 +6502,7 @@ function BinaryFileReader(sUrlPath)
         var nSharedStringTableOffset = null;
 		var nStyleTableOffset = null;
 		var nWorkbookTableOffset = null;
+		var worksheet;
         for(var i = 0; i < mtLen; ++i)
         {
             //mtItem
@@ -6444,7 +6526,9 @@ function BinaryFileReader(sUrlPath)
         var aCellXfs = new Array();
 		var aDxfs = new Array();
         var oMediaArray = new Object();
-        wb.aWorksheets = new Array();
+		if(!this.isCopyPaste)
+			wb.aWorksheets = new Array();
+		
         if(null != nOtherTableOffset)
         {
             res = this.stream.Seek(nOtherTableOffset);
@@ -6485,8 +6569,13 @@ function BinaryFileReader(sUrlPath)
 							// res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
 						// break;
 					case c_oSerTableTypes.Worksheets:
-							res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray)).Read();
+					{
+						res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.isCopyPaste)).Read();
+						if(this.isCopyPaste)
+							worksheet = res;
+					}	
 						break;
+						
 					case c_oSerTableTypes.CalcChain:
 							res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
 						break;
@@ -6498,6 +6587,8 @@ function BinaryFileReader(sUrlPath)
 					break;
 			}
 		}
+		if(this.isCopyPaste)
+			return worksheet;
 		if(null != nWorkbookTableOffset)
         {
             res = this.stream.Seek(nWorkbookTableOffset);

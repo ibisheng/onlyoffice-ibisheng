@@ -16,6 +16,7 @@
 		//activate local buffer
 		var activateLocalStorage = true;
 		var isOnlyLocalBufferSafari = false;
+		var copyPasteUseBinary = false;
 		
 		var Base64 = {
 		 
@@ -259,7 +260,7 @@
 				t.copyText = t._getTextFromTable(t.element.children[0]);
                 var randomVal = Math.floor(Math.random()*10000000);
                 t.copyText.pasteFragment = "pasteFragment_" + randomVal;
-                if(text)
+                if(text && !copyPasteUseBinary)
                     $(text).addClass("pasteFragment_" + randomVal);
 
 				if($(text).find('img')[0] && $.browser['opera'])
@@ -268,7 +269,25 @@
 					if(t.copyText.isImage)
 						t.copyText.text = ' ';
 				}
-
+				History.TurnOff();
+				
+				//use binary strings
+				if(copyPasteUseBinary)
+				{
+					var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+					var sBase64 = oBinaryFileWriter.Write();
+					if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
+					{
+						$(this.element.children[0]).css("font-weight", "normal");;
+						$(this.element.children[0]).wrap(document.createElement("b"));
+					}
+					if(this.element.children[0])
+						$(this.element.children[0]).addClass("xslData;" + sBase64);
+				}
+							
+				
+				History.TurnOn();
+				
 				if($.browser["mozilla"])
 					t._selectElement(t._getStylesSelect);
 				else
@@ -1503,6 +1522,47 @@
 					return;
 				var pasteFragment = node;
                 var t = this;
+				
+				//****binary****
+				if(copyPasteUseBinary)
+				{
+					//find class xsl
+					var base64 = null;
+					var classNode;
+					if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("xslData;") > -1)
+						classNode = node.children[0].getAttribute("class");
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+						classNode = node.children[0].children[0].getAttribute("class");
+					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+						classNode = node.children[0].children[0].children[0].getAttribute("class");
+					
+					if( classNode != null ){
+						cL = classNode.split(" ");
+						for (var i = 0; i < cL.length; i++){
+							if(cL[i].indexOf("xslData;") > -1)
+							{
+								base64 = cL[i].split('xslData;')[1];
+							}
+						}
+					}
+					if(base64 != null)
+					{
+						var oBinaryFileReader = new BinaryFileReader(null, true);
+						var pasteData = oBinaryFileReader.Read(base64, worksheet.model.workbook);
+						if(pasteData)
+						{
+							History.TurnOn();
+							if(pasteData.Drawings && pasteData.Drawings.length)
+								t._insertImagesFromBinary(worksheet, pasteData)
+							else
+								worksheet.setSelectionInfo('paste',pasteData,false,"binary");
+							
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
+							return;
+						}
+					}
+				}
 				
 				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
 					onlyFromLocalStorage = true;
@@ -2858,6 +2918,47 @@
 					}
 				}
 				return true;
+			},
+			
+			_insertImagesFromBinary: function(ws, data)
+			{
+				for(var i = 0; i < data.Drawings.length; i++)
+				{
+					drawingObject = data.Drawings[i];
+					// Object types
+					if (drawingObject.graphicObject instanceof  CChartAsGroup) {
+						
+						ws.objectRender.calcChartInterval(drawingObject.graphicObject.chart);
+						//drawingObject.graphicObject.setPosition(10,10);
+						drawingObject.graphicObject.drawingBase = drawingObject;
+						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
+						
+						if (drawingObject.graphicObject.chartTitle)
+							drawingObject.graphicObject.chartTitle.drawingObjects = ws.objectRender;
+							
+						drawingObject.graphicObject.chart.worksheet = ws.model;
+						//drawingObject.graphicObject.chart.rebuildSeries();
+						//drawingObject.graphicObject.recalculate();
+						drawingObject.graphicObject.init();
+						
+						drawingObject.graphicObject.addToDrawingObjects();
+						//aObjects.push( drawingObject );
+						
+						//var boundsChecker = _this.getBoundsChecker(drawingObject);
+						//aBoundsCheckers.push(boundsChecker);
+					}
+					else if (drawingObject.graphicObject instanceof  CShape || drawingObject.graphicObject instanceof  CImageShape || drawingObject.graphicObject instanceof  CGroupShape) {
+						
+						drawingObject.graphicObject.setPosition(10,10);
+					
+						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
+						drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
+						drawingObject.graphicObject.recalculate();
+						
+						drawingObject.graphicObject.addToDrawingObjects();
+					}
+					
+				}
 			}
 
 		};
