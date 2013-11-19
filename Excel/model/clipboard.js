@@ -1573,8 +1573,19 @@
 							if(pasteData.Drawings && pasteData.Drawings.length)
 								t._insertImagesFromBinary(worksheet, pasteData)
 							else
-								worksheet.setSelectionInfo('paste',pasteData,false,"binary");
-							
+							{
+								var newFonts = [];
+								pasteData.generateFontMap(newFonts);
+								var newArrFonts = [];
+								var index = 0;
+								for(var i in newFonts)
+								{
+									newArrFonts[index] = [];
+									newArrFonts[index][0] = i;
+									index++;
+								};
+								worksheet._loadFonts( newArrFonts, function() {worksheet.setSelectionInfo('paste',pasteData,false,"binary")});
+							}
 							window.GlobalPasteFlag = false;
 							window.GlobalPasteFlagCounter = 0;
 							return;
