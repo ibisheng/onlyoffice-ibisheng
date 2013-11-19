@@ -5931,7 +5931,7 @@ CMathComposition.prototype =
     {
         if(this.Root.content.length > 1)
         {
-            this.Root.setPosition({x: x, y: y});
+            this.Root.setPosition({x: x, y: y - this.Root.size.center});
             this.Root.draw(pGraphics);
             this.UpdateCursor();
         }
