@@ -1709,6 +1709,17 @@ asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
     this.asc_fireCallback("asc_onInitTableTemplates",styles);
 };
 
+function safe_Apply_Changes()
+{
+    try
+    {
+        CollaborativeEditing.Apply_Changes();
+    }
+    catch(err)
+    {
+    }
+}
+
 asc_docs_api.prototype.onSaveCallback = function (e) {
 	var t = this;
 	var nState;
@@ -1719,7 +1730,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		}
 
 		// Принимаем чужие изменения
-		CollaborativeEditing.Apply_Changes();
+        safe_Apply_Changes();
 
 		// Сохраняем файл на сервер
 		var data = this.WordControl.SaveDocument();

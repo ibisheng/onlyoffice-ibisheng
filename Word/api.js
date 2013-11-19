@@ -2563,6 +2563,18 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 		this.CoAuthoringApi.disconnect();
 	}
 };
+
+function safe_Apply_Changes()
+{
+    try
+    {
+        CollaborativeEditing.Apply_Changes();
+    }
+    catch(err)
+    {
+    }
+}
+
 function OnSave_Callback(e)
 {
 	var nState;
@@ -2576,7 +2588,7 @@ function OnSave_Callback(e)
             CollaborativeEditing.Clear_CollaborativeMarks();
 
         // Принимаем чужие изменения
-        CollaborativeEditing.Apply_Changes();
+        safe_Apply_Changes();
 
         // Сохраняем файл на сервер
         var oBinaryFileWriter = new BinaryFileWriter(editor.WordControl.m_oLogicDocument);
