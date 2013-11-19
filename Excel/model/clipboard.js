@@ -395,7 +395,7 @@
 				return false;
 			},
 			
-			copyCellValue: function (value, background) {
+			copyCellValue: function (value) {
 				var t = this;
 				if(activateLocalStorage)
 					t._addValueToLocalStrg(value);
@@ -413,7 +413,6 @@
 				t._cleanElement();
 				nodes.forEach(
 						function(node){
-							node.style.backgroundColor = background !== null ? background : "transparent";
 							t.element.appendChild(node);
 						});
 				if($.browser["mozilla"])
@@ -422,7 +421,7 @@
 					t._selectElement();
 			},
 			
-			copyCellValueButton: function (value, background) {
+			copyCellValueButton: function (value) {
 				if(AscBrowser.isIE)
 				{
 					var t = this;
@@ -440,7 +439,6 @@
 					t._cleanElement();
 					nodes.forEach(
 							function(node){
-								node.style.backgroundColor = background !== null ? background : "transparent";
 								t.element.appendChild(node);
 							});
 					var t = this, selection, rangeToSelect;
@@ -3100,7 +3098,7 @@ function Editor_CopyPaste_Create(api)
 		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
 		{
 			var v = api.wb.cellEditor.copySelection();
-			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
+			if (v) {api.wb.clipboard.copyCellValue(v);}
 		}	
     };
 	
@@ -3112,7 +3110,7 @@ function Editor_CopyPaste_Create(api)
 			if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
 			{
 				var v = api.wb.cellEditor.cutSelection();
-				if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
+				if (v) {api.wb.clipboard.copyCellValue(v);}
 			}	
 		}
 		else

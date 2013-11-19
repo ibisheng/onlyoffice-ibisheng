@@ -9483,7 +9483,6 @@
 					flags: fl,
 					font: new asc_FP(c.getFontname(), c.getFontsize()),
 					background: bg !== null ? bg : t.settings.cells.defaultState.background,
-					hasBackground: bg !== null,
 					textColor: oFontColor || t.settings.cells.defaultState.color,
 					cursorPos: cursorPos,
 					zoom: t.getZoom(),

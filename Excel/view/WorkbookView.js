@@ -1305,7 +1305,7 @@
 					t.clipboard.copyRange(ws.getSelectedRange(), ws);
 				} else {
 					v = t.cellEditor.copySelection();
-					if (v) {t.clipboard.copyCellValue(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					if (v) {t.clipboard.copyCellValue(v);}
 				}
 			},
 
@@ -1316,7 +1316,7 @@
 					return t.clipboard.copyRangeButton(ws.getSelectedRange(), ws);
 				} else {
 					v = t.cellEditor.copySelection();
-					if (v) {return t.clipboard.copyCellValueButton(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					if (v) {return t.clipboard.copyCellValueButton(v);}
 					else {return true;}
 				}
 			},
@@ -1365,7 +1365,7 @@
 					ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
 				} else if(!window.USER_AGENT_SAFARI_MACOS){
 					v = t.cellEditor.cutSelection();
-					if (v) {t.clipboard.copyCellValue(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					if (v) {t.clipboard.copyCellValue(v);}
 				}
 			},
 
@@ -1379,7 +1379,7 @@
 					return result;
 				} else {
 					v = t.cellEditor.cutSelection();
-					if (v) {return t.clipboard.copyCellValueButton(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					if (v) {return t.clipboard.copyCellValueButton(v);}
 					else {return true;}
 				}
 			},
