@@ -2235,7 +2235,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oThis = this;
         for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
         {
-            if(this.isCopyPaste && i != this.wb.nActive)
+            //if copy/paste - write only actve ws
+			if(this.isCopyPaste && i != this.wb.nActive)
 				continue;
 			var ws = this.wb.aWorksheets[i];
 			if(null == this.idWorksheet || this.idWorksheet == ws.getId())
@@ -2245,6 +2246,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
     this.WriteWorksheet = function(ws, index)
     {
         var oThis = this;
+		//add new var in ws
 		if(oThis.isCopyPaste)
 			ws.activeRange = (new CellAddress(oThis.isCopyPaste.r1, oThis.isCopyPaste.c1, 0)).getID() + ":" + (new CellAddress(oThis.isCopyPaste.r2, oThis.isCopyPaste.c2, 0)).getID();
 
@@ -2278,6 +2280,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		if ( ws.Drawings && (ws.Drawings.length) )
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
 
+		//init comments for copy/paste
 		if(oThis.isCopyPaste)
 			window["Asc"]["editor"].wb._initCommentsToSave();
 			
@@ -2316,7 +2319,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             else
                 this.memory.WriteByte(EVisibleType.visibleVisible);
         }
-		//activeRange
+		//activeRange(serialize activeRange)
 		if(oThis.isCopyPaste && ws.activeRange)
 		{
 			this.memory.WriteByte(c_oSerWorksheetPropTypes.Ref);
@@ -2607,6 +2610,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         for(var i in oHyperlinks)
         {
 			var elem = oHyperlinks[i];
+			//write only active hyperlink, else copy/paste
 			if(!this.isCopyPaste || (this.isCopyPaste && elem && elem.bbox && this.isCopyPaste.r1 <= elem.bbox.r1 && this.isCopyPaste.r2 >= elem.bbox.r2 && this.isCopyPaste.c1 <= elem.bbox.c1 && this.isCopyPaste.c2 >= elem.bbox.c2))
 				this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(elem.data);});
         }
@@ -2639,6 +2643,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			var bbox = elem.bbox;
 			if(bbox.r1 != bbox.r2 || bbox.c1 != bbox.c2)
 			{
+				//write only active merge, else copy/paste
 				if(!this.isCopyPaste || (this.isCopyPaste && this.isCopyPaste.r1 <= bbox.r1 && this.isCopyPaste.r2 >= bbox.r2 && this.isCopyPaste.c1 <= bbox.c1 && this.isCopyPaste.c2 >= bbox.c2))
 				{
 					var oFirst = new CellAddress(bbox.r1, bbox.c1, 0);
@@ -2654,7 +2659,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oThis = this;
         for(var i = 0, length = aDrawings.length; i < length; ++i)
         {
-            var oDrawing = aDrawings[i];
+            //write only active drawing, else copy/paste
+			var oDrawing = aDrawings[i];
 			if(!this.isCopyPaste)
 				this.bs.WriteItem(c_oSerWorksheetsTypes.Drawing, function(){oThis.WriteDrawing(oDrawing);});
 			else if(this.isCopyPaste && oDrawing.graphicObject.selected)//for copy/paste
@@ -2727,6 +2733,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oThis = this;
 		//сортируем Row по индексам
 		var aIndexes = new Array();
+		//write only active cells, else copy/paste
 		if(oThis.isCopyPaste)
 		{
 			for(var i = oThis.isCopyPaste.r1; i <= oThis.isCopyPaste.r2; i++)
@@ -3125,6 +3132,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		var oNewComments = new Object();
 		for(var i = 0, length = aComments.length; i < length; ++i)
 		{
+			//write only active comments, else copy/paste
 			if(this.isCopyPaste && !(aComments[i].nRow >= this.isCopyPaste.r1 && aComments[i].nRow <= this.isCopyPaste.r2 && aComments[i].nCol >= this.isCopyPaste.c1 && aComments[i].nCol <= this.isCopyPaste.c2))
 				continue;
 			var elem = aComments[i];
@@ -3150,6 +3158,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		}
 		for(var i = 0, length = aCommentsCoords.length; i < length; ++i)
 		{
+			//write only active comments, else copy/paste
 			if(this.isCopyPaste && !(aCommentsCoords[i].nRow >= this.isCopyPaste.r1 && aCommentsCoords[i].nRow <= this.isCopyPaste.r2 && aCommentsCoords[i].nCol >= this.isCopyPaste.c1 && aCommentsCoords[i].nCol <= this.isCopyPaste.c2))
 				continue;
 			var elem = aCommentsCoords[i];
