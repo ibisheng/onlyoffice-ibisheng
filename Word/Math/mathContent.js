@@ -6530,14 +6530,14 @@ CMathComposition.prototype =
         };
         var fract = new CFraction();
 
-        addToContent_ForRead(MathComposition.Root, fract, props);
+        addToContent_ForRead(this.Root, fract, props);
 
         fract.getNumerator().addTxt("a");
         fract.getDenominator().addTxt("b");
     },
     test_for_edit_2:  function()
     {
-        simulatorMComposition(MATH_EDIT);
+        simulatorMComposition(this, MATH_EDIT);
     }
 
 }

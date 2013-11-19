@@ -1,7 +1,7 @@
 var MATH_EDIT = 0;
 var MATH_READ = 1;
 
-function simulatorMComposition(ttype)
+function simulatorMComposition( MComposition, ttype)
 {
     //////// accent -> bar fraction -> skewed fraction (for numerator)
 
@@ -14,7 +14,7 @@ function simulatorMComposition(ttype)
     var ctrPrp = new CTextPr();
     ctrPrp.FontSize = 11;
 
-    addToContent_ForRead(MathComposition.Root, accent, props, ctrPrp);
+    addToContent_ForRead(MComposition.Root, accent, props, ctrPrp);
 
     props =
     {
@@ -43,7 +43,7 @@ function simulatorMComposition(ttype)
     var space = new CMathText();
     space.add(0x20);
 
-    addToContent_ForRead(MathComposition.Root, space);
+    addToContent_ForRead(MComposition.Root, space);
 
 
     //////// delimiter (with separator) -> two bar fraction -> accent caron
@@ -59,7 +59,7 @@ function simulatorMComposition(ttype)
         column:            2
     };
 
-    addToContent_ForRead(MathComposition.Root, delim, props);
+    addToContent_ForRead(MComposition.Root, delim, props);
 
     delim.getBase(1).addTxt("l");
 
@@ -103,7 +103,7 @@ function simulatorMComposition(ttype)
         type:   DEGREE_RADICAL
     };
 
-    addToContent_ForRead(MathComposition.Root, root, props);
+    addToContent_ForRead(MComposition.Root, root, props);
 
     root.getDegree().addTxt("3");
 
@@ -177,7 +177,7 @@ function simulatorMComposition(ttype)
         row:        4
     };
 
-    addToContent_ForRead(MathComposition.Root, matrix, props);
+    addToContent_ForRead(MComposition.Root, matrix, props);
 
     var mathFunc = new CMathFunc();
     props =
@@ -247,13 +247,13 @@ function simulatorMComposition(ttype)
 
     // only for read
     if(ttype === MATH_READ)
-        RecalculateMComposition();
+        RecalculateMComposition(MComposition);
 
 }
 
-function RecalculateMComposition()
+function RecalculateMComposition(MComposition)
 {
-    MathComposition.RecalculateComposition();
+    MComposition.RecalculateComposition();
 
     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
         Left   : X_Left_Field,
