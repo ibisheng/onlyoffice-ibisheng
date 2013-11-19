@@ -7055,7 +7055,7 @@
 								selectionRange = arn.clone(true);
 								
 								//добавляем автофильтры и форматированные таблицы
-								if(isLocal && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
+								if(isLocal === true && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
 								{
 									var aFilters = val.lStorage.autoFilters;
 									var range;
@@ -7066,6 +7066,27 @@
 											range.cleanFormat();
 										t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, null, null, true);
 										if(!aFilters[aF].autoFilter)
+											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
+									}
+								}
+								else if(isLocal === 'binary' && val.TableParts && val.TableParts.length)
+								{
+									var aFilters = val.TableParts;
+									var range;
+									var tablePartRange;
+									var refInsertBinary = t.autoFilters._refToRange(val.activeRange); 
+									var diffRow;
+									var diffCol;
+									for(var aF = 0; aF < aFilters.length; aF++)
+									{
+										tablePartRange = t.autoFilters._refToRange(aFilters[aF].Ref);
+										diffRow = tablePartRange.r1 - refInsertBinary.r1;
+										diffCol = tablePartRange.c1 - refInsertBinary.c1;
+										range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
+										if(aFilters[aF].style)
+											range.cleanFormat();
+										t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true);
+										if(!aFilters[aF].AutoFilter)
 											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
 									}
 								}
