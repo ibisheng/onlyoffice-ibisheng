@@ -429,7 +429,7 @@ CControlComposition.prototype =
 }
 var MathControl = new CControlComposition();
 MathControl.AddComposition();
-MathControl.SetPosition({x: 27.5 - 6, y: 25.3 });
+MathControl.SetPosition({x: 21.5, y: 25.3 });
 
 var inherit = function(obj, extObj)
 {

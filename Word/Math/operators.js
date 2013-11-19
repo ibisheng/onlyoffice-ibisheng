@@ -3970,14 +3970,14 @@ COperator.prototype.drawSeparator = function(pGraphics)
     {
         var lng = this.coordGlyph.XX.length;
 
-        for(var i = 0; i < this.positions.length; i++)
+        for(var i = 0; i < this.pos.length; i++)
         {
             var X = new Array(),
                 Y = new Array();
             for(var j = 0; j < lng; j++)
             {
-                X.push(this.positions[i].x + this.coordGlyph.XX[j]);
-                Y.push(this.positions[i].y + this.coordGlyph.YY[j]);
+                X.push(this.pos[i].x + this.coordGlyph.XX[j]);
+                Y.push(this.pos[i].y + this.coordGlyph.YY[j]);
             }
 
             this.glyph.draw(pGraphics, X, Y);
@@ -4127,7 +4127,7 @@ CDelimiter.prototype.init = function(props)
     this.endOper.init(props.endChr, props.endChrType, LOCATION_RIGHT);
     this.endOper.relate(this);
 
-    this.endOper.init(props.sepChr, props.sepChrType, LOCATION_SEP);
+    this.sepOper.init(props.sepChr, props.sepChrType, LOCATION_SEP);
     this.sepOper.relate(this);
 
     if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)

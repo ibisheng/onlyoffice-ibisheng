@@ -5927,16 +5927,18 @@ CMathComposition.prototype =
 
         this.Root.draw(pGraphics);
     },
+    Draw_2: function(x, y, pGraphics)
+    {
+        if(this.Root.content.length > 1)
+        {
+            this.Root.setPosition({x: x, y: y});
+            this.Root.draw(pGraphics);
+            this.UpdateCursor();
+        }
+    },
     GetFirstPrp: function()
     {
         return this.Root.getFirstPrp();
-    },
-    Draw_2: function()
-    {
-        this.Resize();
-        this.UpdatePosition();
-        this.CheckTarget();
-        this.Draw();
     },
     Cursor_MoveRight: function()
     {
@@ -6438,7 +6440,7 @@ CMathComposition.prototype =
 
         if(e.CtrlKey == true  && e.KeyCode == 81)
         {
-            simulatorRead();
+            simulatorMComposition(MATH_READ);
             return false;
         }
 
@@ -6507,14 +6509,35 @@ CMathComposition.prototype =
     RecalculateComposition: function()
     {
         //this.Root.setTxtPrp(this.TxtPrp);
-        this.SetReferenceComposition();
+        //this.SetReferenceComposition();
         this.Root.Resize();
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
     },
+    RecalculateComposition_2: function()
+    {
+        this.Root.Resize();
+    },
     SetReferenceComposition: function()
     {
         this.Root.setReferenceComposition(this);
+    },
+    test_for_edit: function()
+    {
+        var props =
+        {
+            type:   BAR_FRACTION
+        };
+        var fract = new CFraction();
+
+        addToContent_ForRead(MathComposition.Root, fract, props);
+
+        fract.getNumerator().addTxt("a");
+        fract.getDenominator().addTxt("b");
+    },
+    test_for_edit_2:  function()
+    {
+        simulatorMComposition(MATH_EDIT);
     }
 
 }
@@ -6587,5 +6610,21 @@ CRun.prototype =
     {
         this.mathRunPrp = oRunPrp.getMathRunPrp();
     }
+}
+
+function TEST_COMPOSITION()
+{
+    //MathComposition.test_for_edit();
+    MathComposition.test_for_edit_2();
+    MathComposition.RecalculateComposition_2();
+    //MathComposition.Draw_2(x, y, )
+
+
+    editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
+        Left   : X_Left_Field,
+        Right  : X_Right_Field,
+        Top    : Y_Top_Field,
+        Bottom : Y_Bottom_Field
+    } } );
 }
 
