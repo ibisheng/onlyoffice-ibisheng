@@ -1523,6 +1523,24 @@
 				var pasteFragment = node;
                 var t = this;
 				
+				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
+					onlyFromLocalStorage = true;
+				
+				//если находимся внутри шейпа
+				if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+				{
+					if(onlyFromLocalStorage)
+					{
+						if(t.lStorage && t.lStorage.htmlInShape)
+							worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
+					}
+					else
+						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+					return;
+				}
+				
 				//****binary****
 				if(copyPasteUseBinary)
 				{
@@ -1562,24 +1580,6 @@
 							return;
 						}
 					}
-				}
-				
-				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
-					onlyFromLocalStorage = true;
-				
-				//если находимся внутри шейпа
-				if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
-				{
-					if(onlyFromLocalStorage)
-					{
-						if(t.lStorage && t.lStorage.htmlInShape)
-							worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(t.lStorage.htmlInShape);
-					}
-					else
-						worksheet.objectRender.controller.curState.textObject.txBody.insertHtml(node);
-					window.GlobalPasteFlag = false;
-					window.GlobalPasteFlagCounter = 0;
-					return;
 				}
 				
 				if(activateLocalStorage)
