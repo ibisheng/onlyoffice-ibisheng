@@ -1,4 +1,7 @@
-function simulatorRead()
+var MATH_EDIT = 0;
+var MATH_READ = 1;
+
+function simulatorMComposition(ttype)
 {
     //////// accent -> bar fraction -> skewed fraction (for numerator)
 
@@ -9,7 +12,7 @@ function simulatorRead()
 
     var accent = new CAccent();
     var ctrPrp = new CTextPr();
-    ctrPrp.FontSize = 36;
+    ctrPrp.FontSize = 11;
 
     addToContent_ForRead(MathComposition.Root, accent, props, ctrPrp);
 
@@ -110,8 +113,8 @@ function simulatorRead()
     var integral = new CNary();
     props =
     {
-        //signType:       NARY_INTEGRAL,
-        chr:            "B",
+        signType:       NARY_INTEGRAL,
+        //chr:            "B",
         limLoc:         NARY_SubSup
     };
     integral.init(props);
@@ -242,6 +245,14 @@ function simulatorRead()
 
     //////////////////////////////////////////////////////////////////
 
+    // only for read
+    if(ttype === MATH_READ)
+        RecalculateMComposition();
+
+}
+
+function RecalculateMComposition()
+{
     MathComposition.RecalculateComposition();
 
     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
@@ -250,9 +261,8 @@ function simulatorRead()
         Top    : Y_Top_Field,
         Bottom : Y_Bottom_Field
     } } );
-
-
 }
+
 function addToContent_ForRead(content, elem, props, ctrPrp)
 {
     try
