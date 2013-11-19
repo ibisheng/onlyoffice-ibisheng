@@ -296,6 +296,111 @@
 			}
 
 		};
+		
+		function ActiveRange(){
+			if(1 == arguments.length)
+			{
+				var range = arguments[0];
+				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+			}
+			else if(arguments.length > 1)
+				ActiveRange.superclass.constructor.apply(this, arguments);
+			else
+				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+			this.type = c_oAscSelectionType.RangeCells;
+			this.startCol = 0; // Активная ячейка в выделении
+			this.startRow = 0; // Активная ячейка в выделении
+			this._updateAdditionalData();
+		}
+		extendClass(ActiveRange, Range);
+		
+		ActiveRange.prototype.assign = function () {
+			ActiveRange.superclass.assign.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.clone = function(){
+			var oRes = new ActiveRange(ActiveRange.superclass.clone.apply(this, arguments));
+			oRes.type = this.type;
+			oRes.startCol = this.startCol;
+			oRes.startRow = this.startRow;
+			return oRes;
+		};
+		ActiveRange.prototype.normalize = function () {
+			ActiveRange.superclass.normalize.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.isEqual = function () {
+			var bRes = ActiveRange.superclass.isEqual.apply(this, arguments);
+			if(bRes && arguments.length > 0)
+			{
+				var range = arguments[0];
+				bRes = this.type == range.type && this.startCol == range.startCol && this.startRow == range.startRow;
+			}
+			return bRes;
+		};
+		ActiveRange.prototype.contains = function () {
+			return ActiveRange.superclass.contains.apply(this, arguments);
+		};
+		ActiveRange.prototype.containsRange = function () {
+			return ActiveRange.superclass.containsRange.apply(this, arguments);
+		};
+		ActiveRange.prototype.intersection = function () {
+			var oRes = new ActiveRange(ActiveRange.superclass.intersection.apply(this, arguments));
+			oRes._updateAdditionalData();
+			return oRes;
+		};
+		ActiveRange.prototype.intersectionSimple = function () {
+			var oRes = ActiveRange.superclass.intersectionSimple.apply(this, arguments);
+			if(null != oRes)
+			{
+				var oRes = new ActiveRange(oRes);
+				oRes._updateAdditionalData();
+			}
+			return oRes;
+		};
+		ActiveRange.prototype.union = function () {
+			var oRes = new ActiveRange(ActiveRange.superclass.union.apply(this, arguments));
+			oRes._updateAdditionalData();
+			return oRes;
+		};
+		ActiveRange.prototype.union2 = function () {
+			ActiveRange.superclass.union2.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.setOffset = function(offset){
+			this.setOffsetFirst(offset);
+			this.setOffsetLast(offset);
+		};
+		ActiveRange.prototype.setOffsetFirst = function(offset){
+			ActiveRange.superclass.setOffsetFirst.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.setOffsetLast = function(offset){
+			ActiveRange.superclass.setOffsetLast.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype._updateAdditionalData = function(){
+			this.startCol = this.c1;
+			this.startRow = this.r1;
+			//не меняем тип выделения, если это не выделение ячееек
+			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
+				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)
+			// {
+				// if(0 == this.r1 && 0 == this.c1 && gc_nMaxRow0 == this.r2 && gc_nMaxCol0 == this.c2)
+					// this.type = c_oAscSelectionType.RangeMax;
+				// else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
+					// this.type = c_oAscSelectionType.RangeCol;
+				// else if(0 == this.c1 && gc_nMaxCol0 == this.c2)
+					// this.type = c_oAscSelectionType.RangeRow;
+				// else
+					// this.type = c_oAscSelectionType.RangeCells;
+			// }
+		};
 
 
 		/**
@@ -442,6 +547,15 @@
 			else
 				return val.replace(/^\s+|\s+$/g,'');  
 		}
+		
+		function extendClass(Child, Parent){
+			var F = function() { };
+			F.prototype = Parent.prototype;
+			Child.prototype = new F();
+			Child.prototype.constructor = Child;
+			Child.superclass = Parent.prototype;
+		}
+
 		
 		function isNumber(val) {
 			var valTrim = trim(val);
@@ -921,8 +1035,10 @@
 		window["Asc"].profileTime = profileTime;
 		window["Asc"].isNumber = isNumber;
 		window["Asc"].trim = trim;
+		window["Asc"].extendClass = extendClass;
 
 		window["Asc"].Range = Range;
+		window["Asc"].ActiveRange = ActiveRange;
 
 		window["Asc"].HandlersList = HandlersList;
 

@@ -28,6 +28,7 @@
 		var asc_incDecFonSize  = asc.incDecFonSize;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_Range   = asc.Range;
+		var asc_ActiveRange   = asc.ActiveRange;
 		var asc_FP      = asc.FontProperties;
 		var asc_parsecolor = asc.parseColor;
 		var asc_clone   = asc.clone;
@@ -342,10 +343,7 @@
 			this.highlightedCol = -1;
 			this.highlightedRow = -1;
 			this.visibleRange = asc_Range(0, 0, 0, 0);
-			this.activeRange = asc_Range(0, 0, 0, 0);
-			this.activeRange.type = c_oAscSelectionType.RangeCells;
-			this.activeRange.startCol = 0; // Активная ячейка в выделении
-			this.activeRange.startRow = 0; // Активная ячейка в выделении
+			this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
 			this.isChanged = false;
 			this.isCellEditMode = false;
 			this.isFormulaEditMode = false;
@@ -5825,7 +5823,7 @@
 						range.r2 = this.rows.length - 1;
 				}
 
-				this.activeRange = range;
+				this.activeRange = new asc_ActiveRange(range);
 				this.activeRange.type = c_oAscSelectionType.RangeCells;
 				this.activeRange.startCol = range.c1;
 				this.activeRange.startRow = range.r1;
@@ -6454,8 +6452,6 @@
 					if (2 === this.fillHandleArea) {
 						// Мы внутри, будет удаление, нормируем и cбрасываем первую ячейку
 						this.activeRange.normalize();
-						this.activeRange.startCol = this.activeRange.c1;
-						this.activeRange.startRow = this.activeRange.r1;
 						// Проверяем, удалили ли мы все (если да, то область не меняется)
 						if (arn.c1 !== this.activeFillHandle.c2 ||
 							arn.r1 !== this.activeFillHandle.r2) {
@@ -6810,8 +6806,6 @@
 						t._updateCellsRange(arnTo);
 						t.cleanSelection();
 						t.activeRange = arnTo.clone(true);
-						t.activeRange.startRow = t.activeRange.r1;
-						t.activeRange.startCol = t.activeRange.c1;
 						t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 						t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
 						t.autoFilters._moveAutoFilters(arnTo, arnFrom);
@@ -6844,9 +6838,6 @@
 				var t = this;
 				var checkRange = null;
 				var arn = t.activeRange.clone(true);
-				arn.startCol = t.activeRange.startCol;
-				arn.startRow = t.activeRange.startRow;
-				arn.type = t.activeRange.type;
 				if (onlyActive) {
 					checkRange = new asc_Range(arn.startCol, arn.startRow, arn.startCol, arn.startRow);
 				} else {
@@ -9069,8 +9060,6 @@
 				valueForSearching = new RegExp(valueForSearching, findFlags);
 				var t = this;
 				var ar = this.activeRange.clone();
-				ar.startCol = this.activeRange.startCol;
-				ar.startRow = this.activeRange.startRow;
 				var aReplaceCells = [];
 				if (options.isReplaceAll) {
 					// На ReplaceAll ставим медленную операцию
@@ -9235,23 +9224,19 @@
 				if (false === this.isSelectionDialogMode) {
 					if (null !== this.copyOfActiveRange) {
 						this.activeRange = this.copyOfActiveRange.clone(true);
-						this.activeRange.startCol = this.copyOfActiveRange.startCol;
-						this.activeRange.startRow = this.copyOfActiveRange.startRow;
 					}
 					this.copyOfActiveRange = null;
 				} else {
 					this.copyOfActiveRange = this.activeRange.clone(true);
-					this.copyOfActiveRange.startCol = this.activeRange.startCol;
-					this.copyOfActiveRange.startRow = this.activeRange.startRow;
 					if (selectRange) {
 						selectRange = parserHelp.parse3DRef(selectRange);
 						if (selectRange) {
 							// ToDo стоит менять и лист
 							selectRange = this.model.getRange2(selectRange.range);
-							if (null !== selectRange) {
-								this.activeRange = selectRange.getBBox0();
-								this.activeRange.startCol = this.activeRange.c1;
-								this.activeRange.startRow = this.activeRange.r1;
+							if (null !== selectRange)
+							{
+								var bbox = selectRange.getBBox0();
+								this.activeRange.assign(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 							}
 						}
 					}
@@ -9350,15 +9335,8 @@
 									  isHideCursor, activeRange) {
 				var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
 				var ar = t.activeRange;
-				if (activeRange) {
-					t.activeRange.c1 = activeRange.c1;
-					t.activeRange.c2 = activeRange.c2;
-					t.activeRange.r1 = activeRange.r1;
-					t.activeRange.r2 = activeRange.r2;
-					t.activeRange.startCol = activeRange.startCol;
-					t.activeRange.startRow = activeRange.startRow;
-					t.activeRange.type = activeRange.type;
-				}
+				if (activeRange)
+					t.activeRange = activeRange.clone();
 
 				if ( t.objectRender.checkCursorDrawingObject(x, y) )
 					return false;

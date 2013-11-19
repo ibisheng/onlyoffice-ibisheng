@@ -61,6 +61,7 @@
 			this.Api					= Api;
 			this.collaborativeEditing	= collaborativeEditing;
 			this.lastSendInfoRange		= null;
+			this.lastSendInfoIsSelectOnShape = null;
 			this.canUpdateAfterShiftUp	= false;	// Нужно ли обновлять информацию после отпускания Shift
 
 			//----- declaration -----
@@ -425,19 +426,14 @@
 				if (null === this.lastSendInfoRange)
 					return false;
 
-				return (this.lastSendInfoRange.isEqual(range) &&
-					this.lastSendInfoRange.startCol === range.startCol &&
-					this.lastSendInfoRange.startRow === range.startRow &&
-					this.lastSendInfoRange.isSelectOnShape === isSelectOnShape);
+				return this.lastSendInfoRange.isEqual(range) && this.lastSendInfoRangeIsSelectOnShape === isSelectOnShape;
 			},
 
 			_onWSSelectionChanged: function (info) {
 				var ws = this.getWorksheet();
 				var ar = ws.activeRange;
 				this.lastSendInfoRange = ar.clone(true);
-				this.lastSendInfoRange.startCol = ar.startCol;
-				this.lastSendInfoRange.startRow = ar.startRow;
-				this.lastSendInfoRange.isSelectOnShape = ws.getSelectionShape();
+				this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
 
 				if (null === info) {
 					info = ws.getSelectionInfo();
@@ -445,7 +441,7 @@
 				// При редактировании ячейки не нужно пересылать изменения
 				if (false === ws.getCellEditMode()) {
 					// Сами запретим заходить в строку формул, когда выделен shape
-					if (this.lastSendInfoRange.isSelectOnShape)
+					if (this.lastSendInfoRangeIsSelectOnShape)
 						this.input.prop("disabled", true);
 					else
 						this.input.prop("disabled", false);
@@ -821,9 +817,6 @@
 				var ws = t.getWorksheet();
 				var activeCellRange = ws.getActiveCell(x, y, isCoord);
 				var arn = ws.activeRange.clone(true);
-				arn.startCol = ws.activeRange.startCol;
-				arn.startRow = ws.activeRange.startRow;
-				arn.type = ws.activeRange.type;
 
 				var editFunction = function() {
 					t.controller.setCellEditMode(true);
@@ -1259,9 +1252,6 @@
 						return false;
 
 					var arn = ws.activeRange.clone(true);
-					arn.startCol = ws.activeRange.startCol;
-					arn.startRow = ws.activeRange.startRow;
-					arn.type = ws.activeRange.type;
 
 					function openEditor(res) {
 						if (res) {
