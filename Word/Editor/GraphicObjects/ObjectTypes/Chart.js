@@ -37,7 +37,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     this.transform = new CMatrix();
     this.invertTransform = new CMatrix();
     this.ownTransform = new CMatrix();
-    this.group = null;
+    //this.group = null;
     this.pageIndex = -1;
 
     this.selectedObjects =
