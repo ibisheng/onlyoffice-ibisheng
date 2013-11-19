@@ -7983,6 +7983,26 @@
 								{
 									var isMerged = false;
 									var range = t.model.getRange3(r + autoR*plRow, c + autoC*plCol, r + autoR*plRow, c + autoC*plCol);
+									//****paste comments****
+									if(val.aComments && val.aComments.length)
+									{
+										var comment;
+										for(var i = 0; i < val.aComments.length; i++)
+										{
+											comment = Asc.clone(val.aComments[i]);
+											if(comment.nCol == pasteCol && comment.nRow == pasteRow)
+											{
+												//change nRow, nCol
+												comment.nCol = c + autoC*plCol;
+												comment.nRow = r + autoR*plRow;
+												
+												var commentData = new asc_CCommentData(comment);
+												commentData.setId();
+												t.cellCommentator.addCommentSerialize(commentData);
+											}
+										}
+									}
+									
 									if(!isOneMerge)
 									{
 										for(mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck)
