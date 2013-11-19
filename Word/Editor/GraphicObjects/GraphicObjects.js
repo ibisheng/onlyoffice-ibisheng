@@ -4757,7 +4757,7 @@ CGraphicObjects.prototype =
                 {
                     if(cur_sel_arr[0].hitToAdj)
                     {
-                        if(cur_sel_arr[0].hitToAdj(g_x, g_y))
+                        if(cur_sel_arr[0].hitToAdj(g_x, g_y).hit)
                             return DRAWING_ARRAY_TYPE_BEFORE;
                     }
                 }
