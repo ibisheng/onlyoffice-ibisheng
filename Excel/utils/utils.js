@@ -347,8 +347,12 @@
 			return ActiveRange.superclass.containsRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.intersection = function () {
-			var oRes = new ActiveRange(ActiveRange.superclass.intersection.apply(this, arguments));
-			oRes._updateAdditionalData();
+			var oRes = ActiveRange.superclass.intersection.apply(this, arguments);
+			if(null != oRes)
+			{
+				var oRes = new ActiveRange(oRes);
+				oRes._updateAdditionalData();
+			}
 			return oRes;
 		};
 		ActiveRange.prototype.intersectionSimple = function () {
