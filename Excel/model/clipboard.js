@@ -2795,25 +2795,51 @@
 				var curRow;
 				var startCol;
 				var startRow;
+				var xfrm;
+				History.Create_NewPoint();
+				History.StartTransaction();
 				//определяем стартовую позицию, если изображений несколько вставляется
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
 					drawingObject = data.Drawings[i];
-					if(i == 0)
+					xfrm = drawingObject.graphicObject.spPr.xfrm;
+					if(xfrm)
 					{
-						startCol = drawingObject.from.col;
-						startRow = drawingObject.from.row;
+						if(i == 0)
+						{
+							startCol = xfrm.offX;
+							startRow = xfrm.offY;
+						}
+						else 
+						{
+							if(startCol > xfrm.offX)
+							{
+								startCol = xfrm.offX;
+							}	
+							if(startRow > xfrm.offY)
+							{
+								startRow = xfrm.offY;
+							}	
+						}
 					}
-					else 
+					else
 					{
-						if(startCol > drawingObject.from.col)
+						if(i == 0)
 						{
 							startCol = drawingObject.from.col;
-						}	
-						if(startRow > drawingObject.from.row)
-						{
 							startRow = drawingObject.from.row;
-						}	
+						}
+						else 
+						{
+							if(startCol > drawingObject.from.col)
+							{
+								startCol = drawingObject.from.col;
+							}	
+							if(startRow > drawingObject.from.row)
+							{
+								startRow = drawingObject.from.row;
+							}	
+						}
 					}
 				};
 				for(var i = 0; i < data.Drawings.length; i++)
@@ -2843,9 +2869,19 @@
 					}
 					else if (drawingObject.graphicObject instanceof  CShape || drawingObject.graphicObject instanceof  CImageShape || drawingObject.graphicObject instanceof  CGroupShape) {
 						
-						curCol = drawingObject.from.col - startCol + activeRange.c1;
-						curRow = drawingObject.from.row - startRow + activeRange.r1;
-						drawingObject.graphicObject.setPosition(ws.objectRender.convertMetric(ws.cols[curCol].left, 1, 3), ws.objectRender.convertMetric(ws.rows[curRow].top, 1, 3));
+						xfrm = drawingObject.graphicObject.spPr.xfrm;
+						if(xfrm)
+						{
+							curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[activeRange.c1].left - ws.getCellLeft(0, 1), 1, 3);
+							curRow = xfrm.offY - startRow + ws.objectRender.convertMetric(ws.rows[activeRange.r1].top  - ws.getCellTop(0, 1), 1, 3);
+							drawingObject.graphicObject.setPosition(curCol, curRow);
+						}
+						else
+						{
+							curCol = drawingObject.from.col - startCol + activeRange.c1;
+							curRow = drawingObject.from.row - startRow + activeRange.r1;
+							drawingObject.graphicObject.setPosition(ws.objectRender.convertMetric(ws.cols[curCol].left, 1, 3), ws.objectRender.convertMetric(ws.rows[curRow].top, 1, 3));
+						}
 					
 						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
 						drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
@@ -2854,6 +2890,7 @@
 						drawingObject.graphicObject.addToDrawingObjects();
 					}
 				};
+				History.EndTransaction();
 			}
 
 		};
