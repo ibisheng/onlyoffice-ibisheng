@@ -660,7 +660,7 @@ CDocument.prototype =
         //var StartTime = new Date().getTime();
 
         //**
-        MathComposition.RecalculateComposition();
+        MathComposition.RecalculateComposition_2(g_oTextMeasurer);
         //**
 
         if ( true === this.TurnOffRecalc )
@@ -1454,7 +1454,7 @@ CDocument.prototype =
     //**
     Draw : function(nPageIndex, pGraphics)
     {
-		
+
         if ( "undefined" == typeof(pGraphics) )
             pGraphics = Canvas;
 
@@ -1462,7 +1462,7 @@ CDocument.prototype =
             nPageIndex = this.CurPage;
 
         if(nPageIndex === 0)
-            MathComposition.Draw_2(21.5, 25.3, pGraphics);
+            MathComposition.Draw(21.5, 25.3, pGraphics);
             //MathComposition.Draw(pGraphics);
 
 

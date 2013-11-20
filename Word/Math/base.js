@@ -870,16 +870,16 @@ CMathBase.prototype =
 
         this.size = {width: _width, height: _height, center: _center};
     },
-    RecalculateReverse: function()
+    RecalculateReverse: function(oMeasure)
     {
         this.recalculateSize();
-        this.Parent.RecalculateReverse();
+        this.Parent.RecalculateReverse(oMeasure);
     },
-    Resize: function()
+    Resize: function(oMeasure)
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].Resize();
+                this.elements[i][j].Resize(oMeasure);
 
         this.recalculateSize();
     },

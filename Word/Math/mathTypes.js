@@ -81,8 +81,9 @@ var DOUBLE_LEFT_ARROW           = 21;
 var DOUBLE_RIGHT_ARROW          = 22;
 var DOUBLE_ARROW_LR             = 23;
 
-var DELIM_OPERATOR              =  0;
-var DELIM_SEPARATOR             =  1;
+var OPER_DELIMITER              =  0;
+var OPER_SEPARATOR              =  1;
+var OPER_GROUP_CHAR             =  2;
 
 
 var TURN_0                      =  0;

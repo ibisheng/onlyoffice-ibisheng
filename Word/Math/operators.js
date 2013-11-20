@@ -321,1051 +321,6 @@ CGlyphOperator.prototype.relate = function(parent)
     this.Parent = parent;
 }
 
-function old_CGlyphOperator()
-{
-    this.loc = null;
-    this.turn = null;
-
-    this.coord = null;
-    this.size = null;
-    this.measure = 0;
-
-    this.penW = 1; // px
-
-    this.TxtPrp = new CMathTextPrp();
-
-}
-/*old_CGlyphOperator.prototype.setLocation = function(loc, turn)
-{
-    // location
-
-    // 0 - up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-
-    // turn
-
-    // 0 - 0
-    // 1 - Pi
-    // 2 - Pi/2
-    // 3 - 3*Pi/2
-
-    this.loc = loc;
-    this.turn = turn;
-}*/
-old_CGlyphOperator.prototype.init = function(props)
-{
-    // location
-
-    // 0 - up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-
-    // turn
-
-    // 0 - 0
-    // 1 - Pi
-    // 2 - Pi/2
-    // 3 - 3*Pi/2
-
-    this.loc = props.location;
-    this.turn = props.turn;
-}
-old_CGlyphOperator.prototype.setPosition = function(pos)
-{
-    this.pos = pos;
-    //this.pos = {x: pos.x, y : pos.y - this.size.center};
-}
-old_CGlyphOperator.prototype.fixSize = function(measure)
-{
-    var sizeGlyph = this.calcSize(measure);
-    var width, height, center;
-
-    //var betta = this.getTxtPrp().FontSize/36;
-    var bHor = this.loc == 0 || this.loc  == 1;
-
-    if(bHor)
-    {
-        width = sizeGlyph.width;
-        height = sizeGlyph.height;
-
-        center = height/2;
-        this.measure = measure > width ? measure : width;
-    }
-    else
-    {
-        width = sizeGlyph.height;
-        height = sizeGlyph.width;
-
-        // baseLine смещен чуть вверх, чтобы текст при вставке в скобки располагался по центру, относительно высоты скобок
-        // плейсхолдер из-за этого располагается чуть выше, как в Ворде
-        //center = height/2 - 1.234722222222222*betta;
-        center = height/2;
-        this.measure = measure > height ? measure : height;
-    }
-
-    this.size = {width: width, height: height, center: center};
-}
-old_CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
-{
-    var coord = this.calcCoord(this.measure);
-
-    var X = coord.XX, Y = coord.YY,
-        W =  this.size.width, H =  this.size.height,
-        glW, glH;
-
-    var bHor = this.loc == 0 || this.loc  == 1;
-
-    if(bHor)
-    {
-        glW = coord.W;
-        glH = coord.H;
-    }
-    else
-    {
-        glW = coord.H;
-        glH = coord.W;
-    }
-
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-        shH =  (H - glH)/2; // при повороте на 90 градусовы
-
-    if(this.loc == 0)
-    {
-        a1 = 1; b1 = 0; c1 = shW;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else if(this.loc == 1)
-    {
-        a1 = 1; b1 = 0; c1 = shW;
-        a2 = 0; b2 = 1; c2 = H - glH;
-    }
-    else if(this.loc == 2)
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = shH;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = W - glW;
-        a2 = 1; b2 = 0; c2 = shH;
-    }
-
-    if(this.turn == 1)
-    {
-        a1 *= -1; b1 *= -1; c1 += glW;
-    }
-    else if(this.turn == 2)
-    {
-        a2 *= -1; b2 *= -1; c2 += glH;
-    }
-    else if(this.turn == 3)
-    {
-        a1 *= -1; b1 *= -1; c1 += glW;
-        a2 *= -1; b2 *= -1; c2 += glH;
-    }
-
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-     shH =  (H - glH)/2; // при повороте на 90 градусовы
-
-     // A*x + B*y + C = 0
-
-     if(bHor)
-     {
-     a1 = 1; b1 = 0; c1 = shW;
-     a2 = 0; b2 = 1; c2 = 0;
-     }
-     else
-     {
-     a1 = 0; b1 = 1; c1 = 0;
-     a2 = 1; b2 = 0; c2 = shH;
-     }
-
-     if(this.turn == 1)
-     {
-     a1 *= -1; b1 *= -1; c1 = W;
-     }
-     else if(this.turn == 2)
-     {
-     a2 *= -1; b2 *= -1; c2 = H;
-     }
-     else if(this.turn == 3)
-     {
-     a1 *= -1; b1 *= -1; c1 = W;
-     a2 *= -1; b2 *= -1; c2 = H;
-     }
-
-    // смещение
-
-    var gpX = 0,
-        gpY = 0;
-
-    if(this.loc == 1)
-        gpY = this.penW*25.4/96;
-    if(this.loc == 3)
-        gpX = - this.penW*25.4/96;
-
-    var XX = new Array(),
-        YY = new Array();
-
-    var x = this.pos.x;
-    y = this.pos.y;
-
-    for(var i = 0; i < X.length; i++)
-    {
-        XX[i] = x + X[i]*a1 + Y[i]*b1 + c1 + gpX;
-        YY[i] = y + X[i]*a2 + Y[i]*b2 + c2 + gpY;
-    }
-
-    for(var i = 0; i < YY.length; i++)
-    {
-        console.log("YY["+ i + "] = "+ YY[i]);
-    }
-
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
-
-    MathControl.pGraph.p_width(this.penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
-
-    this.drawPath(XX,YY);
-
-    MathControl.pGraph.df();
-    MathControl.pGraph.SetIntegerGrid(intGrid);
-
-}
-old_CGlyphOperator.prototype.old_draw = function()
-{
-    var coord = this.calcCoord(this.measure);
-
-    var X = coord.XX, Y = coord.YY,
-        W =  this.size.width, H =  this.size.height;
-
-    var bHor = this.loc == 0 || this.loc  == 1;
-    var glW = 0, glH = 0;
-
-    if(bHor)
-    {
-        glW = coord.W;
-        glH = coord.H;
-    }
-    else
-    {
-        glW = coord.H;
-        glH = coord.W;
-    }
-
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-        shH =  (H - glH)/2; // при повороте на 90 градусовы
-
-    // A*x + B*y + C = 0
-
-    if(bHor)
-    {
-        a1 = 1; b1 = 0; c1 = shW;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = shH;
-    }
-
-    if(this.turn == 1)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1;
-    }
-    else if(this.turn == 2)
-    {
-        a2 *= -1; b2 *= -1; c2 = H - c2;
-    }
-    else if(this.turn == 3)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1;
-        a2 *= -1; b2 *= -1; c2 = H - c2;
-    }
-
-    var gpX = 0,
-        gpY = 0;
-
-    if(this.loc == 3)
-        gpX = - this.penW*25.4/96;
-
-    var XX = new Array(),
-        YY = new Array();
-
-    var x = this.pos.x;
-    y = this.pos.y;
-
-    for(var i = 0; i < X.length; i++)
-    {
-        XX[i] = x + X[i]*a1 + Y[i]*b1 + c1 + gpX;
-        YY[i] = y + X[i]*a2 + Y[i]*b2 + c2 + gpY;
-    }
-
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
-
-    MathControl.pGraph.p_width(this.penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
-
-    this.drawPath(XX,YY);
-
-    MathControl.pGraph.df();
-    MathControl.pGraph.SetIntegerGrid(intGrid);
-
-}
-old_CGlyphOperator.prototype.getCoordinateGlyph = function()
-{
-    var coord = this.calcCoord(this.measure);
-
-    var X = coord.XX, Y = coord.YY,
-        W =  this.size.width, H =  this.size.height;
-
-    var bHor = this.loc == 0 || this.loc  == 1;
-
-    /*var glW = 0, glH = 0;
-
-    if(bHor)
-    {
-        glW = coord.W;
-        glH = coord.H;
-    }
-    else
-    {
-        glW = coord.H;
-        glH = coord.W;
-    }
-
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-        shH =  (H - glH)/2; // при повороте на 90 градусовы*/
-
-    var shW = 0,
-        shH = 0;
-
-    // A*x + B*y + C = 0
-
-    if(bHor)
-    {
-        a1 = 1; b1 = 0; c1 = shW;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = shH;
-    }
-
-    if(this.turn == 1)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1;
-    }
-    else if(this.turn == 2)
-    {
-        a2 *= -1; b2 *= -1; c2 = H - c2;
-    }
-    else if(this.turn == 3)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1;
-        a2 *= -1; b2 *= -1; c2 = H - c2;
-    }
-
-    var gpX = 0,
-        gpY = 0;
-
-    if(this.loc == 3)
-        gpX = - this.penW*25.4/96;
-
-    var XX = new Array(),
-        YY = new Array();
-
-    for(var i = 0; i < X.length; i++)
-    {
-        XX[i] = X[i]*a1 + Y[i]*b1 + c1 + gpX;
-        YY[i] = X[i]*a2 + Y[i]*b2 + c2 + gpY;
-    }
-
-    return {XX: XX, YY: YY, Width: coord.W, Height: coord.H};
-}
-old_CGlyphOperator.prototype.drawGlyph = function(XX, YY)
-{
-    var intGrid = MathControl.pGraph.GetIntegerGrid();
-    MathControl.pGraph.SetIntegerGrid(false);
-
-    MathControl.pGraph.p_width(this.penW*1000);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph._s();
-
-    this.drawPath(XX,YY);
-
-    MathControl.pGraph.df();
-    MathControl.pGraph.SetIntegerGrid(intGrid);
-}
-old_CGlyphOperator.prototype.IsJustDraw = function()
-{
-    return true;
-}
-old_CGlyphOperator.prototype.relate = function(parent)
-{
-    this.Parent = parent;
-}
-old_CGlyphOperator.prototype.Resize = function()
-{
-    this.fixSize(); //??
-}
-old_CGlyphOperator.prototype.getTxtPrp = function()
-{
-    return this.TxtPrp;
-}
-old_CGlyphOperator.prototype.setTxtPrp = function(txtPrp)
-{
-    this.TxtPrp.Merge(txtPrp);
-}
-
-
-function old_CDelimiter()
-{
-    // location
-
-    // 0 -  up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-    // 4 - left/right
-    // 5 - up/down
-
-    this.type = null;
-    this.loc = null;
-    this.base = null;
-
-    CMathBase.call(this);
-}
-extend(old_CDelimiter, CMathBase);
-old_CDelimiter.prototype.init = function(type, loc, turn1, turn2)
-{
-    var base = new CMathContent();
-
-    var params =
-    {
-        type: type,
-        loc: loc,
-        turn1: turn1,
-        turn2: turn2
-    };
-
-    this.init_2(params, base);
-}
-old_CDelimiter.prototype.init_2 = function(params, base)
-{
-    this.type = params.type;
-    this.loc = params.loc;
-
-    this.base = base;
-
-    var nRow, nCol,
-        tturn1, tturn2;
-
-    if(this.loc== 0)
-    {
-        nRow = 2;
-        nCol = 1;
-        tturn1 = params.turn1;
-    }
-    else if(this.loc == 1)
-    {
-        nRow = 2;
-        nCol = 1;
-        tturn2 = params.turn1;
-    }
-    else if(this.loc == 2)
-    {
-        nRow = 1;
-        nCol = 2;
-
-        tturn1 = params.turn1;
-    }
-    else if(this.loc == 3)
-    {
-        nRow = 1;
-        nCol = 2;
-        tturn2 = params.turn1;
-    }
-    else if(this.loc == 4)
-    {
-        nRow = 1;
-        nCol = 3;
-
-        tturn1 = params.turn1;
-        tturn2 = params.turn2;
-    }
-    else
-    {
-        nRow = 3;
-        nCol = 1;
-
-        tturn1 = params.turn1;
-        tturn2 = params.turn2;
-    }
-
-    this.setDimension(nRow, nCol);
-
-    var operator1, operator2,
-        loc1, loc2;
-
-    if(this.loc == 0)
-        loc1 = 0;
-    else if(this.loc == 1)
-        loc2 = 1;
-    else if(this.loc == 2)
-        loc1 = 2;
-    else if(this.loc == 3)
-        loc2 = 3;
-    else if(this.loc == 4)
-    {
-        loc1 = 2;
-        loc2 = 3;
-    }
-    else
-    {
-        loc1 = 0;
-        loc2 = 1;
-    }
-
-
-    if(this.type == 0)
-    {
-        operator1 = new COperatorParenthesis();
-        operator2 = new COperatorParenthesis();
-    }
-    else if(this.type == 1)
-    {
-        operator1 = new COperatorBracket();
-        operator2 = new COperatorBracket();
-    }
-    else if(this.type == 2)
-    {
-        operator1 = new CSquareBracket();
-        operator2 = new CSquareBracket();
-    }
-    else if(this.type == 3)
-    {
-        operator1 = new COperatorAngleBracket();
-        operator2 = new COperatorAngleBracket();
-    }
-    else if(this.type == 4)
-    {
-        operator1 = new CHalfSquareBracket();
-        operator2 = new CHalfSquareBracket();
-    }
-    else if(this.type == 5)
-    {
-        operator1 = new COperatorLine();
-        operator2 = new COperatorLine();
-    }
-    else if(this.type == 6)
-    {
-        operator1 = new COperatorDoubleLine();
-        operator2 = new COperatorDoubleLine();
-    }
-    else
-    {
-        operator1 = new CWhiteSquareBracket();
-        operator2 = new CWhiteSquareBracket();
-    }
-
-    operator1.setLocation(loc1, tturn1);
-    operator1.relate(this);
-    operator2.setLocation(loc2, tturn2);
-    operator2.relate(this);
-  
-
-    if(this.loc == 0 || this.loc == 2)
-    {
-        this.addMCToContent(operator1, base);
-    }
-    else if(this.loc == 1  || this.loc == 3)
-    {
-        this.addMCToContent(base, operator2);
-    }
-    else
-    {
-        this.addMCToContent(operator1, base, operator2);
-    }
-
-    //выравнивание для случая когда центр смещен (не середина), для вложенных дробей и т.п.
-    if(this.loc == 2)
-    {
-        this.alignVer(0, 0.5);
-    }
-    else if(this.loc == 3)
-    {
-        this.alignVer(1, 0.5);
-    }
-    if(this.loc == 4)
-    {
-        this.alignVer(0, 0.5);
-        this.alignVer(2, 0.5);
-    }
-}
-old_CDelimiter.prototype.recalculateSize = function()
-{
-    var width, height, center;
-
-    if(this.loc == 0)
-    {
-        oper = this.elements[0][0];
-        arg = this.elements[1][0];
-
-        oper.recalculateSize(arg.size.width);
-
-        width = oper.size.width > arg.size.width ? oper.size.width : arg.size.width;
-        height = oper.size.height + arg.size.height;
-        center = oper.size.height + arg.size.center;
-    }
-    else if(this.loc == 1)
-    {
-        arg = this.elements[0][0];
-        oper = this.elements[1][0];
-
-        oper.recalculateSize(arg.size.width);
-
-        width = oper.size.width > arg.size.width ? oper.size.width : arg.size.width;
-        height = oper.size.height + arg.size.height;
-        center = arg.size.center;
-    }
-    else if(this.loc == 2)
-    {
-        arg  = this.elements[0][1];
-        oper = this.elements[0][0];
-
-        oper.recalculateSize(arg.size.height);
-
-        width = arg.size.width + oper.size.width;
-        height = oper.size.height > arg.size.height ? oper.size.height : arg.size.height;
-        center = oper.size.center > arg.size.center ? oper.size.center : arg.size.center;
-    }
-    else if(this.loc == 3)
-    {
-        arg  = this.elements[0][0];
-        oper = this.elements[0][1];
-
-        oper.recalculateSize(arg.size.height);
-
-        width = arg.size.width + oper.size.width;
-        height = oper.size.height > arg.size.height ? oper.size.height : arg.size.height;
-        center = oper.size.center > arg.size.center ? oper.size.center : arg.size.center;
-    }
-    else if(this.loc == 4)
-    {
-        oper1 = this.elements[0][0];
-        arg   = this.elements[0][1];
-        oper2 = this.elements[0][2];
-
-        oper1.recalculateSize(arg.size.height);
-        oper2.recalculateSize(arg.size.height);
-
-        width =  oper1.size.width + arg.size.width + oper2.size.width;
-        height = oper1.size.height > arg.size.height ? oper1.size.height : arg.size.height; // oper1.size.height and oper2.size.height are equals
-        center = oper1.size.center > arg.size.center ? oper1.size.center : arg.size.center;
-    }
-    else
-    {
-        oper1 = this.elements[0][0];
-        arg   = this.elements[1][0];
-        oper2 = this.elements[2][0];
-    
-        oper1.recalculateSize(arg.size.width);
-        oper2.recalculateSize(arg.size.width);
-    
-        width = oper1.size.width > arg.size.width ? oper1.size.width : arg.size.width; // oper1.size.width and oper2.size.width are equals
-        height = oper1.size.height + arg.size.height + oper2.size.height;
-        center = oper1.size.height + arg.size.center;
-    }
-
-    this.size = {width: width, height: height, center: center};
-}
-old_CDelimiter.prototype.getBase = function()
-{
-    return this.base;
-}
-old_CDelimiter.prototype.Resize = function()
-{
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(! this.elements[i][j].IsJustDraw() )
-                this.elements[i][j].Resize();
-
-    this.recalculateSize();
-}
-
-/*function CBaseDelimiter()
-{
-    // location
-
-    //-1 - absence
-    // 0 - up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-    // 4 - left/right
-    // 5 - up/down
-
-    this.begOper = null;
-    this.endOper = null;
-    //this.base = null;
-
-    CMathBase.call(this);
-}
-extend(CBaseDelimiter, CMathBase);
-CBaseDelimiter.prototype.init = function(props)
-{
-    if(props.grow == "1" || props.grow == true)
-        this.grow = true;
-    else if(props.grow == "0" || props.grow == false)
-        this.grow = false;
-    else
-        this.grow = true;
-
-    this.begOper = this.getOperator(props.begChr);
-    this.endOper = this.getOperator(props.endChr);
-
-}
-CBaseDelimiter.prototype.init_2 = function(params, base)
-{
-    this.type = params.type;
-    this.loc = params.loc;
-
-    this.base = base;
-
-    var nRow, nCol,
-        tturn1, tturn2;
-
-    if(this.loc== 0)
-    {
-        nRow = 2;
-        nCol = 1;
-        tturn1 = params.turn1;
-    }
-    else if(this.loc == 1)
-    {
-        nRow = 2;
-        nCol = 1;
-        tturn2 = params.turn1;
-    }
-    else if(this.loc == 2)
-    {
-        nRow = 1;
-        nCol = 2;
-
-        tturn1 = params.turn1;
-    }
-    else if(this.loc == 3)
-    {
-        nRow = 1;
-        nCol = 2;
-        tturn2 = params.turn1;
-    }
-    else if(this.loc == 4)
-    {
-        nRow = 1;
-        nCol = 3;
-
-        tturn1 = params.turn1;
-        tturn2 = params.turn2;
-    }
-    else
-    {
-        nRow = 3;
-        nCol = 1;
-
-        tturn1 = params.turn1;
-        tturn2 = params.turn2;
-    }
-
-    this.setDimension(nRow, nCol);
-
-    var operator1, operator2,
-        loc1, loc2;
-
-    if(this.loc == 0)
-        loc1 = 0;
-    else if(this.loc == 1)
-        loc2 = 1;
-    else if(this.loc == 2)
-        loc1 = 2;
-    else if(this.loc == 3)
-        loc2 = 3;
-    else if(this.loc == 4)
-    {
-        loc1 = 2;
-        loc2 = 3;
-    }
-    else
-    {
-        loc1 = 0;
-        loc2 = 1;
-    }
-
-
-    if(this.type == 0)
-    {
-        operator1 = new COperatorParenthesis();
-        operator2 = new COperatorParenthesis();
-    }
-    else if(this.type == 1)
-    {
-        operator1 = new COperatorBracket();
-        operator2 = new COperatorBracket();
-    }
-    else if(this.type == 2)
-    {
-        operator1 = new CSquareBracket();
-        operator2 = new CSquareBracket();
-    }
-    else if(this.type == 3)
-    {
-        operator1 = new COperatorAngleBracket();
-        operator2 = new COperatorAngleBracket();
-    }
-    else if(this.type == 4)
-    {
-        operator1 = new CHalfSquareBracket();
-        operator2 = new CHalfSquareBracket();
-    }
-    else if(this.type == 5)
-    {
-        operator1 = new COperatorLine();
-        operator2 = new COperatorLine();
-    }
-    else if(this.type == 6)
-    {
-        operator1 = new COperatorDoubleLine();
-        operator2 = new COperatorDoubleLine();
-    }
-    else
-    {
-        operator1 = new CWhiteSquareBracket();
-        operator2 = new CWhiteSquareBracket();
-    }
-
-    operator1.setLocation(loc1, tturn1);
-    operator1.relate(this);
-    operator2.setLocation(loc2, tturn2);
-    operator2.relate(this);
-
-
-    if(this.loc == 0 || this.loc == 2)
-    {
-        this.addMCToContent(operator1, base);
-    }
-    else if(this.loc == 1  || this.loc == 3)
-    {
-        this.addMCToContent(base, operator2);
-    }
-    else
-    {
-        this.addMCToContent(operator1, base, operator2);
-    }
-
-    //выравнивание для случая когда центр смещен (не середина), для вложенных дробей и т.п.
-    if(this.loc == 2)
-    {
-        this.alignVer(0, 0.5);
-    }
-    else if(this.loc == 3)
-    {
-        this.alignVer(1, 0.5);
-    }
-    if(this.loc == 4)
-    {
-        this.alignVer(0, 0.5);
-        this.alignVer(2, 0.5);
-    }
-}
-CBaseDelimiter.prototype.recalculateSize = function()
-{
-    var width, height, center;
-
-    if(this.loc == 0)
-    {
-        oper = this.elements[0][0];
-        arg = this.elements[1][0];
-
-        oper.recalculateSize(arg.size.width);
-
-        width = oper.size.width > arg.size.width ? oper.size.width : arg.size.width;
-        height = oper.size.height + arg.size.height;
-        center = oper.size.height + arg.size.center;
-    }
-    else if(this.loc == 1)
-    {
-        arg = this.elements[0][0];
-        oper = this.elements[1][0];
-
-        oper.recalculateSize(arg.size.width);
-
-        width = oper.size.width > arg.size.width ? oper.size.width : arg.size.width;
-        height = oper.size.height + arg.size.height;
-        center = arg.size.center;
-    }
-    else if(this.loc == 2)
-    {
-        arg  = this.elements[0][1];
-        oper = this.elements[0][0];
-
-        oper.recalculateSize(arg.size.height);
-
-        width = arg.size.width + oper.size.width;
-        height = oper.size.height > arg.size.height ? oper.size.height : arg.size.height;
-        center = oper.size.center > arg.size.center ? oper.size.center : arg.size.center;
-    }
-    else if(this.loc == 3)
-    {
-        arg  = this.elements[0][0];
-        oper = this.elements[0][1];
-
-        oper.recalculateSize(arg.size.height);
-
-        width = arg.size.width + oper.size.width;
-        height = oper.size.height > arg.size.height ? oper.size.height : arg.size.height;
-        center = oper.size.center > arg.size.center ? oper.size.center : arg.size.center;
-    }
-    else if(this.loc == 4)
-    {
-        oper1 = this.elements[0][0];
-        arg   = this.elements[0][1];
-        oper2 = this.elements[0][2];
-
-        oper1.recalculateSize(arg.size.height);
-        oper2.recalculateSize(arg.size.height);
-
-        width =  oper1.size.width + arg.size.width + oper2.size.width;
-        height = oper1.size.height > arg.size.height ? oper1.size.height : arg.size.height; // oper1.size.height and oper2.size.height are equals
-        center = oper1.size.center > arg.size.center ? oper1.size.center : arg.size.center;
-    }
-    else
-    {
-        oper1 = this.elements[0][0];
-        arg   = this.elements[1][0];
-        oper2 = this.elements[2][0];
-
-        oper1.recalculateSize(arg.size.width);
-        oper2.recalculateSize(arg.size.width);
-
-        width = oper1.size.width > arg.size.width ? oper1.size.width : arg.size.width; // oper1.size.width and oper2.size.width are equals
-        height = oper1.size.height + arg.size.height + oper2.size.height;
-        center = oper1.size.height + arg.size.center;
-    }
-
-    this.size = {width: width, height: height, center: center};
-}
-CBaseDelimiter.prototype.getBase = function()
-{
-    return this.base;
-}
-CBaseDelimiter.prototype.Resize = function()
-{
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(! this.elements[i][j].IsJustDraw() )
-                this.elements[i][j].Resize();
-
-    this.recalculateSize();
-}
-CBaseDelimiter.prototype.getOperator = function(chr)
-{
-    var operator;
-
-    if( chr.value === "(" || chr.type === PARENTHESIS_LEFT)
-    {
-        operator = new COperatorParenthesis();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === ")" || chr.type === PARENTHESIS_RIGHT)
-    {
-        operator = new COperatorParenthesis();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_RIGHT,
-            turn:       TURN_180
-        };
-        operator.ini(props);
-    }
-    else if( chr.value == "{" || chr.type === BRACKET_CURLY_LEFT)
-    {
-        operator = new COperatorBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === "}" || chr.type === BRACKET_CURLY_RIGHT)
-    {
-        operator = new COperatorBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_RIGHT,
-            turn:       TURN_180
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === "[" || chr.type === BRACKET_SQUARE_LEFT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === "]" || chr.type === BRACKET_SQUARE_RIGHT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_RIGHT,
-            turn:       TURN_180
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === "<" || chr.type === BRACKET_SQUARE_LEFT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_LEFT,
-            turn:       TURN_0
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === ">" || chr.type === BRACKET_SQUARE_RIGHT)
-    {
-        operator = new CSquareBracket();
-        var props =
-        {
-            location:   DELIMITER_LOCATION_RIGHT,
-            turn:       TURN_180
-        };
-        operator.ini(props);
-    }
-    else if( chr.value === "" || chr.type === BRACKET_EMPTY)
-        operator = -1;
-
-    return operator;
-}*/
-
 
 function COperatorBracket()
 {
@@ -2014,285 +969,6 @@ COperatorParenthesis.prototype.drawPath = function(pGraphics, XX, YY)
 // TODO
 // установить минимальный размер стрелок
 
-/*
- function COperator(loc, turn)
- {
- this.loc = loc;
- this.turn = turn;
- this.bHor = this.loc == 0 || this.loc == 1;
- this.oper = null;
- this.arg = null;
-
- var countRow, countCol;
- if(this.bHor)
- {
- countRow = 2;
- countCol = 1;
- }
- else
- {
- countRow = 1;
- countCol = 2;
- }
-
- CMathBase.call(this, countRow, countCol);
- }
- extend(COperator, CMathBase);
- COperator.prototype.setContent = function(calcSizeGlyph, calcCoordGlyph, drawPath)
- {
- var operator = new CGlyphOperator(this.loc, this.turn);
- operator.init(this.params.font);
-
- operator.calcSize = calcSizeGlyph;
- operator.calcCoord = calcCoordGlyph;
- operator.drawPath = drawPath;
-
- var argument = new CMathContent();
- argument.init(this.params);
- argument.relate(this);
- argument.fillPlaceholders();
-
- this.oper = operator;
- this.arg = argument;
-
- var first, second;
-
- if(this.loc == 0 || this.loc == 2)
- {
- first = operator;
- second = argument;
- }
- else
- {
- first = argument;
- second = operator;
- }
-
- COperator.superclass.setContent.call(this, first, second);
- }
- COperator.prototype.recalculateSize = function()
- {
- if(this.bHor)
- this.oper.recalculateSize(this.arg.size.width);
- else
- this.oper.recalculateSize(this.arg.size.height);
-
- COperator.superclass.recalculateSize.call(this);
- }
- COperator.prototype.getCenter = function()
- {
- var center;
-
- if(this.loc == 0)
- center = this.elements[0][0].size.height + this.elements[1][0].size.center;
- else
- center = this.elements[0][0].size.height;
-
- return center;
- }
-
- function COperatorArrow(id, loc, turn)
-{
-    // id
-    // 0 - harpoon
-    // 1 - arrow
-    // 2 - double arrow
-
-    // loc
-    // 0 - up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-
-    this.id = id;
-    if(this.loc == 2 || this.loc == 3)
-    {
-        if(this.turn == 1)
-            this.turn = 3;
-        else if(this.turn == 3)
-            this.turn = 1;
-    }
-
-    COperator.call(this, loc, turn);
-}
-extend(COperatorArrow, COperator);
-COperatorArrow.prototype.setContent = function()
-{
-    COperatorArrow.superclass.setContent.call(this, this.calcSize, this.calcCoord, this.drawPath);
-}
-COperatorArrow.prototype.setContent = function()
-{
-    //this.fillPlaceholders();
-
-    COperatorArrow.superclass.setContent.call(this, this.calcSize, this.calcCoord, this.drawPath);
-
-    if(this.loc == 0)
-        this.arg.SetDotIndef(true);
-}
-COperatorArrow.prototype.calcSize = function()
-{
-    // 0x21BC half, down
-
-    var height = 3.88*this.betta;
-    var width = 4.938*this.betta;
-
-    return {width: width, height: height};
-}
-COperatorArrow.prototype.calcCoord = function(measure)
-{
-    // px                       mm
-    // XX[..]                   width
-    // YY[..]                   height
-    // penW
-
-    var X = new Array(),
-        Y = new Array();
-
-    // 600 pt
-
-    X[0] = 0;       Y[0] = 3047;//Y[2] = 2245;
-    X[1] = 9415;    Y[1] = 11431;
-    X[2] = 10766;   Y[2] = 10171;
-    X[3] = 5566;    Y[3] = 3047;
-
-
-    var lineW = measure/this.alpha;
-    //var lineW = measure - 2*this.penW*this.alpha;  //mm
-    var lineH = 3047;
-
-    //var h = this.size.height > this.size.width ? this.size.width : this.size.height; // т.к. в glyph нет bVert
-    var shY =  (this.size.height/this.alpha - lineH)/2;
-
-    X[4] = 0;            Y[4] = 0;
-    X[5] = 0;            Y[5] = lineH;
-    X[6] = lineW;        Y[6] = lineH;
-    X[7] = lineW;        Y[7] = 0;
-    X[8] = 0;            Y[8] = 0;
-
-    for(var i = 0 ; i < X.length; i++)
-    {
-        X[i] = X[i]*this.alpha;
-        Y[i] = (shY + Y[i])*this.alpha;
-    }
-
-    var W = X[6],
-        H = Y[1];
-
-    return {XX: X, YY: Y, W: W, H: H};
-}
-COperatorArrow.prototype.calcCoord_other = function(measure) //  с выравниванием к краю (относительно аргумента)
-{
-    // px                       mm
-    // XX[..]                   width
-    // YY[..]                   height
-    // penW
-
-    var X = new Array(),
-        Y = new Array();
-
-    // 600 pt
-
-    X[0] = 0;       Y[0] = 3047;//Y[2] = 2245;
-    X[1] = 9415;    Y[1] = 11431;
-    X[2] = 10766;   Y[2] = 10171;
-    X[3] = 5566;    Y[3] = 3047;
-
-    var lineW = measure/this.alpha;
-    var lineH = Y[3];
-
-    var shY = Y[1] - lineH; // выравнивам, чтобы линии стрелок совпадали
-
-    X[4] = 0;            Y[4] = 0;
-    X[5] = 0;            Y[5] = lineH;
-    X[6] = lineW;        Y[6] = lineH;
-    X[7] = lineW;        Y[7] = 0;
-    X[8] = 0;            Y[8] = 0;
-
-    for(var i = 0 ; i < X.length; i++)
-    {
-        X[i] = X[i]*this.alpha;
-        Y[i] = (shY + Y[i])*this.alpha;
-    }
-
-    var W = X[6],
-        H = Y[1];
-
-    return {XX: X, YY: Y, W: W, H: H};
-}
-COperatorArrow.prototype.drawPath = function(XX, YY)
-{
-    MathControl.pGraph._m(XX[0], YY[0]);
-    MathControl.pGraph._l(XX[1], YY[1]);
-    MathControl.pGraph._l(XX[2], YY[2]);
-    MathControl.pGraph._l(XX[3], YY[3]);
-
-    MathControl.pGraph._m(XX[4], YY[4]);
-    MathControl.pGraph._l(XX[5], YY[5]);
-    MathControl.pGraph._l(XX[6], YY[6]);
-    MathControl.pGraph._l(XX[7], YY[7]);
-    MathControl.pGraph._l(XX[8], YY[8]);
-}
-COperatorArrow.prototype.draw = function()
-{
-    if(this.id == 1)
-        bTEST = true;
-    else
-        bTEST = false;
-
-    var turn = this.oper.turn;
-    var TT = new Array();
-    // поворачивая стрелку, рисуем ее несколько раз
-    //cоответствующие коэффициенты поворота записываем в TT
-
-    this.arg.draw();
-    if(this.id == 0)
-        TT.push(this.oper.turn);
-    else if(this.id == 1)
-    {
-        if(this.bHor)
-        {
-            if(this.turn == 0)
-            {
-                TT.push(0);
-                TT.push(2);
-            }
-            else
-            {
-                TT.push(1);
-                TT.push(3);
-            }
-        }
-        else
-        {
-            if(this.turn == 0)
-            {
-                TT.push(0);
-                TT.push(1);
-            }
-            else
-            {
-                TT.push(2);
-                TT.push(3);
-            }
-        }
-    }
-    else
-    {
-        TT.push(0);
-        TT.push(1);
-        TT.push(2);
-        TT.push(3);
-    }
-
-    for(var i = 0; i < TT.length; i++)
-    {
-        this.oper.turn = TT[i];
-        this.oper.draw();
-    }
-
-    this.oper.turn = turn;
-}*/
-
 function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
@@ -2541,68 +1217,6 @@ CHalfSquareBracket.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[6], YY[6]);
 }
 
-function old_GroupCharacter()
-{
-    this.index = null;
-    CSubMathBase.call(this);
-}
-extend(old_GroupCharacter, CSubMathBase);
-old_GroupCharacter.prototype.init = function(index)
-{
-    this.index = index;
-
-    this.setDimension(2, 1);
-
-    var oLim = new CMathContent();
-    oLim.setReduct(DEGR_REDUCT);
-
-    if(this.index == 1)
-    {
-        var oGrBracket = new CDelimiter();
-        oGrBracket.init(1,0,0);
-
-        this.addMCToContent(oLim, oGrBracket);
-    }
-    else
-    {
-        var oGrBracket = new CDelimiter();
-        oGrBracket.init(1,1,2);
-
-        this.addMCToContent(oGrBracket, oLim);
-    }
-
-}
-old_GroupCharacter.prototype.getCenter = function()
-{
-    var center;
-
-    if(this.index == 1)
-    {
-        var hLim = this.elements[0][0].size.height,
-            cGrBr = this.elements[1][0].size.center;
-
-        center = hLim + cGrBr + this.dH;
-    }
-    else
-    {
-        center = this.elements[0][0].size.center;
-    }
-
-    return center;
-}
-old_GroupCharacter.prototype.setDistance = function()
-{
-    this.dH = 1.9581922743055555 * this.getTxtPrp().FontSize / 36;
-}
-old_GroupCharacter.prototype.recalculateSize = function()
-{
-    var metrics = this.params.font.metrics;
-    var gap = metrics.Height - metrics.Placeholder.Height + metrics.Descender;
-
-    this.dH = gap/4;
-
-    old_GroupCharacter.superclass.recalculateSize.call(this);
-}
 
 function COperatorLine()
 {
@@ -2845,87 +1459,6 @@ COperatorDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[9], YY[9]);
 }
 
-/*function CStructArrow()
-{
-    // location
-    // 0 - up
-    // 1 - down
-
-    this.loc = null;
-    CSubMathBase.call(this);
-}
-extend(CStructArrow, CSubMathBase);
-CStructArrow.prototype.init = function(type, loc, turn)
-{
-    this.loc = loc;
-    this.setDimension(2, 1);
-
-    var operator;
-
-    if(type == 1)
-        operator = new CSingleArrow();
-    else if(type == 2)
-        operator = new CLeftRightArrow();
-    else if(type == 3)
-        operator = new CDoubleArrow();
-    else if(type == 4)
-        operator = new CLR_DoubleArrow();
-    else if(type == 5)
-        operator = new CCombiningArrow();
-
-    operator.setLocation(loc, turn);
-
-    var argument = new CMathContent();
-    argument.setReduct(DEGR_REDUCT);
-
-    if(loc == 0)
-        this.addMCToContent(operator, argument);
-    else
-        this.addMCToContent(argument, operator);
-    
-}
-CStructArrow.prototype.getCenter = function()
-{
-    var center, sizeGlyph;
-
-    if(this.loc == 0)
-    {
-        sizeGlyph = this.elements[0][0].getSizeGlyph();
-        center = sizeGlyph.center;
-    }
-    else
-    {
-        sizeGlyph = this.elements[1][0].getSizeGlyph();
-        center = this.elements[1][0].size.height + this.elements[0][0].size.height - sizeGlyph.center;
-    }
-
-    return center;
-}
-CStructArrow.prototype.recalculateSize = function()
-{
-    if(this.loc == 0)
-    {
-        var argSize = this.elements[1][0].size;
-        this.elements[0][0].recalculateSize(argSize.width);
-    }
-    else
-    {
-        var argSize = this.elements[0][0].size;
-        this.elements[1][0].recalculateSize(argSize.width);
-    }
-
-    CStructArrow.superclass.recalculateSize.call(this);
-}
-CStructArrow.prototype.getBase = function()
-{
-    var res;
-    if(this.loc == 0)
-        res = this.elements[1][0];
-    else
-        res = this.elements[0][0];
-
-    return res;
-}*/
 
 function CSingleArrow()
 {
@@ -3287,79 +1820,7 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[22], YY[22]);
     pGraphics._l(XX[23], YY[23]);
 }
-/*CLR_DoubleArrow.prototype.getSizeGlyph = function()
-{
-    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
-    var alpha = textScale*25.4/96 /64;
 
-    var width = 70875*alpha;
-    var height = 39064*alpha;
-    var center = 19532.5*alpha;
-
-    return {width : width, height : height, center : center}
-}*/
-
-/*function CStructCombiningArrow()
-{
-    // location
-    // 0 - up
-    // 1 - down
-
-    this.loc = null;
-    CSubMathBase.call(this);
-}
-extend(CStructCombiningArrow, CSubMathBase);
-CStructCombiningArrow.prototype.init = function(type, loc, turn)
-{
-    this.setDimension(2, 1);
-    this.loc = loc;
-
-    var operator;
-
-    if(type == 0)
-        operator = new CCombiningHalfArrow();
-    else if(type == 1)
-        operator = new CCombiningArrow();
-    else
-        operator = new CCombining_LR_Arrow();
-
-    operator.setLocation(loc, turn);
-
-    var argument = new CMathContent();
-    if(loc == 0)
-        argument.SetDot(true);
-
-    if(loc == 0)
-        this.addMCToContent(operator, argument);
-    else
-        this.addMCToContent(argument, operator);
-}
-CStructCombiningArrow.prototype.getCenter = function()
-{
-    var center;
-
-    if(this.loc == 0)
-        center = this.elements[0][0].size.height + this.elements[1][0].size.center;
-    else
-        center = this.elements[1][0].size.height + this.elements[0][0].size.height;
-
-    return center;
-}
-CStructCombiningArrow.prototype.recalculateSize = function()
-{
-    if(this.loc == 0)
-    {
-        var argSize = this.elements[1][0].size;
-        this.elements[0][0].recalculateSize(argSize.width);
-    }
-    else
-    {
-        var argSize = this.elements[0][0].size;
-        this.elements[1][0].recalculateSize(argSize.width);
-    }
-
-    CStructArrow.superclass.recalculateSize.call(this);
-}*/
 
 
 function CCombiningArrow()
@@ -3687,22 +2148,31 @@ old_old_CSeparator.prototype.drawHorLine = function()
 
 function COperator(type)
 {
-    this.type = type;
+    this.type = type; // delimiter, separator, group character
     this.glyph = -1;
 
     this.code = null;
-    this.typeOper = null;
+    this.typeOper = null;   // тип скобки : круглая и т.п.
+    this.defaultType = null;
 
     this.pos = null;
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 }
-COperator.prototype.init = function(chr, type, location)
+COperator.prototype.init = function(props, defaultProps)        // props (chr, type, location), defaultProps (chr, location)
 {
-    var operator;
-    var code = typeof(chr) === "string" && chr.length > 0 ? chr.charCodeAt(0) : null;
-    var typeOper = null,
-        codeChr = null;
+    var operator = null,
+        typeOper = null,
+        codeChr  = null;
+
+    var prp = this.getProps(props, defaultProps);
+
+    //var code = typeof(prp.chr) === "string" && prp.chr.length > 0 ? prp.chr.charCodeAt(0) : null;
+
+    var type = prp.type,
+        location = prp.loc,
+        code = prp.code;
+
 
     if( code === 0x28 || type === PARENTHESIS_LEFT)
     {
@@ -3717,7 +2187,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x29 || type === PARENTHESIS_RIGHT)
+    else if(code === 0x29 || type === PARENTHESIS_RIGHT)
     {
         codeChr = 0x29;
         typeOper = PARENTHESIS_RIGHT;
@@ -3730,7 +2200,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code == 0x7B || type === BRACKET_CURLY_LEFT)
+    else if(code == 0x7B || type === BRACKET_CURLY_LEFT)
     {
         codeChr = 0x7B;
         typeOper = BRACKET_CURLY_LEFT;
@@ -3743,7 +2213,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x7D || type === BRACKET_CURLY_RIGHT)
+    else if(code === 0x7D || type === BRACKET_CURLY_RIGHT)
     {
         codeChr = 0x7D;
         typeOper = BRACKET_CURLY_RIGHT;
@@ -3756,7 +2226,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x5B || type === BRACKET_SQUARE_LEFT)
+    else if(code === 0x5B || type === BRACKET_SQUARE_LEFT)
     {
         codeChr = 0x5B;
         typeOper = BRACKET_SQUARE_LEFT;
@@ -3769,7 +2239,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x5D || type === BRACKET_SQUARE_RIGHT)
+    else if(code === 0x5D || type === BRACKET_SQUARE_RIGHT)
     {
         codeChr = 0x5D;
         typeOper = BRACKET_SQUARE_RIGHT;
@@ -3782,7 +2252,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x3C || type === BRACKET_ANGLE_LEFT)
+    else if(code === 0x3C || type === BRACKET_ANGLE_LEFT)
     {
         codeChr = 0x3C;
         typeOper = BRACKET_ANGLE_LEFT;
@@ -3796,7 +2266,7 @@ COperator.prototype.init = function(chr, type, location)
         };
         operator.init(props);
     }
-    else if( code === 0x3E || type === BRACKET_ANGLE_RIGHT)
+    else if(code === 0x3E || type === BRACKET_ANGLE_RIGHT)
     {
         codeChr = 0x3E;
         typeOper = BRACKET_ANGLE_RIGHT;
@@ -3940,11 +2410,38 @@ COperator.prototype.init = function(chr, type, location)
     this.typeOper = typeOper;
 
 }
+COperator.prototype.getProps = function(props, defaultProps)
+{
+    var location = props.loc,
+        chr = props.chr,
+        type = props.type;
+
+    this.defaultType = defaultProps.type;
+
+    var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
+        bType = typeof(props.type)!=="undefined" &&  props.type !== null,
+        bEmptyStr = typeof(chr) === "string" && chr.length == 0,
+        bCode = typeof(chr) === "string" && chr.length > 0;
+
+    var code = bCode ? chr.charCodeAt(0) : null;
+
+    var bDPrpDelim =  bDelimiter && !bType && bEmptyStr,
+        bDPrpOther =  !bDelimiter && !bType && !bCode;
+
+    if(bDPrpDelim || bDPrpOther)
+    {
+        type = defaultProps.type;
+        if(defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined")
+            location = defaultProps.loc;
+    }
+
+    return  {loc: location, type: type, code: code};
+}
 COperator.prototype.draw = function(pGraphics)
 {
-    if(this.type === DELIM_OPERATOR)
+    if(this.type === OPER_DELIMITER)
         this.drawOperator(pGraphics);
-    else if(this.type === DELIM_SEPARATOR)
+    else if(this.type === OPER_SEPARATOR)
         this.drawSeparator(pGraphics);
 }
 COperator.prototype.drawOperator = function(pGraphics)
@@ -4045,12 +2542,12 @@ COperator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
 }
-COperator.prototype.getChr = function(defaultCode)
+COperator.prototype.getChr = function()
 {
     var chr = null; //если glyph не определен, то this.code = null
 
     if(this.code !== null)
-        chr = this.code == defaultCode ? "" : String.fromCharCode(this.code);
+        chr = this.typeOper == this.defaultType ? "" : String.fromCharCode(this.code);
 
     return chr;
 }
@@ -4087,9 +2584,9 @@ old_CSeparator.prototype.setPosition = function(pos)
 
 function CDelimiter()
 {
-    this.begOper = new COperator (DELIM_OPERATOR);
-    this.endOper = new COperator (DELIM_OPERATOR);
-    this.sepOper = new COperator (DELIM_SEPARATOR);
+    this.begOper = new COperator (OPER_DELIMITER);
+    this.endOper = new COperator (OPER_DELIMITER);
+    this.sepOper = new COperator (OPER_SEPARATOR);
 
     this.shape = DELIMITER_SHAPE_CENTERED;
     this.grow = true;
@@ -4111,23 +2608,54 @@ CDelimiter.prototype.init = function(props)
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
 
-    if(typeof(props.begChr) === "string" && props.begChr.length == 0)
+    /*if(typeof(props.begChr) === "string" && props.begChr.length == 0)
         props.begChrType = PARENTHESIS_LEFT;
 
     if(typeof(props.endChr) === "string" && props.endChr.length == 0)
         props.endChrType = PARENTHESIS_RIGHT;
 
     if(typeof(props.endChr) === "string" && props.endChr.length == 0)
-        props.sepChrType = DELIMITER_LINE;
+        props.sepChrType = DELIMITER_LINE;*/
 
-
-    this.begOper.init(props.begChr, props.begChrType, LOCATION_LEFT);
+    var begPrp =
+    {
+        chr:   props.begChr,
+        type:   props.begChrType,
+        loc:    LOCATION_LEFT
+    };
+    var begDefaultPrp =
+    {
+        type:  PARENTHESIS_LEFT
+    };
+    this.begOper.init(begPrp, begDefaultPrp);
     this.begOper.relate(this);
 
-    this.endOper.init(props.endChr, props.endChrType, LOCATION_RIGHT);
+    var endPrp =
+    {
+        chr:   props.endChr,
+        type:   props.endChrType,
+        loc:    LOCATION_RIGHT
+    };
+    var endDefaultPrp =
+    {
+        type:  PARENTHESIS_RIGHT
+    };
+
+    this.endOper.init(endPrp, endDefaultPrp);
     this.endOper.relate(this);
 
-    this.sepOper.init(props.sepChr, props.sepChrType, LOCATION_SEP);
+    var sepPrp =
+    {
+        chr:   props.sepChr,
+        type:   props.sepChrType,
+        loc:    LOCATION_SEP
+    };
+    var sepDefaultPrp =
+    {
+        type:  DELIMITER_LINE
+    };
+
+    this.sepOper.init(sepPrp, sepDefaultPrp);
     this.sepOper.relate(this);
 
     if(props.shape == DELIMITER_SHAPE_MATH || props.shp == DELIMITER_SHAPE_MATH)
@@ -4441,145 +2969,11 @@ CDelimiter.prototype.getPropsForWrite = function()
     props.column = this.nCol;
     props.shp = this.shape;
 
-    props.begChr = this.begOper.getChr(0x28); // PARENTHESIS_LEFT
-    props.endChr = this.endOper.getChr(0x29); // PARENTHESIS_RIGHT
-    props.sepChr = this.sepOper.getChr(0x7C); // DELIMITER_LINE
+    props.begChr = this.begOper.getChr(); // default: PARENTHESIS_LEFT
+    props.endChr = this.endOper.getChr(); // default: PARENTHESIS_RIGHT
+    props.sepChr = this.sepOper.getChr(); // default: DELIMITER_LINE
 
     return props;
-}
-
-
-function old_CGroupCharacter()
-{
-    this.operator = null;
-    this.vertJust = VJUST_TOP;
-    this.loc = LOCATION_BOT;
-
-    CSubMathBase.call(this);
-}
-extend(old_CGroupCharacter, CSubMathBase);
-old_CGroupCharacter.prototype.init = function(props)
-{
-    if(props.pos === "top" || props.location === LOCATION_TOP)
-        this.loc = LOCATION_TOP;
-    else if(props.pos === "bot" || props.location === LOCATION_BOT)
-        this.loc = LOCATION_BOT;
-
-    if(props.vertJust === "top" || props.justif == VJUST_TOP)
-        this.vertJust = VJUST_TOP;
-    else if(props.vertJust === "bottom"|| props.justif == VJUST_BOT)
-        this.vertJust = VJUST_BOT;
-
-    this.operator = new COperator ( GetGlyph_GrChr(props.chr, this.loc) );
-    var tPrp = this.getTxtPrp();
-    this.operator.setTxtPrp(tPrp);
-
-    this.setDimension(1, 1);
-    this.setContent();
-}
-old_CGroupCharacter.prototype.recalculateSize = function()
-{
-    var content = this.elements[0][0];
-
-    this.operator.fixSize(this.elements[0][0].size.width);
-
-    var width = content.size.width > this.operator.size.width ? content.size.width : this.operator.size.width,
-        height = content.size.height + this.operator.size.height,
-        center;
-
-    if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)
-        center =  this.operator.size.height/2;
-    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_TOP )
-        center = this.operator.size.height + this.elements[0][0].size.center;
-    else if(this.vertJust === VJUST_TOP && this.loc === LOCATION_BOT )
-        center = this.elements[0][0].size.center;
-    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_BOT )
-        center = this.operator.size.height/2 + this.elements[0][0].size.height;
-
-    this.size = {height: height, width: width, center: center};
-}
-old_CGroupCharacter.prototype.draw = function()
-{
-    this.elements[0][0].draw();
-    this.operator.draw();
-}
-old_CGroupCharacter.prototype.setPosition = function(pos)
-{
-    this.pos = {x: pos.x, y: pos.y - this.size.center};
-
-    var alignOp  =  this.align(this.operator),
-        alignCnt = this.align(this.elements[0][0]);
-
-    if(this.loc === LOCATION_TOP)
-    {
-        var pos = {x: this.pos.x + alignOp, y: this.pos.y};
-        this.operator.setPosition([pos]);
-
-        pos = {x: this.pos.x + alignCnt, y: this.pos.y + this.operator.size.height};
-        this.elements[0][0].setPosition(pos);
-    }
-    else if(this.loc === LOCATION_BOT)
-    {
-        var pos = {x: this.pos.x + alignCnt, y: this.pos.y};
-        this.elements[0][0].setPosition(pos);
-
-        pos = {x: this.pos.x + alignOp, y: this.pos.y + this.elements[0][0].size.height};
-        this.operator.setPosition([pos]);
-    }
-}
-old_CGroupCharacter.prototype.align = function(element)
-{
-    return (this.size.width - element.size.width)/2;
-}
-old_CGroupCharacter.prototype.findDisposition = function(pos)
-{
-    var curs_X = 0,
-        curs_Y = 0;
-    var X, Y;
-
-    var inside_flag = -1;
-
-    var content = this.elements[0][0],
-        align = this.align(content);
-
-    if(pos.x < align)
-    {
-        X = 0;
-        inside_flag = 0;
-    }
-    else if(pos.x > align + content.size.width)
-    {
-        X = content.size.width;
-        inside_flag = 1;
-    }
-    else
-        X = pos.x - align;
-
-    if(this.loc === LOCATION_TOP)
-    {
-        if(pos.y < this.operator.size.height)
-        {
-            Y = 0;
-            inside_flag = 2;
-        }
-        else
-            Y = pos.y - this.operator.size.height;
-    }
-    else if(this.loc === LOCATION_BOT)
-    {
-        if(pos.y > content.size.height)
-        {
-            Y = content.size.height;
-            inside_flag = 2;
-        }
-        else
-            Y = pos.y;
-    }
-
-    var mouseCoord = {x: X, y: Y},
-        posCurs =    {x: curs_X, y: curs_Y};
-
-    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
 
 

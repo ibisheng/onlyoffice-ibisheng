@@ -15,9 +15,11 @@
 //При добавлении в началло контента элемента , он вставляется с размером шрифта 11, посмотреть getCurrRunPrp
 // При удаление из начала контента элемента, у всех остальных автоматом 11 размер шрифта
 
+/// TODO (завтра)
+//  1. протащить через все recalculateSize oMeasure
+//  2. убрать slashWidth
 
-
-/// TODO (tomorrow)
+/// TODO (послезавтра)
 
 // !!! Проверить типы для groupCharacter, delimiters и accent
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
@@ -4145,21 +4147,21 @@ CMathContent.prototype =
 
         this.update_widthContent(); /// !!!!
     },
-    RecalculateReverse: function()
+    RecalculateReverse: function(oMeasure)
     {
         // for add component, set Txt Properties
         var start = this.rInterval.startPos,
             end = this.rInterval.endPos;
         for(var i = start; i < end; i++)
-            this.content[i].value.Resize();
+            this.content[i].value.Resize(oMeasure);
 
         this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
 
         this.recalculateSize();
         if(! this.bRoot )
-            this.Parent.RecalculateReverse();
+            this.Parent.RecalculateReverse(oMeasure);
     },
-    Resize: function() // for  "read"
+    Resize: function(oMeasure)      // пересчитываем всю формулу
     {
         var bItalic = true;
 
@@ -4170,11 +4172,11 @@ CMathContent.prototype =
             if(type == MATH_TEXT)
             {
                 this.content[i].value.setMText(bItalic);
-                this.content[i].value.recalculateSize();
+                this.content[i].value.resize(oMeasure);
             }
             else if(type == MATH_COMP)
             {
-                this.content[i].value.Resize();
+                this.content[i].value.Resize(oMeasure);
             }
             else if(type == MATH_RUN_PRP)
             {
@@ -4201,7 +4203,7 @@ CMathContent.prototype =
                     txtPrp.Italic = false;
 
                     g_oTextMeasurer.SetFont(txtPrp);
-                    this.content[i].value.recalculateSize();
+                    this.content[i].value.resize(oMeasure);
                 }
             }
         }
@@ -5808,7 +5810,7 @@ CMathContent.prototype =
     {
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        //this.Root.Resize();
     },
     _Check_HistoryUninon: function(Data1, Data2)
     {
@@ -5879,6 +5881,9 @@ function CMathComposition()
 }
 CMathComposition.prototype =
 {
+    // сделать глобальную булевскую переменную для того, чтобы запоминать нужен пересчет контента или нет
+    // необходима тк на backspace  может не быть  реального удаления переменных, а только селект
+
     Init: function()
     {
         // TODO
@@ -5908,7 +5913,10 @@ CMathComposition.prototype =
     {
         return this.DefaultTxtPrp;
     },
-    Draw: function(pGraphics)
+    //TODO
+    // переделать Draw (для режима редактирования передавать координату для отрисовки формулы) !!
+    // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
+    Draw_2: function(pGraphics)
     {
         if(this.Root.content.length > 1)
         {
@@ -5927,7 +5935,7 @@ CMathComposition.prototype =
 
         this.Root.draw(pGraphics);
     },
-    Draw_2: function(x, y, pGraphics)
+    Draw: function(x, y, pGraphics)
     {
         if(this.Root.content.length > 1)
         {
@@ -6063,7 +6071,7 @@ CMathComposition.prototype =
 
             // временно
             //this.CurrentContent.RecalculateReverse();
-            this.Root.Resize();
+            this.Resize(g_oTextMeasurer);
             this.UpdatePosition();
         }
 
@@ -6081,13 +6089,13 @@ CMathComposition.prototype =
         this.pos = pos;
         this.Root.setPosition(this.pos);
     },
-    RecalculateReverse: function() // for edit
+    RecalculateReverse: function(oMeasure) // for edit
     {
-        this.SelectContent.RecalculateReverse();
+        this.SelectContent.RecalculateReverse(oMeasure);
     },
-    Resize: function()
+    Resize: function(oMeasure)
     {
-        this.Root.Resize();
+        this.Root.Resize(oMeasure);
     },
     //// edit ////
     AddLetter: function(code)
@@ -6109,7 +6117,7 @@ CMathComposition.prototype =
 
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
 
         this.UpdatePosition();
         ///
@@ -6146,7 +6154,8 @@ CMathComposition.prototype =
         ///
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
         this.UpdatePosition();
         ///
 
@@ -6191,7 +6200,8 @@ CMathComposition.prototype =
         this.ClearSelect();
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
         this.UpdatePosition();
 
         var stackSelect = Common_CopyObj(State.Select.stack),
@@ -6358,7 +6368,8 @@ CMathComposition.prototype =
 
         // временно
         //this.RecalculateReverse();
-        this.Root.Resize();
+        //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
         this.UpdatePosition();
         //this.SelectContent.drawSelect();
         this.CheckTarget();
@@ -6440,7 +6451,7 @@ CMathComposition.prototype =
 
         if(e.CtrlKey == true  && e.KeyCode == 81)
         {
-            simulatorMComposition(MATH_READ);
+            simulatorMComposition(this, MATH_READ);
             return false;
         }
 
@@ -6504,19 +6515,36 @@ CMathComposition.prototype =
         // временно
         //this.RecalculateReverse();
         //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
         this.UpdatePosition();
     },
-    RecalculateComposition: function()
+    RecalculateComposition_2: function(oMeasure)
     {
-        //this.Root.setTxtPrp(this.TxtPrp);
         //this.SetReferenceComposition();
-        this.Root.Resize();
+
+        this.Root.Resize(oMeasure);
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
     },
-    RecalculateComposition_2: function()
+    RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
     {
-        this.Root.Resize();
+        ////*  test  *////
+
+        /*var textPrp = new TextPr();
+        this.DefaultTxtPrp.FontSize = 11;
+        textPrp.Marge(this.DefaultTxtPrp);
+        textPrp.Merge(TextPr);
+
+        this.DefaultTxtPrp = textPrp;*/
+
+        ///////////////////////
+
+        this.Root.Resize(oMeasure); // пересчитываем всю формулу
+
+        var width = this.Root.size.width,
+            height = this.Root.size.height;
+
+        return {Width: width, Height: height, WidthVisible: width };
     },
     SetReferenceComposition: function()
     {
@@ -6541,6 +6569,7 @@ CMathComposition.prototype =
     }
 
 }
+
 
 function CEmpty()
 {
@@ -6569,7 +6598,6 @@ function CEmpty()
     this.getRunPrp = function() {return this.TxtPrp; };
     this.setOwnTPrp = function() {};*/
     this.relate     = function() {};
-
 }
 
 function CRun()
@@ -6596,8 +6624,6 @@ CRun.prototype =
     {
         return MATH_RUN;
     },
-
-
     setTxtPrp:  function(oRunPrp)
     {
         this.txtPrp = oRunPrp.getTextPrp();
@@ -6612,11 +6638,12 @@ CRun.prototype =
     }
 }
 
-function TEST_COMPOSITION()
+
+function TEST_MATH_EDIT()
 {
     //MathComposition.test_for_edit();
-    MathComposition.test_for_edit_2();
-    MathComposition.RecalculateComposition_2();
+    MathComposition.test_for_edit();
+    MathComposition.RecalculateComposition(g_oTextMeasurer, MathComposition.DefaultTxtPrp);
     //MathComposition.Draw_2(x, y, )
 
 

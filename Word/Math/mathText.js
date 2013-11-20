@@ -141,48 +141,10 @@ CMathText.prototype =
         this.typeObj = MATH_PLACEHOLDER;
         this.value = StartTextElement;
     },
-    /*old_getTxtPrp: function()
-    {
-        var txtPrp = this.Parent.getTxtPrp();
-        txtPrp.Merge(this.textPrp);
-        var reduct = this.Parent.getReduct(); // чтобы не перекрывать
-        txtPrp.FontSize *= reduct;
-
-        //txtPrp.FontSize *= this.Parent.getReduct(); // чтобы не перекрывать
-        //txtPrp.Italic = false; // всегда отправляем "false"!!
-
-        return txtPrp;
-    },*/
-    /*setTxtPrp: function(txtPrp)
-    {
-        this.TxtPrp  = new CMathTextPrp();
-        this.TxtPrp.Merge(txtPrp);
-    },
-    setOwnTPrp: function(txtPrp)
-    {
-        this.OwnTPrp.Merge(txtPrp);
-    },*/
     setLIterator: function(bIterator)
     {
         this.bIterator = bIterator; // символы другие , чуть толще
     },
-
-    /*getRunPrp: function()
-    {
-        return this.TxtPrp;
-    },
-    getTxtPrp: function()
-    {
-        var txtPrp = new CMathTextPrp();
-        txtPrp.Merge(this.TxtPrp);
-        txtPrp.Merge(this.OwnTPrp);
-
-        return txtPrp ;
-    },
-    getOwnTPrp: function()
-    {
-        return this.textPrp;
-    },*/
 
     // ascent = Symbol.Ascent // = Placeholder.Ascent (= Placeholder.Height)
     // descent = FontAscent - Placeholder.Height (FontAscent = FontHeight - FontDescent)
@@ -219,6 +181,25 @@ CMathText.prototype =
          var placeholder = font.metrics.Placeholder;
          var  _cent = placeholder.Height*0.375;
          var HH = g_oTextMeasurer.GetHeight();*/
+
+        this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
+    },
+    resize: function(oMeasure)
+    {
+        var letter = this.getCode();
+
+        var metricsTxt = oMeasure.Measure2Code(letter);
+        var _width = metricsTxt.Width;
+
+        var _ascent = metricsTxt.Ascent;
+        var _descent = (metricsTxt.Height - metricsTxt.Ascent);
+        var _height = _ascent + _descent;
+        var widthG =  metricsTxt.WidthG;
+
+        // TODO
+        // убрать это смещение
+        var _center = _ascent - 0.2487852283770651*oMeasure.GetHeight(); // смещаем центр
+
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
@@ -320,14 +301,14 @@ CMathText.prototype =
 		//pGraphics.FillTextCode(xx, yy , this.value);
 
     },
-    old_setPosition: function(pos)
+    setPosition: function(pos)
     {
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x, y: pos.y };
         else                                    // for symbol only drawing
             this.pos = {x: pos.x , y: pos.y + this.size.center};
     },
-    setPosition: function(pos)
+    new_setPosition: function(pos)
     {
         this.pos = {x: pos.x , y: pos.y};
     },
@@ -360,9 +341,9 @@ CMathText.prototype =
         this.size.center = this.size.center*(this.transform.sy + this.transform.shy);*/
 
     },
-    Resize: function()
+    Resize: function(oMeasure)
     {
-        this.recalculateSize();
+        this.resize(oMeasure);
     },
     IsJustDraw: function()
     {

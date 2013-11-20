@@ -354,7 +354,7 @@ CControlComposition.prototype =
     {
         for(var i = 0; i < this.Content.length; i++)
         {
-            this.Content[i].Draw(pGraph);
+            this.Content[i].Draw_2(pGraph);
             if(pGraph != "undefined" && pGraph !== null)
                 this.pGraph = pGraph;
         }
@@ -371,10 +371,11 @@ CControlComposition.prototype =
         return {x: _x, y: _y};
     },
     // AddMathComponent -> CreateEquation
+    // recalculate Equation
     CreateEquation: function(indef)
     {
         this.Content[this.CurPos].CreateEquation(indef);
-        this.Content[this.CurPos].RecalculateReverse();
+        this.Content[this.CurPos].RecalculateReverse(oMeasure);
         this.Content[this.CurPos].UpdatePosition();
     },
     Paragraph_Add: function(TextPr)
@@ -429,7 +430,7 @@ CControlComposition.prototype =
 }
 var MathControl = new CControlComposition();
 MathControl.AddComposition();
-MathControl.SetPosition({x: 21.5, y: 25.3 });
+MathControl.SetPosition({x: 27.5 - 6, y: 25.3 });
 
 var inherit = function(obj, extObj)
 {

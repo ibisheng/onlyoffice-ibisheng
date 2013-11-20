@@ -253,7 +253,7 @@ function simulatorMComposition( MComposition, ttype)
 
 function RecalculateMComposition(MComposition)
 {
-    MComposition.RecalculateComposition();
+    MComposition.RecalculateComposition_2(g_oTextMeasurer);
 
     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
         Left   : X_Left_Field,
@@ -302,7 +302,7 @@ function addToContent_ForRead(content, elem, props, ctrPrp)
     {
         if(elem.typeObj == MATH_COMP)
         {
-            elem.Resize();
+            elem.Resize(g_oTextMeasurer);
         }
     }
     catch(e)
