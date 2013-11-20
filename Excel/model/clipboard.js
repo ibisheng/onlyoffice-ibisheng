@@ -2789,6 +2789,33 @@
 			
 			_insertImagesFromBinary: function(ws, data)
 			{
+				var pasteRange = ws.autoFilters._refToRange(data.activeRange);
+				var activeRange = Asc.clone(ws.activeRange);
+				var curCol;
+				var curRow;
+				var startCol;
+				var startRow;
+				//определяем стартовую позицию, если изображений несколько вставляется
+				for(var i = 0; i < data.Drawings.length; i++)
+				{
+					drawingObject = data.Drawings[i];
+					if(i == 0)
+					{
+						startCol = drawingObject.from.col;
+						startRow = drawingObject.from.row;
+					}
+					else 
+					{
+						if(startCol > drawingObject.from.col)
+						{
+							startCol = drawingObject.from.col;
+						}	
+						if(startRow > drawingObject.from.row)
+						{
+							startRow = drawingObject.from.row;
+						}	
+					}
+				};
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
 					drawingObject = data.Drawings[i];
@@ -2816,7 +2843,9 @@
 					}
 					else if (drawingObject.graphicObject instanceof  CShape || drawingObject.graphicObject instanceof  CImageShape || drawingObject.graphicObject instanceof  CGroupShape) {
 						
-						drawingObject.graphicObject.setPosition(10,10);
+						curCol = drawingObject.from.col - startCol + activeRange.c1;
+						curRow = drawingObject.from.row - startRow + activeRange.r1;
+						drawingObject.graphicObject.setPosition(ws.objectRender.convertMetric(ws.cols[curCol].left, 1, 3), ws.objectRender.convertMetric(ws.rows[curRow].top, 1, 3));
 					
 						drawingObject.graphicObject.setDrawingObjects(ws.objectRender);
 						drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
@@ -2824,8 +2853,7 @@
 						
 						drawingObject.graphicObject.addToDrawingObjects();
 					}
-					
-				}
+				};
 			}
 
 		};
