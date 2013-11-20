@@ -389,8 +389,13 @@
 			return this;
 		};
 		ActiveRange.prototype._updateAdditionalData = function(){
-			this.startCol = this.c1;
-			this.startRow = this.r1;
+			//меняем выделеную ячейку, если она не входит в диапазон
+			//возможно, в будующем придется пределать логику, пока нет примеров, когда это работает плохо
+			if(!this.contains(this.startCol, this.startRow))
+			{
+				this.startCol = this.c1;
+				this.startRow = this.r1;
+			}
 			//не меняем тип выделения, если это не выделение ячееек
 			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
 				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)

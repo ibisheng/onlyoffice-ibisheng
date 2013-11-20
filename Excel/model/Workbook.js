@@ -2106,7 +2106,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		window["Asc"]["editor"]._loadFonts(aFontMap, function(){
 				History.Clear();
 				History.Create_NewPoint();
-				History.SetSelection(null, true);
+				History.SetSelection(null);
+				History.SetSelectionRedo(null);
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
 				var oRedoObjectParam = new Asc.RedoObjectParam();
 				History.RedoPrepare(oRedoObjectParam);
@@ -2686,7 +2687,6 @@ Woorksheet.prototype.removeRows=function(start, stop){
 Woorksheet.prototype._removeRows=function(start, stop){
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
 	var aIndexes = new Array();
@@ -2747,7 +2747,6 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 	History.TurnOff();
 	//index 0 based
@@ -2811,7 +2810,6 @@ Woorksheet.prototype.removeCols=function(start, stop){
 Woorksheet.prototype._removeCols=function(start, stop){
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
 	for(var i in this.aGCells)
@@ -2880,7 +2878,6 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 	History.TurnOff();
 	//index 0 based
@@ -2967,7 +2964,15 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
+	var oSelection = History.GetSelection();
+	if(null != oSelection)
+	{
+		oSelection = oSelection.clone();
+		oSelection.assign(start, 0, stop, gc_nMaxRow0);
+		oSelection.type = c_oAscSelectionType.RangeCol;
+		History.SetSelection(oSelection);
+		History.SetSelectionRedo(oSelection);
+	}
 	var oThis = this;
 	var fProcessCol = function(col){
 		if(col.width != width)
@@ -3002,7 +3007,6 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	var oThis = this;
 	var fProcessCol = function(col){
 		if(col.hd != bHidden)
@@ -3057,7 +3061,6 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	var oThis = this;
 	var fProcessCol = function(col){
 		var oOldProps = col.getWidthProp();
@@ -3116,7 +3119,15 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
+	var oSelection = History.GetSelection();
+	if(null != oSelection)
+	{
+		oSelection = oSelection.clone();
+		oSelection.assign(0, start, gc_nMaxCol0, stop);
+		oSelection.type = c_oAscSelectionType.RangeRow;
+		History.SetSelection(oSelection);
+		History.SetSelectionRedo(oSelection);
+	}
 	for(var i = start;i <= stop; i++){
 		var oCurRow = this._getRow(i);
 		if(oCurRow.h != height)
@@ -3138,7 +3149,6 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	for(var i = start;i <= stop; i++){
 		var oCurRow = null;
 		if(false == bHidden)
@@ -3165,7 +3175,6 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 	if(null == stop)
 		stop = start;
 	History.Create_NewPoint();
-	History.SetSelection(null, true);
 	for(var i = start;i <= stop; i++){
 		var oCurRow = null;
 		if(true == bBestFit && gc_dDefaultRowHeightAttribute == height)
@@ -3566,8 +3575,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 		return;
 	var oThis = this;
 	History.Create_NewPoint();
-	History.SetSelection(new Asc.Range(oBBoxFrom.c1, oBBoxFrom.r1, oBBoxFrom.c2, oBBoxFrom.r2));
-	History.SetSelectionRedo(new Asc.Range(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2));
 	History.StartTransaction();
 	
 	var offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 };
@@ -5116,7 +5123,6 @@ Range.prototype.getCells=function(){
 Range.prototype.setValue=function(val,callback){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	var oThis = this;
 	this._foreach(function(cell){
@@ -5129,7 +5135,6 @@ Range.prototype.setValue=function(val,callback){
 Range.prototype.setValue2=function(array){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	var wb = this.worksheet.workbook, ws = this.worksheet, needRecalc = false, ar =[];
 	//[{"text":"qwe","format":{"b":true, "i":false, "u":"none", "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
@@ -5147,7 +5152,6 @@ Range.prototype.setValue2=function(array){
 Range.prototype.setCellStyle=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5192,7 +5196,6 @@ Range.prototype.setTableStyle=function(val){
 Range.prototype.setNumFormat=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5216,7 +5219,6 @@ Range.prototype.setNumFormat=function(val){
 Range.prototype.shiftNumFormat=function(nShift, aDigitsCount){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	var bRes = false;
 	var oThis = this;
 	this._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
@@ -5226,7 +5228,6 @@ Range.prototype.shiftNumFormat=function(nShift, aDigitsCount){
 }
 Range.prototype.setFont=function(val){
 	History.Create_NewPoint();
-	History.SetSelection(this.bbox.clone());
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5250,7 +5251,6 @@ Range.prototype.setFont=function(val){
 Range.prototype.setFontname=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5274,7 +5274,6 @@ Range.prototype.setFontname=function(val){
 Range.prototype.setFontsize=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5298,7 +5297,6 @@ Range.prototype.setFontsize=function(val){
 Range.prototype.setFontcolor=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5322,7 +5320,6 @@ Range.prototype.setFontcolor=function(val){
 Range.prototype.setBold=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5346,7 +5343,6 @@ Range.prototype.setBold=function(val){
 Range.prototype.setItalic=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5370,7 +5366,6 @@ Range.prototype.setItalic=function(val){
 Range.prototype.setUnderline=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5394,7 +5389,6 @@ Range.prototype.setUnderline=function(val){
 Range.prototype.setStrikeout=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5418,7 +5412,6 @@ Range.prototype.setStrikeout=function(val){
 Range.prototype.setFontAlign=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5442,7 +5435,6 @@ Range.prototype.setFontAlign=function(val){
 Range.prototype.setAlignVertical=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	if("none" == val)
 		val = null;
 	this.createCellOnRowColCross();
@@ -5468,7 +5460,6 @@ Range.prototype.setAlignVertical=function(val){
 Range.prototype.setAlignHorizontal=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5492,7 +5483,6 @@ Range.prototype.setAlignHorizontal=function(val){
 Range.prototype.setFill=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5516,7 +5506,6 @@ Range.prototype.setFill=function(val){
 Range.prototype.setBorderSrc=function(border){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	if (null == border)
 		border = new Border();
@@ -5546,7 +5535,6 @@ Range.prototype.setBorder=function(border){
 	//border = null очисть border
 	//"ih" - внутренние горизонтальные, "iv" - внутренние вертикальные
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	var nRangeType = this._getRangeType();
 	var oThis = this;
 	var fSetBorder = function(nRow, nCol, oNewBorder)
@@ -6131,7 +6119,6 @@ Range.prototype.setBorder=function(border){
 Range.prototype.setShrinkToFit=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -6155,7 +6142,6 @@ Range.prototype.setShrinkToFit=function(val){
 Range.prototype.setWrap=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -6179,7 +6165,6 @@ Range.prototype.setWrap=function(val){
 Range.prototype.setAngle=function(val){
     History.Create_NewPoint();
     var oBBox = this.bbox;
-    History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -6203,7 +6188,6 @@ Range.prototype.setAngle=function(val){
 Range.prototype.setVerticalText=function(val){
     History.Create_NewPoint();
     var oBBox = this.bbox;
-    History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -6888,7 +6872,6 @@ Range.prototype.merge=function(type){
 	if(oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2)
 		return;
 	History.Create_NewPoint();
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	if(this.hasMerged())
 	{
@@ -7193,7 +7176,6 @@ Range.prototype.merge=function(type){
 };
 Range.prototype.unmerge=function(bOnlyInRange){
 	History.Create_NewPoint();
-	History.SetSelection(this.bbox.clone());
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		this.worksheet.mergeManager.remove(this.bbox, null);
@@ -7290,7 +7272,6 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	{
 		var oThis = this;
 		History.Create_NewPoint();
-		History.SetSelection(this.bbox.clone());
 		History.StartTransaction();
 		if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		{
@@ -7326,7 +7307,6 @@ Range.prototype.removeHyperlink=function(val){
 		elem = new RangeDataManagerElem(bbox, val);
 	}
 	History.Create_NewPoint();
-	History.SetSelection(bbox.clone());
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		this.worksheet.hyperlinkManager.remove(bbox, elem);
@@ -7354,7 +7334,6 @@ Range.prototype._shiftLeftRight=function(bLeft){
 	var mergeManager = this.worksheet.mergeManager;
 	//todo вставить предупреждение, что будет unmerge
 	History.Create_NewPoint();
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
@@ -7410,7 +7389,6 @@ Range.prototype._shiftUpDown=function(bUp){
 	var mergeManager = this.worksheet.mergeManager;
 	//todo вставить предупреждение, что будет unmerge
 	History.Create_NewPoint();
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
@@ -7508,7 +7486,6 @@ Range.prototype.cleanCache=function(){
 Range.prototype.cleanFormat=function(){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	this.unmerge();
 	var oThis = this;
@@ -7530,7 +7507,6 @@ Range.prototype.cleanFormat=function(){
 Range.prototype.cleanText=function(){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	var oThis = this;
 	this._setPropertyNoEmpty(null, null,
@@ -7544,7 +7520,6 @@ Range.prototype.cleanText=function(){
 Range.prototype.cleanAll=function(){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
 	History.StartTransaction();
 	this.unmerge();
 	//удаляем только гиперссылки, которые полностью лежат в области
@@ -7725,7 +7700,14 @@ Range.prototype.sort=function(nOption, nStartCol){
 			}
 		}
 		History.Create_NewPoint();
-		History.SetSelection(new Asc.Range(nColFirst0, nRowFirst0, nLastCol0, nLastRow0));
+		var oSelection = History.GetSelection();
+		if(null != oSelection)
+		{
+			oSelection = oSelection.clone();
+			oSelection.assign(nColFirst0, nRowFirst0, nLastCol0, nLastRow0);
+			History.SetSelection(oSelection);
+			History.SetSelectionRedo(oSelection);
+		}
 		var oUndoRedoBBox = new UndoRedoData_BBox({r1:nRowFirst0, c1:nColFirst0, r2:nLastRow0, c2:nLastCol0});
 		oRes = new UndoRedoData_SortData(oUndoRedoBBox, aSortData);
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
@@ -7873,25 +7855,55 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	if(bVertical)
 	{
 		if(nHeight < nIndex)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r2 + 1, oBBox.c1, oBBox.r2 + nIndex - nHeight, oBBox.c2);
+			oPromoteRange = this.worksheet.getRange3(oBBox.r2 + 1, oBBox.c1, oBBox.r1 + nIndex, oBBox.c2);
 		else if(nIndex < 0)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1 - 1, oBBox.c1, oBBox.r1 + nIndex, oBBox.c2);
+			oPromoteRange = this.worksheet.getRange3(oBBox.r1 + nIndex, oBBox.c1, oBBox.r1 - 1, oBBox.c2);
 	}
 	else
 	{
 		if(nWidth < nIndex)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c2 + 1, oBBox.r2, oBBox.c2 + nIndex - nWidth);
+			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c2 + 1, oBBox.r2, oBBox.c1 + nIndex);
 		else if(nIndex < 0)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c1 - 1, oBBox.r2, oBBox.c1 + nIndex);
+			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c1 + nIndex, oBBox.r2, oBBox.c1 - 1);
 	}
 	if(null != oPromoteRange && oPromoteRange.hasMerged())
 		return;
 	lockDraw(this.worksheet.workbook);
-	History.Create_NewPoint();
 	var recalcArr = [];
-	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
-	History.StartTransaction();
-    
+	History.Create_NewPoint();
+	var oSelection = History.GetSelection();
+	if(null != oSelection)
+	{
+		oSelection = oSelection.clone();
+		oSelection.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
+		History.SetSelection(oSelection);
+	}
+	var oSelectionRedo = History.GetSelectionRedo();
+	if(null != oSelectionRedo)
+	{
+		oSelectionRedo = oSelectionRedo.clone();
+		if(0 == nIndex)
+			oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
+		else
+		{
+			if(bVertical)
+			{
+				if(nIndex > 0)
+					oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r1 + nIndex);
+				else if(nIndex < 0)
+					oSelectionRedo.assign(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
+			}
+			else
+			{
+				if(nIndex > 0)
+					oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+				else if(nIndex < 0)
+					oSelectionRedo.assign(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
+			}
+		}
+		History.SetSelectionRedo(oSelectionRedo);
+	}
+    History.StartTransaction();
 	if((true == bVertical && 1 == nHeight) || (false == bVertical && 1 == nWidth))
 		bCtrl = !bCtrl;
 	var fFinishSection = function(param, oPromoteHelper)

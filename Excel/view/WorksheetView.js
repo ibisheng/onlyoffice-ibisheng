@@ -809,7 +809,8 @@
 							return;
 
 						History.Create_NewPoint();
-						History.SetSelection(arHistorySelect);
+						History.SetSelection(arHistorySelect.clone());
+						History.SetSelectionRedo(arCopy.clone());
 						History.StartTransaction();
 
 						if ($.isFunction(functionAction)) {functionAction();}
@@ -3577,7 +3578,6 @@
                         self.cols[col].charCount = colw.charCount;
 
                         History.Create_NewPoint();
-                        History.SetSelection(null, true);
                         History.StartTransaction();
                         // Выставляем, что это bestFit
                         self.model.setColBestFit (true, modelw, col, col);
@@ -5799,7 +5799,12 @@
 				this._trigger("selectionNameChanged", this.getSelectionName());
 				this._trigger("selectionChanged", this.getSelectionInfo());
 			},
-
+			getActiveRangeObj: function(){
+				return this.activeRange.clone(true);
+			},
+			setActiveRangeObj: function(val){
+				this.activeRange = val.clone();
+			},
 			setSelection: function (range, validRange) {
 				// Проверка на валидность range.
 				if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
@@ -5836,6 +5841,31 @@
 				this._trigger("selectionChanged", this.getSelectionInfo());
 
 				return this._calcActiveCellOffset();
+			},
+			
+			setSelectionUndoRedo: function (range, validRange) {
+				// Проверка на валидность range.
+				if (validRange && (range.c2 >= this.nColsCount || range.r2 >= this.nRowsCount)) {
+					if (range.c2 >= this.nColsCount)
+						this.expandColsOnScroll(false, true, range.c2 + 1);
+					if (range.r2 >= this.nRowsCount)
+						this.expandRowsOnScroll(false, true, range.r2 + 1);
+				}
+				var oRes = null;
+				var type = this.activeRange.type;
+				if(type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
+					type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax)
+				{
+					this.cleanSelection();
+
+					this._drawSelection();
+
+					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+					this._trigger("selectionChanged", this.getSelectionInfo());
+
+					oRes = this._calcActiveCellOffset();
+				}
+				return oRes;
 			},
 
 			changeSelectionStartPoint: function (x, y, isCoord, isSelectMode) {
@@ -7093,7 +7123,14 @@
 								}
 
 								History.EndTransaction();
-								History.SetSelection(selectionRange);
+								var oSelection = History.GetSelection();
+								if(null != oSelection)
+								{
+									oSelection = oSelection.clone();
+									oSelection.assign(selectionRange.c1, selectionRange.r1, selectionRange.c2, selectionRange.r2);
+									History.SetSelection(oSelection);
+									History.SetSelectionRedo(oSelection);
+								}
 							};
 
 							var pasteNoLocal = function () {
@@ -7235,7 +7272,6 @@
 					}
 
 					History.EndTransaction();
-					History.SetSelection(selectionRange);
 				};
 				if ("paste" === prop) {
 					// Для past свой диапазон
@@ -8566,7 +8602,6 @@
 								
 								functionModelAction = function () {
 									History.Create_NewPoint();
-									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
 									//t.autoFilters.isEmptyAutoFilters(arn);
 									if (range.deleteCellsShiftLeft()) {
@@ -8592,7 +8627,6 @@
 							
 								functionModelAction = function () {
 										History.Create_NewPoint();
-										History.SetSelection(new asc_Range(_updateRangeDel.c1, _updateRangeDel.r1, _updateRangeDel.c2, _updateRangeDel.r2));
 										History.StartTransaction();
 										//t.autoFilters.isEmptyAutoFilters(arn);
 										if (range.deleteCellsShiftUp()) {
@@ -8618,7 +8652,6 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
-									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 									t.autoFilters.insertColumn(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteColumns);
@@ -8641,7 +8674,6 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
-									History.SetSelection(new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2));
 									History.StartTransaction();
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
 									t.autoFilters.insertRows(prop,_updateRangeDel, arn, c_oAscDeleteOptions.DeleteRows);
@@ -8847,7 +8879,15 @@
 					}
 
 					History.Create_NewPoint();
-					History.SetSelection(null, true);
+					var oSelection = History.GetSelection();
+					if(null != oSelection)
+					{
+						oSelection = oSelection.clone();
+						oSelection.assign(col, 0, col, gc_nMaxRow0);
+						oSelection.type = c_oAscSelectionType.RangeCol;
+						History.SetSelection(oSelection);
+						History.SetSelectionRedo(oSelection);
+					}
 					History.StartTransaction();
 					// Выставляем, что это bestFit
 					t.model.setColBestFit(true, cw, col, col);
@@ -8886,7 +8926,15 @@
 					}
 
 					History.Create_NewPoint();
-					History.SetSelection(null, true);
+					var oSelection = History.GetSelection();
+					if(null != oSelection)
+					{
+						oSelection = oSelection.clone();
+						oSelection.assign(0, row, gc_nMaxCol0, row);
+						oSelection.type = c_oAscSelectionType.RangeRow;
+						History.SetSelection(oSelection);
+						History.SetSelectionRedo(oSelection);
+					}
 					History.StartTransaction();
 					// Выставляем, что это bestFit
 					t.model.setRowBestFit (true, Math.min(height + t.height_1px, t.maxRowHeight), row, row);
@@ -9114,7 +9162,6 @@
 			_replaceCellsText: function (aReplaceCells, valueForSearching, options) {
 				var oSelectionHistory = this.activeRange.clone();
 				History.Create_NewPoint();
-				History.SetSelection(oSelectionHistory);
 				History.StartTransaction();
 
 				options.indexInArray = 0;
@@ -9282,7 +9329,6 @@
 
 				if (!isNotHistory) {
 					History.Create_NewPoint();
-					History.SetSelection(oCellEdit);
 					History.StartTransaction();
 				}
 

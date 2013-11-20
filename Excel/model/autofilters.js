@@ -245,7 +245,6 @@
 			
 			applyAutoFilter: function (type, autoFiltersObject, ar) {
 				History.Create_NewPoint();
-				History.SetSelection(new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2));
 				History.StartTransaction();
 				switch (type) {
 					case 'mainFilter':
@@ -303,8 +302,15 @@
 							History.TurnOff();
 						History.Create_NewPoint();
 						if(selectionTable)
-							History.SetSelectionRedo(new Asc.Range(selectionTable.c1, selectionTable.r1, selectionTable.c2, selectionTable.r2));
-						History.SetSelection(new Asc.Range(ar.c1, ar.r1, ar.c2, ar.r2));
+						{
+							var oSelection = History.GetSelection();
+							if(null != oSelection)
+							{
+								oSelection = oSelection.clone();
+								oSelection.assign(selectionTable.c1, selectionTable.r1, selectionTable.c2, selectionTable.r2);
+								History.SetSelectionRedo(oSelection);
+							}
+						}
 						History.StartTransaction();
 						if(paramsForCallBack)
 						{
@@ -1523,7 +1529,6 @@
 						t._addHistoryObj(oldFilter, historyitem_AutoFilter_Sort,
 							{activeCells: activeCells, type: type, cellId: cellId});
 						History.EndTransaction();
-						History.SetSelection(selectionRange);
 						// ToDo может хватит просто почистить selectionRange или нужно делать полный "update" ?
 						ws._cleanCache(selectionRange);
 						ws.isChanged = true;
@@ -1546,7 +1551,6 @@
 						if(currentFilter.TableStyleInfo)
 							t._setColorStyleTable(currentFilter.Ref.split(":")[0], currentFilter.Ref.split(":")[1], currentFilter);
 						History.EndTransaction();
-						History.SetSelection(selectionRange);
 						ws._cleanCache(selectionRange);
 						ws.isChanged = true;
 						ws.changeWorksheet("update");

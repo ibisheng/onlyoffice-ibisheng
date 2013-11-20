@@ -409,17 +409,10 @@ CHistory.prototype =
 				isRedrawAll = false;
         }
 		gUndoInsDelCellsFlag = true;
-		var oSelectRange = null;
-		if(null != Point.SelectRange)
-			oSelectRange = Point.SelectRange;
 		for(var i in Point.UpdateRigions)
-		{
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
-			if(null != Point.nLastSheetId && i - 0 == Point.nLastSheetId && null == oSelectRange)
-				oSelectRange = Point.UpdateRigions[i];
-		}
-		if(false == Point.bNoSelect && null != oSelectRange)
-			this.workbook.handlers.trigger("setSelection", oSelectRange.clone(), /*validRange*/false);
+		if(null != Point.SelectRange)
+			this.workbook.handlers.trigger("setSelection", Point.SelectRange.clone(), /*validRange*/false);
 		if ( Point.SelectionState != null )
 			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 
@@ -511,12 +504,8 @@ CHistory.prototype =
 		else if(null != Point.SelectRange)
 			oSelectRange = Point.SelectRange;
 		for(var i in Point.UpdateRigions)
-		{
 			this.workbook.handlers.trigger("cleanCellCache", i, Point.UpdateRigions[i]);
-			if(null != Point.nLastSheetId && i - 0 == Point.nLastSheetId && null == oSelectRange)
-				oSelectRange = Point.UpdateRigions[i];
-		}
-		if(false == Point.bNoSelect && null != oSelectRange)
+		if(null != oSelectRange)
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
 		//if (Point.SelectionState != null)
 		//	this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
@@ -561,13 +550,13 @@ CHistory.prototype =
         var Items = new Array();
 		var UpdateRigions = new Object();
         var Time  = new Date().getTime();
+		var oSelectRange = this.workbook.handlers.trigger("getSelection");
 		this.CurPoint = {
             Items : Items, // Массив изменений, начиная с текущего момента
 			UpdateRigions : UpdateRigions,
 			nLastSheetId : null,
-			SelectRange : null,
-			SelectRangeRedo : null,
-			bNoSelect : false,
+			SelectRange : oSelectRange,
+			SelectRangeRedo : oSelectRange,
             Time  : Time,   // Текущее время
 			SelectionState : this.workbook.handlers.trigger("getSelectionState")
         };
@@ -634,29 +623,38 @@ CHistory.prototype =
 			this.CurPoint = null;
 		}
 	},
-	SetSelection : function(range, bNoSelect)
+	SetSelection : function(range)
     {
-        if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
+        if ( 0 !== this.TurnOffHistory )
             return;
 
         if ( null == this.CurPoint )
             return;
         this.CurPoint.SelectRange = range;
-		if(null != bNoSelect)
-			this.CurPoint.bNoSelect = bNoSelect
     },
-	SetSelectionRedo : function(range, bNoSelect)
+	SetSelectionRedo : function(range)
     {
-        if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
+        if ( 0 !== this.TurnOffHistory )
             return;
 
         if ( null == this.CurPoint )
             return;
         this.CurPoint.SelectRangeRedo = range;
-		if(null != bNoSelect)
-			this.CurPoint.bNoSelect = bNoSelect
     },
-	
+	GetSelection : function(range)
+    {
+		var oRes = null;
+		if(null != this.CurPoint)
+			oRes = this.CurPoint.SelectRange;
+        return oRes;
+    },
+	GetSelectionRedo : function(range)
+    {
+		var oRes = null;
+		if(null != this.CurPoint)
+			oRes = this.CurPoint.SelectRangeRedo;
+        return oRes;
+    },
     TurnOff : function()
     {
         this.TurnOffHistory++;

@@ -258,6 +258,9 @@
 				this.model.handlers.add("setSelection", function () {
 					self._onSetSelection.apply(self, arguments);
 				});
+				this.model.handlers.add("getSelection", function () {
+					return self._onGetSelection.apply(self);
+				});
 				this.model.handlers.add("getSelectionState", function () {
 					return self._onGetSelectionState.apply(self);
 				});
@@ -477,11 +480,17 @@
 			_onSetSelection: function (range, validRange) {
 				var ws = this.getWorksheet();
 				ws._checkSelectionShape();
-				var d = ws.setSelection(range, validRange);
+				ws.setActiveRangeObj(range);
+				var d = ws.setSelectionUndoRedo(range, validRange);
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
 				}
+			},
+			
+			_onGetSelection: function () {
+				var ws = this.getWorksheet();
+				return ws.getActiveRangeObj();
 			},
 			
 			_onGetSelectionState: function () {
