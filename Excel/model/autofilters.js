@@ -2207,7 +2207,7 @@
 							if(DeleteCellsAndShiftLeft)
 							{
 								//если данный фильтр находится справа
-								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2))  && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 									if(!bUndoRedo)
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
@@ -2217,7 +2217,7 @@
 							else if(DeleteCellsAndShiftTop)
 							{
 								//если данный фильтр находится внизу
-								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 == activeCells.c1 && tableRange.c2 == activeCells.c2)))
 								{
 									if(!bUndoRedo)
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
@@ -2228,7 +2228,7 @@
 							else if(InsertCellsAndShiftRight)
 							{
 								//если данный фильтр находится справа
-								if(tableRange.c1 > activeCells.c1 && (tableRange.r1 < activeCells.r1 || tableRange.r2 > activeCells.r2))
+								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2)) && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 									if(!bUndoRedo)
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
@@ -2238,7 +2238,7 @@
 							else
 							{
 								//если данный фильтр находится внизу
-								if(tableRange.r1 > activeCells.r1 && (tableRange.c1 < activeCells.c1 || tableRange.c2 > activeCells.c2))
+								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 == activeCells.c1 && tableRange.c2 == activeCells.c2)))
 								{
 									if(!bUndoRedo)
 										ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
