@@ -39,6 +39,7 @@ var para_CollaborativeChangesEnd   = 0x0022; // Конец изменений д
 var para_CommentStart              = 0x0023; // Начало комментария
 var para_CommentEnd                = 0x0024; // Начало комментария
 var para_PresentationNumbering     = 0x0025; // Элемент, обозначающий нумерацию для списков в презентациях
+var para_Math                      = 0x0026; // Формула
 
 var break_Line = 0x01;
 var break_Page = 0x02;
@@ -7483,6 +7484,106 @@ ParaPresentationNumbering.prototype =
     }
 };
 
+// Класс ParaMath
+function ParaMath(value)
+{
+    this.Id = g_oIdCounter.Get_NewId();
+
+    this.Type  = para_Math;
+
+    this.Math = new CMathComposition();
+
+    this.Width        = 0;
+    this.Height       = 0;
+    this.WidthVisible = 0;
+
+    this.TextAscent  = 0;
+    this.TextDescent = 0;
+    this.TextHeight  = 0;
+    this.TextAscent2 = 0;
+    this.YOffset     = 0;
+
+    this.CurPage  = 0;
+    this.CurLines = 0;
+    this.CurRange = 0;
+
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    g_oTableId.Add( this, this.Id );
+}
+
+ParaMath.prototype =
+{
+    Get_Id : function()
+    {
+        return this.Id;
+    },
+
+    Set_Id : function(newId)
+    {
+        g_oTableId.Reset_Id( this, newId, this.Id );
+        this.Id = newId;
+    },
+
+    Draw : function( X, Y, Context )
+    {
+        this.Math.Draw_2( X, Y, Context )
+    },
+
+    Measure : function( Context )
+    {
+        this.Math.RecalculateComposition_2();
+        var Size = this.Math.getSize();
+
+        this.Width        = Size.width;
+        this.Height       = Size.height;
+        this.WidthVisible = Size.width;
+    },
+
+    Is_RealContent : function( )
+    {
+        return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
+    Copy : function()
+    {
+        var Math = new ParaMath();
+        return Math;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Long   : Type
+        // String : Id
+
+        Writer.WriteLong( this.Type );
+        Writer.WriteString2( this.Id );
+    },
+
+    Write_ToBinary2 : function(Writer)
+    {
+
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+
+    },
+
+    Save_Changes : function(Data, Writer)
+    {
+
+    },
+
+    Load_Changes : function(Reader)
+    {
+    }
+};
+
 function ParagraphContent_Read_FromBinary(Reader)
 {
     var ElementType = Reader.GetLong();
@@ -7493,6 +7594,7 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_TextPr            :
         case para_Drawing           :
         case para_HyperlinkStart    :
+        case para_Math              :
         {
             var ElementId = Reader.GetString2();
             Element = g_oTableId.Get_ById( ElementId );

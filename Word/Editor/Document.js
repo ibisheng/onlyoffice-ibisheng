@@ -8790,7 +8790,7 @@ CDocument.prototype =
         var Table = this.Is_TableBorder( X, Y, PageIndex );
         if ( null != Table )
         {
-            if ( true === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Table, CheckType : changestype_Table_Properties } ) )
+            if ( true === editor.isViewMode || true === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Table, CheckType : changestype_Table_Properties } ) )
                 return;
 
             this.Create_NewHistoryPoint();

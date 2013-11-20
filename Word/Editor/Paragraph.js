@@ -889,6 +889,7 @@ Paragraph.prototype =
 
             switch( Item.Type )
             {
+                case para_Math:
                 case para_Text:
                 case para_Space:
                 case para_PageNum:
@@ -1340,6 +1341,7 @@ Paragraph.prototype =
 
                 switch( Item.Type )
                 {
+                    case para_Math:
                     case para_Text:
                     {
                         bStartWord = true;
@@ -3168,6 +3170,7 @@ Paragraph.prototype =
 
             switch( Item.Type )
             {
+                case para_Math:
                 case para_Text:
                 {
                     bFirstLineItem = false;
@@ -3463,6 +3466,7 @@ Paragraph.prototype =
                 case para_TextPr:
                 case para_End:
                 case para_NewLine:
+                case para_Math:
                 {
                     X += Item.WidthVisible;
                     break;
@@ -4288,6 +4292,7 @@ Paragraph.prototype =
                         case para_Drawing:
                         case para_Tab:
                         case para_Text:
+                        case para_Math:
                         {
                             if ( para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType )
                                 break;
@@ -4794,6 +4799,7 @@ Paragraph.prototype =
                     case para_Drawing:
                     case para_Tab:
                     case para_Text:
+                    case para_Math:
                     {
                         if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                         {
@@ -4990,6 +4996,7 @@ Paragraph.prototype =
                         case para_Drawing:
                         case para_Tab:
                         case para_Text:
+                        case para_Math:
                         {
                             if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                             {
@@ -7749,6 +7756,7 @@ Paragraph.prototype =
                 }
                 case para_PageNum:
                 case para_Text:
+                case para_Math:
 
                     TempDx = Item.WidthVisible;
                     bCheck = true;
