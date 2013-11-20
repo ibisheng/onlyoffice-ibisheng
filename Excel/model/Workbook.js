@@ -7889,14 +7889,24 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 			if(bVertical)
 			{
 				if(nIndex > 0)
-					oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r1 + nIndex);
+				{
+					if(nIndex >= nHeight)
+						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r1 + nIndex);
+					else
+						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r1 + nIndex - 1);
+				}
 				else if(nIndex < 0)
 					oSelectionRedo.assign(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
 			}
 			else
 			{
 				if(nIndex > 0)
-					oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+				{
+					if(nIndex >= nWidth)
+						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+					else
+						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c1 + nIndex - 1, oBBox.r2);
+				}
 				else if(nIndex < 0)
 					oSelectionRedo.assign(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
 			}
