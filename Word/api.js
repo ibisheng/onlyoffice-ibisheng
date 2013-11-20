@@ -2487,7 +2487,10 @@ asc_docs_api.prototype.asc_Print = function()
 		if(null == this.WordControl.m_oLogicDocument)
 		{
 			var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"savefromorigin"};
-			sendCommand(editor, function(){editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
+			sendCommand(editor, function(incomeObject){
+				if(null != incomeObject && "save" == incomeObject["type"])
+					editor.processSavedFile(incomeObject["data"], false);
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, rData);
 		}
 		else
 			_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
