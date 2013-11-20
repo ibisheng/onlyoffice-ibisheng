@@ -821,10 +821,12 @@ DrawingObjectsController.prototype =
 						break;
 				}
 				History.Create_NewPoint();
+                this.bNoResetSeclectionState = true;
 				for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
 				{
 					drawingObjectsController.selectedObjects[i].deleteDrawingBase();
 				}
+                this.bNoResetSeclectionState = false;
 				drawingObjectsController.resetSelectionState2();
 				drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
@@ -870,6 +872,8 @@ DrawingObjectsController.prototype =
 
     resetSelectionState: function()
     {
+        if(this.bNoResetSeclectionState === true)
+            return;
         var count = this.selectedObjects.length;
         while(count > 0)
         {
