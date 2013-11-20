@@ -7485,7 +7485,7 @@ ParaPresentationNumbering.prototype =
 };
 
 // Класс ParaMath
-function ParaMath(value)
+function ParaMath()
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -7526,12 +7526,12 @@ ParaMath.prototype =
 
     Draw : function( X, Y, Context )
     {
-        this.Math.Draw_2( X, Y, Context )
+        this.Math.Draw( X, Y, Context );
     },
 
-    Measure : function( Context )
+    Measure : function( Context, TextPr )
     {
-        this.Math.RecalculateComposition_2();
+        this.Math.RecalculateComposition(Context, TextPr);
         var Size = this.Math.getSize();
 
         this.Width        = Size.width;

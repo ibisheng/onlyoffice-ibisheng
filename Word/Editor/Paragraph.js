@@ -693,8 +693,8 @@ Paragraph.prototype =
 
     Internal_Check_EmptyHyperlink : function(Pos)
     {
-        var Start = this.Internal_FindBackward( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_HyperlinkStart ] );
-        var End   = this.Internal_FindForward ( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_HyperlinkEnd, para_End ] );
+        var Start = this.Internal_FindBackward( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_Math, para_HyperlinkStart ] );
+        var End   = this.Internal_FindForward ( Pos, [ para_Text, para_Drawing, para_Space,  para_Tab, para_PageNum, para_Math, para_HyperlinkEnd, para_End ] );
 
         if ( true === Start.Found && para_HyperlinkStart === Start.Type && true === End.Found && para_HyperlinkEnd === End.Type )
         {
@@ -720,29 +720,6 @@ Paragraph.prototype =
 
     Internal_Get_ParaPos_By_Pos : function(ContentPos)
     {
-        /*
-        var CurLine = this.Lines.length - 1;
-        for ( ; CurLine > 0; CurLine-- )
-        {
-            if ( this.Lines[CurLine].StartPos <= ContentPos )
-                break;
-        }
-
-        var CurRange = this.Lines[CurLine].Ranges.length - 1;
-        for ( ; CurRange > 0; CurRange-- )
-        {
-            if ( this.Lines[CurLine].Ranges[CurRange].StartPos <= ContentPos )
-                break;
-        }
-
-        var CurPage = this.Pages.length - 1;
-        for ( ; CurPage > 0; CurPage-- )
-        {
-            if ( this.Pages[CurPage].StartLine <= CurLine )
-                break;
-        }
-        */
-       
         var _ContentPos = Math.max( 0, Math.min( ContentPos, this.Content.length - 1 ) );
 
         while ( undefined === this.Content[_ContentPos].CurPage )
@@ -1349,31 +1326,66 @@ Paragraph.prototype =
                         // При проверке, убирается ли слово, мы должны учитывать ширину
                         // предшевствующих пробелов.
 
-                        if ( LineTextAscent < TextAscent )
-                            LineTextAscent = TextAscent;
-
-                        if ( LineTextAscent2 < TextAscent2 )
-                            LineTextAscent2 = TextAscent2;
-
-                        if ( LineTextDescent < TextDescent )
-                            LineTextDescent = TextDescent;
-
-                        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                        if ( para_Text === Item.Type )
                         {
-                            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-                            if ( LineAscent < TextAscent )
-                                LineAscent = TextAscent;
+                            if ( LineTextAscent < TextAscent )
+                                LineTextAscent = TextAscent;
 
-                            if ( LineDescent < TextDescent )
-                                LineDescent = TextDescent;
+                            if ( LineTextAscent2 < TextAscent2 )
+                                LineTextAscent2 = TextAscent2;
+
+                            if ( LineTextDescent < TextDescent )
+                                LineTextDescent = TextDescent;
+
+                            if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                            {
+                                // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+                                if ( LineAscent < TextAscent )
+                                    LineAscent = TextAscent;
+
+                                if ( LineDescent < TextDescent )
+                                    LineDescent = TextDescent;
+                            }
+                            else
+                            {
+                                if ( LineAscent < TextAscent + Item.YOffset  )
+                                    LineAscent = TextAscent + Item.YOffset;
+
+                                if ( LineDescent < TextDescent - Item.YOffset )
+                                    LineDescent = TextDescent - Item.YOffset;
+                            }
                         }
-                        else
+                        else //if ( para_Math === Item.Type )
                         {
-                            if ( LineAscent < TextAscent + Item.YOffset  )
-                                LineAscent = TextAscent + Item.YOffset;
+                            // TODO: Здесь нужно переделать. Необходимо у формулы запросить ее Ascent и Descent
+                            //       и учитывать именно эти значения.
 
-                            if ( LineDescent < TextDescent - Item.YOffset )
-                                LineDescent = TextDescent - Item.YOffset;
+                            if ( LineTextAscent < TextAscent )
+                                LineTextAscent = TextAscent;
+
+                            if ( LineTextAscent2 < TextAscent2 )
+                                LineTextAscent2 = TextAscent2;
+
+                            if ( LineTextDescent < TextDescent )
+                                LineTextDescent = TextDescent;
+
+                            if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                            {
+                                // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+                                if ( LineAscent < TextAscent )
+                                    LineAscent = TextAscent;
+
+                                if ( LineDescent < TextDescent )
+                                    LineDescent = TextDescent;
+                            }
+                            else
+                            {
+                                if ( LineAscent < TextAscent + Item.YOffset  )
+                                    LineAscent = TextAscent + Item.YOffset;
+
+                                if ( LineDescent < TextDescent - Item.YOffset )
+                                    LineDescent = TextDescent - Item.YOffset;
+                            }
                         }
 
                         if ( !bWord )
@@ -2370,7 +2382,7 @@ Paragraph.prototype =
                     {
                         var _Item = this.Content[_Pos];
                         var _Type = _Item.Type;
-                        if ( para_Drawing === _Type || para_End === _Type || (para_NewLine === _Type && break_Line === _Item.BreakType) || para_PageNum === _Type || para_Space === _Type || para_Tab === _Type || para_Text === _Type )
+                        if ( para_Drawing === _Type || para_End === _Type || (para_NewLine === _Type && break_Line === _Item.BreakType) || para_PageNum === _Type || para_Space === _Type || para_Tab === _Type || para_Text === _Type || para_Math === _Type )
                         {
                             bBreakPageLineEmpty = false;
                             break;
@@ -2525,9 +2537,9 @@ Paragraph.prototype =
 
                         // TODO: заменить на функцию проверки
                         var ____Pos = Pos + 1;
-                        var Next = this.Internal_FindForward( ____Pos, [ para_End, para_NewLine, para_Space, para_Text, para_Drawing, para_Tab, para_PageNum ] );
+                        var Next = this.Internal_FindForward( ____Pos, [ para_End, para_NewLine, para_Space, para_Text, para_Drawing, para_Tab, para_PageNum, para_Math ] );
                         while ( true === Next.Found && para_Drawing === Next.Type && drawing_Anchor === this.Content[Next.LetterPos].Get_DrawingType() )
-                            Next = this.Internal_FindForward( ++____Pos, [ para_End, para_NewLine, para_Space, para_Text, para_Drawing, para_Tab, para_PageNum ] );
+                            Next = this.Internal_FindForward( ++____Pos, [ para_End, para_NewLine, para_Space, para_Text, para_Drawing, para_Tab, para_PageNum, para_Math ] );
 
                         if ( true === Next.Found && para_End === Next.Type )
                         {
@@ -3873,7 +3885,8 @@ Paragraph.prototype =
 
             switch( Item.Type )
             {
-                case para_Text :
+                case para_Math:
+                case para_Text:
                 {
                     if ( false === bWord )
                     {
@@ -5798,6 +5811,14 @@ Paragraph.prototype =
                 this.Internal_AddHyperlink( Item );
                 break;
             }
+            case para_Math:
+            {
+                var TextPr = this.Internal_GetTextPr( CurPos );
+                var NewParaTextPr = new ParaTextPr( TextPr );
+                this.Internal_Content_Add( CurPos, Item );
+                this.Internal_Content_Add( CurPos + 1, NewParaTextPr );
+                break;
+            }
             case para_PageNum:
             case para_Tab:
             case para_Drawing:
@@ -6843,7 +6864,7 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType || para_Math === ItemType )
                 break;
 
             CurPos++;
@@ -6859,7 +6880,7 @@ Paragraph.prototype =
             var ItemType = Item.Type;
             var bEnd = false;
 
-            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_Math === ItemType )
             {
                 this.CurPos.ContentPos = CurPos + 1;
                 bEnd = true;
@@ -6912,7 +6933,7 @@ Paragraph.prototype =
     // Функция определяет начальную позицию курсора в параграфе
     Internal_GetStartPos : function()
     {
-        var oPos = this.Internal_FindForward( 0, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End] );
+        var oPos = this.Internal_FindForward( 0, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math] );
         if ( true === oPos.Found )
             return oPos.LetterPos;
 
@@ -6964,7 +6985,7 @@ Paragraph.prototype =
             var oPos;
 
             if ( true != Word )
-                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End] );
+                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math] );
             else
                 oPos = this.Internal_FindWordStart( this.CurPos.ContentPos - 1, CursorPos_min );
 
@@ -6996,7 +7017,7 @@ Paragraph.prototype =
         {
             var oPos;
             if ( true != Word )
-                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End] );
+                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math] );
             else
                 oPos = this.Internal_FindWordStart( this.CurPos.ContentPos - 1, CursorPos_min );
 
@@ -7022,7 +7043,7 @@ Paragraph.prototype =
             var oPos;
 
             if ( true != Word )
-                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+                oPos = this.Internal_FindBackward( this.CurPos.ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
             else
                 oPos = this.Internal_FindWordStart( this.CurPos.ContentPos - 1, CursorPos_min );
 
@@ -8728,6 +8749,7 @@ Paragraph.prototype =
                     case para_Numbering:
                     case para_PresentationNumbering:
                     case para_PageNum:
+                    case para_Math:
                     {
                         if ( true === bClearText )
                             return null;
@@ -8843,7 +8865,7 @@ Paragraph.prototype =
     // Проверяем пустой ли параграф
     IsEmpty : function()
     {
-        var Pos = this.Internal_FindForward( 0, [para_Tab, para_Drawing, para_PageNum, para_Text, para_Space, para_NewLine] );
+        var Pos = this.Internal_FindForward( 0, [para_Tab, para_Drawing, para_PageNum, para_Text, para_Space, para_NewLine, para_Math] );
         return ( Pos.Found === true ? false : true );
     },
 
@@ -8888,7 +8910,7 @@ Paragraph.prototype =
                 StartPos = Temp;
             }
 
-            var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine];
+            var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math];
             if ( true === bCheckHidden )
                 CheckArray.push( para_End );
 
@@ -8934,7 +8956,7 @@ Paragraph.prototype =
                 TabsCount++;
                 TabsPos.push( Pos );
             }
-            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType )
+            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
                 break;
         }
 
