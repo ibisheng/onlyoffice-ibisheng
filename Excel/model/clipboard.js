@@ -283,6 +283,8 @@
 					}
 					if(this.element.children[0])
 						$(this.element.children[0]).addClass("xslData;" + sBase64);
+					//for buttons copy/paste
+					this.lStorage = sBase64;
 				}
 							
 				
@@ -345,6 +347,16 @@
 					t.copyText = t._getTextFromTable(table);
 					return true;
 				}
+				else if(copyPasteUseBinary)
+				{
+					var t = this;
+					var  table = t._makeTableNode(range, worksheet, isCut);
+					t.copyText = t._getTextFromTable(table);
+					var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+					var sBase64 = oBinaryFileWriter.Write();
+					t.lStorage = sBase64;
+					return true;
+				}
 				return false;
 			},
 			
@@ -385,7 +397,7 @@
 					t._editorPasteExec(worksheet,pastebin)
 					return true;
 				}
-				else if(activateLocalStorage)
+				else if(activateLocalStorage || copyPasteUseBinary)
 				{
 					var t = this;
 					var onlyFromLocalStorage = true;
@@ -1400,22 +1412,28 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
-					//find class xsl
-					var base64 = null;
-					var classNode;
-					if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("xslData;") > -1)
-						classNode = node.children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
-						classNode = node.children[0].children[0].getAttribute("class");
-					else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
-						classNode = node.children[0].children[0].children[0].getAttribute("class");
-					
-					if( classNode != null ){
-						cL = classNode.split(" ");
-						for (var i = 0; i < cL.length; i++){
-							if(cL[i].indexOf("xslData;") > -1)
-							{
-								base64 = cL[i].split('xslData;')[1];
+					if(onlyFromLocalStorage)
+					{
+						base64 = t.lStorage
+					}
+					else//find class xsl
+					{
+						var base64 = null;
+						var classNode;
+						if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("xslData;") > -1)
+							classNode = node.children[0].getAttribute("class");
+						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+							classNode = node.children[0].children[0].getAttribute("class");
+						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+							classNode = node.children[0].children[0].children[0].getAttribute("class");
+						
+						if( classNode != null ){
+							cL = classNode.split(" ");
+							for (var i = 0; i < cL.length; i++){
+								if(cL[i].indexOf("xslData;") > -1)
+								{
+									base64 = cL[i].split('xslData;')[1];
+								}
 							}
 						}
 					}
@@ -2844,6 +2862,8 @@
 				};
 				for(var i = 0; i < data.Drawings.length; i++)
 				{
+					if(i == 0)
+						window["Asc"]["editor"].isStartAddShape = true;
 					drawingObject = data.Drawings[i];
 					// Object types
 					if (drawingObject.graphicObject instanceof  CChartAsGroup) {
@@ -2888,6 +2908,7 @@
 						drawingObject.graphicObject.recalculate();
 						
 						drawingObject.graphicObject.addToDrawingObjects();
+						drawingObject.graphicObject.select(ws.objectRender.controller);
 					}
 				};
 				History.EndTransaction();
