@@ -1406,14 +1406,6 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.needRecalc = {length:0};
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
-
-	// Histoey & global counters
-	History = new CHistory(this);
-
-    g_oIdCounter = new CIdCounter();
-	g_oTableId = new CTableId();
-	if ( this.oApi.User )
-		g_oIdCounter.Set_UserId(this.oApi.User.asc_getId());
 	
 	this.theme = null;
 	this.clrSchemeMap = null;
@@ -1436,17 +1428,6 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.bRedoChanges = false;
 	this.aCollaborativeChangeElements = new Array();
 };
-Workbook.prototype.initGlobalObjects=function(){
-	g_oUndoRedoCell = new UndoRedoCell(this);
-	g_oUndoRedoWorksheet = new UndoRedoWoorksheet(this);
-	g_oUndoRedoWorkbook = new UndoRedoWorkbook(this);
-	g_oUndoRedoCol = new UndoRedoRowCol(this, false);
-	g_oUndoRedoRow = new UndoRedoRowCol(this, true);
-	g_oUndoRedoComment = new UndoRedoComment(this);
-	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
-    g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);
-    g_oIdCounter.Set_Load(false);
-}
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)
 		this.nActive = 0;
