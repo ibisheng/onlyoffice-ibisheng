@@ -69,7 +69,7 @@ function CMathRunPrp()
 {
     this.typeObj = MATH_RUN_PRP;
     this.textPrp = new CTextPr();
-    this.mathRunPrp = null;
+    this.mathPrp = new CMPrp();
     this.size = {width: 0, height: 0, center: 0, ascent: 0};
 }
 CMathRunPrp.prototype =
@@ -78,18 +78,156 @@ CMathRunPrp.prototype =
     {
         this.textPrp.Merge(rPrp);
     },
-    getTextPrp: function()
+    getWRunPrp: function()
     {
+        // смержить c MRunPrp
         return this.textPrp;
     },
-    getMathRunPrp: function()
+    setTxtPrp: function()
     {
-        // заглушка
+        this.textPrp.Merge(oWPrp);
 
+    },
+    setMathRunPrp: function(oMPrp)
+    {
+        this.mathPrp.Merge(oMPrp);
     },
     draw: function() {},
     setPosition: function() {},
-	relate: function() {}
+	relate: function() {},
+    getPropsForWrite: function()
+    {
+        var props = {};
+
+        props.textPrp    = this.textPrp;
+        props.mathRunPrp = this.mathPrp.getPropsForWrite();
+
+        return props;
+    }
+}
+
+function CMPrp()
+{
+    this.aln    = false;
+    this.brk    = false;
+    this.lit    = false;
+    this.nor    = false;        // если normal = false, то берем TextPrp отсюда (в wRunPrp bold/italic не учитываем, выставляем отсюда)
+                                // если normal = true, то их Word не учитывает и берет TextPr из wRunPrp
+    this.scr    = SCR_ROMAN;
+    this.italic = true;
+    this.bold   = false;
+    this.plain  = false;     // plain тоже самое, что и щкьфд, только нельзы поставить другой шрифт, другой размер шрифта и тп
+
+}
+CMPrp.prototype =
+{
+    Merge:  function(mPrp)
+    {
+        this.SetBProp(this.aln, mPrp.aln);
+        this.SetBProp(this.brk, mPrp.brk);
+        this.SetBProp(this.lit, mPrp.lit);
+        this.SetBProp(this.nor, mPrp.nor);
+
+        // если приходит несколько параметров style из xml, то запоминается последний
+        if(mPrp.sty === "i")
+            this.italic = true;
+        else if(mPrp.sty === "bi")
+        {
+            this.italic = true;
+            this.bold = true;
+        }
+        else if(mPrp.sty === "b")
+        {
+            this.italic = false;
+            this.bold = true;
+        }
+        else if(mPrp === "p")
+        {
+            this.plain = true;
+        }
+
+        if(mPrp.scr === "double-struck")
+            this.scr = SCR_DOUBLE_STRUCK;
+        else if(mPrp.scr === "monospace")
+            this.scr = SCR_MONOSPACE;
+        else if(mPrp.scr === "fraktur")
+            this.scr = SCR_FRAKTUR;
+        else if(mPrp.scr === "sans-serif")
+            this.scr = SCR_SANS_SERIF;
+        else if(mPrp.scr === "script")
+            this.scr = SCR_SCRIPT;
+
+    },
+    SetBProp:    function(obj, prp)
+    {
+        if(prp === 1 || prp === true)
+            obj = true;
+        else if(prp === 0 || prp === false)
+            obj = false;
+    },
+    getProps: function()
+    {
+        var props =
+        {
+            align:      this.aln,
+            brk:        this.brk,
+            literal:    this.lit,
+            normal:     this.nor,
+            script:     this.src,
+            italic:     this.italic,
+            bold:       this.bold,
+            plain:      this.plain
+        };
+
+        return props;
+    },
+    getPropsForWrite: function()
+    {
+        var props = {};
+
+        var Italic     = this.italic && !this.bold,
+            BoldItalic = this.italic && this.bold,
+            Bold       = this.bold && !this.italic,
+            Plain      = this.plain;
+
+        if(this.nor)
+        {
+            props.nor = 1;
+        }
+        else
+        {
+            if(BoldItalic)
+                props.sty = "bi";
+            else if(Bold)
+                props.sty = "b";
+            else if(Plain)
+                props.sty = "p";
+        }
+
+        if(this.aln)
+            props.aln = 1;
+
+        if(this.brk)
+            props.brk = 1;
+
+        if(this.lit)
+            props.lit = 1;
+
+
+        if( this.scr === SCR_DOUBLE_STRUCK)
+            props.scr = "double-struck";
+        else if(this.scr === SCR_MONOSPACE)
+            props.scr = "monospace";
+        else if(this.scr === SCR_FRAKTUR)
+            props.scr = "fraktur";
+        else if(this.scr === SCR_SANS_SERIF)
+            props.scr = "sans-serif";
+        else if(this.scr === SCR_SCRIPT)
+            props.scr = "script";
+        
+
+        return props;
+    }
 }
 
 
@@ -169,79 +307,6 @@ CMathContent.prototype =
         this.g_mContext = new dist(0,0,0,0);
         this.content.push( new mathElem(new CEmpty(), new dist(0,0,0,0), 0) );
     },
-    /*setPrp: function(prp) //текстовые настройки
-    {
-        this.OwnTPrp.Merge(prp);
-        for(var i = 0; i < this.content.length; i++)
-            this.content[i].value.setOwnTPrp(prp);
-    },
-    setTxtPrp: function(txtPrp)
-    {
-        this.TxtPrp.Merge(txtPrp);
-        for(var i = 0; i < this.content.length; i++)
-            this.content[i].value.setTxtPrp(txtPrp);
-    },
-    setCtrPrp: function(txtPrp)
-    {
-        this.TxtPrp = new CMathTextPrp();
-        this.TxtPrp.Merge(txtPrp);
-
-        for(var i=0; i < this.content.length; i++)
-            this.content[i].value.setCtrPrp(txtPrp);
-    },
-    changeTxtPrp: function(txtPrp)
-    {
-        var start, end;
-        if( this.selection.startPos != this.selection.endPos )
-        {
-            start = this.selection.startPos;
-            end = this.selection.endPos;
-            if(start > end)
-            {
-                tmp = start;
-                start = end;
-                end = tmp;
-            }
-        }
-
-        for(var i = start; i < end; i++)
-            this.content[i].value.setOwnTPrp(txtPrp);
-    },
-    setOwnTPrp: function(txtPrp)
-    {
-        this.OwnTPrp.Merge(txtPrp);
-        for(var i = 0; i < this.content.length; i++)
-            this.content[i].value.setOwnTPrp(txtPrp);
-    },
-    getRunPrp: function(pos)
-    {
-        var runPrp = new CMathTextPrp();
-        var rPrp = null;
-
-        if(this.content.length > 1)
-        {
-            if(pos == 0)
-            {
-                rPrp = this.content[pos+1].value.getTxtPrp();
-                runPrp.Merge(rPrp);
-            }
-            else
-            {
-                if(this.content[pos].value.empty) // возможность, когда в контенте один CEmpty исключили в начале
-                    rPrp = this.content[pos-1].value.getTxtPrp();
-                else
-                    rPrp = this.content[pos].value.getTxtPrp();
-                runPrp.Merge(rPrp);
-            }
-        }
-        else
-        {
-            runPrp.Merge(this.getTxtPrp());
-        }
-
-        return runPrp;
-    },*/
-    // ?!
     // переделать для селекта
     getSelectTPrp: function(bSelect)
     {
@@ -492,7 +557,6 @@ CMathContent.prototype =
                 shift = -1;
             else
                 shift = 0;
-
 
             this.addToContent(mathElem, shift);
 
@@ -3535,26 +3599,6 @@ CMathContent.prototype =
     {
         this.reduct = this.reduct*coeff;
     },
-    /*getTxtPrp: function()
-    {
-        var txtPrp = new CMathTextPrp();
-        txtPrp.Merge(this.TxtPrp);
-        txtPrp.Merge(this.OwnTPrp);
-
-        if( typeof(txtPrp.FontSize) !== "undefined")
-            txtPrp.FontSize *= this.getReduct();
-
-        return txtPrp;
-    },
-    getReduct: function()
-    {
-        var result = this.reduct;
-
-        if(!this.bRoot)
-            result *= this.Parent.getReduct(); // чтобы не перекрывать
-
-        return result;
-    },*/
     relate: function(parent)
     {
         if(parent === -1)
@@ -4180,7 +4224,7 @@ CMathContent.prototype =
             }
             else if(type == MATH_RUN_PRP)
             {
-                var runPrp = this.content[i].value.getTextPrp();
+                var runPrp = this.content[i].value.getWRunPrp();
 
                 var txtPrp = new CMathTextPrp();
                 txtPrp.Merge(DEFAULT_RUN_PRP);
@@ -4225,7 +4269,7 @@ CMathContent.prototype =
 
                     var rPrp = new CMathTextPrp();
                     rPrp.Merge(DEFAULT_RUN_PRP);
-                    rPrp.Merge( this.content[i].value.getTextPrp() );
+                    rPrp.Merge( this.content[i].value.getWRunPrp() );
 
                     rPrp.Italic = false;
                     pGraphics.SetFont(rPrp);
@@ -4867,8 +4911,8 @@ CMathContent.prototype =
                 {
                     if(this.content[i].value.typeObj === MATH_RUN_PRP)
                     {
-                        var currTPrp = this.content[pos+2].value.getTextPrp();
-                        var prevTPrp = this.content[i].value.getTextPrp();
+                        var currTPrp = this.content[pos+2].value.getWRunPrp();
+                        var prevTPrp = this.content[i].value.getWRunPrp();
                         bSelectRunPrp = currTPrp.isEqual(currTPrp, prevTPrp);
                         break;
                     }
@@ -4895,205 +4939,6 @@ CMathContent.prototype =
         }
 
         return result;
-    },
-    old_old_remove_internal: function(order)
-    {
-         //var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
-         var bMEDirect = order == 1 && currType === MATH_EMPTY, // работает, если только в конце формулы стоим или после идет еще одна формула
-         bMEDirectRPrp = order == 1 && currType === MATH_RUN_PRP && bPrevComp, //стоим после формулы, после RunPrp
-         bMEReverse = order == -1 && nextType === MATH_COMP,
-         bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
-
-        //directly
-        if(bCurrComp) // empty + math composition
-        {
-            this.setStart_Selection(this.CurPos);
-            this.setEnd_Selection( this.CurPos-2 );
-            this.selection.active = false;
-        }
-        else if(bRPrpComp) // runPrp, empty, math composition
-        {
-            //здесь только селектим, ничего не удаляем
-            //селектим RunPrp только в одном случае, когда слева и справа от формулы Run с одними и теми же RunPrp
-
-            var bSelectRunPrp = false;
-
-            if(prev3_Type === MATH_TEXT)
-            {
-                for(var i = this.CurPos - 3; i > 0; i--)
-                {
-                    if(this.content[i].value.typeObj === MATH_RUN_PRP)
-                    {
-                        currRPrp = this.content[this.CurPos].value;
-                        prevRPrp = this.content[i].value;
-                        bSelectRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
-                        break;
-                    }
-                }
-            }
-
-            var start, end;
-            if(bSelectRunPrp)
-            {
-                start = this.CurPos;
-                end = this.CurPos-3;
-            }
-            else
-            {
-                start = this.CurPos-1;
-                end = this.CurPos-3;
-            }
-
-            this.setStart_Selection(start);
-            this.setEnd_Selection(end);
-            this.selection.active = false;
-
-        }
-        //reverse
-        else if(bReverseComp)
-        {
-            if(bAfterRPrp)
-            {
-
-            }
-
-        }
-
-
-
-        var items = null;
-
-        if(!bSelect && bMEDirect)   // если курсор после мат. объекта и нет RunPrp после ма объекта
-        {
-            this.setStart_Selection(this.CurPos);
-            this.setEnd_Selection( this.CurPos-2 );
-            this.selection.active = false;
-        }
-        else if(!bSelect && bMEDirectRPrp) // мат объект, RunPrp
-        {
-            /*if(this.CurPos === 3) // стоим в начале, после мат объекта
-            {
-                start = this.CurPos - 1;
-                end = this.CurPos - 3;
-            }
-            else if(bPrev2_Comp)
-            {
-                start = this.CurPos - 1;
-                end = this.CurPos - 3;
-            }*/
-
-            var bDelRunPrp = false;
-
-            if(prev3_Type === MATH_TEXT)
-            {
-                for(var i = this.CurPos - 3; i > 0; i--)
-                {
-                    if(this.content[i].value.typeObj === MATH_RUN_PRP)
-                    {
-                        currRPrp = this.content[this.CurPos].value;
-                        prevRPrp = this.content[i].value;
-                        bDelRunPrp = currRPrp.isEqual(currRPrp, prevRPrp);
-                        break;
-                    }
-                }
-            }
-
-            if(bDelRunPrp)
-            {
-                this.setStart_Selection(this.CurPos);
-                this.setEnd_Selection(this.CurPos-3);
-                this.selection.active = false;
-            }
-            else
-            {
-                this.setStart_Selection(this.CurPos-1);
-                this.setEnd_Selection(this.CurPos-3);
-                this.selection.active = false;
-            }
-            /*else
-            {
-                start = this.CurPos - 1;
-                end = this.CurPos - 3;
-            }*/
-
-        }
-        else if(!bSelect && bMEReverse)     //аналогично для delete
-        {
-            this.setStart_Selection(this.CurPos);
-            this.setEnd_Selection( this.CurPos + 2 );
-            this.selection.active = false;
-        }
-        else if( !bFirstRunPrp || bSelect) // исключаем если стоим в начале и есть RunPrp
-        {
-            var start, end;
-
-            if(bSelect)
-            {
-                start = this.selection.startPos;
-                end = this.selection.endPos;
-                if(start > end)
-                {
-                    tmp = start;
-                    start = end;
-                    end = tmp;
-                }
-            }
-            else if(order == 1)
-            {
-                start = this.CurPos;
-                end = this.CurPos + 1;
-            }
-            else if(order == -1)
-            {
-                start = this.CurPos + 1;
-                end = this.CurPos + 2;
-            }
-
-            /*var tmp = new Array();
-
-            for(var i = 0; i< start; i++)
-                tmp.push(this.content[i]);
-
-            for (var j = end; j < this.content.length; j++)
-                tmp.push(this.content[j]);*/
-
-            /*var Content_start = this.content.slice(0, start);
-            var Content_end   = this.content.slice(end, this.content.length);
-            this.content = Content_start.concat(Content_end);*/
-
-            if(this.content[start-1].value.typeObj === MATH_RUN_PRP)
-            {
-                if(end === this.content.length )
-                    start--;
-                else
-                    for(var i = start; i < end; i++)
-                    {
-                        if(this.content[i].value.typeObj === MATH_RUN_PRP)
-                        {
-                            start--;
-                            break;
-                        }
-                    }
-            }
-
-            items = this.content.splice(start, end - start);
-
-            if(!TEST)
-            {
-                History.Create_NewPoint();
-                //items = this.content.splice(start, end - start);
-                History.Add(this, {Type: historyitem_Math_RemoveItem, Items: items, Pos: start});
-            }
-
-            this.CurPos = start - 1;
-            this.setStart_Selection(this.CurPos);
-            this.selection.active = false;
-
-            bDelete = true;
-        }
-
-        return {bDelete: bDelete, items: items};
-
     },
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
@@ -5305,7 +5150,7 @@ CMathContent.prototype =
         {
             if(this.content[i].value.typeObj === MATH_RUN_PRP)
             {
-                var run = new CRun();
+                var run = new CMRun();
 
                 run.setTxtPrp(this.content[i].value);
                 run.setMathRunPrp(this.content[i].value);
@@ -5348,7 +5193,7 @@ CMathContent.prototype =
 
                     if(obj.typeObj == MATH_RUN_PRP)
                     {
-                        runPrp.Merge(obj.getTextPrp());
+                        runPrp.Merge(obj.getWRunPrp());
                         break;
                     }
                     else if(obj.typeObj == MATH_COMP)
@@ -5376,7 +5221,7 @@ CMathContent.prototype =
         {
             if(this.content[1].value.typeObj === MATH_RUN_PRP) // если первый объект - буква
             {
-                var runPrp = this.content[1].value.getTextPrp();
+                var runPrp = this.content[1].value.getWRunPrp();
                 txtPrp.Merge(runPrp);
             }
             else if(this.content[1].value.typeObj === MATH_COMP)
@@ -5500,7 +5345,7 @@ CMathContent.prototype =
         {
             var rPrp = this.Parent.getCtrPrp();
 
-            var Run = this.content[1].value.runPrp;
+            var Run = this.content[1].value.textPrp;
             var currRun = new CTextPr();
             currRun.Merge(Run);
 
@@ -5854,7 +5699,18 @@ CMathContent.prototype =
     IsEmpty:    function()
     {
         return this.content.length == 1;
+    },
+
+    ///////  selection for Edit   ////////
+    selection_SetStart: function(x,y)
+    {
+
+    },
+    selection_SetEnd: function(x,y, MouseEvent)
+    {
+
     }
+
 }
 //todo
 //разобраться с gaps
@@ -6019,9 +5875,6 @@ CMathComposition.prototype =
         if(this.Root.selection.active)
         {
             this.ClearSelect();
-
-            /*mouseX = 18.479166666666664;
-            mouseY = 9.76875;*/
 
             var movement = this.Root.mouseMove({x: mouseX, y: mouseY});
             this.SelectContent = movement.SelectContent;
@@ -6194,7 +6047,6 @@ CMathComposition.prototype =
 
         return State;
     },
-    //переделать
     Set_SelectionState : function(State)
     {
         this.ClearSelect();
@@ -6225,28 +6077,6 @@ CMathComposition.prototype =
             this.UpdateCursor();
         }
     },
-    /*Undo: function(Data)
-    {
-        var content = Data.content;
-        content.Undo(Data);
-
-    },
-    Redo: function()
-    {
-
-    },
-    Refresh_RecalcData: function()
-    {
-        this.RecalculateReverse();
-        this.UpdatePosition();
-        this.CurrentContent.update_Cursor();
-        this.ShowCursor();
-    },
-    Save_Changes: function(Data, Writer)
-    {
-
-    },*/
-    ////
 
     ClearSelect: function()
     {
@@ -6550,6 +6380,8 @@ CMathComposition.prototype =
     {
         this.Root.setReferenceComposition(this);
     },
+
+    ////////   For edit    ////////
     test_for_edit: function()
     {
         var props =
@@ -6566,7 +6398,17 @@ CMathComposition.prototype =
     test_for_edit_2:  function()
     {
         simulatorMComposition(this, MATH_EDIT);
+    },
+    Selection_SetStart: function(X, Y, PageNum)
+    {
+        this.Root.selection_SetStart(X, Y);
+    },
+    Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
+    {
+        this.Root.selection_SetEnd(X, Y, MouseEvent);
+
     }
+
 
 }
 
@@ -6600,41 +6442,39 @@ function CEmpty()
     this.relate     = function() {};
 }
 
-function CRun()
+function CMRun()
 {
-    this.text = "";
+    /**this.text = "";
     this.txtPrp = null;
-    this.mathRunPrp = null;
+    this.mathRunPrp = null;*/
+
+    this.props =
+    {
+        text:       "",
+        txtPrp:     null,
+        mathRunPrp: null
+    };
 }
-CRun.prototype =
+CMRun.prototype =
 {
-    getText:    function()
-    {
-        return this.text;
-    },
-    getRunPrp:  function()
-    {
-        return this.txtPrp;
-    },
-    getMathRunPrp:  function()
-    {
-        return this.mathRunPrp;
-    },
     getTypeElement: function()
     {
         return MATH_RUN;
     },
-    setTxtPrp:  function(oRunPrp)
+    setRunPrp:  function(oRunPrp)
     {
-        this.txtPrp = oRunPrp.getTextPrp();
+        var rPrp = oRunPrp.getPropsForWrite();
+
+        this.props.txtPrp     = rPrp.textPrp;
+        this.props.mathRunPrp = rPrp.mathRunPrp;
     },
     addLetter:  function(oMText)
     {
-        this.text += String.fromCharCode(oMText.value);
+        this.props.text += String.fromCharCode(oMText.value);
     },
-    setMathRunPrp:  function(oRunPrp)
+    getPropsForWrite: function()
     {
-        this.mathRunPrp = oRunPrp.getMathRunPrp();
+        return this.props;
     }
 }
 

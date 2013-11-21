@@ -574,7 +574,7 @@ old_CBarFraction.prototype.setSimple = function(flag)
     else
         this.setReduct(1);
 
-    this.Resize();
+    this./**/Resize();
 }
 
 //////////

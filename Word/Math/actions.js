@@ -415,11 +415,11 @@ CControlComposition.prototype =
     {
         this.Content[this.CurPos].Refresh();
     },
-    Set_SelectionState: function(State)
+    old_Set_SelectionState: function(State)
     {
         this.Content[this.CurPos].Set_SelectionState(State);
     },
-    Get_SelectionState: function()
+    old_Get_SelectionState: function()
     {
         return this.Content[this.CurPos].Get_SelectionState();
     },

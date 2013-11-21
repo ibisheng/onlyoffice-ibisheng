@@ -178,10 +178,10 @@ CRadical.prototype.init = function(props)
     /*if(typeof(props.type) !== "undefined" && props.type !== null)
         this.type = props.type;*/
 
-    /*if(props.type === SQUARE_RADICAL)
+    if(props.type === SQUARE_RADICAL)
         this.type = SQUARE_RADICAL;
     else if(props.type === DEGREE_RADICAL)
-        this.type = DEGREE_RADICAL;*/
+        this.type = DEGREE_RADICAL;
 
     if(props.degHide === true && props.degHide === 1)
         this.type = SQUARE_RADICAL;

@@ -1462,9 +1462,8 @@ CDocument.prototype =
             nPageIndex = this.CurPage;
 
         if(nPageIndex === 0)
-            MathComposition.Draw(21.5, 25.3, pGraphics);
-            //MathComposition.Draw(pGraphics);
-
+            //MathComposition.Draw(21.5, 25.3, pGraphics);
+            MathComposition.Draw_2(pGraphics);
 
 
         //DrawUnion();
