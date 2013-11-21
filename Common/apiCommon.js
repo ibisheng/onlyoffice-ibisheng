@@ -76,5 +76,66 @@
 		prot["asc_getCanBranding"]			= prot.asc_getCanBranding;
 		prot["asc_getIsAutosaveEnable"]		= prot.asc_getIsAutosaveEnable;
 		prot["asc_getAutosaveMinInterval"]	= prot.asc_getAutosaveMinInterval;
+
+		/**
+		 * Класс CColor для работы с цветами
+		 * -----------------------------------------------------------------------------
+		 *
+		 * @constructor
+		 * @memberOf window
+		 */
+		 
+		function CColor (r,g,b,a){
+			this.r = (undefined == r) ? 0 : r;
+			this.g = (undefined == g) ? 0 : g;
+			this.b = (undefined == b) ? 0 : b;
+			this.a = (undefined == a) ? 1 : a;
+		}
+		
+		CColor.prototype = {
+			constructor: CColor,
+			getR: function(){return this.r},
+			get_r: function(){return this.r},
+			put_r: function(v){this.r = v; this.hex = undefined;},
+			getG: function(){return this.g},
+			get_g: function(){return this.g;},
+			put_g: function(v){this.g = v; this.hex = undefined;},
+			getB: function(){return this.b},
+			get_b: function(){return this.b;},
+			put_b: function(v){this.b = v; this.hex = undefined;},
+			getA: function(){return this.a},
+			get_hex: function()
+			{
+				if(!this.hex)
+				{
+					var r = this.r.toString(16);
+					var g = this.g.toString(16);
+					var b = this.b.toString(16);
+					this.hex = ( r.length == 1? "0" + r: r) +
+						( g.length == 1? "0" + g: g) +
+						( b.length == 1? "0" + b: b);
+				}
+				return this.hex;
+			}
+		};
+		
+		/*
+		 * Export
+		 * -----------------------------------------------------------------------------
+		 */
+		window["CColor"] = window.CColor = CColor;
+		
+		prot = CColor.prototype;
+		prot["getR"]	= prot.getR;
+		prot["get_r"]	= prot.get_r;
+		prot["put_r"]	= prot.put_r;
+		prot["getG"]	= prot.getG;
+		prot["get_g"]	= prot.get_g;
+		prot["put_g"]	= prot.put_g;
+		prot["getB"]	= prot.getB;
+		prot["get_b"]	= prot.get_b;
+		prot["put_b"]	= prot.put_b;
+		prot["getA"]	= prot.getA;
+		prot["get_hex"]	= prot.get_hex;
 	}
 )(window);
