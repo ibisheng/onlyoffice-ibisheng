@@ -30,9 +30,8 @@
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
-
 var TEST = true;
-var TEST_2 = true;
+
 
 var  DEFAULT_RUN_PRP =
 {
@@ -83,7 +82,7 @@ CMathRunPrp.prototype =
         // смержить c MRunPrp
         return this.textPrp;
     },
-    setTxtPrp: function()
+    setTxtPrp: function(oWPrp)
     {
         this.textPrp.Merge(oWPrp);
 
@@ -3986,7 +3985,7 @@ CMathContent.prototype =
                 this.content[this.CurPos].value.mouseUp();
         }
     },
-    mouseDown: function(mouseCoord, inside_flag)
+    mouseDown: function(mouseCoord, inside_flag)  // mouseDown идем сверху вниз по иерархии
     {
         var result = null;
 
@@ -4021,7 +4020,7 @@ CMathContent.prototype =
 
         return result;
     },
-    mouseMove: function(mouseCoord)
+    mouseMove: function(mouseCoord) // mouseMove идем сверху вниз по иерархии
     {
         var state = true;
         var SelectContent = null;
@@ -4070,9 +4069,9 @@ CMathContent.prototype =
                 if( this.content[pos].value.typeObj === MATH_COMP )
                 {
                     if( direction == 1 )
-                        this.setEnd_Selection( pos + 1);
+                        this.setEnd_Selection(pos + 1);
                     else if( direction == -1 )
-                        this.setEnd_Selection( pos - 1);
+                        this.setEnd_Selection(pos - 1);
                 }
                 else
                     this.setEnd_Selection( pos );
@@ -4957,10 +4956,6 @@ CMathContent.prototype =
             StartIndSelect++; // start+1 ... end
             this.selection.startPos = StartIndSelect;
             this.selection.endPos   = StartIndSelect;
-
-            if(TEST_2)
-                if(this.selection.startPos === 3)
-                    var temp;
         }
         else // один CEmpty
         {
@@ -5702,12 +5697,99 @@ CMathContent.prototype =
     },
 
     ///////  selection for Edit   ////////
-    selection_SetStart: function(x,y)
+    selection_Start: function(x, y)
     {
+        return this.getSelectContent(x, y);
+    },
+    selection_End: function(x, y, MouseEvent)
+    {
+        // реализовано через две ф-ии, т.к. впоследствии нужно будет учитывать MouseEvent
+
+        return this.getSelectContent(x, y);
 
     },
-    selection_SetEnd: function(x,y, MouseEvent)
+    getSelectContent: function(x, y)
     {
+        var state = true; // вышли / не вышли за переделы контента
+        var SelectContent = null;
+
+
+        if(this.IsPlaceholder())
+        {
+            SelectContent = this;
+        }
+        else
+        {
+            var msCoord = this.coordWOGaps({x: x, y: y});
+            var pos = this.findPosition( msCoord );
+
+            //селект внутри элемента (дроби и пр.)
+            if(this.CurPos === pos && this.content[pos].value.typeObj === MATH_COMP)
+            {
+                this.setStartPos_Selection(pos - 1);
+                var coord = this.getCoordElem(this.CurPos, msCoord );
+                var movement = this.content[pos].value.getPosSelect(coord.x, coord.y);
+
+                if( ! movement.state )
+                {
+                    this.setEnd_Selection( pos + 1 );
+                    SelectContent = this;
+                }
+                else
+                    SelectContent = movement.SelectContent;
+            }
+            //селект элементов контента
+            else
+            {
+                SelectContent = this;
+
+                var direction = ( this.CurPos < pos ) ? 1 : -1;
+
+                if ( this.content[this.CurPos].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setStartPos_Selection( this.CurPos - 1);
+                    else if( direction == -1 )
+                        this.setStartPos_Selection( this.CurPos + 1);
+                }
+                else
+                    this.setStartPos_Selection( this.CurPos );
+
+                if( this.content[pos].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setEndPos_Selection(pos + 1);
+                    else if( direction == -1 )
+                        this.setEndPos_Selection(pos - 1);
+                }
+                else
+                    this.setEndPos_Selection( pos );
+            }
+        }
+
+        return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
+    },
+    setStartPos_Selection: function( StartIndSelect )
+    {
+        if( this.content.length != 1)
+        {
+            //this.selection.active = true;
+            StartIndSelect++; // start+1 ... end
+            this.selection.startPos = StartIndSelect;
+            this.selection.endPos   = StartIndSelect;
+        }
+        else // один CEmpty
+        {
+            this.selection.startPos = 0;
+            this.selection.endPos = 0;
+            this.selection.active = false;
+        }
+
+    },
+    setEndPos_Selection: function( EndIndSelect )
+    {
+
+        this.selection.endPos = EndIndSelect + 1;
 
     }
 
@@ -6401,14 +6483,17 @@ CMathComposition.prototype =
     },
     Selection_SetStart: function(X, Y, PageNum)
     {
-        this.Root.selection_SetStart(X, Y);
+        var result = this.Root.selection_Start(X, Y);
+        this.SelectContent = result.SelectContent;
+
+
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
-        this.Root.selection_SetEnd(X, Y, MouseEvent);
+        var result = this.Root.selection_End(X, Y, MouseEvent);
+        this.SelectContent = result.SelectContent;
 
     }
-
 
 }
 
