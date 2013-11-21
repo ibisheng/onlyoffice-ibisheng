@@ -5028,8 +5028,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         return this.bcr.ReadTable(function(t, l){
                 return oThis.ReadWorksheetsContent(t,l);
             });
-		if(this.isCopyPaste)
-			return this.isCopyPaste;
     };
     this.ReadWorksheetsContent = function(type, length)
     {
@@ -5061,8 +5059,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 					hyperlink.Ref.setHyperlinkOpen(hyperlink);
 			}
             oNewWorksheet.init();
-			if(this.isCopyPaste)
-				return oNewWorksheet;
             this.wb.aWorksheets.push(oNewWorksheet);
 			this.wb.aWorksheetsById[oNewWorksheet.getId()] = oNewWorksheet;
         }
@@ -6497,10 +6493,7 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
     {
         this.stream = this.getbase64DecodedData(data);
 		History.TurnOff();
-		if(this.isCopyPaste)
-			return this.ReadFile(wb)
-		else
-			this.ReadFile(wb);
+		this.ReadFile(wb);
 
 		if(!this.isCopyPaste)
 		{
@@ -6527,7 +6520,6 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
         var nSharedStringTableOffset = null;
 		var nStyleTableOffset = null;
 		var nWorkbookTableOffset = null;
-		var worksheet;
         for(var i = 0; i < mtLen; ++i)
         {
             //mtItem
@@ -6551,9 +6543,7 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
         var aCellXfs = new Array();
 		var aDxfs = new Array();
         var oMediaArray = new Object();
-		if(!this.isCopyPaste)
-			wb.aWorksheets = new Array();
-		
+        wb.aWorksheets = new Array();
         if(null != nOtherTableOffset)
         {
             res = this.stream.Seek(nOtherTableOffset);
@@ -6594,13 +6584,8 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
 							// res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
 						// break;
 					case c_oSerTableTypes.Worksheets:
-					{
-						res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.isCopyPaste)).Read();
-						if(this.isCopyPaste)
-							worksheet = res;
-					}	
+							res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray)).Read();
 						break;
-						
 					case c_oSerTableTypes.CalcChain:
 							res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
 						break;
@@ -6612,15 +6597,16 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
 					break;
 			}
 		}
-		if(this.isCopyPaste)
-			return worksheet;
-		if(null != nWorkbookTableOffset)
-        {
-            res = this.stream.Seek(nWorkbookTableOffset);
-            if(c_oSerConstants.ReadOk == res)
-                res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
-        }
-        wb.init();
+		if(!this.isCopyPaste)
+		{
+			if(null != nWorkbookTableOffset)
+			{
+				res = this.stream.Seek(nWorkbookTableOffset);
+				if(c_oSerConstants.ReadOk == res)
+					res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
+			}
+			wb.init();
+		}
         return res;
     };
 };

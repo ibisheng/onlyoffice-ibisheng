@@ -1440,7 +1440,11 @@
 					if(base64 != null)
 					{
 						var oBinaryFileReader = new BinaryFileReader(null, true);
-						var pasteData = oBinaryFileReader.Read(base64, worksheet.model.workbook);
+						var tempWorkbook = new Workbook;
+						oBinaryFileReader.Read(base64, tempWorkbook);
+						var pasteData = null;
+						if(tempWorkbook)
+							pasteData = tempWorkbook.aWorksheets[0]
 						if(pasteData)
 						{
 							History.TurnOn();
