@@ -169,6 +169,7 @@
 			this.ppix = 96;
 			this.ppiy = 96;
 			this.Api = null;
+			this.activeRange = null;
 
 			return this;
 		}
@@ -1442,6 +1443,7 @@
 						var oBinaryFileReader = new BinaryFileReader(null, true);
 						var tempWorkbook = new Workbook;
 						oBinaryFileReader.Read(base64, tempWorkbook);
+						this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
 						var pasteData = null;
 						if(tempWorkbook)
 							pasteData = tempWorkbook.aWorksheets[0]
@@ -2811,7 +2813,7 @@
 			
 			_insertImagesFromBinary: function(ws, data)
 			{
-				var pasteRange = ws.autoFilters._refToRange(data.activeRange);
+				var pasteRange = ws.autoFilters._refToRange(this.activeRange);
 				var activeRange = Asc.clone(ws.activeRange);
 				var curCol;
 				var curRow;

@@ -7859,7 +7859,8 @@
 				var arrFormula = [];
 				var numFor = 0;
 				
-				var activeCellsPasteFragment = this.autoFilters._refToRange(val.activeRange);
+				var pasteRange = window["Asc"]["editor"].wb.clipboard.activeRange;
+				var activeCellsPasteFragment = this.autoFilters._refToRange(pasteRange);
 				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
 				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
 				
