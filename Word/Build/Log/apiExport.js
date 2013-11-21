@@ -711,6 +711,8 @@ var:CParagraphAndTextProp
 prop:get_ParaPr
 prop:get_TextPr
 ---
+var:safe_Apply_Changes
+---
 var:OnSave_Callback
 ---
 var:CDocInfoProp
@@ -960,15 +962,6 @@ var:CAscTexture
 prop:get_id
 prop:get_image
 ---
-var:CColor
-prop:get_r
-prop:put_r
-prop:get_g
-prop:put_g
-prop:get_b
-prop:put_b
-prop:get_hex
----
 var:CAscColor
 prop:get_r
 prop:put_r
@@ -982,6 +975,8 @@ prop:get_type
 prop:put_type
 prop:get_value
 prop:put_value
+prop:put_auto
+prop:get_auto
 prop:get_hex
 prop:get_color
 ---
@@ -1783,6 +1778,7 @@ CTextProp.prototype['get_SmallCaps'] = CTextProp.prototype.get_SmallCaps;
 window['CParagraphAndTextProp'] = CParagraphAndTextProp;
 CParagraphAndTextProp.prototype['get_ParaPr'] = CParagraphAndTextProp.prototype.get_ParaPr;
 CParagraphAndTextProp.prototype['get_TextPr'] = CParagraphAndTextProp.prototype.get_TextPr;
+window['safe_Apply_Changes'] = safe_Apply_Changes;
 window['OnSave_Callback'] = OnSave_Callback;
 window['CDocInfoProp'] = CDocInfoProp;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
@@ -1998,14 +1994,6 @@ CAscColorScheme.prototype['get_name'] = CAscColorScheme.prototype.get_name;
 window['CAscTexture'] = CAscTexture;
 CAscTexture.prototype['get_id'] = CAscTexture.prototype.get_id;
 CAscTexture.prototype['get_image'] = CAscTexture.prototype.get_image;
-window['CColor'] = CColor;
-CColor.prototype['get_r'] = CColor.prototype.get_r;
-CColor.prototype['put_r'] = CColor.prototype.put_r;
-CColor.prototype['get_g'] = CColor.prototype.get_g;
-CColor.prototype['put_g'] = CColor.prototype.put_g;
-CColor.prototype['get_b'] = CColor.prototype.get_b;
-CColor.prototype['put_b'] = CColor.prototype.put_b;
-CColor.prototype['get_hex'] = CColor.prototype.get_hex;
 window['CAscColor'] = CAscColor;
 CAscColor.prototype['get_r'] = CAscColor.prototype.get_r;
 CAscColor.prototype['put_r'] = CAscColor.prototype.put_r;
@@ -2019,6 +2007,8 @@ CAscColor.prototype['get_type'] = CAscColor.prototype.get_type;
 CAscColor.prototype['put_type'] = CAscColor.prototype.put_type;
 CAscColor.prototype['get_value'] = CAscColor.prototype.get_value;
 CAscColor.prototype['put_value'] = CAscColor.prototype.put_value;
+CAscColor.prototype['put_auto'] = CAscColor.prototype.put_auto;
+CAscColor.prototype['get_auto'] = CAscColor.prototype.get_auto;
 CAscColor.prototype['get_hex'] = CAscColor.prototype.get_hex;
 CAscColor.prototype['get_color'] = CAscColor.prototype.get_color;
 window['CreateAscColorCustom'] = CreateAscColorCustom;
