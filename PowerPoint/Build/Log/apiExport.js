@@ -410,6 +410,8 @@ var:CChatMessage
 prop:get_UserId
 prop:get_Message
 ---
+var:safe_Apply_Changes
+---
 var:asc_CCommentData
 prop:asc_getText
 prop:asc_putText
@@ -516,15 +518,6 @@ prop:Read_FromBinary2
 var:CAscTexture
 prop:get_id
 prop:get_image
----
-var:CColor
-prop:get_r
-prop:put_r
-prop:get_g
-prop:put_g
-prop:get_b
-prop:put_b
-prop:get_hex
 ---
 var:CAscColor
 prop:get_r
@@ -1554,6 +1547,7 @@ asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
 CChatMessage.prototype['get_Message'] = CChatMessage.prototype.get_Message;
+window['safe_Apply_Changes'] = safe_Apply_Changes;
 window['asc_CCommentData'] = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
 asc_CCommentData.prototype['asc_putText'] = asc_CCommentData.prototype.asc_putText;
@@ -1646,14 +1640,6 @@ CAscSlideTiming.prototype['Read_FromBinary2'] = CAscSlideTiming.prototype.Read_F
 window['CAscTexture'] = CAscTexture;
 CAscTexture.prototype['get_id'] = CAscTexture.prototype.get_id;
 CAscTexture.prototype['get_image'] = CAscTexture.prototype.get_image;
-window['CColor'] = CColor;
-CColor.prototype['get_r'] = CColor.prototype.get_r;
-CColor.prototype['put_r'] = CColor.prototype.put_r;
-CColor.prototype['get_g'] = CColor.prototype.get_g;
-CColor.prototype['put_g'] = CColor.prototype.put_g;
-CColor.prototype['get_b'] = CColor.prototype.get_b;
-CColor.prototype['put_b'] = CColor.prototype.put_b;
-CColor.prototype['get_hex'] = CColor.prototype.get_hex;
 window['CAscColor'] = CAscColor;
 CAscColor.prototype['get_r'] = CAscColor.prototype.get_r;
 CAscColor.prototype['put_r'] = CAscColor.prototype.put_r;
