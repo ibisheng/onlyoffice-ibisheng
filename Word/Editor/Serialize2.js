@@ -7916,7 +7916,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oMRun.setMathRunPrp(props);
 			oMRun.setTxtPrp(rPrp);						
 			
-			oElem.addElementToContent(rPrp);
+			oElem.addElementToContent(oMRun);
 			
 			var text = this.stream.GetString2LE(length);
 			var str = "";
