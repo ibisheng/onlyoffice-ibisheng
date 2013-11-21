@@ -204,6 +204,10 @@ function DependencyGraph(wb) {
 			var _n = nodes[n.nodeId];
 			_n.deleteAllMasterEdges();
 			_n.deleteAllSlaveEdges();
+			if( areaNodes[_n.nodeId] ){
+                areaNodes[_n.nodeId] = null;
+                delete areaNodes[_n.nodeId];
+            }
 			nodes[_n.nodeId] = null;
 			delete nodes[_n.nodeId];
 			nodeslength--;
