@@ -6583,16 +6583,7 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
 							// res = (new Binary_WorkbookTableReader(this.stream, wb)).Read();
 						// break;
 					case c_oSerTableTypes.Worksheets:
-					{
-						if(this.copyPasteObj.isCopyPaste)
-						{
-							var oBinary_WorksheetTableReader = new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj);
-							res = oBinary_WorksheetTableReader.Read();
-							this.copyPasteObj = oBinary_WorksheetTableReader.copyPasteObj;
-						}
-						else
-							res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray)).Read();
-					}
+							res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
 						break;
 					case c_oSerTableTypes.CalcChain:
 							res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
