@@ -85,7 +85,6 @@ CMathRunPrp.prototype =
     setTxtPrp: function(oWPrp)
     {
         this.textPrp.Merge(oWPrp);
-
     },
     setMathRunPrp: function(oMPrp)
     {
@@ -6485,14 +6484,16 @@ CMathComposition.prototype =
     {
         var result = this.Root.selection_Start(X, Y);
         this.SelectContent = result.SelectContent;
-
-
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
         var result = this.Root.selection_End(X, Y, MouseEvent);
         this.SelectContent = result.SelectContent;
 
+    },
+    Selection_Draw: function()
+    {
+        this.SelectContent.drawSelect();
     }
 
 }
