@@ -4988,7 +4988,6 @@ CMathContent.prototype =
 
         var widthSelect = 0;
 
-
         try
         {
             for(var j = start; j < end ; j++)
@@ -4996,7 +4995,8 @@ CMathContent.prototype =
         }
         catch(e)
         {
-            console.log("Don't work update_widthContent");
+            //console.log("Don't work update_widthContent");
+            console.log("Don't work drawSelect");
         }
 
 
@@ -5787,11 +5787,16 @@ CMathContent.prototype =
     },
     setEndPos_Selection: function( EndIndSelect )
     {
-
         this.selection.endPos = EndIndSelect + 1;
-
+    },
+    setSelect_Beginning: function()
+    {
+        this.setStartPos_Selection(0);
+    },
+    setSelect_Ending: function()
+    {
+        this.setStartPos_Selection(this.content.length - 1);
     }
-
 }
 //todo
 //разобраться с gaps
@@ -6483,7 +6488,7 @@ CMathComposition.prototype =
     Selection_SetStart: function(X, Y, PageNum)
     {
         var result = this.Root.selection_Start(X, Y);
-        this.SelectContent = result.SelectContent;
+        //this.SelectContent = result.SelectContent; // если SetEnd придет раньше
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
@@ -6494,6 +6499,16 @@ CMathComposition.prototype =
     Selection_Draw: function()
     {
         this.SelectContent.drawSelect();
+    },
+    Selection_Beginning: function()
+    {
+        this.Root.setSelect_Beginning();
+        this.SelectContent = this.Root; // а здесь необходимо выставить
+    },
+    Selection_Ending:  function()
+    {
+        this.Root.setSelect_Ending();
+        this.SelectContent = this.Root;
     }
 
 }
