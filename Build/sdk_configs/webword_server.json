@@ -50,7 +50,6 @@
                 "../Common/FontsFreeType/FontFile.js",
                 "../Common/FontsFreeType/FontManager.js",
                 "../Common/PresentationSerializeAdapter.js",
-                "../Word/Drawing/AllFonts.js",
                 "../Word/Drawing/Externals.js",
                 "../Word/Drawing/GlobalLoaders.js",
                 "../Common/FontsFreeType/FontExport.js",
