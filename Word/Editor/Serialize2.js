@@ -6523,7 +6523,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oNewObject.Content.push(oMathPara);	
 			
 			res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathOMathPara(t,l,oMathPara.Math);
+                return oThis.ReadMathArg(t,l,oMathPara.Math.Root);
 			});
 		}
         else
@@ -6873,7 +6873,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathBorderBox = function(type, length, oBorderBox, props)
+	this.ReadMathBorderBox = function(type, length, oBorderBox, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8439,7 +8439,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathSPre = function(type, length, oSPre, props)
+	this.ReadMathSPre = function(type, length, oSPre, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
