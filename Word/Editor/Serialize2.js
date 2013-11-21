@@ -6530,7 +6530,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathAcc = function(type, length, oMathAcc, props)
+	this.ReadMathAcc = function(type, length, oMathAcc, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -6543,6 +6543,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {
 			oMathAcc.init(props);
+			oElem.addElementToContent(oMathAcc);
 			var oElem = oMathAcc.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
@@ -6605,12 +6606,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		props.init = false;
 		if (c_oSer_OMathContentType.Acc === type)
         {
-			var oAccent = new CAccent();
-			
+			var oMathAcc = new CAccent();			
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathAcc(t,l,oAccent,props);
-            });
-			oElem.addElementToContent(oAccent);
+                return oThis.ReadMathAcc(t,l,oMathAcc,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.ArgPr === type)
         {
@@ -6623,25 +6622,22 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
 			var oBar = new CBar();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathBar(t,l,oBar,props);
-            });
-			oElem.addElementToContent(oBar);
+                return oThis.ReadMathBar(t,l,oBar,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.BorderBox === type)
         {
 			var oBorderBox = new CBorderBox();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathBorderBox(t,l,oBorderBox,props);
-            });
-			oElem.addElementToContent(oBorderBox);
+                return oThis.ReadMathBorderBox(t,l,oBorderBox,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.Box === type)
         {
 			var oBox = new CBox();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathBox(t,l,oBox,props);
-            });
-			oElem.addElementToContent(oBox);
+                return oThis.ReadMathBox(t,l,oBox,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.CtrlPr === type)
         {
@@ -6653,73 +6649,64 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {			
 			var oDelimiter = new CDelimiter();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathDelimiter(t,l,oDelimiter,props);
-            });
-			oElem.addElementToContent(oDelimiter);
+                return oThis.ReadMathDelimiter(t,l,oDelimiter,props,oElem);
+            });			
         }	
 		else if (c_oSer_OMathContentType.EqArr === type)
         {			
 			var oEqArr = new CEqArray();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathEqArr(t,l,oEqArr,props);
-            });
-			oElem.addElementToContent(oEqArr);
+                return oThis.ReadMathEqArr(t,l,oEqArr,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.Fraction === type)
         {			
 			var oFraction = new CFraction();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathFraction(t,l,oFraction,props);
-            });
-			oElem.addElementToContent(oFraction);
+                return oThis.ReadMathFraction(t,l,oFraction,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.Func === type)
         {			
 			var oFunc = new CMathFunc();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathFunc(t,l,oFunc,props);
-            });
-			oElem.addElementToContent(oFunc);
+                return oThis.ReadMathFunc(t,l,oFunc,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.GroupChr === type)
         {			
 			var oGroupChr = new CGroupCharacter();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathGroupChr(t,l,oGroupChr,props);
-            });
-			oElem.addElementToContent(oGroupChr);
+                return oThis.ReadMathGroupChr(t,l,oGroupChr,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.LimLow === type)
         {			
 			var oLimLow = new CLimit();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathLimLow(t,l,oLimLow,props);
-            });
-			oElem.addElementToContent(oLimLow);
+                return oThis.ReadMathLimLow(t,l,oLimLow,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.LimUpp === type)
         {			
 			var oLimUpp = new CLimit();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathLimUpp(t,l,oLimUpp,props);
-            });
-			oElem.addElementToContent(oLimUpp);
+                return oThis.ReadMathLimUpp(t,l,oLimUpp,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.Matrix === type)
         {			
 			var oMatrix = new CMathMatrix();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathMatrix(t,l,oMatrix,props);
-            });
-			oElem.addElementToContent(oMatrix);
+                return oThis.ReadMathMatrix(t,l,oMatrix,props,oElem);
+            });			
         }			
 		else if (c_oSer_OMathContentType.Nary === type)
         {			
 			var oNary = new CNary();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathNary(t,l,oNary,props);
-            });
-			oElem.addElementToContent(oNary);
+                return oThis.ReadMathNary(t,l,oNary,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.OMath === type)
         {		
@@ -6731,57 +6718,52 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {			
 			var oPhant = new CPhantom();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathPhant(t,l,oPhant,props);
-            });
-			oElem.addElementToContent(oPhant);
+                return oThis.ReadMathPhant(t,l,oPhant,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.MRun === type)
         {
 			//этой обертки пока нет
 			var rpr = new CTextPr();
+			var props = new Object();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathMRun(t,l,oElem,rpr);
+                return oThis.ReadMathMRun(t,l,oElem,rpr,props);
             });
         }
 		else if (c_oSer_OMathContentType.Rad === type)
         {			
 			var oRad = new CRadical();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathRad(t,l,oRad,props);
-            });
-			oElem.addElementToContent(oRad);
+                return oThis.ReadMathRad(t,l,oRad,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.SPre === type)
         {			
 			var oSPre = new CDegreeSubSup();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathSPre(t,l,oSPre,props);
-            });
-			oElem.addElementToContent(oSPre);
+                return oThis.ReadMathSPre(t,l,oSPre,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.SSub === type)
         {			
 			var oSSub = new CDegree();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathSSub(t,l,oSSub,props);
-            });
-			oElem.addElementToContent(oSSub);
+                return oThis.ReadMathSSub(t,l,oSSub,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.SSubSup === type)
         {			
 			var oSSubSup = new CDegreeSubSup();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathSSubSup(t,l,oSSubSup,props);
-            });
-			oElem.addElementToContent(oSSubSup);
+                return oThis.ReadMathSSubSup(t,l,oSSubSup,props,oElem);
+            });			
         }
 		else if (c_oSer_OMathContentType.SSup === type)
         {			
 			var oSSup = new CDegree();
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathSSup(t,l,oSSup,props);
-            });
-			oElem.addElementToContent(oSSup);
+                return oThis.ReadMathSSup(t,l,oSSup,props,oElem);
+            });			
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6826,7 +6808,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathBar = function(type, length, oBar, props)
+	this.ReadMathBar = function(type, length, oBar, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -6839,6 +6821,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {
 			oBar.init(props);
+			oElem.addElementToContent(oBar);
 			var oElem = oBar.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
@@ -6903,6 +6886,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {
 			oBorderBox.init(props);
+			oElem.addElementToContent(oBorderBox);
 			var oElem = oBorderBox.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
@@ -6974,7 +6958,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathBox = function(type, length, oBox)
+	this.ReadMathBox = function(type, length, oBox, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -6986,8 +6970,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSer_OMathContentType.Element === type)
         {
-			oBorderBox.init(props);
-			var oElem = oBorderBox.getBase();
+			oBox.init(props);
+			oElem.addElementToContent(oBox);
+			var oElem = oBox.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7129,7 +7114,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };		
-	this.ReadMathDelimiter = function(type, length, oDelimiter, props)
+	this.ReadMathDelimiter = function(type, length, oDelimiter, props, oElem)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;		
@@ -7152,6 +7137,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oDelimiter.init(props);
+				oElem.addElementToContent(oDelimiter);
 				props.init = true;
 			}
 			var lColumn = oDelimiter.column;
@@ -7239,7 +7225,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathEqArr = function(type, length, oEqArr, props)
+	this.ReadMathEqArr = function(type, length, oEqArr, props, oElem)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;		
@@ -7255,6 +7241,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oEqArr.init(props);
+				oElem.addElementToContent(oEqArr);
 				props.init = true;
 			}
 			var lRow = oEqArr.row;
@@ -7330,7 +7317,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathGroupChr = function(type, length, oGroupChr, props)
+	this.ReadMathGroupChr = function(type, length, oGroupChr, props, oElem)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;		
@@ -7344,6 +7331,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {			
 			oGroupChr.init(props);
+			oElem.addElementToContent(oGroupChr);
 			var oElem = oGroupChr.getArgument();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
@@ -7397,7 +7385,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };			
-	this.ReadMathFraction = function(type, length, oFraction, props)
+	this.ReadMathFraction = function(type, length, oFraction, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7414,6 +7402,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oFraction.init(props);
+				oElem.addElementToContent(oFraction);
 				props.init = true;
 			}
 			var oElemDen = oFraction.getDenominator();
@@ -7457,7 +7446,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathFunc = function(type, length, oFunc, props)
+	this.ReadMathFunc = function(type, length, oFunc, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7472,6 +7461,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oFunc.init();
+				oElem.addElementToContent(oFunc);
 				props.init = true;
 			}
 			var oElem = oFunc.getArgument();
@@ -7484,6 +7474,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oFunc.init();
+				oElem.addElementToContent(oFunc);
 				props.init = true;
 			}
 			var oFName = oFunc.getFName();
@@ -7575,7 +7566,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathLimLow = function(type, length, oLimLow, props)
+	this.ReadMathLimLow = function(type, length, oLimLow, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7591,6 +7582,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oLimLow.init(props);
+				oElem.addElementToContent(oLimLow);
 				props.init = true;
 			}
 			var oElem = oLimLow.getFName();
@@ -7603,6 +7595,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oLimLow.init(props);
+				oElem.addElementToContent(oLimLow);
 				props.init = true;
 			}
 			var oLim = oLimLow.getIterator();
@@ -7628,7 +7621,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathLimUpp = function(type, length, oLimUpp, props)
+	this.ReadMathLimUpp = function(type, length, oLimUpp, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7644,6 +7637,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oLimUpp.init(props);
+				oElem.addElementToContent(oLimUpp);
 				props.init = true;
 			}
 			var oElem = oLimUpp.getFName();
@@ -7656,6 +7650,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oLimUpp.init(props);
+				oElem.addElementToContent(oLimUpp);
 				props.init = true;
 			}
 			var oLim = oLimUpp.getIterator();
@@ -7693,7 +7688,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMatrix = function(type, length, oMatrix, props)
+	this.ReadMathMatrix = function(type, length, oMatrix, props, oElem)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -7708,6 +7703,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(!props.init)
 			{
 				oMatrix.init(props);
+				oElem.addElementToContent(oMatrix);
 				props.init = true;
 			}
             res = this.bcr.Read1(length, function(t, l){
@@ -7909,17 +7905,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMRun = function(type, length, oElem, rPrp)
+	this.ReadMathMRun = function(type, length, oElem, rPrp, props)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		
 		if (c_oSer_OMathContentType.MText === type)
         {
-			var runPrp = new CMathRunPrp();
-			runPrp.Merge(rPrp);			
+			var oMRun = new CMathRunPrp();
+			oMRun.setMathRunPrp(props);
+			oMRun.setTxtPrp(rPrp);						
 			
-			oElem.addElementToContent(runPrp);
+			oElem.addElementToContent(rPrp);
 			
 			var text = this.stream.GetString2LE(length);
 			var str = "";
@@ -7945,8 +7942,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         }
 		else if (c_oSer_OMathContentType.MRPr === type)
         {
-			//<m:rPr>
-			var props = new Object();
+			//<m:rPr>			
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMRPr(t,l,props);
             });						
@@ -8004,7 +8000,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathNary = function(type, length, oNary, props)
+	this.ReadMathNary = function(type, length, oNary, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8019,6 +8015,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oNary.init(props);
+				oElem.addElementToContent(oNary);
 				props.init = true;
 			}
 			var oSub = oNary.getLowerIterator();
@@ -8031,6 +8028,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oNary.init(props);
+				oElem.addElementToContent(oNary);
 				props.init = true;
 			}
 			var oSup = oNary.getUpperIterator();
@@ -8043,6 +8041,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oNary.init(props);
+				oElem.addElementToContent(oNary);
 				props.init = true;
 			}
 			var oElem = oNary.getBase();
@@ -8181,7 +8180,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathPhant = function(type, length, oPhant, props)
+	this.ReadMathPhant = function(type, length, oPhant, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8194,6 +8193,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {
 			oPhant.init(props);
+			oElem.addElementToContent(oPhant);
 			var oElem = oPhant.getBase();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
@@ -8277,7 +8277,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathRad = function(type, length, oRad, props)
+	this.ReadMathRad = function(type, length, oRad, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8293,6 +8293,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oRad.init(props);
+				oElem.addElementToContent(oRad);
 				props.init = true;
 			}
 			var oDeg = oRad.getDegree();			
@@ -8305,6 +8306,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oRad.init(props);
+				oElem.addElementToContent(oRad);
 				props.init = true;
 			}
 			var oElem = oRad.getBase();
@@ -8453,6 +8455,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSPre.init(props);
+				oElem.addElementToContent(oSPre);
 				props.init = true;
 			}
 			var oSub = oSPre.getLowerIterator();
@@ -8465,6 +8468,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSPre.init(props);
+				oElem.addElementToContent(oSPre);
 				props.init = true;
 			}
 			var oSup = oSPre.getUpperIterator();
@@ -8477,6 +8481,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSPre.init(props);
+				oElem.addElementToContent(oSPre);
 				props.init = true;
 			}
 			var oElem = oSPre.getBase();
@@ -8502,7 +8507,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathSSub = function(type, length, oSSub, props)
+	this.ReadMathSSub = function(type, length, oSSub, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8518,6 +8523,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSub.init(props);
+				oElem.addElementToContent(oSSub);
 				props.init = true;
 			}
 			var oSub = oSSub.getLowerIterator();
@@ -8530,6 +8536,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSub.init(props);
+				oElem.addElementToContent(oSSub);
 				props.init = true;
 			}
 			var oElem = oSSub.getBase();
@@ -8555,7 +8562,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathSSubSup = function(type, length, oSSubSup, props)
+	this.ReadMathSSubSup = function(type, length, oSSubSup, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8571,6 +8578,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSubSup.init(props);
+				oElem.addElementToContent(oSSubSup);
 				props.init = true;
 			}
 			var oSub = oSSubSup.getLowerIterator();
@@ -8583,6 +8591,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSubSup.init(props);
+				oElem.addElementToContent(oSSubSup);
 				props.init = true;
 			}
 			var oSup = oSSubSup.getUpperIterator();
@@ -8626,7 +8635,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathSSup = function(type, length, oSSup, props)
+	this.ReadMathSSup = function(type, length, oSSup, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -8642,6 +8651,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSup.init(props);
+				oElem.addElementToContent(oSSup);
 				props.init = true;
 			}
 			var oSup = oSSup.getUpperIterator();
@@ -8654,6 +8664,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if (!props.init)
 			{
 				oSSup.init(props);
+				oElem.addElementToContent(oSSup);
 				props.init = true;
 			}
 			var oElem = oSSup.getBase();
