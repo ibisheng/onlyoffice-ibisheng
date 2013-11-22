@@ -58,14 +58,19 @@ function getNumberParts(x)
 		sig = SignType.Negative;
 		x = Math.abs(x);
 	}
-    var exp = Math.floor( Math.log(x) * Math.LOG10E ) - gc_nMaxDigCount + 1;
-	//хотелось бы поставить здесь floor, чтобы не округлялось число 0.9999999999999999, но обнаружились проблемы с числом 0.999999999999999
-	//после умножения оно превращается в 999999999999998.9
-    var man = Math.round(x / Math.pow(10, exp));
-	if(man >= gc_nMaxMantissa)
+    var exp = - gc_nMaxDigCount;
+	var man = 0;
+	if(SignType.Null != sig)
 	{
-		exp++;
-		man/=10;
+		exp = Math.floor( Math.log(x) * Math.LOG10E ) - gc_nMaxDigCount + 1;
+		//хотелось бы поставить здесь floor, чтобы не округлялось число 0.9999999999999999, но обнаружились проблемы с числом 0.999999999999999
+		//после умножения оно превращается в 999999999999998.9
+		man = Math.round(x / Math.pow(10, exp));
+		if(man >= gc_nMaxMantissa)
+		{
+			exp++;
+			man/=10;
+		}
 	}
     return {mantissa: man, exponent: exp, sign: sig};//для 0,123 exponent == - gc_nMaxDigCount
 }
@@ -1059,6 +1064,8 @@ NumFormat.prototype =
             {
 				var sNumber = number + "";
 				var nNumberLen = sNumber.length;
+				//для бага Bug 14325 - В загруженной таблице число с 30 знаками после разделителя отображается неправильно.
+				//например число "1.23456789123456e+23" и формат "0.000000000000000000000000000000"
 				if(exponent > nNumberLen)
 				{
 					for(var i = 0; i < exponent - nNumberLen; ++i)
@@ -1089,14 +1096,22 @@ NumFormat.prototype =
                     }
                 }
                 //просто заполняем текстом
-                var bFirstNotNull = false;
                 for(var i = 0, length = sNumber.length; i < length; ++i)
                 {
                     var sCurNumber = sNumber[i];
+					var numFormat = numFormat_Text;
                     var item = format.shift();
-                    if(true == bIsNUll && null != item && numFormat_DigitNoDisp == item.type && FormatStates.Scientific != nReadState)
-                        sCurNumber = "";
-                    aRes.push(new FormatObj(numFormat_Text, sCurNumber));
+                    if(true == bIsNUll && null != item && FormatStates.Scientific != nReadState)
+					{
+						if(numFormat_DigitNoDisp == item.type)
+							sCurNumber = "";
+						else if(numFormat_DigitSpace == item.type)
+						{
+							numFormat = numFormat_DigitSpace;
+							sCurNumber = null;
+						}
+					}
+                    aRes.push(new FormatObj(numFormat, sCurNumber));
                 }
                 
                 //Вставляем разделители 
