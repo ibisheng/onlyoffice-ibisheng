@@ -8979,6 +8979,13 @@ Paragraph.prototype =
                 StartPos = Temp;
             }
 
+            // Проверяем начальный и конечный элемент, если это формулы, тогда надо проверить внутри них селект
+            if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+                return false;
+
+            if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+                return false;
+
             var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math];
             if ( true === bCheckHidden )
                 CheckArray.push( para_End );
@@ -12658,6 +12665,8 @@ Paragraph.prototype =
             Use      : this.Selection.Use,
             StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos),
             EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos),
+            StartPos : this.Internal_Get_ClearPos(this.Selection.StartPos2),
+            EndPos   : this.Internal_Get_ClearPos(this.Selection.EndPos2),
             Flag     : this.Selection.Flag
         };
 
@@ -12682,14 +12691,12 @@ Paragraph.prototype =
             PagesPos   : ParaState.CurPos.PagesPos
         };
 
-        this.Selection =
-        {
-            Start    : ParaState.Selection.Start,
-            Use      : ParaState.Selection.Use,
-            StartPos : this.Internal_Get_RealPos(ParaState.Selection.StartPos),
-            EndPos   : this.Internal_Get_RealPos(ParaState.Selection.EndPos),
-            Flag     : ParaState.Selection.Flag
-        };
+        this.Selection.Start     = ParaState.Selection.Start;
+        this.Selection.Use       = ParaState.Selection.Use;
+        this.Selection.StartPos  = this.Internal_Get_RealPos(ParaState.Selection.StartPos);
+        this.Selection.EndPos    = this.Internal_Get_RealPos(ParaState.Selection.EndPos);
+        this.Selection.StartPos2 = this.Internal_Get_RealPos(ParaState.Selection.StartPos2);
+        this.Selection.EndPos2   = this.Internal_Get_RealPos(ParaState.Selection.EndPos2);
 
         var CursorPos_max = this.Internal_GetEndPos();
         var CursorPos_min = this.Internal_GetStartPos();

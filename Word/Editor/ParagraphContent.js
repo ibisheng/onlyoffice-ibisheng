@@ -7580,6 +7580,11 @@ ParaMath.prototype =
         console.log( "Selection draw" );
     },
 
+    Selection_IsEmpty : function()
+    {
+        return false;
+    },
+
     Copy : function()
     {
         var Math = new ParaMath();
