@@ -4,7 +4,7 @@
 		var res = "";
 		for(var i = 0, length = aFormated.length; i < length; i++)
 		{
-			res += aFormated[i].t;
+			res += aFormated[i].text;
 		}
 		return res;
 	}

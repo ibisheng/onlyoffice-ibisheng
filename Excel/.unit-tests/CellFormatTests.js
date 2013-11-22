@@ -56,7 +56,7 @@
 					var aFormated = expr.format(nArr[i]);
 					var text = "";
 					for(var j = 0, length = aFormated.length; j < length; ++j)
-						text += aFormated[j].t;
+						text += aFormated[j].text;
 					strictEqual(text, res[i], "format(\"" + fmtStr + "\", " + nArr[i] + ")");
 				}
 				break;
