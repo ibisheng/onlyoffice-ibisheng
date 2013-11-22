@@ -1060,7 +1060,7 @@
 				if( $(spanObject).css('vertical-align') == 'baseline')
 					oNewItem.format.va = '';
 
-				oNewItem.format.c = $(spanObject).css('color');
+				oNewItem.format.c = new RgbColor(this._getBinaryColor($(spanObject).css('color')));
 				
 				if(oNewItem.format.c == '')
 					oNewItem.format.c = null;
@@ -1271,7 +1271,7 @@
 
                 if( $(node).css('background-color') != 'none' &&  $(node).css('background-color') != null)
                 {
-                     oNewItem.bc =  $(node).css('background-color');
+                     oNewItem.bc =  new RgbColor(this._getBinaryColor($(node).css('background-color')));
                 }
 				
 				if(node.style.verticalAlign != undefined  && node.style.verticalAlign != null && node.style.verticalAlign != '' && node.style.verticalAlign != 'middle')
@@ -2579,6 +2579,7 @@
 				var t = this, i;
 				var res = [];
 				var fonts = [];
+				var maxSize = 100;
 				var reQuotedStr = /['"]([^'"]+)['"]/;
 				var reSizeStr = /\s*(\d+\.*\d*)\s*(em|ex|cm|mm|in|pt|pc|px|%)?\s*/i;
 
@@ -2601,6 +2602,8 @@
 						return defaultValue;
 					var m = reSizeStr.exec(fs);
 					var sz = m ? parseFloat(m[1]) : 0;
+					if(sz > maxSize)
+						sz = maxSize;
 					return m[2] === "px" ? (sz / t.ppix * 72).toFixed(1)-0 : 0;
 				}
 
@@ -2650,7 +2653,7 @@
 							text = elem.textContent.replace('\t','');
 						if(elem.nodeName.toLowerCase() == 'br')
 							text = '\n';
-						var colorText = style.getPropertyValue("color"); 
+						var colorText = new RgbColor(t._getBinaryColor(style.getPropertyValue("color"))); 
 						if(isText || (isText == '' && typeof isText == 'string'))
 							colorText = null;
 						res.push({
@@ -2947,6 +2950,38 @@
 					}
 				};
 				History.EndTransaction();
+			},
+			
+			_getBinaryColor: function(c) 
+			{
+				var bin, m, x, type, r, g, b, a, s;
+				var reColor = /^\s*(?:#?([0-9a-f]{6})|#?([0-9a-f]{3})|rgba?\s*\(\s*((?:\d*\.?\d+)(?:\s*,\s*(?:\d*\.?\d+)){2,3})\s*\))\s*$/i;
+				if (typeof c === "number") {
+					bin = c;
+				} else {
+				
+					m = reColor.exec(c);
+					if (!m) {return null;}
+
+					if (m[1]) {
+						x = [ m[1].slice(0, 2), m[1].slice(2, 4), m[1].slice(4) ];
+						type = 1;
+					} else if (m[2]) {
+						x = [ m[2].slice(0, 1), m[2].slice(1, 2), m[2].slice(2) ];
+						type = 0;
+					} else {
+						x = m[3].split(/\s*,\s*/i);
+						type = x.length === 3 ? 2 : 3;
+					}
+
+					r = parseInt(type !== 0 ? x[0] : x[0] + x[0], type < 2 ? 16 : 10);
+					g = parseInt(type !== 0 ? x[1] : x[1] + x[1], type < 2 ? 16 : 10);
+					b = parseInt(type !== 0 ? x[2] : x[2] + x[2], type < 2 ? 16 : 10);
+					a = type === 3 ? (Math.round(parseFloat(x[3]) * 100) * 0.01) : 1;
+					bin = (r << 16) | (g << 8) | b;
+
+				}
+				return bin;
 			}
 
 		};

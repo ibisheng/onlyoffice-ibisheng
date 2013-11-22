@@ -7466,8 +7466,8 @@
 										range.setBold(currentObj[0].format.b);
 										range.setItalic(currentObj[0].format.i);
 										range.setStrikeout(currentObj[0].format.s);
-										if(!isOneMerge && currentObj[0].format && currentObj[0].format.c != null && currentObj[0].format.c != undefined && asc_parsecolor(currentObj[0].format.c) != null)
-											range.setFontcolor(new RgbColor(asc_parsecolor(currentObj[0].format.c).binary));
+										if(!isOneMerge && currentObj[0].format && currentObj[0].format.c != null && currentObj[0].format.c != undefined)
+											range.setFontcolor(currentObj[0].format.c);
 										range.setUnderline(currentObj[0].format.u);
 										range.setAlignVertical(currentObj.va);
 										range.setFontname(currentObj[0].format.fn);
@@ -7507,8 +7507,8 @@
 									if(!isOneMerge)
 										range.setBorderSrc(currentObj.borders);
 									range.setWrap(currentObj.wrap);
-									if(currentObj.bc && currentObj.bc != 'rgba(0, 0, 0, 0)' && currentObj.bc != 'transparent' && '' != currentObj.bc && !isOneMerge)
-										range.setFill(new RgbColor(asc_parsecolor(currentObj.bc).binary));
+									if(currentObj.bc && currentObj.bc.rgb)
+										range.setFill(currentObj.bc);
 										var link = values[r][c][0].hyperLink;
 									if(link)
 									{
