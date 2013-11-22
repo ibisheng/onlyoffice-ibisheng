@@ -5698,16 +5698,106 @@ CMathContent.prototype =
     ///////  selection for Edit   ////////
     selection_Start: function(x, y)
     {
-        return this.getSelectContent(x, y);
+        var SelectContent = null;
+
+        if(this.IsPlaceholder())
+        {
+            SelectContent = this;
+        }
+        else
+        {
+            var msCoord = this.coordWOGaps({x: x, y: y});
+            var pos = this.findPosition( msCoord);
+
+            this.setStartPos_Selection(pos);
+
+            if(this.content[pos].value.typeObj === MATH_COMP)
+            {
+                var coord = this.getCoordElem(pos, msCoord);
+                var movement = this.content[pos].value.selection_Start(coord.x, coord.y);
+                SelectContent = movement.SelectContent;
+            }
+            else
+            {
+                /*if ( this.content[pos].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setStartPos_Selection( this.CurPos - 1);
+                    else if( direction == -1 )
+                        this.setStartPos_Selection( this.CurPos + 1);
+                }
+                else
+                    this.setStartPos_Selection( this.CurPos );*/
+
+                SelectContent = this;
+            }
+        }
+
+        return {SelectContent:  SelectContent};
     },
+    /////////////////////
     selection_End: function(x, y, MouseEvent)
     {
-        // реализовано через две ф-ии, т.к. впоследствии нужно будет учитывать MouseEvent
+        // впоследствии нужно будет учитывать MouseEvent
 
-        return this.getSelectContent(x, y);
+        var state = true; // вышли / не вышли за переделы контента
+        var SelectContent = null;
 
+
+        if(this.IsPlaceholder())
+        {
+            SelectContent = this;
+        }
+        else
+        {
+            var msCoord = this.coordWOGaps({x: x, y: y});
+            var posEnd = this.findPosition(msCoord),
+                posStart = this.selection.startPos - 1;
+
+            //селект внутри элемента (дроби и пр.)
+            if(posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
+            {
+                var coord = this.getCoordElem(posEnd, msCoord );
+                var movement = this.content[posEnd].value.selection_End(coord.x, coord.y);
+
+                if( ! movement.state )
+                {
+                    this.setEnd_Selection(posEnd + 1);
+                    SelectContent = this;
+                }
+                else
+                    SelectContent = movement.SelectContent;
+            }
+            //селект элементов контента
+            else
+            {
+                SelectContent = this;
+
+                var direction = (posStart < posEnd) ? 1 : -1;
+
+                if(this.content[posStart].value.typeObj === MATH_COMP)
+                {
+                    if( direction == 1 )
+                        this.setStartPos_Selection( posStart - 1); // переопределяем
+                    else if( direction == -1 )
+                        this.setStartPos_Selection( posStart + 1); // переопределяем
+                }
+
+                if( this.content[posEnd].value.typeObj === MATH_COMP )
+                {
+                    if( direction == 1 )
+                        this.setEndPos_Selection(posEnd + 1);
+                    else if( direction == -1 )
+                        this.setEndPos_Selection(posEnd - 1);
+                }
+                else
+                    this.setEndPos_Selection(posEnd);
+            }
+        }
+
+        return {state: state, SelectContent:  SelectContent};
     },
-    getSelectContent: function(x, y)
+    /*getSelectContent: function(x, y)
     {
         var state = true; // вышли / не вышли за переделы контента
         var SelectContent = null;
@@ -5767,7 +5857,7 @@ CMathContent.prototype =
         }
 
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
-    },
+    },*/
     setStartPos_Selection: function( StartIndSelect )
     {
         if( this.content.length != 1)
@@ -5881,6 +5971,7 @@ CMathComposition.prototype =
     {
         if(this.Root.content.length > 1)
         {
+            this.pos = {x: x, y: y - this.Root.size.center};
             this.Root.setPosition({x: x, y: y - this.Root.size.center});
             this.Root.draw(pGraphics);
             this.UpdateCursor();
@@ -6487,18 +6578,24 @@ CMathComposition.prototype =
     },
     Selection_SetStart: function(X, Y, PageNum)
     {
-        var result = this.Root.selection_Start(X, Y);
+        var x = X - this.pos.x,
+            y = Y - this.pos.y;
+
+        var result = this.Root.selection_Start(x, y);
         //this.SelectContent = result.SelectContent; // если SetEnd придет раньше
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
-        var result = this.Root.selection_End(X, Y, MouseEvent);
+        var x = X - this.pos.x,
+            y = Y - this.pos.y;
+
+        var result = this.Root.selection_End(x, y, MouseEvent);
         this.SelectContent = result.SelectContent;
 
     },
     Selection_Draw: function()
     {
-        this.SelectContent.drawSelect();
+        this.SelectContent.drawSelect2();
     },
     Selection_Beginning: function()
     {

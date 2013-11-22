@@ -12,6 +12,11 @@ function CMathBase()
 
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
+    this.selectPos =
+    {
+        startX:    0,
+        startY:    0
+    };
     this.reduct = 1;
 
     this.nRow = 0;
@@ -19,8 +24,6 @@ function CMathBase()
 
     this.Parent = null;
     this.Composition = null; // ссылка на общую формулу
-    /*this.TxtPrp = new CMathTextPrp();
-    this.OwnTPrp = new CMathTextPrp();*/
 
     this.CtrPrp = new CTextPr();
 
@@ -973,13 +976,68 @@ CMathBase.prototype =
         var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
         return content;
     },
-
     setTypeElement: function(type)
     {
         this.typeElement = type;
     },
-    getTypeElement: function()
+    ////    For Edit   /////
+    /*getSelectContent: function(x, y)
+     {
+     var state = true, SelectContent = null;
+     var elem = this.findDisposition({x: x, y: y});
+     var X = elem.mCoord.x,
+     Y = elem.mCoord.y;
+
+     if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
+     {
+     var movement = this.elements[this.CurPos_X][this.CurPos_Y].getSelectContent(X, Y);
+
+     SelectContent = movement.SelectContent;
+     state = true;
+     }
+     else
+     state = false;
+
+     return {state: state, SelectContent: SelectContent};
+
+     }*/
+    selection_Start: function(x, y)
     {
-        return this.typeElement;
+        var elem = this.findDisposition({x: x, y: y});
+        var X = elem.mCoord.x,
+            Y = elem.mCoord.y,
+            Pos_X = elem.pos.x,
+            Pos_Y = elem.pos.y;
+
+        this.selectPos.startX = Pos_X;
+        this.selectPos.startY = Pos_Y;
+
+        var result = this.elements[Pos_X][Pos_Y].selection_Start(X, Y);
+
+        return result;
+    },
+    selection_End: function(x, y)
+    {
+        var state = true, SelectContent = null;
+        var elem = this.findDisposition({x: x, y: y});
+        var X = elem.mCoord.x,
+            Y = elem.mCoord.y,
+            bInside = elem.inside_flag;
+
+        var endX   = elem.pos.x,
+            endY   = elem.pos.y,
+            startX = this.selectPos.startX,
+            startY = this.selectPos.startY;
+
+        if(startX == endX && startY == endY && bInside === -1)
+        {
+            var movement = this.elements[endX][endY].selection_End(X, Y);
+            SelectContent = movement.SelectContent;
+            state = true;
+        }
+        else
+            state = false;
+
+        return {state: state, SelectContent: SelectContent};
     }
 }
