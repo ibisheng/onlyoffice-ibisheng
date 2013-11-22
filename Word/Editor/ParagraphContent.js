@@ -7491,7 +7491,10 @@ function ParaMath()
 
     this.Type  = para_Math;
 
+    this.Jc   = undefined;
     this.Math = new CMathComposition();
+
+    this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
 
     this.Width        = 0;
     this.Height       = 0;
@@ -7547,6 +7550,34 @@ ParaMath.prototype =
     Can_AddNumbering : function()
     {
         return true;
+    },
+
+    Selection_SetStart : function(X, Y, PageNum)
+    {
+        this.Math.Selection_SetStart( X, Y, PageNum );
+        console.log( "Start x=" + X +" y=" + Y );
+    },
+
+    Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
+    {
+        this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
+        console.log( "End x=" + X +" y=" + Y );
+    },
+
+    Selection_Beginning : function()
+    {
+        this.Math.Selection_Beginning();
+    },
+
+    Selection_Ending : function()
+    {
+        this.Math.Selection_Ending();
+    },
+
+    Selection_Draw : function()
+    {
+        this.Math.Selection_Draw();
+        console.log( "Selection draw" );
     },
 
     Copy : function()

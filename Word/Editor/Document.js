@@ -7276,8 +7276,6 @@ CDocument.prototype =
             this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
         }
 
-        this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
-
         for ( var Index = Start; Index <= End; Index++ )
         {
             var Item = this.Content[Index];
@@ -7294,6 +7292,8 @@ CDocument.prototype =
                             Item.Selection.EndPos   = Item.Content.length - 1;
                         else
                             Item.Selection.StartPos = Item.Content.length - 1;
+
+                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7319,6 +7319,8 @@ CDocument.prototype =
                             Item.Selection.StartPos = Item.Internal_GetStartPos();
                         else
                             Item.Selection.EndPos   = Item.Internal_GetStartPos();
+
+                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7348,6 +7350,8 @@ CDocument.prototype =
                             Item.Selection.EndPos   = Item.Internal_GetStartPos();
                             Item.Selection.StartPos = Item.Content.length - 1;
                         }
+
+                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7373,6 +7377,8 @@ CDocument.prototype =
                     break;
             }
         }
+
+        this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
 
         // Проверяем, чтобы у нас в селект не попали элементы, в которых не выделено ничего
         if ( true === this.Content[End].Selection_IsEmpty() )

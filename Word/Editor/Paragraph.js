@@ -77,15 +77,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         PagesPos   : 0  // позиция в массиве this.Pages
     };
 
-    this.Selection =
-    {
-        Start    : false,
-        Use      : false,
-        StartPos : 0,
-        EndPos   : 0,
-        Flag     : selectionflag_Common
-    };
-
+    this.Selection = new CParagraphSelection();
 
     this.NeedReDraw = true;
     this.DrawingDocument = DrawingDocument;
@@ -860,22 +852,41 @@ Paragraph.prototype =
             Item.Measure( g_oTextMeasurer, FirstTextPr );
         }
 
+        var PrevMathPos = -1;
         for ( var Pos = 0; Pos < ContentLength; Pos++ )
         {
             var Item = this.Content[Pos];
 
             switch( Item.Type )
             {
-                case para_Math:
                 case para_Text:
                 case para_Space:
                 case para_PageNum:
                 {
+                    PrevMathPos = -1;
+
                     Item.Measure( g_oTextMeasurer, CurTextPr);
+                    break;
+                }
+                case para_Math:
+                {
+                    if ( -1 != PrevMathPos )
+                    {
+                        // TODO: нужно реализовать объединение формул
+                    }
+
+                    Item.Measure( g_oTextMeasurer, CurTextPr);
+                    PrevMathPos = Pos;
+
+                    // Проверим, является ли данная формула внутристроковой или нет
+                    var Prev = this.Internal_FindBackward( Pos - 1, [para_Text, para_Space] );
+
                     break;
                 }
                 case para_Drawing:
                 {
+                    PrevMathPos = -1;
+
                     Item.Parent          = this;
                     Item.DocumentContent = this.Parent;
                     Item.DrawingDocument = this.Parent.DrawingDocument;
@@ -886,6 +897,7 @@ Paragraph.prototype =
                 case para_Tab:
                 case para_NewLine:
                 {
+                    PrevMathPos = -1;
                     Item.Measure( g_oTextMeasurer);
 
                     break;
@@ -7694,8 +7706,9 @@ Paragraph.prototype =
 
         var StartPos   = this.Lines[CurLine].StartPos;
         var ResultLine = -1;
-
-        for ( var ItemNum = StartPos; ItemNum < this.Content.length; ItemNum++ )
+        var Pos2       = StartPos;
+        var ItemNum    = StartPos;
+        for ( ; ItemNum < this.Content.length; ItemNum++ )
         {
             var Item = this.Content[ItemNum];
 
@@ -7849,7 +7862,10 @@ Paragraph.prototype =
             }
 
             if ( X >= CurX - 0.001 && X <= CurX + TempDx + 0.001 )
+            {
                 bInText = true;
+                Pos2 = ItemNum;
+            }
 
             CurX += TempDx;
         }
@@ -7858,14 +7874,18 @@ Paragraph.prototype =
         if ( true === bInText && Y >= this.Pages[PNum].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent - 0.01 && Y <= this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap + 0.01 )
             Result.InText = true;
         else
+        {
             Result.InText = false;
+            Pos2 = ItemNum - 1;
+        }
 
         if ( NumberingDiffX <= DiffX )
             Result.Numbering = true;
         else
             Result.Numbering = false;
 
-        Result.Pos  = DiffPos;
+        Result.Pos  = DiffPos; // Позиция ближайшего элемента (по его начальной точке)
+        Result.Pos2 = Pos2;    // Позиция элемента в который мы попали точно
         Result.Line = ResultLine;
 
         return Result;
@@ -8300,9 +8320,13 @@ Paragraph.prototype =
         if ( -1 != Pos.Pos )
         {
             if ( true === Pos.End )
-                this.Selection.StartPos = Pos.Pos + 1;
+                this.Selection.Set_StartPos( Pos.Pos + 1, Pos.Pos2 );
             else
-                this.Selection.StartPos = Pos.Pos;
+                this.Selection.Set_StartPos( Pos.Pos, Pos.Pos2 );
+
+            // Если мы начинаем с математического элемента, тогда у него выставляем начало селекта
+            if ( undefined !== this.Content[Pos.Pos2] && para_Math === this.Content[Pos.Pos2].Type )
+                this.Content[Pos.Pos2].Selection_SetStart(X, Y, PageNum);
 
             this.Set_ContentPos( Pos.Pos, true , Pos.Line );
 
@@ -8346,12 +8370,28 @@ Paragraph.prototype =
                     }
                 }
 
-                this.Selection.EndPos = Pos + 1;
+                this.Selection.Set_EndPos(Pos + 1, Temp.Pos2);
             }
             else
-                this.Selection.EndPos = Pos;
+                this.Selection.Set_EndPos(Pos, Temp.Pos2);
 
-            if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type )
+            // Если мы заканчиваем на математическом элементе, тогда у него выставляем конец селекта
+            if ( undefined !== this.Content[Temp.Pos2] && para_Math === this.Content[Temp.Pos2].Type )
+            {
+                // Если у нас совпали начальная и конечная позиции, тогда не нужно указывать начало селекта, т.к. оно
+                // было определено в Selection_SetStart
+                if ( this.Selection.StartPos2 != this.Selection.EndPos2 )
+                {
+                    if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                        this.Content[Temp.Pos2].Selection_Beginning();
+                    else
+                        this.Content[Temp.Pos2].Selection_Ending();
+                }
+
+                this.Content[Temp.Pos2].Selection_SetEnd(X, Y, PageNum, MouseEvent);
+            }
+
+            if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
             {
                 var NumPr = this.Numbering_Get();
                 if ( true === Temp.Numbering && undefined != NumPr )
@@ -8444,6 +8484,11 @@ Paragraph.prototype =
         }
     },
 
+    Selection_Internal_Update : function()
+    {
+
+    },
+
     Selection_Stop : function(X,Y,PageNum, MouseEvent)
     {
         this.Selection.Start = false;
@@ -8498,7 +8543,6 @@ Paragraph.prototype =
                     EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos + 1 : this.Content.length - 1 ) );
                 }
 
-
                 // Найдем линию, с которой начинается селект
                 var StartParaPos = this.Internal_Get_ParaPos_By_Pos( StartPos );
                 var CurLine  = StartParaPos.Line;
@@ -8533,6 +8577,31 @@ Paragraph.prototype =
 
                 var W = 0;
 
+                // Отдельная отрисовка селекта для формул (используется только, если селект начинается с формулы
+                // или заканчивается формулой, во всех остальных случаях )
+                if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type )
+                {
+                    this.Content[this.Selection.StartPos2].Selection_Draw();
+
+                    if ( this.Selection.StartPos2 === StartPos )
+                        StartPos++;
+                    else if( this.Selection.StartPos2 === EndPos )
+                        EndPos--;
+
+                }
+
+                if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && this.Selection.EndPos2 !== this.Selection.StartPos2 )
+                {
+                    this.Content[this.Selection.EndPos2].Selection_Draw();
+
+                    if ( this.Selection.EndPos2 === StartPos )
+                        StartPos++;
+                    else if( this.Selection.EndPos2 === EndPos )
+                        EndPos--;
+                }
+
+
+                // Рисуем остальной селект
                 for ( Pos = StartPos; Pos < EndPos; Pos++ )
                 {
                     Item = this.Content[Pos];
@@ -9572,9 +9641,9 @@ Paragraph.prototype =
                     End   = this.Selection.StartPos;
                 }
 
-                if ( true === this.Internal_FindForward( End, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End]).Found )
+                if ( true === this.Internal_FindForward( End, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found )
                     _ApplyPara = false;
-                else if ( true === this.Internal_FindBackward( Start - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End]).Found )
+                else if ( true === this.Internal_FindBackward( Start - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found )
                     _ApplyPara = false;
             }
             else
@@ -9729,7 +9798,7 @@ Paragraph.prototype =
         if ( undefined === ContentPos )
             ContentPos = this.CurPos.ContentPos;
 
-        var oPos = this.Internal_FindForward( ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+        var oPos = this.Internal_FindForward( ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
 
         if ( true === oPos.Found )
             return false;
@@ -9743,7 +9812,7 @@ Paragraph.prototype =
         if ( undefined === ContentPos )
             ContentPos = this.CurPos.ContentPos;
 
-        var oPos = this.Internal_FindBackward( ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+        var oPos = this.Internal_FindBackward( ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
         if ( true === oPos.Found )
             return false;
         else
@@ -14456,7 +14525,6 @@ CParaLine.prototype =
         this.StartPos = StartPos;
     },
 
-
     Set_EndPos : function(EndPos, Paragraph)
     {
         this.EndPos = EndPos;
@@ -14492,6 +14560,7 @@ CParaLine.prototype =
 
                 switch( Item.Type )
                 {
+                    case para_Math:
                     case para_Text:
                     {
                         if ( true != bWord )
@@ -14811,4 +14880,30 @@ CParaDrawingRangeLines.prototype =
         }
     }
 
+};
+
+function CParagraphSelection()
+{
+    this.Start     = false;
+    this.Use       = false;
+    this.StartPos  = 0;
+    this.EndPos    = 0;
+    this.StartPos2 = 0;
+    this.EndPos2   = 0,
+    this.Flag      = selectionflag_Common;
+}
+
+CParagraphSelection.prototype =
+{
+    Set_StartPos : function(Pos1, Pos2)
+    {
+        this.StartPos  = Pos1;
+        this.StartPos2 = ( undefined != Pos2 ? Pos2 : Pos1 );
+    },
+
+    Set_EndPos : function(Pos1, Pos2)
+    {
+        this.EndPos  = Pos1;
+        this.EndPos2 = ( undefined != Pos2 ? Pos2 : Pos1 );
+    }
 };
