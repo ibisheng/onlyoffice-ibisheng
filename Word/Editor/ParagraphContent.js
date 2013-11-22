@@ -7543,8 +7543,7 @@ ParaMath.prototype =
         this.Height       = Size.Height;
         this.WidthVisible = Size.WidthVisible;
         this.Ascent       = Size.Ascent;
-        this.Decent       = Size.Descent;
-
+        this.Descent      = Size.Descent;
     },
 
     Is_RealContent : function( )
@@ -7560,25 +7559,23 @@ ParaMath.prototype =
     Selection_SetStart : function(X, Y, PageNum)
     {
         this.Math.Selection_SetStart( X, Y, PageNum );
-        //console.log( "Start x=" + X +" y=" + Y );
     },
 
     Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
     {
         this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
-        //console.log( "End x=" + X +" y=" + Y );
     },
 
-    Selection_Beginning : function()
+    Selection_Beginning : function(bStart)
     {
-        this.Math.Selection_Beginning();
-        console.log("Selection_Beginning");
+        this.Math.Selection_Beginning(bStart);
+        console.log( "Selection Beginning" );
     },
 
-    Selection_Ending : function()
+    Selection_Ending : function(bStart)
     {
-        this.Math.Selection_Ending();
-        console.log("Selection_Ending");
+        this.Math.Selection_Ending(bStart);
+        console.log( "Selection Ending" );
     },
 
     Selection_Draw : function()

@@ -1369,34 +1369,25 @@ Paragraph.prototype =
                         }
                         else //if ( para_Math === Item.Type )
                         {
-                            // TODO: Здесь нужно переделать. Необходимо у формулы запросить ее Ascent и Descent
-                            //       и учитывать именно эти значения.
-
-                            if ( LineTextAscent < TextAscent )
-                                LineTextAscent = TextAscent;
-
-                            if ( LineTextAscent2 < TextAscent2 )
-                                LineTextAscent2 = TextAscent2;
-
-                            if ( LineTextDescent < TextDescent )
-                                LineTextDescent = TextDescent;
+                            var MathAscent  = Item.Ascent;
+                            var MathDescent = Item.Descent;
 
                             if ( linerule_Exact === ParaPr.Spacing.LineRule )
                             {
                                 // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-                                if ( LineAscent < TextAscent )
-                                    LineAscent = TextAscent;
+                                if ( LineAscent < MathAscent )
+                                    LineAscent = MathAscent;
 
-                                if ( LineDescent < TextDescent )
-                                    LineDescent = TextDescent;
+                                if ( LineDescent < MathDescent )
+                                    LineDescent = MathDescent;
                             }
                             else
                             {
-                                if ( LineAscent < TextAscent + Item.YOffset  )
-                                    LineAscent = TextAscent + Item.YOffset;
+                                if ( LineAscent < MathAscent + Item.YOffset  )
+                                    LineAscent = MathAscent + Item.YOffset;
 
-                                if ( LineDescent < TextDescent - Item.YOffset )
-                                    LineDescent = TextDescent - Item.YOffset;
+                                if ( LineDescent < MathDescent - Item.YOffset )
+                                    LineDescent = MathDescent - Item.YOffset;
                             }
                         }
 
@@ -8379,13 +8370,24 @@ Paragraph.prototype =
             if ( undefined !== this.Content[Temp.Pos2] && para_Math === this.Content[Temp.Pos2].Type )
             {
                 // Если у нас совпали начальная и конечная позиции, тогда не нужно указывать начало селекта, т.к. оно
-                // было определено в Selection_SetStart
-                if ( this.Selection.StartPos2 != this.Selection.EndPos2 )
+                // было определено в Selection_SetStart, но это только в случае, когда выделение внутри 1 параграфа.
+                var ParentSelectDirection = this.Parent.Selection_Is_OneElement();
+                if ( 0 === ParentSelectDirection )
                 {
-                    if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
-                        this.Content[Temp.Pos2].Selection_Beginning();
+                    if ( this.Selection.EndPos2 != this.Selection.StartPos2 )
+                    {
+                        if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                            this.Content[Temp.Pos2].Selection_Beginning(true);
+                        else
+                            this.Content[Temp.Pos2].Selection_Ending(true);
+                    }
+                }
+                else
+                {
+                    if ( ParentSelectDirection > 0 )
+                        this.Content[Temp.Pos2].Selection_Beginning(true);
                     else
-                        this.Content[Temp.Pos2].Selection_Ending();
+                        this.Content[Temp.Pos2].Selection_Ending(true);
                 }
 
                 this.Content[Temp.Pos2].Selection_SetEnd(X, Y, PageNum, MouseEvent);
@@ -8983,7 +8985,7 @@ Paragraph.prototype =
             if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
                 return false;
 
-            if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+            if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && false === this.Content[this.Selection.EndPos2].Selection_IsEmpty() )
                 return false;
 
             var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math];
@@ -9016,7 +9018,7 @@ Paragraph.prototype =
         this.Numbering_Remove();
 
         var SelectionUse       = this.Is_SelectionUse();
-        var SelectedOneElement = this.Parent.Selection_Is_OneElement();
+        var SelectedOneElement = (this.Parent.Selection_Is_OneElement() === 0 ? true : false );
 
         // Рассчитаем количество табов, идущих в начале параграфа
         var Count = this.Content.length;

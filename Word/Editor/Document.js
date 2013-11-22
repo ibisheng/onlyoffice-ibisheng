@@ -7410,9 +7410,9 @@ CDocument.prototype =
     Selection_Is_OneElement : function()
     {
         if ( true === this.Selection.Use && this.CurPos.Type === docpostype_Content && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos )
-            return true;
+            return 0;
 
-        return false;
+        return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
     },
 
     Selection_Is_TableBorderMove : function()

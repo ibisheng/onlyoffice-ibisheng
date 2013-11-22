@@ -1631,7 +1631,7 @@ FlowTable.prototype =
 
     Selection_Is_OneElement : function()
     {
-        return true;
+        return 0;
     },
 
     Internal_Update : function()
