@@ -1012,9 +1012,8 @@ CMathBase.prototype =
         this.selectPos.startX = Pos_X;
         this.selectPos.startY = Pos_Y;
 
-        var result = this.elements[Pos_X][Pos_Y].selection_Start(X, Y);
+        this.elements[Pos_X][Pos_Y].selection_Start(X, Y);
 
-        return result;
     },
     selection_End: function(x, y)
     {

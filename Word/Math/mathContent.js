@@ -5006,7 +5006,6 @@ CMathContent.prototype =
             console.log("Don't work drawSelect");
         }
 
-
         if( widthSelect != 0)
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectClear(); // "обнуляем"  логический селект
@@ -5703,7 +5702,7 @@ CMathContent.prototype =
     },
 
     ///////  selection for Edit   ////////
-    selection_Start: function(x, y)
+    old_selection_Start: function(x, y)
     {
         var SelectContent = null;
 
@@ -5725,13 +5724,35 @@ CMathContent.prototype =
                 var movement = this.content[pos].value.selection_Start(coord.x, coord.y);
                 SelectContent = movement.SelectContent;
             }
-            else
+            /*else
             {
                 SelectContent = this;
-            }
+            }*/
         }
 
-        return {SelectContent:  SelectContent};
+        //return {SelectContent:  SelectContent};
+    },
+    selection_Start: function(x, y)
+    {
+        if(this.IsPlaceholder())
+        {
+            this.RealPosSelect.start = 1;
+            this.RealPosSelect.end = 2;
+        }
+        else
+        {
+            var msCoord = this.coordWOGaps({x: x, y: y});
+            var pos = this.findPosition( msCoord);
+
+            this.RealPosSelect.start = pos;
+            this.RealPosSelect.end = pos;
+
+            if(this.content[pos].value.typeObj === MATH_COMP)
+            {
+                var coord = this.getCoordElem(pos, msCoord);
+                this.content[pos].value.selection_Start(coord.x, coord.y);
+            }
+        }
     },
     selection_End: function(x, y, MouseEvent)
     {
@@ -5822,13 +5843,32 @@ CMathContent.prototype =
     {
         this.selection.endPos = EndIndSelect + 1;
     },
-    setSelect_Beginning: function()
+    setSelect_Beginning: function(bStart)
     {
-        this.setStartPos_Selection(0);
+        if(bStart)
+        {
+            this.RealPosSelect.start = 0; /// в итоге, селект начнется с позиции 1
+            this.RealPosSelect.end   = 0;
+        }
+        else
+        {
+            this.RealPosSelect.end   = 0;
+            this.setEndPos_Selection(0);
+
+        }
     },
-    setSelect_Ending: function()
+    setSelect_Ending: function(bStart)
     {
-        this.setStartPos_Selection(this.content.length - 1);
+        if(bStart)
+        {
+            this.RealPosSelect.start = this.content.length - 1;
+            this.RealPosSelect.end   = this.content.length - 1;
+        }
+        else
+        {
+            this.RealPosSelect.end   = this.content.length - 1;
+            this.setEndPos_Selection(this.content.length - 1);
+        }
     }
 }
 //todo
@@ -6538,7 +6578,7 @@ CMathComposition.prototype =
         var x = X - this.pos.x,
             y = Y - this.pos.y;
 
-        var result = this.Root.selection_Start(x, y);
+        this.Root.selection_Start(x, y);
         //this.SelectContent = result.SelectContent; // если SetEnd придет раньше
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
@@ -6554,15 +6594,19 @@ CMathComposition.prototype =
     {
         this.SelectContent.drawSelect2();
     },
-    Selection_Beginning: function()
+    Selection_Beginning: function(bStart)
     {
-        this.Root.setSelect_Beginning();
+        this.Root.setSelect_Beginning(bStart);
         this.SelectContent = this.Root; // а здесь необходимо выставить
     },
-    Selection_Ending:  function()
+    Selection_Ending:  function(bStart)
     {
-        this.Root.setSelect_Ending();
+        this.Root.setSelect_Ending(bStart);
         this.SelectContent = this.Root;
+    },
+    Selection_IsEmpty: function()
+    {
+        return !this.SelectContent.selectUse();
     }
 
 }
