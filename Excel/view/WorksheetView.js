@@ -7095,7 +7095,8 @@
 									var aFilters = val.TableParts;
 									var range;
 									var tablePartRange;
-									var refInsertBinary = t.autoFilters._refToRange(val.activeRange); 
+									var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
+									var refInsertBinary = t.autoFilters._refToRange(activeRange); 
 									var diffRow;
 									var diffCol;
 									for(var aF = 0; aF < aFilters.length; aF++)

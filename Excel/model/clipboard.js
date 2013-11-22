@@ -170,6 +170,7 @@
 			this.ppiy = 96;
 			this.Api = null;
 			this.activeRange = null;
+			this.lStorage = {};
 
 			return this;
 		}
@@ -247,7 +248,9 @@
 					this.element = undefined;
 				}
 			},
-
+			
+			
+			//****copy cells ****
 			copyRange: function (range, worksheet, isCut) {
 				var t = this;
 				t._cleanElement();
@@ -258,11 +261,16 @@
 				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && $.browser['opera'])
 					$(text).find('td')[0].innerHTML = '&nbsp;';
 				t.element.appendChild(text);
-				t.copyText = t._getTextFromTable(t.element.children[0]);
-                var randomVal = Math.floor(Math.random()*10000000);
-                t.copyText.pasteFragment = "pasteFragment_" + randomVal;
-                if(text && !copyPasteUseBinary)
-                    $(text).addClass("pasteFragment_" + randomVal);
+				
+				if(!copyPasteUseBinary)
+				{
+					t.copyText = t._getTextFromTable(t.element.children[0]);
+					var randomVal = Math.floor(Math.random()*10000000);
+					t.copyText.pasteFragment = "pasteFragment_" + randomVal;
+					if(text)
+						$(text).addClass("pasteFragment_" + randomVal);
+				}
+				
 
 				if($(text).find('img')[0] && $.browser['opera'])
 				{
@@ -274,18 +282,23 @@
 				
 				//use binary strings
 				if(copyPasteUseBinary)
-				{
-					var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
-					var sBase64 = oBinaryFileWriter.Write();
-					if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
+				{	
+					if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+						this.lStorage.htmlInShape = text;
+					else
 					{
-						$(this.element.children[0]).css("font-weight", "normal");;
-						$(this.element.children[0]).wrap(document.createElement("b"));
+						var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+						var sBase64 = oBinaryFileWriter.Write();
+						if(this.element.children && this.element.children.length == 1 /*&& window.USER_AGENT_SAFARI_MACOS*/)
+						{
+							$(this.element.children[0]).css("font-weight", "normal");;
+							$(this.element.children[0]).wrap(document.createElement("b"));
+						}
+						if(this.element.children[0])
+							$(this.element.children[0]).addClass("xslData;" + sBase64);
+						//for buttons copy/paste
+						this.lStorage = sBase64;
 					}
-					if(this.element.children[0])
-						$(this.element.children[0]).addClass("xslData;" + sBase64);
-					//for buttons copy/paste
-					this.lStorage = sBase64;
 				}
 							
 				
@@ -341,6 +354,24 @@
 					0);
 					return true;
 				}
+				else if(copyPasteUseBinary)
+				{
+					var t = this;
+					if(worksheet.objectRender.controller.curState.textObject && worksheet.objectRender.controller.curState.textObject.txBody)
+					{
+						var text = t._makeTableNode(range, worksheet, isCut);
+						t.lStorage.htmlInShape = text;
+					}	
+					else
+					{
+						var  table = t._makeTableNode(range, worksheet, isCut);
+						t.copyText = t._getTextFromTable(table);
+						var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+						var sBase64 = oBinaryFileWriter.Write();
+						t.lStorage = sBase64;
+					}
+					return true;
+				}
 				else if(activateLocalStorage)
 				{
 					var t = this;
@@ -348,17 +379,17 @@
 					t.copyText = t._getTextFromTable(table);
 					return true;
 				}
-				else if(copyPasteUseBinary)
-				{
-					var t = this;
-					var  table = t._makeTableNode(range, worksheet, isCut);
-					t.copyText = t._getTextFromTable(table);
-					var oBinaryFileWriter = new BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
-					var sBase64 = oBinaryFileWriter.Write();
-					t.lStorage = sBase64;
-					return true;
-				}
 				return false;
+			},
+			
+			
+			//****paste cells ****
+			pasteRange: function (worksheet) {
+				var t = this;
+				if($.browser["mozilla"])
+					t._editorPaste(worksheet,t._getStylesSelect);
+				else
+					t._editorPaste(worksheet);
 			},
 			
 			pasteRangeButton: function (worksheet)
@@ -408,9 +439,11 @@
 				return false;
 			},
 			
+			
+			//****copy cell value****
 			copyCellValue: function (value) {
 				var t = this;
-				if(activateLocalStorage)
+				if(activateLocalStorage || copyPasteUseBinary)
 					t._addValueToLocalStrg(value);
 				var nodes = t._makeNodesFromCellValue(value);
 				var outer;
@@ -492,7 +525,7 @@
 							0);
 					return true;
 				}
-				else if(activateLocalStorage)
+				else if(activateLocalStorage || copyPasteUseBinary)
 				{
 					var t = this;
 					t._addValueToLocalStrg(value)
@@ -500,23 +533,10 @@
 				}
 				return false;
 			},
-
-			pasteRange: function (worksheet) {
-				var t = this;
-				if($.browser["mozilla"])
-					t._editorPaste(worksheet,t._getStylesSelect);
-				else
-					t._editorPaste(worksheet);
-			},
-
-			pasteCellValue: function (callback) {
-				var t = this;
-				t._paste(function(){t._makeCellValueFromHtml(callback)});
-			},
 			
+			//****insert into cell****
 			pasteAsText: function (callback) {
 				var t = this;
-				//t._paste(function(){t._makeCellValueFromHtml(callback)});
 				t.elementText.style.display = "block";
 				t.elementText.value = '\xa0';
 				t.elementText.focus();
@@ -593,7 +613,7 @@
 							0);
 					return true;
 				}
-				else if(activateLocalStorage)
+				else if(activateLocalStorage || copyPasteUseBinary)
 				{
 					if(t.lStorageText)
 						callback(t.lStorageText, []);
@@ -1413,9 +1433,26 @@
 				//****binary****
 				if(copyPasteUseBinary)
 				{
+					var base64 = null;
 					if(onlyFromLocalStorage)
 					{
-						base64 = t.lStorage
+						if(typeof t.lStorage == "object")
+						{
+							if(t.lStorage.htmlInShape)
+							{
+								node = t.lStorage.htmlInShape;
+								pasteFragment = node;
+							}
+							else
+							{
+								worksheet.setSelectionInfo('paste',t,false,true);
+								window.GlobalPasteFlag = false;
+								window.GlobalPasteFlagCounter = 0;
+								return;
+							}
+						}
+						else
+							base64 = t.lStorage;
 					}
 					else//find class xsl
 					{
@@ -2204,7 +2241,7 @@
 				else if(isSelectedImages && isSelectedImages != -1 && objectRender.controller.curState.textObject && objectRender.controller.curState.textObject.txBody)//если курсор находится внутри шейпа
 				{
 					var htmlInShape = objectRender.controller.curState.textObject.txBody.getSelectedTextHtml();
-					if(activateLocalStorage && htmlInShape)
+					if((activateLocalStorage || copyPasteUseBinary) && htmlInShape)
 					{
 						t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut, htmlInShape);
 					}
@@ -2268,7 +2305,7 @@
 				}
 				else
 				{
-					if(activateLocalStorage)
+					if(activateLocalStorage || copyPasteUseBinary)
 					{
 						var localStText = '';
 						//add local buffer
@@ -2286,7 +2323,8 @@
 								else
 									localStText += textRange;
 								//добавляем ноды
-								t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut);
+								if(!copyPasteUseBinary)
+									t._addLocalStorage(false,false,currentRange,bbox,row,col, worksheet, isCut);
 							}
 						}
 						t.lStorageText = localStText;
@@ -2452,15 +2490,6 @@
 						}
 					}
 				}
-			},
-
-			_paste: function (callback) {
-				var t = this;
-				t._cleanElement();
-				t.element.focus();
-				// Safari requires a filler node inside the div to have the content pasted into it. (#4882)
-				t.element.appendChild(doc.createTextNode('\xa0'));
-				t._selectElement(callback);
 			},
 
 			_makeCellValueFromHtml: function (callback) {
