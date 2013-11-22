@@ -7292,8 +7292,6 @@ CDocument.prototype =
                             Item.Selection.EndPos   = Item.Content.length - 1;
                         else
                             Item.Selection.StartPos = Item.Content.length - 1;
-
-                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7319,8 +7317,6 @@ CDocument.prototype =
                             Item.Selection.StartPos = Item.Internal_GetStartPos();
                         else
                             Item.Selection.EndPos   = Item.Internal_GetStartPos();
-
-                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7350,8 +7346,6 @@ CDocument.prototype =
                             Item.Selection.EndPos   = Item.Internal_GetStartPos();
                             Item.Selection.StartPos = Item.Content.length - 1;
                         }
-
-                        Item.Selection_Internal_Update();
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7376,6 +7370,9 @@ CDocument.prototype =
 
                     break;
             }
+
+            if ( ItemType === type_Paragraph && Index === this.Selection.StartPos && Direction != 0 )
+                Item.Selection_Internal_Update();
         }
 
         this.Content[ContentPos].Selection_SetEnd( X, Y, this.CurPage, MouseEvent );

@@ -8488,7 +8488,15 @@ Paragraph.prototype =
 
     Selection_Internal_Update : function()
     {
-
+        var SelectDirection = this.Parent.Selection_Is_OneElement();
+        var StartPos = this.Selection.StartPos2;
+        if ( 0 !== SelectDirection && undefined !== this.Content[StartPos] && para_Math === this.Content[StartPos].Type )
+        {
+            if ( SelectDirection > 0 )
+                this.Content[StartPos].Selection_Ending(false);
+            else
+                this.Content[StartPos].Selection_Beginning(false);
+        }
     },
 
     Selection_Stop : function(X,Y,PageNum, MouseEvent)
