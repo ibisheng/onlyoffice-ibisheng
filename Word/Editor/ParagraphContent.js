@@ -7499,6 +7499,8 @@ function ParaMath()
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
+    this.Ascent       = 0;
+    this.Descent      = 0;
 
     this.TextAscent  = 0;
     this.TextDescent = 0;
@@ -7537,9 +7539,12 @@ ParaMath.prototype =
         this.Math.RecalculateComposition(Context, TextPr);
         var Size = this.Math.getSize();
 
-        this.Width        = Size.width;
-        this.Height       = Size.height;
-        this.WidthVisible = Size.width;
+        this.Width        = Size.Width;
+        this.Height       = Size.Height;
+        this.WidthVisible = Size.WidthVisible;
+        this.Ascent       = Size.Ascent;
+        this.Decent       = Size.Descent;
+
     },
 
     Is_RealContent : function( )
@@ -7555,29 +7560,31 @@ ParaMath.prototype =
     Selection_SetStart : function(X, Y, PageNum)
     {
         this.Math.Selection_SetStart( X, Y, PageNum );
-        console.log( "Start x=" + X +" y=" + Y );
+        //console.log( "Start x=" + X +" y=" + Y );
     },
 
     Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
     {
         this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
-        console.log( "End x=" + X +" y=" + Y );
+        //console.log( "End x=" + X +" y=" + Y );
     },
 
     Selection_Beginning : function()
     {
         this.Math.Selection_Beginning();
+        console.log("Selection_Beginning");
     },
 
     Selection_Ending : function()
     {
         this.Math.Selection_Ending();
+        console.log("Selection_Ending");
     },
 
     Selection_Draw : function()
     {
         this.Math.Selection_Draw();
-        console.log( "Selection draw" );
+        //console.log( "Selection draw" );
     },
 
     Selection_IsEmpty : function()
