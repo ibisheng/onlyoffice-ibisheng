@@ -5543,8 +5543,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             History.Create_NewPoint();
                             drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
+                            drawingObjectsController.selectedObjects[0].paragraphAdd(new ParaSpace(1));
                             drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
-                            drawingObjectsController.curState.textObject.paragraphAdd(new ParaSpace(1));
                             drawingObjectsController.drawingObjects.showDrawingObjects(true);
                             drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                             //drawingObjectsController.drawingObjects.OnUpdateOverlay();
