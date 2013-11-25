@@ -188,11 +188,6 @@
                     "<%= pkg.menu_path %>/Word/document/": "../Word/document/**"
                 }
             },
-            "mobile_downloader": {
-                "files": {
-                    "<%= pkg.menu_path %>/Common/MobileDownloader/": "../Common/MobileDownloader/**"
-                }
-            },
             "docscoapisettings": {
                 "files": {
                     "<%= pkg.menu_path %>/Common/": [
