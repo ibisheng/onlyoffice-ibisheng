@@ -7569,19 +7569,16 @@ ParaMath.prototype =
     Selection_Beginning : function(bStart)
     {
         this.Math.Selection_Beginning(bStart);
-        console.log( "Selection Beginning(" + bStart +")" );
     },
 
     Selection_Ending : function(bStart)
     {
         this.Math.Selection_Ending(bStart);
-        console.log( "Selection Ending(" + bStart +")"  );
     },
 
     Selection_Draw : function()
     {
         this.Math.Selection_Draw();
-        //console.log( "Selection draw" );
     },
 
     Selection_IsEmpty : function()

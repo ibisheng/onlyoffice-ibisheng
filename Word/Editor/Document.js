@@ -7338,13 +7338,13 @@ CDocument.prototype =
                     {
                         if ( Direction > 0 )
                         {
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
-                            Item.Selection.EndPos   = Item.Content.length - 1;
+                            Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
+                            Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
                         }
                         else
                         {
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
-                            Item.Selection.StartPos = Item.Content.length - 1;
+                            Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
+                            Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
                         }
                     }
                     else //if ( type_Table === ItemType )

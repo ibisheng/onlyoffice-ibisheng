@@ -8366,12 +8366,22 @@ Paragraph.prototype =
             else
                 this.Selection.Set_EndPos(Pos, Temp.Pos2);
 
-            // Если мы заканчиваем на математическом элементе, тогда у него выставляем конец селекта
+
+            // Обработка математических элементов:
+            // 1. Проверяем конец селекта
+            //    Если мы закончили на математическом элементе, тогда смотрим на начало селекта,
+            //    если селект начался в другом элементе, тогда выставляем начало селекта в формуле
+            //    в зависимости от направления, если селект начался в этом же параграфе, тогда проверяем,
+            //    если начало селекта не тот же самый элемент, тогда выставляем начало
+            // 2. Проверяем начало селекта
+            //    Если у нас селект начался в данном параграфе, и начальный элемент -формула, и начало селекта
+            //    не совпадает с концом селекта, тогда выставляем конец селекта у данного элемента
+
+            var ParentSelectDirection = this.Parent.Selection_Is_OneElement();
             if ( undefined !== this.Content[Temp.Pos2] && para_Math === this.Content[Temp.Pos2].Type )
             {
                 // Если у нас совпали начальная и конечная позиции, тогда не нужно указывать начало селекта, т.к. оно
                 // было определено в Selection_SetStart, но это только в случае, когда выделение внутри 1 параграфа.
-                var ParentSelectDirection = this.Parent.Selection_Is_OneElement();
                 if ( 0 === ParentSelectDirection )
                 {
                     if ( this.Selection.EndPos2 != this.Selection.StartPos2 )
@@ -8391,6 +8401,14 @@ Paragraph.prototype =
                 }
 
                 this.Content[Temp.Pos2].Selection_SetEnd(X, Y, PageNum, MouseEvent);
+            }
+
+            if ( undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && 0 === ParentSelectDirection && this.Selection.EndPos2 != this.Selection.StartPos2 )
+            {
+                if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                    this.Content[this.Selection.StartPos2].Selection_Ending(false);
+                else
+                    this.Content[this.Selection.StartPos2].Selection_Beginning(false);
             }
 
             if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
@@ -8594,8 +8612,11 @@ Paragraph.prototype =
                     this.Content[this.Selection.StartPos2].Selection_Draw();
 
                     if ( this.Selection.StartPos2 === StartPos )
+                    {
                         StartPos++;
-                    else if( this.Selection.StartPos2 === EndPos )
+                        StartX  += this.Content[this.Selection.StartPos2].WidthVisible;
+                    }
+                    else if( this.Selection.StartPos2 === EndPos - 1 )
                         EndPos--;
 
                 }
@@ -8605,8 +8626,11 @@ Paragraph.prototype =
                     this.Content[this.Selection.EndPos2].Selection_Draw();
 
                     if ( this.Selection.EndPos2 === StartPos )
+                    {
                         StartPos++;
-                    else if( this.Selection.EndPos2 === EndPos )
+                        StartX  += this.Content[this.Selection.EndPos2].WidthVisible;
+                    }
+                    else if( this.Selection.EndPos2 === EndPos - 1 )
                         EndPos--;
                 }
 
