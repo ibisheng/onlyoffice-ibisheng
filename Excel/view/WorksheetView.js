@@ -3784,7 +3784,7 @@
 
 							if (angle) {
 								this._fetchCellCache(col, row).text.textBound   =
-									this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowHeight, tm.width, ha, va, maxW);
+									this.stringRender.getTransformBound(angle, 0, 0, colWidth, rowInfo.height, tm.width, ha, va, maxW);
 							}
 
 							this.isChanged = true;
