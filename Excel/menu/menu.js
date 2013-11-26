@@ -1,7 +1,8 @@
 ﻿$(function () {
-	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, imgd, pix, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
+	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
 	var g_sheetViewSettings = null;
+	var colorDefault = new CAscColor(0, 0, 0);
 	
 	var docTitle = window.location.toString().match(/&title=([^&]+)&/);
 	if (docTitle) {
@@ -14,6 +15,30 @@
 	$("#ws-navigation .nav-buttons .btn").click(onTabNavigationBtnClicked);
 	// init scaling buttons
 	$("#ws-navigation .ws-zoom-button").click(onZoomBtnClicked);
+
+	function parseColor(color) {
+		var reColor = /^\s*(?:#?([0-9a-f]{6})|#?([0-9a-f]{3})|rgba?\s*\(\s*((?:\d*\.?\d+)(?:\s*,\s*(?:\d*\.?\d+)){2,3})\s*\))\s*$/i;
+		var x, type, r, g, b;
+
+		var m = reColor.exec(color);
+		if (!m) {return null;}
+
+		if (m[1]) {
+			x = [ m[1].slice(0, 2), m[1].slice(2, 4), m[1].slice(4) ];
+			type = 1;
+		} else if (m[2]) {
+			x = [ m[2].slice(0, 1), m[2].slice(1, 2), m[2].slice(2) ];
+			type = 0;
+		} else {
+			x = m[3].split(/\s*,\s*/i);
+			type = x.length === 3 ? 2 : 3;
+		}
+
+		r = parseInt(type !== 0 ? x[0] : x[0] + x[0], type < 2 ? 16 : 10);
+		g = parseInt(type !== 0 ? x[1] : x[1] + x[1], type < 2 ? 16 : 10);
+		b = parseInt(type !== 0 ? x[2] : x[2] + x[2], type < 2 ? 16 : 10);
+		return {r: r, g: g, b: b};
+	}
 	
 	function renderTabs() {
 		var r = $(),
@@ -40,7 +65,7 @@
 					'<div class="tab-suffix"/>' +
 				'</li>')
 				.data("ws-index", i)
-				.on("click", function (event) {onTabClicked( $(this).data("ws-index") );});
+				.on("click", function () {onTabClicked( $(this).data("ws-index") );});
 			r = r.add(li);
 			isFirst = false;
 		}
@@ -66,7 +91,7 @@
 	//--Event handlers--
 
 	function onError(id,level){
-		consolelog("id "+ id + " level " + level)
+		consolelog("id "+ id + " level " + level);
 		switch(arguments[0]){
 			case c_oAscError.ID.FrmlWrongCountParentheses:
 				// alert("неверное количество скобок");
@@ -975,12 +1000,13 @@
 		$(".clrSelector1").click();
 	});
 	$(".clrSelector1").click(function(){
-		var a1="background-color";
-		var a2=$(this).children().css("border-bottom-color");
+		var color=$(this).children().css("border-bottom-color");
 		var otd_color_fon = $("#td_color_fon");
 		otd_color_fon.blur();
 		$("#td_BackgroundColor").removeClass("iconPressed");
-		api.asc_setCellBackgroundColor(Asc.numberToAscColor(Asc.parseColor(a2).binary));
+		var oColor = parseColor(color);
+		if (null !== oColor)
+			api.asc_setCellBackgroundColor(new CAscColor(oColor.r, oColor.g, oColor.b));
 		return false;
 	});
 	$(".clrPicker2, .clrPicker3").mousedown(function(event){
@@ -1020,23 +1046,23 @@
 		}
 	});
 	$(".clrSelector2").click(function(){
-		var a1="background-color";
-		var a2=$(this).children().css("border-bottom-color");
+		var color=$(this).children().css("border-bottom-color");
 		var otd_color = $("#td_color");
 		otd_color.blur();
 		$("#td_TextColor").removeClass("iconPressed");
 		// changeFontColor(a2,"text");
-		api.asc_setCellTextColor(Asc.numberToAscColor(Asc.parseColor(a2).binary))
+		var oColor = parseColor(color);
+		if (null !== oColor)
+			api.asc_setCellTextColor(new CAscColor(oColor.r, oColor.g, oColor.b));
 		return false;
 	});
-	$("#td_func_choose").mousedown(function(event) {
+	$("#td_func_choose").mousedown(function () {
 		if ("none" != $("#formulaList2").css("display")) {
 			IsVisibleMenu = true;
 			$("#td_Formulas").removeClass("iconPressed");
 			$("#formulaList2").hide();
 		}
-	});
-	$("#td_func_choose").click(function() {
+	}).click(function () {
 		if (false == IsVisibleMenu) {
 			var offset = $("#td_Formulas").offset();
 			offset.top += $("#td_Formulas").outerHeight() - 1;
@@ -1047,13 +1073,12 @@
 		}
 		IsVisibleMenu = false;
 	});
-	$("#td_border_choose").mousedown(function(event) {
+	$("#td_border_choose").mousedown(function () {
 		if ("none" != $("#brd_options").css("display")) {
 			$("#td_Border").removeClass('iconPressed');
 			IsVisibleMenu = true;
 		}
-	});
-	$("#td_border_choose").click(function() {
+	}).click(function () {
 		if (false == IsVisibleMenu) {
 			var offset = $("#td_Border").offset();
 			offset.top += $("#td_Border").outerHeight() - 1;
@@ -1081,55 +1106,55 @@
 			}
 			case "1":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "4":{
 				val = [];
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "16":{
 				val = [];
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "64":{
 				val = [];
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "85":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "170":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, "#000");
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, colorDefault);
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, colorDefault);
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, colorDefault);
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thick, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "324":{
 				val = [];
-				val[c_oAscBorderOptions.DiagD] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, "#000");
+				val[c_oAscBorderOptions.DiagD] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "341":{
 				val = [];
-				val[c_oAscBorderOptions.DiagU] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, "#000");
+				val[c_oAscBorderOptions.DiagU] = new window.Asc.asc_CBorder(c_oAscBorderStyles.Thin, colorDefault);
 				api.asc_setCellBorders(val);
 				break;
 			}
@@ -1143,32 +1168,12 @@
 		$("#DateList").hide();
 		$("#MoneyList").hide();
 	});
-	$("#td_fmt_digit").mousedown(function(event) {
+	$("#td_fmt_digit").mousedown(function () {
 	if ("none" != $("#DigitList").css("display")) {
 			IsVisibleMenu = true;
 			remClassIconPress($(this).parent());
 		}
-	});
-	$("#td_fmt_date").mousedown(function(event) {
-		if ("none" != $("#DateList").css("display")) {
-			IsVisibleMenu = true;
-			remClassIconPress($(this).parent());
-			$("#DateList").css("display","none");
-		}
-	});
-	$("#td_fmt_money").mousedown(function(event) {
-		if ("none" != $("#MoneyList").css("display")) {
-			IsVisibleMenu = true;
-			remClassIconPress($(this).parent());
-		}
-	});
-	$("#td_fmt_up").click(function(event) {
-		api.asc_increaseCellDigitNumbers();
-	});
-	$("#td_fmt_down").click(function(event) {
-		api.asc_decreaseCellDigitNumbers();
-	});
-	$("#td_fmt_digit").click(function() {
+	}).click(function () {
 		if (false == IsVisibleMenu) {
 			var offset = $(this).offset();
 			offset.top += 24;
@@ -1180,7 +1185,13 @@
 		}
 		IsVisibleMenu = false;
 	});
-	$("#td_fmt_date").click(function() {
+	$("#td_fmt_date").mousedown(function () {
+		if ("none" != $("#DateList").css("display")) {
+			IsVisibleMenu = true;
+			remClassIconPress($(this).parent());
+			$("#DateList").css("display","none");
+		}
+	}).click(function () {
 		if (false == IsVisibleMenu) {
 			var offset = $(this).offset();
 			offset.top += 24;
@@ -1192,7 +1203,12 @@
 		}
 		IsVisibleMenu = false;
 	});
-	$("#td_fmt_money").click(function() {
+	$("#td_fmt_money").mousedown(function () {
+		if ("none" != $("#MoneyList").css("display")) {
+			IsVisibleMenu = true;
+			remClassIconPress($(this).parent());
+		}
+	}).click(function () {
 		if (false == IsVisibleMenu) {
 			var offset = $("#td_fmt_money").offset();
 			offset.top += 24;
@@ -1203,6 +1219,12 @@
 			addClassIconPress($(this).parent());
 		}
 		IsVisibleMenu = false;
+	});
+	$("#td_fmt_up").click(function(event) {
+		api.asc_increaseCellDigitNumbers();
+	});
+	$("#td_fmt_down").click(function(event) {
+		api.asc_decreaseCellDigitNumbers();
 	});
 	$("[fmt]").click(function() {
 		remClassIconPress($("#td_fmt_digit").parent());
@@ -1417,15 +1439,15 @@
 
 	function setLastColor(red,green,blue){
 		$("#lastColor").css("background-color","rgb("+red+","+green+","+blue+")");
-	};
+	}
 	function setCurrentColor(red,green,blue){
 		$("#currentColor").css("background-color","rgb("+red+","+green+","+blue+")");
-	};
+	}
 	function setColorFromRGB(red,green,blue){
 		newColorSelected.r = red;
 		newColorSelected.g = green;
 		newColorSelected.b = blue;
-	};
+	}
 	function getColor(posLeft,posTop){
 		var data = contextGrad.getImageData(posLeft, posTop, 1, 1).data;
 		document.getElementById("redChannel").value = data[0];
@@ -1454,7 +1476,7 @@
 			x: mouseX,
 			y: mouseY
 		};
-	};
+	}
 	function hslTorgb(h,s,l) {
 		/*h=[0..360] s=[0..100] l=[0..100]*/
 		  h = h/360;
@@ -1492,19 +1514,6 @@
 		if (h*2<1) { return Q; }
 		if (h*3<2) { return P+(Q-P)*(2/3-h)*6; }
 		return P;
-	}
-	function rgbCSS2hex(rgbString){
-		//var rgbString = "rgb(0, 70, 255)"; // get this in whatever way.
-
-		var parts = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-		// parts now should be ["rgb(0, 70, 255", "0", "70", "255"]
-
-		delete (parts[0]);
-		for (var i = 1; i <= 3; ++i) {
-			parts[i] = parseInt(parts[i]).toString(16);
-			if (parts[i].length == 1) parts[i] = '0' + parts[i];
-		}
-		return parts.join('');
 	}
 	// consolelog( api.asc_getFormulasInfo() )
 	var flist = api.asc_getFormulasInfo(), a;
@@ -1585,7 +1594,7 @@
 			$("#addHyperlink_url" ).attr( "disabled", "disabled" );
 			$("#addHyperlink_she,#addHyperlink_ran" ).removeAttr( "disabled" );
 		}
-	};
+	}
 
 	$("#selectTypeLink").change(function() {
 		switch (this.selectedIndex) {
@@ -1727,7 +1736,7 @@
 			comment.asc_putText(t.value);
 			
 			api.asc_changeComment(commentObject.asc_getId(), comment);
-		}
+		};
 
 		// Buttons
 		var replyBtn = document.createElement("input"); 
@@ -1745,7 +1754,7 @@
 			
 			parentComment.asc_addReply(reply);
 			InsertComment(reply, commentObject.asc_getId());
-		}
+		};
 
 		var deleteBtn = document.createElement("input");
 		commentBlock.appendChild(deleteBtn);		
@@ -1756,7 +1765,7 @@
 			RecalcCommentEditor();		
 			var result = api.asc_removeComment(commentObject.asc_getId());			
 			$("#" + commentObject.asc_getId()).remove();
-		}
+		};
 
 		var count = commentObject.asc_getRepliesCount();
 		for (var i = 0; i < count; i++) {
@@ -1795,7 +1804,7 @@
 							api.asc_addComment(comment);
 							
 							InsertComment(comment, "cellComment");
-						}						
+						};
 						
 						for (var i = 0; i < commentList.length; i++) {
 							InsertComment(commentList[i], "cellComment");
@@ -2533,9 +2542,8 @@
 	});
 	$("#selectAllElements").click(function() {
 		var elements = $(".AutoFilterItem ");
-		for(l = 0; l < elements.length; l++)
-		{
-			var elem = $(elements[l])
+		for(l = 0; l < elements.length; l++) {
+			var elem = $(elements[l]);
 			if(!elem.hasClass('hidden') && !elem.hasClass('hidden2'))
 			{
 				if(!$("#selectAllElements").hasClass('SelectedAutoFilterItem'))
@@ -2545,80 +2553,53 @@
 			}
 		}
 		if($("#selectAllElements").hasClass('SelectedAutoFilterItem'))
-			$("#selectAllElements").removeClass('SelectedAutoFilterItem')
+			$("#selectAllElements").removeClass('SelectedAutoFilterItem');
 		else
 			$("#selectAllElements").addClass('SelectedAutoFilterItem')
 			
 	});
 	
 	// Shapes
-	$("#td_shape").mousedown(function(event) {
+	$("#td_shape").mousedown(function () {
 		if ( "none" != ($("#shapeBox").css("display")) ) {
 			IsVisibleMenu = true;
 		}
+	}).click(function () {
+		if (!IsVisibleMenu) {
+			var offset = $("#td_shape").offset();
+			offset.top += $("#td_shape").outerHeight() - 1;
+			$("#shapeBox").css("top", offset.top);
+			$("#shapeBox").css("left", offset.left);
+			$("#shapeBox").attr("init", "shapePrst").show();
+		} else {
+			$("#shapeBox").attr("init", "shapePrst").hide();
+		}
+		IsVisibleMenu = false;
 	});
 	
-	$("#td_shape").click(
-        function()
-        {
-            if ( !IsVisibleMenu )
-            {
-                var offset = $("#td_shape").offset();
-                offset.top += $("#td_shape").outerHeight() - 1;
-                $("#shapeBox").css("top", offset.top);
-                $("#shapeBox").css("left", offset.left);
-                $("#shapeBox").attr("init", "shapePrst").show();
-            }
-            else
-            {
-                $("#shapeBox").attr("init", "shapePrst").hide();
-            }
-            IsVisibleMenu = false;
-        }
-    );
+	$(".cell").css({
+		"width" : "20px",
+		"height": "20px",
+		"padding": "2px"
+	}).mousedown(function () {
+		$(this).css("border", "3px solid #000");
+		$("#shapeBox").attr("init", "shapePrst").hide();
+		api.asc_startAddShape($(this).attr("title"), true);
+	}).mouseover(function () {
+		$(this).css("border", "1px solid #000");
+	}).mouseup(function () {
+		$(this).css("border", "1px solid #000");
+	}).mouseout(function () {
+		$(this).css("border", "0px solid #000");
+	});
 	
-	$(".cell").css("width", "20px");
-	$(".cell").css("height", "20px");
-	$(".cell").css("padding", "2px");
+	$("#td_group").click(function () {
+		api.asc_groupGraphicsObjects();
+	});
 	
-	$(".cell").mousedown(
-        function()
-        {
-            $(this).css("border", "3px solid #000");
-			$("#shapeBox").attr("init", "shapePrst").hide();
-            api.asc_startAddShape($(this).attr("title"), true);
-        }
-    );
-    $(".cell").mouseover(
-        function()
-        {
-            $(this).css("border", "1px solid #000");
-        }
-    );
-    $(".cell").mouseup(
-        function()
-        {
-            $(this).css("border", "1px solid #000");
-        }
-    );
-    $(".cell").mouseout(
-        function()
-        {
-            $(this).css("border", "0px solid #000");
-        }
-    );
-	
-	$("#td_group").click(
-        function() {
-			api.asc_groupGraphicsObjects();
-        }
-    );
-	
-	$("#td_ungroup").click(
-        function() {
-			api.asc_unGroupGraphicsObjects();
-        }
-    );
+	$("#td_ungroup").click(function () {
+		api.asc_unGroupGraphicsObjects();
+	});
 
 	$("#showGridLines").change(function () {
 		onChangeView();
