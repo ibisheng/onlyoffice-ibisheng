@@ -3138,6 +3138,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjects.OnUpdateOverlay();
+        asc["editor"].asc_endAddShape();
 
     };
 
