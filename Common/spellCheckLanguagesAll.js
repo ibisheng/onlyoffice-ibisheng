@@ -162,7 +162,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lt-LT", 0x0427));
 //{ "fa-IR", 0x0429 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("vi-VN", 0x042a));
 //{ "hy-AM", 0x042b },
-//{ "az-Latn-AZ", 0x042c },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("az-Latn-AZ", 0x042c));
 //{ "eu-ES", 0x042d },
 //{ "wen-DE", 0x042e },
 //{ "mk-MK", 0x042f },
