@@ -8417,17 +8417,20 @@ Paragraph.prototype =
             }
 
             // Если мы закончили в математическом элементе и в нем нет селекта, тогда отменяем селект совсем и ставим курсор в формуле
-            if ( this.Selection.EndPos2 === this.Selection.StartPos2 && undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && true === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+            if ( g_mouse_event_type_up === MouseEvent.Type )
             {
-                this.Selection_Remove();
+                if ( this.Selection.EndPos2 === this.Selection.StartPos2 && undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && true === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+                {
+                    this.Selection_Remove();
 
-                this.CurPos.ContentPos2 = this.Selection.EndPos2;
-                this.Set_ContentPos( Pos, true, Temp.Line );
+                    this.CurPos.ContentPos2 = this.Selection.EndPos2;
+                    this.Set_ContentPos( Pos, true, Temp.Line );
 
-                this.RecalculateCurPos();
+                    this.RecalculateCurPos();
+                }
+                else
+                    this.CurPos.ContentPos2 = -1;
             }
-            else
-                this.CurPos.ContentPos2 = -1;
 
             if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
             {
