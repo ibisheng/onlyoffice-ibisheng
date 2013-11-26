@@ -8322,7 +8322,10 @@ Paragraph.prototype =
 
             // Если мы начинаем с математического элемента, тогда у него выставляем начало селекта
             if ( undefined !== this.Content[Pos.Pos2] && para_Math === this.Content[Pos.Pos2].Type )
+            {
+                this.CurPos.ContentPos2 = Pos.Pos2;
                 this.Content[Pos.Pos2].Selection_SetStart(X, Y, PageNum);
+            }
 
             this.Set_ContentPos( Pos.Pos, true , Pos.Line );
 
@@ -8778,7 +8781,13 @@ Paragraph.prototype =
             }
 
             var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
-            if ( -1 != ContentPos.Pos && Start <= ContentPos.Pos && End >= ContentPos.Pos )
+            var Pos  = ContentPos.Pos;
+            var Pos2 = ContentPos.Pos2;
+
+            if ( -1 != Pos2 && undefined !== this.Content[Pos2] && para_Math === this.Content[Pos2].Type )
+                return this.Content[Pos2].Selection_Check( X, Y, Page_Abs );
+
+            if ( -1 != Pos && Start <= Pos && End >= Pos )
                 return true;
 
             return false;

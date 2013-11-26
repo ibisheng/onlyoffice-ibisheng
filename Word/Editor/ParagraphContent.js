@@ -7604,6 +7604,11 @@ ParaMath.prototype =
 
     },
 
+    Selection_Check : function(X, Y, Page_Abs)
+    {
+        return false;
+    },
+
     Copy : function()
     {
         var Math = new ParaMath();
