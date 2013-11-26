@@ -41,13 +41,19 @@ function CAscColor()
     this.Mods = new Array();
     this.ColorSchemeId = -1;
 
-	if (3 <= arguments.length) {
-		this.r = arguments[0];
-		this.g = arguments[1];
-		this.b = arguments[2];
+	if (1 === arguments.length) {
+		this.r = arguments[0].r;
+		this.g = arguments[0].g;
+		this.b = arguments[0].b;
+	} else {
+		if (3 <= arguments.length) {
+			this.r = arguments[0];
+			this.g = arguments[1];
+			this.b = arguments[2];
+		}
+		if (4 === arguments.length)
+			this.a = arguments[3];
 	}
-	if (4 === arguments.length)
-		this.a = arguments[3];
 }
 CAscColor.prototype.get_r = function(){return this.r}
 CAscColor.prototype.put_r = function(v){this.r = v; this.hex = undefined;}
