@@ -1,6 +1,3 @@
-/** @define {boolean} */
-var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
-
 (function(document) {
 
 	var ImageLoadStatus = {
@@ -366,39 +363,16 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
         this.SetStandartFonts = function()
         {
             //В стандартных шрифтах закоментированы те шрифты, которые были добавлены на docs.teamlab.com
-            var standarts = [];
-			
-			if(ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY)
-			{
-				standarts = ["Arial","Comic Sans MS","Courier New","Georgia","Impact","Lucida Sans Unicode","Tahoma","Times New Roman","Trebuchet MS","Verdana",
-                "Open Sans","Open Sans Condensed","Droid Sans","Droid Serif","Oswald","PT Sans","Lobster","Lobster Two","Ubuntu","Ubuntu Condensed",
-                "Arvo","Dancing Script","Pacifico","Cuprum"];
-			}
-			else
-			{
-				standarts = ["Agency FB","Arabic Transparent","Arial","Arial Black","Arial Narrow","Arvo","Book Antiqua",
-                "Baskerville Old Face","Bell MT","Bernard MT Condensed","Bodoni MT Black","Bodoni MT Condensed",
-                "Bradley Hand ITC","Britannic Bold","Broadway","Brush Script MT","Calibri","Calisto MT",
-                "Cambria","Candara","Castellar","Centaur","Century Schoolbook","Century Gothic",
-                "Colonna MT","Comic Sans MS","Consolas","Cooper Black","Corbel","Courier New","Cuprum","Curlz MT","Dancing Script",
-                "Droid Sans Mono","Droid Sans","Droid Serif",
-                "DejaVu Sans","DejaVu Sans Condensed","DejaVu Sans Light","DejaVu Sans Mono","DejaVu Serif","DejaVu Serif Condensed","Dotum","DotumChe",
-                "Elephant","Engravers MT","Eras Bold ITC","Eras Demi ITC","Eras Light ITC","Eras Medium ITC",
-                "Felix Titling","Forte","Franklin Gothic Book","Franklin Gothic Demi","Franklin Gothic Demi Cond",
-                "Franklin Gothic Heavy","Franklin Gothic Medium","Franklin Gothic Medium Cond",
-                "Freestyle Script","French Script MT","Footlight MT Light","Garamond","Georgia",
-                "Gigi","Gill Sans MT","Gill Sans MT Condensed","Gill Sans MT Ext Condensed Bold","Gill Sans Ultra Bold",
-                "Gill Sans Ultra Bold Condensed","Gloucester MT Extra Condensed","Goudy Stout",
-                "Gulim","GulimChe",
-                "Harrington","Impact","Imprint MT Shadow","Jokerman","Lobster","Lobster Two","Lucida Sans Unicode","Microsoft Sans Serif","Monotype Corsiva",
-                "MS Gothic",
-                "Niagara Engraved","Niagara Solid","OCR A Extended","Old English Text MT","Onyx","Open Sans","Open Sans Condensed","Oswald",
-                "Pacifico","Palatino Linotype","Papyrus","Perpetua","Playbill","Pristina","PT Sans","Ravie","Rockwell",
-                "Segoe UI","Showcard Gothic",
-                "SimHei",
-                "Snap ITC","Symbol","Tahoma","Times New Roman","Trebuchet MS","Ubuntu","Ubuntu Condensed",
-                "Verdana","Viner Hand ITC","Vladimir Script","Webdings","Wide Latin","Wingdings","Wingdings 2","Wingdings 3"];
-			}
+            var standarts = window.standarts;
+
+            if (undefined == standarts)
+            {
+                standarts = [];
+                for (var i = 0; i < window.g_font_infos.length; i++)
+                {
+                    standarts.push(window.g_font_infos[i].Name);
+                }
+            }
 
             var _count = standarts.length;
             var _infos = this.fontInfos;
