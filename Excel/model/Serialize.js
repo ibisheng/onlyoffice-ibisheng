@@ -4086,6 +4086,8 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 		// Начнем с 1, т.к. 2 зарегистрировано для normal
 		var nIndexStyleMap = 1;
 		var XfIdTmp;
+		// Список имен для стилей
+		var oCellStyleNames = {};
 
 		for (var nIndex in oStyleObject.aCellStyles) {
 			if (!oStyleObject.aCellStyles.hasOwnProperty(nIndex))
@@ -4155,6 +4157,20 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 
 			// ToDo при отсутствии имени все не очень хорошо будет!
 			this.wb.CellStyles.CustomStyles.push(oCellStyle);
+			if (null !== oCellStyle.Name)
+				oCellStyleNames[oCellStyle.Name] = true;
+		}
+
+		// ToDo стоит это переделать в дальнейшем (пробежимся по именам, и у отсутствующих создадим имя)
+		var nNewStyleIndex = 1, newStyleName;
+		for (var i = 0, length = this.wb.CellStyles.CustomStyles.length; i < length; ++i) {
+			if (null === this.wb.CellStyles.CustomStyles[i].Name) {
+				do {
+					newStyleName = "Style" + nNewStyleIndex++;
+				} while (oCellStyleNames[newStyleName])
+					;
+				this.wb.CellStyles.CustomStyles[i].Name = newStyleName;
+			}
 		}
 
 		// ToDo это нужно будет переделать (проходимся по всем стилям и меняем у них XfId по порядку)
