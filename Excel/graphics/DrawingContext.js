@@ -14,13 +14,6 @@ var asc = window["Asc"];
 var asc_round = asc.round;
 var asc_floor = asc.floor;
 
-function numberToAscColor(n) {
-	var r = (n >> 16) & 0xff;
-	var g = (n >> 8) & 0xff;
-	var b = n & 0xff;
-	return CreateAscColorCustom(r, g, b);
-}
-
 function colorObjToAscColor(color) {
 	var oRes = null;
 	var n = color.getRgb();
@@ -1181,7 +1174,6 @@ DrawingContext.prototype = {
 
 window["Asc"].getCvtRatio      = getCvtRatio;
 window["Asc"].calcNearestPt    = calcNearestPt;
-window["Asc"].numberToAscColor = numberToAscColor;
 window["Asc"].colorObjToAscColor = colorObjToAscColor;
 
 window["Asc"].FontProperties   = FontProperties;

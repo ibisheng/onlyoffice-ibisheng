@@ -22,7 +22,6 @@
 		var asc_floor   = asc.floor;
 		var asc_ceil    = asc.ceil;
 		var asc_round   = asc.round;
-		var asc_n2Color   = asc.numberToAscColor;
 		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
 		var asc_incDecFonSize  = asc.incDecFonSize;
@@ -188,8 +187,7 @@
 				defaultState: {
 					background: new CColor(255, 255, 255),
 					border: new CColor(218, 220, 221),
-					color: new CColor(0, 0, 0),
-					colorNumber : 0
+					color: new CColor(0, 0, 0)
 				},
 				padding: 2/*px horizontal padding*/
 			};
@@ -5630,9 +5628,9 @@
 				cell_info.font.strikeout = c.getStrikeout();
 				cell_info.font.subscript = fa === "subscript";
 				cell_info.font.superscript = fa === "superscript";
-				cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
+				cell_info.font.color = (fc ? asc_obj2Color(fc) : new CAscColor(c_opt.defaultState.color));
 
-				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_obj2Color(bg) : bg);
+				cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
 				cell_info.border = new asc_CBorders();
 				cell_info.border.left = new asc_CBorder(b.l.s, b.l.c);
@@ -5753,7 +5751,7 @@
 				}
 
 				// Заливка не нужна как таковая
-				objectInfo.fill = new asc_CFill(asc_n2Color(0));
+				objectInfo.fill = new asc_CFill(null);
 
 				// ToDo locks
 
