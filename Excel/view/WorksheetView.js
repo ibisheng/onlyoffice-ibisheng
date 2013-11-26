@@ -9705,7 +9705,7 @@
 					if (false === isSuccess)
 						return;
 					
-					return t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
+					t.autoFilters.addAutoFilter(lTable, ar, undefined, false, addFormatTableOptionsObj);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
@@ -9729,17 +9729,14 @@
 					if (false === isSuccess)
 						return;
 
-					return t.autoFilters.sortColFilter(type, cellId, ar);
+					t.autoFilters.sortColFilter(type, cellId, ar);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
 			
-			getAddFormatTableOptions: function(nameOption)
-			{
+			getAddFormatTableOptions: function () {
 				var ar = this.activeRange.clone(true);
-				var t = this;
-				var result = t.autoFilters.getAddFormatTableOptions(ar);
-				return result;
+				return this.autoFilters.getAddFormatTableOptions(ar);
 			},
 
 			_loadFonts: function (fontArr, callback) {

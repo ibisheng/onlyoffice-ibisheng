@@ -2593,10 +2593,6 @@ function DrawingObjects() {
         _t.getCanvasContext = function() {
             return _this.drawingDocument.CanvasHitContext;
         }
-
-		_t.setActive = function() {
-			worksheet._moveActiveCellToXY( mmToPx(_t.graphicObject.x + 1), mmToPx(_t.graphicObject.y + 1) );
-		}
 		
 		// GraphicObject: x, y, extX, extY
 		_t.getGraphicObjectMetrics = function() {
@@ -4436,7 +4432,6 @@ function DrawingObjects() {
         }
 
 		drawingObject.setGraphicObjectCoords();
-		drawingObject.setActive();
 		
 		_this.showDrawingObjects(false);
 		_this.sendGraphicObjectProps();
