@@ -13,90 +13,6 @@
 var asc = window["Asc"];
 var asc_round = asc.round;
 var asc_floor = asc.floor;
-var asc_typeof = asc.typeOf;
-
-
-var lastColor = undefined,
-    lastResult = null,
-    reColor = /^\s*(?:#?([0-9a-f]{6})|#?([0-9a-f]{3})|rgba?\s*\(\s*((?:\d*\.?\d+)(?:\s*,\s*(?:\d*\.?\d+)){2,3})\s*\))\s*$/i;
-
-/**
- * Parses text string or number to get css color
- * @param {String|Number} c  Color
- */
-function parseColor(c) {
-	if (lastColor === c) {return lastResult;}
-
-	var bin, m, x, type, r, g, b, a, css, s, rgb, rgba;
-
-	if (asc_typeof(c) === "number") {
-
-		type = 4;
-		r = (c >> 16) & 0xFF;
-		g = (c >> 8) & 0xFF;
-		b = c & 0xFF;
-		a = 1;
-		bin = c;
-
-	} else {
-
-		m = reColor.exec(c);
-		if (!m) {return null;}
-
-		if (m[1]) {
-			x = [ m[1].slice(0, 2), m[1].slice(2, 4), m[1].slice(4) ];
-			type = 1;
-		} else if (m[2]) {
-			x = [ m[2].slice(0, 1), m[2].slice(1, 2), m[2].slice(2) ];
-			type = 0;
-		} else {
-			x = m[3].split(/\s*,\s*/i);
-			type = x.length === 3 ? 2 : 3;
-		}
-
-		r = parseInt(type !== 0 ? x[0] : x[0] + x[0], type < 2 ? 16 : 10);
-		g = parseInt(type !== 0 ? x[1] : x[1] + x[1], type < 2 ? 16 : 10);
-		b = parseInt(type !== 0 ? x[2] : x[2] + x[2], type < 2 ? 16 : 10);
-		a = type === 3 ? (asc_round(parseFloat(x[3]) * 100) * 0.01) : 1;
-		bin = (r << 16) | (g << 8) | b;
-
-	}
-
-	css = bin.toString(16);
-	while (css.length < 6) {css = "0" + css;}
-	css = "#" + css;
-
-	s = r + ", " + g + ", " + b;
-	rgb = "rgb(" + s + ")";
-	rgba = "rgba(" + s + ", " + a + ")";
-
-	lastColor = c;
-	lastResult = {
-		r: r,
-		g: g,
-		b: b,
-		a: a,
-		rgb:   rgb,
-		rgba:  rgba,
-		color: css,
-		origColor: type < 2 ? css : (type === 2 ? rgb : (type === 3 ? rgba : bin)),
-		origType:  type /* 0 = '#abc' form; 1 = '#aabbcc' form; 2 = 'rgb(r,g,b)' form; 3 = 'rgba(r,g,b,a)' form; 4 = 0xRRGGBB form */,
-		binary: bin
-	};
-	return lastResult;
-}
-
-var gLastColor = null,
-    gLastResult = null;
-
-function numberToCSSColor(s) {
-	if (gLastColor === c) {return gLastResult;}
-	var c = s.toString(16);
-	while (c.length < 6) {c = "0" + c;}
-	gLastColor = s;
-	gLastResult = "#" + c;
-	return gLastResult;
-}
 
 function numberToAscColor(n) {
 	var r = (n >> 16) & 0xff;
@@ -1215,12 +1131,6 @@ DrawingContext.prototype = {
 		return this;
 	},
 
-	// Other methods
-
-	parseColor: function (c) {
-		return parseColor(c);
-	},
-
 	// Private methods
 
 	_calcRect: function (x, y, w, h) {
@@ -1271,10 +1181,8 @@ DrawingContext.prototype = {
 
 window["Asc"].getCvtRatio      = getCvtRatio;
 window["Asc"].calcNearestPt    = calcNearestPt;
-window["Asc"].numberToCSSColor = numberToCSSColor;
 window["Asc"].numberToAscColor = numberToAscColor;
 window["Asc"].colorObjToAscColor = colorObjToAscColor;
-window["Asc"].parseColor       = parseColor;
 
 window["Asc"].FontProperties   = FontProperties;
 window["Asc"].TextMetrics      = TextMetrics;
