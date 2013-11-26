@@ -4355,23 +4355,40 @@ CMathContent.prototype =
         while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
             pos++;
 
-
         var gps = this.content[pos].g_mContext;
+        var width = this.content[pos].value.size.width;
+        var widthToEl = this.content[pos].widthToEl;
+
         if(pos !== 0)
         {
-            if( this.content[ pos ].value.typeObj === MATH_COMP )
+            if( this.content[pos].value.typeObj === MATH_COMP )
             {
-                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
+                /*if( this.content[pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
                     pos--;
-                else if( (this.content[ pos ].widthToEl - gps.right) < mouseX && mouseX <= this.content[ pos ].widthToEl)
+                else if( (this.content[pos].widthToEl - gps.right) < mouseX && mouseX <= this.content[ pos ].widthToEl)
+                    pos++;*/
+
+
+                if(mouseX < widthToEl - width - gps.right)
+                    pos--;
+                else if(mouseX >= widthToEl - gps.right)
                     pos++;
+
+                /*if(!bPos)
+                    pos--;
+                else
+                    pos++;*/
+
             }
             else
             {
-                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[ pos - 1].widthToEl + gps.left) )
+                if( !(widthToEl - width/2 <  mouseX) )
+                    pos--;
+
+                /*if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[ pos - 1].widthToEl + gps.left) )
                     pos--;
                 else if( (this.content[ pos ].widthToEl - (this.content[ pos ].value.size.width/2) - this.content[ pos ].g_mContext.left ) > mouseX )
-                    pos--;
+                    pos--;*/
             }
         }
 
@@ -5702,36 +5719,6 @@ CMathContent.prototype =
     },
 
     ///////  selection for Edit   ////////
-    old_selection_Start: function(x, y)
-    {
-        var SelectContent = null;
-
-        if(this.IsPlaceholder())
-        {
-            SelectContent = this;
-        }
-        else
-        {
-            var msCoord = this.coordWOGaps({x: x, y: y});
-            var pos = this.findPosition( msCoord);
-
-            this.RealPosSelect.start = pos;
-            this.RealPosSelect.end = pos;
-
-            if(this.content[pos].value.typeObj === MATH_COMP)
-            {
-                var coord = this.getCoordElem(pos, msCoord);
-                var movement = this.content[pos].value.selection_Start(coord.x, coord.y);
-                SelectContent = movement.SelectContent;
-            }
-            /*else
-            {
-                SelectContent = this;
-            }*/
-        }
-
-        //return {SelectContent:  SelectContent};
-    },
     selection_Start: function(x, y)
     {
         if(this.IsPlaceholder())
@@ -5772,18 +5759,19 @@ CMathContent.prototype =
             var posEnd = this.findPosition(msCoord),
                 posStart = this.RealPosSelect.start;
 
+            this.CurPos = posStart;
             this.RealPosSelect.end = posEnd;
-
 
             //селект внутри элемента (дроби и пр.)
             if(posStart === posEnd && this.content[posEnd].value.typeObj === MATH_COMP)
             {
                 var coord = this.getCoordElem(posEnd, msCoord );
                 var movement = this.content[posEnd].value.selection_End(coord.x, coord.y);
+                this.setStartPos_Selection(posStart-1);
 
                 if( ! movement.state )
                 {
-                    this.setEnd_Selection(posEnd + 1);
+                    this.setEndPos_Selection(posEnd + 1);
                     SelectContent = this;
                 }
                 else
@@ -5849,6 +5837,7 @@ CMathContent.prototype =
         {
             this.RealPosSelect.start = 0; /// в итоге, селект начнется с позиции 1
             this.RealPosSelect.end   = 0;
+            this.CurPos = 1;
         }
         else
         {
@@ -5863,6 +5852,7 @@ CMathContent.prototype =
         {
             this.RealPosSelect.start = this.content.length - 1;
             this.RealPosSelect.end   = this.content.length - 1;
+            this.CurPos = this.content.length - 1;
         }
         else
         {
@@ -5903,7 +5893,8 @@ CMathComposition.prototype =
     {
         // TODO
         // переделать gaps
-        var g_Unif = 6*g_dKoef_pix_to_mm;
+        //var g_Unif = 6*g_dKoef_pix_to_mm;
+        var g_Unif = 0;
         var gps = new dist(g_Unif, g_Unif, g_Unif, g_Unif);
 
         this.Root = new CMathContent();
@@ -6271,10 +6262,10 @@ CMathComposition.prototype =
     UpdateCursor: function()
     {
         this.CurrentContent.update_Cursor();
-        if( this.SelectContent.selection.startPos !== this.SelectContent.selection.endPos)
+        /*if( this.SelectContent.selection.startPos !== this.SelectContent.selection.endPos)
             this.HideCursor();
         else
-            this.ShowCursor();
+            this.ShowCursor();*/
     },
     GetPrpSelectContent: function()
     {

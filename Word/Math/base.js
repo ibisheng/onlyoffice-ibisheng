@@ -981,26 +981,7 @@ CMathBase.prototype =
         this.typeElement = type;
     },
     ////    For Edit   /////
-    /*getSelectContent: function(x, y)
-     {
-     var state = true, SelectContent = null;
-     var elem = this.findDisposition({x: x, y: y});
-     var X = elem.mCoord.x,
-     Y = elem.mCoord.y;
 
-     if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
-     {
-     var movement = this.elements[this.CurPos_X][this.CurPos_Y].getSelectContent(X, Y);
-
-     SelectContent = movement.SelectContent;
-     state = true;
-     }
-     else
-     state = false;
-
-     return {state: state, SelectContent: SelectContent};
-
-     }*/
     selection_Start: function(x, y)
     {
         var elem = this.findDisposition({x: x, y: y});
