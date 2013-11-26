@@ -7556,6 +7556,11 @@ ParaMath.prototype =
         return true;
     },
 
+    RecalculateCurPos : function()
+    {
+
+    },
+
     Selection_SetStart : function(X, Y, PageNum)
     {
         this.Math.Selection_SetStart( X, Y, PageNum );
@@ -7584,6 +7589,11 @@ ParaMath.prototype =
     Selection_IsEmpty : function()
     {
         return false;
+    },
+
+    Selection_Remove : function()
+    {
+
     },
 
     Copy : function()

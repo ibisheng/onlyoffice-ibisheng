@@ -68,13 +68,14 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.CurPos  =
     {
-        X          : 0,
-        Y          : 0,
-        ContentPos : 0,
-        Line       : -1,
-        RealX      : 0, // позиция курсора, без учета расположения букв
-        RealY      : 0, // это актуально для клавиш вверх и вниз
-        PagesPos   : 0  // позиция в массиве this.Pages
+        X           : 0,
+        Y           : 0,
+        ContentPos  : 0,  // Ближайшая позиция в контенте (между элементами)
+        ContentPos2 : -1, // Реальный элемент
+        Line        : -1,
+        RealX       : 0, // позиция курсора, без учета расположения букв
+        RealY       : 0, // это актуально для клавиш вверх и вниз
+        PagesPos    : 0  // позиция в массиве this.Pages
     };
 
     this.Selection = new CParagraphSelection();
@@ -3863,6 +3864,10 @@ Paragraph.prototype =
 
     RecalculateCurPos : function()
     {
+        var Pos = this.CurPos.ContentPos2;
+        if ( undefined !== this.Content[Pos] && para_Math === this.Content[Pos].Type )
+            return this.Content[Pos].RecalculateCurPos();
+
         this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, true, false );
     },
 
@@ -8411,6 +8416,19 @@ Paragraph.prototype =
                     this.Content[this.Selection.StartPos2].Selection_Beginning(false);
             }
 
+            // Если мы закончили в математическом элементе и в нем нет селекта, тогда отменяем селект совсем и ставим курсор в формуле
+            if ( this.Selection.EndPos2 === this.Selection.StartPos2 && undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && true === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+            {
+                this.Selection_Remove();
+
+                this.CurPos.ContentPos2 = this.Selection.EndPos2;
+                this.Set_ContentPos( Pos, true, Temp.Line );
+
+                this.RecalculateCurPos();
+            }
+            else
+                this.CurPos.ContentPos2 = -1;
+
             if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
             {
                 var NumPr = this.Numbering_Get();
@@ -8524,6 +8542,15 @@ Paragraph.prototype =
 
     Selection_Remove : function()
     {
+        var StartPos = this.Selection.StartPos2;
+        var EndPos   = this.Selection.EndPos2;
+
+        if ( undefined !== this.Content[StartPos] && para_Math === this.Content[StartPos].Type )
+            this.Content[StartPos].Selection_Remove();
+
+        if ( undefined !== this.Content[EndPos] && para_Math === this.Content[EndPos].Type && StartPos != EndPos )
+            this.Content[EndPos].Selection_Remove();
+
         this.Selection.Use = false;
         this.Selection.Flag = selectionflag_Common;
         this.Selection_Clear();
