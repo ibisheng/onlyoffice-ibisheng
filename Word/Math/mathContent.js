@@ -5859,6 +5859,30 @@ CMathContent.prototype =
             this.RealPosSelect.end   = this.content.length - 1;
             this.setEndPos_Selection(this.content.length - 1);
         }
+    },
+    selection_check:  function(X, Y)
+    {
+        var flag = false;
+
+        var x = X - this.pos.x,
+            y = Y - this.pos.y;
+
+        var bWidth =  x >=0 && x <= this.size.width,    // попали в контент по ширине
+            bHeight = y >=0 && y <= this.size.height,   // попали в контент по высоте
+            bSelect = this.selectUse();
+
+        if(bSelect && bWidth && bHeight)
+        {
+            var start = this.selection.startPos,
+                end = this.selection.endPos;
+
+            var beforeSelect = this.content[start - 1].widthToEl,
+                afterSelect = this.content[end].widthToEl  + this.content[end].g_mContext.right;
+
+            flag = beforeSelect <= x && x <= afterSelect;
+        }
+
+        return flag;
     }
 }
 //todo
@@ -6599,6 +6623,10 @@ CMathComposition.prototype =
     Selection_IsEmpty: function()
     {
         return !this.SelectContent.selectUse();
+    },
+    Selection_Check: function(X, Y)
+    {
+        return this.SelectContent.selection_check(X, Y);
     }
 
 }
