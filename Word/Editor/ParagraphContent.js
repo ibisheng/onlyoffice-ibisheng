@@ -7558,17 +7558,20 @@ ParaMath.prototype =
 
     RecalculateCurPos : function()
     {
-
+        console.log("RecalculateCurPos");
+        this.Math.UpdateCursor();
     },
 
     Selection_SetStart : function(X, Y, PageNum)
     {
         this.Math.Selection_SetStart( X, Y, PageNum );
+        //console.log("Selection_SetStart");
     },
 
     Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
     {
         this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
+        //console.log("Selection_SetEnd");
     },
 
     Selection_Beginning : function(bStart)
@@ -7584,11 +7587,16 @@ ParaMath.prototype =
     Selection_Draw : function()
     {
         this.Math.Selection_Draw();
+        console.log("Selection_Draw");
     },
 
     Selection_IsEmpty : function()
     {
-        return false;
+        var empty = this.Math.Selection_IsEmpty();
+        console.log("Selection_IsEmpty("+empty+")");
+
+        //return false;
+        return empty;
     },
 
     Selection_Remove : function()
