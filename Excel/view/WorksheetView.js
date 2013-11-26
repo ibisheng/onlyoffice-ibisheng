@@ -30,7 +30,6 @@
 		var asc_Range   = asc.Range;
 		var asc_ActiveRange   = asc.ActiveRange;
 		var asc_FP      = asc.FontProperties;
-		var asc_parsecolor = asc.parseColor;
 		var asc_clone   = asc.clone;
 		var asc_AF     = asc.AutoFilters;
 
@@ -189,7 +188,7 @@
 				defaultState: {
 					background: new CColor(255, 255, 255),
 					border: new CColor(218, 220, 221),
-					color: "#000",
+					color: new CColor(0, 0, 0),
 					colorNumber : 0
 				},
 				padding: 2/*px horizontal padding*/
