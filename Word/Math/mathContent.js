@@ -6261,7 +6261,8 @@ CMathComposition.prototype =
     },
     UpdateCursor: function()
     {
-        this.CurrentContent.update_Cursor();
+        //this.CurrentContent.update_Cursor();
+        this.SelectContent.update_Cursor();
         /*if( this.SelectContent.selection.startPos !== this.SelectContent.selection.endPos)
             this.HideCursor();
         else
