@@ -7514,6 +7514,10 @@ function ParaMath()
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+
+    // TODO:
+    // по двойному, тройному клику селект элемента (мат. объекта/Run), формулы
+    // по shift + ctr + стрелка сделать выделение, как минимумумом по элементам (мат. объект/Run)
 }
 
 ParaMath.prototype =
@@ -7603,12 +7607,16 @@ ParaMath.prototype =
 
     Selection_IsEmpty : function()
     {
-        return this.Math.Selection_IsEmpty();
+        var empty = this.Math.Selection_IsEmpty()
+        console.log("Selection_IsEmpty:  " +  empty);
+        return empty;
     },
 
     Selection_IsUse : function()
     {
-        return true;
+        //return true;
+        //var IsUse =
+        //return
     },
 
     Selection_Remove : function()

@@ -4423,7 +4423,7 @@ CMathContent.prototype =
         var state =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
-            bBeging:                false,    /* в начале контента или нет */
+            bBegin:                false,    /* в начале контента или нет */
             bEnd:                   false     /* в конце */
         };
 
@@ -4455,7 +4455,7 @@ CMathContent.prototype =
                 bLast = order == -1 && this.CurPos == this.content.length - 1;
 
             if(bFirst)
-                state.bBeging = true;
+                state.bBegin = true;
             else if(bLast)
                 state.bEnd = true;
 
@@ -5871,12 +5871,16 @@ CMathContent.prototype =
             bHeight = y >=0 && y <= this.size.height,   // попали в контент по высоте
             bSelect = this.selectUse();
 
-        if(bSelect && bWidth && bHeight)
+        if(this.IsPlaceholder())
         {
-            var start = this.selection.startPos,
-                end = this.selection.endPos;
+            flag = false;
+        }
+        else if(bSelect && bWidth && bHeight)
+        {
+            var start = this.selection.startPos - 1,
+                end = this.selection.endPos - 1;
 
-            var beforeSelect = this.content[start - 1].widthToEl,
+            var beforeSelect = this.content[start].widthToEl,
                 afterSelect = this.content[end].widthToEl  + this.content[end].g_mContext.right;
 
             flag = beforeSelect <= x && x <= afterSelect;
@@ -5895,6 +5899,7 @@ function CMathComposition()
 
     this.CurrentContent    = null;
     this.SelectContent     = null;
+    this.NeedRecalculate   = true;
 
     this.DefaultTxtPrp =
     {
@@ -6080,6 +6085,22 @@ CMathComposition.prototype =
         return size;
     },
     Remove: function(order)
+    {
+        //this.ClearSelect();
+
+        var result = this.SelectContent.remove(order);
+
+
+        this.CurrentContent = result.CurrContent;
+        this.SelectContent  = result.SelectContent;
+
+        this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
+
+        this.NeedRecalculate = result.state.bDelete;
+
+        return !(result.state.bBegin || result.state.bEnd);
+    },
+    Remove_2: function(order)
     {
         if(TEST)
         {
@@ -6559,7 +6580,10 @@ CMathComposition.prototype =
 
         ///////////////////////
 
-        this.Root.Resize(oMeasure); // пересчитываем всю формулу
+        if(this.NeedRecalculate)
+            this.Root.Resize(oMeasure); // пересчитываем всю формулу
+
+        this.NeedRecalculate = true;
 
         var width = this.Root.size.width,
             height = this.Root.size.height;
@@ -6622,7 +6646,10 @@ CMathComposition.prototype =
     },
     Selection_IsEmpty: function()
     {
-        return !this.SelectContent.selectUse();
+        var bPlh = this.SelectContent.IsPlaceholder(),
+            bNotSelect = !this.SelectContent.selectUse();
+
+        return !bPlh && !this.SelectContent.selectUse();
     },
     Selection_Check: function(X, Y)
     {
