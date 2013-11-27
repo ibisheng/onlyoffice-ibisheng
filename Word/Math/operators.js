@@ -320,6 +320,10 @@ CGlyphOperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
 }
+CGlyphOperator.prototype.IsArrow = function()
+{
+    return false;
+}
 
 
 function COperatorBracket()
@@ -1462,7 +1466,6 @@ COperatorDoubleLine.prototype.drawPath = function(pGraphics, XX, YY)
 
 function CSingleArrow()
 {
-    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CSingleArrow, CGlyphOperator);
@@ -1532,10 +1535,13 @@ CSingleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[9], YY[9]);
     pGraphics._l(XX[10], YY[10]);
 }
+CSingleArrow.prototype.IsArrow = function()
+{
+    return true;
+}
 
 function CLeftRightArrow()
 {
-    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CLeftRightArrow, CGlyphOperator);
@@ -1618,10 +1624,13 @@ CLeftRightArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[16], YY[16]);
 
 }
+CLeftRightArrow.prototype.IsArrow = function()
+{
+    return true;
+}
 
 function CDoubleArrow()
 {
-    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CDoubleArrow, CGlyphOperator);
@@ -1714,10 +1723,13 @@ CDoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._m(XX[16], YY[16]);
     pGraphics._l(XX[17], YY[17]);
 }
+CDoubleArrow.prototype.IsArrow = function()
+{
+    return true;
+}
 
 function CLR_DoubleArrow()
 {
-    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CLR_DoubleArrow, CGlyphOperator);
@@ -1819,6 +1831,10 @@ CLR_DoubleArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[21], YY[21]);
     pGraphics._l(XX[22], YY[22]);
     pGraphics._l(XX[23], YY[23]);
+}
+CLR_DoubleArrow.prototype.IsArrow = function()
+{
+    return true;
 }
 
 
@@ -2174,6 +2190,7 @@ COperator.prototype.init = function(props, defaultProps)        // props (chr, t
         code = prp.code;
 
 
+    //////////    delimiters    //////////
     if( code === 0x28 || type === PARENTHESIS_LEFT)
     {
         codeChr = 0x28;
@@ -2397,6 +2414,103 @@ COperator.prototype.init = function(props, defaultProps)        // props (chr, t
         typeOper = BRACKET_EMPTY;
         operator = -1;
     }
+
+    //////////////////////////////////////
+
+    //////////     accents     //////////
+
+    //////////////////////////////////////
+
+    //////////   group characters   //////////
+
+    else if(code === 0x23DE || type == BRACKET_CURLY_TOP)
+    {
+        codeChr = 0x23DE;
+        typeOper = BRACKET_CURLY_TOP;
+
+        glyph = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM  )
+    {
+        glyph = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_MIRROR_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2190 || type === ARROW_LEFT)
+    {
+        glyph = new CSingleArrow();
+
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2192 || type === ARROW_RIGHT)
+    {
+        glyph = new CSingleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2194 || type === ARROW_LR)
+    {
+        glyph = new CLeftRightArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
+    {
+        glyph = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
+    {
+        glyph = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
+    {
+        glyph = new CLR_DoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+
+    //////////////////////////////////////////
+
+
     else if(code !== null)
     {
         operator = new CMathText();
@@ -3122,7 +3236,7 @@ CGroupCharacter.prototype.init = function(props)
     else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
         this.loc = LOCATION_BOT;
 
-    var type = props.chrType;
+    /*var type = props.chrType;
     var code = typeof(props.chr) === "string" ? props.chr.charCodeAt(0) : null;
 
     if( typeof(type) === "undefined"|| type === null && code === null )
@@ -3134,9 +3248,12 @@ CGroupCharacter.prototype.init = function(props)
     var glyph = this.getGlyph(code, type);
 
     if(glyph.bArrow)
-        this.setReduct(DEGR_REDUCT);
+        this.setReduct(DEGR_REDUCT);*/
 
-    this.setOperator(new COperator(glyph));
+    /*this.setOperator(new COperator(glyph));*/
+
+    if(this.operator.IsArrow())
+        this.setReduct(DEGR_REDUCT); /// заменить впоследствии на более подходящую функцию
 }
 CGroupCharacter.prototype.getCenter = function()
 {

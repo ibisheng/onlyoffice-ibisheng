@@ -3748,14 +3748,26 @@ CMathContent.prototype =
         var state = true,
             SelectContent = null, CurrContent = null;
 
+        var currType = this.content[this.CurPos].value.typeObj;
+        var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
+
         if(this.IsPlaceholder())
         {
             var movement = this.Parent.cursor_moveLeft();
             CurrContent = SelectContent = movement.SelectContent;
         }
-        else if(this.CurPos!=1 || this.selection.startPos != this.selection.endPos) // не в начале
+        else if(bFirstRunPrp)
         {
-            var currType = this.content[this.CurPos].value.typeObj;
+            if( ! this.bRoot )
+            {
+                var movement = this.Parent.cursor_moveLeft();
+                SelectContent = CurrContent = movement.SelectContent;
+            }
+            else
+                state = false;
+        }
+        else if(this.CurPos!=0 || this.selection.startPos != this.selection.endPos) // не в начале
+        {
 
             if(this.selection.startPos != this.selection.endPos)
             {
@@ -3804,21 +3816,17 @@ CMathContent.prototype =
             {
                 //если нет селекта, то просто перемещаемся по контенту
 
-                var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
 
-                if(!bFirstRunPrp)  // иначе, по контенту не перемещаемся
-                {
-                    var prevType = this.content[this.CurPos - 1].value.typeObj,
-                        prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
+                var prevType = this.content[this.CurPos - 1].value.typeObj,
+                    prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
 
-                    var bDiffRPrp = prevType === MATH_RUN_PRP && prev2_Type == MATH_TEXT,
-                        bRPrComp = currType === MATH_RUN_PRP && prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
+                var bDiffRPrp = prevType === MATH_RUN_PRP && prev2_Type == MATH_TEXT,
+                    bRPrComp = currType === MATH_RUN_PRP && prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
 
-                    if(bDiffRPrp || bRPrComp)
-                        this.CurPos -= 2;
-                    else
-                        this.CurPos--;
-                }
+                if(bDiffRPrp || bRPrComp)
+                    this.CurPos -= 2;
+                else
+                    this.CurPos--;
 
                 if( this.content[this.CurPos].value.typeObj === MATH_COMP ) // this.CurPos может измениться
                 {
@@ -3826,6 +3834,7 @@ CMathContent.prototype =
                 }
                 else
                     CurrContent = SelectContent = this;
+
             }
 
             this.setStart_Selection(this.CurPos);
@@ -3833,6 +3842,9 @@ CMathContent.prototype =
 
         }
         else
+            state = false;
+
+        /*else
         {
             if( ! this.bRoot )
             {
@@ -3841,7 +3853,7 @@ CMathContent.prototype =
             }
             else
                 state = false;
-        }
+        }*/
 
         return {state: state, SelectContent: SelectContent, CurrContent: CurrContent };
     },
@@ -5198,7 +5210,7 @@ CMathContent.prototype =
             {
                 runPrp.Merge(this.Parent.getCtrPrp());
             }
-            else if(this.CurPos == 1 && this.content[1].value.typeObj == MATH_COMP)
+            else if(this.CurPos == 0 && this.content[1].value.typeObj == MATH_COMP)
             {
                 runPrp.Merge(this.content[1].value.getCtrPrp());
             }
@@ -5984,7 +5996,7 @@ CMathComposition.prototype =
     {
         return this.Root.getFirstPrp();
     },
-    Cursor_MoveRight: function()
+    Cursor_MoveRight_2: function()
     {
         this.ClearSelect();
         var move = this.SelectContent.cursor_moveRight();
@@ -5996,16 +6008,30 @@ CMathComposition.prototype =
             this.SelectContent = move.SelectContent;
             this.CurrentContent = move.CurrContent;
 
-            //this.CheckTarget();
+            this.CheckTarget();
         }
 
-        console.log("Cursor_MoveRight:   " + move.state);
+        return move.state;
+    },
+    Cursor_MoveLeft_2: function()
+    {
+        this.ClearSelect();
+        var move = this.SelectContent.cursor_moveLeft();
+
+        if(move.state)
+        {
+            this.SelectContent = move.SelectContent;
+            this.CurrentContent = move.CurrContent;
+
+            this.CheckTarget();
+        }
+
 
         return move.state;
     },
     Cursor_MoveLeft: function()
     {
-        this.ClearSelect();
+        //this.ClearSelect();
         var move = this.SelectContent.cursor_moveLeft();
 
         if(move.state)
@@ -6017,6 +6043,23 @@ CMathComposition.prototype =
         }
 
         console.log("Cursor_MoveLeft:   " + move.state);
+
+        return move.state;
+    },
+    Cursor_MoveRight: function()
+    {
+        //this.ClearSelect();
+        var move = this.SelectContent.cursor_moveRight();
+
+        //передаем состояние, т.к. можем выйти за пределы формулы
+        if(move.state)
+        {
+            // SelectContent == CurrentContent
+            this.SelectContent = move.SelectContent;
+            this.CurrentContent = move.CurrContent;
+
+            //this.CheckTarget();
+        }
 
         return move.state;
     },
@@ -6454,14 +6497,14 @@ CMathComposition.prototype =
         //стрелка влево
         if(e.KeyCode==37)
         {
-            this.Cursor_MoveLeft();
+            this.Cursor_MoveLeft_2();
 
             return true;
         }
         //стрелка вправо
         else if(e.KeyCode==39)
         {
-            this.Cursor_MoveRight();
+            this.Cursor_MoveRight_2();
 
             return true;
         }
@@ -6470,7 +6513,7 @@ CMathComposition.prototype =
         {
             try
             {
-                if(this.Remove(1))
+                if(this.Remove_2(1))
                 {
                     //this.UpdatePosition();
                     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
@@ -6487,7 +6530,7 @@ CMathComposition.prototype =
         //delete
         else if ( e.KeyCode == 46)
         {
-            if(this.Remove(-1))
+            if(this.Remove_2(-1))
             {
                 //this.UpdatePosition();
                 editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
