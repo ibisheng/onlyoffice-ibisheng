@@ -123,6 +123,7 @@
 			this.callTopLineMouseup = false;
 			this.lastKeyCode = undefined;
 			this.m_nEditorState		= null;			// Состояние редактора
+			this.isUpdateValue = true;				// Обновлять ли состояние строки при вводе в TextArea
 			//-----------------
 
 			this.init();
@@ -206,7 +207,8 @@
 						.off("." + namespace)
 						.on("focus."     + namespace, function () {return t.isOpened ? t._topLineGotFocus.apply(t, arguments) : true;})
 						.on("mousedown." + namespace, function () {return t.isOpened ? (t.callTopLineMouseup = true, true) : true;})
-						.on("mouseup."   + namespace, function () {return t.isOpened ? t._topLineMouseUp.apply(t, arguments) : true;});
+						.on("mouseup."   + namespace, function () {return t.isOpened ? t._topLineMouseUp.apply(t, arguments) : true;})
+						.on("input."     + namespace, function () {return t._onInputTextArea.apply(t, arguments);});
 
 				// check input, it may have zero len, for mobile version
 				if(t.input[0])
@@ -1345,7 +1347,7 @@
 				t.selectionBegin = begPos;
 				t.selectionEnd = endPos;
 				t._drawSelection();
-				if (t.isTopLineActive) {t._updateTopLineCurPos();}
+				if (t.isTopLineActive && !t.skipTLUpdate) {t._updateTopLineCurPos();}
 			},
 
 			_changeSelection: function (coord) {
@@ -1846,6 +1848,7 @@
 				}
 
 				//t.setFocus(true);
+				t.isUpdateValue = false;
 				t._addChars(String.fromCharCode(event.which));
 				return t.isTopLineActive ? true : false; // prevent event bubbling
 			},
@@ -1932,6 +1935,17 @@
 
 				t._moveCursor(kPosition, startWord);
 				t._selectChars(kPosition, endWord);
+				return true;
+			},
+
+			/** @param event {jQuery.Event} */
+			_onInputTextArea: function (event) {
+				if (this.isUpdateValue) {
+					// Для языков с иероглифами не приходят эвенты с клавиатуры, поэтому обработаем здесь
+					this.skipTLUpdate = true;
+					this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.val());
+				}
+				this.isUpdateValue = true;
 				return true;
 			},
 
