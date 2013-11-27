@@ -3753,7 +3753,7 @@ CMathContent.prototype =
             var movement = this.Parent.cursor_moveLeft();
             CurrContent = SelectContent = movement.SelectContent;
         }
-        else if(this.CurPos!=0 || this.selection.startPos != this.selection.endPos)
+        else if(this.CurPos!=1 || this.selection.startPos != this.selection.endPos) // не в начале
         {
             var currType = this.content[this.CurPos].value.typeObj;
 
@@ -3842,7 +3842,6 @@ CMathContent.prototype =
             else
                 state = false;
         }
-
 
         return {state: state, SelectContent: SelectContent, CurrContent: CurrContent };
     },
@@ -4498,6 +4497,7 @@ CMathContent.prototype =
     },
     remove_internal: function(order)
     {
+        var items = null;
         var bDelete = false;
         var bSelect = this.selection.startPos !== this.selection.endPos;
         var currType = this.content[this.CurPos].value.typeObj,
@@ -5996,8 +5996,10 @@ CMathComposition.prototype =
             this.SelectContent = move.SelectContent;
             this.CurrentContent = move.CurrContent;
 
-            this.CheckTarget();
+            //this.CheckTarget();
         }
+
+        console.log("Cursor_MoveRight:   " + move.state);
 
         return move.state;
     },
@@ -6011,8 +6013,10 @@ CMathComposition.prototype =
             this.SelectContent = move.SelectContent;
             this.CurrentContent = move.CurrContent;
 
-            this.CheckTarget();
+            //this.CheckTarget();
         }
+
+        console.log("Cursor_MoveLeft:   " + move.state);
 
         return move.state;
     },
@@ -6090,15 +6094,16 @@ CMathComposition.prototype =
 
         var result = this.SelectContent.remove(order);
 
+        this.NeedRecalculate = result.state.bDelete;
+        var bRoot = this.SelectContent.bRoot === true,
+            bToUpper = result.state.bBegin || result.state.bEnd; // наверх нужно ли прокидовать
 
         this.CurrentContent = result.CurrContent;
         this.SelectContent  = result.SelectContent;
-
         this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
 
-        this.NeedRecalculate = result.state.bDelete;
 
-        return !(result.state.bBegin || result.state.bEnd);
+        return !(bRoot && bToUpper); // посылаем false, если в начале + backspace или в конце + delete
     },
     Remove_2: function(order)
     {
@@ -6649,7 +6654,7 @@ CMathComposition.prototype =
         var bPlh = this.SelectContent.IsPlaceholder(),
             bNotSelect = !this.SelectContent.selectUse();
 
-        return !bPlh && !this.SelectContent.selectUse();
+        return !bPlh && bNotSelect;
     },
     Selection_Check: function(X, Y)
     {
