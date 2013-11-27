@@ -2257,7 +2257,7 @@
                 var h  = this.rows[rowB].top + this.rows[rowB].height - offsetY - y1;
                 var x2 = x1 + w - (isTrimmedR ? 0 : this.width_1px);
                 var y2 = y1 + h - this.height_1px;
-                var bl = !isMerged ? (y2 - this.rows[rowB].descender) : (y2 - ct.metrics.height + ct.metrics.baseline);
+                var bl = !isMerged ? (y2 - this.rows[rowB].descender) : (y2 - ct.metrics.height + ct.metrics.baseline - this.height_1px);
                 var x1ct  = isMerged ? x1 : this.cols[col].left - offsetX;
                 var x2ct  = isMerged ? x2 : x1ct + this.cols[col].width - this.width_1px;
                 var textX = this._calcTextHorizPos(x1ct, x2ct, ct.metrics, ct.cellHA);
