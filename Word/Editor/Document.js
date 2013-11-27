@@ -8412,16 +8412,31 @@ CDocument.prototype =
                 //не возвращаем true чтобы не было preventDefault
             }
         }
-        else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
+        else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + E + ...
         {
-            var ParaPr = this.Get_Paragraph_ParaPr();
-            if ( null != ParaPr )
+            if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+                var ParaPr = this.Get_Paragraph_ParaPr();
+                if ( null != ParaPr )
+                {
+                    if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+                    {
+                        this.Create_NewHistoryPoint();
+                        this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
+                        this.Document_UpdateInterfaceState();
+                    }
+                    bRetValue = true;
+                }
+            }
+            else // Ctrl + Alt + E - добавляем знак евро €
+            {
+                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
                     this.Create_NewHistoryPoint();
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
-                    this.Document_UpdateInterfaceState();
+
+                    this.DrawingDocument.TargetStart();
+                    this.DrawingDocument.TargetShow();
+                    this.Paragraph_Add( new ParaText( "€" ) );
                 }
                 bRetValue = true;
             }

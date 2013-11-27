@@ -7556,9 +7556,23 @@ ParaMath.prototype =
         return true;
     },
 
+    Add : function(Item)
+    {
+        var Type = Item.Type;
+
+        if ( para_Text === Type )
+            this.Math.AddLetter( Item.Value.charCodeAt(0) );
+        else if ( para_Space === Type )
+            this.Math.AddLetter( 0x0020 );
+    },
+
+    Remove : function(Order, bOnAddText)
+    {
+        return this.Math.Remove(Order, bOnAddText);
+    },
+
     RecalculateCurPos : function()
     {
-        console.log("RecalculateCurPos");
         this.Math.UpdateCursor();
     },
 
@@ -7592,6 +7606,11 @@ ParaMath.prototype =
         return this.Math.Selection_IsEmpty();
     },
 
+    Selection_IsUse : function()
+    {
+        return true;
+    },
+
     Selection_Remove : function()
     {
 
@@ -7599,9 +7618,25 @@ ParaMath.prototype =
 
     Selection_Check : function(X, Y, Page_Abs)
     {
-        var check = this.Math.Selection_Check(X, Y);
-        console.log("Selection_Check:   "+ check);
-        return check;
+        return this.Math.Selection_Check(X, Y);
+    },
+
+    Cursor_MoveLeft : function(bShiftKey, bCtrlKey)
+    {
+        return this.Math.Cursor_MoveLeft(bShiftKey, bCtrlKey);
+    },
+
+    Cursor_MoveRight : function(bShiftKey, bCtrlKey)
+    {
+        return this.Math.Cursor_MoveRight(bShiftKey, bCtrlKey);
+    },
+
+    Cursor_MoveToStartPos : function()
+    {
+    },
+
+    Cursor_MoveToEndPos : function()
+    {
     },
 
     Copy : function()

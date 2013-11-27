@@ -5347,7 +5347,7 @@ Paragraph.prototype =
     // nCount - количество удаляемых элементов, > 0 удаляем элементы после курсора
     //                                          < 0 удаляем элементы до курсора
     // bOnlyText - true: удаляем только текст и пробелы, false - Удаляем любые элементы
-    Remove : function(nCount, bOnlyText)
+    Remove : function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
     {
         this.Internal_Remove_CollaborativeMarks(true);
 
@@ -5356,18 +5356,47 @@ Paragraph.prototype =
         // Сначала проверим имеется ли у нас селект
         if ( true === this.Selection.Use )
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+            var StartPos  = this.Selection.StartPos;
+            var EndPos    = this.Selection.EndPos;
+            var StartPos2 = this.Selection.StartPos2;
+            var EndPos2   = this.Selection.EndPos2;
 
             if ( StartPos > EndPos )
             {
                 var Temp = EndPos;
                 EndPos   = StartPos;
                 StartPos = Temp;
+
+                var Temp2 = EndPos2;
+                EndPos2   = StartPos2;
+                StartPos2 = Temp2;
             }
 
             if ( EndPos >= this.Content.length - 1 )
             {
+                var CurPos2 = -1;
+                if ( undefined !== this.Content[StartPos2] && para_Math === this.Content[StartPos2].Type )
+                {
+                    if ( false === this.Content[StartPos2].Remove(nCount, bOnAddText) )
+                    {
+                        // Нам нужно удалить данный элемент
+                        this.Internal_Content_Remove( StartPos2, 1 );
+                        if ( StartPos > StartPos2 )
+                            StartPos--;
+
+                        if ( EndPos > StartPos2 )
+                            EndPos--;
+                    }
+                    else
+                    {
+                        // Нам нужно удалить данный элемент
+                        if ( StartPos === StartPos2 )
+                            StartPos++;
+
+                        CurPos2 = StartPos2;
+                    }
+                }
+
                 for ( var Index = StartPos; Index < this.Content.length - 2; Index++ )
                 {
                     var Item = this.Content[Index];
@@ -5396,6 +5425,7 @@ Paragraph.prototype =
                     StartPos = Temp;
                 }
 
+                this.CurPos.ContentPos2 = StartPos2;
                 this.Set_ContentPos( StartPos, true, -1 );
 
                 if ( null != Hyper_start )
@@ -5409,6 +5439,58 @@ Paragraph.prototype =
             }
             else
             {
+                var CurPos2 = -1;
+                if ( undefined !== this.Content[EndPos2] && para_Math === this.Content[EndPos2].Type )
+                {
+                    if ( false === this.Content[EndPos2].Remove(nCount, bOnAddText) )
+                    {
+                        // Нам нужно удалить данный элемент
+                        this.Internal_Content_Remove( EndPos2, 1 );
+                    }
+                    else
+                    {
+                        if ( StartPos2 === EndPos2 )
+                            CurPos2 = StartPos2;
+                    }
+
+
+                    if ( EndPos > EndPos2 )
+                        EndPos--;
+                }
+
+                if ( undefined !== this.Content[StartPos2] && para_Math === this.Content[StartPos2].Type && StartPos2 !== EndPos2 )
+                {
+                    if ( false === this.Content[EndPos2].Remove(nCount, bOnAddText) )
+                    {
+                        // Нам нужно удалить данный элемент
+                        this.Internal_Content_Remove( EndPos2, 1 );
+
+                        if ( StartPos > StartPos2 )
+                            StartPos--;
+
+                        if ( EndPos > StartPos2 )
+                            EndPos--;
+                    }
+                    else
+                    {
+                        if ( StartPos === StartPos2 )
+                            StartPos++;
+
+                        if ( EndPos === StartPos2 )
+                            EndPos--;
+
+                        CurPos2 = StartPos2;
+                    }
+                }
+
+                if ( EndPos <= StartPos )
+                {
+                    this.CurPos.ContentPos2 = CurPos2;
+                    this.Set_ContentPos( StartPos, true, -1 );
+
+                    return true;
+                }
+
                 var Hyper_start = this.Check_Hyperlink2( StartPos );
                 var Hyper_end   = this.Check_Hyperlink2( EndPos );
 
@@ -5443,6 +5525,7 @@ Paragraph.prototype =
                 if ( null != LastTextPr )
                     this.Internal_Content_Add( StartPos, new ParaTextPr( LastTextPr.Value ) );
 
+                this.CurPos.ContentPos2 = CurPos2;
                 this.Set_ContentPos( StartPos, true, -1 );
 
                 if ( Hyper_start != Hyper_end )
@@ -5500,7 +5583,34 @@ Paragraph.prototype =
     Internal_RemoveBackward : function(bOnlyText)
     {
         var Line = this.Content;
-        var CurPos = this.CurPos.ContentPos;
+        var CurPos  = this.CurPos.ContentPos;
+        var CurPos2 = this.CurPos.ContentPos2;
+
+        var MathItem = this.Content[CurPos2];
+        if ( undefined !== MathItem && para_Math === MathItem.Type )
+        {
+            if ( false != MathItem.Remove(1) )
+            {
+                // TODO: тут надо проверить, не остался ли данный элемент пустым
+
+                // После удаления в математическом элементе может остаться выделение
+                if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
+                {
+                    this.Selection.Use       = true;
+                    this.Selection.Start     = false;
+                    this.Selection.StartPos  = CurPos2;
+                    this.Selection.EndPos    = CurPos2 + 1;
+                    this.Selection.StartPos2 = CurPos2;
+                    this.Selection.EndPos2   = CurPos2;
+
+                    this.Document_SetThisElementCurrent();
+                }
+
+                return true;
+            }
+
+            CurPos = CurPos2;
+        }
 
         if ( !bOnlyText )
         {
@@ -5584,7 +5694,35 @@ Paragraph.prototype =
     Internal_RemoveForward : function(bOnlyText)
     {
         var Line = this.Content;
-        var CurPos = this.CurPos.ContentPos;
+        var CurPos  = this.CurPos.ContentPos;
+        var CurPos2 = this.CurPos.ContentPos2;
+
+        var MathItem = this.Content[CurPos2];
+        if ( undefined !== MathItem && para_Math === MathItem.Type )
+        {
+            if ( false != MathItem.Remove(-1) )
+            {
+                // TODO: тут надо проверить, не остался ли данный элемент пустым
+
+
+                // После удаления в математическом элементе может остаться выделение
+                if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
+                {
+                    this.Selection.Use       = true;
+                    this.Selection.Start     = false;
+                    this.Selection.StartPos  = CurPos2;
+                    this.Selection.EndPos    = CurPos2 + 1;
+                    this.Selection.StartPos2 = CurPos2;
+                    this.Selection.EndPos2   = CurPos2;
+
+                    this.Document_SetThisElementCurrent();
+                }
+
+                return true;
+            }
+
+            CurPos = CurPos2 + 1;
+        }
 
         if ( !bOnlyText )
         {
@@ -5792,7 +5930,8 @@ Paragraph.prototype =
     // Добавляем новый элемент к содержимому параграфа (на текущую позицию)
     Add : function(Item)
     {
-        var CurPos = this.CurPos.ContentPos;
+        var CurPos  = this.CurPos.ContentPos;
+        var CurPos2 = this.CurPos.ContentPos2;
 
         if ( "undefined" != typeof(Item.Parent) )
             Item.Parent = this;
@@ -5800,13 +5939,13 @@ Paragraph.prototype =
         switch (Item.Type)
         {
             case para_Text:
-            {
-                this.Internal_Content_Add( CurPos, Item );
-                break;
-            }
             case para_Space:
             {
-                this.Internal_Content_Add( CurPos, Item );
+                if ( undefined !== this.Content[CurPos2] && para_Math === this.Content[CurPos2].Type )
+                    this.Content[CurPos2].Add( Item );
+                else
+                    this.Internal_Content_Add( CurPos, Item );
+
                 break;
             }
             case para_TextPr:
@@ -6766,18 +6905,21 @@ Paragraph.prototype =
     {
         this.Selection.Use = false;
         this.Set_ContentPos( this.Internal_GetStartPos(), true, -1 );
+        this.CurPos.ContentPos2 = -1;
     },
 
     Cursor_MoveToEndPos : function()
     {
         this.Selection.Use = false;
         this.Set_ContentPos( this.Internal_GetEndPos(), true, -1 );
+        this.CurPos.ContentPos2 = -1;
     },
 
     Cursor_MoveToNearPos : function(NearPos)
     {
         this.Selection.Use = false;
         this.Set_ContentPos( NearPos.ContentPos, true, -1 );
+        this.CurPos.ContentPos2 = -1;
     },
 
     Cursor_MoveUp_To_LastRow : function(X, Y, AddToSelect)
@@ -6938,6 +7080,21 @@ Paragraph.prototype =
         return this.Selection.Use;
     },
 
+    Internal_SelectMath : function(Pos)
+    {
+        if ( undefined === this.Content[Pos] || para_Math != this.Content[Pos].Type )
+            return;
+
+        this.Selection.Use       = true;
+        this.Selection.Start     = false;
+        this.Selection.StartPos  = Pos;
+        this.Selection.EndPos    = Pos + 1;
+        this.Selection.StartPos2 = Pos;
+        this.Selection.EndPos2   = Pos;
+
+        this.Document_SetThisElementCurrent();
+    },
+
     // Функция определяет начальную позицию курсора в параграфе
     Internal_GetStartPos : function()
     {
@@ -6974,17 +7131,39 @@ Paragraph.prototype =
                 // В случае селекта, убираем селект и перемещаем курсор в начало селекта
                 var StartPos = this.Selection.StartPos;
                 var EndPos   = this.Selection.EndPos;
+                var StartPos  = this.Selection.StartPos;
+                var EndPos    = this.Selection.EndPos;
+                var StartPos2 = this.Selection.StartPos2;
+                var EndPos2   = this.Selection.EndPos2;
 
                 if ( StartPos > EndPos )
                 {
                     var Temp = EndPos;
                     EndPos   = StartPos;
                     StartPos = Temp;
+
+                    var Temp2 = EndPos2;
+                    EndPos2   = StartPos2;
+                    StartPos2 = Temp2;
                 }
 
                 this.Selection_Remove();
-                this.Set_ContentPos( StartPos, true, -1 );
-                return;
+
+                if ( undefined != this.Content[StartPos2] && para_Math === this.Content[StartPos2].Type )
+                {
+                    this.Set_ContentPos( StartPos, true, -1 );
+                    this.CurPos.ContentPos2 = StartPos2;
+
+                    if ( true === this.Content[StartPos2].Cursor_MoveLeft(AddToSelect, Word) )
+                    {
+                        if ( true === this.Content[StartPos2].Selection_IsUse() && false === this.Content[StartPos2].Selection_IsEmpty() )
+                            this.Internal_SelectMath( StartPos2 );
+                    }
+                }
+                else
+                    this.Set_ContentPos( StartPos, true, -1 );
+
+                return true;
             }
         }
 
@@ -7048,6 +7227,24 @@ Paragraph.prototype =
         }
         else
         {
+            var CurPos2  = this.CurPos.ContentPos2;
+            var MathItem = this.Content[CurPos2];
+            if ( undefined !== MathItem && para_Math === MathItem.Type )
+            {
+                if ( true === MathItem.Cursor_MoveLeft(false, Word) )
+                {
+                    if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
+                        this.Internal_SelectMath( CurPos2 );
+
+                    return true;
+                }
+                else
+                {
+                    this.CurPos.ContentPos  = CurPos2 + 1;
+                    this.CurPos.ContensPos2 = -1;
+                }
+            }
+
             var oPos;
 
             if ( true != Word )
@@ -7058,6 +7255,15 @@ Paragraph.prototype =
             if ( oPos.Found )
             {
                 this.Set_ContentPos( oPos.LetterPos, true, -1 );
+
+                if ( para_Math === oPos.Type )
+                {
+                    this.CurPos.ContentPos2 = oPos.LetterPos;
+                    this.Content[oPos.LetterPos].Cursor_MoveToEndPos();
+                }
+                else
+                    this.CurPos.ContentPos2 = -1;
+
                 return true;
             }
             else
@@ -7229,18 +7435,38 @@ Paragraph.prototype =
             else
             {
                 // В случае селекта, убираем селект и перемещаем курсор в конец селекта
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
+                var StartPos  = this.Selection.StartPos;
+                var EndPos    = this.Selection.EndPos;
+                var StartPos2 = this.Selection.StartPos2;
+                var EndPos2   = this.Selection.EndPos2;
 
                 if ( StartPos > EndPos )
                 {
                     var Temp = EndPos;
                     EndPos   = StartPos;
                     StartPos = Temp;
+
+                    var Temp2 = EndPos2;
+                    EndPos2   = StartPos2;
+                    StartPos2 = Temp2;
                 }
 
                 this.Selection_Remove();
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ), true, -1 );
+
+                if ( undefined != this.Content[EndPos2] && para_Math === this.Content[EndPos2].Type )
+                {
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ), true, -1 );
+                    this.CurPos.ContentPos2 = EndPos2;
+
+                    if ( true === this.Content[EndPos2].Cursor_MoveRight(AddToSelect, Word) )
+                    {
+                        if ( true === this.Content[EndPos2].Selection_IsUse() && false === this.Content[EndPos2].Selection_IsEmpty() )
+                            this.Internal_SelectMath( EndPos2 );
+                    }
+                }
+                else
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ), true, -1 );
+
                 return true;
             }
         }
@@ -7304,11 +7530,29 @@ Paragraph.prototype =
         }
         else
         {
+            var CurPos2  = this.CurPos.ContentPos2;
+            var MathItem = this.Content[CurPos2];
+            if ( undefined !== MathItem && para_Math === MathItem.Type )
+            {
+                if ( true === MathItem.Cursor_MoveRight(false, Word) )
+                {
+                    if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
+                        this.Internal_SelectMath( CurPos2 );
+
+                    return true;
+                }
+                else
+                {
+                    this.CurPos.ContentPos  = CurPos2;
+                    this.CurPos.ContentPos2 = -1;
+                }
+            }
+
             var oPos;
 
             if ( true != Word )
             {
-                oPos = this.Internal_FindForward( this.CurPos.ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+                oPos = this.Internal_FindForward( this.CurPos.ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
                 if ( oPos.Found )
                     oPos.LetterPos++;
             }
@@ -7318,6 +7562,15 @@ Paragraph.prototype =
             if ( oPos.Found )
             {
                 this.Set_ContentPos( oPos.LetterPos, true, -1 );
+
+                if ( para_Math === oPos.Type )
+                {
+                    this.CurPos.ContentPos2 = oPos.LetterPos - 1;
+                    this.Content[oPos.LetterPos - 1].Cursor_MoveToStartPos();
+                }
+                else
+                    this.CurPos.ContentPos2 = -1;
+
                 return true;
             }
             else
