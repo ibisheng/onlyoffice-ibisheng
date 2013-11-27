@@ -16,10 +16,9 @@ var asc_floor = asc.floor;
 
 function colorObjToAscColor(color) {
 	var oRes = null;
-	var n = color.getRgb();
-	var r = (n >> 16) & 0xff;
-	var g = (n >> 8) & 0xff;
-	var b = n & 0xff;
+	var r = color.getR();
+	var g = color.getG();
+	var b = color.getB();
 	var bTheme = false;
 	if(color instanceof ThemeColor && null != color.theme)
 	{
@@ -101,10 +100,6 @@ function calcNearestPt(origPt, ppi, pxAddon) {
 	    y = x | x,
 	    p = x - y < .000000001 ? 0 : 1; // to fix float number precision caused by binary presentation
 	return (y + p + a) / ppi * 72;
-}
-
-function getOption(opt, name, def) {
-	return opt !== undefined && opt[name] !== undefined ? opt[name] : def;
 }
 
 function deg2rad(deg){

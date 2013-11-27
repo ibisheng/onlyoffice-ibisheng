@@ -179,7 +179,7 @@
 					color: new CColor(54, 54, 54)
 				}
 				],
-				cornerColor: "#C1C1C1"
+				cornerColor: new CColor(193, 193, 193)
 			};
 			this.cells = {
 				fontName: "Calibri",
@@ -1856,7 +1856,7 @@
 						.lineTo(x2 - dx, y2 - dy)
 						.lineTo(x1 + dx, y2 - dy)
 						.lineTo(x2 - dx, y1 + dy)
-						.setFillPattern(this.settings.header.cornerColor)
+						.setFillStyle(this.settings.header.cornerColor)
 						.fill();
 			},
 
