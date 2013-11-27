@@ -641,6 +641,10 @@
 					// Отсылаем эвент с объектами
 					this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 
+                    if(ct.target === "moveRange" && ctrlKey && ct.cursor == "move"){
+                        ct.cursor = "copy";
+                    }
+
 					if (canvasElem.style.cursor !== ct.cursor) {
 						canvasElem.style.cursor = ct.cursor;
 					}

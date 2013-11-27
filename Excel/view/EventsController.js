@@ -1336,6 +1336,12 @@
 
 				// Режим перемещения диапазона
 				if (t.isMoveRangeMode) {
+                    if(event.ctrlKey){
+                        event.currentTarget.style.cursor = "copy";
+                    }
+                    else{
+                        event.currentTarget.style.cursor = "move";
+                    }
 					t._moveRangeHandle(event);
 					return true;
 				}

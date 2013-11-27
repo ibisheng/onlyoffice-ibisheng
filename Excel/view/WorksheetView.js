@@ -6828,18 +6828,20 @@
 						History.SetSelection(arnFrom.clone());
 						History.SetSelectionRedo(arnTo.clone());
 						History.StartTransaction();
-						t.autoFilters._preMoveAutoFilters(arnFrom);
+                        if( !copyRange ) t.autoFilters._preMoveAutoFilters(arnFrom);
 						t.model._moveRange(arnFrom, arnTo, copyRange);
 						t._updateCellsRange(arnTo);
 						t.cleanSelection();
 						t.activeRange = arnTo.clone(true);
 						t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 						t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
-						t.autoFilters._moveAutoFilters(arnTo, arnFrom);
-						// Вызываем функцию пересчета для заголовков форматированной таблицы
-						t.autoFilters._renameTableColumn(arnFrom);
-						t.autoFilters._renameTableColumn(arnTo);
-						t.autoFilters.reDrawFilter(arnFrom);
+                        if( !copyRange ) {
+                            t.autoFilters._moveAutoFilters(arnTo, arnFrom);
+						    // Вызываем функцию пересчета для заголовков форматированной таблицы
+                            t.autoFilters._renameTableColumn( arnFrom );
+                            t.autoFilters._renameTableColumn( arnTo );
+                            t.autoFilters.reDrawFilter( arnFrom );
+                        }
 						History.EndTransaction();
 					}
 					

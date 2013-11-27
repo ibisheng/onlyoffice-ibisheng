@@ -608,13 +608,15 @@ UndoRedoData_FromToRowCol.prototype = {
 	}
 };
 
-function UndoRedoData_FromTo(from, to){
+function UndoRedoData_FromTo(from, to, copyRange){
 	this.Properties = {
 		from: 0,
-		to: 1
+		to: 1,
+        copyRange: 2
 	};
 	this.from = from;
 	this.to = to;
+    this.copyRange = copyRange;
 }
 UndoRedoData_FromTo.prototype = {
 	getType : function()
@@ -631,6 +633,7 @@ UndoRedoData_FromTo.prototype = {
 		{
 			case this.Properties.from: return this.from;break;
 			case this.Properties.to: return this.to;break;
+			case this.Properties.copyRange: return this.copyRange;break;
 		}
 	},
 	setProperty : function(nType, value)
@@ -639,6 +642,7 @@ UndoRedoData_FromTo.prototype = {
 		{
 			case this.Properties.from: this.from = value;break;
 			case this.Properties.to: this.to = value;break;
+			case this.Properties.copyRange: this.copyRange = value;break;
 		}
 	}
 };
@@ -3162,6 +3166,7 @@ UndoRedoWoorksheet.prototype = {
 			//todo worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
 			var from = Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
 			var to = Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
+            var copyRange = Data.copyRange;
 
 			if(bUndo)
 			{
@@ -3186,10 +3191,10 @@ UndoRedoWoorksheet.prototype = {
 				coBBoxFrom.r2 = collaborativeEditing.getLockOtherRow2(		nSheetId, from.r2);
 				coBBoxFrom.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, from.c2);
 
-				ws._moveRange(coBBoxFrom, coBBoxTo);
+				ws._moveRange(coBBoxFrom, coBBoxTo, copyRange);
 			}
 			else{
-				ws._moveRange(from, to);
+				ws._moveRange(from, to, copyRange);
 			}
 			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			if(bUndo)//если на Undo перемещается диапазон из форматированной таблицы - стиль форматированной таблицы не должен цепляться

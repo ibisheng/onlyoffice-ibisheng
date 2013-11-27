@@ -3555,7 +3555,7 @@ Woorksheet.prototype._moveRecalcGraph=function(oBBoxFrom, offset){
 
     return rec;
 }
-Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
+Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	if(oBBoxFrom.isEqual(oBBoxTo))
 		return;
 	var oThis = this;
@@ -3575,12 +3575,16 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 			for(var j = oBBoxFrom.c1; j <= oBBoxFrom.c2; j++)
 			{
 				var cell = row.c[j];
-				if(null != cell)
-					oTempRow[j + offset.offsetCol] = cell;
+				if(null != cell){
+                    if(copyRange)
+					    oTempRow[j + offset.offsetCol] = cell.clone();
+                    else
+					    oTempRow[j + offset.offsetCol] = cell;
+                }
 			}
 		}
 	}
-	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
+	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges && !copyRange)
 	{
 		var aMerged = this.mergeManager.get(oBBoxFrom);
 		if(aMerged.inner.length > 0)
@@ -3610,56 +3614,56 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 	//перемещаем без истории
 	History.TurnOff();
 	//удаляем from без истории, потому что эти данные не терются а перемещаются
-	var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2);
-	oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
-		var row = oThis._getRowNoEmpty(nRow0);
-		if(null != row)
-			delete row.c[nCol0];
-	});
-	//lockDraw(this.workbook);
-    var rec = this._moveRecalcGraph(oBBoxFrom, offset);
-	for(var i in aTempObj.cells)
-	{
-		var oTempRow = aTempObj.cells[i];
-		var row = this._getRow(i - 0);
-		for(var j in oTempRow)
-		{
-			var oTempCell = oTempRow[j];
-			if(null != oTempCell)
-			{
-				oTempCell.moveHor(offset.offsetCol);
-				oTempCell.moveVer(offset.offsetRow);
-				row.c[j] = oTempCell;
-				// var sFormula = oTempCell.getFormula();
-				// if("" != sFormula)
-					// oTempCell.setValue("=" + sFormula);
+	var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 ), rec = {length:0};
+    if(!copyRange || (copyRange && this.workbook.bUndoChanges)){
+        oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
+            var row = oThis._getRowNoEmpty(nRow0);
+            if(null != row)
+                delete row.c[nCol0];
+        });
+    }
+    if(!copyRange){
+        rec = this._moveRecalcGraph(oBBoxFrom, offset);
+    }
 
-                if( oTempCell.sFormula ){
+    for ( var i in aTempObj.cells ) {
+        var oTempRow = aTempObj.cells[i];
+        var row = this._getRow( i - 0 );
+        for ( var j in oTempRow ) {
+            var oTempCell = oTempRow[j];
+            if ( null != oTempCell ) {
+                oTempCell.moveHor( offset.offsetCol );
+                oTempCell.moveVer( offset.offsetRow );
+                row.c[j] = oTempCell;
+
+                if ( oTempCell.sFormula ) {
                     this.workbook.cwf[this.Id].cells[oTempCell.getName()] = oTempCell.getName();
                     rec[ oTempCell.getName() ] = [ this.Id, oTempCell.getName() ];
                     rec.length++;
+                    if(copyRange){
+                        oTempCell.formulaParsed = new parserFormula( oTempCell.sFormula, oTempCell.oId.getID(), this );
+                        oTempCell.formulaParsed.parse();
+                        oTempCell.formulaParsed = oTempCell.formulaParsed.changeOffset(offset);
+                        oTempCell.sFormula = oTempCell.formulaParsed.assemble();
+                    }
                 }
-			}
-		}
-	}
-
-    var move = this.workbook.dependencyFormulas.helper(oBBoxTo,this.Id);
-    for(var id in move.recalc){
-        var n = move.recalc[id];
-        var _sn = n.getSlaveEdges2();
-        for( var _id in _sn ){
-            rec[_sn[_id].nodeId] = [ _sn[_id].sheetId, _sn[_id].cellId ];
-            rec.length++;
+            }
         }
     }
 
-	this.workbook.buildDependency();
-	this.workbook.needRecalc = rec;
-	recalc(this.workbook);
+    if(!copyRange){
+        var move = this.workbook.dependencyFormulas.helper(oBBoxTo,this.Id);
+        for(var id in move.recalc){
+            var n = move.recalc[id];
+            var _sn = n.getSlaveEdges2();
+            for( var _id in _sn ){
+                rec[_sn[_id].nodeId] = [ _sn[_id].sheetId, _sn[_id].cellId ];
+                rec.length++;
+            }
+        }
+    }
+
 	
-	// this.renameDependencyNodes( offset, oBBoxFrom );
-	// buildRecalc(this.workbook);
-	// unLockDraw(this.workbook);
 	History.TurnOn();
 	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
 	{
@@ -3691,10 +3695,14 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 		this.nRowsCount = oBBoxTo.r2 + 1;
 	if(oBBoxTo.c2 > this.nColsCount)
 		this.nColsCount = oBBoxTo.c2 + 1;
-	
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
+
+
+    this.workbook.buildDependency();
+    this.workbook.needRecalc = rec;
+    recalc(this.workbook);
+    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
-				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo)));
+				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo), copyRange));
 	History.EndTransaction();
 	return true;
 }
@@ -4015,8 +4023,9 @@ Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDele
 			}
 		}
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell(), cellName = cell.getName();
+			var cell = _sn[_id].returnCell(), cellName;
 			if( cell && cell.formulaParsed ){
+                cellName = cell.getName();
 				cell.formulaParsed.stretchArea( objForRebuldFormula.stretch[id].offset, oBBox, n, this.Id );
 				cell.setFormula(cell.formulaParsed.assemble());
 				c[cellName] = cell;
