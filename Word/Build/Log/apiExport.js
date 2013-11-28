@@ -178,6 +178,7 @@ prop:Init
 prop:asc_getEditorPermissions
 prop:asc_getEditorPermissionsCallback
 prop:asc_setDocInfo
+prop:asc_setLocale
 prop:LoadDocument
 prop:SetFontsPath
 prop:SetTextBoxInputMode
@@ -1258,6 +1259,7 @@ asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
 asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
 asc_docs_api.prototype['asc_getEditorPermissionsCallback'] = asc_docs_api.prototype.asc_getEditorPermissionsCallback;
 asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
+asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
 asc_docs_api.prototype['SetFontsPath'] = asc_docs_api.prototype.SetFontsPath;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;

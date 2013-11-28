@@ -412,6 +412,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if(c_DocInfo)
 					this.DocInfo = c_DocInfo;			
 			},
+			asc_setLocale: function (val) {
+			},
 			asc_LoadDocument: function (c_DocInfo) {
 				var t = this;
 				
@@ -3289,6 +3291,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		prot["asc_Init"] = prot.asc_Init;
 		prot["asc_setDocInfo"] = prot.asc_setDocInfo;
+		prot["asc_setLocale"] = prot.asc_setLocale;
 		prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
 		prot["asc_LoadDocument"] = prot.asc_LoadDocument;
 		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;

@@ -526,6 +526,7 @@ function asc_docs_api(name)
     this.DocumentUrl = "";
     this.DocumentName = "";
 	this.DocInfo = null;
+	this.InterfaceLocale = null;
         
     this.ShowParaMarks = false;
 	this.isAddSpaceBetweenPrg = false;
@@ -887,6 +888,10 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 	if(c_DocInfo)
 		this.DocInfo = c_DocInfo;
 }
+asc_docs_api.prototype.asc_setLocale = function(val)
+{
+	this.InterfaceLocale = val;
+}
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
 
@@ -940,6 +945,12 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"create", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": g_sEmpty_bin};
 			sendCommand( oThis, function(){}, rData );
 			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
+			if(this.InterfaceLocale)
+			{
+				var nLocale = g_oLcidNameToIdMap[this.InterfaceLocale];
+				if(null != nLocale)
+					this.asc_setDefaultLanguage(nLocale);
+			}
 		}
 		else
 		{

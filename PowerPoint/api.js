@@ -759,6 +759,9 @@ asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 	if(c_DocInfo)
 		this.DocInfo = c_DocInfo;
 }
+asc_docs_api.prototype.asc_setLocale = function(val)
+{
+}
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
 
