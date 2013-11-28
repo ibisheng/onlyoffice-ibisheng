@@ -25,16 +25,11 @@ function convertFormula(formula, ws) {
 	var range = null;
 
 	if (formula && ws) {
-		var ref3D = parserHelp.is3DRef(formula, 0);
-		if (!ref3D[0])
-			range = ws.model.getRange2(formula.toUpperCase());
-		else {
-			var resultRef = parserHelp.parse3DRef(formula);
-			if (null !== resultRef) {
-				var ws = ws.model.workbook.getWorksheetByName(resultRef.sheet);
-				if (ws)
-					range = ws.getRange2(resultRef.range);
-			}
+		var result = parserHelp.parse3DRef(formula);
+		if (null !== result) {
+			var ws = ws.model.workbook.getWorksheetByName(result.sheet);
+			if (ws)
+				range = ws.getRange2(result.range);
 		}
 	}
 	return range;
@@ -2750,10 +2745,8 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.createDrawingObject = function() {
-	
-		var drawing = new DrawingBase(worksheet);
-		return drawing;
-	}
+		return new DrawingBase(worksheet);
+	};
 
 	_this.cloneDrawingObject = function(obj) {
 
