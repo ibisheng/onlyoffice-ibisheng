@@ -8360,7 +8360,18 @@
 					return;
 
 				var t = this;
+				var checkRange = null;
 				var arn = t.activeRange.clone(true);
+				if (c_oAscSelectionType.RangeMax === arn.type) {
+					checkRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+				} else if (c_oAscSelectionType.RangeCol === arn.type) {
+					checkRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+				} else if (c_oAscSelectionType.RangeRow === arn.type) {
+					checkRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+				} else {
+					checkRange = arn;
+				}
+
 				var range;
 				var fullRecalc = undefined;
 				var pad, cw;
@@ -8403,7 +8414,7 @@
 						functionModelAction = function () {
 							pad = t.width_padding * 2 + t.width_1px;
 							cw = t._charCountToModelColWidth(val, true);
-							t.model.setColWidth(cw, arn.c1, arn.c2);
+							t.model.setColWidth(cw, checkRange.c1, checkRange.c2);
 							isUpdateCols = true;
 							fullRecalc = true;
 						};
