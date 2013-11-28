@@ -2043,12 +2043,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var i = this.wbModel.getActive();
 				var sheetId = this.wbModel.getWorksheet(i).getId();
 				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
-				
-				// Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
-				for (var n = 0; n < this.wb.wsViews.length; n++) {
-					var ws = this.wb.wsViews[n];
-					ws.objectRender.updateChartReferences(this.wbModel.getWorksheet(i).sName, ws.model.sName);
-				}
 
 				var t = this;
 				var deleteCallback = function (res) {

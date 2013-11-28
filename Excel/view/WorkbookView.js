@@ -1063,7 +1063,7 @@
 				return this;
 			},
 
-			/** @param arrIndexes {Array} массив индексов */
+			/** @param nIndex {Number} массив индексов */
 			removeWorksheet: function (nIndex) {
 				this.wsViews.splice(nIndex, 1);
 				// Сбрасываем активный (чтобы не досчитывать после смены)
