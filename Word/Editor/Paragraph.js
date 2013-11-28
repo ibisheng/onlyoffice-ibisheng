@@ -5485,6 +5485,13 @@ Paragraph.prototype =
 
                 if ( EndPos <= StartPos )
                 {
+                    var MathItem = this.Content[CurPos2];
+                    if ( undefined !== MathItem && para_Math === MathItem.Type )
+                    {
+                        if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
+                            this.Internal_SelectMath( CurPos2 );
+                    }
+
                     this.CurPos.ContentPos2 = CurPos2;
                     this.Set_ContentPos( StartPos, true, -1 );
 
@@ -7240,7 +7247,7 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    this.CurPos.ContentPos  = CurPos2 + 1;
+                    this.CurPos.ContentPos  = CurPos2;
                     this.CurPos.ContensPos2 = -1;
                 }
             }
@@ -7543,7 +7550,7 @@ Paragraph.prototype =
                 }
                 else
                 {
-                    this.CurPos.ContentPos  = CurPos2;
+                    this.CurPos.ContentPos  = CurPos2 + 1;
                     this.CurPos.ContentPos2 = -1;
                 }
             }

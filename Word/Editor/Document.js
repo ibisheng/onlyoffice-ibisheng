@@ -2646,7 +2646,6 @@ CDocument.prototype =
                 // после удаления (если параграфы удалялись не целиком), либо следующий за ним, либо
                 // перед ним. В любом случае, ничего не испортится если мы у текущего параграфа удалим
                 // селект.
-                this.Content[this.CurPos.ContentPos].Selection_Remove();
                 this.ContentLastChangePos = this.CurPos.ContentPos;
                 this.Recalculate();
             }

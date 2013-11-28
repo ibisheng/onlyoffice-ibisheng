@@ -7607,16 +7607,12 @@ ParaMath.prototype =
 
     Selection_IsEmpty : function()
     {
-        var empty = this.Math.Selection_IsEmpty()
-        console.log("Selection_IsEmpty:  " +  empty);
-        return empty;
+        return this.Math.Selection_IsEmpty()
     },
 
     Selection_IsUse : function()
     {
-        //return true;
-        //var IsUse =
-        //return
+        return ( true === this.Math.Selection_IsEmpty() ? false : true );
     },
 
     Selection_Remove : function()
