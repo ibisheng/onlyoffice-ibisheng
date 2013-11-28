@@ -321,9 +321,6 @@ asc_CChart.prototype = {
 			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
 		}
 	
-		var api_doc = window["editor"];
-		var api_sheet = window["Asc"]["editor"];
-		
 		this.bChartEditor = true;
 		this.header.title = "2012 Olympics Medal Standings";
 		this.range.interval = "Sheet1!A1:D7";
@@ -585,9 +582,6 @@ asc_CChart.prototype = {
 		var _t = this;
 		var revSeries = [];
 		var serLen = _t.series.length;
-		var api_doc = window["editor"];
-		var api_sheet = window["Asc"]["editor"];
-		var api = api_sheet ? api_sheet : api_doc;
 		
 		var aData = [];
 		for (var j = 0; j < _t.series.length; j++) {
@@ -595,7 +589,7 @@ asc_CChart.prototype = {
 			aData.push(_t.series[j].xVal.NumCache.length);
 			aData.push(_t.series[j].Cat.NumCache.length);
 		}
-		maxDataLen = Math.max.apply(Math, aData);
+		var maxDataLen = Math.max.apply(Math, aData);
 		var emptyItem = { numFormatStr: "General", isDateTimeFormat: false, val: "", isHidden: false };
 		
 		for (var j = 0; j < _t.series.length; j++) {
