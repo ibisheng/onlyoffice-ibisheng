@@ -284,7 +284,7 @@ CMathBase.prototype =
         }
         else
         {
-            this.elements[ this.CurPos_X ][ this.CurPos_Y].end();
+            this.elements[ this.CurPos_X ][ this.CurPos_Y].cursor_MoveToEndPos(); //  end => cursor_MoveToEndPos
             content = this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement(); //если внутренний элемент не контент, а базовый класс, вернется последний элемент этого класса
         }
 
@@ -319,7 +319,7 @@ CMathBase.prototype =
         }
         else
         {
-            this.elements[ this.CurPos_X ][ this.CurPos_Y ].home();
+            this.elements[ this.CurPos_X ][ this.CurPos_Y ].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
             content = this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
         } //если внутренний элемент не контент, а базовый класс, вернется первый элемент этого класса
 
@@ -359,7 +359,7 @@ CMathBase.prototype =
             }
         }
 
-        this.elements[this.CurPos_X][this.CurPos_Y].end();
+        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
 
         return this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement();
     },
@@ -380,7 +380,7 @@ CMathBase.prototype =
             }
         }
 
-        this.elements[this.CurPos_X][this.CurPos_Y].home();
+        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
 
         return this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
     },
@@ -525,7 +525,7 @@ CMathBase.prototype =
     {
         this.elements[this.CurPos_X][this.CurPos_Y].drawSelect();
     },
-    home: function()
+    cursor_MoveToStartPos: function() //   home => cursor_MoveToStartPos
     {
         this.CurPos_X = 0;
         this.CurPos_Y = 0;
@@ -542,9 +542,9 @@ CMathBase.prototype =
             }
         }
 
-        this.elements[this.CurPos_X][this.CurPos_Y].home();
+        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
     },
-    end: function()
+    cursor_MoveToEndPos: function()  //  end => cursor_MoveToEndPos
     {
          this.CurPos_X = this.nRow - 1;
          this.CurPos_Y = this.nCol - 1;
@@ -561,7 +561,7 @@ CMathBase.prototype =
              }
          }
 
-         this.elements[this.CurPos_X][this.CurPos_Y].end();
+         this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
 
     },
     mouseUp: function()

@@ -7493,6 +7493,7 @@ function ParaMath()
 
     this.Jc   = undefined;
     this.Math = new CMathComposition();
+    this.Math.Parent = this;
 
     this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
 
@@ -7584,6 +7585,12 @@ ParaMath.prototype =
         this.Math.UpdateCursor();
     },
 
+    Refresh_RecalcData2: function()
+    {
+        this.Parent.RecalcInfo.Set_Type_0(pararecalc_0_All);
+        this.Parent.Refresh_RecalcData2();
+    },
+
     Selection_SetStart : function(X, Y, PageNum)
     {
         this.Math.Selection_SetStart( X, Y, PageNum );
@@ -7659,10 +7666,12 @@ ParaMath.prototype =
 
     Cursor_MoveToStartPos : function()
     {
+        this.Math.Cursor_MoveToStartPos();
     },
 
     Cursor_MoveToEndPos : function()
     {
+        this.Math.Cursor_MoveToEndPos();
     },
 
     Copy : function()

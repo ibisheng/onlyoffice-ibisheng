@@ -3743,6 +3743,110 @@ CMathContent.prototype =
         return res;
 
     },
+    cursor_moveLeft2: function()
+    {
+        //когда возвращаем наверх, проверяем на bRoot
+
+
+
+
+    },
+    getPos_toMoveLeft: function()
+    {
+        var state = true,
+            SelectContent = null;
+
+        var start = this.RealPosSelect.start,
+            end   = this.RealPosSelect.end;
+
+        var posStart = start > end ? end : start; // для CurPos, стартовая и конечная позиции совпадают
+        var posLeft;
+
+        var currType = this.content[posStart].value.typeObj;
+        var bFirstRunPrp = posStart == 1 && currType == MATH_RUN_PRP;
+        var bComposition = this.CurPos == 0 && !this.bRoot;
+
+        if(this.IsPlaceholder())
+        {
+            var movement = this.Parent.getPos_toMoveLeft();
+            SelectContent = movement.SelectContent;
+        }
+        else if(bFirstRunPrp && bComposition)
+        {
+            var movement = this.Parent.getPos_toMoveLeft();
+            SelectContent = movement.SelectContent;
+            //state = false; // перешли вверх по иерархии
+        }
+        else if(posStart!=0 || this.selection.startPos != this.selection.endPos) // не в начале
+        {
+
+            if(this.selection.startPos != this.selection.endPos)
+            {
+
+                if( this.selection.active )
+                {
+                    SelectContent = this;
+                    var end_select = this.selection.endPos > 0 ? this.selection.endPos - 1 : 0;
+                    this.setEnd_Selection(end_select);
+                }
+                else
+                {
+                    this.CurPos = start - 1;
+                    SelectContent = this;
+                }
+
+            }
+            //пришли из базового класса
+            else if( currType === MATH_COMP )
+            {
+                if( this.selection.active )
+                {
+                    var end_select = this.CurPos > 0 ? this.CurPos - 1 : 0;
+                    this.setStart_Selection(end_select);
+                    this.setEnd_Selection(this.CurPos);
+                    SelectContent = this;
+                }
+                else
+                {
+                    this.CurPos--;
+                    SelectContent = this;
+                }
+            }
+            else
+            {
+                //если нет селекта, то просто перемещаемся по контенту
+
+                var prevType = this.content[this.CurPos - 1].value.typeObj,
+                    prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
+
+                var bDiffRPrp = prevType === MATH_RUN_PRP && prev2_Type == MATH_TEXT,
+                    bRPrComp = currType === MATH_RUN_PRP && prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
+
+                if(bDiffRPrp || bRPrComp)
+                    this.CurPos -= 2;
+                else
+                    this.CurPos--;
+
+                if( this.content[this.CurPos].value.typeObj === MATH_COMP ) // this.CurPos может измениться
+                {
+                    SelectContent = this.content[this.CurPos].value.goToLastElement();
+                }
+                else
+                    SelectContent = this;
+
+            }
+
+            this.setStart_Selection(this.CurPos);
+            this.selection.active = false;
+
+        }
+        else
+            state = false;
+
+
+        return {state: state, SelectContent: SelectContent, pos: pos};
+    },
+
     cursor_moveLeft: function()
     {
         var state = true,
@@ -3750,21 +3854,16 @@ CMathContent.prototype =
 
         var currType = this.content[this.CurPos].value.typeObj;
         var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
+        var bComposition = this.CurPos == 0;
+        var bPlh = this.IsPlaceholder(),
+            bStartPos = (bFirstRunPrp || bComposition) && !this.bRoot;
 
-        if(this.IsPlaceholder())
+        var bUpperLevel = bPlh || bStartPos;
+
+        if(bUpperLevel)
         {
             var movement = this.Parent.cursor_moveLeft();
             CurrContent = SelectContent = movement.SelectContent;
-        }
-        else if(bFirstRunPrp)
-        {
-            if( ! this.bRoot )
-            {
-                var movement = this.Parent.cursor_moveLeft();
-                SelectContent = CurrContent = movement.SelectContent;
-            }
-            else
-                state = false;
         }
         else if(this.CurPos!=0 || this.selection.startPos != this.selection.endPos) // не в начале
         {
@@ -3802,7 +3901,6 @@ CMathContent.prototype =
                     this.setStart_Selection(end_select);
                     this.setEnd_Selection(this.CurPos);
                     SelectContent = this;
-
                 }
                 else
                 {
@@ -3810,12 +3908,10 @@ CMathContent.prototype =
                     SelectContent = this;
                     CurrContent   = this;
                 }
-
             }
             else
             {
                 //если нет селекта, то просто перемещаемся по контенту
-
 
                 var prevType = this.content[this.CurPos - 1].value.typeObj,
                     prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
@@ -3842,7 +3938,7 @@ CMathContent.prototype =
 
         }
         else
-            state = false;
+            state = false;  // bRoot, в начале
 
         /*else
         {
@@ -4097,8 +4193,10 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
-    home: function()
+    cursor_MoveToStartPos: function()  //   home => cursor_MoveToStartPos
     {
+        console.log("cursor_MoveToStartPos");
+
         if( !this.IsEmpty() )
         {
             if(!this.IsPlaceholder())
@@ -4108,14 +4206,20 @@ CMathContent.prototype =
                 else // первым идет мат объект
                     this.CurPos = 1;
             }
+            else
+                this.CurPos = 0;
         }
     },
-    end: function()
+    cursor_MoveToEndPos: function()  //  end => cursor_MoveToEndPos
     {
+        console.log("cursor_MoveToStartPos");
+
         if( !this.IsEmpty() )
         {
             if(!this.IsPlaceholder())
                 this.CurPos = this.content.length - 1;
+            else
+                this.CurPos = 0;
         }
     },
     //////////////////////////////////////
@@ -4434,16 +4538,29 @@ CMathContent.prototype =
         var state =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
-            bBegin:                false,    /* в начале контента или нет */
+            bBegin:                 false,    /* в начале контента или нет */
             bEnd:                   false     /* в конце */
         };
 
         var CurrContent = SelectContent = null,
             items = null;
 
-        if( this.IsPlaceholder() )
+
+        var currType = this.content[this.CurPos].value.typeObj;
+        var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
+        var bComposition = this.CurPos == 0;
+        var bPlh = this.IsPlaceholder(),
+            bStartPos = (bFirstRunPrp || bComposition) &&  order == 1;
+
+        var bSelect = this.selectUse();
+
+        var bLastPos = order == -1 && this.CurPos == this.content.length - 1;
+
+        var bUpperLevel = (bPlh || bStartPos || bLastPos) && !bSelect ; // на плейсхолдер это не распространяется
+                                                                        // т.к. даже когда в нем находимся, у него selection.startPos и selection.endPos совпадают
+        if(bUpperLevel)
         {
-            if ( !this.bRoot )
+            if(!this.bRoot)
             {
                 var result = this.Parent.remove(-2);
                 SelectContent = result.SelectContent;
@@ -4451,59 +4568,36 @@ CMathContent.prototype =
             }
             else
             {
-                //в основном контенте и элемент target
-                //переделать : вставлять объект типа placeholder
-                this.content.length = 0;
-                state.bDelete = true;
+                if(bStartPos)
+                    state.bBegin = true;
+                else if(bLastPos)
+                    state.bEnd = true;
+                else // на всякий случай, для плейсхолдера в Root
+                {
+                    this.content.length = 0;
+                    state.bDelete = true;
+                }
 
-                SelectContent = this;
-                CurrContent   = this;
+                CurrContent = SelectContent = this;
             }
         }
-        else
+        else if(order == 1 || order == -1)
         {
-            var bFirst = order == 1 && this.CurPos == 0,
-                bLast = order == -1 && this.CurPos == this.content.length - 1;
-
-            if(bFirst)
-                state.bBegin = true;
-            else if(bLast)
-                state.bEnd = true;
-
-            if(bFirst || bLast)
-            {
-                if( ! this.bRoot )
-                {
-                    var result = this.Parent.remove(-2);
-                    SelectContent = result.SelectContent;
-                    CurrContent = this;
-                }
-                else
-                {
-                    CurrContent = SelectContent = this;
-                }
-            }
-            else if(order == 1 || order == -1)
-            {
-                result = this.remove_internal(order);
-                items = result.items;
-                state.bDelete = result.bDelete;
-                SelectContent = this;
-                CurrContent   = this;
-            }
-            else if(order == -2)
-            {
-                /*this.setStart_Selection(this.CurPos + 1);
-                this.setEnd_Selection(this.CurPos - 1);
-                this.selection.active = false;*/
-
-                this.removeFormula(this.CurPos);
-
-                SelectContent = this;
-                CurrContent   = null; // т.к. пришли из другого контента
-            }
-
+            result = this.remove_internal(order);
+            items = result.items;
+            state.bDelete = result.bDelete;
+            SelectContent = this;
+            CurrContent   = this;
         }
+        else if(order == -2)
+        {
+
+            this.removeFormula(this.CurPos);
+
+            SelectContent = this;
+            CurrContent   = null; // т.к. пришли из другого контента
+        }
+
 
         return {CurrContent : CurrContent, SelectContent: SelectContent, state: state, items: items};
     },
@@ -5121,6 +5215,12 @@ CMathContent.prototype =
             end = tmp;
         }
 
+        if(this.IsPlaceholder())
+        {
+            start = 1;
+            end = 2;
+        }
+
         //var heightSelect = this.size.ascent + this.size.descent;
         var heightSelect = this.size.height;
         var widthSelect = 0;
@@ -5682,10 +5782,16 @@ CMathContent.prototype =
     },
     Refresh_RecalcData: function()
     {
+        this.Composition.Refresh_RecalcData2(); // Refresh_RecalcData сообщает родительскому классу, что у него произошли изменения, нужно пересчитать
+                                                // Refresh_RecalcData2 у родительского класса сообщает, что у внутреннего класса произошли изменения, нужен пересчет
         // временно
         //this.RecalculateReverse();
         //this.Root.Resize();
     },
+    /*Refresh_RecalcData2: function()
+    {
+        this.Composition.Refresh_RecalcData2();
+    },*/
     _Check_HistoryUninon: function(Data1, Data2)
     {
         var Type1 = Data1.Type;
@@ -5759,7 +5865,6 @@ CMathContent.prototype =
 
         var state = true; // вышли / не вышли за переделы контента
         var SelectContent = null;
-
 
         if(this.IsPlaceholder())
         {
@@ -5847,14 +5952,14 @@ CMathContent.prototype =
     {
         if(bStart)
         {
-            this.RealPosSelect.start = 0; /// в итоге, селект начнется с позиции 1
-            this.RealPosSelect.end   = 0;
+            this.RealPosSelect.start = 1; /// в итоге, селект начнется с позиции 1
+            this.RealPosSelect.end   = 1;
             this.CurPos = 1;
         }
         else
         {
-            this.RealPosSelect.end   = 0;
-            this.setEndPos_Selection(0);
+            this.RealPosSelect.end   = 1;
+            this.setEndPos_Selection(1);
 
         }
     },
@@ -5911,7 +6016,6 @@ function CMathComposition()
 
     this.CurrentContent    = null;
     this.SelectContent     = null;
-    this.NeedRecalculate   = true;
 
     this.DefaultTxtPrp =
     {
@@ -5924,6 +6028,8 @@ function CMathComposition()
     };
 
     this.Init();
+
+    this.Parent = undefined;
 }
 CMathComposition.prototype =
 {
@@ -6042,7 +6148,7 @@ CMathComposition.prototype =
             //this.CheckTarget();
         }
 
-        console.log("Cursor_MoveLeft:   " + move.state);
+        //console.log("Cursor_MoveLeft:   " + move.state);
 
         return move.state;
     },
@@ -6090,6 +6196,16 @@ CMathComposition.prototype =
 
         return move.state;
     },
+    Cursor_MoveToStartPos: function()
+    {
+        this.Root.cursor_MoveToStartPos();
+        this.CurrentContent = this.SelectContent = this.Root;
+    },
+    Cursor_MoveToEndPos: function()
+    {
+        this.Root.cursor_MoveToEndPos();
+        this.CurrentContent = this.SelectContent = this.Root;
+    },
     MouseDown: function(mouseX, mouseY)
     {
         this.ClearSelect();
@@ -6133,13 +6249,30 @@ CMathComposition.prototype =
     },
     Remove: function(order)
     {
-        //this.ClearSelect();
+        ////*    History    */////
+        History.Create_NewPoint();
+        var start = this.SelectContent.selection.startPos,
+            end = this.SelectContent.selection.endPos;
+        var Pos;
+
+        if(start !== end)
+            Pos = start < end ? start: end;
+        else if(order == 1)
+            Pos = this.SelectContent.CurPos;
+        else
+            Pos = this.SelectContent.CurPos + 1;
+
+        ///////////////////////////
 
         var result = this.SelectContent.remove(order);
 
-        this.NeedRecalculate = result.state.bDelete;
         var bRoot = this.SelectContent.bRoot === true,
             bToUpper = result.state.bBegin || result.state.bEnd; // наверх нужно ли прокидовать
+
+
+        if( result.state.bDelete )
+            History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
+
 
         this.CurrentContent = result.CurrContent;
         this.SelectContent  = result.SelectContent;
@@ -6463,7 +6596,10 @@ CMathComposition.prototype =
         //this.SelectContent.drawSelect();
         this.CheckTarget();
     },
-
+    Refresh_RecalcData2: function()
+    {
+        this.Parent.Refresh_RecalcData2();
+    },
     //test
     // из MathControl
     IsRect: function(x, y)
@@ -6628,10 +6764,7 @@ CMathComposition.prototype =
 
         ///////////////////////
 
-        if(this.NeedRecalculate)
-            this.Root.Resize(oMeasure); // пересчитываем всю формулу
-
-        this.NeedRecalculate = true;
+        this.Root.Resize(oMeasure); // пересчитываем всю формулу
 
         var width = this.Root.size.width,
             height = this.Root.size.height;
