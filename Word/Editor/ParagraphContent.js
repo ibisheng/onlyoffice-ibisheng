@@ -7639,6 +7639,24 @@ ParaMath.prototype =
         return this.Math.Cursor_MoveRight(bShiftKey, bCtrlKey);
     },
 
+    Cursor_MoveUp : function(bShiftKey)
+    {
+        return this.Math.Cursor_MoveUp( bShiftKey );
+    },
+
+    Cursor_MoveDown : function(bShiftKey)
+    {
+        return this.Math.Cursor_MoveDown( bShiftKey );
+    },
+
+    Cursor_MoveAt : function(X, Y)
+    {
+        var MouseEvent = new CMouseEventHandler();
+        MouseEvent.Type = g_mouse_event_type_up;
+        this.Math.Selection_SetStart( X, Y, 0 );
+        this.Math.Selection_SetEnd( X, Y, 0, MouseEvent );
+    },
+
     Cursor_MoveToStartPos : function()
     {
     },

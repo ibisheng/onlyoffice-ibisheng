@@ -6561,6 +6561,8 @@ Paragraph.prototype =
                 }
 
                 this.Set_ContentPos( StartPos, true, -1 );
+                this.CurPos.ContentPos2 = -1;
+
                 this.Selection_Remove();
 
                 // Пока сделаем для Count = 1
@@ -6621,6 +6623,23 @@ Paragraph.prototype =
         }
         else
         {
+            var CurPos2     = this.CurPos.ContentPos2;
+            var MathElement = this.Content[CurPos2];
+            if ( undefined !== MathElement && para_Math === MathElement.Type )
+            {
+                if ( true === MathElement.Cursor_MoveUp(false) )
+                {
+                    if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                        this.Internal_SelectMath( CurPos2 );
+
+                    return true;
+                }
+                else
+                {
+                    this.CurPos.ContentPos2 = -1;
+                }
+            }
+
             if ( 0 == CurLine )
             {
                 // Возвращяем значение false, это означает, что надо перейти в
@@ -6763,6 +6782,23 @@ Paragraph.prototype =
         }
         else
         {
+            var CurPos2     = this.CurPos.ContentPos2;
+            var MathElement = this.Content[CurPos2];
+            if ( undefined !== MathElement && para_Math === MathElement.Type )
+            {
+                if ( true === MathElement.Cursor_MoveDown(false) )
+                {
+                    if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                        this.Internal_SelectMath( CurPos2 );
+
+                    return true;
+                }
+                else
+                {
+                    this.CurPos.ContentPos2 = -1;
+                }
+            }
+
             if ( this.Lines.length - 1 == CurLine )
             {
                 // Возвращяем значение false, это означает, что надо перейти в
@@ -8551,6 +8587,14 @@ Paragraph.prototype =
         var TempPos = this.Internal_GetContentPosByXY( X, Y, bLine, PageNum );
         var Pos  = TempPos.Pos;
         var Line = TempPos.Line;
+
+        if ( undefined !== this.Content[TempPos.Pos2] && para_Math === this.Content[TempPos.Pos2].Type )
+        {
+            this.Content[TempPos.Pos2].Cursor_MoveAt( X, Y );
+            this.CurPos.ContentPos2 = TempPos.Pos2;
+        }
+        else
+            this.CurPos.ContentPos2 = -1;
 
         if ( -1 != Pos )
         {
