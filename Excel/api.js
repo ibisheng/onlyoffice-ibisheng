@@ -1093,6 +1093,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onCellTextChanged		(text, cursorPosition, isFormula, formulaPos, formulaName)
 			 * asc_onSelectionChanged		(asc_CCellInfo);											- эвент на смену информации о выделении
 			 * asc_onSelectionNameChanged	(sName);													- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
+			 * asc_onSelectionMathChanged	(asc_CSelectionMathInfo);									- эвент на смену математической информации о выделении
 			 * asc_onZoomChanged			(zoom)
 			 * asc_onSheetsChanged			()															- эвент на обновление списка листов
 			 * asc_onActiveSheetChanged		(indexActiveSheet)											- эвент на обновление активного листа

@@ -46,6 +46,7 @@
 		var asc_CPagePrint		= asc.CPagePrint;
 		var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
 		var asc_CCellCommentator = asc.asc_CCellCommentator;
+		var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
 
 		/*
 		* Constants
@@ -5543,6 +5544,29 @@
 				return false;
 			},
 
+			getSelectionMathInfo: function () {
+				var ar = this.activeRange;
+				var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
+				var tmp;
+				var oSelectionMathInfo = new asc_CSelectionMathInfo();
+				var sum = 0, countNumbers = 0;
+				range._setPropertyNoEmpty(null, null, function (c) {
+					++oSelectionMathInfo.count;
+					if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
+						tmp = parseFloat(c.getValueWithoutFormat());
+						if (isNaN(tmp))
+							return;
+						++countNumbers;
+						sum += tmp;
+					}
+				});
+				if (0 !== countNumbers) {
+					oSelectionMathInfo.sum = sum;
+					oSelectionMathInfo.average = sum / countNumbers;
+				}
+				return oSelectionMathInfo;
+			},
+
 			getSelectionName: function (bRangeText) {
 				if (this.isSelectOnShape)
 					return " ";	// Пока отправим пустое имя(с пробелом, пустое не воспринимаем в меню..) ToDo
@@ -5785,6 +5809,7 @@
 			_updateSelectionNameAndInfo: function () {
 				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this._trigger("selectionChanged", this.getSelectionInfo());
+				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			},
 
 			getSelectionShape: function () {
@@ -5795,6 +5820,7 @@
 				// отправляем евент для получения свойств картинки, шейпа или группы
 				this._trigger("selectionNameChanged", this.getSelectionName());
 				this._trigger("selectionChanged", this.getSelectionInfo());
+				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			},
 			getActiveRangeObj: function(){
 				return this.activeRange.clone(true);
@@ -5836,6 +5862,7 @@
 
 				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this._trigger("selectionChanged", this.getSelectionInfo());
+				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 
 				return this._calcActiveCellOffset();
 			},
@@ -5859,6 +5886,7 @@
 
 					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					this._trigger("selectionChanged", this.getSelectionInfo());
+					this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 
 					oRes = this._calcActiveCellOffset();
 				}
@@ -5893,8 +5921,10 @@
 				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow || isChangeSelectionShape)) {
 					if (!this.isSelectionDialogMode) {
 						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-						if (!isSelectMode)
+						if (!isSelectMode) {
 							this._trigger("selectionChanged", this.getSelectionInfo());
+							this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+						}
 					} else {
 						// Смена диапазона
 						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
@@ -6013,8 +6043,10 @@
 				if (!this.isCellEditMode && !arnOld.isEqual(ar.clone(true))) {
 					if (!this.isSelectionDialogMode) {
 						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
-						if (!isSelectMode)
+						if (!isSelectMode) {
 							this._trigger("selectionChanged", this.getSelectionInfo(false));
+							this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+						}
 					} else {
 						// Смена диапазона
 						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
@@ -9625,6 +9657,7 @@
 					t._trigger("reinitializeScroll");
 					t._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					t._trigger("selectionChanged", t.getSelectionInfo());
+					t._trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 				}
 
 				t.objectRender.rebuildChartGraphicObjects();

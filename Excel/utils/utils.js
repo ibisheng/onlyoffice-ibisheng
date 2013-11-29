@@ -1025,6 +1025,21 @@
 			return this;
 		}
 
+		// Математическая информация о выделении
+		/** @constructor */
+		function asc_CSelectionMathInfo() {
+			this.count = 0;
+			this.sum = null;
+			this.average = null;
+		}
+
+		asc_CSelectionMathInfo.prototype = {
+			constructor: asc_CSelectionMathInfo,
+			asc_getCount: function () { return this.count; },
+			asc_getSum: function () { return this.sum; },
+			asc_getAverage: function () { return this.average; }
+		};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1149,6 +1164,12 @@
 		prot["asc_getDocStylesImage"] = prot.asc_getDocStylesImage;
 
 		window["Asc"]["asc_CSheetPr"] = window["Asc"].asc_CSheetPr = asc_CSheetPr;
+
+		window["Asc"]["asc_CSelectionMathInfo"] = window["Asc"].asc_CSelectionMathInfo = asc_CSelectionMathInfo;
+		prot = asc_CSelectionMathInfo.prototype;
+		prot["asc_getCount"] = prot.asc_getCount;
+		prot["asc_getSum"] = prot.asc_getSum;
+		prot["asc_getAverage"] = prot.asc_getAverage;
 
 }
 )(jQuery, window);
