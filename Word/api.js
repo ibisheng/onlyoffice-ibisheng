@@ -10,6 +10,8 @@ var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
+var documentFormatSave = c_oAscFileType.DOCX;
+var documentFormatSaveTxtCodepage = 65001;//utf8
 
 function CDocOpenProgress()
 {
@@ -903,7 +905,24 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
-		
+		if(documentFormat)
+		{
+			switch(documentFormat)
+			{
+				case "docx" : documentFormatSave = c_oAscFileType.DOCX;break;
+				case "doc" : documentFormatSave = c_oAscFileType.DOC;break;
+				case "odt" : documentFormatSave = c_oAscFileType.ODT;break;
+				case "rtf" : documentFormatSave = c_oAscFileType.RTF;break;
+				case "txt" : documentFormatSave = c_oAscFileType.TXT;break;
+				case "htm" :
+				case "html" : documentFormatSave = c_oAscFileType.HTML_ZIP;break;
+				case "mht" : documentFormatSave = c_oAscFileType.MHT;break;
+				case "pdf" : documentFormatSave = c_oAscFileType.PDF;break;
+				case "epub" : documentFormatSave = c_oAscFileType.EPUB;break;
+				case "fb2" : documentFormatSave = c_oAscFileType.FB2;break;
+				case "mobi" : documentFormatSave = c_oAscFileType.MOBI;break;
+			}
+		}
 		var nIndex = -1;
 		if(documentTitle)
 			nIndex = documentTitle.lastIndexOf(".");
@@ -2617,7 +2636,9 @@ function OnSave_Callback(e)
 			oAdditionalData["c"] = "save";
 			oAdditionalData["id"] = documentId;
             oAdditionalData["vkey"] = documentVKey;
-            oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+            oAdditionalData["outputformat"] = documentFormatSave;
+			if(c_oAscFileType.TXT == documentFormatSaveTxtCodepage)
+				oAdditionalData["codepage"] = documentFormatSaveTxtCodepage;
 			oAdditionalData["innersave"] = true;
 			var data = oBinaryFileWriter.Write();
 			oAdditionalData["savetype"] = "completeall";
@@ -6930,7 +6951,8 @@ function sendCommand(editor, fCallback, rdata){
 					});
                 break;
 				case "needparams":
-					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"reopen", "url": documentUrl, "title": documentTitle, "codepage": 0, "embeddedfonts": editor.isUseEmbeddedCutFonts};
+					//todo dialog
+					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"reopen", "url": documentUrl, "title": documentTitle, "codepage": documentFormatSaveTxtCodepage, "embeddedfonts": editor.isUseEmbeddedCutFonts};
                     sendCommand(editor, fCallback,  rData)
                 break;
                 case "waitopen":

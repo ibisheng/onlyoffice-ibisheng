@@ -67,6 +67,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentFormat = "null";
 			this.documentVKey = null;
 			this.documentOrigin = "";
+			this.documentFormatSave = c_oAscFileType.XLSX;
+			this.documentFormatSaveCsvCodepage = 65001;//utf8
+			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
 			this.cCharDelimiter = String.fromCharCode(5);
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
@@ -428,6 +431,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.documentOrigin 		= this.DocInfo["Origin"];
 					this.chartEditor			= this.DocInfo["ChartEditor"];
 					this.documentOpenOptions 	= this.DocInfo["Options"];
+					
+					if(this.documentFormat)
+					{
+						switch(this.documentFormat)
+						{
+							case "xlsx" : documentFormatSave = c_oAscFileType.XLSX;break;
+							case "xls" : documentFormatSave = c_oAscFileType.XLS;break;
+							case "ods" : documentFormatSave = c_oAscFileType.ODS;break;
+							case "csv" : documentFormatSave = c_oAscFileType.CSV;break;
+							case "htm" :
+							case "html" : documentFormatSave = c_oAscFileType.HTML;break;
+						}
+					}
 
 					var nIndex = -1;
 					if(this.documentTitle)
@@ -723,6 +739,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					case c_oAscAdvancedOptionsID.CSV:
 						// Проверяем тип состояния в данный момент
 						if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+							this.documentFormatSaveCsvCodepage = option.asc_getCodePage();
+							this.documentFormatSaveCsvDelimiter = option.asc_getDelimiter();
 							var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"reopen", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "delimiter": option.asc_getDelimiter(), "codepage": option.asc_getCodePage()};
 							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, v);
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
@@ -981,7 +999,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
 				oAdditionalData["vkey"] = this.documentVKey;
-				oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+				oAdditionalData["outputformat"] = this.documentFormatSave;
+				if(c_oAscFileType.CSV == this.documentFormatSave)
+				{
+					oAdditionalData["codepage"] = this.documentFormatSaveCsvCodepage;
+					oAdditionalData["delimiter"] = this.documentFormatSaveCsvDelimiter;
+				}
 				oAdditionalData["innersave"] = true;
 				oAdditionalData["savetype"] = "completeall";
 				oAdditionalData["data"] = data;

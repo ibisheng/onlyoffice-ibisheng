@@ -9,6 +9,7 @@ var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
+var documentFormatSave = c_oAscFileType.PPTX;//пока не во что другое сохранять не можем.
 
 var c_oSerFormat =
 {
@@ -1741,7 +1742,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		oAdditionalData["c"] = "save";
 		oAdditionalData["id"] = documentId;
 		oAdditionalData["vkey"] = documentVKey;
-		oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+		oAdditionalData["outputformat"] = documentFormatSave;
 		oAdditionalData["innersave"] = true;
 		oAdditionalData["savetype"] = "completeall";
 		oAdditionalData["data"] = data;
