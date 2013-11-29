@@ -5372,6 +5372,8 @@ Paragraph.prototype =
                 StartPos2 = Temp2;
             }
 
+            this.Selection_Remove();
+
             if ( EndPos >= this.Content.length - 1 )
             {
                 var CurPos2 = -1;

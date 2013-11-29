@@ -7568,6 +7568,10 @@ ParaMath.prototype =
             this.Math.AddLetter( Item.Value.charCodeAt(0) );
         else if ( para_Space === Type )
             this.Math.AddLetter( 0x0020 );
+        else if ( para_Math === Type )
+        {
+            // TODO: реализовать
+        }
     },
 
     Remove : function(Order, bOnAddText)

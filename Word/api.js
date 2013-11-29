@@ -7300,3 +7300,17 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
         this.WordControl.m_oDrawingDocument.FirePaint();
     }
 }
+
+asc_docs_api.prototype.asc_AddMath = function(Type)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+        var MathElement = new ParaMath();
+        // TODO: в зависимости от типа Type сделать заполнение MathElement
+
+        this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
+    }
+}
+
