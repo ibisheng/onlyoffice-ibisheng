@@ -5604,16 +5604,7 @@ Paragraph.prototype =
 
                 // После удаления в математическом элементе может остаться выделение
                 if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
-                {
-                    this.Selection.Use       = true;
-                    this.Selection.Start     = false;
-                    this.Selection.StartPos  = CurPos2;
-                    this.Selection.EndPos    = CurPos2 + 1;
-                    this.Selection.StartPos2 = CurPos2;
-                    this.Selection.EndPos2   = CurPos2;
-
-                    this.Document_SetThisElementCurrent();
-                }
+                    this.Internal_SelectMath( CurPos2 );
 
                 return true;
             }
@@ -5635,13 +5626,34 @@ Paragraph.prototype =
         {
             var LetterPos = CurPos - 1;
 
-            var oPos = this.Internal_FindBackward( LetterPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+            var oPos = this.Internal_FindBackward( LetterPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
 
             if ( oPos.Found )
             {
                 if ( para_Drawing === oPos.Type )
                 {
                     this.Parent.Select_DrawingObject( this.Content[oPos.LetterPos].Get_Id() );
+                }
+                else if ( para_Math === oPos.Type )
+                {
+                    var MathElement = this.Content[oPos.LetterPos];
+                    MathElement.Cursor_MoveToEndPos();
+                    MathElement.Remove( -1, false );
+
+                    if ( true === MathElement.Is_Empty() )
+                    {
+                        this.Internal_Content_Remove( oPos.LetterPos );
+                        this.Set_ContentPos( oPos.LetterPos, true, -1 );
+                    }
+                    else
+                    {
+                        this.Set_ContentPos( oPos.LetterPos, true, -1 );
+
+                        if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                            this.Internal_SelectMath( oPos.LetterPos );
+                        else
+                            this.CurPos.ContentPos2 = oPos.LetterPos;
+                    }
                 }
                 else
                 {
@@ -5716,16 +5728,7 @@ Paragraph.prototype =
 
                 // После удаления в математическом элементе может остаться выделение
                 if ( true === MathItem.Selection_IsUse() && false === MathItem.Selection_IsEmpty() )
-                {
-                    this.Selection.Use       = true;
-                    this.Selection.Start     = false;
-                    this.Selection.StartPos  = CurPos2;
-                    this.Selection.EndPos    = CurPos2 + 1;
-                    this.Selection.StartPos2 = CurPos2;
-                    this.Selection.EndPos2   = CurPos2;
-
-                    this.Document_SetThisElementCurrent();
-                }
+                    this.Internal_SelectMath( CurPos2 );
 
                 return true;
             }
@@ -5749,13 +5752,34 @@ Paragraph.prototype =
         {
             var LetterPos = CurPos;
 
-            var oPos = this.Internal_FindForward( LetterPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+            var oPos = this.Internal_FindForward( LetterPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
 
             if ( oPos.Found )
             {
                 if ( para_Drawing === oPos.Type )
                 {
                     this.Parent.Select_DrawingObject( this.Content[oPos.LetterPos].Get_Id() );
+                }
+                else if ( para_Math === oPos.Type )
+                {
+                    var MathElement = this.Content[oPos.LetterPos];
+                    MathElement.Cursor_MoveToStartPos();
+                    MathElement.Remove( 1, false );
+
+                    if ( true === MathElement.Is_Empty() )
+                    {
+                        this.Internal_Content_Remove( oPos.LetterPos );
+                        this.Set_ContentPos( oPos.LetterPos, true, -1 );
+                    }
+                    else
+                    {
+                        this.Set_ContentPos( oPos.LetterPos, true, -1 );
+
+                        if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                            this.Internal_SelectMath( oPos.LetterPos );
+                        else
+                            this.CurPos.ContentPos2 = oPos.LetterPos;
+                    }
                 }
                 else
                 {

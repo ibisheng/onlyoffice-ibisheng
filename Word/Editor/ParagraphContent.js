@@ -7575,6 +7575,11 @@ ParaMath.prototype =
         }
     },
 
+    Is_Empty : function()
+    {
+        return false;
+    },
+
     Remove : function(Order, bOnAddText)
     {
         return this.Math.Remove(Order, bOnAddText);
