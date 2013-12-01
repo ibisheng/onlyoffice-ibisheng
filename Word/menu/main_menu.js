@@ -4246,7 +4246,18 @@ $(".colorWatch").mouseover(function(){
 	
 	editor.LoadDocument(c_DocInfo);
 	
+	$(".mathList").click(function(event)
+	{
+		var mathClass = this.id.substring(3);
+		$(".mathContainer").hide();
+		$("."+mathClass).show();
+	});
 	
+	$(".mathContainer div").click(function()
+	{
+		var value = parseInt(this.getAttribute("value"));
+		editor.asc_AddMath( value );		
+	});
 	
 	
  },500)
@@ -5497,6 +5508,7 @@ function CToolBox()
     this.Users     = { Active : false, Enabled : true, Over : false };
     this.Comments  = { Active : false, Enabled : true, Over : false };
     this.Search    = { Active : false, Enabled : true, Over : false };
+	this.Math      = { Active : false, Enabled : true, Over : false };
 
     var oThis = this;
 
@@ -5847,6 +5859,51 @@ function CToolBox()
                 }
             }
         };
+		
+		var ButtonMath = document.createElement("div");
+        ButtonMath.id                       = "id_toolbox_buttonMath";
+        ButtonMath.style["float"]           = "left";
+        ButtonMath.style.backgroundImage    = "url('Math/img/Equation.png')";
+        ButtonMath.style.width              = "34px";
+        ButtonMath.style.height             = "30px";
+        ToolBoxDiv.appendChild( ButtonMath );
+
+        ButtonMath.onmouseover = function()
+        {
+            if ( true === oThis.Math.Enabled )
+            {
+                oThis.Math.Over = true;
+                oThis.Internal_OnChange_Math();
+            }
+        };
+
+        ButtonMath.onmouseout = function()
+        {
+            if ( true === oThis.Math.Enabled )
+            {
+                oThis.Math.Over = false;
+                oThis.Internal_OnChange_Math();
+            }
+        };
+
+        ButtonMath.onmousedown = function()
+        {
+            if ( true === oThis.Math.Enabled )
+            {
+                oThis.Math.Active = oThis.Math.Active === true ? false : true;
+                oThis.Internal_OnChange_Math();
+
+                if ( true === oThis.Math.Active )
+                {
+                    $("#mathDrag").show();
+                }
+                else
+                {
+                    $("#mathDrag").hide();
+					$(".mathContainer").hide();
+                }
+            }
+        };
 
         this.Internal_OnChange_Paragraph();
         this.Internal_OnChange_Table();
@@ -5855,6 +5912,7 @@ function CToolBox()
         this.Internal_OnChange_Comments();
         this.Internal_OnChange_Users();
         this.Internal_OnChange_Search();
+		this.Internal_OnChange_Math();
     };
 
     this.Disable_Props = function()
@@ -6054,6 +6112,27 @@ function CToolBox()
                 BackGroundPosition = "0px -710px";
             else
                 BackGroundPosition = "0px -680px";
+        }
+
+        Button.style.backgroundPosition = BackGroundPosition;
+    };
+	this.Internal_OnChange_Math = function()
+    {
+        var Button = document.getElementById("id_toolbox_buttonMath");
+        var BackGroundPosition = "";
+
+        if ( true != this.Search.Enabled )
+        {
+            BackGroundPosition = "0px -740px";
+        }
+        else
+        {
+            if ( true === this.Math.Over )
+                BackGroundPosition = "0px -830px";
+            else if ( true === this.Math.Active )
+                BackGroundPosition = "0px -830px";
+            else
+                BackGroundPosition = "0px -800px";
         }
 
         Button.style.backgroundPosition = BackGroundPosition;

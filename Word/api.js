@@ -7331,8 +7331,233 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 
         var MathElement = new ParaMath();
         // TODO: в зависимости от типа Type сделать заполнение MathElement
+		
+		var props = new Object();
+		var ctrPrp = new CTextPr();
+		
+		switch (Type)
+		{
+			case 1: 	var sNum = "";
+						var sDen = "";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 2: 	props = {type:SKEWED_FRACTION};
+						var sNum = "";
+						var sDen = "";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 3: 	props = {type:LINEAR_FRACTION};
+						var sNum = "";
+						var sDen = "";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 4: 	var oBox = new CBox();
+						oBox.setCtrPrp(ctrPrp);
+						oBox.init(props);
+						MathElement.Math.Root.addElementToContent(oBox);	
+						var oElem = oBox.getBase();
+						//здесь выставляем для oElem argPr.argSz=-1; этой обертки нет
+						CreateFraction(oElem, props, sNum, sDen);
+						break;
+			case 5: 	var sNum = "dx";
+						var sDen = "dy";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 6: 	var sNum = String.fromCharCode(916) + "y";
+						var sDen = String.fromCharCode(916) + "x";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 7: 	var sNum = String.fromCharCode(8706) + "y";
+						var sDen = String.fromCharCode(8706) + "x";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 8: 	var sNum = String.fromCharCode(948) + "y";
+						var sDen = String.fromCharCode(948) + "x";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 9: 	var sNum = String.fromCharCode(960);
+						var sDen = "2";
+						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						break;
+			case 10:	props = {type:DEGREE_SUPERSCRIPT};
+						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						break;
+			case 11:	props = {type:DEGREE_SUBSCRIPT};
+						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						break;
+			case 12:	props = {type:DEGREE_SubSup};
+						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						break;
+			case 13:	props = {type:DEGREE_PreSubSup};
+						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						break;
+			case 14:	props = {type:DEGREE_SUBSCRIPT};			
+						var oDegree = new CDegree();
+						oDegree.setCtrPrp(ctrPrp);
+						oDegree.init(props);
+						MathElement.Math.Root.addElementToContent(oDegree);
+						var oElem = oDegree.getBase();
+						var oMRun = new CMathRunPrp();
+						oMRun.setTxtPrp(ctrPrp);
+						oElem.addElementToContent(oMRun);
+						var oText = new CMathText();
+						oText.addTxt("x");
+						oElem.addElementToContent(oText);
+						var oSub = oDegree.getLowerIterator();
+						
+						props = {type:DEGREE_SUPERSCRIPT};	
+						var sBase = "y"
+						var sSup = "2"
+						CreateDegree(oSub, props, sBase, sSup, null);
+						break;
+			case 15:	props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "e";
+						var sSup = "-i" + String.fromCharCode(969) + "t";
+						CreateDegree(MathElement.Math.Root, props, sBase, sSup, null);
+						break;
+			case 16:	props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "x";
+						var sSup = "2";
+						CreateDegree(MathElement.Math.Root, props, sBase, sSup, null);
+						break;
+			case 17:	props = {type:DEGREE_PreSubSup};
+						var sBase = "Y";
+						var sSup = "n";
+						var sSub = "1";
+						CreateDegreeSubSup(MathElement.Math.Root, props, sBase, sSup, sSub);
+						break;
+						
+		}
 
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
+}
+function CreateDegreeSubSup(oParentElem,props,sBaseText,sSupText,sSubText)
+{
+	var oDegreeSubSup = new CDegreeSubSup();
+	var ctrPrp = new CTextPr();
+	oDegreeSubSup.setCtrPrp(ctrPrp);
+	oDegreeSubSup.init(props);
+	oParentElem.addElementToContent(oDegreeSubSup);	
+	var oElem = oDegreeSubSup.getBase();
+	if (sBaseText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oElem.addElementToContent(oMRun);		
+		for (var i=0;i<sBaseText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sBaseText[i]);
+			oElem.addElementToContent(oText);
+		}
+	}
+	var oSup = oDegreeSubSup.getUpperIterator();
+	if (sSupText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oSup.addElementToContent(oMRun);		
+		for (var i=0;i<sSupText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sSupText[i]);
+			oSup.addElementToContent(oText);
+		}
+	}
+	var oSub = oDegreeSubSup.getLowerIterator();
+	if (sSubText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oSub.addElementToContent(oMRun);		
+		for (var i=0;i<sSubText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sSubText[i]);
+			oSub.addElementToContent(oText);
+		}
+	}
+}
+function CreateDegree(oParentElem,props,sBaseText,sSupText,sSubText)
+{
+	var oDegree = new CDegree();
+	var ctrPrp = new CTextPr();
+	oDegree.setCtrPrp(ctrPrp);
+	oDegree.init(props);
+	oParentElem.addElementToContent(oDegree);	
+	var oElem = oDegree.getBase();
+	if (sBaseText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oElem.addElementToContent(oMRun);		
+		for (var i=0;i<sBaseText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sBaseText[i]);
+			oElem.addElementToContent(oText);
+		}
+	}
+	var oSup = oDegree.getUpperIterator();
+	if (sSupText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oSup.addElementToContent(oMRun);		
+		for (var i=0;i<sSupText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sSupText[i]);
+			oSup.addElementToContent(oText);
+		}
+	}
+	var oSub = oDegree.getLowerIterator();
+	if (sSubText)
+	{
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oSub.addElementToContent(oMRun);		
+		for (var i=0;i<sSubText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sSubText[i]);
+			oSub.addElementToContent(oText);
+		}
+	}
+}
+function CreateFraction(oParentElem,props,sNumText,sDenText)
+{
+	var oFraction = new CFraction();
+	var ctrPrp = new CTextPr();
+	oFraction.setCtrPrp(ctrPrp);
+	oFraction.init(props);
+	oParentElem.addElementToContent(oFraction);	
+	var oElemDen = oFraction.getDenominator();
+	if (sDenText)
+	{			
+		var oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oElemDen.addElementToContent(oMRun);		
+		for (var i=0;i<sDenText.length;i++)
+		{
+			var oText = new CMathText();
+			oText.addTxt(sDenText[i]);
+			oElemDen.addElementToContent(oText);
+		}		
+	}
+	var oElemNum = oFraction.getNumerator();
+	if(sNumText)
+	{
+		oMRun = new CMathRunPrp();
+		oMRun.setTxtPrp(ctrPrp);
+		oElemNum.addElementToContent(oMRun);		
+		for (var i=0;i<sNumText.length;i++)
+		{
+			oText = new CMathText();
+			oText.addTxt(sNumText[i]);
+			oElemNum.addElementToContent(oText);
+		}		
+	}
 }
 

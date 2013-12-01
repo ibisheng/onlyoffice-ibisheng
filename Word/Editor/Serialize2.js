@@ -6958,7 +6958,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathBox = function(type, length, oBox, oElem)
+	this.ReadMathBox = function(type, length, oBox, props, oElem)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
