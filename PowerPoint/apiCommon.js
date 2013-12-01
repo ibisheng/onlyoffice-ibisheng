@@ -2058,7 +2058,7 @@ function CBorder (obj)
         this.Size = (undefined != obj.Size) ? obj.Size : null;
         this.Value = (undefined != obj.Value) ? obj.Value : null;
         this.Space = (undefined != obj.Space) ? obj.Space : null;
-        this.fill = (undefined != obj.fill) ? obj.fill : null;
+        this.unifill = (undefined != obj.unifill) ? CreateAscFill(obj.unifill) : null;
     }
     else
     {

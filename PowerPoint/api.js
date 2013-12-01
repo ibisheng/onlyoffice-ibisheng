@@ -3733,6 +3733,7 @@ asc_docs_api.prototype.asc_getComments = function()
 
 asc_docs_api.prototype.OpenDocumentEndCallback = function()
 {
+    this.bNoSendComments = false;
     var bIsScroll = false;
 
     if (0 == this.DocumentType)

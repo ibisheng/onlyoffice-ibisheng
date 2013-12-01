@@ -1,11 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/28/13
- * Time: 4:14 PM
- * To change this template use File | Settings | File Templates.
- */
-
 function MoveShapeImageTrack(originalObject)
 {
     this.originalObject = originalObject;

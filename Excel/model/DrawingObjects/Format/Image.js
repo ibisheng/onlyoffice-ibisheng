@@ -1,33 +1,5 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/26/13
- * Time: 6:24 PM
- * To change this template use File | Settings | File Templates.
- */
-
 
 var MIN_SHAPE_DIST = 5.08;
-
-var CARD_DIRECTION_N = 0;
-var CARD_DIRECTION_NE = 1;
-var CARD_DIRECTION_E = 2;
-var CARD_DIRECTION_SE = 3;
-var CARD_DIRECTION_S = 4;
-var CARD_DIRECTION_SW = 5;
-var CARD_DIRECTION_W = 6;
-var CARD_DIRECTION_NW = 7;
-
-var CURSOR_TYPES_BY_CARD_DIRECTION = [];
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_N]  = "n-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NE] = "ne-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_E]  = "e-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SE] = "se-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_S]  = "s-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SW] = "sw-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_W]  = "w-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
-
 
 function isRealNumber(number)
 {
@@ -498,50 +470,6 @@ CImageShape.prototype =
             this.setRasterImage(this.chart.img);
             editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.chart.img);
         }
-        /*if(this.chart != null)
-        {
-            var chartRender = new ChartRender();
-            var width_pix = this.drawingDocument.GetDotsPerMM(this.absExtX);
-            var heght_pix = this.drawingDocument.GetDotsPerMM(this.absExtY);
-            var chartBase64 = chartRender.insertChart(this.chart, width_pix, heght_pix);
-            if ( !chartBase64 )
-                return;
-
-            var _image = editor.ImageLoader.LoadImage(_getFullImageSrc(chartBase64), 1);
-            var or_shp = this;
-            if (null != _image)
-            {
-                this.setRasterImage(chartBase64)
-            }
-            else
-            {
-                editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                editor.asyncImageEndLoaded2 = function(_image)
-                {
-                    or_shp.setRasterImage(_image.src);
-                    editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                    if(or_shp.group == null)
-                    {
-                        var or_gr_obj = or_shp.parent;
-                        var bounds_2 = or_gr_obj.getBounds();
-                        if(!or_gr_obj.Is_Inline())
-                        {
-                            or_gr_obj.calculateOffset();
-                            var pos_x = or_gr_obj.absOffsetX;
-                            var pos_y = or_gr_obj.absOffsetY;
-                            var near_pos = or_shp.document.Get_NearestPos(or_gr_obj.PageNum, bounds_2.l, bounds_2.t, true, or_gr_obj);
-                            var W = bounds_2.r - bounds_2.l;
-                            var H = bounds_2.b - bounds_2.t;
-                            or_gr_obj.OnEnd_ChangeFlow(pos_x, pos_y, or_gr_obj.pageIndex, W, H, near_pos, false, true);
-                        }
-                        else
-                        {
-                            or_gr_obj.OnEnd_ResizeInline(bounds_2.r - bounds_2.l, bounds_2.b - bounds_2.t);
-                        }
-                    }
-                }
-            }
-        }       */
     },
 	
 	calculateTransformMatrix: function(transform)

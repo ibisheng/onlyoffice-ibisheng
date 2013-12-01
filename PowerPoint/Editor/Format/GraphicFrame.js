@@ -69,6 +69,12 @@ CGraphicFrame.prototype =
         return sp;
     },
 
+
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    },
+
     getAllFonts: function(fonts)
     {
         if(this.graphicObject)
@@ -671,7 +677,7 @@ CGraphicFrame.prototype =
 
     canResize: function()
     {
-        return true;//TODO
+        return false;//TODO
     },
 
     canMove: function()

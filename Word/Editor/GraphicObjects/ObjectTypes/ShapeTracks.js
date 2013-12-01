@@ -301,10 +301,9 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex, bChart)
 
     this.transformMatrix = originalShape.transform.CreateDublicate();
     this.geometry = originalShape.spPr.geometry.createDuplicate();
-    this.brush = originalShape.brush;
-    this.pen = originalShape.pen;
 
-    if(bChart === true)
+
+    if(originalShape instanceof CChartAsGroup)
     {
         var brush = new CUniFill();
         brush.fill = new CSolidFill();
@@ -317,9 +316,15 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex, bChart)
         pen.Fill.fill = new CSolidFill();
         pen.Fill.fill.color = new CUniColor();
         pen.Fill.fill.color.color = new CRGBColor();
+        this.pen =  pen;
         this.brush = brush;
-        this.pen = pen;
     }
+    else
+    {
+        this.pen = originalShape.pen;
+        this.brush = originalShape.brush;
+    }
+
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
     this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transformMatrix);
@@ -1724,9 +1729,28 @@ function ShapeForResizeInGroup2(originalShape, numberHandle)
 
     this.transformMatrix = originalShape.transform.CreateDublicate();
     this.geometry = originalShape.spPr.geometry.createDuplicate();
-    this.brush = originalShape.brush;
-    this.pen = originalShape.pen;
-
+    var pen, brush;
+    if(originalShape instanceof CChartAsGroup)
+    {
+        brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+        this.pen =  pen;
+        this.brush = brush;
+    }
+    else
+    {
+        this.pen = originalShape.pen;
+        this.brush = originalShape.brush;
+    }
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
     this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transformMatrix);

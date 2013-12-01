@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 7/1/13
- * Time: 11:15 AM
- * To change this template use File | Settings | File Templates.
- */
 function XYAdjustmentTrack(originalShape, adjIndex)
 {
     this.originalShape = originalShape;

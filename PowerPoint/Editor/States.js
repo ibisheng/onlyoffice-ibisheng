@@ -46,6 +46,592 @@ var STATES_ID_CHART_TEXT_ADD = 0x36;
 var STATES_ID_TEXT_ADD_IN_GROUP = 0x37;
 var STATES_ID_PRE_MOVE_COMMENT = 0x38;
 var STATES_ID_MOVE_COMMENT = 0x39;
+var STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT_GROUP = 0x40;
+var STATES_ID_MOVE_INTERNAL_CHART_OBJECT_GROUP = 0x41;
+var STATES_ID_CHART_GROUP = 0x42;
+var STATES_ID_CHART_GROUP_TEXT_ADD = 0x43;
+
+
+
+function resetGroupChartSelection(state)
+{
+    if(isRealObject(state))
+    {
+        if(isRealObject(state.chart))
+        {
+            state.chart.resetSelection();
+        }
+        if(isRealObject(state.group))
+        {
+            state.group.resetSelection();
+        }
+    }
+}
+
+
+function resetChartSelection(state)
+{
+    if(isRealObject(state))
+    {
+        if(isRealObject(state.chart))
+        {
+            state.chart.resetSelection();
+        }
+    }
+}
+
+function handleSelectedObjects(drawingObjects, drawingObjectsController, e, x, y)
+{
+    var state = drawingObjectsController.State;
+    var selected_objects = drawingObjectsController.selectedObjects;
+    if(selected_objects.length === 1)
+    {
+        var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+        if(hit_to_adj.hit)
+        {
+            if(selected_objects[0].canChangeAdjustments())
+            {
+                drawingObjectsController.clearPreTrackObjects();
+                if(hit_to_adj.adjPolarFlag === false)
+                    drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
+                else
+                    drawingObjectsController.addPreTrackObject(new PolarAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
+                drawingObjectsController.changeCurrentState(new PreChangeAdjState(drawingObjectsController, drawingObjects, selected_objects[0]));
+            }
+            resetGroupChartSelection(drawingObjectsController.State);
+            return true;
+        }
+    }
+
+    for(var i = selected_objects.length - 1; i > -1; --i)
+    {
+        var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+        if(hit_to_handles > -1)
+        {
+            if(hit_to_handles === 8)
+            {
+                if(!selected_objects[i].canRotate())
+                    return false;
+
+                drawingObjectsController.clearPreTrackObjects();
+                for(var j = 0; j < selected_objects.length; ++j)
+                {
+                    if(selected_objects[j].canRotate())
+                    {
+                        drawingObjectsController.addPreTrackObject(selected_objects[j].createRotateTrack());
+                    }
+                }
+                drawingObjectsController.changeCurrentState(new PreRotateState(drawingObjectsController, drawingObjects, selected_objects[i]));
+            }
+            else
+            {
+                if(!selected_objects[i].canResize())
+                    return;
+                drawingObjectsController.clearPreTrackObjects();
+                var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                for(var j = 0; j < selected_objects.length; ++j)
+                {
+                    if(selected_objects[j].canResize())
+                        drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
+                }
+                drawingObjectsController.changeCurrentState(new PreResizeState(drawingObjectsController, drawingObjects, selected_objects[i], card_direction))
+            }
+            resetGroupChartSelection(drawingObjectsController.State);
+            return true;
+        }
+    }
+
+    for(i = selected_objects.length - 1; i > -1; --i)
+    {
+        if(selected_objects[i].hitInBoundingRect(x, y))
+        {
+            if(!selected_objects[i].canMove())
+                return false;
+            drawingObjectsController.clearPreTrackObjects();
+            for(var j = 0; j < selected_objects.length; ++j)
+            {
+                drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+            }
+            drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects, x, y, e.ShiftKey, e.ctrl, selected_objects[i], true, false));
+            resetGroupChartSelection(drawingObjectsController.State);
+            return true;
+        }
+    }
+    return false;
+}
+
+function handleShapeImage(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
+{
+    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
+    var hit_in_path = drawing.hitInPath(x, y);
+    var hit_in_text_rect = drawing.hitInTextRect(x, y);
+    var selected_objects = drawingObjectsController.selectedObjects;
+    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+    {
+        drawingObjectsController.clearPreTrackObjects();
+        var is_selected =  drawing.selected;
+        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+            drawingObjectsController.resetSelection();
+         drawing.select(drawingObjectsController);
+        drawingObjects.OnUpdateOverlay();
+        for(var j = 0; j < selected_objects.length; ++j)
+        {
+            drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+        }
+        resetGroupChartSelection(drawingObjectsController.State);
+        drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects,x, y, e.ShiftKey, e.ctrl,  drawing, is_selected, true));
+        return true;
+    }
+    else if(hit_in_text_rect)
+    {
+        var  old_text_object = drawingObjectsController.State.textObject;
+        if(e.Button !== g_mouse_button_right
+            || drawingObjectsController.State === handleState
+            || (drawingObjectsController.State.textObject !==  drawing)
+            || (e.Button === g_mouse_button_right && drawingObjectsController.State.textObject && drawingObjectsController.State.textObject === drawing && !(drawing.pointInSelectedText(x, y))))
+        {
+            drawingObjectsController.resetSelection();
+            drawing.select(drawingObjectsController);
+            drawing.selectionSetStart(e, x, y);
+            resetGroupChartSelection(drawingObjectsController.State);
+            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
+
+            if( (old_text_object !== drawing ) && (isRealObject(old_text_object) && old_text_object.isEmptyPlaceholder() || drawing.isEmptyPlaceholder()) )
+            {
+                editor.WordControl.m_oDrawingDocument.OnRecalculatePage(drawingObjects.num, drawingObjects);
+                editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+            }
+            if(e.ClickCount < 2)
+                drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+        }
+        return true;
+    }
+    return false;
+}
+
+
+function handleGroup(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
+{
+    var grouped_objects = drawing.getArrGraphicObjects();
+    var selected_objects = drawingObjectsController.selectedObjects;
+    for(var j = grouped_objects.length - 1; j > -1; --j)
+    {
+        var cur_grouped_object = grouped_objects[j];
+        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape || (!drawing.selected && cur_grouped_object instanceof CChartAsGroup))
+        {
+            var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+            var hit_in_path = cur_grouped_object.hitInPath(x, y);
+            var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+            {
+                drawingObjectsController.clearPreTrackObjects();
+                var is_selected = drawing.selected;
+                if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+                    drawingObjectsController.resetSelection();
+                drawing.select(drawingObjectsController);
+                drawingObjects.OnUpdateOverlay();
+                for(var j = 0; j < selected_objects.length; ++j)
+                {
+                    drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                }
+                resetGroupChartSelection(drawingObjectsController.State);
+                drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects,x, y, e.ShiftKey, e.ctrl, drawing, is_selected, true));
+                return true;
+            }
+            else if(hit_in_text_rect)
+            {
+                drawingObjectsController.resetSelection();
+                cur_grouped_object.select(drawingObjectsController);
+                grouped_objects[j].select(cur_grouped_object);
+                grouped_objects[j].selectionSetStart(e, x, y);
+
+                resetGroupChartSelection(drawingObjectsController.State);
+                drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjects, drawing, grouped_objects[j]));
+                if(e.ClickCount < 2)
+                    grouped_objects[j].updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                return true;
+            }
+        }
+        else
+        {
+            if(cur_grouped_object instanceof CChartAsGroup)
+            {
+                if(cur_grouped_object.hitInWorkArea(x, y))
+                {
+                    if(!e.ShiftKey && !e.CtrlKey)
+                    {
+                        var object_for_move_in_chart = null;
+                        if(isRealObject(cur_grouped_object.chartTitle))
+                        {
+                            if(cur_grouped_object.chartTitle.hit(x, y))
+                            {
+                                object_for_move_in_chart = cur_grouped_object.chartTitle;
+                            }
+                        }
+
+                        if(isRealObject(cur_grouped_object.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                        {
+                            if(cur_grouped_object.hAxisTitle.hit(x, y))
+                            {
+                                object_for_move_in_chart = cur_grouped_object.hAxisTitle;
+                            }
+                        }
+
+                        if(isRealObject(cur_grouped_object.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                        {
+                            if(cur_grouped_object.vAxisTitle.hit(x, y))
+                            {
+                                object_for_move_in_chart = cur_grouped_object.vAxisTitle;
+                            }
+                        }
+                        if(isRealObject(object_for_move_in_chart))
+                        {
+                            drawingObjectsController.resetSelection();
+                            cur_grouped_object.select(drawingObjectsController);
+                            object_for_move_in_chart.select();
+                            drawingObjectsController.clearPreTrackObjects();
+                            resetGroupChartSelection(drawingObjectsController.State);
+                            drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                            drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectGroupState(drawingObjectsController, drawingObjects, x, y, object_for_move_in_chart, drawing));
+                            drawingObjects.OnUpdateOverlay();
+                            return  true;
+                        }
+                    }
+
+                    drawingObjectsController.clearPreTrackObjects();
+                    if(!(e.CtrlKey || e.ShiftKey))
+                        drawingObjectsController.resetSelection();
+                    drawing.select(drawingObjectsController);
+                    drawingObjects.OnUpdateOverlay();
+                    for(var j = 0; j < selected_objects.length; ++j)
+                    {
+                        drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                    }
+                    resetGroupChartSelection(drawingObjectsController.State);
+                    drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects,x, y, e.ShiftKey, e.ctrl, drawing, true, true));
+                    return true;
+
+
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
+function handleChart(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
+{
+    if(drawing.hitInWorkArea(x, y))
+    {
+        var selected_objects = drawingObjectsController.selectedObjects;
+        if(!e.ShiftKey && !e.CtrlKey)
+        {
+            var object_for_move_in_chart = null;
+            if(isRealObject(drawing.chartTitle))
+            {
+                if(drawing.chartTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.chartTitle;
+                }
+            }
+
+            if(isRealObject(drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+            {
+                if(drawing.hAxisTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.hAxisTitle;
+                }
+            }
+
+            if(isRealObject(drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+            {
+                if(drawing.vAxisTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.vAxisTitle;
+                }
+            }
+            if(isRealObject(object_for_move_in_chart))
+            {
+                drawingObjectsController.resetSelection();
+                drawing.select(drawingObjectsController);
+                object_for_move_in_chart.select();
+                drawingObjectsController.clearPreTrackObjects();
+                drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                resetGroupChartSelection(drawingObjectsController.State);
+                drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(drawingObjectsController, drawingObjects, x, y, object_for_move_in_chart));
+                drawingObjects.OnUpdateOverlay();
+                return true;
+            }
+
+        }
+
+        drawingObjectsController.clearPreTrackObjects();
+        var is_selected = drawing.selected;
+        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+            drawingObjectsController.resetSelection();
+        drawing.select(drawingObjectsController);
+        drawingObjects.OnUpdateOverlay();
+        for(var j = 0; j < selected_objects.length; ++j)
+        {
+            drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+        }
+        resetGroupChartSelection(drawingObjectsController.State);
+        drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects,x, y, e.ShiftKey, e.ctrl, drawing, is_selected, true));
+        resetGroupChartSelection(drawingObjectsController.State);
+        return true;
+    }
+    return false;
+}
+
+function handleTable(drawing, drawingObjects, drawingObjectsController, e, x, y, handleState)
+{
+    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
+    var hit_in_bounding_rect = drawing.hitInBoundingRect(x, y);
+    if(hit_in_bounding_rect || hit_in_inner_area)
+    {
+        resetGroupChartSelection(drawingObjectsController.State);
+        if(e.CtrlKey && drawingObjectsController.selectedObjects.length > 0)
+        {
+            var b_selected = drawing.selected;
+            drawing.select(drawingObjectsController);
+            for(var j = 0; j < drawingObjectsController.selectedObjects.length; ++j)
+            {
+                drawingObjectsController.addPreTrackObject(drawingObjectsController.selectedObjects[j].createMoveTrack());
+            }
+            drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects, x, y, e.ShiftKey, e.CtrlKey, drawing, b_selected, true));
+            drawingObjects.OnUpdateOverlay();
+            return true;
+        }
+        else
+        {
+            drawingObjectsController.resetSelection();
+            drawing.select(drawingObjectsController);
+            if(!(e.Button === g_mouse_button_right)&&(!drawing.isTableBorder(x, y)
+                || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
+            {
+                drawing.selectionSetStart(e, x, y);
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
+            }
+            else if(e.Button === g_mouse_button_right && drawingObjectsController.State.textObject && drawingObjectsController.State.textObject === drawing && !(drawing.pointInSelectedText(x, y)))
+            {
+                drawing.selectionSetStart(e, x, y);
+                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjects, drawing));
+            }
+            drawingObjects.presentation.Document_UpdateSelectionState();
+            drawingObjects.OnUpdateOverlay();
+            return true;
+        }
+    }
+    return false;
+}
+
+function handleShapeImageInGroup(drawing, drawingObjects, drawingObjectsController, group, e, x, y, handleState)
+{
+    var hit_in_inner_area = drawing.hitInInnerArea(x, y);
+    var hit_in_path = drawing.hitInPath(x, y);
+    var hit_in_text_rect = drawing.hitInTextRect(x, y);
+    var group_selected_objects = group.selectedObjects;
+    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+    {
+        var is_selected = drawing.selected;
+        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+            group.resetSelection();
+        drawing.select(drawingObjectsController);
+        drawingObjects.OnUpdateOverlay();
+        for(var j = 0; j < group_selected_objects.length; ++j)
+        {
+            drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
+        }
+        resetChartSelection(drawingObjectsController.State);
+        drawingObjectsController.changeCurrentState(new PreMoveInGroupState(drawingObjectsController, drawingObjects, group,  x, y, e.ShiftKey, e.ctrl, drawing, is_selected));
+        drawingObjects.OnUpdateOverlay();
+        return true;
+    }
+    else if(hit_in_text_rect)
+    {
+        drawingObjectsController.resetSelection();
+        group.select(drawingObjectsController);
+        drawing.select(group);
+        drawing.selectionSetStart(e, x, y);
+        resetChartSelection(drawingObjectsController.State);
+        drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjects, group, drawing));
+        if(e.ClickCount < 2)
+            drawing.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+        return true;
+    }
+    return false;
+}
+
+
+function handleSelectedOjectsGroup(drawingObjects, drawingObjectsController, group, e, x, y)
+{
+    var group_selected_objects = group.selectedObjects;
+    if(group_selected_objects.length === 1)
+    {
+        var hit_to_adj = group_selected_objects[0].hitToAdjustment(x, y);
+        if(hit_to_adj.hit)
+        {
+            if(group_selected_objects[0].canChangeAdjustments())
+            {
+                if(hit_to_adj.adjPolarFlag === false)
+                    drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(group_selected_objects[0], hit_to_adj.adjNum));
+                else
+                    drawingObjectsController.addPreTrackObject(new PolarAdjustmentTrack(group_selected_objects[0], hit_to_adj.adjNum));
+                drawingObjectsController.changeCurrentState(new PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, group));
+            }
+            return true;
+        }
+    }
+    for(var i = group_selected_objects.length - 1; i  > -1; --i)
+    {
+        var hit_to_handles = group_selected_objects[i].hitToHandles(x, y);
+        if(hit_to_handles > -1)
+        {
+            if(hit_to_handles === 8)
+            {
+                if(!group_selected_objects[i].canRotate())
+                    return false;
+                for(var j = 0; j < group_selected_objects.length; ++j)
+                {
+                    drawingObjectsController.addPreTrackObject(group_selected_objects[j].createRotateInGroupTrack())
+                }
+                drawingObjectsController.changeCurrentState(new PreRotateInGroupState(drawingObjectsController, drawingObjects, group, group_selected_objects[i]));
+            }
+            else
+            {
+                if(!group_selected_objects[i].canResize())
+                    return true;
+                var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                for(var j = 0; j < group_selected_objects.length; ++j)
+                {
+                    drawingObjectsController.addPreTrackObject(group_selected_objects[j].createResizeInGroupTrack(card_direction))
+                }
+                drawingObjectsController.changeCurrentState(new PreResizeInGroupState(drawingObjectsController, drawingObjects, group, group_selected_objects[i], card_direction));
+            }
+            return true;
+        }
+    }
+
+    var hit_to_handles = group.hitToHandles(x, y);
+    if(hit_to_handles > -1)
+    {
+        if(hit_to_handles === 8)
+        {
+            if(!group.canRotate())
+                return false;
+
+            resetChartSelection(drawingObjectsController.State);
+            group.resetSelection(drawingObjectsController);
+            drawingObjectsController.addPreTrackObject(group.createRotateTrack());
+            drawingObjectsController.changeCurrentState(new PreRotateState(drawingObjectsController, drawingObjects, group));
+            return true;
+        }
+        else
+        {
+            if(!group.canResize())
+                return false;
+            group.resetSelection(drawingObjectsController);
+            var card_direction = group.getCardDirectionByNum(hit_to_handles);
+            drawingObjectsController.addPreTrackObject(group.createResizeTrack(card_direction));
+            drawingObjectsController.changeCurrentState(new PreResizeState(drawingObjectsController, drawingObjects, group, card_direction));
+            resetChartSelection(drawingObjectsController.State);
+            return true;
+        }
+    }
+
+
+    for(i = group_selected_objects.length - 1; i  > -1; --i)
+    {
+        if(group_selected_objects[i].hitInBoundingRect(x, y))
+        {
+            drawingObjectsController.clearPreTrackObjects();
+            for(var j = 0; j < group_selected_objects.length; ++j)
+            {
+                drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
+            }
+            resetChartSelection(drawingObjectsController.State);
+            drawingObjectsController.changeCurrentState(new PreMoveInGroupState(drawingObjectsController, drawingObjects, group,
+                x, y, e.ShiftKey, e.CtrlKey, group_selected_objects[i], true));
+            return true;
+        }
+    }
+    if(group.hitInBoundingRect(x, y))
+    {
+        resetChartSelection(drawingObjectsController.State);
+        group.resetSelection();
+        drawingObjectsController.addPreTrackObject(group.createMoveTrack());
+        drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects, x, y, e.ShiftKey, e.CtrlKey, group, true, false));
+        return true;
+    }
+    return false;
+}
+
+
+function handleChartGroup(drawing, drawingObjects, drawingObjectsController, group, e, x, y)
+{
+    if(drawing.hitInWorkArea(x, y))
+    {
+        var selected_objects = group.selectedObjects;
+        if(!e.ShiftKey && !e.CtrlKey)
+        {
+            var object_for_move_in_chart = null;
+            if(isRealObject(drawing.chartTitle))
+            {
+                if(drawing.chartTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.chartTitle;
+                }
+            }
+
+            if(isRealObject(drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+            {
+                if(drawing.hAxisTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.hAxisTitle;
+                }
+            }
+
+            if(isRealObject(drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+            {
+                if(drawing.vAxisTitle.hit(x, y))
+                {
+                    object_for_move_in_chart = drawing.vAxisTitle;
+                }
+            }
+            if(isRealObject(object_for_move_in_chart))
+            {
+                resetChartSelection(drawingObjectsController.State);
+                drawingObjectsController.resetSelection();
+                drawing.resetSelection();
+                drawing.select(drawingObjectsController);
+                object_for_move_in_chart.select();
+                drawingObjectsController.clearPreTrackObjects();
+                drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectGroupState(drawingObjectsController, drawingObjects, x, y, object_for_move_in_chart, group));
+                drawingObjects.OnUpdateOverlay();
+                return true;
+            }
+
+        }
+
+        drawingObjectsController.clearPreTrackObjects();
+        var is_selected = drawing.selected;
+        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+            group.resetSelection();
+        drawing.resetSelection();
+        resetChartSelection(drawingObjectsController.State);
+        drawing.select(drawingObjectsController);
+        for(var j = 0; j < selected_objects.length; ++j)
+        {
+            drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveInGroupTrack());
+        }
+        drawingObjectsController.changeCurrentState(new PreMoveInGroupState(drawingObjectsController, drawingObjects, group, x, y, e.ShiftKey, e.CtrlKey, drawing,  is_selected));
+        drawingObjects.OnUpdateOverlay();
+        return true;
+    }
+    return false;
+}
 
 
 function NullState(drawingObjectsController, drawingObjects)
@@ -73,77 +659,10 @@ function NullState(drawingObjectsController, drawingObjects)
                 return;
             }
         }
+
+        if(handleSelectedObjects(this.drawingObjects, this.drawingObjectsController, e, x, y))
+            return;
         var selected_objects = this.drawingObjectsController.selectedObjects;
-        if(selected_objects.length === 1)
-        {
-            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
-            if(hit_to_adj.hit)
-            {
-                if(selected_objects[0].canChangeAdjustments())
-                {
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    if(hit_to_adj.adjPolarFlag === false)
-                        this.drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
-                    else
-                        this.drawingObjectsController.addPreTrackObject(new PolarAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
-                    this.drawingObjectsController.changeCurrentState(new PreChangeAdjState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
-                }
-                return;
-            }
-        }
-
-        for(var i = selected_objects.length - 1; i > -1; --i)
-        {
-            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
-            if(hit_to_handles > -1)
-            {
-                if(hit_to_handles === 8)
-                {
-                    if(!selected_objects[i].canRotate())
-                        return;
-
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        if(selected_objects[j].canRotate())
-                        {
-                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createRotateTrack());
-                        }
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreRotateState(this.drawingObjectsController, this.drawingObjects, selected_objects[i]));
-                }
-                else
-                {
-                    if(!selected_objects[i].canResize())
-                        return;
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        if(selected_objects[j].canResize())
-                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreResizeState(this.drawingObjectsController, this.drawingObjects, selected_objects[i], card_direction))
-                }
-                return;
-            }
-        }
-
-        for(i = selected_objects.length - 1; i > -1; --i)
-        {
-            if(selected_objects[i].hitInBoundingRect(x, y))
-            {
-                if(!selected_objects[i].canMove())
-                    return;
-                this.drawingObjectsController.clearPreTrackObjects();
-                for(var j = 0; j < selected_objects.length; ++j)
-                {
-                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                }
-                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.ctrl, selected_objects[i], true, false));
-                return;
-            }
-        }
 
         var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
         for(i = arr_drawing_objects.length-1; i > -1; --i)
@@ -152,192 +671,23 @@ function NullState(drawingObjectsController, drawingObjects)
             var cur_drawing = cur_drawing_base;
             if(cur_drawing.isShape() || cur_drawing.isImage())
             {
-                var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                var hit_in_path = cur_drawing.hitInPath(x, y);
-                var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
-                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                {
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    var is_selected = cur_drawing.selected;
-                    if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                        this.drawingObjectsController.resetSelection();
-                    cur_drawing.select(this.drawingObjectsController);
-                    this.drawingObjects.OnUpdateOverlay();
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
+                if(handleShapeImage(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
-                }
-                else if(hit_in_text_rect)
-                {
-                    if(e.Button !== g_mouse_button_right || this.drawingObjectsController.State === this || (this.drawingObjectsController.State.textObject !== cur_drawing))
-                    {
-                        this.drawingObjectsController.resetSelection();
-                        cur_drawing.select(this.drawingObjectsController);
-                        cur_drawing.selectionSetStart(e, x, y);
-                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                        if(e.ClickCount < 2)
-                            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                    }
-                    else
-                    {
-                        if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
-                        {
-                            this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            cur_drawing.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                            if(e.ClickCount < 2)
-                                this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                        }
-                    }
-                    return;
-                }
             }
             else if(cur_drawing.isGroup())
             {
-                var grouped_objects = cur_drawing.getArrGraphicObjects();
-                for(var j = grouped_objects.length - 1; j > -1; --j)
-                {
-                    var cur_grouped_object = grouped_objects[j];
-                    var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                    var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                    var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                    {
-                        this.drawingObjectsController.clearPreTrackObjects();
-                        var is_selected = cur_drawing.selected;
-                        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                            this.drawingObjectsController.resetSelection();
-                        cur_drawing.select(this.drawingObjectsController);
-                        this.drawingObjects.OnUpdateOverlay();
-                        for(var j = 0; j < selected_objects.length; ++j)
-                        {
-                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                        }
-                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
-                        return;
-                    }
-                    else if(hit_in_text_rect)
-                    {
-                        this.drawingObjectsController.resetSelection();
-                        cur_grouped_object.select(this.drawingObjectsController);
-                        grouped_objects[j].select(cur_grouped_object);
-                        grouped_objects[j].selectionSetStart(e, x, y);
-                        this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
-                        if(e.ClickCount < 2)
-                            grouped_objects[j].updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                        return;
-                    }
-                }
+                if(handleGroup(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
             }
             else if(cur_drawing.isChart())
             {
-                if(cur_drawing.hitInWorkArea(x, y))
-                {
-
-                    if(!e.ShiftKey && !e.CtrlKey)
-                    {
-                        var object_for_move_in_chart = null;
-                        if(isRealObject(cur_drawing.chartTitle))
-                        {
-                            if(cur_drawing.chartTitle.hit(x, y))
-                            {
-                                object_for_move_in_chart = cur_drawing.chartTitle;
-                            }
-                        }
-
-                        if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
-                        {
-                            if(cur_drawing.hAxisTitle.hit(x, y))
-                            {
-                                object_for_move_in_chart = cur_drawing.hAxisTitle;
-                            }
-                        }
-
-                        if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
-                        {
-                            if(cur_drawing.vAxisTitle.hit(x, y))
-                            {
-                                object_for_move_in_chart = cur_drawing.vAxisTitle;
-                            }
-                        }
-                        if(isRealObject(object_for_move_in_chart))
-                        {
-                            this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            object_for_move_in_chart.select();
-                            this.drawingObjectsController.clearPreTrackObjects();
-                            this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
-                            this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
-                            this.drawingObjects.OnUpdateOverlay();
-                            return;
-                        }
-
-                    }
-
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    var is_selected = cur_drawing.selected;
-                    if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                        this.drawingObjectsController.resetSelection();
-                    cur_drawing.select(this.drawingObjectsController);
-                    this.drawingObjects.OnUpdateOverlay();
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
+                if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this) )
                     return;
-
-
-                }
             }
             else if(cur_drawing.isTable && cur_drawing.isTable())
             {
-                var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                var hit_in_bounding_rect = cur_drawing.hitInBoundingRect(x, y);
-                if(hit_in_bounding_rect || hit_in_inner_area)
-                {
-                    if(e.CtrlKey && this.drawingObjectsController.selectedObjects.length > 0)
-                    {
-                        var b_selected = cur_drawing.selected;
-                        cur_drawing.select(this.drawingObjectsController);
-                        for(var j = 0; j < this.drawingObjectsController.selectedObjects.length; ++j)
-                        {
-                            this.drawingObjectsController.addPreTrackObject(this.drawingObjectsController.selectedObjects[j].createMoveTrack());
-                        }
-                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, cur_drawing, b_selected, true));
-                        this.drawingObjects.OnUpdateOverlay();
-                        return;
-                    }
-                    else
-                    {
-                        this.drawingObjectsController.resetSelection();
-                        cur_drawing.select(this.drawingObjectsController);
-                        if(!(e.Button === g_mouse_button_right)&&(!cur_drawing.isTableBorder(x, y)
-                            || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false))
-                        {
-                            cur_drawing.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                        }
-                        else if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
-                        {
-                            cur_drawing.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                        }
-                        this.drawingObjects.presentation.Document_UpdateSelectionState();
-                        this.drawingObjects.OnUpdateOverlay();
-                        return;
-
-                    }
-                }
-
+                if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
             }
         }
         this.drawingObjectsController.resetSelection();
@@ -1086,6 +1436,114 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 }
 
 
+function PreMoveInternalChartObjectGroupState(drawingObjectsController, drawingObjects, startX, startY, chartElement, group)
+{
+    this.id = STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT_GROUP;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.chartElement = chartElement;
+    this.group = group;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.swapTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new MoveInternalChartObjectGroupState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, this.chartElement, this.group))
+        this.drawingObjectsController.onMouseMove(e, x, y);
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.clearPreTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new ChartGroupState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup, this.group));
+    };
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.transform, 0, 0, this.group.extX, this.group.extY, this.group.canRotate());
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.chartElement.chartGroup.transform, 0, 0, this.chartElement.chartGroup.extX, this.chartElement.chartGroup.extY, false);
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.transform, 0, 0, this.chartElement.extX, this.chartElement.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectsId: this.chartElement.chartGroup.Id, cursorType:"move"};
+    };
+}
+
+
+function MoveInternalChartObjectGroupState(drawingObjectsController, drawingObjects, startX, startY, chartElement, group)
+{
+    this.id = STATES_ID_MOVE_INTERNAL_CHART_OBJECT_GROUP;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.chartElement = chartElement;
+    this.chart = chartElement.chartGroup;
+    this.group = group;
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        var dx = x - this.startX;
+        var dy = y - this.startY;
+        this.drawingObjectsController.trackMoveObjects(dx, dy);
+        this.drawingObjects.OnUpdateOverlay();
+
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        {
+            History.Create_NewPoint();
+            this.drawingObjectsController.trackEnd();
+            editor.WordControl.m_oLogicDocument.Recalculate();
+        }
+
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjectsController.changeCurrentState(new ChartGroupState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup, this.group));
+
+    };
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.transform, 0, 0, this.group.extX, this.group.extY, this.group.canRotate())
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.chartGroup.transform, 0, 0, this.chartElement.chartGroup.extX, this.chartElement.chartGroup.extY, false);
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.transform, 0, 0, this.chartElement.extX, this.chartElement.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectsId: this.chartElement.chartGroup.Id, cursorType:"move"};
+
+    };
+}
+
+
 function ChartState(drawingObjectsController, drawingObjects, chart)
 {
     this.id = STATES_ID_CHART;
@@ -1102,7 +1560,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         titles.push(this.chart.vAxisTitle);
         if(!e.CtrlKey)
         {
-
             for(var i = 0; i < titles.length; ++i)
             {
                 if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
@@ -1118,7 +1575,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                     this.drawingObjectsController.updateSelectionState();
-                   // this.drawingObjects.OnUpdateOverlay();
                     return;
                 }
             }
@@ -1140,7 +1596,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                 this.drawingObjectsController.addPreTrackObject(this.chart.createResizeTrack(card_direction));
                 this.drawingObjectsController.changeCurrentState(new PreResizeState(this.drawingObjectsController, this.drawingObjects, this.chart, card_direction));
                 this.drawingObjectsController.updateSelectionState();
-                //this.drawingObjects.OnUpdateOverlay();
                 return;
             }
         }
@@ -1157,7 +1612,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
             this.drawingObjectsController.addPreTrackObject(this.chart.createMoveTrack());
             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, this.chart, true, false));
             this.drawingObjectsController.updateSelectionState();
-           // this.drawingObjects.OnUpdateOverlay();
             return;
         }
 
@@ -1168,68 +1622,20 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
             var cur_drawing_base = drawing_bases[i];
 
             var cur_drawing = cur_drawing_base;
-            if(cur_drawing.isShape() || cur_drawing.isImage())
+            if(cur_drawing instanceof CShape|| cur_drawing instanceof  CImageShape)
             {
-                var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                var hit_in_path = cur_drawing.hitInPath(x, y);
-                var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
-                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                {
-                    this.chart.resetSelection(this.drawingObjectsController);
-                    if(!(e.CtrlKey || e.ShiftKey))
-                        this.drawingObjectsController.resetSelection();
-                    cur_drawing.select(this.drawingObjectsController);
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                    this.drawingObjectsController.updateSelectionState();
-                    //this.drawingObjects.OnUpdateOverlay();
+                if(handleShapeImage(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
-                }
-                else if(hit_in_text_rect)
-                {
-                    //TODO
-                }
             }
-            if(cur_drawing.isGroup())
+            else if(cur_drawing instanceof CGroupShape)
             {
-                var grouped_objects = cur_drawing.getArrGraphicObjects();
-                for(var j = grouped_objects.length - 1; j > -1; --j)
-                {
-                    var cur_grouped_object = grouped_objects[j];
-                    var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                    var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                    var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                    {
-                        this.drawingObjectsController.clearPreTrackObjects();
-                        var is_selected = cur_drawing.selected;
-                        if(!(e.CtrlKey || e.ShiftKey))
-                            this.drawingObjectsController.resetSelection();
-                        cur_drawing.select(this.drawingObjectsController);
-                        this.drawingObjectsController.updateSelectionState();
-                        //this.drawingObjects.OnUpdateOverlay();
-                        for(var j = 0; j < selected_objects.length; ++j)
-                        {
-                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                        }
-                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
-                        return;
-                    }
-                    else if(hit_in_text_rect)
-                    {
-                        this.drawingObjectsController.resetSelection();
-                        cur_grouped_object.select(this.drawingObjectsController);
-                        grouped_objects[j].select(cur_grouped_object);
-                        grouped_objects[j].selectionSetStart(e, x, y);
-                        this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
-                        if(e.ClickCount < 2)
-                            grouped_objects[j].updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                        return;
-                    }
-                }
+                if(handleGroup(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
+            }
+            else if(cur_drawing instanceof  CGraphicFrame)
+            {
+                if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
             }
             else if(cur_drawing.isChart())
             {
@@ -1250,7 +1656,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                     this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                                     this.drawingObjectsController.updateSelectionState();
-                                    //this.drawingObjects.OnUpdateOverlay();
                                     return;
                                 }
                             }
@@ -1268,12 +1673,10 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     }
                                     else
                                     {
-
                                         this.drawingObjectsController.clearPreTrackObjects();
                                         this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                         this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                                         this.drawingObjectsController.updateSelectionState();
-                                        //this.drawingObjects.OnUpdateOverlay();
                                     }
                                     return;
                                 }
@@ -1294,79 +1697,13 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         }
                         this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
                         this.drawingObjectsController.updateSelectionState();
-                        //this.drawingObjects.OnUpdateOverlay();
                         return;
                     }
                 }
                 else
                 {
-                    if(cur_drawing.hitInWorkArea(x, y))
-                    {
-
-                        if(!e.ShiftKey && !e.CtrlKey)
-                        {
-
-                            if(isRealObject(cur_drawing.chartLegend))
-                            {
-                                //TODO
-                            }
-
-                            var object_for_move_in_chart = null;
-                            if(isRealObject(cur_drawing.chartTitle))
-                            {
-                                if(cur_drawing.chartTitle.hit(x, y))
-                                {
-                                    object_for_move_in_chart = cur_drawing.chartTitle;
-                                }
-                            }
-
-                            if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
-                            {
-                                if(cur_drawing.hAxisTitle.hit(x, y))
-                                {
-                                    object_for_move_in_chart = cur_drawing.hAxisTitle;
-                                }
-                            }
-
-                            if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
-                            {
-                                if(cur_drawing.vAxisTitle.hit(x, y))
-                                {
-                                    object_for_move_in_chart = cur_drawing.vAxisTitle;
-                                }
-                            }
-                            if(isRealObject(object_for_move_in_chart))
-                            {
-                                this.chart.resetSelection();
-                                this.drawingObjectsController.resetSelection();
-                                cur_drawing.select(this.drawingObjectsController);
-                                object_for_move_in_chart.select();
-                                this.drawingObjectsController.clearPreTrackObjects();
-                                this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
-                                this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
-                                this.drawingObjectsController.updateSelectionState();
-                                //this.drawingObjects.OnUpdateOverlay();
-                                return;
-                            }
-                            this.drawingObjectsController.clearPreTrackObjects();
-                            var is_selected = cur_drawing.selected;
-                            this.chart.resetSelection();
-                            if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                                this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            this.drawingObjectsController.updateSelectionState();
-                            //this.drawingObjects.OnUpdateOverlay();
-                            for(var j = 0; j < selected_objects.length; ++j)
-                            {
-                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                            }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
-                            return;
-                        }
-
-
-
-                    }
+                    if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                        return;
                 }
             }
 
@@ -1375,7 +1712,6 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjectsController.updateSelectionState();
-        //this.drawingObjects.OnUpdateOverlay();
     };
 
     this.onMouseMove = function(e, x, y)
@@ -1595,6 +1931,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
         if(this.drawingObjectsController.State.id !== STATES_ID_CHART_TEXT_ADD || this.drawingObjectsController.State.textObject !== this.textObject)
         {
             this.chart.recalculate();
+            this.drawingObjectsController.updateSelectionState();
             this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
         }
     };
@@ -1645,6 +1982,549 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
     {
         return this.chartState.isPointInDrawingObjects(x, y);
     };
+}
+
+
+function ChartGroupState(drawingObjectsController, drawingObjects, chart, group)
+{
+    this.id = STATES_ID_CHART_GROUP;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.chart = chart;
+    this.group = group;
+
+    this.onMouseDown = function(e, x, y)
+    {
+        var titles = [];
+        titles.push(this.chart.chartTitle);
+        titles.push(this.chart.hAxisTitle);
+        titles.push(this.chart.vAxisTitle);
+        if(!e.CtrlKey)
+        {
+            for(var i = 0; i < titles.length; ++i)
+            {
+                if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
+                {
+                    var title = titles[i];
+                    for(var j = 0; j < titles.length; ++j)
+                    {
+                        if(isRealObject(titles[j]))
+                            titles[j].deselect();
+                    }
+                    title.select();
+                    this.drawingObjectsController.clearPreTrackObjects();
+                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
+                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectGroupState(this.drawingObjectsController, this.drawingObjects, x, y, title, this.group));
+                    this.drawingObjectsController.updateSelectionState();
+                    return;
+                }
+            }
+        }
+
+        var group_selected_objects = this.group.selectedObjects;
+        if(handleSelectedOjectsGroup(this.drawingObjects, this.drawingObjectsController, this.group, e, x, y))
+            return;
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            var cur_drawing = cur_drawing_base;
+            if(cur_drawing instanceof CShape || cur_drawing instanceof CImageShape)
+            {
+                if(handleShapeImage(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y))
+                    return;
+            }
+            else if(cur_drawing.isTable && cur_drawing.isTable())
+            {
+                if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
+            }
+            else if(cur_drawing instanceof CChartAsGroup)
+            {
+                if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
+            }
+            else if(cur_drawing instanceof CGroupShape)
+            {
+                if(this.group === cur_drawing)
+                {
+                    var arr_graphic_objects = this.group.getArrGraphicObjects();
+                    for(var s = arr_graphic_objects.length - 1; s > -1; --s)
+                    {
+                        var cur_grouped_object = arr_graphic_objects[s];
+                        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape || cur_grouped_object instanceof CGraphicFrame)
+                        {
+                            if(handleShapeImageInGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y, this))
+                                return;
+                        }
+                        else if(cur_grouped_object instanceof CChartAsGroup)
+                        {
+
+                            if(cur_grouped_object === this.chart)
+                            {
+
+                                var selected_title;
+                                for(var j = 0; j < titles.length; ++j)
+                                {
+                                    if(titles[j] && titles[j].selected)
+                                    {
+                                        selected_title = titles[j];
+                                        break;
+                                    }
+                                }
+                                if(selected_title)
+                                {
+                                    if(selected_title.hitInTextRect(x, y))
+                                    {
+                                        selected_title.selectionSetStart(e, x, y);
+                                        this.drawingObjectsController.changeCurrentState(new ChartGroupTextAddState(this.drawingObjectsController, this.drawingObjects,  this.chart, this.group, selected_title));
+                                        if(e.ClickCount < 2)
+                                            selected_title.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                                        return;
+                                    }
+                                }
+                            }
+                            if(handleChartGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y))
+                                return;
+                        }
+                    }
+                }
+                else
+                {
+                    if(handleGroup(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                        return;
+                }
+            }
+        }
+        this.group.resetSelection(this.drawingObjectsController);
+        this.drawingObjectsController.resetSelection();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjects.OnUpdateOverlay();
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {};
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        var selected_title;
+        if(this.chart.chartTitle && this.chart.chartTitle.selected)
+            selected_title = this.chart.chartTitle;
+        else if(this.chart.hAxisTitle && this.chart.hAxisTitle.selected)
+            selected_title = this.chart.hAxisTitle;
+        else if(this.chart.vAxisTitle && this.chart.vAxisTitle.selected)
+            selected_title = this.chart.vAxisTitle;
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.transform, 0, 0, this.group.extX, this.group.extY, this.group.canRotate());
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.chart.transform, 0, 0, this.chart.extX, this.chart.extY, false);
+        if(selected_title)
+        {
+            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_title.transform, 0, 0, selected_title.extX, selected_title.extY, false);
+        }
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+
+        var titles = [];
+        titles.push(this.chart.chartTitle);
+        titles.push(this.chart.hAxisTitle);
+        titles.push(this.chart.vAxisTitle);
+        if(/*!e.CtrlKey*/true)
+        {
+            for(var i = 0; i < titles.length; ++i)
+            {
+                if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
+                {
+                    return {objectId: this.chart.Id, cursorType: "move"};
+                }
+            }
+        }
+
+        if(this.chart.canResize())
+        {
+            var hit_to_handles = this.chart.hitToHandles(x, y);
+            if(hit_to_handles > -1 && hit_to_handles < 8)
+            {
+                var card_direction = this.chart.getCardDirectionByNum(hit_to_handles);
+                return {objectId: this.chart.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            }
+        }
+
+        if(this.chart.hitInBoundingRect(x, y))
+        {
+            return {objectId: this.chart.Id, cursorType: "move"};
+
+        }
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(var i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isShape() || cur_drawing.isImage())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
+                    }
+                }
+                else if(cur_drawing.isGroup())
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
+                        }
+                    }
+                }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing === this.chart)
+                    {
+                        for(var j = 0; j < titles.length; ++j)
+                        {
+                            var title = titles[j];
+                            if(isRealObject(title))
+                            {
+                                if(!title.selected)
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        return {objectId: this.chart.Id, cursorType: "move"};
+                                    }
+
+                                }
+                                else
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        if(title.hitInTextRect(x, y))
+                                        {
+                                            return {objectId: this.chart.Id, cursorType: "move"};
+                                        }
+                                        else
+                                        {
+
+                                            return {objectId: this.chart.Id, cursorType: "move"};
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+                            return {objectId: this.chart.Id, cursorType: "move"};
+                        }
+
+                    }
+                    else
+                    {
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+
+                            if(!e.ShiftKey && !e.CtrlKey)
+                            {
+
+                                if(isRealObject(cur_drawing.chartLegend))
+                                {
+                                    //TODO
+                                }
+
+                                var object_for_move_in_chart = null;
+                                if(isRealObject(cur_drawing.chartTitle))
+                                {
+                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.hAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.vAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                    }
+                                }
+                                if(isRealObject(object_for_move_in_chart))
+                                {
+                                    return {objectId: this.chart.Id, cursorType: "move"};
+                                }
+
+                                return {objectId: this.chart.Id, cursorType: "move"};
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+}
+
+function ChartGroupTextAddState(drawingObjectsController, drawingObjects, chart, group, title)
+{
+    this.id = STATES_ID_CHART_GROUP_TEXT_ADD;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.chart = chart;
+    this.group = group;
+    this.title = title;
+    this.textObject = title;
+    this.groupState = new ChartGroupState(this.drawingObjectsController, this.drawingObjects, this.chart, this.group);
+
+    this.onMouseDown = function(e, x, y)
+    {
+        this.groupState.onMouseDown(e, x, y);
+        if(this.drawingObjectsController.State.id !== STATES_ID_CHART_GROUP_TEXT_ADD)
+        {
+            this.chart.recalculate();
+            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+        }
+        this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        if(e.IsLocked)
+        {
+            this.textObject.selectionSetEnd(e, x, y, this.drawingObjects.num);
+            this.drawingObjectsController.updateSelectionState();
+        }
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.textObject.selectionSetEnd(e, x, y, this.drawingObjects.num);
+        this.drawingObjectsController.updateSelectionState();
+    };
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.transform, 0, 0, this.group.extX, this.group.extY, this.group.canRotate());
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.chart.transform, 0, 0, this.chart.extX, this.chart.extY, false);
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.title.transform, 0, 0, this.title.extX, this.title.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+
+        var titles = [];
+        titles.push(this.chart.chartTitle);
+        titles.push(this.chart.hAxisTitle);
+        titles.push(this.chart.vAxisTitle);
+        if(/*!e.CtrlKey*/true)
+        {
+            for(var i = 0; i < titles.length; ++i)
+            {
+                if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
+                {
+                    return {objectId: this.chart.Id, cursorType: "move"};
+                }
+            }
+        }
+
+        if(this.chart.canResize())
+        {
+            var hit_to_handles = this.chart.hitToHandles(x, y);
+            if(hit_to_handles > -1 && hit_to_handles < 8)
+            {
+                var card_direction = this.chart.getCardDirectionByNum(hit_to_handles);
+                return {objectId: this.chart.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            }
+        }
+
+        if(this.chart.hitInBoundingRect(x, y))
+        {
+            return {objectId: this.chart.Id, cursorType: "move"};
+
+        }
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(var i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isShape() || cur_drawing.isImage())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
+                    }
+                }
+                else if(cur_drawing.isGroup())
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
+                        }
+                    }
+                }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing === this.chart)
+                    {
+                        for(var j = 0; j < titles.length; ++j)
+                        {
+                            var title = titles[j];
+                            if(isRealObject(title))
+                            {
+                                if(!title.selected)
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        return {objectId: this.chart.Id, cursorType: "move"};
+                                    }
+
+                                }
+                                else
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        if(title.hitInTextRect(x, y))
+                                        {
+                                            return {objectId: this.chart.Id, cursorType: "move"};
+                                        }
+                                        else
+                                        {
+
+                                            return {objectId: this.chart.Id, cursorType: "move"};
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+                            return {objectId: this.chart.Id, cursorType: "move"};
+                        }
+
+                    }
+                    else
+                    {
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+
+                            if(!e.ShiftKey && !e.CtrlKey)
+                            {
+
+                                if(isRealObject(cur_drawing.chartLegend))
+                                {
+                                    //TODO
+                                }
+
+                                var object_for_move_in_chart = null;
+                                if(isRealObject(cur_drawing.chartTitle))
+                                {
+                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.hAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.vAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                    }
+                                }
+                                if(isRealObject(object_for_move_in_chart))
+                                {
+                                    return {objectId: this.chart.Id, cursorType: "move"};
+                                }
+
+                                return {objectId: this.chart.Id, cursorType: "move"};
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
 }
 
 function TextAddState(drawingObjectsController, drawingObjects, textObject)
@@ -2776,98 +3656,8 @@ function GroupState(drawingObjectsController, drawingObjects, group)
     this.onMouseDown = function(e, x, y)
     {
         var group_selected_objects = this.group.selectedObjects;
-        if(group_selected_objects.length === 1)
-        {
-            var hit_to_adj = group_selected_objects[0].hitToAdjustment(x, y);
-            if(hit_to_adj.hit)
-            {
-                if(group_selected_objects[0].canChangeAdjustments())
-                {
-                    if(hit_to_adj.adjPolarFlag === false)
-                        this.drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(group_selected_objects[0], hit_to_adj.adjNum));
-                    else
-                        this.drawingObjectsController.addPreTrackObject(new PolarAdjustmentTrack(group_selected_objects[0], hit_to_adj.adjNum));
-                    this.drawingObjectsController.changeCurrentState(new PreChangeAdjInGroupState(this.drawingObjectsController, this.drawingObjects, this.group));
-                }
-                return;
-            }
-        }
-        for(var i = group_selected_objects.length - 1; i  > -1; --i)
-        {
-            var hit_to_handles = group_selected_objects[i].hitToHandles(x, y);
-            if(hit_to_handles > -1)
-            {
-                if(hit_to_handles === 8)
-                {
-                    if(!group_selected_objects[i].canRotate())
-                        return;
-                    for(var j = 0; j < group_selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createRotateInGroupTrack())
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreRotateInGroupState(this.drawingObjectsController, this.drawingObjects, this.group, group_selected_objects[i]));
-                }
-                else
-                {
-                    if(!group_selected_objects[i].canResize())
-                        return;
-                    var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
-                    for(var j = 0; j < group_selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createResizeInGroupTrack(card_direction))
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreResizeInGroupState(this.drawingObjectsController, this.drawingObjects, this.group, group_selected_objects[i], card_direction));
-                }
-                return;
-            }
-        }
-
-        var hit_to_handles = this.group.hitToHandles(x, y);
-        if(hit_to_handles > -1)
-        {
-            if(hit_to_handles === 8)
-            {
-                if(!this.group.canRotate())
-                    return;
-                this.group.resetSelection(this.drawingObjectsController);
-                this.drawingObjectsController.addPreTrackObject(this.group.createRotateTrack());
-                this.drawingObjectsController.changeCurrentState(new PreRotateState(this.drawingObjectsController, this.drawingObjects, this.group));
-                return;
-            }
-            else
-            {
-                if(!this.group.canResize())
-                    return;
-                this.group.resetSelection(this.drawingObjectsController);
-                var card_direction = this.group.getCardDirectionByNum(hit_to_handles);
-                this.drawingObjectsController.addPreTrackObject(this.group.createResizeTrack(card_direction));
-                this.drawingObjectsController.changeCurrentState(new PreResizeState(this.drawingObjectsController, this.drawingObjects, this.group, card_direction));
-                return;
-            }
-        }
-
-
-        for(i = group_selected_objects.length - 1; i  > -1; --i)
-        {
-            if(group_selected_objects[i].hitInBoundingRect(x, y))
-            {
-                this.drawingObjectsController.clearPreTrackObjects();
-                for(var j = 0; j < group_selected_objects.length; ++j)
-                {
-                    this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
-                }
-                this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects, this.group,
-                    x, y, e.ShiftKey, e.CtrlKey, group_selected_objects[i], true));
-            }
-        }
-
-        if(this.group.hitInBoundingRect(x, y))
-        {
-            this.group.resetSelection();
-            this.drawingObjectsController.addPreTrackObject(this.group.createMoveTrack());
-            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, this.group, true, false));
+        if(handleSelectedOjectsGroup(this.drawingObjects, this.drawingObjectsController, this.group, e, x, y))
             return;
-        }
 
         var drawing_bases = this.drawingObjects.getDrawingObjects();
         var selected_objects = this.drawingObjectsController.selectedObjects;
@@ -2875,56 +3665,22 @@ function GroupState(drawingObjectsController, drawingObjects, group)
         {
             var cur_drawing_base = drawing_bases[i];
             var cur_drawing = cur_drawing_base;
-            if(cur_drawing.isSimpleObject())
+            if(cur_drawing instanceof CShape || cur_drawing instanceof CImageShape)
             {
-                var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                var hit_in_path = cur_drawing.hitInPath(x, y);
-                var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
-                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                {
-                    this.group.resetSelection(this.drawingObjectsController);
-                    if(!(e.CtrlKey || e.ShiftKey))
-                        this.drawingObjectsController.resetSelection();
-                    cur_drawing.select(this.drawingObjectsController);
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                    }
-                    this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                    this.drawingObjects.OnUpdateOverlay();
+                if(handleShapeImage(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y))
                     return;
-                }
-                else if(hit_in_text_rect)
-                {
-                    if(e.Button !== g_mouse_button_right || this.drawingObjectsController.State === this || (this.drawingObjectsController.State.textObject !== cur_drawing))
-                    {
-                        this.drawingObjectsController.resetSelection();
-                        cur_drawing.select(this.drawingObjectsController);
-                        cur_drawing.selectionSetStart(e, x, y);
-                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                        if(e.ClickCount < 2)
-                            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                    }
-                    else
-                    {
-                        if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
-                        {
-                            this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            cur_drawing.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
-                            if(e.ClickCount < 2)
-                                this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                        }
-                    }
-                    return;
-                }
             }
-            else
+            else if(cur_drawing.isTable && cur_drawing.isTable())
+            {
+                if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
+            }
+            else if(cur_drawing instanceof CChartAsGroup)
+            {
+                if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                    return;
+            }
+            else if(cur_drawing instanceof CGroupShape)
             {
                 if(this.group === cur_drawing)
                 {
@@ -2932,73 +3688,22 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                     for(var s = arr_graphic_objects.length - 1; s > -1; --s)
                     {
                         var cur_grouped_object = arr_graphic_objects[s];
-                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape || cur_grouped_object instanceof CGraphicFrame)
                         {
-                            var is_selected = cur_grouped_object.selected;
-                            if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                                this.group.resetSelection();
-                            cur_grouped_object.select(this.drawingObjectsController);
-                            this.drawingObjects.OnUpdateOverlay();
-                            for(var j = 0; j < group_selected_objects.length; ++j)
-                            {
-                                this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
-                            }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects,this.group,  x, y, e.ShiftKey, e.ctrl, cur_grouped_object, is_selected));
-                            this.drawingObjects.OnUpdateOverlay();
-                            return;
+                            if(handleShapeImageInGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y, this))
+                                return;
                         }
-                        else if(hit_in_text_rect)
+                        else if(cur_grouped_object instanceof CChartAsGroup)
                         {
-                            this.drawingObjectsController.resetSelection();
-                            this.group.select(this.drawingObjectsController);
-                            cur_grouped_object.select(this.group);
-                            cur_grouped_object.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_grouped_object));
-                            if(e.ClickCount < 2)
-                                cur_grouped_object.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                            return;
+                            if(handleChartGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y))
+                                return;
                         }
                     }
                 }
                 else
                 {
-                    var grouped_objects = cur_drawing.getArrGraphicObjects();
-                    for(var j = grouped_objects.length - 1; j > -1; --j)
-                    {
-                        var cur_grouped_object = grouped_objects[j];
-                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                        {
-                            this.group.resetSelection(this.drawingObjectsController);
-                            if(!(e.CtrlKey || e.ShiftKey))
-                                this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            this.drawingObjects.OnUpdateOverlay();
-                            for(var t = 0; t < selected_objects.length; ++t)
-                            {
-                                this.drawingObjectsController.addPreTrackObject(selected_objects[t].createMoveTrack());
-                            }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                            editor.WordControl.OnUpdateOverlay();
-                            return;
-                        }
-                        else if(hit_in_text_rect)
-                        {
-                            this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            cur_grouped_object.select(this.group);
-                            cur_grouped_object.selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_grouped_object));
-                            if(e.ClickCount < 2)
-                                cur_grouped_object.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
-                            return;
-                        }
-                    }
+                    if(handleGroup(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
+                        return;
                 }
             }
 

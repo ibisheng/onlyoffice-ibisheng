@@ -1320,7 +1320,7 @@ WordGroupShapes.prototype =
                 numN = 1;
             }
         }
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             return (cardDirection + numN) % 8;
         }
@@ -1380,7 +1380,7 @@ WordGroupShapes.prototype =
         }
 
         var tmpArr=[];
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             tmpArr[numN] = CARD_DIRECTION_N;
             tmpArr[(numN+1)%8] = CARD_DIRECTION_NE;
@@ -5630,7 +5630,31 @@ function ShapeForResizeInGroup(originalShape, parentTrack)
     {
         this.geometry.Recalculate(this.extX, this.extY);
     }
-    this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.extX, this.extY, originalShape.brush, originalShape.pen, this.transform);
+
+
+    var pen, brush;
+    if(originalShape instanceof CChartAsGroup)
+    {
+        brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+        pen =  pen;
+        brush = brush;
+    }
+    else
+    {
+        pen = originalShape.pen;
+        brush = originalShape.brush;
+    }
+    this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.extX, this.extY, brush, pen, this.transform);
     this.updateSize = function(kw, kh)
     {
         var _kw, _kh;

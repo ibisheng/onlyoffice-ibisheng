@@ -353,18 +353,6 @@ CChartAsGroup.prototype =
         History.Add(this, data);
     },
 
-
-
-    setDrawingObjects: function(drawingObjects)
-    {
-        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
-        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-        this.drawingObjects = drawingObjects;
-
-    },
-
     getBoundsInGroup: function()
     {
 
@@ -470,36 +458,7 @@ CChartAsGroup.prototype =
         return OtherProps;
     },
 
-    syncAscChart: function() {
 
-        if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
-            this.chart.asc_getHeader().asc_setTitle(this.chartTitle.txBody.content.getTextString());
-        }
-        if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
-            this.chart.asc_getYAxis().asc_setTitle(this.vAxisTitle.txBody.content.getTextString());
-        }
-        if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
-            this.chart.asc_getXAxis().asc_setTitle(this.hAxisTitle.txBody.content.getTextString());
-        }
-    },
-
-    setDrawingObjects: function(drawingObjects)
-    {
-        this.drawingObjects = drawingObjects;
-        if(isRealObject(this.chartTitle))
-            this.chartTitle.drawingObjects = drawingObjects;
-        if(isRealObject(this.hAxisTitle))
-            this.hAxisTitle.drawingObjects = drawingObjects;
-        if(isRealObject(this.vAxisTitle))
-            this.vAxisTitle.drawingObjects = drawingObjects;
-    },
-
-    addToDrawingObjects: function()
-    {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-        this.select(this.drawingObjects.controller);
-        this.drawingObjects.addGraphicObject(this);
-    },
 
 
     getTransform: function()
@@ -510,10 +469,9 @@ CChartAsGroup.prototype =
     {},
 
     hitToPath: function()
-    {},
-
-    hitToTextRect: function()
-    {},
+    {
+        return false;
+    },
 
     recalculatePosExt: function()
     {
@@ -601,127 +559,6 @@ CChartAsGroup.prototype =
 
 
 
-    setXfrmObject: function(xfrm)
-    {
-        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
-        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
-        this.spPr.xfrm = xfrm;
-    },
-
-    /* init: function()
-     {
-     var is_on = History.Is_On();
-     if(is_on)
-     History.TurnOff();
-     if(isRealObject(this.chartTitle))
-     {
-     this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
-     if(this.chartTitle.isEmpty())
-     {
-     var title_str = "Chart Title";
-     this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-     for(var i in title_str)
-     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-
-     }
-     else
-     {
-     var content = this.chartTitle.txBody.content;
-     content.Parent = this.chartTitle.txBody;
-     content.DrawingDocument = this.drawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = this.drawingDocument;
-     content.Content[i].Parent = content;
-     }
-     }
-     var content2 =  this.chartTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-     //  this.chart.header.title = this.chartTitle.txBody.content.getTextString();
-     }
-
-     if(isRealObject(this.hAxisTitle))
-     {
-     this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
-     this.hAxisTitle.drawingObjects = this.drawingObjects;
-     if(this.hAxisTitle.isEmpty())
-     {
-     var title_str = "X Axis";
-     this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-     for(var i in title_str)
-     this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-     }
-     else
-     {
-     var content = this.hAxisTitle.txBody.content;
-     content.Parent = this.hAxisTitle.txBody;
-     content.DrawingDocument = this.drawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = this.drawingDocument;
-     content.Content[i].Parent = content;
-     }
-     }
-     var content2 =  this.hAxisTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-
-     //  this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
-     }
-
-     if(isRealObject(this.vAxisTitle))
-     {
-     this.chart.xAxis.title = "";
-     this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
-     this.vAxisTitle.drawingObjects = this.drawingObjects;
-     if(this.vAxisTitle.isEmpty())
-     {
-     var title_str = "Y Axis";
-     this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
-
-     for(var i in title_str)
-     this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-
-     this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
-     this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
-     this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
-     }
-     else
-     {
-     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
-
-     var content = this.vAxisTitle.txBody.content;
-     content.Parent = this.vAxisTitle.txBody;
-     content.DrawingDocument = this.drawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = this.drawingDocument;
-     content.Content[i].Parent = content;
-     }
-     content.Set_ApplyToAll(true);
-     content.Set_ParagraphAlign(align_Center);
-     content.Set_ApplyToAll(false);
-     }
-     var content2 =  this.vAxisTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-     //  this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
-     }
-
-     if(is_on)
-     History.TurnOn();
-     //this.recalculate();
-     },   */
 
     calculateAfterOpen: function()
     {
@@ -790,16 +627,6 @@ CChartAsGroup.prototype =
         }
     },
 
-    deleteDrawingBase: function()
-    {
-        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
-        if(isRealNumber(position))
-        {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
-        }
-    },
-
-
 
 
     setChartTitle: function(chartTitle)
@@ -828,12 +655,20 @@ CChartAsGroup.prototype =
 
         graphics.reset();
         graphics.SetIntegerGrid(true);
+
+        graphics.SaveGrState();
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.transform);
+        graphics.AddClipRect(-1, -1, this.absExtX + 1, this.absExtY + 1);
         if(this.chartTitle)
             this.chartTitle.draw(graphics, pageIndex);
         if(this.hAxisTitle)
             this.hAxisTitle.draw(graphics, pageIndex);
         if(this.vAxisTitle)
             this.vAxisTitle.draw(graphics, pageIndex);
+        graphics.RestoreGrState();
+
+
     },
 
     check_bounds: function(checker)
@@ -920,6 +755,22 @@ CChartAsGroup.prototype =
     },
 
 
+    applyTextPr: function(paraItem, bRecalculate)
+    {
+        if(this.chartTitle)
+        {
+            this.chartTitle.applyTextPr(paraItem, bRecalculate);
+        }
+        if(this.hAxisTitle)
+        {
+            this.hAxisTitle.applyTextPr(paraItem, bRecalculate);
+        }
+        if(this.vAxisTitle)
+        {
+            this.vAxisTitle.applyTextPr(paraItem, bRecalculate);
+        }
+    },
+
     transformPointRelativeShape: function(x, y)
     {
         //this.calculateLeftTopPoint();
@@ -1001,9 +852,43 @@ CChartAsGroup.prototype =
 
     },
 
+    Refresh_RecalcData : function(Data)
+    {
+        if(this.group == null && isRealObject(this.parent))
+            this.parent.Refresh_RecalcData();
+        else
+        {
+            if(isRealObject(this.group))
+            {
+                var cur_group = this.group;
+                while(isRealObject(cur_group.group))
+                    cur_group = cur_group.group;
+                if(isRealObject(cur_group.parent))
+                    cur_group.parent.Refresh_RecalcData();
+            }
+        }
+    },
+
+    Refresh_RecalcData2 : function()
+    {
+        if(this.group == null && isRealObject(this.parent))
+            History.RecalcData_Add({ Type : historyrecalctype_Flow, Data : this.parent});
+        else
+        {
+            if(isRealObject(this.group))
+            {
+                var cur_group = this.group;
+                while(isRealObject(cur_group.group))
+                    cur_group = cur_group.group;
+                if(isRealObject(cur_group.parent))
+                    History.RecalcData_Add({ Type : historyrecalctype_Flow, Data : cur_group.parent});
+            }
+
+        }
+    },
+
     recalculate: function(updateImage)
     {
-
         try
         {
             this.recalculatePosExt();
@@ -1183,8 +1068,6 @@ CChartAsGroup.prototype =
                 title: title_margin
             };
 
-            /*if ( !this.chart.range.intervalObject )
-             this.drawingObjects.intervalToIntervalObject(this.chart);           */
             if(!(updateImage === false))
             {
                 this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.absExtY));
@@ -1696,6 +1579,498 @@ CChartAsGroup.prototype =
 
     },
 
+    init2: function()
+    {
+        var is_on = History.Is_On();
+        if(is_on)
+            History.TurnOff();
+        if(isRealObject(this.parent))
+        {
+            var xfrm = this.spPr.xfrm;
+            if(!this.group)
+            {
+                xfrm.offX = 0;
+                xfrm.offY = 0;
+            }
+            xfrm.extX = this.parent.Extent.W;
+            xfrm.extY = this.parent.Extent.H;
+        }
+
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
+            if (this.chartTitle.txBody)
+                this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
+            //this.chartTitle.drawingObjects = this.drawingObjects;
+            if(this.chartTitle.isEmpty())
+            {
+                var title_str = "Chart Title";
+                this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
+                if(this.chartTitle.txBody.content && this.chartTitle.txBody.shape instanceof CChartTitle)
+                {
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+                    TextPr.Bold = true;
+                    if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.chartTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.chartTitle.txBody.content.Styles = styles;
+                    this.chartTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+                }
+                //this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
+                for(var i in title_str)
+                    this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+            }
+            else
+            {
+                if(this.chartTitle.txBody.content && this.chartTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.chartTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.chartTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.chartTitle.txBody.content.Styles = styles;
+                    this.chartTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
+                var content = this.chartTitle.txBody.content;
+                content.Parent = this.chartTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+                    this.chartTitle.txBody.content.Content[i].Style_Add_Open(default_legend_style.Id);
+                }
+            }
+            var content = this.chartTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                //content.Content[i].Pr.PStyle = this.chartTitle.txBody.content.Styles.Style.length - 1;
+            }
+
+            this.chartTitle.txBody.content.Set_ApplyToAll(true);
+            this.chartTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.chartTitle.txBody.content.Set_ApplyToAll(false);
+            // this.chart.header.title = this.chartTitle.txBody.content.getTextString();TODO
+        }
+
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
+
+            //this.hAxisTitle.drawingObjects = this.drawingObjects;
+            if(this.hAxisTitle.isEmpty())
+            {
+                var title_str = "X Axis";
+                this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+                if(this.hAxisTitle.txBody.content && this.hAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.hAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.hAxisTitle.txBody.content.Styles = styles;
+                    this.hAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
+                for(var i in title_str)
+                    this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+            }
+            else
+            {
+
+                var content = this.hAxisTitle.txBody.content;
+                content.Parent = this.hAxisTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                if(this.hAxisTitle.txBody.content && this.hAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.hAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.hAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.hAxisTitle.txBody.content.Styles = styles;
+                    this.hAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+                    content.Content[i].Style_Add_Open(default_legend_style.Id);
+                }
+
+            }
+
+
+            var content = this.hAxisTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                //content.Content[i].Pr.PStyle = this.hAxisTitle.txBody.content.Styles.Style.length - 1;
+            }
+            this.hAxisTitle.txBody.content.Set_ApplyToAll(true);
+            this.hAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.hAxisTitle.txBody.content.Set_ApplyToAll(false);
+        }
+
+        if(isRealObject(this.vAxisTitle))
+        {
+            //this.chart.xAxis.title = "";
+            this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
+
+            //  this.vAxisTitle.drawingObjects = this.drawingObjects;
+            if(this.vAxisTitle.isEmpty())
+            {
+                var title_str = "Y Axis";
+                this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+                if(this.vAxisTitle.txBody.content && this.vAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.vAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.vAxisTitle.txBody.content.Styles = styles;
+                    this.vAxisTitle.txBody.content.Content[0].Style_Add_Open(default_legend_style.Id);
+
+                }
+                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+
+                for(var i in title_str)
+                    this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+            }
+            else
+            {
+                this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+                var content = this.vAxisTitle.txBody.content;
+
+                if(this.vAxisTitle.txBody.content && this.vAxisTitle.txBody.shape instanceof CChartTitle)
+                {
+
+                    var styles = new CStyles();
+                    var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
+
+                    var TextPr = {FontFamily:{}};
+                    TextPr.FontFamily.Name = "Calibri";
+                    TextPr.Bold = true;
+                    if(this.vAxisTitle.txBody.shape.getTitleType() === CHART_TITLE_TYPE_TITLE)
+                        TextPr.FontSize = 18;
+                    else
+                        TextPr.FontSize = 10;
+                    TextPr.RFonts = {};
+                    TextPr.RFonts.Ascii =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.EastAsia =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.HAnsi =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    TextPr.RFonts.CS =
+                    {
+                        Name  : "Calibri",
+                        Index : -1
+                    };
+
+                    default_legend_style.TextPr.Set_FromObject(TextPr);
+                    default_legend_style.ParaPr.Spacing.After = 0;
+                    default_legend_style.ParaPr.Spacing.Before = 0;
+                    default_legend_style.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                    default_legend_style.ParaPr.Spacing.Line = 1;
+                    default_legend_style.ParaPr.Jc = align_Center;
+
+                    //TODO:ParaPr: default_legend_style.ParaPr.Ind
+                    var tx_pr;
+                    if(isRealObject(this.vAxisTitle.txBody.txPr))
+                    {
+                        //TODO
+                    }
+                    styles.Style[default_legend_style.Id] = default_legend_style;
+                    this.vAxisTitle.txBody.content.Styles = styles;
+
+                }
+
+                content.Parent = this.vAxisTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+
+                    this.vAxisTitle.txBody.content.Content[i].Style_Add_Open(default_legend_style.Id);
+                    //content.Content[i].setTextPr(new ParaTextPr());
+                }
+            }
+            var content = this.vAxisTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                //content.Content[i].Pr.PStyle = this.vAxisTitle.txBody.content.Styles.Style.length - 1;
+            }
+            this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
+            this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
+            //this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
+        }
+        if(is_on)
+            History.TurnOn();
+    },
+
+    getSelectedTitle: function()
+    {
+        if(this.chartTitle && this.chartTitle.selected)
+        {
+            return this.chartTitle;
+        }
+        else if(this.hAxisTitle && this.hAxisTitle.selected)
+        {
+            return this.hAxisTitle;
+        }
+        else if(this.vAxisTitle && this.vAxisTitle.selected)
+        {
+            return this.vAxisTitle;
+        }
+        return null;
+    },
+
     calculateSnapArrays: function(snapArrayX, snapArrayY)
     {
         var t = this.transform;
@@ -2195,7 +2570,7 @@ CChartAsGroup.prototype =
         }
 
         var tmpArr=[];
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             tmpArr[numN] = CARD_DIRECTION_N;
             tmpArr[(numN+1)%8] = CARD_DIRECTION_NE;
@@ -2288,7 +2663,7 @@ CChartAsGroup.prototype =
                 numN = 1;
             }
         }
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             return (cardDirection + numN) % 8;
         }
@@ -2355,11 +2730,6 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
-    Refresh_RecalcData: function()
-    {},
-
-    Refresh_RecalcData2: function()
-    {},
 
     Undo: function(data)
     {
@@ -3150,12 +3520,55 @@ CChartAsGroup.prototype =
 
     copy: function(parent, group)
     {
+        return this.copy3(parent, group);
         var _group = isRealObject(group) ? group : null;
         var c = new CChartAsGroup(parent, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, _group);
         c.setChartBinary(this.getChartBinary());
         return c;
     },
 
+    copy3: function(parent, group)
+    {
+        var _group = isRealObject(group) ? group : null;
+        var c = new CChartAsGroup(parent, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, _group);
+        //var r = CreateBinaryReader(binary, 0, binary.length);
+        if(this.chartTitle)
+        {
+            c.addTitle(this.chartTitle.copy(c, CHART_TITLE_TYPE_TITLE));
+        }
+        else
+        {
+            c.addTitle(null);
+        }
+
+        if(this.vAxisTitle)
+        {
+            c.addYAxis(this.vAxisTitle.copy(c, CHART_TITLE_TYPE_V_AXIS));
+        }
+        else
+        {
+            c.addYAxis(null);
+        }
+        if(this.hAxisTitle)
+        {
+            c.addXAxis(this.hAxisTitle.copy(c, CHART_TITLE_TYPE_H_AXIS));
+        }
+        else
+        {
+            c.addXAxis(null);
+        }
+        c.setSpPr(this.spPr.createDuplicate());
+        g_oTableId.m_bTurnOff = true;
+        var chart = new asc_CChart(this.chart);
+        g_oTableId.m_bTurnOff = false;
+        c.setAscChart(chart);
+        if(isRealObject(c.parent))
+        {
+            c.parent.setExtent(c.spPr.xfrm.extX, c.spPr.xfrm.extY);
+        }
+        History.Add(this, {Type: historyitem_AutoShapes_RecalculateAfterResize});
+        return c;
+    },
 
     setParent: function(paraDrawing)
     {

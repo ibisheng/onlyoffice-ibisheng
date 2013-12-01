@@ -1,10 +1,3 @@
-/**
- * Created by JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 2/24/12
- * Time: 12:41 PM
- * To change this template use File | Settings | File Templates.
- */
 function CShapeColor(r, g, b)
 {
     this.r = r;

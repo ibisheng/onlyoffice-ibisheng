@@ -71,7 +71,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             case STATES_ID_CHART_TEXT_ADD:
-
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
             {
                 if(this.State.textObject.txBody)
                 {
@@ -104,7 +104,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             case STATES_ID_CHART_TEXT_ADD:
-
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
@@ -211,6 +211,8 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_GROUP:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
+            case STATES_ID_CHART_GROUP:
             {
                 var group_selected_objects = this.State.group.selectedObjects;
                 if(group_selected_objects.length === 1)
@@ -308,6 +310,34 @@ CGraphicObjects.prototype = {
                             var arr_graphic_objects = this.State.group.getArrGraphicObjects();
                             for(var s = arr_graphic_objects.length - 1; s > -1; --s)
                             {
+                                if(this.State.id === STATES_ID_CHART_GROUP_TEXT_ADD || this.State.id === STATES_ID_CHART_GROUP)
+                                {
+                                    if(arr_graphic_objects[s] === this.State.chart)
+                                    {
+
+                                        var selected_title;
+                                        var titles = [];
+                                        titles.push(this.State.chart.chartTitle);
+                                        titles.push(this.State.chart.hAxisTitle);
+                                        titles.push(this.State.chart.vAxisTitle);
+                                        for(var j = 0; j < titles.length; ++j)
+                                        {
+                                            if(titles[j] && titles[j].selected)
+                                            {
+                                                selected_title = titles[j];
+                                                break;
+                                            }
+                                        }
+                                        if(selected_title)
+                                        {
+                                            if(selected_title.hitInTextRect(x, y))
+                                            {
+                                                drawingDocument.SetCursorType("text");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
                                 var cur_grouped_object = arr_graphic_objects[s];
                                 var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
                                 var hit_in_path = cur_grouped_object.hitInPath(x, y);
@@ -348,7 +378,6 @@ CGraphicObjects.prototype = {
                     }
 
                 }
-
                 drawingDocument.SetCursorType("default");
                 break;
             }
@@ -369,7 +398,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_RESIZE:
             case STATES_ID_RESIZE_IN_GROUP:
             {
-                drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[this.State.cardDirection])
+                drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[this.State.cardDirection]);
                 break;
             }
 
@@ -1748,9 +1777,18 @@ CGraphicObjects.prototype = {
 
     },
 
+
     getChartObject: function()
     {
         var selected_arr = this.selectedObjects;
+        if(this.State.group)
+        {
+            selected_objects = this.State.group.selectedObjects;
+            if(selected_objects.length === 1 && selected_objects[0] instanceof CChartAsGroup)
+            {
+                return selected_objects[0];
+            }
+        }
         for(var  i = 0;  i < selected_arr.length; ++i)
         {
             if(selected_arr[i].chart != null)
@@ -2637,6 +2675,13 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_GROUP:
             {
+                var seleted_objects = this.State.group.selectedObjects;
+                if(selected_objects.length === 1 && selected_objects[0] instanceof CChartAsGroup)
+                {
+                    selected_objects[0].initFromBinary(binary);
+                    this.State.group.updateCoordinatesAfterInternalResize();
+                    editor.WordControl.m_oLogicDocument.recalcMap[this.State.group.Id] = this.State.group;
+                }
                 break;
             }
             case STATES_ID_NULL:
@@ -3142,12 +3187,14 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
                     History.Create_NewPoint();
                     this.State.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
-                    this.State.textObject.recalculate();
+                    if(this.State.textObject.recalculate)
+                        this.State.textObject.recalculate();
                     this.updateSelectionState();
                 }
                 break;
@@ -3346,6 +3393,31 @@ CGraphicObjects.prototype = {
                 s.selectedTitle = selected_title;
                 break;
             }
+            case STATES_ID_MOVE_INTERNAL_CHART_OBJECT_GROUP:
+            case STATES_ID_CHART_GROUP:
+            {
+                s.id = STATES_ID_CHART_GROUP;
+                s.chart = this.State.chart;
+                s.group = this.State.group;
+                var chart = this.State.chart;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                    selected_title = chart.chartTitle;
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                    selected_title = chart.hAxisTitle;
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                    selected_title = chart.vAxisTitle;
+                s.selectedTitle = selected_title;
+                break;
+            }
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
+            {
+                s.id = STATES_ID_CHART_GROUP_TEXT_ADD;
+                s.chart = this.State.chart;
+                s.group = this.State.group;
+                s.title = this.State.title;
+                s.textSelectionState = this.State.title.getTextSelectionState();
+                break;
+            }
             default :
             {
                 s.id = STATES_ID_NULL;
@@ -3407,6 +3479,26 @@ CGraphicObjects.prototype = {
                 if(s.selectedTitle)
                     s.selectedTitle.select();
                 this.changeCurrentState(new ChartState(this, this.slide, s.chart));
+                break;
+            }
+            case STATES_ID_CHART_GROUP:
+            {
+                s.group.select(this);
+                s.chart.select(this);
+                if(s.selectedTitle)
+                {
+                    s.selectedTitle.select();
+                }
+                this.changeCurrentState(new ChartGroupState(this, this.slide, s.chart, s.group));
+                break;
+            }
+            case STATES_ID_CHART_GROUP_TEXT_ADD:
+            {
+                s.group.select(this);
+                s.chart.select(this);
+                s.title.select();
+                s.title.setTextSelectionState(s.textSelectionState);
+                this.changeCurrentState(new ChartGroupTextAddState(this, this.slide, s.chart, s.group, s.title));
                 break;
             }
             default :

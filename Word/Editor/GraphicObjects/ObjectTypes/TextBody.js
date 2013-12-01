@@ -1,13 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 7/4/13
- * Time: 5:25 PM
- * To change this template use File | Settings | File Templates.
- */
-
-
-
 function CTextBody(shape)
 {
     //this.shape = shape;
@@ -161,7 +151,19 @@ CTextBody.prototype =
     },
 
     Refresh_RecalcData: function()
-    {},
+    {
+        if(isRealObject(this.content))
+        {
+            if(this.shape instanceof  CChartTitle)
+            {
+                if(this.shape.chartGroup instanceof CChartAsGroup && this.shape.chartGroup.chart)
+                    this.shape.chartGroup.Refresh_RecalcData();
+
+            }
+            else
+                this.content.Recalculate_Page(0, true);
+        }
+    },
 
 
     draw: function(graphics, pageIndex)
@@ -405,19 +407,20 @@ CTextBody.prototype =
     updateSelectionState: function()
     {
         var Doc = this.content;
-        var dd = editor.WordControl.m_oLogicDocument.DrawingDocument;
+        var DrawingDocument = editor.WordControl.m_oDrawingDocument;
         if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
-            dd.UpdateTargetTransform(this.shape.transformText);
-            dd.TargetEnd();
-            dd.SelectEnabled(true);
-            dd.SelectClear();
-            dd.SelectShow();
+            DrawingDocument.UpdateTargetTransform(this.shape.transformText);
+            DrawingDocument.TargetEnd();
+            DrawingDocument.SelectEnabled(true);
+            DrawingDocument.SelectClear();
+            DrawingDocument.SelectShow();
         }
-        else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
+        else
         {
-            dd.UpdateTargetTransform(this.shape.transformText);
-            dd.TargetShow();
-            dd.SelectEnabled(false);
+            editor.WordControl.m_oLogicDocument.RecalculateCurPos();
+            DrawingDocument.UpdateTargetTransform(this.shape.transformText);
+            DrawingDocument.TargetShow();
+            DrawingDocument.SelectEnabled(false);
         }
     },
 
@@ -588,9 +591,10 @@ CTextBody.prototype =
     {
         if(isRealObject(this.content))
         {
-            if(this.shape instanceof  CChartTitle && this.shape.chartGroup instanceof CChartAsGroup && this.shape.chartGroup.chart)
+            if(this.shape instanceof  CChartTitle )
             {
-                this.shape.chartGroup.recalculate();
+                if(this.shape.chartGroup instanceof CChartAsGroup && this.shape.chartGroup.chart)
+                    this.shape.chartGroup.Refresh_RecalcData2();
 
             }
             else
@@ -886,8 +890,32 @@ CTextBody.prototype =
                     this.content.Paragraph_Add(par.Content[i].Copy());
             }
         }
-    }
+    },
 
+    copyFromOther: function(txBody)
+    {
+        if(isRealObject(this.parent) && this.parent.setBodyPr)
+        {
+            this.parent.setBodyPr(this.bodyPr.createDuplicate());
+        }
+        for(var i = 0; i < txBody.content.Content.length; ++i)
+        {
+            if(i > 0)
+            {
+                this.content.Add_NewParagraph()
+            }
+            var par = txBody.content.Content[i];
+            for(var i = 0; i < par.Content.length; ++i)
+            {
+                if(!(par.Content[i] instanceof ParaEnd || par.Content[i] instanceof ParaEmpty || par.Content[i] instanceof ParaNumbering) && par.Content[i].Copy)
+                    this.content.Paragraph_Add(par.Content[i].Copy());
+            }
+        }
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            this.content.Content[i].Set_DocumentIndex(i);
+        }
+    }
 };
 
 

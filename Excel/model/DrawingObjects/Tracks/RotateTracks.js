@@ -1,13 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/27/13
- * Time: 3:29 PM
- * To change this template use File | Settings | File Templates.
- */
-
-
-
 function OverlayObject(geometry, extX, extY, brush, pen, transform)
     //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
 {
@@ -133,7 +123,7 @@ function RotateTrackShapeImage(originalObject)
 function RotateTrackShapeImageInGroup(originalObject)
 {
     this.originalObject = originalObject;
-    this.transform = new CMatrix();
+    this.transform = originalObject.transform.CreateDublicate();
     this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
@@ -196,10 +186,9 @@ function RotateTrackShapeImageInGroup(originalObject)
 function RotateTrackGroup(originalObject)
 {
     this.originalObject = originalObject;
-    this.transform = new CMatrix();
+    this.transform = originalObject.transform.CreateDublicate();
 
     this.overlayObjects = [];
-
 
     this.arrTransforms = [];
     this.arrTransforms2 = [];
@@ -211,9 +200,8 @@ function RotateTrackGroup(originalObject)
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
         this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
-            arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
+            arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, arr_graphic_objects[i].transform.CreateDublicate());
     }
-
 
     this.angle = originalObject.rot;
 

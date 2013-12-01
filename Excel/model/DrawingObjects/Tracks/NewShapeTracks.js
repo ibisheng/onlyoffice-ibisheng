@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/28/13
- * Time: 11:18 AM
- * To change this template use File | Settings | File Templates.
- */
 function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 {
     this.drawingObjects = drawingObjects;

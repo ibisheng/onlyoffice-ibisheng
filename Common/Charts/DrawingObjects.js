@@ -5071,8 +5071,8 @@ function DrawingObjects() {
 
 	_this.checkCursorDrawingObject = function(x, y) {
 	
-		if ( !aObjects.length )
-			return null;
+		//if ( !aObjects.length )
+		//	return null;
 
 		var objectInfo = { cursor: null, id: null, object: null, isGraphicObject: false };
 		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
@@ -5572,6 +5572,25 @@ function readFromBinaryParagraphContent(r)
     return Element;
 }
 
+
+var CARD_DIRECTION_N = 0;
+var CARD_DIRECTION_NE = 1;
+var CARD_DIRECTION_E = 2;
+var CARD_DIRECTION_SE = 3;
+var CARD_DIRECTION_S = 4;
+var CARD_DIRECTION_SW = 5;
+var CARD_DIRECTION_W = 6;
+var CARD_DIRECTION_NW = 7;
+
+var CURSOR_TYPES_BY_CARD_DIRECTION = [];
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_N]  = "n-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NE] = "ne-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_E]  = "e-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SE] = "se-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_S]  = "s-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SW] = "sw-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_W]  = "w-resize";
+CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
 
 function CreateParagraphContent(s)
 {

@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/27/13
- * Time: 12:06 PM
- * To change this template use File | Settings | File Templates.
- */
 function CGroupShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;

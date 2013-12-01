@@ -1,14 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 7/4/13
- * Time: 5:25 PM
- * To change this template use File | Settings | File Templates.
- */
-
-
-
-
 function CTableId()
 {
     this.m_aPairs   = new Object();
@@ -38,9 +27,7 @@ CTableId.prototype =
         }
     },
 
-//this.Add(this);
 
-    // Получаем указатель на класс по Id
     Get_ById: function(Id)
     {
         if ( "undefined" != typeof(this.m_aPairs[Id]) )
@@ -49,7 +36,6 @@ CTableId.prototype =
         return null;
     },
 
-    // Получаем Id, по классу (вообще, данную функцию лучше не использовать)
     Get_ByClass: function(Class)
     {
         if ( "undefined" != typeof( Class.Get_Id ) )
@@ -1015,7 +1001,6 @@ CTextBody.prototype =
 		if(this.curState.textObject && this.curState.textObject.txBody)
 		{
             History.Create_NewPoint();
-
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_OnContentRecalculateUndo, null, null,
                 new UndoRedoDataGraphicObjects(this.curState.textObject.txBody.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 			var paste_processor = new PasteProcessor(this.curState.textObject.txBody.content);
@@ -1102,7 +1087,7 @@ function CopyProcessor(oDocument)
     this.bOccurEndPar;
     this.oCurHyperlink = null;
     this.oCurHyperlinkElem = null;
-};
+}
 CopyProcessor.prototype =
 {
     getSrc : function(src)
@@ -1836,7 +1821,7 @@ function CopyPasteCorrectString(str)
     res = res.replace(/'/g,'&apos;');
     res = res.replace(/"/g,'&quot;');
     return res;
-};
+}
 
 function PasteProcessor(content)
 {
@@ -4454,7 +4439,7 @@ PasteProcessor.prototype =
 
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
-};
+}
 
 function Common_CmpObj2(Obj1, Obj2)
 {
@@ -4489,4 +4474,4 @@ function Common_CmpObj2(Obj1, Obj2)
             return false;
     }
     return true;
-};
+}

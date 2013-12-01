@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/26/13
- * Time: 6:29 PM
- * To change this template use File | Settings | File Templates.
- */
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -51,7 +44,6 @@ DrawingObjectsController.prototype =
 
     setCellStrikeout: function (isStrikeout) {
         this.checkSelectedObjectsAndCallback(this.setCellStrikeoutCallBack, [isStrikeout]);
-
     },
 
     setCellSubscript: function (isSubscript) {
@@ -711,8 +703,8 @@ DrawingObjectsController.prototype =
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             case STATES_ID_CHART_TEXT_ADD:
+            case STATES_ID_CHART_TEXT_GROUP:
             {
-               
 				History.Create_NewPoint();
 				var state = drawingObjectsController.curState;
 				state.textObject.remove(dir, true);
@@ -1164,7 +1156,6 @@ DrawingObjectsController.prototype =
         return null;
     },
 
-
     getSelectionState: function()
     {
         var state = {};
@@ -1175,6 +1166,11 @@ DrawingObjectsController.prototype =
                 state.id = STATES_ID_TEXT_ADD;
                 state.textObjectId = this.curState.textObject.Get_Id();
                 state.textState = this.curState.textObject.txBody.content.Get_SelectionState();
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
                 break;
             }
             case STATES_ID_GROUP:
@@ -1194,6 +1190,11 @@ DrawingObjectsController.prototype =
                 state.chart = this.curState.chart;
                 state.textObjectId = this.curState.textObject.Get_Id();
                 state.textState = this.curState.textObject.txBody.content.Get_SelectionState();
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
                 break;
             }
             case STATES_ID_CHART:
@@ -1214,11 +1215,43 @@ DrawingObjectsController.prototype =
                 {
                     state.selectedTitle = chart.vAxisTitle;
                 }
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
+                break;
+            }
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.id = STATES_ID_TEXT_ADD_IN_GROUP;
+                state.group = this.curState.group;
+                state.textObject = this.curState.textObject;
+                state.textState = this.curState.textObject.txBody.content.Get_SelectionState();
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
+                break;
+            }
+            case STATES_ID_CHART_TEXT_GROUP:
+            {
+                state.id = STATES_ID_CHART_TEXT_GROUP;
+                state.group = this.curState.group;
+                state.chart = this.curState.chart;
+                state.textObject = this.curState.textObject;
+                state.textSelectionState = this.curState.textObject.txBody.content.Get_SelectionState();
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
                 break;
             }
             default :
             {
-                if(this.curState.group)
+                if(this.curState.group && !this.curState.chart)
                 {
                     state.id = STATES_ID_GROUP;
                     state.groupId = this.curState.group.Get_Id();
@@ -1229,7 +1262,7 @@ DrawingObjectsController.prototype =
                     }
                     break;
                 }
-                else if(this.curState.chart && this.curState.id !== STATES_ID_EXPECT_DOUBLE_CLICK)
+                else if(!this.curState.group && this.curState.chart && this.curState.id !== STATES_ID_EXPECT_DOUBLE_CLICK)
                 {
                     state.id = STATES_ID_CHART;
                     state.chart = this.curState.chart;
@@ -1247,6 +1280,24 @@ DrawingObjectsController.prototype =
                     {
                         state.selectedTitle = chart.vAxisTitle;
                     }
+                    state.selectedObjects = [];
+                    for(var i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                    }
+                    break;
+                }
+                else if(this.curState.chart && this.curState.group)
+                {
+                    state.id = STATES_ID_CHART_GROUP;
+                    state.chart = this.curState.chart;
+                    state.group = this.curState.group;
+                    state.selectedTitle = this.curState.chart.getSelectedTitle();
+                    state.selectedObjects = [];
+                    for(var i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                    }
                     break;
                 }
                 state.id = STATES_ID_NULL;
@@ -1258,7 +1309,7 @@ DrawingObjectsController.prototype =
                 break;
             }
         }
-        state.sheetId = this.drawingObjects.getWorksheet().model.getId()
+        state.sheetId = this.drawingObjects.getWorksheet().model.getId();
         return state;
     },
 
@@ -1307,6 +1358,32 @@ DrawingObjectsController.prototype =
                     state.selectedTitle.select();
                 }
                 this.changeCurrentState(new ChartState(this, this.drawingObjects, state.chart));
+                break;
+            }
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.group.select(this);
+                state.textObject.select(this);
+                state.textObject.txBody.content.Set_SelectionState(state.textState, state.textState.length - 1);
+                this.changeCurrentState(new TextAddInGroup(this, this.drawingObjects, state.group, state.textObject));
+                break;
+            }
+            case STATES_ID_CHART_TEXT_GROUP:
+            {
+                state.group.select(this);
+                state.chart.select(this);
+                state.textObject.select();
+                state.textObject.txBody.content.Set_SelectionState(state.textSelectionState, state.textSelectionState.length - 1);
+                this.changeCurrentState(new ChartTextAddGroup(this, this.drawingObjects, state.group, state.chart, state.textObject));
+                break;
+            }
+            case STATES_ID_CHART_GROUP:
+            {
+                state.group.select(this);
+                state.chart.select(this);
+                if(state.selectedTitle)
+                    state.selectedTitle.select();
+                this.changeCurrentState(new ChartGroupState(this, this.drawingObjects, state.group, state.chart));
                 break;
             }
             default :

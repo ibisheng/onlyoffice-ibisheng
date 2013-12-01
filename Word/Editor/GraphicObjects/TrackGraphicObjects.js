@@ -870,8 +870,31 @@ function MoveTrackInGroup(original)
     this.startY = xfrm.offY;
     this.transform = original.transform.CreateDublicate();
     this.geometry = original.spPr.geometry;
-    this.pen = original.pen;
-    this.brush = original.brush;
+
+    if(original instanceof CChartAsGroup)
+    {
+        var brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        var pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+        this.pen =  pen;
+        this.brush = brush;
+    }
+    else
+    {
+        this.pen = original.pen;
+        this.brush = original.brush;
+    }
+
+
+
     this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, xfrm.absExtX, xfrm.absExtY, this.brush, this.pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(original.group.transform);
     this.draw = function(overlay)

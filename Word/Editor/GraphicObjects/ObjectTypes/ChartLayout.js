@@ -201,6 +201,8 @@ CChartLayout.prototype =
     },
 
 
+    copy: function()
+    {},
 
     writeToBinary: function(w)
     {

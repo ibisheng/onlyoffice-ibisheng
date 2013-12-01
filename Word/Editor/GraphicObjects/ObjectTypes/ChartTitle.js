@@ -9,9 +9,6 @@ function CChartTitle(chartGroup, type)
     this.layout = null;
     this.overlay = false;
     this.spPr = new CSpPr();
-    //this.chartGroup = chartGroup;
-    //this.drawingObjects = chartGroup.drawingObjects;
-    //this.type = type;
 
     this.txPr = null;
     this.isDefaultText = false;
@@ -125,10 +122,6 @@ CChartTitle.prototype =
     },
 
 
-    setBodyPr: function(bodyPr)
-    {
-        this.bodyPr = bodyPr;
-    },
 
     remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
@@ -331,9 +324,24 @@ CChartTitle.prototype =
         this.calculateTransformTextMatrix();
     },
 
+    applyTextPr: function(paraItem, bRecalculate)
+    {
+        this.txBody.content.Set_ApplyToAll(true);
+        this.txBody.content.Paragraph_Add(paraItem, bRecalculate);
+        this.txBody.content.Set_ApplyToAll(false);
+    },
+
     updateSelectionState: function(drawingDocument)
     {
         this.txBody.updateSelectionState(drawingDocument);
+    },
+
+    updateCursorType: function(e, x, y, pageIndex)
+    {
+        var invert = this.invertTransformText;
+        var tx = invert.TransformPointX(x, y, pageIndex);
+        var ty = invert.TransformPointY(x, y, pageIndex);
+        this.txBody.content.Update_CursorType(tx, ty, pageIndex);
     },
 
     recalculateCurPos: function()
@@ -862,35 +870,7 @@ CChartTitle.prototype =
         graphics.reset();
         graphics.SetIntegerGrid(true);
 
-        /* graphics.SetIntegerGrid(false);
-         graphics.transform3(this.transform);
-         graphics.p_width(500);
-         graphics._m(0, 0);
-         graphics._l(this.extX, 0);
-         graphics._l(this.extX, this.extY);
-         graphics._l(0, this.extY);
-         graphics._z();
-         graphics.ds();
-         graphics.reset();
-         graphics.SetIntegerGrid(true);     */
     },
-
-
-    /* selectionSetStart: function(e, x, y, pageIndex)
-     {
-     var t_x, t_y;
-     t_x = this.invertTransformText.TransformPointX(x, y);
-     t_y = this.invertTransformText.TransformPointY(x, y);
-     this.txBody.selectionSetStart(e, t_x, t_y, pageIndex);
-     },
-
-     selectionSetEnd: function(e, x, y, pageIndex)
-     {
-     var t_x, t_y;
-     t_x = this.invertTransformText.TransformPointX(x, y);
-     t_y = this.invertTransformText.TransformPointY(x, y);
-     this.txBody.selectionSetEnd(e, t_x, t_y, pageIndex);
-     },*/
 
     selectionSetStart: function(event, x, y, pageIndex)
     {
@@ -1020,18 +1000,23 @@ CChartTitle.prototype =
         }
         this.overlay = r.GetBool();
         this.spPr.Read_FromBinary2(r);
-        //if(r.GetBool())
-        //{
-        //    this.txPr = new CTextBody(this);
-        //    this.txPr.readFromBinary(r);
-        //}
 
         if(r.GetBool())
         {
-            //this.txBody = new CTextBody(this);
             this.txBody.readFromBinary(r);
         }
+    },
 
+    copy: function(chartGroup, type)
+    {
+        var c = new CChartTitle(chartGroup, type);
+        if(this.layout)
+        {
+            c.setLayout(this.layout.copy());
+        }
+        c.overlay = this.overlay;
+        c.txBody.copyFromOther(this.txBody);
+        return c;
     },
 
     setBodyPr: function(bodyPr)

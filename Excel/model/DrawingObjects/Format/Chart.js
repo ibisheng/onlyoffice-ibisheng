@@ -77,15 +77,16 @@ CChartAsGroup.prototype =
         return false;
     },
 
-    setDrawingObjects: function(drawingObjects)
+    getTitlesArray: function()
     {
-		if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )
-		{
-			var newValue = drawingObjects.getWorksheet().model.getId();
-			var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-			History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-			this.drawingObjects = drawingObjects;
-		}
+        var ret = [];
+        if(this.chartTitle)
+            ret.push(this.chartTitle);
+        if(this.hAxisTitle)
+            ret.push(this.hAxisTitle);
+        if(this.vAxisTitle)
+            ret.push(this.vAxisTitle);
+        return ret;
     },
 
     getBoundsInGroup: function()
@@ -214,6 +215,7 @@ CChartAsGroup.prototype =
                 this.vAxisTitle.setDrawingObjects(drawingObjects);
         }
     },
+
 
 
     addToDrawingObjects: function()
@@ -470,7 +472,6 @@ CChartAsGroup.prototype =
         }
         this.recalculate();
     },
-
 
     setChart: function(chart, isCollaborative)
     {
@@ -972,6 +973,17 @@ CChartAsGroup.prototype =
         }
     },
 
+    getSelectedTitle: function()
+    {
+        if(this.chartTitle && this.chartTitle.selected)
+            return this.chartTitle;
+        if(this.hAxisTitle && this.hAxisTitle.selected)
+            return this.hAxisTitle;
+        if(this.vAxisTitle && this.vAxisTitle.selected)
+            return this.vAxisTitle;
+        return null;
+    },
+
     draw: function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -996,17 +1008,22 @@ CChartAsGroup.prototype =
 				graphics.SetIntegerGrid(true);
 			}
 		}
-		
+
+
         graphics.reset();
         graphics.SetIntegerGrid(true);
+
+        graphics.SaveGrState();
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.transform);
+        graphics.AddClipRect(-1, -1, this.extX + 1, this.extY + 1);
         if(this.chartTitle)
             this.chartTitle.draw(graphics);
         if(this.hAxisTitle)
             this.hAxisTitle.draw(graphics);
         if(this.vAxisTitle)
             this.vAxisTitle.draw(graphics);
-        if(this.chartLegend)
-            this.chartLegend.draw(graphics);
+        graphics.RestoreGrState();
     },
 
     check_bounds: function(checker)
@@ -1036,8 +1053,6 @@ CChartAsGroup.prototype =
     {
         return [];
     },
-
-
 
     select: function(drawingObjectsController)
     {
@@ -1200,9 +1215,6 @@ CChartAsGroup.prototype =
             this.chartTitle.calculateContent();
             this.chartTitle.calculateTransformTextMatrix();
         }
-
-
-
 
         if(isRealObject(this.hAxisTitle))
         {

@@ -43,7 +43,7 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.oddPage = null;
 
     this.urlMap = [];
-
+    this.recalcMap = {};
     this.arrForCalculateAfterOpen = [];
     this.Id = g_oIdCounter.Get_NewId();
     this.Lock = new CLock();
@@ -2034,7 +2034,6 @@ CGraphicObjects.prototype =
             if(isRealObject(this.curState.textObject) && isRealObject(this.curState.textObject.textBoxContent) )
                 this.curState.textObject.textBoxContent.Selection_Remove();
         }
-        //this.resetSelection();
         switch (selection_state.stateId)
         {
             case STATES_ID_TEXT_ADD:
@@ -2052,7 +2051,6 @@ CGraphicObjects.prototype =
                 selection_state.textObject.GraphicObj.select(selection_state.selectStartPage);
                 break;
             }
-
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 this.curState = new TextAddInGroup(this, selection_state.textObject, selection_state.group);
@@ -2135,6 +2133,30 @@ CGraphicObjects.prototype =
                 this.changeCurrentState(new ChartState(this, selection_state.chart));
                 break;
             }
+            case STATES_ID_CHART_GROUP:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
+            {
+                selection_state.group.select(selection_state.selectStartPage);
+                selection_state.chart.select(selection_state.selectStartPage);
+                this.selectionInfo.selectionArray.push(selection_state.group);
+                selection_state.group.GraphicObj.selectionInfo.selectionArray.length = 0;
+                selection_state.group.GraphicObj.selectionInfo.selectionArray.push(selection_state.chart);
+                selection_state.chart.select(selection_state.selectStartPage);
+                if(selection_state.selectedTitle)
+                {
+                    selection_state.selectedTitle.select(selection_state.selectStartPage);
+                }
+                if(selection_state.stateId === STATES_ID_CHART_TITLE_TEXT_GROUP)
+                {
+                    selection_state.selectedTitle.txBody.content.Set_SelectionState(selection_state.textSelectionState, selection_state.textSelectionState.length - 1);
+                    this.changeCurrentState(new TextAddInChartTitleGroup(this, selection_state.group, selection_state.chart, selection_state.selectedTitle));
+                }
+                else
+                {
+                    this.changeCurrentState(new ChartGroupState(this, selection_state.group, selection_state.chart));
+                }
+                break;
+            }
             default :
             {
 
@@ -2152,7 +2174,6 @@ CGraphicObjects.prototype =
                 this.changeCurrentState(new NullState(this));
                 break;
             }
-
         }
     },
 
@@ -2207,7 +2228,7 @@ CGraphicObjects.prototype =
             }
             default :
             {
-                if(isRealObject(this.curState.chart))
+                if(isRealObject(this.curState.chart) && !isRealObject(this.curState.group))
                 {
                     selection_state.stateId = STATES_ID_CHART;
                     selection_state.chart = this.curState.chart;
@@ -2228,7 +2249,7 @@ CGraphicObjects.prototype =
                     selection_state.selectedTitle = selected_title;
                     break;
                 }
-                else if(this.curState.group)
+                else if(isRealObject(this.curState.group) && !isRealObject(this.curState.chart))
                 {
                     selection_state.stateId = STATES_ID_GROUP;
                     selection_state.group = this.curState.group;
@@ -2240,6 +2261,18 @@ CGraphicObjects.prototype =
                     {
                         selection_state.selectionArray.push(cur_selection_array[i]);
                         selection_state.selectStartPages.push(cur_selection_array[i].selectStartPage);
+                    }
+                }
+                else if(isRealObject(this.curState.chart) && isRealObject(this.curState.group))
+                {
+                    selection_state.stateId = this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP ? STATES_ID_CHART_TITLE_TEXT_GROUP : STATES_ID_CHART_GROUP;
+                    selection_state.chart = this.curState.chart;
+                    selection_state.group = this.curState.group;
+                    selection_state.selectStartPage = this.curState.group.selectStartPage;
+                    selection_state.selectedTitle = this.curState.chart.getSelectedTitle();
+                    if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP)
+                    {
+                        selection_state.textSelectionState = this.curState.textObject.txBody.content.Get_SelectionState();
                     }
                 }
                 else
@@ -2275,7 +2308,7 @@ CGraphicObjects.prototype =
         {
             this.curState.textObject.updateSelectionState();
         }
-        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
         {
             this.curState.title.updateSelectionState();
         }
@@ -3237,6 +3270,7 @@ CGraphicObjects.prototype =
 
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 var parapr = this.curState.title.getParagraphParaPr();
                 return parapr ? parapr : new CParaPr();
@@ -3288,6 +3322,7 @@ CGraphicObjects.prototype =
                 return new CTextPr();
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 var parapr = this.curState.title.getParagraphTextPr();
                 return parapr ? parapr : new CTextPr();
@@ -3413,6 +3448,27 @@ CGraphicObjects.prototype =
                 this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.getTransformMatrix(), 0, 0, chart.absExtX, chart.absExtY, false, false);
                 if(title)
                     this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, title.transform, 0, 0, title.extX, title.extY, false, false);
+                break;
+            }
+
+            case STATES_ID_CHART_GROUP:
+            case STATES_ID_PRE_MOVE_CHART_TITLE_GROUP:
+            case STATES_ID_MOVE_CHART_TITLE_GROUP:
+            {
+                this.drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.curState.group.GraphicObj.transform, 0, 0, this.curState.group.GraphicObj.absExtX, this.curState.group.GraphicObj.absExtY, false, this.curState.group.GraphicObj.canRotate());
+                this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.curState.chart.transform, 0, 0, this.curState.chart.absExtX, this.curState.chart.absExtY, false, this.curState.chart.canRotate());
+                var selected_title = this.curState.chart.getSelectedTitle();
+                if(selected_title)
+                {
+                    this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_title.transform, 0, 0, selected_title.extX, selected_title.extY, false, false);
+                }
+                break;
+            }
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
+            {
+                this.drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.curState.group.GraphicObj.transform, 0, 0, this.curState.group.GraphicObj.absExtX, this.curState.group.GraphicObj.absExtY, false, this.curState.group.GraphicObj.canRotate());
+                this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.curState.chart.transform, 0, 0, this.curState.chart.absExtX, this.curState.chart.absExtY, false, this.curState.chart.canRotate());
+                this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.curState.title.transform, 0, 0, this.curState.title.extX, this.curState.title.extY, false, false);
                 break;
             }
             default:
@@ -4104,6 +4160,7 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 if(typeof this.curState.title.cursorMoveLeft === "function")
                     this.curState.title.cursorMoveLeft(AddToSelect, Word);
@@ -4166,6 +4223,7 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 if(typeof this.curState.title.cursorMoveRight === "function")
                     this.curState.title.cursorMoveRight(AddToSelect, Word);
@@ -4228,6 +4286,7 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 if(typeof this.curState.title.cursorMoveUp === "function")
                     this.curState.title.cursorMoveUp(AddToSelect);
@@ -4289,6 +4348,7 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 if(typeof this.curState.title.cursorMoveDown === "function")
                     this.curState.title.cursorMoveDown(AddToSelect);
@@ -4317,6 +4377,7 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 if(typeof this.curState.title.cursorMoveEndOfLine === "function")
                     this.curState.title.cursorMoveEndOfLine(AddToSelect);
@@ -4402,6 +4463,8 @@ CGraphicObjects.prototype =
             }
         }
 
+      //  if(this.)
+
         for(var _sel_obj_index = 0; _sel_obj_index < this.selectionInfo.selectionArray.length; ++_sel_obj_index)
             this.selectionInfo.selectionArray[_sel_obj_index].deselect();
         this.selectionInfo.selectionArray.length = 0;
@@ -4449,7 +4512,7 @@ CGraphicObjects.prototype =
             if(typeof this.curState.textObject.recalculateCurPos === "function")
                 this.curState.textObject.recalculateCurPos();
         }
-        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
         {
             this.curState.title.recalculateCurPos();
         }
@@ -4667,8 +4730,90 @@ CGraphicObjects.prototype =
             }
 
             case STATES_ID_CHART_TITLE_TEXT:
+            case STATES_ID_CHART_TITLE_TEXT_GROUP:
             {
                 this.curState.title.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+                break;
+            }
+
+            case STATES_ID_CHART:
+            {
+                var chart = this.curState.chart.GraphicObj;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addTitle(null);
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.header.asc_setTitle("");
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addXAxis(null);
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.xAxis.asc_setTitle("");
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addYAxis(null);
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.yAxis.asc_setTitle("");
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                chart.recalculate();
+                this.document.Recalculate();
+                break;
+            }
+            case STATES_ID_CHART_GROUP:
+            {
+                var chart = this.curState.chart;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addTitle(null);
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.header.asc_setTitle("");
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addXAxis(null);
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.xAxis.asc_setTitle("");
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartUndo});
+                    chart.addYAxis("");
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.yAxis.asc_setTitle(null);
+                    chart.setAscChart(copy_asc_chart);
+                    History.Add(chart, {Type:historyitem_AutoShapes_RecalculateChartRedo});
+                }
+                chart.recalculate();
+                this.document.Recalculate();
                 break;
             }
             default :
@@ -4732,24 +4877,24 @@ CGraphicObjects.prototype =
         if(this.curState.polylineFlag === true /*&& documentContent === this.document*/)
             return DRAWING_ARRAY_TYPE_BEFORE;
 
-        if((this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)/* && this.curState.group.parent.Parent.Parent === documentContent*/)
+        if((this.curState.group)/* && this.curState.group.parent.Parent.Parent === documentContent*/)
         {
-            var cur_sel_arr = this.curState.group.selectionInfo.selectionArray;
-
+            var group =  this.curState.group instanceof  WordGroupShapes ? this.curState.group : this.curState.group.GraphicObj;
+            var cur_sel_arr = group.selectionInfo.selectionArray;
             if(cur_sel_arr.length > 0)
             {
-                var group_invert_transform = global_MatrixTransformer.Invert(this.curState.group.transform);
+                var group_invert_transform = global_MatrixTransformer.Invert(group.transform);
                 tr_x = group_invert_transform.TransformPointX(x, y);
                 tr_y = group_invert_transform.TransformPointY(x, y);
                 var g_x, g_y;
-                if(pageIndex === this.curState.pageIndex)
+                if(pageIndex === group.pageIndex)
                 {
                     g_x = x;
                     g_y = y;
                 }
                 else
                 {
-                    var t_p = this.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.curState.group.pageIndex);
+                    var t_p = this.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, group.pageIndex);
                     g_x = t_p.X;
                     g_y = t_p.Y;
                 }
@@ -4761,9 +4906,11 @@ CGraphicObjects.prototype =
                             return DRAWING_ARRAY_TYPE_BEFORE;
                     }
                 }
+
                 for(var i = cur_sel_arr.length - 1; i > -1; --i)
                 {
-                    if(cur_sel_arr[i].hit(g_x, g_y))
+                    var h_h = cur_sel_arr[i].hitToHandle(x, y);
+                    if(h_h && h_h.hit)
                         return DRAWING_ARRAY_TYPE_BEFORE;
                 }
             }
@@ -5850,7 +5997,7 @@ CGraphicObjects.prototype =
         {
             this.curState.textObject.updateSelectionState();
         }
-        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
         {
             this.curState.title.updateSelectionState();
         }
@@ -5877,7 +6024,7 @@ CGraphicObjects.prototype =
                 if(this.curState.textObject.pageIndex === pageIndex)
                     this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
             }
-            else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+            else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
             {
                 if(this.curState.chart.pageIndex === pageIndex)
                     this.curState.title.txBody.content.Selection_Draw_Page(pageIndex);
@@ -5894,6 +6041,11 @@ CGraphicObjects.prototype =
             {
                 if(this.curState.textObject.selectStartPage === pageIndex)
                     this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
+            }
+            else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+            {
+                if(this.curState.chart.pageIndex === pageIndex)
+                    this.curState.title.txBody.content.Selection_Draw_Page(pageIndex);
             }
         }
         //this.drawSelect(pageIndex);
@@ -6280,6 +6432,7 @@ CGraphicObjects.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        var selected_array = this.selectionInfo.selectionArray;
         var cur_state  = this.curState;
         if(cur_state.id === STATES_ID_TEXT_ADD || cur_state.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
@@ -6316,12 +6469,8 @@ CGraphicObjects.prototype =
                 {
                     for(var sel_index = 0; sel_index < selected_array.length; ++sel_index)
                     {
-                        //if(/*false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : selected_array[sel_index].Parent, CheckType : changestype_Paragraph_Content} )*/)
                         selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
                     }
-
-                    /* this.drawingDocument.OnRecalculatePage(0, this.document.Pages[0]);//TODO:
-                     this.drawingDocument.OnEndRecalculate(false, false);  */
                 }
                 else
                 {
@@ -6397,6 +6546,48 @@ CGraphicObjects.prototype =
                     this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
                     this.drawingDocument.OnEndRecalculate(false, false);
                 }
+            }
+            else if(cur_state.id === STATES_ID_CHART)
+            {
+                var selected_title = this.curState.chart.GraphicObj.getSelectedTitle();
+                if(selected_title)
+                {
+                    if(paraItem.Type === para_TextPr)
+                    {
+                        selected_title.applyTextPr(paraItem, bRecalculate);
+                    }
+                    else
+                    {
+                        this.changeCurrentState(new TextAddInChartTitle(this, selected_array[0], selected_title));
+                        this.paragraphAdd(paraItem, bRecalculate);
+                    }
+                }
+                this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
+                this.drawingDocument.OnEndRecalculate(false, false);
+            }
+            else if(cur_state.id === STATES_ID_CHART_GROUP)
+            {
+                var selected_title = this.curState.chart.getSelectedTitle();
+                if(selected_title)
+                {
+                    if(paraItem.Type === para_TextPr)
+                    {
+                        selected_title.applyTextPr(paraItem, bRecalculate);
+                    }
+                    else
+                    {
+                        this.changeCurrentState(new TextAddInChartTitleGroup(this, cur_state.group, cur_state.chart, selected_title));
+                        this.paragraphAdd(paraItem, bRecalculate);
+                    }
+                }
+                this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
+                this.drawingDocument.OnEndRecalculate(false, false);
+            }
+            else if(cur_state.id === STATES_ID_CHART_TITLE_TEXT_GROUP)
+            {
+                cur_state.title.paragraphAdd(paraItem, bRecalculate);
+                this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
+                this.drawingDocument.OnEndRecalculate(false, false);
             }
         }
         this.document.Recalculate();

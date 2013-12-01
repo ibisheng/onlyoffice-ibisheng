@@ -1,13 +1,8 @@
  var MIN_SHAPE_DIST = 5.08;
 
-var CARD_DIRECTION_N = 0;
-var CARD_DIRECTION_NE = 1;
-var CARD_DIRECTION_E = 2;
-var CARD_DIRECTION_SE = 3;
-var CARD_DIRECTION_S = 4;
-var CARD_DIRECTION_SW = 5;
-var CARD_DIRECTION_W = 6;
-var CARD_DIRECTION_NW = 7;
+
+
+
 
 function WordShape(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
@@ -68,11 +63,134 @@ function WordShape(parent/*(WordGraphicObject)*/, document, drawingDocument, gro
         recalculateCursorTypes: true
     };
 
+   /* this.recalcData =
+    {
+        transform: true,
+        transformText: true,
+        brush: true,
+        pen: true,
+        wrapPolygon: true,
+        content: true
+    };
+
+    this.x = 0;
+    this.y = 0;
+    this.extX = 0;
+    this.extY = 0;
+    this.flipH = false;
+    this.flipV = false;
+    this.rot = 0;
+
+    this.localTransform = new CMatrix();
+    this.localTransformText = new CMatrix();
+    this.localPosX = 0;
+    this.localPosY = 0;    */
+
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
 }
 
 WordShape.prototype =
 {
+
+    RecalculateLocalTransform: function()
+    {
+
+    },
+
+    RecalculateLocalTransformText: function()
+    {},
+
+   /* recalculatePosExt: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        var posX, posY, extX, extY;
+        if(isRealObject(xfrm))
+        {
+            posX = isRealNumber(xfrm.offX) ? xfrm.offX : 0;
+            posY = isRealNumber(xfrm.offY) ? xfrm.offY : 0;
+            extX = isRealNumber(xfrm.extX) ? xfrm.extX : (isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.W) ? this.parent.Extent.W : 5);
+            extY = isRealNumber(xfrm.extX) ? xfrm.extX : (isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.W) ? this.parent.Extent.H : 5);
+        }
+        else
+        {
+            posX = 0;
+            posY = 0;
+            extX = isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.W) ? this.parent.Extent.W : 5;
+            extY = isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.H) ? this.parent.Extent.H : 5;
+        }
+
+        if(!isRealObject(this.group))
+        {
+            this.x = isRealNumber(xfrm.offX) ? xfrm.offX : 0;
+            this.y = isRealNumber(xfrm.offY) ? xfrm.offY : 0;
+            this.extX = xfrm.extX;
+            this.extY = xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx*xfrm.extX;
+            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+    },
+
+    recalculateTransform: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        if(xfrm)
+        {
+            if(isRealNumber(xfrm.offX))
+            {
+                this.x = xfrm.offX;
+            }
+            else
+            {
+                this.x = 0;
+            }
+            if(isRealNumber(xfrm.offY))
+            {
+                this.y = xfrm.offY;
+            }
+            else
+            {
+                this.y = 0;
+            }
+        }
+        var _transform = new CMatrix();
+
+        var _horizontal_center = this.absExtX*0.5;
+        var _vertical_center = this.absExtY*0.5;
+        global_MatrixTransformer.TranslateAppend(_transform, -_horizontal_center, -_vertical_center);
+
+        if(this.absFlipH)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, -1, 1);
+        }
+        if(this.absFlipV)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, 1, -1);
+        }
+
+        global_MatrixTransformer.RotateRadAppend(_transform, -this.absRot);
+
+        global_MatrixTransformer.TranslateAppend(_transform, this.absOffsetX, this.absOffsetY);
+        global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+
+        if(this.mainGroup !== null)
+        {
+            global_MatrixTransformer.MultiplyAppend(_transform, this.mainGroup.getTransform());
+        }
+        this.transform = _transform;
+        this.ownTransform = _transform.CreateDublicate();
+    },    */
     calculateAfterOpen10: function()
     {
         var xfrm = this.spPr.xfrm;
@@ -91,6 +209,8 @@ WordShape.prototype =
     {
         return undefined;
     },
+
+
 
     canFill: function()
     {
@@ -190,6 +310,10 @@ WordShape.prototype =
 
     },
 
+
+    recalculate: function()
+    {},
+
     Selection_Is_TableBorderMove: function()
     {
         if(isRealObject(this.textBoxContent))
@@ -234,11 +358,6 @@ WordShape.prototype =
     Get_TableStyleForPara: function()
     {
         return this.document.Get_TableStyleForPara();
-    },
-
-    Get_TextBackGroundColor : function()
-    {
-        return undefined;
     },
 
     Is_Cell: function()
@@ -3204,6 +3323,15 @@ WordShape.prototype =
         return {kd1: 1, kd2: 1};
     },
 
+
+
+    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
+    {
+        if(isRealObject(this.textBoxContent) && typeof this.textBoxContent.Get_AllParagraphs_ByNumbering === "function" )
+            this.textBoxContent.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
+    },
+
+
     cardDirectionToNumber: function(cardDirection)
     {
         var y1, y3, y5, y7, hc, vc, sin, cos, numN, x1, x3, x5, x7;
@@ -3232,23 +3360,23 @@ WordShape.prototype =
         {
             case y1:
             {
-                    numN = 1;
+                numN = 1;
                 break;
             }
             case y3:
             {
-                    numN = 3;
+                numN = 3;
                 break;
             }
             case y5:
             {
-                    numN=5;
+                numN=5;
                 break;
             }
             case y7:
             {
 
-                    numN = 7;
+                numN = 7;
                 break;
             }
             default:
@@ -3256,7 +3384,7 @@ WordShape.prototype =
                 numN = 1;
             }
         }
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             return (cardDirection + numN) % 8;
         }
@@ -3268,13 +3396,6 @@ WordShape.prototype =
             else
                 return t;
         }
-    },
-
-
-    Get_AllParagraphs_ByNumbering : function(NumPr, ParaArray)
-    {
-        if(isRealObject(this.textBoxContent) && typeof this.textBoxContent.Get_AllParagraphs_ByNumbering === "function" )
-            this.textBoxContent.Get_AllParagraphs_ByNumbering(NumPr, ParaArray);
     },
 
     numberToCardDirection: function(handleNumber)
@@ -3323,7 +3444,7 @@ WordShape.prototype =
         }
 
         var tmpArr=[];
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             tmpArr[numN] = CARD_DIRECTION_N;
             tmpArr[(numN+1)%8] = CARD_DIRECTION_NE;
@@ -5863,6 +5984,17 @@ WordShape.prototype =
                 }
                 arr_graphic_objects[i].updateCursorTypes();
             }
+        }
+    },
+
+    updateCursorType: function(e, x, y, pageIndex)
+    {
+        if(this.textBoxContent)
+        {
+            var invert_matrix = this.invertTextMatrix;
+            var tx = invert_matrix.TransformPointX(x, y);
+            var ty = invert_matrix.TransformPointY(x, y);
+            this.textBoxContent.Update_CursorType(tx, ty, pageIndex);
         }
     },
 

@@ -4067,6 +4067,13 @@ ParaDrawing.prototype =
         }
     },
 
+    deselect: function()
+    {
+        this.selected = false;
+        if(this.GraphicObj && this.GraphicObj.deselect)
+            this.GraphicObj.deselect();
+    },
+
     updatePosition3: function(pageIndex, x, y)
     {
         this.graphicObjects.removeById(this.pageIndex, this.Get_Id());
@@ -6699,8 +6706,11 @@ ParaDrawing.prototype =
             c.Set_GraphicObject(g);
             if(g.isGroup())
                 g.calculateAfterOpen3();
-            else
+            else if(!(g instanceof CChartAsGroup))
                 g.calculateAfterOpen();
+            else
+                g.init2();
+
         }
 
         var d = this.Distance;

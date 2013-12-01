@@ -1,13 +1,3 @@
-var MIN_SHAPE_DIST = 5.08;
-
-var CARD_DIRECTION_N = 0;
-var CARD_DIRECTION_NE = 1;
-var CARD_DIRECTION_E = 2;
-var CARD_DIRECTION_SE = 3;
-var CARD_DIRECTION_S = 4;
-var CARD_DIRECTION_SW = 5;
-var CARD_DIRECTION_W = 6;
-var CARD_DIRECTION_NW = 7;
 
 function WordImage(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
@@ -1307,7 +1297,7 @@ WordImage.prototype =
                 numN = 1;
             }
         }
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             return (cardDirection + numN) % 8;
         }
@@ -1367,7 +1357,7 @@ WordImage.prototype =
         }
 
         var tmpArr=[];
-        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) < 0)
         {
             tmpArr[numN] = CARD_DIRECTION_N;
             tmpArr[(numN+1)%8] = CARD_DIRECTION_NE;
@@ -2015,16 +2005,6 @@ WordImage.prototype =
 
     applyTextPr: function(paraItem, bRecalculate)
     {
-        if(this.textBoxContent)
-        {
-            this.textBoxContent.Set_ApplyToAll(true);
-            this.textBoxContent.Paragraph_Add(paraItem, bRecalculate);
-            this.textBoxContent.Set_ApplyToAll(false);
-            if(paraItem.Value.Check_NeedRecalc() === true)
-            {
-                this.textBoxContent.Recalculate();
-            }
-        }
     },
 
     canChangeWrapPolygon: function()
