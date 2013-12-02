@@ -7681,11 +7681,13 @@ ParaMath.prototype =
 
     Cursor_MoveToStartPos : function()
     {
+        console.log("cursor_MoveToStartPos");
         this.Math.Cursor_MoveToStartPos();
     },
 
     Cursor_MoveToEndPos : function()
     {
+        console.log("cursor_MoveToStartPos");
         this.Math.Cursor_MoveToEndPos();
     },
 
