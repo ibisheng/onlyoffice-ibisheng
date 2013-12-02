@@ -2029,7 +2029,7 @@
 							}
 						}
 						if(this._rangeHitInAnRange(range,tableRange))
-							return true;
+							return tableRange;
 					}
 				}
 				return false;
