@@ -2791,30 +2791,166 @@ CDocument.prototype =
         }
     },
 
-    Cursor_MoveToStartPos : function()
+    Cursor_MoveToStartPos : function(AddToSelect)
     {
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = 0;
-        this.Selection.Flag     = selectionflag_Common;
+        if ( true === AddToSelect )
+        {
+            if ( docpostype_HdrFtr === this.CurPos.Type )
+            {
+                this.HdrFtr.Cursor_MoveToStartPos( true );
+            }
+            else if ( docpostype_DrawingObjects === this.CurPos.Type )
+            {
+                // TODO: Пока ничего не делаем, в дальнейшем надо будет делать в зависимости от селекта внутри
+                //       автофигуры: если селект текста внутри, то делать для текста внутри, а если выделена
+                //       сама автофигура, тогда мы перемещаем курсор влево от нее в контенте параграфа и выделяем все до конца
+            }
+            else if ( docpostype_Content === this.CurPos.Type )
+            {
+                var StartPos = ( true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos )
+                var EndPos   = 0;
 
-        this.CurPos.ContentPos = 0;
-        this.CurPos.Type       = docpostype_Content;
-        this.Content[0].Cursor_MoveToStartPos();
+                this.Selection.Start    = false;
+                this.Selection.Use      = true;
+                this.Selection.StartPos = StartPos;
+                this.Selection.EndPos   = EndPos;
+                this.Selection.Flag     = selectionflag_Common;
+
+                this.CurPos.ContentPos = 0;
+                this.CurPos.Type       = docpostype_Content;
+
+                for ( var Index = StartPos - 1; Index >= EndPos; Index-- )
+                {
+                    var Item = this.Content[Index];
+                    Item.Selection.Use = true;
+                    var ItemType = Item.GetType();
+
+                    if ( type_Paragraph === ItemType )
+                    {
+                        Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
+                        Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                    }
+                    else //if ( type_Table === ItemType )
+                    {
+                        var Row  = Item.Content.length - 1;
+                        var Cell = Item.Content[Row].Get_CellsCount() - 1;
+                        var Pos0  = { Row: 0, Cell : 0 };
+                        var Pos1  = { Row: Row, Cell : Cell };
+
+                        Item.Selection.EndPos.Pos   = Pos0;
+                        Item.Selection.StartPos.Pos = Pos1;
+                        Item.Internal_Selection_UpdateCells();
+                    }
+                }
+
+                this.Content[StartPos].Cursor_MoveToStartPos(true);
+
+                if ( this.Content[StartPos].GetType() === type_Paragraph  )
+                    this.Content[StartPos].Selection_Internal_Update();
+            }
+        }
+        else
+        {
+            if ( docpostype_HdrFtr === this.CurPos.Type )
+            {
+                this.HdrFtr.Cursor_MoveToStartPos( false );
+            }
+            else
+            {
+                this.Selection_Remove();
+
+                this.Selection.Start    = false;
+                this.Selection.Use      = false;
+                this.Selection.StartPos = 0;
+                this.Selection.EndPos   = 0;
+                this.Selection.Flag     = selectionflag_Common;
+
+                this.CurPos.ContentPos = 0;
+                this.CurPos.Type       = docpostype_Content;
+                this.Content[0].Cursor_MoveToStartPos(false);
+            }
+        }
     },
 
-    Cursor_MoveToEndPos : function()
+    Cursor_MoveToEndPos : function(AddToSelect)
     {
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = 0;
-        this.Selection.Flag     = selectionflag_Common;
+        if ( true === AddToSelect )
+        {
+            if ( docpostype_HdrFtr === this.CurPos.Type )
+            {
+                this.HdrFtr.Cursor_MoveToEndPos( true );
+            }
+            else if ( docpostype_DrawingObjects === this.CurPos.Type )
+            {
+                // TODO: Пока ничего не делаем, в дальнейшем надо будет делать в зависимости от селекта внутри
+                //       автофигуры: если селект текста внутри, то делать для текста внутри, а если выделена
+                //       сама автофигура, тогда мы перемещаем курсор влево от нее в контенте параграфа и выделяем все до конца
+            }
+            else if ( docpostype_Content === this.CurPos.Type )
+            {
+                var StartPos = ( true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos )
+                var EndPos   = this.Content.length - 1;
 
-        this.CurPos.ContentPos = this.Content.length - 1;
-        this.CurPos.Type       = docpostype_Content;
-        this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+                this.Selection.Start    = false;
+                this.Selection.Use      = true;
+                this.Selection.StartPos = StartPos;
+                this.Selection.EndPos   = EndPos;
+                this.Selection.Flag     = selectionflag_Common;
+
+                this.CurPos.ContentPos = this.Content.length - 1;
+                this.CurPos.Type       = docpostype_Content;
+
+                for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
+                {
+                    var Item = this.Content[Index];
+                    Item.Selection.Use = true;
+                    var ItemType = Item.GetType();
+
+                    if ( type_Paragraph === ItemType )
+                    {
+                        Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
+                        Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                    }
+                    else //if ( type_Table === ItemType )
+                    {
+                        var Row  = Item.Content.length - 1;
+                        var Cell = Item.Content[Row].Get_CellsCount() - 1;
+                        var Pos0  = { Row: 0, Cell : 0 };
+                        var Pos1  = { Row: Row, Cell : Cell };
+
+                        Item.Selection.StartPos.Pos = Pos0;
+                        Item.Selection.EndPos.Pos   = Pos1;
+                        Item.Internal_Selection_UpdateCells();
+                    }
+                }
+
+                this.Content[StartPos].Cursor_MoveToEndPos(true);
+
+                if ( this.Content[StartPos].GetType() === type_Paragraph  )
+                    this.Content[StartPos].Selection_Internal_Update();
+            }
+        }
+        else
+        {
+            if ( docpostype_HdrFtr === this.CurPos.Type )
+            {
+                this.HdrFtr.Cursor_MoveToEndPos( false );
+            }
+            else
+            {
+                this.Selection_Remove();
+
+                this.Selection.Start    = false;
+                this.Selection.Use      = false;
+                this.Selection.StartPos = 0;
+                this.Selection.EndPos   = 0;
+                this.Selection.Flag     = selectionflag_Common;
+
+                this.CurPos.ContentPos = this.Content.length - 1;
+                this.CurPos.Type       = docpostype_Content;
+                this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+            }
+        }
     },
 
     Cursor_MoveLeft : function(AddToSelect, Word)
@@ -8232,7 +8368,7 @@ CDocument.prototype =
         {
             if ( true === e.CtrlKey ) // Ctrl + End - переход в конец документа
             {
-                this.Cursor_MoveToEndPos();
+                this.Cursor_MoveToEndPos( true === e.ShiftKey );
             }
             else // Переходим в конец строки
             {
@@ -8245,7 +8381,7 @@ CDocument.prototype =
         {
             if ( true === e.CtrlKey ) // Ctrl + Home - переход в начало документа
             {
-                this.Cursor_MoveToStartPos();
+                this.Cursor_MoveToStartPos( true === e.ShiftKey );
             }
             else // Переходим в начало строки
             {

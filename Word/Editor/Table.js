@@ -7781,31 +7781,67 @@ CTable.prototype =
         this.Internal_Selection_UpdateCells();
     },
 
-    Cursor_MoveToStartPos : function()
+    Cursor_MoveToStartPos : function(AddToSelect)
     {
-        this.CurCell = this.Content[0].Get_Cell( 0 );
+        if ( true === AddToSelect )
+        {
+            var StartRow = ( true === this.Selection.Use ? this.Selection.StartPos.Pos.Row : this.CurCell.Row.Index );
+            var EndRow   = 0;
 
-        this.Selection.Use   = false;
-        this.Selection.Start = false;
-        this.Selection.StartPos.Pos = { Row : 0, Cell: 0 };
-        this.Selection.EndPos.Pos   = { Row : 0, Cell: 0 };
-        this.Selection.CurRow       = 0;
+            this.Selection.Use   = true;
+            this.Selection.Start = false;
+            this.Selection.Type  = table_Selection_Cell;
+            this.Selection.Type2 = table_Selection_Common;
+            this.Selection.StartPos.Pos = { Row : StartRow, Cell: this.Content[StartRow].Get_CellsCount() - 1 };
+            this.Selection.EndPos.Pos   = { Row : EndRow,   Cell: 0 };
+            this.Selection.CurRow       = EndRow;
 
-        this.CurCell.Content_Cursor_MoveToStartPos();
+            this.Internal_Selection_UpdateCells();
+        }
+        else
+        {
+            this.CurCell = this.Content[0].Get_Cell( 0 );
+
+            this.Selection.Use   = false;
+            this.Selection.Start = false;
+            this.Selection.StartPos.Pos = { Row : 0, Cell: 0 };
+            this.Selection.EndPos.Pos   = { Row : 0, Cell: 0 };
+            this.Selection.CurRow       = 0;
+
+            this.CurCell.Content_Cursor_MoveToStartPos();
+        }
     },
 
-    Cursor_MoveToEndPos : function()
+    Cursor_MoveToEndPos : function(AddToSelect)
     {
-        var Row = this.Content[this.Content.length - 1];
-        this.CurCell = Row.Get_Cell( Row.Get_CellsCount() - 1 );
+        if ( true === AddToSelect )
+        {
+            var StartRow = ( true === this.Selection.Use ? this.Selection.StartPos.Pos.Row : this.CurCell.Row.Index );
+            var EndRow   = this.Content.length - 1;
 
-        this.Selection.Use = false;
-        this.Selection.Start = false;
-        this.Selection.StartPos.Pos = { Row : Row.Index, Cell: this.CurCell.Index };
-        this.Selection.EndPos.Pos   = { Row : Row.Index, Cell: this.CurCell.Index };
-        this.Selection.CurRow       = Row.Index;
+            this.Selection.Use   = true;
+            this.Selection.Start = false;
+            this.Selection.Type  = table_Selection_Cell;
+            this.Selection.Type2 = table_Selection_Common;
+            this.Selection.StartPos.Pos = { Row : StartRow, Cell: 0 };
+            this.Selection.EndPos.Pos   = { Row : EndRow,   Cell: this.Content[EndRow].Get_CellsCount() - 1 };
+            this.Selection.CurRow       = EndRow;
 
-        this.CurCell.Content_Cursor_MoveToEndPos();
+            this.Internal_Selection_UpdateCells();
+        }
+        else
+        {
+            var Row = this.Content[this.Content.length - 1];
+            this.CurCell = Row.Get_Cell( Row.Get_CellsCount() - 1 );
+
+            this.Selection.Use = false;
+            this.Selection.Start = false;
+            this.Selection.StartPos.Pos = { Row : Row.Index, Cell: this.CurCell.Index };
+            this.Selection.EndPos.Pos   = { Row : Row.Index, Cell: this.CurCell.Index };
+            this.Selection.CurRow       = Row.Index;
+
+            this.CurCell.Content_Cursor_MoveToEndPos();
+        }
     },
 
     Cursor_IsStart : function(bOnlyPara)

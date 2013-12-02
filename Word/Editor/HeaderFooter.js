@@ -806,6 +806,26 @@ CHeaderFooter.prototype =
         return bRetValue;
     },
 
+    Cursor_MoveToStartPos : function(AddToSelect)
+    {
+        var bRetValue = this.Content.Cursor_MoveToStartPos( AddToSelect );
+
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+
+        return bRetValue;
+    },
+
+    Cursor_MoveToEndPos : function(AddToSelect)
+    {
+        var bRetValue = this.Content.Cursor_MoveToEndPos( AddToSelect );
+
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+
+        return bRetValue;
+    },
+
     Cursor_MoveAt : function( X, Y, PageIndex, AddToSelect, bRemoveOldSelection )
     {
         this.Content.Set_StartPage( PageIndex );
@@ -2303,6 +2323,18 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.Cursor_MoveAt( X, Y, AddToSelect );
+    },
+
+    Cursor_MoveToStartPos : function(AddToSelect)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Cursor_MoveToStartPos( AddToSelect );
+    },
+
+    Cursor_MoveToEndPos : function(AddToSelect)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Cursor_MoveToEndPos( AddToSelect );
     },
 
     Cursor_MoveToCell : function(bNext)
