@@ -204,11 +204,13 @@ CNary.prototype.getBase = function()
 }
 CNary.prototype.getUpperIterator = function()
 {
-    return this.elements[0][0].getUpperIterator();
+	if (!this.supHide)
+		return this.elements[0][0].getUpperIterator();
 }
 CNary.prototype.getLowerIterator = function()
 {
-    return this.elements[0][0].getLowerIterator();
+	if (!this.subHide)
+		return this.elements[0][0].getLowerIterator();
 }
 CNary.prototype.getPropsForWhite = function()
 {

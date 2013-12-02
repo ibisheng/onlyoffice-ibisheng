@@ -7333,230 +7333,330 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
         // TODO: в зависимости от типа Type сделать заполнение MathElement
 		
 		var props = new Object();
-		var ctrPrp = new CTextPr();
 		
 		switch (Type)
 		{
-			case 1: 	var sNum = "";
-						var sDen = "";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+			case 1: 	var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, null, null);
 						break;
 			case 2: 	props = {type:SKEWED_FRACTION};
-						var sNum = "";
-						var sDen = "";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, null, null);
 						break;
 			case 3: 	props = {type:LINEAR_FRACTION};
-						var sNum = "";
-						var sDen = "";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, null, null);
 						break;
 			case 4: 	var oBox = new CBox();
-						oBox.setCtrPrp(ctrPrp);
-						oBox.init(props);
-						MathElement.Math.Root.addElementToContent(oBox);	
+						CreateElem(oBox, MathElement.Math.Root, props)
+						
 						var oElem = oBox.getBase();
 						//здесь выставляем для oElem argPr.argSz=-1; этой обертки нет
-						CreateFraction(oElem, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, oElem, props, null, null);
 						break;
 			case 5: 	var sNum = "dx";
 						var sDen = "dy";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, sNum, sDen);
 						break;
 			case 6: 	var sNum = String.fromCharCode(916) + "y";
 						var sDen = String.fromCharCode(916) + "x";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, sNum, sDen);
 						break;
 			case 7: 	var sNum = String.fromCharCode(8706) + "y";
 						var sDen = String.fromCharCode(8706) + "x";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, sNum, sDen);
 						break;
 			case 8: 	var sNum = String.fromCharCode(948) + "y";
 						var sDen = String.fromCharCode(948) + "x";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, sNum, sDen);
 						break;
 			case 9: 	var sNum = String.fromCharCode(960);
 						var sDen = "2";
-						CreateFraction(MathElement.Math.Root, props, sNum, sDen);
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, MathElement.Math.Root, props, sNum, sDen);
 						break;
 			case 10:	props = {type:DEGREE_SUPERSCRIPT};
-						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
 						break;
 			case 11:	props = {type:DEGREE_SUBSCRIPT};
-						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
 						break;
 			case 12:	props = {type:DEGREE_SubSup};
-						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
 						break;
 			case 13:	props = {type:DEGREE_PreSubSup};
-						CreateDegree(MathElement.Math.Root, props, null, null, null);
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
 						break;
 			case 14:	props = {type:DEGREE_SUBSCRIPT};			
 						var oDegree = new CDegree();
-						oDegree.setCtrPrp(ctrPrp);
-						oDegree.init(props);
-						MathElement.Math.Root.addElementToContent(oDegree);
-						var oElem = oDegree.getBase();
-						var oMRun = new CMathRunPrp();
-						oMRun.setTxtPrp(ctrPrp);
-						oElem.addElementToContent(oMRun);
-						var oText = new CMathText();
-						oText.addTxt("x");
-						oElem.addElementToContent(oText);
-						var oSub = oDegree.getLowerIterator();
+						CreateElem(oDegree, MathElement.Math.Root, props)
 						
+						var oElem = oDegree.getBase();
+						AddText(oElem, "x");
+						
+						var oSub = oDegree.getLowerIterator();						
 						props = {type:DEGREE_SUPERSCRIPT};	
 						var sBase = "y"
-						var sSup = "2"
-						CreateDegree(oSub, props, sBase, sSup, null);
+						var sSup = "2"						
+						var oDegree1 = new CDegree();
+						CreateDegree(oDegree1, oSub, props, sBase, sSup, null);
 						break;
 			case 15:	props = {type:DEGREE_SUPERSCRIPT};
 						var sBase = "e";
 						var sSup = "-i" + String.fromCharCode(969) + "t";
-						CreateDegree(MathElement.Math.Root, props, sBase, sSup, null);
+						
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, sBase, sSup, null);
 						break;
 			case 16:	props = {type:DEGREE_SUPERSCRIPT};
 						var sBase = "x";
 						var sSup = "2";
-						CreateDegree(MathElement.Math.Root, props, sBase, sSup, null);
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, MathElement.Math.Root, props, sBase, sSup, null);
 						break;
 			case 17:	props = {type:DEGREE_PreSubSup};
 						var sBase = "Y";
 						var sSup = "n";
 						var sSub = "1";
-						CreateDegreeSubSup(MathElement.Math.Root, props, sBase, sSup, sSub);
-						break;
 						
+						var oDegreeSubSup = new CDegreeSubSup();
+						CreateDegree(oDegreeSubSup, MathElement.Math.Root, props, sBase, sSup, sSub);
+						break;
+			case 18:	props = {type:SQUARE_RADICAL, degHede:true};
+					
+						var oRadical = new CRadical();
+						CreateRadical(oRadical, MathElement.Math.Root, props, null, null);
+						break;
+			case 19:	props = {type:DEGREE_RADICAL};
+					
+						var oRadical = new CRadical();
+						CreateRadical(oRadical, MathElement.Math.Root, props, null, null);
+						break;
+			case 20:	props = {type:DEGREE_RADICAL};
+						var sDeg = "2";
+						
+						var oRadical = new CRadical();
+						CreateRadical(oRadical, MathElement.Math.Root, props, null, sDeg);
+						break;
+			case 21:	props = {type:DEGREE_RADICAL};
+						var sDeg = "3";
+						
+						var oRadical = new CRadical();
+						CreateRadical(oRadical, MathElement.Math.Root, props, null, sDeg);
+						break;
+			case 22:	var oFraction = new CFraction();						
+						CreateElem(oFraction, MathElement.Math.Root, props);
+						
+						var oElemNum = oFraction.getNumerator();
+						var sText = "-b" + String.fromCharCode(177);
+						AddText(oElemNum, sText);
+						
+						props = {type:SQUARE_RADICAL, degHede:true};
+						var oRadical = new CRadical();
+						CreateElem(oRadical, oElemNum, props);						
+						var oElem = oRadical.getBase();
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var oDegree = new CDegree();
+						CreateElem(oDegree, oElem, props);						
+						var oDegElem = oDegree.getBase();
+						AddText(oDegElem, "b");
+						var oDegSup = oDegree.getUpperIterator();
+						AddText(oDegSup, "2");
+						
+						AddText(oElem, "-4ac");					
+						
+						var oElemDen = oFraction.getDenominator();
+						AddText(oElemDen, "2a");												
+						break;
+			case 23:	props = {type:SQUARE_RADICAL, degHede:true};
+						var oRadical = new CRadical();
+						CreateElem(oRadical, MathElement.Math.Root, props);
+						
+						var oElem = oRadical.getBase();
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "a";
+						var sSup = "2";
+						var oDegree1 = new CDegree();
+						CreateDegree(oDegree1, oElem, props, sBase, sSup, null);
+						
+						AddText(oElem, "+");
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						sBase = "b";
+						sSup = "2";
+						var oDegree2 = new CDegree();
+						CreateDegree(oDegree2, oElem, props, sBase, sSup, null);						
+						break;
+			case 24:	props = {limLoc:NARY_SubSup, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 25:	props = {limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 26:	props = {limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 27:	var sVal = String.fromCharCode(8748);
+						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 28:	var sVal = String.fromCharCode(8748);
+						props = {limLoc:NARY_SubSup, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 29:	var sVal = String.fromCharCode(8748);
+						props = {limLoc:NARY_UndOvr, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 30:	var sVal = String.fromCharCode(8749);
+						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 31:	var sVal = String.fromCharCode(8749);
+						props = {limLoc:NARY_SubSup, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 32:	var sVal = String.fromCharCode(8749);
+						props = {limLoc:NARY_UndOvr, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 33:	var sVal = String.fromCharCode(8750);
+						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 34:	var sVal = String.fromCharCode(8750);
+						props = {limLoc:NARY_SubSup, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 35:	var sVal = String.fromCharCode(8750);
+						props = {limLoc:NARY_UndOvr, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 36:	var sVal = String.fromCharCode(8751);
+						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 37:	var sVal = String.fromCharCode(8751);
+						props = {limLoc:NARY_SubSup, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 38:	var sVal = String.fromCharCode(8751);
+						props = {limLoc:NARY_UndOvr, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 39:	var sVal = String.fromCharCode(8752);
+						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 40:	var sVal = String.fromCharCode(8752);
+						props = {limLoc:NARY_SubSup, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 41:	var sVal = String.fromCharCode(8752);
+						props = {limLoc:NARY_UndOvr, chr:sVal};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+									
 		}
 
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 }
-function CreateDegreeSubSup(oParentElem,props,sBaseText,sSupText,sSubText)
+function CreateNary(oNary,oParentElem,props,sElemText,sSubText,sSupText)
 {
-	var oDegreeSubSup = new CDegreeSubSup();
-	var ctrPrp = new CTextPr();
-	oDegreeSubSup.setCtrPrp(ctrPrp);
-	oDegreeSubSup.init(props);
-	oParentElem.addElementToContent(oDegreeSubSup);	
-	var oElem = oDegreeSubSup.getBase();
-	if (sBaseText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oElem.addElementToContent(oMRun);		
-		for (var i=0;i<sBaseText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sBaseText[i]);
-			oElem.addElementToContent(oText);
-		}
-	}
-	var oSup = oDegreeSubSup.getUpperIterator();
-	if (sSupText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oSup.addElementToContent(oMRun);		
-		for (var i=0;i<sSupText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sSupText[i]);
-			oSup.addElementToContent(oText);
-		}
-	}
-	var oSub = oDegreeSubSup.getLowerIterator();
-	if (sSubText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oSub.addElementToContent(oMRun);		
-		for (var i=0;i<sSubText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sSubText[i]);
-			oSub.addElementToContent(oText);
-		}
-	}
+	CreateElem(oNary, oParentElem, props);
+	
+	var oElem = oNary.getBase();
+	AddText(oElem, sElemText);
+	
+	var oSub = oNary.getLowerIterator();
+	AddText(oSub, sSubText);
+	
+	var oSup = oNary.getUpperIterator();
+	AddText(oSup, sSupText);	
 }
-function CreateDegree(oParentElem,props,sBaseText,sSupText,sSubText)
+function CreateRadical(oRad,oParentElem,props,sElemText,sDegText)
 {
-	var oDegree = new CDegree();
-	var ctrPrp = new CTextPr();
-	oDegree.setCtrPrp(ctrPrp);
-	oDegree.init(props);
-	oParentElem.addElementToContent(oDegree);	
+	CreateElem(oRad, oParentElem, props);
+	
+	var oElem = oRad.getBase();
+	AddText(oElem, sElemText);
+	
+	var oDeg = oRad.getDegree();
+	AddText(oDeg, sDegText);
+	
+}
+function CreateDegree(oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
+{	
+	CreateElem(oDegree, oParentElem, props);
+	
 	var oElem = oDegree.getBase();
-	if (sBaseText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oElem.addElementToContent(oMRun);		
-		for (var i=0;i<sBaseText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sBaseText[i]);
-			oElem.addElementToContent(oText);
-		}
-	}
+	AddText(oElem, sBaseText);
+	
 	var oSup = oDegree.getUpperIterator();
-	if (sSupText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oSup.addElementToContent(oMRun);		
-		for (var i=0;i<sSupText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sSupText[i]);
-			oSup.addElementToContent(oText);
-		}
-	}
+	AddText(oSup, sSupText);
+	
 	var oSub = oDegree.getLowerIterator();
-	if (sSubText)
-	{
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oSub.addElementToContent(oMRun);		
-		for (var i=0;i<sSubText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sSubText[i]);
-			oSub.addElementToContent(oText);
-		}
-	}
+	AddText(oSub, sSubText);
 }
-function CreateFraction(oParentElem,props,sNumText,sDenText)
+function CreateFraction(oFraction,oParentElem,props,sNumText,sDenText)
 {
-	var oFraction = new CFraction();
-	var ctrPrp = new CTextPr();
-	oFraction.setCtrPrp(ctrPrp);
-	oFraction.init(props);
-	oParentElem.addElementToContent(oFraction);	
+	CreateElem(oFraction, oParentElem, props);
+	
 	var oElemDen = oFraction.getDenominator();
-	if (sDenText)
-	{			
-		var oMRun = new CMathRunPrp();
-		oMRun.setTxtPrp(ctrPrp);
-		oElemDen.addElementToContent(oMRun);		
-		for (var i=0;i<sDenText.length;i++)
-		{
-			var oText = new CMathText();
-			oText.addTxt(sDenText[i]);
-			oElemDen.addElementToContent(oText);
-		}		
-	}
+	AddText(oElemDen, sDenText);
+	
 	var oElemNum = oFraction.getNumerator();
-	if(sNumText)
+	AddText(oElemNum, sNumText);
+}
+function CreateElem(oElem, oParent, props)
+{
+	var ctrPrp = new CTextPr();
+	oElem.setCtrPrp(ctrPrp);
+	oElem.init(props);
+	oParent.addElementToContent(oElem);	
+}
+function AddText(oElem, sText)
+{
+	if(sText)
 	{
+		var ctrPrp = new CTextPr();
 		oMRun = new CMathRunPrp();
 		oMRun.setTxtPrp(ctrPrp);
-		oElemNum.addElementToContent(oMRun);		
-		for (var i=0;i<sNumText.length;i++)
+		oElem.addElementToContent(oMRun);		
+		for (var i=0;i<sText.length;i++)
 		{
 			oText = new CMathText();
-			oText.addTxt(sNumText[i]);
-			oElemNum.addElementToContent(oText);
+			oText.addTxt(sText[i]);
+			oElem.addElementToContent(oText);
 		}		
 	}
 }

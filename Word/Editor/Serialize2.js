@@ -8282,16 +8282,16 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		if (c_oSer_OMathContentType.RadPr === type)
-        {
-			props.type = SQUARE_RADICAL;
+        {			
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathRadPr(t,l,props,oRad);
-            });			
+            });				
         }
 		else if (c_oSer_OMathContentType.Deg === type)
-        {
+        {			
 			if (!props.init)
-			{
+			{	
+				props.type = DEGREE_RADICAL;
 				oRad.init(props);
 				oElem.addElementToContent(oRad);
 				props.init = true;
@@ -8305,6 +8305,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
 			if (!props.init)
 			{
+				props.type = SQUARE_RADICAL;
 				oRad.init(props);
 				oElem.addElementToContent(oRad);
 				props.init = true;
