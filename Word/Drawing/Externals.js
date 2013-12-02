@@ -1,5 +1,5 @@
 /** @define {boolean} */
-var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = true;
+var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = false;
 
 var bIsLocalFontsUse = false;
 
