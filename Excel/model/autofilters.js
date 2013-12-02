@@ -2032,7 +2032,7 @@
 							return tableRange;
 					}
 				}
-				return false;
+				return null;
 			},
 			
 			getAddFormatTableOptions: function(activeCells)

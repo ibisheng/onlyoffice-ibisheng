@@ -5631,7 +5631,7 @@
 				cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 				cell_info.valign = c.getAlignVertical().toLowerCase();
 				
-				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell);
+				cell_info.isFormatTable = (null !== this.autoFilters.searchRangeInTableParts(activeCell));
 				cell_info.styleName = c.getStyleName();
 				cell_info.angle = c.getAngle();
 
