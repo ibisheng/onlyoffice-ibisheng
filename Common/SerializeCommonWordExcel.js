@@ -1907,6 +1907,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadDataLabels(t,l, oOutput);
 				});
+			if(null != oOutput.ShowVal)
+				seria.bShowValue = oOutput.ShowVal;
 			if(null != oOutput.TxPrPptx && null != oOutput.TxPrPptx.font)
 				seria.LabelFont = oOutput.TxPrPptx.font;
 		}
