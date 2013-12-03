@@ -29,6 +29,8 @@ window.USER_AGENT_WEBKIT = AscBrowser.isWebkit;
 window.GlobalPasteFlagCounter = 0;
 window.GlobalPasteFlag = false;
 
+window.PasteEndTimerId = -1;
+
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
@@ -2511,7 +2513,7 @@ function Editor_Paste(api, bClean)
         {
             if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
             {
-                window.setTimeout(func_timeout, 10);
+                window.PasteEndTimerId = window.setTimeout(func_timeout, 10);
                 return;
             }
         }
@@ -2539,10 +2541,16 @@ function Editor_Paste(api, bClean)
         }
         else
             pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+
+        window.PasteEndTimerId = -1;
     };
 
-    var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
-    window.setTimeout( func_timeout, _interval_time );
+    var _interval_time = window.USER_AGENT_MACOS ? 200 : 100;
+
+    if (-1 != window.PasteEndTimerId)
+        clearTimeout(window.PasteEndTimerId);
+
+    window.PasteEndTimerId = window.setTimeout( func_timeout, _interval_time );
 };
 function CopyPasteCorrectString(str)
 {
