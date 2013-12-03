@@ -3305,394 +3305,427 @@ CCellValue.prototype =
 		}
 	}
 };
+function IntervalTreeRBNode(low, high, storedValue){
+	this.storedValue = null;
+	this.key = null;
+	this.high = null;
+	this.red = null;
+	
+	if(storedValue)
+		this.storedValue = storedValue;
+	if(low)
+		this.key = low;
+	if(high)
+		this.high = high;
+	this.maxHigh = this.high;
+	
+	this.left = null;
+	this.right = null;
+	this.parent = null;
+};
+function IntervalTreeRB(){
+	this.nil = new IntervalTreeRBNode();
+	this.nil.left = this.nil.right = this.nil.parent = this.nil;
+	this.nil.key = this.nil.high = this.nil.maxHigh = Number.MIN_VALUE;
+	this.nil.red = 0;
+	this.nil.storedValue = null;
+	
+	this.root = new IntervalTreeRBNode();
+	this.root.left = this.nil.right = this.nil.parent = this.nil;
+	this.root.key = this.root.high = this.root.maxHigh = Number.MAX_VALUE;
+	this.root.red = 0;
+	this.root.storedValue = null;
+};
+IntervalTreeRB.prototype = {
+	_treeInsertHelp : function(z){
+		z.left = z.right = this.nil;
+		var y = this.root;
+		var x = this.root.left;
+		while(x != this.nil){
+			y = x;
+			if(x.key > z.key)
+				x = x.left;
+			else
+				x = x.right;
+		}
+		z.parent = y;
+		if(y == this.root || y.key > z.key)
+			y.left = z;
+		else
+			y.right = z;
+	},
+	_fixUpMaxHigh : function(x){
+		while(x != this.root){
+			x.maxHigh = Math.max(x.high, Math.max(x.left.maxHigh, x.right.maxHigh));
+			x = x.parent;
+		}
+	},
+	_leftRotate : function(x){
+		var y = x.right;
+		x.right = y.left;
+		if (y.left != this.nil)
+			y.left.parent = x;
+		y.parent = x.parent;
+		if(x == x.parent.left){
+			x.parent.left = y;
+		}
+		else{
+			x.parent.right = y;
+		}
+		y.left = x;
+		x.parent = y;
+
+		x.maxHigh = Math.max(x.left.maxHigh,Math.max(x.right.maxHigh,x.high));
+		y.maxHigh = Math.max(x.maxHigh,Math.max(y.right.maxHigh,y.high));
+	},
+	_rightRotate : function(y){
+		var x = y.left;
+		y.left = x.right;
+		if(this.nil !=  x.right)
+			x.right.parent = y;
+		x.parent = y.parent;
+		if(y == y.parent.left){
+			y.parent.left = x;
+		}
+		else{
+			y.parent.right = x;
+		}
+		x.right = y;
+		y.parent = x;
+
+		y.maxHigh = Math.max(y.left.maxHigh,Math.max(y.right.maxHigh,y.high));
+		x.maxHigh = Math.max(x.left.maxHigh,Math.max(y.maxHigh,x.high));
+	},
+	insert : function(low, high, storedValue){
+		var x = new IntervalTreeRBNode(low, high, storedValue);
+		var y = null;
+		var oRes = x;
+		this._treeInsertHelp(x);
+		this._fixUpMaxHigh(x.parent);
+		x.red = 1;
+		while(x.parent.red)
+		{
+			if(x.parent == x.parent.parent.left){
+				y = x.parent.parent.right;
+				if(y.red){
+					x.parent.red = 0;
+					y.red = 0;
+					x.parent.parent.red = 1;
+					x = x.parent.parent;
+				}
+				else{
+					if (x == x.parent.right) {
+					  x = x.parent;
+					  this._leftRotate(x);
+					}
+					x.parent.red=0;
+					x.parent.parent.red=1;
+					this._rightRotate(x.parent.parent);
+				}
+			}
+			else{
+				y = x.parent.parent.left;
+				if (y.red){
+					x.parent.red = 0;
+					y.red = 0;
+					x.parent.parent.red = 1;
+					x = x.parent.parent;
+				}
+				else{
+					if (x == x.parent.left) {
+						x = x.parent;
+						this._rightRotate(x);
+					}
+					x.parent.red = 0;
+					x.parent.parent.red = 1;
+					this._leftRotate(x.parent.parent);
+				} 
+			}
+		}
+		this.root.left.red = 0;
+		return oRes;
+	},
+	_getSuccessorOf : function(x){
+		var y;
+		if(this.nil != (y = x.right)){
+			while(y.left != this.nil){
+				y = y.left;
+			}
+			return(y);
+		}
+		else{
+			y = x.parent;
+			while(x == y.right) {
+			  x = y;
+			  y = y.parent;
+			}
+			if (y == this.root) return(this.nil);
+			return(y);
+		}
+	},
+	_deleteFixUp : function(x){
+		var w;
+		var rootLeft = this.root.left;
+		
+		while((!x.red) && (rootLeft != x)){
+			if(x == x.parent.left){
+				w = x.parent.right;
+				if (w.red){
+					w.red = 0;
+					x.parent.red = 1;
+					this._leftRotate(x.parent);
+					w = x.parent.right;
+				}
+				if((!w.right.red) && (!w.left.red)){
+					w.red = 1;
+					x = x.parent;
+				}
+				else{
+					if(!w.right.red){
+						w.left.red = 0;
+						w.red = 1;
+						this._rightRotate(w);
+						w = x.parent.right;
+					}
+					w.red = x.parent.red;
+					x.parent.red = 0;
+					w.right.red = 0;
+					this._leftRotate(x.parent);
+					x = rootLeft; /* this is to exit while loop */
+				}
+			}
+			else{
+				w = x.parent.left;
+				if (w.red){
+					w.red = 0;
+					x.parent.red = 1;
+					this._rightRotate(x.parent);
+					w = x.parent.left;
+				}
+				if ( (!w.right.red) && (!w.left.red)){
+					w.red = 1;
+					x = x.parent;
+				}
+				else{
+					if (!w.left.red) {
+						w.right.red = 0;
+						w.red = 1;
+						this._leftRotate(w);
+						w = x.parent.left;
+					}
+					w.red = x.parent.red;
+					x.parent.red = 0;
+					w.left.red = 0;
+					this._rightRotate(x.parent);
+					x = rootLeft; /* this is to exit while loop */
+				}
+			}
+		}
+		x.red=0;
+	},
+	deleteNode : function(z){
+		var oRes = z.storedValue;
+		var y = ((z.left == this.nil) || (z.right == this.nil)) ? z : this._getSuccessorOf(z);
+		var x = (y.left == this.nil) ? y.right : y.left;
+		if (this.root == (x.parent = y.parent)){
+			this.root.left = x;
+		}
+		else{
+			if (y == y.parent.left){
+				y.parent.left = x;
+			}
+			else{
+				y.parent.right = x;
+			}
+		}
+		if (y != z){ 
+			y.maxHigh = Number.MIN_VALUE;
+			y.left = z.left;
+			y.right = z.right;
+			y.parent = z.parent;
+			z.left.parent = z.right.parent = y;
+			if (z == z.parent.left){
+				z.parent.left = y; 
+			}
+			else{
+				z.parent.right = y;
+			}
+			this._fixUpMaxHigh(x.parent); 
+			if(!(y.red)){
+				y.red = z.red;
+				this._deleteFixUp(x);
+			}
+			else
+				y.red = z.red; 
+		}
+		else{
+			this._fixUpMaxHigh(x.parent);
+			if (!(y.red))
+				this._deleteFixUp(x);
+		}
+		return oRes;
+	},
+	_overlap : function(a1, a2, b1, b2){
+		var bRes;
+		if (a1 <= b1){
+			bRes = ((b1 <= a2));
+		}
+		else{
+			bRes = ((a1 <= b2));
+		}
+		return bRes;
+	},
+	_enumerateRecursion : function(low, high, x, enumResultStack){
+		var stuffToDo = (x != this.nil);
+		while(stuffToDo){
+			if (this._overlap(low, high, x.key, x.high) ){
+				enumResultStack.push(x);
+			}
+			if(x.left.maxHigh >= low){
+				this._enumerateRecursion(low, high, x.right, enumResultStack);
+				x = x.left;
+			}
+			else
+				x = x.right;
+			stuffToDo = (x != this.nil);
+		}
+	},
+	enumerate : function(low, high){
+		var enumResultStack = [];
+		this._enumerateRecursion(low, high, this.root.left, enumResultStack);
+		return enumResultStack;
+	},
+	getNode : function(low, high){
+		var oRes = null;
+		var enumResultStack = this.enumerate(low, high);
+		for(var i = 0, length = enumResultStack.length; i < length; i++)
+		{
+			var elem = enumResultStack[i];
+			if(elem.key == low && elem.high == high)
+			{
+				oRes = elem;
+				break;
+			}
+		}
+		return oRes;
+	},
+	getNodeAll : function(){
+		//todo переделать
+		return this.enumerate(Number.MIN_VALUE, Number.MAX_VALUE);
+	}
+};
 function RangeDataManagerElem(bbox, data)
 {
 	this.bbox = bbox;
 	this.data = data;
-	this.id = 0;
 }
-function RangeDataManager(bAllowIntersect, fChange)
+function RangeDataManager(fChange)
 {
-	this.oGCells = {};
-	this.oRows = {};
-	this.oCols = {};
-	this.oAll = null;
-	this.oElements = {};
-	this.nElementsCount = 0;
-	this.bbox = null;
-	this.nStopRecalculate = 0;
-	
-	this.idGen = 0;
-	
+	this.oIntervalTreeRB = new IntervalTreeRB();
 	this.oDependenceManager = null;
-	this.bAllowIntersect = bAllowIntersect;
 	this.fChange = fChange;
 }
 RangeDataManager.prototype = {
 	add : function(bbox, data)
 	{
 		var oNewElem = new RangeDataManagerElem(new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2), data);
-		oNewElem.id = this.idGen++;
-		var nRangeType = getRangeType(bbox);
-		if(c_oRangeType.Range == nRangeType)
+		var aNodeValues = null;
+		var oNode = this.oIntervalTreeRB.getNode(bbox.r1, bbox.r2);
+		if(null == oNode)
 		{
-			for(var i = bbox.r1; i <= bbox.r2; i++)
-			{
-				var row = this.oGCells[i];
-				if(null == row)
-				{
-					row = {};
-					this.oGCells[i] = row;
-				}
-				for(var j = bbox.c1; j <= bbox.c2; j++)
-				{
-					if(this.bAllowIntersect)
-					{
-						var elem = row[j];
-						if(null == elem)
-						{
-							elem = [];
-							row[j] = elem;
-						}
-						elem.push(oNewElem);
-					}
-					else
-						row[j] = oNewElem;
-				}
-			}
+			aNodeValues = [];
+			this.oIntervalTreeRB.insert(bbox.r1, bbox.r2, aNodeValues);
 		}
-		else if(c_oRangeType.Col == nRangeType)
-		{
-			for(var i = bbox.c1; i <= bbox.c2; i++)
-			{
-				if(this.bAllowIntersect)
-				{
-					var elem = this.oCols[i];
-					if(null == elem)
-					{
-						elem = [];
-						this.oCols[i] = elem;
-					}
-					elem.push(oNewElem);
-				}
-				else
-					this.oCols[i] = oNewElem;
-			}
-		}
-		else if(c_oRangeType.Row == nRangeType)
-		{
-			for(var i = bbox.r1; i <= bbox.r2; i++)
-			{
-				if(this.bAllowIntersect)
-				{
-					var elem = this.oRows[i];
-					if(null == elem)
-					{
-						elem = [];
-						this.oRows[i] = elem;
-					}
-					elem.push(oNewElem);
-				}
-				else
-					this.oRows[i] = oNewElem;
-			}
-		}
-		else if(c_oRangeType.All == nRangeType)
-		{
-			if(this.bAllowIntersect)
-				this.oAll = [oNewElem];
-			else
-				this.oAll = oNewElem;
-		}
-		this.oElements[this._getBBoxIndex(bbox)] = oNewElem;
-		this._recalculate();
+		else
+			aNodeValues = oNode.storedValue;
+		aNodeValues.push(oNewElem);
 		if(null != this.fChange)
 			this.fChange.call(this, oNewElem.data, null, oNewElem.bbox);
 	},
-	_getExecElem : function(elem, oFindElems)
-	{
-		if(null != elem)
-		{
-			if(this.bAllowIntersect)
-			{
-				for(var i = 0, length = elem.length; i < length; ++i)
-				{
-					var item = elem[i];
-					oFindElems[item.id] = item;
-				}
-			}
-			else
-				oFindElems[elem.id] = elem;
-		}		
-	},
 	get : function(bbox)
 	{
+		var bboxRange = new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
 		var oRes = {all: [], inner: [], outer: []};
-		if(null != this.bbox)
-			bbox = this.bbox.intersectionSimple(bbox);
-		else
-			bbox = null;
-		if(null != bbox)
+		var oNodes = this.oIntervalTreeRB.enumerate(bbox.r1, bbox.r2);
+		for(var i = 0, length = oNodes.length; i < length; i++)
 		{
-			var oFindElems = {};
-			//todo подумать, может в некоторых случаях можно пускать полный перебор
-			// if(this.nElementsCount < 100)
-			// {
-				// for(var i in this.oElements)
-				// {
-					// var elem = this.oElements[i];
-					// if(null != elem.bbox.intersectionSimple(bbox))
-					// {
-						// if(this.bAllowIntersect)
-							// this._getExecElem([elem], oFindElems);
-						// else
-							// this._getExecElem(elem, oFindElems);
-					// }
-				// }
-			// }
-			// else
+			var oNode = oNodes[i];
+			if(oNode.storedValue)
 			{
-				var nRangeType = getRangeType(bbox);
-				if(bbox.r2 < gc_nMaxRow0 / 4)
+				for(var j = 0, length2 = oNode.storedValue.length; j < length2; j++)
 				{
-					for(var i = bbox.r1; i <= bbox.r2; i++)
+					var elem = oNode.storedValue[j];
+					if(elem.bbox.isIntersect(bbox))
 					{
-						var row = this.oGCells[i];
-						if(null != row)
-						{
-							if(bbox.c2 < gc_nMaxCol0 / 4)
-							{
-								for(var j = bbox.c1; j <= bbox.c2; j++)
-								{
-									var cell = row[j];
-									if(null != cell)
-										this._getExecElem(cell, oFindElems);
-								}
-							}
-							else
-							{
-								for(var j in row)
-								{
-									var nIndexJ = j - 0;
-									if(bbox.c1 <= nIndexJ && nIndexJ <= bbox.c2)
-										this._getExecElem(row[j], oFindElems);
-								}
-							}
-						}
+						oRes.all.push(elem);
+						if(bboxRange.containsRange(elem.bbox))
+							oRes.inner.push(elem);
+						else
+							oRes.outer.push(elem);
 					}
 				}
-				else
-				{
-					for(var i in this.oGCells)
-					{
-						var nIndexI = i - 0;
-						if(bbox.r1 <= nIndexI && nIndexI <= bbox.r2)
-						{
-							var row = this.oGCells[i];
-							if(null != row)
-							{
-								if(bbox.c2 < gc_nMaxCol0 / 4)
-								{
-									for(var j = bbox.c1; j <= bbox.c2; j++)
-									{
-										var cell = row[j];
-										if(null != cell)
-											this._getExecElem(cell, oFindElems);
-									}
-								}
-								else
-								{
-									for(var j in row)
-									{
-										var nIndexJ = j - 0;
-										if(bbox.c1 <= nIndexJ && nIndexJ <= bbox.c2)
-											this._getExecElem(row[j], oFindElems);
-									}
-								}
-							}
-						}
-					}
-				}
-				if(bbox.c2 < gc_nMaxCol0 / 4)
-				{
-					for(var i = bbox.c1; i <= bbox.c2; i++)
-							this._getExecElem(this.oCols[i], oFindElems);
-				}
-				else
-				{
-					for(var i in this.oCols)
-					{
-						var nIndex = i - 0;
-						if(bbox.c1 <= nIndex && nIndex <= bbox.c2)
-							this._getExecElem(this.oCols[i], oFindElems);
-					}
-				}
-				if(bbox.r2 < gc_nMaxRow0 / 4)
-				{
-					for(var i = bbox.r1; i <= bbox.r2; i++)
-						this._getExecElem(this.oRows[i], oFindElems);
-				}
-				else
-				{
-					for(var i in this.oRows)
-					{
-						var nIndex = i - 0;
-						if(bbox.r1 <= nIndex && nIndex <= bbox.r2)
-							this._getExecElem(this.oRows[i], oFindElems);
-					}
-				}
-				this._getExecElem(this.oAll, oFindElems);
 			}
-			for(var i in oFindElems)
-			{
-				var elem = oFindElems[i];
-				oRes.all.push(elem);
-				if(bbox.containsRange(elem.bbox))
-					oRes.inner.push(elem);
-				else
-					oRes.outer.push(elem);
-			}
-		}
-		return oRes;
-	},
-	_getByCellExecElem : function(elem)
-	{
-		var oRes = null;
-		if(null != elem)
-		{
-			if(this.bAllowIntersect)
-			{
-				if(elem.length > 0)
-					oRes = elem[0];
-			}
-			else
-				oRes = elem;
 		}
 		return oRes;
 	},
 	_getByCell : function(nRow, nCol)
 	{
 		var oRes = null;
-		var row = this.oGCells[nRow];
-		if(null != row)
-			oRes = this._getByCellExecElem(row[nCol]);
-		if(null == oRes)
-		{
-			oRes = this._getByCellExecElem(this.oRows[nRow]);
-			if(null == oRes)
-			{
-				oRes = this._getByCellExecElem(this.oCols[nCol]);
-				if(null == oRes)
-					oRes = this._getByCellExecElem(this.oAll);
-			}
-		}
+		var aAll = this.get(new Asc.Range(nCol, nRow, nCol, nRow));
+		if(aAll.all.length > 0)
+			oRes = aAll.all[0];
 		return oRes;
 	},
 	getByCell : function(nRow, nCol)
 	{
-		var oRes = null;
-		if(null != this.bbox)
+		var oRes = this._getByCell(nRow, nCol);
+		if(null == oRes && null != this.oDependenceManager)
 		{
-			if(this.bbox.contains(nCol, nRow))
-				oRes = this._getByCell(nRow, nCol);
-			if(null == oRes && null != this.oDependenceManager)
+			var oDependence = this.oDependenceManager._getByCell(nRow, nCol);
+			if(null != oDependence)
 			{
-				var oDependence = this.oDependenceManager._getByCell(nRow, nCol);
-				if(null != oDependence)
-				{
-					var oTempRes = this.get(oDependence.bbox);
-					if(oTempRes.all.length > 0)
-						oRes = oTempRes.all[0];
-				}
+				var oTempRes = this.get(oDependence.bbox);
+				if(oTempRes.all.length > 0)
+					oRes = oTempRes.all[0];
 			}
 		}
 		return oRes;
 	},
-	_removeExecElem : function(container, index, elemToDelete)
+	remove : function(bbox)
 	{
-		var elem = null;
-		if(null != index)
-			elem = container[index];
-		else
-			elem = container;
-		if(null != elem)
+		var aElems = this.get(bbox);
+		for(var i = 0, length = aElems.all.length; i < length; ++i)
 		{
-			if(this.bAllowIntersect)
-			{
-				for(var i = 0, length = elem.length; i < length; ++i)
-				{
-					var item = elem[i];
-					if(elemToDelete.data == item.data)
-					{
-						elem.splice(i, 1);
-						break;
-					}
-				}
-				if(0 == elem.length)
-				{
-					if(null != index)
-						delete container[index];
-					else
-						container = null;
-				}
-			}
-			else
-			{
-				if(elemToDelete.data == elem.data)
-				{
-					if(null != index)
-						delete container[index];
-					else
-						container = null;
-				}
-			}
+			var elem = aElems.all[i];
+			this.removeElement(elem);
 		}
-		return container;
 	},
-	remove : function(bbox, elemToDelete)
+	removeElement : function(elemToDelete)
 	{
 		if(null != elemToDelete)
 		{
-			var nRangeType = getRangeType(bbox);
-			if(c_oRangeType.Range == nRangeType)
+			var bbox = elemToDelete.bbox;
+			var oNodes = this.oIntervalTreeRB.enumerate(bbox.r1, bbox.r2);
+			for(var i = 0, length = oNodes.length; i < length; i++)
 			{
-				for(var i = bbox.r1; i <= bbox.r2; i++)
+				var oNode = oNodes[i];
+				if(oNode.storedValue)
 				{
-					var row = this.oGCells[i];
-					if(null != row)
+					for(var j = 0, length2 = oNode.storedValue.length; j < length2; j++)
 					{
-						for(var j = bbox.c1; j <= bbox.c2; j++)
-							this._removeExecElem(row, j, elemToDelete);
+						var elem = oNode.storedValue[j];
+						if(elem.bbox.isEqual(bbox))
+						{
+							oNode.storedValue.splice(j, 1);
+							break;
+						}
 					}
+					if(0 == oNode.storedValue.length)
+						this.oIntervalTreeRB.deleteNode(oNode);
 				}
 			}
-			else if(c_oRangeType.Col == nRangeType)
-			{
-				for(var i = bbox.c1; i <= bbox.c2; i++)
-					this._removeExecElem(this.oCols, i, elemToDelete);
-			}
-			else if(c_oRangeType.Row == nRangeType)
-			{
-				for(var i = bbox.r1; i <= bbox.r2; i++)
-					this._removeExecElem(this.oRows, i, elemToDelete);
-			}
-			else if(c_oRangeType.All == nRangeType)
-				this.oAll = this._removeExecElem(this.oAll, null, elemToDelete);
-			delete this.oElements[this._getBBoxIndex(elemToDelete.bbox)];
-			this._recalculate();
 			if(null != this.fChange)
 				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
-		}
-		else
-		{
-			this.stopRecalculate();
-			var aElems = this.get(bbox);
-			for(var i = 0, length = aElems.all.length; i < length; ++i)
-			{
-				var elem = aElems.all[i];
-				this.remove(elem.bbox, elem);
-			}
-			this.startRecalculate();
 		}
 	},
 	shiftGet : function(bbox, bHor)
@@ -3706,7 +3739,6 @@ RangeDataManager.prototype = {
 	},
 	shift : function(bbox, bAdd, bHor, oGetRes)
 	{
-		this.stopRecalculate();
 		if(null == oGetRes)
 			oGetRes = this.shiftGet(bbox, bHor);
 		var aToChange = [];
@@ -3809,7 +3841,7 @@ RangeDataManager.prototype = {
 		{
 			var item = aToChange[i];
 			var elem = item.elem;
-			this.remove(elem.bbox, elem);
+			this.removeElement(elem);
 		}
 		//добавляем измененные ячейки
 		for(var i = 0, length = aToChange.length; i < length; ++i)
@@ -3818,51 +3850,27 @@ RangeDataManager.prototype = {
 			if(null != item.to)
 				this.add(item.to, item.elem.data);
 		}
-		this.startRecalculate();
 	},
 	getAll : function()
 	{
-		return this.oElements;
+		var aRes = [];
+		var oNodes = this.oIntervalTreeRB.getNodeAll();
+		for(var i = 0, length = oNodes.length; i < length; i++)
+		{
+			var oNode = oNodes[i];
+			if(oNode.storedValue)
+			{
+				for(var j = 0, length2 = oNode.storedValue.length; j < length2; j++)
+				{
+					var elem = oNode.storedValue[j];
+					aRes.push(elem);
+				}
+			}
+		}
+		return aRes;
 	},
 	setDependenceManager : function(oDependenceManager)
 	{
 		this.oDependenceManager = oDependenceManager;
-	},
-	stopRecalculate : function()
-	{
-		this.nStopRecalculate++;
-	},
-	startRecalculate : function()
-	{
-		this.nStopRecalculate--;
-		if(this.nStopRecalculate <= 0)
-		{
-			this.nStopRecalculate = 0;
-			this._recalculate();
-		}
-	},
-	_getBBoxIndex : function(bbox)
-	{
-		return bbox.r1 + "-" + bbox.c1 + "-" + bbox.r2 + "-" + bbox.c2;
-	},
-	_recalculate : function()
-	{
-		if(0 == this.nStopRecalculate)
-		{
-			this.nElementsCount = 0;
-			this.bbox = null;
-			for(var i in this.oElements)
-			{
-				var elem = this.oElements[i];
-				if(null != elem)
-				{
-					this.nElementsCount++;
-					if(null == this.bbox)
-						this.bbox = elem.bbox.clone();
-					else
-						this.bbox.union2(elem.bbox);
-				}
-			}
-		}
 	}
 };

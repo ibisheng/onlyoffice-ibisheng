@@ -254,6 +254,15 @@
 					oRes = new Range(c1, r1, c2, r2);
 				return oRes;
 			},
+			
+			isIntersect: function (range) {
+				var bRes = true;
+				if(range.r2 < this.r1 || this.r2 < range.r1)
+					bRes = false;
+				else if(range.c2 < this.c1 || this.c2 < range.c1)
+					bRes = false;
+				return bRes;
+			},
 
 			union: function (range) {
 				var s1 = this.clone(true),

@@ -7907,7 +7907,6 @@
 
 				
 				var startCell = val.getCell( new CellAddress(activeCellsPasteFragment.r1, activeCellsPasteFragment.c1, 0));
-				val.mergeManager.bbox = startCell.bbox;
 				var isMergedStartCell = startCell.hasMerged();
 				
 				var firstValuesCol;
@@ -8036,8 +8035,7 @@
 
 								var startCell = val.getCell( new CellAddress(activeCellsPasteFragment.r1, activeCellsPasteFragment.c1, 0));
 
-								val.mergeManager.bbox = newVal.bbox
-								curMerge = newVal.hasMerged()
+								curMerge = newVal.hasMerged();
 								
 								if(undefined !== newVal)
 								{
@@ -8186,7 +8184,6 @@
 									if(angle)
 										range.setAngle(angle);
 									
-									val.hyperlinkManager.bbox = newVal.bbox;
 									var hyperLink =  newVal.getHyperlink();
 									if(hyperLink != null)
 									{

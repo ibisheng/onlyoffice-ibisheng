@@ -3326,7 +3326,7 @@ UndoRedoWoorksheet.prototype = {
 					var merged = aMerged.inner[i];
 					if(merged.bbox.isEqual(from))
 					{
-						ws.mergeManager.remove(merged.bbox, merged);
+						ws.mergeManager.removeElement(merged);
 						break;
 					}
 				}
@@ -3359,7 +3359,7 @@ UndoRedoWoorksheet.prototype = {
 					if(hyp.bbox.isEqual(from))
 					{
 						data = hyp.data;
-						ws.hyperlinkManager.remove(hyp.bbox, hyp);
+						ws.hyperlinkManager.removeElement(hyp);
 						break;
 					}
 				}

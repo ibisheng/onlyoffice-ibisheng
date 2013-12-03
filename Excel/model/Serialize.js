@@ -5049,9 +5049,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			this.aMerged = new Array();
 			this.aHyperlinks = new Array();
             var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length, false);
-			//отключаем пересчет на открытие, потому что может быть много обьектов
-			oNewWorksheet.mergeManager.stopRecalculate();
-			oNewWorksheet.hyperlinkManager.stopRecalculate();
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheet(t,l, oNewWorksheet);
                 });
