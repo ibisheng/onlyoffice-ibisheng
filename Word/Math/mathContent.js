@@ -4515,16 +4515,9 @@ CMathContent.prototype =
     },
     update_widthContent: function()
     {
-        try
+        for(var i = 1; i <this.content.length; i++)
         {
-            for(var i = 1; i <this.content.length; i++)
-            {
-                this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
-            }
-        }
-        catch(e)
-        {
-            console.log("Don't work update_widthContent");
+            this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
         }
 
     },
@@ -4634,7 +4627,7 @@ CMathContent.prototype =
     },
     remove: function(order)
     {
-        //console.log("Order of remove: " + order);
+        console.log("Order of remove: " + order);
         var state =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
@@ -4712,7 +4705,7 @@ CMathContent.prototype =
             nextType = this.CurPos + 1 < this.content.length ? this.content[this.CurPos + 1].value.typeObj : null,
             next2_Type = this.CurPos + 2 < this.content.length ? this.content[this.CurPos + 2].value.typeObj : null;
 
-        var bMEDirect = order == 1,
+        var bMEDirect  = order == 1,
             bMEReverse = order == -1;
 
         var bDirectlyBegin = this.CurPos == 0 || (currType == MATH_RUN_PRP && this.CurPos == 1) && bMEDirect, // Empty или RunPrp в начале, значит курсор в начале контента
@@ -4763,8 +4756,8 @@ CMathContent.prototype =
 
                 this.CurPos = start - 1;
 
-                if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то позиция курсора будет перед RunPrp, а нужно после
-                    this.CurPos++;
+                /*if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то позиция курсора будет перед RunPrp, а нужно после
+                    this.CurPos++;*/
             }
             else
             {
@@ -4787,9 +4780,27 @@ CMathContent.prototype =
                     end = start + 1;
 
                 this.CurPos = start - 1;
+                console.log("Remove: " + " CurPos = " + this.CurPos);
+                var type = "";
+                var currType = this.content[this.CurPos].value.typeObj;
+                if(currType === MATH_EMPTY)
+                    type = "Empty";
+                else if(currType === MATH_RUN_PRP)
+                    type = "Run properties";
+                else if(currType == MATH_TEXT)
+                    type = "Text";
+                else if(currType == MATH_COMP)
+                    type = "Composition";
+                else
+                    type = "Placeholder";
+
+                console.log("Remove: " + " typeObj of Current is " + type);
 
                 items = this.content.splice(start, end - start);
             }
+
+            if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то позиция курсора будет перед RunPrp, а нужно после
+                this.CurPos++;
 
             this.setLogicalPosition(this.CurPos);
 
@@ -6368,9 +6379,6 @@ CMathComposition.prototype =
             this.SelectContent  = result.SelectContent;
             this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
 
-            /*var bPlh = this.SelectContent.IsPlaceholder();
-            console.log("After Remove: IsPlaceholder "+ bPlh);*/
-
             removeMComp = !(bRoot && bToUpper);  // посылаем false, если в начале + backspace или в конце + delete
         }
 
@@ -6438,7 +6446,6 @@ CMathComposition.prototype =
     {
         this.Root.Resize(oMeasure);
     },
-    //// edit ////
     AddLetter: function(code)
     {
         if(TEST)
@@ -6898,9 +6905,6 @@ CMathComposition.prototype =
 
         this.Root.selection_Start(x, y);
 
-        var bPlh = this.SelectContent.IsPlaceholder();
-        console.log("Selection_SetStart: IsPlaceholder "+ bPlh);
-
         //this.SelectContent = result.SelectContent; // если SetEnd придет раньше
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
@@ -6910,17 +6914,10 @@ CMathComposition.prototype =
 
         var result = this.Root.selection_End(x, y, MouseEvent);
         this.SelectContent = result.SelectContent;
-
-        var bPlh = this.SelectContent.IsPlaceholder();
-        console.log("Selection_SetEnd: IsPlaceholder "+ bPlh);
-
     },
     Selection_Draw: function()
     {
         this.SelectContent.drawSelect2();
-
-        var bPlh = this.SelectContent.IsPlaceholder();
-        console.log("Selection_Draw: IsPlaceholder "+ bPlh);
     },
     Selection_Beginning: function(bStart) // если приходит bStart = false, то это означает Selection_SetEnd (конец селекта в начале контента)
     {

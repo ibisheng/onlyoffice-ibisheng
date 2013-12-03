@@ -7608,18 +7608,12 @@ ParaMath.prototype =
 
     Selection_SetStart : function(X, Y, PageNum)
     {
-        //console.log("Selection_SetStart");
-
         this.Math.Selection_SetStart( X, Y, PageNum );
-        //console.log("Selection_Draw: IsPlaceholder "+ bPlh);
     },
 
     Selection_SetEnd : function(X, Y, PageNum, MouseEvent)
     {
-        console.log("Selection_SetEnd");
-        var bPlh = this.Math.SelectContent.IsPlaceholder();
         this.Math.Selection_SetEnd( X, Y, PageNum, MouseEvent );
-        console.log("Selection_Draw: IsPlaceholder "+ bPlh);
     },
 
     Selection_Beginning : function(bStart)
@@ -7634,8 +7628,6 @@ ParaMath.prototype =
 
     Selection_Draw : function()
     {
-        var bPlh = this.Math.SelectContent.IsPlaceholder();
-        console.log("Selection_Draw: IsPlaceholder "+ bPlh);
         this.Math.Selection_Draw();
     },
 
