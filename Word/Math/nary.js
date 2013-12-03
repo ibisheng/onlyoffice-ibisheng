@@ -153,12 +153,12 @@ CNary.prototype.init = function(props)
         }
         else if( this.supHide && !this.subHide )
         {
-            base = new CNaryUnd();
+            base = new CNaryOvr();
             base.init(sign);
         }
         else if( !this.supHide && this.subHide )
         {
-            base = new CNaryOvr();
+            base = new CNaryUnd();
             base.init(sign);
         }
         else
@@ -172,13 +172,13 @@ CNary.prototype.init = function(props)
         if( this.supHide && !this.subHide )
         {
             base = new CDegree();
-            var prp = {type: DEGREE_SUPERSCRIPT};
+            var prp = {type: DEGREE_SUBSCRIPT};
             base.init_2(prp, sign);
         }
         else if( !this.supHide && this.subHide )
         {
             base = new CDegree();
-            var prp = {type: DEGREE_SUBSCRIPT};
+            var prp = {type: DEGREE_SUPERSCRIPT};
             base.init_2(prp, sign);
         }
         else

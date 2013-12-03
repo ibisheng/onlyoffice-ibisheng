@@ -7124,13 +7124,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathDelimiterPr(t,l,props,oDelimiter);
             });	
-			//заглушка для скобок и сепаратора
-			if ( !props.begChr )
-				props.begChrType = 0; 
-			if ( !props.endChr )
-				props.endChrType = 1;
-			if ( !props.sepChr && props.column >1 )
-				props.sepChrType = 12;				
         }
 		else if (c_oSer_OMathContentType.Element === type)
         {			
@@ -7393,9 +7386,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathFPr(t,l,props, oFraction);
-            });
-			if (!props.type)
-				props.type = BAR_FRACTION;			
+            });						
         }
 		else if (c_oSer_OMathContentType.Den === type)
         {

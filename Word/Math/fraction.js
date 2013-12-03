@@ -7,6 +7,8 @@ function CFraction()
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
+	if (props.type == undefined)
+				props.type = BAR_FRACTION;
     var bValid = typeof(props.type) !== "undefined" && props.type !== null;
 
     if(bValid)

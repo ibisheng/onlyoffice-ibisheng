@@ -2722,14 +2722,14 @@ CDelimiter.prototype.init = function(props)
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
 
-    /*if(typeof(props.begChr) === "string" && props.begChr.length == 0)
+    if(props.begChr == undefined)
         props.begChrType = PARENTHESIS_LEFT;
 
-    if(typeof(props.endChr) === "string" && props.endChr.length == 0)
+    if(props.endChr == undefined)
         props.endChrType = PARENTHESIS_RIGHT;
 
-    if(typeof(props.endChr) === "string" && props.endChr.length == 0)
-        props.sepChrType = DELIMITER_LINE;*/
+    if(props.endChr == undefined && props.column >1)
+        props.sepChrType = DELIMITER_LINE;
 
     var begPrp =
     {

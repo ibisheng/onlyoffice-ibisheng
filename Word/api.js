@@ -7584,11 +7584,293 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oNary = new CNary();
 						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						break;
-									
+			case 42:	props = {diff:1};
+						var sVal = "dx";
+						var oBox = new CBox();
+						CreateBox(oBox,MathElement.Math.Root,props,sVal);
+						break;
+			case 43:	props = {diff:1};
+						var sVal = "dy";
+						var oBox = new CBox();
+						CreateBox(oBox,MathElement.Math.Root,props,sVal);
+						break;
+			case 44:	props = {diff:1};
+						var sVal = "d" + String.fromCharCode(952);
+						var oBox = new CBox();
+						CreateBox(oBox,MathElement.Math.Root,props,sVal);
+						break;
+			case 45:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 46:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 47:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 48:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 49:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 50:	var sChar = String.fromCharCode(8719);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 51:	var sChar = String.fromCharCode(8719);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 52:	var sChar = String.fromCharCode(8719);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 53:	var sChar = String.fromCharCode(8719);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 54:	var sChar = String.fromCharCode(8719);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 55:	var sChar = String.fromCharCode(8720);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 56:	var sChar = String.fromCharCode(8720);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 57:	var sChar = String.fromCharCode(8720);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 58:	var sChar = String.fromCharCode(8720);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 59:	var sChar = String.fromCharCode(8720);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 60:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 61:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 62:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 63:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 64:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 65:	var sChar = String.fromCharCode(8898);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 66:	var sChar = String.fromCharCode(8898);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 67:	var sChar = String.fromCharCode(8898);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 68:	var sChar = String.fromCharCode(8898);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 69:	var sChar = String.fromCharCode(8898);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 70:	var sChar = String.fromCharCode(8897);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 71:	var sChar = String.fromCharCode(8897);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 72:	var sChar = String.fromCharCode(8897);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 73:	var sChar = String.fromCharCode(8897);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 74:	var sChar = String.fromCharCode(8897);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 75:	var sChar = String.fromCharCode(8896);
+						props = {chr:sChar, limLoc:NARY_UndOvr, subHide:true, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 76:	var sChar = String.fromCharCode(8896);
+						props = {chr:sChar, limLoc:NARY_UndOvr};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 77:	var sChar = String.fromCharCode(8896);
+						props = {chr:sChar, limLoc:NARY_SubSup};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 78:	var sChar = String.fromCharCode(8896);
+						props = {chr:sChar, limLoc:NARY_UndOvr, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 79:	var sChar = String.fromCharCode(8896);
+						props = {chr:sChar, limLoc:NARY_SubSup, supHide:true};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
+						break;
+			case 80:	var sChar = String.fromCharCode(8721);
+						props = {/*limLoc:NARY_UndOvr,*/ chr:sChar, supHide:true};
+						var oNary = new CNary();
+						CreateElem(oNary,MathElement.Math.Root,props);
+						var narySub = oNary.getLowerIterator();
+						AddText(narySub, "k");
+						var naryBase = oNary.getBase();
+						
+						props = {column:1};
+						var oDelimiter = new CDelimiter();
+						CreateElem(oDelimiter,naryBase,props);
+						var delimiterBase = oDelimiter.getBase(0);
+						
+						props = {type:NO_BAR_FRACTION};
+						var oFraction = new CFraction();
+						CreateFraction(oFraction, delimiterBase, props, "n", "k");
+						break
+			case 81:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar/*, limLoc:NARY_UndOvr*/};
+						var oNary = new CNary();
+						CreateNary(oNary,MathElement.Math.Root,props,null,"i=0","n");
+						break;
+			case 82:	var sChar = String.fromCharCode(8721);
+						props = {chr:sChar, /*limLoc:NARY_UndOvr,*/ supHide:true};
+						var oNary = new CNary();
+						CreateElem(oNary,MathElement.Math.Root,props);
+						var narySub = oNary.getLowerIterator();
+						
+						props = {row:2};
+						var oEqArr = new CEqArray();
+						CreateElem(oEqArr, narySub, props);
+						var eqarrElem0 = oEqArr.getElement(0);
+						AddText(eqarrElem0, "0≤ i ≤ m");
+						var eqarrElem1 = oEqArr.getElement(1);
+						AddText(eqarrElem1, "0< j < n");
+
+						var naryBase = oNary.getBase();
+						AddText(naryBase, "P");
+						
+						props = {column:1};
+						var oDelimiter = new CDelimiter();
+						CreateElem(oDelimiter,naryBase,props);
+						var delimiterBase = oDelimiter.getBase(0);
+						AddText(delimiterBase, "i,j");
+						break;						
+			case 83:	var sChar = String.fromCharCode(8719);
+						props = {/*limLoc:NARY_UndOvr,*/ chr:sChar};
+						var oNary = new CNary();
+						CreateElem(oNary, MathElement.Math.Root, props);
+						var narySup = oNary.getUpperIterator();
+						AddText(narySup, "n");
+						var narySub = oNary.getLowerIterator();
+						AddText(narySub, "k=1");
+						var naryBase = oNary.getBase();
+						
+						props = {type:DEGREE_SUBSCRIPT};
+						var oSSub = new CDegree();
+						CreateDegree(oSSub, naryBase, props, "A", null, "k");
+						break;
+			case 84:	var sChar = String.fromCharCode(8899);
+						props = {chr:sChar/*, limLoc:NARY_UndOvr*/};
+						var oNary = new CNary();
+						CreateElem(oNary,MathElement.Math.Root,props);
+						
+						var narySub = oNary.getLowerIterator();
+						AddText(narySub, "n=1");
+						var narySup = oNary.getUpperIterator();
+						AddText(narySup, "m");
+						var naryBase = oNary.getBase();
+						
+						props = {column:1};
+						var oDelimiter = new CDelimiter();
+						CreateElem(oDelimiter,naryBase,props);
+						var delimiterBase = oDelimiter.getBase(0);
+						
+						props = {type:DEGREE_SUBSCRIPT};
+						var oSSub0 = new CDegree();
+						CreateDegree(oSSub0, delimiterBase, props, "X", null, "n"); 
+						
+						sChar = String.fromCharCode(8898);
+						AddText(delimiterBase, sChar);
+						
+						props = {type:DEGREE_SUBSCRIPT};
+						var oSSub1 = new CDegree();
+						CreateDegree(oSSub1, delimiterBase, props, "Y", null, "n"); 					
+						break;
 		}
 
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
+}
+function CreateBox(oBox,oParentElem,props,sElemText)
+{
+	CreateElem(oBox, oParentElem, props);
+	
+	var oElem = oBox.getBase();
+	AddText(oElem, sElemText);
 }
 function CreateNary(oNary,oParentElem,props,sElemText,sSubText,sSupText)
 {
@@ -7642,7 +7924,8 @@ function CreateElem(oElem, oParent, props)
 	var ctrPrp = new CTextPr();
 	oElem.setCtrPrp(ctrPrp);
 	oElem.init(props);
-	oParent.addElementToContent(oElem);	
+	if (oParent)
+		oParent.addElementToContent(oElem);	
 }
 function AddText(oElem, sText)
 {
@@ -7651,13 +7934,16 @@ function AddText(oElem, sText)
 		var ctrPrp = new CTextPr();
 		oMRun = new CMathRunPrp();
 		oMRun.setTxtPrp(ctrPrp);
-		oElem.addElementToContent(oMRun);		
-		for (var i=0;i<sText.length;i++)
+		if (oElem)
 		{
-			oText = new CMathText();
-			oText.addTxt(sText[i]);
-			oElem.addElementToContent(oText);
-		}		
+			oElem.addElementToContent(oMRun);		
+			for (var i=0;i<sText.length;i++)
+			{
+				oText = new CMathText();
+				oText.addTxt(sText[i]);
+				oElem.addElementToContent(oText);
+			}	
+		}
 	}
 }
 
