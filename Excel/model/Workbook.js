@@ -1616,13 +1616,13 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(indexBefore, oNewWorksheet.getName(), null, oNewWorksheet.getId()));
 	return oNewWorksheet.index;
 };
-Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId){
+Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
 		History.TurnOff();
 		var wsFrom = this.aWorksheets[index];
 		var nameSheet = wsFrom.getName();
-		var newSheet = wsFrom.clone(sId);
+		var newSheet = wsFrom.clone(sId, bFromRedo);
 		if(null != sName)
 		{
 			if(true == this.checkValidSheetName(sName))
@@ -2251,7 +2251,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		}
 	}
 }
-Woorksheet.prototype.clone=function(sNewId){
+Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 	var oNewWs;
 	if(null != sNewId)
 		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, true, sNewId);
@@ -2289,7 +2289,7 @@ Woorksheet.prototype.clone=function(sNewId){
 		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
 		range.setHyperlinkOpen(elem.data);
 	}
-	if(null != this.Drawings && this.Drawings.length > 0)
+	if(null != this.Drawings && this.Drawings.length > 0 && !(bFromRedo === true))
     {
         oNewWs.Drawings = [];
         var w = new CMemory();

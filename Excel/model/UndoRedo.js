@@ -2688,7 +2688,7 @@ UndoRedoWorkbook.prototype = {
 					{
 						var oCurWorksheet = this.wb.getWorksheetById(Data.sheetidfrom);
 						var nIndex = oCurWorksheet.getIndex();
-						this.wb.copyWorksheet(nIndex, Data.insertBefore, Data.name, Data.sheetid);
+						this.wb.copyWorksheet(nIndex, Data.insertBefore, Data.name, Data.sheetid, true);
 					}
 				}
 				this.wb.handlers.trigger("spliceWorksheet", Data.insertBefore, 0, null);
