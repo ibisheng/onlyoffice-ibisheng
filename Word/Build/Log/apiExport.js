@@ -558,6 +558,7 @@ prop:asc_editChartDrawingObject
 prop:asc_getChartPreviews
 prop:sync_closeChartEditor
 prop:asc_setDrawCollaborationMarks
+prop:asc_AddMath
 ---
 var:CChatMessage
 prop:get_UserId
@@ -954,6 +955,20 @@ var:asc_ajax
 var:CErrorData
 prop:put_Value
 prop:get_Value
+---
+var:CreateBox
+---
+var:CreateNary
+---
+var:CreateRadical
+---
+var:CreateDegree
+---
+var:CreateFraction
+---
+var:CreateElem
+---
+var:AddText
 ---
 var:CAscColorScheme
 prop:get_colors
@@ -1639,6 +1654,7 @@ asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.as
 asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
 asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
 asc_docs_api.prototype['asc_setDrawCollaborationMarks'] = asc_docs_api.prototype.asc_setDrawCollaborationMarks;
+asc_docs_api.prototype['asc_AddMath'] = asc_docs_api.prototype.asc_AddMath;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
 CChatMessage.prototype['get_Message'] = CChatMessage.prototype.get_Message;
@@ -1990,6 +2006,13 @@ window['asc_ajax'] = asc_ajax;
 window['CErrorData'] = CErrorData;
 CErrorData.prototype['put_Value'] = CErrorData.prototype.put_Value;
 CErrorData.prototype['get_Value'] = CErrorData.prototype.get_Value;
+window['CreateBox'] = CreateBox;
+window['CreateNary'] = CreateNary;
+window['CreateRadical'] = CreateRadical;
+window['CreateDegree'] = CreateDegree;
+window['CreateFraction'] = CreateFraction;
+window['CreateElem'] = CreateElem;
+window['AddText'] = AddText;
 window['CAscColorScheme'] = CAscColorScheme;
 CAscColorScheme.prototype['get_colors'] = CAscColorScheme.prototype.get_colors;
 CAscColorScheme.prototype['get_name'] = CAscColorScheme.prototype.get_name;
