@@ -556,6 +556,14 @@ CBoundsController.prototype =
     {
         this.CheckPoint1(x,y);
         this.CheckPoint2(x + w,y + h);
+    },
+
+    fromBounds : function(_bounds)
+    {
+        this.min_x = _bounds.min_x;
+        this.min_y = _bounds.min_y;
+        this.max_x = _bounds.max_x;
+        this.max_y = _bounds.max_y;
     }
 };
 
