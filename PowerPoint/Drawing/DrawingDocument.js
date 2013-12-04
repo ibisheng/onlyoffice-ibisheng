@@ -4924,6 +4924,8 @@ function CSlideDrawer()
 
         this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, this.BoundsChecker);
 
+        this.m_oWordControl.CheckCalculateDocumentSize(this.BoundsChecker.Bounds);
+
         // теперь смотрим, используем ли кэш для скролла
         var _need_pix_width     = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1;
         var _need_pix_height    = this.BoundsChecker.Bounds.max_y - this.BoundsChecker.Bounds.min_y + 1;

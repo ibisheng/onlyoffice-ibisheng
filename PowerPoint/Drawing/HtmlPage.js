@@ -172,6 +172,7 @@ function CEditorPage(api)
 
     this.Thumbnails = new CThumbnailsManager();
     this.SlideDrawer = new CSlideDrawer();
+    this.SlideBoundsOnCalculateSize = new CBoundsController();
     this.MainScrollsEnabledFlag = 0;
 
     this.bIsUseKeyPress = true;
@@ -2498,7 +2499,8 @@ function CEditorPage(api)
 
         var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-        var _bounds_slide = this.SlideDrawer.BoundsChecker.Bounds;
+        this.SlideBoundsOnCalculateSize.fromBounds(this.SlideDrawer.BoundsChecker.Bounds);
+        var _bounds_slide = this.SlideBoundsOnCalculateSize;
 
         var _srcW = this.m_oEditor.HtmlElement.width;
         var _srcH = this.m_oEditor.HtmlElement.height;
@@ -2579,7 +2581,6 @@ function CEditorPage(api)
 
         this.checkNeedHorScroll();
 
-        var ver_scroll = document.getElementById('id_vertical_scroll');
         document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
 
         this.UpdateScrolls();
@@ -2590,6 +2591,95 @@ function CEditorPage(api)
         this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
         this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
         this.Thumbnails.CheckSizes();
+    }
+
+    this.CheckCalculateDocumentSize = function(_bounds)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+        {
+            oThis.UpdateScrolls();
+            return;
+        }
+
+        if ((Math.abs(_bounds.min_x - this.SlideBoundsOnCalculateSize.min_x) < 0.1) &&
+            (Math.abs(_bounds.min_y - this.SlideBoundsOnCalculateSize.min_y) < 0.1) &&
+            (Math.abs(_bounds.max_x - this.SlideBoundsOnCalculateSize.max_x) < 0.1) &&
+            (Math.abs(_bounds.max_y - this.SlideBoundsOnCalculateSize.max_y) < 0.1))
+        {
+            return;
+        }
+
+        this.m_dDocumentWidth   = 0;
+        this.m_dDocumentHeight  = 0;
+        this.m_dDocumentPageWidth = 0;
+        this.m_dDocumentPageHeight = 0;
+
+        var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+        this.SlideBoundsOnCalculateSize.fromBounds(_bounds);
+        var _bounds_slide = this.SlideBoundsOnCalculateSize;
+
+        var _srcW = this.m_oEditor.HtmlElement.width;
+        var _srcH = this.m_oEditor.HtmlElement.height;
+        if (this.bIsRetinaSupport)
+        {
+            _srcW >>= 1;
+            _srcH >>= 1;
+
+            _bounds_slide = {
+                min_x : _bounds_slide.min_x >> 1,
+                min_y : _bounds_slide.min_y >> 1,
+                max_x : _bounds_slide.max_x >> 1,
+                max_y : _bounds_slide.max_y >> 1
+            };
+        }
+
+        var _centerX = (_srcW / 2) >> 0;
+        var _centerSlideX = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
+        var _hor_width_left = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
+        var _hor_width_right = Math.max(_srcW - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
+
+        var _centerY = (_srcH / 2) >> 0;
+        var _centerSlideY = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
+        var _ver_height_top = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(_srcH - 1, _centerY + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
+
+        var lWSlide = _hor_width_right - _hor_width_left + 1;
+        var lHSlide = _ver_height_bottom - _ver_height_top + 1;
+
+        var one_slide_width = lWSlide;
+        var one_slide_height = Math.max(lHSlide, _srcH);
+
+        this.m_dDocumentPageWidth = one_slide_width;
+        this.m_dDocumentPageHeight = one_slide_height;
+
+        this.m_dDocumentWidth = one_slide_width;
+        this.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
+
+        if (0 == this.m_oDrawingDocument.SlidesCount)
+            this.m_dDocumentHeight = one_slide_height >> 0;
+
+        this.OldDocumentWidth = this.m_dDocumentWidth;
+        this.OldDocumentHeight = this.m_dDocumentHeight;
+
+        this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
+        this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
+
+        if (0 == this.m_oDrawingDocument.SlidesCount)
+        {
+            this.SlideScrollMIN = 0;
+            this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
+        }
+
+        this.MainScrollLock();
+
+        this.checkNeedHorScroll();
+
+        document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
+
+        this.UpdateScrolls();
+
+        this.MainScrollUnLock();
     }
 
     this.InitDocument = function(bIsEmpty)
