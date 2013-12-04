@@ -2721,6 +2721,16 @@ CDelimiter.prototype.init = function(props)
         this.grow = true;
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
+		
+	if(props.begChr == undefined)
+        props.begChrType = PARENTHESIS_LEFT;
+
+    if(props.endChr == undefined)
+        props.endChrType = PARENTHESIS_RIGHT;
+
+    if(props.sepChr == undefined && props.column >1)
+        props.sepChrType = DELIMITER_LINE;
+
 
     var begPrp =
     {
