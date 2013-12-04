@@ -1848,7 +1848,7 @@ function CEditorPage(api)
                 return;
             }
 
-            var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.1) >> 0; // 0.1 - ошибка округления!!
+            var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.01) >> 0; // 0.01 - ошибка округления!!
             if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
             {
                 if (this.IsGoToPageMAXPosition)

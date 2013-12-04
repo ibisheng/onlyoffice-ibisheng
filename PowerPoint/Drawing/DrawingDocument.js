@@ -3612,7 +3612,7 @@ function CThumbnailsManager()
             oThis.OnUpdateOverlay();
 
             // теперь нужно посмотреть, нужно ли проскроллить
-            if (this.m_bIsScrollVisible)
+            if (oThis.m_bIsScrollVisible)
             {
                 var _Y = global_mouseEvent.Y - oThis.m_oWordControl.Y;
                 var _abs_pos = oThis.m_oWordControl.m_oThumbnails.AbsolutePosition;
