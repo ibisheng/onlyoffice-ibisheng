@@ -5952,6 +5952,9 @@ CPresentation.prototype =
                 break;
         }
 
+        var _selectedPage = this.CurPage;
+        var _newSelectedPage = 0;
+
         deleted.reverse();
         for(var i = 0; i < deleted.length; ++i)
         {
@@ -5959,13 +5962,16 @@ CPresentation.prototype =
         }
         for(i = 0; i < this.Slides.length; ++i)
         {
+            if (this.Slides[i].num == _selectedPage)
+                _newSelectedPage = i;
+
             this.Slides[i].changeNum(i);
         }
 
         this.Document_UpdateUndoRedoState();
         this.DrawingDocument.OnEndRecalculate();
         this.DrawingDocument.UpdateThumbnailsAttack();
-        this.DrawingDocument.m_oWordControl.GoToPage(1);
+        this.DrawingDocument.m_oWordControl.GoToPage(_newSelectedPage);
     },
 
     deleteSlides: function(array)
