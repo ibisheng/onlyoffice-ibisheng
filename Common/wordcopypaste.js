@@ -2941,6 +2941,7 @@ PasteProcessor.prototype =
 						}
                     }
                     Item.Internal_Content_Add(nContentPos, TextPr);
+                    Item.Set_ContentPos(nContentPos, true, -1);
                 }
 				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
 				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
