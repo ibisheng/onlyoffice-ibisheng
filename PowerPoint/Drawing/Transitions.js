@@ -2791,6 +2791,7 @@ function CDemonstrationManager(htmlpage)
 
     this.StartSlideBackward = function()
     {
+        var _is_transition = oThis.Transition.IsPlaying();
         oThis.StopTransition();
 
         if (oThis.SlideNum == oThis.SlidesCount)
@@ -2816,13 +2817,15 @@ function CDemonstrationManager(htmlpage)
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
         var _timing = _slides[oThis.SlideNum].timing;
 
-        if (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0)
+        if (!_is_transition && (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0))
         {
             oThis.StartTransition(_timing, false, true);
             return;
         }
 
-        oThis.SlideNum--;
+        if (!_is_transition)
+            oThis.SlideNum--;
+
         oThis.OnPaintSlide(false);
     }
 
