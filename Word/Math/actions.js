@@ -375,8 +375,6 @@ CControlComposition.prototype =
     CreateEquation: function(indef)
     {
         this.Content[this.CurPos].CreateEquation(indef);
-        this.Content[this.CurPos].RecalculateReverse(oMeasure);
-        this.Content[this.CurPos].UpdatePosition();
     },
     Paragraph_Add: function(TextPr)
     {
@@ -414,14 +412,6 @@ CControlComposition.prototype =
     Recalculate: function()
     {
         this.Content[this.CurPos].Refresh();
-    },
-    old_Set_SelectionState: function(State)
-    {
-        this.Content[this.CurPos].Set_SelectionState(State);
-    },
-    old_Get_SelectionState: function()
-    {
-        return this.Content[this.CurPos].Get_SelectionState();
     },
     UpdateCursor: function()
     {
@@ -1268,7 +1258,7 @@ function Set_Container(dimension, path, index)
                         document.getElementById("Container").style.display = "none";
                         // AddMathComponent -> CreateEquation
                         //MathControl.CreateEquation(index + _i*column + _j);
-                        MathComposition.CreateEquation(index + _i*column + _j);
+                        MathComposition.CreateEquation2(index + _i*column + _j);
                         editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
                             Left   : X_Left_Field,
                             Right  : X_Right_Field,

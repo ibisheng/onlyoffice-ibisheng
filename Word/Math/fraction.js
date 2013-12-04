@@ -7,8 +7,6 @@ function CFraction()
 extend(CFraction, CMathBase);
 CFraction.prototype.init = function(props)
 {
-	if (props.type == undefined)
-				props.type = BAR_FRACTION;
     var bValid = typeof(props.type) !== "undefined" && props.type !== null;
 
     if(bValid)
@@ -576,7 +574,7 @@ old_CBarFraction.prototype.setSimple = function(flag)
     else
         this.setReduct(1);
 
-    this./**/Resize();
+    this.Resize();
 }
 
 //////////

@@ -18,7 +18,7 @@ function simulatorMComposition( MComposition, ttype)
 
     props =
     {
-        type:   BAR_FRACTION
+        //type:   BAR_FRACTION
     };
     var fract = new CFraction();
     addToContent_ForRead(accent.getBase(), fract, props);
@@ -52,10 +52,13 @@ function simulatorMComposition( MComposition, ttype)
 
     props =
     {
-        begChrType:        PARENTHESIS_LEFT,
+        begChr: "",
+        endChr: "",
+        sepChr: "",
+        //begChrType:        PARENTHESIS_LEFT,
         //endChrType:      PARENTHESIS_RIGHT,
-        endChr:             ")",
-        sepChrType:        DELIMITER_LINE,
+        //endChr:             ")",
+        //sepChrType:        DELIMITER_LINE,
         column:            2
     };
 
@@ -230,7 +233,7 @@ function simulatorMComposition( MComposition, ttype)
 
     lastElem.addTxt("w");
 
-    var oper = new CGroupCharacter();
+    /*var oper = new CGroupCharacter();
     props =
     {
         chrType:       DOUBLE_ARROW_LR,
@@ -239,7 +242,7 @@ function simulatorMComposition( MComposition, ttype)
 
     addToContent_ForRead(lastElem, oper, props);
 
-    oper.getBase().addTxt("a");
+    oper.getBase().addTxt("a");*/
 
     lastElem.addTxt("y");
 

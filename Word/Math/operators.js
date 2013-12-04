@@ -2533,14 +2533,14 @@ COperator.prototype.getProps = function(props, defaultProps)
     this.defaultType = defaultProps.type;
 
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
-        bType = typeof(props.type)!=="undefined" &&  props.type !== null,
+        bNotType = typeof(props.type)=="undefined" ||  props.type == null,
         bEmptyStr = typeof(chr) === "string" && chr.length == 0,
         bCode = typeof(chr) === "string" && chr.length > 0;
 
     var code = bCode ? chr.charCodeAt(0) : null;
 
-    var bDPrpDelim =  bDelimiter && !bType && bEmptyStr,
-        bDPrpOther =  !bDelimiter && !bType && !bCode;
+    var bDPrpDelim =  bDelimiter && bNotType && bEmptyStr,
+        bDPrpOther =  !bDelimiter && bNotType && !bCode;
 
     if(bDPrpDelim || bDPrpOther)
     {
@@ -2721,15 +2721,6 @@ CDelimiter.prototype.init = function(props)
         this.grow = true;
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
-
-    if(props.begChr == undefined)
-        props.begChrType = PARENTHESIS_LEFT;
-
-    if(props.endChr == undefined)
-        props.endChrType = PARENTHESIS_RIGHT;
-
-    if(props.endChr == undefined && props.column >1)
-        props.sepChrType = DELIMITER_LINE;
 
     var begPrp =
     {
@@ -3253,7 +3244,7 @@ CGroupCharacter.prototype.init = function(props)
     /*this.setOperator(new COperator(glyph));*/
 
     if(this.operator.IsArrow())
-        this.setReduct(DEGR_REDUCT); /// заменить впоследствии на более подходящую функцию
+        this.setReduct(DEGR_REDUCT);
 }
 CGroupCharacter.prototype.getCenter = function()
 {

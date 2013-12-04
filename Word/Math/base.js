@@ -521,10 +521,6 @@ CMathBase.prototype =
 
         return content;
     },
-    drawSelect: function()
-    {
-        this.elements[this.CurPos_X][this.CurPos_Y].drawSelect();
-    },
     cursor_MoveToStartPos: function() //   home => cursor_MoveToStartPos
     {
         this.CurPos_X = 0;
@@ -873,11 +869,11 @@ CMathBase.prototype =
 
         this.size = {width: _width, height: _height, center: _center};
     },
-    RecalculateReverse: function(oMeasure)
+    /*RecalculateReverse: function(oMeasure)
     {
         this.recalculateSize();
         this.Parent.RecalculateReverse(oMeasure);
-    },
+    },*/
     Resize: function(oMeasure)
     {
         for(var i=0; i < this.nRow; i++)

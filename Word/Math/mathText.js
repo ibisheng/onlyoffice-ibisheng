@@ -184,7 +184,7 @@ CMathText.prototype =
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
-    resize: function(oMeasure)
+    Resize: function(oMeasure)
     {
         var letter = this.getCode();
 
@@ -340,10 +340,6 @@ CMathText.prototype =
         this.size.descent = this.size.descent*(this.transform.sy + this.transform.shy);
         this.size.center = this.size.center*(this.transform.sy + this.transform.shy);*/
 
-    },
-    Resize: function(oMeasure)
-    {
-        this.resize(oMeasure);
     },
     IsJustDraw: function()
     {

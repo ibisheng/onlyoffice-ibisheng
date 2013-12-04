@@ -4412,20 +4412,7 @@ CMathContent.prototype =
 
         this.update_widthContent(); /// !!!!
     },
-    RecalculateReverse: function(oMeasure)
-    {
-        // for add component, set Txt Properties
-        var start = this.rInterval.startPos,
-            end = this.rInterval.endPos;
-        for(var i = start; i < end; i++)
-            this.content[i].value.Resize(oMeasure);
 
-        this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
-
-        this.recalculateSize();
-        if(! this.bRoot )
-            this.Parent.RecalculateReverse(oMeasure);
-    },
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
         var bItalic = true;
@@ -4437,7 +4424,7 @@ CMathContent.prototype =
             if(type == MATH_TEXT)
             {
                 this.content[i].value.setMText(bItalic);
-                this.content[i].value.resize(oMeasure);
+                this.content[i].value.Resize(oMeasure);
             }
             else if(type == MATH_COMP)
             {
@@ -4468,7 +4455,7 @@ CMathContent.prototype =
                     txtPrp.Italic = false;
 
                     g_oTextMeasurer.SetFont(txtPrp);
-                    this.content[i].value.resize(oMeasure);
+                    this.content[i].value.Resize(oMeasure);
                 }
             }
         }
@@ -5079,44 +5066,6 @@ CMathContent.prototype =
             this.drawSelect();
         }
     },
-    //TODO
-    //переделать
-    old_drawSelect: function()
-    {
-        var start   = this.selection.startPos;
-        var end     = this.selection.endPos ;
-
-        if( start > end)
-        {
-            var tmp = start;
-            start = end;
-            end = tmp;
-        }
-
-        var widthSelect = 0;
-
-        try
-        {
-            for(var j = start; j < end ; j++)
-                widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
-        }
-        catch(e)
-        {
-            //console.log("Don't work update_widthContent");
-            console.log("Don't work drawSelect");
-        }
-
-        if( widthSelect != 0)
-        {
-            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectClear(); // "обнуляем"  логический селект
-            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(true); // select
-            /// ...Selectenabled(false)         deselect, убираем слой
-            //editor.WordControl.m_oLogicDocument.DrawingDocument.TargetEnd();
-            //editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0,this.pos.x + this.content[start-1].widthToEl, this.pos.y, widthSelect, heightSelect );
-            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectShow();
-            //editor.WordControl.m_oLogicDocument.DrawingDocument.TargetStart();
-        }
-    },
     IsPlaceholder: function()
     {
         var flag = false;
@@ -5168,7 +5117,7 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    drawSelect2: function()
+    drawSelect: function()
     {
         var start   = this.RealSelect.startPos,
             end     = this.RealSelect.endPos;
@@ -6061,6 +6010,26 @@ CMathContent.prototype =
         //this.selection.active = false;
     }
     /////////////////////////////////////////////////////////////////
+
+
+    ////  test function for me  ////
+
+    /*RecalculateReverse: function(oMeasure)
+     {
+     // for add component, set Txt Properties
+     var start = this.rInterval.startPos,
+     end = this.rInterval.endPos;
+     for(var i = start; i < end; i++)
+     this.content[i].value.Resize(oMeasure);
+
+     this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
+
+     this.recalculateSize();
+     if(! this.bRoot )
+     this.Parent.RecalculateReverse(oMeasure);
+     },*/
+    //////////////*    end  of  test  functions   *//////////////////
+
 }
 //todo
 //разобраться с gaps
@@ -6093,371 +6062,7 @@ CMathComposition.prototype =
     // сделать глобальную булевскую переменную для того, чтобы запоминать нужен пересчет контента или нет
     // необходима тк на backspace  может не быть  реального удаления переменных, а только селект
 
-    Init: function()
-    {
-        // TODO
-        // переделать gaps
-        //var g_Unif = 6*g_dKoef_pix_to_mm;
-        var g_Unif = 0;
-        var gps = new dist(g_Unif, g_Unif, g_Unif, g_Unif);
-
-        this.Root = new CMathContent();
-        this.Root.g_mContext = gps;
-        this.Root.setComposition(this);
-        //this.SetTestRunPrp();
-        //this.Root.setTxtPrp(this.TxtPrp);
-
-        this.CurrentContent = this.Root;
-        this.SelectContent  = this.Root;
-
-        this.Root.relate(-1); // корень
-    },
-    /*SetTestRunPrp: function()
-    {
-        var runPrp = new CTextPr();
-        runPrp.Merge(this.DefaultTxtPrp);
-
-        this.Root.addRunPrp(runPrp);
-    },*/
-    GetTxtPrp: function()
-    {
-        return this.DefaultTxtPrp;
-    },
-    //TODO
-    // переделать Draw (для режима редактирования передавать координату для отрисовки формулы) !!
-    // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
-    Draw_2: function(pGraphics)
-    {
-        if(this.Root.content.length > 1)
-        {
-            var w_Box = this.Root.size.width;
-            var h_Box = this.Root.size.height;
-
-            pGraphics.p_color(224, 238, 224, 255); // "p_color" for stroke
-            // "b_color1" for fill
-            //context.b_color1(224, 238, 230, 255);
-
-            pGraphics.drawHorLine(0, this.pos.y, this.pos.x, this.pos.x + w_Box, 0.2);
-            pGraphics.drawHorLine(0, this.pos.y + h_Box, this.pos.x, this.pos.x + w_Box, 0.2);
-            pGraphics.drawVerLine(0,this.pos.x, this.pos.y, this.pos.y + h_Box, 0.2 );
-            pGraphics.drawVerLine(0,this.pos.x + w_Box, this.pos.y, this.pos.y + h_Box, 0.2 );
-        }
-
-        this.Root.draw(pGraphics);
-    },
-    Draw: function(x, y, pGraphics)
-    {
-        if(this.Root.content.length > 1)
-        {
-            this.pos = {x: x, y: y - this.Root.size.center};
-            this.Root.setPosition({x: x, y: y - this.Root.size.center});
-            this.Root.draw(pGraphics);
-            //this.UpdateCursor();
-        }
-    },
-    GetFirstPrp: function()
-    {
-        return this.Root.getFirstPrp();
-    },
-    Cursor_MoveLeft: function()
-    {
-        var move = this.SelectContent.cursor_moveLeft();
-
-        if(move.state)
-        {
-            this.SelectContent = move.SelectContent;
-            this.CurrentContent = move.CurrContent;
-        }
-
-        return move.state;
-    },
-    Cursor_MoveRight: function()
-    {
-        var move = this.SelectContent.cursor_moveRight();
-
-        //передаем состояние, т.к. можем выйти за пределы формулы
-        if(move.state)
-        {
-            this.SelectContent = move.SelectContent;
-            this.CurrentContent = move.CurrContent;
-        }
-
-        return move.state;
-    },
-    Cursor_MoveUp: function()
-    {
-        //TODO !!!
-        //сделать как в Cursor_MoveLeft/Right
-        // в зависимости от пришедшего флага выставлять/не выставлять контент
-
-        var move = this.SelectContent.cursor_moveUp();
-
-        this.CurrentContent = move.CurrContent;
-        this.SelectContent = move.SelectContent;
-
-        return move.state;
-    },
-    Cursor_MoveDown: function()
-    {
-        var move = this.SelectContent.cursor_moveDown();
-
-        this.CurrentContent = move.CurrContent;
-        this.SelectContent = move.SelectContent;
-
-        return move.state;
-    },
-    Cursor_MoveToStartPos: function()
-    {
-        this.Root.cursor_MoveToStartPos();
-        this.CurrentContent = this.SelectContent = this.Root;
-    },
-    Cursor_MoveToEndPos: function()
-    {
-        this.Root.cursor_MoveToEndPos();
-        this.CurrentContent = this.SelectContent = this.Root;
-    },
-
-    getSize: function()
-    {
-        /*return this.Root.size;*/
-
-        //
-        var sh = 0.2487852283770651*g_oTextMeasurer.GetHeight();
-        //
-        var size =
-        {
-            Width:          this.Root.size.width,
-            WidthVisible:   this.Root.size.width,
-            Height:         this.Root.size.height,
-            Ascent:         this.Root.size.center + sh,
-            Descent:        this.Root.size.height - this.Root.size.center
-        };
-
-        return size;
-    },
-    Remove: function(order, bOnAdd)
-    {
-        ////*    History    */////
-        History.Create_NewPoint();
-        /*var start = this.SelectContent.selection.startPos,
-            end = this.SelectContent.selection.endPos;*/
-        var start = this.SelectContent.RealSelect.startPos,
-            end   = this.SelectContent.RealSelect.endPos;
-        var Pos;
-
-        if(start !== end)
-            Pos = start < end ? start: end;
-        else if(order == 1)
-            Pos = this.SelectContent.CurPos;
-        else
-            Pos = this.SelectContent.CurPos + 1;
-
-        ///////////////////////////
-
-
-        var removeMComp = true;
-
-        if(bOnAdd)
-        {
-            this.SelectContent.removeAreaSelect();
-        }
-        else
-        {
-            var result = this.SelectContent.remove(order);
-
-            var bRoot = this.SelectContent.bRoot === true,
-                bToUpper = result.state.bBegin || result.state.bEnd; // наверх нужно ли прокидовать
-
-
-            if( result.state.bDelete )
-                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
-
-
-            this.CurrentContent = result.CurrContent;
-            this.SelectContent  = result.SelectContent;
-            this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
-
-            removeMComp = !(bRoot && bToUpper);  // посылаем false, если в начале + backspace или в конце + delete
-        }
-
-        return removeMComp;
-    },
-
-    UpdatePosition: function()
-    {
-        this.Root.setPosition(this.pos);
-    },
-    SetPosition: function(pos)
-    {
-        this.pos = pos;
-        this.Root.setPosition(this.pos);
-    },
-    RecalculateReverse: function(oMeasure) // for edit
-    {
-        this.SelectContent.RecalculateReverse(oMeasure);
-    },
-    Resize: function(oMeasure)
-    {
-        this.Root.Resize(oMeasure);
-    },
-    AddLetter: function(code)
-    {
-        if(TEST)
-        {
-            History.Create_NewPoint();
-        }
-
-        //this.ClearSelect();
-        //this.SelectContent.removeAreaSelect();
-
-
-        /*if(this.Root.IsEmpty())
-            this.Root.addRunPrp(this.DefaultTxtPrp);*/
-
-        var items =  this.SelectContent.addLetter(code);
-
-        ///
-
-        // временно
-        //this.RecalculateReverse();
-        this.Resize(g_oTextMeasurer);
-
-        this.UpdatePosition();
-        ///
-
-        if(TEST)
-        {
-            var Pos = this.SelectContent.CurPos,
-                EndPos = this.SelectContent.CurPos + 1;
-
-            History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
-        }
-
-        this.CurrentContent = this.SelectContent;
-        this.CurrentContent.update_Cursor();
-
-        this.ShowCursor();
-    },
-    CreateEquation2: function(indef)
-    {
-        if(TEST)
-        {
-            History.Create_NewPoint();
-        }
-
-        //this.ClearSelect();
-        //this.SelectContent.removeAreaSelect();
-
-        if(TEST)
-            var Pos = this.SelectContent.CurPos + 1;
-
-        var items = this.SelectContent.createEquation(indef);
-
-        ///
-        // временно
-        //this.RecalculateReverse();
-        //this.Root.Resize();
-        this.Resize(g_oTextMeasurer);
-        this.UpdatePosition();
-        ///
-
-        if(TEST)
-        {
-            //var Pos = this.SelectContent.CurPos - 1,
-            var EndPos = this.SelectContent.CurPos + 1;
-            History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
-        }
-
-        this.CurrentContent = this.SelectContent;
-        this.CurrentContent.update_Cursor();
-
-        this.ShowCursor();
-    },
-    Get_SelectionState : function()
-    {
-        var State = new Object();
-
-        var stackCurrent = new Array();
-        this.CurrentContent.getStackPositions( stackCurrent );
-        State.Current =
-        {
-            stack:              stackCurrent
-        };
-
-        var stackSelect = new Array();
-        this.SelectContent.getStackPositions( stackSelect );
-
-        State.Select =
-        {
-            StartSelect:        this.SelectContent.RealSelect.startPos - 1,
-            EndSelect:          this.SelectContent.RealSelect.endPos - 1,
-            stack:              stackSelect
-        };
-
-        return State;
-    },
-    Set_SelectionState : function(State)
-    {
-        this.ClearSelect();
-        // временно
-        //this.RecalculateReverse();
-        //this.Root.Resize();
-        this.Resize(g_oTextMeasurer);
-        this.UpdatePosition();
-
-        var stackSelect = Common_CopyObj(State.Select.stack),
-            stackCurrent = Common_CopyObj(State.Current.stack);
-
-        this.SelectContent = this.Root.getContent( stackSelect, false );
-        this.CurrentContent = this.Root.getContent( stackCurrent, true );
-
-        /*if(this.SelectContent.IsPlaceholder())
-            this.CheckTarget();
-        else if( State.Select.StartSelect !== State.Select.EndSelect )
-        {
-            this.SelectContent.setStart_Selection(State.Select.StartSelect );
-            this.SelectContent.setEnd_Selection(State.Select.EndSelect);
-            //this.SelectContent.selection.active = false;
-        }
-        else
-        {
-            this.SelectContent.setStart_Selection(State.Select.StartSelect - 1);
-            //this.SelectContent.selection.active = false;
-            this.UpdateCursor();
-        }*/
-    },
-
-    ClearSelect: function()
-    {
-        if(this.SelectContent.selectUse())
-        {
-            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectClear();
-            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
-        }
-    },
-    old_SetTxtPrp: function(txtPrp)
-    {
-        this.SelectContent.changeTxtPrp(txtPrp, false);
-        //this.SelectContent.setTxtPrp(txtPrp, false);
-        this.Resize();
-        this.UpdatePosition();
-        this.UpdateCursor();
-    },
-    UpdateCursor: function()
-    {
-        //this.CurrentContent.update_Cursor();
-        this.SelectContent.update_Cursor();
-        /*if( this.SelectContent.selection.startPos !== this.SelectContent.selection.endPos)
-            this.HideCursor();
-        else
-            this.ShowCursor();*/
-    },
-    /*GetPrpSelectContent: function()
-    {
-        return this.SelectContent.getSelectTPrp(true);
-    },*/
-
-    ////  test function  ////
+    ////  test function for me  ////
     TestSetPosition: function()
     {
         this.Root.setPosition(this.posCompos);
@@ -6635,7 +6240,7 @@ CMathComposition.prototype =
         if(code>=0x0020 )
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
-            this.AddLetter(code);
+            this.AddLetter_2(code);
 
             return true;
         }
@@ -6739,9 +6344,62 @@ CMathComposition.prototype =
         this.Root.setPosition(this.pos);
         this.UpdateCursor();
     },
-    ////
+    AddLetter_2: function(code)
+    {
+        if(TEST)
+        {
+            History.Create_NewPoint();
+        }
 
-    //////    ///////
+        this.ClearSelect();
+        this.SelectContent.removeAreaSelect();
+
+
+        /*if(this.Root.IsEmpty())
+         this.Root.addRunPrp(this.DefaultTxtPrp);*/
+
+        var items =  this.SelectContent.addLetter(code);
+
+        ///
+
+        // временно
+        //this.RecalculateReverse();
+        this.Resize(g_oTextMeasurer);
+
+        this.UpdatePosition();
+        ///
+
+        if(TEST)
+        {
+            var Pos = this.SelectContent.CurPos,
+                EndPos = this.SelectContent.CurPos + 1;
+
+            History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+        }
+
+        this.CurrentContent = this.SelectContent;
+        this.CurrentContent.update_Cursor();
+
+        this.ShowCursor();
+    },
+    CreateEquation2: function(indef)
+    {
+        this.CreateEquation(indef);
+        // временно
+        //this.RecalculateReverse();
+        //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
+        this.UpdatePosition();
+    },
+    UpdateCursor2: function()
+    {
+        //this.CurrentContent.update_Cursor();
+        this.SelectContent.update_Cursor();
+        if( this.SelectContent.selectUse())
+            this.HideCursor();
+        else
+            this.ShowCursor();
+    },
     HideCursor: function()
     {
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetEnd();
@@ -6752,19 +6410,80 @@ CMathComposition.prototype =
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetStart();
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetShow();
     },
-
-    ////////
-
-    DrawSelect2: function()
+    old_SetTxtPrp: function(txtPrp)
     {
-        this.SelectContent.drawSelect2();
+        this.SelectContent.changeTxtPrp(txtPrp, false);
+        //this.SelectContent.setTxtPrp(txtPrp, false);
+        this.Resize();
+        this.UpdatePosition();
+        this.UpdateCursor();
     },
-    Refresh_RecalcData2: function()
+    Set_SelectionState_2 : function(State)
     {
-        this.Parent.Refresh_RecalcData2();
+        this.ClearSelect();
+        // временно
+        //this.RecalculateReverse();
+        //this.Root.Resize();
+        this.Resize(g_oTextMeasurer);
+        this.UpdatePosition();
+
+        var stackSelect = Common_CopyObj(State.Select.stack),
+            stackCurrent = Common_CopyObj(State.Current.stack);
+
+        this.SelectContent = this.Root.getContent( stackSelect, false );
+        this.CurrentContent = this.Root.getContent( stackCurrent, true );
+
+        /*if(this.SelectContent.IsPlaceholder())
+         this.CheckTarget();
+         else if( State.Select.StartSelect !== State.Select.EndSelect )
+         {
+         this.SelectContent.setStart_Selection(State.Select.StartSelect );
+         this.SelectContent.setEnd_Selection(State.Select.EndSelect);
+         //this.SelectContent.selection.active = false;
+         }
+         else
+         {
+         this.SelectContent.setStart_Selection(State.Select.StartSelect - 1);
+         //this.SelectContent.selection.active = false;
+         this.UpdateCursor();
+         }*/
     },
-    //test
-    // из MathControl
+    ClearSelect: function()
+    {
+        if(this.SelectContent.selectUse())
+        {
+            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectClear();
+            editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
+        }
+    },
+    Draw_2: function(pGraphics)
+    {
+        if(this.Root.content.length > 1)
+        {
+            var w_Box = this.Root.size.width;
+            var h_Box = this.Root.size.height;
+
+            pGraphics.p_color(224, 238, 224, 255); // "p_color" for stroke
+            // "b_color1" for fill
+            //context.b_color1(224, 238, 230, 255);
+
+            pGraphics.drawHorLine(0, this.pos.y, this.pos.x, this.pos.x + w_Box, 0.2);
+            pGraphics.drawHorLine(0, this.pos.y + h_Box, this.pos.x, this.pos.x + w_Box, 0.2);
+            pGraphics.drawVerLine(0,this.pos.x, this.pos.y, this.pos.y + h_Box, 0.2 );
+            pGraphics.drawVerLine(0,this.pos.x + w_Box, this.pos.y, this.pos.y + h_Box, 0.2 );
+        }
+
+        this.Root.draw(pGraphics);
+    },
+    UpdatePosition: function()
+    {
+        this.Root.setPosition(this.pos);
+    },
+    SetPosition: function(pos)
+    {
+        this.pos = pos;
+        this.Root.setPosition(this.pos);
+    },
     IsRect: function(x, y)
     {
         var size = this.Root.size;
@@ -6777,42 +6496,10 @@ CMathComposition.prototype =
 
         return {x: _x, y: _y};
     },
-
-    CreateEquation: function(indef)
+    Resize: function(oMeasure)
     {
-        this.CreateEquation2(indef);
-        // временно
-        //this.RecalculateReverse();
-        //this.Root.Resize();
-        this.Resize(g_oTextMeasurer);
-        this.UpdatePosition();
+        this.Root.Resize(oMeasure);
     },
-    RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
-    {
-        ////*  test  *////
-
-        /*var textPrp = new TextPr();
-        this.DefaultTxtPrp.FontSize = 11;
-        textPrp.Marge(this.DefaultTxtPrp);
-        textPrp.Merge(TextPr);
-
-        this.DefaultTxtPrp = textPrp;*/
-
-        ///////////////////////
-
-        this.Root.Resize(oMeasure); // пересчитываем всю формулу
-
-        var width = this.Root.size.width,
-            height = this.Root.size.height;
-
-        return {Width: width, Height: height, WidthVisible: width };
-    },
-    SetReferenceComposition: function()
-    {
-        this.Root.setReferenceComposition(this);
-    },
-
-    ////////   For edit    ////////
     test_for_edit: function()
     {
         var props =
@@ -6830,14 +6517,227 @@ CMathComposition.prototype =
     {
         simulatorMComposition(this, MATH_EDIT);
     },
+    /*RecalculateReverse: function(oMeasure) // for edit
+     {
+     this.SelectContent.RecalculateReverse(oMeasure);
+     },*/
+    //////////////*    end  of  test  functions   *//////////////////
+
+    Init: function()
+    {
+        // TODO
+        // переделать gaps
+        //var g_Unif = 6*g_dKoef_pix_to_mm;
+        var g_Unif = 0;
+        var gps = new dist(g_Unif, g_Unif, g_Unif, g_Unif);
+
+        this.Root = new CMathContent();
+        this.Root.g_mContext = gps;
+        this.Root.setComposition(this);
+        //this.SetTestRunPrp();
+        //this.Root.setTxtPrp(this.TxtPrp);
+
+        this.CurrentContent = this.Root;
+        this.SelectContent  = this.Root;
+
+        this.Root.relate(-1); // корень
+    },
+    /*SetTestRunPrp: function()
+    {
+        var runPrp = new CTextPr();
+        runPrp.Merge(this.DefaultTxtPrp);
+
+        this.Root.addRunPrp(runPrp);
+    },*/
+    GetTxtPrp: function()
+    {
+        return this.DefaultTxtPrp;
+    },
+    //TODO
+    // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
+    Draw: function(x, y, pGraphics)
+    {
+        if(this.Root.content.length > 1)
+        {
+            this.pos = {x: x, y: y - this.Root.size.center};
+            this.Root.setPosition({x: x, y: y - this.Root.size.center});
+            this.Root.draw(pGraphics);
+        }
+    },
+    GetFirstPrp: function()
+    {
+        return this.Root.getFirstPrp();
+    },
+    Cursor_MoveLeft: function()
+    {
+        var move = this.SelectContent.cursor_moveLeft();
+
+        if(move.state)
+        {
+            this.SelectContent = move.SelectContent;
+            this.CurrentContent = move.CurrContent;
+        }
+
+        return move.state;
+    },
+    Cursor_MoveRight: function()
+    {
+        var move = this.SelectContent.cursor_moveRight();
+
+        //передаем состояние, т.к. можем выйти за пределы формулы
+        if(move.state)
+        {
+            this.SelectContent = move.SelectContent;
+            this.CurrentContent = move.CurrContent;
+        }
+
+        return move.state;
+    },
+    Cursor_MoveUp: function()
+    {
+        //TODO !!!
+        //сделать как в Cursor_MoveLeft/Right
+        // в зависимости от пришедшего флага выставлять/не выставлять контент
+
+        var move = this.SelectContent.cursor_moveUp();
+
+        this.CurrentContent = move.CurrContent;
+        this.SelectContent = move.SelectContent;
+
+        return move.state;
+    },
+    Cursor_MoveDown: function()
+    {
+        var move = this.SelectContent.cursor_moveDown();
+
+        this.CurrentContent = move.CurrContent;
+        this.SelectContent = move.SelectContent;
+
+        return move.state;
+    },
+    Cursor_MoveToStartPos: function()
+    {
+        this.Root.cursor_MoveToStartPos();
+        this.CurrentContent = this.SelectContent = this.Root;
+    },
+    Cursor_MoveToEndPos: function()
+    {
+        this.Root.cursor_MoveToEndPos();
+        this.CurrentContent = this.SelectContent = this.Root;
+    },
+    getSize: function()
+    {
+        /*return this.Root.size;*/
+
+        //
+        var sh = 0.2487852283770651*g_oTextMeasurer.GetHeight();
+        //
+        var size =
+        {
+            Width:          this.Root.size.width,
+            WidthVisible:   this.Root.size.width,
+            Height:         this.Root.size.height,
+            Ascent:         this.Root.size.center + sh,
+            Descent:        this.Root.size.height - this.Root.size.center
+        };
+
+        return size;
+    },
+    Remove: function(order, bOnAdd)
+    {
+        ////*    History    */////
+        History.Create_NewPoint();
+
+        var start = this.SelectContent.RealSelect.startPos,
+            end   = this.SelectContent.RealSelect.endPos;
+        var Pos;
+
+        if(start !== end)
+            Pos = start < end ? start: end;
+        else if(order == 1)
+            Pos = this.SelectContent.CurPos;
+        else
+            Pos = this.SelectContent.CurPos + 1;
+
+        ///////////////////////////
+
+        var removeMComp = true;
+
+        if(bOnAdd)
+        {
+            this.SelectContent.removeAreaSelect();
+        }
+        else
+        {
+            var result = this.SelectContent.remove(order);
+
+            var bRoot = this.SelectContent.bRoot === true,
+                bToUpper = result.state.bBegin || result.state.bEnd; // наверх нужно ли прокидовать
+
+
+            if( result.state.bDelete )
+                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
+
+
+            this.CurrentContent = result.CurrContent;
+            this.SelectContent  = result.SelectContent;
+            this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
+
+            removeMComp = !(bRoot && bToUpper);  // посылаем false, если в начале + backspace или в конце + delete
+        }
+
+        return removeMComp;
+    },
+    AddLetter: function(code)
+    {
+        History.Create_NewPoint();
+
+        var items =  this.SelectContent.addLetter(code);
+        this.CurrentContent = this.SelectContent;
+
+        ///
+
+        var Pos = this.SelectContent.CurPos,
+            EndPos = this.SelectContent.CurPos + 1;
+
+        History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+    },
+    CreateEquation: function(indef)
+    {
+        History.Create_NewPoint();
+
+        var Pos = this.SelectContent.CurPos + 1;
+        var items = this.SelectContent.createEquation(indef);
+        this.CurrentContent = this.SelectContent;
+
+        var EndPos = this.SelectContent.CurPos + 1;
+        History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+
+    },
+    UpdateCursor: function()
+    {
+        this.SelectContent.update_Cursor();
+    },
+
+    Refresh_RecalcData2: function()
+    {
+        this.Parent.Refresh_RecalcData2();
+    },
+    RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
+    {
+        this.Root.Resize(oMeasure); // пересчитываем всю формулу
+
+        var width = this.Root.size.width,
+            height = this.Root.size.height;
+
+        return {Width: width, Height: height, WidthVisible: width };
+    },
     Selection_SetStart: function(X, Y, PageNum)
     {
         var x = X - this.pos.x,
             y = Y - this.pos.y;
 
         this.Root.selection_Start(x, y);
-
-        //this.SelectContent = result.SelectContent; // если SetEnd придет раньше
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
@@ -6849,7 +6749,7 @@ CMathComposition.prototype =
     },
     Selection_Draw: function()
     {
-        this.SelectContent.drawSelect2();
+        this.SelectContent.drawSelect();
     },
     Selection_Beginning: function(bStart) // если приходит bStart = false, то это означает Selection_SetEnd (конец селекта в начале контента)
     {
@@ -6875,7 +6775,41 @@ CMathComposition.prototype =
     Is_Empty: function()
     {
         return this.Root.IsEmpty();
+    },
+
+    /////////  for Undo/Redo ////////
+    Get_SelectionState : function()
+    {
+        var State = new Object();
+
+        var stackCurrent = new Array();
+        this.CurrentContent.getStackPositions( stackCurrent );
+        State.Current =
+        {
+            stack:              stackCurrent
+        };
+
+        var stackSelect = new Array();
+        this.SelectContent.getStackPositions( stackSelect );
+
+        State.Select =
+        {
+            StartSelect:        this.SelectContent.RealSelect.startPos - 1,
+            EndSelect:          this.SelectContent.RealSelect.endPos - 1,
+            stack:              stackSelect
+        };
+
+        return State;
+    },
+    Set_SelectionState : function(State)
+    {
+        var stackSelect = Common_CopyObj(State.Select.stack),
+            stackCurrent = Common_CopyObj(State.Current.stack);
+
+        this.SelectContent = this.Root.getContent( stackSelect, false );
+        this.CurrentContent = this.Root.getContent( stackCurrent, true );
     }
+    /////////////////////////////////////////
 
 }
 

@@ -1332,7 +1332,7 @@ CDocument.prototype =
             this.Document_UpdateRulersState();
             //**
             //MathControl.UpdateCursor();
-            MathComposition.UpdateCursor();
+            MathComposition.UpdateCursor2();
             //this.RecalculateCurPos();
             //**
             //this.RecalculateCurPos();
