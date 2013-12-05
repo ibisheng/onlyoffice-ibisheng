@@ -646,6 +646,23 @@ function asc_CCellCommentator(currentSheet) {
 		}
 	}
 	
+	_this.deleteCommentsRange = function(range) {
+		if ( range ) {
+			var aCommentId = [];
+			for (var i = 0; i < _this.aComments.length; ++i) {
+				var comment = _this.aComments[i];
+				if ( (comment.nCol >= range.c1) && (comment.nCol <= range.c2) && (comment.nRow >= range.r1) && (comment.nRow <= range.r2) ) {
+					aCommentId.push(comment.asc_getId());
+				}
+			}
+			History.StartTransaction();
+			for (var i = 0; i < aCommentId.length; i++) {
+				_this.asc_removeComment(aCommentId[i]);
+			}
+			History.EndTransaction();
+		}
+	}
+	
 	_this.addCommentSerialize = function(oComment) {
 
 		var _this = this;

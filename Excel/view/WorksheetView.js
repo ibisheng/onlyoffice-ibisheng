@@ -7037,6 +7037,8 @@
 							t.autoFilters.isEmptyAutoFilters(arn);
 							// Вызываем функцию пересчета для заголовков форматированной таблицы
 							t.autoFilters._renameTableColumn(arn);
+							// Удаляем комментарии
+							t.cellCommentator.deleteCommentsRange(arn);
 							//удаляем выделенные графичекие объекты
 							t.objectRender.controller.deleteSelectedObjects();
 
