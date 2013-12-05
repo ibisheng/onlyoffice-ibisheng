@@ -8153,7 +8153,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oDegree = new CDegree();
 						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
 						break;
-			case 132:	var oFunc = new CMathFunc();
+			case 133:	var oFunc = new CMathFunc();
 						CreateElem(oFunc,MathElement.Math.Root,props);
 						oFName = oFunc.getFName();						
 						
@@ -8163,7 +8163,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oDegree = new CDegree();
 						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
 						break;
-			case 132:	var oFunc = new CMathFunc();
+			case 134:	var oFunc = new CMathFunc();
 						CreateElem(oFunc,MathElement.Math.Root,props);
 						oFName = oFunc.getFName();						
 						
@@ -8173,7 +8173,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oDegree = new CDegree();
 						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
 						break;
-			case 132:	var oFunc = new CMathFunc();
+			case 135:	var oFunc = new CMathFunc();
 						CreateElem(oFunc,MathElement.Math.Root,props);
 						oFName = oFunc.getFName();						
 						
@@ -8182,6 +8182,626 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var sSup = "-1";
 						var oDegree = new CDegree();
 						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 136:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "sec";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 137:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "cot";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 138:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "sinh", props);
+						break;
+			case 139:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "cosh", props);
+						break;
+			case 140:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "tanh", props);
+						break;
+			case 141:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "csch", props);
+						break;
+			case 142:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "sech", props);
+						break;
+			case 143:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "coth", props);
+						break;
+			case 144:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "sinh";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 145:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "cosh";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 146:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "tanh";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 147:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "csch";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 148:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "sech";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 149:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var sBase = "coth";
+						var sSup = "-1";
+						var oDegree = new CDegree();
+						CreateDegree(oDegree, oFName, props, sBase, sSup, null);						
+						break;
+			case 150:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "sin", props);
+						
+						oArg = oFunc.getArgument();
+						var argText = String.fromCharCode(952);
+						AddText(oArg, argText);
+						break;
+			case 151:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "cos", props);
+						
+						oArg = oFunc.getArgument();
+						AddText(oArg, "2x");
+						break;
+			case 152:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "tan", props);						
+						oArg = oFunc.getArgument();
+						var argText = String.fromCharCode(952);
+						AddText(oArg, argText);
+						AddText(MathElement.Math.Root, "=");
+						
+						props = {};
+						var oFraction = new CFraction();
+						CreateElem(oFraction, MathElement.Math.Root, props);
+						
+						var oNum = oFraction.getNumerator();						
+						props = {};
+						var oFuncNum = new CMathFunc();
+						CreateElem(oFuncNum,oNum,props);
+						oFNameNum = oFuncNum.getFName();						
+						props = {sty:"p"};
+						AddText(oFNameNum, "sin", props);						
+						oArgNum = oFuncNum.getArgument();
+						AddText(oArgNum, argText);
+						
+						var oDen = oFraction.getDenominator();
+						props = {};
+						var oFuncDen = new CMathFunc();
+						CreateElem(oFuncDen,oDen,props);
+						oFNameDen = oFuncDen.getFName();						
+						props = {sty:"p"};
+						AddText(oFNameDen, "cos", props);						
+						oArgDen = oFuncDen.getArgument();
+						AddText(oArgDen, argText);						
+						break;
+			case 153:	var sChr = String.fromCharCode(775);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 154:	var sChr = String.fromCharCode(776);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 155:	var sChr = String.fromCharCode(8411);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 156:	props = {};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 157:	var sChr = String.fromCharCode(780);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 158:	var sChr = String.fromCharCode(769);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 159:	var sChr = String.fromCharCode(768);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 160:	var sChr = String.fromCharCode(774);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 161:	var sChr = String.fromCharCode(771);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 162:	var sChr = String.fromCharCode(773);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 163:	var sChr = String.fromCharCode(831);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 164:	var sChr = String.fromCharCode(9182);
+						props = {chr:sChr, pos:"top", vertJc:"bot"};
+						oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,MathElement.Math.Root,props);
+						break;
+			case 165:	oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,MathElement.Math.Root,props);
+						break;
+			case 166:	props = {type:LIMIT_UP};
+						var oLimUpp = new CLimit();
+						CreateElem(oLimUpp,MathElement.Math.Root,props);
+						var oElem = oLimUpp.getFName();
+				
+						var sChr = String.fromCharCode(9182);
+						props = {chr:sChr, pos:"top", vertJc:"bot"};
+						oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 167:	props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow,MathElement.Math.Root,props);
+						var oElem = oLimLow.getFName();
+				
+						oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 168:	var sChr = String.fromCharCode(8406);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 169:	var sChr = String.fromCharCode(8407);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 170:	var sChr = String.fromCharCode(8417);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 171:	var sChr = String.fromCharCode(8400);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 172:	var sChr = String.fromCharCode(8401);
+						props = {chr:sChr};
+						var oAcc = new CAccent();
+						CreateElem(oAcc,MathElement.Math.Root,props);
+						break;
+			case 173:	var oBorderBox = new CBorderBox();
+						CreateElem(oBorderBox,MathElement.Math.Root,props);
+						break;
+			case 174:	var oBorderBox = new CBorderBox();
+						CreateElem(oBorderBox,MathElement.Math.Root,props);
+						var oElem = oBorderBox.getBase();
+						
+						props = {type:DEGREE_SUPERSCRIPT};
+						var oDegree0 = new CDegree();
+						CreateDegree(oDegree0, oElem, props, "a", "2", null);
+						AddText(oElem, "=");
+						var oDegree1 = new CDegree();
+						CreateDegree(oDegree1, oElem, props, "b", "2", null);
+						AddText(oElem, "+");
+						var oDegree2 = new CDegree();
+						CreateDegree(oDegree2, oElem, props, "c", "2", null);					
+						break;
+			case 175:	props = {pos:"top"};
+						var oBar = new CBar();
+						CreateElem(oBar,MathElement.Math.Root,props);
+						break;
+			case 176:	var oBar = new CBar();
+						CreateElem(oBar,MathElement.Math.Root,props);
+						break;
+			case 177:	props = {pos:"top"};
+						var oBar = new CBar();
+						CreateElem(oBar,MathElement.Math.Root,props);
+						oElem = oBar.getBase();
+						AddText(oElem, "A");
+						break;
+			case 178:	props = {pos:"top"};
+						var oBar = new CBar();
+						CreateElem(oBar,MathElement.Math.Root,props);
+						oElem = oBar.getBase();
+						AddText(oElem, "ABC");
+						break;
+			case 179:	props = {pos:"top"};
+						var oBar = new CBar();
+						CreateElem(oBar,MathElement.Math.Root,props);
+						oElem = oBar.getBase();
+						var sText = "x" + String.fromCharCode(8853) + "y";
+						AddText(oElem, sText);
+						break;
+			case 180:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);						
+						oFName = oFunc.getFName();
+						
+						props = {type:DEGREE_SUBSCRIPT};
+						var oSSub = new CDegree();
+						CreateElem(oSSub, oFName, props);
+						
+						var sSubBase = oSSub.getBase();						
+						props = {sty:"p"};
+						AddText(sSubBase, "log", props);
+						break;
+			case 181:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "log", props);
+						break;
+			case 182:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);						
+						oFName = oFunc.getFName();
+						
+						props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow, oFName, props);
+						
+						var oElem = oLimLow.getFName();
+						props = {sty:"p"};
+						AddText(oFName, "lim", props);						
+						break;
+			case 183:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);						
+						oFName = oFunc.getFName();
+						
+						props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow, oFName, props);
+						
+						var oElem = oLimLow.getFName();
+						props = {sty:"p"};
+						AddText(oFName, "min", props);						
+						break;
+			case 184:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);						
+						oFName = oFunc.getFName();
+						
+						props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow, oFName, props);
+						
+						var oElem = oLimLow.getFName();
+						props = {sty:"p"};
+						AddText(oFName, "max", props);						
+						break;
+			case 185:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);
+						oFName = oFunc.getFName();						
+						props = {sty:"p"};
+						AddText(oFName, "ln", props);
+						break;
+			case 186:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);	
+						
+						oFName = oFunc.getFName();							
+						props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow, oFName, props);
+						var limLowElem = oLimLow.getFName();
+						props = {sty:"p"};
+						AddText(limLowElem, "lim", props);
+						var limLowLim = oLimLow.getIterator();
+						var sText = "n" + String.fromCharCode(8594,8734)
+						AddText(limLowLim, sText);
+						
+						var oElem = oFunc.getArgument();
+						props = {type:DEGREE_SUPERSCRIPT};
+						var oDegree = new CDegree();
+						CreateElem(oDegree, oElem, props);
+						var oSup = oDegree.getUpperIterator();
+						AddText(oSup, "n");
+						var degreeElem = oDegree.getBase();
+						
+						props = {column:1};
+						var oDelimiter = new CDelimiter();
+						CreateElem(oDelimiter,degreeElem,props);
+						var delElem = oDelimiter.getBase(0);
+						AddText(delElem,"1+");
+						
+						props = {};
+						var oFraction = new CFraction();
+						CreateFraction(oFraction,delElem,props,"1","n");
+						break;
+			case 187:	var oFunc = new CMathFunc();
+						CreateElem(oFunc,MathElement.Math.Root,props);	
+						
+						oFName = oFunc.getFName();
+						props = {type:LIMIT_LOW};
+						var oLimLow = new CLimit();
+						CreateElem(oLimLow, oFName, props);
+						
+						var limLowElem = oLimLow.getFName();
+						props = {sty:"p"};
+						AddText(limLowElem, "max", props);
+						var limLowLim = oLimLow.getIterator();
+						var sText = "0" + String.fromCharCode(8804) + "x" + String.fromCharCode(8804) + "1";
+						AddText(limLowLim, sText);
+						
+						var oElem = oFunc.getArgument();
+						AddText(oElem, "x");
+						props = {type:DEGREE_SUPERSCRIPT};
+						var oDegree = new CDegree();
+						CreateElem(oDegree, oElem, props);
+						var degreeElem = oDegree.getBase();
+						AddText(degreeElem, "e");
+						
+						var oSup = oDegree.getUpperIterator();
+						AddText(oSup, "-");
+						props = {type:DEGREE_SUPERSCRIPT};
+						var supSup = new CDegree();
+						CreateElem(supSup, oSup, props);
+						var supElem = supSup.getBase();
+						AddText(supElem, "x");
+						var supSupSup = supSup.getUpperIterator();
+						AddText(supSupSup, "2");
+						break;
+			case 188:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						AddText(oElem, ":=");
+						break;
+			case 189:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						AddText(oElem, "==");
+						break;
+			case 190:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						AddText(oElem, "+=");
+						break;
+			case 191:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						AddText(oElem, "-=");
+						break;
+			case 192:	var sText = String.fromCharCode(8797);
+						AddText(MathElement.Math.Root, sText);
+						break;
+			case 193:	var sText = String.fromCharCode(8798);
+						AddText(MathElement.Math.Root, sText);
+						break;
+			case 194:	var sText = String.fromCharCode(8796);
+						AddText(MathElement.Math.Root, sText);
+						break;
+			case 195:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8592);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 196:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8594);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 197:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8592);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 198:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8594);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 199:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8656);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 200:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8658);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 201:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8656);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 202:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8658);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 203:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8596);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 204:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8596);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 205:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8660);
+						props = {pos:"top", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 206:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8660);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						break;
+			case 207:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8594);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						var groupElem = oGroupChr.getArgument();
+						AddText(groupElem,"yields");
+						break;
+			case 208:	props = {opEmu:1};
+						var oBox = new CBox();
+						CreateElem(oBox,MathElement.Math.Root,props);
+						var oElem = oBox.getBase();
+						
+						var sChr = String.fromCharCode(8594);
+						props = {vertJc:"bot", chr:sChr}
+						var oGroupChr = new CGroupCharacter();
+						CreateElem(oGroupChr,oElem,props);
+						var groupElem = oGroupChr.getArgument();
+						var sText = String.fromCharCode(8710);
+						AddText(groupElem,sText);
 						break;
 		}
 
