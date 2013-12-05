@@ -1843,7 +1843,7 @@ DrawingObjectsController.prototype =
 		
 		for (var i = 0; i < ret.length; i++) {
 		
-			if ( (!api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady()) && ret[i].ChartProperties ) {
+			if ( api.chartStyleManager && api.chartPreviewManage && (!api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady()) && ret[i].ChartProperties ) {
 				api.chartStyleManager.init();
 				api.chartPreviewManager.init();
 				this.drawingObjects.callTrigger("asc_onUpdateChartStyles");
