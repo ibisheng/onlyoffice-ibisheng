@@ -6403,7 +6403,7 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
                     if( isRealObject(obj.chart))
                     {
                         if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.group.parent.Parent, CheckType : changestype_Paragraph_Content} )) {
-                            var chart = obj;
+                            var chart = obj.chart;
                             var oColor, oNewColor;
                             chart["themeColors"] = [];
                             for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
@@ -6414,7 +6414,7 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
 								oNewColor.RGBA.B = oColor.b;
                                 chart["themeColors"].push(oNewColor);
                             }
-                            editor.asc_fireCallback("asc_doubleClickOnChart", chart);
+                            editor.asc_fireCallback("asc_doubleClickOnChart", obj);
                         }
                     }
                 }

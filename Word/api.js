@@ -6243,23 +6243,24 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 Document.CurPos.ContentPos = 0;
 
                 var hdr = Document.HdrFtr.Content[0].Header;
+                var ftr = Document.HdrFtr.Content[0].Footer;
                 var drawing_objects = Document.DrawingObjects;
-                if(hdr.First != null)
+                if(hdr.First != null || ftr.First != null)
                 {
                     drawing_objects.firstPage = new HeaderFooterGraphicObjects();
                 }
-                if(hdr.Even != null)
+                if(hdr.Even != null || ftr.Even != null)
                 {
-                    if(hdr.Even == hdr.First)
+                    if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
                         drawing_objects.evenPage = drawing_objects.firstPage;
                     else
                         drawing_objects.evenPage = new HeaderFooterGraphicObjects();
                 }
-                if(hdr.Odd != null)
+                if(hdr.Odd != null || ftr.Odd != null)
                 {
-                    if(hdr.Odd == hdr.First)
+                    if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
                         drawing_objects.oddPage = drawing_objects.firstPage;
-                    else if(hdr.Odd == hdr.Even)
+                    else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
                         drawing_objects.oddPage = drawing_objects.evenPage;
                     else
                         drawing_objects.oddPage = new HeaderFooterGraphicObjects();

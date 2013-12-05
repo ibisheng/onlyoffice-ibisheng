@@ -9016,6 +9016,10 @@ function CreateGeometry(prst){
     }
 
     f.isLine = (prst == "line");
+    if(f.AddPreset)
+    {
+        f.AddPreset(prst);
+    }
     f.preset = prst;
     return f;
 }

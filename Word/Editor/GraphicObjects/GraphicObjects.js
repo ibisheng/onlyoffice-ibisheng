@@ -3352,7 +3352,7 @@ CGraphicObjects.prototype =
 
     isSelectedText: function()
     {
-        return this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP;
+        return this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP || this.curState.id === STATES_ID_CHART_TITLE_TEXT || this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP;
     },
 
     selectAll: function()
@@ -3364,6 +3364,10 @@ CGraphicObjects.prototype =
         if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
             this.curState.textObject.textBoxContent.Select_All();
+        }
+        if(this.curState.id === STATES_ID_CHART_TITLE_TEXT || this.curState.id === STATES_ID_CHART_TITLE_TEXT_GROUP)
+        {
+            this.curState.title.txBody.content.Select_All();
         }
     },
 

@@ -2207,19 +2207,6 @@ WordShape.prototype =
 
         if(this.textBoxContent !== null && !graphics.IsNoSupportTextDraw && isRealObject(this.transformText))
         {
-
-
-            /*var _rect = null;
-            if (this.spPr.geometry && this.spPr.geometry.rect)
-            {
-                var rect = this.spPr.geometry.rect;
-                _rect = { x : rect.l, y : rect.t, w : rect.r - rect.l, h : rect.b - rect.t };
-            }
-            else
-            {
-                _rect = { x : 0, y : 0, w : this.absExtX, h : this.absExtY};
-            }      */
-
             if(typeof pageIndex === "number")
             {
                 var old_start_page = this.textBoxContent.Get_StartPage_Relative();

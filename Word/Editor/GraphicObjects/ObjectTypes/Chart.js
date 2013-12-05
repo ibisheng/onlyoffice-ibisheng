@@ -2,11 +2,16 @@
 var CLASS_TYPE_CHART_DATA = 9999;
 function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
-    this.parent = parent;
+    if(parent instanceof ParaDrawing)
+        this.parent = parent;
     this.document = document;
     this.drawingDocument = drawingDocument;
     this.group = isRealObject(group) ? group : null;
 
+    if(parent instanceof WordGroupShapes)
+    {
+        this.group = parent;
+    }
     this.chartTitle = null;
     this.vAxisTitle = null;
     this.hAxisTitle = null;
@@ -57,7 +62,6 @@ CChartAsGroup.prototype =
     {
         return this.chart;
     },
-
 
     setAscChart: function(chart)
     {
@@ -1105,9 +1109,10 @@ CChartAsGroup.prototype =
         var is_on = History.Is_On();
         if(is_on)
             History.TurnOff();
-        if(isRealObject(this.parent))
+        var xfrm = this.spPr.xfrm;
+        if(isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.W) &&isRealNumber(this.parent.Extent.H)
+            && (!isRealNumber(xfrm.offX)||!isRealNumber(xfrm.offY)|| !isRealNumber(xfrm.extX)||!isRealNumber(xfrm.extY)))
         {
-            var xfrm = this.spPr.xfrm;
             if(!this.group)
             {
                 xfrm.offX = 0;
@@ -1115,6 +1120,11 @@ CChartAsGroup.prototype =
             }
             xfrm.extX = this.parent.Extent.W;
             xfrm.extY = this.parent.Extent.H;
+        }
+        if(isRealObject(this.parent) && isRealObject(this.parent.Extent))
+        {
+            this.parent.Extent.W = xfrm.extX;
+            this.parent.Extent.H = xfrm.extY;
         }
 
         if(isRealObject(this.chartTitle))
@@ -1584,9 +1594,10 @@ CChartAsGroup.prototype =
         var is_on = History.Is_On();
         if(is_on)
             History.TurnOff();
-        if(isRealObject(this.parent))
+        var xfrm = this.spPr.xfrm;
+        if(isRealObject(this.parent) && isRealObject(this.parent.Extent) && isRealNumber(this.parent.Extent.W) &&isRealNumber(this.parent.Extent.H)
+            && (!isRealNumber(xfrm.offX)||!isRealNumber(xfrm.offY)|| !isRealNumber(xfrm.extX)||!isRealNumber(xfrm.extY)))
         {
-            var xfrm = this.spPr.xfrm;
             if(!this.group)
             {
                 xfrm.offX = 0;
@@ -1594,6 +1605,11 @@ CChartAsGroup.prototype =
             }
             xfrm.extX = this.parent.Extent.W;
             xfrm.extY = this.parent.Extent.H;
+        }
+        if(isRealObject(this.parent) && isRealObject(this.parent.Extent))
+        {
+            this.parent.Extent.W = xfrm.extX;
+            this.parent.Extent.H = xfrm.extY;
         }
 
         if(isRealObject(this.chartTitle))
@@ -2694,6 +2710,7 @@ CChartAsGroup.prototype =
         var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
         this.parent = new ParaDrawing(null, null, this, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
         this.parent.Set_GraphicObject(this);
+        this.init2();
         this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, false);
         if(this.spPr.geometry)
             this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
@@ -2705,6 +2722,7 @@ CChartAsGroup.prototype =
         var rot = xfrm.rot == null ? 0 : xfrm.rot;
         var flip_h = xfrm.flipH == null ? false : xfrm.flipH;
         var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
+        this.init();
         this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, false);
         if(this.spPr.geometry)
             this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
