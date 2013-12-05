@@ -1390,11 +1390,14 @@ CChartAsGroup.prototype =
             //this.chartTitle.drawingObjects = this.drawingObjects;
             if(this.chartTitle.isEmpty())
             {
-                var title_str = "Chart Title";
-                this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
+                if(this.chart.header && this.chart.header.bDefaultTitle)
+                {
+                    var title_str = "Chart Title";
+                    this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
 
-                for(var i in title_str)
-                    this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                    for(var i in title_str)
+                        this.chartTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                }
             }
             else
             {
@@ -1427,10 +1430,13 @@ CChartAsGroup.prototype =
             //this.hAxisTitle.drawingObjects = this.drawingObjects;
             if(this.hAxisTitle.isEmpty())
             {
-                var title_str = "X Axis";
-                this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-                for(var i in title_str)
-                    this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                if(this.chart.xAxis && this.chart.xAxis.bDefaultTitle)
+                {
+                    var title_str = "X Axis";
+                    this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+                    for(var i in title_str)
+                        this.hAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                }
             }
             else
             {
@@ -1465,14 +1471,17 @@ CChartAsGroup.prototype =
             //  this.vAxisTitle.drawingObjects = this.drawingObjects;
             if(this.vAxisTitle.isEmpty())
             {
-                var title_str = "Y Axis";
-                this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-                var body_pr = new CBodyPr();
-                body_pr.vert = nVertTTvert270;
-                this.vAxisTitle.setBodyPr(body_pr);
+                if(this.chart.yAxis && this.chart.yAxis.bDefaultTitle)
+                {
+                    var title_str = "Y Axis";
+                    this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+                    var body_pr = new CBodyPr();
+                    body_pr.vert = nVertTTvert270;
+                    this.vAxisTitle.setBodyPr(body_pr);
 
-                for(var i in title_str)
-                    this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                    for(var i in title_str)
+                        this.vAxisTitle.txBody.content.Paragraph_Add(CreateParagraphContent(title_str[i]), false);
+                }
             }
             else
             {
