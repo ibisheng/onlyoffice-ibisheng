@@ -4907,23 +4907,26 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    var _length = s.GetLong();
+					var _length = s.GetLong();
                     var _pos = s.cur;
+					
+					if(typeof CChartAsGroup !== "undefined")
+					{
+						_chart = new CChartAsGroup(this.TempMainObject);
+						var _stream = new FT_Stream2();
+						_stream.data = s.data;
+						_stream.pos = s.pos;
+						_stream.cur = s.cur;
+						_stream.size = s.size;
+						var oBinary_ChartReader = new Binary_ChartReader(_stream, _chart.chart, _chart);
+						oBinary_ChartReader.ReadExternal(_length);
 
-                    _chart = new CChartAsGroup(this.TempMainObject);
-                    var _stream = new FT_Stream2();
-                    _stream.data = s.data;
-                    _stream.pos = s.pos;
-                    _stream.cur = s.cur;
-                    _stream.size = s.size;
-                    var oBinary_ChartReader = new Binary_ChartReader(_stream, _chart.chart, _chart);
-                    oBinary_ChartReader.ReadExternal(_length);
-
-                    if(null == _chart.chart.range.interval || _chart.chart.range.interval.length <= 0)
-                    {
-                        _chart = null;
-                    }
-
+						if(null == _chart.chart.range.interval || _chart.chart.range.interval.length <= 0)
+						{
+							_chart = null;
+						}
+					}
+					
                     s.Seek2(_pos + _length);
                     break;
                 }

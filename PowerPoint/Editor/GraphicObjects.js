@@ -1827,7 +1827,7 @@ CGraphicObjects.prototype = {
         for(var i = 0; i < sp_tree.length; ++i)
         {
             var sp = sp_tree[i];
-            if(sp instanceof CChartAsGroup)
+            if(typeof(CChartAsGroup) != "undefined" && sp instanceof CChartAsGroup)
             {
                 sp.recalculate();
             }
@@ -1837,7 +1837,7 @@ CGraphicObjects.prototype = {
                 for(var j = 0; j < arr_g_o.length; ++j)
                 {
                     var cur_group_sp = arr_g_o[j];
-                    if(cur_group_sp instanceof CChartAsGroup)
+                    if(typeof(CChartAsGroup) != "undefined" && cur_group_sp instanceof CChartAsGroup)
                     {
                         cur_group_sp.recalculate();
                     }

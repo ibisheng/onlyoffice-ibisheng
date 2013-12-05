@@ -120,9 +120,18 @@ function asc_docs_api(name)
 
 	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
-    this.chartStyleManager = new ChartStyleManager();
-    this.chartPreviewManager = new ChartPreviewManager();
-    this.chartTranslate = new asc_CChartTranslate();
+	if(typeof ChartStyleManager !== "undefined")
+		this.chartStyleManager = new ChartStyleManager();
+	else
+		this.chartStyleManager = null;
+	if(typeof ChartPreviewManager !== "undefined")	
+		this.chartPreviewManager = new ChartPreviewManager();
+	else
+		this.chartPreviewManager = null;
+	if(typeof asc_CChartTranslate !== "undefined")	
+		this.chartTranslate = new asc_CChartTranslate();
+	else
+		this.chartTranslate = null;
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
@@ -640,7 +649,7 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function(options)
 {
 
-    if ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() )
+    if ( this.chartStyleManager && this.chartPreviewManager && ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() ))
     {
         for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
         {
