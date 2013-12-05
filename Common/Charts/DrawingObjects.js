@@ -2477,7 +2477,9 @@ function DrawingObjects() {
 	var api = asc["editor"];
 	var asc_Range = asc.Range;
 	
-	var chartRender = new ChartRender();
+	var chartRender = null;
+	if( typeof ChartRender !== "undefined" )
+		chartRender = new ChartRender();
 	var worksheet = null;
 	
 	var drawingCtx = null;
@@ -2771,7 +2773,7 @@ function DrawingObjects() {
 		copyObject.graphicObject = obj.graphicObject;
 		
 		// Series colors
-		if ( copyObject.graphicObject instanceof  CChartAsGroup ) {
+		if ( typeof CChartAsGroup !== "undefined" && copyObject.graphicObject instanceof  CChartAsGroup ) {
 		
 			var chart = copyObject.graphicObject.chart;
 			var uniColors = chart.generateUniColors(chart.series.length);
@@ -2847,7 +2849,7 @@ function DrawingObjects() {
 			}
 			
 			// Object types
-            if (drawingObject.graphicObject instanceof  CChartAsGroup) {
+            if (typeof CChartAsGroup !== "undefined" && drawingObject.graphicObject instanceof  CChartAsGroup) {
 				
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
 				drawingObject.graphicObject.drawingBase = drawingObject;

@@ -5664,6 +5664,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 					return oThis.ReadPic(t,l, oDrawing);
                 });
         }
+		/** proprietary begin **/
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
 			var oNewGraphicObject = new CChartAsGroup();
@@ -5673,6 +5674,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			if(null != oNewGraphicObject.chart.range.interval && oNewGraphicObject.chart.range.interval.length > 0)
 				oDrawing.graphicObject = oNewGraphicObject;
         }
+		/** proprietary end **/
 		else if ( c_oSer_DrawingType.pptxDrawing == type )
         {
             var oGraphicObject = this.oPPTXContentLoader.ReadGraphicObject(this.stream);
