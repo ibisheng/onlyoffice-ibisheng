@@ -438,12 +438,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					{
 						switch(this.documentFormat)
 						{
-							case "xlsx" : documentFormatSave = c_oAscFileType.XLSX;break;
-							case "xls" : documentFormatSave = c_oAscFileType.XLS;break;
-							case "ods" : documentFormatSave = c_oAscFileType.ODS;break;
-							case "csv" : documentFormatSave = c_oAscFileType.CSV;break;
-							case "htm" :
-							case "html" : documentFormatSave = c_oAscFileType.HTML;break;
+							case "xlsx" : this.documentFormatSave = c_oAscFileType.XLSX;break;
+							case "xls"  : this.documentFormatSave = c_oAscFileType.XLS;break;
+							case "ods"  : this.documentFormatSave = c_oAscFileType.ODS;break;
+							case "csv"  : this.documentFormatSave = c_oAscFileType.CSV;break;
+							case "htm"  :
+							case "html" : this.documentFormatSave = c_oAscFileType.HTML;break;
 						}
 					}
 
