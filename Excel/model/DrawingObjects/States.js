@@ -2880,7 +2880,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         {
             track_objects2.push(track_objects[i]);
         }
-        if(!isViewMode)
+        if ( !isViewMode && !asc["editor"].isChartEditor)
         {
             if(!ctrlKey)
             {
