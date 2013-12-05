@@ -552,9 +552,6 @@ CPresentation.prototype =
         var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", null, null, styletype_Table );
         Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
         this.globalTableStyles[count] = Style_Table_BorderedLined_Accent6;
-
-
-
     },
     // Проводим начальные действия, исходя из Документа
     Init : function()
@@ -3199,186 +3196,30 @@ CPresentation.prototype =
         {
             if ( true === e.AltKey )
             {
-                var MouseEvent = new CMouseEventHandler();
-
-                MouseEvent.ClickCount = 1;
-                MouseEvent.Type = g_mouse_event_type_down;
-
-                this.CurPage--;
-
-                if ( this.CurPage < 0 )
-                    this.CurPage = 0;
-
-                this.Selection_SetStart( 0, 0, MouseEvent );
-
-                MouseEvent.Type = g_mouse_event_type_up;
-                this.Selection_SetEnd( 0, 0, MouseEvent );
-
-                bRetValue = true;
+                // bRetValue = false;
             }
             else
             {
-                var TempXY = this.Cursor_GetPos();
-
-                var X = TempXY.X;
-                var Y = TempXY.Y;
-
-                var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                if ( Y - Dy < 0 )
+                if(this.CurPage  > 0)
                 {
-                    this.CurPage--;
-                    Dy -= Y;
-                    Y = Page_Height;
-                    while ( Dy > Page_Height )
-                    {
-                        Dy -= Page_Height;
-                        this.CurPage--;
-                    }
-
-                    if ( this.CurPage < 0 )
-                    {
-                        this.CurPage = 0;
-                        Dy = Page_Height - this.Content[0].Pages[this.Content[0].Pages.length - 1].Bounds.Top;
-                    }
+                    this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage - 1);
+                    bRetValue = true;
                 }
-
-                // TODO: переделать данную проверку
-                if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                    this.CurPage = this.DrawingDocument.m_lPagesCount;
-
-                var StartX = X;
-                var StartY = Y;
-                var CurY   = Y;
-
-                while ( Math.abs(StartY - Y) < 0.001 )
-                {
-                    var bBreak = false;
-                    CurY -= Dy;
-
-                    if ( CurY < 0 )
-                    {
-                        this.CurPage--;
-                        CurY = Page_Height;
-
-                        // Эта проверка нужна для выполнения PgUp в начале документа
-                        if ( this.CurPage < 0 )
-                        {
-                            this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-                            CurY = 0;
-                        }
-
-                        // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                        bBreak = true;
-                    }
-
-                    this.Cursor_MoveAt( StartX, CurY, false );
-                    this.CurPos.RealX = StartX;
-                    this.CurPos.RealY = CurY;
-
-                    TempXY = this.Cursor_GetPos();
-                    X = TempXY.X;
-                    Y = TempXY.Y;
-
-                    if ( true === bBreak )
-                        break;
-                }
-
-                bRetValue = true;
             }
         }
         else if ( e.KeyCode == 34 ) // PgDn
         {
             if ( true === e.AltKey )
             {
-                var MouseEvent = new CMouseEventHandler();
-
-                MouseEvent.ClickCount = 1;
-                MouseEvent.Type = g_mouse_event_type_down;
-
-                this.CurPage++;
-
-                // TODO: переделать данную проверку
-                if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                    this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-
-                this.Selection_SetStart( 0, 0, MouseEvent );
-
-                MouseEvent.Type = g_mouse_event_type_up;
-                this.Selection_SetEnd( 0, 0, MouseEvent );
-
-                bRetValue = true;
+                // bRetValue = false;
             }
             else
             {
-                var TempXY = this.Cursor_GetPos();
-
-                var X = TempXY.X;
-                var Y = TempXY.Y;
-
-                var Dy = this.DrawingDocument.GetVisibleMMHeight();
-                if ( Y + Dy > Page_Height )
+                if(this.CurPage + 1 < this.Slides.length)
                 {
-                    this.CurPage++;
-                    Dy -= Page_Height - Y;
-                    Y = 0;
-                    while ( Dy > Page_Height )
-                    {
-                        Dy -= Page_Height;
-                        this.CurPage++;
-                    }
-
-                    // TODO: переделать данную проверку
-                    if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                    {
-                        this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-                        Dy = this.Content[this.Content.length - 1].Pages[this.Content[this.Content.length - 1].Pages.length - 1].Bounds.Bottom;
-                    }
+                    this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage + 1);
+                    bRetValue = true;
                 }
-
-                // TODO: переделать данную проверку
-                if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                    this.CurPage = this.DrawingDocument.m_lPagesCount;
-
-                var StartX = X;
-                var StartY = Y;
-                var CurY   = Y;
-
-                while ( Math.abs(StartY - Y) < 0.001 )
-                {
-                    var bBreak = false;
-                    CurY += Dy;
-
-                    if ( CurY > Page_Height )
-                    {
-                        this.CurPage++;
-                        CurY = 0;
-
-                        // TODO: переделать данную проверку
-                        // Эта проверка нужна для выполнения PgDn в конце документа
-                        if ( this.CurPage >= this.DrawingDocument.m_lPagesCount )
-                        {
-                            var LastElement = this.Content[this.Content.length - 1];
-                            this.CurPage = this.DrawingDocument.m_lPagesCount - 1;
-                            CurY = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
-                        }
-
-                        // Поскольку мы перешли на другую страницу, то можно из цикла выходить
-                        bBreak = true;
-                    }
-
-                    this.Cursor_MoveAt( StartX, CurY, false );
-                    this.CurPos.RealX = StartX;
-                    this.CurPos.RealY = CurY;
-
-                    TempXY = this.Cursor_GetPos();
-                    X = TempXY.X;
-                    Y = TempXY.Y;
-
-                    if ( true === bBreak )
-                        break;
-                }
-
-                bRetValue = true;
             }
         }
         else if ( e.KeyCode == 35 ) // клавиша End
@@ -3410,8 +3251,8 @@ CPresentation.prototype =
         else if ( e.KeyCode == 37 ) // Left Arrow
         {
             // Чтобы при зажатой клавише курсор не пропадал
-            if ( true != e.ShiftKey )
-                this.DrawingDocument.TargetStart();
+           // if ( true != e.ShiftKey )
+           //     this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveLeft( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = true;
@@ -3419,8 +3260,8 @@ CPresentation.prototype =
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
             // Чтобы при зажатой клавише курсор не пропадал
-            if ( true != e.ShiftKey )
-                this.DrawingDocument.TargetStart();
+            //if ( true != e.ShiftKey )
+            //    this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveUp( true === e.ShiftKey );
             bRetValue = true;
@@ -3428,8 +3269,8 @@ CPresentation.prototype =
         else if ( e.KeyCode == 39 ) // Right Arrow
         {
             // Чтобы при зажатой клавише курсор не пропадал
-            if ( true != e.ShiftKey )
-                this.DrawingDocument.TargetStart();
+           // if ( true != e.ShiftKey )
+           //     this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveRight( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = true;
@@ -3437,8 +3278,8 @@ CPresentation.prototype =
         else if ( e.KeyCode == 40 ) // Bottom Arrow
         {
             // Чтобы при зажатой клавише курсор не пропадал
-            if ( true != e.ShiftKey )
-                this.DrawingDocument.TargetStart();
+            //if ( true != e.ShiftKey )
+            //    this.DrawingDocument.TargetStart();
 
             this.Cursor_MoveDown( true === e.ShiftKey );
             bRetValue = true;
@@ -6031,7 +5872,7 @@ CPresentation.prototype =
                         var _ph_type = layout.cSld.spTree[j].getPhType();
                         if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
                         {
-                            var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex());
+                            var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex(), layout.cSld.spTree[j].getIsSingleBody ? layout.cSld.spTree[j].getIsSingleBody() : false);
                             if(matching_shape == null && layout.cSld.spTree[j].copy2)
                             {
                                 var sp = new CShape(slide);

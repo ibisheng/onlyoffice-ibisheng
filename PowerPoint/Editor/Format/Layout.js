@@ -98,7 +98,7 @@ function SlideLayout(slideMaster)
     //-----------------------------------------------
 
 
-    this.getMatchingShape =  function(type, idx)
+    this.getMatchingShape =  function(type, idx, bSingleBody)
     {
         var _input_reduced_type;
         if(type == null)
@@ -133,27 +133,28 @@ function SlideLayout(slideMaster)
         var _index, _type;
         var _final_index, _final_type;
         var _glyph;
+        var body_count = 0;
+        var last_body;
         for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
         {
             _glyph = _sp_tree[_shape_index];
             if(_glyph.isPlaceholder())
             {
-               // if(_glyph instanceof CShape)
+                if(_glyph instanceof CShape)
                 {
                     _index = _glyph.nvSpPr.nvPr.ph.idx;
                     _type = _glyph.nvSpPr.nvPr.ph.type;
                 }
-                /*if(_glyph instanceof CImage2)
+                if(_glyph instanceof CImageShape)
                 {
                     _index = _glyph.nvPicPr.nvPr.ph.idx;
                     _type = _glyph.nvPicPr.nvPr.ph.type;
-                }*/
-                /*if(_glyph instanceof  GroupShape)
+                }
+                if(_glyph instanceof  CGroupShape)
                 {
                     _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
                     _type = _glyph.nvGrpSpPr.nvPr.ph.type;
-                }         */
-
+                }
                 if(_type == null)
                 {
                     _final_type = phType_body;
@@ -169,6 +170,7 @@ function SlideLayout(slideMaster)
                         _final_type = _type;
                     }
                 }
+
                 if(_index == null)
                 {
                     _final_index = 0;
@@ -182,9 +184,17 @@ function SlideLayout(slideMaster)
                 {
                     return _glyph;
                 }
+                if(_input_reduced_type == phType_title && _input_reduced_type == _final_type)
+                {
+                    return _glyph;
+                }
+                if(phType_body === _type)
+                {
+                    ++body_count;
+                    last_body = _glyph;
+                }
             }
         }
-
 
 
         if(_input_reduced_type == phType_sldNum || _input_reduced_type == phType_dt || _input_reduced_type == phType_ftr || _input_reduced_type == phType_hdr)
@@ -215,47 +225,10 @@ function SlideLayout(slideMaster)
             }
         }
 
-        for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
+        if(body_count === 1 && type === phType_body && bSingleBody)
         {
-            _glyph = _sp_tree[_shape_index];
-            if(_glyph.isPlaceholder())
-            {
-                if(_glyph instanceof CShape)
-                {
-                    _type = _glyph.nvSpPr.nvPr.ph.type;
-                }
-                if(_glyph instanceof CImageShape)
-                {
-                    _type = _glyph.nvPicPr.nvPr.ph.type;
-                }
-                if(_glyph instanceof  CGroupShape)
-                {
-                    _type = _glyph.nvGrpSpPr.nvPr.ph.type;
-                }
-
-                if(_type == null)
-                {
-                    _final_type = phType_body;
-                }
-                else
-                {
-                    if(_type == phType_ctrTitle)
-                    {
-                        _final_type = phType_title;
-                    }
-                    else
-                    {
-                        _final_type = _type;
-                    }
-                }
-
-                if(this.type === nSldLtTTitle && (_input_reduced_type === phType_body || _input_reduced_type === phType_subTitle) && (_final_type === phType_body || _final_type === phType_subTitle) )
-                {
-                    return _glyph;
-                }
-            }
+            return last_body;
         }
-
         return null;
     };
 

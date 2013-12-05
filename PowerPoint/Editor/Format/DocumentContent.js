@@ -629,7 +629,7 @@ CDocumentContent.prototype =
                                 {
                                     if(_layout_shape === undefined)
                                     {
-                                        _layout_shape = _parent.parent.Layout.getMatchingShape(_parent.getPhType(), _parent.getPhIndex());
+                                        _layout_shape = _parent.parent.Layout.getMatchingShape(_parent.getPhType(), _parent.getPhIndex(), _parent.getIsSingleBody());
                                     }
 
                                     if(_layout_shape !== null)
@@ -648,7 +648,7 @@ CDocumentContent.prototype =
                                     {
                                         if(_master_shape === undefined)
                                         {
-                                            _master_shape = _parent.parent.Layout.Master.getMatchingShape(_parent.getPhType(), _parent.getPhIndex());
+                                            _master_shape = _parent.parent.Layout.Master.getMatchingShape(_parent.getPhType(), _parent.getPhIndex(), _parent.getIsSingleBody());
                                         }
 
                                         if(_master_shape !== null)
@@ -670,7 +670,7 @@ CDocumentContent.prototype =
                                 {
                                     if(_master_shape === undefined)
                                     {
-                                        _master_shape = _parent.parent.Master.getMatchingShape(_parent.getPhType(), _parent.getPhIndex());
+                                        _master_shape = _parent.parent.Master.getMatchingShape(_parent.getPhType(), _parent.getPhIndex(), _parent.getIsSingleBody());
                                     }
 
                                     if(_master_shape !== null)

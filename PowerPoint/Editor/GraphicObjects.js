@@ -838,13 +838,17 @@ CGraphicObjects.prototype = {
         var by_types = this.getSelectedArraysByTypes();
         switch(this.State.id)
         {
-            case STATES_ID_NULL:
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_GROUP:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-                // case STATES_ID_TEXT_ADD_IN_GROUP:
-            case STATES_ID_CHART_TEXT_ADD:
-            case STATES_ID_CHART:
+            //case STATES_ID_NULL:
+            //case STATES_ID_TEXT_ADD:
+            //case STATES_ID_GROUP:
+            //case STATES_ID_TEXT_ADD_IN_GROUP:
+            //case STATES_ID_CHART_TEXT_ADD:
+            //case STATES_ID_CHART:
+            case null:
+            {
+                break;
+            }
+            default :
             {
                 if(this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
                 {
@@ -1094,7 +1098,7 @@ CGraphicObjects.prototype = {
         }
 
         editor.sync_slidePropCallback(this.slide);
-        if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP || this.State.id === STATES_ID_CHART_TEXT_ADD)
+        if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP || this.State.id === STATES_ID_CHART_TEXT_ADD || this.State.id === STATES_ID_CHART_GROUP_TEXT_ADD)
         {
 
             if(image_props !== null)

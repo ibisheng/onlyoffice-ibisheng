@@ -9213,6 +9213,11 @@ Paragraph.prototype =
         if (this.Parent && this.Parent.Parent && this.Parent.Parent.shape) {
             text_transform = this.Parent.Parent.shape.transformText;
         }
+        else if(this.Parent && this.Parent.Parent && this.Parent.Parent.Row && this.Parent.Parent.Row.Table  && this.Parent.Parent.Row.Table.Parent
+            && this.Parent.Parent.Row.Table.Parent.transform)
+        {
+            text_transform = this.Parent.Parent.Row.Table.Parent.transform;
+        }
         else {
             text_transform = new CMatrix();
         }

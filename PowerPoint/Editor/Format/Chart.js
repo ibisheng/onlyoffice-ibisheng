@@ -259,16 +259,6 @@ CChartAsGroup.prototype =
     },
 
 
-    setDrawingObjects: function(drawingObjects)
-    {
-        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
-        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
-        this.drawingObjects = drawingObjects;
-
-    },
-
 
     getFullFlipH: function()
     {
@@ -285,12 +275,6 @@ CChartAsGroup.prototype =
         return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
 
-    getAspect: function(num)
-    {
-        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
-        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
-        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
-    },
 
     getFullRotate: function()
     {
@@ -301,20 +285,6 @@ CChartAsGroup.prototype =
     {
 
         return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
-        var r = this.rot;
-        if((r >= 0 && r < Math.PI*0.25)
-            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
-            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
-        {
-        }
-        else
-        {
-            var hc = this.extX*0.5;
-            var vc = this.extY*0.5;
-            var xc = this.x + hc;
-            var yc = this.y + vc;
-            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
-        }
     },
 
     hit: function(x, y)
@@ -406,17 +376,39 @@ CChartAsGroup.prototype =
             this.vAxisTitle.drawingObjects = drawingObjects;
     },
 
-    addToDrawingObjects: function()
-    {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-        this.select(this.drawingObjects.controller);
-        this.drawingObjects.addGraphicObject(this);
-    },
 
 
     getTransform: function()
     {
         return this.transform;
+    },
+
+    getHierarchy: function () {
+        if (this.recalcInfo.recalculateShapeHierarchy) {
+            this.compiledHierarchy.length = 0;
+            var hierarchy = this.compiledHierarchy;
+            if (this.isPlaceholder()) {
+                var ph_type = this.getPlaceholderType();
+                var ph_index = this.getPlaceholderIndex();
+                var b_is_single_body = this.getIsSingleBody();
+                switch (this.parent.kind) {
+                    case SLIDE_KIND:
+                    {
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
+
+                    case LAYOUT_KIND:
+                    {
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
+                }
+            }
+            this.recalcInfo.recalculateShapeHierarchy = false;
+        }
+        return this.compiledHierarchy;
     },
 
     recalculatePosExt: function()
@@ -609,6 +601,24 @@ CChartAsGroup.prototype =
         this.setExtents(new_ext_x, new_ext_y);
     },
 
+    getIsSingleBody: function()
+    {
+        if(!this.isPlaceholder())
+            return false;
+        if(this.getPlaceholderType() !== phType_body)
+            return false;
+        if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
+        {
+            var sp_tree = this.parent.cSld.spTree;
+            for(var i = 0; i < sp_tree.length; ++i)
+            {
+                if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
+                    return true;
+            }
+        }
+        return true;
+    },
+
     checkNotNullTransform: function()
     {
         if(this.spPr.xfrm && this.spPr.xfrm.isNotNull())
@@ -617,20 +627,21 @@ CChartAsGroup.prototype =
         {
             var ph_type = this.getPlaceholderType();
             var ph_index = this.getPlaceholderIndex();
+            var b_single_body = this.getIsSingleBody();
             switch (this.parent.kind)
             {
                 case SLIDE_KIND:
                 {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index, b_single_body);
                     if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull())
                         return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_single_body);
                     return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
                 }
 
                 case LAYOUT_KIND:
                 {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index, b_single_body);
                     return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNull();
                 }
             }
@@ -730,6 +741,11 @@ CChartAsGroup.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.spPr.xfrm = xfrm;
+    },
+
+    isEmptyPlaceholder: function ()
+    {
+        return false;
     },
 
     /* init: function()

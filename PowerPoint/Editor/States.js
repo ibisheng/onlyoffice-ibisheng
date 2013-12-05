@@ -166,6 +166,8 @@ function handleShapeImage(drawing, drawingObjects, drawingObjectsController, e, 
     var hit_in_path = drawing.hitInPath(x, y);
     var hit_in_text_rect = drawing.hitInTextRect(x, y);
     var selected_objects = drawingObjectsController.selectedObjects;
+
+    var  old_text_object = drawingObjectsController.State.textObject;
     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
     {
         drawingObjectsController.clearPreTrackObjects();
@@ -173,6 +175,11 @@ function handleShapeImage(drawing, drawingObjects, drawingObjectsController, e, 
         if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
             drawingObjectsController.resetSelection();
          drawing.select(drawingObjectsController);
+        if( (old_text_object !== drawing ) && (isRealObject(old_text_object) && old_text_object.isEmptyPlaceholder() || drawing.isEmptyPlaceholder()) )
+        {
+            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(drawingObjects.num, drawingObjects);
+            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
+        }
         drawingObjects.OnUpdateOverlay();
         for(var j = 0; j < selected_objects.length; ++j)
         {
@@ -180,11 +187,11 @@ function handleShapeImage(drawing, drawingObjects, drawingObjectsController, e, 
         }
         resetGroupChartSelection(drawingObjectsController.State);
         drawingObjectsController.changeCurrentState(new PreMoveState(drawingObjectsController, drawingObjects,x, y, e.ShiftKey, e.ctrl,  drawing, is_selected, true));
+
         return true;
     }
     else if(hit_in_text_rect)
     {
-        var  old_text_object = drawingObjectsController.State.textObject;
         if(e.Button !== g_mouse_button_right
             || drawingObjectsController.State === handleState
             || (drawingObjectsController.State.textObject !==  drawing)
@@ -713,120 +720,7 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onKeyDown = function(e)
     {
-        return  DefaultKeyDownHandle(this.drawingObjectsController, e);
-        var b_prevent_default = false;
 
-        var selected_objects = this.drawingObjectsController.selectedObjects;
-        switch (e.keyCode)
-        {
-            case 9:		// Tab (селект объектов)
-            {
-                /*var aObjects = this.drawingObjectsController.drawingObjects.getDrawingObjects();
-
-                 if ( aObjects.length > 1 ) {
-                 var lastSelectedId = selected_objects[selected_objects.length - 1].Id;
-                 this.drawingObjectsController.resetSelectionState();
-
-                 for (var i = 0; i < aObjects.length; i++) {
-                 if ( aObjects[i].graphicObject.Id == lastSelectedId ) {
-
-                 var index = i;
-                 if ( e.ShiftKey ) 	// назад
-                 index = (i > 0) ? i - 1 : aObjects.length - 1;
-                 else
-                 index = (i < aObjects.length - 1) ? i + 1 : 0;
-
-                 aObjects[index].graphicObject.select(this.drawingObjectsController);
-                 this.drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                 break;
-                 }
-                 }
-                 } */
-                var a_drawing_bases = this.drawingObjects.getDrawingObjects();
-                if(!e.ShiftKey)
-                {
-                    var last_selected = null, last_selected_index = null;
-                    for(var i = a_drawing_bases.length - 1;  i > -1; --i)
-                    {
-                        if(a_drawing_bases[i].graphicObject.selected)
-                        {
-                            last_selected = a_drawing_bases[i].graphicObject;
-                            last_selected_index = i;
-                            break;
-                        }
-                    }
-                    if(isRealObject(last_selected))
-                    {
-                        b_prevent_default = true;
-                        this.drawingObjectsController.resetSelection();
-                        if(!last_selected.isGroup() || last_selected.arrGraphicObjects.length === 0)
-                        {
-                            if(last_selected_index < a_drawing_bases.length - 1)
-                            {
-                                a_drawing_bases[last_selected_index+1].graphicObject.select(this.drawingObjectsController);
-                            }
-                            else
-                            {
-                                a_drawing_bases[0].graphicObject.select(this.drawingObjectsController);
-                            }
-                        }
-                        else
-                        {
-                            last_selected.select(this.drawingObjectsController);
-                            last_selected.arrGraphicObjects[0].select(last_selected);
-                            this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, last_selected));
-                        }
-                    }
-                }
-                else
-                {
-                    var first_selected = null, first_selected_index = null;
-                    for(var i = 0; i < a_drawing_bases.length; ++i)
-                    {
-                        if(a_drawing_bases[i].graphicObject.selected)
-                        {
-                            first_selected = a_drawing_bases[i].graphicObject;
-                            first_selected_index = i;
-                            break;
-                        }
-                    }
-                    if(isRealObject(first_selected))
-                    {
-                        b_prevent_default = true;
-                        this.drawingObjectsController.resetSelection();
-                        if(!first_selected.isGroup() || first_selected.arrGraphicObjects.length === 0)
-                        {
-                            if(first_selected_index > 0)
-                            {
-                                a_drawing_bases[first_selected_index - 1].graphicObject.select(this.drawingObjectsController);
-                            }
-                            else
-                            {
-                                a_drawing_bases[a_drawing_bases.length - 1].graphicObject.select(this.drawingObjectsController);
-                            }
-                        }
-                        else
-                        {
-                            first_selected.select(this.drawingObjectsController);
-                            first_selected.arrGraphicObjects[first_selected.arrGraphicObjects.length - 1].select(first_selected);
-                            this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, first_selected));
-                        }
-                    }
-                }
-                this.drawingObjects.OnUpdateOverlay();
-                break;
-            }
-            case 46:// Backspace
-            case 8:	// Delete
-            {
-                History.Create_NewPoint();
-                DeleteSelectedObjects(this.drawingObjectsController);
-                this.drawingObjects.showDrawingObjects(true);
-                b_prevent_default = true;
-            }
-        }
-        if(b_prevent_default)
-            e.preventDefault();
     };
 
     this.onKeyPress = function(e)
@@ -1299,7 +1193,7 @@ function MoveCommentState(drawingObjectsController, drawingObjects, startX, star
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_MoveComment, this.drawingObjectsController.arrTrackObjects[0].comment.Get_Id()) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_MoveComment, this.drawingObjectsController.arrTrackObjects[0].comment.Get_Id()) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -1403,7 +1297,7 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -1510,7 +1404,7 @@ function MoveInternalChartObjectGroupState(drawingObjectsController, drawingObje
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -2571,7 +2465,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
             if(editor.isPaintFormat)
             {
                 var doc = editor.WordControl.m_oLogicDocument;
-                if(this.textObject.paragraphFormatPaste && doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                if(!editor.isViewMode && this.textObject.paragraphFormatPaste && doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
                     History.Create_NewPoint();
                     this.textObject.paragraphFormatPaste(doc.CopyTextPr, doc.CopyParaPr, false);
@@ -2584,7 +2478,6 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onKeyDown = function(e)
     {
-        return DefaultKeyDownHandle(drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -2847,7 +2740,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -2948,7 +2841,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.onMouseUp = function(e, x, y)
     {
 
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -3493,7 +3386,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         if(!e.CtrlKey)
         {
-            if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+            if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
             {
                 History.Create_NewPoint();
                 this.drawingObjectsController.trackEnd();
@@ -3503,24 +3396,27 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         }
         else
         {
-            History.Create_NewPoint();
-            var t_o = this.drawingObjectsController.arrTrackObjects;
-            for(var i = 0; i < t_o.length; ++i)
+            if(!editor.isViewMode)
             {
-                if(t_o[i].originalObject.copy)
+                History.Create_NewPoint();
+                var t_o = this.drawingObjectsController.arrTrackObjects;
+                for(var i = 0; i < t_o.length; ++i)
                 {
-                    t_o[i].originalObject.deselect(this.drawingObjectsController);
-                    var copy = t_o[i].originalObject.copy(this.drawingObjects);
-                    copy.setParent(this.drawingObjects);
-                    copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
-                    this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, copy);
-                    copy.select(this.drawingObjectsController);
+                    if(t_o[i].originalObject.copy)
+                    {
+                        t_o[i].originalObject.deselect(this.drawingObjectsController);
+                        var copy = t_o[i].originalObject.copy(this.drawingObjects);
+                        copy.setParent(this.drawingObjects);
+                        copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
+                        this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, copy);
+                        copy.select(this.drawingObjectsController);
+                    }
                 }
-            }
 
-            this.drawingObjects.presentation.Recalculate();
-            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
-            this.drawingObjects.presentation.DrawingDocument.OnEndRecalculate();
+                this.drawingObjects.presentation.Recalculate();
+                this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                this.drawingObjects.presentation.DrawingDocument.OnEndRecalculate();
+            }
         }
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
@@ -3613,7 +3509,7 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -3724,7 +3620,6 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onKeyDown = function(e)
     {
-        return DefaultKeyDownHandle(this.drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -4224,7 +4119,7 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     {
 
 
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             if(!e.CtrlKey)
             {
@@ -4354,7 +4249,7 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode && this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -4446,7 +4341,7 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode &&  this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -4546,7 +4441,7 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!editor.isViewMode &&  this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();
@@ -5437,1402 +5332,6 @@ function DrawGroupSelection(group, drawingDocument)
     {
         group_selected_objects[0].drawAdjustments(drawingDocument);
     }
-}
-
-function DefaultKeyDownHandle(drawingObjectsController, e)
-{
-    var bRetValue = false;
-    var state = drawingObjectsController.State;
-    var isViewMode = drawingObjectsController.drawingObjects.isViewerMode();
-    if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
-    {
-
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_TEXT_ADD)
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
-                else
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        state.textObject.remove(-1, true);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-
-                        var state = drawingObjectsController.State;
-                        var group = state.group;
-                        var selected_objects = [];
-                        for(var i = 0; i < group.selectedObjects.length; ++i)
-                        {
-                            selected_objects.push(group.selectedObjects[i]);
-                        }
-                        group.resetSelection();
-                        drawingObjectsController.resetSelectionState();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-                            new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                        var groups = [];
-                        for(i = 0; i < selected_objects.length; ++i)
-                        {
-                            var parent_group = selected_objects[i].group;
-                            parent_group.removeFromSpTree(selected_objects[i].Get_Id());
-                            for(var j = 0; j < groups.length; ++j)
-                            {
-                                if(groups[i] === parent_group)
-                                    break;
-                            }
-                            if(j === groups.length)
-                                groups.push(parent_group);
-                        }
-                        groups.sort(CompareGroups);
-                        for(i  = 0; i < groups.length; ++i)
-                        {
-                            var parent_group = groups[i];
-                            if(parent_group !== group)
-                            {
-                                if(parent_group.spTree.length === 0)
-                                {
-                                    parent_group.group.removeFromSpTree(parent_group.Get_Id());
-                                }
-                                if(parent_group.spTree.length === 1)
-                                {
-                                    var sp = parent_group.spTree[0];
-                                    sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
-                                    sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
-                                        sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                                    sp.setPosition(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
-                                    parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
-                                }
-                            }
-                            else
-                            {
-                                switch (parent_group.spTree.length)
-                                {
-                                    case 0:
-                                    {
-                                        parent_group.deleteDrawingBase();
-                                        break;
-                                    }
-                                    case 1:
-                                    {
-                                        var sp = parent_group.spTree[0];
-                                        sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
-                                        sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
-                                            sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                                        sp.setPosition(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
-                                        sp.setGroup(null);
-                                        var pos = parent_group.deleteDrawingBase();
-                                        sp.addToDrawingObjects(pos);
-                                        sp.select(drawingObjectsController);
-                                        sp.recalculateTransform();
-                                        sp.calculateTransformTextMatrix();
-                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null,
-                                            new UndoRedoDataGraphicObjects(sp.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                                        break;
-                                    }
-                                    default:
-                                    {
-                                        parent_group.normalize();
-                                        parent_group.updateCoordinatesAfterInternalResize();
-                                        parent_group.select(drawingObjectsController);
-                                        parent_group.recalculate();
-                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
-                                            new UndoRedoDataGraphicObjects(parent_group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                break;
-            }
-            case STATES_ID_NULL:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            drawingObjectsController.selectedObjects[i].deleteDrawingBase();
-                        }
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-
-                break;
-            }
-            default :
-            {
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 9 && false === isViewMode ) // Tab
-    {
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_TEXT_ADD)
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
-                else
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        state.textObject.paragraphAdd( new ParaTab() );
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_NULL:
-            {
-                var a_drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
-                if(!e.ShiftKey)
-                {
-                    var last_selected = null, last_selected_index = null;
-                    for(var i = a_drawing_bases.length - 1;  i > -1; --i)
-                    {
-                        if(a_drawing_bases[i].graphicObject.selected)
-                        {
-                            last_selected = a_drawing_bases[i].graphicObject;
-                            last_selected_index = i;
-                            break;
-                        }
-                    }
-                    if(isRealObject(last_selected))
-                    {
-                        bRetValue = true;
-                        drawingObjectsController.resetSelection();
-                        if(!last_selected.isGroup() || last_selected.arrGraphicObjects.length === 0)
-                        {
-                            if(last_selected_index < a_drawing_bases.length - 1)
-                            {
-                                a_drawing_bases[last_selected_index+1].graphicObject.select(drawingObjectsController);
-                            }
-                            else
-                            {
-                                a_drawing_bases[0].graphicObject.select(drawingObjectsController);
-                            }
-                        }
-                        else
-                        {
-                            last_selected.select(drawingObjectsController);
-                            last_selected.arrGraphicObjects[0].select(last_selected);
-                            drawingObjectsController.changeCurrentState(new GroupState(drawingObjectsController, drawingObjectsController.drawingObjects, last_selected));
-                        }
-                    }
-                }
-                else
-                {
-                    var first_selected = null, first_selected_index = null;
-                    for(var i = 0; i < a_drawing_bases.length; ++i)
-                    {
-                        if(a_drawing_bases[i].graphicObject.selected)
-                        {
-                            first_selected = a_drawing_bases[i].graphicObject;
-                            first_selected_index = i;
-                            break;
-                        }
-                    }
-                    if(isRealObject(first_selected))
-                    {
-                        bRetValue = true;
-                        drawingObjectsController.resetSelection();
-                        if(first_selected_index > 0)
-                        {
-                            a_drawing_bases[first_selected_index - 1].graphicObject.select(drawingObjectsController);
-                        }
-                        else
-                        {
-                            a_drawing_bases[a_drawing_bases.length - 1].graphicObject.select(drawingObjectsController);
-                        }
-                    }
-                }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                var group = state.group;
-                var arr_graphic_objects = group.arrGraphicObjects;
-                if(!e.ShiftKey)
-                {
-                    for(var i = arr_graphic_objects.length - 1; i > -1; --i)
-                    {
-                        if(arr_graphic_objects[i].selected)
-                        {
-                            break;
-                        }
-                    }
-                    group.resetSelection();
-                    if(i < arr_graphic_objects.length - 1)
-                    {
-                        arr_graphic_objects[i+1].select(group);
-                    }
-                    else
-                    {
-                        drawingObjectsController.resetSelectionState();
-                        var a_drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
-                        for(var i = 0; i < a_drawing_bases.length; ++i)
-                        {
-                            if(a_drawing_bases.graphicObject === group)
-                            {
-                                break;
-                            }
-                        }
-                        if(i < a_drawing_bases.length)
-                        {
-                            a_drawing_bases[i+1].graphicObject.select(drawingObjectsController);
-                        }
-                        else
-                        {
-                            a_drawing_bases[0].graphicObject.select(drawingObjectsController);
-                        }
-                    }
-                }
-                else
-                {
-                    for(var i = 0; i < arr_graphic_objects.length; ++i)
-                    {
-                        if(arr_graphic_objects[i].selected)
-                        {
-                            break;
-                        }
-                    }
-                    group.resetSelection();
-                    if(i > 0)
-                    {
-                        arr_graphic_objects[i - 1].select(group);
-                    }
-                    else
-                    {
-                        drawingObjectsController.resetSelectionState();
-                        group.select(drawingObjectsController);
-                    }
-                }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                break;
-            }
-        }
-    }
-    else if ( e.keyCode == 13 && false === isViewMode ) // Enter
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape())
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
-
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            var sp = drawingObjectsController.selectedObjects[0];
-                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, sp));
-                            if(isRealObject(sp.txBody))
-                            {
-                                sp.txBody.content.Select_All();
-                            }
-                            else
-                            {
-                                sp.addTextBody(new CTextBody(sp));
-                                sp.calculateContent();
-                                sp.calculateTransformTextMatrix();
-                            }
-                            sp.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-
-                }
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.textObject.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        state.textObject.addNewParagraph();
-                        state.textObject.calculateContent();
-                        state.textObject.calculateTransformTextMatrix();
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-
-
-                bRetValue = true;
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 27 ) // Esc
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                state.textObject.txBody.content.Selection_Remove();
-                drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjectsController.drawingObjects));
-                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                bRetValue = true;
-                break;
-            }
-        }
-    }
-    else if ( e.keyCode == 32 && false === isViewMode ) // Space
-    {
-
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                if(!e.CtrlKey)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    if(state.id === STATES_ID_TEXT_ADD)
-                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
-                    else
-                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            var state = drawingObjectsController.State;
-                            state.textObject.paragraphAdd(new ParaSpace(1));
-                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                            state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                }
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                if(!e.CtrlKey && state.group.selectedObjects.length === 1)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            var state = drawingObjectsController.State;
-                            drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
-                            drawingObjectsController.state.textObject.paragraphAdd(new ParaSpace(1));
-                            drawingObjectsController.showDrawingObjects(true);
-                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                }
-                break;
-            }
-            case STATES_ID_NULL:
-            {
-                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.CtrlKey)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
-                            drawingObjectsController.State.textObject.paragraphAdd(new ParaSpace(1));
-                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                }
-                break;
-            }
-            default :
-            {
-                break;
-            }
-        }
-
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 33 ) // PgUp
-    {
-    }
-    else if ( e.keyCode == 34 ) // PgDn
-    {
-    }
-    else if ( e.keyCode == 35 ) // клавиша End
-    {
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                if (e.CtrlKey) // Ctrl + End - переход в конец документа
-                {
-                    state.textObject.txBody.content.Cursor_MoveToEndPos();
-                    drawingObjectsController.updateSelectionState();
-                }
-                else // Переходим в конец строки
-                {
-                    state.textObject.txBody.content.Cursor_MoveEndOfLine(e.ShiftKey);
-                    drawingObjectsController.updateSelectionState();
-                }
-                break;
-            }
-        }
-
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 36 ) // клавиша Home
-    {
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                if (e.CtrlKey) // Ctrl + End - переход в конец документа
-                {
-                    state.textObject.txBody.content.Cursor_MoveToStartPos();
-                    drawingObjectsController.updateSelectionState();
-                }
-                else // Переходим в конец строки
-                {
-                    state.textObject.txBody.content.Cursor_MoveStartOfLine(e.ShiftKey);
-                    drawingObjectsController.updateSelectionState();
-                }
-                break;
-            }
-        }
-
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 37 ) // Left Arrow
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                //TODO реализовать изменение размеров объектов с ShiftKey
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX - 3, xfrm.offY);
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].recalculateTransform();
-                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
-                        }
-
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.State.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
-                        {
-                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
-                            state.group.selectedObjects[i].setPosition(xfrm.offX - 3, xfrm.offY);
-                        }
-                        state.group.normalize();
-                        state.group.updateCoordinatesAfterInternalResize();
-                        state.group.recalculate();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                state.textObject.txBody.content.Cursor_MoveLeft(e.ShiftKey,e.CtrlKey );
-                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 38 ) // Top Arrow
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                //TODO реализовать изменение размеров объектов с ShiftKey
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY - 3);
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].recalculateTransform();
-                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
-                        }
-
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.State.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
-                        {
-                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
-                            state.group.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY - 3);
-                        }
-                        state.group.normalize();
-                        state.group.updateCoordinatesAfterInternalResize();
-                        state.group.recalculate();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                state.textObject.txBody.content.Cursor_MoveUp(e.ShiftKey,e.CtrlKey );
-                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 39 ) // Right Arrow
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                //TODO реализовать изменение размеров объектов с ShiftKey
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX + 3, xfrm.offY);
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].recalculateTransform();
-                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
-                        }
-
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.State.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
-                        {
-                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
-                            state.group.selectedObjects[i].setPosition(xfrm.offX + 3, xfrm.offY);
-                        }
-                        state.group.normalize();
-                        state.group.updateCoordinatesAfterInternalResize();
-                        state.group.recalculate();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                state.textObject.txBody.content.Cursor_MoveRight(e.ShiftKey,e.CtrlKey );
-                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 40 ) // Bottom Arrow
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            {
-                //TODO реализовать изменение размеров объектов с ShiftKey
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY + 3);
-                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
-                            drawingObjectsController.selectedObjects[i].recalculateTransform();
-                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
-                        }
-
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.State.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
-                        {
-                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
-                            state.group.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY + 3);
-                        }
-                        state.group.normalize();
-                        state.group.updateCoordinatesAfterInternalResize();
-                        state.group.recalculate();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                bRetValue = true;
-                break;
-            }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                state.textObject.txBody.content.Cursor_MoveDown(e.ShiftKey,e.CtrlKey );
-                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 45 ) // Insert
-    {
-        //TODO
-    }
-    else if ( e.keyCode == 46 && false === isViewMode ) // Delete
-    {
-        switch(state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_TEXT_ADD)
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
-                else
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        state.textObject.remove(1, true);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                break;
-            }
-            case STATES_ID_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-
-                        var state = drawingObjectsController.State;
-                        var group = state.group;
-                        var selected_objects = [];
-                        for(var i = 0; i < group.selectedObjects.length; ++i)
-                        {
-                            selected_objects.push(group.selectedObjects[i]);
-                        }
-                        group.resetSelection();
-                        drawingObjectsController.resetSelectionState();
-                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-                            new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                        var groups = [];
-                        for(i = 0; i < selected_objects.length; ++i)
-                        {
-                            var parent_group = selected_objects[i].group;
-                            parent_group.removeFromSpTree(selected_objects[i].Get_Id());
-                            for(var j = 0; j < groups.length; ++j)
-                            {
-                                if(groups[i] === parent_group)
-                                    break;
-                            }
-                            if(j === groups.length)
-                                groups.push(parent_group);
-                        }
-                        groups.sort(CompareGroups);
-                        for(i  = 0; i < groups.length; ++i)
-                        {
-                            var parent_group = groups[i];
-                            if(parent_group !== group)
-                            {
-                                if(parent_group.spTree.length === 0)
-                                {
-                                    parent_group.group.removeFromSpTree(parent_group.Get_Id());
-                                }
-                                if(parent_group.spTree.length === 1)
-                                {
-                                    var sp = parent_group.spTree[0];
-                                    sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
-                                    sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
-                                        sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                                    sp.setPosition(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
-                                    parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
-                                }
-                            }
-                            else
-                            {
-                                switch (parent_group.spTree.length)
-                                {
-                                    case 0:
-                                    {
-                                        parent_group.deleteDrawingBase();
-                                        break;
-                                    }
-                                    case 1:
-                                    {
-                                        var sp = parent_group.spTree[0];
-                                        sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
-                                        sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
-                                            sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
-                                        sp.setPosition(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
-                                        sp.setGroup(null);
-                                        var pos = parent_group.deleteDrawingBase();
-                                        sp.addToDrawingObjects(pos);
-                                        sp.select(drawingObjectsController);
-                                        sp.recalculateTransform();
-                                        sp.calculateTransformTextMatrix();
-                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null,
-                                            new UndoRedoDataGraphicObjects(sp.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                                        break;
-                                    }
-                                    default:
-                                    {
-                                        parent_group.normalize();
-                                        parent_group.updateCoordinatesAfterInternalResize();
-                                        parent_group.select(drawingObjectsController);
-                                        parent_group.recalculate();
-                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
-                                            new UndoRedoDataGraphicObjects(parent_group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                break;
-            }
-            case STATES_ID_NULL:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[i].Get_Id());
-                }
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
-                        {
-                            drawingObjectsController.selectedObjects[i].deleteDrawingBase();
-                        }
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-
-                break;
-            }
-            default :
-            {
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
-    {
-        switch(state.id)
-        {
-            case STATES_ID_NULL:
-            case STATES_ID_GROUP:
-            {
-                if(state.id === STATES_ID_GROUP)
-                    state.group.resetSelection();
-                state.resetSelectionState();
-                var drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
-                for(var i = 0; i < drawing_bases.length; ++i)
-                {
-                    drawing_bases.graphicObject.select(drawingObjectsController);
-                }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                break;
-            }
-        }
-
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 66 && false === isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellBold === "function")
-            {
-                state.setCellBold(TextPr.Bold === true ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
-    {
-        //TODO
-    }
-    else if ( e.keyCode == 69 && false === isViewMode && true === e.CtrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
-    {
-
-        var ParaPr = drawingObjectsController.getParagraphParaPr();
-        if ( isRealObject(ParaPr))
-        {
-            if(typeof state.setCellAlign === "function")
-            {
-                state.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 73 && false === isViewMode && true === e.CtrlKey ) // Ctrl + I - делаем текст наклонным
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellItalic === "function")
-            {
-                state.setCellItalic(TextPr.Italic === true ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 74 && false === isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
-    {
-        var ParaPr = drawingObjectsController.getParagraphParaPr();
-        if ( isRealObject(ParaPr))
-        {
-            if(typeof state.setCellAlign === "function")
-            {
-                state.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 75 && false === isViewMode && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
-    {
-        //TODO
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 76 && false === isViewMode && true === e.CtrlKey ) // Ctrl + L + ...
-    {
-
-        var ParaPr = drawingObjectsController.getParagraphParaPr();
-        if ( isRealObject(ParaPr))
-        {
-            if(typeof state.setCellAlign === "function")
-            {
-                state.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
-            }
-            bRetValue = true;
-        }
-
-    }
-    else if ( e.keyCode == 77 && false === isViewMode && true === e.CtrlKey ) // Ctrl + M + ...
-    {
-        bRetValue = true;
-
-    }
-    else if ( e.keyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
-    {
-        bRetValue = true;
-
-    }
-    else if ( e.keyCode == 82 && false === isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
-    {
-        var ParaPr = drawingObjectsController.getParagraphParaPr();
-        if ( isRealObject(ParaPr))
-        {
-            if(typeof state.setCellAlign === "function")
-            {
-                state.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 83 && false === isViewMode && true === e.CtrlKey ) // Ctrl + S - save
-    {
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 85 && false === isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellUnderline === "function")
-            {
-                state.setCellUnderline(TextPr.Underline === true ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 86 && false === isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
-    {
-
-    }
-    else if ( e.keyCode == 88 && false === isViewMode && true === e.CtrlKey ) // Ctrl + X - cut
-    {
-        //не возвращаем true чтобы не было preventDefault
-    }
-    else if ( e.keyCode == 89 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
-    {
-    }
-    else if ( e.keyCode == 90 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Z - Undo
-    {
-    }
-    else if ( e.keyCode == 93 || 57351 == e.keyCode /*в Opera такой код*/ ) // контекстное меню
-    {
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
-    {
-    }
-    else if ( e.keyCode == 144 ) // Num Lock
-    {
-    }
-    else if ( e.keyCode == 145 ) // Scroll Lock
-    {
-    }
-    else if ( e.keyCode == 187 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellSubscript === "function" && typeof state.setCellSuperscript === "function")
-            {
-                if ( true === e.ShiftKey )
-                    state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
-                else
-                    state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 188 && true === e.CtrlKey ) // Ctrl + ,
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellSuperscript === "function")
-            {
-                state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 189 && false === isViewMode ) // Клавиша Num-
-    {
-
-        var Item = null;
-        if ( true === e.CtrlKey && true === e.ShiftKey )
-        {
-            Item = new ParaText( String.fromCharCode( 0x2013 ) );
-            Item.SpaceAfter = false;
-        }
-        else if ( true === e.ShiftKey )
-            Item = new ParaText( "_" );
-        else
-            Item = new ParaText( "-" );
-        switch (state.id)
-        {
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
-                drawingObjectsController.drawingObjects.objectLocker.reset();
-                if(state.id === STATES_ID_TEXT_ADD)
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
-                else
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-
-                var selection_state =  drawingObjectsController.getSelectionState();
-                var callback = function(bLock)
-                {
-                    if(bLock)
-                    {
-                        History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
-                        drawingObjectsController.setSelectionState(selection_state);
-                        var state = drawingObjectsController.State;
-                        state.textObject.paragraphAdd(Item);
-                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                    }
-                };
-                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                break;
-            }
-
-            case STATES_ID_GROUP:
-            {
-                if(!e.CtrlKey && state.group.selectedObjects.length === 1)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
-
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            var state = drawingObjectsController.State;
-                            drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
-                            drawingObjectsController.state.textObject.paragraphAdd(Item);
-                            drawingObjectsController.showDrawingObjects(true);
-                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                }
-                break;
-            }
-            case STATES_ID_NULL:
-            {
-                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.CtrlKey)
-                {
-                    drawingObjectsController.drawingObjects.objectLocker.reset();
-                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
-                    var selection_state =  drawingObjectsController.getSelectionState();
-                    var callback = function(bLock)
-                    {
-                        if(bLock)
-                        {
-                            History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
-                            drawingObjectsController.setSelectionState(selection_state);
-                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
-                            drawingObjectsController.State.textObject.paragraphAdd(Item);
-                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
-                        }
-                    };
-                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
-                }
-                break;
-            }
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 190 && true === e.CtrlKey ) // Ctrl + .
-    {
-        var TextPr = drawingObjectsController.getParagraphTextPr();
-        if ( isRealObject(TextPr))
-        {
-            if(typeof state.setCellSubscript === "function")
-            {
-                state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
-            }
-            bRetValue = true;
-        }
-    }
-    else if ( e.keyCode == 219 && false === isViewMode && true === e.CtrlKey ) // Ctrl + [
-    {
-        if(typeof state.decreaseFontSize === "function")
-        {
-            state.decreaseFontSize();
-        }
-        bRetValue = true;
-    }
-    else if ( e.keyCode == 221 && false === isViewMode && true === e.CtrlKey ) // Ctrl + ]
-    {
-        if(typeof state.increaseFontSize === "function")
-        {
-            state.increaseFontSize();
-        }
-        bRetValue = true;
-    }
-    if(bRetValue)
-        e.preventDefault();
-    return bRetValue;
 }
 
 function CompareGroups(a, b)

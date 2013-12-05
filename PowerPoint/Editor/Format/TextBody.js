@@ -242,9 +242,6 @@ CTextBody.prototype =
 
     calculateContent: function()
     {
-
-
-
         var parent_object = this.shape.getParentObjects();
         for(var i = 0; i < this.textPropsForRecalc.length; ++i)
         {
@@ -277,6 +274,106 @@ CTextBody.prototype =
         }
 
         this.content.Set_StartPage(/*isRealNumber(this.shape.parent.num) ? this.shape.parent.num : */0);
+
+
+
+        if(this.textFieldFlag)
+        {
+            this.textFieldFlag = false;
+            if(this.shape && this.shape.isPlaceholder())
+            {
+                var _ph_type = this.shape.getPlaceholderType();
+                switch (_ph_type)
+                {
+                    case phType_dt :
+                    {
+                        var _cur_date = new Date();
+                        var _cur_year = _cur_date.getFullYear();
+                        var _cur_month = _cur_date.getMonth();
+                        var _cur_month_day = _cur_date.getDate();
+                        var _cur_week_day = _cur_date.getDay();
+                        var _cur_hour = _cur_date.getHours();
+                        var _cur_minute = _cur_date.getMinutes();
+                        var _cur_second = _cur_date.getSeconds();
+                        var _text_string = "";
+                        switch (this.fieldType)
+                        {
+                            default :
+                            {
+                                _text_string += (_cur_month_day > 9 ? _cur_month_day : "0" + _cur_month_day)
+                                    +  "." +   ((_cur_month +1) > 9 ? (_cur_month + 1) : "0" + (_cur_month +1))
+                                    + "." + _cur_year;
+                                break;
+                            }
+                        }
+                        var par = this.content.Content[0];
+                        var EndPos = par.Internal_GetEndPos();
+
+                        var _history_status = History.Is_On();
+
+                        if(_history_status)
+                        {
+                            History.TurnOff();
+                        }
+
+                        for(var _text_index = 0; _text_index < _text_string.length; ++_text_index)
+                        {
+                            if(_text_string[_text_index] != " ")
+                            {
+                                par.Internal_Content_Add(EndPos, new ParaText(_text_string[_text_index]));
+                            }
+                            else
+                            {
+                                par.Internal_Content_Add(EndPos, new ParaSpace(1));
+                            }
+                            ++EndPos;
+                        }
+                        if(_history_status)
+                        {
+                            History.TurnOn();
+                        }
+                        this.calculateContent();
+                        break;
+                    }
+                    case phType_sldNum :
+                    {
+                        if(this.shape.parent instanceof Slide)
+                        {
+                            var _text_string = "" + (this.shape.parent.num+1);
+                            par = this.content.Content[0];
+                            EndPos = par.Internal_GetEndPos();
+
+                            _history_status = History.Is_On();
+
+                            if(_history_status)
+                            {
+                                History.TurnOff();
+                            }
+
+                            for(_text_index = 0; _text_index < _text_string.length; ++_text_index)
+                            {
+                                if(_text_string[_text_index] != " ")
+                                {
+                                    par.Internal_Content_Add(EndPos, new ParaText(_text_string[_text_index]));
+                                }
+                                else
+                                {
+                                    par.Internal_Content_Add(EndPos, new ParaSpace(1));
+                                }
+                                ++EndPos;
+                            }
+
+                            if(_history_status)
+                            {
+                                History.TurnOn();
+                            }
+                            this.calculateContent();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 
         if(this.bodyPr.textFit !== null && typeof this.bodyPr.textFit === "object")
         {
@@ -369,6 +466,7 @@ CTextBody.prototype =
             this.calculateContent();
             return;
         }
+
         this.bodyPr.normAutofit = false;
 
         var _l, _t, _r, _b;

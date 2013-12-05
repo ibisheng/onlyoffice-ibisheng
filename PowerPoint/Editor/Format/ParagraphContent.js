@@ -702,7 +702,7 @@ ParaTextPr.prototype =
 
     Set_RFonts : function(Value)
     {
-        var OldValue = this.Value;
+        var OldValue = this.Value.RFonts;
         if ( undefined != Value )
             this.Value.RFonts = Value;
         else
@@ -713,7 +713,7 @@ ParaTextPr.prototype =
 
     Set_Lang : function(Value)
     {
-        var OldValue = this.Value;
+        var OldValue = this.Value.Lang;
 
         var NewValue = new CLang();
         if ( undefined != Value )

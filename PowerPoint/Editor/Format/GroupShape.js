@@ -159,7 +159,7 @@ CGroupShape.prototype =
 
     getBoundsInGroup: function()
     {
-        var r = this.rot;
+        var r = isRealNumber(this.rot) ? this.rot : 0;
         if((r >= 0 && r < Math.PI*0.25)
             || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
             || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
@@ -693,6 +693,25 @@ CGroupShape.prototype =
         return this.isPlaceholder() ? this.nvGrpSpPr.nvPr.ph.idx : null;
     },
 
+    getIsSingleBody: function()
+    {
+        if(!this.isPlaceholder())
+            return false;
+        if(this.getPlaceholderType() !== phType_body)
+            return false;
+        if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
+        {
+            var sp_tree = this.parent.cSld.spTree;
+            for(var i = 0; i < sp_tree.length; ++i)
+            {
+                if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
+                    return true;
+            }
+        }
+        return true;
+    },
+
+
     checkNotNullTransform: function()
     {
         if(this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())
@@ -701,20 +720,21 @@ CGroupShape.prototype =
         {
             var ph_type = this.getPlaceholderType();
             var ph_index = this.getPlaceholderIndex();
+            var b_is_single_body = this.getIsSingleBody();
             switch (this.parent.kind)
             {
                 case SLIDE_KIND:
                 {
-                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index);
+                    var placeholder = this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body);
                     if(placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup())
                         return true;
-                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index);
+                    placeholder = this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
                     return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
                 }
 
                 case LAYOUT_KIND:
                 {
-                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index);
+                    var placeholder = this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body);
                     return placeholder && placeholder.spPr && placeholder.spPr.xfrm && placeholder.spPr.xfrm.isNotNullForGroup();
                 }
             }
@@ -730,23 +750,29 @@ CGroupShape.prototype =
         {
             var ph_type = this.getPlaceholderType();
             var ph_index = this.getPlaceholderIndex();
+            var b_is_single_body = this.getIsSingleBody();
             switch (this.parent.kind)
             {
                 case SLIDE_KIND:
                 {
-                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
-                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                     break;
                 }
 
                 case LAYOUT_KIND:
                 {
-                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                     break;
                 }
             }
         }
         return this.compiledHierarchy;
+    },
+
+    isEmptyPlaceholder: function ()
+    {
+        return false;
     },
 
     getCompiledFill: function()

@@ -118,6 +118,11 @@ CChartTitle.prototype =
         return false;
     },
 
+    isEmptyPlaceholder: function()
+    {
+        return false;
+    },
+
     isEmpty: function()
     {
         return isRealObject(this.txBody) ? this.txBody.isEmpty() : true;

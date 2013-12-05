@@ -47,9 +47,6 @@ function Slide(presentation, slideLayout, slideNum)
     this.maxId = 1000;
 
     this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
-    //this.show = true;
-    //this.showMasterPhAnim = false;
-    //this.showMasterSp = false;
 
     this.changeProportions = function(kW, kH)
     {
@@ -62,326 +59,7 @@ function Slide(presentation, slideLayout, slideNum)
         }
     };
 
-    this.changeLayout = function(layout)
-    {
 
-        var _slide_shapes = this.cSld.spTree;
-        var _slide_shape;
-        var _new_layout_shapes = layout.cSld.spTree;
-        var _layout_shape;
-        var _shape_index;
-        var _history_obj;
-        _history_obj = {};
-        _history_obj.oldLayout = this.Layout;
-        _history_obj.undo_function = function(data)
-        {
-            this.Layout = data.oldLayout;
-            for(var i = 0; i < this.elementsManipulator.ArrGlyph.length; ++i)
-            {
-                if(this.elementsManipulator.ArrGlyph[i].resetTextStyles)
-                    this.elementsManipulator.ArrGlyph[i].resetTextStyles();
-            }
-            this.calculate2();
-        };
-
-        _history_obj.redo_function = function(data)
-        {
-        };
-        History.Add(this, _history_obj);
-        for(_shape_index = 0; _shape_index < _slide_shapes.length; ++_shape_index)
-        {
-            _slide_shape = _slide_shapes[_shape_index];
-            if(_slide_shape.isEmptyPlaceholder())
-            {
-                _history_obj = {};
-                _history_obj.shape = _slide_shape;
-                _history_obj.shapeIndex = _shape_index;
-                _history_obj.slideShapes = _slide_shapes;
-                _history_obj.undo_function = function(data)
-                {
-                    data.slideShapes.splice(data.shapeIndex, 0, data.shape);
-                };
-                _history_obj.redo_function = function(data)
-                {
-                    data.slideShapes.splice(data.shapeIndex, 1);
-                };
-                History.Add(this, _history_obj);
-
-                _slide_shapes.splice(_shape_index, 1);
-                --_shape_index;
-                continue;
-            }
-
-            var _slide_shape_xfrm = _slide_shape.spPr.xfrm;
-            if(_slide_shape_xfrm && _slide_shape_xfrm.offX != null)
-            {
-                _history_obj = {};
-                _history_obj.shape = _slide_shape;
-                _history_obj.oldXfrmOffX = _slide_shape_xfrm.offX;
-                _history_obj.oldXfrmOffY = _slide_shape_xfrm.offY;
-                _history_obj.oldXfrmExtX = _slide_shape_xfrm.extX;
-                _history_obj.oldXfrmExtY = _slide_shape_xfrm.extY;
-                _history_obj.oldXfrmFlipH = _slide_shape_xfrm.flipH;
-                _history_obj.oldXfrmFlipV = _slide_shape_xfrm.flipV;
-                _history_obj.oldXfrmRot = _slide_shape_xfrm.rot;
-
-                _history_obj.newXfrmOffX =_slide_shape.pH;
-                _history_obj.newXfrmOffY =_slide_shape.pV;
-                _history_obj.newXfrmExtX =_slide_shape.ext.cx;
-                _history_obj.newXfrmExtY =_slide_shape.ext.cy;
-                _history_obj.newXfrmFlipH =_slide_shape.flipH;
-                _history_obj.newXfrmFlipV =_slide_shape.flipV;
-                _history_obj.newXfrmRot = _slide_shape.flipV;
-
-
-                _history_obj.undo_function = function(data)
-                {
-                    data.shape.spPr.xfrm.offX = data.oldXfrmOffX;
-                    data.shape.spPr.xfrm.offY = data.oldXfrmOffY;
-                    data.shape.spPr.xfrm.extX = data.oldXfrmExtX;
-                    data.shape.spPr.xfrm.extY = data.oldXfrmExtY;
-                    data.shape.spPr.xfrm.flipH = data.oldXfrmFlipH;
-                    data.shape.spPr.xfrm.flipV = data.oldXfrmFlipV;
-                    data.shape.spPr.xfrm.rot = data.oldXfrmRot;
-                };
-                _history_obj.redo_function = function(data)
-                {
-                    data.shape.spPr.xfrm.offX = data.newXfrmOffX;
-                    data.shape.spPr.xfrm.offY = data.newXfrmOffY;
-                    data.shape.spPr.xfrm.extX = data.newXfrmExtX;
-                    data.shape.spPr.xfrm.extY = data.newXfrmExtY;
-                    data.shape.spPr.xfrm.flipH = data.newXfrmFlipH;
-                    data.shape.spPr.xfrm.flipV = data.newXfrmFlipV;
-                    data.shape.spPr.xfrm.rot = data.newXfrmRot;
-                };
-                History.Add(this, _history_obj);
-
-
-                _slide_shape.spPr.xfrm.offX =_slide_shape.pH;
-                _slide_shape.spPr.xfrm.offY =_slide_shape.pV;
-                _slide_shape.spPr.xfrm.extX =_slide_shape.ext.cx;
-                _slide_shape.spPr.xfrm.extY =_slide_shape.ext.cy;
-                _slide_shape.spPr.xfrm.flipH =_slide_shape.flipH;
-                _slide_shape.spPr.xfrm.flipV =_slide_shape.flipV;
-                _slide_shape.spPr.xfrm.rot =_slide_shape.rot;
-            }
-            else if(_slide_shape.isPlaceholder())
-            {
-                var _new_master = layout.Master;
-                var _ph_idx = null, _ph_type = null;
-                if(_slide_shape instanceof  CShape)
-                {
-                    _ph_idx = _slide_shape.nvSpPr.nvPr.ph.idx;
-                    _ph_type = _slide_shape.nvSpPr.nvPr.ph.type;
-                }
-                if(_slide_shape instanceof  CImageShape)
-                {
-                    _ph_idx = _slide_shape.nvPicPr.nvPr.ph.idx;
-                    _ph_type = _slide_shape.nvPicPr.nvPr.ph.type;
-                }
-                var _merged_xfrm = new CXfrm();
-
-                var _master_shape = _new_master.getMatchingShape(_ph_type, _ph_idx);
-                var _layout_shape = layout.getMatchingShape(_ph_type, _ph_idx);
-                var _master_shape_xfrm = null;
-                if(_master_shape != null && _master_shape.spPr )
-                {
-                    _merged_xfrm.merge(_master_shape.spPr.xfrm);
-                }
-                if(_layout_shape != null && _layout_shape.spPr )
-                {
-                    _merged_xfrm.merge(_layout_shape.spPr.xfrm);
-                }
-                if(_merged_xfrm.offX == null)
-                {
-                    _history_obj = {};
-                    _history_obj.shape = _slide_shape;
-                    _history_obj.oldXfrmOffX = _slide_shape_xfrm.offX;
-                    _history_obj.oldXfrmOffY = _slide_shape_xfrm.offY;
-                    _history_obj.oldXfrmExtX = _slide_shape_xfrm.extX;
-                    _history_obj.oldXfrmExtY = _slide_shape_xfrm.extY;
-                    _history_obj.oldXfrmFlipH = _slide_shape_xfrm.flipH;
-                    _history_obj.oldXfrmFlipV = _slide_shape_xfrm.flipV;
-                    _history_obj.oldXfrmRot = _slide_shape_xfrm.rot;
-
-                    _history_obj.newXfrmOffX =_slide_shape.pH;
-                    _history_obj.newXfrmOffY =_slide_shape.pV;
-                    _history_obj.newXfrmExtX =_slide_shape.ext.cx;
-                    _history_obj.newXfrmExtY =_slide_shape.ext.cy;
-                    _history_obj.newXfrmFlipH =_slide_shape.flipH;
-                    _history_obj.newXfrmFlipV =_slide_shape.flipV;
-                    _history_obj.newXfrmRot = _slide_shape.flipV;
-
-
-                    _history_obj.undo_function = function(data)
-                    {
-                        data.shape.spPr.xfrm.offX = data.oldXfrmOffX;
-                        data.shape.spPr.xfrm.offY = data.oldXfrmOffY;
-                        data.shape.spPr.xfrm.extX = data.oldXfrmExtX;
-                        data.shape.spPr.xfrm.extY = data.oldXfrmExtY;
-                        data.shape.spPr.xfrm.flipH = data.oldXfrmFlipH;
-                        data.shape.spPr.xfrm.flipV = data.oldXfrmFlipV;
-                        data.shape.spPr.xfrm.rot = data.oldXfrmRot;
-                    };
-                    _history_obj.redo_function = function(data)
-                    {
-                        data.shape.spPr.xfrm.offX = data.newXfrmOffX;
-                        data.shape.spPr.xfrm.offY = data.newXfrmOffY;
-                        data.shape.spPr.xfrm.extX = data.newXfrmExtX;
-                        data.shape.spPr.xfrm.extY = data.newXfrmExtY;
-                        data.shape.spPr.xfrm.flipH = data.newXfrmFlipH;
-                        data.shape.spPr.xfrm.flipV = data.newXfrmFlipV;
-                        data.shape.spPr.xfrm.rot = data.newXfrmRot;
-                    };
-                    History.Add(this, _history_obj);
-
-
-                    _slide_shape.spPr.xfrm.offX =_slide_shape.pH;
-                    _slide_shape.spPr.xfrm.offY =_slide_shape.pV;
-                    _slide_shape.spPr.xfrm.extX =_slide_shape.ext.cx;
-                    _slide_shape.spPr.xfrm.extY =_slide_shape.ext.cy;
-                    _slide_shape.spPr.xfrm.flipH =_slide_shape.flipH;
-                    _slide_shape.spPr.xfrm.flipV =_slide_shape.flipV;
-                    _slide_shape.spPr.xfrm.rot =_slide_shape.rot;
-                }
-            }
-        }
-
-
-        for(_shape_index = 0; _shape_index < _new_layout_shapes.length; ++_shape_index)
-        {
-            _layout_shape = _new_layout_shapes[_shape_index];
-            if(_layout_shape.isPlaceholder())
-            {
-                if(_layout_shape instanceof  CShape)
-                {
-                    _ph_idx = _layout_shape.nvSpPr.nvPr.ph.idx;
-                    _ph_type = _layout_shape.nvSpPr.nvPr.ph.type;
-                }
-                if(_layout_shape instanceof  CImageShape)
-                {
-                    _ph_idx = _layout_shape.nvPicPr.nvPr.ph.idx;
-                    _ph_type = _layout_shape.nvPicPr.nvPr.ph.type;
-                }
-                var _matching_slide_shape = this.getMatchingShape(_ph_type, _ph_idx);
-                if(_matching_slide_shape == null && (_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum))
-                {
-                    var _index = _shape_index > _slide_shapes.length ? _slide_shapes.length : _shape_index;
-                    var _added_shape = _layout_shape.createDuplicate2(this, this.elementsManipulator);
-                    _added_shape.txBody = _layout_shape.txBody.createFullCopy(_added_shape);
-                    _added_shape.txBody.content = new CDocumentContent(_added_shape, this.elementsManipulator.DrawingDocument, 0, 0, 0, 0, false, false);
-
-                    var text = pHText[0][_added_shape.nvSpPr.nvPr.ph.type] != undefined ?  pHText[0][_added_shape.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
-                    _added_shape.txBody.content2 = new CDocumentContent(_added_shape, this.elementsManipulator.DrawingDocument, 0, 0, 0, 0, false, false);
-                    _added_shape.txBody.content2.Content.length = 0;
-                    var par = new Paragraph(this.elementsManipulator.DrawingDocument, _added_shape.txBody.content2, 0, 0, 0, 0, 0);
-                    var EndPos = 0;
-                    _added_shape.spPr.Fill = new CUniFill();
-                    _added_shape.spPr.ln = new CLn();
-                    _added_shape.spPr.xfrm = new CXfrm();
-                    var _h_is_on = History.Is_On();
-                    if(_h_is_on)
-                    {
-                        History.TurnOff();
-                    }
-                    for(var key = 0 ; key <  text.length; ++key)
-                    {
-                        par.Internal_Content_Add( EndPos++, new ParaText(text[key]));
-                    }
-
-                    _added_shape.txBody.content2.Internal_Content_Add( 0, par);
-
-                    if(_h_is_on)
-                    {
-                        History.TurnOn();
-                    }
-                    _history_obj = {};
-                    _history_obj.layoutShape = _added_shape;
-                    _history_obj.shapeIndex = _index;
-                    _history_obj.slideShapes = _slide_shapes;
-                    _history_obj.undo_function = function(data)
-                    {
-                        data.slideShapes.splice(data.shapeIndex, 1);
-                    };
-                    _history_obj.redo_function = function(data)
-                    {
-                        data.slideShapes.splice(data.shapeIndex, 0, data.layoutShape);
-                    };
-                    History.Add(this, _history_obj);
-
-                    _slide_shapes.splice(_index, 0, _added_shape);
-                }
-            }
-        }
-        _history_obj = {};
-        _history_obj.newLayout = layout;
-        _history_obj.undo_function = function(data)
-        {
-
-        };
-
-        _history_obj.redo_function = function(data)
-        {
-            this.Layout = data.newLayout;
-            for(var i = 0; i < this.elementsManipulator.ArrGlyph.length; ++i)
-            {
-                if(this.elementsManipulator.ArrGlyph[i].resetTextStyles)
-                    this.elementsManipulator.ArrGlyph[i].resetTextStyles();
-            }
-            this.calculate2();
-        };
-        History.Add(this, _history_obj);
-        this.Layout = layout;
-        for(var i = 0; i < this.elementsManipulator.ArrGlyph.length; ++i)
-        {
-            if(this.elementsManipulator.ArrGlyph[i].resetTextStyles)
-                this.elementsManipulator.ArrGlyph[i].resetTextStyles();
-        }
-        this.calculate2();
-    };
-
-    this.prepareToChangeTheme =  function(_new_layout)
-    {
-        for(var i = 0, glyphs = this.elementsManipulator.ArrGlyph, n = glyphs.length; i < n; ++i)
-        {
-            if(glyphs[i].prepareToChangeTheme)
-            {
-                glyphs[i].prepareToChangeTheme(_new_layout);
-            }
-        }
-    };
-
-    this.prepareToChangeTheme2 =  function(_new_layout)
-    {
-        for(var i = 0, glyphs = this.elementsManipulator.ArrGlyph, n = glyphs.length; i < n; ++i)
-        {
-            if(glyphs[i].prepareToChangeTheme2)
-            {
-                glyphs[i].prepareToChangeTheme2();
-            }
-        }
-    };
-
-    this.createFullCopy = function(_slide_num)
-    {
-        var _history_is_on = History.Is_On();
-        if(_history_is_on)
-        {
-            History.TurnOff();
-        }
-        var _copy = new Slide(this.presentation, this.Layout, _slide_num);
-        _copy.Layout = this.Layout;
-        _copy.Master = this.Master;
-        _copy.Theme = this.Theme;
-        _copy.cSld =  this.cSld.createFullCopy(_copy, _copy.elementsManipulator);
-        _copy.elementsManipulator.ArrGlyph = _copy.cSld.spTree;
-
-        if(_history_is_on)
-        {
-            History.TurnOn();
-        }
-        return _copy;
-    };
     //---------------------
     this.setSize = function(width, height)
     {
@@ -400,17 +78,7 @@ function Slide(presentation, slideLayout, slideNum)
 
 
 
-    this.CreateFontMap = function(FontMap)
-    {
-        var _arr_glyph = this.elementsManipulator.ArrGlyph;
-        for(var i =0; i < _arr_glyph.length; ++i)
-        {
-            if(_arr_glyph[i].CreateFontMap != undefined)
-            {
-                _arr_glyph[i].CreateFontMap(FontMap);
-            }
-        }
-    };
+
     this.calculateColors = function()
     {
         var _shapes = this.cSld.spTree;
@@ -424,7 +92,7 @@ function Slide(presentation, slideLayout, slideNum)
 
 
 
-    this.getMatchingShape =  function(type, idx)
+    this.getMatchingShape =  function(type, idx, bSingleBody)
     {
         var _input_reduced_type;
         if(type == null)
@@ -459,6 +127,8 @@ function Slide(presentation, slideLayout, slideNum)
         var _index, _type;
         var _final_index, _final_type;
         var _glyph;
+        var body_count = 0;
+        var last_body;
         for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
         {
             _glyph = _sp_tree[_shape_index];
@@ -494,6 +164,7 @@ function Slide(presentation, slideLayout, slideNum)
                         _final_type = _type;
                     }
                 }
+
                 if(_index == null)
                 {
                     _final_index = 0;
@@ -506,6 +177,15 @@ function Slide(presentation, slideLayout, slideNum)
                 if(_input_reduced_type == _final_type && _input_reduced_index == _final_index)
                 {
                     return _glyph;
+                }
+                if(_input_reduced_type == phType_title && _input_reduced_type == _final_type)
+                {
+                    return _glyph;
+                }
+                if(phType_body === _type)
+                {
+                    ++body_count;
+                    last_body = _glyph;
                 }
             }
         }
@@ -539,222 +219,17 @@ function Slide(presentation, slideLayout, slideNum)
             }
         }
 
+        if(body_count === 1 && type === phType_body && bSingleBody)
+        {
+            return last_body;
+        }
         return null;
-    };
-
-    this.calculate = function()
-    {
-        this.compiledShapes.length = 0;
-        var slideSpTree = this.cSld.spTree;
-        for(var i=0; i < slideSpTree.length; ++i)
-        {
-            slideSpTree[i].calculate();
-        }
-        this.elementsManipulator.ArrGlyph = slideSpTree;
-    };
-
-    this.calculate2 = function()
-    {
-        var spTree = this.cSld.spTree;
-        for(var i = 0, n = spTree.length; i < n; ++i)
-        {
-            if(spTree[i].calculate2)
-            {
-                spTree[i].calculate2();
-            }
-        }
     };
 
 
     this.changeNum = function(num)
     {
         this.num = num;
-        /*var _arr_glyph = this.cSld.spTree;
-        var _shape_index;
-        for(_shape_index = 0; _shape_index < _arr_glyph.length; ++_shape_index)
-        {
-            if(_arr_glyph[_shape_index].isPlaceholder())
-            {
-                if(_arr_glyph[_shape_index] instanceof  CShape)
-                {
-                    if(_arr_glyph[_shape_index].nvSpPr.nvPr.ph.type == phType_sldNum && _arr_glyph[_shape_index].txBody.textFieldFlag)
-                    {
-                        _arr_glyph[_shape_index].txBody.recalculate(_arr_glyph[_shape_index]);
-                    }
-                }
-            }
-        } */
-    };
-
-    this.calculateAfterChangeLayout = function()
-    {
-        var historyData;
-        var _history_is_on = History.Is_On();
-        if(_history_is_on)
-        {
-            History.TurnOff();
-        }
-        for(var i = this.cSld.spTree.length-1; i > -1 ; --i)
-        {
-            if(this.cSld.spTree[i].isEmptyPlaceholder())
-            {
-                var deletedShape = this.cSld.spTree.splice(i, 1)[0];
-
-                historyData = {};
-                historyData.deletedShape = deletedShape;
-                historyData.shapeIndex = i;
-                historyData.undo_function = function(data)
-                {
-                    this.cSld.spTree.splice(data.shapeIndex, 0, data.deletedShape);
-                };
-                historyData.redo_function = function(data)
-                {
-                    this.cSld.spTree.splice(data.shapeIndex, 1);
-                };
-                //History.Add(this, historyData);
-            }
-        }
-        for(i = this.Layout.cSld.spTree.length-1; i > -1 ; --i)
-        {
-            if(this.Layout.cSld.spTree[i].isPlaceholder())
-            {
-                var matchingShape;
-                var _ph_type = this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.type;
-
-                if(((matchingShape = this.getMatchingShape(this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.type, this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.idx)) == null)
-                    && ((_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)/* ||
-                 (_ph_type == phType_dt && this.Layout.hf.dt === true) || (_ph_type == phType_ftr && this.Layout.hf.ftr === true)
-                 || (_ph_type == phType_hdr && this.Layout.hf.hdr === true) || (_ph_type == phType_sldNum && this.Layout.hf.sldNum === true))*/))
-                {
-                    var duplicate = this.Layout.cSld.spTree[i].createDuplicate2(this, this.elementsManipulator);
-                    if(this.Layout.cSld.spTree[i] instanceof CShape)
-                    {
-                        var _body_pr
-                        if(this.Layout.cSld.spTree[i].txBody && this.Layout.cSld.spTree[i].txBody.bodyPr)
-                        {
-                            _body_pr = this.Layout.cSld.spTree[i].txBody.bodyPr.createDuplicate();
-
-                        }
-                        else
-                        {
-                            _body_pr = new CBodyPr();
-                        }
-                        duplicate.txBody = new CTextBody(duplicate);
-                        duplicate.txBody.bodyPr = _body_pr;
-                        duplicate.txBody.content = new CDocumentContent(duplicate, this.elementsManipulator.DrawingDocument, 0, 0, 0, 0, false, false);
-                    }
-                    duplicate.spPr.xfrm = new CXfrm();
-                    duplicate.spPr.Fill = new CUniFill();
-                    duplicate.spPr.ln = new CLn();
-                    duplicate.calculate();
-                    duplicate.setParent(this);
-                    duplicate.setContainer(this.elementsManipulator);
-                    this.cSld.spTree.splice(i, 0, duplicate);
-
-                    historyData = {};
-                    historyData.addedShape = duplicate;
-                    historyData.shapeIndex = i;
-                    historyData.undo_function = function(data)
-                    {
-                        this.cSld.spTree.splice(data.shapeIndex, 1);
-                    };
-                    historyData.redo_function = function(data)
-                    {
-                        this.cSld.spTree.splice(data.shapeIndex, 0, data.addedShape);
-                    };
-                    //History.Add(this, historyData);
-                }
-                else  if(matchingShape != null)
-                {
-                    _ph_type = this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.type;
-
-                    if(this.Layout.cSld.spTree[i].spPr.xfrm.extX!=undefined)
-                    {
-                        historyData = {};
-                        historyData.old_SpPrXfrm = clone(matchingShape.spPr.xfrm);
-                        historyData.old_pH = matchingShape.pH;
-                        historyData.old_pV = matchingShape.pV;
-                        historyData.old_ext = clone(matchingShape.ext);
-                        historyData.shape = matchingShape;
-                        historyData.undo_function = function(data)
-                        {
-                            data.shape.spPr.xfrm.offX = data.old_SpPrXfrm.offX;
-                            data.shape.spPr.xfrm.offY = data.old_SpPrXfrm.offY;
-                            data.shape.spPr.xfrm.extX = data.old_SpPrXfrm.extX;
-                            data.shape.spPr.xfrm.extY = data.old_SpPrXfrm.extY;
-                            data.shape.spPr.xfrm.chOffX = data.old_SpPrXfrm.chOffX;
-                            data.shape.spPr.xfrm.chOffY = data.old_SpPrXfrm.chOffY;
-                            data.shape.spPr.xfrm.chExtX = data.old_SpPrXfrm.chExtX;
-                            data.shape.spPr.xfrm.chExtY = data.old_SpPrXfrm.chExtY;
-                        };
-
-                        historyData.redo_function = function(data)
-                        {
-                            data.shape.spPr.xfrm = new CXfrm();
-                        };
-                        //History.Add(this, historyData);
-
-                        matchingShape.spPr.xfrm = new CXfrm();
-                    }
-                    else
-                    {
-                        var masterMatchingShape = this.Layout.Master.getMatchingShape(this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.type, this.Layout.cSld.spTree[i].nvSpPr.nvPr.ph.idx);
-
-                        if(masterMatchingShape != null && masterMatchingShape.spPr.xfrm.extX != undefined)
-                        {
-                            historyData = {};
-                            historyData.old_SpPrXfrm = clone(matchingShape.spPr.xfrm);
-                            historyData.old_pH = matchingShape.pH;
-                            historyData.old_pV = matchingShape.pV;
-                            historyData.old_ext = clone(matchingShape.ext);
-                            historyData.shape = matchingShape;
-                            historyData.undo_function = function(data)
-                            {
-                                data.shape.spPr.xfrm.offX = data.old_SpPrXfrm.offX;
-                                data.shape.spPr.xfrm.offY = data.old_SpPrXfrm.offY;
-                                data.shape.spPr.xfrm.extX = data.old_SpPrXfrm.extX;
-                                data.shape.spPr.xfrm.extY = data.old_SpPrXfrm.extY;
-                                data.shape.spPr.xfrm.chOffX = data.old_SpPrXfrm.chOffX;
-                                data.shape.spPr.xfrm.chOffY = data.old_SpPrXfrm.chOffY;
-                                data.shape.spPr.xfrm.chExtX = data.old_SpPrXfrm.chExtX;
-                                data.shape.spPr.xfrm.chExtY = data.old_SpPrXfrm.chExtY;
-                            };
-
-                            historyData.redo_function = function(data)
-                            {
-                                data.shape.spPr.xfrm = new CXfrm();
-                            };
-                            //History.Add(this, historyData);
-
-                            matchingShape.spPr.xfrm = new CXfrm();
-                        }
-                    }
-
-                }
-            }
-        }
-
-
-        historyData = {};
-        historyData.undo_function = function(data)
-        {};
-        historyData.redo_function = function(data)
-        {
-            for(var i = 0; i < this.cSld.spTree.length; ++i)
-            {
-                this.cSld.spTree[i].calculate2();
-            }
-        };
-        //History.Add(this, historyData);
-
-        for(i = 0; i < this.cSld.spTree.length; ++i)
-        {
-            this.cSld.spTree[i].calculate2();
-        }
-        if(_history_is_on)
-        {
-            History.TurnOn();
-        }
     };
 
 
@@ -822,84 +297,6 @@ function Slide(presentation, slideLayout, slideNum)
 
         return _back_fill;
     }
-
-    /*this.recalculate = function()
-    {
-        var _shapes = this.cSld.spTree;
-        var _shape_index;
-        var _shape_count = _shapes.length;
-        for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
-        {
-            _shapes[_shape_index].Recalculate();
-        }
-    };   */
-
-    /*this.draw = function(graphics)
-    {
-        var _back_fill = this.getBackground();
-        DrawBackground(graphics, _back_fill, 0, 0, this.Width, this.Height);
-        if(this.showMasterSp || (this.showMasterSp === undefined && (this.Layout.showMasterSp===undefined || this.Layout.showMasterSp)))
-        {
-            if (graphics.IsSlideBoundsCheckerType === undefined)
-                this.Layout.Master.draw(graphics);
-        }
-
-        if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
-            this.Layout.draw(graphics);
-        for(var i=0; i < this.elementsManipulator.ArrGlyph.length; ++i)
-        {
-            this.elementsManipulator.ArrGlyph[i].Draw(graphics);
-        }
-    }; */
-
-
-   /* this.Undo = function(data)
-    {
-        data.undo_function.call(this, data);
-    };
-
-
-    this.Redo = function(data)
-    {
-        data.redo_function.call(this, data);
-    };*/
-
-    this.changeBg = function(bg)
-    {
-        var historyData = {};
-        historyData.old_bg = this.cSld.Bg;
-        historyData.new_bg = bg;
-
-        historyData.undo_function = function(data)
-        {
-            this.cSld.Bg = data.old_bg;
-            this.elementsManipulator.DrawingDocument.OnRecalculatePage(this.num, this);
-        };
-
-        historyData.undo_function = function(data)
-        {
-            this.cSld.Bg = data.new_bg;
-            this.elementsManipulator.DrawingDocument.OnRecalculatePage(this.num, this);
-        };
-
-        this.cSld.Bg = bg;
-        this.elementsManipulator.DrawingDocument.OnRecalculatePage(this.num, this);
-    };
-
-    this.OnMouseDown = function(e, X, Y)
-    {
-        this.elementsManipulator.OnMouseDown(e, X, Y, this.SlideNum);
-    };
-
-    this.OnMouseMove = function(e, X, Y)
-    {
-        this.elementsManipulator.OnMouseMove(e, X, Y, this.SlideNum);
-    };
-    this.OnMouseUp = function(e, X, Y)
-    {
-        this.elementsManipulator.OnMouseUp(e, X, Y, this.SlideNum);
-    };
-
 
     this.commentX = 0;
     this.commentY = 0;
@@ -1263,7 +660,7 @@ Slide.prototype =
                 var obj = spTree.splice(i, 1)[0];
                 if(obj.isPlaceholder() && !(obj.isEmptyPlaceholder && obj.isEmptyPlaceholder()))
                 {
-                    var m_s = this.Layout.getMatchingShape(obj.getPlaceholderType(), obj.getPlaceholderIndex());
+                    var m_s = this.Layout.getMatchingShape(obj.getPlaceholderType(), obj.getPlaceholderIndex(), obj.getIsSingleBody ? obj.getIsSingleBody() : false);
                     if(m_s)
                     {
                         var shape = new CShape(this);
@@ -2419,7 +1816,7 @@ SlideComments.prototype =
             case historyitem_AddComment:
             {
                 this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.objectId));
-                editor.sync_AddComment( data.objectId, this.comments[data.pos].Data);
+                editor.sync_AddComment( data.objectId, this.comments[data.Pos].Data);
 
                 break;
             }
