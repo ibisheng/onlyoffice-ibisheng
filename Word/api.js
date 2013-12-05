@@ -623,9 +623,10 @@ function asc_docs_api(name)
     this.DocumentReaderMode = null;
 	
 	this.isChartEditor = false;
+    /** proprietary begin **/
 	this.chartStyleManager = new ChartStyleManager();
 	this.chartPreviewManager = new ChartPreviewManager();
-
+    /** proprietary end **/
     this.IsLongActionCurrent = false;
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
@@ -758,7 +759,7 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
-	if ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() )
+	if ( (this.chartStyleManager &&  this.chartPreviewManager)&&(!this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady()) )
 	{
 		for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
 		{

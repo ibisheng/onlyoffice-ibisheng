@@ -461,7 +461,7 @@ CGroupShape.prototype =
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i] instanceof CChartAsGroup)
+            if(typeof  CChartAsGroup != "undefined" && this.spTree[i] instanceof CChartAsGroup)
             {
                 this.spTree[i].init();
             }

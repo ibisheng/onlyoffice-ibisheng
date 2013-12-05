@@ -436,7 +436,7 @@ function handleCurrentGroup(drawing, drawingObjects, drawingObjectsController, e
             if(handleShapeImageInCurrentGroup(cur_drawing, drawing, drawingObjects, drawingObjectsController, e, x, y))
                 return true;
         }
-        if(cur_drawing instanceof CChartAsGroup)
+        if(typeof  CChartAsGroup != "undefined" && cur_drawing instanceof CChartAsGroup)
         {
             if(handleChartInCurrentGroup(cur_drawing, drawing, drawingObjects, drawingObjectsController, e, x, y))
                 return true;
@@ -457,7 +457,7 @@ function handleCurrentGroupCursorType(drawing, drawingObjects, drawingObjectsCon
             if(cursor_type)
                 return cursor_type;
         }
-        if(cur_drawing instanceof CChartAsGroup)
+        if(typeof  CChartAsGroup != "undefined" && cur_drawing instanceof CChartAsGroup)
         {
             var cursor_type = handleChartInCurrentGroupCursorType(cur_drawing, drawing, drawingObjects, drawingObjectsController, e, x, y);
             if(cursor_type)

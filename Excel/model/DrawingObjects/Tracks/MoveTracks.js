@@ -55,7 +55,7 @@ function MoveShapeImageTrackInGroup(originalObject)
     this.transform = new CMatrix();
 
     var pen, brush;
-    if(!(this.originalObject instanceof CChartAsGroup))
+    if(!(typeof  CChartAsGroup != "undefined" && this.originalObject instanceof CChartAsGroup))
     {
         pen = this.originalObject.pen;
         brush = this.originalObject.brush;
@@ -145,7 +145,7 @@ function MoveGroupTrack(originalObject)
         this.arrTransforms2[i] = gr_obj_transform_copy;
 
         var pen, brush;
-        if(!(arr_graphic_objects[i] instanceof CChartAsGroup))
+        if(!(typeof  CChartAsGroup != "undefined" && arr_graphic_objects[i] instanceof CChartAsGroup))
         {
             pen = arr_graphic_objects[i].pen;
             brush = arr_graphic_objects[i].brush;

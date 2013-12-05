@@ -701,7 +701,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
     this.geometry = originalObject.spPr.geometry.createDuplicate();
 
     var pen, brush;
-    if(!(originalObject instanceof CChartAsGroup))
+    if(!(typeof  CChartAsGroup != "undefined" && originalObject instanceof CChartAsGroup))
     {
         pen = originalObject.pen;
         brush = originalObject.brush;
@@ -1821,7 +1821,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.geometry.Recalculate(this.extX, this.extY);
     }
     var pen, brush;
-    if(!(originalObject instanceof CChartAsGroup))
+    if(!(typeof  CChartAsGroup != "undefined" && originalObject instanceof CChartAsGroup))
     {
         pen = originalObject.pen;
         brush = originalObject.brush;

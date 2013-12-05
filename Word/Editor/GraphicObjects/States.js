@@ -382,7 +382,7 @@ function handleFloatObjects(drawingArray, graphicObjects, e, x, y, pageIndex, ha
             if(handleFloatGroup(_current_graphic_object, graphicObjects, e, x, y, pageIndex, handleState))
                 return true;
         }
-        else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+        else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
         {
             if(handleChart(_current_graphic_object, graphicObjects, x, y, e, pageIndex))
                 return true;
@@ -709,7 +709,7 @@ function handleInlineObjects(inlineObjects, graphicObjects, e, x, y, pageIndex, 
                 if(handleInlineGroup(_current_graphic_object, graphicObjects, e, x, y, pageIndex, handleState))
                     return true;
             }
-            else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChart(_current_graphic_object, graphicObjects, x, y, e, pageIndex) === true)
                     return true;
@@ -1270,7 +1270,7 @@ function handleFloatObjectsCursorType(drawingArray, graphicObjects, e, x, y, pag
             if(handleFloatGroupCursorType(_current_graphic_object, graphicObjects, e, x, y, pageIndex, handleState))
                 return true;
         }
-        else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+        else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
         {
             if(handleChartCursorType(_current_graphic_object, graphicObjects, x, y, e, pageIndex))
                 return true;
@@ -1441,7 +1441,7 @@ function handleInlineObjectsCursorType(inlineObjects, graphicObjects, e, x, y, p
                 if(handleInlineGroupCursorType(_current_graphic_object, graphicObjects, e, x, y, pageIndex, handleState))
                     return true;
             }
-            else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChartCursorType(_current_graphic_object, graphicObjects, x, y, e, pageIndex) === true)
                     return true;
@@ -1552,7 +1552,7 @@ function handleShapeImageGroup(drawing, group, graphicObjects, e, x, y, pageInde
                     graphicObjects.arrPreTrackObjects.push(new MoveTrackInGroup(_group_selection_array[_sel_index]));
                 }
                 graphicObjects.changeCurrentState(new PreMoveInGroup(graphicObjects, group, false, true, x, y));
-                if(drawing instanceof CChartAsGroup)
+                if(typeof  CChartAsGroup != "undefined" && drawing instanceof CChartAsGroup)
                 {
                     var selected_title = drawing.getSelectedTitle();
                     if(selected_title)
@@ -1848,7 +1848,7 @@ function handleCurrentGroup(drawing, graphicObjects, e, x, y, pageIndex, state)
             if(handleShapeImageGroup(cur_sp, group, graphicObjects, e, x, y, pageIndex, state))
                 return true;
         }
-        else if(cur_sp instanceof CChartAsGroup)
+        else if(typeof  CChartAsGroup != "undefined" && cur_sp instanceof CChartAsGroup)
         {
             if(handleChartGroup(cur_sp, group, graphicObjects, e, x, y, pageIndex, state))
                 return true;
@@ -1882,7 +1882,7 @@ function handleCurrentGroupCursorType(drawing, graphicObjects, e, x, y, pageInde
             if(handleShapeImageGroupCursorType(cur_sp, group, graphicObjects, e, x, y, pageIndex, state))
                 return true;
         }
-        else if(cur_sp instanceof CChartAsGroup)
+        else if(typeof  CChartAsGroup != "undefined" && cur_sp instanceof CChartAsGroup)
         {
             if(handleChartGroupCursorType(cur_sp, group, graphicObjects, e, x, y, pageIndex, state))
                 return true;
@@ -1909,7 +1909,7 @@ function handleFloatObjectsGroupState(drawingArray, graphicObjects, e, x, y, pag
                 if(handleFloatShapeImage(_cur_object, graphicObjects, e, x, y, pageIndex, state))
                     return true;
             }
-            else if(_cur_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _cur_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChart(_cur_object, graphicObjects, x, y, e, pageIndex))
                     return true;
@@ -1942,7 +1942,7 @@ function handleFloatObjectsGroupStateCursorType(drawingArray, graphicObjects, e,
                 if(handleFloatShapeImageCursorType(_cur_object, graphicObjects, e, x, y, pageIndex, state))
                     return true;
             }
-            else if(_cur_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _cur_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChartCursorType(_cur_object, graphicObjects, x, y, e, pageIndex))
                     return true;
@@ -1974,7 +1974,7 @@ function handleInlineObjectsGroupState(drawingArray, graphicObjects, e, x, y, pa
                 if(handleInlineShapeImage(_current_graphic_object, graphicObjects, e, x, y, pageIndex, state))
                     return true;
             }
-            else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChart(_current_graphic_object, graphicObjects, x, y, e, pageIndex))
                     return true;
@@ -2006,7 +2006,7 @@ function handleInlineObjectsGroupStateCursorType(drawingArray, graphicObjects, e
                 if(handleInlineShapeImageCursorType(_current_graphic_object, graphicObjects, e, x, y, pageIndex, state))
                     return true;
             }
-            else if(_current_graphic_object.GraphicObj instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && _current_graphic_object.GraphicObj instanceof CChartAsGroup)
             {
                 if(handleChartCursorType(_current_graphic_object, graphicObjects, x, y, e, pageIndex))
                     return true;
@@ -3929,6 +3929,7 @@ function PreMoveInlineObject(graphicObjects, objectId, ctrlShiftFlag, bSelectedM
             if(e.ClickCount > 1)
             {
                 var gr_obj = this.graphicObjects.majorGraphicObject;
+                /** proprietary begin **/
                 if( isRealObject(gr_obj.GraphicObj.chart))
                 {
 
@@ -3948,6 +3949,7 @@ function PreMoveInlineObject(graphicObjects, objectId, ctrlShiftFlag, bSelectedM
                         editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }
                 }
+                /** proprietary end **/
             }
         }
 
@@ -4556,6 +4558,7 @@ function PreMoveState(graphicObjects, ctrlShiftFlag/*Р±С‹Р» Р»Рё РЅ
             if(e.ClickCount > 1)
             {
                 var gr_obj = this.graphicObjects.majorGraphicObject;
+                /** proprietary begin **/
                 if(gr_obj.GraphicObj.chart)
                 {
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
@@ -4573,6 +4576,7 @@ function PreMoveState(graphicObjects, ctrlShiftFlag/*Р±С‹Р» Р»Рё РЅ
                         editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }
                 }
+                /** proprietary end **/
             }
         }
 
@@ -6393,6 +6397,7 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
     {
         this.graphicObjects.arrPreTrackObjects.length = 0;
         this.graphicObjects.changeCurrentState(new GroupState(this.graphicObjects, this.group.parent));
+        /** proprietary begin **/
         if(this.ctrlShiftFlag === false)
         {
             if(e.ClickCount > 1)
@@ -6420,6 +6425,7 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
                 }
             }
         }
+        /** proprietary end **/
 
     };
     this.updateCursorType = function(pageIndex, x, y)

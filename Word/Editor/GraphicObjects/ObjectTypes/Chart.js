@@ -38,6 +38,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
 
     this.brush = new CUniFill();
     this.brush.fill = new CBlipFill();
+    this.brush.fill.RasterImageId = "";
 
     this.transform = new CMatrix();
     this.invertTransform = new CMatrix();
@@ -664,12 +665,14 @@ CChartAsGroup.prototype =
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform);
         graphics.AddClipRect(-1, -1, this.absExtX + 1, this.absExtY + 1);
+        /** proprietary begin **/
         if(this.chartTitle)
             this.chartTitle.draw(graphics, pageIndex);
         if(this.hAxisTitle)
             this.hAxisTitle.draw(graphics, pageIndex);
         if(this.vAxisTitle)
             this.vAxisTitle.draw(graphics, pageIndex);
+        /** proprietary end **/
         graphics.RestoreGrState();
 
 
@@ -897,6 +900,7 @@ CChartAsGroup.prototype =
         {
             this.recalculatePosExt();
             this.recalculateTransform();
+            /** proprietary begin **/
             if(isRealObject(this.chartTitle))
             {
                 var max_title_width = this.absExtX*0.8;
@@ -1078,6 +1082,7 @@ CChartAsGroup.prototype =
                 this.brush.fill.RasterImageId = "";
                 //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
             }
+            /** proprietary end **/
 
         }
         catch(e)
@@ -1127,6 +1132,7 @@ CChartAsGroup.prototype =
             this.parent.Extent.H = xfrm.extY;
         }
 
+        /** proprietary begin **/
         if(isRealObject(this.chartTitle))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
@@ -1582,6 +1588,7 @@ CChartAsGroup.prototype =
             this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
             //this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
         }
+        /** proprietary end **/
         if(is_on)
             History.TurnOn();
 
@@ -1612,6 +1619,7 @@ CChartAsGroup.prototype =
             this.parent.Extent.H = xfrm.extY;
         }
 
+        /** proprietary begin **/
         if(isRealObject(this.chartTitle))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
@@ -2066,6 +2074,7 @@ CChartAsGroup.prototype =
             this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
             //this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
         }
+        /** proprietary end **/
         if(is_on)
             History.TurnOn();
     },

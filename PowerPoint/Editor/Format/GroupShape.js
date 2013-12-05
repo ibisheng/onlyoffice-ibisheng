@@ -447,7 +447,7 @@ CGroupShape.prototype =
     {
         for(var i = 0; i < this.arrGraphicObjects.length; ++i)
         {
-            if(this.arrGraphicObjects[i] instanceof CGraphicFrame || this.arrGraphicObjects[i] instanceof CChartAsGroup)
+            if(this.arrGraphicObjects[i] instanceof CGraphicFrame || (typeof CChartAsGroup != "undefined" && this.arrGraphicObjects[i] instanceof CChartAsGroup))
                 return false
         }
         return true;

@@ -956,7 +956,7 @@ DrawingObjectsController.prototype =
 				// Если открыт iframe, то нельзя удалить диаграмму
 				if ( drawingObjectsController.selectedObjects.length == 1 )
 				{
-					if ( (drawingObjectsController.selectedObjects[0] instanceof CChartAsGroup) && (drawingObjectsController.selectedObjects[0].chart.bChartEditor) )
+					if ( (typeof  CChartAsGroup != "undefined" && drawingObjectsController.selectedObjects[0] instanceof CChartAsGroup) && (drawingObjectsController.selectedObjects[0].chart.bChartEditor) )
 						break;
 				}
 				History.Create_NewPoint();

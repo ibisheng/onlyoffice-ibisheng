@@ -871,7 +871,7 @@ function MoveTrackInGroup(original)
     this.transform = original.transform.CreateDublicate();
     this.geometry = original.spPr.geometry;
 
-    if(original instanceof CChartAsGroup)
+    if(typeof  CChartAsGroup != "undefined" && original instanceof CChartAsGroup)
     {
         var brush = new CUniFill();
         brush.fill = new CSolidFill();

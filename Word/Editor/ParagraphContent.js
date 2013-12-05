@@ -3740,7 +3740,7 @@ ParaDrawing.prototype =
             else
                 result_height = this.GraphicObj.absExtY;
 
-            if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || this.GraphicObj instanceof  CChartAsGroup)
+            if(this.GraphicObj.isShape() || this.GraphicObj.isImage() || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof  CChartAsGroup))
             {
                 this.GraphicObj.setAbsoluteTransform(null, null, result_width, result_height, null, null, null);
                 this.GraphicObj.setXfrm(null, null, result_width, result_height, null, null, null);
@@ -6365,14 +6365,14 @@ ParaDrawing.prototype =
         var bounds_checker = new  CSlideBoundsChecker();
         bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
         var temp_transform = this.GraphicObj.transform;
-        if(this.GraphicObj instanceof  WordImage || this.GraphicObj instanceof CChartAsGroup)
+        if(this.GraphicObj instanceof  WordImage || (typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof CChartAsGroup))
         {
            this.GraphicObj.transform = this.GraphicObj.ownTransform;
         }
         bounds_checker.transform3(this.GraphicObj.transform);
         bounds_checker.rect(0,0, this.GraphicObj.absExtX, this.GraphicObj.absExtY);
 
-        if(!(this.GraphicObj instanceof CChartAsGroup))
+        if(!(typeof  CChartAsGroup != "undefined" && this.GraphicObj instanceof CChartAsGroup))
             this.draw(bounds_checker);
         this.GraphicObj.transform = temp_transform;
 
@@ -6706,7 +6706,7 @@ ParaDrawing.prototype =
             c.Set_GraphicObject(g);
             if(g.isGroup())
                 g.calculateAfterOpen3();
-            else if(!(g instanceof CChartAsGroup))
+            else if(!(typeof  CChartAsGroup != "undefined" && g instanceof CChartAsGroup))
                 g.calculateAfterOpen();
             else
                 g.init2();

@@ -224,7 +224,7 @@ function handleGroup(drawing, drawingObjects, drawingObjectsController, e, x, y,
     for(var j = grouped_objects.length - 1; j > -1; --j)
     {
         var cur_grouped_object = grouped_objects[j];
-        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape || (!drawing.selected && cur_grouped_object instanceof CChartAsGroup))
+        if(cur_grouped_object instanceof CShape || cur_grouped_object instanceof CImageShape || (typeof  CChartAsGroup != "undefined" && !drawing.selected && cur_grouped_object instanceof CChartAsGroup))
         {
             var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
             var hit_in_path = cur_grouped_object.hitInPath(x, y);
@@ -261,7 +261,7 @@ function handleGroup(drawing, drawingObjects, drawingObjectsController, e, x, y,
         }
         else
         {
-            if(cur_grouped_object instanceof CChartAsGroup)
+            if(typeof  CChartAsGroup != "undefined" && cur_grouped_object instanceof CChartAsGroup)
             {
                 if(cur_grouped_object.hitInWorkArea(x, y))
                 {
@@ -1935,7 +1935,7 @@ function ChartGroupState(drawingObjectsController, drawingObjects, chart, group)
                 if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
             }
-            else if(cur_drawing instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && cur_drawing instanceof CChartAsGroup)
             {
                 if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
@@ -1953,7 +1953,7 @@ function ChartGroupState(drawingObjectsController, drawingObjects, chart, group)
                             if(handleShapeImageInGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y, this))
                                 return;
                         }
-                        else if(cur_grouped_object instanceof CChartAsGroup)
+                        else if(typeof  CChartAsGroup != "undefined" && cur_grouped_object instanceof CChartAsGroup)
                         {
 
                             if(cur_grouped_object === this.chart)
@@ -3571,7 +3571,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                 if(handleTable(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
             }
-            else if(cur_drawing instanceof CChartAsGroup)
+            else if(typeof  CChartAsGroup != "undefined" && cur_drawing instanceof CChartAsGroup)
             {
                 if(handleChart(cur_drawing, this.drawingObjects, this.drawingObjectsController, e, x, y, this))
                     return;
@@ -3589,7 +3589,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             if(handleShapeImageInGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y, this))
                                 return;
                         }
-                        else if(cur_grouped_object instanceof CChartAsGroup)
+                        else if(typeof  CChartAsGroup != "undefined" && cur_grouped_object instanceof CChartAsGroup)
                         {
                             if(handleChartGroup(cur_grouped_object, this.drawingObjects, this.drawingObjectsController, this.group, e, x, y))
                                 return;

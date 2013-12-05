@@ -1152,7 +1152,7 @@ prot["asc_removeSeries"] = prot.asc_removeSeries;
 function asc_CChartBinary(chart) {
 	
 	this["binary"] = null;
-	if (chart instanceof CChartAsGroup)
+	if (typeof CChartAsGroup != "undefined" && chart instanceof CChartAsGroup)
 		this["binary"] = chart.getChartBinary();
 }
 
@@ -3449,7 +3449,7 @@ function DrawingObjects() {
 			else if ( graphicObject instanceof CShape )
 				printShape(graphicObject, ctx, top, left);
 			// Chart
-			else if ( graphicObject instanceof CChartAsGroup )
+			else if (typeof CChartAsGroup != "undefined" &&  graphicObject instanceof CChartAsGroup )
 				printChart(graphicObject, ctx, top, left);
 			// Group
 			else if ( graphicObject instanceof CGroupShape )
@@ -3502,7 +3502,7 @@ function DrawingObjects() {
 				
 		function printChart(graphicObject, ctx, top, left) {
 			
-			if ( (graphicObject instanceof CChartAsGroup) && graphicObject && ctx ) {
+			if ( typeof CChartAsGroup != "undefined" && (graphicObject instanceof CChartAsGroup) && graphicObject && ctx ) {
 				
 				// Save
 				var tx = graphicObject.transform.tx;
@@ -3553,7 +3553,7 @@ function DrawingObjects() {
 					else if ( graphicItem instanceof CShape )
 						printShape(graphicItem, ctx, top, left);
 						
-					else if ( graphicItem instanceof CChartAsGroup )
+					else if ( typeof CChartAsGroup != "undefined" && graphicItem instanceof CChartAsGroup )
 						printChart(graphicItem, ctx, top, left);
 				}
 			}

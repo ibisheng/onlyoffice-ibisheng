@@ -1389,7 +1389,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
-                else if (spTree[i] instanceof CChartAsGroup)
+                else if (typeof CChartAsGroup != "undefined" && spTree[i] instanceof CChartAsGroup)
                 {
                     oThis.WriteChart(spTree[i]);
                 }
@@ -2898,7 +2898,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
-                else if (spTree[i] instanceof CChartAsGroup)
+                else if (typeof CChartAsGroup != "undefined" && spTree[i] instanceof CChartAsGroup)
                 {
                     oThis.WriteChart(spTree[i]);
                 }

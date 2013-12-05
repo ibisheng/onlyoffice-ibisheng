@@ -1823,6 +1823,8 @@ CGraphicObjects.prototype = {
 
     redrawCharts: function()
     {
+        if(!(typeof  CChartAsGroup != "undefined"))
+            return;
         var sp_tree = this.slide.cSld.spTree;
         for(var i = 0; i < sp_tree.length; ++i)
         {
@@ -2680,7 +2682,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_GROUP:
             {
                 var seleted_objects = this.State.group.selectedObjects;
-                if(selected_objects.length === 1 && selected_objects[0] instanceof CChartAsGroup)
+                if(typeof  CChartAsGroup != "undefined" && selected_objects.length === 1 && selected_objects[0] instanceof CChartAsGroup)
                 {
                     selected_objects[0].initFromBinary(binary);
                     this.State.group.updateCoordinatesAfterInternalResize();

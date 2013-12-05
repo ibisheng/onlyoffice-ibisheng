@@ -2904,7 +2904,7 @@
 						window["Asc"]["editor"].isStartAddShape = true;
 					drawingObject = data.Drawings[i];
 					// Object types
-					if (drawingObject.graphicObject instanceof  CChartAsGroup) {
+					if (typeof  CChartAsGroup != "undefined" && drawingObject.graphicObject instanceof  CChartAsGroup) {
 						
 						ws.objectRender.calcChartInterval(drawingObject.graphicObject.chart);
 						//drawingObject.graphicObject.setPosition(10,10);

@@ -87,7 +87,7 @@ CGraphicObjects.prototype =
                         {
                             History.Add(obj, {Type: historyitem_CalculateAfterCopyInGroup});
                         }
-                        if(obj instanceof CChartAsGroup)
+                        if(typeof CChartAsGroup != "undefined" && obj instanceof CChartAsGroup)
                         {
                             History.Add(obj, {Type: historyitem_AutoShapes_RecalculateAfterResize});
                         }
@@ -6905,9 +6905,11 @@ CGraphicObjects.prototype =
             {
                 this.document.theme.themeElements.clrScheme = data.oldScheme;
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
+                /** proprietary begin **/
                 editor.chartStyleManager.init();
                 editor.chartPreviewManager.init();
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
+                /** proprietary end **/
                 this.calculateAfterChangeTheme();
 
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
@@ -6931,8 +6933,10 @@ CGraphicObjects.prototype =
             {
                 this.document.theme.themeElements.clrScheme = data.newScheme;
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
+                /** proprietary begin **/
                 editor.chartStyleManager.init();
                 editor.chartPreviewManager.init();
+                /** proprietary end **/
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
                 this.calculateAfterChangeTheme();
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
@@ -7022,8 +7026,10 @@ CGraphicObjects.prototype =
                 clr_scheme.Read_FromBinary2(r);
                 this.document.theme.themeElements.clrScheme =clr_scheme;
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
+                /** proprietary begin **/
                 editor.chartStyleManager.init();
                 editor.chartPreviewManager.init();
+                /** proprietary end **/
                 editor.asc_fireCallback("asc_onUpdateChartStyles");
                 this.calculateAfterChangeTheme();
                 editor.WordControl.m_oDrawingDocument.CheckGuiControlColors();
