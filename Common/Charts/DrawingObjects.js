@@ -2975,6 +2975,7 @@ function DrawingObjects() {
 			}
 		}
         _this.shiftMap = {};
+        worksheet.model.Drawings = aObjects;
 	}
 
     _this.preCopy = function() {
