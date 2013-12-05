@@ -109,12 +109,15 @@ CImageShape.prototype =
         return true;
     },
 
+
     deleteDrawingBase: function()
     {
         var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
         if(isRealNumber(position))
         {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+            var data = new UndoRedoDataGOSingleProp(position, null);
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
+            this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Remove, data.oldValue, 1, data));
         }
         return position;
     },
@@ -122,7 +125,9 @@ CImageShape.prototype =
     addToDrawingObjects: function(pos)
     {
         var position = this.drawingObjects.addGraphicObject(this, pos, true);
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+        var data = new UndoRedoDataGOSingleProp(position, null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
+        this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Add, data.oldValue, 1, data));
     },
 
     initDefault: function(x, y, extX, extY, imageId)
@@ -1161,13 +1166,32 @@ CImageShape.prototype =
                 this.calculateTransformTextMatrix();
                 break;
             }
-			case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
             {
-				this.drawingObjects.addGraphicObject(this, data.oldValue);
+                var pos;
+                if(data.bCollaborativeChanges)
+                {
+                    pos = this.drawingObjects.controller.contentChanges.Check(contentchanges_Add, data.oldValue);
+                }
+                else
+                {
+                    pos = data.oldValue;
+                }
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
                 break;
             }
-			case historyitem_AutoShapes_DeleteDrawingBase:
+
+            case historyitem_AutoShapes_DeleteDrawingBase:
             {
+                var pos;
+                if(data.bCollaborativeChanges)
+                {
+                    pos = this.drawingObjects.controller.contentChanges.Check(contentchanges_Remove, data.oldValue);
+                }
+                else
+                {
+                    pos = data.oldValue;
+                }
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }

@@ -240,6 +240,9 @@ CTextBody.prototype =
         return this.content.Is_Empty();
     },
 
+    OnContentReDraw: function()
+    {},
+
     calculateContent: function()
     {
         var parent_object = this.shape.getParentObjects();

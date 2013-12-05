@@ -675,8 +675,6 @@ CGeometry.prototype=
             w.WriteString2(this.rectS.r);
             w.WriteString2(this.rectS.b);
         }
-        // WriteObjectString(Writer, this.rectS);
-        //WriteObjectDouble(Writer, this.rect);
     },
 
     Read_FromBinary2: function(Reader)
@@ -702,18 +700,17 @@ CGeometry.prototype=
             if(r.GetBool())
                 gd_info.z = r.GetString2();
 
-            if(this.avLst[gd_info.name])
-            {
-                this.AddAdj(gd_info.name, gd_info.formula, gd_info.x, gd_info.y, gd_info.z)
-            }
-            else
-            {
-                this.AddGuide(gd_info.name, gd_info.formula, gd_info.x, gd_info.y, gd_info.z)
-            }
+
+            this.AddGuide(gd_info.name, gd_info.formula, gd_info.x, gd_info.y, gd_info.z)
         }
 
 
          this.gdLst = ReadObjectLong(r);
+        for(var key in this.avLst)
+        {
+            this.AddAdj(key, undefined, this.gdLst[key], undefined, undefined);
+        }
+
 
        var cnx_lst_count = Reader.GetLong();
        for(index = 0; index < cnx_lst_count; ++index)
@@ -842,6 +839,12 @@ CGeometry.prototype=
                 x:x,
                 y:y
             });
+    },
+
+    AddPreset: function(preset)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GeometryAddPreset, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.preset, preset)), null);
+        this.preset = preset;
     },
 
     AddHandleXY: function(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
@@ -1250,6 +1253,7 @@ CGeometry.prototype=
         {
             case historyitem_AutoShapes_Add_Adjustment:
             {
+                delete  this.avLst[data.name];
                 delete  this.gdLst[data.name];
                 break;
             }
@@ -1312,6 +1316,11 @@ CGeometry.prototype=
                 this.ahPolarLstInfo.splice(this.ahPolarLstInfo.length - 1, 1);
                 break;
             }
+            case historyitem_AutoShapes_GeometryAddPreset:
+            {
+                this.preset = data.oldValue;
+                break;
+            }
         }
     },
 
@@ -1321,6 +1330,7 @@ CGeometry.prototype=
         {
             case historyitem_AutoShapes_Add_Adjustment:
             {
+                this.avLst[data.name] = true;
                 this.gdLst[data.name] = data.val;
                 break;
             }
@@ -1445,6 +1455,11 @@ CGeometry.prototype=
                         posX:data.posX,
                         posY:data.posY
                     });
+                break;
+            }
+            case historyitem_AutoShapes_GeometryAddPreset:
+            {
+                this.preset = data.newValue;
                 break;
             }
         }

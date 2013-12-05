@@ -2018,6 +2018,11 @@ Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = new Array();
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
+    var wsViews = this.oApi.wb.wsViews;
+    for(var i = 0; i < wsViews.length; ++i)
+    {
+        wsViews[i].objectRender.controller.refreshContentChanges();
+    }
 	var aActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aActions.length > 0)
 	{
@@ -2110,7 +2115,11 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 							if(g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
 								oHistoryPositions = item;
 							else
-								History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+                            {
+                                if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
+                                    item.oData.drawingData.bCollaborativeChanges = true;
+                                History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+                            }
 						}
 					}
 				}

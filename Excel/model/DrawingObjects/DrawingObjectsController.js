@@ -1,3 +1,138 @@
+
+var contentchanges_Add    = 1;
+var contentchanges_Remove = 2;
+
+
+function CContentChangesElement(Type, Pos, Count, Data)
+{
+    this.m_nType  = Type;  // Тип изменений (удаление или добавление)
+    this.m_nPos   = Pos;   // Позиция, в которой произошли изменения
+    this.m_nCount = Count; // Количество добавленных/удаленных элементов
+    this.m_pData  = Data;  // Связанные с данным изменением данные из истории
+
+    this.Refresh_BinaryData = function()
+    {
+        this.m_pData.oldValue = this.m_aPositions[0];
+    };
+
+    this.Check_Changes = function(Type, Pos)
+    {
+        var CurPos = Pos;
+        if ( contentchanges_Add === Type )
+        {
+            for ( var Index = 0; Index < this.m_nCount; Index++ )
+            {
+                if ( false !== this.m_aPositions[Index] )
+                {
+                    if ( CurPos <= this.m_aPositions[Index] )
+                        this.m_aPositions[Index]++;
+                    else
+                    {
+                        if ( contentchanges_Add === this.m_nType )
+                            CurPos++;
+                        else //if ( contentchanges_Remove === this.m_nType )
+                            CurPos--;
+                    }
+                }
+            }
+        }
+        else //if ( contentchanges_Remove === Type )
+        {
+            for ( var Index = 0; Index < this.m_nCount; Index++ )
+            {
+                if ( false !== this.m_aPositions[Index] )
+                {
+                    if ( CurPos < this.m_aPositions[Index] )
+                        this.m_aPositions[Index]--;
+                    else if ( CurPos > this.m_aPositions[Index] )
+                    {
+                        if ( contentchanges_Add === this.m_nType )
+                            CurPos++;
+                        else //if ( contentchanges_Remove === this.m_nType )
+                            CurPos--;
+                    }
+                    else //if ( CurPos === this.m_aPositions[Index] )
+                    {
+                        if ( contentchanges_Remove === this.m_nType )
+                        {
+                            // Отмечаем, что действия совпали
+                            this.m_aPositions[Index] = false;
+                            return false;
+                        }
+                        else
+                        {
+                            CurPos++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return CurPos;
+    };
+
+    this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
+    {
+        // Разбиваем действие на простейшие
+        var Positions = new Array();
+        if ( contentchanges_Add === Type )
+        {
+            for ( var Index = 0; Index < Count; Index++ )
+                Positions[Index] = Pos + Index;
+        }
+        else //if ( contentchanges_Remove === Type )
+        {
+            for ( var Index = 0; Index < Count; Index++ )
+                Positions[Index] = Pos;
+        }
+
+        return Positions;
+    };
+
+    // Разбиваем сложное действие на простейшие
+    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
+}
+
+function CContentChanges()
+{
+    this.m_aChanges = new Array();
+
+    this.Add = function(Changes)
+    {
+        this.m_aChanges.push( Changes );
+    };
+
+    this.Clear = function()
+    {
+        this.m_aChanges.length = 0;
+    };
+
+    this.Check = function(Type, Pos)
+    {
+        var CurPos = Pos;
+        var Count = this.m_aChanges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
+            if ( false === NewPos )
+                return false;
+
+            CurPos = NewPos;
+        }
+
+        return CurPos;
+    };
+
+    this.Refresh = function()
+    {
+        var Count = this.m_aChanges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.m_aChanges[Index].Refresh_BinaryData();
+        }
+    };
+}
+
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -9,10 +144,22 @@ function DrawingObjectsController(drawingObjects)
     this.defaultColorMap = GenerateDefaultColorMap().color_map;
 	
 	var ascSelectedObjects = [];
+    this.contentChanges = new  CContentChanges();
 }
 
 DrawingObjectsController.prototype =
 {
+    addContentChanges: function(changes)
+    {
+        this.contentChanges.Add(changes);
+    },
+
+    refreshContentChanges: function()
+    {
+        this.contentChanges.Refresh();
+        this.contentChanges.Clear();
+    },
+
     getAllFontNames: function()
     {
     },
@@ -2312,6 +2459,8 @@ DrawingObjectsController.prototype =
 
     }
 };
+
+
 
 //-----------------------------------------------------------------------------------
 // ASC Classes

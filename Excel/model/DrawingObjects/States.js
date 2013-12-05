@@ -1408,24 +1408,28 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
         var track_objects = this.drawingObjectsController.arrTrackObjects;
 
 
-        this.drawingObjects.objectLocker.addObjectId(this.chartElement.chartGroup.Get_Id());
-        var track_objects2 = [];
-        for(var i = 0; i < track_objects.length; ++i)
+        var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
+        if(!isViewMode)
         {
-            track_objects2.push(track_objects[i]);
-        }
-
-        var drawingObjects = this.drawingObjects;
-        var callback = function(bLock)
-        {
-            if(bLock)
+            this.drawingObjects.objectLocker.addObjectId(this.chartElement.chartGroup.Get_Id());
+            var track_objects2 = [];
+            for(var i = 0; i < track_objects.length; ++i)
             {
-                History.Create_NewPoint();
-                track_objects2[0].trackEnd();
-                drawingObjects.showDrawingObjects(true);
+                track_objects2.push(track_objects[i]);
             }
-        };
-        this.drawingObjects.objectLocker.checkObjects(callback);
+
+            var drawingObjects = this.drawingObjects;
+            var callback = function(bLock)
+            {
+                if(bLock)
+                {
+                    History.Create_NewPoint();
+                    track_objects2[0].trackEnd();
+                    drawingObjects.showDrawingObjects(true);
+                }
+            };
+            this.drawingObjects.objectLocker.checkObjects(callback);
+        }
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));

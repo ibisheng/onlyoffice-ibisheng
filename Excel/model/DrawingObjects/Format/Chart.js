@@ -218,13 +218,6 @@ CChartAsGroup.prototype =
 
 
 
-    addToDrawingObjects: function()
-    {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-		this.select(this.drawingObjects.controller);
-        this.drawingObjects.addGraphicObject(this, null, true);
-    },
-
 
     getTransform: function()
     {
@@ -737,14 +730,24 @@ CChartAsGroup.prototype =
     },
 
 
-
     deleteDrawingBase: function()
     {
         var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
         if(isRealNumber(position))
         {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+            var data = new UndoRedoDataGOSingleProp(position, null);
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
+            this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Remove, data.oldValue, 1, data));
         }
+        return position;
+    },
+
+    addToDrawingObjects: function(pos)
+    {
+        var position = this.drawingObjects.addGraphicObject(this, pos, true);
+        var data = new UndoRedoDataGOSingleProp(position, null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, data), null);
+        this.drawingObjects.controller.addContentChanges(new CContentChangesElement(contentchanges_Add, data.oldValue, 1, data));
     },
 
     initFromChartObject: function(chart, options)
@@ -1535,6 +1538,10 @@ CChartAsGroup.prototype =
 
     setExtents: function(extX, extY)
     {
+        if(!this.spPr.xfrm)
+        {
+            this.setXfrmObject(new CXfrm());
+        }
         this.spPr.xfrm.setExtents(extX, extY);
     },
 
@@ -1833,11 +1840,30 @@ CChartAsGroup.prototype =
             }
             case historyitem_AutoShapes_Add_To_Drawing_Objects:
             {
+                var pos;
+                if(data.bCollaborativeChanges)
+                {
+                    pos = this.drawingObjects.controller.contentChanges.Check(contentchanges_Add, data.oldValue);
+                }
+                else
+                {
+                    pos = data.oldValue;
+                }
                 this.drawingObjects.addGraphicObject(this, data.oldValue);
                 break;
             }
-			case historyitem_AutoShapes_DeleteDrawingBase:
+
+            case historyitem_AutoShapes_DeleteDrawingBase:
             {
+                var pos;
+                if(data.bCollaborativeChanges)
+                {
+                    pos = this.drawingObjects.controller.contentChanges.Check(contentchanges_Remove, data.oldValue);
+                }
+                else
+                {
+                    pos = data.oldValue;
+                }
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
