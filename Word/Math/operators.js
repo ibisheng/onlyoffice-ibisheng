@@ -2409,9 +2409,9 @@ COperator.prototype.init = function(props, defaultProps)        // props (chr, t
         };
         operator.init(props);
     }
-    else if(type === BRACKET_EMPTY)
+    else if(type === OPERATOR_EMPTY)
     {
-        typeOper = BRACKET_EMPTY;
+        typeOper = OPERATOR_EMPTY;
         operator = -1;
     }
 
@@ -2534,19 +2534,28 @@ COperator.prototype.getProps = function(props, defaultProps)
 
     var bDelimiter = this.type == OPER_DELIMITER || this.type == OPER_SEPARATOR,
         bNotType = typeof(props.type)=="undefined" ||  props.type == null,
-        bEmptyStr = typeof(chr) === "string" && chr.length == 0,
+        bStr = typeof(chr) === "string",
+        bEmptyStr = bStr && chr.length == 0,
         bCode = typeof(chr) === "string" && chr.length > 0;
 
     var code = bCode ? chr.charCodeAt(0) : null;
 
-    var bDPrpDelim =  bDelimiter && bNotType && bEmptyStr,
+    var bDPrpDelim =  bDelimiter && bNotType && !bStr,
         bDPrpOther =  !bDelimiter && bNotType && !bCode;
 
-    if(bDPrpDelim || bDPrpOther)
+    var bDefault = bDPrpDelim || bDPrpOther,
+        bEmpty = bDelimiter && bEmptyStr;
+
+
+    if(bDefault)
     {
         type = defaultProps.type;
         if(defaultProps.loc !== null && typeof(defaultProps.loc)!== "undefined")
             location = defaultProps.loc;
+    }
+    else if(bEmpty)
+    {
+        type = OPERATOR_EMPTY;
     }
 
     return  {loc: location, type: type, code: code};
@@ -2721,16 +2730,6 @@ CDelimiter.prototype.init = function(props)
         this.grow = true;
     else if(props.grow == false || props.grow == 0)
         this.grow = false;
-		
-	if(props.begChr == undefined)
-        props.begChrType = PARENTHESIS_LEFT;
-
-    if(props.endChr == undefined)
-        props.endChrType = PARENTHESIS_RIGHT;
-
-    if(props.sepChr == undefined && props.column >1)
-        props.sepChrType = DELIMITER_LINE;
-
 
     var begPrp =
     {

@@ -55,7 +55,7 @@ var BOX_ALIGN               	=  2;
 var BOX_BREAK               	=  3;
 var BOX_NOBREAK             	=  4;
 
-var BRACKET_EMPTY               = -1;
+var OPERATOR_EMPTY              = -1;
 var PARENTHESIS_LEFT        	=  0;
 var PARENTHESIS_RIGHT       	=  1;
 var BRACKET_CURLY_LEFT      	=  2;
