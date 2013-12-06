@@ -21699,7 +21699,7 @@ CTableCell.prototype =
                 else
                 {
                     Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
+                    Data.New.writeToBinaryCollaborative( Writer );
                 }
 
                 break;
@@ -21745,7 +21745,7 @@ CTableCell.prototype =
                     else
                     {
                         Writer.WriteBool( false );
-                        Data.New.Write_ToBinary( Writer );
+                        Data.New.writeToBinaryCollaborative( Writer );
                     }
                 }
 
@@ -21882,7 +21882,7 @@ CTableCell.prototype =
                 else
                 {
                     this.Pr.Shd = new CDocumentShd();
-                    this.Pr.Shd.Read_FromBinary( Reader );
+                    this.Pr.Shd.readFromBinaryCollaborative( Reader );
                 }
 
                 this.Recalc_CompiledPr();
@@ -21925,7 +21925,7 @@ CTableCell.prototype =
                     else
                     {
                         this.Pr.TableCellBorders.Left = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Left.Read_FromBinary( Reader );
+                        this.Pr.TableCellBorders.Left.readFromBinaryCollaborative( Reader );
                     }
                 }
 
@@ -21953,7 +21953,7 @@ CTableCell.prototype =
                     else
                     {
                         this.Pr.TableCellBorders.Right = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Right.Read_FromBinary( Reader );
+                        this.Pr.TableCellBorders.Right.readFromBinaryCollaborative( Reader );
                     }
                 }
 
@@ -21981,7 +21981,7 @@ CTableCell.prototype =
                     else
                     {
                         this.Pr.TableCellBorders.Top = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Top.Read_FromBinary( Reader );
+                        this.Pr.TableCellBorders.Top.readFromBinaryCollaborative( Reader );
                     }
                 }
 
@@ -22009,7 +22009,7 @@ CTableCell.prototype =
                     else
                     {
                         this.Pr.TableCellBorders.Bottom = new CDocumentBorder();
-                        this.Pr.TableCellBorders.Bottom.Read_FromBinary( Reader );
+                        this.Pr.TableCellBorders.Bottom.readFromBinaryCollaborative( Reader );
                     }
                 }
 

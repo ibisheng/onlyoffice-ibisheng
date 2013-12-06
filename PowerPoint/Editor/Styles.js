@@ -2844,6 +2844,44 @@ CDocumentShd.prototype =
             this.Color.Read_FromBinary(Reader);
         else
             this.Color.Set(0, 0, 0);
+    },
+
+    writeToBinaryCollaborative: function(w)
+    {
+        w.WriteByte(this.Value);
+        w.WriteBool(isRealObject(this.unifill));
+        if(isRealObject(this.unifill))
+        {
+            this.unifill.Write_ToBinary2(w);
+        }
+        w.WriteBool(isRealObject(this.fillRef));
+        if(isRealObject(this.fillRef))
+        {
+            this.fillRef.Write_ToBinary2(w);
+        }
+    },
+
+    readFromBinaryCollaborative: function(r)
+    {
+        this.Value = r.GetByte();
+        if(r.GetBool())
+        {
+            this.unifill = new CUniFill();
+            this.unifill.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.unifill = null;
+        }
+        if(r.GetBool())
+        {
+            this.fillRef = new StyleRef();
+            this.fillRef.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.fillRef = null;
+        }
     }
 };
 
@@ -2986,6 +3024,51 @@ CDocumentBorder.prototype =
         this.Space = Reader.GetLong();
         this.Value = Reader.GetByte();
         this.Color.Read_FromBinary( Reader );
+    },
+
+
+    writeToBinaryCollaborative: function(w)
+    {
+        this.Color.Write_ToBinary(w);
+        w.WriteLong(this.Space);
+        w.WriteDouble(this.Size);
+        w.WriteByte(this.Value);
+        w.WriteBool(isRealObject(this.unifill));
+        if(isRealObject(this.unifill))
+        {
+            this.unifill.Write_ToBinary2(w);
+        }
+        w.WriteBool(isRealObject(this.lnRef));
+        if(isRealObject(this.lnRef))
+        {
+            this.lnRef.Write_ToBinary2(w);
+        }
+    },
+
+    readFromBinaryCollaborative: function(r)
+    {
+        this.Color.Read_FromBinary(r);
+        this.Space = r.GetLong();
+        this.Size  = r.GetDouble();
+        this.Value = r.GetByte();
+        if(r.GetBool())
+        {
+            this.unifill = new CUniFill();
+            this.unifill.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.unifill = null;
+        }
+        if(r.GetBool())
+        {
+            this.lnRef = new StyleRef();
+            this.lnRef.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.lnRef = null;
+        }
     }
 }
 
