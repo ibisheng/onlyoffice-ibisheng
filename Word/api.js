@@ -628,8 +628,8 @@ function asc_docs_api(name)
 		this.chartStyleManager = new ChartStyleManager();
 	else
 		this.chartStyleManager = null;
-	if(typeof chartPreviewManager != "undefined)
-		this.chartPreviewManager = new chartPreviewManager();
+	if(typeof ChartPreviewManager != "undefined")
+		this.chartPreviewManager = new ChartPreviewManager();
 	else
 		this.chartPreviewManager = null;
 		
