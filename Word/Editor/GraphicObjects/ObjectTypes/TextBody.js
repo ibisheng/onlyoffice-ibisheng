@@ -892,6 +892,30 @@ CTextBody.prototype =
         }
     },
 
+    getDocContentForCopyPaste: function()
+    {
+        var history_is_on = History.Is_On();
+        if(history_is_on)
+            History.TurnOff();
+        var ret = this.content.Copy(this);
+        ret.Styles = this.content.Styles;
+        ret.Recalculate_Page(0, true);
+        ret.CurPos = this.content.CurPos;
+        ret.Selection = this.content.Selection;
+        for(var i = 0; i < ret.Content.length; ++i)
+        {
+            var text_pr = ret.Content[i].Get_CompiledPr2().TextPr;
+            ret.Content[i].Style_Remove();
+            var start_pos = ret.Content[i].Internal_GetStartPos();
+            ret.Content[i].Internal_Content_Add(start_pos, new ParaTextPr(text_pr), true);
+            ret.Content[i].CurPos = this.content.Content[i].CurPos;
+            ret.Content[i].Selection = this.content.Content[i].Selection;
+        }
+        if(history_is_on)
+            History.TurnOn();
+        return ret;
+    },
+
     copyFromOther: function(txBody)
     {
         if(isRealObject(this.parent) && this.parent.setBodyPr)

@@ -1599,6 +1599,14 @@ CopyProcessor.prototype =
                                 oDocument = text_object.textBoxContent;
                             break;
                         }
+                        case STATES_ID_CHART_TITLE_TEXT:
+                        case STATES_ID_CHART_TITLE_TEXT_GROUP:
+                        {
+                            var text_object = oDocument.DrawingObjects.curState.title;
+                            if(text_object != null &&  text_object.txBody != null &&  text_object.txBody != null)
+                                oDocument = text_object.txBody.getDocContentForCopyPaste();
+                            break;
+                        }
 
                         case STATES_ID_GROUP:
                         {
@@ -1675,13 +1683,12 @@ CopyProcessor.prototype =
 								var sBase64 = this.oBinaryFileWriter.GetResult();
 								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
 								{
-									$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+									$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
 								}
 								if(this.ElemToSelect.children[0])
 									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 							}
-							
                             return;
                         }
                         default :
@@ -2806,6 +2813,14 @@ PasteProcessor.prototype =
                         text_object = oDocument.DrawingObjects.curState.textObject;
                         if(text_object != null &&  text_object.textBoxContent != null)
                             oDocument = text_object.textBoxContent;
+                        break;
+                    }
+                    case STATES_ID_CHART_TITLE_TEXT:
+                    case STATES_ID_CHART_TITLE_TEXT_GROUP:
+                    {
+                        text_object = oDocument.DrawingObjects.curState.title;
+                        if(text_object != null &&  text_object.txBody != null && text_object.txBody.content != null)
+                            oDocument = text_object.txBody.content;
                         break;
                     }
                 }
