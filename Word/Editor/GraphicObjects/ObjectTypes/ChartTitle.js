@@ -81,6 +81,11 @@ CChartTitle.prototype =
         return this.Id;
     },
 
+    Is_DrawingShape : function()
+    {
+        return false;
+    },
+
     getTitleType: function()
     {
         if(this === this.chartGroup.chartTitle)
