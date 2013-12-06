@@ -1118,11 +1118,11 @@ CGraphicObjects.prototype = {
             }
 
             this.State.textObject.updateInterfaceTextState();
-            if(this.State.textObject.isTable && this.State.textObject.isTable())
-            {
-                editor.sync_TblPropCallback(this.State.textObject.graphicObject.Get_Props());
-                this.slide.presentation.DrawingDocument.CheckTableStyles(this.State.textObject.graphicObject.Get_TableLook(), this.State.textObject);
-            }
+            //if(this.State.textObject.isTable && this.State.textObject.isTable())
+            //{
+            //    editor.sync_TblPropCallback(this.State.textObject.graphicObject.Get_Props());
+            //    this.slide.presentation.DrawingDocument.CheckTableStyles(this.State.textObject.graphicObject.Get_TableLook(), this.State.textObject);
+            //}
         }
         else
         {

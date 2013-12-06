@@ -2058,7 +2058,11 @@ function CBorder (obj)
         this.Size = (undefined != obj.Size) ? obj.Size : null;
         this.Value = (undefined != obj.Value) ? obj.Value : null;
         this.Space = (undefined != obj.Space) ? obj.Space : null;
-        this.unifill = (undefined != obj.unifill) ? CreateAscFill(obj.unifill) : null;
+        this.fill = (undefined != obj.unifill) ? CreateAscFill(obj.unifill) : null;
+        if(obj.fill != undefined)
+        {
+            this.fill = obj.fill;
+        }
     }
     else
     {
@@ -2083,12 +2087,12 @@ CBorder.prototype.put_ForSelectedCells = function(v){this.ForSelectedCells = v;}
 
 CBorder.prototype.put_Fill = function(v)
 {
-    this.unifill = v;
+    this.fill = v;
 }
 
 CBorder.prototype.get_Fill = function()
 {
-    return this.unifill;
+    return this.fill;
 }
 
 CBorder.prototype.put_LnRef = function(v)

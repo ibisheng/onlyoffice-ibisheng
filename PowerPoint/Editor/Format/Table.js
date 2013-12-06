@@ -20712,7 +20712,9 @@ CTableCell.prototype =
             var Shd_new =
             {
                 Value : OtherPr.Shd.Value,
-                Color : { r : OtherPr.Shd.Color.r, g : OtherPr.Shd.Color.g, b : OtherPr.Shd.Color.b }
+                Color : { r : OtherPr.Shd.Color.r, g : OtherPr.Shd.Color.g, b : OtherPr.Shd.Color.b },
+                unifill: OtherPr.Shd.unifill ? OtherPr.Shd.unifill.createDuplicate() : null,
+                fillRef: OtherPr.Shd.fillRef ? OtherPr.Shd.fillRef.createDuplicate() : null
             };
 
             this.Set_Shd( Shd_new );
@@ -20737,7 +20739,8 @@ CTableCell.prototype =
                 Value : OtherPr.TableCellBorders.Top.Value,
                 Size  : OtherPr.TableCellBorders.Top.Size,
                 Color : { r : OtherPr.TableCellBorders.Top.Color.r, g : OtherPr.TableCellBorders.Top.Color.g, b : OtherPr.TableCellBorders.Top.Color.b },
-                Space : OtherPr.TableCellBorders.Top.Space
+                Space : OtherPr.TableCellBorders.Top.Space,
+                unifill: OtherPr.TableCellBorders.Top.unifill ? OtherPr.TableCellBorders.Top.unifill.createDuplicate() : null
             } );
 
             this.Set_Border( Border_top_new, 0 );
@@ -20753,7 +20756,8 @@ CTableCell.prototype =
                 Value : OtherPr.TableCellBorders.Bottom.Value,
                 Size  : OtherPr.TableCellBorders.Bottom.Size,
                 Color : { r : OtherPr.TableCellBorders.Bottom.Color.r, g : OtherPr.TableCellBorders.Bottom.Color.g, b : OtherPr.TableCellBorders.Bottom.Color.b },
-                Space : OtherPr.TableCellBorders.Bottom.Space
+                Space : OtherPr.TableCellBorders.Bottom.Space,
+                unifill: OtherPr.TableCellBorders.Bottom.unifill ? OtherPr.TableCellBorders.Bottom.unifill.createDuplicate() : null
             } );
 
             this.Set_Border( Border_bottom_new, 2 );
@@ -20769,7 +20773,8 @@ CTableCell.prototype =
                 Value : OtherPr.TableCellBorders.Left.Value,
                 Size  : OtherPr.TableCellBorders.Left.Size,
                 Color : { r : OtherPr.TableCellBorders.Left.Color.r, g : OtherPr.TableCellBorders.Left.Color.g, b : OtherPr.TableCellBorders.Left.Color.b },
-                Space : OtherPr.TableCellBorders.Left.Space
+                Space : OtherPr.TableCellBorders.Left.Space ,
+                unifill: OtherPr.TableCellBorders.Left.unifill ? OtherPr.TableCellBorders.Left.unifill.createDuplicate() : null
             } );
 
             this.Set_Border( Border_left_new, 3 );
@@ -20785,7 +20790,8 @@ CTableCell.prototype =
                 Value : OtherPr.TableCellBorders.Right.Value,
                 Size  : OtherPr.TableCellBorders.Right.Size,
                 Color : { r : OtherPr.TableCellBorders.Right.Color.r, g : OtherPr.TableCellBorders.Right.Color.g, b : OtherPr.TableCellBorders.Right.Color.b },
-                Space : OtherPr.TableCellBorders.Right.Space
+                Space : OtherPr.TableCellBorders.Right.Space,
+                unifill: OtherPr.TableCellBorders.Right.unifill ? OtherPr.TableCellBorders.Right.unifill.createDuplicate() : null
             } );
 
             this.Set_Border( Border_right_new, 1 );
@@ -21241,6 +21247,7 @@ CTableCell.prototype =
             NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : NewBorder.Color.r );
             NewBorder.Color.g = ( null != Border.Color ? Border.Color.g : NewBorder.Color.g );
             NewBorder.Color.b = ( null != Border.Color ? Border.Color.b : NewBorder.Color.b );
+            NewBorder.unifill = Border.unifill ? Border.unifill.createDuplicate() : null;
 
             History.Add( this, { Type : HistoryType, Old : null, New : NewBorder } );
 
@@ -21262,6 +21269,7 @@ CTableCell.prototype =
             NewBorder.Color.r = ( null != Border.Color ? Border.Color.r : DstBorder.Color.r );
             NewBorder.Color.g = ( null != Border.Color ? Border.Color.g : DstBorder.Color.g );
             NewBorder.Color.b = ( null != Border.Color ? Border.Color.b : DstBorder.Color.b );
+            NewBorder.unifill = Border.unifill ? Border.unifill.createDuplicate() : null;
 
             History.Add( this, { Type : HistoryType, Old : DstBorder, New : NewBorder } );
 
