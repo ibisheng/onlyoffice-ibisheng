@@ -107,8 +107,8 @@
 				"../../Excel/model/DrawingObjects/DrawingDocument.js",
 				"../../Excel/model/DrawingObjects/ShapeDrawer.js",
                 "../../Word/apiCommon.js",
-                "../../Excel/api.js"
-                "../../Common/Shapes/EditorSettings.js",				
+                "../../Excel/api.js",
+                "../../Common/Shapes/EditorSettings.js"
             ],
             "dst": "../../Excel/sdk-all.js"
         }
