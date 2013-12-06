@@ -132,7 +132,6 @@ function asc_docs_api(name)
 		this.chartTranslate = new asc_CChartTranslate();
 	else
 		this.chartTranslate = null;
-    /** proprietary end **/
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
