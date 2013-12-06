@@ -2077,14 +2077,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var deleteCallback = function (res) {
 					if (res) {
 						
-						History.Create_NewPoint();
+						/*History.Create_NewPoint();
 						History.StartTransaction();
 						
 						// Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
 						for (var key in t.wb.wsViews) {
 							var ws = t.wb.wsViews[key];
 							ws.objectRender.updateChartReferences(activeName, ws.model.sName);
-						}
+						}*/
 						
 						// Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)
 						var activeNow = t.wbModel.removeWorksheet(i);
@@ -2095,7 +2095,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							t.sheetsChanged();
 						}
 						
-						History.EndTransaction();
+						//History.EndTransaction();
 					}
 				};
 
