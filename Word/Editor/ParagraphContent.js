@@ -7580,8 +7580,12 @@ ParaMath.prototype =
         else if ( para_Space === Type )
             this.Math.AddLetter( 0x0020 );
         else if ( para_Math === Type )
-        {
-            // TODO: реализовать
+        {		
+			var oCorContent =  this.Math.CurrentContent;
+			var rPr = oCorContent.getRpr();
+			Item.Root.setRPrp(rPr);
+			oCorContent.AddContentToContent(Item.Math.Root);
+			oCorContent.verifyRPrp_MC_2(rPr);	
         }
     },
 
