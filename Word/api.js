@@ -623,10 +623,16 @@ function asc_docs_api(name)
     this.DocumentReaderMode = null;
 	
 	this.isChartEditor = false;
-    /** proprietary begin **/
-	this.chartStyleManager = new ChartStyleManager();
-	this.chartPreviewManager = new ChartPreviewManager();
-    /** proprietary end **/
+	
+	if(typeof ChartStyleManager != "undefined")
+		this.chartStyleManager = new ChartStyleManager();
+	else
+		this.chartStyleManager = null;
+	if(typeof chartPreviewManager != "undefined)
+		this.chartPreviewManager = new chartPreviewManager();
+	else
+		this.chartPreviewManager = null;
+		
     this.IsLongActionCurrent = false;
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
