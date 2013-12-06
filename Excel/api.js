@@ -2069,20 +2069,33 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					return false;
 
 				var i = this.wbModel.getActive();
+				var activeName = this.wbModel.getWorksheet(i).sName;
 				var sheetId = this.wbModel.getWorksheet(i).getId();
 				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
 				var t = this;
 				var deleteCallback = function (res) {
 					if (res) {
+						
+						History.Create_NewPoint();
+						History.StartTransaction();
+						
+						// Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
+						for (var key in t.wb.wsViews) {
+							var ws = t.wb.wsViews[key];
+							ws.objectRender.updateChartReferences(activeName, ws.model.sName);
+						}
+						
 						// Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)
 						var activeNow = t.wbModel.removeWorksheet(i);
 						if (-1 !== activeNow){
 							t.wb.removeWorksheet(i);
-							t.asc_showWorksheet (activeNow);
+							t.asc_showWorksheet(activeNow);
 							// Посылаем callback об изменении списка листов
 							t.sheetsChanged();
 						}
+						
+						History.EndTransaction();
 					}
 				};
 

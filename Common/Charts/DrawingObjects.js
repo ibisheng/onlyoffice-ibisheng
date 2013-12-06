@@ -4386,10 +4386,19 @@ function DrawingObjects() {
 
 	_this.updateChartReferences = function(oldWorksheet, newWorksheet) {
 		
+		History.Create_NewPoint();
+		History.StartTransaction();
 		for (var i = 0; i < aObjects.length; i++) {
 			var graphicObject = aObjects[i].graphicObject;
 			if ( graphicObject.isChart() && (graphicObject.chart.range.interval.indexOf(oldWorksheet) == 0) ) {
+			
+				var _interval = graphicObject.chart.range.interval;
 				graphicObject.chart.range.interval = graphicObject.chart.range.interval.replace(oldWorksheet, newWorksheet);
+				
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, graphicObject.chart.range.interval)));
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+				
 				var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
 				if ( _range ) {
 					graphicObject.chart.range.intervalObject = _range;
@@ -4398,6 +4407,7 @@ function DrawingObjects() {
 				}
 			}
 		}
+		History.EndTransaction();
 	}
 	
 	//-----------------------------------------------------------------------------------

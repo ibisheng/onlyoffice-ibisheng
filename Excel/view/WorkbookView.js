@@ -1120,8 +1120,7 @@
 				}
 			},
 			
-			updateWorksheetByModel : function()
-			{
+			updateWorksheetByModel : function() {
 				//расставляем ws так как они идут в модели.
 				var oNewWsViews = new Array();
 				for(var i in this.wsViews)
