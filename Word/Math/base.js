@@ -252,7 +252,7 @@ CMathBase.prototype =
     {
         this.Parent = parent;
     },
-    cursor_moveLeft: function()
+    old_cursor_moveLeft: function()
     {
         var bUpperLevel = false;
         //var oldPos = {x: this.CurPos_X, y: this.CurPos_Y}; //старая позиция нужна когда  только в случае если находимся в базовом контенте, а здесь нет, т.к. всегда есть родитель
@@ -290,7 +290,7 @@ CMathBase.prototype =
 
         return { SelectContent: content };
     },
-    cursor_moveRight: function()
+    old_cursor_moveRight: function()
     {
         var bUpperLevel = false;
 
@@ -359,7 +359,7 @@ CMathBase.prototype =
             }
         }
 
-        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
+        //this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
 
         return this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement();
     },
@@ -380,7 +380,7 @@ CMathBase.prototype =
             }
         }
 
-        this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
+        //this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToStartPos();  //   home => cursor_MoveToStartPos
 
         return this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
     },
@@ -521,7 +521,7 @@ CMathBase.prototype =
 
         return content;
     },
-    cursor_MoveToStartPos: function() //   home => cursor_MoveToStartPos
+    /*cursor_MoveToStartPos: function() //   home => cursor_MoveToStartPos
     {
         this.CurPos_X = 0;
         this.CurPos_Y = 0;
@@ -559,7 +559,7 @@ CMathBase.prototype =
 
          this.elements[this.CurPos_X][this.CurPos_Y].cursor_MoveToEndPos();  //  end => cursor_MoveToEndPos
 
-    },
+    },*/
     mouseUp: function()
     {
         this.elements[this.CurPos_X][this.CurPos_Y].mouseUp();
@@ -1007,6 +1007,8 @@ CMathBase.prototype =
 
         if(startX == endX && startY == endY && bInside === -1)
         {
+            this.CurPos_X = startX;
+            this.CurPos_Y = startY;
             var movement = this.elements[endX][endY].selection_End(X, Y);
             SelectContent = movement.SelectContent;
             state = true;
@@ -1015,5 +1017,73 @@ CMathBase.prototype =
             state = false;
 
         return {state: state, SelectContent: SelectContent};
+    },
+    goToLeft: function()
+    {
+        var bUpperLevel = false;
+
+        do{
+            if( this.CurPos_Y > 0  )
+            {
+                this.CurPos_Y--;
+            }
+            else if(this.CurPos_X > 0)
+            {
+                this.CurPos_X--;
+                this.CurPos_Y = this.nCol - 1;
+            }
+            else
+            {
+                bUpperLevel = true;
+                break;
+            }
+        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+
+        //из цикла вышли если bJustDraw = false  or  bUpperLevel = true
+
+        var SelectContent;
+        if(bUpperLevel)
+        {
+            SelectContent = this.Parent.goToLeft();
+        }
+        else
+        {
+            SelectContent = this.elements[this.CurPos_X][this.CurPos_Y].goToLastElement(); //если внутренний элемент не контент, а базовый класс, вернется последний элемент этого класса
+        }
+
+        return SelectContent;
+    },
+    goToRight: function()
+    {
+        var bUpperLevel = false;
+
+        do{
+            if( this.CurPos_Y < this.nCol - 1 )
+            {
+                this.CurPos_Y++;
+            }
+            else if(this.CurPos_X < this.nRow - 1)
+            {
+                this.CurPos_X++;
+                this.CurPos_Y = 0;
+            }
+            else
+            {
+                bUpperLevel = true;
+                break;
+            }
+        } while( this.elements[this.CurPos_X][this.CurPos_Y].IsJustDraw() )
+
+        var SelectContent;
+        if( bUpperLevel )
+        {
+            SelectContent = this.Parent.goToRight();
+        }
+        else
+        {
+            SelectContent = this.elements[this.CurPos_X][this.CurPos_Y].goToFirstElement();
+        }
+
+        return SelectContent;
     }
 }

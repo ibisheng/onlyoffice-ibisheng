@@ -16,6 +16,8 @@
 // При удаление из начала контента элемента, у всех остальных автоматом 11 размер шрифта
 
 /// TODO
+
+//  1. после того, как будет реализован селект с учетом RunPrp, убрать проверки из remove на RunPrp (!)
 //  1. properties для записи в файл
 //  2. плейсхолдер на чтение
 //  3. убрать slashWidth
@@ -26,6 +28,7 @@
 
 
 /// TODO
+
 // !!! Проверить типы для groupCharacter, delimiters и accent
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
 // 2. Убрать ненужные(!!) setTxtPrp и getTxtPrp
@@ -3640,7 +3643,7 @@ CMathContent.prototype =
     },
 
     /////////   перемещение     //////////
-    old_cursor_moveRight: function()
+    old_old_cursor_moveRight: function()
     {
         var state = true,
             SelectContent = null, CurrContent = null;
@@ -3716,7 +3719,7 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent, CurrContent: CurrContent };
     },
-    cursor_moveRight: function()
+    old_cursor_moveRight: function()
     {
         var state = true,
             SelectContent = null, CurrContent = null;
@@ -3821,13 +3824,111 @@ CMathContent.prototype =
 
         return res;
     },
-    cursor_moveLeft2: function()
+    cursor_moveLeft: function(bShiftKey, bCtrlKey)
     {
-        //когда возвращаем наверх, проверяем на bRoot
+        var state = true,
+            SelectContent = null;
 
+        if(bShiftKey)
+        {
 
+        }
+        else
+        {
+            var pos;
 
+            if(!this.selectUse())
+                pos = this.changeSelectPosition(this.CurPos, -1);
+            else
+            {
+                var start = this.RealSelect.startPos,
+                    end   = this.RealSelect.endPos;
 
+                pos = start < end ? start : end;
+            }
+
+            if(pos !== -1)
+            {
+                this.CurPos = pos;
+
+                if(this.content[pos].value.typeObj == MATH_COMP)
+                    SelectContent = this.content[pos].value.goToLastElement();
+                else
+                    SelectContent = this;
+            }
+            else
+            {
+                if(!this.bRoot)
+                {
+                    SelectContent = this.Parent.goToLeft();
+                }
+                else
+                    state = false;
+            }
+
+        }
+
+        return {state: state, SelectContent: SelectContent};
+    },
+    goToLeft: function()
+    {
+        var SelectContent = this;
+        this.CurPos--; // в принципе, вызов changeSelectPosition(...) приведет к этому действию
+
+        return SelectContent;
+    },
+    cursor_moveRight: function(bShiftKey, bCtrlKey)
+    {
+        var state = true,
+            SelectContent = null;
+
+        if(bShiftKey)
+        {
+
+        }
+        else
+        {
+            var pos;
+
+            if(!this.selectUse())
+                pos = this.changeSelectPosition(this.CurPos, 1);
+            else
+            {
+                var start = this.RealSelect.startPos,
+                    end   = this.RealSelect.endPos;
+
+                pos = start > end ? start : end;
+            }
+
+            if(pos !== -1)
+            {
+                this.CurPos = pos;
+
+                if(this.content[pos].value.typeObj == MATH_COMP)
+                    SelectContent = this.content[pos].value.goToFirstElement();
+                else
+                    SelectContent = this;
+            }
+            else
+            {
+                if(!this.bRoot)
+                {
+                    SelectContent = this.Parent.goToRight();
+                }
+                else
+                    state = false;
+            }
+
+        }
+
+        return {state: state, SelectContent: SelectContent};
+    },
+    goToRight: function()
+    {
+        var SelectContent = this;
+        this.CurPos = this.changeSelectPosition(this.CurPos, 1);
+
+        return SelectContent;
     },
     getPos_toMoveLeft: function()
     {
@@ -3856,7 +3957,6 @@ CMathContent.prototype =
         }
         else if(!bStartRoot || this.selectUse()) // не в начале
         {
-
             if(this.selectUse())
             {
                 var start = this.RealSelect.start,
@@ -3945,7 +4045,7 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent, pos: pos};
     },
-    cursor_moveLeft: function()
+    old_cursor_moveLeft: function()
     {
         var state = true,
             SelectContent = null, CurrContent = null;
@@ -4056,10 +4156,12 @@ CMathContent.prototype =
     },
     goToLastElement: function()
     {
+        this.cursor_MoveToEndPos();
         return this;
     },
     goToFirstElement: function()
     {
+        this.cursor_MoveToStartPos();
         return this;
     },
     goToLowerLevel: function( coord )
@@ -4295,8 +4397,56 @@ CMathContent.prototype =
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
 
+    changeSelectPosition: function(pos, order)
+    {
+        var posChange = -1;
+        var currType   = this.content[pos].value.typeObj,
+            prevType   = pos - 1 > 0 ? this.content[pos-1].value.typeObj : null,
+            prev2_Type = pos - 2 > 0 ? this.content[pos-2].value.typeObj : null,
+            nextType   = pos + 1 < this.content.length ? this.content[pos+1].value.typeObj : null,
+            next2_Type = pos + 2 < this.content.length ? this.content[pos+2].value.typeObj : null;
+
+        //////   проверка на начало и конец  контента //////
+        var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
+        var bFirst = bFirstRunPrp || this.CurPos == 0;
+
+        var bPlh = this.IsPlaceholder();
+
+        var bLeft =  order == -1 && !bFirst && !bPlh,
+            bRight = order == 1 && this.CurPos !== this.content.length - 1 && !bPlh;
+
+        ////////////////////////////////////////////////////
+
+        /*var bLeftTextRPrp  = currType == MATH_RUN_PRP && prevType == MATH_TEXT,
+            bRightTextRPrp = nextType == MATH_TEXT && next2_Type == MATH_RUN_PRP;*/
+
+
+        /*var bLeft2Comp  = currType == MATH_EMPTY && prevType == MATH_COMP,
+            bRight2Comp = nextType == MATH_EMPTY && next2_Type !== MATH_RUN_PRP;*/
+
+        /*var bLeftCompRPrp  = currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP,
+            bRightCompRPrp = nextType == MATH_EMPTY && next2_Type == MATH_RUN_PRP;*/
+
+
+        if(bLeft)
+        {
+            if(currType == MATH_RUN_PRP)  // перепрыгнули через RunPrp, неважно какой предыдущий элемент
+                posChange = pos - 2;
+            else
+                posChange = pos - 1;
+        }
+        else if(bRight)
+        {
+            if(next2_Type == MATH_RUN_PRP) // перепрыгнули через RunPrp, неважно какой следующий элемент за текущим
+                posChange = pos + 2;
+            else
+                posChange = pos + 1;
+        }
+
+        return posChange;
+    },
     // выставить курсор в начало конента
-    cursor_MoveToStartPos: function()  //   home => cursor_MoveToStartPos
+    cursor_MoveToStartPos: function()  //  home => cursor_MoveToStartPos
     {
         if( !this.IsEmpty() )
         {
@@ -5853,7 +6003,6 @@ CMathContent.prototype =
             {
                 this.RealSelect.startPos -= 2;
             }
-
         }
     },
     selection_check:  function(X, Y)
@@ -6568,21 +6717,28 @@ CMathComposition.prototype =
     {
         return this.Root.getFirstPrp();
     },
-    Cursor_MoveLeft: function()
+    Cursor_MoveLeft: function(bShiftKey, bCtrlKey)
     {
-        var move = this.SelectContent.cursor_moveLeft();
+        var move = this.SelectContent.cursor_moveLeft(bShiftKey, bCtrlKey);
 
         if(move.state)
         {
-            this.SelectContent = move.SelectContent;
-            this.CurrentContent = move.CurrContent;
+            if(bShiftKey)
+            {
+
+            }
+            else
+            {
+                 this.SelectContent = move.SelectContent;
+                 this.CurrentContent = move.CurrContent;
+            }
         }
 
         return move.state;
     },
-    Cursor_MoveRight: function()
+    Cursor_MoveRight: function(bShiftKey, bCtrlKey)
     {
-        var move = this.SelectContent.cursor_moveRight();
+        var move = this.SelectContent.cursor_moveRight(bShiftKey, bCtrlKey);
 
         //передаем состояние, т.к. можем выйти за пределы формулы
         if(move.state)
