@@ -2926,10 +2926,6 @@ PasteProcessor.prototype =
                 }
             }
         }
-        else
-        {
-            console.log("err");
-        }
 
         if(false == this.bNested && nInsertLength > 0)
         {
