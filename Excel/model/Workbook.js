@@ -7842,6 +7842,13 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		}
 	}
 };
+Range.prototype._canPromote=function(oPromoteRange){
+	var bRes = true;
+	if(null != oPromoteRange && oPromoteRange.hasMerged()){
+		bRes = false;
+	}
+	return bRes;
+}
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
@@ -7853,23 +7860,43 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		bWholeRow = true;
 	if((bWholeCol && bWholeRow) || (true == bVertical && bWholeCol) || (false == bVertical && bWholeRow))
 		return;
+	var oPromoteAscRange = null;
 	var oPromoteRange = null;
-	if(bVertical)
-	{
-		if(nHeight < nIndex)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r2 + 1, oBBox.c1, oBBox.r1 + nIndex, oBBox.c2);
-		else if(nIndex < 0)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1 + nIndex, oBBox.c1, oBBox.r1 - 1, oBBox.c2);
-	}
+	if(0 == nIndex)
+		oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2);
 	else
 	{
-		if(nWidth < nIndex)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c2 + 1, oBBox.r2, oBBox.c1 + nIndex);
-		else if(nIndex < 0)
-			oPromoteRange = this.worksheet.getRange3(oBBox.r1, oBBox.c1 + nIndex, oBBox.r2, oBBox.c1 - 1);
+		if(bVertical)
+		{
+			if(nIndex > 0)
+			{
+				if(nIndex >= nHeight)
+					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r2 + 1, oBBox.c2, oBBox.r1 + nIndex);
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
+			}
+			else if(nIndex < 0)
+				oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
+		}
+		else
+		{
+			if(nIndex > 0)
+			{
+				if(nIndex >= nWidth)
+					oPromoteAscRange = Asc.Range(oBBox.c2 + 1, oBBox.r1, oBBox.c1 + nIndex, oBBox.r2);
+				else
+					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
+			}
+			else if(nIndex < 0)
+				oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
+		}
 	}
-	if(null != oPromoteRange && oPromoteRange.hasMerged())
+	//проверяем можно ли очуществить promote
+	if(null != oPromoteAscRange)
+		oPromoteRange = this.worksheet.getRange3(oPromoteAscRange.r1, oPromoteAscRange.c1, oPromoteAscRange.r2, oPromoteAscRange.c2);
+	if(null == oPromoteRange || !this._canPromote(oPromoteRange))
 		return;
+
 	lockDraw(this.worksheet.workbook);
 	var recalcArr = [];
 	History.Create_NewPoint();
@@ -7916,421 +7943,205 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		History.SetSelectionRedo(oSelectionRedo);
 	}
     History.StartTransaction();
-	if((true == bVertical && 1 == nHeight) || (false == bVertical && 1 == nWidth))
-		bCtrl = !bCtrl;
-	var fFinishSection = function(param, oPromoteHelper)
+	var nLastCol = oPromoteAscRange.c2;
+	if(bWholeRow)
 	{
-		if(null != param && null != param.prefix)
-		{
-			if(false == oPromoteHelper.isOnlyIntegerSequence())
-			{
-				param.valid = false;
-				oPromoteHelper.removeLast();
-			}
-		}
-		oPromoteHelper.finishSection();
+		nLastCol = 0;
+		this._foreachRowNoEmpty(function(){}, function(cell){
+			var nCurCol0 = cell.oId.getCol0();
+			if(nCurCol0 > nLastCol0)
+				nLastCol0 = nCurCol0;
+		});
 	}
-    if(true == bVertical)
-    {
-		//todo слишком простое решение, возможно в случае строки надо создавать массив колонок
-		var nLastCol = oBBox.c2;
-		if(bWholeRow)
-		{
-			nLastCol = 0;
-			this._foreachRowNoEmpty(function(){}, function(cell){
-				var nCurCol0 = cell.oId.getCol0();
-				if(nCurCol0 > nLastCol0)
-					nLastCol0 = nCurCol0;
-			});
-		}
-        if(nIndex >= 0 && nHeight > nIndex)
-        {
-			//удаляем содержимое
-            for(var i = oBBox.c1; i <= nLastCol; ++i)
-            {
-                for(var j = oBBox.r1 + nIndex; j <= oBBox.r2; ++j)
-                {
-                    var oCurCell = this.worksheet._getCellNoEmpty(j, i);
-                    if(null != oCurCell)
-                        oCurCell.setValue("");
-                }
-            }
-        }
-        else
-        {
-            //копируем содержимое
-            for(var i = oBBox.c1; i <= nLastCol; ++i)
-            {
-                //пробегаемся по диапазону запоминаем ячеек смотрим какие из них числа
-                var aCells = new Array();
-				var oPromoteHelper = new PromoteHelper();
-				var oDigParams = null;
-                for(var j = oBBox.r1; j <= oBBox.r2; ++j)
-                {
-                    var oCurCell = this.worksheet._getCellNoEmpty(j, i);
-                    var nVal = null, nF = null;
-					var sCurPrefix = null;
-                    if(null != oCurCell)
-                    {
-						if (!oCurCell.sFormula)
-                        {
-							var nType = oCurCell.getType();
-							if(CellValueType.Number == nType || CellValueType.String == nType)
-							{
-                                var sValue = oCurCell.getValueWithoutFormat();
-                                if("" != sValue)
-                                {
-									if(CellValueType.Number == nType)
-										nVal = sValue - 0;
-									else
-									{
-										//если текст заканчивается на цифру тоже используем ее
-										var nEndIndex = sValue.length;
-										for(var k = sValue.length - 1; k >= 0; --k)
-										{
-											var sCurChart = sValue[k];
-											if('0' <= sCurChart && sCurChart <= '9')
-												nEndIndex--;
-											else
-												break;
-										}
-										if(sValue.length != nEndIndex)
-										{
-											sCurPrefix = sValue.substring(0, nEndIndex);
-											nVal = sValue.substring(nEndIndex) - 0;
-										}
-									}
-									if(null != nVal)
-									{
-										if(null == oDigParams)
-											oDigParams = {valid: true, prefix: sCurPrefix};
-										else if(sCurPrefix != oDigParams.prefix)
-										{
-											fFinishSection(oDigParams, oPromoteHelper);
-											oDigParams = {valid: true, prefix: sCurPrefix};
-										}
-										oPromoteHelper.add(nVal);
-									}
-									else
-									{
-										fFinishSection(oDigParams, oPromoteHelper);
-										oDigParams = null;
-									}
-                                }
-                            }
-						}
-						else{
-							fFinishSection(oDigParams, oPromoteHelper);
-							oDigParams = null;
-							nF = true;
-						}
-                    }
-					if(null == nVal)
-						aCells.push({digparams: null, cell: oCurCell, formula:nF});
-					else
-						aCells.push({digparams: oDigParams, cell: oCurCell, formula:nF});
-                }
-				fFinishSection(oDigParams, oPromoteHelper);
-				oPromoteHelper.finishAdd();
-                var bExistDigit = false;
-                if(false == bCtrl && false == oPromoteHelper.isEmpty())
-                {
-                    bExistDigit = true;
-					oPromoteHelper.calc();
-                }
-                var nCellsLength = aCells.length;
-                var nCellsIndex;
-                var nStart;
-                var nEnd;
-                var nDj;
-                var nDCellsIndex;
-                var fCondition;
-                if(nIndex > 0)
-                {
-                    nStart = oBBox.r2 + 1;
-                    nEnd = oBBox.r2 + (nIndex - nHeight + 1);
-                    nCellsIndex = 0;
-                    nDj = 1;
-                    nDCellsIndex = 1;
-                    fCondition = function(j , nEnd){return j <= nEnd;}
-                }
-                else
-                {
-					oPromoteHelper.reverse();
-                    nStart = oBBox.r1 - 1;
-                    nEnd = oBBox.r1 + nIndex;
-                    if(nEnd < 0)
-                        nEnd = 0;
-                    nCellsIndex = nCellsLength - 1;
-                    nDj = -1;
-                    nDCellsIndex = -1;
-                    fCondition = function(j , nEnd){return j >= nEnd;}
-                }
-                for(var j = nStart; fCondition(j, nEnd); j += nDj)
-                {
-                    var oCurItem = aCells[nCellsIndex];
-                    //удаляем текущее содержимое ячейки
-                    var oCurCell = this.worksheet._getCellNoEmpty(j, i);
-                    if(null != oCurCell){
-						this.worksheet._removeCell(j, i);
-					}
-                    if(null != oCurItem.cell)
-                    {
-                        var oCopyCell = this.worksheet._getCell(j, i);
-                        oCopyCell.setStyle(oCurItem.cell.getStyle());
-                        oCopyCell.setType(oCurItem.cell.getType());
-                        if(bExistDigit && null != oCurItem.digparams && true == oCurItem.digparams.valid)
-                        {
-							var dNewValue = oPromoteHelper.getNext();
-							var sVal = "";
-							if(null != oCurItem.digparams.prefix)
-								sVal += oCurItem.digparams.prefix;
-							sVal += dNewValue;
-                            oCopyCell.setValue(sVal);
-                        }
-                        else
-                        {
-                            //копируем полностью
-							if(!oCurItem.formula){
-								var DataOld = oCopyCell.getValueData();
-								oCopyCell.oValue = oCurItem.cell.oValue.clone(oCopyCell);
-								var DataNew = oCopyCell.getValueData();
-								if(false == DataOld.isEqual(DataNew))
-									History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.worksheet.getId(), new Asc.Range(0, oCopyCell.oId.getRow0(), gc_nMaxCol0, oCopyCell.oId.getRow0()), new UndoRedoData_CellSimpleData(oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), DataOld, DataNew));
-								//todo
-								// if(oCopyCell.isEmptyTextString())
-									// this.worksheet._getHyperlink().remove({r1: oCopyCell.oId.getRow0(), c1: oCopyCell.oId.getCol0(), r2: oCopyCell.oId.getRow0(), c2: oCopyCell.oId.getCol0()});
-								
-								if( !arrRecalc[this.worksheet.getId()] ){
-									arrRecalc[this.worksheet.getId()] = {};
-								}
-								arrRecalc[this.worksheet.getId()][oCopyCell.getName()] = oCopyCell.getName();
-								this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-								if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-								this.worksheet.workbook.needRecalc.length++;
-							}
-							else{
-								var assemb;
-								var _p_ = new parserFormula(oCurItem.cell.sFormula,oCopyCell.getName(),this.worksheet);
-								if( _p_.parse() ){
-									assemb = _p_.changeOffset(oCopyCell.getOffset2(oCurItem.cell.getName())).assemble();
-									oCopyCell.setValue("="+assemb);
-									
-								}
-								this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-								if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-								this.worksheet.workbook.needRecalc.length++;
-							}
-                        }
-                    }
-                    
-                    nCellsIndex += nDCellsIndex;
-                    if(nDCellsIndex > 0 && nCellsIndex >= nCellsLength)
-                        nCellsIndex = 0;
-                    else if(nCellsIndex < 0)
-                        nCellsIndex = nCellsLength - 1;
-                        
-                }
-            }
-		}
-    }
+	var nLastRow = oPromoteAscRange.r2;
+	if(bWholeCol)
+	{
+		nLastRow = 0;
+		this._foreachColNoEmpty(function(){}, function(cell){
+			var nCurRow0 = cell.oId.getRow0();
+			if(nCurRow0 > nLastRow)
+				nLastRow = nCurRow0;
+		});
+	}
+	if(nLastCol != oPromoteAscRange.c2 || nLastRow != oPromoteAscRange.r2)
+	{
+		oPromoteRange.setOffsetLast({offsetCol:nLastCol - oPromoteAscRange.c2, offsetRow:nLastRow - oPromoteAscRange.r2});
+		oPromoteAscRange = oPromoteRange.getBBox0();
+	}
+	//удаляем текст или все в области для заполнения
+	if(nIndex >= 0 && ((true == bVertical && nHeight > nIndex) || (false == bVertical && nWidth > nIndex)))
+	{
+		//удаляем только текст в области для заполнения
+		oPromoteRange.cleanText();
+	}
 	else
 	{
-		var nLastRow = oBBox.r2;
-		if(bWholeCol)
-		{
-			nLastRow = 0;
-			this._foreachColNoEmpty(function(){}, function(cell){
-				var nCurRow0 = cell.oId.getRow0();
-				if(nCurRow0 > nLastRow)
-					nLastRow = nCurRow0;
-			});
-		}
-		if(nIndex >= 0 && nWidth > nIndex)
-        {
-			//удаляем содержимое
-            for(var i = oBBox.r1; i <= nLastRow; ++i)
-            {
-                for(var j = oBBox.c1 + nIndex; j <= oBBox.c2; ++j)
-                {
-                    var oCurCell = this.worksheet._getCellNoEmpty(i, j);
-                    if(null != oCurCell)
-                        oCurCell.setValue("");
-                }
-            }
-        }
-		else
-        {
-            //копируем содержимое
-            for(var i = oBBox.r1; i <= nLastRow; ++i)
-            {
-                //пробегаемся по диапазону запоминаем ячеек смотрим какие из них числа
-                var aCells = new Array();
-				var oPromoteHelper = new PromoteHelper();
-				var oDigParams = null;
-                for(var j = oBBox.c1; j <= oBBox.c2; ++j)
-                {
-                    var oCurCell = this.worksheet._getCellNoEmpty(i, j);
-                    var nVal = null, nF = null;
-					var sCurPrefix = null;
-                    if(null != oCurCell)
-                    {
-                        if (!oCurCell.sFormula)
+		//удаляем все в области для заполнения
+		oPromoteRange.cleanAll();
+		//собираем все данные 
+		var aCells = new Array();
+		var bReverse = false;
+		if(nIndex < 0)
+			bReverse = true;
+		var oPromoteHelper = new PromoteHelper(bVertical, bReverse, oBBox);
+		this._foreachNoEmpty(function(oCell, nRow0, nCol0,nRowStart0, nColStart0){
+			 if(null != oCell)
+			 {
+				var nVal = null;
+				var bDelimiter = false;
+				var sPrefix = null;
+				var bDate = false;
+				if (!oCell.sFormula)
+				{
+					var sValue = oCell.getValueWithoutFormat();
+					if("" != sValue)
+					{
+						bDelimiter = true;
+						var nType = oCell.getType();
+						if(CellValueType.Number == nType || CellValueType.String == nType)
 						{
-							var nType = oCurCell.getType();
-							if(CellValueType.Number == nType || CellValueType.String == nType)
+							if(CellValueType.Number == nType)
+								nVal = sValue - 0;
+							else
 							{
-								var sValue = oCurCell.getValueWithoutFormat();
-                                if("" != sValue)
-                                {
-									if(CellValueType.Number == nType)
-										nVal = sValue - 0;
+								//если текст заканчивается на цифру тоже используем ее
+								var nEndIndex = sValue.length;
+								for(var k = sValue.length - 1; k >= 0; --k)
+								{
+									var sCurChart = sValue[k];
+									if('0' <= sCurChart && sCurChart <= '9')
+										nEndIndex--;
 									else
-									{
-										//если текст заканчивается на цифру тоже используем ее
-										var nEndIndex = sValue.length;
-										for(var k = sValue.length - 1; k >= 0; --k)
-										{
-											var sCurChart = sValue[k];
-											if('0' <= sCurChart && sCurChart <= '9')
-												nEndIndex--;
-											else
-												break;
-										}
-										if(sValue.length != nEndIndex)
-										{
-											sCurPrefix = sValue.substring(0, nEndIndex);
-											nVal = sValue.substring(nEndIndex) - 0;
-										}
-									}
-									if(null != nVal)
-									{
-										if(null == oDigParams)
-											oDigParams = {valid: true, prefix: sCurPrefix};
-										else if(sCurPrefix != oDigParams.prefix)
-										{
-											fFinishSection(oDigParams, oPromoteHelper);
-											oDigParams = {valid: true, prefix: sCurPrefix};
-										}
-										oPromoteHelper.add(nVal);
-									}
-									else
-									{
-										fFinishSection(oDigParams, oPromoteHelper);
-										oDigParams = null;
-									}
-                                }
-                            }
-                        }
-						else{
-							fFinishSection(oDigParams, oPromoteHelper);
-							oDigParams = null;
-							nF = true;
+										break;
+								}
+								if(sValue.length != nEndIndex)
+								{
+									sPrefix = sValue.substring(0, nEndIndex);
+									nVal = sValue.substring(nEndIndex) - 0;
+								}
+							}
 						}
-                    }
-                    if(null == nVal)
-						aCells.push({digparams: null, cell: oCurCell, formula:nF});
+						if(null != oCell.xfs && null != oCell.xfs.num && null != oCell.xfs.num.f){
+							var numFormat = oNumFormatCache.get(oCell.xfs.num.f);
+							if(numFormat.isDateTimeFormat())
+								bDate = true;
+						}
+						if(null != nVal)
+							bDelimiter = false;
+					}
+				}
+				else
+					bDelimiter = true;
+				oPromoteHelper.add(nRow0 - nRowStart0, nCol0 - nColStart0, nVal, bDelimiter, sPrefix, bDate, oCell);
+             }
+		});
+		var bCopy = false;
+		if(bCtrl)
+			bCopy = true;
+		//в случае одной ячейки с числом меняется смысл bCtrl
+		if(1 == nWidth && 1 == nHeight && oPromoteHelper.isOnlyIntegerSequence())
+			bCopy = !bCopy;
+		oPromoteHelper.finishAdd(bCopy);
+		//заполняем ячейки данными
+		var nStartRow, nEndRow, nStartCol, nEndCol, nColDx, bRowFirst;
+		if(bVertical)
+		{
+			nStartRow = oPromoteAscRange.c1;
+			nEndRow = oPromoteAscRange.c2;
+			bRowFirst = false;
+			if(bReverse)
+			{
+				nStartCol = oPromoteAscRange.r2;
+				nEndCol = oPromoteAscRange.r1;
+				nColDx = -1;
+			}
+			else
+			{
+				nStartCol = oPromoteAscRange.r1;
+				nEndCol = oPromoteAscRange.r2;
+				nColDx = 1;
+			}
+		}
+		else
+		{
+			nStartRow = oPromoteAscRange.r1;
+			nEndRow = oPromoteAscRange.r2;
+			bRowFirst = true;
+			if(bReverse)
+			{
+				nStartCol = oPromoteAscRange.c2;
+				nEndCol = oPromoteAscRange.c1;
+				nColDx = -1;
+			}
+			else
+			{
+				nStartCol = oPromoteAscRange.c1;
+				nEndCol = oPromoteAscRange.c2;
+				nColDx = 1;
+			}
+		}
+		for(var i = nStartRow; i <= nEndRow; i ++)
+        {
+			oPromoteHelper.setIndex(i - nStartRow);
+            for(var j = nStartCol; (nStartCol - j) * (nEndCol - j) <= 0; j += nColDx)
+            {
+                var data = oPromoteHelper.getNext();
+				if(null != data && (data.oAdditional || (false == bCopy && null != data.nCurValue)))
+				{
+					var oFromCell = data.oAdditional;
+					var oCopyCell = null;
+					if(bRowFirst)
+						oCopyCell = this.worksheet._getCell(i, j);
 					else
-						aCells.push({digparams: oDigParams, cell: oCurCell, formula:nF});
-                }
-				fFinishSection(oDigParams, oPromoteHelper);
-				oPromoteHelper.finishAdd();
-                var bExistDigit = false;
-                if(false == bCtrl && false == oPromoteHelper.isEmpty())
-                {
-                    bExistDigit = true;
-					oPromoteHelper.calc();
-                }
-                var nCellsLength = aCells.length;
-                var nCellsIndex;
-                var nStart;
-                var nEnd;
-                var nDj;
-                var nDCellsIndex;
-                var fCondition;
-                if(nIndex > 0)
-                {
-                    nStart = oBBox.c2 + 1;
-                    nEnd = oBBox.c2 + (nIndex - nWidth + 1);
-                    nCellsIndex = 0;
-                    nDj = 1;
-                    nDCellsIndex = 1;
-                    fCondition = function(j , nEnd){return j <= nEnd;}
-                }
-                else
-                {
-					oPromoteHelper.reverse();
-                    nStart = oBBox.c1 - 1;
-                    nEnd = oBBox.c1 + nIndex;
-                    if(nEnd < 0)
-                        nEnd = 0;
-                    nCellsIndex = nCellsLength - 1;
-                    nDj = -1;
-                    nDCellsIndex = -1;
-                    fCondition = function(j , nEnd){return j >= nEnd;}
-                }
-                for(var j = nStart; fCondition(j, nEnd); j += nDj)
-                {
-                    var oCurItem = aCells[nCellsIndex];
-                    //удаляем текущее содержимое ячейки
-                    var oCurCell = this.worksheet._getCellNoEmpty(i, j);
-                    if(null != oCurCell)
-						this.worksheet._removeCell(i, j);
-                    if(null != oCurItem.cell)
-                    {
-                        var oCopyCell = this.worksheet._getCell(i, j);
-                        oCopyCell.setStyle(oCurItem.cell.getStyle());
-                        oCopyCell.setType(oCurItem.cell.getType());
-                        if(bExistDigit && null != oCurItem.digparams && true == oCurItem.digparams.valid)
-                        {
-							var dNewValue = oPromoteHelper.getNext();
-							var sVal = "";
-							if(null != oCurItem.digparams.prefix)
-								sVal += oCurItem.digparams.prefix;
-							sVal += dNewValue;
-                            oCopyCell.setValue(sVal);
-                        }
-                        else
-                        {
-                            //копируем полностью
-							if(!oCurItem.formula){
-								var DataOld = oCopyCell.getValueData();
-								oCopyCell.oValue = oCurItem.cell.oValue.clone(oCopyCell);
-								var DataNew = oCopyCell.getValueData();
-								if(false == DataOld.isEqual(DataNew))
-									History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.worksheet.getId(), new Asc.Range(0, oCopyCell.oId.getRow0(), gc_nMaxCol0, oCopyCell.oId.getRow0()), new UndoRedoData_CellSimpleData(oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), DataOld, DataNew));
-								//todo
-								// if(oCopyCell.isEmptyTextString())
-									// this.worksheet._getHyperlink().remove({r1: oCopyCell.oId.getRow0(), c1: oCopyCell.oId.getCol0(), r2: oCopyCell.oId.getRow0(), c2: oCopyCell.oId.getCol0()});
+						oCopyCell = this.worksheet._getCell(j, i);
+					if(null != oFromCell)
+					{
+						oCopyCell.setStyle(oFromCell.getStyle());
+						oCopyCell.setType(oFromCell.getType());
+					}
+					if(false == bCopy && null != data.nCurValue)
+					{
+						var sVal = "";
+						if(null != data.sPrefix)
+							sVal += data.sPrefix;
+						sVal += data.nCurValue;
+						oCopyCell.setValue(sVal);
+					}
+					else if(null != oFromCell)
+					{
+						//копируем полностью
+						if(!oFromCell.sFormula){
+							var DataOld = oCopyCell.getValueData();
+							oCopyCell.oValue = oFromCell.oValue.clone(oCopyCell);
+							var DataNew = oCopyCell.getValueData();
+							if(false == DataOld.isEqual(DataNew))
+								History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.worksheet.getId(), new Asc.Range(0, oCopyCell.oId.getRow0(), gc_nMaxCol0, oCopyCell.oId.getRow0()), new UndoRedoData_CellSimpleData(oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), DataOld, DataNew));
+							//todo
+							// if(oCopyCell.isEmptyTextString())
+								// this.worksheet._getHyperlink().remove({r1: oCopyCell.oId.getRow0(), c1: oCopyCell.oId.getCol0(), r2: oCopyCell.oId.getRow0(), c2: oCopyCell.oId.getCol0()});
+							
+							if( !arrRecalc[this.worksheet.getId()] ){
+								arrRecalc[this.worksheet.getId()] = {};
+							}
+							arrRecalc[this.worksheet.getId()][oCopyCell.getName()] = oCopyCell.getName();
+							this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
+							if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
+							this.worksheet.workbook.needRecalc.length++;
+						}
+						else{
+							var assemb;
+							var _p_ = new parserFormula(oFromCell.sFormula,oCopyCell.getName(),this.worksheet);
+							if( _p_.parse() ){
+								assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble();
+								oCopyCell.setValue("="+assemb);
 								
-								if( !arrRecalc[this.worksheet.getId()] ){
-									arrRecalc[this.worksheet.getId()] = {};
-								}
-								arrRecalc[this.worksheet.getId()][oCopyCell.getName()] = oCopyCell.getName();
-								this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-								if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-								this.worksheet.workbook.needRecalc.length++;
 							}
-							else{
-								var assemb;
-								var _p_ = new parserFormula(oCurItem.cell.sFormula,oCopyCell.getName(),this.worksheet);
-								if( _p_.parse() ){
-									assemb = _p_.changeOffset(oCopyCell.getOffset2(oCurItem.cell.getName())).assemble();
-									oCopyCell.setValue("="+assemb);
-								}
-								this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-								if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-								this.worksheet.workbook.needRecalc.length++;
-							}
-                        }
-                    }
-                    
-                    nCellsIndex += nDCellsIndex;
-                    if(nDCellsIndex > 0 && nCellsIndex >= nCellsLength)
-                        nCellsIndex = 0;
-                    else if(nCellsIndex < 0)
-                        nCellsIndex = nCellsLength - 1;
-                }
+							this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
+							if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
+							this.worksheet.workbook.needRecalc.length++;
+						}
+					}
+				}
             }
 		}
 	}
@@ -8361,109 +8172,62 @@ Range.prototype.createCellOnRowColCross=function(){
 /**
  * @constructor
  */
-function PromoteHelper(){
-	//для открытия 
-	this.aCurDigits = new Array();
+function PromoteHelper(bVerical, bReverse, bbox){
+	//автозаполнение происходит всегда в правую сторону, поэтому менются индексы в методе add, и это надо учитывать при вызове getNext
+	this.bVerical = bVerical;
+	this.bReverse = bReverse;
+	this.bbox = bbox;
+	this.oDataRow = {};
 	//для get
-	this.nCurSequence = 0;
-	this.nCurSequenceIndex = 0;
-	this.nDx = 1;
-	//общее
-	this.aSequence = new Array();
-	this.nSequenceLength = 0;
+	this.oCurRow = null;
+	this.nCurColIndex = null;
+	this.nColLength = 0;
+	if(this.bVerical)
+		this.nColLength = this.bbox.r2 - this.bbox.r1 + 1;
+	else
+		this.nColLength = this.bbox.c2 - this.bbox.c1 + 1;
 };
 PromoteHelper.prototype = {
-	add: function(dVal){
-		this.aCurDigits.push(dVal);
-	},
-	finishSection: function()
-	{
-		if(this.aCurDigits.length > 0)
+	add: function(nRow, nCol, nVal, bDelimiter, sPrefix, bDate, oAdditional){
+		if(this.bVerical)
 		{
-			this.aSequence.push({digits: this.aCurDigits, a0: 0, a1: 0, nX: 0, length: this.aCurDigits.length});
-			this.aCurDigits = new Array();
+			//транспонируем для удобства
+			var temp = nRow;
+			nRow = nCol;
+			nCol = temp;
 		}
-	},
-	isOnlyIntegerSequence: function()
-	{
-		var bRes = true;
-		var nPrevValue = null;
-		var nDiff = null;
-		for(var i = 0, length = this.aCurDigits.length; i < length; ++i)
+		if(this.bReverse)
+			nCol = this.nColLength - nCol - 1;
+		var row = this.oDataRow[nRow];
+		if(null == row)
 		{
-			var nCurValue = this.aCurDigits[i];
-			if(null != nPrevValue)
+			row = {};
+			this.oDataRow[nRow] = row;
+		}
+		row[nCol] = {nCol: nCol, nVal: nVal, bDelimiter: bDelimiter, sPrefix: sPrefix, bDate: bDate, oAdditional: oAdditional, oSequence: null, nCurValue: null};
+	},
+	isOnlyIntegerSequence: function(){
+		var bRes = true;
+		var bEmpty = true;
+		for(var i in this.oDataRow)
+		{
+			var row = this.oDataRow[i];
+			for(var j in row)
 			{
-				if(null == nDiff)
-					nDiff = nCurValue - nPrevValue;
-				else if(nCurValue != nPrevValue + nDiff)
+				var data = row[j];
+				bEmpty = false;
+				if(!(null != data.nVal && true != data.bDate && null == data.sPrefix))
 				{
 					bRes = false;
 					break;
 				}
 			}
-			nPrevValue = nCurValue;
+			if(!bRes)
+				break;
 		}
+		if(bEmpty)
+			bRes = false;
 		return bRes;
-	},
-	removeLast: function()
-	{
-		this.aCurDigits = new Array();
-	},
-	finishAdd: function(){
-		if(this.aCurDigits.length > 0)
-			this.aSequence.push({digits: this.aCurDigits, a0: 0, a1: 0, nX: 0, length: this.aCurDigits.length});
-		this.nSequenceLength = this.aSequence.length;
-	},
-	isEmpty : function()
-	{
-		return 0 == this.nSequenceLength;
-	},
-	calc: function(){
-		for(var i = 0, length = this.aSequence.length; i < length; ++i)
-		{
-			var sequence = this.aSequence[i];
-			var sequenceParams = this._promoteSequence(sequence.digits);
-			sequence.a0 = sequenceParams.a0;
-			sequence.a1 = sequenceParams.a1;
-			sequence.nX = sequenceParams.nX;
-		}
-	},
-	reverse: function(){
-		if(this.isEmpty())
-			return;
-		this.nCurSequence = this.nSequenceLength - 1;
-		this.nCurSequenceIndex = this.aSequence[this.nCurSequence].length - 1;
-		this.nDx = -1;
-		for(var i = 0, length = this.aSequence.length; i < length; ++i)
-			this.aSequence[i].nX = -1;
-	},
-	getNext: function(){
-		var sequence = this.aSequence[this.nCurSequence];
-		var dNewVal = sequence.a1 * sequence.nX + sequence.a0;
-		sequence.nX += this.nDx;
-		this.nCurSequenceIndex += this.nDx;
-        if(this.nDx > 0)
-		{
-			if(this.nCurSequenceIndex >= sequence.length)
-			{
-				this.nCurSequenceIndex = 0;
-				this.nCurSequence++;
-				if(this.nCurSequence >= this.nSequenceLength)
-					this.nCurSequence = 0;
-			}
-		}
-        else
-		{
-			if(this.nCurSequenceIndex < 0)
-			{
-				this.nCurSequence--;
-				if(this.nCurSequence < 0)
-					this.nCurSequence = this.nSequenceLength - 1;
-				this.nCurSequenceIndex = this.aSequence[this.nCurSequence].length - 1;
-			}
-		}
-		return dNewVal
 	},
 	_promoteSequence: function(aDigits){
 		// Это коэффициенты линейного приближения (http://office.microsoft.com/ru-ru/excel-help/HP010072685.aspx)
@@ -8479,7 +8243,7 @@ PromoteHelper.prototype = {
 		{
 			nX = 1;
 			a1 = 1;
-			a0 = aDigits[0];
+			a0 = aDigits[0].y;
 		}
 		else
 		{
@@ -8495,9 +8259,11 @@ PromoteHelper.prototype = {
 			var dYiXi = 0.0;
 
 			// Цикл по всем строкам
-			for (var i = 0, length = aDigits.length; i < length; ++i, ++nX)
+			for (var i = 0, length = aDigits.length; i < length; ++i)
 			{
-				var dValue = aDigits[i];
+				var data = aDigits[i];
+				nX = data.x;
+				var dValue = data.y;
 
 				// Вычисляем значения
 				nXi += nX;
@@ -8505,6 +8271,7 @@ PromoteHelper.prototype = {
 				dYi += dValue;
 				dYiXi += dValue * nX;
 			}
+			nX++;
 
 			// Теперь решаем систему уравнений
 			// Общий детерминант
@@ -8518,6 +8285,243 @@ PromoteHelper.prototype = {
 			a1 = dD2 / dD;
 		}
 		return {a0: a0, a1: a1, nX: nX};
+	},
+	_addSequenceToRow : function(nRowIndex, aSortRowIndex, row, aCurSequence){
+		if(aCurSequence.length > 0)
+		{
+			var oFirstData = aCurSequence[0];
+			var bCanPromote = true;
+			//если последовательность состоит из одного числа и той же колонке есть еще последовательности, то надо копировать, а не автозаполнять
+			if(1 == aCurSequence.length)
+			{
+				var bVisitRowIndex = false;
+				var oVisitData = null;
+				for(var i = 0, length = aSortRowIndex.length; i < length; i++)
+				{
+					var nCurRowIndex = aSortRowIndex[i];
+					if(nRowIndex == nCurRowIndex)
+					{
+						bVisitRowIndex = true;
+						if(oVisitData && oFirstData.sPrefix == oVisitData.sPrefix && oFirstData.bDate == oVisitData.bDate)
+						{
+							bCanPromote = false;
+							break;
+						}
+					}
+					else
+					{
+						var oCurRow = this.oDataRow[nCurRowIndex];
+						if(oCurRow)
+						{
+							var data = oCurRow[oFirstData.nCol];
+							if(null != data)
+							{
+								if(null != data.nVal)
+								{
+									oVisitData = data;
+									if(bVisitRowIndex)
+									{
+										if(oFirstData.sPrefix == oVisitData.sPrefix && oFirstData.bDate == oVisitData.bDate)
+											bCanPromote = false;
+										break;
+									}
+								}
+								else if(data.bDelimiter)
+								{
+									oVisitData = null;
+									if(bVisitRowIndex)
+										break;
+								}
+							}
+						}
+					}
+				}
+			}
+			if(bCanPromote)
+			{
+				var nMinIndex = null;
+				var nMaxIndex = null;
+				var bValidIndexDif = true;
+				var nPrevX = null;
+				var nPrevVal = null;
+				var nIndexDif = null;
+				var nValueDif = null;
+				//анализируем последовательность, если числа расположены не на одинаковом расстоянии, то считаем их сплошной последовательностью
+				//последовательность с промежутками может быть только целочисленной
+				for(var i = 0, length = aCurSequence.length; i < length; i++)
+				{
+					var data = aCurSequence[i];
+					var nCurX = data.nCol;
+					if(null == nMinIndex || null == nMaxIndex)
+						nMinIndex = nMaxIndex = nCurX;
+					else
+					{
+						if(nCurX < nMinIndex)
+							nMinIndex = nCurX;
+						if(nCurX > nMaxIndex)
+							nMaxIndex = nCurX;
+					}
+					if(bValidIndexDif)
+					{
+						if(null != nPrevX && null != nPrevVal)
+						{
+							var nCurDif = nCurX - nPrevX;
+							var nCurValDif = data.nVal - nPrevVal;
+							if(null == nIndexDif || null == nCurValDif)
+							{
+								nIndexDif = nCurDif;
+								nValueDif = nCurValDif;
+							}
+							else if(nIndexDif != nCurDif || nValueDif != nCurValDif)
+							{
+								nIndexDif = null;
+								bValidIndexDif = false;
+							}
+						}
+					}
+					nPrevX = nCurX;
+					nPrevVal = data.nVal;
+				}
+				var bWithSpace = false;
+				if(null != nIndexDif)
+				{
+					nIndexDif = Math.abs(nIndexDif);
+					if(nIndexDif > 1)
+						bWithSpace = true;
+				}
+				//заполняем массив с координатами
+				var bExistSpace = false;
+				nPrevX = null;
+				var aDigits = [];
+				for(var i = 0, length = aCurSequence.length; i < length; i++)
+				{
+					var data = aCurSequence[i];
+					var nCurX = data.nCol;
+					var x = nCurX - nMinIndex;
+					if(null != nIndexDif && nIndexDif > 0)
+						x /= nIndexDif;
+					if(null != nPrevX && nCurX - nPrevX > 1)
+						bExistSpace = true;
+					var y = data.nVal;
+					//даты автозаполняем только по целой части
+					if(data.bDate)
+						y = parseInt(y);
+					aDigits.push({x: x, y: y});
+					nPrevX = nCurX;
+				}
+				if(aDigits.length > 0)
+				{
+					var oSequence = this._promoteSequence(aDigits);
+					if(1 == aDigits.length && this.bReverse)
+					{
+						//меняем коэффициенты для случая одного числа в последовательности, иначе она в любую сторону будет возрастающей
+						oSequence.a1 *= -1;
+					}
+					var bIsIntegerSequence = oSequence.a1 != parseInt(oSequence.a1);
+					//для дат и чисел с префиксом автозаполняются только целочисленные последовательности
+					if(!((null != oFirstData.sPrefix || true == oFirstData.bDate) && bIsIntegerSequence))
+					{
+						if(false == bWithSpace && bExistSpace)
+						{
+							for(var i = nMinIndex; i <= nMaxIndex; i++)
+							{
+								var data = row[i];
+								if(null == data)
+								{
+									data = {nCol: i, nVal: null, bDelimiter: oFirstData.bDelimiter, sPrefix: oFirstData.sPrefix, bDate: oFirstData.bDate, oAdditional: null, oSequence: null, nCurValue: null};
+									row[i] = data;
+								}
+								data.oSequence = oSequence;
+							}
+						}
+						else
+						{
+							for(var i = 0, length = aCurSequence.length; i < length; i++)
+							{
+								var nCurX = aCurSequence[i].nCol;
+								if(null != nCurX)
+									row[nCurX].oSequence = oSequence;
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	finishAdd : function(bCopy){
+		if(true != bCopy)
+		{
+			var aSortRowIndex = [];
+			for(var i in this.oDataRow)
+				aSortRowIndex.push(i - 0);
+			aSortRowIndex.sort(fSortAscending);
+			for(var i = 0, length = aSortRowIndex.length; i < length; i++)
+			{
+				var nRowIndex = aSortRowIndex[i];
+				var row = this.oDataRow[nRowIndex];
+				//собираем информация о последовательностях в row
+				var aSortIndex = [];
+				for(var j in row)
+					aSortIndex.push(j - 0);
+				aSortIndex.sort(fSortAscending);
+				var aCurSequence = [];
+				var oPrevData = null;
+				for(var j = 0, length2 = aSortIndex.length; j < length2; j++)
+				{
+					var nColIndex = aSortIndex[j];
+					var data = row[nColIndex];
+					var bAddToSequence = false;
+					if(null != data.nVal)
+					{
+						bAddToSequence = true;
+						if(null != oPrevData && (oPrevData.bDelimiter != data.bDelimiter || oPrevData.sPrefix != data.sPrefix || oPrevData.bDate != data.bDate))
+						{
+							this._addSequenceToRow(nRowIndex, aSortRowIndex, row, aCurSequence);
+							aCurSequence = [];
+							oPrevData = null;
+						}
+						oPrevData = data;
+					}
+					else if(data.bDelimiter)
+					{
+						this._addSequenceToRow(nRowIndex, aSortRowIndex, row, aCurSequence);
+						aCurSequence = [];
+						oPrevData = null;
+					}
+					if(bAddToSequence)
+						aCurSequence.push(data);
+				}
+				this._addSequenceToRow(nRowIndex, aSortRowIndex, row, aCurSequence);
+			}
+		}
+	},
+	setIndex: function(index){
+		this.oCurRow = this.oDataRow[index];
+		this.nCurColIndex = 0;
+	},
+	getNext: function(){
+		var oRes = null;
+		if(this.oCurRow)
+		{
+			var oRes = this.oCurRow[this.nCurColIndex];
+			if(null != oRes)
+			{
+				oRes.nCurValue = null;
+				if(null != oRes.oSequence)
+				{
+					var sequence = oRes.oSequence;
+					if(oRes.bDate || null != oRes.sPrefix)
+						oRes.nCurValue = Math.abs(sequence.a1 * sequence.nX + sequence.a0);
+					else
+						oRes.nCurValue = sequence.a1 * sequence.nX + sequence.a0;
+					sequence.nX ++;
+				}
+			}
+			this.nCurColIndex++;
+			if(this.nCurColIndex >= this.nColLength)
+				this.nCurColIndex = 0;
+		}
+		return oRes;
 	}
 };
 function DefinedName(){
