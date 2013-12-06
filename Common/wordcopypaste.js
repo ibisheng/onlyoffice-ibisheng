@@ -42,6 +42,10 @@ if (window.USER_AGENT_SAFARI_MACOS)
     var ELEMENT_DISPAY_STYLE = "block";
 }
 
+var PASTE_EMPTY_COUNTER_MAX = 10;
+var PASTE_EMPTY_COUNTER     = 0;
+var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
+
 var g_bIsDocumentCopyPaste = true;
 var isOnlyLocalBufferSafariWord = false;
 function Editor_Copy_GetElem(api)
@@ -2516,6 +2520,23 @@ function Editor_Paste(api, bClean)
     //���� ���������� paste
     var func_timeout = function() {
 
+        if (PASTE_EMPTY_USE && !oWordControl.bIsEventPaste)
+        {
+            // не править. это сделано для фаерфокса. ну не успевает он вставить
+            // в дивку контент. и получалось, что мы через раз вставляем пробел.
+            // тут идет надежда на то, что вставлять пробел не будут. А если будут - то он вставится,
+            // но может с задержкой 1-2 секунды.
+            if (pastebin.innerHTML == "&nbsp;")
+            {
+                PASTE_EMPTY_COUNTER++;
+                if (PASTE_EMPTY_COUNTER < PASTE_EMPTY_COUNTER_MAX)
+                {
+                    window.PasteEndTimerId = window.setTimeout( func_timeout, 100 );
+                    return;
+                }
+            }
+        }
+
         if (window.USER_AGENT_SAFARI_MACOS)
         {
             if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
@@ -2552,11 +2573,12 @@ function Editor_Paste(api, bClean)
         window.PasteEndTimerId = -1;
     };
 
-    var _interval_time = window.USER_AGENT_MACOS ? 200 : 100;
+    var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
 
     if (-1 != window.PasteEndTimerId)
         clearTimeout(window.PasteEndTimerId);
 
+    PASTE_EMPTY_COUNTER = 0;
     window.PasteEndTimerId = window.setTimeout( func_timeout, _interval_time );
 };
 function CopyPasteCorrectString(str)
@@ -2903,6 +2925,10 @@ PasteProcessor.prototype =
                     oDocument.Parent.txBody.recalculate();
                 }
             }
+        }
+        else
+        {
+            console.log("err");
         }
 
         if(false == this.bNested && nInsertLength > 0)

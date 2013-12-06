@@ -11,7 +11,8 @@
     isOpera : false,
     isWebkit : false,
     isSafari : false,
-    isArm : false
+    isArm : false,
+    isMozilla : false
 };
 
 // user agent lower case
@@ -62,3 +63,5 @@ AscBrowser.isWebkit = (AscBrowser.userAgent.indexOf("webkit") > -1);
 
 // arm detect
 AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
+
+AscBrowser.isMozilla = ((AscBrowser.userAgent.indexOf("firefox") > -1) && (!AscBrowser.isIE));
