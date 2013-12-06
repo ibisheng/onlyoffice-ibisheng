@@ -2319,6 +2319,8 @@ CGraphicFrame.prototype =
             case historyitem_SetGraphicObject:
             {
                 this.graphicObject = data.newPr;
+                if(this.graphicObject && this.graphicObject.Recalc_CompiledPr)
+                    this.graphicObject.Recalc_CompiledPr();
                 break;
             }
             case historyitem_SetShapeRot:
@@ -2592,6 +2594,8 @@ CGraphicFrame.prototype =
                     if(r.GetBool())
                     {
                         this.graphicObject = g_oTableId.Get_ById(r.GetString2());
+                        if(this.graphicObject && this.graphicObject.Recalc_CompiledPr)
+                            this.graphicObject.Recalc_CompiledPr();
                     }
                     else
                     {

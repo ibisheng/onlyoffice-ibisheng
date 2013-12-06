@@ -1785,6 +1785,25 @@ CPresentation.prototype =
 
     Set_TableProps : function(Props)
     {
+        if(Props.CellBorders)
+        {
+            if(Props.CellBorders.Left && Props.CellBorders.Left.Color)
+            {
+                Props.CellBorders.Left.unifill = CreteSolidFillRGB(Props.CellBorders.Left.Color.r, Props.CellBorders.Left.Color.g, Props.CellBorders.Left.Color.b)
+            }
+            if(Props.CellBorders.Top && Props.CellBorders.Top.Color)
+            {
+                Props.CellBorders.Top.unifill = CreteSolidFillRGB(Props.CellBorders.Top.Color.r, Props.CellBorders.Top.Color.g, Props.CellBorders.Top.Color.b)
+            }
+            if(Props.CellBorders.Right && Props.CellBorders.Right.Color)
+            {
+                Props.CellBorders.Right.unifill = CreteSolidFillRGB(Props.CellBorders.Right.Color.r, Props.CellBorders.Right.Color.g, Props.CellBorders.Right.Color.b)
+            }
+            if(Props.CellBorders.Bottom && Props.CellBorders.Bottom.Color)
+            {
+                Props.CellBorders.Bottom.unifill = CreteSolidFillRGB(Props.CellBorders.Bottom.Color.r, Props.CellBorders.Bottom.Color.g, Props.CellBorders.Bottom.Color.b)
+            }
+        }
         this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
         this.Recalculate();
 

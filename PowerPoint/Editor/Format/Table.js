@@ -3037,9 +3037,9 @@ CTable.prototype =
 
         var Table = new CTable( this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid);
 
+        Table.Set_TableStyle( this.styleIndex );
         // Копируем настройки
         Table.Set_Pr( this.Pr.Copy() );
-        Table.Set_TableStyle( this.styleIndex );
         Table.Set_TableLook( this.TableLook.Copy() );
 
         Table.Rows = this.Rows;
@@ -3058,6 +3058,7 @@ CTable.prototype =
         if ( Table.Content.length > 0 && Table.Content[0].Get_CellsCount() > 0 )
             Table.CurCell = Table.Content[0].Get_Cell(0);
 
+        Table.Recalc_CompiledPr();
         return Table;
     },
 
