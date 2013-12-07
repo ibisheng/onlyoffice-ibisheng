@@ -56,9 +56,9 @@ module.exports = function(grunt) {
                 banner: '/*\n' +
                     ' * Copyright (c) Ascensio System SIA <%= grunt.template.today("yyyy") %>. All rights reserved\n' +
                     ' *\n' +
-                    ' * <%= pkg.homepage %> \n' +
+                    ' * <%= pkg.info.homepage %> \n' +
                     ' *\n' +
-                    ' * Version: <%= pkg.version %> (build:<%= pkg.build %>)\n' +
+                    ' * Version: <%= pkg.info.version %> (build:<%= pkg.info.build %>)\n' +
                     ' */'
             },
 
