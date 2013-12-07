@@ -8573,4 +8573,4 @@ NameGenerator.prototype = {
 		this.addTableName(sNewName, ws, Ref);
 		return sNewName;
 	}
-}
+};
