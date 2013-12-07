@@ -91,6 +91,7 @@ CMathBase.prototype =
     {
         this.CtrPrp.Merge(runPrp); // only runPrp for paragraph
     },
+
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
@@ -117,13 +118,13 @@ CMathBase.prototype =
 
         return rPrp;
     },
-    addRPrp: function(rPrp)
+    setRPrp: function(rPrp)
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
             {
                 if( !this.elements[i][j].IsJustDraw())
-                    this.elements[i][j].addRPrp(rPrp);
+                    this.elements[i][j].setRPrp(rPrp);
             }
     },
     /////////

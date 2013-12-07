@@ -283,11 +283,6 @@ function CMathContent()
     this.Composition = null; // ссылка на общую формулу
 
     this.reduct     =   1;      // индефикатор для степени (уменьшение размера шрифта)
-    this.rInterval =
-    {
-        startPos: 0,
-        endPos: 0
-    };
 
 
     ////**  real select  **////
@@ -431,9 +426,6 @@ CMathContent.prototype =
     },
     addLetter: function(code)
     {
-        if(this.rInterval.startPos == this.rInterval.endPos)
-            this.rInterval.startPos = this.rInterval.endPos = this.CurPos + 1;
-
         this.verifyRPrp_Letter();
 
         /*var gps = null;
@@ -467,18 +459,6 @@ CMathContent.prototype =
         this.addToContent(symb);
         var item = this.content[this.CurPos];
 
-        if(!TEST)
-        {
-            History.Create_NewPoint();
-
-            var Pos = this.CurPos,
-                EndPos = this.CurPos + 1;
-
-            History.Add(this, {Type: historyitem_Math_AddItem, Items: [item], Pos: Pos, PosEnd: EndPos});
-        }
-
-        this.rInterval.endPos++; // max количество элементов this.CurPos
-
         return [item];
     },
     addMComponent: function(ind)
@@ -486,8 +466,6 @@ CMathContent.prototype =
         //var l_gap =  0, r_gap = 0;
         var mathElem = null;    //положение этого элемента будет this.CurPos + 1
 
-        if(this.rInterval.startPos == this.rInterval.endPos)
-            this.rInterval.startPos = this.rInterval.endPos = this.CurPos + 1;
 
         switch(ind)
         {
@@ -582,11 +560,11 @@ CMathContent.prototype =
 
             this.verifyRPrp_MC(ctrPrp);
 
-            this.rInterval.endPos += 2;
         }
 
         return mathElem; // for finished equation
     },
+
     addElementToContent: function(obj)   //for "read"
     {
         var element = new mathElem(obj);
@@ -630,6 +608,9 @@ CMathContent.prototype =
         this.setLogicalPosition(this.CurPos);
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
+    },
+    addToContent_2: function(content) // for "menu"
+    {
 
     },
     setComposition: function(Composition)
@@ -3838,7 +3819,7 @@ CMathContent.prototype =
             var pos;
 
             if(!this.selectUse())
-                pos = this.changeSelectPosition(this.CurPos, -1);
+                pos = this.changePosForMove(this.CurPos, -1);
             else
             {
                 var start = this.RealSelect.startPos,
@@ -3873,7 +3854,7 @@ CMathContent.prototype =
     goToLeft: function()
     {
         var SelectContent = this;
-        this.CurPos--; // в принципе, вызов changeSelectPosition(...) приведет к этому действию
+        this.CurPos--; // в принципе, вызов changePosForMove(...) приведет к этому действию
 
         return SelectContent;
     },
@@ -3891,7 +3872,7 @@ CMathContent.prototype =
             var pos;
 
             if(!this.selectUse())
-                pos = this.changeSelectPosition(this.CurPos, 1);
+                pos = this.changePosForMove(this.CurPos, 1);
             else
             {
                 var start = this.RealSelect.startPos,
@@ -3926,7 +3907,7 @@ CMathContent.prototype =
     goToRight: function()
     {
         var SelectContent = this;
-        this.CurPos = this.changeSelectPosition(this.CurPos, 1);
+        this.CurPos = this.changePosForMove(this.CurPos, 1);
 
         return SelectContent;
     },
@@ -4397,7 +4378,7 @@ CMathContent.prototype =
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
 
-    changeSelectPosition: function(pos, order)
+    old_changePosForMove: function(pos, order)
     {
         var posChange = -1;
         var currType   = this.content[pos].value.typeObj,
@@ -4417,16 +4398,6 @@ CMathContent.prototype =
 
         ////////////////////////////////////////////////////
 
-        /*var bLeftTextRPrp  = currType == MATH_RUN_PRP && prevType == MATH_TEXT,
-            bRightTextRPrp = nextType == MATH_TEXT && next2_Type == MATH_RUN_PRP;*/
-
-
-        /*var bLeft2Comp  = currType == MATH_EMPTY && prevType == MATH_COMP,
-            bRight2Comp = nextType == MATH_EMPTY && next2_Type !== MATH_RUN_PRP;*/
-
-        /*var bLeftCompRPrp  = currType == MATH_RUN_PRP && prevType == MATH_EMPTY && prev2_Type == MATH_COMP,
-            bRightCompRPrp = nextType == MATH_EMPTY && next2_Type == MATH_RUN_PRP;*/
-
 
         if(bLeft)
         {
@@ -4438,6 +4409,85 @@ CMathContent.prototype =
         else if(bRight)
         {
             if(next2_Type == MATH_RUN_PRP) // перепрыгнули через RunPrp, неважно какой следующий элемент за текущим
+                posChange = pos + 2;
+            else
+                posChange = pos + 1;
+        }
+
+        return posChange;
+    },
+
+    /*
+        курсор стоит перед RunPrp, в случае если после них идет текст,
+        в случае с мат. объектом логическое положение курсора после RunPrp (аналогично и для начала формулы) = >
+
+        1. CEmpty + Runprp - курсор после
+        2. одни RunPrp курсор перед
+    */
+    changePosForMove: function(pos, order)
+    {
+        var posChange = -1;
+        var currType   = this.content[pos].value.typeObj,
+            prevType   = pos - 1 > 0 ? this.content[pos-1].value.typeObj : null,
+            prev2_Type = pos - 2 > 0 ? this.content[pos-2].value.typeObj : null,
+            nextType   = pos + 1 < this.content.length ? this.content[pos+1].value.typeObj : null,
+            next2_Type = pos + 2 < this.content.length ? this.content[pos+2].value.typeObj : null;
+
+        //////   проверка на начало и конец  контента //////
+        var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
+        var bFirst = bFirstRunPrp || this.CurPos == 0;
+
+        var bPlh = this.IsPlaceholder();
+
+        var bLeft =  order == -1 && !bFirst && !bPlh,
+            bRight = order == 1 && this.CurPos !== this.content.length - 1 && !bPlh;
+
+
+        ////////////////////////////////////////////////////
+
+        //////*   LEFT   *//////
+
+        //  prevType  == MATH_RUN_PRP
+        //          &&
+        //  prev2Type == MATH_TEXT
+        //  -2
+        //////
+        //  currType == MATH_RUN_PRP
+        //  -2
+
+        /////////////////////////
+
+        //////*   RIGHT   *//////
+
+        //  nextType == MATH_RUN_PRP
+        //  +2
+        //////
+        //  nextType == MATH_EMPTY
+        //          &&
+        //  next2_Type == MATH_RUN_PRP
+        //  +2
+
+        //////////////////////////
+
+        ///////////////////////////////////////////////////////
+
+        var bLeftComp    = currType == MATH_RUN_PRP,
+            bLeftRPpText = prevType == MATH_RUN_PRP &&   prev2_Type == MATH_TEXT;
+
+        var bRightRPrp   = nextType  == MATH_RUN_PRP,
+            bRightComp   = nextType  == MATH_EMPTY && next2_Type == MATH_RUN_PRP;
+
+
+        if(bLeft)
+        {
+            if(bLeftComp || bLeftRPpText)  // перепрыгнули через RunPrp, неважно какой предыдущий элемент
+                posChange = pos - 2;
+            else
+                posChange = pos - 1;
+        }
+        else if(bRight)
+        {
+            if(bRightRPrp || bRightComp) // перепрыгнули через RunPrp, неважно какой следующий элемент за текущим
                 posChange = pos + 2;
             else
                 posChange = pos + 1;
@@ -4611,7 +4661,6 @@ CMathContent.prototype =
         }
 
         this.recalculateSize();
-        //this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
     },
     draw: function(pGraphics)
     {
@@ -4891,14 +4940,13 @@ CMathContent.prototype =
                     start = end;
                     end = tmp;
                 }
-
             }
             else
             {
                 start = order == 1 ? this.CurPos : this.CurPos + 1;     // позиция, с которой будем удалять
 
                 if(this.content[start].value.typeObj === MATH_RUN_PRP) // встали на RunPrp
-                    start -= order;
+                    start = (order == -1) ? start + 1 : start - 1;
 
                 var bRun = start - 1 > 0 ? this.content[start - 1].value.typeObj === MATH_RUN_PRP : false,
                     bNotNextText = start + 1 < this.content.length ?  this.content[start + 1].value.typeObj !== MATH_TEXT : true; // start  < this.content.length - 1, значит последняя буква в контента
@@ -5512,6 +5560,15 @@ CMathContent.prototype =
             this.addRunPrp(runPrp);
         }
     },
+    verifyRPrp_MC_2: function(rPrp) // for "menu"
+    {
+        // добавляем RunPrp для текста, они будут такие же как и ctrPrp
+        if(this.CurPos !== this.content.length - 1 && this.content[this.CurPos].value.typeObj !== MATH_TEXT) // после того как добавили мат. объект, текущий объект не RunPrp, а текст
+        {
+            var runPrp = Common_CopyObj(rPrp);
+            this.addRunPrp(runPrp);
+        }
+    },
     verifyRPrp_Letter: function()
     {
         var currType = this.content[this.CurPos].value.typeObj,
@@ -5521,8 +5578,8 @@ CMathContent.prototype =
 
         var bEmpty = this.IsEmpty(),
             OnlyRunPrp = this.content.length == 2 && currType == MATH_RUN_PRP,
-            bPreComposition = currType == MATH_EMPTY && prevType == MATH_COMP, // стоим после мат. объекта, соответственно RunPrp нет
-            bFirstComp = this.CurPos == 1 && nextType == MATH_COMP;
+            bPreComposition = currType == MATH_EMPTY && prevType == MATH_COMP, // стоим между двумя мат. объектами
+            bFirstComp = this.CurPos == 0 && nextType == MATH_COMP;
 
         if(this.bRoot && bEmpty)
         {
@@ -5618,11 +5675,11 @@ CMathContent.prototype =
             }
             else if(obj.typeObj == MATH_COMP)
             {
-                obj.addRPrp(rPrp);
+                obj.setRPrp(rPrp);
             }
         }
     },
-    addRPrp: function(rPrp)
+    setRPrp: function(rPrp)
     {
         for(var i = 0; i < this.content.length; i++)
         {
@@ -5633,7 +5690,7 @@ CMathContent.prototype =
             }
             else if(obj.typeObj == MATH_COMP)
             {
-                obj.addRPrp(rPrp);
+                obj.setRPrp(rPrp);
             }
         }
     },
