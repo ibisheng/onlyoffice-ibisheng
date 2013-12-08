@@ -10220,7 +10220,7 @@ CTable.prototype =
 
         // Считываем свойства для текущего стиля
         var Pr = Styles.Get_Pr( StyleId, styles_Table, null );
-        if(!this.Parent || !this.Parent.Parent)
+        if(!this.Parent || !this.Parent.parent)
         {
             if(this.Pr !== null && typeof this.Pr === "object")
                 Pr.TablePr.Merge(this.Pr);
