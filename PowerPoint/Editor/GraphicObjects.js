@@ -3265,6 +3265,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
             case STATES_ID_CHART_GROUP_TEXT_ADD:
+            case STATES_ID_CHART_TEXT_ADD:
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
@@ -3273,6 +3274,43 @@ CGraphicObjects.prototype = {
                     if(this.State.textObject.recalculate)
                         this.State.textObject.recalculate();
                     this.updateSelectionState();
+                }
+                break;
+            }
+            case STATES_ID_CHART:
+            case STATES_ID_CHART_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    History.Create_NewPoint();
+                    var chart = this.State.chart;
+                    if(chart.chartTitle && chart.chartTitle.selected)
+                    {
+                        chart.addTitle(null);
+                        g_oTableId.m_bTurnOff = true;
+                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        g_oTableId.m_bTurnOff = false;
+                        copy_asc_chart.header.asc_setTitle("");
+                        chart.setAscChart(copy_asc_chart);
+                    }
+                    else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                    {
+                        chart.addXAxis(null);
+                        g_oTableId.m_bTurnOff = true;
+                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        g_oTableId.m_bTurnOff = false;
+                        copy_asc_chart.xAxis.asc_setTitle("");
+                        chart.setAscChart(copy_asc_chart);
+                    }
+                    else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                    {
+                        chart.addYAxis(null);
+                        g_oTableId.m_bTurnOff = true;
+                        var copy_asc_chart = new asc_CChart(chart.chart);
+                        g_oTableId.m_bTurnOff = false;
+                        copy_asc_chart.yAxis.asc_setTitle("");
+                        chart.setAscChart(copy_asc_chart);
+                    }
                 }
                 break;
             }
@@ -3394,16 +3432,6 @@ CGraphicObjects.prototype = {
                             }
                         }
                     }
-                }
-                break;
-            }
-            case STATES_ID_CHART_TEXT_ADD:
-            {
-                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
-                {
-                    History.Create_NewPoint();
-                    this.State.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
-                    this.updateSelectionState();
                 }
                 break;
             }

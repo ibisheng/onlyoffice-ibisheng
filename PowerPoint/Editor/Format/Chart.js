@@ -733,133 +733,10 @@ CChartAsGroup.prototype =
     },
 
 
-
-    setXfrmObject: function(xfrm)
-    {
-        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
-        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
-        this.spPr.xfrm = xfrm;
-    },
-
     isEmptyPlaceholder: function ()
     {
         return false;
     },
-
-    /* init: function()
-     {
-     var is_on = History.Is_On();
-     if(is_on)
-     History.TurnOff();
-     if(isRealObject(this.chartTitle))
-     {
-     this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
-     if(this.chartTitle.isEmpty())
-     {
-     var title_str = "Chart Title";
-     this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-     for(var i in title_str)
-     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-
-     }
-     else
-     {
-     var content = this.chartTitle.txBody.content;
-     content.Parent = this.chartTitle.txBody;
-     content.DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     content.Content[i].Parent = content;
-     }
-     }
-     var content2 =  this.chartTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-     //  this.chart.header.title = this.chartTitle.txBody.content.getTextString();
-     }
-
-     if(isRealObject(this.hAxisTitle))
-     {
-     this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
-     this.hAxisTitle.drawingObjects = this.drawingObjects;
-     if(this.hAxisTitle.isEmpty())
-     {
-     var title_str = "X Axis";
-     this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-     for(var i in title_str)
-     this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-     }
-     else
-     {
-     var content = this.hAxisTitle.txBody.content;
-     content.Parent = this.hAxisTitle.txBody;
-     content.DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     content.Content[i].Parent = content;
-     }
-     }
-     var content2 =  this.hAxisTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-
-     //  this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
-     }
-
-     if(isRealObject(this.vAxisTitle))
-     {
-     this.chart.xAxis.title = "";
-     this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
-     this.vAxisTitle.drawingObjects = this.drawingObjects;
-     if(this.vAxisTitle.isEmpty())
-     {
-     var title_str = "Y Axis";
-     this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
-
-     for(var i in title_str)
-     this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
-
-     this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
-     this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
-     this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
-     }
-     else
-     {
-     this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
-
-     var content = this.vAxisTitle.txBody.content;
-     content.Parent = this.vAxisTitle.txBody;
-     content.DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     for(var i = 0; i < content.Content.length; ++i)
-     {
-     content.Content[i].DrawingDocument = editor.WordControl.m_oDrawingDocument;
-     content.Content[i].Parent = content;
-     }
-     content.Set_ApplyToAll(true);
-     content.Set_ParagraphAlign(align_Center);
-     content.Set_ApplyToAll(false);
-     }
-     var content2 =  this.vAxisTitle.txBody.content.Content;
-     for(var i = 0; i < content2.length; ++i)
-     {
-     content2[i].Pr.PStyle = 3;
-     }
-     //  this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
-     }
-
-     if(is_on)
-     History.TurnOn();
-     //this.recalculate();
-     },   */
 
     calculateAfterOpen: function()
     {
@@ -913,18 +790,6 @@ CChartAsGroup.prototype =
         }
     },
 
-    deleteDrawingBase: function()
-    {
-        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
-        if(isRealNumber(position))
-        {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
-        }
-    },
-
-
-
-
     setChartTitle: function(chartTitle)
     {
         this.chartTitle = chartTitle;
@@ -946,6 +811,7 @@ CChartAsGroup.prototype =
         var newValue = isRealObject(title) ? title.Get_Id() : null;
         this.hAxisTitle = title;
         History.Add(this, {Type: historyitem_AutoShapes_AddXAxis, oldPr: oldValue, newPr: newValue});
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     addYAxis: function(title)
@@ -961,6 +827,7 @@ CChartAsGroup.prototype =
             this.vAxisTitle.setBodyPr(body_pr);
         }
         History.Add(this, {Type: historyitem_AutoShapes_AddYAxis, oldPr: oldValue, newPr: newValue});
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     addTitle: function(title)
@@ -969,6 +836,7 @@ CChartAsGroup.prototype =
         var newValue = isRealObject(title) ? title.Get_Id() : null;
         this.chartTitle = title;
         History.Add(this, {Type: historyitem_AutoShapes_AddTitle, oldPr: oldValue, newPr: newValue});
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
 
