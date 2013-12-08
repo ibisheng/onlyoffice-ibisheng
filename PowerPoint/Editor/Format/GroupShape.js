@@ -200,6 +200,18 @@ CGroupShape.prototype =
         return false;
     },
 
+    setDiagram: function(chartPr)
+    {
+        var bRecalc = false;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setDiagram)
+            {
+                this.spTree[i].setDiagram(chartPr);
+            }
+        }
+    },
+
     recalcAll: function()
     {
         this.recalcInfo =

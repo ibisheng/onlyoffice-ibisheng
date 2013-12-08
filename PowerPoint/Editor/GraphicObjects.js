@@ -850,7 +850,7 @@ CGraphicObjects.prototype = {
             }
             default :
             {
-                if(this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                if(this.State.group instanceof CGroupShape)
                 {
                     by_types = this.State.group.getSelectedArraysByTypes();
                 }
@@ -1004,6 +1004,39 @@ CGraphicObjects.prototype = {
                         }
                     }
 
+                    var charts = arr_by_types.charts;
+                    for(var j = 0;  j < charts.length; ++j)
+                    {
+                        if(!isRealObject(chart_props))
+                        {
+                            chart_props = {fromGroup: true};
+                            chart_props.ChartProperties = charts[j].chart;
+                            chart_props.Width = charts[j].extX;
+                            chart_props.Height = charts[j].extY;
+                        }
+                        else
+                        {
+                            chart_props.chart = null;
+                            chart_props.severalCharts = true;
+                            if(chart_props.severalChartTypes !== true)
+                            {
+                                if(!(chart_props.ChartProperties.type === charts[j].chart.type && chart_props.ChartProperties.subType === charts[j].chart.subType) )
+                                    chart_props.severalChartTypes = true;
+                            }
+                            if(chart_props.severalChartStyles !== true)
+                            {
+                                if(chart_props.ChartProperties.styleId !== charts[j].chart.styleId )
+                                    chart_props.severalChartStyles = true;
+                            }
+                            if(chart_props.Width !== charts[j].extX || chart_props.Height !== charts[j].extY)
+                            {
+                                chart_props.Width = null;
+                                chart_props.Height = null;
+                            }
+                        }
+                    }
+
+
                     if(image_props)
                     {
                         if(cur_group.Lock.Is_Locked())
@@ -1023,6 +1056,13 @@ CGraphicObjects.prototype = {
                         if(cur_group.Lock.Is_Locked())
                         {
                             para_props.Locked = true;
+                        }
+                    }
+                    if(chart_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            cur_group.Locked = true;
                         }
                     }
                 }
@@ -1784,19 +1824,52 @@ CGraphicObjects.prototype = {
 
     getChartObject: function()
     {
-        var selected_arr = this.selectedObjects;
-        if(this.State.group)
+        if(!(this.State.group instanceof CGroupShape))
         {
-            selected_objects = this.State.group.selectedObjects;
-            if(selected_objects.length === 1 && selected_objects[0] instanceof CChartAsGroup)
+            var by_types = this.getSelectedArraysByTypes();
+            if(by_types.charts.length === 1)
             {
-                return selected_objects[0];
+                if(by_types.groups.length === 0)
+                    return by_types.charts[0];
+                if(by_types.groups.length > 0)
+                {
+                    for(var i = 0; i < by_types.groups.length; ++i)
+                    {
+                        var group_by_types = by_types.groups[i].getArraysByTypes();
+                        if(group_by_types.charts.length > 0)
+                            break;
+                    }
+                    if(i === by_types.groups.length)
+                        return by_types.charts[0];
+                }
+            }
+            else if(by_types.charts.length === 0 && by_types.groups.length > 0)
+            {
+                var chart_for_ret;
+                for(var i = 0; i < by_types.groups.length; ++i)
+                {
+                    var group_by_types = by_types.groups[i].getArraysByTypes();
+                    if(group_by_types.charts.length === 1)
+                    {
+                        if(!chart_for_ret)
+                            chart_for_ret = group_by_types.charts[0];
+                        else
+                            break;
+                    }
+                    else if(group_by_types.charts.length > 1)
+                    {
+                        break;
+                    }
+                }
+                if(chart_for_ret)
+                    return chart_for_ret;
             }
         }
-        for(var  i = 0;  i < selected_arr.length; ++i)
+        else
         {
-            if(selected_arr[i].chart != null)
-                return selected_arr[i];
+            var by_types = this.State.group.getSelectedArraysByTypes();
+            if(by_types.charts.length === 1)
+                return by_types.charts[0];
         }
         History.TurnOff();
         var ret = new CChartAsGroup();
@@ -2046,7 +2119,6 @@ CGraphicObjects.prototype = {
             {
 
                 var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
-
                 if(isRealNumber(properties.Width) && isRealNumber(properties.Height))
                 {
                     if(this.State.group)
@@ -2095,7 +2167,7 @@ CGraphicObjects.prototype = {
                         if(selectedObjects[i].isImage && selectedObjects[i].isImage() && selectedObjects[i].setBlipFill)
                         {
                             var b_f = selectedObjects[i].blipFill.createDuplicate();
-                            b_f.fill.RasterImageId = properties.ImageUrl
+                            b_f.fill.RasterImageId = properties.ImageUrl;
                             selectedObjects[i].setBlipFill(b_f);
                         }
                     }
@@ -2107,28 +2179,27 @@ CGraphicObjects.prototype = {
 
     chartApply: function(properties)
     {
-        switch(this.State.id)
-        {
-            case STATES_ID_NULL:
-            case STATES_ID_GROUP:
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
-            {
+        var selectedObjects = (this.State.group instanceof CGroupShape) ? this.State.group.selectedObjects : this.selectedObjects;
 
-                var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
-                if(this.State.group)
-                {
-                    this.State.group.normalize();
-                }
-                for(var i = 0; i < selectedObjects.length; ++i)
-                {
-                    if(selectedObjects[i].isChart && selectedObjects[i].isChart())
-                    {
-                        selectedObjects[i].setDiagram(properties);
-                    }
-                }
-                break;
+        if(this.State.group)
+        {
+            this.State.group.normalize();
+        }
+        for(var i = 0; i < selectedObjects.length; ++i)
+        {
+            if(selectedObjects[i] instanceof CGroupShape)
+            {
+                selectedObjects[i].normalize();
             }
+            selectedObjects[i].setDiagram(properties);
+            if(selectedObjects[i] instanceof CGroupShape)
+            {
+                selectedObjects[i].updateCoordinatesAfterInternalResize()
+            }
+        }
+        if(this.State.group)
+        {
+            this.State.group.updateCoordinatesAfterInternalResize();
         }
     },
 
