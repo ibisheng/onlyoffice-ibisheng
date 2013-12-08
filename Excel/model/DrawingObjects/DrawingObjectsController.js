@@ -858,6 +858,52 @@ DrawingObjectsController.prototype =
 				state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                 break;
             }
+            case STATES_ID_CHART:
+            case STATES_ID_CHART_GROUP:
+            {
+                History.Create_NewPoint();
+                var chart = state.chart;
+                var history_is_on = History.Is_On();
+                if(chart.chartTitle && chart.chartTitle.selected)
+                {
+                    if(history_is_on)
+                        History.TurnOff();
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.header.asc_setTitle("");
+                    if(history_is_on)
+                        History.TurnOn();
+                    chart.setChart(copy_asc_chart);
+                    History.TurnOn();
+                }
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                {
+                    if(history_is_on)
+                        History.TurnOff();
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.xAxis.asc_setTitle("");
+                    if(history_is_on)
+                        History.TurnOn();
+                    chart.setChart(copy_asc_chart);
+                }
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                {
+                    if(history_is_on)
+                        History.TurnOff();
+                    g_oTableId.m_bTurnOff = true;
+                    var copy_asc_chart = new asc_CChart(chart.chart);
+                    g_oTableId.m_bTurnOff = false;
+                    copy_asc_chart.yAxis.asc_setTitle("");
+                    if(history_is_on)
+                        History.TurnOn();
+                    chart.setChart(copy_asc_chart);
+                }
+                chart.recalculate();
+                break;
+            }
             case STATES_ID_GROUP:
             {
 				History.Create_NewPoint();

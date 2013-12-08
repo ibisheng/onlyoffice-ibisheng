@@ -3126,6 +3126,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
 function ChartGroupState(drawingObjectsController, drawingObjects, group, chart)
 {
+    this.id = STATES_ID_CHART_GROUP;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
     this.group = group;
