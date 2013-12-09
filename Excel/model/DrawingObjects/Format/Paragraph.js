@@ -3510,7 +3510,9 @@ Paragraph.prototype =
         //  2. Удаляем все рассчитанные переносы строк, внутренние переносы, переносы страниц
         //  3. Объединяем подряд идущие TextPr
 
-        History.TurnOff();
+        var is_on = History.Is_On();
+        if(is_on)
+            History.TurnOff();
         if ( 0 === CurPage )
         {
             if ( para_Numbering != this.Content[0].Type )
@@ -3528,7 +3530,8 @@ Paragraph.prototype =
                 }
             }
         }
-        History.TurnOn();
+        if(is_on)
+            History.TurnOn();
 
         // Пересчет параграфа:
         //  1. Сначала рассчитаем новые переносы строк, при этом подсчитав количество

@@ -2405,7 +2405,9 @@ PasteProcessor.prototype =
                 oThis.aContent = new Array();
                 //�� ����� ���������� �������� ��� ������� ��������� �������
                 var arrShapes = [], arrImages = [], arrTables = [];
-                History.TurnOff();
+                var is_on = History.Is_On();
+                if(is_on)
+                    History.TurnOff();
                // g_oTableId.m_bTurnOff = true;
                 var shape = new CShape(null);
                 shape.drawingObjects = content.Parent.shape.drawingObjects;
@@ -2422,7 +2424,8 @@ PasteProcessor.prototype =
                         shape.txBody.content.Internal_Content_Remove(0, 1);
                     }
                 }
-                History.TurnOn();
+                if(is_on)
+                    History.TurnOn();
                 var api = asc["editor"];
                 var arrFonts = [];
                 for(var key in oThis.fontMap)
