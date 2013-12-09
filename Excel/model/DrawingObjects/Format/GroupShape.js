@@ -36,7 +36,6 @@ function CGroupShape(drawingBase, drawingObjects)
 
     this.brush  = null;
     this.pen = null;
-
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -101,6 +100,8 @@ CGroupShape.prototype =
     },
 
 
+
+
     removeFromSpTree: function(id)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -112,6 +113,149 @@ CGroupShape.prototype =
                 this.spTree.splice(i, 1);
             }
         }
+    },
+
+
+    haveSelectedObjects: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(!(this.spTree[i] instanceof CGroupShape))
+            {
+                if(this.spTree[i].selected)
+                    return true;
+            }
+            else
+            {
+                if(this.spTree[i].haveSelectedObjects())
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
+
+    bringToFront : function()
+    {
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var sp_tree = this.spTree;
+        var selected = [];
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            if(!(sp_tree[i] instanceof CGroupShape))
+            {
+                if(sp_tree[i].selected)
+                {
+                    selected.push(sp_tree[i]);
+                }
+            }
+            else
+            {
+                sp_tree[i].bringToFront();
+            }
+        }
+        for(var i = sp_tree.length-1; i > -1 ; --i)
+        {
+            if(sp_tree[i].selected)
+            {
+                this.removeFromSpTree(sp_tree[i].Get_Id());
+            }
+        }
+        for(i = 0; i < selected.length; ++i)
+        {
+            this.addToSpTree(selected[i]);
+        }
+        this.recalcInfo.recalculateArrGraphicObjects = true;
+        this.recalculateArrGraphicObjects();
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
+
+    bringForward : function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var sp_tree = this.spTree;
+        for(var i = sp_tree.length - 1;i > -1; --i)
+        {
+            var sp = sp_tree[i];
+            if(!(sp instanceof CGroupShape))
+            {
+                if( sp.selected && i < sp_tree.length - 1 && !sp_tree[i+1].selected)
+                {
+                    this.removeFromSpTree(sp.Get_Id());
+                    this.addToSpTreeToPos(sp, i+1);
+                }
+            }
+            else
+            {
+                sp.bringForward();
+            }
+        }
+        this.recalculateArrGraphicObjects();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
+
+    sendToBack : function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var sp_tree = this.spTree;
+        var  j = 0;
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            if(!(sp_tree[i] instanceof CGroupShape))
+            {
+                if(sp_tree[i].selected)
+                {
+                    var object = sp_tree[i];
+                    this.removeFromSpTree(object.Get_Id());
+                    this.addToSpTreeToPos(object, j);
+                    ++j;
+                }
+            }
+            else
+            {
+                sp_tree[i].sendToBack();
+            }
+        }
+        this.recalculateArrGraphicObjects();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
+
+
+    bringBackward : function()
+    {
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var sp_tree = this.spTree;
+        for(var i = 0;i < sp_tree.length; ++i)
+        {
+            var sp = sp_tree[i];
+            if(!(sp instanceof CGroupShape))
+            {
+                if(sp.selected && i > 0 && !sp_tree[i-1].selected)
+                {
+                    this.removeFromSpTree(sp.Get_Id());
+                    this.addToSpTreeToPos(sp, i-1);
+                }
+            }
+            else
+            {
+                sp.bringForward();
+            }
+        }
+        this.recalculateArrGraphicObjects();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
     isShape: function()
@@ -244,6 +388,13 @@ CGroupShape.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(obj.Get_Id(), null)));
         this.spTree.push(obj);
         this.recalcInfo.recalculateArrGraphicObjects = true;
+    },
+
+    addToSpTreeToPos: function(grObj, pos)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddToGroupSpTreeToPos, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(grObj.Get_Id(), pos)));
+        this.spTree.splice(pos, 0, grObj);
     },
 
     getMainGroup: function()
@@ -1615,12 +1766,18 @@ CGroupShape.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo:
+            {
+                this.recalculateArrGraphicObjects();
+                break;
+            }
             case historyitem_AutoShapes_SetGroup:
             {
                 this.group = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
             case  historyitem_AutoShapes_AddToSpTree:
+            case historyitem_AutoShapes_AddToGroupSpTreeToPos:
             {
                 for(var i = this.spTree.length -1; i > -1; --i)
                 {
@@ -1632,6 +1789,7 @@ CGroupShape.prototype =
                 }
                 break;
             }
+
             case historyitem_AutoShapes_SetXfrm:
             {
                 this.spPr.xfrm = g_oTableId.Get_ById(data.oldValue);
@@ -1688,6 +1846,11 @@ CGroupShape.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo:
+            {
+                this.recalculateArrGraphicObjects();
+                break;
+            }
             case historyitem_AutoShapes_SetGroup:
             {
                 this.group = g_oTableId.Get_ById(data.newValue);
@@ -1696,6 +1859,11 @@ CGroupShape.prototype =
             case  historyitem_AutoShapes_AddToSpTree:
             {
                 this.spTree.push(g_oTableId.Get_ById(data.oldValue));
+                break;
+            }
+            case historyitem_AutoShapes_AddToGroupSpTreeToPos:
+            {
+                this.spTree.splice(data.newValue, 0, g_oTableId.Get_ById(data.oldValue));
                 break;
             }
             case historyitem_AutoShapes_GroupRecalculateRedo:
@@ -1774,8 +1942,6 @@ CGroupShape.prototype =
             }
         }
     },
-
-
 
     getBase64Image: function()
     {

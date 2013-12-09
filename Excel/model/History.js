@@ -196,6 +196,9 @@ var historyitem_AutoShapes_SetChartTitleType = 84;
 var historyitem_AutoShapes_OnContentRecalculateUndo = 85;
 var historyitem_AutoShapes_OnContentRecalculateRedo = 86;
 var historyitem_AutoShapes_GeometryAddPreset = 87;
+var historyitem_AutoShapes_AddToGroupSpTreeToPos = 88;
+var historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo = 89;
+var historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo = 90;
 
 
 

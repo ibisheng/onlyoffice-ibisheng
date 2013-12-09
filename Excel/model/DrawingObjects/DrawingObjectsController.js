@@ -2356,64 +2356,97 @@ DrawingObjectsController.prototype =
 
     setGraphicObjectLayerCallBack: function(layerType)
     {
-        History.Create_NewPoint();
-        switch (layerType)
+        if(!(this.curState.group instanceof CGroupShape))
         {
-            case 0:
+            History.Create_NewPoint();
+            switch (layerType)
             {
-                this.bringToFront();
-                break;
-            }
-            case 1:
-            {
-                this.sendToBack();
-                break;
-            }
-            case 2:
-            {
-                this.bringForward();
-                break;
-            }
-            case 3:
-            {
-                this.bringBackward();
+                case 0:
+                {
+                    this.bringToFront();
+                    break;
+                }
+                case 1:
+                {
+                    this.sendToBack();
+                    break;
+                }
+                case 2:
+                {
+                    this.bringForward();
+                    break;
+                }
+                case 3:
+                {
+                    this.bringBackward();
+                }
             }
         }
+        else
+        {
+            var oThis = this;
+            var callback = function(layer)
+            {
+                History.Create_NewPoint();
+                switch (layer)
+                {
+                    case 0:
+                    {
+                        oThis.bringToFront();
+                        break;
+                    }
+                    case 1:
+                    {
+                        oThis.sendToBack();
+                        break;
+                    }
+                    case 2:
+                    {
+                        oThis.bringForward();
+                        break;
+                    }
+                    case 3:
+                    {
+                        oThis.bringBackward();
+                    }
+                }
+            };
+            this.checkSelectedObjectsAndCallback(callback, [layerType]);
+        }
+
     },
+
+
 
     bringToFront : function()
     {
         var state = this.curState;
         var sp_tree = this.drawingObjects.getDrawingObjects();
-        switch(state.id)
+        if(!(state.group instanceof CGroupShape))
         {
-            case STATES_ID_NULL:
+            var selected = [];
+            for(var i = 0; i < sp_tree.length; ++i)
             {
-                var selected = [];
-                for(var i = 0; i < sp_tree.length; ++i)
+                if(sp_tree[i].graphicObject.selected)
                 {
-                    if(sp_tree[i].graphicObject.selected)
-                    {
-                        selected.push(sp_tree[i].graphicObject);
-                    }
+                    selected.push(sp_tree[i].graphicObject);
                 }
-                for(var i = sp_tree.length-1; i > -1 ; --i)
-                {
-                    if(sp_tree[i].graphicObject.selected)
-                    {
-                        sp_tree[i].graphicObject.deleteDrawingBase();
-                    }
-                }
-                for(i = 0; i < selected.length; ++i)
-                {
-                    selected[i].addToDrawingObjects(sp_tree.length);
-                }
-                break;
             }
-            case STATES_ID_GROUP:
+            for(var i = sp_tree.length-1; i > -1 ; --i)
             {
-                break;
+                if(sp_tree[i].graphicObject.selected)
+                {
+                    sp_tree[i].graphicObject.deleteDrawingBase();
+                }
             }
+            for(i = 0; i < selected.length; ++i)
+            {
+                selected[i].addToDrawingObjects(sp_tree.length);
+            }
+        }
+        else
+        {
+            state.group.bringToFront();
         }
         this.drawingObjects.showDrawingObjects(true);
 
@@ -2423,25 +2456,21 @@ DrawingObjectsController.prototype =
     {
         var state = this.curState;
         var sp_tree = this.drawingObjects.getDrawingObjects();
-        switch(state.id)
+        if(!(state.group instanceof CGroupShape))
         {
-            case STATES_ID_NULL:
+            for(var i = sp_tree.length - 1;i > -1; --i)
             {
-                for(var i = sp_tree.length - 1;i > -1; --i)
+                var sp = sp_tree[i].graphicObject;
+                if(sp.selected && i < sp_tree.length - 1 && !sp_tree[i+1].graphicObject.selected)
                 {
-                    var sp = sp_tree[i].graphicObject;
-                    if(sp.selected && i < sp_tree.length - 1 && !sp_tree[i+1].graphicObject.selected)
-                    {
-                        sp.deleteDrawingBase();
-                        sp.addToDrawingObjects(i+1);
-                    }
+                    sp.deleteDrawingBase();
+                    sp.addToDrawingObjects(i+1);
                 }
-                break;
             }
-            case STATES_ID_GROUP:
-            {
-                break;
-            }
+        }
+        else
+        {
+            state.group.bringForward();
         }
         this.drawingObjects.showDrawingObjects(true);
     },
@@ -2450,27 +2479,24 @@ DrawingObjectsController.prototype =
     {
         var state = this.curState;
         var sp_tree = this.drawingObjects.getDrawingObjects();
-        switch(state.id)
+
+        if(!(state.group instanceof CGroupShape))
         {
-            case STATES_ID_NULL:
+            var  j = 0;
+            for(var i = 0; i < sp_tree.length; ++i)
             {
-                var  j = 0;
-                for(var i = 0; i < sp_tree.length; ++i)
+                if(sp_tree[i].graphicObject.selected)
                 {
-                    if(sp_tree[i].graphicObject.selected)
-                    {
-                        var object = sp_tree[i].graphicObject;
-                        object.deleteDrawingBase();
-                        object.addToDrawingObjects(j);
-                        ++j;
-                    }
+                    var object = sp_tree[i].graphicObject;
+                    object.deleteDrawingBase();
+                    object.addToDrawingObjects(j);
+                    ++j;
                 }
-                break;
             }
-            case STATES_ID_GROUP:
-            {
-                break;
-            }
+        }
+        else
+        {
+            state.group.sendToBack();
         }
         this.drawingObjects.showDrawingObjects(true);
 
@@ -2481,25 +2507,21 @@ DrawingObjectsController.prototype =
     {
         var state = this.curState;
         var sp_tree = this.drawingObjects.getDrawingObjects();
-        switch(state.id)
+        if(!(state.group instanceof CGroupShape))
         {
-            case STATES_ID_NULL:
+            for(var i = 0;i < sp_tree.length; ++i)
             {
-                for(var i = 0;i < sp_tree.length; ++i)
+                var sp = sp_tree[i].graphicObject;
+                if(sp.selected && i > 0 && !sp_tree[i-1].graphicObject.selected)
                 {
-                    var sp = sp_tree[i].graphicObject;
-                    if(sp.selected && i > 0 && !sp_tree[i-1].graphicObject.selected)
-                    {
-                        sp.deleteDrawingBase();
-                        sp.addToDrawingObjects(i-1);
-                    }
+                    sp.deleteDrawingBase();
+                    sp.addToDrawingObjects(i-1);
                 }
-                break;
             }
-            case STATES_ID_GROUP:
-            {
-                break;
-            }
+        }
+        else
+        {
+            state.group.bringBackward();
         }
         this.drawingObjects.showDrawingObjects(true);
 
