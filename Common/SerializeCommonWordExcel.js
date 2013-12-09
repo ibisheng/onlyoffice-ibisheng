@@ -1155,7 +1155,7 @@ function BinaryChartWriter(memory)
 			oTempSpPr.Fill = oFill;
 			this.bs.WriteItem(c_oSer_ChartSeriesType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
 		}
-		if(null != seria.Cat && (null != seria.Cat.Formula || seria.Cat.NumCache.length > 0))
+		if(c_oAscChartType.scatter != chart.type && null != seria.Cat && (null != seria.Cat.Formula || seria.Cat.NumCache.length > 0))
 			this.bs.WriteItem(c_oSer_ChartSeriesType.Cat, function(){oThis.WriteSeriesNumCache(seria.Cat);});
     };
 	this.WriteSeriesNumCache = function(oCache)
