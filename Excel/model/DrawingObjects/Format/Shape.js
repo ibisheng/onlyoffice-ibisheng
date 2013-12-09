@@ -536,16 +536,20 @@ CShape.prototype =
     },
 
     setPaddings: function (paddings) {
-        if(isRealObject(this.txBody))
+
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        if(!isRealObject(this.txBody))
         {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
-                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-            this.txBody.setPaddings(paddings);
-            this.calculateContent();
-            this.calculateTransformTextMatrix();
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
-                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            this.addTextBody(new CTextBody(this));
+            this.txBody.calculateContent();
         }
+        this.txBody.setPaddings(paddings);
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
     setCellTextWrap: function (isWrapped) {

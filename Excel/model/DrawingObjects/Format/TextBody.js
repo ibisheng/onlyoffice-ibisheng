@@ -831,7 +831,7 @@ CTextBody.prototype =
     {
         if(isRealNumber(ins))
         {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_LeftInset, null, null,
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_BottomInset, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.bIns, ins)));
             this.bodyPr.bIns = ins;
         }
@@ -902,6 +902,26 @@ CTextBody.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_LeftInset:
+            {
+                this.bodyPr.lIns = data.oldValue;
+                break;
+            }
+            case historyitem_AutoShapes_TopInset:
+            {
+                this.bodyPr.tIns = data.oldValue;
+                break;
+            }
+            case historyitem_AutoShapes_RightInset:
+            {
+                this.bodyPr.rIns = data.oldValue;
+                break;
+            }
+            case historyitem_AutoShapes_BottomInset:
+            {
+                this.bodyPr.bIns = data.oldValue;
+                break;
+            }
             case historyitem_AutoShapes_AddDocContent:
             {
                 this.content = g_oTableId.Get_ById(data.oldValue);
@@ -935,6 +955,26 @@ CTextBody.prototype =
     {
         switch(type)
         {
+            case historyitem_AutoShapes_LeftInset:
+            {
+                this.bodyPr.lIns = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_TopInset:
+            {
+                this.bodyPr.tIns = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_RightInset:
+            {
+                this.bodyPr.rIns = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_BottomInset:
+            {
+                this.bodyPr.bIns = data.newValue;
+                break;
+            }
             case historyitem_AutoShapes_AddDocContent:
             {
                 this.content = g_oTableId.Get_ById(data.newValue);
