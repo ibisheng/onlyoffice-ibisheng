@@ -129,13 +129,13 @@ CMathBase.prototype =
     },
     /////////
 
-    setComposition: function(composition)
+    setComposition: function(Composition)
     {
-        this.Composition = composition;
+        this.Composition = Composition;
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setComposition(composition);
+                this.elements[i][j].setComposition(Composition);
     },
     setReferenceComposition: function(Comp)
     {

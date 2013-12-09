@@ -564,7 +564,6 @@ CMathContent.prototype =
 
         return mathElem; // for finished equation
     },
-
     addElementToContent: function(obj)   //for "read"
     {
         var element = new mathElem(obj);
@@ -583,7 +582,7 @@ CMathContent.prototype =
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
-    addToContent: function(obj, shift)          // for "edit"
+    addToContent: function(obj, shift)   // for "edit"
     {
         var elem = new mathElem(obj);
 
@@ -609,8 +608,59 @@ CMathContent.prototype =
         //this.setStart_Selection(this.CurPos);
         //this.selection.active = false;
     },
-    addToContent_2: function(content) // for "menu"
+    addToContent_2: function(oSub)   // for "menu"
     {
+        // добавление к контенту элементов из другого контента в текущую позицию
+
+        // первый элемент в добавляемом контенте CEmpty пропускаем
+
+        var subContent = oSub.content;
+        var subStart = 1;
+        //var subEnd = subContent.length - 1;
+
+        var curStart = this.CurPos,
+            curEnd   = this.CurPos;
+
+        var CurFirstType = this.content[this.CurPos].value.typeObj,
+            CurLastType  = this.CurPos < this.content.length - 1 ? this.content[this.CurPos + 1].value.typeObj : null,
+            SubFirstType = subContent[1].value.typeObj,
+            SubLastType  = subContent[subContent.length - 1].value.typeObj;
+
+        if(CurFirstType == MATH_RUN_PRP)
+        {
+            curStart = this.CurPos - 1;
+            curEnd   = SubLastType == MATH_EMPTY ? this.CurPos - 1 : this.CurPos; // если последний элемент у добавляемого контента текст, убираем RunPrp в текущей позиции
+        }
+        else if(CurFirstType == MATH_TEXT)
+        {
+            subStart = SubFirstType == MATH_RUN_PRP ? 2 : 1;
+
+            if(CurLastType == MATH_TEXT && SubLastType == MATH_EMPTY) // добавляем RunPrp, если в конце добавляемого контента стоит мат. объект
+            {
+                var rPrp = new CMathRunPrp();
+                rPrp.Merge( this.getCurrRunPrp() );
+                subContent.push( new mathElem(rPrp) );
+            }
+        }
+
+        // "relate" for math objects
+        for(var i = 0; i < subContent.length; i++)
+            subContent[i].value.relate(this);
+
+        oSub.setReferenceComposition(this.Composition);
+
+        var startContent  = this.content.slice(0, curStart + 1),
+            middleContent = subContent.slice(subStart),
+            endContent    = this.content.slice(curEnd);
+
+        this.content = [];
+        this.content = this.content.concat(startContent);
+        this.content = this.content.concat(middleContent);
+        this.content = this.content.concat(endContent);
+
+        var pos = startContent.length + middleContent.length;
+        this.setLogicalPositionOfCursor(pos);
+
 
     },
     setComposition: function(Composition)
@@ -4712,7 +4762,12 @@ CMathContent.prototype =
     update_Cursor: function()
     {
         //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
-        var sizeCursor = this.getCurrRunPrp().FontSize*g_dKoef_pt_to_mm;
+
+        var rPrp = new CMathTextPrp();
+        rPrp.Merge(DEFAULT_RUN_PRP);
+        rPrp.Merge(this.getCurrRunPrp());
+
+        var sizeCursor = rPrp.FontSize*g_dKoef_pt_to_mm;
         var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor*0.8 };
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
@@ -6787,7 +6842,8 @@ CMathComposition.prototype =
             else
             {
                  this.SelectContent = move.SelectContent;
-                 this.CurrentContent = move.CurrContent;
+                 //this.CurrentContent = move.CurrContent;
+                 this.CurrentContent = this.SelectContent;
             }
         }
 
@@ -7106,5 +7162,31 @@ function TEST_MATH_EDIT()
         Top    : Y_Top_Field,
         Bottom : Y_Bottom_Field
     } } );
+}
+
+function TEST_UNION_CONTENT(indef)
+{
+    var oMathComp = new CMathComposition();
+
+    if(indef == 1)
+    {
+        oMathComp.AddLetter("a");
+        oMathComp.CreateEquation(1);
+        oMathComp.AddLetter("b");
+    }
+    else
+    {
+        oMathComp.CreateEquation(0);
+    }
+
+
+    var oCurrent =  oMathComp.CurrentContent;
+    var rPr = MathComposition.Root.getCurrRunPrp();
+    oCurrent.setRPrp(rPr);
+    MathComposition.Root.addToContent_2(oCurrent);
+
+    MathComposition.RecalculateComposition(g_oTextMeasurer);
+
+    //oCurContent.verifyRPrp_MC_2(rPr);
 }
 
