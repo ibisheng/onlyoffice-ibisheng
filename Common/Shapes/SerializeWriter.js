@@ -3633,7 +3633,7 @@ function CBinaryFileWriter()
 
     this.WriteTableCellBorderLineStyle2 = function(rec_type, _border)
     {
-        if (!_border)
+        if (!_border && false)
         {
             oThis.StartRecord(rec_type);
 
