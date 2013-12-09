@@ -1677,7 +1677,9 @@ CBlipFill.prototype =
         {
 			
             var string_to_write = getFullImageSrc(this.RasterImageId);
-			if(string_to_write.indexOf(window["Asc"]["editor"].documentOrigin) !== 0)
+			if(string_to_write.indexOf(window["Asc"]["editor"].documentOrigin) !== 0
+                && (0 != string_to_write.indexOf("http:") && 0 != string_to_write.indexOf("data:")
+                && 0 != string_to_write.indexOf("https:") && 0 != string_to_write.indexOf("ftp:") && 0 != string_to_write.indexOf("file:")))
 			{
 				string_to_write = window["Asc"]["editor"].documentOrigin + string_to_write;
 			}
