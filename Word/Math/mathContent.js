@@ -610,6 +610,7 @@ CMathContent.prototype =
     },
     addToContent_2: function(oSub)   // for "menu"
     {
+		History.Create_NewPoint();
         // добавление к контенту элементов из другого контента в текущую позицию
 
         // первый элемент в добавляемом контенте CEmpty пропускаем
@@ -667,6 +668,7 @@ CMathContent.prototype =
             pos++;
 
         this.CurPos = pos;
+		History.Add(this.Composition.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
     },
     setComposition: function(Composition)
     {
