@@ -610,7 +610,6 @@ CMathContent.prototype =
     },
     addToContent_2: function(oSub)   // for "menu"
     {
-		History.Create_NewPoint();
         // добавление к контенту элементов из другого контента в текущую позицию
 
         // первый элемент в добавляемом контенте CEmpty пропускаем
@@ -630,7 +629,10 @@ CMathContent.prototype =
         if(CurFirstType == MATH_RUN_PRP)
         {
             curStart = this.CurPos - 1;
-            curEnd   = SubLastType == MATH_EMPTY ? this.CurPos - 1 : this.CurPos; // если последний элемент у добавляемого контента текст, убираем RunPrp в текущей позиции
+
+            // не убираем RunPrp для вставляемого текста, чтобы History работала нормально !!
+            // когда на запись отдаем, можно лишние RunPrp убрать, как в Ворде
+            // curEnd   = SubLastType == MATH_EMPTY ? this.CurPos - 1 : this.CurPos; // если последний элемент у добавляемого контента текст, убираем RunPrp в текущей позиции
         }
         else if(CurFirstType == MATH_TEXT)
         {
@@ -668,7 +670,10 @@ CMathContent.prototype =
             pos++;
 
         this.CurPos = pos;
-		History.Add(this.Composition.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+
+		//History.Add(this.Composition.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+
+        return middleContent;
     },
     setComposition: function(Composition)
     {
@@ -7088,8 +7093,29 @@ CMathComposition.prototype =
 
         this.SelectContent = this.Root.getContent( stackSelect, false );
         this.CurrentContent = this.Root.getContent( stackCurrent, true );
-    }
+    },
     /////////////////////////////////////////
+
+    //////// for menu  ///////////
+    AddToComposition: function(content)
+    {
+        History.Create_NewPoint();
+
+        var items = this.CurrentContent.addToContent_2(content);
+
+        var Pos = this.CurrentContent.CurPos,
+            PosEnd = Pos + items.length;
+
+        History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
+
+    },
+    GetCurrentRPrp: function()
+    {
+        return this.CurrentContent.getCurrRunPrp();
+    }
+
+
+    //////////////////////////////
 
 }
 
@@ -7191,16 +7217,16 @@ function TEST_UNION_CONTENT(indef)
     }
 
 
-    var oCurrent =  oMathComp.Root;
-    var rPr = MathComposition.CurrentContent.getCurrRunPrp();
-    oCurrent.setRPrp(rPr);
-    MathComposition.CurrentContent.addToContent_2(oCurrent);
+    var oRoot =  oMathComp.Root;
+    var rPr = MathComposition.GetCurrentRPrp();
+    oRoot.setRPrp(rPr);
+    MathComposition.AddToComposition(oRoot);
 
-    MathComposition.RecalculateComposition(g_oTextMeasurer);
+    //MathComposition.RecalculateComposition(g_oTextMeasurer);
 
-    MathComposition.CurrentContent.update_Cursor();
+    //MathComposition.CurrentContent.update_Cursor();
 
-    editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
+    //editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
 
     //oCurContent.verifyRPrp_MC_2(rPr);
 }
