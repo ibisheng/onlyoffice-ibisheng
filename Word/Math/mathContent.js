@@ -7031,6 +7031,9 @@ CMathComposition.prototype =
 
         var result = this.Root.selection_End(x, y, MouseEvent);
         this.SelectContent = result.SelectContent;
+
+        if(!this.SelectContent.selectUse())
+            this.CurrentContent = this.SelectContent;
     },
     Selection_Draw: function()
     {

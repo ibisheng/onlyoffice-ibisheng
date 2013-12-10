@@ -7691,12 +7691,16 @@ ParaMath.prototype =
             this.Math.AddLetter( 0x0020 );
         else if ( para_Math === Type )
         {		
-			var oCurContent =  this.Math.CurrentContent;
+			/*var oCurContent =  this.Math.CurrentContent;
 			var rPr = oCurContent.getCurrRunPrp();
 			Item.Math.Root.setRPrp(rPr);
 			oCurContent.addToContent_2(Item.Math.Root);
 			//Item.Measure(g_oTextMeasurer, rPr);
-			oCurContent.verifyRPrp_MC_2(rPr);	
+			oCurContent.verifyRPrp_MC_2(rPr);*/
+
+            var rPr = this.Math.GetCurrentRPrp();
+            Item.Math.Root.setRPrp(rPr);
+            this.Math.AddToComposition(Item.Math.Root);
         }
     },
 
