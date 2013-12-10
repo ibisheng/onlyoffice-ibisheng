@@ -3482,6 +3482,7 @@ function CBinaryFileWriter()
 
         oThis.StartRecord(0);
 
+        /*
         oThis.WriteTableCellBorderLineStyle2(0, _part.TableCellPr.TableCellBorders.Left);
         oThis.WriteTableCellBorderLineStyle2(1, _part.TableCellPr.TableCellBorders.Right);
         oThis.WriteTableCellBorderLineStyle2(2, _part.TableCellPr.TableCellBorders.Top);
@@ -3489,6 +3490,16 @@ function CBinaryFileWriter()
 
         oThis.WriteTableCellBorderLineStyle2(4, _part.TableCellPr.TableCellBorders.InsideH);
         oThis.WriteTableCellBorderLineStyle2(5, _part.TableCellPr.TableCellBorders.InsideV);
+        */
+
+        oThis.WriteRecord3(0, _part.TableCellPr.TableCellBorders.Left, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteRecord3(1, _part.TableCellPr.TableCellBorders.Right, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteRecord3(2, _part.TableCellPr.TableCellBorders.Top, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteRecord3(3, _part.TableCellPr.TableCellBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
+
+        oThis.WriteRecord3(4, _part.TableCellPr.TableCellBorders.InsideH, oThis.WriteTableCellBorderLineStyle);
+        oThis.WriteRecord3(5, _part.TableCellPr.TableCellBorders.InsideV, oThis.WriteTableCellBorderLineStyle);
+
 
         oThis.EndRecord();
 
@@ -3537,6 +3548,7 @@ function CBinaryFileWriter()
 
         var bIsRet = false;
 
+        /*
         bIsRet = oThis.WriteRecord3(0, _part.TableCellPr.TableCellBorders.Left, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteRecord3(0, tablePr.TableBorders.Left, oThis.WriteTableCellBorderLineStyle);
@@ -3552,9 +3564,30 @@ function CBinaryFileWriter()
         bIsRet = oThis.WriteRecord3(3, _part.TableCellPr.TableCellBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
         if (!bIsRet)
             oThis.WriteRecord3(3, tablePr.TableBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
+        */
 
+        bIsRet = oThis.WriteRecord3(0, _part.TableCellPr.TableCellBorders.Left, oThis.WriteTableCellBorderLineStyle);
+        if (!bIsRet)
+            oThis.WriteTableCellBorderLineStyle2(0, tablePr.TableBorders.Left);
+
+        bIsRet = oThis.WriteRecord3(1, _part.TableCellPr.TableCellBorders.Right, oThis.WriteTableCellBorderLineStyle);
+        if (!bIsRet)
+            oThis.WriteTableCellBorderLineStyle2(1, tablePr.TableBorders.Right);
+
+        bIsRet = oThis.WriteRecord3(2, _part.TableCellPr.TableCellBorders.Top, oThis.WriteTableCellBorderLineStyle);
+        if (!bIsRet)
+            oThis.WriteTableCellBorderLineStyle2(2, tablePr.TableBorders.Top);
+
+        bIsRet = oThis.WriteRecord3(3, _part.TableCellPr.TableCellBorders.Bottom, oThis.WriteTableCellBorderLineStyle);
+        if (!bIsRet)
+            oThis.WriteTableCellBorderLineStyle2(3, tablePr.TableBorders.Bottom);
+
+        /*
         oThis.WriteRecord3(4, _part.TablePr.TableBorders.InsideH, oThis.WriteTableCellBorderLineStyle);
         oThis.WriteRecord3(5, _part.TablePr.TableBorders.InsideV, oThis.WriteTableCellBorderLineStyle);
+        */
+        oThis.WriteTableCellBorderLineStyle2(4, _part.TablePr.TableBorders.InsideH);
+        oThis.WriteTableCellBorderLineStyle2(5, _part.TablePr.TableBorders.InsideV);
 
         oThis.EndRecord();
 
@@ -3633,7 +3666,7 @@ function CBinaryFileWriter()
 
     this.WriteTableCellBorderLineStyle2 = function(rec_type, _border)
     {
-        if (!_border && false)
+        if (!_border)
         {
             oThis.StartRecord(rec_type);
 
