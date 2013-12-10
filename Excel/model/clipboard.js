@@ -690,6 +690,23 @@
 				  //paste
 				var func_timeout = function() {
 
+					if (PASTE_EMPTY_USE && !isTruePaste)
+					{
+						// не править. это сделано для фаерфокса. ну не успевает он вставить
+						// в дивку контент. и получалось, что мы через раз вставляем пробел.
+						// тут идет надежда на то, что вставлять пробел не будут. А если будут - то он вставится,
+						// но может с задержкой 1-2 секунды.
+						if (pastebin.innerHTML == "&nbsp;")
+						{
+							PASTE_EMPTY_COUNTER++;
+							if (PASTE_EMPTY_COUNTER < PASTE_EMPTY_COUNTER_MAX)
+							{
+								window.setTimeout( func_timeout, 100 );
+								return;
+							}
+						}
+					}
+					
 					if (window.USER_AGENT_SAFARI_MACOS)
 					{
 						if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
@@ -724,9 +741,9 @@
 					if (callback && callback.call) {callback();}
 				};
 
-				var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
-				if($.browser["mozilla"])
-					_interval_time = 10;
+				var _interval_time = window.USER_AGENT_MACOS ? 200 : 100;
+
+				PASTE_EMPTY_COUNTER = 0;
 				window.setTimeout( func_timeout, _interval_time );
             },
             
@@ -3007,6 +3024,11 @@ var ELEMENT_DISPAY_STYLE = "none";
 var COPYPASTE_ELEMENT_CLASS = "sdk-element";
 var kElementTextId = "clipboard-helper-text";
 var isNeedEmptyAfterCut = false;
+
+var PASTE_EMPTY_COUNTER_MAX = 10;
+var PASTE_EMPTY_COUNTER     = 0;
+var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
+
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
