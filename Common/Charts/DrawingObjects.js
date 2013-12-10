@@ -5294,14 +5294,15 @@ function ClickCounter() {
 	var _this = this;
 	_this.x = 0;
 	_this.y = 0;
+	_this.button = 0;
 	_this.time = 0;
 	_this.clickCount = 0;
 	_this.log = false;
 	
-	_this.mouseDownEvent = function(x, y) {
+	_this.mouseDownEvent = function(x, y, button) {
 	
 		var currTime = getCurrentTime();
-		if ( (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) )
+		if ( (_this.button === button) && (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) )
 			_this.clickCount++;
 		else
 			_this.clickCount = 1;

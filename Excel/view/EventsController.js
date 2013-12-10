@@ -1119,7 +1119,7 @@
 					if ( event.metaKey )
 						event.ctrlKey = true;
 					
-					this.clickCounter.mouseDownEvent(coord.x, coord.y);
+					this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 					event.ClickCount = this.clickCounter.clickCount;
 					
 					if ( (event.ClickCount == 2) && asc["editor"].isStartAddShape ) 

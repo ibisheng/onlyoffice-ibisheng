@@ -2674,6 +2674,8 @@
 				if (!this.isSelectionDialogMode) {
 					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 					this._drawSelectionRange(range);
+					if ( this.objectRender.selectedGraphicObjectsExists() )
+						this.objectRender.OnUpdateOverlay();
 				} 
 				else {
 					this._drawSelectionRange(range);
