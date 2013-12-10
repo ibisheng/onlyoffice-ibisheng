@@ -7703,6 +7703,100 @@ ParaMath.prototype =
             this.Math.AddToComposition(Item.Math.Root);
         }
     },
+	
+	AddText : function(oElem, sText, props)
+    {
+        if(sText)
+		{
+			var rPr = new CTextPr();		
+			var oMRun = new CMathRunPrp();
+			if (props)
+				oMRun.setMathRunPrp(props);
+			oMRun.setTxtPrp(rPr);
+			if (oElem)
+			{
+				oElem.addElementToContent(oMRun);		
+				for (var i=0;i<sText.length;i++)
+				{
+					/*text[i].replace("&",	"&amp;");
+					text[i].Replace("'",	"&apos;");
+					text[i].Replace("<",	"&lt;");
+					text[i].Replace(">",	"&gt;");
+					text[i].Replace("\"",	"&quot;");*/
+					oText = new CMathText();
+					oText.addTxt(sText[i]);
+					oElem.addElementToContent(oText);
+				}	
+			}
+		}
+    },
+	
+	CreateElem : function (oElem, oParent, props)
+	{
+		var ctrPrp = new CTextPr();
+		oElem.setCtrPrp(ctrPrp);
+		oElem.init(props);
+		if (oParent)
+			oParent.addElementToContent(oElem);	
+	},
+	
+	CreateFraction : function (oFraction,oParentElem,props,sNumText,sDenText)
+	{
+		this.CreateElem(oFraction, oParentElem, props);
+		
+		var oElemDen = oFraction.getDenominator();
+		this.AddText(oElemDen, sDenText);
+		
+		var oElemNum = oFraction.getNumerator();
+		this.AddText(oElemNum, sNumText);
+	},
+	
+	CreateDegree : function (oDegree, oParentElem,props,sBaseText,sSupText,sSubText)
+	{	
+		this.CreateElem(oDegree, oParentElem, props);
+		
+		var oElem = oDegree.getBase();
+		this.AddText(oElem, sBaseText);
+		
+		var oSup = oDegree.getUpperIterator();
+		this.AddText(oSup, sSupText);
+		
+		var oSub = oDegree.getLowerIterator();
+		this.AddText(oSub, sSubText);
+	},
+	
+	CreateRadical : function (oRad,oParentElem,props,sElemText,sDegText)
+	{
+		this.CreateElem(oRad, oParentElem, props);
+		
+		var oElem = oRad.getBase();
+		this.AddText(oElem, sElemText);
+		
+		var oDeg = oRad.getDegree();
+		this.AddText(oDeg, sDegText);		
+	},
+	
+	CreateNary : function (oNary,oParentElem,props,sElemText,sSubText,sSupText)
+	{
+		this.CreateElem(oNary, oParentElem, props);
+		
+		var oElem = oNary.getBase();
+		this.AddText(oElem, sElemText);
+		
+		var oSub = oNary.getLowerIterator();
+		this.AddText(oSub, sSubText);
+		
+		var oSup = oNary.getUpperIterator();
+		this.AddText(oSup, sSupText);	
+	},
+	
+	CreateBox : function (oBox,oParentElem,props,sElemText)
+	{
+		this.CreateElem(oBox, oParentElem, props);
+		
+		var oElem = oBox.getBase();
+		this.AddText(oElem, sElemText);
+	},
 
     Is_Empty : function()
     {

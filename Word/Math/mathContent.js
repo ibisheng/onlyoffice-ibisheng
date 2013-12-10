@@ -670,9 +670,6 @@ CMathContent.prototype =
             pos++;
 
         this.CurPos = pos;
-
-		//History.Add(this.Composition.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
-
         return middleContent;
     },
     setComposition: function(Composition)

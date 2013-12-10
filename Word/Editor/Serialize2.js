@@ -6545,6 +6545,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oMathAcc.init(props);
 			oElem.addElementToContent(oMathAcc);
 			var oElem = oMathAcc.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -6821,8 +6823,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if (c_oSer_OMathContentType.Element === type)
         {
 			oBar.init(props);
-			oElem.addElementToContent(oBar);
+			oElem.addElementToContent(oBar);			
 			var oElem = oBar.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -6888,6 +6892,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oBorderBox.init(props);
 			oElem.addElementToContent(oBorderBox);
 			var oElem = oBorderBox.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -6973,6 +6979,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oBox.init(props);
 			oElem.addElementToContent(oBox);
 			var oElem = oBox.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7135,6 +7143,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			}
 			var lColumn = oDelimiter.column;
 			var oElem = oDelimiter.getBase(lColumn);
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });		
@@ -7239,6 +7249,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			}
 			var lRow = oEqArr.row;
 			var oElem = oEqArr.getElement(lRow);
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });		
@@ -7326,6 +7338,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oGroupChr.init(props);
 			oElem.addElementToContent(oGroupChr);
 			var oElem = oGroupChr.getArgument();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });		
@@ -7397,6 +7411,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElemDen = oFraction.getDenominator();
+			if (length == 0)
+				oElemDen.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemDen);
             });			
@@ -7409,6 +7425,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElemNum = oFraction.getNumerator();
+			if (length == 0)
+				oElemNum.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElemNum);
             });			
@@ -7456,6 +7474,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oFunc.getArgument();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7469,6 +7489,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oFName = oFunc.getFName();
+			if (length == 0)
+				oFName.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oFName);
             });			
@@ -7577,6 +7599,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oLimLow.getFName();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7590,6 +7614,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oLim = oLimLow.getIterator();
+			if (length == 0)
+				oLim.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oLim);
             });			
@@ -7632,6 +7658,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oLimUpp.getFName();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -7645,6 +7673,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oLim = oLimUpp.getIterator();
+			if (length == 0)
+				oLim.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oLim);
             });			
@@ -7873,6 +7903,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var lRow = oMatrix.row;
 			var lColumn = oMatrix.column;
 			var oElem = oMatrix.getElement(lRow,lColumn);
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8010,6 +8042,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSub = oNary.getLowerIterator();
+			if (length == 0)
+				oSub.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSub);
             });			
@@ -8023,6 +8057,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSup = oNary.getUpperIterator();
+			if (length == 0)
+				oSup.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSup);
             });			
@@ -8036,6 +8072,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oNary.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8186,6 +8224,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oPhant.init(props);
 			oElem.addElementToContent(oPhant);
 			var oElem = oPhant.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8287,7 +8327,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				oElem.addElementToContent(oRad);
 				props.init = true;
 			}
-			var oDeg = oRad.getDegree();			
+			var oDeg = oRad.getDegree();
+			if (length == 0)
+				oDeg.fillPlaceholders();			
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oDeg);
             });			
@@ -8302,6 +8344,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oRad.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8451,6 +8495,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSub = oSPre.getLowerIterator();
+			if (length == 0)
+				oSub.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSub);
             });			
@@ -8464,6 +8510,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSup = oSPre.getUpperIterator();
+			if (length == 0)
+				oSup.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSup);
             });			
@@ -8477,6 +8525,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oSPre.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8519,6 +8569,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSub = oSSub.getLowerIterator();
+			if (length == 0)
+				oSub.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSub);
             });			
@@ -8532,6 +8584,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oSSub.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			
@@ -8574,6 +8628,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSub = oSSubSup.getLowerIterator();
+			if (length == 0)
+				oSub.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSub);
             });			
@@ -8647,6 +8703,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oSup = oSSup.getUpperIterator();
+			if (length == 0)
+				oESup.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oSup);
             });			
@@ -8660,6 +8718,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				props.init = true;
 			}
 			var oElem = oSSup.getBase();
+			if (length == 0)
+				oElem.fillPlaceholders();
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathArg(t,l,oElem);
             });			

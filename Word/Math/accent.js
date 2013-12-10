@@ -550,7 +550,7 @@ CSign.prototype.setSign = function(props)
     else
     {
         this.type = ACCENT_TEXT;
-        this.sign.add(sign.code);
+        this.sign.add(props.code);
     }
 }
 CSign.prototype.setPosition = function(pos)
