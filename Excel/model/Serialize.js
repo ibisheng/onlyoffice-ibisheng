@@ -566,7 +566,17 @@ var c_oSer_SheetView = {
 	ZoomScale					: 15,
 	ZoomScaleNormal				: 16,
 	ZoomScalePageLayoutView		: 17,
-	ZoomScaleSheetLayoutView	: 18
+	ZoomScaleSheetLayoutView	: 18,
+
+	Pane						: 19
+};
+/** @enum */
+var c_oSer_Pane = {
+	ActivePane	: 0,
+	State		: 1,
+	TopLeftCell	: 2,
+	XSplit		: 3,
+	YSplit		: 4
 };
 /** @enum */
 var c_oSer_CellStyle = {
@@ -6067,11 +6077,27 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		return res;
 	};
 	this.ReadSheetView = function (type, length, oSheetView) {
+		var oThis = this;
 		var res = c_oSerConstants.ReadOk;
 		if (c_oSer_SheetView.ShowGridLines === type) {
 			oSheetView.showGridLines = this.stream.GetBool();
 		} else if (c_oSer_SheetView.ShowRowColHeaders === type) {
 			oSheetView.showRowColHeaders = this.stream.GetBool();
+		} else if (c_oSer_SheetView.Pane === type) {
+			oSheetView.pane = new Asc.asc_CPane();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadPane(t, l, oSheetView.pane);
+			});
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadPane = function (type, length, oPane) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSer_Pane.State === type) {
+			oPane.state = this.stream.GetString2LE(length);
+		} else if (c_oSer_Pane.TopLeftCell === type) {
+			oPane.topLeftCell = this.stream.GetString2LE(length);
 		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;
