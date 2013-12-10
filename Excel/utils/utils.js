@@ -805,6 +805,7 @@
 			this["r2"] = r2;
 		}
 
+		/** @constructor */
 		function asc_CSheetViewSettings () {
 			if (!(this instanceof asc_CSheetViewSettings)) {
 				return new asc_CSheetViewSettings();
@@ -819,6 +820,9 @@
 			this.showGridLines = null;
 			// Показывать обозначения строк и столбцов
 			this.showRowColHeaders = null;
+
+			// Закрепление области
+			this.pane = null;
 
 			return this;
 		}
@@ -862,6 +866,18 @@
 				}
 			}
 		};
+
+		/** @constructor */
+		function asc_CPane () {
+			if (!(this instanceof asc_CPane)) {
+				return new asc_CPane();
+			}
+
+			this.state = null;
+			this.topLeftCell = null;
+
+			return this;
+		}
 
 		function RedoObjectParam () {
 			if (!(this instanceof RedoObjectParam)) {
@@ -1156,6 +1172,8 @@
 		prot["asc_getShowRowColHeaders"] = prot.asc_getShowRowColHeaders;
 		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
+
+		window["Asc"]["asc_CPane"] = window["Asc"].asc_CPane = asc_CPane;
 
 		window["Asc"]["asc_CStyleImage"] = window["Asc"].asc_CStyleImage = asc_CStyleImage;
 		prot = asc_CStyleImage.prototype;
