@@ -507,7 +507,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			initGlobalObjects: function(wbModel)
 			{
-				// Histoey & global counters
+				// History & global counters
 				History = new CHistory(wbModel);
 
 				g_oIdCounter = new CIdCounter();
@@ -2083,7 +2083,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						// Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
 						for (var key in t.wb.model.aWorksheets) {
 							var wsModel = t.wb.model.aWorksheets[key];
+							var history_is_on = History.Is_On();
+							if ( history_is_on )
+								History.TurnOff();
 							var ws = t.wb.getWorksheet(wsModel.index);
+							if ( history_is_on )
+								History.TurnOn();
+							
 							if ( ws )
 								ws.objectRender.updateChartReferences(activeName, ws.model.sName);
 						}
