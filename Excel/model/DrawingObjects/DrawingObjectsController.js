@@ -800,6 +800,8 @@ DrawingObjectsController.prototype =
     {
         var chart_as_group = new CChartAsGroup(null, this.drawingObjects);
         chart_as_group.initFromChartObject(chart, options);
+        this.resetSelectionState();
+        chart_as_group.select(this);
     },
 
     changeCurrentState: function(newState)
