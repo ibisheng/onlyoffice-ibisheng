@@ -651,17 +651,22 @@ CMathContent.prototype =
 
         var startContent  = this.content.slice(0, curStart + 1),
             middleContent = subContent.slice(subStart),
-            endContent    = this.content.slice(curEnd);
+            endContent    = this.content.slice(curEnd + 1);
 
         this.content = [];
         this.content = this.content.concat(startContent);
         this.content = this.content.concat(middleContent);
         this.content = this.content.concat(endContent);
 
-        var pos = startContent.length + middleContent.length;
-        this.setLogicalPositionOfCursor(pos);
+        var pos = startContent.length + middleContent.length - 1;
 
+        var currType  = this.content[pos].value.typeObj;
+        var nextType = pos < this.content.length - 1 ? this.content[pos + 1].value.typeObj : null;
 
+        if(currType == MATH_EMPTY && nextType == MATH_RUN_PRP)
+            pos++;
+
+        this.CurPos = pos;
     },
     setComposition: function(Composition)
     {
@@ -3671,6 +3676,10 @@ CMathContent.prototype =
         //placeholder.setTxtPrp(this.getTxtPrp());
 
         this.content.push( new mathElem( placeholder ) );
+    },
+    setCtrPrp: function(ctrPrp)
+    {
+
     },
 
     /////////   перемещение     //////////
@@ -7170,9 +7179,9 @@ function TEST_UNION_CONTENT(indef)
 
     if(indef == 1)
     {
-        oMathComp.AddLetter("a");
+        oMathComp.Root.addTxt("a");
         oMathComp.CreateEquation(1);
-        oMathComp.AddLetter("b");
+        oMathComp.Root.addTxt("b");
     }
     else
     {
@@ -7180,12 +7189,16 @@ function TEST_UNION_CONTENT(indef)
     }
 
 
-    var oCurrent =  oMathComp.CurrentContent;
-    var rPr = MathComposition.Root.getCurrRunPrp();
+    var oCurrent =  oMathComp.Root;
+    var rPr = MathComposition.CurrentContent.getCurrRunPrp();
     oCurrent.setRPrp(rPr);
-    MathComposition.Root.addToContent_2(oCurrent);
+    MathComposition.CurrentContent.addToContent_2(oCurrent);
 
     MathComposition.RecalculateComposition(g_oTextMeasurer);
+
+    MathComposition.CurrentContent.update_Cursor();
+
+    editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
 
     //oCurContent.verifyRPrp_MC_2(rPr);
 }
