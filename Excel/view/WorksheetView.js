@@ -4580,25 +4580,28 @@
 				return r[row].top + r[row].height - r[topRow].top + this.cellsTop > this.drawingCtx.getHeight();
 			},
 
-			_isVisibleX: function (x, leftCol) {
+			_isVisibleX: function () {
+				var vr = this.visibleRange;
 				var c = this.cols;
-				return x - c[leftCol].left + this.cellsLeft < this.drawingCtx.getWidth();
+				var x = c[vr.c2].left + c[vr.c2].width;
+				return x - c[vr.c1].left + this.cellsLeft < this.drawingCtx.getWidth();
 			},
 
-			_isVisibleY: function (y, topRow) {
+			_isVisibleY: function () {
+				var vr = this.visibleRange;
 				var r = this.rows;
-				return y - r[topRow].top + this.cellsTop < this.drawingCtx.getHeight();
+				var y = r[vr.r2].top + r[vr.r2].height;
+				return y - r[vr.r1].top + this.cellsTop < this.drawingCtx.getHeight();
 			},
 
 			_updateVisibleRowsCount: function (skipScrolReinit) {
-				var vr = this.visibleRange;
 				this._calcVisibleRows();
-				if ( this._isVisibleY(this.rows[vr.r2].top + this.rows[vr.r2].height, vr.r1) ) {
-					do{  // Добавим еще строки, чтоб не было видно фон под таблицей
+				if (this._isVisibleY()) {
+					do {  // Добавим еще строки, чтоб не было видно фон под таблицей
 						this.expandRowsOnScroll(true);
 						this._calcVisibleRows();
 						if (this.rows[this.rows.length - 1].height < 0.000001) {break;}
-					} while ( this._isVisibleY(this.rows[vr.r2].top + this.rows[vr.r2].height, vr.r1) );
+					} while (this._isVisibleY());
 					if (!skipScrolReinit) {
 						this._trigger("reinitializeScrollY");
 					}
@@ -4606,14 +4609,13 @@
 			},
 
 			_updateVisibleColsCount: function (skipScrolReinit) {
-				var vr = this.visibleRange;
 				this._calcVisibleColumns();
-				if ( this._isVisibleX(this.cols[vr.c2].left + this.cols[vr.c2].width, vr.c1) ) {
+				if (this._isVisibleX()) {
 					do {  // Добавим еще столбцы, чтоб не было видно фон под таблицей
 						this.expandColsOnScroll(true);
 						this._calcVisibleColumns();
 						if (this.cols[this.cols.length - 1].width < 0.000001) {break;}
-					} while ( this._isVisibleX(this.cols[vr.c2].left + this.cols[vr.c2].width, vr.c1) );
+					} while (this._isVisibleX());
 					if (!skipScrolReinit) {
 						this._trigger("reinitializeScrollX");
 					}
