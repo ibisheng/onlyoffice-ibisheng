@@ -7544,11 +7544,19 @@ Range.prototype.cleanAll=function(){
 	History.EndTransaction();
 }
 Range.prototype.sort=function(nOption, nStartCol){
-	//todo sort с замержеными ячейками.
 	//todo горизонтальная сортировка
-    lockDraw(this.worksheet.workbook);
-	if(null != this.hasMerged())
+	var aMerged = this.worksheet.mergeManager.get(this.bbox);
+	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == this._isSameSizeMerged(this.bbox, aMerged.inner)))
 		return null;
+	var nMergedHeight = 1;
+	if(aMerged.inner.length > 0)
+	{
+		var merged = aMerged.inner[0];
+		nMergedHeight = merged.bbox.r2 - merged.bbox.r1 + 1;
+		//меняем nStartCol, потому что приходит колонка той ячейки, на которой начали выделение
+		nStartCol = merged.bbox.c1;
+	}
+	lockDraw(this.worksheet.workbook);
 	var oRes = null;
 	var oThis = this;
 	var bAscent = false;
@@ -7662,11 +7670,11 @@ Range.prototype.sort=function(nOption, nStartCol){
 	for(var i = 0, length = aSortElems.length; i < length; ++i)
 	{
 		var item = aSortElems[i];
-		var nNewIndex = i + nRowFirst0 + nHiddenCount;
+		var nNewIndex = i * nMergedHeight + nRowFirst0 + nHiddenCount;
 		while(null != aHiddenRow[nNewIndex])
 		{
 			nHiddenCount++;
-			nNewIndex = i + nRowFirst0 + nHiddenCount;
+			nNewIndex = i * nMergedHeight + nRowFirst0 + nHiddenCount;
 		}
 		var oNewElem = new UndoRedoData_FromToRowCol(true, item.row, nNewIndex);
 		oFromArray[item.row] = 1;
@@ -7713,7 +7721,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		var oUndoRedoBBox = new UndoRedoData_BBox({r1:nRowFirst0, c1:nColFirst0, r2:nLastRow0, c2:nLastCol0});
 		oRes = new UndoRedoData_SortData(oUndoRedoBBox, aSortData);
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
-		this._sortByArray(oUndoRedoBBox, aSortData, false);
+		this._sortByArray(oUndoRedoBBox, aSortData);
 	}
     buildRecalc(this.worksheet.workbook,true);
     unLockDraw(this.worksheet.workbook);
@@ -7727,7 +7735,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		var item = aSortData[i];
 		var nFrom = item.from;
 		var nTo = item.to;
-		if(bUndo)
+		if(true == this.worksheet.workbook.bUndoChanges)
 		{
 			nFrom = item.to;
 			nTo = item.from;

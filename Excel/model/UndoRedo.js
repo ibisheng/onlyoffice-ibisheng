@@ -3159,7 +3159,7 @@ UndoRedoWoorksheet.prototype = {
 				}
 			}
 			var range = ws.getRange(new CellAddress(bbox.r1, bbox.c1, 0), new CellAddress(bbox.r2, bbox.c2, 0));
-			range._sortByArray(bbox, places, bUndo);
+			range._sortByArray(bbox, places);
 		}
 		else if(historyitem_Worksheet_MoveRange == Type)
 		{
