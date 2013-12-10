@@ -62,6 +62,8 @@ var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжи
 
 var StartTime;
 
+var g_TestColumns = false;
+
 function CSelectedElement(Element, SelectedAll)
 {
     this.Element     = Element;
@@ -661,17 +663,51 @@ CDocument.prototype =
 
     Get_PageContentStartPos : function (PageIndex)
     {
-        var Y = Y_Top_Field;
-        var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
-        if ( YHeader >= 0 && YHeader > Y )
-            Y = YHeader;
+        if ( true !== g_TestColumns )
+        {
+            var Y = Y_Top_Field;
+            var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
+            if ( YHeader >= 0 && YHeader > Y )
+                Y = YHeader;
 
-        var YLimit = Y_Bottom_Field;
-        var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
-        if ( YFooter >= 0 &&  YFooter < YLimit )
-            YLimit = YFooter;
+            var YLimit = Y_Bottom_Field;
+            var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
+            if ( YFooter >= 0 &&  YFooter < YLimit )
+                YLimit = YFooter;
 
-        return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
+            return { X : X_Left_Field, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
+        }
+        else
+        {
+            if ( 0 === PageIndex % 2 )
+            {
+                var Y = Y_Top_Field;
+                var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
+                if ( YHeader >= 0 && YHeader > Y )
+                    Y = YHeader;
+
+                var YLimit = Y_Bottom_Field;
+                var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
+                if ( YFooter >= 0 &&  YFooter < YLimit )
+                    YLimit = YFooter;
+
+                return { X : X_Left_Field, Y : Y, XLimit : (X_Left_Field + X_Right_Field) / 2 - 10, YLimit : YLimit };
+            }
+            else
+            {
+                var Y = Y_Top_Field;
+                var YHeader = this.HdrFtr.Get_HeaderBottomPos( PageIndex );
+                if ( YHeader >= 0 && YHeader > Y )
+                    Y = YHeader;
+
+                var YLimit = Y_Bottom_Field;
+                var YFooter = this.HdrFtr.Get_FooterTopPos( PageIndex );
+                if ( YFooter >= 0 &&  YFooter < YLimit )
+                    YLimit = YFooter;
+
+                return { X : (X_Left_Field + X_Right_Field) / 2 + 10, Y : Y, XLimit : X_Right_Field, YLimit : YLimit };
+            }
+        }
     },
 
     Get_PageLimits : function(PageIndex)
@@ -1273,14 +1309,35 @@ CDocument.prototype =
 
         if ( true === bReDraw )
         {
-            this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
+            if ( true !== g_TestColumns )
+                this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
+            else
+            {
+                if ( 1 === PageIndex % 2 || Index >= Count )
+                {
+                    var __PageIndex = 0;
+                    if ( 1 === PageIndex % 2 )
+                        __PageIndex = (PageIndex - 1) / 2;
+                    else
+                        __PageIndex = PageIndex / 2;
+
+                    this.DrawingDocument.OnRecalculatePage( __PageIndex, this.Pages[PageIndex] );
+                }
+            }
         }
 
         if ( Index >= Count )
         {
             this.Internal_CheckCurPage();
             this.DrawingDocument.OnEndRecalculate( true );
-            this.DrawingObjects.onEndRecalculateDocument( this.Pages.length );
+
+            if ( true !== g_TestColumns )
+                this.DrawingObjects.onEndRecalculateDocument( this.Pages.length );
+            else
+            {
+                var _Len = ( 0 === this.Pages.length % 2 ? this.Pages.length / 2 : (this.Pages.length + 1) / 2 );
+                this.DrawingObjects.onEndRecalculateDocument( _Len );
+            }
 
             if ( true === this.Selection.UpdateOnRecalc )
             {
@@ -1520,11 +1577,35 @@ CDocument.prototype =
         this.DrawingObjects.drawBehindDoc( nPageIndex, pGraphics );
         this.DrawingObjects.drawWrappingObjects( nPageIndex, pGraphics );
 
-        var Page_StartPos = this.Pages[nPageIndex].Pos;
-        var Page_EndPos   = this.Pages[nPageIndex].EndPos;
-        for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
+        if ( true !== g_TestColumns )
         {
-            this.Content[Index].Draw(nPageIndex, pGraphics);
+            var Page_StartPos = this.Pages[nPageIndex].Pos;
+            var Page_EndPos   = this.Pages[nPageIndex].EndPos;
+            for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
+            {
+                this.Content[Index].Draw(nPageIndex, pGraphics);
+            }
+        }
+        else
+        {
+            var __PageIndex = nPageIndex * 2;
+            var Page_StartPos = this.Pages[__PageIndex].Pos;
+            var Page_EndPos   = this.Pages[__PageIndex].EndPos;
+            for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
+            {
+                this.Content[Index].Draw(__PageIndex, pGraphics);
+            }
+
+            __PageIndex = nPageIndex * 2 + 1;
+            if ( undefined != this.Pages[__PageIndex] )
+            {
+                Page_StartPos = this.Pages[__PageIndex].Pos;
+                Page_EndPos   = this.Pages[__PageIndex].EndPos;
+                for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
+                {
+                    this.Content[Index].Draw(__PageIndex, pGraphics);
+                }
+            }
         }
 
         this.DrawingObjects.drawBeforeObjects( nPageIndex, pGraphics );
@@ -9123,7 +9204,7 @@ CDocument.prototype =
         if ( PageIndex < 0 )
             return;
 
-        this.Update_CursorType( X, Y, PageIndex, e );
+        //this.Update_CursorType( X, Y, PageIndex, e );
 
         if ( true === this.Selection.Use && true === this.Selection.Start )
         {

@@ -40,6 +40,8 @@ var para_CommentStart              = 0x0023; // Начало комментар�
 var para_CommentEnd                = 0x0024; // Начало комментария
 var para_PresentationNumbering     = 0x0025; // Элемент, обозначающий нумерацию для списков в презентациях
 var para_Math                      = 0x0026; // Формула
+var para_Run                       = 0x0027; // Текстовый элемент
+var para_Sym                       = 0x0028; // Символ
 
 var break_Line = 0x01;
 var break_Page = 0x02;
@@ -325,6 +327,113 @@ ParaSpace.prototype =
         this.Value = Reader.GetLong();
     }
 };
+
+
+function ParaSym(Char, FontFamily)
+{
+    this.Type       = para_Sym;
+    this.FontFamily = FontFamily;
+    this.Char       = Char;
+
+    this.FontSlot   = fontslot_ASCII;
+    this.FontKoef   = 1;
+
+    this.Width        = 0;
+    this.Height       = 0;
+    this.WidthVisible = 0;
+}
+
+ParaSym.prototype =
+{
+    Draw : function(X,Y,Context, TextPr)
+    {
+        var CurTextPr = TextPr.Copy();
+
+        switch ( this.FontSlot )
+        {
+            case fontslot_ASCII:    CurTextPr.RFonts.Ascii    = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_CS:       CurTextPr.RFonts.CS       = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_EastAsia: CurTextPr.RFonts.EastAsia = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_HAnsi:    CurTextPr.RFonts.HAnsi    = { Name : this.FontFamily, Index : -1 }; break;
+        }
+
+        Context.SetTextPr( CurTextPr );
+        Context.SetFontSlot( this.FontSlot, this.FontKoef );
+
+        Context.FillText( X, Y, String.fromCharCode( this.Char ) );
+        Context.SetTextPr( TextPr );
+    },
+
+    Measure : function(Context, TextPr)
+    {
+        this.FontKoef = TextPr.Get_FontKoef();
+
+        var Hint = TextPr.RFonts.Hint;
+        var bCS  = TextPr.CS;
+        var bRTL = TextPr.RTL;
+        var lcid = TextPr.Lang.EastAsia;
+
+        this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+        var CurTextPr = TextPr.Copy();
+
+        switch ( this.FontSlot )
+        {
+            case fontslot_ASCII:    CurTextPr.RFonts.Ascii    = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_CS:       CurTextPr.RFonts.CS       = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_EastAsia: CurTextPr.RFonts.EastAsia = { Name : this.FontFamily, Index : -1 }; break;
+            case fontslot_HAnsi:    CurTextPr.RFonts.HAnsi    = { Name : this.FontFamily, Index : -1 }; break;
+        }
+
+        Context.SetTextPr( CurTextPr );
+        Context.SetFontSlot( this.FontSlot, this.FontKoef );
+
+        var Temp = Context.Measure( this.CalcValue );
+        Context.SetTextPr( TextPr );
+
+        Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
+
+        this.Width        = Temp.Width;
+        this.Height       = Temp.Height;
+        this.WidthVisible = Temp.Width;
+    },
+
+    Is_RealContent : function()
+    {
+        return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
+    Copy : function()
+    {
+        return new ParaSym( this.Char, this.FontFamily );
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Long   : Type
+        // String : FontFamily
+        // Long   : Char
+
+        Writer.WriteLong( this.Type );
+        Writer.WriteString2( this.FontFamily );
+        Writer.WriteLong( this.Char );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // String : FontFamily
+        // Long   : Char
+
+        this.FontFamily = Reader.GetString2();
+        this.Char = Reader.GetLong();
+    }
+};
+
 
 // Класс ParaTextPr
 function ParaTextPr(Props)
@@ -2491,6 +2600,7 @@ function ParaNumbering()
 {
     this.Type = para_Numbering;
     this.Pos  = -1;
+    this.Item = undefined;
 
     this.Internal =
     {

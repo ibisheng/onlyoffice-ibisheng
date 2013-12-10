@@ -7,6 +7,7 @@
 var Default_Tab_Stop = 12.5;
 
 var Default_Heading_Font = "Arial";
+var Default_Font         = "Arial";
 
 var align_Right   = 0;
 var align_Left    = 1;
