@@ -4845,7 +4845,6 @@ Paragraph.prototype =
 
                     RecalcResult = recalcresult_NextPage;
                     bBreak = true;
-                    break;
                 }
                 else
                 {
