@@ -7842,14 +7842,112 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		}
 	}
 };
-Range.prototype._canPromote=function(oPromoteRange){
-	var bRes = true;
-	if(null != oPromoteRange && oPromoteRange.hasMerged()){
-		bRes = false;
+Range.prototype._isSameSizeMerged=function(bbox, aMerged){
+	var oRes = null;
+	var nWidth = null;
+	var nHeight = null;
+	for(var i = 0, length = aMerged.length; i < length; i++)
+	{
+		var mergedBBox = aMerged[i].bbox;
+		var nCurWidth = mergedBBox.c2 - mergedBBox.c1 + 1;
+		var nCurHeight = mergedBBox.r2 - mergedBBox.r1 + 1;
+		if(null == nWidth || null == nHeight)
+		{
+			nWidth = nCurWidth;
+			nHeight = nCurHeight;
+		}
+		else if(nCurWidth != nWidth || nCurHeight != nHeight)
+		{
+			nWidth = null;
+			nHeight = null;
+			break;
+		}
 	}
-	return bRes;
+	if(null != nWidth && null != nHeight)
+	{
+		//проверяем что merge ячеки полностью заполняют область
+		var nBBoxWidth = bbox.c2 - bbox.c1 + 1;
+		var nBBoxHeight = bbox.r2 - bbox.r1 + 1;
+		if(nBBoxWidth == nWidth || nBBoxHeight == nHeight)
+		{
+			var bRes = false;
+			var aRowColTest = null;
+			if(nBBoxWidth == nWidth && nBBoxHeight == nHeight)
+				bRes = true;
+			else if(nBBoxWidth == nWidth)
+			{
+				aRowColTest = new Array(nBBoxHeight);
+				for(var i = 0, length = aMerged.length; i < length; i++)
+				{
+					var merged = aMerged[i];
+					for(var j = merged.bbox.r1; j <= merged.bbox.r2; j++)
+						aRowColTest[j - bbox.r1] = 1;
+				}
+			}
+			else if(nBBoxHeight == nHeight)
+			{
+				aRowColTest = new Array(nBBoxWidth);
+				for(var i = 0, length = aMerged.length; i < length; i++)
+				{
+					var merged = aMerged[i];
+					for(var j = merged.bbox.c1; j <= merged.bbox.c2; j++)
+						aRowColTest[j - bbox.c1] = 1;
+				}
+			}
+			if(null != aRowColTest)
+			{
+				var bExistNull = false;
+				for(var i = 0, length = aRowColTest.length; i < length; i++)
+				{
+					if(null == aRowColTest[i])
+					{
+						bExistNull = true;
+						break;
+					}
+				}
+				if(!bExistNull)
+					bRes = true;
+			}
+			if(bRes)
+				oRes = {width: nWidth, height: nHeight};
+		}
+	}
+	return oRes;
+}
+Range.prototype._canPromote=function(oPromoteRange, nWidth, nHeight, bVertical, nIndex){
+	var oRes = {oMergedFrom: null, oMergedTo: null};
+	//если надо только удалить внутреннее содержимое не смотрим на замерженость
+	if(!((true == bVertical && nIndex >= 0 && nIndex < nHeight) || (false == bVertical && nIndex >= 0 && nIndex < nWidth)))
+	{
+		if(null != oPromoteRange){
+			var oMergedTo = this.worksheet.mergeManager.get(oPromoteRange.getBBox0());
+			if(oMergedTo.outer.length > 0)
+				oRes = null;
+			else
+			{
+				var oMergedFrom = this.worksheet.mergeManager.get(this.getBBox0());
+				oRes.oMergedFrom = oMergedFrom;				
+				if(oMergedTo.inner.length > 0)
+				{
+					oRes.oMergedTo = oMergedTo;
+					if(oMergedFrom.inner.length > 0)
+					{
+						//merge области должны иметь одинаковый размер
+						var oSizeFrom = this._isSameSizeMerged(this.getBBox0(), oMergedFrom.inner);
+						var oSizeTo = this._isSameSizeMerged(oPromoteRange.getBBox0(), oMergedTo.inner);
+						if(!(null != oSizeFrom && null != oSizeTo && oSizeTo.width == oSizeFrom.width && oSizeTo.height == oSizeFrom.height))
+							oRes = null;
+					}
+					else
+						oRes = null;
+				}
+			}
+		}
+	}
+	return oRes;
 }
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
+	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
 	var nWidth = oBBox.c2 - oBBox.c1 + 1;
     var nHeight = oBBox.r2 - oBBox.r1 + 1;
@@ -7875,7 +7973,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 				else
 					oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
 			}
-			else if(nIndex < 0)
+			else
 				oPromoteAscRange = Asc.Range(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r1 - 1);
 		}
 		else
@@ -7887,14 +7985,14 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 				else
 					oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
 			}
-			else if(nIndex < 0)
+			else
 				oPromoteAscRange = Asc.Range(oBBox.c1 + nIndex, oBBox.r1, oBBox.c1 - 1, oBBox.r2);
 		}
 	}
-	//проверяем можно ли очуществить promote
-	if(null != oPromoteAscRange)
-		oPromoteRange = this.worksheet.getRange3(oPromoteAscRange.r1, oPromoteAscRange.c1, oPromoteAscRange.r2, oPromoteAscRange.c2);
-	if(null == oPromoteRange || !this._canPromote(oPromoteRange))
+	//проверяем можно ли осуществить promote
+	oPromoteRange = this.worksheet.getRange3(oPromoteAscRange.r1, oPromoteAscRange.c1, oPromoteAscRange.r2, oPromoteAscRange.c2);
+	var oCanPromote = this._canPromote(oPromoteRange, nWidth, nHeight, bVertical, nIndex);
+	if(null == oCanPromote)
 		return;
 
 	lockDraw(this.worksheet.workbook);
@@ -7924,7 +8022,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 					else
 						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r1 + nIndex - 1);
 				}
-				else if(nIndex < 0)
+				else
 					oSelectionRedo.assign(oBBox.c1, oBBox.r1 + nIndex, oBBox.c2, oBBox.r2);
 			}
 			else
@@ -7936,7 +8034,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 					else
 						oSelectionRedo.assign(oBBox.c1, oBBox.r1, oBBox.c1 + nIndex - 1, oBBox.r2);
 				}
-				else if(nIndex < 0)
+				else
 					oSelectionRedo.assign(oBBox.c1 + nIndex, oBBox.r1, oBBox.c2, oBBox.r2);
 			}
 		}
@@ -8143,6 +8241,68 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 					}
 				}
             }
+		}
+		//добавляем замерженые области
+		var nShiftHorizontal = 0;
+		var nShiftVertical = 0;
+		if(bVertical)
+		{
+			if(nIndex < 0)
+				nShiftVertical = -nHeight;
+			else
+				nShiftVertical = nHeight;
+		}
+		else
+		{
+			if(nIndex < 0)
+				nShiftHorizontal = -nWidth;
+			else
+				nShiftHorizontal = nWidth;
+		}
+		var oMergedFrom = oCanPromote.oMergedFrom;
+		if(null != oMergedFrom && oMergedFrom.all.length > 0)
+		{
+			var bInserted = true;
+			var nCount = 0;
+			while(bInserted)
+			{
+				bInserted = false;
+				nCount++;
+				for(var i = 0, length = oMergedFrom.all.length; i < length; i++)
+				{
+					var oMergedBBox = oMergedFrom.all[i].bbox;
+					var oNewMerged = Asc.Range(oMergedBBox.c1 + nCount * nShiftHorizontal, oMergedBBox.r1 + nCount * nShiftVertical, oMergedBBox.c2 + nCount * nShiftHorizontal, oMergedBBox.r2 + nCount * nShiftVertical);
+					if(oPromoteAscRange.containsRange(oNewMerged))
+					{
+						this.worksheet.mergeManager.add(oNewMerged, 1);
+						bInserted = true;
+					}
+				}
+			}
+		}
+		//добавляем ссылки
+		//не как в Excel поддерживаются ссылки на диапазоны
+		var oHyperlinks = this.worksheet.hyperlinkManager.get(oBBox);
+		if(oHyperlinks.inner.length > 0)
+		{
+			var bInserted = true;
+			var nCount = 0;
+			while(bInserted)
+			{
+				bInserted = false;
+				nCount++;
+				for(var i = 0, length = oHyperlinks.inner.length; i < length; i++)
+				{
+					var oHyperlink = oHyperlinks.inner[i];
+					var oHyperlinkBBox = oHyperlink.bbox;
+					var oNewHyperlink = Asc.Range(oHyperlinkBBox.c1 + nCount * nShiftHorizontal, oHyperlinkBBox.r1 + nCount * nShiftVertical, oHyperlinkBBox.c2 + nCount * nShiftHorizontal, oHyperlinkBBox.r2 + nCount * nShiftVertical);
+					if(oPromoteAscRange.containsRange(oNewHyperlink))
+					{
+						this.worksheet.hyperlinkManager.add(oNewHyperlink, oHyperlink.data.clone());
+						bInserted = true;
+					}
+				}
+			}
 		}
 	}
 	History.EndTransaction();
