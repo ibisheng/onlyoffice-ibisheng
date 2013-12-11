@@ -217,12 +217,12 @@
 						if (isVert) {
 							var vsHelperH = self.vsb.outerHeight() + Math.max(vSize * opt.vscrollStep, 1);
 							self.vsb.find("#ws-v-scroll-helper").height(vsHelperH);
-							self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow());
+							self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 						}
 						if (isHoriz) {
 							var hsHelperW = self.hsb.outerWidth() + Math.max(hSize * opt.hscrollStep, 1);
 							self.hsb.find("#ws-h-scroll-helper").width(hsHelperW);
-							self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol());
+							self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 						}
 					});
 				}

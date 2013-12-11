@@ -110,6 +110,9 @@
 
 		var kNewLine = "\n";
 
+		var kPaneStateFrozen = "frozen";
+		var kPaneStateFrozenSplit = "frozenSplit";
+
 		function calcDecades(num) {
 			return Math.abs(num) < 10 ? 1 : 1 + calcDecades( asc_floor(num * 0.1) );
 		}
@@ -200,6 +203,9 @@
 													new CColor(107, 0, 214), new CColor(214, 0, 160)];
 			// Цвет заливки границы выделения области автозаполнения
 			this.fillHandleBorderColorSelect	= new CColor(255, 255, 255, 1);
+
+			// Цвет закрепленных областей
+			this.frozenColor					= new CColor(0, 0, 0, 1);
 			return this;
 		}
 
@@ -340,6 +346,7 @@
 			this.height_4px = 0;
 			this.highlightedCol = -1;
 			this.highlightedRow = -1;
+			this.topLeftFrozenCell = null;	// Верхняя ячейка для закрепления диапазона
 			this.visibleRange = asc_Range(0, 0, 0, 0);
 			this.activeRange = new asc_ActiveRange(0, 0, 0, 0);
 			this.isChanged = false;
@@ -419,16 +426,22 @@
 				return this._updateCellsRange(this.getVisibleRange());
 			},
 
-			getFirstVisibleCol: function () {
-				return this.visibleRange.c1;
+			getFirstVisibleCol: function (allowPane) {
+				var tmp = 0;
+				if (allowPane && this.topLeftFrozenCell)
+					tmp = this.topLeftFrozenCell.getCol0();
+				return this.visibleRange.c1 - tmp;
 			},
 
 			getLastVisibleCol: function () {
 				return this.visibleRange.c2;
 			},
 
-			getFirstVisibleRow: function () {
-				return this.visibleRange.r1;
+			getFirstVisibleRow: function (allowPane) {
+				var tmp = 0;
+				if (allowPane && this.topLeftFrozenCell)
+					tmp = this.topLeftFrozenCell.getRow0();
+				return this.visibleRange.r1 - tmp;
 			},
 
 			getLastVisibleRow: function () {
@@ -955,6 +968,7 @@
 			_init: function () {
 				this._initConstValues();
 				this._initWorksheetDefaultWidth();
+				this._initPane();
 				this._initCellsArea(true);
 				this.autoFilters.addFiltersAfterOpen();
 				this._initConditionalFormatting();
@@ -1102,6 +1116,21 @@
 				this._calcVisibleColumns();
 				this._updateVisibleColsCount(/*skipScrolReinit*/true);
 			},
+			_initPane: function () {
+				var pane = this.model.sheetViews[0].pane;
+				if (null !== pane) {
+					// ToDo Обрабатываем пока только frozen и frozenSplit
+					if (kPaneStateFrozen === pane.state || kPaneStateFrozenSplit === pane.state) {
+						this.topLeftFrozenCell = new CellAddress(pane.topLeftCell);
+						if (!this.topLeftFrozenCell.isValid())
+							this.topLeftFrozenCell = null;
+						else {
+							this.visibleRange.r1 = this.topLeftFrozenCell.getRow0();
+							this.visibleRange.c1 = this.topLeftFrozenCell.getCol0();
+						}
+					}
+				}
+			},
 
 			/**
 			 * Вычисляет ширину столбца для заданного количества символов
@@ -1213,7 +1242,7 @@
 					i = this.cols.length;
 					x = this.cols[i - 1].left + this.cols[i - 1].width;
 				}
-				for (; ((0 !== fullRecalc) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i <= gc_nMaxCol0; ++i) {
+				for (; ((0 !== fullRecalc) ? i < l || x + hiddenW < visibleW : i < this.cols.length) && i < gc_nMaxCol; ++i) {
 					// Получаем свойства колонки
 					column = this.model._getColNoEmptyWithAll(i);
 					if (!column) {
@@ -1252,7 +1281,7 @@
 					i = this.rows.length;
 					y = this.rows[i - 1].top + this.rows[i - 1].height;
 				}
-				for (; (0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length; ++i) {
+				for (; ((0 !== fullRecalc) ? i < l || y + hiddenH < visibleH : i < this.rows.length) && i < gc_nMaxRow; ++i) {
 					row = this.model._getRowNoEmpty(i);
 					if (!row) {
 						h = -1; // Будет использоваться дефолтная высота строки
@@ -1287,7 +1316,7 @@
 			_calcVisibleColumns: function () {
 				var l = this.cols.length;
 				var w = this.drawingCtx.getWidth();
-				var sumW = this.cellsLeft;
+				var sumW = this.topLeftFrozenCell ? this.cols[this.topLeftFrozenCell.getCol0()].left : this.cellsLeft;
 				for (var i = this.visibleRange.c1, f = false; i < l && sumW < w; ++i) {
 					sumW += this.cols[i].width;
 					f = true;
@@ -1299,7 +1328,7 @@
 			_calcVisibleRows: function () {
 				var l = this.rows.length;
 				var h = this.drawingCtx.getHeight();
-				var sumH = this.cellsTop;
+				var sumH = this.topLeftFrozenCell ? this.rows[this.topLeftFrozenCell.getRow0()].top : this.cellsTop;
 				for (var i = this.visibleRange.r1, f = false; i < l && sumH < h; ++i) {
 					sumH += this.rows[i].height;
 					f = true;
@@ -1357,6 +1386,13 @@
 				var vw = c[vr.c2].left + c[vr.c2].width - c[vr.c1].left;
 				var vh = r[vr.r2].top + r[vr.r2].height - r[vr.r1].top;
 				var i;
+
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					vw += c[cFrozen].left - c[0].left;
+					vh += r[rFrozen].top - r[0].top;
+				}
 
 				if (vw < w) {
 					for (i = vr.c1 - 1; i >= 0; --i) {
@@ -1743,6 +1779,8 @@
 				this._drawGrid(/*drawingCtx*/ undefined);
 				this._drawCells(/*drawingCtx*/undefined);
 				this._drawCellsBorders(/*drawingCtx*/undefined);
+				this._drawFrozenPane();
+				this._drawFrozenPaneLines();
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
@@ -1867,8 +1905,13 @@
 					return;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
-				var offsetX = (offsetXForDraw) ? offsetXForDraw : this.cols[vr.c1].left - this.cellsLeft;
-				var offsetY = (offsetYForDraw) ? offsetYForDraw : this.headersTop;
+				var c = this.cols;
+				var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : c[vr.c1].left - this.cellsLeft;
+				var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : this.headersTop;
+				if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetXForDraw) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= c[cFrozen].left - c[0].left;
+				}
 
 				if (asc_typeof(start) !== "number") {start = vr.c1;}
 				if (asc_typeof(end) !== "number") {end = vr.c2;}
@@ -1878,8 +1921,8 @@
 
 				// draw column headers
 				for (var i = start; i <= end; ++i) {
-					this._drawHeader(drawingCtx, this.cols[i].left - offsetX, offsetY,
-						this.cols[i].width, this.headersHeight, style, true, i);
+					this._drawHeader(drawingCtx, c[i].left - offsetX, offsetY,
+						c[i].width, this.headersHeight, style, true, i);
 				}
 			},
 
@@ -1889,8 +1932,13 @@
 					return;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
-				var offsetX = (offsetXForDraw) ? offsetXForDraw : this.headersLeft;
-				var offsetY = (offsetYForDraw) ? offsetYForDraw : this.rows[vr.r1].top - this.cellsTop;
+				var r = this.rows;
+				var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
+				var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
+				if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= r[rFrozen].top - r[0].top;
+				}
 
 				if (asc_typeof(start) !== "number") {start = vr.r1;}
 				if (asc_typeof(end) !== "number") {end = vr.r2;}
@@ -1900,8 +1948,8 @@
 
 				// draw row headers
 				for (var i = start; i <= end; ++i) {
-					this._drawHeader(drawingCtx, offsetX, this.rows[i].top - offsetY,
-						this.headersWidth, this.rows[i].height, style, false, i);
+					this._drawHeader(drawingCtx, offsetX, r[i].top - offsetY,
+						this.headersWidth, r[i].height, style, false, i);
 				}
 			},
 
@@ -2054,14 +2102,26 @@
 					range = this.visibleRange;
 				}
 				var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+				var c = this.cols;
+				var r = this.rows;
 				var widthCtx = (width) ? width : ctx.getWidth();
 				var heightCtx = (height) ? height : ctx.getHeight();
-				var offsetX = (leftFieldInPt) ? leftFieldInPt : this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = (topFieldInPt) ? topFieldInPt : this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var x1  = this.cols[range.c1].left - offsetX;
-				var y1  = this.rows[range.r1].top - offsetY;
-				var x2  = Math.min(this.cols[range.c2].left - offsetX + this.cols[range.c2].width, widthCtx);
-				var y2  = Math.min(this.rows[range.r2].top - offsetY + this.rows[range.r2].height, heightCtx);
+				var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
+				var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
+				if (undefined === drawingCtx && this.topLeftFrozenCell) {
+					if (undefined === leftFieldInPt) {
+						var cFrozen = this.topLeftFrozenCell.getCol0();
+						offsetX -= c[cFrozen].left - c[0].left;
+					}
+					if (undefined === topFieldInPt) {
+						var rFrozen = this.topLeftFrozenCell.getRow0();
+						offsetY -= r[rFrozen].top - r[0].top;
+					}
+				}
+				var x1  = c[range.c1].left - offsetX;
+				var y1  = r[range.r1].top - offsetY;
+				var x2  = Math.min(c[range.c2].left - offsetX + c[range.c2].width, widthCtx);
+				var y2  = Math.min(r[range.r2].top - offsetY + r[range.r2].height, heightCtx);
 				ctx.setFillStyle(this.settings.cells.defaultState.background)
 						.fillRect(x1, y1, x2 - x1, y2 - y1)
 						.setStrokeStyle(this.settings.cells.defaultState.border)
@@ -2069,13 +2129,13 @@
 
 				var w, h;
 				for (var i = range.c1, x = x1 - this.width_1px; i <= range.c2 && x <= x2; ++i) {
-					w = this.cols[i].width;
+					w = c[i].width;
 					x += w;
 					if (w >= this.width_1px)
 						ctx.lineVer(x, y1, y2);
 				}
 				for (var j = range.r1, y = y1 - this.height_1px; j <= range.r2 && y <= y2; ++j) {
-					h = this.rows[j].height;
+					h = r[j].height;
 					y += h;
 					if (h >= this.height_1px)
 						ctx.lineHor(x1, y, x2);
@@ -2085,7 +2145,7 @@
 			},
 
 			/** Рисует ячейки таблицы */
-			_drawCells: function (drawingCtx, range, offsetX, offsetY) {
+			_drawCells: function (drawingCtx, range, offsetXForDraw, offsetYForDraw) {
 				if (range === undefined) {
 					range = this.visibleRange;
 				}
@@ -2093,8 +2153,18 @@
 				this._prepareCellTextMetricsCache(range);
 
 				var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
-				offsetX = (undefined === offsetX) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetX;
-				offsetY = (undefined === offsetY) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetY;
+				var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
+				var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
+				if (undefined === drawingCtx && this.topLeftFrozenCell) {
+					if (undefined === offsetXForDraw) {
+						var cFrozen = this.topLeftFrozenCell.getCol0();
+						offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					}
+					if (undefined === offsetYForDraw) {
+						var rFrozen = this.topLeftFrozenCell.getRow0();
+						offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+					}
+				}
 				var mergedCells = {}, mc, i;
 
 				if (!drawingCtx) {
@@ -2467,9 +2537,21 @@
 				}
 				var t = this;
 				var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
-				var offsetX = (leftFieldInPt) ? leftFieldInPt : this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = (topFieldInPt) ? topFieldInPt : this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var bc    = undefined; // cached border color
+				var c = this.cols;
+				var r = this.rows;
+				var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
+				var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
+				var bc = undefined; // cached border color
+				if (undefined === drawingCtx && this.topLeftFrozenCell) {
+					if (undefined === leftFieldInPt) {
+						var cFrozen = this.topLeftFrozenCell.getCol0();
+						offsetX -= c[cFrozen].left - c[0].left;
+					}
+					if (undefined === topFieldInPt) {
+						var rFrozen = this.topLeftFrozenCell.getRow0();
+						offsetY -= r[rFrozen].top - r[0].top;
+					}
+				}
 
 				// ToDo в одну функцию
 				function drawBorderHor(border, x1, y, x2) {
@@ -2520,15 +2602,15 @@
 				}
 
 				for (var row = range.r1; row <= range.r2 && row < this.nRowsCount; ++row) {
-					if (this.rows[row].height < this.height_1px) {continue;}
+					if (r[row].height < this.height_1px) {continue;}
 					var isFirstRow = row === range.r1;
 					var isLastRow  = row === range.r2;
-					var y1 = this.rows[row].top - offsetY;
-					var y2 = y1 + this.rows[row].height - this.height_1px;
+					var y1 = r[row].top - offsetY;
+					var y2 = y1 + r[row].height - this.height_1px;
 					var mc = null;
 
 					for (var isMerged = false, hasHideCol = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
-						if (this.cols[col].width < this.width_1px) {hasHideCol = true; continue;}
+						if (c[col].width < this.width_1px) {hasHideCol = true; continue;}
 						var isFirstCol = col === range.c1;
 
 						if (!mergedCellsStage) {
@@ -2550,8 +2632,8 @@
 							}
 						}
 
-						var x1 = this.cols[col].left - offsetX;
-						var x2 = x1 + this.cols[col].width - this.width_1px;
+						var x1 = c[col].left - offsetX;
+						var x2 = x1 + c[col].width - this.width_1px;
 						//
 						var dd = this._getActiveBorder(col, row, kcbidDiagonalDown);
 						var du = this._getActiveBorder(col, row, kcbidDiagonalUp);
@@ -2580,8 +2662,8 @@
 							var y2Diagonal = y2;
 							if (mergedCellsStage) {
 								// Merge cells
-								x2Diagonal = this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px;
-								y2Diagonal = this.rows[range.r2].top + this.rows[range.r2].height - offsetY - this.height_1px;
+								x2Diagonal = c[range.c2].left + c[range.c2].width - offsetX - this.width_1px;
+								y2Diagonal = r[range.r2].top + r[range.r2].height - offsetY - this.height_1px;
 							}
 
 							// ToDo Clip diagonal borders
@@ -2589,8 +2671,8 @@
 									.beginPath()
 									.rect(x1 + this.width_1px * (lb.w < 1 ? -1 : (lb.w < 3 ? 0 : +1)),
 										  y1 + this.width_1px * (tb.w < 1 ? -1 : (tb.w < 3 ? 0 : +1)),
-										  this.cols[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
-										  this.rows[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
+										  c[col].width + this.width_1px * ( -1 + (lb.w < 1 ? +1 : (lb.w < 3 ? 0 : -1)) + (rb.w < 1 ? +1 : (rb.w < 2 ? 0 : -1)) ),
+										  r[row].height + this.height_1px * ( -1 + (tb.w < 1 ? +1 : (tb.w < 3 ? 0 : -1)) + (bb.w < 1 ? +1 : (bb.w < 2 ? 0 : -1)) ))
 									.clip();
 							*/
 							if (hasDD) {
@@ -2663,6 +2745,61 @@
 
 				if (!drawingCtx) {
 					ctx.restore();
+				}
+			},
+
+			/** Рисует закрепленные области областей */
+			_drawFrozenPane: function () {
+				if (this.topLeftFrozenCell) {
+					var row = this.topLeftFrozenCell.getRow0();
+					var col = this.topLeftFrozenCell.getCol0();
+
+					var tmpRange, offsetX, offsetY;
+					if (0 < row && 0 < col) {
+						offsetX = this.cols[0].left - this.cellsLeft;
+						offsetY = this.rows[0].top - this.cellsTop;
+						tmpRange = asc_Range(0, 0, col - 1, row - 1);
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
+					if (0 < row) {
+						row -= 1;
+						offsetX = undefined;
+						offsetY = this.rows[0].top - this.cellsTop;
+						tmpRange = asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, row);
+						this._drawRowHeaders(/*drawingCtx*/ undefined, 0, row, kHeaderDefault, offsetX, offsetY);
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
+					if (0 < col) {
+						col -= 1;
+						offsetX = this.cols[0].left - this.cellsLeft;
+						offsetY = undefined;
+						tmpRange = asc_Range(0, this.visibleRange.r1, col, this.visibleRange.r2);
+						this._drawColumnHeaders(/*drawingCtx*/ undefined, 0, col, kHeaderDefault, offsetX, offsetY);
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
+				}
+			},
+
+			/** Рисует закрепление областей */
+			_drawFrozenPaneLines: function (notDrawCol, notDrawRow) {
+				if (this.topLeftFrozenCell) {
+					var ctx = this.drawingCtx;
+					var row = this.topLeftFrozenCell.getRow0();
+					var col = this.topLeftFrozenCell.getCol0();
+					ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
+					if (0 < row && !notDrawRow) {
+						ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
+					}
+					if (0 < col && !notDrawCol) {
+						ctx.lineVer(this.cols[col].left - this.width_1px, 0, ctx.getHeight());
+					}
+					ctx.stroke();
 				}
 			},
 
@@ -4568,24 +4705,28 @@
 				};
 			},
 
-			_isColDrawnPartially: function (col, leftCol) {
+			_isColDrawnPartially: function (col, leftCol, diffWidth) {
 				if (col <= leftCol || col >= this.nColsCount)
 					return false;
 				var c = this.cols;
-				return c[col].left + c[col].width - c[leftCol].left + this.cellsLeft > this.drawingCtx.getWidth();
+				return c[col].left + c[col].width - c[leftCol].left + this.cellsLeft + diffWidth > this.drawingCtx.getWidth();
 			},
 
-			_isRowDrawnPartially: function (row, topRow) {
+			_isRowDrawnPartially: function (row, topRow, diffHeight) {
 				if (row <= topRow || row >= this.nRowsCount)
 					return false;
 				var r = this.rows;
-				return r[row].top + r[row].height - r[topRow].top + this.cellsTop > this.drawingCtx.getHeight();
+				return r[row].top + r[row].height - r[topRow].top + this.cellsTop + diffHeight > this.drawingCtx.getHeight();
 			},
 
 			_isVisibleX: function () {
 				var vr = this.visibleRange;
 				var c = this.cols;
 				var x = c[vr.c2].left + c[vr.c2].width;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					x += c[cFrozen].left - c[0].left;
+				}
 				return x - c[vr.c1].left + this.cellsLeft < this.drawingCtx.getWidth();
 			},
 
@@ -4593,6 +4734,10 @@
 				var vr = this.visibleRange;
 				var r = this.rows;
 				var y = r[vr.r2].top + r[vr.r2].height;
+				if (this.topLeftFrozenCell) {
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					y += r[rFrozen].top - r[0].top;
+				}
 				return y - r[vr.r1].top + this.cellsTop < this.drawingCtx.getHeight();
 			},
 
@@ -4647,16 +4792,25 @@
 				var dy     = this.rows[start].top - this.rows[vr.r1].top;
 				var oldEnd = vr.r2;
 				var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
-				var oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1);
+				var diffHeight = 0;
+				var oldVRE_isPartial;
+				var oldH = ctxH - this.cellsTop - Math.abs(dy);
+				var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
+				var oldW, x, dx, cFrozen, rFrozen;
+				if (this.topLeftFrozenCell) {
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
+					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
+					y += diffHeight;
+					if (dy > 0)
+						oldH -= diffHeight;
+				}
+				oldVRE_isPartial = this._isRowDrawnPartially(vr.r2, vr.r1, diffHeight);
 
 				if (this.isCellEditMode && editor) {editor.move(0, -dy);}
 
 				vr.r1 = start;
 				this._updateVisibleRowsCount();
-
-				var oldH = ctxH - this.cellsTop - Math.abs(dy);
-				var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
-				var oldW, x, dx;
 				
 				this.objectRender.setScrollOffset();
 
@@ -4712,6 +4866,14 @@
 					this._drawGrid(/*drawingCtx*/ undefined, range);
 					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					if (0 < cFrozen) {
+						range.c1 = 0;
+						range.c2 = cFrozen - 1;
+						this._drawGrid(/*drawingCtx*/ undefined, range);
+						this._drawCells(/*drawingCtx*/undefined, range);
+						this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					}
+					this._drawFrozenPaneLines(false, true);
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 
@@ -4750,7 +4912,20 @@
 				var ctxH    = ctx.getHeight();
 				var dx      = this.cols[start].left - this.cols[vr.c1].left;
 				var oldEnd  = vr.c2;
-				var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1);
+				var diffWidth = 0;
+				var oldW = ctxW - this.cellsLeft - Math.abs(dx);
+				var x = this.cellsLeft + (dx > 0 && oldW > 0 ? dx : 0);
+				var y = this.headersTop;
+				var cFrozen, rFrozen;
+				if (this.topLeftFrozenCell) {
+					rFrozen = this.topLeftFrozenCell.getRow0();
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
+					x += diffWidth;
+					if (dx > 0)
+						oldW -= diffWidth;
+				}
+				var oldVCE_isPartial = this._isColDrawnPartially(vr.c2, vr.c1, diffWidth);
 
 				if (this.isCellEditMode && editor) {editor.move(-dx, 0);}
 
@@ -4759,9 +4934,6 @@
 				
 				this.objectRender.setScrollOffset();
 
-				var oldW = ctxW - this.cellsLeft - Math.abs(dx);
-				var x = this.cellsLeft + (dx > 0 && oldW > 0 ? dx : 0);
-				var y = this.headersTop;
 				if (oldW > 0) {
 					ctx.drawImage(ctx.getCanvas(), x, y, oldW, ctxH, x - dx, y, oldW, ctxH);
 				}
@@ -4779,6 +4951,14 @@
 					this._drawGrid(/*drawingCtx*/ undefined, range);
 					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					if (rFrozen) {
+						range.r1 = 0;
+						range.r2 = rFrozen - 1;
+						this._drawGrid(/*drawingCtx*/ undefined, range);
+						this._drawCells(/*drawingCtx*/undefined, range);
+						this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					}
+					this._drawFrozenPaneLines(true, false);
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 				}

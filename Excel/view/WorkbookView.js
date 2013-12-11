@@ -468,7 +468,7 @@
 
 			_onScrollY: function (pos) {
 				var ws = this.getWorksheet();
-				var delta = asc_round(pos - ws.getFirstVisibleRow());
+				var delta = asc_round(pos - ws.getFirstVisibleRow(/*allowPane*/true));
 				if (delta !== 0) {
 					ws.scrollVertical(delta, this.cellEditor);
 				}
@@ -476,7 +476,7 @@
 
 			_onScrollX: function (pos) {
 				var ws = this.getWorksheet();
-				var delta = asc_round(pos - ws.getFirstVisibleCol());
+				var delta = asc_round(pos - ws.getFirstVisibleCol(/*allowPane*/true));
 				if (delta !== 0) {
 					ws.scrollHorizontal(delta, this.cellEditor);
 				}
