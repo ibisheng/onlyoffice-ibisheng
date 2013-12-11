@@ -3931,6 +3931,12 @@ function CBg()
         {
             this.bgPr.Write_ToBinary2(w);
         }
+        w.WriteBool(isRealObject(this.bgRef));
+        if(isRealObject(this.bgRef))
+        {
+            this.bgRef.Write_ToBinary2(w);
+
+        }
     };
 
     this.Read_FromBinary2 = function(r)
@@ -3939,6 +3945,19 @@ function CBg()
         {
             this.bgPr = new CBgPr();
             this.bgPr.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.bgPr = null;
+        }
+        if(r.GetBool())
+        {
+            this.bgRef = new StyleRef();
+            this.bgRef.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.bgRef = null;
         }
     };
 }
