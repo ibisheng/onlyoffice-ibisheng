@@ -4893,9 +4893,10 @@
 					if (0 < cFrozen) {
 						range.c1 = 0;
 						range.c2 = cFrozen - 1;
-						this._drawGrid(/*drawingCtx*/ undefined, range);
-						this._drawCells(/*drawingCtx*/undefined, range);
-						this._drawCellsBorders(/*drawingCtx*/undefined, range);
+						var offsetX = this.cols[0].left - this.cellsLeft;
+						this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
+						this._drawCells(/*drawingCtx*/undefined, range, offsetX);
+						this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
 					}
 					this._drawFrozenPaneLines(false, true);
 					this._fixSelectionOfMergedCells();
@@ -4978,9 +4979,10 @@
 					if (rFrozen) {
 						range.r1 = 0;
 						range.r2 = rFrozen - 1;
-						this._drawGrid(/*drawingCtx*/ undefined, range);
-						this._drawCells(/*drawingCtx*/undefined, range);
-						this._drawCellsBorders(/*drawingCtx*/undefined, range);
+						var offsetY = this.rows[0].top - this.cellsTop;
+						this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					}
 					this._drawFrozenPaneLines(true, false);
 					this._fixSelectionOfMergedCells();
