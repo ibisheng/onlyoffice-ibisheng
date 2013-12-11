@@ -17,6 +17,7 @@
 		var activateLocalStorage = true;
 		var isOnlyLocalBufferSafari = false;
 		var copyPasteUseBinary = false;
+		var copyPasteFromWordUseBinary = false;
 		
 		var Base64 = {
 		 
@@ -1110,7 +1111,7 @@
 				var nBorderWidth = parseFloat(borderWidth);
 				if (isNaN(nBorderWidth))
 					return res;
-				if (-1 !== borderWidth.indexOf("pt"))
+				if (typeof borderWidth == "string" && -1 !== borderWidth.indexOf("pt"))
 					nBorderWidth = nBorderWidth * 96 / 72;
 
 				switch (borderStyle) {
@@ -1474,12 +1475,13 @@
 					else//find class xsl
 					{
 						var base64 = null;
+						var base64FromWord = null;
 						var classNode;
-						if(node.children[0] && node.children[0].getAttribute("class") != null && node.children[0].getAttribute("class").indexOf("xslData;") > -1)
+						if(node.children[0] && node.children[0].getAttribute("class") != null && (node.children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].getAttribute("class").indexOf("docData;") > -1))
 							classNode = node.children[0].getAttribute("class");
-						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
 							classNode = node.children[0].children[0].getAttribute("class");
-						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1)
+						else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].children[0] && node.children[0].children[0].children[0].getAttribute("class") != null && (node.children[0].children[0].children[0].getAttribute("class").indexOf("xslData;") > -1 || node.children[0].children[0].children[0].getAttribute("class").indexOf("docData;") > -1))
 							classNode = node.children[0].children[0].children[0].getAttribute("class");
 						
 						if( classNode != null ){
@@ -1488,6 +1490,10 @@
 								if(cL[i].indexOf("xslData;") > -1)
 								{
 									base64 = cL[i].split('xslData;')[1];
+								}
+								else if(cL[i].indexOf("docData;") > -1)
+								{
+									base64FromWord = cL[i].split('docData;')[1];
 								}
 							}
 						}
@@ -1524,6 +1530,16 @@
 							window.GlobalPasteFlagCounter = 0;
 							return;
 						}
+					}
+					else if(base64FromWord && copyPasteFromWordUseBinary)
+					{
+						var pasteData = null;
+						var pasteData = this.ReadFromBinaryWord(base64FromWord);
+						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
+						pasteFromBinaryWord._paste(worksheet, pasteData);
+						window.GlobalPasteFlag = false;
+						window.GlobalPasteFlagCounter = 0;
+						return;
 					}
 				}
 				
@@ -1956,6 +1972,142 @@
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
             },
+			
+			ReadFromBinaryWord : function(sBase64)
+			{
+				//TODO ПРОСМОТРЕТЬ ВСЕ ЗАКОММЕНТИРОВАННЫЕ ОБЛАСТИ!!!!
+				
+				//надо сбросить то, что остался после открытия документа
+				//window.global_pptx_content_loader.Clear();
+				//window.global_pptx_content_loader.Start_UseFullUrl();		
+				var openParams = {checkFileSize: false, charCount: 0, parCount: 0};
+				var newCDocument = new CDocument2();
+				var oBinaryFileReader = new BinaryFileReader2(newCDocument, openParams);
+				oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
+				oBinaryFileReader.ReadMainTable();
+				
+				//обрабатываем списки
+				/*for(var i in oReadResult.numToNumClass)
+				{
+					var oNumClass = oReadResult.numToNumClass[i];
+					var documentANum = this.oDocument.Numbering.AbstractNum;
+					//проверка на уже существующий такой же AbstractNum
+					var isAlreadyContains = false;
+					for(var n in documentANum)
+					{
+						var isEqual = documentANum[n].isEqual(oNumClass);
+						if(isEqual == true)
+						{
+							isAlreadyContains = true;
+							break;
+						}
+					}
+					if(!isAlreadyContains)
+					{
+						this.oDocument.Numbering.Add_AbstractNum(oNumClass);
+					}
+					else
+						oReadResult.numToNumClass[i] = documentANum[n];
+						
+				}
+				for(var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i)
+				{
+					var numPr = oReadResult.paraNumPrs[i];
+					var oNumClass = oReadResult.numToNumClass[numPr.NumId];
+					if(null != oNumClass)
+						numPr.NumId = oNumClass.Get_Id();
+					else
+						numPr.NumId = 0;
+				}*/
+				//обрабатываем стили
+				var isAlreadyContainsStyle;
+				var api = this.api;
+				var oStyleTypes = {par: 1, table: 2, lvl: 3};
+				var addNewStyles = false;
+				var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, nStyleType)
+				{
+					if(aStyles == undefined)
+						return;
+					for(var i = 0, length = aStyles.length; i < length; ++i)
+					{
+						var elem = aStyles[i];
+						var stylePaste = oReadResult.styles[elem.style];
+						var isEqualName = null;
+						if(null != stylePaste && null != stylePaste.style)
+						{
+							for(var j in oDocumentStyles.Style)
+							{
+								var styleDoc = oDocumentStyles.Style[j];
+								isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
+								if(styleDoc.Name == stylePaste.style.Name)
+									isEqualName = j;
+								if(isAlreadyContainsStyle)
+								{
+									if(oStyleTypes.par == nStyleType)
+										elem.pPr.PStyle = j;
+									else if(oStyleTypes.table == nStyleType)
+										elem.pPr.Set_TableStyle2(j);
+									else
+										elem.pPr.PStyle = j;
+									break;
+								}
+							}
+							if(!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
+							{
+								if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
+									elem.pPr.PStyle = isEqualName;
+								else if (nStyleType == oStyleTypes.table)
+									elem.pPr.Set_TableStyle2(isEqualName);
+							}
+							else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
+							{
+								//todo править и BaseOn
+								var nStyleId = oDocumentStyles.Add(stylePaste.style);
+								if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
+									elem.pPr.PStyle = nStyleId;
+								else if (nStyleType == oStyleTypes.table)
+									elem.pPr.Set_TableStyle2(nStyleId);
+								addNewStyles = true;
+							}
+						}
+					}
+				}
+
+				fParseStyle(oBinaryFileReader.oReadResult.paraStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.par);
+				fParseStyle(oBinaryFileReader.oReadResult.tableStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.table);
+				fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, newCDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
+				
+				return oBinaryFileReader.oReadResult;
+					
+				/*var aContent = oBinaryFileReader.oReadResult.DocumentContent;
+				for(var i = 0, length = oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
+					oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks[i].call();
+				if(oReadResult.bLastRun)
+					this.bInBlock = false;
+				else
+					this.bInBlock = true;
+				//создаем список используемых шрифтов
+				var AllFonts = new Object();
+				this.oDocument.Numbering.Document_Get_AllFontNames(AllFonts);
+				this.oDocument.Styles.Document_Get_AllFontNames(AllFonts);
+				for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
+					aContent[Index].Document_Get_AllFontNames( AllFonts );
+				var aPrepeareFonts = [];
+				for(var i in AllFonts)
+					aPrepeareFonts.push(new CFont(i, 0, "", 0));
+				//создаем список используемых картинок
+				var oPastedImagesUnique = {};
+				var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+				for(var i = 0, length = aPastedImages.length; i < length; ++i)
+				{
+					var elem = aPastedImages[i];
+					oPastedImagesUnique[elem.Url] = 1;
+				}
+				var aPrepeareImages = [];
+				for(var i in oPastedImagesUnique)
+					aPrepeareImages.push(i);
+				return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};*/
+			},
 			
 			_isEqualText: function(node, table){
 				var t = this;
@@ -3002,11 +3154,530 @@
 			}
 
 		};
+		
+		/** @constructor */
+		function pasteFromBinaryWord(clipboard, ws) {
+			if ( !(this instanceof pasteFromBinaryWord) ) {return new pasteFromBinaryWord();}
+
+			this.fontsNew = [];
+			this.aResult = [];
+			this.clipboard = clipboard;
+			this.ws = ws;
+			
+			return this;
+		}
+
+		pasteFromBinaryWord.prototype = {
+			
+			_paste : function(worksheet, pasteData)
+			{
+				var documentContent = pasteData.DocumentContent;
+				var value2;
+				var activeRange = worksheet.activeRange.clone(true);
+				
+				if(documentContent && documentContent.length)
+				{
+					var documentContentBounds = new Asc.DocumentContentBounds();
+					var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
+					this._parseChildren(coverDocument, activeRange);
+					//this.parseDocumentContent(documentContent, activeRange);
+				};
+				
+				this.aResult.fontsNew = this.fontsNew;
+				aResult = this.aResult;
+				worksheet.setSelectionInfo('paste', aResult, this);
+			},
+			
+			_parseChildren: function(children, activeRange)
+			{
+				var childrens = children.children;
+				for(var i = 0; i < childrens.length; i++)
+				{
+					if(childrens[i].type == c_oAscBoundsElementType.Cell)
+					{
+						for(var row = childrens[i].top; row < childrens[i].top + childrens[i].height; row++)
+						{
+							if(!this.aResult[row + activeRange.r1])
+								this.aResult[row + activeRange.r1] = [];
+							for(var col = childrens[i].left; col < childrens[i].left + childrens[i].width; col++)
+							{
+								if(!this.aResult[row + activeRange.r1][col + activeRange.c1])
+									this.aResult[row + activeRange.r1][col + activeRange.c1] = [];
+								if(!this.aResult[row + activeRange.r1][col + activeRange.c1][0])
+									this.aResult[row + activeRange.r1][col + activeRange.c1][0] = [];
+									
+								var isCtable = false;
+								var tempChildren = childrens[i].children[0].children;
+								var colSpan = null;
+								var rowSpan = null;
+								for(var temp = 0; temp < tempChildren.length; temp++)
+								{
+									if(tempChildren[temp].type == c_oAscBoundsElementType.Table)
+										isCtable = true;
+								}
+								if(childrens[i].width > 1 && isCtable && col == childrens[i].left)
+								{
+									colSpan = childrens[i].width;
+									rowSpan = 1;
+								}	
+								else if(!isCtable && tempChildren.length == 1)
+								{
+									rowSpan = childrens[i].height;
+									colSpan = childrens[i].width;
+								}	
+
+								this.aResult[row + activeRange.r1][col + activeRange.c1][0].rowSpan = rowSpan;
+								this.aResult[row + activeRange.r1][col + activeRange.c1][0].colSpan = colSpan;
+								
+								this.aResult[row + activeRange.r1][col + activeRange.c1][0].borders = this._getBorders(childrens[i], row, col, this.aResult[row + activeRange.r1][col + activeRange.c1][0].borders);
+							}
+						}
+					}
+					if(childrens[i].children.length == 0)
+					{
+						//if parent - cell of table
+						var colSpan = null;
+						var rowSpan = null;
+						
+						this._parseParagraph(childrens[i].elem, activeRange, childrens[i].top + activeRange.r1, childrens[i].left + activeRange.c1);
+					}
+					else
+						this._parseChildren(childrens[i], activeRange);
+				}
+			},
+			
+			_getBorders: function(cellTable, top, left, oldBorders)
+			{
+				var borders = cellTable.elem.Get_Borders();
+				var widthCell = cellTable.width;
+				var heigthCell = cellTable.height;
+				var defaultStyle = "solid";
+				
+				var formatBorders = oldBorders ? oldBorders : new Border();
+				//top border for cell
+				if(top == cellTable.top && !formatBorders.t.s)
+				{
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size,3,1));
+					if (null !== borderStyleName) {
+						formatBorders.t.setStyle(borderStyleName);
+						formatBorders.t.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Top.Color.r + "," + borders.Top.Color.g + "," + borders.Top.Color.b + ")"));
+					}
+				}
+				//left border for cell
+				if(left == cellTable.left && !formatBorders.l.s)
+				{
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size,3,1));
+					if (null !== borderStyleName) {
+						formatBorders.l.setStyle(borderStyleName);
+						formatBorders.l.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Left.Color.r + "," + borders.Left.Color.g + "," + borders.Left.Color.b + ")"));
+					}
+				}
+				//bottom border for cell
+				if(top == cellTable.top + heigthCell - 1 && !formatBorders.b.s)
+				{
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size,3,1));
+					if (null !== borderStyleName) {
+						formatBorders.b.setStyle(borderStyleName);
+						formatBorders.b.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Bottom.Color.r + "," + borders.Bottom.Color.g + "," + borders.Bottom.Color.b + ")"));
+					}
+				}
+				//right border for cell
+				if(left == cellTable.left + widthCell - 1 && !formatBorders.r.s)
+				{
+					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size,3,1));
+					if (null !== borderStyleName) {
+						formatBorders.r.setStyle(borderStyleName);
+						formatBorders.r.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Right.Color.r + "," + borders.Right.Color.g + "," + borders.Right.Color.b + ")"));
+					}
+				}
+				
+				return formatBorders;
+			},
+			
+			_parseParagraph: function(paragraph, activeRange, row, col, rowSpan, colSpan)
+			{
+				var content = paragraph.Content;
+				var row;
+				var text = null;
+				var oNewItem = [];
+
+				aResult = this.aResult;
+				if(row === undefined)
+				{
+					if(aResult.length == 0)
+					{
+						row = activeRange.r1;
+					}
+					else
+						row = aResult.length;
+				}
+				
+				if(this.aResult[row] && this.aResult[row][col] && this.aResult[row][col][0] && this.aResult[row][col][0].length === 0 && (this.aResult[row][col][0].borders || this.aResult[row][col][0].rowSpan != null))
+				{
+					if(this.aResult[row][col][0].borders)
+						oNewItem.borders = this.aResult[row][col][0].borders;
+					if(this.aResult[row][col][0].rowSpan != null)
+					{
+						oNewItem.rowSpan = this.aResult[row][col][0].rowSpan;
+						oNewItem.colSpan = this.aResult[row][col][0].colSpan;
+					}
+					delete this.aResult[row][col];
+				}
+	
+				if(!aResult[row])
+					aResult[row] = [];
+				var s = 0;
+				var c1 = col !== undefined ? col : activeRange.c1;
+				
+				//backgroundColor
+				var backgroundColor = null;
+				if(paragraph.Parent && paragraph.Parent.Parent && paragraph.Parent.Parent instanceof CTableCell2 && paragraph.Parent.Parent.CompiledPr && paragraph.Parent.Parent.CompiledPr.Pr.Shd && paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color)
+				{
+					var color = paragraph.Parent.Parent.CompiledPr.Pr.Shd.Color;
+					backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+				}
+				if(backgroundColor)
+					oNewItem.bc = backgroundColor;
+				
+				paragraph.CompiledPr.NeedRecalc = true;
+				var paraPr = paragraph.Get_CompiledPr();
+				var paragraphFontFamily = paraPr.TextPr.FontFamily.Name;
+				var paragraphFontSize = paraPr.TextPr.FontSize;
+				var paragraphBold = paraPr.TextPr.Bold;
+				var paragraphItalic = paraPr.TextPr.Italic;
+				var paragraphStrikeout = paraPr.TextPr.Strikeout;
+				var paragraphUnderline = paraPr.TextPr.Underline;
+				var paragraphVertAlign = "none";
+				if(paraPr.TextPr.VertAlign == 1)
+					paragraphVertAlign = "superscript";
+				else if(paraPr.TextPr.VertAlign == 2)
+					paragraphVertAlign = "subscript";
+
+				var colorParagraph = new RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
+				
+				
+				//проходимся по контенту paragraph
+				for(var n = 0; n < content.length; n++)
+				{
+					//s  - меняется в зависимости от табуляции
+					if(!aResult[row][s + c1])
+					{
+						aResult[row][s + c1] = [];
+					}
+					if(text == null)
+						text = "";
+					
+					
+					if(content[n] instanceof ParaTextPr2)//settings for text	
+					{
+						if(text !== null && oNewItem[oNewItem.length - 1])//oNewItem - массив, аналогичный value2
+							oNewItem[oNewItem.length - 1].text = text;
+						else if(text !== null && oNewItem.length == 0)
+						{
+							fontFamily = "Arial";
+							this.fontsNew[this.fontsNew.length] = []; 
+							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+							
+							var calcValue = content[n].CalcValue;
+							oNewItem.push({
+								format: {
+									fn: calcValue.FontFamily && calcValue.FontFamily.Name ? calcValue.FontFamily.Name : paragraphFontFamily,
+									fs: calcValue.FontSize ? calcValue.FontSize : paragraphFontSize,
+									c: colorParagraph ? colorParagraph : colorText,
+									b: paragraphBold,
+									i: paragraphItalic,
+									u: paragraphUnderline,
+									s: paragraphStrikeout,
+									va: "none"
+								}
+							});
+							oNewItem[oNewItem.length - 1].text = text;
+						}	
+						
+						text = "";
+						
+						cTextPr = content[n].CalcValue;
+						
+						if(cTextPr.Color)
+							colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
+						else
+							colorText = null;
+						
+						fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
+						this.fontsNew[this.fontsNew.length] = [];
+						this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+						
+						var verticalAlign;
+						if(cTextPr.VertAlign == 2)
+							verticalAlign = "subscript";
+						else if(cTextPr.VertAlign == 1)
+							verticalAlign = "superscript";
+							
+
+						oNewItem.push({
+							format: {
+								fn: fontFamily,
+								fs: cTextPr.FontSize ? cTextPr.FontSize : paragraphFontSize,
+								c: colorText ? colorText : colorParagraph,
+								b: cTextPr.Bold ? cTextPr.Bold : paragraphBold,
+								i: cTextPr.Italic ? cTextPr.Italic : paragraphItalic,
+								u: cTextPr.Underline ? cTextPr.Underline : paragraphUnderline,
+								s: cTextPr.Strikeout ? cTextPr.Strikeout : paragraphStrikeout,
+								va: verticalAlign ? verticalAlign : paragraphVertAlign
+							}
+						});
+					}
+					else if(content[n] instanceof ParaText2)//text
+					{
+						text += content[n].Value;
+					}
+					else if(content[n] instanceof ParaSpace2)
+					{	
+						text += " ";
+					}
+					else if(content[n] instanceof ParaTab2)//tab
+					{
+						if(!oNewItem.length)
+						{
+							fontFamily = paragraphFontFamily;
+							this.fontsNew[this.fontsNew.length] = []; 
+							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+							
+							oNewItem.push({
+								format: {
+									fn: fontFamily,
+									fs: paragraphFontSize,
+									c: colorText,
+									b: paragraphBold,
+									i: paragraphItalic,
+									u: paragraphUnderline,
+									s: paragraphStrikeout,
+									va: paragraphVertAlign
+								}
+							});
+						}
+						if(text !== null)
+							oNewItem[oNewItem.length - 1].text = text;
+						//переходим в следующую ячейку
+						if(typeof aResult[row][s + c1] == "object")
+							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem
+						else
+						{
+							aResult[row][s + c1] = [];
+							aResult[row][s + c1][0] = oNewItem;
+						}
+							
+						text = "";
+						oNewItem = [];
+						s++;
+					}
+					else if(content[n] instanceof ParaEnd2)//end
+					{
+						if(!oNewItem.length)
+						{
+							fontFamily = paragraphFontFamily;
+							this.fontsNew[this.fontsNew.length] = []; 
+							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
+							
+							oNewItem.push({
+								format: {
+									fn: fontFamily,
+									fs: paragraphFontSize,
+									c: colorText,
+									b: paragraphBold,
+									i: paragraphItalic,
+									u: paragraphUnderline,
+									s: paragraphStrikeout,
+									va: paragraphVertAlign
+								}
+							});
+						}
+						if(text !== null)
+							oNewItem[oNewItem.length - 1].text = text;
+						text = "";
+						if(typeof aResult[row][s + c1] == "object")
+							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem
+						else
+						{
+							aResult[row][s + c1] = [];
+							aResult[row][s + c1][0] = oNewItem;
+						}
+					}
+					else if(n == content.length - 1)//end of row
+					{
+						text = "";
+						oNewItem = [];
+					}
+				};
+			}
+		};
+		
+		var c_oAscBoundsElementType = {
+			Content		: 0,
+			Paragraph	: 1,
+			Table		: 2,
+			Row			: 3,
+			Cell		: 4
+		};
+		function DocumentContentBoundsElement(elem, type, parent){
+			this.elem = elem;
+			this.type = type;
+			this.parent = parent;
+			this.children = [];
+			
+			this.left = 0;
+			this.top = 0;
+			this.width = 0;
+			this.height = 0;
+		}
+		function DocumentContentBounds(){
+		};
+		DocumentContentBounds.prototype = {
+			getBounds: function(nLeft, nTop, aDocumentContent){
+				//в первный проход заполняем размеры
+				//и могут заноситься относительные сдвиги при небходимости
+				var oRes = this._getMeasure(aDocumentContent, null);
+				//заполняем абсолютные сдвиги
+				this._getOffset(nLeft, nTop, oRes);
+				return oRes;
+			},
+			_getOffset: function(nLeft, nTop, elem){
+				elem.left += nLeft;
+				elem.top += nTop;
+				var nCurLeft = elem.left;
+				var nCurTop = elem.top;
+				var bIsRow = elem.elem instanceof CTableRow;
+				for(var i = 0, length = elem.children.length; i < length; i++)
+				{
+					var child = elem.children[i];
+					this._getOffset(nCurLeft, nCurTop, child);
+					if(bIsRow)
+						nCurLeft += child.width;
+					else
+						nCurTop += child.height;
+				}
+			},
+			_getMeasure: function(aDocumentContent, oParent){
+				var oRes = new DocumentContentBoundsElement(aDocumentContent, c_oAscBoundsElementType.Content, oParent);
+				for(var i = 0, length = aDocumentContent.length; i < length; i++)
+				{
+					var elem = aDocumentContent[i];
+					var oNewElem = null;
+					if(type_Paragraph == elem.GetType())
+					{
+						oNewElem = new DocumentContentBoundsElement(elem, c_oAscBoundsElementType.Paragraph, oRes);
+						oNewElem.width = 1;
+						oNewElem.height = 1;
+					}
+					else if(type_Table == elem.GetType())
+						oNewElem = this._getTableMeasure(elem, oRes);
+					if(null != oNewElem)
+					{
+						oRes.children.push(oNewElem);
+						if(oNewElem.width && oNewElem.width > oRes.width)
+							oRes.width = oNewElem.width;
+						oRes.height += oNewElem.height;
+					}
+				}
+				return oRes;
+			},
+			_getTableMeasure: function(table, oParent){
+				var oRes = new DocumentContentBoundsElement(table, c_oAscBoundsElementType.Table, oParent);
+				//надо рассчитать сколько ячеек приходится на tableGrid, по умолчанию по одной
+				//todo надо оптимизировать размер 
+				var aGridWidth = [];
+				for(var i = 0, length = table.TableGrid.length; i < length; i++)
+					aGridWidth.push(1);
+				//заполняем aGridWidth
+				for(var i = 0, length = table.Content.length; i < length; i++)
+				{
+					var row = table.Content[i];
+					var oNewElem = this._setRowGridWidth(row, oRes, aGridWidth);
+					if(null != oNewElem)
+						oRes.children.push(oNewElem);
+				}
+				var aSumGridWidth = [];
+				var nTempSum = 0;
+				for(var i = 0, length = aGridWidth.length; i < length + 1; i++)
+				{
+					aSumGridWidth[i] = nTempSum;
+					var nCurValue = aGridWidth[i];
+					if(nCurValue)
+						nTempSum += nCurValue;
+				}
+				//заполняем размеры
+				for(var i = 0, length = oRes.children.length; i < length; i++)
+				{
+					var rowWrapped = oRes.children[i];
+					this._getRowMeasure(rowWrapped, aSumGridWidth);
+					oRes.height += rowWrapped.height;
+					//в left временно занесен относительный сдвиг
+					if(rowWrapped.width + rowWrapped.left > oRes.width)
+						oRes.width = rowWrapped.width + rowWrapped.left;
+				}
+				return oRes;
+			},
+			_setRowGridWidth: function(row, oParent, aGridWidth){
+				var oRes = new DocumentContentBoundsElement(row, c_oAscBoundsElementType.Row, oParent);
+				var nSumGrid = 0;
+				var BeforeInfo = row.Get_Before();
+				if(BeforeInfo && BeforeInfo.GridBefore)
+					nSumGrid += BeforeInfo.GridBefore;
+				for(var i = 0, length = row.Content.length; i < length; i++)
+				{
+					var cell = row.Content[i];
+					var oNewCell = new DocumentContentBoundsElement(cell, c_oAscBoundsElementType.Cell, oRes);
+					oRes.children.push(oNewCell);
+					var oNewElem = this._getMeasure(cell.Content.Content, oNewCell);
+					oNewCell.children.push(oNewElem);
+					oNewCell.width = oNewElem.width;
+					oNewCell.height = oNewElem.height;
+					if(oNewCell.height > oRes.height)
+						oRes.height = oNewCell.height;
+					var nCellGrid = cell.Get_GridSpan();
+					if(oNewElem.width > nCellGrid)
+					{
+						var nFirstGridWidth = oNewElem.width - nCellGrid + 1;
+						var nCurValue = aGridWidth[nSumGrid];
+						if(null != nCurValue && nCurValue < nFirstGridWidth)
+							aGridWidth[nSumGrid] = nFirstGridWidth;
+					}
+					nSumGrid += nCellGrid;
+				}
+				return oRes;
+			},
+			_getRowMeasure: function(rowWrapped, aSumGridWidth){
+				var nSumGrid = 0;
+				var BeforeInfo = rowWrapped.elem.Get_Before();
+				if(BeforeInfo && BeforeInfo.GridBefore)
+				{
+					//временно заносим относительный сдвиг
+					rowWrapped.left = aSumGridWidth[nSumGrid + BeforeInfo.GridBefore] - aSumGridWidth[nSumGrid];
+					nSumGrid += BeforeInfo.GridBefore;
+				}
+				for(var i = 0, length = rowWrapped.children.length; i < length; i++)
+				{
+					var cellWrapped = rowWrapped.children[i];
+					var nCellGrid = cellWrapped.elem.Get_GridSpan();
+					cellWrapped.width = aSumGridWidth[nSumGrid + nCellGrid] - aSumGridWidth[nSumGrid];
+					//выравниваем высоту ячеек по-максимому
+					cellWrapped.height = rowWrapped.height;
+					rowWrapped.width += cellWrapped.width;
+					nSumGrid += nCellGrid;
+				}
+			}
+		};
+		
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
 		window["Asc"].Clipboard = Clipboard;
+		window["Asc"].pasteFromBinaryWord = pasteFromBinaryWord;
+		window["Asc"].DocumentContentBounds = DocumentContentBounds;
 
 	}
 )(jQuery, window);
