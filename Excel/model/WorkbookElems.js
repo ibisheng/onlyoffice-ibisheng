@@ -1450,7 +1450,12 @@ StyleManager.prototype =
     _prepareSet : function(oItemWithXfs)
 	{
 		if(null == oItemWithXfs.xfs)
-			oItemWithXfs.xfs = this.oDefaultXfs.clone();
+		{
+			if(oItemWithXfs.getDefaultXfs)
+				oItemWithXfs.xfs = oItemWithXfs.getDefaultXfs();
+			if(null == oItemWithXfs.xfs)
+				oItemWithXfs.xfs = this.oDefaultXfs.clone();
+		}
         return oItemWithXfs.xfs;
 	},
     _prepareSetFont : function(oItemWithXfs)
@@ -2335,6 +2340,13 @@ Row.prototype =
 		for(var i in this.c)
 			oNewRow.c[i] = this.c[i].clone();
 		return oNewRow;
+	},
+	getDefaultXfs : function()
+	{
+		var oRes = null;
+		if(null != this.ws.oAllCol && null != this.ws.oAllCol.xfs)
+			oRes = this.ws.oAllCol.xfs.clone();
+		return oRes;
 	},
 	getHeightProp : function()
 	{

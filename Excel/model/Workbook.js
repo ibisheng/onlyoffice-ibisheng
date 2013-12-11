@@ -3400,8 +3400,6 @@ Woorksheet.prototype._getRow=function(row){
 	if(!oCurRow){
 		oCurRow = new Row(this);
 		oCurRow.create(row + 1);
-		if(null != this.oAllCol && null != this.oAllCol.xfs)
-			oCurRow.xfs = this.oAllCol.xfs.clone();
 		this.aGCells[row] = oCurRow;
 		this.nRowsCount = row > this.nRowsCount ? row : this.nRowsCount ;
 		//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateRow, this.getId(), null, new UndoRedoData_SingleProperty(row));
