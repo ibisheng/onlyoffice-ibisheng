@@ -9648,7 +9648,14 @@
 
 			openCellEditor: function (editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell,
 									  isHideCursor, activeRange) {
-				var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
+				var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg,
+					cFrozen, rFrozen, widthDiff = 0, heightDiff = 0;
+				if (this.topLeftFrozenCell) {
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
+					widthDiff += tc[cFrozen].left - tc[0].left;
+					heightDiff += tr[rFrozen].top - tr[0].top;
+				}
 				var ar = t.activeRange;
 				if (activeRange)
 					t.activeRange = activeRange.clone();
@@ -9657,7 +9664,7 @@
 					return false;
 
 				function getLeftSide(col) {
-					var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left;
+					var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - widthDiff;
 					for (i = col; i >= vr.c1; --i) {
 						res.push(t.cols[i].left - offs);
 					}
@@ -9665,7 +9672,7 @@
 				}
 
 				function getRightSide(col) {
-					var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left;
+					var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - widthDiff;
 
 					// Для замерженных ячеек, можем уйти за границу
 					if (fl.isMerged && col > vr.c2)
@@ -9682,7 +9689,7 @@
 				}
 
 				function getBottomSide(row) {
-					var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top;
+					var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - heightDiff;
 
 					// Для замерженных ячеек, можем уйти за границу
 					if (fl.isMerged && row > vr.r2)
@@ -9767,8 +9774,8 @@
 				}
 					
 				editor.open({
-					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left,
-					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top,
+					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + widthDiff,
+					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + heightDiff,
 					leftSide: getLeftSide(!fl.isMerged ? col : mc.c1),
 					rightSide: getRightSide(!fl.isMerged ? col : mc.c2),
 					bottomSide: getBottomSide(!fl.isMerged ? row : mc.r2),
