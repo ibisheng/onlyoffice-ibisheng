@@ -2886,7 +2886,8 @@ function DrawingObjects() {
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
 				drawingObject.graphicObject.recalculate(aImagesSync);
-				aObjects.push( drawingObject );
+				//aObjects.push( drawingObject );
+				drawingObject.graphicObject.addToDrawingObjects();
 				
 				var boundsChecker = _this.getBoundsChecker(drawingObject);
 				aBoundsCheckers.push(boundsChecker);
