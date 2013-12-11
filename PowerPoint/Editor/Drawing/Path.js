@@ -27,8 +27,13 @@ function Path(extrusionOk, fill, stroke, w, h)
     if(this.pathW!=undefined)
     {
         this.divPW = 1/w;
+    }
+
+    if(this.pathH!=undefined)
+    {
         this.divPH = 1/h;
     }
+
 
     this.ArrPathCommandInfo = new Array();
     this.ArrPathCommand = new Array();
@@ -323,13 +328,19 @@ Path.prototype = {
         var ch, cw;
         if(this.pathW!=undefined)
         {
-            ch = (gdLst["h"]/this.pathH);
             cw = (gdLst["w"]/this.pathW);
         }
         else
         {
-            ch=1;
             cw=1;
+        }
+        if(this.pathH!=undefined)
+        {
+            ch = (gdLst["h"]/this.pathH);
+        }
+        else
+        {
+            ch=1;
         }
         var APCI=this.ArrPathCommandInfo, n = APCI.length, cmd;
         var x0, y0, x1, y1, x2, y2, wR, hR, stAng, swAng, lastX, lastY;
@@ -542,13 +553,19 @@ Path.prototype = {
         var ch, cw;
         if(this.pathW!=undefined)
         {
-            ch = (gdLst["h"]/this.pathH);
             cw = (gdLst["w"]/this.pathW);
         }
         else
         {
-            ch = 1;
-            cw = 1;
+            cw=1;
+        }
+        if(this.pathH!=undefined)
+        {
+            ch = (gdLst["h"]/this.pathH);
+        }
+        else
+        {
+            ch=1;
         }
         var APCI=this.ArrPathCommandInfo, n = APCI.length, cmd;
         var x0, y0, x1, y1, x2, y2, wR, hR, stAng, swAng, lastX, lastY;
