@@ -1195,6 +1195,11 @@ CImageShape.prototype =
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
+            case historyitem_AutoShapes_GroupRecalculateAfterLoad:
+            {
+                this.recalculate();
+                break;
+            }
         }
     },
 
@@ -1368,9 +1373,8 @@ CImageShape.prototype =
 
     readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
     {
-        this.group = group;
-        this.drawingObjects = drawingObjects;
-
+        this.setGroup(group);
+        this.setDrawingObjects(drawingObjects);
         this.setBlipFill(new CUniFill());
         this.blipFill.Read_FromBinary2(r);
         var dx = 0, dy = 0;
@@ -1379,14 +1383,98 @@ CImageShape.prototype =
             dx = r.GetDouble();
             dy = r.GetDouble();
         }
-        this.spPr.Read_FromBinary2(r);
+        //this.spPr.Read_FromBinary2(r);
+        //*********************
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+        var Reader = r;
+        var offX, offY, extX, extY, flipH = null, flipV = null, rot = null;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            geometry.Init(5, 5);
+            this.setGeometry(geometry);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            // this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            //this.setUniLine(ln);
+        }
+
+
+        //***********************************
         if(isRealNumber(x) && isRealNumber(y))
         {
             this.setPosition(x + dx, y + dy);
         }
 
-        if(!isRealObject(group))
-        {
-        }
     }
 };

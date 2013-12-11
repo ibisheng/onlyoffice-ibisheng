@@ -2862,9 +2862,12 @@ function DrawingObjects() {
 				drawingObject.graphicObject.chart.rebuildSeries();
 				
                 drawingObject.graphicObject.init();
-                aObjects.push( drawingObject );
-				
-				var boundsChecker = _this.getBoundsChecker(drawingObject);
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit2Chart, null, null,
+                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                drawingObject.graphicObject.addToDrawingObjects();
+
+
+                var boundsChecker = _this.getBoundsChecker(drawingObject);
 				aBoundsCheckers.push(boundsChecker);
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
@@ -2887,6 +2890,8 @@ function DrawingObjects() {
                 }
 				drawingObject.graphicObject.recalculate(aImagesSync);
 				//aObjects.push( drawingObject );
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 				drawingObject.graphicObject.addToDrawingObjects();
 				
 				var boundsChecker = _this.getBoundsChecker(drawingObject);
@@ -2912,7 +2917,11 @@ function DrawingObjects() {
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
                 drawingObject.graphicObject.recalculate(aImagesSync);
-			}
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null,
+                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                drawingObject.graphicObject.addToDrawingObjects();
+
+            }
             if (drawingObject.graphicObject instanceof  CGroupShape) {
 
                 drawingObject.graphicObject.drawingBase = drawingObject;
@@ -2938,9 +2947,12 @@ function DrawingObjects() {
                 drawingObject.graphicObject.recalculate(aImagesSync);
                 if(aImagesSync.length > old_len)
                     aObjectsSync[aObjectsSync.length] = drawingObject;
-                aObjects.push( drawingObject );
-				
-				var boundsChecker = _this.getBoundsChecker(drawingObject);
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null,
+                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                drawingObject.graphicObject.addToDrawingObjects();
+
+
+                var boundsChecker = _this.getBoundsChecker(drawingObject);
 				aBoundsCheckers.push(boundsChecker);
             }
 		}

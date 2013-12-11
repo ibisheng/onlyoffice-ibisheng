@@ -895,7 +895,13 @@ CTextBody.prototype =
     Refresh_RecalcData2: function()
     {
         if(isRealObject(this.content))
-            this.content.Recalculate_Page(0, true);
+        {
+            if((this.shape && this.shape instanceof CShape)
+                || ((this.shape instanceof CChartTitle) && this.shape.chartGroup && this.shape.chartGroup.drawingObjects))
+            {
+                this.content.Recalculate_Page(0, true);
+            }
+        }
     },
 
     Undo: function(type, data)

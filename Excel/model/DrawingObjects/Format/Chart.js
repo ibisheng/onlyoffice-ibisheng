@@ -1893,6 +1893,11 @@ CChartAsGroup.prototype =
                 this.recalculate();
                 break;
             }
+            case historyitem_AutoShapes_RecalculateAfterInit2Chart:
+            {
+                this.init();
+                break;
+            }
         }
     },
 

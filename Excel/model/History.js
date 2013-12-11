@@ -199,6 +199,10 @@ var historyitem_AutoShapes_GeometryAddPreset = 88;
 var historyitem_AutoShapes_AddToGroupSpTreeToPos = 89;
 var historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsUndo = 90;
 var historyitem_AutoShapes_GroupRecalculateArrGraphicObjectsRedo = 91;
+var historyitem_AutoShapes_RecalculateAfterInit2Chart = 92;
+var historyitem_AutoShapes_GroupRecalculateAfterLoad = 93;
+
+
 
 
 

@@ -1654,6 +1654,10 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		History.TurnOn();
 		History.Create_NewPoint();
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
+        if(!(bFromRedo === true))
+        {
+            wsFrom.copyDrawingObjects(newSheet);
+        }
 	}
 };
 Workbook.prototype.insertWorksheet=function(index, sheet, cwf){
@@ -2298,7 +2302,19 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
 		range.setHyperlinkOpen(elem.data);
 	}
-	if(null != this.Drawings && this.Drawings.length > 0 && !(bFromRedo === true))
+	if(null != this.aComments) {
+		for (var i = 0; i < this.aComments.length; i++) {
+			var comment = new asc_CCommentData(this.aComments[i]);
+			comment.wsId = oNewWs.getId();
+			comment.setId();
+			oNewWs.aComments.push(comment);
+		}
+	}		
+	return oNewWs;
+};
+Woorksheet.prototype.copyDrawingObjects=function(oNewWs)
+{
+    if(null != this.Drawings && this.Drawings.length > 0)
     {
         oNewWs.Drawings = [];
         var w = new CMemory();
@@ -2318,11 +2334,10 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
             drawingObjects = new DrawingObjects();
             drawingObjects.drawingDocument = new CDrawingDocument(drawingObjects);
         }
-        //drawingObjects.init(new WorksheetView());
         for(var i = 0; i < this.Drawings.length; ++i)
         {
             var obj = null;
-			var objectType = stream.GetLong();
+            var objectType = stream.GetLong();
             switch (objectType)
             {
                 case CLASS_TYPE_SHAPE:
@@ -2354,17 +2369,7 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
                 oNewWs.Drawings.push(drawingObject);
             }
         }
-        //oNewWs.Drawings = this.Drawings.concat();
     }
-	if(null != this.aComments) {
-		for (var i = 0; i < this.aComments.length; i++) {
-			var comment = new asc_CCommentData(this.aComments[i]);
-			comment.wsId = oNewWs.getId();
-			comment.setId();
-			oNewWs.aComments.push(comment);
-		}
-	}		
-	return oNewWs;
 };
 Woorksheet.prototype.init=function(){
 	this.workbook.cwf[this.Id]={ cells:{} };

@@ -1940,6 +1940,12 @@ CGroupShape.prototype =
                 this.spTree.splice(data.newValue1, 0, g_oTableId.Get_ById(data.oldValue2));
                 break;
             }
+            case historyitem_AutoShapes_GroupRecalculateAfterLoad:
+            {
+                this.initCharts();
+                this.recalculate();
+                break;
+            }
         }
     },
 
@@ -2131,6 +2137,13 @@ CGroupShape.prototype =
                     this.addToSpTree(sp);
                     break;
                 }
+                case CLASS_TYPE_CHART_AS_GROUP:
+                {
+                    var sp = new CChartAsGroup(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    this.addToSpTree(sp);
+                    break;
+                }
             }
         }
 
@@ -2138,6 +2151,7 @@ CGroupShape.prototype =
         {
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
                 new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            this.initCharts();
             this.recalculate();
         }
     },
@@ -2145,15 +2159,113 @@ CGroupShape.prototype =
     readFromBinaryForCopyPaste2: function(r, group, drawingObjects, x, y)
     {
 
-        this.group = group;
-        this.drawingObjects = drawingObjects;
-        this.spPr.Read_FromBinary2(r);
+        this.setGroup(group);
+        this.setDrawingObjects(drawingObjects);
+        this.spPr.bwMode = r.GetBool();
+        r.GetBool();
+        this.setXfrmObject(new CXfrm());
+
+        var Reader = r;
+
+
+        var offX, offY, extX, extY, flipH = null, flipV = null, rot = null;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+        var chExtX, chExtY, chOffX, chOffY;
+
+        flag = Reader.GetBool();
+        if(flag)
+            chOffX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chOffY = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chExtX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            chExtY = Reader.GetDouble();
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        if(isRealNumber(chOffX) && isRealNumber(chOffY))
+            this.setChildOffsets(chOffX, chOffY);
+
+        if(isRealNumber(chExtX) && isRealNumber(chExtY))
+            this.setChildExtents(chExtX, chExtY);
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            geometry.Init(5, 5);
+            //this.setGeometry(geometry);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            // this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            //this.setUniLine(ln);
+        }
+
         var dx = 0, dy = 0;
         if(r.GetBool())
         {
             dx = r.GetDouble();
             dy = r.GetDouble();
         }
+
         if(isRealNumber(x) && isRealNumber(y))
         {
             this.setPosition(x + dx, y + dy);
@@ -2165,22 +2277,33 @@ CGroupShape.prototype =
             {
                 case CLASS_TYPE_SHAPE:
                 {
-                    this.spTree[i] = new CShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste2(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
 
                 case CLASS_TYPE_IMAGE:
                 {
-                    this.spTree[i] = new CImageShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CImageShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste2(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
 
                 case CLASS_TYPE_GROUP:
                 {
-                    this.spTree[i] = new CGroupShape(null, drawingObjects);
-                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    var sp = new CGroupShape(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste2(r, this, drawingObjects);
+                    this.addToSpTree(sp);
+                    break;
+                }
+
+                case CLASS_TYPE_CHART_AS_GROUP:
+                {
+                    var sp = new CChartAsGroup(null, drawingObjects);
+                    sp.readFromBinaryForCopyPaste2(r, this, drawingObjects);
+                    this.addToSpTree(sp);
                     break;
                 }
             }

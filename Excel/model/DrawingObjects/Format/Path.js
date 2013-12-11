@@ -300,7 +300,6 @@ Path.prototype = {
         }
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_PathWH, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(oldValue1, oldValue2, newValue1, newValue2)));
-        UndoRedoDataGOPairProps
     },
 
     moveTo: function(x, y)

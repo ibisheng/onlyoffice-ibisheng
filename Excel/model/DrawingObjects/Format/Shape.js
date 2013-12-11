@@ -3477,8 +3477,8 @@ CShape.prototype =
         }
         if(r.GetBool())
         {
-            this.txBody = new CTextBody(this);
-            this.txBody.readFromBinaryForCopyPaste(r, drawingObjects.drawingDocument);
+            this.addTextBody(new CTextBody(this));
+            this.txBody.readFromBinary(r, drawingObjects.drawingDocument);
         }
         if(!isRealObject(group))
         {
@@ -3600,10 +3600,9 @@ CShape.prototype =
         }
         if(r.GetBool())
         {
-            this.txBody = new CTextBody(this);
-            this.txBody.readFromBinaryForCopyPaste(r, drawingObjects.drawingDocument);
+            this.addTextBody(new CTextBody(this));
+            this.txBody.readFromBinary(r, drawingObjects.drawingDocument);
         }
-
     },
 
     setStyleBinary: function(style)
