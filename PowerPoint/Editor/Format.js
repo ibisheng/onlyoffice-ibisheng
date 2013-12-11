@@ -3370,13 +3370,13 @@ function ClrMap()
 {
     this.color_map = new Array();
 
-    for (var i = g_clr_MIN; i <= g_clr_MAX; i++)
+    for (var i = 0; i < 17; i++)
         this.color_map[i] = null;
 
     this.createDuplicate =  function()
     {
         var _copy = new ClrMap();
-        for(var _color_index = g_clr_MIN; _color_index <= this.color_map.length; ++_color_index)
+        for(var _color_index = 0; _color_index < 17; ++_color_index)
         {
             _copy.color_map[_color_index] = this.color_map[_color_index];
         }
@@ -3385,7 +3385,7 @@ function ClrMap()
 
     this.Write_ToBinary2 = function(w)
     {
-        for(var i = g_clr_MIN; i <= g_clr_MAX; i++)
+        for(var i = 0; i < 17; i++)
         {
             w.WriteBool(isRealNumber(this.color_map[i]));
             if(isRealNumber(this.color_map[i]))
@@ -3397,7 +3397,7 @@ function ClrMap()
 
     this.Read_FromBinary2 = function(r)
     {
-        for(var i = g_clr_MIN; i <= g_clr_MAX; i++)
+        for(var i = 0; i < 17; i++)
         {
             if(r.GetBool())
             {
