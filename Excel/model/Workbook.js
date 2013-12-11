@@ -5630,13 +5630,13 @@ Range.prototype._setBorderEdge=function(bbox, oItemWithXfs, nRow, nCol, oNewBord
 			(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 				var oTargetBorder = oCurBorder.clone();
 				if(nCol == bbox.c1 - 1)
-					oTargetBorder.r = oNewBorderProp;
+					oTargetBorder.r = new BorderProp();
 				else if(nRow == bbox.r1 - 1)
-					oTargetBorder.b = oNewBorderProp;
+					oTargetBorder.b = new BorderProp();
 				else if(nCol == bbox.c2 + 1)
-					oTargetBorder.l = oNewBorderProp;
+					oTargetBorder.l = new BorderProp();
 				else if(nRow == bbox.r2 + 1)
-					oTargetBorder.t = oNewBorderProp;
+					oTargetBorder.t = new BorderProp();
 				oItemWithXfs.setBorder(oTargetBorder);
 			}
 	}
