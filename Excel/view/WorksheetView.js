@@ -2062,6 +2062,11 @@
 
 			_cleanColumnHeaders: function (colStart, colEnd) {
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+				}
+
 				if (colEnd === undefined) {colEnd = colStart;}
 				colStart = Math.max(this.visibleRange.c1, colStart);
 				colEnd = Math.min(this.visibleRange.c2, colEnd);
@@ -2074,6 +2079,11 @@
 
 			_cleanRowHeades: function (rowStart, rowEnd) {
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+				}
+
 				if (rowEnd === undefined) {rowEnd = rowStart;}
 				rowStart = Math.max(this.visibleRange.r1, rowStart);
 				rowEnd = Math.min(this.visibleRange.r2, rowEnd);
@@ -2864,6 +2874,13 @@
 				var opt = this.settings;
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+				}
+
 				var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
 				var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
 				var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX - this.width_1px) : 0;
@@ -3290,6 +3307,13 @@
 				var y1 = Number.MAX_VALUE;
 				var y2 = -Number.MAX_VALUE;
 				var i;
+
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+				}
 
 				if (arnIntersection) {
 					x1 = this.cols[arnIntersection.c1].left - offsetX - this.width_2px;
@@ -4977,11 +5001,16 @@
 
 			// dX = true - считать с половиной следующей ячейки
 			_findColUnderCursor: function (x, canReturnNull, dX) {
-				var c = this.visibleRange.c1;
-				var offset = this.cols[c].left - this.cellsLeft;
-				var c2, x1, x2;
+				var c = this.visibleRange.c1,
+					offset = this.cols[c].left - this.cellsLeft,
+					c2, x1, x2, cFrozen, widthDiff = 0;
 				if (x >= this.cellsLeft) {
-					for (x1 = this.cellsLeft, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
+					if (this.topLeftFrozenCell) {
+						cFrozen = this.topLeftFrozenCell.getCol0();
+						widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+					}
+					// ToDo select in frozen pane
+					for (x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
 						x2 = x1 + this.cols[c].width;
 						if (x1 <= x && x < x2) {
 							if (dX){
@@ -5027,10 +5056,15 @@
 			// dY = true - считать с половиной следующей ячейки
 			_findRowUnderCursor: function (y, canReturnNull, dY) {
 				var r = this.visibleRange.r1,
-				offset = this.rows[r].top - this.cellsTop,
-				r2, y1, y2;
+					offset = this.rows[r].top - this.cellsTop,
+					r2, y1, y2, rFrozen, heightDiff = 0;
 				if (y >= this.cellsTop) {
-					for (y1 = this.cellsTop, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
+					// ToDo select in frozen pane
+					if (this.topLeftFrozenCell) {
+						rFrozen = this.topLeftFrozenCell.getRow0();
+						heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+					}
+					for (y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
 						y2 = y1 + this.rows[r].height;
 						if (y1 <= y && y < y2) {
 							if (dY){
