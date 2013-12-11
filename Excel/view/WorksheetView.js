@@ -6173,6 +6173,14 @@
 				var _y = y * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
 
 				var isInSelection = false;
+				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+				}
 
 				// Проверяем попали ли мы в выделение
 				if ((_x < this.cellsLeft || _y < this.cellsTop) && c_oAscSelectionType.RangeMax === ar.type) {
@@ -6180,8 +6188,8 @@
 					isInSelection = true;
 				} else if (_x > this.cellsLeft && _y > this.cellsTop) {
 					// Пересчитываем X и Y относительно видимой области
-					_x += (this.cols[this.visibleRange.c1].left - this.cellsLeft);
-					_y += (this.rows[this.visibleRange.r1].top - this.cellsTop);
+					_x += offsetX;
+					_y += offsetY;
 
 					if (xL <= _x && _x <= xR && yL <= _y && _y <= yR) {
 						// Попали в выделение ячеек
@@ -6190,7 +6198,7 @@
 				} else if (_x <= this.cellsLeft && _y >= this.cellsTop && c_oAscSelectionType.RangeRow === ar.type) {
 					// Выделены строки
 					// Пересчитываем Y относительно видимой области
-					_y += (this.rows[this.visibleRange.r1].top - this.cellsTop);
+					_y += offsetY;
 
 					if (yL <= _y && _y <= yR) {
 						// Попали в выделение ячеек
@@ -6199,7 +6207,7 @@
 				} else if (_y <= this.cellsTop && _x >= this.cellsLeft && c_oAscSelectionType.RangeCol === ar.type) {
 					// Выделены столбцы
 					// Пересчитываем X относительно видимой области
-					_x += (this.cols[this.visibleRange.c1].left - this.cellsLeft);
+					_x += offsetX;
 					if (xL <= _x && _x <= xR) {
 						// Попали в выделение ячеек
 						isInSelection = true;
