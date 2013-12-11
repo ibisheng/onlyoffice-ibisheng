@@ -24,6 +24,9 @@ function ParaRun(Document)
     this.Descent     = 0; // общий descent
     this.YOffset     = 0; // смещение по Y
 
+    this.NeedAddNumbering = false;  // Нужно ли добавлять нумерацию (true - нужно, false - не нужно, первый элемент,
+                                    // у которого будет false и будет элемент с нумерацией)
+
     this.Lines       = new Array(); // Массив CParaRunLine
     this.StartLine   = 0;           // Строка, с которой начинается данный ран
 
@@ -68,9 +71,8 @@ ParaRun.prototype =
     // Выставляем начальную строку и обнуляем массив строк
     Recalculate_Reset : function(StartLine)
     {
-        this.StartLine  = StartLine;
-
-        this.Lines = new Array();
+        this.StartLine = StartLine;
+        this.Lines     = new Array();
     },
 
     // Пересчитываем размеры всех элементов
@@ -120,7 +122,7 @@ ParaRun.prototype =
             this.Lines[CurLine] = new CParaRunLine();
         }
 
-        var Para     = PRS.Paragraph;
+        var Para = PRS.Paragraph;
 
         var RangeStartPos = 0;
         var RangeEndPos   = -1;
@@ -165,9 +167,9 @@ ParaRun.prototype =
             var ItemType = Item.Type;
 
             // Проверяем, не нужно ли добавить нумерацию к данному элементу
-            this.Internal_Recalculate_Numbering( Item, PRS );
+            if ( true === this.Internal_Recalculate_Numbering( Item, PRS, ParaPr ) )
+                RRS.Set_NumberingPos( Pos );
 
-            var bBreak = false;
             switch( Item.Type )
             {
                 case para_Sym:
@@ -200,7 +202,8 @@ ParaRun.prototype =
 
                         if ( true !== PRS.NewRange )
                         {
-                            PRS.Set_WordStart( Pos );
+                            // Отмечаем начало нового слова
+                            PRS.Set_LineBreakPos( Pos );
                             PRS.WordLen = Item.Width;
                             PRS.Word    = true;
                         }
@@ -223,23 +226,26 @@ ParaRun.prototype =
 
                                 if ( false === Para.Internal_Check_Ranges(PRS.Line, PRS.Range)  )
                                 {
-                                    PRS.MovePosToWordStart = true;
-                                    PRS.NewRange = true;
+                                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                    PRS.MoveToLBP = true;
+                                    PRS.NewRange  = true;
                                 }
                                 else
                                 {
                                     PRS.EmptyLine  = false;
                                     PRS.X         += PRS.WordLen;
 
+                                    // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
+                                    // делим слово в данном месте
                                     PRS.NewRange = true;
                                     RangeEndPos  = Pos;
                                 }
                             }
                             else
                             {
-                                // Слово не убирается в промежутке. Переносим слово на новую строку
-                                PRS.MovePosToWordStart = true;
-                                PRS.NewRange = true;
+                                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                PRS.MoveToLBP = true;
+                                PRS.NewRange  = true;
                             }
                         }
 
@@ -319,6 +325,7 @@ ParaRun.prototype =
 
                         if ( PRS.X + PRS.SpaceLen + Item.Width > PRS.XEnd && ( false === PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges( PRS.Line, PRS.Range ) ) )
                         {
+                            // Автофигура не убирается, ставим перенос перед ней
                             PRS.NewRange = true;
                             RangeEndPos  = Pos;
                         }
@@ -462,8 +469,9 @@ ParaRun.prototype =
 
                     if ( PRS.X + PRS.SpaceLen + Item.Width > PRS.XEnd && ( false === PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges( PRS.Line, PRS.Range ) ) )
                     {
-                        // TODO: отмечаем здесь конец данного отрезка
+                        // Данный элемент не убирается, ставим перенос перед ним
                         PRS.NewRange = true;
+                        RangeEndPos  = Pos;
                     }
                     else
                     {
@@ -513,7 +521,7 @@ ParaRun.prototype =
                         {
                             PRS.WordLen = NewX - PRS.X;
 
-                            // TODO: отмечаем здесь конец данного отрезка
+                            RangeEndPos  = Pos;
                             PRS.NewRange = true;
                         }
                         else
@@ -537,10 +545,10 @@ ParaRun.prototype =
                     }
 
                     // Считаем, что с таба начинается слово
+                    PRS.Set_LineBreakPos( Pos );
+
                     PRS.StartWord = true;
                     PRS.Word      = true;
-
-                    PRS.Set_WordStart( Pos );
 
                     break;
                 }
@@ -562,7 +570,8 @@ ParaRun.prototype =
                     }
                     else
                     {
-                        // TODO: вставить перенос отрезка
+                        RangeEndPos = Pos + 1;
+
                         PRS.NewRange  = true;
                         PRS.EmptyLine = false;
                     }
@@ -605,10 +614,14 @@ ParaRun.prototype =
                     }
 
                     PRS.NewRange = true;
+                    PRS.End      = true;
 
                     break;
                 }
             }
+
+            if ( true === PRS.NewRange )
+                break;
 
             Pos++;
         }
@@ -616,178 +629,181 @@ ParaRun.prototype =
         this.Lines[CurLine].Add_Range( PRS.Range, RangeStartPos, RangeEndPos );
     },
 
-    Internal_Recalculate_Numbering : function(Item, PRS)
+    Recalculate_Set_RangeEndPos : function(PRS, PRP, Depth)
     {
-        if ( true === PRS.AddNumbering )
+        var CurLine  = PRS.Line - this.StartLine;
+        var CurRange = PRS.Range;
+        var CurPos   = PRP[Depth];
+
+        this.Line[CurLine].Ranges[CurRange].EndPos = CurPos;
+    },
+
+    Internal_Recalculate_Numbering : function(Item, PRS, ParaPr)
+    {
+        // Если нужно добавить нумерацию и на текущем элементе ее можно добавить, тогда добавляем её
+        if ( true === this.NeedAddNumbering && true === Item.Can_AddNumbering() )
         {
-            var Para = PRS.Paragraph;
-            if ( undefined === Para )
-                return;
+            var NumberingItem = Para.Numbering;
+            var NumberingType = Para.Numbering.Type;
 
-            var Pr     = Para.Get_CompiledPr2( false );
-            var ParaPr = Pr.ParaPr;
-
-            // Проверим, возможно на текущем элементе стоит добавить нумерацию
-            if ( true === Item.Can_AddNumbering() )
+            if ( para_Numbering === NumberingType )
             {
-                var NumberingItem = Para.Numbering;
-                var NumberingType = Para.Numbering.Type;
-
-                if ( para_Numbering === NumberingType )
+                var NumPr = ParaPr.NumPr;
+                if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
                 {
-                    var NumPr = ParaPr.NumPr;
-                    if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-                    {
-                        // Так мы обнуляем все рассчитанные ширины данного элемента
-                        NumberingItem.Measure( g_oTextMeasurer, undefined );
-                    }
-                    else
-                    {
-                        var Numbering = Para.Parent.Get_Numbering();
-                        var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-                        var NumSuff   = NumLvl.Suff;
-                        var NumJc     = NumLvl.Jc;
-                        var NumInfo   = Para.Parent.Internal_GetNumInfo( this.Id, NumPr );
-                        var NumTextPr = Pr.TextPr.Copy();
-                        NumTextPr.Merge( Para.TextPr.Value );
-                        NumTextPr.Merge( NumLvl.TextPr );
-
-                        // Здесь измеряется только ширина символов нумерации, без суффикса
-                        NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr );
-
-                        // При рассчете высоты строки, если у нас параграф со списком, то размер символа
-                        // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
-                        // ниже baseline.
-                        if ( LineAscent < NumberingItem.Height )
-                            LineAscent = NumberingItem.Height;
-
-                        switch ( NumJc )
-                        {
-                            case align_Right:
-                            {
-                                NumberingItem.WidthVisible = 0;
-                                break;
-                            }
-                            case align_Center:
-                            {
-                                NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
-                                PRS.X                     += NumberingItem.WidthNum / 2;
-                                break;
-                            }
-                            case align_Left:
-                            default:
-                            {
-                                NumberingItem.WidthVisible = NumberingItem.WidthNum;
-                                PRS.X                     += NumberingItem.WidthNum;
-                                break;
-                            }
-                        }
-
-                        switch( NumSuff )
-                        {
-                            case numbering_suff_Nothing:
-                            {
-                                // Ничего не делаем
-                                break;
-                            }
-                            case numbering_suff_Space:
-                            {
-                                var OldTextPr = g_oTextMeasurer.GetTextPr();
-                                g_oTextMeasurer.SetTextPr( NumTextPr );
-                                g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-                                NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
-                                g_oTextMeasurer.SetTextPr( OldTextPr );
-                                break;
-                            }
-                            case numbering_suff_Tab:
-                            {
-                                var NewX = null;
-                                var PageStart = Para.Parent.Get_PageContentStartPos( Para.PageNum + PRS.Page );
-
-                                // Если у данного параграфа есть табы, тогда ищем среди них
-                                var TabsCount = ParaPr.Tabs.Get_Count();
-
-                                // Добавим в качестве таба левую границу
-                                var TabsPos = new Array();
-                                var bCheckLeft = true;
-                                for ( var Index = 0; Index < TabsCount; Index++ )
-                                {
-                                    var Tab = ParaPr.Tabs.Get(Index);
-                                    var TabPos = Tab.Pos + PageStart.X;
-
-                                    if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
-                                    {
-                                        TabsPos.push( PageStart.X + ParaPr.Ind.Left );
-                                        bCheckLeft = false;
-                                    }
-
-                                    if ( tab_Clear !=  Tab.Value )
-                                        TabsPos.push( TabPos );
-                                }
-
-                                if ( true === bCheckLeft )
-                                    TabsPos.push( PageStart.X + ParaPr.Ind.Left );
-
-                                TabsCount++;
-
-                                for ( var Index = 0; Index < TabsCount; Index++ )
-                                {
-                                    var TabPos = TabsPos[Index];
-
-                                    if ( X < TabPos )
-                                    {
-                                        NewX = TabPos;
-                                        break;
-                                    }
-                                }
-
-                                // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-                                if ( null === NewX )
-                                {
-                                    if ( X < PageStart.X + ParaPr.Ind.Left )
-                                        NewX = PageStart.X + ParaPr.Ind.Left;
-                                    else
-                                    {
-                                        NewX = this.X;
-                                        while ( X >= NewX )
-                                            NewX += Default_Tab_Stop;
-                                    }
-                                }
-
-                                NumberingItem.WidthSuff = NewX - PRS.X;
-
-                                break;
-                            }
-                        }
-
-                        NumberingItem.Width         = NumberingItem.WidthNum;
-                        NumberingItem.WidthVisible += NumberingItem.WidthSuff;
-
-                        PRS.X += NumberingItem.WidthSuff;
-                        //Para.Numbering.Pos  = Pos;
-                        Para.Numbering.Item = Item;
-
-                    }
+                    // Так мы обнуляем все рассчитанные ширины данного элемента
+                    NumberingItem.Measure( g_oTextMeasurer, undefined );
                 }
-                else if ( para_PresentationNumbering === NumberingType )
+                else
                 {
-                    var Bullet = Para.PresentationPr.Bullet;
-                    if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
+                    var Numbering = Para.Parent.Get_Numbering();
+                    var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+                    var NumSuff   = NumLvl.Suff;
+                    var NumJc     = NumLvl.Jc;
+                    var NumInfo   = Para.Parent.Internal_GetNumInfo( this.Id, NumPr );
+                    var NumTextPr = Pr.TextPr.Copy();
+                    NumTextPr.Merge( Para.TextPr.Value );
+                    NumTextPr.Merge( NumLvl.TextPr );
+
+                    // Здесь измеряется только ширина символов нумерации, без суффикса
+                    NumberingItem.Measure( g_oTextMeasurer, Numbering, NumInfo, NumTextPr, NumPr );
+
+                    // При рассчете высоты строки, если у нас параграф со списком, то размер символа
+                    // в списке влияет только на высоту строки над Baseline, но не влияет на высоту строки
+                    // ниже baseline.
+                    if ( LineAscent < NumberingItem.Height )
+                        LineAscent = NumberingItem.Height;
+
+                    switch ( NumJc )
                     {
-                        if ( ParaPr.Ind.FirstLine < 0 )
-                            NumberingItem.WidthVisible = Math.max( NumberingItem.Width, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - PRS.X, Para.X + ParaPr.Ind.Left - PRS.X );
-                        else
-                            NumberingItem.WidthVisible = Math.max( Para.X + ParaPr.Ind.Left + NumberingItem.Width - PRS.X, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - PRS.X, Para.X + ParaPr.Ind.Left - PRS.X );
+                        case align_Right:
+                        {
+                            NumberingItem.WidthVisible = 0;
+                            break;
+                        }
+                        case align_Center:
+                        {
+                            NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
+                            PRS.X                     += NumberingItem.WidthNum / 2;
+                            break;
+                        }
+                        case align_Left:
+                        default:
+                        {
+                            NumberingItem.WidthVisible = NumberingItem.WidthNum;
+                            PRS.X                     += NumberingItem.WidthNum;
+                            break;
+                        }
                     }
 
-                    PRS.X += NumberingItem.WidthVisible;
+                    switch( NumSuff )
+                    {
+                        case numbering_suff_Nothing:
+                        {
+                            // Ничего не делаем
+                            break;
+                        }
+                        case numbering_suff_Space:
+                        {
+                            var OldTextPr = g_oTextMeasurer.GetTextPr();
+                            g_oTextMeasurer.SetTextPr( NumTextPr );
+                            g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+                            NumberingItem.WidthSuff = g_oTextMeasurer.Measure( " " ).Width;
+                            g_oTextMeasurer.SetTextPr( OldTextPr );
+                            break;
+                        }
+                        case numbering_suff_Tab:
+                        {
+                            var NewX = null;
+                            var PageStart = Para.Parent.Get_PageContentStartPos( Para.PageNum + PRS.Page );
+
+                            // Если у данного параграфа есть табы, тогда ищем среди них
+                            var TabsCount = ParaPr.Tabs.Get_Count();
+
+                            // Добавим в качестве таба левую границу
+                            var TabsPos = new Array();
+                            var bCheckLeft = true;
+                            for ( var Index = 0; Index < TabsCount; Index++ )
+                            {
+                                var Tab = ParaPr.Tabs.Get(Index);
+                                var TabPos = Tab.Pos + PageStart.X;
+
+                                if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
+                                {
+                                    TabsPos.push( PageStart.X + ParaPr.Ind.Left );
+                                    bCheckLeft = false;
+                                }
+
+                                if ( tab_Clear !=  Tab.Value )
+                                    TabsPos.push( TabPos );
+                            }
+
+                            if ( true === bCheckLeft )
+                                TabsPos.push( PageStart.X + ParaPr.Ind.Left );
+
+                            TabsCount++;
+
+                            for ( var Index = 0; Index < TabsCount; Index++ )
+                            {
+                                var TabPos = TabsPos[Index];
+
+                                if ( X < TabPos )
+                                {
+                                    NewX = TabPos;
+                                    break;
+                                }
+                            }
+
+                            // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
+                            if ( null === NewX )
+                            {
+                                if ( X < PageStart.X + ParaPr.Ind.Left )
+                                    NewX = PageStart.X + ParaPr.Ind.Left;
+                                else
+                                {
+                                    NewX = this.X;
+                                    while ( X >= NewX )
+                                        NewX += Default_Tab_Stop;
+                                }
+                            }
+
+                            NumberingItem.WidthSuff = NewX - PRS.X;
+
+                            break;
+                        }
+                    }
+
+                    NumberingItem.Width         = NumberingItem.WidthNum;
+                    NumberingItem.WidthVisible += NumberingItem.WidthSuff;
+
+                    PRS.X += NumberingItem.WidthSuff;
                     //Para.Numbering.Pos  = Pos;
                     Para.Numbering.Item = Item;
+
+                }
+            }
+            else if ( para_PresentationNumbering === NumberingType )
+            {
+                var Bullet = Para.PresentationPr.Bullet;
+                if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
+                {
+                    if ( ParaPr.Ind.FirstLine < 0 )
+                        NumberingItem.WidthVisible = Math.max( NumberingItem.Width, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - PRS.X, Para.X + ParaPr.Ind.Left - PRS.X );
+                    else
+                        NumberingItem.WidthVisible = Math.max( Para.X + ParaPr.Ind.Left + NumberingItem.Width - PRS.X, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - PRS.X, Para.X + ParaPr.Ind.Left - PRS.X );
                 }
 
-                PRS.AddNumbering = false;
+                PRS.X += NumberingItem.WidthVisible;
+                //Para.Numbering.Pos  = Pos;
+                Para.Numbering.Item = Item;
             }
+
+            this.NeedAddNumbering = false;
+
+            return true;
         }
+
+        return false;
     },
 
     Internal_Recalculate_LineMetrics : function(PRS, SpacingLineRule)
@@ -1377,7 +1393,7 @@ ParaRun.prototype =
         switch ( Type )
         {
         }
-    },
+    }
 
 };
 

@@ -55,6 +55,8 @@ var recalcresult_NextElement = 0x00; // Пересчитываем следую�
 var recalcresult_PrevPage    = 0x01; // Пересчитываем заново предыдущую страницу
 var recalcresult_CurPage     = 0x02; // Пересчитываем заново текущую страницу
 var recalcresult_NextPage    = 0x03; // Пересчитываем следующую страницу
+var recalcresult_NextLine    = 0x04; // Пересчитываем следующую строку
+var recalcresult_CurLine     = 0x05; // Пересчитываем текущую строку
 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
@@ -9204,7 +9206,8 @@ CDocument.prototype =
         if ( PageIndex < 0 )
             return;
 
-        //this.Update_CursorType( X, Y, PageIndex, e );
+        if ( false === g_TestColumns )
+            this.Update_CursorType( X, Y, PageIndex, e );
 
         if ( true === this.Selection.Use && true === this.Selection.Start )
         {
