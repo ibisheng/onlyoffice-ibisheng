@@ -85,22 +85,20 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
 
     },
-
     ///////// RunPrp, CtrPrp
     setCtrPrp: function(runPrp)
     {
         this.CtrPrp.Merge(runPrp); // only runPrp for paragraph
     },
-
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
         ctrPrp.Merge(DEFAULT_RUN_PRP);
-        ctrPrp.Merge(this.CtrPrp);
         ctrPrp.Merge(this.Composition.GetFirstPrp() );
+        ctrPrp.Merge(this.CtrPrp);
         return ctrPrp;
     },
-    getCtrPrp_2: function()
+    getCtrPrpForFirst: function()
     {
         var ctrPrp = new CTextPr();
         ctrPrp.Merge(DEFAULT_RUN_PRP);
@@ -108,18 +106,20 @@ CMathBase.prototype =
 
         return ctrPrp;
     },
-    // getPrpToControlLetter => getCtrPrp
-    old_getPrpToControlLetter: function()
+    // для управляющих символов в приоритете GetFirstPrp
+    // если первый элемент - мат объект, то берутся его CtrPrp
+    getPrpToControlLetter: function()
     {
         var rPrp = new CTextPr();
-        //rPrp.Merge(DEFAULT_RUN_PRP);
-        rPrp.Merge( this.getCtrPrp() );
         rPrp.Merge( this.Composition.GetFirstPrp() );
 
         return rPrp;
     },
     setRPrp: function(rPrp)
     {
+        this.CtrPrp = new CTextPr();
+        this.CtrPrp.Merge(rPrp);
+
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
             {

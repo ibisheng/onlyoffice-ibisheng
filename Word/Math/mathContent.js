@@ -19,12 +19,15 @@
 
 //  1. после того, как будет реализован селект с учетом RunPrp, убрать проверки из remove на RunPrp (!)
 //  1. properties для записи в файл
-//  2. плейсхолдер на чтение
-//  3. убрать slashWidth
-//  4. центр => baseline
-//  5. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
-//  6. объединение формул на remove и add
-//  7. ctr + shift
+//  2. убрать slashWidth
+//  3. центр => baseline
+//  4. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
+//  5. баг с отрисовкой кругового интеграла
+//  5. ctr + shift
+//  6. Merge textPrp и mathTextPrp (bold, italic)
+//  7. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
+//  8. объединение формул на remove и add
+
 
 
 /// TODO
@@ -33,7 +36,7 @@
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
 // 2. Убрать ненужные(!!) setTxtPrp и getTxtPrp
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
-// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выровнено как alignTop)
+// 4. Протестировать n-арные операторы, когда добавляется текст вместо оператора (mouseDown не работает, выравнено как alignTop)
 
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
@@ -611,7 +614,6 @@ CMathContent.prototype =
     addToContent_2: function(oSub)   // for "menu"
     {
         // добавление к контенту элементов из другого контента в текущую позицию
-
         // первый элемент в добавляемом контенте CEmpty пропускаем
 
         var subContent = oSub.content;
@@ -629,6 +631,7 @@ CMathContent.prototype =
         if(CurFirstType == MATH_RUN_PRP)
         {
             curStart = this.CurPos - 1;
+            curEnd   = this.CurPos - 1;
 
             // не убираем RunPrp для вставляемого текста, чтобы History работала нормально !!
             // когда на запись отдаем, можно лишние RunPrp убрать, как в Ворде
@@ -3974,121 +3977,6 @@ CMathContent.prototype =
 
         return SelectContent;
     },
-    getPos_toMoveLeft: function()
-    {
-        var state = true,
-            SelectContent = null;
-
-        var start = this.RealSelect.start,
-            end   = this.RealSelect.end;
-
-        var posLeft = null; // позиция курсора, стартовая позиция селекта
-        var posStart = start > end ? end : start; // для CurPos, стартовая и конечная позиции совпадают
-
-        var currType = this.content[this.CurPos].value.typeObj;
-        var bFirstRunPrp = this.CurPos == 1 && currType == MATH_RUN_PRP;
-        var bComposition = this.CurPos == 0;
-        var bPlh = this.IsPlaceholder(),
-            bStartPos = bFirstRunPrp || bComposition;
-
-        var bStartRoot = bStartPos && this.bRoot;
-        var bUpperLevel = (bPlh || bStartPos) && !this.bRoot;
-
-        if(bUpperLevel)
-        {
-            var movement = this.Parent.cursor_moveLeft();
-            SelectContent = movement.SelectContent;
-        }
-        else if(!bStartRoot || this.selectUse()) // не в начале
-        {
-            if(this.selectUse())
-            {
-                var start = this.RealSelect.start,
-                    end   = this.RealSelect.end;
-
-                if(start > end)
-                {
-                    var tmp = start;
-                    start = end;
-                    end = tmp;
-                }
-
-                // select move left
-
-                /*if( this.selection.active )
-                 {
-                 SelectContent = this;
-                 var end_select = this.selection.endPos > 0 ? this.selection.endPos - 1 : 0;
-                 this.setEnd_Selection(end_select);
-                 }
-                 else
-                 {
-                 this.CurPos = start - 1;
-                 SelectContent = this;
-                 CurrContent   = this;
-                 }*/
-
-                this.CurPos = start - 1;
-                SelectContent = this;
-
-            }
-            //пришли из базового класса
-            else if( currType === MATH_COMP )
-            {
-                // select move left
-
-                /*if( this.selection.active )
-                 {
-                 var end_select = this.CurPos > 0 ? this.CurPos - 1 : 0;
-                 this.setStart_Selection(end_select);
-                 this.setEnd_Selection(this.CurPos);
-                 SelectContent = this;
-                 }
-                 else
-                 {
-                 this.CurPos--;
-                 SelectContent = this;
-                 CurrContent   = this;
-                 }*/
-
-                this.CurPos--;
-                SelectContent = this;
-            }
-            else
-            {
-                //если нет селекта, то просто перемещаемся по контенту
-
-                var prevType = this.content[this.CurPos - 1].value.typeObj,
-                    prev2_Type = this.CurPos > 2 ?  this.content[this.CurPos - 2].value.typeObj : null;
-
-                var bDiffRPrp = prevType === MATH_RUN_PRP && prev2_Type == MATH_TEXT,
-                    bRPrComp = currType === MATH_RUN_PRP && prevType === MATH_EMPTY && prev2_Type === MATH_COMP;
-
-                if(bDiffRPrp || bRPrComp)
-                    this.CurPos -= 2;
-                else
-                    this.CurPos--;
-
-                if( this.content[this.CurPos].value.typeObj === MATH_COMP ) // this.CurPos может измениться
-                {
-                    SelectContent = this.content[this.CurPos].value.goToLastElement();
-                }
-                else
-                    SelectContent = this;
-
-            }
-
-            this.setLogicalPosition(this.CurPos);
-
-        }
-        else
-            state = false;  // bRoot, в начале
-
-        //return {state: state, SelectContent: SelectContent, CurrContent: CurrContent };
-
-
-        return {state: state, SelectContent: SelectContent, pos: pos};
-    },
     old_cursor_moveLeft: function()
     {
         var state = true,
@@ -4826,34 +4714,34 @@ CMathContent.prototype =
         {
             if( this.content[pos].value.typeObj === MATH_COMP )
             {
-                /*if( this.content[pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
-                    pos--;
-                else if( (this.content[pos].widthToEl - gps.right) < mouseX && mouseX <= this.content[ pos ].widthToEl)
-                    pos++;*/
-
-
                 if(mouseX < widthToEl - width - gps.right)
                     pos--;
                 else if(mouseX >= widthToEl - gps.right)
                     pos++;
-
-                /*if(!bPos)
-                    pos--;
-                else
-                    pos++;*/
 
             }
             else
             {
                 if( !(widthToEl - width/2 <  mouseX) )
                     pos--;
-
-                /*if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[ pos - 1].widthToEl + gps.left) )
-                    pos--;
-                else if( (this.content[ pos ].widthToEl - (this.content[ pos ].value.size.width/2) - this.content[ pos ].g_mContext.left ) > mouseX )
-                    pos--;*/
             }
         }
+
+        // проверка на RunPrp
+        pos = this.verifyCurPos(pos);
+
+        return pos;
+    },
+    verifyCurPos: function(pos)  // проверка на RunPrp
+    {
+        var currType  = this.content[pos].value.typeObj,
+            prevType = pos > 0 ? this.content[pos-1].value.typeObj : null,
+            nextType = pos < this.content.length -1 ? this.content[pos+1].value.typeObj : null;
+
+        if(currType == MATH_RUN_PRP && prevType == MATH_TEXT)
+            pos--;
+        else if(currType == MATH_EMPTY && nextType == MATH_RUN_PRP)
+            pos++;
 
         return pos;
     },
@@ -4980,7 +4868,7 @@ CMathContent.prototype =
 
         var bRemoveFormula = (bDirectly_CurrComp|| bDirectly_RPrpComp || bReverseComp) && !bSelect;
 
-        if(bRemoveFormula)
+        if(bRemoveFormula)   // удаление формулы (селект)
         {
             var pos;
             if(bMEReverse)
@@ -4992,11 +4880,11 @@ CMathContent.prototype =
 
             this.removeFormula(pos);
         }
-        else if(!bNotRemove)
+        else if(!bNotRemove) // удаление в контенте
         {
             var start, end;
 
-            if(bSelect)
+            if(bSelect)      // если заселекчено
             {
                 start =  this.RealSelect.startPos;
                 end   =  this.RealSelect.endPos;
@@ -5008,8 +4896,54 @@ CMathContent.prototype =
                     start = end;
                     end = tmp;
                 }
+
+                // при селекте используем  findPosition
+                // соответственно, если перед RunPrp идёт текст, то встаем перед RunPrp,
+                // а если empty, то встаем после RunPrp
+
+                var endCurType    = this.content[end - 1].value.typeObj,                        // последний элемент в селекте "end - 1"
+                    endNextType   = end < this.content.length ? this.content[end].value.typeObj : null,
+                    startCurType  = this.content[start].value.typeObj,                          // RunPrp1, RunPrp2
+                    startPrevType = start > 0 ? this.content[start - 1].value.typeObj : null;   // MATH_COMP + RunPrp
+
+                var bStartCurrRPrp = startCurType == MATH_RUN_PRP,      // проверка на то, чтобы добавить RunPrp к селекту
+                    bStartPrevRPrp = startPrevType == MATH_RUN_PRP;     // проверка на то, чтобы убрать RunPrp из селекта
+
+                if(endCurType == MATH_RUN_PRP)
+                    end--;
+
+                if(bStartCurrRPrp || bStartPrevRPrp) // check RunPrp
+                {
+                    var bSelectRunPrp = false;
+
+                    if(this.content.length == end)
+                        bSelectRunPrp = true;
+                    else if(endNextType !== MATH_TEXT)
+                        bSelectRunPrp = true;
+                    else
+                    {
+                        for(var i = start + 1; i < end; i++)
+                        {
+                            if(this.content[i].value.typeObj !== MATH_TEXT)
+                            {
+                                bSelectRunPrp = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(!bSelectRunPrp && bStartCurrRPrp)
+                        start++;
+                    else if(bSelectRunPrp && bStartPrevRPrp)
+                        start--;
+
+                    // TODO
+                    // добавить RunPrp, когда не весь Run заселектили, но при этом начали селектить вне Run (и следовательно заселектили RunPrp)
+                    // на Undo сделать флаг, что были добавлены RunPrp при удалении
+                }
+
             }
-            else
+            else             // если нет селекта
             {
                 start = order == 1 ? this.CurPos : this.CurPos + 1;     // позиция, с которой будем удалять
 
@@ -5017,9 +4951,9 @@ CMathContent.prototype =
                     start = (order == -1) ? start + 1 : start - 1;
 
                 var bRun = start - 1 > 0 ? this.content[start - 1].value.typeObj === MATH_RUN_PRP : false,
-                    bNotNextText = start + 1 < this.content.length ?  this.content[start + 1].value.typeObj !== MATH_TEXT : true; // start  < this.content.length - 1, значит последняя буква в контента
+                    bNextText = start + 1 < this.content.length ?  this.content[start + 1].value.typeObj == MATH_TEXT : false; // start  < this.content.length - 1, значит последняя буква в контента
 
-                var bOnlyLetter = bRun && bNotNextText; // если все текстовые элементы удалили из Run, нужно удалить RunPrp
+                var bOnlyLetter = bRun && ! bNextText; // если все текстовые элементы удалили из Run, нужно удалить RunPrp
 
                 if(bOnlyLetter)
                 {
@@ -5036,6 +4970,9 @@ CMathContent.prototype =
 
             if(!this.IsEmpty() && this.CurPos == 0 && this.content[this.CurPos+1].value.typeObj === MATH_RUN_PRP) // если удалили мат. объект и стоим в начале, то позиция курсора будет перед RunPrp, а нужно после
                 this.CurPos++;
+
+            // проверка на RunPrp
+            this.CurPos = this.verifyCurPos(this.CurPos);
 
             this.setLogicalPosition(this.CurPos);
 
@@ -5239,6 +5176,10 @@ CMathContent.prototype =
 
 
         return {bDelete: bDelete, items: items};
+    },
+    removeLetter: function(pos, order)
+    {
+
     },
     removeFormula: function(pos)
     {
@@ -5536,7 +5477,7 @@ CMathContent.prototype =
             else if(this.content[1].value.typeObj === MATH_COMP)
             {
                 //var ctrPrp = this.content[1].value.getCtrPrp();
-                var ctrPrp = this.content[1].value.getCtrPrp_2();// иначе зациклимся на getCtrPrp
+                var ctrPrp = this.content[1].value. getCtrPrpForFirst();// иначе зациклимся на getCtrPrp
                 txtPrp.Merge(ctrPrp);
             }
         }
@@ -6855,7 +6796,6 @@ CMathComposition.prototype =
             else
             {
                  this.SelectContent = move.SelectContent;
-                 //this.CurrentContent = move.CurrContent;
                  this.CurrentContent = this.SelectContent;
             }
         }
@@ -6866,11 +6806,17 @@ CMathComposition.prototype =
     {
         var move = this.SelectContent.cursor_moveRight(bShiftKey, bCtrlKey);
 
-        //передаем состояние, т.к. можем выйти за пределы формулы
         if(move.state)
         {
-            this.SelectContent = move.SelectContent;
-            this.CurrentContent = move.CurrContent;
+            if(bShiftKey)
+            {
+
+            }
+            else
+            {
+                this.SelectContent = move.SelectContent;
+                this.CurrentContent = this.SelectContent;
+            }
         }
 
         return move.state;
@@ -7103,8 +7049,8 @@ CMathComposition.prototype =
 
         var items = this.CurrentContent.addToContent_2(content);
 
-        var Pos = this.CurrentContent.CurPos,
-            PosEnd = Pos + items.length;
+        var Pos    = this.CurrentContent.CurPos - items.length,
+            PosEnd = this.CurrentContent.CurPos;
 
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 
@@ -7114,9 +7060,7 @@ CMathComposition.prototype =
         return this.CurrentContent.getCurrRunPrp();
     }
 
-
     //////////////////////////////
-
 }
 
 
