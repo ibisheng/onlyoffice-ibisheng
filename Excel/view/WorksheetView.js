@@ -2812,7 +2812,7 @@
 					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 					this._drawSelectionRange(range);
 					if ( this.objectRender.selectedGraphicObjectsExists() )
-						this.objectRender.OnUpdateOverlay();
+						this.objectRender.raiseLayerDrawingObjects();
 				} 
 				else {
 					this._drawSelectionRange(range);
