@@ -8663,7 +8663,7 @@ Paragraph.prototype =
             }
             case para_Math:
             {
-                if ( undefined !== this.Content[CurPos2] && para_Math === this.Content[CurPos].Type )
+                if ( undefined !== this.Content[CurPos2] && para_Math === this.Content[CurPos2].Type )
                     this.Content[CurPos2].Add( Item );
                 else
                 {
