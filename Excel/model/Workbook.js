@@ -5530,589 +5530,166 @@ Range.prototype.setBorderSrc=function(border){
 	});
 	History.EndTransaction();
 };
-Range.prototype.setBorder=function(border){
-	History.Create_NewPoint();
-	//border = null очисть border
-	//"ih" - внутренние горизонтальные, "iv" - внутренние вертикальные
-	var oBBox = this.bbox;
-	var nRangeType = this._getRangeType();
-	var oThis = this;
-	var fSetBorder = function(nRow, nCol, oNewBorder)
+Range.prototype._setBorderMerge=function(bLeft, bTop, bRight, bBottom, oNewBorder, oCurBorder){
+	var oTargetBorder = new Border();
+	//не делаем clone для свойств потому у нас нельзя поменять свойство отдельное свойство border можно только применить border целиком
+	if(bLeft)
+		oTargetBorder.l = oNewBorder.l;
+	else
+		oTargetBorder.l = oNewBorder.iv;
+	if(bTop)
+		oTargetBorder.t = oNewBorder.t;
+	else
+		oTargetBorder.t = oNewBorder.ih;
+	if(bRight)
+		oTargetBorder.r = oNewBorder.r;
+	else
+		oTargetBorder.r = oNewBorder.iv;
+	if(bBottom)
+		oTargetBorder.b = oNewBorder.b;
+	else
+		oTargetBorder.b = oNewBorder.ih;
+	oTargetBorder.dd = oNewBorder.dd;
+	oTargetBorder.du = oNewBorder.du;
+	var oRes = null;
+	if(null != oCurBorder)
 	{
-		if(null == oNewBorder)
+		oCurBorder.mergeInner(oTargetBorder);
+		oRes = oCurBorder;
+	}
+	else
+		oRes = oTargetBorder;
+	return oRes;
+}
+Range.prototype._setCellBorder=function(bbox, cell, oNewBorder){
+	if(null == oNewBorder)
+		cell.setBorder(oNewBorder);
+	else
+	{
+		var oCurBorder = null;
+        if(null != cell.xfs && null != cell.xfs.border)
+			oCurBorder = cell.xfs.border.clone();
+		var nRow = cell.oId.getRow0();
+		var nCol = cell.oId.getCol0();
+		cell.setBorder(this._setBorderMerge(nCol == bbox.c1, nRow == bbox.r1, nCol == bbox.c2, nRow == bbox.r2, oNewBorder, oCurBorder));
+	}
+}
+Range.prototype._setRowColBorder=function(bbox, rowcol, bRow, oNewBorder){
+	if(null == oNewBorder)
+		rowcol.setBorder(oNewBorder);
+	else
+	{
+		var oCurBorder = null;
+		if(null != rowcol.xfs && null != rowcol.xfs.border)
+			oCurBorder = rowcol.xfs.border.clone();
+		var bLeft, bTop, bRight, bBottom = false;
+		if(bRow)
 		{
-			var cell = oThis.worksheet._getCellNoEmpty(nRow, nCol);
-			if(null != cell)
-				cell.setBorder(oNewBorder);
+			bTop = rowcol.index == bbox.r1;
+			bBottom = rowcol.index == bbox.r2;
 		}
 		else
 		{
-			if(oNewBorder.isEqual(g_oDefaultBorderAbs))
-				return;
-			var _cell = oThis.worksheet.getCell(new CellAddress(nRow, nCol, 0));
-			var oCurBorder = _cell.getBorderSrc().clone();
-			oCurBorder.mergeInner(oNewBorder);
-			var cell = oThis.worksheet._getCell(nRow, nCol);
-			cell.setBorder(oCurBorder);
+			bLeft = rowcol.index == bbox.c1;
+			bRight = rowcol.index == bbox.c2;
 		}
-	};
-	var fSetBorderRowCol = function(rowcol, oNewBorder)
+		rowcol.setBorder(this._setBorderMerge(bLeft, bTop, bRight, bBottom, oNewBorder, oCurBorder));
+	}
+}
+Range.prototype._setBorderEdge=function(bbox, oItemWithXfs, nRow, nCol, oNewBorder){
+	var oCurBorder = null;
+    if(null != oItemWithXfs.xfs && null != oItemWithXfs.xfs.border)
+		oCurBorder = oItemWithXfs.xfs.border;
+	if(null != oCurBorder)
 	{
-		if(null == oNewBorder)
-			rowcol.setBorder(null);
-		else
-		{
-			if(oNewBorder.isEqual(g_oDefaultBorderAbs))
-				return;
-			var oCurBorder;
-			if(null != rowcol.xfs && null != rowcol.xfs.border)
-				oCurBorder = rowcol.xfs.border.clone();
-			else
-				oCurBorder = new Border();
-			oCurBorder.mergeInner(oNewBorder);
-            rowcol.setBorder(oNewBorder);
-		}
-	};
-	var nEdgeTypeLeft = 1;
-	var nEdgeTypeTop = 2;
-	var nEdgeTypeRight = 3;
-	var nEdgeTypeBottom = 4;
-	var fSetBorderEdge = function(nRow, nCol, oNewBorder, type)
-	{
-		var _cell = oThis.worksheet.getCell(new CellAddress(nRow, nCol, 0));
-		var oCurBorder = _cell.getBorderSrc().clone();
-		var oCurBorderProp;
+		var oCurBorderProp = null;
+		if(nCol == bbox.c1 - 1)
+			oCurBorderProp = oCurBorder.r;
+		else if(nRow == bbox.r1 - 1)
+			oCurBorderProp = oCurBorder.b;
+		else if(nCol == bbox.c2 + 1)
+			oCurBorderProp = oCurBorder.l;
+		else if(nRow == bbox.r2 + 1)
+			oCurBorderProp = oCurBorder.t;
 		var oNewBorderProp = null;
 		if(null == oNewBorder)
 			oNewBorderProp = new BorderProp();
-		switch(type)
+		else
 		{
-			case nEdgeTypeLeft:
-				oCurBorderProp = oCurBorder.r;
-				if(null != oNewBorder)
-					oNewBorderProp = oNewBorder.l;
-				break;
-			case nEdgeTypeTop:
-				oCurBorderProp = oCurBorder.b;
-				if(null != oNewBorder)
-					oNewBorderProp = oNewBorder.t;
-				break;
-			case nEdgeTypeRight:
-				oCurBorderProp = oCurBorder.l;
-				if(null != oNewBorder)
-					oNewBorderProp = oNewBorder.r;
-				break;
-			case nEdgeTypeBottom:
-				oCurBorderProp = oCurBorder.t;
-				if(null != oNewBorder)
-					oNewBorderProp = oNewBorder.b;
-				break;
+			if(nCol == bbox.c1 - 1)
+				oNewBorderProp = oNewBorder.l;
+			else if(nRow == bbox.r1 - 1)
+				oNewBorderProp = oNewBorder.t;
+			else if(nCol == bbox.c2 + 1)
+				oNewBorderProp = oNewBorder.r;
+			else if(nRow == bbox.r2 + 1)
+				oNewBorderProp = oNewBorder.b;
 		}
+		
 		if(null != oNewBorderProp && null != oCurBorderProp && c_oAscBorderStyles.None != oCurBorderProp.s && (null == oNewBorder || c_oAscBorderStyles.None != oNewBorderProp.s) &&
 			(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
-			switch(type)
-			{
-				case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
-				case nEdgeTypeTop: oCurBorder.b = new BorderProp(); break;
-				case nEdgeTypeRight: oCurBorder.l = new BorderProp(); break;
-				case nEdgeTypeBottom: oCurBorder.t = new BorderProp(); break;
+				var oTargetBorder = oCurBorder.clone();
+				if(nCol == bbox.c1 - 1)
+					oTargetBorder.r = oNewBorderProp;
+				else if(nRow == bbox.r1 - 1)
+					oTargetBorder.b = oNewBorderProp;
+				else if(nCol == bbox.c2 + 1)
+					oTargetBorder.l = oNewBorderProp;
+				else if(nRow == bbox.r2 + 1)
+					oTargetBorder.t = oNewBorderProp;
+				oItemWithXfs.setBorder(oTargetBorder);
 			}
-			var cell = oThis.worksheet._getCell(nRow, nCol);
-			cell.setBorder(oCurBorder);
-		}
-	};
-	var fSetBorderRowColEdge = function(rowcol, oNewBorder, type)
-	{
-		if(null != rowcol.xfs && null != rowcol.xfs.border)
-		{
-			var oCurBorder = rowcol.xfs.border.clone();
-			var oCurBorderProp;
-			var oNewBorderProp;
-			if(null == oNewBorder)
-				oNewBorderProp = new BorderProp();
-			switch(type)
-			{
-				case nEdgeTypeLeft:
-					oCurBorderProp = oCurBorder.r;
-					if(null != oNewBorder)
-						oNewBorderProp = oNewBorder.l;
-					break;
-				case nEdgeTypeTop:
-					oCurBorderProp = oCurBorder.b;
-					if(null != oNewBorder)
-						oNewBorderProp = oNewBorder.t;
-					break;
-				case nEdgeTypeRight:
-					oCurBorderProp = oCurBorder.l;
-					if(null != oNewBorder)
-						oNewBorderProp = oNewBorder.r;
-					break;
-				case nEdgeTypeBottom:
-					oCurBorderProp = oCurBorder.t;
-					if(null != oNewBorder)
-						oNewBorderProp = oNewBorder.b;
-					break;
-			}
-			if(null != oNewBorderProp && null != oCurBorderProp && c_oAscBorderStyles.None != oCurBorderProp.s && (null == oNewBorder || c_oAscBorderStyles.None != oNewBorderProp.s) &&
-				(oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
-				switch(type)
-				{
-					case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
-					case nEdgeTypeTop: oCurBorder.b = new BorderProp(); break;
-					case nEdgeTypeRight: oCurBorder.l = new BorderProp(); break;
-					case nEdgeTypeBottom: oCurBorder.t = new BorderProp(); break;
-				}
-				rowcol.setBorder(oCurBorder);
-			}
-		}
-	};
-	if (null != border && border.isEqual(g_oDefaultBorderAbs))
-		border = null;
-	if(nRangeType == c_oRangeType.Col)
-	{
-		var oLeftOuter = null;
-		var oLeftInner = null;
-		var oInner = null;
-		var oRightInner = null;
-		var oRightOuter = null;
-		var nWidth = oBBox.c2 - oBBox.c1 + 1;
-		if(null != border)
-		{
-			if(oBBox.c1 > 0 && null != border.l)
-			{
-				oLeftOuter = new Border();
-				oLeftOuter.l = border.l;
-			}
-			if(oBBox.c2 < gc_nMaxCol0 && null != border.r)
-			{
-				oRightOuter = new Border();
-				oRightOuter.r = border.r;
-			}
-			oLeftInner = new Border();
-			oLeftInner.l = border.l;
-			oLeftInner.t = border.ih;
-			if(nWidth > 1)
-				oLeftInner.r = border.iv;
-			else
-				oLeftInner.r = border.r;
-			oLeftInner.b = border.ih;
-			oLeftInner.d = border.d;
-			oLeftInner.dd = border.dd;
-			oLeftInner.du = border.du;
-			if(oLeftInner.isEqual(g_oDefaultBorderAbs))
-				oLeftInner = null;
-			if(nWidth > 1)
-			{
-				oRightInner = new Border();
-				oRightInner.l = border.iv;
-				oRightInner.t = border.ih;
-				oRightInner.r = border.r;
-				oRightInner.b = border.ih;
-				oRightInner.d = border.d;
-				oRightInner.dd = border.dd;
-				oRightInner.du = border.du;
-				if(oRightInner.isEqual(g_oDefaultBorderAbs))
-					oRightInner = null;
-			}
-			if(nWidth > 2)
-			{
-				oInner = new Border();
-				oInner.l = border.iv;
-				oInner.t = border.ih;
-				oInner.r = border.iv;
-				oInner.b = border.ih;
-				oInner.d = border.d;
-				oInner.dd = border.dd;
-				oInner.du = border.du;
-				if(oInner.isEqual(g_oDefaultBorderAbs))
-					oInner = null;
-			}
-		}
-		//oLeftOuter
-		if(oBBox.c1 > 0)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(0, oBBox.c1 - 1, 0), new CellAddress(gc_nMaxRow0, oBBox.c1 - 1, 0));
-			oTempRange._foreachColNoEmpty(function(col){
-				if(null != col.xfs)
-					fSetBorderRowColEdge(col, oLeftOuter, nEdgeTypeLeft);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorderEdge(nRow, nCol ,oLeftOuter, nEdgeTypeLeft);
-			});
-		}
-		//oLeftInner
-		var oTempRange = this.worksheet.getRange(new CellAddress(0, oBBox.c1, 0), new CellAddress(gc_nMaxRow0, oBBox.c1, 0));
-		oTempRange._foreachCol(function(col){
-			fSetBorderRowCol(col, oLeftInner);
-		},
-		function(cell, nRow, nCol, nRowStart, nColStart){
-			fSetBorder(nRow, nCol ,oLeftInner);
-		});
-		//oInner
-		if(nWidth > 2)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(0, oBBox.c1 + 1, 0), new CellAddress(gc_nMaxRow0, oBBox.c2 - 1, 0));
-			oTempRange._foreachCol(function(col){
-				fSetBorderRowCol(col, oInner);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorder(nRow, nCol ,oInner);
-			});
-		}
-		//oRightInner
-		if(nWidth > 1)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(0, oBBox.c2, 0), new CellAddress(gc_nMaxRow0, oBBox.c2, 0));
-			oTempRange._foreachCol(function(col){
-				fSetBorderRowCol(col, oRightInner);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorder(nRow, nCol ,oRightInner);
-			});
-		}
-		//oRightOuter
-		if(oBBox.c2 < gc_nMaxCol0)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(0, oBBox.c2 + 1, 0), new CellAddress(gc_nMaxRow0, oBBox.c2 + 1, 0));
-			oTempRange._foreachColNoEmpty(function(col){
-				if(null != col.xfs)
-					fSetBorderRowColEdge(col, oRightOuter, nEdgeTypeRight);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorderEdge(nRow, nCol ,oRightOuter, nEdgeTypeRight);
-			});
-		}
 	}
-	else if(nRangeType == c_oRangeType.Row)
+}
+Range.prototype.setBorder=function(border){
+	//border = null очисть border
+	//"ih" - внутренние горизонтальные, "iv" - внутренние вертикальные
+	History.Create_NewPoint();
+	var _this = this;
+	var oBBox = this.bbox;
+	this.createCellOnRowColCross();
+	var fSetProperty = this._setProperty;
+	var nRangeType = this._getRangeType();
+	if(c_oRangeType.All == nRangeType)
 	{
-		var oTopOuter = null;
-		var oTopInner = null;
-		var oInner = null;
-		var oBottomInner = null;
-		var oBottomOuter = null;
-		var nHeight = oBBox.r2 - oBBox.r1 + 1;
-		if(null != border)
-		{
-			if(oBBox.r1 > 0 && null != border.t)
-			{
-				oTopOuter = new Border();
-				oTopOuter.t = border.t;
-			}
-			if(oBBox.r2 < gc_nMaxRow0 && null != border.b)
-			{
-				oBottomOuter = new Border();
-				oBottomOuter.b = border.b;
-			}
-			oTopInner = new Border();
-			oTopInner.l = border.iv;
-			oTopInner.t = border.t;
-			oTopInner.r = border.iv;
-			if(nHeight > 1)
-				oTopInner.b = border.ih;
-			else
-				oTopInner.b = border.b;
-			oTopInner.d = border.d;
-			oTopInner.dd = border.dd;
-			oTopInner.du = border.du;
-			if(oTopInner.isEqual(g_oDefaultBorderAbs))
-				oTopInner = null;
-			if(nHeight > 1)
-			{
-				oBottomInner = new Border();
-				oBottomInner.l = border.iv;
-				oBottomInner.t = border.ih;
-				oBottomInner.r = border.iv;
-				oBottomInner.b = border.b;
-				oBottomInner.d = border.d;
-				oBottomInner.dd = border.dd;
-				oBottomInner.du = border.du;
-				if(oBottomInner.isEqual(g_oDefaultBorderAbs))
-					oBottomInner = null;
-			}
-			if(nHeight > 2)
-			{
-				oInner = new Border();
-				oInner.l = border.iv;
-				oInner.t = border.ih;
-				oInner.r = border.iv;
-				oInner.b = border.ih;
-				oInner.d = border.d;
-				oInner.dd = border.dd;
-				oInner.du = border.du;
-				if(oInner.isEqual(g_oDefaultBorderAbs))
-					oInner = null;
-			}
-		}
-		//oTopOuter
-		if(oBBox.r1 > 0)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(oBBox.r1 - 1, 0, 0), new CellAddress(oBBox.r1 - 1, gc_nMaxCol0, 0));
-			oTempRange._foreachRowNoEmpty(function(row){
-				if(null != row.xfs)
-					fSetBorderRowColEdge(row, oTopOuter, nEdgeTypeTop);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorderEdge(nRow, nCol ,oTopOuter, nEdgeTypeTop);
-			});
-		}
-		//oTopInner
-		var oTempRange = this.worksheet.getRange(new CellAddress(oBBox.r1, 0, 0), new CellAddress(oBBox.r1, gc_nMaxCol0, 0));
-		oTempRange._foreachRow(function(row){
-			fSetBorderRowCol(row, oTopInner);
-		},
-		function(cell, nRow, nCol, nRowStart, nColStart){
-			fSetBorder(nRow, nCol ,oTopInner);
-		});
-		//oInner
-		if(nHeight > 2)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(oBBox.r1 + 1, 0, 0), new CellAddress(oBBox.r2 - 1, gc_nMaxCol0, 0));
-			oTempRange._foreachRow(function(row){
-				fSetBorderRowCol(row, oInner);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorder(nRow, nCol ,oInner);
-			});
-		}
-		//oBottomInner
-		if(nHeight > 1)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(oBBox.r2, 0, 0), new CellAddress(oBBox.r2, gc_nMaxCol0, 0));
-			oTempRange._foreachRow(function(row){
-				fSetBorderRowCol(row, oBottomInner);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorder(nRow, nCol ,oBottomInner);
-			});
-		}
-		//oBottomOuter
-		if(oBBox.r2 < gc_nMaxRow0)
-		{
-			var oTempRange = this.worksheet.getRange(new CellAddress(oBBox.r2 + 1, 0, 0), new CellAddress(oBBox.r2 + 1, gc_nMaxCol0, 0));
-			oTempRange._foreachRowNoEmpty(function(row){
-				if(null != row.xfs)
-					fSetBorderRowColEdge(row, oBottomOuter, nEdgeTypeBottom);
-			},
-			function(cell, nRow, nCol, nRowStart, nColStart){
-				fSetBorderEdge(nRow, nCol ,oBottomOuter, nEdgeTypeBottom);
-			});
-		}
+		var oAllCol = this.worksheet.getAllCol();
+		_this._setRowColBorder(oBBox, oAllCol, false, border);
+		fSetProperty = this._setPropertyNoEmpty;
 	}
-	else if(nRangeType == c_oRangeType.Range)
+	fSetProperty.call(this, function(row){
+		if(c_oRangeType.All == nRangeType && null == row.xfs)
+			return;
+		_this._setRowColBorder(oBBox, row, true, border);
+	},
+	function(col){
+		_this._setRowColBorder(oBBox, col, false, border);
+	},
+	function(cell){
+		_this._setCellBorder(oBBox, cell, border);
+	});
+	//убираем граничные border
+	var aEdgeBorders = [];
+	if(oBBox.c1 > 0 && (null == border || !border.l.isEmpty()))
+		aEdgeBorders.push(this.worksheet.getRange3(oBBox.r1, oBBox.c1 - 1, oBBox.r2, oBBox.c1 - 1));
+	if(oBBox.r1 > 0 && (null == border || !border.t.isEmpty()))
+		aEdgeBorders.push(this.worksheet.getRange3(oBBox.r1 - 1, oBBox.c1, oBBox.r1 - 1, oBBox.c2));
+	if(oBBox.c2 < gc_nMaxCol0 && (null == border || !border.r.isEmpty()))
+		aEdgeBorders.push(this.worksheet.getRange3(oBBox.r1, oBBox.c2 + 1, oBBox.r2, oBBox.c2 + 1));
+	if(oBBox.r2 < gc_nMaxRow0 && (null == border || !border.b.isEmpty()))
+		aEdgeBorders.push(this.worksheet.getRange3(oBBox.r2 + 1, oBBox.c1, oBBox.r2 + 1, oBBox.c2));
+	for(var i = 0, length = aEdgeBorders.length; i < length; i++)
 	{
-		var bLeftBorder = false;
-		var bTopBorder = false;
-		var bRightBorder = false;
-		var bBottomBorder = false;
-		if(null == border){
-			this._foreachNoEmpty(function(cell){
-				cell.setBorder(border);
-			});
-			bLeftBorder = true;
-			bTopBorder = true;
-			bRightBorder = true;
-			bBottomBorder = true;
-		}
-		else{
-			bLeftBorder = null != border.l;
-			bTopBorder = null != border.t;
-			bRightBorder = null != border.r;
-			bBottomBorder = null != border.b;
-			var bInnerHBorder = null != border.ih;
-			var bInnerVBorder = null != border.iv;
-			var bDiagonal = null != border.d;
-			if(oBBox.c1 == oBBox.c2 && oBBox.r1 == oBBox.r2){
-				//Если ячейка одна
-				fSetBorder(oBBox.r1, oBBox.c1, border);
-			}
-			else{
-				//бордеры угловых ячеек
-				if(oBBox.c1 == oBBox.c2){
-					if(bLeftBorder || bTopBorder || bRightBorder || bInnerHBorder || bDiagonal){
-						var oLTBorder = new Border();
-						oLTBorder.l = border.l;
-						oLTBorder.t = border.t;
-						oLTBorder.r = border.r;
-						oLTBorder.b = border.ih;
-						oLTBorder.d = border.d;
-						oLTBorder.dd = border.dd;
-						oLTBorder.du = border.du;
-						fSetBorder(oBBox.r1, oBBox.c1, oLTBorder);
-					}
-					if(bLeftBorder || bBottomBorder || bRightBorder || bInnerHBorder || bDiagonal){
-						var oLBBorder = new Border();
-						oLBBorder.l = border.l;
-						oLBBorder.t = border.ih;
-						oLBBorder.r = border.r;
-						oLBBorder.b = border.b;
-						oLBBorder.d = border.d;
-						oLBBorder.dd = border.dd;
-						oLBBorder.du = border.du;
-						fSetBorder(oBBox.r2, oBBox.c1, oLBBorder);
-					}
-				}
-				else{
-					if(bLeftBorder || bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
-						var oLTBorder = new Border();
-						oLTBorder.l = border.l;
-						oLTBorder.t = border.t;
-						oLTBorder.r = border.iv;
-						if(oBBox.r1 == oBBox.r2)
-							oLTBorder.b = border.b;
-						else
-							oLTBorder.b = border.ih;
-						oLTBorder.d = border.d;
-						oLTBorder.dd = border.dd;
-						oLTBorder.du = border.du;
-						fSetBorder(oBBox.r1, oBBox.c1, oLTBorder);
-					}
-					if(oBBox.r1 != oBBox.r2 && (bLeftBorder || bInnerVBorder || bInnerHBorder || bBottomBorder || bDiagonal)){
-						var oLBBorder = new Border();
-						oLBBorder.l = border.l;
-						oLBBorder.t = border.ih;
-						oLBBorder.r = border.iv;
-						oLBBorder.b = border.b;
-						oLBBorder.d = border.d;
-						oLBBorder.dd = border.dd;
-						oLBBorder.du = border.du;
-						fSetBorder(oBBox.r2, oBBox.c1, oLBBorder);
-					}
-					if(bRightBorder || bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
-						var oRTBorder = new Border();
-						oRTBorder.l = border.iv;
-						oRTBorder.t = border.t;
-						oRTBorder.r = border.r;
-						if(oBBox.r1 == oBBox.r2)
-							oRTBorder.b = border.b;
-						else
-							oRTBorder.b = border.ih;
-						oRTBorder.d = border.d;
-						oRTBorder.dd = border.dd;
-						oRTBorder.du = border.du;
-						fSetBorder(oBBox.r1, oBBox.c2, oRTBorder);
-					}
-					if(oBBox.r1 != oBBox.r2 && (bRightBorder || bInnerHBorder || bInnerVBorder || bBottomBorder || bDiagonal) ){
-						var oRBBorder = new Border();
-						oRBBorder.l = border.iv;
-						oRBBorder.t = border.ih;
-						oRBBorder.r = border.r;
-						oRBBorder.b = border.b;
-						oRBBorder.d = border.d;
-						oRBBorder.dd = border.dd;
-						oRBBorder.du = border.du;
-						fSetBorder(oBBox.r2, oBBox.c2, oRBBorder);
-					}
-				}
-				//граничные бордеры
-				if(bTopBorder || bInnerVBorder || (oBBox.r1 == oBBox.r2 ? bBottomBorder : bInnerHBorder) || bDiagonal){
-					for(var  i = oBBox.c1 + 1 ; i < oBBox.c2; i++){
-						var oTopBorder = new Border();
-						oTopBorder.l = border.iv;
-						oTopBorder.t = border.t;
-						oTopBorder.r = border.iv;
-						if(oBBox.r1 == oBBox.r2)
-							oTopBorder.b = border.b;
-						else
-							oTopBorder.b = border.ih;
-						oTopBorder.d = border.d;
-						oTopBorder.dd = border.dd;
-						oTopBorder.du = border.du;
-						fSetBorder(oBBox.r1, i, oTopBorder);
-					}
-				}
-				if(oBBox.r1 != oBBox.r2 && (bBottomBorder || bInnerVBorder || bInnerHBorder || bDiagonal)){
-					for(var  i = oBBox.c1 + 1 ; i < oBBox.c2; i++){
-						var oBottomBorder = new Border();
-						oBottomBorder.l = border.iv;
-						oBottomBorder.t = border.ih;
-						oBottomBorder.r = border.iv;
-						oBottomBorder.b = border.b;
-						oBottomBorder.d = border.d;
-						oBottomBorder.dd = border.dd;
-						oBottomBorder.du = border.du;
-						fSetBorder(oBBox.r2, i, oBottomBorder);
-					}
-				}
-				if(bLeftBorder || bInnerHBorder || (oBBox.c1 == oBBox.c2 ? bRightBorder : bInnerVBorder) || bDiagonal){
-					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
-						var oLeftBorder = new Border();
-						oLeftBorder.l = border.l;
-						oLeftBorder.t = border.ih;
-						if(oBBox.c1 == oBBox.c2)
-							oLeftBorder.r = border.r;
-						else
-							oLeftBorder.r = border.iv;
-						oLeftBorder.b = border.ih;
-						oLeftBorder.d = border.d;
-						oLeftBorder.dd = border.dd;
-						oLeftBorder.du = border.du;
-						fSetBorder(i, oBBox.c1, oLeftBorder);
-					}
-				}
-				if(oBBox.c1 != oBBox.c2 && (bRightBorder || bInnerVBorder || bInnerHBorder || bDiagonal)){
-					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
-						var oRightBorder = new Border();
-						oRightBorder.l = border.iv;
-						oRightBorder.t = border.ih;
-						oRightBorder.r = border.r;
-						oRightBorder.b = border.ih;
-						oRightBorder.d = border.d;
-						oRightBorder.dd = border.dd;
-						oRightBorder.du = border.du;
-						fSetBorder(i, oBBox.c2, oRightBorder);
-					}
-				}
-				//Внутренние границы
-				if(bInnerHBorder || bInnerVBorder || bDiagonal){
-					for(var  i = oBBox.r1 + 1 ; i < oBBox.r2; i++){
-						for(var  j = oBBox.c1 + 1 ; j < oBBox.c2; j++){
-							var oInnerBorder = new Border();
-							oInnerBorder.l = border.iv;
-							oInnerBorder.t = border.ih;
-							oInnerBorder.r = border.iv;
-							oInnerBorder.b = border.ih;
-							oInnerBorder.d = border.d;
-							oInnerBorder.dd = border.dd;
-							oInnerBorder.du = border.du;
-							fSetBorder(i, j, oInnerBorder);
-						}
-					}
-				}
-			}
-		}
-		//для граничных ячеек стираем border
-		if(bLeftBorder && oBBox.c1 > 0){
-			var nCol = oBBox.c1 - 1;
-			for(var  i = oBBox.r1 ; i <= oBBox.r2; i++)
-				fSetBorderEdge(i, nCol, border, nEdgeTypeLeft);
-		}
-		if(bTopBorder && oBBox.r1 > 0){
-			var nRow = oBBox.r1 - 1;
-			for(var  i = oBBox.c1 ; i <= oBBox.c2; i++)
-				fSetBorderEdge(nRow, i, border, nEdgeTypeTop);
-		}
-		if(bRightBorder && oBBox.c2 + 1 < this.worksheet.getColsCount()){
-			var nCol = oBBox.c2 + 1;
-			for(var  i = oBBox.r1 ; i <= oBBox.r2; i++)
-				fSetBorderEdge(i, nCol, border, nEdgeTypeRight);
-		}
-		if(bBottomBorder && oBBox.r2 + 1 < this.worksheet.getRowsCount()){
-			var nRow = oBBox.r2 + 1;
-			for(var  i = oBBox.c1 ; i <= oBBox.c2; i++)
-				fSetBorderEdge(nRow, i, border, nEdgeTypeBottom);
-		}
-	}
-	else
-	{
-		this.worksheet.getAllCol().setBorder(border);
-		this._setPropertyNoEmpty(function(row){
-			row.setBorder(border);
+		var range = aEdgeBorders[i];
+		range._setPropertyNoEmpty(function(row){
+			if(c_oRangeType.All == nRangeType && null == row.xfs)
+				return;
+			_this._setBorderEdge(oBBox, row, row.index, 0, border);
 		},
 		function(col){
-			col.setBorder(border);
+			_this._setBorderEdge(oBBox, col, 0, col.index, border);
 		},
 		function(cell){
-			cell.setBorder(border);
+			_this._setBorderEdge(oBBox, cell, cell.oId.getRow0(), cell.oId.getCol0(), border);
 		});
 	}
 };
@@ -8327,15 +7904,21 @@ Range.prototype.createCellOnRowColCross=function(){
 	if(c_oRangeType.Row == nRangeType)
 	{
 		this._foreachColNoEmpty(function(col){
-			for(var i = bbox.r1; i <= bbox.r2; ++i)
-				oThis.worksheet._getCell(i, col.index);
+			if(null != col.xfs)
+			{
+				for(var i = bbox.r1; i <= bbox.r2; ++i)
+					oThis.worksheet._getCell(i, col.index);
+			}
 		}, null);
 	}
 	else if(c_oRangeType.Col == nRangeType)
 	{
 		this._foreachRowNoEmpty(function(row){
-			for(var i = bbox.c1; i <= bbox.c2; ++i)
-				oThis.worksheet._getCell(row.index, i);
+			if(null != row.xfs)
+			{
+				for(var i = bbox.c1; i <= bbox.c2; ++i)
+					oThis.worksheet._getCell(row.index, i);
+			}
 		}, null);
 	}
 }

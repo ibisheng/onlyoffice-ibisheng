@@ -2370,7 +2370,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             var col = aCols[nIndex];
 			if(null != col)
 			{
-				if(false == col.isEmptyToSave())
+				if(false == col.isEmpty())
 				{
 					if(null != oAllCol && null == nPrevIndex && nIndex > 0)
 					{
@@ -2772,7 +2772,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
             var row = ws.aGCells[aIndexes[i]];
 			if(null != row)
 			{ 
-				if(false == row.isEmptyToSave())
+				if(false == row.isEmpty())
 					this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function(){oThis.WriteRow(row);});
 			}
         }
@@ -2838,7 +2838,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			if(!oThis.isCopyPaste || (oThis.isCopyPaste && cell))
 			{	
 				var nXfsId = this.prepareXfs(cell.xfs);
-				if(0 != nXfsId || false == cell.isEmptyText())
+				//сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
+				if(null != cell.xfs || false == cell.isEmptyText())
 					this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
 			};
         };

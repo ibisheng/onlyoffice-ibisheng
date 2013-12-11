@@ -2050,13 +2050,9 @@ Col.prototype =
 		}
 		return bRes;
 	},
-    isEmptyToSave : function()
-	{
-		return null == this.BestFit && null == this.hd && null == this.width && null == this.xfs && null == this.CustomWidth;
-	},
 	isEmpty : function()
 	{
-		return this.isEmptyToSave();
+		return null == this.BestFit && null == this.hd && null == this.width && null == this.xfs && null == this.CustomWidth;
 	},
 	Remove : function()
 	{
@@ -2303,7 +2299,7 @@ Row.prototype =
 	{
 		this.r += nDif;
 	},
-	isEmptyToSave : function()
+	isEmpty : function()
 	{
 		if(null != this.xfs || null != this.h || null != this.hd || null != this.CustomHeight)
 			return false;
@@ -2316,10 +2312,6 @@ Row.prototype =
 		if(false == bEmptyCells)
 			return false;
 		return true;
-	},
-	isEmpty : function()
-	{
-		return this.isEmptyToSave();
 	},
 	Remove : function()
 	{
