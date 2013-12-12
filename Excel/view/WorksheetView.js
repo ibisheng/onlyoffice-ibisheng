@@ -5177,7 +5177,7 @@
 			getCursorTypeFromXY: function (x, y, isViewerMode) {
 				var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
 					sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
-					isLocked = false, ar = this.activeRange;
+					widthDiff = 0, heightDiff = 0, isLocked = false, ar = this.activeRange;
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
@@ -5221,6 +5221,19 @@
 
 				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+					heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+					if (x < this.cellsLeft + widthDiff && 0 !== widthDiff)
+						widthDiff = 0;
+					if (y < this.cellsTop + heightDiff && 0 !== heightDiff)
+						heightDiff = 0;
+					offsetX -= widthDiff;
+					offsetY -= heightDiff;
+				}
+
 				var oFormulaOrChartCursor = this._getCursorFormulaOrChart(x, y, offsetX, offsetY);
 				if (oFormulaOrChartCursor)
 					return oFormulaOrChartCursor;
