@@ -1694,7 +1694,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.isLocked && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -1936,7 +1936,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.isLocked && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -3225,7 +3225,7 @@ function ChartTextAddGroup(drawingObjectsController, drawingObjects, group, char
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.isLocked && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -3587,7 +3587,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.isLocked && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -5081,7 +5081,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.isLocked && e.type === "mousemove")
         {
             this.polyline.arrPoint[this.polyline.arrPoint.length - 1] = {x: x, y: y};
         }
