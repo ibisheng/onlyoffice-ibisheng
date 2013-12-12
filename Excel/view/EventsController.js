@@ -141,6 +141,21 @@
 						//.on("touchstart", function () {self._onMouseDown(arguments[0].originalEvent.touches[0]);return false;})
 						//.on("touchmove", function () {self._onMouseMove(arguments[0].originalEvent.touches[0]);return false;})
 						//.on("touchend", function () {self._onMouseUp(arguments[0].originalEvent.changedTouches[0]);return false;});
+						
+				// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
+				var oShapeCursor = $("#id_target_cursor");
+				if ( oShapeCursor ) {
+					oShapeCursor
+						.on("mousedown",  function () {
+							return self._onMouseDown.apply(self, arguments);
+						})
+						.on("mouseup",    function () {
+							return self._onMouseUp.apply(self, arguments);
+						})
+						.on("mousemove",  function () {
+							return self._onMouseMove.apply(self, arguments);
+						});
+				}
 
 				this.element[0].ontouchstart = function (e){
 					self._onMouseDown(e.touches[0]);

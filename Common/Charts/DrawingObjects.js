@@ -5316,19 +5316,18 @@ function ClickCounter() {
 	
 		var currTime = getCurrentTime();
 		if ( (_this.button === button) && (_this.x === x) && (_this.y === y) && (currTime - _this.time < 500) )
-			_this.clickCount++;
+			_this.clickCount = 2;
 		else
 			_this.clickCount = 1;
 		
 		if ( _this.log ) {
 			console.log("-----");
-			console.log("x: " + (_this.x === x));
-			console.log("y: " + (_this.y === y));
+			console.log("x-> " + _this.x + " : " + x);
+			console.log("y-> " + _this.y + " : " + y);
 			console.log("Time: " + (currTime - _this.time));
 			console.log("Count: " + _this.clickCount);
 			console.log("");
 		}
-			
 		_this.time = currTime;
 	}
 	
