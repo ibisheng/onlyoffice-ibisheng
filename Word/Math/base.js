@@ -1086,5 +1086,13 @@ CMathBase.prototype =
         }
 
         return SelectContent;
+    },
+    goToLeftSelect: function()
+    {
+        return this.Parent.goToLeftSelect();
+    },
+    goToRightSelect: function()
+    {
+        return this.Parent.goToRightSelect();
     }
 }
