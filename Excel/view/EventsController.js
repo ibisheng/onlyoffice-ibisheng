@@ -66,6 +66,7 @@
 			
 			// Обработчик кликов для граф.объектов
 			this.clickCounter = new ClickCounter();
+			this.isLocked = false;
 
 			// Был ли DblClick обработан в onMouseDown эвенте
 			this.isDblClickInMouseDown = false;
@@ -1117,6 +1118,7 @@
 				var t = this;
 				var coord = t._getCoordinates(event);
 				event.isLocked = true;
+				t.isLocked = true;
 
 				if (t.handlers.trigger("isGlobalLockEditCell"))
 					return;
@@ -1278,6 +1280,8 @@
 				// Shapes
 				var coord = this._getCoordinates(event);
 				event.isLocked = false;
+				this.isLocked = false;
+				
 				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
 				if ( asc["editor"].isStartAddShape ) {
 				
@@ -1329,6 +1333,8 @@
 			_onMouseMove: function (event) {
 				var t = this;
 				var coord = t._getCoordinates(event);
+				event.isLocked = t.isLocked;
+				
 				t.hasCursor = true;
 				
 				// Shapes
