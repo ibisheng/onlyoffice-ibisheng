@@ -7690,14 +7690,7 @@ ParaMath.prototype =
         else if ( para_Space === Type )
             this.Math.AddLetter( 0x0020 );
         else if ( para_Math === Type )
-        {		
-			/*var oCurContent =  this.Math.CurrentContent;
-			var rPr = oCurContent.getCurrRunPrp();
-			Item.Math.Root.setRPrp(rPr);
-			oCurContent.addToContent_2(Item.Math.Root);
-			//Item.Measure(g_oTextMeasurer, rPr);
-			oCurContent.verifyRPrp_MC_2(rPr);*/
-
+        {
             var rPr = this.Math.GetCurrentRPrp();
             Item.Math.Root.setRPrp(rPr);
             this.Math.AddToComposition(Item.Math.Root);
@@ -7846,11 +7839,13 @@ ParaMath.prototype =
 
     Selection_IsEmpty : function()
     {
+        console.log("Selection_IsEmpty " + this.Math.Selection_IsEmpty());
         return this.Math.Selection_IsEmpty();
     },
 
     Selection_IsUse : function()
     {
+        console.log("Selection_IsUse " + ( true === this.Math.Selection_IsEmpty() ? false : true ));
         return ( true === this.Math.Selection_IsEmpty() ? false : true );
     },
 

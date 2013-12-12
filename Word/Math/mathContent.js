@@ -659,7 +659,7 @@ CMathContent.prototype =
             middleContent = subContent.slice(subStart),
             endContent    = this.content.slice(curEnd + 1);
 
-        this.content = [];
+        this.content.length = 0;
         this.content = this.content.concat(startContent);
         this.content = this.content.concat(middleContent);
         this.content = this.content.concat(endContent);
@@ -4775,7 +4775,8 @@ CMathContent.prototype =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
             bBegin:                 false,    /* в начале контента или нет */
-            bEnd:                   false     /* в конце */
+            bEnd:                   false,    /* в конце */
+            bAddRPrp:               false
         };
 
         var CurrContent = SelectContent = null,
@@ -4821,12 +4822,12 @@ CMathContent.prototype =
             result = this.remove_internal(order);
             items = result.items;
             state.bDelete = result.bDelete;
+            state.bAddRPrp = result.bAddRPrp;
             SelectContent = this;
             CurrContent   = this;
         }
         else if(order == -2)
         {
-
             this.removeFormula(this.CurPos);
 
             SelectContent = this;
@@ -4840,6 +4841,7 @@ CMathContent.prototype =
     {
         var items = null;
         var bDelete = false;
+        var bAddRPrp = false;
 
         var bSelect = this.selectUse();
         var currType = this.content[this.CurPos].value.typeObj,
@@ -4909,8 +4911,36 @@ CMathContent.prototype =
                 var bStartCurrRPrp = startCurType == MATH_RUN_PRP,      // проверка на то, чтобы добавить RunPrp к селекту
                     bStartPrevRPrp = startPrevType == MATH_RUN_PRP;     // проверка на то, чтобы убрать RunPrp из селекта
 
+
+
                 if(endCurType == MATH_RUN_PRP)
                     end--;
+                else if(endCurType == MATH_TEXT && endNextType == MATH_TEXT) // слева справа текст, в середине Run
+                {
+                    // добавляем RunPrp, когда не весь Run заселектили   // начали селектить вне Run заселектили текущие RunPrp или начали не в конце Run и вышли за его пределы (заселектили RunPrp) //
+
+                    for(var i = end - 1; i--; i > start - 1)
+                    {
+                        if(this.content[i].value.typeObj == MATH_RUN_PRP)
+                        {
+                            bAddRPrp = true;
+                            var rPrp = new CMathRunPrp();
+                            rPrp.Merge( this.getRPrpByPosition(end - 1) );
+                            var element = new mathElem(rPrp);
+
+                            var startContent = this.content.splice(0, end);
+                            var endContent = this.content.splice(0, this.content.length);
+
+                            this.content.length = 0;
+                            this.content = this.content.concat(startContent);
+                            this.content = this.content.concat(element);
+                            this.content = this.content.concat(endContent);
+
+                            break;
+                        }
+                    }
+
+                }
 
                 if(bStartCurrRPrp || bStartPrevRPrp) // check RunPrp
                 {
@@ -4937,9 +4967,6 @@ CMathContent.prototype =
                     else if(bSelectRunPrp && bStartPrevRPrp)
                         start--;
 
-                    // TODO
-                    // добавить RunPrp, когда не весь Run заселектили, но при этом начали селектить вне Run (и следовательно заселектили RunPrp)
-                    // на Undo сделать флаг, что были добавлены RunPrp при удалении
                 }
 
             }
@@ -4979,7 +5006,7 @@ CMathContent.prototype =
             bDelete = true;
         }
 
-        return {bDelete: bDelete, items: items};
+        return {bDelete: bDelete, bAddRPrp: bAddRPrp, items: items};
     },
     old_remove_internal: function(order)
     {
@@ -5423,6 +5450,10 @@ CMathContent.prototype =
     },
     getCurrRunPrp: function()
     {
+        return this.getRPrpByPosition(this.CurPos);
+    },
+    getRPrpByPosition: function(position)
+    {
         var runPrp = new CTextPr();
 
         if(this.content.length > 1)
@@ -5431,13 +5462,13 @@ CMathContent.prototype =
             {
                 runPrp.Merge(this.Parent.getCtrPrp());
             }
-            else if(this.CurPos == 0 && this.content[1].value.typeObj == MATH_COMP)
+            else if(position == 0 && this.content[1].value.typeObj == MATH_COMP)
             {
                 runPrp.Merge(this.content[1].value.getCtrPrp());
             }
             else
             {
-                for(var i = this.CurPos; i > 0; i--)
+                for(var i = position; i > 0; i--)
                 {
                     var obj = this.content[i].value;
 
@@ -6900,11 +6931,12 @@ CMathComposition.prototype =
             var result = this.SelectContent.remove(order);
 
             var bRoot = this.SelectContent.bRoot === true,
-                bToUpper = result.state.bBegin || result.state.bEnd; // наверх нужно ли прокидовать
+                bToUpper = result.state.bBegin || result.state.bEnd, // наверх нужно ли прокидовать
+                bAddRPrp = result.state.bAddRPrp;
 
 
             if( result.state.bDelete )
-                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
+                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos, bAddRPrp: bAddRPrp});
 
 
             this.CurrentContent = result.CurrContent;
