@@ -5215,178 +5215,175 @@
 						}
 					}
 				}
-				
-				do {
-					// Эпсилон для fillHandle
-					var fillHandleEpsilon = this.width_1px;
-					if (!isViewerMode && !this.isChartAreaEditMode &&
-						x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
-						y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
-						// Мы на "квадрате" для автозаполнения
-						if (!this.objectRender.selectedGraphicObjectsExists())
-							return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
+
+				// Эпсилон для fillHandle
+				var fillHandleEpsilon = this.width_1px;
+				if (!isViewerMode && !this.isChartAreaEditMode &&
+					x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
+					y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
+					// Мы на "квадрате" для автозаполнения
+					if (!this.objectRender.selectedGraphicObjectsExists())
+						return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
+				}
+
+				var xWithOffset = x + offsetX;
+				var yWithOffset = y + offsetY;
+
+				// Навели на выделение
+				arIntersection = ar.intersectionSimple(this.visibleRange);
+				if (!isViewerMode && arIntersection) {
+					left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
+					right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
+					top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
+					bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
+					if ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
+						(null !== right && xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
+						null !== top && null !== bottom && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
+						(((null !== top && yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
+						(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
+						null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px)) {
+						// Мы навели на границу выделения
+						if ( !this.objectRender.selectedGraphicObjectsExists() )
+							return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 					}
+				}
 
-					var xWithOffset = x + offsetX;
-					var yWithOffset = y + offsetY;
-					
-					// Навели на выделение
-					arIntersection = ar.intersectionSimple(this.visibleRange);
-					if (!isViewerMode && arIntersection) {
-						left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
-						right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
-						top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
-						bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
-						if ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
-							(null !== right && xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
-							null !== top && null !== bottom && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
-							(((null !== top && yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
-							(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
-							null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px)) {
-							// Мы навели на границу выделения
-							if ( !this.objectRender.selectedGraphicObjectsExists() )
-								return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
-						}
-					}
+				if (x < this.cellsLeft && y < this.cellsTop) {
+					return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
+				}
 
-					if (x < this.cellsLeft && y < this.cellsTop) {
-						return {cursor: kCurCorner, target: "corner", col: -1, row: -1};
-					}
+				if (x > this.cellsLeft && y > this.cellsTop) {
+					c = this._findColUnderCursor(x, true);
+					r = this._findRowUnderCursor(y, true);
+					if (c === null || r === null) {break;}
 
-					if (x > this.cellsLeft && y > this.cellsTop) {
-						c = this._findColUnderCursor(x, true);
-						r = this._findRowUnderCursor(y, true);
-						if (c === null || r === null) {break;}
+					// Проверка на совместное редактирование
+					var lockRange = undefined;
+					var lockAllPosLeft = undefined;
+					var lockAllPosTop = undefined;
+					var userIdAllProps = undefined;
+					var userIdAllSheet = undefined;
+					if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
+						var c1Recalc = null, r1Recalc = null;
+						var selectRangeRecalc = asc_Range(c.col, r.row, c.col, r.row);
+						// Пересчет для входящих ячеек в добавленные строки/столбцы
+						var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
+						if (false === isIntersection) {
+							lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+								sheetId, new asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
+									selectRangeRecalc.c2, selectRangeRecalc.r2));
+							isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
+								c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false);
+							if (false !== isLocked) {
+								// Кто-то сделал lock
+								userId = isLocked.UserId;
+								lockRange = isLocked.Element["rangeOrObjectId"];
 
-						// Проверка на совместное редактирование
-						var lockRange = undefined;
-						var lockAllPosLeft = undefined;
-						var lockAllPosTop = undefined;
-						var userIdAllProps = undefined;
-						var userIdAllSheet = undefined;
-						if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
-							var c1Recalc = null, r1Recalc = null;
-							var selectRangeRecalc = asc_Range(c.col, r.row, c.col, r.row);
-							// Пересчет для входящих ячеек в добавленные строки/столбцы
-							var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
-							if (false === isIntersection) {
-								lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-									sheetId, new asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
-										selectRangeRecalc.c2, selectRangeRecalc.r2));
-								isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
-									c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false);
-								if (false !== isLocked) {
-									// Кто-то сделал lock
-									userId = isLocked.UserId;
-									lockRange = isLocked.Element["rangeOrObjectId"];
-
-									c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(
-										lockRange["c1"], c_oAscLockTypes.kLockTypeOther);
-									r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(
-										lockRange["r1"], c_oAscLockTypes.kLockTypeOther);
-									if (null !== c1Recalc && null !== r1Recalc) {
-										lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
-										lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
-										// Пересчитываем X и Y относительно видимой области
-										lockRangePosLeft -= (this.cols[this.visibleRange.c1].left - this.cellsLeft);
-										lockRangePosTop -= (this.rows[this.visibleRange.r1].top - this.cellsTop);
-										// Пересчитываем в px
-										lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-										lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-									}
+								c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(
+									lockRange["c1"], c_oAscLockTypes.kLockTypeOther);
+								r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(
+									lockRange["r1"], c_oAscLockTypes.kLockTypeOther);
+								if (null !== c1Recalc && null !== r1Recalc) {
+									lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
+									lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
+									// Пересчитываем X и Y относительно видимой области
+									lockRangePosLeft -= (this.cols[this.visibleRange.c1].left - this.cellsLeft);
+									lockRangePosTop -= (this.rows[this.visibleRange.r1].top - this.cellsTop);
+									// Пересчитываем в px
+									lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+									lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
 								}
-							} else {
-								lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-									sheetId, null);
 							}
-							// Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
-							lockInfo["type"] = c_oAscLockTypeElem.Sheet;
+						} else {
+							lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+								sheetId, null);
+						}
+						// Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
+						lockInfo["type"] = c_oAscLockTypeElem.Sheet;
+						isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
+							c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
+						if (false !== isLocked) {
+							// Кто-то сделал lock
+							userIdAllSheet = isLocked.UserId;
+							lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+							lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+						}
+
+						// Проверим не залочены ли все свойства листа (только если не удален весь лист)
+						if (undefined === userIdAllSheet) {
+							lockInfo["type"] = c_oAscLockTypeElem.Range;
+							lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
 							isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
 								c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
 							if (false !== isLocked) {
 								// Кто-то сделал lock
-								userIdAllSheet = isLocked.UserId;
+								userIdAllProps = isLocked.UserId;
+
 								lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 								lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
 							}
-
-							// Проверим не залочены ли все свойства листа (только если не удален весь лист)
-							if (undefined === userIdAllSheet) {
-								lockInfo["type"] = c_oAscLockTypeElem.Range;
-								lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
-								isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
-									c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
-								if (false !== isLocked) {
-									// Кто-то сделал lock
-									userIdAllProps = isLocked.UserId;
-
-									lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-									lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-								}
-							}
 						}
-						
-						// Проверим есть ли комменты
-						var comments = this.cellCommentator.asc_getComments(c.col, r.row);
-						var coords = undefined;
-						var indexes = undefined;
-
-						if (0 < comments.length) {
-							indexes = [];
-							for (i = 0; i < comments.length; ++i) {
-								indexes.push(comments[i].asc_getId());
-							}
-							coords = this.cellCommentator.getCommentsCoords(comments);
-						}
-
-						// Проверим, может мы в гиперлинке
-						oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
-						cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
-							row: (r ? r.row : -1), userId: userId,
-							lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop,
-							userIdAllProps: userIdAllProps, lockAllPosLeft: lockAllPosLeft,
-							lockAllPosTop: lockAllPosTop, userIdAllSheet: userIdAllSheet,
-							commentIndexes: indexes, commentCoords: coords};
-						if (null !== oHyperlink) {
-							return {cursor: kCurHyperlink, target: "hyperlink",
-								hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
-								userId: userId, lockRangePosLeft: lockRangePosLeft,
-								lockRangePosTop: lockRangePosTop, userIdAllProps: userIdAllProps,
-								userIdAllSheet: userIdAllSheet, lockAllPosLeft: lockAllPosLeft,
-								lockAllPosTop: lockAllPosTop, commentIndexes: indexes, commentCoords: coords};
-						}
-						return cellCursor;
 					}
 
-					if (x <= this.cellsLeft && y >= this.cellsTop) {
-						r = this._findRowUnderCursor(y, true);
-						if (r === null) {break;}
-						f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
-						// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-						return {
-							cursor: f ? kCurRowResize : kCurRowSelect,
-							target: f ? "rowresize" : "rowheader",
-							col: -1,
-							row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
-							mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
-						};
+					// Проверим есть ли комменты
+					var comments = this.cellCommentator.asc_getComments(c.col, r.row);
+					var coords = undefined;
+					var indexes = undefined;
+
+					if (0 < comments.length) {
+						indexes = [];
+						for (i = 0; i < comments.length; ++i) {
+							indexes.push(comments[i].asc_getId());
+						}
+						coords = this.cellCommentator.getCommentsCoords(comments);
 					}
 
-					if (y <= this.cellsTop && x >= this.cellsLeft) {
-						c = this._findColUnderCursor(x, true);
-						if (c === null) {break;}
-						f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
-						// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-						return {
-							cursor: f ? kCurColResize : kCurColSelect,
-							target: f ? "colresize" : "colheader",
-							col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
-							row: -1,
-							mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
-						};
+					// Проверим, может мы в гиперлинке
+					oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
+					cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
+						row: (r ? r.row : -1), userId: userId,
+						lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop,
+						userIdAllProps: userIdAllProps, lockAllPosLeft: lockAllPosLeft,
+						lockAllPosTop: lockAllPosTop, userIdAllSheet: userIdAllSheet,
+						commentIndexes: indexes, commentCoords: coords};
+					if (null !== oHyperlink) {
+						return {cursor: kCurHyperlink, target: "hyperlink",
+							hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
+							userId: userId, lockRangePosLeft: lockRangePosLeft,
+							lockRangePosTop: lockRangePosTop, userIdAllProps: userIdAllProps,
+							userIdAllSheet: userIdAllSheet, lockAllPosLeft: lockAllPosLeft,
+							lockAllPosTop: lockAllPosTop, commentIndexes: indexes, commentCoords: coords};
 					}
-				
-				} while(0);
+					return cellCursor;
+				}
+
+				if (x <= this.cellsLeft && y >= this.cellsTop) {
+					r = this._findRowUnderCursor(y, true);
+					if (r === null) {break;}
+					f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
+					// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+					return {
+						cursor: f ? kCurRowResize : kCurRowSelect,
+						target: f ? "rowresize" : "rowheader",
+						col: -1,
+						row: r.row + (r.row !== this.visibleRange.r1 && f && y < r.top + 3 ? -1 : 0),
+						mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px): (r.bottom - y - this.height_1px))  : null
+					};
+				}
+
+				if (y <= this.cellsTop && x >= this.cellsLeft) {
+					c = this._findColUnderCursor(x, true);
+					if (c === null) {break;}
+					f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
+					// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+					return {
+						cursor: f ? kCurColResize : kCurColSelect,
+						target: f ? "colresize" : "colheader",
+						col: c.col + (c.col !== this.visibleRange.c1 && f && x < c.left + 3 ? -1 : 0),
+						row: -1,
+						mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px): (c.right - x - this.width_1px))  : null
+					};
+				}
 
 				return {cursor: kCurDefault, target: "none", col: -1, row: -1};
 			},

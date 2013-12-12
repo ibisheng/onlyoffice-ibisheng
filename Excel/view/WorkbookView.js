@@ -716,9 +716,9 @@
 			_onMoveResizeRangeHandle: function (x, y, target, callback) {
 				var ws = this.getWorksheet();
 				var res = ws.changeSelectionMoveResizeRangeHandle(x, y, target);
-				if( res ){
-					if( 0 == target.targetArr )
-						ws.changeCellRange(this.cellEditor,res.ar)
+				if(res){
+					if(0 == target.targetArr)
+						ws.changeCellRange(this.cellEditor,res.ar);
 					if ($.isFunction(callback)) {callback(res.d);}
 				}
 			},
