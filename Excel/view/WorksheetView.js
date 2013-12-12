@@ -5010,8 +5010,11 @@
 					if (this.topLeftFrozenCell) {
 						cFrozen = this.topLeftFrozenCell.getCol0();
 						widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+						if (x < this.cellsLeft + widthDiff && 0 !== widthDiff) {
+							c = 0;
+							widthDiff = 0;
+						}
 					}
-					// ToDo select in frozen pane
 					for (x1 = this.cellsLeft + widthDiff, c2 = this.cols.length - 1; c <= c2; ++c, x1 = x2) {
 						x2 = x1 + this.cols[c].width;
 						if (x1 <= x && x < x2) {
@@ -5061,10 +5064,13 @@
 					offset = this.rows[r].top - this.cellsTop,
 					r2, y1, y2, rFrozen, heightDiff = 0;
 				if (y >= this.cellsTop) {
-					// ToDo select in frozen pane
 					if (this.topLeftFrozenCell) {
 						rFrozen = this.topLeftFrozenCell.getRow0();
 						heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+						if (y < this.cellsTop + heightDiff && 0 !== heightDiff) {
+							r = 0;
+							heightDiff = 0;
+						}
 					}
 					for (y1 = this.cellsTop + heightDiff, r2 = this.rows.length - 1; r <= r2; ++r, y1 = y2) {
 						y2 = y1 + this.rows[r].height;
@@ -5110,24 +5116,18 @@
 			},
 
 			getCursorTypeFromXY: function (x, y, isViewerMode) {
-				var c, r, f, i, offsetX, offsetY, arNorm, arIntersection;
-				var left, top, right, bottom;
-				var sheetId = this.model.getId();
-				var userId = undefined;
-				var lockRangePosLeft = undefined;
-				var lockRangePosTop = undefined;
-				var lockInfo = undefined;
-				var isLocked = false;
+				var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
+					sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
+					isLocked = false, ar = this.activeRange;
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (asc["editor"].isStartAddShape && CheckIdSatetShapeAdd(this.objectRender.controller.curState.id))
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				if (drawingInfo && drawingInfo.id) {
-					
 					// Возможно картинка с lock
 					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
-					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,false);
+					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
 					if (false !== isLocked) {
 						// Кто-то сделал lock
 						userId = isLocked.UserId;
@@ -5135,33 +5135,18 @@
 						lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
 					}
 					
-					if ( drawingInfo.hyperlink && (drawingInfo.hyperlink instanceof ParaHyperlinkStart) ) {
-					
-						var oHyperlink = new Hyperlink();
+					if (drawingInfo.hyperlink instanceof ParaHyperlinkStart) {
+						oHyperlink = new Hyperlink();
 						oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
 						var spl = drawingInfo.hyperlink.Value.split("!");
-						if (spl.length === 2) {
+						if (spl.length === 2)
 							oHyperlink.setLocation(drawingInfo.hyperlink.Value);
-						}
 						else
 							oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
-						
-						var _r = this.activeRange.clone(true);
-						oHyperlink.Ref = this.model.getRange3(_r.r1, _r.c1, _r.r2, _r.c2);
-						
-						var cellCursor = {cursor: drawingInfo.cursor, target: "cells", col: (c ? c.col : -1),
-							row: (r ? r.row : -1), userId: userId,
-							lockRangePosLeft: undefined, lockRangePosTop: undefined,
-							userIdAllProps: undefined, lockAllPosLeft: undefined,
-							lockAllPosTop: undefined, userIdAllSheet: undefined,
-							commentIndexes: undefined, commentCoords: undefined};
-						
+
+						cellCursor = {cursor: drawingInfo.cursor, target: "cells", col: -1, row: -1, userId: userId};
 						return {cursor: kCurHyperlink, target: "hyperlink",
-								hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor,
-								userId: userId, lockRangePosLeft: undefined,
-								lockRangePosTop: undefined, userIdAllProps: undefined,
-								userIdAllSheet: undefined, lockAllPosLeft: undefined,
-								lockAllPosTop: undefined, commentIndexes: undefined, commentCoords: undefined};						
+								hyperlink: new asc_CHyperlink(oHyperlink), cellCursor: cellCursor, userId: userId};
 					}
 
 					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1,
@@ -5238,7 +5223,7 @@
 						x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
 						y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
 						// Мы на "квадрате" для автозаполнения
-						if ( !this.objectRender.selectedGraphicObjectsExists() )
+						if (!this.objectRender.selectedGraphicObjectsExists())
 							return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
 					}
 
@@ -5246,19 +5231,18 @@
 					var yWithOffset = y + offsetY;
 					
 					// Навели на выделение
-					arNorm = this.activeRange.clone(true);
-					arIntersection = arNorm.intersectionSimple(this.visibleRange);
-					if (arIntersection) {
-						left = arNorm.c1 === arIntersection.c1 ? this.cols[arNorm.c1].left : null;
-						right = arNorm.c2 === arIntersection.c2 ? this.cols[arNorm.c2].left + this.cols[arNorm.c2].width : null;
-						top = arNorm.r1 === arIntersection.r1 ? this.rows[arNorm.r1].top : null;
-						bottom = arNorm.r2 === arIntersection.r2 ? this.rows[arNorm.r2].top + this.rows[arNorm.r2].height : null;
-						if (!isViewerMode && ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
+					arIntersection = ar.intersectionSimple(this.visibleRange);
+					if (!isViewerMode && arIntersection) {
+						left = ar.c1 === arIntersection.c1 ? this.cols[ar.c1].left : null;
+						right = ar.c2 === arIntersection.c2 ? this.cols[ar.c2].left + this.cols[ar.c2].width : null;
+						top = ar.r1 === arIntersection.r1 ? this.rows[ar.r1].top : null;
+						bottom = ar.r2 === arIntersection.r2 ? this.rows[ar.r2].top + this.rows[ar.r2].height : null;
+						if ((((null !== left && xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
 							(null !== right && xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
 							null !== top && null !== bottom && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
 							(((null !== top && yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
 							(null !== bottom && yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
-							null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px))) {
+							null !== left && null !== right && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px)) {
 							// Мы навели на границу выделения
 							if ( !this.objectRender.selectedGraphicObjectsExists() )
 								return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
@@ -5356,8 +5340,8 @@
 						}
 
 						// Проверим, может мы в гиперлинке
-						var oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
-						var cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
+						oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
+						cellCursor = {cursor: kCurCells, target: "cells", col: (c ? c.col : -1),
 							row: (r ? r.row : -1), userId: userId,
 							lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop,
 							userIdAllProps: userIdAllProps, lockAllPosLeft: lockAllPosLeft,
