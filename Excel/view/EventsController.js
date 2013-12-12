@@ -1116,6 +1116,7 @@
 			_onMouseDown: function (event) {
 				var t = this;
 				var coord = t._getCoordinates(event);
+				event.isLocked = true;
 
 				if (t.handlers.trigger("isGlobalLockEditCell"))
 					return;
@@ -1276,6 +1277,7 @@
 			
 				// Shapes
 				var coord = this._getCoordinates(event);
+				event.isLocked = false;
 				this.handlers.trigger("graphicObjectMouseUpEx", event, coord.x, coord.y);
 				if ( asc["editor"].isStartAddShape ) {
 				
@@ -1283,6 +1285,8 @@
 					if ( event.metaKey )
 						event.ctrlKey = true;
 				
+					//console.log("_onMouseUp: " + this.clickCounter.clickCount);
+					
 					event.ClickCount = this.clickCounter.clickCount;
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					this._changeSelectionDone(event);
