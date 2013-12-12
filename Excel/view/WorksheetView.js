@@ -4732,6 +4732,7 @@
 			_isColDrawnPartially: function (col, leftCol, diffWidth) {
 				if (col <= leftCol || col >= this.nColsCount)
 					return false;
+				diffWidth = diffWidth ? diffWidth : 0;
 				var c = this.cols;
 				return c[col].left + c[col].width - c[leftCol].left + this.cellsLeft + diffWidth > this.drawingCtx.getWidth();
 			},
@@ -4739,6 +4740,7 @@
 			_isRowDrawnPartially: function (row, topRow, diffHeight) {
 				if (row <= topRow || row >= this.nRowsCount)
 					return false;
+				diffHeight = diffHeight ? diffHeight : 0;
 				var r = this.rows;
 				return r[row].top + r[row].height - r[topRow].top + this.cellsTop + diffHeight > this.drawingCtx.getHeight();
 			},
@@ -5115,6 +5117,63 @@
 				return null;
 			},
 
+			_getCursorFormulaOrChart: function (x, y, offsetX, offsetY) {
+				var i;
+				if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+					var cursor, oFormulaRange, oFormulaIn, xFormula1, xFormula2, yFormula1, yFormula2;
+					var col = -1, row = -1;
+					var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
+						targetArr = this.isFormulaEditMode ? 0 : -1;
+					for (i in arrRanges) {
+						if (!arrRanges.hasOwnProperty(i))
+							continue;
+						oFormulaRange = arrRanges[i].clone(true);
+
+						oFormulaIn = oFormulaRange.intersection(this.visibleRange);
+						if (oFormulaIn) {
+							xFormula1 = this.cols[oFormulaIn.c1].left - offsetX;
+							xFormula2 = this.cols[oFormulaIn.c2].left + this.cols[oFormulaIn.c2].width - offsetX;
+							yFormula1 = this.rows[oFormulaIn.r1].top - offsetY;
+							yFormula2 = this.rows[oFormulaIn.r2].top + this.rows[oFormulaIn.r2].height - offsetY;
+
+							if (
+								(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
+									||
+									(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
+								){
+								cursor = kCurMove;
+								break;
+							} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
+								cursor = kCurSEResize;
+								col = oFormulaIn.c2;
+								row = oFormulaIn.r2;
+								break;
+							} else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
+								cursor = kCurSEResize;
+								col = oFormulaIn.c1;
+								row = oFormulaIn.r1;
+								break;
+							} else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
+								cursor = kCurNEResize;
+								col = oFormulaIn.c1;
+								row = oFormulaIn.r2;
+								break;
+							} else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
+								cursor = kCurNEResize;
+								col = oFormulaIn.c2;
+								row = oFormulaIn.r1;
+								break;
+							}
+						}
+					}
+					if (cursor) {
+						return {cursor: cursor, target: "moveResizeRange", col: col, row: row,
+							formulaRange: oFormulaRange, indexFormulaRange: i, targetArr: targetArr};
+					}
+				}
+				return null;
+			},
+
 			getCursorTypeFromXY: function (x, y, isViewerMode) {
 				var c, r, f, i, offsetX, offsetY, arIntersection, left, top, right, bottom, cellCursor,
 					sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink,
@@ -5162,59 +5221,9 @@
 
 				offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-					var arr = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
-						targetArr = this.isFormulaEditMode ? 0 : -1;
-					for (i in arr) {
-						if (!arr.hasOwnProperty(i))
-							continue;
-						var arFormulaTmp = arr[i].clone(true);
-						var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
-						
-						if (aFormulaIntersection) {
-							var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX;
-							var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX;
-							var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
-							var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
-							
-							if (
-								(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
-								||
-								(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
-							){
-								return {cursor: kCurMove, target: "moveResizeRange",
-												col: -1,
-												row: -1,
-												formulaRange: arFormulaTmp, indexFormulaRange:i,
-												targetArr: targetArr};
-							} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
-								return {cursor: kCurSEResize, target: "moveResizeRange",
-												col: aFormulaIntersection.c2,
-												row: aFormulaIntersection.r2, 
-												formulaRange: arFormulaTmp, indexFormulaRange:i,
-												targetArr: targetArr};
-							} else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
-								return {cursor: kCurSEResize, target: "moveResizeRange",
-												col: aFormulaIntersection.c1,
-												row: aFormulaIntersection.r1, 
-												formulaRange: arFormulaTmp, indexFormulaRange:i,
-												targetArr: targetArr};
-							} else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
-								return {cursor: kCurNEResize, target: "moveResizeRange",
-												col: aFormulaIntersection.c1,
-												row: aFormulaIntersection.r2, 
-												formulaRange: arFormulaTmp, indexFormulaRange:i,
-												targetArr: targetArr};
-							} else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
-								return {cursor: kCurNEResize, target: "moveResizeRange",
-												col: aFormulaIntersection.c2,
-												row: aFormulaIntersection.r1, 
-												formulaRange: arFormulaTmp, indexFormulaRange:i,
-												targetArr: targetArr};
-							}
-						}
-					}
-				}
+				var oFormulaOrChartCursor = this._getCursorFormulaOrChart(x, y, offsetX, offsetY);
+				if (oFormulaOrChartCursor)
+					return oFormulaOrChartCursor;
 
 				var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
 				// Эпсилон для fillHandle
