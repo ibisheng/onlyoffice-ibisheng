@@ -5216,6 +5216,7 @@
 					}
 				}
 
+				var oResDefault = {cursor: kCurDefault, target: "none", col: -1, row: -1};
 				// Эпсилон для fillHandle
 				var fillHandleEpsilon = this.width_1px;
 				if (!isViewerMode && !this.isChartAreaEditMode &&
@@ -5255,7 +5256,8 @@
 				if (x > this.cellsLeft && y > this.cellsTop) {
 					c = this._findColUnderCursor(x, true);
 					r = this._findRowUnderCursor(y, true);
-					if (c === null || r === null) {break;}
+					if (c === null || r === null)
+						return oResDefault;
 
 					// Проверка на совместное редактирование
 					var lockRange = undefined;
@@ -5359,7 +5361,8 @@
 
 				if (x <= this.cellsLeft && y >= this.cellsTop) {
 					r = this._findRowUnderCursor(y, true);
-					if (r === null) {break;}
+					if (r === null)
+						return oResDefault;
 					f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
 					// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 					return {
@@ -5373,7 +5376,8 @@
 
 				if (y <= this.cellsTop && x >= this.cellsLeft) {
 					c = this._findColUnderCursor(x, true);
-					if (c === null) {break;}
+					if (c === null)
+						return oResDefault;
 					f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
 					// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 					return {
@@ -5385,7 +5389,7 @@
 					};
 				}
 
-				return {cursor: kCurDefault, target: "none", col: -1, row: -1};
+				return oResDefault;
 			},
 
 			_fixSelectionOfMergedCells: function (fixedRange) {
