@@ -2072,37 +2072,61 @@
 
 			_cleanColumnHeaders: function (colStart, colEnd) {
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+				var i, cFrozen = 0;
 				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
+					cFrozen = this.topLeftFrozenCell.getCol0();
 					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 				}
 
 				if (colEnd === undefined) {colEnd = colStart;}
-				colStart = Math.max(this.visibleRange.c1, colStart);
-				colEnd = Math.min(this.visibleRange.c2, colEnd);
-				for (var i = colStart; i <= colEnd; ++i) {
+				var colStartTmp = Math.max(this.visibleRange.c1, colStart);
+				var colEndTmp = Math.min(this.visibleRange.c2, colEnd);
+				for (i = colStartTmp; i <= colEndTmp; ++i) {
 					this.drawingCtx.clearRect(
 						this.cols[i].left - offsetX - this.width_1px, this.headersTop,
 						this.cols[i].width + this.width_1px, this.headersHeight);
+				}
+				if (0 !== cFrozen) {
+					// Почистим для pane
+					colStart = Math.max(0, colStart);
+					colEnd = Math.min(cFrozen, colEnd);
+					for (i = colStart; i <= colEnd; ++i) {
+						this.drawingCtx.clearRect(
+							this.cols[i].left - offsetX - this.width_1px, this.headersTop,
+							this.cols[i].width + this.width_1px, this.headersHeight);
+					}
 				}
 			},
 
 			_cleanRowHeades: function (rowStart, rowEnd) {
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				var i, rFrozen = 0;
 				if (this.topLeftFrozenCell) {
-					var rFrozen = this.topLeftFrozenCell.getRow0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
 				}
 
 				if (rowEnd === undefined) {rowEnd = rowStart;}
-				rowStart = Math.max(this.visibleRange.r1, rowStart);
-				rowEnd = Math.min(this.visibleRange.r2, rowEnd);
-				for (var i = rowStart; i <= rowEnd; ++i) {
+				var rowStartTmp = Math.max(this.visibleRange.r1, rowStart);
+				var rowEndTmp = Math.min(this.visibleRange.r2, rowEnd);
+				for (i = rowStartTmp; i <= rowEndTmp; ++i) {
 					if (this.height_1px > this.rows[i].height)
 						continue;
 					this.drawingCtx.clearRect(
 						this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
 						this.headersWidth, this.rows[i].height + this.height_1px);
+				}
+				if (0 !== rFrozen) {
+					// Почистим для pane
+					rowStart = Math.max(0, rowStart);
+					rowEnd = Math.min(rFrozen, rowEnd);
+					for (i = rowStart; i <= rowEnd; ++i) {
+						if (this.height_1px > this.rows[i].height)
+							continue;
+						this.drawingCtx.clearRect(
+							this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
+							this.headersWidth, this.rows[i].height + this.height_1px);
+					}
 				}
 			},
 
