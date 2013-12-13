@@ -1393,9 +1393,12 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	}
 };
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
+	// Если не автосохранение, то не забываем закрыть Block-сообщение
+	if (!this.isAutoSave)
+		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	this.canSave = true;
 	this.isAutoSave = false;
-	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 	this.CoAuthoringApi.unSaveChanges();
 	if (isDocumentSaved) {
 		// Запускаем таймер автосохранения
@@ -1768,6 +1771,9 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
 		// Но сохранять до прихода ответа от сервера не сможет
 		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+		// Если не автосохранение, то продолжаем показывать Block-сообщение
+		if (!t.isAutoSave)
+			t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 	} else {
 		nState = t.CoAuthoringApi.get_state();
 		if (3 === nState) {

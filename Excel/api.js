@@ -589,9 +589,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_OnSaveEnd : function (isDocumentSaved) {
+				// Если не автосохранение, то не забываем закрыть Block-сообщение
+				if (!this.isAutoSave)
+					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+				this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 				this.canSave = true;
 				this.isAutoSave = false;
-				this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 				this.CoAuthoringApi.unSaveChanges();
 				if (isDocumentSaved) {
 					// Запускаем таймер автосохранения
@@ -1807,6 +1810,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
 					// Но сохранять до прихода ответа от сервера не сможет
 					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+					// Если не автосохранение, то продолжаем показывать Block-сообщение
+					if (!this.isAutoSave)
+						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 				} else {
 					nState = t.CoAuthoringApi.get_state();
 					if (3 === nState) {
