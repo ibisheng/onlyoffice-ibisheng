@@ -3411,13 +3411,12 @@
 				var arnIntersection = arn.intersectionSimple(range ? range : this.visibleRange);
 				var width = ctx.getWidth();
 				var height = ctx.getHeight();
-				var offsetX, offsetY, diffWidth, diffHeight;
+				var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
 				var x1 = Number.MAX_VALUE;
 				var x2 = -Number.MAX_VALUE;
 				var y1 = Number.MAX_VALUE;
 				var y2 = -Number.MAX_VALUE;
 				var i;
-				var diffWidth = 0, diffHeight = 0;
 
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
