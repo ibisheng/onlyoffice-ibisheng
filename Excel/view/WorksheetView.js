@@ -3276,6 +3276,12 @@
 				var ctx = this.overlayCtx;
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+				}
 				var i;
 
 				var currentSheetId = this.model.getId();
