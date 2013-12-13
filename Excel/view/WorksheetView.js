@@ -3417,6 +3417,7 @@
 				var y1 = Number.MAX_VALUE;
 				var y2 = -Number.MAX_VALUE;
 				var i;
+				var diffWidth = 0, diffHeight = 0;
 
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
