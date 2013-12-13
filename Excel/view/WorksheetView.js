@@ -1885,14 +1885,14 @@
 				this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
 				this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
 				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					if (0 !== cFrozen) {
+					var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
+					var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
+					if (0 <= cFrozen) {
 						c1 = Math.max(0, arn.c1);
 						c2 = Math.min(cFrozen, arn.c2);
 						this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
 					}
-					if (0 !== rFrozen) {
+					if (0 <= rFrozen) {
 						r1 = Math.max(0, arn.r1);
 						r2 = Math.min(rFrozen, arn.r2);
 						this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
@@ -2911,21 +2911,23 @@
 
 					if (!isFrozen) {
 						var oFrozenRange;
-						if (0 < cFrozen && 0 < rFrozen) {
-							oFrozenRange = new asc_Range(0, 0, cFrozen - 1, rFrozen - 1);
+						cFrozen -= 1; rFrozen -= 1;
+						if (0 <= cFrozen && 0 <= rFrozen) {
+							oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
 							this._drawSelectionRange(oFrozenRange, true);
 						}
-						if (0 < cFrozen) {
-							oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen - 1, this.visibleRange.r2);
+						if (0 <= cFrozen) {
+							oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
 							this._drawSelectionRange(oFrozenRange, true);
 						}
-						if (0 < rFrozen) {
-							oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen - 1);
+						if (0 <= rFrozen) {
+							oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
 							this._drawSelectionRange(oFrozenRange, true);
 						}
 					}
 				}
 
+				var tmpRange = range;
 				if (!this.isSelectionDialogMode)
 					range = this.activeRange.intersection(range !== undefined ? range : this.visibleRange);
 				else
@@ -2953,8 +2955,18 @@
 
 				var ctx = this.overlayCtx;
 				var opt = this.settings;
-				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
-				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
+				var offsetX, offsetY;
+				if (isFrozen) {
+					if (tmpRange.c1 !== this.visibleRange.c1)
+						diffWidth = 0;
+					if (tmpRange.r1 !== this.visibleRange.r1)
+						diffHeight = 0;
+					offsetX = this.cols[tmpRange.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[tmpRange.r1].top - this.cellsTop - diffHeight;
+				} else {
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
+				}
 
 				var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
 				var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
@@ -3196,8 +3208,8 @@
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
 				}
 
@@ -3330,8 +3342,8 @@
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
 				}
 				var i;
@@ -3399,8 +3411,7 @@
 				var arnIntersection = arn.intersectionSimple(range ? range : this.visibleRange);
 				var width = ctx.getWidth();
 				var height = ctx.getHeight();
-				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				var offsetX, offsetY, diffWidth, diffHeight;
 				var x1 = Number.MAX_VALUE;
 				var x2 = -Number.MAX_VALUE;
 				var y1 = Number.MAX_VALUE;
@@ -3410,24 +3421,36 @@
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
 					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
-					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
+					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 
 					if (!isFrozen) {
 						var oFrozenRange;
-						if (0 < cFrozen && 0 < rFrozen) {
+						cFrozen -= 1; rFrozen -= 1;
+						if (0 <= cFrozen && 0 <= rFrozen) {
 							oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
 							this.cleanSelection(oFrozenRange, true);
 						}
-						if (0 < cFrozen) {
+						if (0 <= cFrozen) {
 							oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
 							this.cleanSelection(oFrozenRange, true);
 						}
-						if (0 < rFrozen) {
+						if (0 <= rFrozen) {
 							oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
 							this.cleanSelection(oFrozenRange, true);
 						}
 					}
+				}
+				if (isFrozen) {
+					if (range.c1 !== this.visibleRange.c1)
+						diffWidth = 0;
+					if (range.r1 !== this.visibleRange.r1)
+						diffHeight = 0;
+					offsetX = this.cols[range.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[range.r1].top - this.cellsTop - diffHeight;
+				} else {
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 				}
 
 				if (arnIntersection) {
