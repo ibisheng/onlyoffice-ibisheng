@@ -6540,11 +6540,6 @@ Range.prototype.merge=function(type){
 				oRightBorder = oRightCol.xfs.border.r;
 		}
 	}
-	//правила работы с гиперссылками во время merge(отличются от Excel в случаем областей, например hyperlink: C3:D3 мержим C2:C3)
-	//1) Если первой встретилась ссылка в одной ячейке, то эта ссылка переходит в первую ячейку мерженой области, останые одноклеточные ссылки внутри мерженой области стираются
-	//2) Если встретилась многоклеточная ссылка, которая полностью лежит в замерженой области(но не совпадает с ней), она удаляется
-	//3) Если встретилась многоклеточная ссылка, которая не полностью лежит в замерженой области(или совпадает с ней), то такие ссылки оставляем без изменений.
-	//4) Ссылки в строках, столбцах всегда остаются без изменений
 	
 	var bFirst = true;
 	var oThis = this;
@@ -6563,18 +6558,36 @@ Range.prototype.merge=function(type){
 			oFirstCellValue = cell.getValueData();
 			oFirstCellRow = cell.oId.getRow0();
 			oFirstCellCol = cell.oId.getCol0();
-			var oCurHyp = oThis.worksheet.hyperlinkManager.getByCell(oFirstCellRow, oFirstCellCol);
-			//todo надо весь массив просмотреть
-			if(null != oCurHyp && oCurHyp.data.Ref.isOneCell())
-			{
-				oFirstCellHyperlink = oCurHyp.data;
-			}
+
 		}
 		if(nRow0 == nRowStart && nCol0 == nColStart)
 			oLeftTopCellStyle = cell.getStyle();
-		
-		cell.setValue("");
 	});
+	//правила работы с гиперссылками во время merge(отличются от Excel в случаем областей, например hyperlink: C3:D3 мержим C2:C3)
+	// 1)оставляем все ссылки, которые не полностью лежат в merge области
+	// 2)оставляем многоклеточные ссылки, top граница которых совпадает с top границей merge области, а высота merge > 1 или совпадает с высотой области merge
+	// 3)оставляем и переносим в первую ячейку одну одноклеточную ссылку, если она находится в первой ячейке с данными
+	var aHyperlinks = this.worksheet.hyperlinkManager.get(oBBox);
+	var aHyperlinksToRestore = [];
+	for(var i = 0, length = aHyperlinks.inner.length; i < length; i++)
+	{
+		var elem = aHyperlinks.inner[i];
+		if(oFirstCellRow == elem.bbox.r1 && oFirstCellCol == elem.bbox.c1 && elem.bbox.r1 == elem.bbox.r2 && elem.bbox.c1 == elem.bbox.c2)
+		{
+			var oNewHyperlink = elem.data.clone();
+			oNewHyperlink.Ref.setOffset({offsetCol:oBBox.c1 - oFirstCellCol, offsetRow:oBBox.r1 - oFirstCellRow});
+			aHyperlinksToRestore.push(oNewHyperlink);
+		}
+		else if( oBBox.r1 == elem.bbox.r1 && (elem.bbox.r1 != elem.bbox.r2 || (elem.bbox.c1 != elem.bbox.c2 && oBBox.r1 == oBBox.r2)))
+			aHyperlinksToRestore.push(elem.data);
+	}
+	this.cleanAll();
+	//восстанавливаем hyperlink
+	for(var i = 0, length = aHyperlinksToRestore.length; i < length; i++)
+	{
+		var elem = aHyperlinksToRestore[i];
+		this.worksheet.hyperlinkManager.add(elem.Ref.getBBox0(), elem);
+	}
 	var oTargetStyle = null;
 	if(null != oFirstCellValue && null != oFirstCellRow && null != oFirstCellCol)
 	{
