@@ -575,6 +575,11 @@
 				x2 += mouseX;
 
 				var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
+				if (t.topLeftFrozenCell) {
+					var cFrozen = t.topLeftFrozenCell.getCol0();
+					offsetX -= t.cols[cFrozen].left - t.cols[0].left;
+				}
+
 				var x1 = t.cols[col].left - offsetX - this.width_1px;
 				var w = Math.max(x2 - x1, 0);
 				var cc = Math.min(t._colWidthToCharCount(w), /*max col width*/255);
@@ -601,6 +606,11 @@
 				y2 += mouseY;
 
 				var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
+				if (t.topLeftFrozenCell) {
+					var rFrozen = t.topLeftFrozenCell.getRow0();
+					offsetY -= t.rows[rFrozen].top - t.rows[0].top;
+				}
+
 				var y1 = t.rows[row].top - offsetY - this.height_1px;
 
 				var onChangeHeightCallback = function (isSuccess) {
