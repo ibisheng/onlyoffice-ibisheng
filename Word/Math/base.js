@@ -1087,12 +1087,26 @@ CMathBase.prototype =
 
         return SelectContent;
     },
-    goToLeftSelect: function()
+    goToLeftSelect: function(bParent)
     {
-        return this.Parent.goToLeftSelect();
+        var content;
+
+        if(bParent == SELECT_PARENT)
+            content = this.Parent.goToLeftSelect(bParent);
+        else
+            content = this.elements[this.CurPos_X][this.CurPos_Y].goToLeftSelect(bParent);
+
+        return content;
     },
-    goToRightSelect: function()
+    goToRightSelect: function(bParent)
     {
-        return this.Parent.goToRightSelect();
+        var content;
+
+        if(bParent == SELECT_PARENT)
+            content = this.Parent.goToRightSelect(bParent);
+        else
+            content = this.elements[this.CurPos_X][this.CurPos_Y].goToRightSelect(bParent);
+
+        return content;
     }
 }

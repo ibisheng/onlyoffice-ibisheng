@@ -42,6 +42,8 @@ var historyitem_Math_AddItem                   =  1; // Добавляем эл�
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
 var TEST = true;
+var SELECT_PARENT = 0;
+var SELECT_CHILD  = 1;
 
 
 var  DEFAULT_RUN_PRP =
@@ -3889,17 +3891,26 @@ CMathContent.prototype =
             {
                 if(!this.bRoot)
                 {
-                    SelectContent = this.Parent.goToLeftSelect();
+                    SelectContent = this.Parent.goToLeftSelect(SELECT_PARENT);
                 }
                 else
                     state = false;
             }
             else
             {
-                if(this.content[endSelect].value.typeObj == MATH_COMP) // select math object
-                    endSelect--;
-
                 SelectContent = this;
+
+                if(this.LogicalSelect.start == endSelect && this.content[endSelect].value.typeObj == MATH_COMP)
+                {
+                    SelectContent = this.content[endSelect].value.goToLeftSelect(SELECT_CHILD);
+                    endSelect--;
+                }
+                else if(this.content[endSelect].value.typeObj == MATH_COMP) // select math object
+                {
+                    endSelect--;
+                }
+
+
                 this.setEndPos_Selection(endSelect);
 
                 console.log("After move: start of select " + this.RealSelect.startPos);
@@ -3952,14 +3963,18 @@ CMathContent.prototype =
 
         return SelectContent;
     },
-    goToLeftSelect: function()
+    goToLeftSelect: function(bParent)
     {
-        this.RealSelect.startPos +=2;
+        if(bParent == SELECT_PARENT)
+            this.RealSelect.startPos +=2;
+
         return this;
     },
-    goToRightSelect: function()
+    goToRightSelect: function(bParent)
     {
-        this.RealSelect.endPos +=2;
+        if(bParent == SELECT_PARENT)
+            this.RealSelect.endPos +=2;
+
         return this;
     },
     cursor_moveRight: function(bShiftKey, bCtrlKey)
@@ -3970,23 +3985,39 @@ CMathContent.prototype =
         if(bShiftKey)
         {
             var pos = this.RealSelect.endPos - 1;
+            // если вышли из формулы, то RunPrp селектить нужно только когда селектим текст
+            // поэтому чтобы правильно выставить позицию, когда уже селектим текст в этой ситуации, смещаем позицию
+
+            var currType = this.content[pos].value.typeObj,
+                nextType = pos < this.content.length - 1 ? this.content[pos+1].value.typeObj : null;
+
+            if(currType == MATH_EMPTY && nextType == MATH_RUN_PRP)
+                pos++;
+
             var endSelect = this.changePosForMove(pos, 1);
 
             if(endSelect == -1)
             {
                 if(!this.bRoot)
                 {
-                    SelectContent = this.Parent.goToRightSelect();
+                    SelectContent = this.Parent.goToRightSelect(SELECT_PARENT);
                 }
                 else
                     state = false;
             }
             else
             {
-                if(this.content[endSelect].value.typeObj == MATH_COMP) // select empty
+                SelectContent = this;
+
+                if(this.LogicalSelect.start == endSelect && this.content[endSelect].value.typeObj == MATH_COMP)
+                {
+                    SelectContent = this.content[endSelect].value.goToRightSelect(SELECT_CHILD);
+                    endSelect++;
+                }
+                else if(this.content[endSelect].value.typeObj == MATH_COMP) // select empty
                     endSelect++;
 
-                SelectContent = this;
+
                 this.setEndPos_Selection(endSelect);
                 this.LogicalSelect.end = endSelect;
             }
@@ -4019,7 +4050,7 @@ CMathContent.prototype =
             {
                 if(!this.bRoot)
                 {
-                    SelectContent = this.Parent.goToRight();
+                    SelectContent = this.Parent.goToRight(SELECT_PARENT);
                 }
                 else
                     state = false;
@@ -6882,10 +6913,10 @@ CMathComposition.prototype =
     },
     Cursor_MoveLeft: function(bShiftKey, bCtrlKey)
     {
-        //var move = this.SelectContent.cursor_moveLeft(bShiftKey, bCtrlKey);
+        var move = this.SelectContent.cursor_moveLeft(bShiftKey, bCtrlKey);
 
         //for test
-        var move = this.SelectContent.cursor_moveLeft(true, bCtrlKey);
+        //var move = this.SelectContent.cursor_moveLeft(true, bCtrlKey);
 
         if(move.state)
         {
@@ -6904,10 +6935,10 @@ CMathComposition.prototype =
     },
     Cursor_MoveRight: function(bShiftKey, bCtrlKey)
     {
-        //var move = this.SelectContent.cursor_moveRight(bShiftKey, bCtrlKey);
+        var move = this.SelectContent.cursor_moveRight(bShiftKey, bCtrlKey);
 
         //for test
-        var move = this.SelectContent.cursor_moveRight(true, bCtrlKey);
+        //var move = this.SelectContent.cursor_moveRight(true, bCtrlKey);
 
         if(move.state)
         {
