@@ -3322,6 +3322,7 @@ function IntervalTreeRBNode(low, high, storedValue){
 	if(high)
 		this.high = high;
 	this.maxHigh = this.high;
+	this.minLow = this.key;
 	
 	this.left = null;
 	this.right = null;
@@ -3331,12 +3332,14 @@ function IntervalTreeRB(){
 	this.nil = new IntervalTreeRBNode();
 	this.nil.left = this.nil.right = this.nil.parent = this.nil;
 	this.nil.key = this.nil.high = this.nil.maxHigh = Number.MIN_VALUE;
+	this.nil.minLow = Number.MAX_VALUE;
 	this.nil.red = 0;
 	this.nil.storedValue = null;
 	
 	this.root = new IntervalTreeRBNode();
 	this.root.left = this.nil.right = this.nil.parent = this.nil;
 	this.root.key = this.root.high = this.root.maxHigh = Number.MAX_VALUE;
+	this.root.minLow = Number.MIN_VALUE;
 	this.root.red = 0;
 	this.root.storedValue = null;
 };
@@ -3361,6 +3364,7 @@ IntervalTreeRB.prototype = {
 	_fixUpMaxHigh : function(x){
 		while(x != this.root){
 			x.maxHigh = Math.max(x.high, Math.max(x.left.maxHigh, x.right.maxHigh));
+			x.minLow = Math.min(x.key, Math.min(x.left.minLow, x.right.minLow));
 			x = x.parent;
 		}
 	},
@@ -3380,7 +3384,9 @@ IntervalTreeRB.prototype = {
 		x.parent = y;
 
 		x.maxHigh = Math.max(x.left.maxHigh,Math.max(x.right.maxHigh,x.high));
+		x.minLow = Math.min(x.left.minLow,Math.min(x.right.minLow,x.key));
 		y.maxHigh = Math.max(x.maxHigh,Math.max(y.right.maxHigh,y.high));
+		y.minLow = Math.min(x.minLow,Math.min(y.right.minLow,y.key));
 	},
 	_rightRotate : function(y){
 		var x = y.left;
@@ -3398,7 +3404,9 @@ IntervalTreeRB.prototype = {
 		y.parent = x;
 
 		y.maxHigh = Math.max(y.left.maxHigh,Math.max(y.right.maxHigh,y.high));
+		y.minLow = Math.min(y.left.minLow,Math.min(y.right.minLow,y.key));
 		x.maxHigh = Math.max(x.left.maxHigh,Math.max(y.maxHigh,x.high));
+		x.minLow = Math.min(x.left.minLow,Math.min(y.minLow,y.key));
 	},
 	insert : function(low, high, storedValue){
 		var x = new IntervalTreeRBNode(low, high, storedValue);
@@ -3544,6 +3552,7 @@ IntervalTreeRB.prototype = {
 		}
 		if (y != z){ 
 			y.maxHigh = Number.MIN_VALUE;
+			y.minLow = Number.MAX_VALUE;
 			y.left = z.left;
 			y.right = z.right;
 			y.parent = z.parent;
@@ -3580,18 +3589,14 @@ IntervalTreeRB.prototype = {
 		return bRes;
 	},
 	_enumerateRecursion : function(low, high, x, enumResultStack){
-		var stuffToDo = (x != this.nil);
-		while(stuffToDo){
-			if (this._overlap(low, high, x.key, x.high) ){
-				enumResultStack.push(x);
-			}
-			if(x.left.maxHigh >= low){
+		if(x != this.nil){
+			if(this._overlap(low, high, x.minLow, x.maxHigh))
+			{
+				if (this._overlap(low, high, x.key, x.high))
+					enumResultStack.push(x);
+				this._enumerateRecursion(low, high, x.left, enumResultStack);
 				this._enumerateRecursion(low, high, x.right, enumResultStack);
-				x = x.left;
 			}
-			else
-				x = x.right;
-			stuffToDo = (x != this.nil);
 		}
 	},
 	enumerate : function(low, high){
