@@ -2876,7 +2876,8 @@
 				}
 			},
 
-			_drawSelectionRange: function (range) {
+			_drawSelectionRange: function (range, isFrozen) {
+				isFrozen = !!isFrozen;
 				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
 					if (this.isChartAreaEditMode) {
 						this._drawFormulaRange(this.arrActiveChartsRanges);
@@ -2899,6 +2900,22 @@
 					var rFrozen = this.topLeftFrozenCell.getRow0();
 					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
 					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
+
+					if (!isFrozen) {
+						var oFrozenRange;
+						if (0 < cFrozen && 0 < rFrozen) {
+							oFrozenRange = new asc_Range(0, 0, cFrozen - 1, rFrozen - 1);
+							this._drawSelectionRange(oFrozenRange, true);
+						}
+						if (0 < cFrozen) {
+							oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen - 1, this.visibleRange.r2);
+							this._drawSelectionRange(oFrozenRange, true);
+						}
+						if (0 < rFrozen) {
+							oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen - 1);
+							this._drawSelectionRange(oFrozenRange, true);
+						}
+					}
 				}
 
 				if (!this.isSelectionDialogMode)
@@ -2917,9 +2934,11 @@
 				}
 
 				if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
-					this._drawActiveHeaders();
-					if (this.isSelectionDialogMode) {
-						this._drawSelectRange(this.activeRange.clone(true));
+					if (!isFrozen) {
+						this._drawActiveHeaders();
+						if (this.isSelectionDialogMode) {
+							this._drawSelectRange(this.activeRange.clone(true));
+						}
 					}
 					return;
 				}
@@ -3032,9 +3051,17 @@
 				} else {
 					// Автозаполнения нет, просто рисуем обводку
 					if (drawTopSide)    {ctx.lineHor(x1 + l, y1 - this.height_1px, x2 + this.width_1px + r);}
-					if (drawBottomSide) {ctx.lineHor(x1 + l, y2, x2 + this.width_1px + r - fillHandleWidth);}
+					if (drawBottomSide) {
+						if (isFrozen && !drawRightSide)
+							fillHandleWidth = 0;
+						ctx.lineHor(x1 + l, y2, x2 + this.width_1px + r - fillHandleWidth);
+					}
 					if (drawLeftSide)   {ctx.lineVer(x1, y1 + t, y2 + b);}
-					if (drawRightSide)  {ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);}
+					if (drawRightSide)  {
+						if (isFrozen && !drawBottomSide)
+							fillHandleHeight = 0;
+						ctx.lineVer(x2, y1 + t, y2 + b - fillHandleHeight);
+					}
 				}
 				ctx.stroke();
 
@@ -3060,15 +3087,17 @@
 						ctx.clearRect(_l, _t, _r - _l, _b - _t).restore();
 					}
 
-					// Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
-					cr = range.intersection(asc_Range(range.c2, range.r2, range.c2, range.r2));
-					if (cr !== null) {
-						this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
-						this.fillHandleR = this.fillHandleL + fillHandleWidth;
-						this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
-						this.fillHandleB = this.fillHandleT + fillHandleHeight;
+					if (!(isFrozen && (!drawRightSide || !drawBottomSide))) {
+						// Рисуем "квадрат" для автозаполнения (располагается "квадрат" в правом нижнем углу последней ячейки выделения)
+						cr = range.intersection(asc_Range(range.c2, range.r2, range.c2, range.r2));
+						if (cr !== null) {
+							this.fillHandleL = this.cols[cr.c1].left - offsetX + this.cols[cr.c1].width - this.width_1px - this.width_2px;
+							this.fillHandleR = this.fillHandleL + fillHandleWidth;
+							this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
+							this.fillHandleB = this.fillHandleT + fillHandleHeight;
 
-						ctx.setFillStyle (opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+							ctx.setFillStyle (opt.activeCellBorderColor).fillRect(this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT);
+						}
 					}
 				}
 
@@ -3147,7 +3176,9 @@
 				if ( !this.isChartAreaEditMode )
 					this.objectRender.raiseLayerDrawingObjects();
 
-				this._drawActiveHeaders();
+				if (!isFrozen) {
+					this._drawActiveHeaders();
+				}
 			},
 			
 			_drawFormulaRange: function(arr){
@@ -3353,10 +3384,11 @@
 				this.cellCommentator.drawCommentCells();
 			},
 			
-			cleanSelection: function () {
+			cleanSelection: function (range, isFrozen) {
+				isFrozen = !!isFrozen;
 				var ctx = this.overlayCtx;
 				var arn = this.activeRange.clone(true);
-				var arnIntersection = arn.intersectionSimple(this.visibleRange);
+				var arnIntersection = arn.intersectionSimple(range ? range : this.visibleRange);
 				var width = ctx.getWidth();
 				var height = ctx.getHeight();
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
@@ -3369,9 +3401,25 @@
 
 				if (this.topLeftFrozenCell) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					var rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+
+					if (!isFrozen) {
+						var oFrozenRange;
+						if (0 < cFrozen && 0 < rFrozen) {
+							oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+							this.cleanSelection(oFrozenRange, true);
+						}
+						if (0 < cFrozen) {
+							oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+							this.cleanSelection(oFrozenRange, true);
+						}
+						if (0 < rFrozen) {
+							oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+							this.cleanSelection(oFrozenRange, true);
+						}
+					}
 				}
 
 				if (arnIntersection) {
@@ -3381,10 +3429,12 @@
 					y2 = this.rows[arnIntersection.r2].top + this.rows[arnIntersection.r2].height - offsetY + this.height_1px + /* Это высота "квадрата" для автофильтра от границы ячейки */this.height_2px;
 				}
 
-				this._activateOverlayCtx();
-				this._cleanColumnHeaders(arn.c1, arn.c2);
-				this._cleanRowHeades(arn.r1, arn.r2);
-				this._deactivateOverlayCtx();
+				if (!isFrozen) {
+					this._activateOverlayCtx();
+					this._cleanColumnHeaders(arn.c1, arn.c2);
+					this._cleanRowHeades(arn.r1, arn.r2);
+					this._deactivateOverlayCtx();
+				}
 
 				// Если есть активное автозаполнения, то нужно его тоже очистить
 				if (this.activeFillHandle !== null) {
