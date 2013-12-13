@@ -1934,7 +1934,10 @@
 				var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : this.headersTop;
 				if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetXForDraw) {
 					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= c[cFrozen].left - c[0].left;
+					if (start < vr.c1)
+						offsetX = c[0].left - this.cellsLeft;
+					else
+						offsetX -= c[cFrozen].left - c[0].left;
 				}
 
 				if (asc_typeof(start) !== "number") {start = vr.c1;}
@@ -1961,7 +1964,10 @@
 				var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
 				if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
 					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetY -= r[rFrozen].top - r[0].top;
+					if (start < vr.r1)
+						offsetY = r[0].top - this.cellsTop;
+					else
+						offsetY -= r[rFrozen].top - r[0].top;
 				}
 
 				if (asc_typeof(start) !== "number") {start = vr.r1;}
@@ -2101,6 +2107,7 @@
 						this.cols[i].width + this.width_1px, this.headersHeight);
 				}
 				if (0 !== cFrozen) {
+					offsetX = this.cols[0].left - this.cellsLeft;
 					// Почистим для pane
 					colStart = Math.max(0, colStart);
 					colEnd = Math.min(cFrozen, colEnd);
@@ -2131,6 +2138,7 @@
 						this.headersWidth, this.rows[i].height + this.height_1px);
 				}
 				if (0 !== rFrozen) {
+					offsetY = this.rows[0].top - this.cellsTop;
 					// Почистим для pane
 					rowStart = Math.max(0, rowStart);
 					rowEnd = Math.min(rFrozen, rowEnd);
