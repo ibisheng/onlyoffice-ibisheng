@@ -6944,7 +6944,7 @@ CMathComposition.prototype =
         {
             if(bShiftKey)
             {
-
+                this.SelectContent = move.SelectContent;
             }
             else
             {
