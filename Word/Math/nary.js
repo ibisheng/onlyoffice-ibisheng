@@ -13,6 +13,8 @@
 
 function CNary()
 {
+    this.kind = MATH_NARY;
+
     this.type = null;
     this.code = null;   // for "read"
     this.grow = false;

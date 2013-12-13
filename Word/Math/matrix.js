@@ -1,5 +1,7 @@
 function CMathMatrix()
 {
+    this.kind = MATH_MATRIX;
+
     this.lineGapColumn = 1.5;
     this.lineGapRow = 1;
     this.gaps = null;
@@ -470,6 +472,8 @@ CMathMatrix.prototype.baseJustification = function(type)
 ////
 function CEqArray()
 {
+    this.kind = MATH_EQ_ARRAY;
+
     CMathMatrix.call(this);
 }
 extend(CEqArray, CMathMatrix);

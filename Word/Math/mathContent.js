@@ -1,13 +1,13 @@
 //поправить центр у N-арных операторов
 /*
- FRACTION
- MATH_FUNCTION
- NARY
- BOX (доделать Spacing)
- DEGREE
- DEGREE_SubSup
- RADICAL
- LIMIT
+     FRACTION
+     MATH_FUNCTION
+     NARY
+     BOX (доделать Spacing)
+     DEGREE
+     DEGREE_SubSup
+     RADICAL
+     LIMIT
  */
 
 //Bugs
@@ -23,10 +23,10 @@
 //  3. центр => baseline
 //  4. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
 //  5. баг с отрисовкой кругового интеграла
-//  5. ctr + shift
-//  6. Merge textPrp и mathTextPrp (bold, italic)
-//  7. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
-//  8. объединение формул на remove и add
+//  6. cursor_Up, cursor_Down (+ c зажитым shift)
+//  7. Merge textPrp и mathTextPrp (bold, italic)
+//  8. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
+//  9. объединение формул на remove и add
 
 
 
@@ -470,7 +470,6 @@ CMathContent.prototype =
     {
         //var l_gap =  0, r_gap = 0;
         var mathElem = null;    //положение этого элемента будет this.CurPos + 1
-
 
         switch(ind)
         {
@@ -6074,11 +6073,10 @@ CMathContent.prototype =
             else
             {
                 SelectContent = this;
-
                 var direction = (posStart < posEnd) ? 1 : -1;
 
 
-                if ( this.content[posStart].value.typeObj === MATH_COMP )
+                if( this.content[posStart].value.typeObj === MATH_COMP )
                 {
                     if( direction == 1 )
                         this.setStartPos_Selection( posStart - 1);

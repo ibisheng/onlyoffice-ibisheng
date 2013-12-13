@@ -604,6 +604,8 @@ CSign.prototype.getCodeAccent = function()
 
 function CAccent()
 {
+    this.kind = MATH_ACCENT;
+
     this.code = null;   // храним код буквы и тип здесь
     this. type = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;

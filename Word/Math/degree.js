@@ -1,5 +1,7 @@
 function CDegree()
 {
+    this.kind = MATH_DEGREE;
+
     this.type = DEGREE_SUPERSCRIPT ;
     this.shiftDegree = 0;
     CMathBase.call(this);
@@ -208,6 +210,8 @@ CIterators.prototype.getCtrPrp = function()
 
 function CDegreeSubSup()
 {
+    this.kind = MATH_DEGREESubSup;
+
     this.type = DEGREE_SubSup;
     this.alnScr = false;    // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
     CSubMathBase.call(this);

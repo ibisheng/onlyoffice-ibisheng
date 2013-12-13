@@ -1,5 +1,7 @@
 function CLimit()
 {
+    this.kind = MATH_LIMIT;
+
     this.type = LIMIT_LOW;
     CMathBase.call(this);
 }
@@ -59,6 +61,8 @@ CLimit.prototype.setDistance = function()
 
 function CMathFunc()
 {
+    this.kind = MATH_FUNCTION;
+
     CMathBase.call(this);
 }
 extend(CMathFunc, CMathBase);

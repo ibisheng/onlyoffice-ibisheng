@@ -1,5 +1,7 @@
 function CFraction()
 {
+    this.kind = MATH_FRACTION;
+
     this.type = BAR_FRACTION;
     this.bHideBar = false;
     CMathBase.call(this);
@@ -381,6 +383,13 @@ CFraction.prototype.findDisposition = function( mCoord )
         disposition = CFraction.superclass.findDisposition.call(this, mCoord);
 
     return disposition;
+}
+CFraction.prototype.getPropsForWrite = function()
+{
+    var props = {};
+    props.type = this.type;
+
+    return props;
 }
 
 

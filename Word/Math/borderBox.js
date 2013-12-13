@@ -1,5 +1,7 @@
 function CBorderBox()
 {
+    this.kind = MATH_BORDER_BOX;
+
     this.gapBrd = 0;
 
     this.bLeft = true;
@@ -262,6 +264,8 @@ CBorderBox.prototype.getBase = function()
 
 function CBox()
 {
+    this.kind = MATH_BOX;
+
     this.opEmu = false;
     this.diff = false;
     this.noBreak = false;
@@ -290,6 +294,8 @@ CBox.prototype.getBase = function()
 
 function CBar()
 {
+    this.kind = MATH_BAR;
+
     this.loc = LOCATION_BOT;
     CCharacter.call(this);
 }
