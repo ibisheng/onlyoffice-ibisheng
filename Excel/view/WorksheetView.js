@@ -1876,14 +1876,28 @@
 
 			_drawActiveHeaders: function () {
 				var arn = this.activeRange.clone(true),
-				vr = this.visibleRange,
-				c1 = Math.max(vr.c1, arn.c1),
-				c2 = Math.min(vr.c2, arn.c2),
-				r1 = Math.max(vr.r1, arn.r1),
-				r2 = Math.min(vr.r2, arn.r2);
+					vr = this.visibleRange,
+					c1 = Math.max(vr.c1, arn.c1),
+					c2 = Math.min(vr.c2, arn.c2),
+					r1 = Math.max(vr.r1, arn.r1),
+					r2 = Math.min(vr.r2, arn.r2);
 				this._activateOverlayCtx();
 				this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
 				this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					if (0 !== cFrozen) {
+						c1 = Math.max(0, arn.c1);
+						c2 = Math.min(cFrozen, arn.c2);
+						this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
+					}
+					if (0 !== rFrozen) {
+						r1 = Math.max(0, arn.r1);
+						r2 = Math.min(rFrozen, arn.r2);
+						this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+					}
+				}
 				this._deactivateOverlayCtx();
 			},
 
@@ -2855,19 +2869,17 @@
 				if (!this.isSelectionDialogMode) {
 					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 					this._drawSelectionRange(range);
-					if ( this.objectRender.selectedGraphicObjectsExists() )
+					if (this.objectRender.selectedGraphicObjectsExists())
 						this.objectRender.raiseLayerDrawingObjects();
-				} 
-				else {
+				} else {
 					this._drawSelectionRange(range);
 				}
 			},
 
 			_drawSelectionRange: function (range) {
-				
 				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
 					if (this.isChartAreaEditMode) {
-						this._drawFormulaRange(this.arrActiveChartsRanges)
+						this._drawFormulaRange(this.arrActiveChartsRanges);
 					}
 					return;
 				}
@@ -2879,6 +2891,14 @@
 					this.activeRange.r2 = this.rows.length - 1;
 				} else if (c_oAscSelectionType.RangeRow === this.activeRange.type) {
 					this.activeRange.c2 = this.cols.length - 1;
+				}
+
+				var diffWidth = 0, diffHeight = 0;
+				if (this.topLeftFrozenCell) {
+					var cFrozen = this.topLeftFrozenCell.getCol0();
+					var rFrozen = this.topLeftFrozenCell.getRow0();
+					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
+					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 				}
 
 				if (!this.isSelectionDialogMode)
@@ -2906,14 +2926,8 @@
 
 				var ctx = this.overlayCtx;
 				var opt = this.settings;
-				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
-				}
+				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
+				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 
 				var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
 				var x1 = (range) ? (this.cols[range.c1].left - offsetX - this.width_1px) : 0;
@@ -3126,7 +3140,6 @@
 					}
 					ctx.stroke();
 				}
-
 				
 				// restore canvas' original clipping range
 				ctx.restore();
