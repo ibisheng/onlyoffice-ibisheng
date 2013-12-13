@@ -555,6 +555,67 @@ ParaTextPr.prototype =
             this.Set_Lang( TextPr.Lang );
     },
 
+    Clear_Style : function()
+    {
+        // Пока удаляем все кроме настроек языка
+        if ( undefined != this.Value.Bold )
+            this.Set_Bold( undefined );
+
+        if ( undefined != this.Value.Italic )
+            this.Set_Italic( undefined );
+
+        if ( undefined != this.Value.Strikeout )
+            this.Set_Strikeout( undefined );
+
+        if ( undefined != this.Value.Underline )
+            this.Set_Underline( undefined );
+
+        if ( undefined != this.Value.FontSize )
+            this.Set_FontSize( undefined );
+
+        if ( undefined != this.Value.Color )
+            this.Set_Color( undefined );
+
+        if ( undefined != this.Value.VertAlign )
+            this.Set_VertAlign( undefined );
+
+        if ( undefined != this.Value.HighLight )
+            this.Set_HighLight( undefined );
+
+        if ( undefined != this.Value.RStyle )
+            this.Set_RStyle( undefined );
+
+        if ( undefined != this.Value.Spacing )
+            this.Set_Spacing( undefined );
+
+        if ( undefined != this.Value.DStrikeout )
+            this.Set_DStrikeout( undefined );
+
+        if ( undefined != this.Value.Caps )
+            this.Set_Caps( undefined );
+
+        if ( undefined != this.Value.SmallCaps )
+            this.Set_SmallCaps( undefined );
+
+        if ( undefined != this.Value.Position )
+            this.Set_Position( undefined );
+
+        if ( undefined != this.Value.RFonts.Ascii )
+            this.Set_RFonts_Ascii( RFonts.Ascii );
+
+        if ( undefined != this.Value.HAnsi )
+            this.Set_RFonts_HAnsi( undefined );
+
+        if ( undefined != this.Value.CS )
+            this.Set_RFonts_CS( undefined );
+
+        if ( undefined != this.Value.EastAsia )
+            this.Set_RFonts_EastAsia( undefined );
+
+        if ( undefined != this.Value.Hint )
+            this.Set_RFonts_Hint( undefined );
+    },
+
     Set_Prop : function(Prop, Value)
     {
         var OldValue = ( undefined != this.Value[Prop] ? this.Value[Prop] : undefined );
@@ -2599,8 +2660,8 @@ ParaEmpty.prototype =
 function ParaNumbering()
 {
     this.Type = para_Numbering;
-    this.Pos  = -1;
     this.Item = undefined;
+    this.Pos  = new CParagraphRecalculatePos();
 
     this.Internal =
     {
