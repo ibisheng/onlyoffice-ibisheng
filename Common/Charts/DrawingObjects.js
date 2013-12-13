@@ -5006,7 +5006,7 @@ function DrawingObjects() {
 					
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
-				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges);
+				worksheet._drawFormulaRanges(worksheet.arrActiveChartsRanges);
 				bRaise = true;
 			}
 		}

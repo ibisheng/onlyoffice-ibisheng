@@ -2888,7 +2888,7 @@
 				isFrozen = !!isFrozen;
 				if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
 					if (this.isChartAreaEditMode) {
-						this._drawFormulaRange(this.arrActiveChartsRanges);
+						this._drawFormulaRanges(this.arrActiveChartsRanges);
 					}
 					return;
 				}
@@ -3154,15 +3154,15 @@
 					ctx.stroke();
 				}
 
-				if (this.isFormulaEditMode) {
-					this._drawFormulaRange(this.arrActiveFormulaRanges);
+				if (!isFrozen && this.isFormulaEditMode) {
+					this._drawFormulaRanges(this.arrActiveFormulaRanges);
 				}
 
-				if (this.isChartAreaEditMode) {
-					this._drawFormulaRange(this.arrActiveChartsRanges);
+				if (!isFrozen && this.isChartAreaEditMode) {
+					this._drawFormulaRanges(this.arrActiveChartsRanges);
 				}
 
-				if (this.isSelectionDialogMode) {
+				if (!isFrozen && this.isSelectionDialogMode) {
 					this._drawSelectRange(this.activeRange.clone(true));
 				}
 
@@ -3200,63 +3200,94 @@
 					this._drawActiveHeaders();
 				}
 			},
+
+			_drawFormulaRange: function (index, oFormulaRange, oFormulaRangeIntersection, visibleRange, offsetX, offsetY) {
+				if (!oFormulaRangeIntersection)
+					return;
+				var ctx = this.overlayCtx, opt = this.settings;
+				ctx.beginPath()
+					.setStrokeStyle(opt.formulaRangeBorderColor[index%opt.formulaRangeBorderColor.length])
+					.setFillStyle(opt.formulaRangeBorderColor[index%opt.formulaRangeBorderColor.length]);
+				var drawLeftSideFormula   = oFormulaRangeIntersection.c1 === oFormulaRange.c1;
+				var drawRightSideFormula  = oFormulaRangeIntersection.c2 === oFormulaRange.c2;
+				var drawTopSideFormula    = oFormulaRangeIntersection.r1 === oFormulaRange.r1;
+				var drawBottomSideFormula = oFormulaRangeIntersection.r2 === oFormulaRange.r2;
+
+				var xFormula1 = this.cols[oFormulaRangeIntersection.c1].left - offsetX - this.width_1px;
+				var xFormula2 = this.cols[oFormulaRangeIntersection.c2].left + this.cols[oFormulaRangeIntersection.c2].width - offsetX - this.width_1px;
+				var yFormula1 = this.rows[oFormulaRangeIntersection.r1].top - offsetY;
+				var yFormula2 = this.rows[oFormulaRangeIntersection.r2].top + this.rows[oFormulaRangeIntersection.r2].height - offsetY - this.height_1px;
+
+				if ( drawTopSideFormula && oFormulaRangeIntersection.r1 != visibleRange.r1 ) {
+					ctx.lineHor( xFormula1 + this.width_1px, yFormula1 - this.height_1px, xFormula2 + this.width_1px );
+				}
+				if ( drawBottomSideFormula ) {
+					ctx.lineHor( xFormula1 + this.width_1px, yFormula2, xFormula2 + this.width_1px );
+				}
+				if ( drawLeftSideFormula && oFormulaRangeIntersection.c1 != visibleRange.c1 ) {
+					ctx.lineVer( xFormula1, yFormula1 - this.width_1px * (oFormulaRangeIntersection.r1 != visibleRange.r1), yFormula2 + this.width_1px );
+				}
+				if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
+
+				if (drawLeftSideFormula && drawTopSideFormula)
+					ctx.fillRect(xFormula1 + this.width_1px, yFormula1, this.width_4px, this.height_4px);
+
+				if (drawRightSideFormula && drawTopSideFormula)
+					ctx.fillRect(xFormula2 - this.width_4px, yFormula1, this.width_4px, this.height_4px);
+
+				if (drawRightSideFormula && drawBottomSideFormula)
+					ctx.fillRect(xFormula2 - this.width_4px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
+
+				if (drawLeftSideFormula && drawBottomSideFormula)
+					ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
+
+				ctx.closePath().stroke();
+			},
 			
-			_drawFormulaRange: function(arr){
-				var ctx = this.overlayCtx,
-					opt = this.settings,
+			_drawFormulaRanges: function(arr){
+				var ctx = this.overlayCtx, cFrozen = 0, rFrozen = 0,
 					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				var arrFrozenRanges = [], arrOffsetsX = [], arrOffsetsY = [];
 				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					var rFrozen = this.topLeftFrozenCell.getRow0();
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
 					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
 					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+
+					var oFrozenRange;
+					cFrozen -= 1; rFrozen -= 1;
+					if (0 <= cFrozen && 0 <= rFrozen) {
+						oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+						arrFrozenRanges.push(oFrozenRange);
+						arrOffsetsX.push(this.cols[0].left - this.cellsLeft);
+						arrOffsetsY.push(this.rows[0].top - this.cellsTop);
+					}
+					if (0 <= cFrozen) {
+						oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+						arrFrozenRanges.push(oFrozenRange);
+						arrOffsetsX.push(this.cols[0].left - this.cellsLeft);
+						arrOffsetsY.push(offsetY);
+					}
+					if (0 <= rFrozen) {
+						oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+						arrFrozenRanges.push(oFrozenRange);
+						arrOffsetsX.push(offsetX);
+						arrOffsetsY.push(this.rows[0].top - this.cellsTop);
+					}
 				}
 
 				ctx.setLineWidth(1);
 					
 				for (var i in arr) {
-					var arFormulaTmp = arr[i].clone(true);
-					var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
-
-					if (aFormulaIntersection) {
-						ctx.beginPath()
-							.setStrokeStyle(opt.formulaRangeBorderColor[i%opt.formulaRangeBorderColor.length])
-							.setFillStyle(opt.formulaRangeBorderColor[i%opt.formulaRangeBorderColor.length]);
-						var drawLeftSideFormula   = aFormulaIntersection.c1 === arFormulaTmp.c1;
-						var drawRightSideFormula  = aFormulaIntersection.c2 === arFormulaTmp.c2;
-						var drawTopSideFormula    = aFormulaIntersection.r1 === arFormulaTmp.r1;
-						var drawBottomSideFormula = aFormulaIntersection.r2 === arFormulaTmp.r2;
-
-						var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX - this.width_1px;
-						var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX - this.width_1px;
-						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
-						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY - this.height_1px;
-
-                        if ( drawTopSideFormula && aFormulaIntersection.r1 != this.visibleRange.r1 ) {
-                            ctx.lineHor( xFormula1 + this.width_1px, yFormula1 - this.height_1px, xFormula2 + this.width_1px );
-                        }
-                        if ( drawBottomSideFormula ) {
-                            ctx.lineHor( xFormula1 + this.width_1px, yFormula2, xFormula2 + this.width_1px );
-                        }
-                        if ( drawLeftSideFormula && aFormulaIntersection.c1 != this.visibleRange.c1 ) {
-                            ctx.lineVer( xFormula1, yFormula1 - this.width_1px * (aFormulaIntersection.r1 != this.visibleRange.r1), yFormula2 + this.width_1px );
-                        }
-						if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
-
-						if (drawLeftSideFormula && drawTopSideFormula)
-							ctx.fillRect(xFormula1 + this.width_1px, yFormula1, this.width_4px, this.height_4px);
-
-						if (drawRightSideFormula && drawTopSideFormula)
-							ctx.fillRect(xFormula2 - this.width_4px, yFormula1, this.width_4px, this.height_4px);
-
-						if (drawRightSideFormula && drawBottomSideFormula)
-							ctx.fillRect(xFormula2 - this.width_4px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
-
-						if (drawLeftSideFormula && drawBottomSideFormula)
-							ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
-						
-						ctx.closePath().stroke();
+					if (!arr.hasOwnProperty(i))
+						continue;
+					var oFormulaTmp = arr[i].clone(true);
+					var oFormulaIntersection = oFormulaTmp.intersection(this.visibleRange);
+					this._drawFormulaRange(i, oFormulaTmp, oFormulaIntersection, this.visibleRange, offsetX, offsetY);
+					for (var j = 0; j < arrFrozenRanges.length; ++j) {
+						oFormulaIntersection = oFormulaTmp.intersection(arrFrozenRanges[j]);
+						this._drawFormulaRange(i, oFormulaTmp, oFormulaIntersection, arrFrozenRanges[j], arrOffsetsX[j], arrOffsetsY[j]);
 					}
 				}
 			},
@@ -3500,7 +3531,7 @@
 						for (i = 0; i < arrayElements.length; ++i) {
 							var arFormulaTmp = asc_Range (arrayElements[i].c1, arrayElements[i].r1, arrayElements[i].c2, arrayElements[i].r2);
 
-							var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
+							var aFormulaIntersection = arFormulaTmp.intersection(range ? range : this.visibleRange);
 
 							if (aFormulaIntersection) {
 								// Координаты для автозаполнения
@@ -3523,7 +3554,7 @@
 					for (i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
 						var activeFormula = this.arrActiveFormulaRanges[i].clone(true);
 
-						activeFormula = this.visibleRange.intersection(activeFormula);
+						activeFormula = activeFormula.intersection(range ? range : activeFormula);
 						if (null === activeFormula) {
 							// это ссылка из формулы на еще не добавленный рэндж
 							continue;
@@ -3552,7 +3583,7 @@
 					for (i in this.arrActiveChartsRanges ) {
 						var activeFormula = this.arrActiveChartsRanges[i].clone(true);
 
-						activeFormula = this.visibleRange.intersection(activeFormula);
+						activeFormula = activeFormula.intersection(range ? range : activeFormula);
 						if (null === activeFormula) {
 							// это ссылка из формулы на еще не добавленный рэндж
 							continue;
