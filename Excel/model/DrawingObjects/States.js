@@ -259,7 +259,7 @@ function handleShapeImageCursorType(drawing, drawingObjects, drawingObjectsContr
     }
     else if(hit_in_text_rect)
     {
-        return {objectId: drawing.Id, cursorType: "text"};
+        return {objectId: drawing.Id, cursorType: "text", hyperlink: hit_in_text_rect};
     }
     return null;
 }
@@ -311,7 +311,7 @@ function handleGroupedShapeImageCursorType(drawing, group, drawingObjects, drawi
     }
     else if(hit_in_text_rect)
     {
-        return {objectId: group.Id, cursorType: "text"};
+        return {objectId: group.Id, cursorType: "text", hyperlink: hit_in_text_rect};
     }
     return null;
 }
@@ -512,7 +512,7 @@ function handleShapeImageInCurrentGroupCursorType(drawing, group, drawingObjects
     }
     else if(hit_in_text_rect)
     {
-        return {objectId: group.Id, cursorType: "text"};
+        return {objectId: group.Id, cursorType: "text", hyperlink: hit_in_text_rect};
     }
     return null;
 }
