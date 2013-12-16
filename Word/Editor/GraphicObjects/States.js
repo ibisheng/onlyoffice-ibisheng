@@ -1167,14 +1167,6 @@ function handleSelectedObjectsGroupCursorType(graphicObjects, group, e, x, y, pa
     hit = group.hitToHandle(t_x, t_y);
     if(hit.hit)
     {
-        for(i = 0; i < group.selectionInfo.selectionArray.length; ++i)
-        {
-            group.selectionInfo.selectionArray[i].deselect();
-        }
-        group.selectionInfo.selectionArray.length = 0;
-
-        graphicObjects.majorGraphicObject = group.parent;
-        graphicObjects.arrPreTrackObjects.length = 0;
         if(hit.handleRotate === false)
         {
             var _card_direction = group.numberToCardDirection(hit.handleNum);
