@@ -2779,6 +2779,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     //���������� ������(�������� ��� ������� ������� �������, ������ ��� ������� ����������� ������ � ��������� � ������� ����� �������� ���� �����������)
     this.dScaleKoef = 1;
     this.bUseScaleKoef = false;
+	this.bIsPlainText = false;
 
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
@@ -2955,18 +2956,19 @@ PasteProcessor.prototype =
 					var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [para_TextPr]);
                     var TextPr = null;
 					var nContentPos = Item.CurPos.ContentPos;
-					if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
+					if(!this.bIsPlainText)
 					{
-						TextPr = Item.Content[oFindObj.LetterPos].Copy();
-						//если до этого были ParaTextPr и content для вставки не начинается с ParaTextPr, то вставляем пустые настройки
-						if(nContentLength > 0 && para_TextPr != oInsertPar.Content[0].Type)
+						if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
 						{
-							Item.Internal_Content_Add(nContentPos, new ParaTextPr());
-							nContentPos++;
+							TextPr = Item.Content[oFindObj.LetterPos].Copy();
+							//если до этого были ParaTextPr и content для вставки не начинается с ParaTextPr, то вставляем пустые настройки
+							if(nContentLength > 0 && para_TextPr != oInsertPar.Content[0].Type)
+							{
+								Item.Internal_Content_Add(nContentPos, new ParaTextPr());
+								nContentPos++;
+							}
 						}
 					}
-					else
-						TextPr = new ParaTextPr();
 
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
@@ -2977,7 +2979,11 @@ PasteProcessor.prototype =
 							nContentPos++;
 						}
                     }
-                    Item.Internal_Content_Add(nContentPos, TextPr);
+					if(null != TextPr)
+					{
+						Item.Internal_Content_Add(nContentPos, TextPr);
+						nContentPos++;
+					}
                     Item.Set_ContentPos(nContentPos, true, -1);
                 }
 				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -3449,6 +3455,7 @@ PasteProcessor.prototype =
 
             var presentation = editor.WordControl.m_oLogicDocument;
             this.oRootNode = node;
+			this.bIsPlainText = this._CheckIsPlainText(node);
             this._Prepeare(node,
                 function(){
                     oThis.aContent = new Array();
@@ -4977,12 +4984,15 @@ PasteProcessor.prototype =
                     }
                     if(node != oFirstTextChild)
                     {
-                        var oLvl = AbstractNum.Lvl[0];
-						var oTextPr = this._read_rPr(oFirstTextChild);
-						if(numbering_numfmt_Bullet == num)
-                            oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
-                        //�������� ��������� �� node
-						AbstractNum.Apply_TextPr(0, oTextPr);
+						if(!this.bIsPlainText)
+						{
+							var oLvl = AbstractNum.Lvl[0];
+							var oTextPr = this._read_rPr(oFirstTextChild);
+							if(numbering_numfmt_Bullet == num)
+								oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
+							//�������� ��������� �� node
+							AbstractNum.Apply_TextPr(0, oTextPr);
+						}
                     }
                 }
                 Para.Numbering_Add( NumId, 0 );
@@ -5036,13 +5046,16 @@ PasteProcessor.prototype =
     },
     _commit_rPr : function(node)
     {
-        var rPr = this._read_rPr(node);
-        //���� ��������� ��������� ���������� ��������� �������
-        if(false == Common_CmpObj2(this.oCur_rPr, rPr))
-        {
-            this._Paragraph_Add( new ParaTextPr( rPr ) );
-            this.oCur_rPr = rPr;
-        }
+		if(!this.bIsPlainText)
+		{
+			var rPr = this._read_rPr(node);
+			//���� ��������� ��������� ���������� ��������� �������
+			if(false == Common_CmpObj2(this.oCur_rPr, rPr))
+			{
+				this._Paragraph_Add( new ParaTextPr( rPr ) );
+				this.oCur_rPr = rPr;
+			}
+		}
     },
     _read_rPr : function(node)
     {
@@ -5814,6 +5827,31 @@ PasteProcessor.prototype =
         //������� ��������, ������� ��������� � ������� �� ���������
         cell.Content.Internal_Content_Remove(0, 1);
     },
+	_CheckIsPlainText : function(node)
+	{
+		var bIsPlainText = true;
+		for(var i = 0, length = node.childNodes.length; i < length; i++)
+		{
+			var child = node.childNodes[i];
+			if(Node.ELEMENT_NODE == child.nodeType)
+			{
+				var sClass = child.getAttribute("class");
+				var sStyle = child.getAttribute("style");
+				if(sClass || sStyle)
+				{
+					bIsPlainText = false;
+					break;
+				}
+				else if(!this._CheckIsPlainText(child))
+				{
+					bIsPlainText = false;
+					break;
+				}
+					
+			}
+		}
+		return bIsPlainText;
+	},
     _Execute : function(node, pPr, bRoot, bAddParagraph, bInBlock)
     {
         //bAddParagraph ���� �������� �� ������� _Decide_AddParagraph, ��������� �������� ��� ���.
@@ -6346,10 +6384,12 @@ PasteProcessor.prototype =
                         //��������� ������� ����� ���� �� ���������
                         //this._commit_rPr(node.parentNode);
 
-
-                        var rPr = this._read_rPr(node.parentNode);
-                        var Item = new ParaTextPr( rPr);
-                        shape.paragraphAdd(Item);
+						if(!this.bIsPlainText)
+						{
+							var rPr = this._read_rPr(node.parentNode);
+							var Item = new ParaTextPr( rPr);
+							shape.paragraphAdd(Item);
+						}
                         for(var i = 0, length = value.length; i < length; i++)
                         {
                             var Char = value.charAt(i);
@@ -6480,9 +6520,12 @@ PasteProcessor.prototype =
                 var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
                 if(nTabCount > 0)
                 {
-                    var rPr = this._read_rPr(node);
-                    var Item = new ParaText( rPr);
-                    shape.paragraphAdd(Item);
+					if(!this.bIsPlainText)
+					{
+						var rPr = this._read_rPr(node);
+						var Item = new ParaText( rPr);
+						shape.paragraphAdd(Item);
+					}
                     for(var i = 0; i < nTabCount; i++)
                         shape.paragraphAdd( new ParaTab() );
                     return;
