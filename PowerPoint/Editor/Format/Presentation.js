@@ -5991,6 +5991,7 @@ CPresentation.prototype =
             _arr_new_layouts.push(_new_layout);
 
             this.Slides[_slide_index].setLayout(_new_layout);
+            this.Slides[_slide_index].checkNoTransformPlaceholder();
         }
 
 
@@ -6200,6 +6201,7 @@ CPresentation.prototype =
             _arr_new_layouts.push(_new_layout);
 
             _slides_array[_slide_index].setLayout(_new_layout);
+            _slides_array[_slide_index].checkNoTransformPlaceholder();
         }
 
         this.resetStateCurSlide();

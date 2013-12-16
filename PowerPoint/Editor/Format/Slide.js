@@ -931,6 +931,34 @@ Slide.prototype =
         return ShapeToImageConverter(this, 0).ImageUrl;
     },
 
+    checkNoTransformPlaceholder: function()
+    {
+        var sp_tree = this.cSld.spTree;
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            var sp = sp_tree[i];
+            if(sp instanceof CShape || sp instanceof CImageShape)
+            {
+                if(sp.isPlaceholder && sp.isPlaceholder())
+                {
+                    sp.recalcInfo.recalculateShapeHierarchy = true;
+                    var hierarchy = sp.getHierarchy();
+
+                    for(var j = 0; j < hierarchy.length; ++j)
+                    {
+                        if(isRealObject(hierarchy[j]))
+                            break;
+                    }
+                    if(j === hierarchy.length)
+                    {
+                        sp.setOffset(sp.x, sp.y);
+                        sp.setExtents(sp.extX, sp.extY);
+                    }
+                }
+            }
+        }
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
