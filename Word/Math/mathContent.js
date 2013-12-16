@@ -17,16 +17,17 @@
 
 /// TODO
 
-//  1. после того, как будет реализован селект с учетом RunPrp, убрать проверки из remove на RunPrp (!)
 //  1. properties для записи в файл
-//  2. убрать slashWidth
+//  2. выставить setFont для accent, group charater в случае, если придет текст
 //  3. центр => baseline
-//  4. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
-//  5. баг с отрисовкой кругового интеграла
-//  6. cursor_Up, cursor_Down (+ c зажитым shift)
-//  7. Merge textPrp и mathTextPrp (bold, italic)
-//  8. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
-//  9. объединение формул на remove и add
+//  4. поправить центр для delimiters (когда оператор текст)
+//  5. Поправить пересчет размера для delimiters (для скобок (control object) идет смещение для baseline)
+//  5. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
+//  6. баг с отрисовкой кругового интеграла
+//  7. cursor_Up, cursor_Down (+ c зажитым shift)
+//  8. Merge textPrp и mathTextPrp (bold, italic)
+//  9. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
+//  10. объединение формул на remove и add
 
 
 
@@ -4680,7 +4681,8 @@ CMathContent.prototype =
                 bItalic = txtPrp.Italic;
                 txtPrp.Italic = false;
 
-                g_oTextMeasurer.SetFont(txtPrp);
+                oMeasure.SetFont(txtPrp);
+                //g_oTextMeasurer.SetFont(txtPrp);
 
             }
             else if(type == MATH_PLACEHOLDER)
@@ -4694,7 +4696,8 @@ CMathContent.prototype =
                     txtPrp.Merge(ctrPrp);
                     txtPrp.Italic = false;
 
-                    g_oTextMeasurer.SetFont(txtPrp);
+                    oMeasure.SetFont(txtPrp);
+                    //g_oTextMeasurer.SetFont(txtPrp);
                     this.content[i].value.Resize(oMeasure);
                 }
             }

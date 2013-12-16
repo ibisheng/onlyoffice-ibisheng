@@ -52,9 +52,6 @@ function GetMathFont(GFont)
     return type;
 }*/
 
-// slashWidth
-// setFont
-//
 
 function getStateHeight(height, print)
 {

@@ -444,20 +444,6 @@ var extend = function(Child, Parent)
     
 }
 
-//todo
-//убрать эту функцию
-function slashWidth(IFont)
-{
-    var GFont =
-    {
-        FontSize: IFont.FontSize,
-        FontFamily: IFont.FontFamily
-    };
-
-    g_oTextMeasurer.SetFont(GFont);
-    return g_oTextMeasurer.Measure(String.fromCharCode(0x0020)).Width; // ширина space
-}
-
 var MathDesign =
 {
     bStruct: true

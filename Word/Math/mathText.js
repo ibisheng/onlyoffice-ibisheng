@@ -153,7 +153,7 @@ CMathText.prototype =
     // descent = Symbol.Descent ( = 0)
 
     // gap = FontHeight - FontDescent - Placeholder.Height + FontDescent
-    recalculateSize: function()
+    old_recalculateSize: function()
     {
         /*var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
