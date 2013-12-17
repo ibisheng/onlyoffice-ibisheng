@@ -471,3 +471,5 @@ var c_oAscCoAuthoringOtherBorderColor				= new CColor(238, 53, 37);
 var c_oAscCoAuthoringLockTablePropertiesBorderColor	= new CColor(255, 144, 0);
 var c_oAscCoAuthoringDottedWidth					= 2;
 var c_oAscCoAuthoringDottedDistance					= 2;
+
+var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
