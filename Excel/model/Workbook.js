@@ -2023,9 +2023,10 @@ Workbook.prototype.SerializeHistory = function(){
 	var aRes = new Array();
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
     var wsViews = this.oApi.wb.wsViews;
-    for(var i = 0; i < wsViews.length; ++i)
+    for(var i in wsViews)
     {
-        wsViews[i].objectRender.controller.refreshContentChanges();
+        if(isRealObject(wsViews[i]) && isRealObject(wsViews[i].objectRender) && isRealObject(wsViews[i].objectRender.controller))
+            wsViews[i].objectRender.controller.refreshContentChanges();
     }
 	var aActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aActions.length > 0)
