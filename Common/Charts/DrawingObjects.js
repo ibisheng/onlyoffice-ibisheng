@@ -286,6 +286,7 @@ asc_CChart.prototype = {
 		else
 			return Math.max( 0, (val * (1 + percent)) >> 0 );
 	},
+
 	_generateColor: function (oColor, percent) {
 		return new CColor(this._generateColorPart(oColor.r, percent),
 			this._generateColorPart(oColor.g, percent), this._generateColorPart(oColor.b, percent));
@@ -1520,11 +1521,11 @@ prot["asc_setUnderline"] = prot.asc_setUnderline;
 //-----------------------------------------------------------------------------------
 
 function asc_CChartSeria() {
-	this.Val = { Formula: null, NumCache: [] };
-	this.xVal = { Formula: null, NumCache: [] };
-	this.Cat = { Formula: null, NumCache: [] };
-	this.TxCache = { Formula: null, Tx: null };
-	this.Marker = { Size: null, Symbol: null };
+	this.Val = { Formula: "", NumCache: [] };
+	this.xVal = { Formula: "", NumCache: [] };
+	this.Cat = { Formula: "", NumCache: [] };
+	this.TxCache = { Formula: "", Tx: "" };
+	this.Marker = { Size: 0, Symbol: "" };
 	this.OutlineColor = null;
 	this.FormatCode = "";
 	this.isHidden = false;
@@ -2447,6 +2448,38 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
+function ScrollGraphicObject(ws, type, delta) {
+	this.ws = ws;
+	this.type = type;
+	this.delta = delta;		// + Down || - Up
+	
+	this.getUpdatedRange = function() {
+	
+		var vr = this.ws.visibleRange.clone();
+		if ( this.delta === 0 )
+			return vr;
+		
+		if ( this.type === c_oAscScrollType.Vertical ) {
+			// Down
+			if ( this.delta > 0 )
+				vr.r1 = vr.r2 - this.delta;
+			// Up
+			else
+				vr.r2 = vr.r1 - this.delta;
+		}
+		else if ( this.type === c_oAscScrollType.Horizontal ) {
+			// Right
+			if ( this.delta > 0 )
+				vr.c1 = vr.c2 - this.delta;
+			// Left
+			else
+				vr.c2 = vr.c1 - this.delta;
+		}
+		
+		return vr;
+	}
+}
+
 function Exception(error) {
 	var err = error;
 }
@@ -2478,7 +2511,7 @@ function DrawingObjects() {
 	var asc_Range = asc.Range;
 	
 	var chartRender = null;
-	if( typeof ChartRender !== "undefined" )
+	if ( typeof ChartRender !== "undefined" )
 		chartRender = new ChartRender();
 	var worksheet = null;
 	
@@ -2513,12 +2546,12 @@ function DrawingObjects() {
 	
 	function drawTaskFunction() {
 	
+		// При скролах нужно выполнить все задачи
+		
 		var taskLen = aDrawTasks.length;
 		if ( taskLen ) {
-		
-			//console.log("Task count = " + taskLen);
-			
-			_this.showDrawingObjectsEx(aDrawTasks[taskLen - 1].params[0], aDrawTasks[taskLen - 1].params[1]);
+			var lastTask = aDrawTasks[taskLen - 1];
+			_this.showDrawingObjectsEx(lastTask.params.clearCanvas, lastTask.params.scrollType, lastTask.params.printOptions);
 			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
 		}
 	}
@@ -2542,7 +2575,7 @@ function DrawingObjects() {
 		_t.size = { width: 0, height: 0 };
 
 		_t.graphicObject = null; // CImage, CShape, GroupShape or CChartAsGroup
-
+		
 		_t.flags = {
 			anchorUpdated: false,
 			lockState: c_oAscLockTypes.kLockTypeNone
@@ -2624,18 +2657,28 @@ function DrawingObjects() {
 		}
 		
 		// Проверяет выход за границы
-		_t.inVisibleArea = function() {
+		_t.inVisibleArea = function(scrollType) {
 			var result = true;
-			
-			var fvc = _t.worksheet.getFirstVisibleCol();
-			var fvr = _t.worksheet.getFirstVisibleRow();
-			var lvc = _t.worksheet.getLastVisibleCol();
-			var lvr = _t.worksheet.getLastVisibleRow();
+			var fvc, fvr, lvc, lvr;
 			
 			var checker = _this.getBoundsChecker(_t);
 			var coords = _this.getBoundsCheckerCoords(checker);
-			if ( coords ) {
-				if ( (fvr > coords.to.row + 1) || (lvr < coords.from.rom - 1) || (fvc > coords.to.col + 1) || (lvc < coords.from.col - 1) )
+			if ( coords ) {				
+				if ( scrollType ) {
+					var updatedRange = scrollType.getUpdatedRange();
+					fvc = updatedRange.c1;
+					fvr = updatedRange.r1;
+					lvc = updatedRange.c2;
+					lvr = updatedRange.r2;
+				}
+				else {
+					fvc = _t.worksheet.getFirstVisibleCol();
+					fvr = _t.worksheet.getFirstVisibleRow();
+					lvc = _t.worksheet.getLastVisibleCol();
+					lvr = _t.worksheet.getLastVisibleRow();
+			
+				}
+				if ( (fvr >= coords.to.row + 1) || (lvr <= coords.from.row - 1) || (fvc >= coords.to.col + 1) || (lvc <= coords.from.col - 1) )
 					result = false;
 			}
 
@@ -3363,18 +3406,25 @@ function DrawingObjects() {
 	// Drawing objects
 	//-----------------------------------------------------------------------------------
 	
-	_this.showDrawingObjects = function(clearCanvas, printOptions) {
+	_this.showDrawingObjects = function(clearCanvas, scrollType, printOptions) {
 	
 		var currDate = new Date();
 		var currTime = currDate.getTime();
 		if ( aDrawTasks.length ) {
-			if ( currTime - aDrawTasks[aDrawTasks.length - 1].time < 40 )
+			
+			var lastTask = aDrawTasks[aDrawTasks.length - 1];
+			
+			if ( lastTask.params.scrollType && scrollType && (lastTask.params.scrollType.type === scrollType.type) ) {
+				lastTask.params.scrollType.delta += scrollType.delta;
+				return;
+			}
+			if ( (currTime - lastTask.time < 40) )
 				return;
 		}
-		aDrawTasks.push( { time: currTime, params: [clearCanvas, printOptions] } );
+		aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, scrollType: scrollType, printOptions: printOptions} });
 	}
 	
-	_this.showDrawingObjectsEx = function(clearCanvas, printOptions) {
+	_this.showDrawingObjectsEx = function(clearCanvas, scrollType, printOptions) {
 
 		/*********** Print Options ***************
 		printOptions : {
@@ -3396,7 +3446,7 @@ function DrawingObjects() {
 				worksheet._drawGraphic();
 				
 				// Clip
-				_this.clipGraphicsCanvas(shapeCtx);
+				_this.clipGraphicsCanvas(shapeCtx, scrollType);
 				
 				for (var i = 0; i < aObjects.length; i++) {
 
@@ -3406,9 +3456,11 @@ function DrawingObjects() {
 						drawingObject.graphicObject.syncAscChart();
 					
 					if ( !printOptions ) {
-						if ( !drawingObject.inVisibleArea() )
+						if ( !drawingObject.inVisibleArea(scrollType) )
 							continue;
 					}
+					
+					//console.log("draw object: " + (i + 1));
 						
 					if ( !drawingObject.flags.anchorUpdated )
 						drawingObject.updateAnchorPosition();
@@ -3604,12 +3656,33 @@ function DrawingObjects() {
 		return metrics;
 	}
 	
-	_this.clipGraphicsCanvas = function(canvas) {
+	_this.clipGraphicsCanvas = function(canvas, scrollType) {
 		if ( canvas instanceof CGraphics ) {
-			var x = worksheet.getCellLeft(0, 0);
-			var y = worksheet.getCellTop(0, 0);
-			var w = shapeCtx.m_lWidthPix - x;
-			var h = shapeCtx.m_lHeightPix - y;				
+		
+			var x, y, w, h;
+			
+			if ( scrollType ) {
+				var updatedRange = scrollType.getUpdatedRange();
+				
+				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
+				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+				
+				x = worksheet.getCellLeft(updatedRange.c1, 0) - ptToPx(offsetX);
+				y = worksheet.getCellTop(updatedRange.r1, 0) - ptToPx(offsetY);
+				w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0);
+				h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0);
+				
+				/*canvas.m_oContext.beginPath();
+				canvas.m_oContext.strokeStyle = "#FF0000";
+				canvas.m_oContext.rect(x, y, w, h);
+				canvas.m_oContext.stroke();*/
+			}
+			else {
+				x = worksheet.getCellLeft(0, 0);
+				y = worksheet.getCellTop(0, 0);
+				w = shapeCtx.m_lWidthPix - x;
+				h = shapeCtx.m_lHeightPix - y;
+			}
 			
 			canvas.m_oContext.save();
 			canvas.m_oContext.beginPath();
@@ -3622,8 +3695,7 @@ function DrawingObjects() {
 	}
 	
 	_this.restoreGraphicsCanvas = function(canvas) {
-		if ( canvas instanceof CGraphics )
-        {
+		if ( canvas instanceof CGraphics ) {
             // этот рестор нужен для восстановления сложных вложенных клипов
             canvas.m_oContext.restore();
 

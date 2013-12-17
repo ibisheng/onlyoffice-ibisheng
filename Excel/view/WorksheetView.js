@@ -1768,7 +1768,7 @@
 						ctx: drawingCtx,
 						printPagesData: printPagesData
 					};
-					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
+					this.objectRender.showDrawingObjectsEx(false, null, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange;
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
@@ -5094,7 +5094,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjects(false, new ScrollGraphicObject(this, c_oAscScrollType.Vertical, delta));
 				return this;
 			},
 
@@ -5178,7 +5178,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(true);
+				this.objectRender.showDrawingObjects(false, new ScrollGraphicObject(this, c_oAscScrollType.Horizontal, delta));
 				return this;
 			},
 			
