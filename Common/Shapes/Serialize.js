@@ -5749,7 +5749,8 @@ function BinaryPPTYLoader()
                 }
                 case 15:
                 {
-                    s.Skip2(4); // spc
+                    //s.Skip2(4); // spc
+                    rPr.Spacing = s.GetLong() * 25.4 / 7200;
                     break;
                 }
                 case 16:
