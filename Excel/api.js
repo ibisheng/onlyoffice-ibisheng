@@ -2176,8 +2176,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.IsFocus = isEnabled;
 			},
 
-            asc_searchEnabled: function(bIsEnabled)
-            {
+            asc_searchEnabled: function(bIsEnabled) {
             },
 
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
@@ -2458,9 +2457,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getWorkbookComments: function() {
 				var _this = this, comments = [];
 				if ( _this.wb ) {
-					for (var i = 0; i < _this.wb.model.aWorksheets.length; i++) {
-						for (var j = 0; j < _this.wb.model.aWorksheets[i].aComments.length; j++) {
-							comments.push( { "Id": _this.wb.model.aWorksheets[i].aComments[j].asc_getId(), "Comment": _this.wb.model.aWorksheets[i].aComments[j] } );
+					for (var key in _this.wb.model.aWorksheets) {
+						var wsModel = _this.wb.model.aWorksheets[key];
+						var ws = _this.wb.getWorksheet(wsModel.index);
+						if ( ws ) {
+							for (var i = 0; i < ws.cellCommentator.aComments.length; i++) {
+								var comment = ws.cellCommentator.aComments[i];
+								comments.push( { "Id": comment.asc_getId(), "Comment": comment } );
+							}
 						}
 					}
 				}
@@ -2469,7 +2473,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			// Shapes
             setStartPointHistory: function(){History.Create_NewPoint(); History.StartTransaction()},
-            setEndPointHistory: function(){History.EndTransaction()},
+            
+			setEndPointHistory: function(){History.EndTransaction()},
 
 			asc_startAddShape: function(sPreset) {
 				this.isStartAddShape = true;

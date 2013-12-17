@@ -987,6 +987,7 @@
 				// initializing is completed
 				this._trigger("initialized");
 			},
+			
 			_initConditionalFormatting: function () {
 				var oGradient = null;
 				var aCFs = this.model.aConditionalFormatting;
@@ -1052,19 +1053,15 @@
 					}
 				}
 			},
+			
 			_prepareComments: function () {
-				var commentList = [];	// для отправки за один раз
-				for(var i = 0, length = this.model.aComments.length;  i < length; ++i)
-				{
+				// Теперь получение всех комментариев через asc_getWorkbookComments
+				for (var i = 0, length = this.model.aComments.length;  i < length; ++i) {
 					var comment = { "Id": this.model.aComments[i].asc_getId(), "Comment": this.model.aComments[i] };
 					this.cellCommentator.addCommentSerialize(comment["Comment"]);
-					commentList.push(comment);
-					// Если, например, перемещаем лист
-					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment["Id"]);
 				}
-				if ( commentList.length )
-					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
 			},
+			
 			_prepareDrawingObjects: function () {
 				if ( !this.settings.objectRender ) {
 					this.objectRender = new DrawingObjects();
@@ -1073,6 +1070,7 @@
 				else
 					this.objectRender = this.settings.objectRender;
 			},
+			
 			_initWorksheetDefaultWidth: function () {
 				this.nBaseColWidth = this.model.nBaseColWidth || this.nBaseColWidth;
 				// Теперь рассчитываем число px
@@ -1097,6 +1095,7 @@
 				var tm = this._roundTextMetrics(sr.measureString("A"));
 				this.headersHeightByFont = tm.height;
 			},
+			
 			_initConstValues: function () {
 				var ppiX = this._getPPIX();
 				var ppiY = this._getPPIY();
@@ -1111,6 +1110,7 @@
 				this.height_3px = asc_calcnpt(0, ppiY, 3/*px*/);
 				this.height_4px = asc_calcnpt(0, ppiY, 4/*px*/);
 			},
+			
 			_initCellsArea: function (fullRecalc) {
 				// calculate rows heights and visible rows
 				this._calcHeaderRowHeight();
@@ -1126,6 +1126,7 @@
 				this._calcVisibleColumns();
 				this._updateVisibleColsCount(/*skipScrolReinit*/true);
 			},
+			
 			_initPane: function () {
 				var pane = this.model.sheetViews[0].pane;
 				if (null !== pane) {
