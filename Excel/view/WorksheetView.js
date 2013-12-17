@@ -2869,6 +2869,107 @@
 				}
 			},
 
+			_drawSelectionElement: function (range, visibleRange, offsetX, offsetY, isDashLine,
+											 lineWidth, strokeColor, fillColor, isAllRange) {
+				var ctx = this.overlayCtx, c = this.cols, r = this.rows;
+				var oIntersection = range.intersectionSimple(visibleRange);
+				if (!oIntersection)
+					return;
+
+				var fHorLine, fVerLine;
+				if (isDashLine) {
+					fHorLine = ctx.dashLineCleverHor;
+					fVerLine = ctx.dashLineCleverVer;
+				} else {
+					fHorLine = ctx.lineHor;
+					fVerLine = ctx.lineVer;
+				}
+
+				var firstCol = oIntersection.c1 === visibleRange.c1 && !isAllRange;
+				var firstRow = oIntersection.r1 === visibleRange.r1 && !isAllRange;
+
+				var drawLeftSide	= oIntersection.c1 === range.c1;
+				var drawRightSide	= oIntersection.c2 === range.c2;
+				var drawTopSide		= oIntersection.r1 === range.r1;
+				var drawBottomSide	= oIntersection.r2 === range.r2;
+
+				var x1 = c[oIntersection.c1].left - offsetX - this.width_1px;
+				var x2 = c[oIntersection.c2].left + c[oIntersection.c2].width - offsetX - this.width_1px;
+				var y1 = r[oIntersection.r1].top - offsetY;
+				var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY - this.height_1px;
+
+				ctx.setLineWidth(lineWidth).setStrokeStyle(strokeColor);
+				if (fillColor)
+					ctx.setFillStyle(fillColor);
+				ctx.beginPath();
+
+				if (drawTopSide && !firstRow)
+					fHorLine.apply(ctx, [x1 + this.width_1px, y1 - this.height_1px, x2 + this.width_1px]);
+				if (drawBottomSide)
+					fHorLine.apply(ctx, [x1 + this.width_1px, y2, x2 + this.width_1px]);
+				if (drawLeftSide && !firstCol)
+					fVerLine.apply(ctx, [x1, y1 - this.width_1px * !firstRow, y2 + this.width_1px]);
+				if (drawRightSide)
+					fVerLine.apply(ctx, [x2, y1, y2]);
+
+				// Отрисовка квадратов для move/resize
+				if (fillColor) {
+					if (drawLeftSide && drawTopSide)
+						ctx.fillRect(x1 + this.width_1px, y1, this.width_4px, this.height_4px);
+					if (drawRightSide && drawTopSide)
+						ctx.fillRect(x2 - this.width_4px, y1, this.width_4px, this.height_4px);
+					if (drawRightSide && drawBottomSide)
+						ctx.fillRect(x2 - this.width_4px, y2 - this.height_4px, this.width_4px, this.height_4px);
+					if (drawLeftSide && drawBottomSide)
+						ctx.fillRect(x1 + this.width_1px, y2 - this.height_4px, this.width_4px, this.height_4px);
+				}
+
+				ctx.closePath().stroke();
+			},
+			/**
+			 * Отрисовывает диапазон с заданными параметрами
+			 * @param range
+			 * @param isDashLine
+			 * @param lineWidth
+			 * @param strokeColor
+			 * @param fillColor
+			 * @param isAllRange
+			 * @private
+			 */
+			_drawSelectionElements: function (range, isDashLine, lineWidth, strokeColor, fillColor, isAllRange) {
+				var cFrozen = 0, rFrozen = 0,
+					c = this.cols, r = this.rows,
+					offsetX = c[this.visibleRange.c1].left - this.cellsLeft,
+					offsetY = r[this.visibleRange.r1].top - this.cellsTop;
+				if (this.topLeftFrozenCell) {
+					cFrozen = this.topLeftFrozenCell.getCol0();
+					rFrozen = this.topLeftFrozenCell.getRow0();
+					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
+					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
+
+					var oFrozenRange;
+					cFrozen -= 1; rFrozen -= 1;
+					if (0 <= cFrozen && 0 <= rFrozen) {
+						oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
+						this._drawSelectionElement(range, oFrozenRange, c[0].left - this.cellsLeft,
+							r[0].top - this.cellsTop, isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+					}
+					if (0 <= cFrozen) {
+						oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
+						this._drawSelectionElement(range, oFrozenRange, c[0].left - this.cellsLeft, offsetY,
+							isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+					}
+					if (0 <= rFrozen) {
+						oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
+						this._drawSelectionElement(range, oFrozenRange, offsetX, r[0].top - this.cellsTop,
+							isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+					}
+				}
+
+				this._drawSelectionElement(range, this.visibleRange, offsetX, offsetY, isDashLine,
+					lineWidth, strokeColor, fillColor, isAllRange);
+			},
+
 			/**
 			 * Рисует выделение вокруг ячеек
 			 * @param {Asc.Range} range
@@ -3200,126 +3301,23 @@
 					this._drawActiveHeaders();
 				}
 			},
-
-			_drawFormulaRange: function (index, oFormulaRange, oFormulaRangeIntersection, visibleRange, offsetX, offsetY) {
-				if (!oFormulaRangeIntersection)
-					return;
-				var ctx = this.overlayCtx, opt = this.settings;
-				ctx.beginPath()
-					.setStrokeStyle(opt.formulaRangeBorderColor[index%opt.formulaRangeBorderColor.length])
-					.setFillStyle(opt.formulaRangeBorderColor[index%opt.formulaRangeBorderColor.length]);
-				var drawLeftSideFormula   = oFormulaRangeIntersection.c1 === oFormulaRange.c1;
-				var drawRightSideFormula  = oFormulaRangeIntersection.c2 === oFormulaRange.c2;
-				var drawTopSideFormula    = oFormulaRangeIntersection.r1 === oFormulaRange.r1;
-				var drawBottomSideFormula = oFormulaRangeIntersection.r2 === oFormulaRange.r2;
-
-				var xFormula1 = this.cols[oFormulaRangeIntersection.c1].left - offsetX - this.width_1px;
-				var xFormula2 = this.cols[oFormulaRangeIntersection.c2].left + this.cols[oFormulaRangeIntersection.c2].width - offsetX - this.width_1px;
-				var yFormula1 = this.rows[oFormulaRangeIntersection.r1].top - offsetY;
-				var yFormula2 = this.rows[oFormulaRangeIntersection.r2].top + this.rows[oFormulaRangeIntersection.r2].height - offsetY - this.height_1px;
-
-				if ( drawTopSideFormula && oFormulaRangeIntersection.r1 != visibleRange.r1 ) {
-					ctx.lineHor( xFormula1 + this.width_1px, yFormula1 - this.height_1px, xFormula2 + this.width_1px );
-				}
-				if ( drawBottomSideFormula ) {
-					ctx.lineHor( xFormula1 + this.width_1px, yFormula2, xFormula2 + this.width_1px );
-				}
-				if ( drawLeftSideFormula && oFormulaRangeIntersection.c1 != visibleRange.c1 ) {
-					ctx.lineVer( xFormula1, yFormula1 - this.width_1px * (oFormulaRangeIntersection.r1 != visibleRange.r1), yFormula2 + this.width_1px );
-				}
-				if (drawRightSideFormula)	{ctx.lineVer(xFormula2, yFormula1, yFormula2);}
-
-				if (drawLeftSideFormula && drawTopSideFormula)
-					ctx.fillRect(xFormula1 + this.width_1px, yFormula1, this.width_4px, this.height_4px);
-
-				if (drawRightSideFormula && drawTopSideFormula)
-					ctx.fillRect(xFormula2 - this.width_4px, yFormula1, this.width_4px, this.height_4px);
-
-				if (drawRightSideFormula && drawBottomSideFormula)
-					ctx.fillRect(xFormula2 - this.width_4px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
-
-				if (drawLeftSideFormula && drawBottomSideFormula)
-					ctx.fillRect(xFormula1 + this.width_1px, yFormula2 - this.height_4px, this.width_4px, this.height_4px);
-
-				ctx.closePath().stroke();
-			},
 			
-			_drawFormulaRanges: function(arr){
-				var ctx = this.overlayCtx, cFrozen = 0, rFrozen = 0,
-					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
-					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var arrFrozenRanges = [], arrOffsetsX = [], arrOffsetsY = [];
-				if (this.topLeftFrozenCell) {
-					cFrozen = this.topLeftFrozenCell.getCol0();
-					rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
-					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
-
-					var oFrozenRange;
-					cFrozen -= 1; rFrozen -= 1;
-					if (0 <= cFrozen && 0 <= rFrozen) {
-						oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
-						arrFrozenRanges.push(oFrozenRange);
-						arrOffsetsX.push(this.cols[0].left - this.cellsLeft);
-						arrOffsetsY.push(this.rows[0].top - this.cellsTop);
-					}
-					if (0 <= cFrozen) {
-						oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
-						arrFrozenRanges.push(oFrozenRange);
-						arrOffsetsX.push(this.cols[0].left - this.cellsLeft);
-						arrOffsetsY.push(offsetY);
-					}
-					if (0 <= rFrozen) {
-						oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
-						arrFrozenRanges.push(oFrozenRange);
-						arrOffsetsX.push(offsetX);
-						arrOffsetsY.push(this.rows[0].top - this.cellsTop);
-					}
-				}
-
-				ctx.setLineWidth(1);
-					
-				for (var i in arr) {
-					if (!arr.hasOwnProperty(i))
+			_drawFormulaRanges: function(arrRanges){
+				var lineWidth = 1, isDashLine = false,
+					opt = this.settings, lengthColors = opt.formulaRangeBorderColor.length;
+				var strokeColor, fillColor;
+				for (var i in arrRanges) {
+					if (!arrRanges.hasOwnProperty(i))
 						continue;
-					var oFormulaTmp = arr[i].clone(true);
-					var oFormulaIntersection = oFormulaTmp.intersection(this.visibleRange);
-					this._drawFormulaRange(i, oFormulaTmp, oFormulaIntersection, this.visibleRange, offsetX, offsetY);
-					for (var j = 0; j < arrFrozenRanges.length; ++j) {
-						oFormulaIntersection = oFormulaTmp.intersection(arrFrozenRanges[j]);
-						this._drawFormulaRange(i, oFormulaTmp, oFormulaIntersection, arrFrozenRanges[j], arrOffsetsX[j], arrOffsetsY[j]);
-					}
+					var oFormulaRange = arrRanges[i].clone(true);
+					strokeColor = fillColor = opt.formulaRangeBorderColor[i%lengthColors];
+					this._drawSelectionElements(oFormulaRange, isDashLine, lineWidth, strokeColor, fillColor);
 				}
 			},
 
 			_drawSelectRange: function (oSelectRange) {
-				var ctx = this.overlayCtx,
-					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
-					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-
-				ctx.setLineWidth(1);
-
-				var oSelectRangeIntersection = oSelectRange.intersection(this.visibleRange);
-				if (oSelectRangeIntersection) {
-					ctx.beginPath()
-						.setStrokeStyle(c_oAscCoAuthoringOtherBorderColor);
-					var drawLeftSideSelectRange   = oSelectRangeIntersection.c1 === oSelectRange.c1;
-					var drawRightSideSelectRange  = oSelectRangeIntersection.c2 === oSelectRange.c2;
-					var drawTopSideSelectRange    = oSelectRangeIntersection.r1 === oSelectRange.r1;
-					var drawBottomSideSelectRange = oSelectRangeIntersection.r2 === oSelectRange.r2;
-
-					var xSelectRange1 = this.cols[oSelectRangeIntersection.c1].left - offsetX;
-					var xSelectRange2 = this.cols[oSelectRangeIntersection.c2].left + this.cols[oSelectRangeIntersection.c2].width - offsetX;
-					var ySelectRange1 = this.rows[oSelectRangeIntersection.r1].top - offsetY;
-					var ySelectRange2 = this.rows[oSelectRangeIntersection.r2].top + this.rows[oSelectRangeIntersection.r2].height - offsetY;
-
-					if (drawTopSideSelectRange)		{ctx.dashLineCleverHor(xSelectRange1, ySelectRange1, xSelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawBottomSideSelectRange)	{ctx.dashLineCleverHor(xSelectRange1, ySelectRange2, xSelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawLeftSideSelectRange)	{ctx.dashLineCleverVer(xSelectRange1, ySelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					if (drawRightSideSelectRange)	{ctx.dashLineCleverVer(xSelectRange2, ySelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-
-					ctx.closePath().stroke().fill();
-				}
+				var lineWidth = 1, isDashLine = true, strokeColor = c_oAscCoAuthoringOtherBorderColor;
+				this._drawSelectionElements(oSelectRange, isDashLine, lineWidth, strokeColor);
 			},
 			
 			_drawCollaborativeElements: function (bIsDrawObjects) {
@@ -3331,103 +3329,44 @@
 			},
 
 			_drawCollaborativeElementsAllLock: function () {
-				var ctx = this.overlayCtx;
 				var currentSheetId = this.model.getId();
 				var nLockAllType = this.collaborativeEditing.isLockAllOther(currentSheetId);
 				if (c_oAscMouseMoveLockedObjectType.None !== nLockAllType) {
-					var styleColor = (c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
-						c_oAscCoAuthoringLockTablePropertiesBorderColor : c_oAscCoAuthoringOtherBorderColor;
-					ctx.setStrokeStyle(styleColor).setLineWidth(1).beginPath();
-
-					var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-					var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-					var arAllRange = asc_Range (0, 0, gc_nMaxCol0, gc_nMaxRow0);
-
-					var aFormulaIntersection = arAllRange.intersection(this.visibleRange);
-
-					if (aFormulaIntersection) {
-						var drawLeftSideFormula   = aFormulaIntersection.c1 === arAllRange.c1;
-						var drawRightSideFormula  = aFormulaIntersection.c2 === arAllRange.c2;
-						var drawTopSideFormula    = aFormulaIntersection.r1 === arAllRange.r1;
-						var drawBottomSideFormula = aFormulaIntersection.r2 === arAllRange.r2;
-
-						var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX;
-						var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX;
-						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
-						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
-
-						if (drawTopSideFormula)		{ctx.dashLineCleverHor(xFormula1, yFormula1, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawBottomSideFormula)	{ctx.dashLineCleverHor(xFormula1, yFormula2, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawLeftSideFormula)	{ctx.dashLineCleverVer(xFormula1, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawRightSideFormula)	{ctx.dashLineCleverVer(xFormula2, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					}
-
-					ctx.stroke();
-					ctx.restore();
+					var lineWidth = 1, isDashLine = true, isAllRange = true,
+						strokeColor = (c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
+							c_oAscCoAuthoringLockTablePropertiesBorderColor : c_oAscCoAuthoringOtherBorderColor,
+						oAllRange = asc_Range (0, 0, gc_nMaxCol0, gc_nMaxRow0);
+					this._drawSelectionElements(oAllRange, isDashLine, lineWidth, strokeColor, null, isAllRange);
 				}
 			},
 
 			_drawCollaborativeElementsMeOther: function (type, bIsDrawObjects) {
-				var ctx = this.overlayCtx;
-				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
-					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
-				}
-				var i;
-
-				var currentSheetId = this.model.getId();
-				var styleColor = (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscCoAuthoringMeBorderColor : c_oAscCoAuthoringOtherBorderColor;
-				var arrayCells = (c_oAscLockTypes.kLockTypeMine === type) ? this.collaborativeEditing.getLockCellsMe(currentSheetId) : this.collaborativeEditing.getLockCellsOther(currentSheetId);
+				var currentSheetId = this.model.getId(),
+					i, lineWidth = 1, isDashLine = true, strokeColor, arrayCells, oCellTmp;
 				if (c_oAscLockTypes.kLockTypeMine === type) {
+					strokeColor = c_oAscCoAuthoringMeBorderColor;
+					arrayCells = this.collaborativeEditing.getLockCellsMe(currentSheetId);
+
 					arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertColumnsBySheetId(currentSheetId));
 					arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertRowsBySheetId(currentSheetId));
+				} else {
+					strokeColor = c_oAscCoAuthoringOtherBorderColor;
+					arrayCells = this.collaborativeEditing.getLockCellsOther(currentSheetId);
 				}
 
-				if ( bIsDrawObjects ) {
-					var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ? this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
+				if (bIsDrawObjects) {
+					var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ?
+						this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
 						
 					for (i = 0; i < arrayObjects.length; ++i) {
-						this.objectRender.setGraphicObjectLockState(arrayObjects[i], (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscLockTypes.kLockTypeMine : c_oAscLockTypes.kLockTypeOther);
+						this.objectRender.setGraphicObjectLockState(arrayObjects[i], type);
 					}
 				}
-
-				// set clipping rect to cells area
-				ctx.save()
-					.beginPath()
-					.rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
-					.clip();
-
-				ctx.setStrokeStyle(styleColor).setLineWidth(1).beginPath();
 
 				for (i = 0; i < arrayCells.length; ++i) {
-					var arFormulaTmp = asc_Range (arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
-
-					var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
-
-					if (aFormulaIntersection) {
-						var drawLeftSideFormula   = aFormulaIntersection.c1 === arFormulaTmp.c1;
-						var drawRightSideFormula  = aFormulaIntersection.c2 === arFormulaTmp.c2;
-						var drawTopSideFormula    = aFormulaIntersection.r1 === arFormulaTmp.r1;
-						var drawBottomSideFormula = aFormulaIntersection.r2 === arFormulaTmp.r2;
-
-						var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX;
-						var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX;
-						var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
-						var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
-
-						if (drawTopSideFormula)		{ctx.dashLineCleverHor(xFormula1, yFormula1, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawBottomSideFormula)	{ctx.dashLineCleverHor(xFormula1, yFormula2, xFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawLeftSideFormula)	{ctx.dashLineCleverVer(xFormula1, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-						if (drawRightSideFormula)	{ctx.dashLineCleverVer(xFormula2, yFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
-					}
+					oCellTmp = asc_Range (arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
+					this._drawSelectionElements(oCellTmp, isDashLine, lineWidth, strokeColor);
 				}
-
-				ctx.stroke();
-				ctx.restore();
 			},
 
 			_drawGraphic: function() {

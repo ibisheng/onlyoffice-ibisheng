@@ -955,7 +955,8 @@ DrawingContext.prototype = {
 		return this;
 	},
 
-	dashLineCleverHor : function (x1, y, x2, w_dot, w_dist) {
+	dashLineCleverHor : function (x1, y, x2) {
+		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
 		var _x1 = this._mct.transformPointX(x1, y);
 		var _y  = this._mct.transformPointY(x1, y);
 		var _x2 = this._mct.transformPointX(x2, y);
@@ -975,7 +976,8 @@ DrawingContext.prototype = {
 			ctx.lineTo(_x1, _y);
 		}
 	},
-	dashLineCleverVer : function (x, y1, y2, w_dot, w_dist) {
+	dashLineCleverVer : function (x, y1, y2) {
+		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
 		var _y1 = this._mct.transformPointY(x, y1);
 		var _x  = this._mct.transformPointX(x, y1);
 		var _y2 = this._mct.transformPointY(x, y2);
