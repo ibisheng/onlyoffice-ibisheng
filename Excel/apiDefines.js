@@ -217,8 +217,8 @@ var c_oAscSelectionType = {
 };
 
 var c_oAscScrollType = {
-	Vertical		: "vertical",
-	Horizontal		: "horizontal"
+	Vertical		: 1,
+	Horizontal		: 2
 };
 
 var c_oAscLegendMarkerType = {
