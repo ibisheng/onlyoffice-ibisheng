@@ -417,7 +417,7 @@ CHeaderFooter.prototype =
         return this.Content.Get_PageBounds(0);
     },
 
-    UpdateMargins : function(bNoRecalc)
+    UpdateMargins : function(bNoRecalc, bNoSaveHistory)
     {
         // Обновляем границы
         this.Content.X      = X_Left_Field;
@@ -426,7 +426,11 @@ CHeaderFooter.prototype =
         // Запускаем пересчет
         if ( hdrftr_Footer === this.Type )
         {
-            History.Add( this, { Type : historyitem_HdrFtr_BoundY2, Old : this.BoundY2, New : Page_Height - Y_Default_Footer } );
+            if ( true !== bNoSaveHistory )
+            {
+                History.Add( this, { Type : historyitem_HdrFtr_BoundY2, Old : this.BoundY2, New : Page_Height - Y_Default_Footer } );
+            }
+
             this.BoundY2 = Page_Height - Y_Default_Footer;
         }
 
@@ -2010,29 +2014,29 @@ CHeaderFooterController.prototype =
         return -1;
     },
 
-    UpdateMargins : function(Index, bNoRecalc)
+    UpdateMargins : function(Index, bNoRecalc, bNoSaveHistory)
     {
         var SectHdrFtr = this.Content[Index];
         var Headers = SectHdrFtr.Header;
         var Footers = SectHdrFtr.Footer;
 
         if ( Headers.First != Headers.Odd && Headers.First != Headers.Even && null != Headers.First )
-            Headers.First.UpdateMargins(bNoRecalc);
+            Headers.First.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
         if ( Headers.Even != Headers.Odd && null != Headers.Even )
-            Headers.Even.UpdateMargins(bNoRecalc);
+            Headers.Even.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
         if ( null != Headers.Odd )
-            Headers.Odd.UpdateMargins(bNoRecalc);
+            Headers.Odd.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
         if ( Footers.First != Footers.Odd && Footers.First != Footers.Even && null != Footers.First )
-            Footers.First.UpdateMargins(bNoRecalc);
+            Footers.First.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
         if ( Footers.Even != Footers.Odd && null != Footers.Even )
-            Footers.Even.UpdateMargins(bNoRecalc);
+            Footers.Even.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
         if ( null != Footers.Odd )
-            Footers.Odd.UpdateMargins(bNoRecalc);
+            Footers.Odd.UpdateMargins(bNoRecalc, bNoSaveHistory);
 
     },
 

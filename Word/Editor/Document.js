@@ -781,10 +781,12 @@ CDocument.prototype =
         if ( true === bFullRecalc )
         {
             ChangeIndex = 0;
+            RecalcData.Inline.PageNum = 0;
         }
         else if ( -1 === RecalcData.Inline.Pos )
         {
             ChangeIndex = -1;
+            RecalcData.Inline.PageNum = 0;
         }
         else if ( RecalcData.Inline.Pos >= 0 )
         {
@@ -1014,7 +1016,6 @@ CDocument.prototype =
 
                     if ( undefined === Frame_YLimit )
                         Frame_YLimit = Page_Height;
-
 
                     for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
                     {
@@ -10750,7 +10751,7 @@ CDocument.prototype =
                     Y_Top_Margin    = Y_Top_Field;
                 }
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
                 break;
             }
 
@@ -10766,7 +10767,7 @@ CDocument.prototype =
                 Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
                 Y_Top_Field    = Y_Top_Margin;
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
                 break;
             }
 
@@ -10779,7 +10780,7 @@ CDocument.prototype =
                 Y_Bottom_Margin = Data.Margins_old.Bottom;
                 X_Left_Margin   = Data.Margins_old.Left;
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
 
                 editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
                 editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
@@ -10837,7 +10838,7 @@ CDocument.prototype =
                     Y_Top_Margin    = Y_Top_Field;
                 }
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
                 break;
             }
 
@@ -10853,7 +10854,7 @@ CDocument.prototype =
                 Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
                 Y_Top_Field    = Y_Top_Margin;
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
                 break;
             }
 
@@ -10866,7 +10867,7 @@ CDocument.prototype =
                 Y_Bottom_Margin = Data.Margins_new.Bottom;
                 X_Left_Margin   = Data.Margins_new.Left;
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
 
                 editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
                 editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
@@ -11578,7 +11579,7 @@ CDocument.prototype =
                     Y_Top_Margin    = Y_Top_Field;
                 }
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
 
                 break;
             }
@@ -11598,7 +11599,7 @@ CDocument.prototype =
                 Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
                 Y_Top_Field    = Y_Top_Margin;
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
 
                 break;
             }
@@ -11618,7 +11619,7 @@ CDocument.prototype =
                 Y_Bottom_Margin = Reader.GetDouble();
                 X_Left_Margin   = Reader.GetDouble();
 
-                this.HdrFtr.UpdateMargins( 0, true );
+                this.HdrFtr.UpdateMargins( 0, true, true );
 
                 editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
                 editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
