@@ -39,160 +39,187 @@ function consolelog(text){
 
 /** @constructor */
 function DependencyGraph(wb) {
-	var nodes = {}, badRes = [], result = [], nodeslength = 0, nodesfirst, __nodes = {}, areaNodes = {}, thas = this;
-	
+	var nodes = {}, nodesId = {}, badRes = [], result = [], nodeslength = 0, __nodes = {}, thas = this;
 	this.wb = wb;
 	
 	this.clear = function(){
 		nodes = {};
+		nodesId = {};
 		__nodes = {};
-		areaNodes = {};
 		badRes = [];
 		result = [];
 		nodeslength = 0;
-		nodesfirst = null;
 	}
 	
 	this.nodeExist = function(node){
-		return nodes[node.nodeId] !== undefined;
+		return null != this.getNode3(node);
 	}
 
 	this.nodeExist2 = function(sheetId, cellId){
-		var n = new Vertex(sheetId, cellId);
-		var exist = nodes[n.nodeId] !== undefined;
-		if ( !exist ){
-			for( var id in areaNodes){
-				if( areaNodes[id].containCell(n) )
-					return true;
-			}
-		}
-		return exist;
+		var bRes = false;
+		var node = new Vertex(sheetId, cellId);
+		var oGetRes = this.getNode4(node);
+		if(oGetRes.exist)
+			bRes = true;
+		else if(oGetRes.contains && oGetRes.contains.length > 0)
+			bRes = true;
+		return bRes;
 	}
 	
 	//добавляем вершину по id листа и по id ячейки
 	this.addNode = function(sheetId, cellId){
 		var node = new Vertex(sheetId, cellId,this.wb);
-		if (nodes[node.nodeId] === undefined){
-			if (nodeslength == 0){
-				nodesfirst = node.nodeId;
-			}
-			nodes[node.nodeId] = node;
-			nodeslength++;
-			if( node.isArea && !areaNodes[node.nodeId] ){
-				areaNodes[node.nodeId] = node;
-			}
-		}
+		this.addNode2(node);
 	}
 
 	//добавляем уже существующую вершину
 	this.addNode2 = function(node){
-		if (nodes[node.nodeId] === undefined) {
-			if (nodeslength == 0){
-				nodesfirst = node.nodeId;
+		if(!nodesId[node.nodeId])
+		{
+			var nodesSheet = nodes[node.sheetId];
+			if(null == nodesSheet)
+			{
+				nodesSheet = new RangeDataManager(null);
+				nodes[node.sheetId] = nodesSheet;
 			}
-			nodes[node.nodeId] = node;
-			nodeslength ++;
-			if( node.isArea && !areaNodes[node.nodeId] ){
-				areaNodes[node.nodeId] = node;
-                for( var id in nodes ){
-                    if( !nodes[id].isArea ){
-                        if( node.containCell(nodes[id]) ){
-                            node.addMasterEdge(nodes[id]);
-                            nodes[id].addSlaveEdge(node);
-                        }
-                    }
-                }
-                return;
+			var oBBoxNode = node.getBBox();
+			nodesSheet.add(oBBoxNode, node);
+			nodesId[node.nodeId] = node;
+			nodeslength++;
+			var oIntersectNodes = nodesSheet.get(oBBoxNode);
+			if( node.isArea)
+			{
+				for(var i = 0, length = oIntersectNodes.inner.length; i < length; i++)
+				{
+					var elem = oIntersectNodes.inner[i];
+					var nodeMaster = elem.data;
+					if(!nodeMaster.isArea)
+					{
+						node.addMasterEdge(nodeMaster);
+						nodeMaster.addSlaveEdge(node);
+					}
+				}
 			}
-
-            for( var id2  in areaNodes ){
-                if( areaNodes[id2].containCell(node) ){
-                    areaNodes[id2].addMasterEdge(node);
-                    node.addSlaveEdge(areaNodes[id2]);
-                }
-            }
+			else
+			{
+				for(var i = 0, length = oIntersectNodes.outer.length; i < length; i++)
+				{
+					var elem = oIntersectNodes.outer[i];
+					var nodeSlave = elem.data;
+					if(nodeSlave.isArea && elem.bbox.containsRange(oBBoxNode))
+					{
+						nodeSlave.addMasterEdge(node);
+						node.addSlaveEdge(nodeSlave);
+					}
+				}
+			}
 		}
 	}
 	
 	//добавление ребер между вершинами
 	this.addEdge = function(sheetIdFrom, cellIdFrom, sheetIdTo, cellIdTo){
-		var n1 = new Vertex(sheetIdFrom, cellIdFrom,this.wb),
-			n2 = new Vertex(sheetIdTo, cellIdTo,this.wb);
+		var n1 = this.getNode(sheetIdFrom, cellIdFrom),
+			n2 = this.getNode(sheetIdTo, cellIdTo);
 			
-		if( !this.nodeExist(n1) ){
+		if( !n1 ){
+			n1 = new Vertex(sheetIdFrom, cellIdFrom,this.wb);
 			this.addNode2(n1);
 		}
 		
-		if( !this.nodeExist(n2) ){
+		if( !n2 ){
+			n2 = new Vertex(sheetIdTo, cellIdTo,this.wb);
 			this.addNode2(n2);
 		}
 		
-		nodes[n1.nodeId].addMasterEdge(nodes[n2.nodeId]);
-		nodes[n2.nodeId].addSlaveEdge(nodes[n1.nodeId]);
+		n1.addMasterEdge(n2);
+		n2.addSlaveEdge(n1);
 	}
 
 	this.addEdge2 = function(nodeFrom, nodeTo){
-
-		if( !this.nodeExist(nodeFrom) ){
-			this.addNode2(nodeFrom);
-		}
-		
-		if( !this.nodeExist(nodeTo) ){
-			this.addNode2(nodeTo);
-		}
-		
-		nodes[nodeFrom.nodeId].addMasterEdge(nodes[nodeTo.nodeId]);
-		nodes[nodeTo.nodeId].addSlaveEdge(nodes[nodeFrom.nodeId]);
+		this.addEdge(nodeFrom.sheetId, nodeFrom.cellId, nodeTo.sheetId, nodeTo.cellId);
 	}
 	
 	this.renameNode = function(sheetIdFrom, cellIdFrom, sheetIdTo, cellIdTo){
 		if( sheetIdFrom == sheetIdTo && cellIdFrom == cellIdTo ){
 			return;
 		}
-		nodes[getVertexId(sheetIdTo, cellIdTo)] = nodes[getVertexId(sheetIdFrom, cellIdFrom)];
-		if( !nodes[getVertexId(sheetIdTo, cellIdTo)] )
-			return;
-		nodes[getVertexId(sheetIdFrom, cellIdFrom)] = undefined;
-		delete nodes[getVertexId(sheetIdFrom, cellIdFrom)];
-		nodes[getVertexId(sheetIdTo, cellIdTo)].changeCellId(cellIdTo);
+		var nodeTo = this.getNode3(sheetIdTo, cellIdTo);
+		if(null != nodeTo)
+			this.deleteNode(nodeTo);		
+		var nodeFrom = this.getNode3(sheetIdFrom, cellIdFrom);
+		if(null != nodeFrom)
+		{
+			this.deleteNode(nodeFrom);
+			nodeFrom.changeCellId(cellIdTo);
+			this.addNode2(nodeFrom);
+		}
 	}
 	
 	this.getNode = function(sheetId, cellId){
 		var n = new Vertex(sheetId, cellId)
-		if( this.nodeExist(n) )
-			return nodes[n.nodeId];
+		return this.getNode3(n);
 	}
 
     this.getNode2 = function(sheetId, cellId){
-        var n = new Vertex( sheetId, cellId );
-        var exist = nodes[n.nodeId] !== undefined, res = [];
-        if ( exist ) {
-            res.push( nodes[n.nodeId] )
-        }
-        else {
-            for ( var id in areaNodes ) {
-                if ( areaNodes[id].containCell( n ) ) {
-                    res.push( areaNodes[id] )
-                }
-            }
-        }
+        var node = new Vertex( sheetId, cellId );
+		var res = [];
+		var oGetRes = this.getNode4(node);
+		if(oGetRes.exist)
+			res.push(oGetRes.exist);
+		else if(oGetRes.contains)
+			res = oGetRes.contains;
         return res.length > 0 ? res : null;
     }
-
-	this.getNodeByNodeId = function(nodeId){
-		if( nodes[nodeId] )
-			return nodes[nodeId];
-	}
+	this.getNode3 = function(node){
+        // var oRes = null;
+		// var nodesSheet = nodes[node.sheetId];
+		// if(nodesSheet)
+		// {
+			// var elem = nodesSheet.getExact(node.getBBox());
+			// if(elem)
+				// oRes = elem.data;
+		// }
+		return nodesId[node.nodeId];;
+    }
+	this.getNode4 = function(node){
+        var oRes = {exist: null, contains: null};
+		oRes.exist = this.getNode3(node);
+		if(!oRes.exist)
+		{
+			var nodesSheet = nodes[node.sheetId];
+			if(nodesSheet)
+			{
+				var oBBoxNode = node.getBBox();
+				var oIntersectNodes = nodesSheet.get(oBBoxNode);
+				oRes.contains = [];
+				for(var i = 0, length = oIntersectNodes.outer.length; i < length; i++)
+				{
+					var elem = oIntersectNodes.outer[i];
+					if(elem.data.isArea && elem.bbox.containsRange(oBBoxNode))
+						oRes.contains.push(elem.data);
+				}
+			}
+		}
+		return oRes;
+    }
 
 	this.getNodeBySheetId = function(sheetId){
 		var arr = [];
-		for(var id in nodes){
-			if ( nodes[id].sheetId == sheetId && nodes[id].getSlaveEdges()){
-				arr.push(nodes[id]);
-				var n = nodes[id].getSlaveEdges()
-				for(var id2 in n){
-					n[id2].weightNode++;
-					// arr.push(n[id2]);
+		var nodesSheet = nodes[sheetId];
+		if(nodesSheet)
+		{
+			var aNodes = nodesSheet.getAll();
+			for(var i = 0, length = aNodes.length; i < length; i++)
+			{
+				var node = aNodes[i].data;
+				var n = node.getSlaveEdges();
+				if(n)
+				{
+					arr.push(node);
+					for(var id2 in n){
+						n[id2].weightNode++;
+						// arr.push(n[id2]);
+					}
 				}
 			}
 		}
@@ -200,66 +227,80 @@ function DependencyGraph(wb) {
 	}
 	
 	this.deleteNode = function(n){
-		if( this.nodeExist(n) ){
-			var _n = nodes[n.nodeId];
-			_n.deleteAllMasterEdges();
-			_n.deleteAllSlaveEdges();
-			if( areaNodes[_n.nodeId] ){
-                areaNodes[_n.nodeId] = null;
-                delete areaNodes[_n.nodeId];
-            }
-			nodes[_n.nodeId] = null;
-			delete nodes[_n.nodeId];
-			nodeslength--;
+		var nodesSheet = nodes[n.sheetId];
+		if(nodesSheet)
+		{
+			var elem = nodesSheet.getExact(n.getBBox());
+			if( elem )
+			{
+				var node = elem.data;
+				node.deleteAllMasterEdges();
+				node.deleteAllSlaveEdges();
+				nodesSheet.removeElement(elem);
+				delete nodesId[node.nodeId];
+				nodeslength--;
+			}
 		}
 	}
 	
 	this.deleteMasterNodes = function(sheetId, cellId){
-		var n = new Vertex(sheetId, cellId);
-		if( this.nodeExist(n) ){
-			var arr = nodes[n.nodeId].deleteAllMasterEdges();
-			for(var i = 0; i < arr.length; i++){
-				if( nodes[arr[i]].refCount <= 0 ){
-					nodes[arr[i]] = null;
-					delete nodes[arr[i]];
-					nodeslength--;
+		var node = this.getNode(sheetId, cellId);
+		if(node)
+		{
+			var nodesSheet = nodes[node.sheetId];
+			if(nodesSheet)
+			{
+				var arr = node.deleteAllMasterEdges();
+				for(var i in arr){
+					var nodeMaster = arr[i];
+					if( nodeMaster.refCount <= 0 ){
+						//может через deleteNode ?
+						var elem = nodesSheet.getExact(nodeMaster.getBBox());
+						if(elem)
+						{
+							nodesSheet.removeElement(elem);
+							delete nodesId[nodeMaster.nodeId];
+							nodeslength--;
+						}
+					}
 				}
 			}
 		}
 	}
 	
 	this.deleteSlaveNodes = function(sheetId, cellId){
-		var n = new Vertex(sheetId, cellId);
-		if( this.nodeExist(n) ){
-			nodes[n.nodeId].deleteAllSlaveEdges();
-		}
+		var node = this.getNode(sheetId, cellId);
+		if(node)
+			node.deleteAllSlaveEdges();
 	}
 	
 	this.getSlaveNodes = function(sheetId, cellId){
+		var oRes = null;
 		var node = new Vertex(sheetId, cellId);
-		if( this.nodeExist(node) ){
-			return nodes[node.nodeId].getSlaveEdges();
-		}
-		else{
+		var oGetRes = this.getNode4(node);
+		if(oGetRes.exist)
+			oRes = oGetRes.exist;
+		else if(oGetRes.contains)
+		{
 			var _t = {}, f = false;
-			for( var id in areaNodes ){
-				if( areaNodes[id].containCell(node) ){
-					_t[id] = areaNodes[id];
-					f = true;
-				}
+			for(var i = 0, length = oGetRes.contains.length; i < length; i++)
+			{
+				var elem = oGetRes.contains[i];
+				_t[elem.nodeId] = elem;
+				f = true;
 			}
 			if (f)
-				return _t;
+				oRes = _t;
 		}
-		return null;
+		return oRes;
 	}
 
 	this.getMasterNodes = function(sheetId, cellId){
-		var n = new Vertex(sheetId, cellId);
-		if( this.nodeExist(n) ){
-			return nodes[n.nodeId].getMasterEdges();
-		}
-		return null;
+		var oRes = null;
+		var node = this.getNode(sheetId, cellId);
+		if(node)
+			oRes = node.getMasterEdges();
+		return oRes;
 	}
 	
 	//объект __nodes является копией объекта nodes. чтобы не бегать по всему графу в поисках очередной вершины, будем бегать по __nodes и удалять полученную новую вершину из __nodes.
@@ -269,55 +310,56 @@ function DependencyGraph(wb) {
 			__nodes[n.nodeId] = n;
 		}
 	}
-	
-	//сортировка по зависимым(ведомым) ячейкам. у объекта берем массив slaveEdges и по нему бегаем.
-	this.t_sort_slave = function(sheetId,cellId){
-
-		function getFirstNode(sheetId,cellId) {
-			
-			var n = new Vertex(sheetId,cellId,thas.wb);
-			if ( !nodes[n.nodeId] ){
-				var a = [];
-				for( var id in areaNodes ){
-					if( areaNodes[id].containCell(n) )
-						a.push(areaNodes[id])
-				}
-				if( a.length > 0 ){
-					for( var i in a ){
-						n.addSlaveEdge( a[i] );
-					}
-					n.valid = false;
-					return n;
-				}
-				else{
-					return undefined;
-				}
-			}
-			else
-				return nodes[n.nodeId];
-		}
+	this.getFirstNode = function(sheetId,cellId) {
 		
-		function getNextNode(node) {
-			for (var id in node.slaveEdges){
-				var n = nodes[id];
-				if (n !== undefined){
-					if ((n.isBlack === undefined || !n.isBlack) && !n.isBad) {
-						return n;
-					}
+		var n = new Vertex(sheetId,cellId,thas.wb);
+		var oGetRes = this.getNode4(n);
+		if(oGetRes.exist)
+			return oGetRes.exist;
+		else
+		{
+			if(oGetRes.contains && oGetRes.contains.length > 0)
+			{
+				for( var i = 0, length = oGetRes.contains.length; i < length; i++){
+					n.addSlaveEdge( oGetRes.contains[i] );
 				}
-				else {
-					delete node.slaveEdges[id];
-				}
+				n.valid = false;
+				return n;
 			}
 			return undefined;
 		}
-		
-		var stack = [],	n = getFirstNode(sheetId,cellId),__t = true, next, badResS = [], resultS = [];
+	}
+	this.getNextNode = function(node, aArrayToFind, oIndexObj) {
+		if(node)
+		{
+			for(var i = oIndexObj.cur, length = oIndexObj.indexes.length; i < length; i++)
+			{
+				var n = aArrayToFind[oIndexObj.indexes[i]];
+				oIndexObj.cur++;
+				var node = this.getNode3(n);
+				if(node)
+				{
+					if ((node.isBlack === undefined || !node.isBlack) && !node.isBad)
+						return node;
+				}
+				else
+					delete aArrayToFind[id];
+			}
+		}
+		return undefined;
+	}
+	//сортировка по зависимым(ведомым) ячейкам. у объекта берем массив slaveEdges и по нему бегаем.
+	this.t_sort_slave = function(sheetId,cellId){
+		//todo из этой функции хотелось бы убрать getNextNode, тогда можно будет убрать getSlaveEdgesIndexes
+		var stack = [],	n = this.getFirstNode(sheetId,cellId),__t = true, next, badResS = [], resultS = [];
 
 		if( !n ){
 			return {depF: resultS.reverse(), badF: badResS}
 		}
-		
+		//todo можно будет убрать getSlaveEdgesIndexes если сделать алгоритм без getNext
+		var oIndexObj = {cur: 0, indexes: n.getSlaveEdgesIndexes()};
+		var oIndexMap = {};
+		oIndexMap[n.nodeId] = oIndexObj;
 		while (1) {
 			if ( n.isGray && !n.isArea ){
 				for( var i = stack.length-1; i>=0;i--){
@@ -329,18 +371,34 @@ function DependencyGraph(wb) {
 				}
 				if (stack.length < 1) {
 					for (var id in __nodes){
-						if( nodes[id] !== undefined && ((nodes[id].isBlack === undefined || !nodes[id].isBlack) && !nodes[id].isBad) ){
-							n = nodes[id];
+						var temp = __nodes[id];
+						var nodeTemp = thas.getNode3(temp);
+						if(nodeTemp && ((nodeTemp.isBlack === undefined || !nodeTemp.isBlack) && !nodeTemp.isBad) )
+						{
+							n = nodeTemp;
+							oIndexObj = oIndexMap[n.nodeId];
+							if(!oIndexObj)
+							{
+								oIndexObj = {cur: 0, indexes: n.getSlaveEdgesIndexes()};
+								oIndexMap[n.nodeId] = oIndexObj;
+							}
 							delete __nodes[id];
 						}
 					}
 				}
 			}
-			next = getNextNode(n);
+			
+			next = this.getNextNode(n, n.slaveEdges, oIndexObj);
 			if (next !== undefined) {
 				n.isGray = true;
 				stack.push(n);
 				n = next;
+				oIndexObj = oIndexMap[n.nodeId];
+				if(!oIndexObj)
+				{
+					oIndexObj = {cur: 0, indexes: n.getSlaveEdgesIndexes()};
+					oIndexMap[n.nodeId] = oIndexObj;
+				}
 			}
 			else {
 				n.isBlack = true;
@@ -350,6 +408,12 @@ function DependencyGraph(wb) {
 					break;
 				n = stack.pop();
 				n.isGray = false;
+				oIndexObj = oIndexMap[n.nodeId];
+				if(!oIndexObj)
+				{
+					oIndexObj = {cur: 0, indexes: n.getSlaveEdgesIndexes()};
+					oIndexMap[n.nodeId] = oIndexObj;
+				}
 			}
 		}
 		
@@ -367,57 +431,18 @@ function DependencyGraph(wb) {
 		return {depF: resultS.reverse(), badF: badResS}
 		
 	}
-	
 	//сортировка по ведущим ячейкам. у объекта берем массив masterEdges и по нему бегаем.
 	this.t_sort_master = function(sheetId,cellId){
-
-		function getFirstNode(sheetId,cellId) {
-			
-			var n = new Vertex(sheetId,cellId,thas.wb);
-			if ( !nodes[n.nodeId] ){
-				var a = [];
-				for( var id in areaNodes ){
-					if( areaNodes[id].containCell(n) )
-						a.push(areaNodes[id])
-				}
-				if( a.length > 0 ){
-					for( var i in a ){
-						n.addSlaveEdge( a[i] );
-					}
-					n.valid = false;
-					return n;
-				}
-				else{
-					return undefined;
-				}
-			}
-			else
-				return nodes[n.nodeId];
-		}
-		
-		function getNextNode(node) {
-			if(node){
-				for (var id in node.masterEdges){
-					var n = nodes[id];
-					if (n !== undefined){
-						if ((n.isBlack === undefined || !n.isBlack) && !n.isBad) {
-							return n;
-						}
-					}
-					else {
-						delete node.masterEdges[id];
-					}
-				}
-			}
-			return undefined;
-		}
-		
-		var stack = [],	n = getFirstNode(sheetId,cellId), __t = true, next, badResS = [], resultS = [];
+		//todo из этой функции хотелось бы убрать getNextNode, тогда можно будет убрать getSlaveEdgesIndexes
+		var stack = [],	n = this.getFirstNode(sheetId,cellId), __t = true, next, badResS = [], resultS = [];
 		
 		if( !n ){
 			return {depF: resultS, badF: badResS}
 		}
-		
+		//предполагаем что masterEdges не меняется в цикле
+		var oIndexObj = {cur: 0, indexes: n.getMasterEdgesIndexes()};
+		var oIndexMap = {};
+		oIndexMap[n.nodeId] = oIndexObj;
 		while (1) {
 			if( n ){
 				if ( n.isGray && !n.isArea ){
@@ -429,19 +454,29 @@ function DependencyGraph(wb) {
 				}
 			}
 			if( n.valid && !n.isArea ){
-				for( var id in areaNodes ){
-					if( areaNodes[id].containCell(n) ){
-						areaNodes[id].addMasterEdge(n);
-						n.addSlaveEdge(areaNodes[id]);
+				var oGetRes = this.getNode4(n);
+				if(oGetRes.contains)
+				{
+					for(var i = 0, length = oGetRes.contains.length; i < length; i++)
+					{
+						var nodeSlave = oGetRes.contains[i];
+						nodeSlave.addMasterEdge(n);
+						n.addSlaveEdge(nodeSlave);
 					}
 				}
 				n.valid = false;
 			}
-			next = getNextNode(n);
+			next = this.getNextNode(n, n.masterEdges, oIndexObj);
 			if (next !== undefined) {
 				n.isGray = true;
 				stack.push(n);
 				n = next;
+				oIndexObj = oIndexMap[n.nodeId];
+				if(!oIndexObj)
+				{
+					oIndexObj = {cur: 0, indexes: n.getMasterEdgesIndexes()};
+					oIndexMap[n.nodeId] = oIndexObj;
+				}
 			}
 			else {
 				n.isBlack = true;
@@ -450,6 +485,12 @@ function DependencyGraph(wb) {
 				if (stack.length < 1)
 					break;
 				n = stack.pop();
+				oIndexObj = oIndexMap[n.nodeId];
+				if(!oIndexObj)
+				{
+					oIndexObj = {cur: 0, indexes: n.getMasterEdgesIndexes()};
+					oIndexMap[n.nodeId] = oIndexObj;
+				}
 				n.isGray = false;
 			}
 		}
@@ -470,35 +511,23 @@ function DependencyGraph(wb) {
 	
 	//сортировка всего графа по всем вершинам.
 	this.t_sort = function() {
-	
-		for(var i in nodes){
-			nodes[i].isBlack = false;
-			nodes[i].isBad = false;
-			nodes[i].isGray = false;
-		}
-	
-		function getFirstNode() {
-			return nodes[nodesfirst];
+		var stack = [],n = null,__t = true, next;
+		for(var i in nodes)
+		{
+			var nodesSheet = nodes[i];
+			var aNodes = nodesSheet.getAll();
+			for(var j = 0, length2 = aNodes.length; j < length2; j++)
+			{
+				var node = aNodes[j].data;
+				if(null == n)
+					n = node;
+				node.isBlack = false;
+				node.isBad = false;
+				node.isGray = false;
+			}
 		}
 		
-		function getNextNode(node) {
-			for (var id in node.masterEdges){
-				var n = nodes[id];
-				if (n !== undefined){
-					if ((n.isBlack === undefined || !n.isBlack) && !n.isBad) {
-						return n;
-					}
-				}
-				else {
-					delete node.masterEdges[id];
-				}
-			}
-			return undefined;
-		}
-
-		var stack = [],
-				n = getFirstNode(),__t = true,
-				next;
+		var oIndexObj = this.getNextNodeIndexes(n.masterEdges);
 		while (1) {
 			if ( n.isGray ){
 				for( var i = stack.length-1; i>=0;i--){
@@ -510,14 +539,17 @@ function DependencyGraph(wb) {
 				}
 				if (stack.length < 1) {
 					for (var id in __nodes){
-						if( nodes[id] !== undefined && ((nodes[id].isBlack === undefined || !nodes[id].isBlack) && !nodes[id].isBad) ){
-							n = nodes[id];
+						var temp = __nodes[id];
+						var nodeTemp = thas.getNode3(temp);
+						if(nodeTemp && ((nodeTemp.isBlack === undefined || !nodeTemp.isBlack) && !nodeTemp.isBad) )
+						{
+							n = nodeTemp;
 							delete __nodes[id];
 						}
 					}
 				}
 			}
-			next = getNextNode(n);
+			next = this.getNextNode(n, n.masterEdges, oIndexObj);
 			if (next !== undefined) {
 				n.isGray = true;
 				stack.push(n);
@@ -530,14 +562,16 @@ function DependencyGraph(wb) {
 				if (stack.length < 1) {
 					n = undefined;
 					for (var id in __nodes){
-						if( nodes[id] !== undefined && ((nodes[id].isBlack === undefined || !nodes[id].isBlack) && !nodes[id].isBad) ){
-							n = nodes[id];
+						var temp = __nodes[id];
+						var nodeTemp = thas.getNode3(temp);
+						if(nodeTemp && ((nodeTemp.isBlack === undefined || !nodeTemp.isBlack) && !nodeTemp.isBad) )
+						{
+							n = nodeTemp;
 							delete __nodes[id];
 							break;
 						}
-						else{
+						else
 							delete __nodes[id];
-						}
 					}
 					if (n)
 						continue;
@@ -551,10 +585,6 @@ function DependencyGraph(wb) {
 		return {depF: result, badF: badRes}
 		
 	}
-
-	this.returnNode = function(){
-		return nodes;
-	}
 	
 	this.getNodesLength = function(){
 		return nodeslength;
@@ -566,12 +596,14 @@ function DependencyGraph(wb) {
 	
 	this.checkOffset = function(BBox, offset, wsId, noDelete){
 		var move = {}, stretch = {}, recalc = {};
-		for( var id in nodes ){
-			if( nodes[id].sheetId != wsId )
-				continue;
-			var n = { r1:nodes[id].firstCellAddress.getRow0(), c1:nodes[id].firstCellAddress.getCol0(),
-					  r2:nodes[id].lastCellAddress.getRow0(), c2:nodes[id].lastCellAddress.getCol0() }
-			if( nodes[id].isArea ){
+		var nodesSheet = nodes[wsId];
+		if(nodesSheet){
+		var aNodes = nodesSheet.getAll();
+		for( var i = 0, length = aNodes.length; i < length; i++){
+			var node = aNodes[i].data;
+			var id = node.nodeId;
+			var n = node.getBBox();
+			if( node.isArea ){
 				/* 
 					Есть 2 области. Первая - это диапазон, что участвует в формуле, второй - это который удаляют/вставляют. Нужно определить положение двух этих областей относительно друг друга.
 					Если вторая область находится ( ( выше и левее ) или правее или ниже ) первой, такая область нас не интересуею. Она не повлияет на сдвиг диапазона.
@@ -601,42 +633,42 @@ function DependencyGraph(wb) {
 						else{
 							if( BBox1.r2 < n1.r1 ) continue;
 							else if( BBox1.r2 < n1.r2 || BBox1.r1 > n1.r1 ){
-								recalc[id] = nodes[id];
+								recalc[id] = node;
 							}
 							else{
 								if( offset.offsetCol > 0 ){
 									if( BBox1.r1 <= n1.r1 && BBox1.r2 >= n1.r2){
 										if( BBox1.c2 <= n1.c2 && BBox1.c1 <= n1.c1 || BBox1.c1 == n1.c1 && BBox1.c2 > n1.c2 )
-											move[id] = { node : nodes[id], offset : offset };
+											move[id] = { node : node, offset : offset };
 										else if( BBox1.c1 > n1.c1 && BBox1.c1 <= n1.c2 ){
-											stretch[id] = { node : nodes[id], offset : offset };
+											stretch[id] = { node : node, offset : offset };
 										}
 									}
 								}
 								else{
 									if( BBox1.r1 <= n1.r1 && BBox1.r2 >= n1.r2){
 										if( BBox1.c2 < n1.c1 ){
-											move[id] = { node : nodes[id], offset : offset };
+											move[id] = { node : node, offset : offset };
 										}
 										else if( BBox1.c2 >= n1.c1 && BBox1.c1 <= n1.c1 ){
 											if(	n1.r1 >= BBox1.r1 && n1.r2 <= BBox1.r2 && n1.c1 >= BBox1.c1 && n1.c2 <= BBox1.c2 ){
-												move[id] = { node : nodes[id], offset : offset , toDelete: !noDelete };
-												recalc[id] = nodes[id];
+												move[id] = { node : node, offset : offset , toDelete: !noDelete };
+												recalc[id] = node;
 											}
 											else{
-												move[id] = { node : nodes[id], offset : { offsetCol : -Math.abs(n1.c1-BBox1.c1), offsetRow: offset.offsetRow } };
-												stretch[id] = { node : nodes[id], offset : { offsetCol : -Math.abs(n1.c1-BBox1.c2)-1, offsetRow: offset.offsetRow } };
-												recalc[id] = nodes[id];
+												move[id] = { node : node, offset : { offsetCol : -Math.abs(n1.c1-BBox1.c1), offsetRow: offset.offsetRow } };
+												stretch[id] = { node : node, offset : { offsetCol : -Math.abs(n1.c1-BBox1.c2)-1, offsetRow: offset.offsetRow } };
+												recalc[id] = node;
 											}
 										}
 										else if( BBox1.c1 > n1.c1 && BBox1.c1 <= n1.c2 || BBox1.c1 == n1.c1 && BBox1.c2 >= n1.c1 ){
 											if( BBox1.c2 > n1.c2 ){
-												stretch[id] = { node : nodes[id], offset : { offsetCol : -Math.abs(n1.c2-BBox1.c1)-1, offsetRow: offset.offsetRow } };
-												recalc[id] = nodes[id];
+												stretch[id] = { node : node, offset : { offsetCol : -Math.abs(n1.c2-BBox1.c1)-1, offsetRow: offset.offsetRow } };
+												recalc[id] = node;
 											}
 											else{
-												stretch[id] = { node : nodes[id], offset : offset };
-												recalc[id] = nodes[id];
+												stretch[id] = { node : node, offset : offset };
+												recalc[id] = node;
 											}
 										}
 									}
@@ -648,42 +680,42 @@ function DependencyGraph(wb) {
 					else{
 						if( BBox1.c2 < n1.c1 ) continue;
 						else if( BBox1.c2 < n1.c2 || BBox1.c1 > n1.c1 ){
-							recalc[id] = nodes[id];
+							recalc[id] = node;
 						}
 						else{
 							if( offset.offsetRow > 0 ){
 								if( BBox1.c1 <= n1.c1 && BBox1.c2 >= n1.c2){
 									if( BBox1.r2 <= n1.r2 && BBox1.r1 <= n1.r1 || BBox1.r1 == n1.r1 && BBox1.r2 > n1.r2 )
-										move[id] = { node : nodes[id], offset : offset };
+										move[id] = { node : node, offset : offset };
 									else if( BBox1.r1 > n1.r1 && BBox1.r1 <= n1.r2 ){
-										stretch[id] = { node : nodes[id], offset : offset };
+										stretch[id] = { node : node, offset : offset };
 									}
 								}
 							}
 							else{
 								if( BBox1.c1 <= n1.c1 && BBox1.c2 >= n1.c2){
 									if( BBox1.r2 < n1.r1 ){
-										move[id] = { node : nodes[id], offset : offset };
+										move[id] = { node : node, offset : offset };
 									}
 									else if( BBox1.r2 >= n1.r1 && BBox1.r1 <= n1.r1 ){
 										if(	n1.r1 >= BBox1.r1 && n1.r2 <= BBox1.r2 && n1.c1 >= BBox1.c1 && n1.c2 <= BBox1.c2 ){
-											move[id] = { node : nodes[id], offset : offset , toDelete: !noDelete };
-											recalc[id] = nodes[id];
+											move[id] = { node : node, offset : offset , toDelete: !noDelete };
+											recalc[id] = node;
 										}
 										else{
-											move[id] = { node : nodes[id], offset : { offsetRow : -Math.abs(n1.r1-BBox1.r1), offsetCol: offset.offsetCol } };
-											stretch[id] = { node : nodes[id], offset : { offsetRow : -Math.abs(n1.r1-BBox1.r2)-1, offsetCol: offset.offsetCol } };
-											recalc[id] = nodes[id];
+											move[id] = { node : node, offset : { offsetRow : -Math.abs(n1.r1-BBox1.r1), offsetCol: offset.offsetCol } };
+											stretch[id] = { node : node, offset : { offsetRow : -Math.abs(n1.r1-BBox1.r2)-1, offsetCol: offset.offsetCol } };
+											recalc[id] = node;
 										}
 									}
 									else if( BBox1.r1 > n1.r1 && BBox1.r1 <= n1.r2 || BBox1.r1 == n1.r1 && BBox1.r2 >= n1.r1 ){
 										if( BBox1.r2 > n1.r2 ){
-											stretch[id] = { node : nodes[id], offset : { offsetRow : -Math.abs(n1.r2-BBox1.r1)-1, offsetCol: offset.offsetCol } };
-											recalc[id] = nodes[id];
+											stretch[id] = { node : node, offset : { offsetRow : -Math.abs(n1.r2-BBox1.r1)-1, offsetCol: offset.offsetCol } };
+											recalc[id] = node;
 										}
 										else{
-											stretch[id] = { node : nodes[id], offset : offset };
-											recalc[id] = nodes[id];
+											stretch[id] = { node : node, offset : offset };
+											recalc[id] = node;
 										}
 									}
 								}
@@ -698,13 +730,14 @@ function DependencyGraph(wb) {
 					( n.c1 >= BBox.c1 && n.c1 <= BBox.c2 && n.r1 >= BBox.r2 && offset.offsetRow != 0 ) ||
 					( n.r1 >= BBox.r1 && n.r2 <= BBox.r2 && n.c1 >= BBox.c1 && n.c2 <= BBox.c2 ) )
 				{
-					move[id] = { node : nodes[id], offset : offset , toDelete: false };
+					move[id] = { node : node, offset : offset , toDelete: false };
 					if(	n.r1 >= BBox.r1 && n.r2 <= BBox.r2 && n.c1 >= BBox.c1 && n.c2 <= BBox.c2 && !noDelete && ( offset.offsetCol < 0 || offset.offsetRow < 0 ) ){
 						move[id].toDelete = true;
-						recalc[id] = nodes[id];
+						recalc[id] = node;
 					}
 				}
 			}
+		}
 		}
 		
 		return {move:move,stretch:stretch,recalc:recalc};
@@ -716,37 +749,39 @@ function DependencyGraph(wb) {
 			n = new Vertex(range.getWorksheet().getId(),range.getName());
 		
 		if( n.isArea ){
-			if( n.nodeId in nodes ){
-				move[n.nodeId] = nodes[n.nodeId];
+			var node = this.getNode3(n);
+			if( null != node ){
+				move[n.nodeId] = node;
 			}
 			else{
-                for( var id2 in areaNodes ){
-                    if( n.containCell(areaNodes[id2]) ){
-                        move[areaNodes[id2].nodeId] = nodes[areaNodes[id2].nodeId];
-                    }
-                }
-
-				range = range.getCells();
-				for( var id in range ){
-					n = new Vertex(wsId,range[id].getName());
-					if( n.nodeId in nodes ){
-						move[n.nodeId] = nodes[n.nodeId];
+				var nodesSheet = nodes[n.sheetId];
+				if(nodesSheet)
+				{
+					var oGetRes = nodesSheet.get(n.getBBox());
+					for(var i = 0, length = oGetRes.inner.length; i < length; i++)
+					{
+						var elem = oGetRes.inner[i].data;
+						move[elem.nodeId] = elem;
 					}
-					for( var id2 in areaNodes ){
-						if( areaNodes[id2].containCell(n) ){
-							recalc[id2] = areaNodes[id2];
-						}
+					for(var i = 0, length = oGetRes.outer.length; i < length; i++)
+					{
+						var elem = oGetRes.outer[i].data;
+						if(elem.isArea)
+							recalc[elem.nodeId] = elem;
 					}
 				}
 			}
 		}
 		else {
-			if( n.nodeId in nodes ){
-				move[n.nodeId] = nodes[n.nodeId];
-			}
-			for( var id  in areaNodes ){
-				if( areaNodes[id].containCell(n) ){
-					recalc[id] = areaNodes[id];
+			var oGetRes = this.getNode4(n);
+			if(oGetRes.exist)
+				move[n.nodeId] = oGetRes.exist;
+			if(oGetRes.contains)
+			{
+				for(var i = 0, length = oGetRes.contains.length; i < length; i++)
+				{
+					var elem = oGetRes.contains[i];
+					recalc[elem.nodeid] = elem;
 				}
 			}
 		}
@@ -922,9 +957,13 @@ function DependencyGraph(wb) {
 		var arr = false;
 		this.wb.needRecalc = [];
 		this.wb.needRecalc.length = 0;
-		for(var id in nodes){
-			if(nodes[id].sheetId == sheetId){
-				var se = nodes[id].getSlaveEdges();
+		var nodesSheet = nodes[sheetId];
+		if(nodesSheet){
+			var aNodes = nodesSheet.getAll();
+			for(var i = 0, length = aNodes.length; i < length; i++)
+			{
+				var node = aNodes[i].data;
+				var se = node.getSlaveEdges();
 				for(var id2 in se){
 					if(se[id2].sheetId != sheetId){
 						if(!arr) arr = true;
@@ -933,12 +972,12 @@ function DependencyGraph(wb) {
 						// arr.push(se[id2]);
 					}
 				}
-				nodes[id].deleteAllMasterEdges();
-				nodes[id].deleteAllSlaveEdges();
-				nodes[id] = null;
-				delete nodes[id];
+				node.deleteAllMasterEdges();
+				node.deleteAllSlaveEdges();
+				delete nodesId[node.nodeId];
 				nodeslength--;
 			}
+			nodesSheet.removeAll();
 		}
 		return arr;
 	}
@@ -1005,11 +1044,15 @@ function Vertex(sheetId,cellId,wb){
 	
 	//masterEdges содержит ячейки, от которых зависит текущая ячейка
 	this.masterEdges = null;
+	//masterEdgesIndexes - массив индексов masterEdges, чтобы можно было быстро делать getNext для masterEdges
+	this.masterEdgesIndexes = null;
 	
 	this.helpMasterEdges = {};
 	
 	//slaveEdges содержит ячейки, которые зависят от данной ячейки
 	this.slaveEdges = null;
+	//slaveEdgesIndexes - массив индексов masterEdges, чтобы можно было быстро делать getNext для slaveEdges
+	this.slaveEdgesIndexes = null;
 	
 	this.refCount = 0;
 	
@@ -1018,6 +1061,11 @@ function Vertex(sheetId,cellId,wb){
 Vertex.prototype = {	
 	
 	constructor: Vertex,
+	
+	getBBox : function()
+	{
+		return new Asc.Range(this.firstCellAddress.getCol0(), this.firstCellAddress.getRow0(), this.lastCellAddress.getCol0(), this.lastCellAddress.getRow0());
+	},
 	
 	changeCellId : function(cellId){
 		var lastId = this.nodeId;
@@ -1028,6 +1076,7 @@ Vertex.prototype = {
 				this.masterEdges[id].slaveEdges[this.nodeId] = this.masterEdges[id].slaveEdges[lastId];
 				this.masterEdges[id].slaveEdges[lastId] = null;
 				delete this.masterEdges[id].slaveEdges[lastId];
+				this.masterEdges[id].slaveEdgesIndexes = null;
 			}
 		}
 		for( var id in this.slaveEdges ){
@@ -1035,6 +1084,7 @@ Vertex.prototype = {
 				this.slaveEdges[id].masterEdges[this.nodeId] = this.slaveEdges[id].masterEdges[lastId];
 				this.slaveEdges[id].masterEdges[lastId] = null;
 				delete this.slaveEdges[id].masterEdges[lastId];
+				this.slaveEdges[id].masterEdgesIndexes = null;
 			}
 		}
 	},
@@ -1045,6 +1095,7 @@ Vertex.prototype = {
 			this.masterEdges = {};
 		this.masterEdges[node.nodeId] = node;
 		this.refCount ++;
+		this.masterEdgesIndexes = null;
 	},
 
 	addHelpMasterEdge : function(node){
@@ -1057,10 +1108,20 @@ Vertex.prototype = {
 			this.slaveEdges = {};
 		this.slaveEdges[node.nodeId] = node;
 		this.refCount ++;
+		this.slaveEdgesIndexes = null;
 	},
 	
 	getMasterEdges : function(){
 		return this.masterEdges;
+	},
+	getMasterEdgesIndexes : function(){
+		if(null == this.masterEdgesIndexes)
+		{
+			this.masterEdgesIndexes = [];
+			for(var i in this.masterEdges)
+				this.masterEdgesIndexes.push(i);
+		}
+		return this.masterEdgesIndexes;
 	},
 
 	getHelpMasterEdges : function(){
@@ -1069,6 +1130,16 @@ Vertex.prototype = {
 	
 	getSlaveEdges : function(){
 		return this.slaveEdges;
+	},
+	
+	getSlaveEdgesIndexes : function(){
+		if(null == this.slaveEdgesIndexes)
+		{
+			this.slaveEdgesIndexes = [];
+			for(var i in this.slaveEdges)
+				this.slaveEdgesIndexes.push(i);
+		}
+		return this.slaveEdgesIndexes;
 	},
 
 	getSlaveEdges2 : function(){
@@ -1088,6 +1159,7 @@ Vertex.prototype = {
 		this.masterEdges[node.nodeId] = null;
 		delete this.masterEdges[node.nodeId];
 		this.refCount--;
+		this.masterEdgesIndexes = null;
 	},
 
 	deleteHelpMasterEdge : function(node){
@@ -1099,19 +1171,22 @@ Vertex.prototype = {
 		this.slaveEdges[node.nodeId] = null;
 		delete this.slaveEdges[node.nodeId];
 		this.refCount--;
+		this.slaveEdgesIndexes = null;
 	},
 
 	//очищаем все ребра по ведущим ячейкам.
 	deleteAllMasterEdges : function(){
-		var ret = [];
+		var ret = {};
 		for( var id in this.masterEdges ){
-			this.masterEdges[id].deleteSlaveEdge(this);
+			var masterEdge = this.masterEdges[id];
+			masterEdge.deleteSlaveEdge(this);
 			this.masterEdges[id] = null;
 			delete this.masterEdges[id];
 			this.refCount--;
-			ret.push(id);
+			ret[id] = masterEdge;
 		}
 		this.masterEdges = null;
+		this.masterEdgesIndexes = null;
 		return ret;
 	},
 	
@@ -1126,6 +1201,7 @@ Vertex.prototype = {
 			ret.push(id);
 		}
 		this.slaveEdges = null;
+		this.slaveEdgesIndexes = null;
 		return ret;
 	},
 

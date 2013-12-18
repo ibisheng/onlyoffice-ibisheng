@@ -3677,6 +3677,21 @@ RangeDataManager.prototype = {
 		}
 		return oRes;
 	},
+	getExact : function(bbox)
+	{
+		var oRes = null;
+		var oGet = this.get(bbox);
+		for(var i = 0, length = oGet.inner.length; i < length; i++)
+		{
+			var elem = oGet.inner[i];
+			if(elem.bbox.isEqual(bbox))
+			{
+				oRes = elem;
+				break;
+			}
+		}
+		return oRes;
+	},
 	_getByCell : function(nRow, nCol)
 	{
 		var oRes = null;
@@ -3736,6 +3751,11 @@ RangeDataManager.prototype = {
 			if(null != this.fChange)
 				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
 		}
+	},
+	removeAll : function()
+	{
+		//todo fChange
+		this.oIntervalTreeRB = new IntervalTreeRB();
 	},
 	shiftGet : function(bbox, bHor)
 	{
