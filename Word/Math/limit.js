@@ -8,7 +8,7 @@ function CLimit()
 extend(CLimit, CMathBase);
 CLimit.prototype.init = function(props)
 {
-    if( typeof(props.type) !== "undefined" && props.type !== null)
+    if(props.type === LIMIT_UP || props.type === LIMIT_LOW)
         this.type = props.type;
 
     this.setDimension(2, 1);
@@ -57,7 +57,15 @@ CLimit.prototype.setDistance = function()
 {
     this.dH = 0.03674768518518519*this.getCtrPrp().FontSize;
 }
+CLimit.prototype.getPropsForWrite = function()
+{
+    var props =
+    {
+        type:   this.type
+    };
 
+    return props;
+}
 
 function CMathFunc()
 {
@@ -82,6 +90,11 @@ CMathFunc.prototype.getFName = function()
 CMathFunc.prototype.getArgument = function()
 {
     return this.elements[0][1];
+}
+CMathFunc.prototype.getPropsForWrite = function()
+{
+    var props = {};
+    return props;
 }
 
 

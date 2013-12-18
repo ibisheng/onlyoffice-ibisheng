@@ -262,17 +262,19 @@ CBorderBox.prototype.getBase = function()
 }
 CBorderBox.prototype.getPropsForWrite = function()
 {
-    var props = {
-		hideBot:	!this.bBot,
-		hideLeft:	!this.bLeft,
-		hideRight:	!this.bRight,
-		hideTop:	!this.bTop,
-		strikeBLTR:	this.bLDiag,
-		strikeH:	this.bHor,
-		strikeTLBR:	this.bRDiag,
-		strikeV:	this.bVert
-	};
-	return props;
+    var props = {};
+
+    props.hideLeft  = !this.bLeft;
+    props.hideRight = !this.bRight;
+    props.hideTop   = !this.bTop;
+    props.hideBot   = !this.bBot;
+
+    props.strikeBLTR = this.bRDiag;
+    props.strikeTLBR = this.bLDiag;
+    props.strikeH    = this.bHor;
+    props.strikeV    = this.bVert;
+
+    return props;
 }
 
 
@@ -280,9 +282,11 @@ function CBox()
 {
     this.kind = MATH_BOX;
 
+    this.aln  = false;
     this.opEmu = false;
     this.diff = false;
     this.noBreak = false;
+    this.brk = false;
 
     CMathBase.call(this);
 }
@@ -298,6 +302,12 @@ CBox.prototype.init = function(props)
     if(props.noBreak === true || props.noBreak === 1)
         this.noBreak = true;
 
+    if(props.brk === true || props.brk === 1)
+        this.brk = true;
+
+    if(props.aln === true || props.aln === 1)
+        this.aln = true;
+
     this.setDimension(1, 1);
     this.setContent();
 }
@@ -307,14 +317,16 @@ CBox.prototype.getBase = function()
 }
 CBox.prototype.getPropsForWrite = function()
 {
-    var props = {
-		aln:		null,
-		brk:		null,
-		diff:		this.diff,
-		noBreak:	this.noBreak,
-		opEmu:		this.opEmu
-	};
-	return props;
+    var props =
+    {
+        aln:     this.aln,
+        opEmu:   this.opEmu,
+        diff:    this.diff,
+        noBreak: this.noBreak,
+        brk:     this.brk
+    };
+
+    return props;
 }
 
 function CBar()
@@ -322,6 +334,8 @@ function CBar()
     this.kind = MATH_BAR;
 
     this.loc = LOCATION_BOT;
+    this.operator = new COperator(OPER_BAR);
+
     CCharacter.call(this);
 }
 extend(CBar, CCharacter);
@@ -332,7 +346,7 @@ CBar.prototype.init = function(props)
     else if(props.pos === LOCATION_BOT || props.location === LOCATION_BOT)
         this.loc = LOCATION_BOT;
 
-    var glyph = new COperatorLine();
+    /*var glyph = new COperatorLine();
     var props =
     {
         location:    this.loc,
@@ -340,7 +354,20 @@ CBar.prototype.init = function(props)
     };
     glyph.init(props);
 
-    this.setOperator( new COperator(glyph) );
+    this.setOperator( new COperator(glyph) );*/
+
+    var props =
+    {
+        location:    this.loc,
+        type:        DELIMITER_LINE
+    };
+
+    var defaultProps =
+    {
+        loc:   LOCATION_BOT
+    };
+
+    this.setCharacter(props, defaultProps);
 }
 CBar.prototype.getCenter = function()
 {
@@ -353,15 +380,29 @@ CBar.prototype.getCenter = function()
 
     return center;
 }
+CBar.prototype.getPropsForWrite = function()
+{
+    var props =
+    {
+        pos:    this.loc
+    };
+
+    return props;
+}
 
 function CPhantom()
 {
+    this.props = null;
     CMathBase.call(this);
 }
 extend(CPhantom, CMathBase);
 CPhantom.prototype.init = function(props)
 {
-
+    this.props = props;
     this.setDimension(1, 1);
     this.setContent();
+}
+CPhantom.prototype.getPropsForWrite = function()
+{
+    return this.props;
 }

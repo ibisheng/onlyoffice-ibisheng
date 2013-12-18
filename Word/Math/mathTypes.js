@@ -81,6 +81,11 @@ var ARROW_LR                    = 21;
 var DOUBLE_LEFT_ARROW           = 22;
 var DOUBLE_RIGHT_ARROW          = 23;
 var DOUBLE_ARROW_LR             = 24;
+var ACCENT_ARROW_LEFT           = 26;
+var ACCENT_ARROW_RIGHT          = 27;
+var ACCENT_ARROW_LR             = 28;
+var ACCENT_HALF_ARROW_LEFT      = 29;
+var ACCENT_HALF_ARROW_RIGHT     = 30;
 
 var SCR_ROMAN                   =  0;
 var SCR_SCRIPT                  =  1;
@@ -92,6 +97,8 @@ var SCR_MONOSPACE               =  5;
 var OPER_DELIMITER              =  0;
 var OPER_SEPARATOR              =  1;
 var OPER_GROUP_CHAR             =  2;
+var OPER_ACCENT                 =  3;
+var OPER_BAR                    =  4;
 
 
 var TURN_0                      =  0;
@@ -105,6 +112,7 @@ var DELIMITER_SHAPE_CENTERED    =  1;
 var LIMIT_LOW               	=  0;
 var LIMIT_UP                	=  1;
 
+//////////////////////////////////////////
 var ACCENT_ONE_DOT              =  0;
 var ACCENT_TWO_DOTS             =  1;
 var ACCENT_THREE_DOTS           =  2;
@@ -119,13 +127,11 @@ var DOUBLE_LINE                 = 10;
 var ACCENT_TILDE                = 11;
 var ACCENT_BREVE                = 12;
 var ACCENT_INVERT_BREVE         = 13;
-var ACCENT_ARROW_LEFT           = 14;
-var ACCENT_ARROW_RIGHT          = 15;
-var ACCENT_ARROW_LR             = 16;
-var ACCENT_HALF_ARROW_LEFT      = 17;
-var ACCENT_HALF_ARROW_RIGHT     = 18;
+
 var ACCENT_SIGN                 = 19;
 var ACCENT_TEXT                 = 20;
+
+/////////////////////////////////////////
 
 var BASEJC_CENTER               =  0;
 var BASEJC_TOP                  =  1;

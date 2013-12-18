@@ -59,12 +59,15 @@ CMathMatrix.prototype.init = function(props)
             this.baseJc = MATRIX_BOTTOM;
     }*/
 
-    if(props.baseJc === BASEJC_CENTER)
+    /*if(props.baseJc === BASEJC_CENTER)
         this.baseJc = BASEJC_CENTER;
     else if(props.baseJc === BASEJC_TOP)
         this.baseJc = BASEJC_TOP;
     else if(props.baseJc === BASEJC_BOTTOM)
-        this.baseJc = BASEJC_BOTTOM;
+        this.baseJc = BASEJC_BOTTOM;*/
+
+    if(props.baseJc === BASEJC_CENTER || props.baseJc === BASEJC_TOP || props.baseJc === BASEJC_BOTTOM)
+        this.baseJc = props.baseJc;
 
     this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
     this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
@@ -74,8 +77,6 @@ CMathMatrix.prototype.init = function(props)
         this.plcHide = true;
         this.hidePlaceholder(true);
     }
-
-    //if(props.)
 
 
     /*if(props.cGpRule !== "undefined" && props.cGpRule !== null)
@@ -127,12 +128,13 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 
 
     if(gap == gap - 0 && gap == gap^0)
-        space.value = gap;
+        space.gap = gap;
     else
-        space.value = 0;
+        space.gap = 0;
 
     if(minGap == minGap - 0 && minGap == minGap^0)
         space.minGap = gap;
+
     /*else
         space.minGap = 0;*/
 
@@ -466,27 +468,33 @@ CMathMatrix.prototype.baseJustification = function(type)
     this.baseJc = type;
 
 }
+////
 CMathMatrix.prototype.getPropsForWrite = function()
 {
-	var props = {
-		baseJc:		this.baseJc, 
-		cGp:		this.spaceColumn.gap, 
-		cGpRule:	this.spaceColumn.rule, 
-		cSp:		null,
-		column: 	this.nCol,
-		plcHide:	this.plcHide,
-		rSp:		null,
-		rSpRule:	null
-		};
-    return props;	
-}
-////
+    var props = {};
 
+    props.baseJc  = this.baseJc;
+    props.row     = this.nRow;
+    props.column  = this.nCol;
+    props.plcHide = this.plcHide;
+
+    props.cGpRule = this.spaceColumn.rule;
+    props.cGp     = this.spaceColumn.gap;
+    props.cSp     = this.spaceColumn.minGap;
+
+    props.rSpRule = this.spaceRow.rule;
+    props.rSp     = this.spaceRow.gap;
+
+    return props;
+}
 
 ////
 function CEqArray()
 {
     this.kind = MATH_EQ_ARRAY;
+
+    this.maxDist = 0;
+    this.objDist = 0;
 
     CMathMatrix.call(this);
 }
@@ -516,10 +524,10 @@ CEqArray.prototype.init = function(props)
         Pr.baseJc = props.baseJc;
 
     if(props.maxDist !== "undefined" && props.maxDist !== null)
-        Pr.maxDist = props.maxDist;
+        this.maxDist = props.maxDist;
 
     if(props.objDist !== "undefined" && props.objDist !== null)
-        Pr.objDist = props.objDist;
+        this.objDist = props.objDist;
     
     CEqArray.superclass.init.call(this, Pr);
 }
@@ -540,4 +548,18 @@ CEqArray.prototype.old_init = function(props)
 CEqArray.prototype.getElement = function(num)
 {
     return this.elements[num][0];
+}
+CEqArray.prototype.getPropsForWrite = function()
+{
+    var props = {};
+
+    props.row     = this.nRow;
+    props.baseJc  = this.baseJc;
+
+    props.rSpRule = this.spaceRow.rule;
+    props.rSp     = this.spaceRow.gap;
+    props.maxDist = this.maxDist;
+    props.objDist = this.objDist;
+
+    return props;
 }

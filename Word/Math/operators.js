@@ -13,7 +13,7 @@ function CGlyphOperator()
     this.turn = null;
 
     this.size = null;
-    this.measure = 0;
+    this.stretch = 0;
 
     this.penW = 1; // px
 }
@@ -36,9 +36,9 @@ CGlyphOperator.prototype.init = function(props)
     this.loc = props.location;
     this.turn = props.turn;
 }
-CGlyphOperator.prototype.fixSize = function(measure)
+CGlyphOperator.prototype.fixSize = function(stretch)
 {
-    var sizeGlyph = this.calcSize(measure);
+    var sizeGlyph = this.calcSize(stretch);
     var width, height, center;
 
     //var betta = this.getTxtPrp().FontSize/36;
@@ -50,7 +50,7 @@ CGlyphOperator.prototype.fixSize = function(measure)
         height = sizeGlyph.height;
 
         center = height/2;
-        this.measure = measure > width ? measure : width;
+        this.stretch = stretch > width ? stretch : width;
     }
     else
     {
@@ -61,14 +61,14 @@ CGlyphOperator.prototype.fixSize = function(measure)
         // плейсхолдер из-за этого располагается чуть выше, как в Ворде
         //center = height/2 - 1.234722222222222*betta;
         center = height/2;
-        this.measure = measure > height ? measure : height;
+        this.stretch = stretch > height ? stretch : height;
     }
 
     this.size = {width: width, height: height, center: center};
 }
 CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
 {
-    var coord = this.calcCoord(this.measure);
+    var coord = this.calcCoord(this.stretch);
 
     var X = coord.XX, Y = coord.YY,
         W =  this.size.width, H =  this.size.height,
@@ -202,7 +202,7 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
 }
 CGlyphOperator.prototype.getCoordinateGlyph = function()
 {
-    var coord = this.calcCoord(this.measure);
+    var coord = this.calcCoord(this.stretch);
 
     var X = coord.XX, Y = coord.YY,
         W =  this.size.width, H =  this.size.height;
@@ -331,7 +331,7 @@ function COperatorBracket()
     CGlyphOperator.call(this);
 }
 extend(COperatorBracket, CGlyphOperator);
-COperatorBracket.prototype.calcSize = function( measure )
+COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
 
@@ -339,7 +339,7 @@ COperatorBracket.prototype.calcSize = function( measure )
     var minBoxH = 4.917529296874999 *betta, //width of 0x28
         widthBr = 12.347222222222221*betta;
 
-    var rx = measure / widthBr;
+    var rx = stretch / widthBr;
     if(rx < 1)
         rx = 1;
 
@@ -357,7 +357,7 @@ COperatorBracket.prototype.calcSize = function( measure )
 
     return {width: widthBr, height: heightBr};
 }
-COperatorBracket.prototype.calcCoord = function(measure)
+COperatorBracket.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -423,7 +423,7 @@ COperatorBracket.prototype.calcCoord = function(measure)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var augm = measure/((X[52] + (X[0] - X[1])/2 + X[1] - X[52])*alpha*2);
+    var augm = stretch/((X[52] + (X[0] - X[1])/2 + X[1] - X[52])*alpha*2);
 
     if(augm < 1)
         augm = 1;
@@ -848,7 +848,7 @@ function COperatorParenthesis()
     CGlyphOperator.call(this);
 }
 extend(COperatorParenthesis, CGlyphOperator);
-COperatorParenthesis.prototype.calcSize = function(measure)
+COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
 
@@ -856,7 +856,7 @@ COperatorParenthesis.prototype.calcSize = function(measure)
         minBoxH =   5.27099609375 *betta, //width of 0x28
         widthBr = 11.99444444444 *betta;
 
-    var ry = measure / widthBr,
+    var ry = stretch / widthBr,
         delta = maxBoxH - minBoxH;
 
     var heightBr = delta/4.3 * (ry - 1) + minBoxH;
@@ -864,7 +864,7 @@ COperatorParenthesis.prototype.calcSize = function(measure)
 
     return {height: heightBr, width : widthBr};
 }
-COperatorParenthesis.prototype.calcCoord = function(measure)
+COperatorParenthesis.prototype.calcCoord = function(stretch)
 {
     //cкобка перевернутая на 90 градусов
 
@@ -885,7 +885,7 @@ COperatorParenthesis.prototype.calcCoord = function(measure)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var aug = measure/(X[9]*alpha)/2; //Y[9]*alpha - высота скобки
+    var aug = stretch/(X[9]*alpha)/2; //Y[9]*alpha - высота скобки
     var RX, RY;
 
     if(aug > 6.53)
@@ -942,7 +942,7 @@ COperatorParenthesis.prototype.calcCoord = function(measure)
     {
         YY[19 - i] = YY[i] =  shiftY - Y[i]*alpha;
         XX[19 - i] =  X[i]*alpha;
-        XX[i] = measure - X[i]*alpha;
+        XX[i] = stretch - X[i]*alpha;
     }
 
     YY[20] = YY[0];
@@ -978,21 +978,22 @@ function COperatorAngleBracket()
     CGlyphOperator.call(this);
 }
 extend(COperatorAngleBracket, CGlyphOperator);
-COperatorAngleBracket.prototype.calcSize = function(measure)
+COperatorAngleBracket.prototype.calcSize = function(stretch)
 {
     //скобка перевернутая
 
     var betta = this.getCtrPrp().FontSize/36;
     var widthBr = 11.994444444444444*betta;
+    var heightBr;
 
-    if( measure/widthBr > 3.768 )
+    if( stretch/widthBr > 3.768 )
         heightBr = 5.3578125*betta;
     else
         heightBr = 4.828645833333333*betta;
 
     return {width : widthBr, height: heightBr};
 }
-COperatorAngleBracket.prototype.calcCoord = function(measure)
+COperatorAngleBracket.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1009,7 +1010,7 @@ COperatorAngleBracket.prototype.calcCoord = function(measure)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var augm = measure/(X[5]*alpha);
+    var augm = stretch/(X[5]*alpha);
 
     if(augm < 1)
         augm = 1;
@@ -1088,7 +1089,7 @@ function CSquareBracket()
     CGlyphOperator.call(this);
 }
 extend(CSquareBracket, CGlyphOperator);
-CSquareBracket.prototype.calcCoord = function(measure)
+CSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1106,7 +1107,7 @@ CSquareBracket.prototype.calcCoord = function(measure)
     var textScale = this.getCtrPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
-    var lng = measure/alpha - X[4] - 2*X[0];
+    var lng = stretch/alpha - X[4] - 2*X[0];
 
     if(lng < 0)
         lng = 0;
@@ -1159,7 +1160,7 @@ function CHalfSquareBracket()
     CGlyphOperator.call(this);
 }
 extend(CHalfSquareBracket, CGlyphOperator);
-CHalfSquareBracket.prototype.calcCoord = function(measure)
+CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1177,7 +1178,7 @@ CHalfSquareBracket.prototype.calcCoord = function(measure)
 
     var w1 = X[4],
         w2 = X[4] - X[3];
-    var lng = measure/alpha - w1 - w2;
+    var lng = stretch/alpha - w1 - w2;
 
     if(lng < 0)
         lng = 0;
@@ -1240,7 +1241,7 @@ COperatorLine.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-COperatorLine.prototype.calcCoord = function(measure)
+COperatorLine.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1265,7 +1266,7 @@ COperatorLine.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha + shY;
     }
 
-    var lng = measure - X[2]*alpha;
+    var lng = stretch - X[2]*alpha;
 
     if(lng < 0)
         lng = 0;
@@ -1303,7 +1304,7 @@ CWhiteSquareBracket.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CWhiteSquareBracket.prototype.calcCoord = function(measure)
+CWhiteSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1353,7 +1354,7 @@ CWhiteSquareBracket.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha + shY;
     }
 
-    var lngY = measure - X[4]*alpha;
+    var lngY = stretch - X[4]*alpha;
 
     for(var i = 0; i < 4; i++)
         XX[4+i] += lngY;
@@ -1402,7 +1403,7 @@ COperatorDoubleLine.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-COperatorDoubleLine.prototype.calcCoord = function(measure)
+COperatorDoubleLine.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1437,8 +1438,8 @@ COperatorDoubleLine.prototype.calcCoord = function(measure)
 
     for(var i = 0; i < 2; i++)
     {
-        XX[2+i] = measure;
-        XX[7+i] = measure;
+        XX[2+i] = stretch;
+        XX[7+i] = stretch;
     }
 
     var W = XX[7],
@@ -1477,7 +1478,7 @@ CSingleArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CSingleArrow.prototype.calcCoord = function(measure)
+CSingleArrow.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1506,8 +1507,8 @@ CSingleArrow.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha;
     }
 
-    //var lng = measure - 10000*alpha;
-    var lng = measure;
+    //var lng = stretch - 10000*alpha;
+    var lng = stretch;
 
     if(lng > XX[9])
     {
@@ -1554,7 +1555,7 @@ CLeftRightArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CLeftRightArrow.prototype.calcCoord = function(measure)
+CLeftRightArrow.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1591,7 +1592,7 @@ CLeftRightArrow.prototype.calcCoord = function(measure)
 
     var w = X[10]*alpha;
 
-    var lng = measure - w;
+    var lng = stretch - w;
 
     if(lng > 0)
         for(var i = 0; i < 8; i++)
@@ -1643,7 +1644,7 @@ CDoubleArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CDoubleArrow.prototype.calcCoord = function(measure)
+CDoubleArrow.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1680,7 +1681,7 @@ CDoubleArrow.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha;
     }
 
-    var lng = measure - 10000*alpha;
+    var lng = stretch - 10000*alpha;
 
     if(lng > XX[16])
     {
@@ -1742,7 +1743,7 @@ CLR_DoubleArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CLR_DoubleArrow.prototype.calcCoord = function(measure)
+CLR_DoubleArrow.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -1786,7 +1787,7 @@ CLR_DoubleArrow.prototype.calcCoord = function(measure)
     }
 
     var w = XX[4];
-    var lng = measure - 10000*alpha - w;
+    var lng = stretch - 10000*alpha - w;
 
     for(var i = 1; i < 9; i++)
         XX[i] += lng;
@@ -1853,7 +1854,7 @@ CCombiningArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CCombiningArrow.prototype.calcCoord = function(measure)
+CCombiningArrow.prototype.calcCoord = function(stretch)
 {
     // px                       mm
     // XX[..]                   width
@@ -1887,7 +1888,7 @@ CCombiningArrow.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha;
     }
 
-    XX[4] = XX[5] = measure;
+    XX[4] = XX[5] = stretch;
 
     var W = XX[4],
         H = YY[8];
@@ -1936,7 +1937,7 @@ CCombiningHalfArrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[6], YY[6]);
     pGraphics._l(XX[7], YY[7]);
 }
-CCombiningHalfArrow.prototype.calcCoord = function(measure)
+CCombiningHalfArrow.prototype.calcCoord = function(stretch)
 {
     // px                       mm
     // XX[..]                   width
@@ -1967,7 +1968,7 @@ CCombiningHalfArrow.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha;
     }
 
-    XX[4] = XX[5] = measure;
+    XX[4] = XX[5] = stretch;
 
     var W = XX[4],
         H = YY[5];
@@ -2010,7 +2011,7 @@ CCombining_LR_Arrow.prototype.drawPath = function(pGraphics, XX, YY)
     pGraphics._l(XX[16], YY[16]);
 
 }
-CCombining_LR_Arrow.prototype.calcCoord = function(measure)
+CCombining_LR_Arrow.prototype.calcCoord = function(stretch)
 {
     var X = new Array(),
         Y = new Array();
@@ -2045,7 +2046,7 @@ CCombining_LR_Arrow.prototype.calcCoord = function(measure)
         YY[i] = Y[i]*alpha;
     }
 
-    var lng = measure - XX[7];
+    var lng = stretch - XX[7];
 
     for(var i = 0; i < 8; i++)
     {
@@ -2164,8 +2165,8 @@ old_old_CSeparator.prototype.drawHorLine = function()
 
 function COperator(type)
 {
-    this.type = type; // delimiter, separator, group character
-    this.glyph = -1;
+    this.type = type; // delimiter, separator, group character, accent
+    this.operator = -1;
 
     this.code = null;
     this.typeOper = null;   // тип скобки : круглая и т.п.
@@ -2175,13 +2176,13 @@ function COperator(type)
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 }
-COperator.prototype.init = function(props, defaultProps)        // props (chr, type, location), defaultProps (chr, location)
+COperator.prototype.init = function(properties, defaultProps)        // props (chr, type, location), defaultProps (chr, location)
 {
     var operator = null,
         typeOper = null,
         codeChr  = null;
 
-    var prp = this.getProps(props, defaultProps);
+    var prp = this.getProps(properties, defaultProps);
 
     //var code = typeof(prp.chr) === "string" && prp.chr.length > 0 ? prp.chr.charCodeAt(0) : null;
 
@@ -2420,6 +2421,213 @@ COperator.prototype.init = function(props, defaultProps)        // props (chr, t
 
     ////////////     accents     /////////////
 
+    /////// only arrows /////
+
+    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+    {
+        codeChr = 0x20D6;
+        typeOper = ACCENT_ARROW_LEFT;
+
+        operator = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_ARROW_RIGHT;
+        codeChr = 0x20D7;
+
+        operator = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+    {
+        typeOper = ACCENT_ARROW_LR;
+        codeChr = 0x20E1;
+
+        operator = new CCombining_LR_Arrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+
+        operator.init(props);
+    }
+    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+    {
+        typeOper = ACCENT_HALF_ARROW_LEFT;
+        codeChr = 0x20D0;
+
+        operator = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_HALF_ARROW_RIGHT;
+        codeChr = 0x20D1;
+
+        operator = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+
+    /////////////////////////
+
+    /*else if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
+    {
+        typeOper = ACCENT_CIRCUMFLEX;
+        codeChr = 0x302;
+
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x30C || type === ACCENT_COMB_CARON)
+    {
+        typeOper = ACCENT_COMB_CARON;
+        codeChr = 0x30C;
+
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x332 || type === ACCENT_LINE)
+    {
+        typeOper = ACCENT_LINE;
+        codeChr = 0x332;
+
+        operator = new CLine();
+    }
+    else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
+    {
+        typeOper = ACCENT_DOUBLE_LINE;
+        codeChr = 0x333;
+
+        operator = new CDoubleLine();
+
+    }
+    else if(code === 0x303 || type === ACCENT_TILDE)
+    {
+        typeOper = ACCENT_TILDE;
+        codeChr = 0x303;
+
+        operator = new CTilde();
+    }
+    else if(code === 0x306 || type === ACCENT_BREVE)
+    {
+        typeOper = ACCENT_BREVE;
+        codeChr = 0x306;
+
+        operator = new CBreve();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
+    {
+        typeOper = ACCENT_INVERT_BREVE;
+        codeChr = 0x311;
+
+        operator = new CBreve();
+        var props =
+        {
+            turn:   TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+    {
+        typeOper = ACCENT_ARROW_LEFT;
+        codeChr = 0x20D6;
+
+        operator = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_ARROW_RIGHT;
+        codeChr = 0x20D7;
+
+        operator = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+    {
+        typeOper = ACCENT_ARROW_LR;
+        codeChr = 0x20E1;
+
+        operator = new CCombining_LR_Arrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+    {
+        typeOper = ACCENT_HALF_ARROW_LEFT;
+        codeChr = 0x20D0;
+
+        operator = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_HALF_ARROW_RIGHT;
+        codeChr = 0x20D1;
+
+        operator = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        operator.init(props);
+    }*/
+
     //////////////////////////////////////////
 
     //////////   group characters   //////////
@@ -2544,7 +2752,7 @@ COperator.prototype.init = function(props, defaultProps)        // props (chr, t
     else
         operator = -1;
 
-    this.glyph = operator;
+    this.operator = operator;
     this.code = codeChr;
     this.typeOper = typeOper;
 
@@ -2605,20 +2813,20 @@ COperator.prototype.draw = function(pGraphics)
 
         ////////////////////////////////////////////////
 
-        this.glyph.draw(pGraphics);
+        this.operator.draw(pGraphics);
     }
     else
     {
-        if(this.type === OPER_DELIMITER || this.type == OPER_GROUP_CHAR)
-            this.drawOperator(pGraphics);
-        else if(this.type === OPER_SEPARATOR)
+        if(this.type === OPER_SEPARATOR)
             this.drawSeparator(pGraphics);
+        else
+            this.drawOperator(pGraphics);
     }
 
 }
 COperator.prototype.drawOperator = function(pGraphics)
 {
-    if(this.glyph !== -1)
+    if(this.operator !== -1)
     {
         var lng = this.coordGlyph.XX.length;
 
@@ -2630,12 +2838,12 @@ COperator.prototype.drawOperator = function(pGraphics)
             Y.push(this.pos.y + this.coordGlyph.YY[j]);
         }
 
-        this.glyph.draw(pGraphics, X, Y);
+        this.operator.draw(pGraphics, X, Y);
     }
 }
 COperator.prototype.drawSeparator = function(pGraphics)
 {
-    if(this.glyph !== -1)
+    if(this.operator !== -1)
     {
         var lng = this.coordGlyph.XX.length;
 
@@ -2649,13 +2857,13 @@ COperator.prototype.drawSeparator = function(pGraphics)
                 Y.push(this.pos[i].y + this.coordGlyph.YY[j]);
             }
 
-            this.glyph.draw(pGraphics, X, Y);
+            this.operator.draw(pGraphics, X, Y);
         }
     }
 }
-COperator.prototype.fixSize = function(stretch, oMeasure)
+COperator.prototype.fixSize = function(oMeasure, stretch)
 {
-    if(this.glyph !== -1)
+    if(this.operator !== -1)
     {
         var width, height;
 
@@ -2670,37 +2878,37 @@ COperator.prototype.fixSize = function(stretch, oMeasure)
 
             oMeasure.SetFont(rPrp);
 
-            this.glyph.Resize();
+            this.operator.Resize();
 
-            if(this.glyph.loc == 0 || this.glyph.loc == 1)
+            if(this.operator.loc == 0 || this.operator.loc == 1)
             {
-                height = this.glyph.size.height;
-                width  = stretch > this.glyph.size.width ? stretch : this.glyph.size.width;
+                height = this.operator.size.height;
+                width  = stretch > this.operator.size.width ? stretch : this.operator.size.width;
                 center = height/2;
             }
             else
             {
-                width = this.glyph.size.width;
-                height = stretch > this.glyph.size.height ? stretch : this.glyph.size.height;
-                center = this.glyph.size.height/2;
+                width = this.operator.size.width;
+                height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
+                center = this.operator.size.height/2;
             }
         }
         else
         {
-            this.glyph.fixSize(stretch);
-            var dims = this.glyph.getCoordinateGlyph();
+            this.operator.fixSize(stretch);
+            var dims = this.operator.getCoordinateGlyph();
             this.coordGlyph = {XX: dims.XX, YY: dims.YY};
 
-            if(this.glyph.loc == 0 || this.glyph.loc == 1)
+            if(this.operator.loc == 0 || this.operator.loc == 1)
             {
-                //width = stretch > this.glyph.size.width ? stretch : this.glyph.size.width;
+                //width = stretch > this.operator.size.width ? stretch : this.operator.size.width;
                 width = dims.Width;
-                height = this.glyph.size.height;
+                height = this.operator.size.height;
             }
             else
             {
-                width = this.glyph.size.width;
-                //height = stretch > this.glyph.size.height ? stretch : this.glyph.size.height;
+                width = this.operator.size.width;
+                //height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
                 height = dims.Height;
                 //height = dims.Height > stretch ? stretch : dims.Height;
             }
@@ -2710,7 +2918,6 @@ COperator.prototype.fixSize = function(stretch, oMeasure)
         }
 
         this.size = { width: width, height: height, center: center};
-
     }
 }
 COperator.prototype.setPosition = function(pos)
@@ -2720,13 +2927,13 @@ COperator.prototype.setPosition = function(pos)
 
     if(this.typeOper == OPERATOR_TEXT)
     {
-        this.glyph.setPosition({x: pos.x, y: pos.y});
-        //this.glyph.setPosition(pos);
+        this.operator.setPosition({x: pos.x, y: pos.y});
+        //this.operator.setPosition(pos);
     }
-        //this.glyph.setPosition({x: pos.x, y: pos.y + this.size.center});
+        //this.operator.setPosition({x: pos.x, y: pos.y + this.size.center});
 
     /*if(this.typeOper == OPERATOR_TEXT)
-        this.glyph.setPosition(pos);*/
+        this.operator.setPosition(pos);*/
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -2734,21 +2941,21 @@ COperator.prototype.IsJustDraw = function()
 }
 COperator.prototype.Resize = function(oMeasure)
 {
-    if(this.glyph !== -1)
+    if(this.operator !== -1)
     {
-        var bHor = this.glyph.loc == 0 || this.glyph.loc  == 1;
+        var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
 
         if(bHor)
-            this.fixSize(this.size.width, oMeasure);
+            this.fixSize(oMeasure, this.size.width);
         else
-            this.fixSize(this.size.height, oMeasure);
+            this.fixSize(oMeasure, this.size.height);
     }
 }
 COperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
-    if(this.glyph !== -1)
-        this.glyph.relate(this);
+    if(this.operator !== -1)
+        this.operator.relate(this);
 }
 COperator.prototype.getCtrPrp = function()
 {
@@ -2756,7 +2963,7 @@ COperator.prototype.getCtrPrp = function()
 }
 COperator.prototype.getChr = function()
 {
-    var chr = null; //если glyph не определен, то this.code = null
+    var chr = null; //если operator не определен, то this.code = null
 
     if(this.code !== null)
         chr = this.typeOper == this.defaultType ? "" : String.fromCharCode(this.code);
@@ -2765,17 +2972,17 @@ COperator.prototype.getChr = function()
 }
 COperator.prototype.IsArrow = function()
 {
-    return this.glyph.IsArrow();
+    return this.operator.IsArrow();
 }
 
-function old_CSeparator(glyph)
+function old_CSeparator(operator)
 {
-    COperator.call(this, glyph);
+    COperator.call(this, operator);
 }
 extend(old_CSeparator, COperator);
 old_CSeparator.prototype.draw = function(pGraphics)
 {
-    if(this.glyph !== -1)
+    if(this.operator !== -1)
     {
         var lng = this.coordGlyph.XX.length;
 
@@ -2789,7 +2996,7 @@ old_CSeparator.prototype.draw = function(pGraphics)
                 Y.push(this.positions[i].y + this.coordGlyph.YY[j]);
             }
 
-            this.glyph.draw(pGraphics, X, Y);
+            this.operator.draw(pGraphics, X, Y);
         }
     }
 }
@@ -3089,7 +3296,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
         center = ascent;
     }
 
-    this.begOper.fixSize(height, oMeasure);
+    this.begOper.fixSize(oMeasure, height);
     width += this.begOper.size.width;
 
     if(height < this.begOper.size.height)
@@ -3100,7 +3307,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
 
     }
 
-    this.endOper.fixSize(height, oMeasure);
+    this.endOper.fixSize(oMeasure, height);
     width += this.endOper.size.width;
     if(height < this.endOper.size.height)
     {
@@ -3110,7 +3317,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
         //center = this.endOper.size.center;
     }
 
-    this.sepOper.fixSize(height, oMeasure);
+    this.sepOper.fixSize(oMeasure, height);
     width += (this.nCol - 1)*this.sepOper.size.width;
     if(height < this.endOper.size.height)
     {
@@ -3336,7 +3543,7 @@ function CCharacter()
     CSubMathBase.call(this);
 }
 extend(CCharacter, CSubMathBase);
-CCharacter.prototype.setOperator = function(props, defaultProps)
+CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.init(props, defaultProps);
     this.operator.relate(this);
@@ -3349,7 +3556,7 @@ CCharacter.prototype.Resize = function(oMeasure)
     var base = this.elements[0][0];
     base.Resize(oMeasure);
 
-    this.operator.fixSize(base.size.width, oMeasure);
+    this.operator.fixSize(oMeasure, base.size.width);
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height,
@@ -3446,6 +3653,7 @@ CCharacter.prototype.getBase = function()
 }
 
 
+
 function CGroupCharacter()
 {
     this.kind = MATH_GROUP_CHARACTER;
@@ -3475,10 +3683,11 @@ CGroupCharacter.prototype.init = function(props)
     var operProps =
     {
         type:   props.chrType,
-        chr:    props.chr
+        chr:    props.chr,
+        loc:    this.loc
     };
 
-    this.setOperator(operProps, operDefaultPrp);
+    this.setCharacter(operProps, operDefaultPrp);
 
     /*var type = props.chrType;
     var code = typeof(props.chr) === "string" ? props.chr.charCodeAt(0) : null;
@@ -3489,12 +3698,12 @@ CGroupCharacter.prototype.init = function(props)
         this.loc = LOCATION_BOT;
     }
 
-    var glyph = this.getGlyph(code, type);
+    var operator = this.getGlyph(code, type);
 
-    if(glyph.bArrow)
+    if(operator.bArrow)
         this.setReduct(DEGR_REDUCT);*/
 
-    /*this.setOperator(new COperator(glyph));*/
+    /*this.setOperator(new COperator(operator));*/
 
     /*if(this.operator.IsArrow())
         this.setReduct(DEGR_REDUCT);*/
@@ -3516,183 +3725,171 @@ CGroupCharacter.prototype.getCenter = function()
 }
 CGroupCharacter.prototype.old_getGlyph = function(code, type)
 {
-    var glyph, props;
+    var operator, props;
 
     if(code === 0x23DE || type == BRACKET_CURLY_TOP)
     {
-        glyph = new COperatorBracket();
+        operator = new COperatorBracket();
         props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM  )
     {
-        glyph = new COperatorBracket();
+        operator = new COperatorBracket();
         props =
         {
             location:   this.loc,
             turn:       TURN_MIRROR_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x2190 || type === ARROW_LEFT)
     {
-        glyph = new CSingleArrow();
+        operator = new CSingleArrow();
 
         props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x2192 || type === ARROW_RIGHT)
     {
-        glyph = new CSingleArrow();
+        operator = new CSingleArrow();
         props =
         {
             location:   this.loc,
             turn:       TURN_180
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x2194 || type === ARROW_LR)
     {
-        glyph = new CLeftRightArrow();
+        operator = new CLeftRightArrow();
         props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
     {
-        glyph = new CDoubleArrow();
+        operator = new CDoubleArrow();
         props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
     {
-        glyph = new CDoubleArrow();
+        operator = new CDoubleArrow();
         props =
         {
             location:   this.loc,
             turn:       TURN_180
         };
-        glyph.init(props);
+        operator.init(props);
     }
     else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
     {
-        glyph = new CLR_DoubleArrow();
+        operator = new CLR_DoubleArrow();
         props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
     /////    accents     /////
     else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
     {
-        glyph = new CCombiningArrow();
+        operator = new CCombiningArrow();
         props =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
-        accent = new COperator(glyph);
+        operator.init(props);
+        accent = new COperator(operator);
     }
     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
     {
-        glyph = new CCombiningArrow();
+        operator = new CCombiningArrow();
         props =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        glyph.init(props);
-        accent = new COperator(glyph);
+        operator.init(props);
+        accent = new COperator(operator);
     }
     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
     {
-        glyph = new CCombining_LR_Arrow();
+        operator = new CCombining_LR_Arrow();
         props =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
-        accent = new COperator(glyph);
+        operator.init(props);
+        accent = new COperator(operator);
     }
     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
     {
-        glyph = new CCombiningHalfArrow();
+        operator = new CCombiningHalfArrow();
         props =
         {
             location:   LOCATION_TOP,
             turn:       TURN_0
         };
-        glyph.init(props);
-        accent = new COperator(glyph);
+        operator.init(props);
+        accent = new COperator(operator);
     }
     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
     {
-        glyph = new CCombiningHalfArrow();
+        operator = new CCombiningHalfArrow();
         props =
         {
             location:   LOCATION_TOP,
             turn:       TURN_180
         };
-        glyph.init(props);
-        accent = new COperator(glyph);
+        operator.init(props);
+        accent = new COperator(operator);
     }
     /////
     else if(typeof(code) !=="undefined" && code !== null)
     {
-        glyph = new CMathText();
-        glyph.add(code);
+        operator = new CMathText();
+        operator.add(code);
     }
     else
     {
-        glyph = new COperatorBracket();
+        operator = new COperatorBracket();
         props =
         {
             location:   LOCATION_BOT,
             turn:       TURN_MIRROR_0
         };
-        glyph.init(props);
+        operator.init(props);
     }
 
-    return glyph;
+    return operator;
 }
 CGroupCharacter.prototype.getPropsForWrite = function()
 {
-	var vertJc = null;
-	if (this.vertJc == VJUST_BOT)
-		vertJc = 0;
-	else if ( this.vertJc == VJUST_TOP)
-		vertJc = 1;
-		
-	var pos = null;
-	if (this.loc == LOCATION_BOT)
-		pos = 0;
-	else if ( this.loc == LOCATION_TOP)
-		pos = 1;
-	
-    var props = {
-		chr:	String.fromCharCode(this.operator.code),
-		pos:	pos,
-		vertJc:	vertJc
-	};
-    return props;
+    var props = {};
 
+    props.vertJ = this.vertJust;
+    props.pos   = this.loc;
+    props.chr   = this.operator.getChr();
+
+    return props;
 }

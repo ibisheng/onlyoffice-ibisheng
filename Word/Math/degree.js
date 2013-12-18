@@ -4,11 +4,18 @@ function CDegree()
 
     this.type = DEGREE_SUPERSCRIPT ;
     this.shiftDegree = 0;
+    this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
+
     CMathBase.call(this);
 }
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
 {
+    if(props.alnScr === true || props.alnScr === 1)
+        this.alnScr = true;
+    else if(props.alnScr === false || props.alnScr === 0)
+        this.alnScr = false;
+
     this.init_2( props, new CMathContent() );
 }
 CDegree.prototype.init_2 = function(props, oBase)
@@ -68,7 +75,7 @@ CDegree.prototype.setPosition = function(_pos)
     this.elements[0][0].setPosition({x: pos.x, y: pos.y - this.elements[0][0].size.center });
     this.elements[0][1].setPosition({x: pos.x + this.elements[0][0].size.width + this.dW, y: pos.y + this.shiftDegree - this.size.center});
 }
-CDegree.prototype.findDisposition = function( mCoord )
+CDegree.prototype.findDisposition = function(mCoord)
 {
     var coordX, coordY;
     var X, Y;
@@ -143,6 +150,14 @@ CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
+CDegree.prototype.getPropsForWrite = function()
+{
+    var props = {};
+    props.type = this.type;
+    props.alnScr = this.alnScr;
+
+    return props;
+}
 
 function CIterators()
 {
@@ -211,6 +226,11 @@ function CDegreeSubSup()
 extend(CDegreeSubSup, CSubMathBase);
 CDegreeSubSup.prototype.init = function(props)
 {
+    if(props.alnScr === true || props.alnScr === 1)
+        this.alnScr = true;
+    else if(props.alnScr === false || props.alnScr === 0)
+        this.alnScr = false;
+
     var oBase = new CMathContent();
     this.init_2(props, oBase);
 }
@@ -223,11 +243,6 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
         this.type = DEGREE_SubSup;
     else if(props.type === DEGREE_PreSubSup)
         this.type = DEGREE_PreSubSup;
-
-    if(props.alnScr === true || props.alnScr === 1)
-        this.alnScr = true;
-    else if(props.alnScr === false || props.alnScr === 0)
-        this.alnScr = false;
 
     this.setDimension(1, 2);
 
@@ -304,9 +319,11 @@ CDegreeSubSup.prototype.getLowerIterator = function()
 }
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
-    var props = {
-		alnScr:	this.alnScr
-	};
+    var props = {};
+
+    props.type = this.type;
+    props.alnScr = this.alnScr;
+
     return props;
 }
 

@@ -20,18 +20,18 @@ function CCircumflex()
     this.Parent = null;
     this.turn = TURN_0;
 }
-CCircumflex.prototype.setTurn = function(turn)
+CCircumflex.prototype.init = function(props)
 {
-    this.turn = turn;
+    this.turn = props.turn;
 }
-CCircumflex.prototype.fixSize = function(mesure, bIncl)
+CCircumflex.prototype.fixSize = function(oMeasure, stretch, bIncl)
 {
     var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var width = 3.88*alpha;
     var height = 3.175*alpha;
 
-    var augm = 0.9*mesure/width;
+    var augm = 0.9*stretch/width;
 
     if(augm < 1)
         augm = 1;
@@ -189,14 +189,18 @@ function CLine()
     this.PEN_W = 0.04;
     this.Parent = null;
 }
-CLine.prototype.fixSize = function(measure)
+CLine.prototype.init = function(props)
+{
+
+}
+CLine.prototype.fixSize = function(oMeasure, stretch)
 {
     var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var height = 1.68*alpha;
     var width  = 4.938*alpha;
 
-    width = measure > width ? measure : width;
+    width = stretch > width ? stretch : width;
 
     this.size = {width: width, height: height}
 }
@@ -240,14 +244,18 @@ function CDoubleLine()
     this.PEN_W = 0.04;
     this.Parent = null;
 }
-CDoubleLine.prototype.fixSize = function(measure)
+CDoubleLine.prototype.init = function(props)
+{
+
+}
+CDoubleLine.prototype.fixSize = function(oMeasure, stretch)
 {
     var alpha = this.Parent.getCtrPrp().FontSize/36;
 
     var height = 2.843*alpha;
     var width  = 4.938*alpha;
 
-    width = measure > width ? measure : width;
+    width = stretch > width ? stretch : width;
 
     this.size = {width: width, height: height}
 }
@@ -290,6 +298,10 @@ CDoubleLine.prototype.relate = function(parent)
 
 function CTilde()
 {
+}
+CTilde.prototype.init = function(props)
+{
+
 }
 CTilde.prototype.fixSize = function()
 {
@@ -396,9 +408,9 @@ function CBreve()
 {
     this.turn = TURN_MIRROR_0;
 }
-CBreve.prototype.setTurn = function(tturn)
+CBreve.prototype.init = function(props)
 {
-    this.turn = tturn;
+    this.turn = props.turn;
 }
 CBreve.prototype.fixSize = function()
 {
@@ -511,10 +523,10 @@ CBreve.prototype.relate = function(parent)
 function CSign()
 {
     this.sign = new CMathText();
-    this.type = null;
+    this.typeOper = null;
     this.Parent = null;
 }
-CSign.prototype.setSign = function(props)
+CSign.prototype.init = function(props)
 {
     var bDot        = props.code === 0x307 || props.type === ACCENT_ONE_DOT,
         b2Dots      = props.code === 0x308 || props.type === ACCENT_TWO_DOTS,
@@ -524,32 +536,32 @@ CSign.prototype.setSign = function(props)
 
     if(bDot)
     {
-        this.type = ACCENT_ONE_DOT;
+        this.typeOper = ACCENT_ONE_DOT;
         this.sign.add(0x307);
     }
     else if(b2Dots)
     {
-        this.type = ACCENT_TWO_DOTS;
+        this.typeOper = ACCENT_TWO_DOTS;
         this.sign.add(0x308);
     }
     else if(b3Dots)
     {
-        this.type = ACCENT_THREE_DOTS;
+        this.typeOper = ACCENT_THREE_DOTS;
         this.sign.add(0x20DB);
     }
     else if(bAccGrave)
     {
-        this.type = ACCENT_GRAVE;
+        this.typeOper = ACCENT_GRAVE;
         this.sign.add(0x300);
     }
     else if(bAccAcute)
     {
-        this.type = ACCENT_ACUTE;
+        this.typeOper = ACCENT_ACUTE;
         this.sign.add(0x301);
     }
     else
     {
-        this.type = ACCENT_TEXT;
+        this.typeOper = ACCENT_TEXT;
         this.sign.add(props.code);
     }
 }
@@ -557,29 +569,55 @@ CSign.prototype.setPosition = function(pos)
 {
     var shX = 0;
 
-    if(this.type == ACCENT_GRAVE)
+    if(this.typeOper == ACCENT_GRAVE)
         shX = 1.1*this.sign.size.widthG;
-    else if(this.type == ACCENT_ACUTE)
+    else if(this.typeOper == ACCENT_ACUTE)
         shX = 1.25*this.sign.size.widthG;
-    else if(this.type == ACCENT_ONE_DOT)
+    else if(this.typeOper == ACCENT_ONE_DOT)
         shX = 1.53*this.sign.size.widthG;
-    else if(this.type == ACCENT_TWO_DOTS)
+    else if(this.typeOper == ACCENT_TWO_DOTS)
         shX = 0.95*this.sign.size.widthG;
-    else if(this.type == ACCENT_THREE_DOTS)
+    else if(this.typeOper == ACCENT_THREE_DOTS)
         shX = 0.015*this.sign.size.widthG;
     
     var position =
     {
-        x: pos.x + shX ,
+        x: pos.x + shX,
         y: pos.y + this.sign.size.ascent
     };
     this.sign.setPosition(position);
 }
-CSign.prototype.fixSize = function(bIncline)
+CSign.prototype.old_fixSize = function(bIncline)
 {
     this.sign.recalculateSize();
 
     this.dH = 0.7*this.Parent.getCtrPrp().FontSize/36;
+
+    var height = this.sign.size.height + this.dH,
+        width = this.sign.size.widthG;
+
+    if(bIncline)
+        width += 0.1 * this.sign.size.height; // incline
+
+    this.size = {width: width, height: height};
+}
+CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
+{
+    var ctrPrp = this.Parent.getCtrPrp();
+
+    var rPrp = new CMathTextPrp();
+    rPrp.Merge(DEFAULT_RUN_PRP);
+    rPrp.Merge(ctrPrp);
+    rPrp.Italic = false;
+
+    oMeasure.SetFont(rPrp);
+
+    this.sign.Resize(oMeasure);
+
+    if(this.typeOper == ACCENT_THREE_DOTS)
+        this.dH = 1.2*ctrPrp.FontSize/36;
+    else
+        this.dH = 1.2*ctrPrp.FontSize/36;
 
     var height = this.sign.size.height + this.dH,
         width = this.sign.size.widthG;
@@ -597,7 +635,7 @@ CSign.prototype.relate = function(parent)
 {
     this.Parent = parent;
 }
-CSign.prototype.getCodeAccent = function()
+CSign.prototype.getCodeCharacter = function()
 {
     return this.sign.value;
 }
@@ -606,24 +644,45 @@ function CAccent()
 {
     this.kind = MATH_ACCENT;
 
+    this.operator = new COperator(OPER_ACCENT);
     this.code = null;   // храним код буквы и тип здесь
     this. type = null;  // т.к в класах, которые вызываем, не учитываем случаи, когда элементы (стрелки/скобки) переворачиваются
     this.loc = LOCATION_TOP;
     CCharacter.call(this);
 }
 extend(CAccent, CCharacter);
-CAccent.prototype.init = function(props)
+CAccent.prototype._for_operator_init = function(props)
 {
-    var code, accent;
-    var type = props.chrType;
+    var prp =
+    {
+        chr:    props.chr,
+        type:   props.chrType
+    };
+
+    var defaultPrp =
+    {
+        type:  ACCENT_COMB_CARON
+    };
+
+    this.setCharacter(prp, defaultPrp);
+}
+CAccent.prototype.init = function(properties)
+{
+    var type = properties.chrType,
+        code;
+
+    var typeOper, codeChr;
+    var operator;
+
+    ////    ВРЕМЕННО !!!!
 
     var bCode = false,
         bType = typeof(type) !== "undefined" && type !== null;
 
-    if(typeof(props.chr) === "string")
+    if(typeof(properties.chr) === "string")
     {
         bCode = true;
-        code = props.chr.charCodeAt(0);
+        code = properties.chr.charCodeAt(0);
     }
 
     /*var bDot        = code === 0x307 || props.chr.type === ACCENT_ONE_DOT,
@@ -636,12 +695,234 @@ CAccent.prototype.init = function(props)
     {
         this.accent = new CMathText();
         this.accent.add(code);
-        this.type = props.chr.type;
+        typeOper = props.chr.type;
     }*/
-    
+
     if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
     {
-        this.type = ACCENT_CIRCUMFLEX;
+        typeOper = ACCENT_CIRCUMFLEX;
+        codeChr = 0x302;
+
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x30C || type === ACCENT_COMB_CARON)
+    {
+        typeOper = ACCENT_COMB_CARON;
+        codeChr = 0x30C;
+
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x305 || type === ACCENT_LINE)
+    {
+        typeOper = ACCENT_LINE;
+        //codeChr = 0x332;
+        codeChr = 0x305;
+
+        operator = new CLine();
+    }
+    else if(code === 0x33F || type === ACCENT_DOUBLE_LINE)
+    {
+        typeOper = ACCENT_DOUBLE_LINE;
+        //codeChr = 0x333;
+        codeChr = 0x33F;
+
+        operator = new CDoubleLine();
+    }
+    else if(code === 0x303 || type === ACCENT_TILDE)
+    {
+        typeOper = ACCENT_TILDE;
+        codeChr = 0x303;
+
+        operator = new CTilde();
+    }
+    else if(code === 0x306 || type === ACCENT_BREVE)
+    {
+        typeOper = ACCENT_BREVE;
+        codeChr = 0x306;
+
+        operator = new CBreve();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
+    {
+        typeOper = ACCENT_INVERT_BREVE;
+        codeChr = 0x311;
+
+        operator = new CBreve();
+        var props =
+        {
+            turn:   TURN_0
+        };
+        operator.init(props);
+    }
+    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+    {
+
+        typeOper = ACCENT_ARROW_LEFT;
+        codeChr = 0x20D6;
+
+        /*var glyph = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        glyph.init(props);*/
+
+        operator = new COperator(OPER_ACCENT);
+
+        var props =
+        {
+            type:   properties.chrType,
+            chr:    properties.chr
+        };
+
+        var defaultProps =
+        {
+            loc:   LOCATION_TOP
+        };
+
+        operator.init(props, defaultProps);
+    }
+    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_ARROW_RIGHT;
+        codeChr = 0x20D7;
+
+        /*var glyph = new CCombiningArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+
+        operator = new COperator(glyph);*/
+
+        operator = new COperator(OPER_ACCENT);
+
+        var props =
+        {
+            type:   properties.chrType,
+            chr:    properties.chr
+        };
+
+        var defaultProps =
+        {
+            loc:   LOCATION_TOP
+        };
+
+        operator.init(props, defaultProps);
+    }
+    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+    {
+        typeOper = ACCENT_ARROW_LR;
+        codeChr = 0x20E1;
+
+        /*var glyph = new CCombining_LR_Arrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+
+        glyph.init(props);
+
+        operator = new COperator(glyph);*/
+
+        operator = new COperator(OPER_ACCENT);
+
+        var props =
+        {
+            type:   properties.chrType,
+            chr:    properties.chr
+        };
+
+        var defaultProps =
+        {
+            loc:   LOCATION_TOP
+        };
+
+        operator.init(props, defaultProps);
+    }
+    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+    {
+        typeOper = ACCENT_HALF_ARROW_LEFT;
+        codeChr = 0x20D0;
+
+        /*var glyph = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+
+        operator = new COperator(glyph);*/
+
+        operator = new COperator(OPER_ACCENT);
+
+        var props =
+        {
+            type:   properties.chrType,
+            chr:    properties.chr
+        };
+
+        var defaultProps =
+        {
+            loc:   LOCATION_TOP
+        };
+
+        operator.init(props, defaultProps);
+    }
+    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+    {
+        typeOper = ACCENT_HALF_ARROW_RIGHT;
+        codeChr = 0x20D1;
+
+        /*var glyph = new CCombiningHalfArrow();
+        var props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+
+        operator = new COperator(glyph);*/
+
+        operator = new COperator(OPER_ACCENT);
+
+        var props =
+        {
+            type:   properties.chrType,
+            chr:    properties.chr
+        };
+
+        var defaultProps =
+        {
+            loc:   LOCATION_TOP
+        };
+
+        operator.init(props, defaultProps);
+
+    }
+    /*if(code === 0x302 || type === ACCENT_CIRCUMFLEX)
+    {
+        typeOper = ACCENT_CIRCUMFLEX;
         this.code = 0x302;
 
         accent = new CCircumflex();
@@ -649,7 +930,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x30C || type === ACCENT_COMB_CARON)
     {
-        this.type = ACCENT_COMB_CARON;
+        typeOper = ACCENT_COMB_CARON;
         this.code = 0x30C;
 
         accent = new CCircumflex();
@@ -657,28 +938,28 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x332 || type === ACCENT_LINE)
     {
-        this.type = ACCENT_LINE;
+        typeOper = ACCENT_LINE;
         this.code = 0x332;
 
         accent = new CLine();
     }
     else if(code === 0x333 || type === ACCENT_DOUBLE_LINE)
     {
-        this.type = ACCENT_DOUBLE_LINE;
+        typeOper = ACCENT_DOUBLE_LINE;
         this.code = 0x333;
 
         accent = new CDoubleLine();
     }
     else if(code === 0x303 || type === ACCENT_TILDE)
     {
-        this.type = ACCENT_TILDE;
+        typeOper = ACCENT_TILDE;
         this.code = 0x303;
 
         accent = new CTilde();
     }
     else if(code === 0x306 || type === ACCENT_BREVE)
     {
-        this.type = ACCENT_BREVE;
+        typeOper = ACCENT_BREVE;
         this.code = 0x306;
 
         accent = new CBreve();
@@ -686,7 +967,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code == 0x311 || type == ACCENT_INVERT_BREVE)
     {
-        this.type = ACCENT_INVERT_BREVE;
+        typeOper = ACCENT_INVERT_BREVE;
         this.code = 0x311;
 
         accent = new CBreve();
@@ -694,7 +975,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
     {
-        this.type = ACCENT_ARROW_LEFT;
+        typeOper = ACCENT_ARROW_LEFT;
         this.code = 0x20D6;
 
         glyph = new CCombiningArrow();
@@ -708,7 +989,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
     {
-        this.type = ACCENT_ARROW_RIGHT;
+        typeOper = ACCENT_ARROW_RIGHT;
         this.code = 0x20D7;
 
         glyph = new CCombiningArrow();
@@ -722,7 +1003,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
     {
-        this.type = ACCENT_ARROW_LR;
+        typeOper = ACCENT_ARROW_LR;
         this.code = 0x20E1;
 
         glyph = new CCombining_LR_Arrow();
@@ -736,7 +1017,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
     {
-        this.type = ACCENT_HALF_ARROW_LEFT;
+        typeOper = ACCENT_HALF_ARROW_LEFT;
         this.code = 0x20D0;
 
         glyph = new CCombiningHalfArrow();
@@ -750,7 +1031,7 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
     {
-        this.type = ACCENT_HALF_ARROW_RIGHT;
+        typeOper = ACCENT_HALF_ARROW_RIGHT;
         this.code = 0x20D1;
 
         glyph = new CCombiningHalfArrow();
@@ -761,26 +1042,26 @@ CAccent.prototype.init = function(props)
         };
         glyph.init(prp);
         accent = new COperator(glyph);
-    }
+    }*/
     ///// group characters /////
-    else if(code === 0x2190 || type === ARROW_LEFT)
+    /*else if(code === 0x2190 || type === ARROW_LEFT)
     {
-        this.type = ARROW_LEFT;
-        this.code = 0x2190;
+        typeOper = ARROW_LEFT;
+        codeChr = 0x2190;
 
-        glyph = new CSingleArrow();
+        operator = new CSingleArrow();
 
-        var prp =
+        var props =
         {
             location:   this.loc,
             turn:       TURN_0
         };
-        glyph.init(prp);
+        operator.init(props);
     }
     else if(code === 0x2192 || type === ARROW_RIGHT)
     {
-        this.type = ARROW_RIGHT;
-        this.code = 0x2192;
+        typeOper = ARROW_RIGHT;
+        codeChr = 0x2192;
 
         glyph = new CSingleArrow();
         var prp =
@@ -792,8 +1073,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x2194 || type === ARROW_LR)
     {
-        this.type = ARROW_LR;
-        this.code = 0x2194;
+        typeOper = ARROW_LR;
+        codeChr = 0x2194;
 
         glyph = new CLeftRightArrow();
         var prp =
@@ -805,8 +1086,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
     {
-        this.type = DOUBLE_LEFT_ARROW;
-        this.code = 0x21D0;
+        typeOper = DOUBLE_LEFT_ARROW;
+        codeChr = 0x21D0;
 
         glyph = new CDoubleArrow();
         var prp =
@@ -818,8 +1099,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
     {
-        this.type = DOUBLE_RIGHT_ARROW;
-        this.code = 0x21D2;
+        typeOper = DOUBLE_RIGHT_ARROW;
+        codeChr = 0x21D2;
 
         glyph = new CDoubleArrow();
         var prp =
@@ -831,8 +1112,8 @@ CAccent.prototype.init = function(props)
     }
     else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
     {
-        this.type = DOUBLE_ARROW_LR;
-        this.code = 0x21D4;
+        typeOper = DOUBLE_ARROW_LR;
+        codeChr = 0x21D4;
 
         glyph = new CLR_DoubleArrow();
         var prp =
@@ -841,32 +1122,54 @@ CAccent.prototype.init = function(props)
             turn:       TURN_0
         };
         glyph.init(prp);
-    }
+    }*/
     /////
     else if(bCode || bType)
     {
-        this.type = ACCENT_SIGN;
+        typeOper = ACCENT_SIGN;
 
-        accent = new CSign();
-        var prp =
+        operator = new CSign();
+        var props =
         {
             type:   type,
             code:   code
         };
-        accent.setSign(prp);
-
-        this.code = accent.getCodeAccent();
+        operator.init(props);
+        codeChr = operator.getCodeCharacter();
     }
     else
     {
-        this.type = ACCENT_COMB_CARON;
-        this.code = 0x30C;
+        /*typeOper = ACCENT_COMB_CARON;
+        codeChr = 0x30C;
 
-        accent = new CCircumflex();
-        accent.setTurn(TURN_MIRROR_0);
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);*/
+
+        typeOper = ACCENT_CIRCUMFLEX;
+        codeChr = 0x302;
+
+        operator = new CCircumflex();
+        var props =
+        {
+            turn:   TURN_MIRROR_0
+        };
+        operator.init(props);
     }
 
-    this.setOperator(accent);
+    this.operator = operator;
+    this.operator.relate(this);
+    this.typeOper = typeOper;
+    this.code = codeChr;
+
+    this.setDimension(1, 1);
+    this.setContent();
+
+
+    //this.setOperator(accent);
     this.elements[0][0].SetDot(true);
 }
 CAccent.prototype.getCenter = function()
