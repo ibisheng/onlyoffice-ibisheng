@@ -485,21 +485,21 @@ function CTextMeasurer()
     this.GetAscender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Ascender   = this.m_oManager.m_lAscender;
+        var Ascender   = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em * this.m_oManager.m_lAscender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lAscender;
 
         return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }
     this.GetDescender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Descender  = this.m_oManager.m_lDescender;
+        var Descender  = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em * this.m_oManager.m_lDescender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lDescender;
 
         return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }
     this.GetHeight = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Height     = this.m_oManager.m_lLineHeight;
+        var Height     = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * this.m_oManager.m_lUnits_Per_Em : this.m_oManager.m_lLineHeight;
 
         return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     }

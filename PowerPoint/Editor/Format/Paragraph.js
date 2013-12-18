@@ -692,7 +692,8 @@ Paragraph.prototype =
     },
 
     // Рассчитываем текст
-    Internal_Recalculate_0: function () {
+    Internal_Recalculate_0: function ()
+    {
         if (pararecalc_0_None === this.RecalcInfo.Recalc_0_Type)
             return;
 
@@ -711,10 +712,15 @@ Paragraph.prototype =
         var TextDescent = 0;
 
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-        TextHeight = g_oTextMeasurer.GetHeight();
-        TextDescent = Math.abs(g_oTextMeasurer.GetDescender());
-        TextAscent = TextHeight - TextDescent;
-        TextAscent2 = g_oTextMeasurer.GetAscender();
+
+        var TA = g_oTextMeasurer.GetAscender();
+        var TD = Math.abs(g_oTextMeasurer.GetDescender());
+        var TH = g_oTextMeasurer.GetHeight();
+
+        TextDescent = TD;
+        TextAscent  = TH - TD;
+        TextAscent2 = TA;
+        TextHeight  = TH;
 
         var ContentLength = this.Content.length;
 
@@ -781,13 +787,19 @@ Paragraph.prototype =
                 }
                 case para_TextPr:
                 {
+
                     CurTextPr = this.Internal_CalculateTextPr(Pos);
                     g_oTextMeasurer.SetTextPr(CurTextPr);
                     g_oTextMeasurer.SetFontSlot(fontslot_ASCII);
-                    TextDescent = Math.abs(g_oTextMeasurer.GetDescender());
-                    TextHeight = g_oTextMeasurer.GetHeight();
-                    TextAscent = TextHeight - TextDescent;
-                    TextAscent2 = g_oTextMeasurer.GetAscender();
+
+                    TA = g_oTextMeasurer.GetAscender();
+                    TD = Math.abs(g_oTextMeasurer.GetDescender());
+                    TH = g_oTextMeasurer.GetHeight();
+
+                    TextDescent = TD;
+                    TextAscent  = TH - TD;
+                    TextAscent2 = TA;
+                    TextHeight  = TH;
 
                     break;
                 }
@@ -807,9 +819,9 @@ Paragraph.prototype =
                 }
             }
 
-            Item.TextAscent = TextAscent;
+            Item.TextAscent  = TextAscent;
             Item.TextDescent = TextDescent;
-            Item.TextHeight = TextHeight;
+            Item.TextHeight  = TextHeight;
             Item.TextAscent2 = TextAscent2;
             Item.YOffset = CurTextPr.Position;
         }
@@ -1825,7 +1837,7 @@ Paragraph.prototype =
                 // убирается в промежутках.
 
                 var TempDy = this.Lines[this.Pages[CurPage].FirstLine].Metrics.Ascent;
-                if (0 === this.Pages[CurPage].FirstLine && (0 === CurPage || true === this.Parent.Is_TableCellContent()))
+                if (0 === this.Pages[CurPage].FirstLine && (0 === CurPage || true === this.Parent.Is_TableCellContent()) && null !== this.Get_DocumentPrev() )
                     TempDy += ParaPr.Spacing.Before;
 
                 if (0 === this.Pages[CurPage].FirstLine) {
@@ -1840,17 +1852,21 @@ Paragraph.prototype =
 
                 var LastPage_Bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                if (true === this.Lines[CurLine].RangeY) {
+                if ( true === this.Lines[CurLine].RangeY )
+                {
                     Top = Y;
                     Top2 = Y;
                     this.Lines[CurLine].Top = Top - this.Pages[CurPage].Y;
 
-                    if (0 === CurLine) {
-                        if (0 === CurPage || true === this.Parent.Is_TableCellContent()) {
+                    if (0 === CurLine)
+                    {
+                        if ( ( 0 === CurPage || true === this.Parent.Is_TableCellContent() ) && null !== this.Get_DocumentPrev() )
+                        {
                             Top2 = Top + ParaPr.Spacing.Before;
                             Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
                             Bottom = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
-                            if (true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value) {
+                            if (true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value)
+                            {
                                 Top2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                                 Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                                 Bottom += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
@@ -1861,19 +1877,22 @@ Paragraph.prototype =
                                 Bottom += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                             }
                         }
-                        else {
+                        else
+                        {
                             // Параграф начинается с новой страницы
                             Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
-                            Bottom = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
+                            Bottom  = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
 
-                            if (border_Single === ParaPr.Brd.Top.Value) {
-                                Top2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                            if (border_Single === ParaPr.Brd.Top.Value)
+                            {
+                                Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                                 Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
-                                Bottom += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom  += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                             }
                         }
                     }
-                    else {
+                    else
+                    {
                         Bottom2 = Top + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent;
                         Bottom = Top + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
                     }
@@ -1900,9 +1919,12 @@ Paragraph.prototype =
                     this.Bounds.Bottom = Bottom;
                     this.Pages[CurPage].Bounds.Bottom = Bottom;
                 }
-                else {
-                    if (0 != CurLine) {
-                        if (CurLine != this.Pages[CurPage].FirstLine) {
+                else
+                {
+                    if (0 != CurLine)
+                    {
+                        if (CurLine != this.Pages[CurPage].FirstLine)
+                        {
                             Top = Y + TempDy + this.Lines[CurLine - 1].Metrics.Descent + this.Lines[CurLine - 1].Metrics.LineGap;
                             Bottom = Top + this.Lines[CurLine].Metrics.Ascent + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
                             Top2 = Top;
@@ -1965,11 +1987,13 @@ Paragraph.prototype =
                         }
 
                     }
-                    else {
+                    else
+                    {
                         Top = Y;
                         Top2 = Y;
 
-                        if (0 === CurPage || true === this.Parent.Is_TableCellContent()) {
+                        if ( ( 0 === CurPage || true === this.Parent.Is_TableCellContent() ) && null !== this.Get_DocumentPrev() )
+                        {
                             Top2 = Top + ParaPr.Spacing.Before;
                             Bottom = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
                             Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1985,7 +2009,8 @@ Paragraph.prototype =
                                 Bottom += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                             }
                         }
-                        else {
+                        else
+                        {
                             // Параграф начинается с новой страницы
                             Bottom = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
                             Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1997,7 +2022,8 @@ Paragraph.prototype =
                             }
                         }
 
-                        if (bEnd) {
+                        if (bEnd)
+                        {
                             Bottom += ParaPr.Spacing.After;
 
                             // Если нижняя граница Between, тогда она учитывается в следующем параграфе
@@ -2441,7 +2467,7 @@ Paragraph.prototype =
         var EndLine = this.Lines.length - 1;
 
         var TempDy = this.Lines[this.Pages[CurPage].FirstLine].Metrics.Ascent;
-        if (0 === StartLine && (0 === CurPage || true === this.Parent.Is_TableCellContent()))
+        if (0 === StartLine && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() ) && null !== this.Get_DocumentPrev() )
             TempDy += ParaPr.Spacing.Before;
 
         if (0 === StartLine) {
