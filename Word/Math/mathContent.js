@@ -5928,7 +5928,7 @@ CMathContent.prototype =
                 var Content_start = this.content.slice(0, Pos);
                 var Content_end   = this.content.slice(Pos);
                 
-                this.setStart_Selection(Pos);
+				this.setStartPos_Selection(Pos);
                 //this.selection.active = false;
 
                 this.content = Content_start.concat(Data.Items, Content_end);
@@ -5942,7 +5942,7 @@ CMathContent.prototype =
 
                 var Content_start = this.content.slice(0, Pos);
                 var Content_end   = this.content.slice(PosEnd);
-                this.setStart_Selection(Pos - 1);
+				this.setStartPos_Selection(Pos);
                 //this.selection.active = false;
 
                 this.content = Content_start.concat(Content_end);
@@ -7183,11 +7183,9 @@ CMathComposition.prototype =
     {
         History.Create_NewPoint();
 
+		var Pos = this.CurrentContent.CurPos + 1;            
         var items = this.CurrentContent.addToContent_2(content);
-
-        var Pos    = this.CurrentContent.CurPos - items.length,
-            PosEnd = this.CurrentContent.CurPos;
-
+		var PosEnd = Pos + items.length;
         History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: PosEnd});
 
     },

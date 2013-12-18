@@ -8755,7 +8755,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oAcc.fillPlaceholders();
 						break;
 			case 164:	var sChr = String.fromCharCode(9182);
-						props = {chr:sChr, pos:"top", vertJc:"bot"};
+						props = {chr:sChr, pos:VJUST_TOP, vertJc:VJUST_BOT};
 						oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,MathElement.Math.Root,props);
 						oGroupChr.fillPlaceholders();
@@ -8772,10 +8772,10 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oLimUpp.getFName();
 				
 						var sChr = String.fromCharCode(9182);
-						props = {chr:sChr, pos:"top", vertJc:"bot"};
+						props = {chr:sChr, pos:VJUST_TOP, vertJc:VJUST_BOT};
 						oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
-						var grElem = oGroupChr.getArgument();
+						var grElem = oGroupChr.getBase();
 						grElem.fillPlaceholders();
 						break;
 			case 167:	props = {type:LIMIT_LOW};
@@ -8787,7 +8787,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 				
 						oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
-						var grElem = oGroupChr.getArgument();
+						var grElem = oGroupChr.getBase();
 						grElem.fillPlaceholders();
 						break;
 			case 168:	var sChr = String.fromCharCode(8406);
@@ -9052,7 +9052,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8592);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9063,7 +9063,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8594);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9074,7 +9074,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8592);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9085,7 +9085,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8594);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9096,7 +9096,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8656);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9107,7 +9107,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8658);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9118,7 +9118,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8656);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9129,7 +9129,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8658);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9140,7 +9140,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8596);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9151,7 +9151,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8596);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9162,7 +9162,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8660);
-						props = {pos:"top", chr:sChr}
+						props = {pos:VJUST_TOP, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9173,7 +9173,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8660);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
 						oGroupChr.fillPlaceholders();
@@ -9184,10 +9184,10 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8594);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
-						var groupElem = oGroupChr.getArgument();
+						var groupElem = oGroupChr.getBase();
 						MathElement.AddText(groupElem,"yields");
 						break;
 			case 208:	props = {opEmu:1};
@@ -9196,10 +9196,10 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oElem = oBox.getBase();
 						
 						var sChr = String.fromCharCode(8594);
-						props = {vertJc:"bot", chr:sChr}
+						props = {vertJc:VJUST_BOT, chr:sChr}
 						var oGroupChr = new CGroupCharacter();
 						MathElement.CreateElem(oGroupChr,oElem,props);
-						var groupElem = oGroupChr.getArgument();
+						var groupElem = oGroupChr.getBase();
 						var sText = String.fromCharCode(8710);
 						MathElement.AddText(groupElem,sText);
 						break;
