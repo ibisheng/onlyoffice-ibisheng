@@ -143,14 +143,6 @@ CDegree.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
-CDegree.prototype.getPropsForWrite = function()
-{
-    var props = {};
-    props.type = this.type;
-
-    return props;
-}
-
 
 function CIterators()
 {
@@ -312,11 +304,9 @@ CDegreeSubSup.prototype.getLowerIterator = function()
 }
 CDegreeSubSup.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    props.type = this.type;
-    props.alnScr = this.alnScr;
-
+    var props = {
+		alnScr:	this.alnScr
+	};
     return props;
 }
 

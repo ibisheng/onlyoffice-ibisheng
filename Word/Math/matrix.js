@@ -466,6 +466,20 @@ CMathMatrix.prototype.baseJustification = function(type)
     this.baseJc = type;
 
 }
+CMathMatrix.prototype.getPropsForWrite = function()
+{
+	var props = {
+		baseJc:		this.baseJc, 
+		cGp:		this.spaceColumn.gap, 
+		cGpRule:	this.spaceColumn.rule, 
+		cSp:		null,
+		column: 	this.nCol,
+		plcHide:	this.plcHide,
+		rSp:		null,
+		rSpRule:	null
+		};
+    return props;	
+}
 ////
 
 

@@ -260,6 +260,20 @@ CBorderBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
+CBorderBox.prototype.getPropsForWrite = function()
+{
+    var props = {
+		hideBot:	!this.bBot,
+		hideLeft:	!this.bLeft,
+		hideRight:	!this.bRight,
+		hideTop:	!this.bTop,
+		strikeBLTR:	this.bLDiag,
+		strikeH:	this.bHor,
+		strikeTLBR:	this.bRDiag,
+		strikeV:	this.bVert
+	};
+	return props;
+}
 
 
 function CBox()
@@ -290,6 +304,17 @@ CBox.prototype.init = function(props)
 CBox.prototype.getBase = function()
 {
     return this.elements[0][0];
+}
+CBox.prototype.getPropsForWrite = function()
+{
+    var props = {
+		aln:		null,
+		brk:		null,
+		diff:		this.diff,
+		noBreak:	this.noBreak,
+		opEmu:		this.opEmu
+	};
+	return props;
 }
 
 function CBar()

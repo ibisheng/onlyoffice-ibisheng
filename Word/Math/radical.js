@@ -439,7 +439,7 @@ CRadical.prototype.getDegree = function()
 
     return  this.elements[0][0];
 }
-CRadical.prototype.getPropsForWhite = function()
+CRadical.prototype.getPropsForWrite = function()
 {
     var props = {};
 

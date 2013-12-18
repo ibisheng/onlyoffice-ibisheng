@@ -2443,6 +2443,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		var oThis = this;
 		var nStart = 0;
         var nEnd   = oOMath.content.length - 1;		
+		var nCurPos = 0;
 		
 		var oText = "";		
 		for(var i = nStart; i <= nEnd; i++)
@@ -2499,21 +2500,29 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 						break;
 					}
 				case MATH_RUN_PRP:
-					{				
+					{			
+						nCurPos = this.bs.WriteItemWithLengthStart();
+						this.memory.WriteByte(c_oSer_OMathContentType.MRun);
+						
 						var props = item.getPropsForWrite(); 
 						oThis.bs.WriteItem(c_oSerRunType.rPr, function(){oThis.brPrs.Write_rPr(props.textPrp);}); // w:rPr
 						if ( props.mathRunPrp != null)
 							this.bs.WriteItem(c_oSer_OMathContentType.MRPr, function(){oThis.WriteMathMRPr(props.mathRunPrp);}); // m:rPr
 						
-						oText = "";						
+						oText = "";		
 					}
 					break;
 				case MATH_TEXT:
 					{
 						oText += String.fromCharCode(item.value);	
 						if (nextItem == null || nextItem.typeObj == MATH_RUN_PRP)
+						{
 							if (null != oText)
 								this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(oText.toString());}); //m:t
+								
+							this.bs.WriteItemEnd(nCurPos);
+							nCurPos = 0;
+						}
 					}
 					break;
 				case MATH_PLACEHOLDER:	
@@ -2672,6 +2681,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		this.memory.WriteByte(c_oSerPropLenType.Variable);
 		this.memory.WriteString2(Chr);
 	}
+	this.WriteMathCount = function(Count)
+	{
+		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(Count);
+	}
 	this.WriteMathCSp = function(CSp)
 	{
 		this.memory.WriteByte(c_oSer_OMathBottomNodesValType.Val);
@@ -2789,13 +2804,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		var oThis = this;
 		var oFName = oFunc.getFName();
 		var oElem = oFunc.getArgument();	
-		var props = oFunc.getPropsForWrite();
 		
-		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteMathFuncPr(props, oFunc);});		
+		this.bs.WriteItem(c_oSer_OMathContentType.FPr, function(){oThis.WriteMathFuncPr(oFunc);});		
 		this.bs.WriteItem(c_oSer_OMathContentType.FName, function(){oThis.WriteMathArgNodes(oFName);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteMathArgNodes(oElem);});
 	}
-	this.WriteMathFuncPr = function(props,oFunc)
+	this.WriteMathFuncPr = function(oFunc)
 	{
 		var oThis = this;
 		if (null != oFunc.CtrPrp)
@@ -2804,7 +2818,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	this.WriteMathGroupChr = function(oGroupChr)
 	{
 		var oThis = this;		
-		var oElem = oGroupChr.getArgument();
+		var oElem = oGroupChr.getBase();
 		var props = oGroupChr.getPropsForWrite();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.GroupChrPr, function(){oThis.WriteMathGroupChrPr(props, oGroupChr);});
@@ -2869,13 +2883,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		var oThis = this;		
 		var oElem = oLimLow.getFName();
 		var oLim  = oLimLow.getIterator();
-		var props = oLimLow.getPropsForWrite();
 		
-		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteMathLimLowPr(props, oLimLow);});
+		this.bs.WriteItem(c_oSer_OMathContentType.LimLowPr, function(){oThis.WriteMathLimLowPr(oLimLow);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteMathArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteMathArgNodes(oLim);});
 	}
-	this.WriteMathLimLowPr = function(props,oLimLow)
+	this.WriteMathLimLowPr = function(oLimLow)
 	{
 		var oThis = this;
 		if (null != oLimLow.CtrPrp)
@@ -2886,13 +2899,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		var oThis = this;		
 		var oElem = oLimUpp.getFName();
 		var oLim  = oLimUpp.getIterator();
-		var props = oLimUpp.getPropsForWrite();
 		
-		this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteMathLimUppPr(props, oLimUpp);});
+		this.bs.WriteItem(c_oSer_OMathContentType.LimUppPr, function(){oThis.WriteMathLimUppPr(oLimUpp);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteMathArgNodes(oElem);});
 		this.bs.WriteItem(c_oSer_OMathContentType.Lim, function(){oThis.WriteMathArgNodes(oLim);});
 	}
-	this.WriteMathLimUppPr = function(props,oLimUpp)
+	this.WriteMathLimUppPr = function(oLimUpp)
 	{
 		var oThis = this;
 		if (null != oLimUpp.CtrPrp)
@@ -2914,7 +2926,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	{
 		var oThis 	= this;		
 		var nStart = 0;
-        var nEnd   = oMatrix.props.row;
+        var nEnd   = oMatrix.nRow;
 		var props = oMatrix.getPropsForWrite();
 		
 		this.bs.WriteItem(c_oSer_OMathContentType.MatrixPr, function(){oThis.WriteMathMPr(props, oMatrix);});
@@ -2968,11 +2980,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 	{
 		var oThis 	= this;		
 		var nStart = 0;
-        var nEnd   = oMatrix.props.column;
+        var nEnd   = oMatrix.nCol;
 
 		for(var i = nStart; i < nEnd; i++)	
 		{	
-			var oElem = oMatrix.getBase(nRow,i);
+			var oElem = oMatrix.getElement(nRow,i);
 			this.bs.WriteItem(c_oSer_OMathContentType.Element, function(){oThis.WriteMathArgNodes(oElem);});
 		}
 	}	

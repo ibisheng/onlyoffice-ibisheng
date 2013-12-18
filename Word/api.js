@@ -7481,7 +7481,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var sText = "-b" + String.fromCharCode(177);
 						MathElement.AddText(oElemNum, sText);
 						
-						props = {type:SQUARE_RADICAL, degHede:true};
+						props = {type:DEGREE_RADICAL, degHede:true};
 						var oRadical = new CRadical();
 						MathElement.CreateElem(oRadical, oElemNum, props);						
 						var oElem = oRadical.getBase();

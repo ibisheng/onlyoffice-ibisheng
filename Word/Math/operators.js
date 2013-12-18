@@ -3674,3 +3674,25 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
 
     return glyph;
 }
+CGroupCharacter.prototype.getPropsForWrite = function()
+{
+	var vertJc = null;
+	if (this.vertJc == VJUST_BOT)
+		vertJc = 0;
+	else if ( this.vertJc == VJUST_TOP)
+		vertJc = 1;
+		
+	var pos = null;
+	if (this.loc == LOCATION_BOT)
+		pos = 0;
+	else if ( this.loc == LOCATION_TOP)
+		pos = 1;
+	
+    var props = {
+		chr:	String.fromCharCode(this.operator.code),
+		pos:	pos,
+		vertJc:	vertJc
+	};
+    return props;
+
+}

@@ -386,9 +386,19 @@ CFraction.prototype.findDisposition = function( mCoord )
 }
 CFraction.prototype.getPropsForWrite = function()
 {
-    var props = {};
-    props.type = this.type;
+	var type = null;
+	if (this.type == BAR_FRACTION)
+		type = 0;
+	else if (this.type == LINEAR_FRACTION)
+		type = 1;
+	else if (this.type == NO_BAR_FRACTION)
+		type = 2;
+	else if (this.type == SKEWED_FRACTION)
+		type = 3;
 
+    var props = {
+		type: type
+	};
     return props;
 }
 
