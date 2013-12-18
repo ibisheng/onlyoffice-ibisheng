@@ -3447,6 +3447,23 @@ function DrawingObjects() {
 				
 				// Clip
 				_this.clipGraphicsCanvas(shapeCtx, scrollType);
+				// Area for update
+				if ( scrollType ) {
+					var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
+					var updatedRange = scrollType.getUpdatedRange();
+					
+					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
+					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+					
+					updatedRect.x = worksheet.getCellLeft(updatedRange.c1, 3) - ptToMm(offsetX) - pxToMm(scrollOffset.getX());
+					updatedRect.y = worksheet.getCellTop(updatedRange.r1, 3) - ptToMm(offsetY) - pxToMm(scrollOffset.getY());
+					updatedRect.w = worksheet.getCellLeft(updatedRange.c2, 3) - worksheet.getCellLeft(updatedRange.c1, 3);
+					updatedRect.h = worksheet.getCellTop(updatedRange.r2, 3) - worksheet.getCellTop(updatedRange.r1, 3);
+					
+					shapeCtx.updatedRect = updatedRect;
+				}
+				else
+					shapeCtx.updatedRect = null;
 				
 				for (var i = 0; i < aObjects.length; i++) {
 
@@ -3493,6 +3510,7 @@ function DrawingObjects() {
 			}
 			worksheet.model.Drawings = aObjects;
 		}
+		
 		if ( !printOptions ) {
 		
 			if ( aObjects.length ) {
