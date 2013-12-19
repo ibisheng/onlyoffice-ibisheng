@@ -3885,11 +3885,23 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
 }
 CGroupCharacter.prototype.getPropsForWrite = function()
 {
-    var props = {};
+    var vertJc = null;
+    if (this.vertJc == VJUST_BOT)
+        vertJc = 0;
+    else if ( this.vertJc == VJUST_TOP)
+        vertJc = 1;
 
-    props.vertJ = this.vertJust;
-    props.pos   = this.loc;
-    props.chr   = this.operator.getChr();
+    var pos = null;
+    if (this.loc == LOCATION_BOT)
+        pos = 0;
+    else if ( this.loc == LOCATION_TOP)
+        pos = 1;
 
+    var props = {
+        chr:	this.operator.getChr(),
+        pos:	pos,
+        vertJc:	vertJc
+    };
     return props;
+
 }

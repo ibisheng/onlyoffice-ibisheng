@@ -214,16 +214,20 @@ CNary.prototype.getLowerIterator = function()
 	if (!this.subHide)
 		return this.elements[0][0].getLowerIterator();
 }
-CNary.prototype.getPropsForWhite = function()
+CNary.prototype.getPropsForWrite = function()
 {
-    var props = {};
-
-    props.limLoc = (this.limLoc == NARY_UndOvr) ? NARY_UndOvr : NARY_SubSup;
-    props.chr = String.fromCharCode(this.code);
-    props.supHide = this.supHide;
-    props.subHide = this.subHide;
-    props.grow = this.grow;
-
+    var limloc = null;
+    if (this.limLoc == NARY_SubSup)
+        limLoc = 0;
+    else if (this.limLoc == NARY_UndOvr)
+        limLoc = 1;
+    var props = {
+        chr:		String.fromCharCode(this.code),
+        grow:		this.grow,
+        limLoc: 	limLoc,
+        subHide:	this.subHide,
+        supHide:	this.supHide
+    };
     return props;
 }
 
