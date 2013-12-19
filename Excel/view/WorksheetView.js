@@ -5034,7 +5034,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false, new ScrollGraphicObject(this, c_oAscScrollType.Vertical, delta));
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, delta));
 				return this;
 			},
 
@@ -5118,7 +5118,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false, new ScrollGraphicObject(this, c_oAscScrollType.Horizontal, delta));
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, delta));
 				return this;
 			},
 			

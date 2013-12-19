@@ -216,9 +216,10 @@ var c_oAscSelectionType = {
 	RangeChartText	: 9
 };
 
-var c_oAscScrollType = {
-	Vertical		: 1,
-	Horizontal		: 2
+var c_oAscGraphicOption = {
+	ScrollVertical			: 1,
+	ScrollHorizontal		: 2,
+	AddText					: 3
 };
 
 var c_oAscLegendMarkerType = {

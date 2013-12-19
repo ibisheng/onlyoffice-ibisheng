@@ -969,6 +969,7 @@ function handleNullStateCursorType(drawingObjectsController, drawingObjects, e, 
 
 function NullState(drawingObjectsController, drawingObjects)
 {
+	var _this = this;
     this.id = STATES_ID_NULL;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -1098,7 +1099,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     {
                         History.Create_NewPoint();
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(true);
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                         text_object.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.controller.changeCurrentState(new TextAddState(drawingObjects.controller, drawingObjects, text_object));
                     }
@@ -1457,6 +1458,7 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 
 function ChartState(drawingObjectsController, drawingObjects, chart)
 {
+	var _this = this;
     this.id = STATES_ID_CHART;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -1501,7 +1503,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         History.Create_NewPoint();
                         drawingObjects.controller.changeCurrentState(new ChartTextAdd(drawingObjects.controller, drawingObjects, chart, text_object));
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(true);
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                         drawingObjects.controller.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.OnUpdateOverlay();
                     }
@@ -1674,6 +1676,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
 function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObject)
 {
+	var _this = this;
     this.id = STATES_ID_CHART_TEXT_ADD;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -1729,7 +1732,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(true);
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -1918,6 +1921,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
 function TextAddState(drawingObjectsController, drawingObjects, textObject)
 {
+	var _this = this;
     this.id = STATES_ID_TEXT_ADD;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -1979,7 +1983,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(true);
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -3126,6 +3130,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
 function ChartGroupState(drawingObjectsController, drawingObjects, group, chart)
 {
+	var _this = this;
     this.id = STATES_ID_CHART_GROUP;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -3190,7 +3195,7 @@ function ChartGroupState(drawingObjectsController, drawingObjects, group, chart)
                         History.Create_NewPoint();
                         drawingObjects.controller.changeCurrentState(new ChartTextAddGroup(drawingObjects.controller, drawingObjects, group, chart, selected_title));
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(true);
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                         drawingObjects.controller.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.OnUpdateOverlay();
                     }

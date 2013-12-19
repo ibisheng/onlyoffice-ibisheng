@@ -2448,34 +2448,68 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
-function ScrollGraphicObject(ws, type, delta) {
-	this.ws = ws;
-	this.type = type;
-	this.delta = delta;		// + Down || - Up
+function GraphicOption(ws, type, delta) {
+	var _this = this;
+	_this.ws = ws;
+	_this.type = type;
+	_this.delta = delta;		// Scroll offset: + Down || - Up
 	
-	this.getUpdatedRange = function() {
+	_this.isScrollType = function() {
+		return ( (_this.type === c_oAscGraphicOption.ScrollVertical) || (_this.type === c_oAscGraphicOption.ScrollHorizontal) );
+	}
 	
-		var vr = this.ws.visibleRange.clone();
-		if ( this.delta === 0 )
+	_this.getUpdatedRange = function() {
+	
+		var vr = _this.ws.visibleRange.clone();
+		if ( _this.isScrollType() && (_this.delta === 0) )
 			return vr;
 		
-		if ( this.type === c_oAscScrollType.Vertical ) {
-			// Down
-			if ( this.delta > 0 )
-				vr.r1 = vr.r2 - this.delta;
-			// Up
-			else
-				vr.r2 = vr.r1 - this.delta;
+		switch (_this.type) {
+			case c_oAscGraphicOption.ScrollVertical: {
+				// Down
+				if ( _this.delta > 0 )
+					vr.r1 = vr.r2 - _this.delta;
+				// Up
+				else
+					vr.r2 = vr.r1 - _this.delta;
+			}
+			break;
+			
+			case c_oAscGraphicOption.ScrollHorizontal: {
+				// Right
+				if ( _this.delta > 0 )
+					vr.c1 = vr.c2 - _this.delta;
+				// Left
+				else
+					vr.c2 = vr.c1 - _this.delta;
+			}
+			break;
+			
+			case c_oAscGraphicOption.AddText: {
+				if ( _this.ws ) {
+					var controller = _this.ws.objectRender.controller;
+					var selectedObjects = controller.selectedObjects;
+					if ( selectedObjects.length === 1 ) {
+						var drawingObject = selectedObjects[0].drawingBase;
+						var checker = _this.ws.objectRender.getBoundsChecker(drawingObject);
+						var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
+						if ( coords ) {
+							vr.c1 = coords.from.col;
+							vr.r1 = coords.from.row;
+							
+							if ( !_this.ws.cols[coords.to.col + 1] )
+								_this.ws.expandColsOnScroll(true);
+							vr.c2 = coords.to.col + 1;
+							
+							if ( !_this.ws.rows[coords.to.row + 1] )
+								_this.ws.expandRowsOnScroll(true);
+							vr.r2 = coords.to.row + 1;
+						}
+					}
+				}
+			}
+			break;
 		}
-		else if ( this.type === c_oAscScrollType.Horizontal ) {
-			// Right
-			if ( this.delta > 0 )
-				vr.c1 = vr.c2 - this.delta;
-			// Left
-			else
-				vr.c2 = vr.c1 - this.delta;
-		}
-		
 		return vr;
 	}
 }
@@ -2551,7 +2585,7 @@ function DrawingObjects() {
 		var taskLen = aDrawTasks.length;
 		if ( taskLen ) {
 			var lastTask = aDrawTasks[taskLen - 1];
-			_this.showDrawingObjectsEx(lastTask.params.clearCanvas, lastTask.params.scrollType, lastTask.params.printOptions);
+			_this.showDrawingObjectsEx(lastTask.params.clearCanvas, lastTask.params.graphicOption, lastTask.params.printOptions);
 			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
 		}
 	}
@@ -3406,7 +3440,7 @@ function DrawingObjects() {
 	// Drawing objects
 	//-----------------------------------------------------------------------------------
 	
-	_this.showDrawingObjects = function(clearCanvas, scrollType, printOptions) {
+	_this.showDrawingObjects = function(clearCanvas, graphicOption, printOptions) {
 	
 		var currDate = new Date();
 		var currTime = currDate.getTime();
@@ -3414,17 +3448,17 @@ function DrawingObjects() {
 			
 			var lastTask = aDrawTasks[aDrawTasks.length - 1];
 			
-			if ( lastTask.params.scrollType && scrollType && (lastTask.params.scrollType.type === scrollType.type) ) {
-				lastTask.params.scrollType.delta += scrollType.delta;
+			if ( lastTask.params.graphicOption && lastTask.params.graphicOption.isScrollType() && graphicOption && (lastTask.params.graphicOption.type === graphicOption.type) ) {
+				lastTask.params.graphicOption.delta += graphicOption.delta;
 				return;
 			}
 			if ( (currTime - lastTask.time < 40) )
 				return;
 		}
-		aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, scrollType: scrollType, printOptions: printOptions} });
+		aDrawTasks.push({ time: currTime, params: { clearCanvas: clearCanvas, graphicOption: graphicOption, printOptions: printOptions} });
 	}
 	
-	_this.showDrawingObjectsEx = function(clearCanvas, scrollType, printOptions) {
+	_this.showDrawingObjectsEx = function(clearCanvas, graphicOption, printOptions) {
 
 		/*********** Print Options ***************
 		printOptions : {
@@ -3446,11 +3480,12 @@ function DrawingObjects() {
 				worksheet._drawGraphic();
 				
 				// Clip
-				_this.clipGraphicsCanvas(shapeCtx, scrollType);
+				_this.clipGraphicsCanvas(shapeCtx, graphicOption);
+				
 				// Area for update
-				if ( scrollType ) {
+				if ( graphicOption ) {
 					var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
-					var updatedRange = scrollType.getUpdatedRange();
+					var updatedRange = graphicOption.getUpdatedRange();
 					
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
@@ -3473,7 +3508,7 @@ function DrawingObjects() {
 						drawingObject.graphicObject.syncAscChart();
 					
 					if ( !printOptions ) {
-						if ( !drawingObject.inVisibleArea(scrollType) )
+						if ( !drawingObject.inVisibleArea(graphicOption) )
 							continue;
 					}
 					
@@ -3674,13 +3709,13 @@ function DrawingObjects() {
 		return metrics;
 	}
 	
-	_this.clipGraphicsCanvas = function(canvas, scrollType) {
+	_this.clipGraphicsCanvas = function(canvas, graphicOption) {
 		if ( canvas instanceof CGraphics ) {
 		
 			var x, y, w, h;
 			
-			if ( scrollType ) {
-				var updatedRange = scrollType.getUpdatedRange();
+			if ( graphicOption ) {
+				var updatedRange = graphicOption.getUpdatedRange();
 				
 				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
