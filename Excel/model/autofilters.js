@@ -948,10 +948,9 @@
 							var rowAdd = 0;
 							var tableColumns = [];
 							var j = 0;
-							rangeShift = ws.model.getRange(new CellAddress(activeCells.r1, activeCells.c1, 0), new CellAddress(activeCells.r1, activeCells.c2, 0));
+							rangeShift = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r1, activeCells.c2);
 							if(addNameColumn)
 							{
-								//rangeShift.addCellsShiftBottom();
 								rowAdd = 1;
 							}
 							paramsForCallBack = 'changeAllFOnTable';
@@ -1110,7 +1109,7 @@
 					var mainCell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1, 0)).getCells();
 					var val = mainCell[0].getValue();
 					var mainAdjacentCells = this._getAdjacentCellsAF(activeCells, aWs);
-					rangeShift = ws.model.getRange(new CellAddress(mainAdjacentCells.r1, mainAdjacentCells.c1, 0), new CellAddress(mainAdjacentCells.r1, mainAdjacentCells.c2, 0));
+					rangeShift = ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r1, mainAdjacentCells.c2);
 					var rowAdd = 0;
 					//в случае таблице меняем контент и добавляем строку с названиями
 					if(lTable)
@@ -1141,7 +1140,7 @@
 				}
 				else//выделено > 1 ячейки
 				{		
-					rangeShift = ws.model.getRange(new CellAddress(activeCells.r1, activeCells.c1, 0), new CellAddress(activeCells.r1, activeCells.c2, 0));
+					rangeShift = ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r1, activeCells.c2);
 					var rowAdd = 0;
 					if(lTable)
 					{
@@ -1497,7 +1496,6 @@
 				var oldFilter;
 				var activeCells;
 				var newEndId;
-				var newStartId;
 				var t = this;
 				var selectionRange;
 				var onSortAutoFilterCallback = function(success)
@@ -1609,15 +1607,8 @@
 						}
 						else if(startCellFilter.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
 						{
-							var newStartCell = 
-							{
-								r1: activeRange.r1 + 1,
-								c1: activeRange.c1
-							};
 							sortCol = activeRange.c1;
-							newStartId = t._rangeToId(newStartCell);
-							newEndId = t._rangeToId({r1: activeRange.r2, c1: activeRange.c2});
-							sortRange = ws.model.getRange(new CellAddress(newStartId), new CellAddress(newEndId));
+							sortRange = ws.model.getRange3(activeRange.r1 + 1, activeRange.c1, activeRange.r2, activeRange.c2);
 							selectionRange = activeRange;
 							var sortRange1 = t._getAscRange(sortRange.bbox);
 							currentFilter = curFilter;
@@ -1660,8 +1651,9 @@
 				selectionRange = new Asc.Range(startCell.c1, startCell.r1 + 1, endCell.c2, endCell.r2);
 				newEndId = t._rangeToId(curCell);
 				startCell.r1 = startCell.r1 + 1;
-				newStartId = t._rangeToId(startCell);
-				sortRange = ws.model.getRange(new CellAddress(newStartId), new CellAddress(rangeCell[1]));
+
+				sortRange = ws.model.getRange3(startCell.r1, startCell.c1, endCell.r1, endCell.c1);
+				
 				var sortRange1 = t._getAscRange(sortRange.bbox);
 				if(isTurnOffHistory)
 					onSortAutoFilterCallback(true);
@@ -2738,7 +2730,7 @@
 							valueMerg = null;
 							if(merged)
 							{
-								valueMerg = ws.model.getRange(new CellAddress(merged.r1 + 1,merged.c1 + 1), new CellAddress(merged.r2 + 1,merged.c2 + 1)).getValue();
+								valueMerg = ws.model.getRange3(merged.r1 + 1, merged.c1 + 1, merged.r2 + 1, merged.c2 + 1).getValue();
 								if(valueMerg != null && valueMerg != "")
 								{	
 									if(merged.r1 < cloneActiveRange.r1)
