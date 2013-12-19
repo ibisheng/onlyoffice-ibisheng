@@ -1355,6 +1355,12 @@ CDocument.prototype =
             this.FullRecalc.PageIndex  = _PageIndex;
             this.FullRecalc.Start      = _bStart;
             this.FullRecalc.StartIndex = _StartIndex;
+            
+            if (window.NATIVE_EDITOR_ENJINE_SYNC_RECALC === true)
+            {
+                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+                return;
+            }
 
             //this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
 

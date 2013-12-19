@@ -5,6 +5,9 @@ var bIsLocalFontsUse = false;
 
 function _is_support_cors()
 {
+    if (window.NATIVE_EDITOR_ENJINE === true)
+        return false;
+        
     var xhrSupported = new XMLHttpRequest();
     return !!xhrSupported && ("withCredentials" in xhrSupported);
 }
@@ -741,17 +744,27 @@ CFontInfo.prototype =
         else
             fontfile = font_loader.fontFiles[index];
 
-        if (fontfile.Status != 0 && (this.Type == FONT_TYPE_STANDART || this.Type == FONT_TYPE_ADDITIONAL) &&
-            null != _embedded_cur.map_name_cutindex && undefined !== _embedded_cur.map_name_cutindex[this.Name])
+        if (window.NATIVE_EDITOR_ENJINE === undefined)
         {
-            // нормальный шрифт пока не подгрузился... берем обрезанный
-            var _font_info = _embedded_cur.map_name_cutindex[this.Name];
-
-            if (_font_info !== undefined)
+            if (fontfile.Status != 0 && (this.Type == FONT_TYPE_STANDART || this.Type == FONT_TYPE_ADDITIONAL) &&
+                null != _embedded_cur.map_name_cutindex && undefined !== _embedded_cur.map_name_cutindex[this.Name])
             {
-                return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                // нормальный шрифт пока не подгрузился... берем обрезанный
+                var _font_info = _embedded_cur.map_name_cutindex[this.Name];
+
+                if (_font_info !== undefined)
+                {
+                    return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                }
             }
         }
+        else
+        {
+            if (fontfile.Status != 0)
+            {
+                fontfile.LoadFontNative();
+            }
+        }        
 
         var _ext = "";
         if (bNeedBold)

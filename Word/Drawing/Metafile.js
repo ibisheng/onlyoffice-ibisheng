@@ -1154,12 +1154,21 @@ CMetafile.prototype =
             this.Memory.WriteDouble(h);
             return;
         }
+        
+        var _src = "";
+        if (!window.native)
+        {
+            var _img = window.editor.ImageLoader.map_image_index[img];
+            if (_img == undefined || _img.Image == null)
+                return;
 
-        var _img = window.editor.ImageLoader.map_image_index[img];
-        if (_img == undefined || _img.Image == null)
-            return;
+            _src = _img.src;
+        }
+        else
+        {
+            _src = img;
+        }
 
-        var _src = _img.src;
         var _search = window.editor.DocumentUrl;
         if (0 == _src.indexOf(_search))
             _src = _src.substring(_search.length);
@@ -1311,7 +1320,7 @@ CMetafile.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1327,7 +1336,7 @@ CMetafile.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSizeCS;
@@ -1343,7 +1352,7 @@ CMetafile.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1360,7 +1369,7 @@ CMetafile.prototype =
 
                 if (_lastFont.Index == -1 || _lastFont.Index === undefined)
                 {
-                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                    _lastFont.Index = window.g_map_font_index[_lastFont.Name];
                 }
 
                 _lastFont.Size = this.m_oTextPr.FontSize;
@@ -1592,6 +1601,9 @@ CDocumentRenderer.prototype =
     // images
     drawImage : function(img,x,y,w,h,alpha,srcRect)
     {
+        if (img == null || img == undefined || img == "")
+            return;
+            
         if (0 != this.m_lPagesCount)
         {
             if (!srcRect)
@@ -1906,6 +1918,9 @@ CDocumentRenderer.prototype =
     },
     put_brushTexture : function(src, mode)
     {
+        if (src == null || src == undefined)
+            src = "";
+            
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].put_brushTexture(src, mode);
     },
