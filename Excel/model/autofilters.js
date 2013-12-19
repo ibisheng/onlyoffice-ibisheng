@@ -5145,53 +5145,6 @@
 			
 			_sortArrayMinMax: function(elements)
 			{
-				/*var sortArray = [];
-				for(var j = 0; j < elements.length; j++)
-				{
-					sortArray[j] = elements[j].val2;
-				}
-				var sortArray =  sortArray.sort();
-				var firstArray = [];
-				var lastArray = [];
-				var fA = 0;
-				var lA = 0;
-				for(var j = 0; j < sortArray.length; j++)
-				{
-					if(!isNaN(parseFloat(sortArray[j])))
-					{
-						firstArray[fA] = parseFloat(sortArray[j]);
-						fA++;
-					}
-					else
-					{	
-						lastArray[lA] = sortArray[j];
-						lA++;
-					}
-				}
-				firstArray.sort(function sortArr(a, b)
-				{
-					return a - b;
-				});
-				var allArray = firstArray.concat(lastArray);
-				var finishArray = [];
-				for(j = 0; j < allArray.length; j++)
-				{
-					for(var k = 0; k < elements.length; k++)
-					{
-						var elem = elements[k].val2;
-						if(!isNaN(parseFloat(elem)))
-							elem = parseFloat(elem);
-						if(allArray[j] == elem)
-						{
-							finishArray[j] = elements[k];
-							elements.splice(k,1);
-							break;
-						}
-					}
-				}
-				if(elements.dF)
-					finishArray.dF = true;
-				return finishArray;*/
 				elements.sort (function sortArr(a, b)
 				{
 					return a["val2"] - b["val2"];
@@ -5216,28 +5169,6 @@
 				if(isIn && isOut)
 					return true;
 				return false;
-			},
-			
-			_setStyleForTextInTable: function(range,style)
-			{
-				if(!style)
-				{
-					return;
-				}
-				range.setFontname(style.fn);
-				range.setFontsize(style.fs); 
-				range.setBold(style.b); 
-				range.setItalic(style.i);
-				range.setUnderline(style.u); 
-				range.setStrikeout(style.s);
-				range.setFontcolor(style.c);
-				
-				/*range.setFontAlign(val); 
-				range.setAlignHorizontal(val);
-				range.setAlignVertical(val);
-				range.setNumFormat(val);
-                range.setAngle(val);*/
-
 			},
 			
 			_drawSmallIconTable: function(canvas, style, fmgrGraphics, oFont)
@@ -5677,56 +5608,6 @@
 					
 			},
 			
-			_cloneArray: function(array)
-			{
-				if(!array)
-					return array;
-				var newArr = [];
-				for(var i = 0; i < array.length; i ++)
-				{
-					newArr[i] = array[i];
-				}
-				return newArr;
-			},
-			
-			_cloneAutoFilter: function(obj)
-			{
-				if(!obj)
-					return obj;
-				var newObj = 
-				{
-					Ref: obj.Ref,
-					result: obj.result ? this._cloneArray(obj.result): null,
-					TableColumns: obj.TableColumns ? obj.TableColumns : null,
-					FilterColumns: obj.FilterColumns ? obj.FilterColumns : null,
-					DisplayName: obj.DisplayName ? obj.DisplayName: null,
-					TableStyleInfo: obj.TableStyleInfo ? obj.TableStyleInfo : null,
-					AutoFilter: obj.AutoFilter ? obj.AutoFilter : null,
-					SortState : obj.SortState ? obj.SortState : null
-				};
-				return newObj;
-			},
-
-			_removeTableByName: function (name) {
-				var ws = this.worksheet;
-				if (undefined === name) {
-					// Удаляем общий фильтр
-					delete ws.AutoFilter;
-					return;
-				}
-
-				var oTables = ws.TableParts;
-				if (!oTables)
-					return;
-				var i = 0;
-				for (; i < oTables.length; ++i) {
-					if (name === oTables[i].DisplayName) {
-						oTables.splice(i, 1);
-						return;
-					}
-				}
-			},
-			
 			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow) {
 				var ws = this.worksheet;
 				var oHistoryObject = new UndoRedoData_AutoFilter();
@@ -6100,36 +5981,6 @@
 					return ref;
 				}
 				return false;
-			},
-			
-			_addBlankValues: function(aWs)
-			{
-				if(aWs.AutoFilter)
-				{
-					var filterColumns = aWs.AutoFilter.FilterColumns
-					for(var i = 0; i < filterColumns.length; i++)
-					{
-						var filters = filterColumns[i].Filters;
-						if(filters && filters.Blank == true)
-							filters.Values[filters.Values.length] = ""; 
-					}
-				}
-				if(aWs.TableParts)
-				{
-					for(var i = 0; i < aWs.TableParts.length; i++)
-					{
-						if(aWs.TableParts[i].AutoFilter)
-						{
-							var filterColumns = aWs.TableParts[i].AutoFilter.FilterColumns;
-							for(var j = 0; j < filterColumns.length; j++)
-							{
-								var filters = filterColumns[j].Filters;
-								if(filters && filters.Blank == true)
-									filters.Values[filters.Values.length] = ""; 
-							}
-						}
-					}
-				}
 			},
 			
 			//ShowButton(в случае объединенных ячеек в автофильтрах)
