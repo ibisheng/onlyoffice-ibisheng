@@ -1169,28 +1169,13 @@
 				
 				//устанавливаем стиль для таблицы
 				if(!isAll && openFilter != undefined)
-				{
 					this._setColorStyleTable(result[0].id, result[result.length -1].idNext, aWs.TableParts[openFilter]);
-					var firstCell = ws.model.getCell(new CellAddress((result[0].id)));
-					var endCell = ws.model.getCell(new CellAddress((result[result.length -1].idNext)));
-					var arn = 
-					{
-						r1: firstCell.first.row,
-						r2: endCell.first.row,
-						c1: firstCell.first.col,
-						c2: endCell.first.col
-					}
-				}
 				
 				if(openFilter != undefined)
 				{
-					var sortRange;
-					var sortCol;
-					var descending;
 					if(openFilter == 'all')
 					{
 						aWs.AutoFilter.result = result;
-						var sortOptios = aWs.AutoFilter.SortState;
 					}
 					else
 					{
@@ -1199,20 +1184,12 @@
 							isInsertButton = false;
 						}
 						aWs.TableParts[openFilter].result = result;
-						var sortOptios = aWs.TableParts[openFilter].SortState;
 					}
-				}
-				
-				if(openFilter != undefined)
-				{
+
 					newRes =
 					{
 						result: result,
 						isVis:  true
-					};
-					var ref = 
-					{
-						Ref: result[0].id + ':' + result[result.length -1].idNext
 					};
 					if(isInsertButton){
 						//if (bIsActiveSheet)
@@ -1222,8 +1199,8 @@
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
-					if(openFilter != undefined)
-						History.TurnOn();
+
+					History.TurnOn();
 					return true;
 				}
 			},
@@ -2667,13 +2644,10 @@
 			},
 			
 			_getAutoFilterArray: function(cell) {
-				var nextCell;
-				var activeCells;
 				var curId = cell.id;
 				var nextId = cell.idNext;
 				var ws = this.worksheet;
-				cell = ws.model.getCell(new CellAddress(curId)).getCells();
-				activeCells = 
+				var activeCells =
 				{
 					c1: ws.model.getCell(new CellAddress(curId)).first.col - 1,
 					r1: ws.model.getCell(new CellAddress(curId)).first.row - 1,
@@ -2683,9 +2657,7 @@
 				//проверяем какому фильтру принадлежит
 				var indexFilter = this._findArrayFromAllFilter3(activeCells,curId);
 				//получаем массив скрытых и открытых ячеек
-				var result = this._getArrayOpenCells(indexFilter,curId);
-				
-				return result;
+				return this._getArrayOpenCells(indexFilter,curId);
 			},
 			
 			//функция поиска среди смежных ячеек 
@@ -2721,7 +2693,7 @@
 						cell = ws.model._getCell(n,k);
 						//если находимся уже внутри выделенного фрагмента, то смысла его просматривать нет
 						if(k >= cloneActiveRange.c1 && k <= cloneActiveRange.c2 && n >= cloneActiveRange.r1 && n <= cloneActiveRange.r2)
-							continue
+							continue;
 						range = ws.model.getCell(new CellAddress(n + 1,k + 1));
 						//если мерженная ячейка
 						if(!(n == ar.r1 && k == ar.c1) && range)
@@ -6450,8 +6422,8 @@
 							var cell = ws.model._getCell(i, n);
 							cell.setTableStyle(null);
 						}
-					};
-				};
+					}
+				}
 			}
 		};
 
