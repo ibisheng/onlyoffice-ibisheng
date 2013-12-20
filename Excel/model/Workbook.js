@@ -2356,7 +2356,7 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 	oNewWs.nRowsCount = this.nRowsCount;
 	oNewWs.nColsCount = this.nColsCount;
 	for (i = 0; i < this.TableParts.length; ++i)
-		oNewWs.TableParts.push(this.TableParts[i].clone());
+		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs));
 	if(this.AutoFilter)
 		oNewWs.AutoFilter = this.AutoFilter.clone();
 	for(i in this.aCols)

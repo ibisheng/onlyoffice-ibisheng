@@ -3928,12 +3928,11 @@ function TablePart() {
 	this.TableColumns = null;
 	this.TableStyleInfo = null;
 }
-TablePart.prototype.clone = function() {
+TablePart.prototype.clone = function(ws) {
 	var i, res = new TablePart();
 	res.Ref = this.Ref;
 	res.HeaderRowCount = this.HeaderRowCount;
 	res.TotalsRowCount = this.TotalsRowCount;
-	res.DisplayName = this.DisplayName;
 	if (this.AutoFilter)
 		res.AutoFilter = this.AutoFilter.clone();
 	if (this.SortState)
@@ -3945,7 +3944,12 @@ TablePart.prototype.clone = function() {
 	}
 	if (this.TableStyleInfo)
 		res.TableStyleInfo = this.TableStyleInfo.clone();
+
+	res.recalc(ws);
 	return res;
+};
+TablePart.prototype.recalc = function(ws) {
+	this.DisplayName = ws.workbook.oNameGenerator.getNextTableName(ws, this.Ref);
 };
 /** @constructor */
 function AutoFilter() {
