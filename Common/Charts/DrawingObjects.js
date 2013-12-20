@@ -2448,11 +2448,11 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
-function GraphicOption(ws, type, delta) {
+function GraphicOption(ws, type, range) {
 	var _this = this;
 	_this.ws = ws;
 	_this.type = type;
-	_this.delta = delta;		// Scroll offset: + Down || - Up
+	_this.range = range;
 	
 	function checkCol(col) {
 		while ( (col > 0) && !_this.ws.cols[col] )
@@ -2471,34 +2471,14 @@ function GraphicOption(ws, type, delta) {
 	_this.getUpdatedRange = function() {
 	
 		var vr = _this.ws.visibleRange.clone();
-		if ( _this.isScrollType() && (_this.delta === 0) )
+		if ( _this.isScrollType() && !range )
 			return vr;
 		
 		switch (_this.type) {
-			case c_oAscGraphicOption.ScrollVertical: {
-				// Down
-				if ( _this.delta > 0 ) {
-					vr.r1 = vr.r2 - _this.delta;
-					checkRow(++vr.r2);
-				}
-				// Up
-				else
-					vr.r2 = vr.r1 - _this.delta;
-				
-				checkCol(++vr.c2);
-			}
-			break;
-			
+			case c_oAscGraphicOption.ScrollVertical:
 			case c_oAscGraphicOption.ScrollHorizontal: {
-				// Right
-				if ( _this.delta > 0 ) {
-					vr.c1 = vr.c2 - _this.delta;
-					checkCol(++vr.c2);
-				}
-				// Left
-				else
-					vr.c2 = vr.c1 - _this.delta;
-					
+				vr = range.clone();
+				checkCol(++vr.c2);
 				checkRow(++vr.r2);
 			}
 			break;
@@ -3482,7 +3462,10 @@ function DrawingObjects() {
 			var lastTask = aDrawTasks[aDrawTasks.length - 1];
 			
 			if ( lastTask.params.graphicOption && lastTask.params.graphicOption.isScrollType() && graphicOption && (lastTask.params.graphicOption.type === graphicOption.type) ) {
-				lastTask.params.graphicOption.delta += graphicOption.delta;
+				lastTask.params.graphicOption.range.c1 = Math.min(lastTask.params.graphicOption.range.c1, graphicOption.range.c1);
+				lastTask.params.graphicOption.range.r1 = Math.min(lastTask.params.graphicOption.range.r1, graphicOption.range.r1);
+				lastTask.params.graphicOption.range.c2 = Math.max(lastTask.params.graphicOption.range.c2, graphicOption.range.c2);
+				lastTask.params.graphicOption.range.r2 = Math.max(lastTask.params.graphicOption.range.r2, graphicOption.range.r2);
 				return;
 			}
 			if ( (currTime - lastTask.time < 40) )

@@ -1099,7 +1099,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     {
                         History.Create_NewPoint();
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                         text_object.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.controller.changeCurrentState(new TextAddState(drawingObjects.controller, drawingObjects, text_object));
                     }
@@ -1503,7 +1503,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         History.Create_NewPoint();
                         drawingObjects.controller.changeCurrentState(new ChartTextAdd(drawingObjects.controller, drawingObjects, chart, text_object));
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                         drawingObjects.controller.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.OnUpdateOverlay();
                     }
@@ -1732,7 +1732,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -1983,7 +1983,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -3195,7 +3195,7 @@ function ChartGroupState(drawingObjectsController, drawingObjects, group, chart)
                         History.Create_NewPoint();
                         drawingObjects.controller.changeCurrentState(new ChartTextAddGroup(drawingObjects.controller, drawingObjects, group, chart, selected_title));
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                         drawingObjects.controller.updateSelectionState(drawingObjects.drawingDocument);
                         drawingObjects.OnUpdateOverlay();
                     }
@@ -3266,7 +3266,7 @@ function ChartTextAddGroup(drawingObjectsController, drawingObjects, group, char
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -3637,7 +3637,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
                     {
                         History.Create_NewPoint();
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText));
                         text_object.updateSelectionState(drawingObjects.drawingDocument);
                     }
                 };

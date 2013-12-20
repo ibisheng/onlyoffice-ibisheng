@@ -4985,12 +4985,14 @@
 						.fillRect(this.headersLeft, y + (dy > 0 && oldH > 0 ? oldH - dy : 0),
 						          ctxW, ctxH - this.cellsTop - (oldH > 0 ? oldH : 0));
 
+				var rangeGraphic = null;
 				if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
 					var c1 = vr.c1;
 					var r1 = dy > 0 && oldH > 0 ? oldEnd + (oldVRE_isPartial ? 0 : 1) : vr.r1;
 					var c2 = vr.c2;
 					var r2 = dy > 0 || oldH <= 0 ? vr.r2 : vr.r1 - 1 - delta; /* delta < 0 here */
 					var range = asc_Range(c1, r1, c2, r2);
+					rangeGraphic = range.clone();
 					// Это необходимо для того, чтобы строки, у которых высота по тексту рассчитались (баг http://bugzserver/show_bug.cgi?id=21552)
 					this._prepareCellTextMetricsCache(range);
 					if (dx === 0) {
@@ -5034,7 +5036,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, delta));
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 				return this;
 			},
 
@@ -5089,12 +5091,14 @@
 						.fillRect(x + (dx > 0 && oldW > 0 ? oldW - dx : 0), y,
 						          ctxW - this.cellsLeft - (oldW > 0 ? oldW : 0), ctxH);
 
+				var rangeGraphic = null;
 				if ( !(dx > 0 && vr.c2 === oldEnd && !oldVCE_isPartial) ) {
 					var c1 = dx > 0 && oldW > 0 ? oldEnd + (oldVCE_isPartial ? 0 : 1) : vr.c1;
 					var r1 = vr.r1;
 					var c2 = dx > 0 || oldW <= 0 ? vr.c2 : vr.c1 - 1 - delta; /* delta < 0 here */
 					var r2 = vr.r2;
 					var range = asc_Range(c1, r1, c2, r2);
+					rangeGraphic = range.clone();
 					this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
 					this._drawGrid(/*drawingCtx*/ undefined, range);
 					this._drawCells(/*drawingCtx*/undefined, range);
@@ -5118,7 +5122,7 @@
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, delta));
+				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 				return this;
 			},
 			
