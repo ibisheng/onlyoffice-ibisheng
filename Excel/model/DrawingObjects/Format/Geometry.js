@@ -1472,6 +1472,10 @@ CGeometry.prototype=
 
     hitInInnerArea: function(canvasContext, x, y)
     {
+        if(this.preset === "rect")
+        {
+            return x > 0 && x < this.gdLst["w"] && y > 0 && y < this.gdLst["h"];
+        }
         var _path_list = this.pathLst;
         var _path_count = _path_list.length;
         var _path_index;
@@ -1485,6 +1489,11 @@ CGeometry.prototype=
 
     hitInPath: function(canvasContext, x, y)
     {
+        if(this.preset === "rect")
+        {
+            if(x < -2 || x > this.gdLst["w"] + 2 || y < -2 || y > this.gdLst["h"] + 2)
+                return false;
+        }
         var _path_list = this.pathLst;
         var _path_count = _path_list.length;
         var _path_index;

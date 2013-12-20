@@ -153,6 +153,13 @@ function CShape(drawingBase, drawingObjects, legendEntry)
     this.transformText = new CMatrix();
     this.invertTransformText = null;
     this.cursorTypes = [];
+    this.bounds =
+    {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0
+    };
 
     this.brush  = null;
     this.pen = null;
@@ -1220,6 +1227,19 @@ CShape.prototype =
 				this.spPr.geometry.Recalculate(this.extX, this.extY);
 			}
 		}
+
+        try
+        {
+            var boundsChecker = new  CSlideBoundsChecker();
+            this.draw(boundsChecker);
+            boundsChecker.CorrectBounds();
+            this.bounds.x = boundsChecker.Bounds.min_x;
+            this.bounds.y = boundsChecker.Bounds.min_y;
+            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+        }
+        catch(e)
+        {}
         this.calculateContent();
         this.calculateTransformTextMatrix();
     },
@@ -2098,6 +2118,19 @@ CShape.prototype =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+
+        try
+        {
+            var boundsChecker = new  CSlideBoundsChecker();
+            this.draw(boundsChecker);
+            boundsChecker.CorrectBounds();
+            this.bounds.x = boundsChecker.Bounds.min_x;
+            this.bounds.y = boundsChecker.Bounds.min_y;
+            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+        }
+        catch(e)
+        {}
     },
 
     normalize: function()
@@ -2216,6 +2249,16 @@ CShape.prototype =
 
     draw: function(graphics)
     {
+        if(graphics.updatedRect && this.group)
+        {
+            var rect = graphics.updatedRect;
+            var bounds = this.bounds;
+            if(bounds.x > rect.x + rect.w
+                || bounds.y > rect.y + rect.h
+                || bounds.x + bounds.w < rect.x
+                || bounds.y + bounds.h < rect.y)
+            return;
+        }
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
         var shape_drawer = new CShapeDrawer();
@@ -2884,6 +2927,11 @@ CShape.prototype =
 
     hitInPath: function(x, y)
     {
+        if(x < this.bounds.x
+            || y < this.bounds.y
+            || x > this.bounds.x + this.bounds.w
+            || y > this.bounds.y + this.bounds.h)
+            return false;
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
@@ -2894,6 +2942,11 @@ CShape.prototype =
 
     hitInInnerArea: function(x, y)
     {
+        if(x < this.bounds.x
+            || y < this.bounds.y
+            || x > this.bounds.x + this.bounds.w
+            || y > this.bounds.y + this.bounds.h)
+            return false;
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
@@ -2904,6 +2957,11 @@ CShape.prototype =
 	
 	hitInTextRect: function(x, y)
     {
+        if(x < this.bounds.x
+            || y < this.bounds.y
+            || x > this.bounds.x + this.bounds.w
+            || y > this.bounds.y + this.bounds.h)
+            return false;
         if(isRealObject(this.txBody))
         {
             var t_x, t_y;
