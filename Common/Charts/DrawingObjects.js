@@ -2494,16 +2494,16 @@ function GraphicOption(ws, type, delta) {
 						var checker = _this.ws.objectRender.getBoundsChecker(drawingObject);
 						var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
 						if ( coords ) {
-							vr.c1 = coords.from.col;
-							vr.r1 = coords.from.row;
+							vr.c1 = Math.max(coords.from.col, vr.c1);
+							vr.r1 = Math.max(coords.from.row, vr.r1);
 							
 							if ( !_this.ws.cols[coords.to.col + 1] )
 								_this.ws.expandColsOnScroll(true);
-							vr.c2 = coords.to.col + 1;
+							vr.c2 = Math.min(coords.to.col + 1, vr.c2);
 							
 							if ( !_this.ws.rows[coords.to.row + 1] )
 								_this.ws.expandRowsOnScroll(true);
-							vr.r2 = coords.to.row + 1;
+							vr.r2 = Math.min(coords.to.row + 1, vr.r2);
 						}
 					}
 				}
