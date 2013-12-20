@@ -882,5 +882,5 @@ var lcid_haLatn = 0x7c68; // Hausa, Latin
     window["CDetectFontUse"] = CDetectFontUse;
 })(window.document);
 
-var g_font_detector = new CDetectFontUse();
+var g_font_detector = new window.CDetectFontUse();
 g_font_detector.Init();
