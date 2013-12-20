@@ -2342,7 +2342,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 	}
 }
 Woorksheet.prototype.clone=function(sNewId, bFromRedo){
-	var oNewWs;
+	var oNewWs, i, elem, range;
 	if(null != sNewId)
 		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, true, sNewId);
 	else
@@ -2355,32 +2355,32 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 	oNewWs.index = this.index;
 	oNewWs.nRowsCount = this.nRowsCount;
 	oNewWs.nColsCount = this.nColsCount;
-	if(this.TableParts)
-		oNewWs.TableParts = Asc.clone(this.TableParts);
+	for (i = 0; i < oNewWs.TableParts.length; ++i)
+		oNewWs.TableParts.push(this.TableParts[i].clone());
 	if(this.AutoFilter)
-		oNewWs.AutoFilter = Asc.clone(this.AutoFilter);
-	for(var i in this.aCols)
+		oNewWs.AutoFilter = this.AutoFilter.clone();
+	for(i in this.aCols)
 		oNewWs.aCols[i] = this.aCols[i].clone();
 	if(null != this.oAllCol)
 		oNewWs.oAllCol = this.oAllCol.clone();
-	for(var i in this.aGCells)
+	for(i in this.aGCells)
 		oNewWs.aGCells[i] = this.aGCells[i].clone();
 	var aMerged = this.mergeManager.getAll();
-	for(var i in aMerged)
+	for(i in aMerged)
 	{
-		var elem = aMerged[i];
-		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
+		elem = aMerged[i];
+		range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
 		range.mergeOpen();
 	}
 	var aHyperlinks = this.hyperlinkManager.getAll();
-	for(var i in aHyperlinks)
+	for(i in aHyperlinks)
 	{
-		var elem = aHyperlinks[i];
-		var range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
+		elem = aHyperlinks[i];
+		range = oNewWs.getRange3(elem.bbox.r1, elem.bbox.c1, elem.bbox.r2, elem.bbox.c2);
 		range.setHyperlinkOpen(elem.data);
 	}
 	if(null != this.aComments) {
-		for (var i = 0; i < this.aComments.length; i++) {
+		for (i = 0; i < this.aComments.length; i++) {
 			var comment = new asc_CCommentData(this.aComments[i]);
 			comment.wsId = oNewWs.getId();
 			comment.setId();

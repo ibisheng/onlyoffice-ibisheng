@@ -5215,7 +5215,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		}
 		else if ( c_oSerWorksheetsTypes.TableParts == type )
         {
-			oWorksheet.TableParts = [];
 			oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oBinary_TableReader.Read(length, oWorksheet.TableParts);
         }

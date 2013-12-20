@@ -3916,18 +3916,60 @@ function TablePart() {
 	this.TableColumns = null;
 	this.TableStyleInfo = null;
 }
+TablePart.prototype.clone = function() {
+	var i, res = new TablePart();
+	res.Ref = this.Ref;
+	res.HeaderRowCount = this.HeaderRowCount;
+	res.TotalsRowCount = this.TotalsRowCount;
+	res.DisplayName = this.DisplayName;
+	if (this.AutoFilter)
+		res.AutoFilter = this.AutoFilter.clone();
+	if (this.SortState)
+		res.SortState = this.SortState.clone();
+	if (this.TableColumns) {
+		res.TableColumns = [];
+		for (i = 0; i < this.TableColumns.length; ++i)
+			res.TableColumns.push(this.TableColumns[i].clone());
+	}
+	if (this.TableStyleInfo)
+		res.TableStyleInfo = this.TableStyleInfo.clone();
+	return res;
+};
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
 	this.FilterColumns = null;
 	this.SortState = null;
 }
+AutoFilter.prototype.clone = function() {
+	var i, res = new AutoFilter();
+	res.Ref = this.Ref;
+	if (this.FilterColumns) {
+		res.FilterColumns = [];
+		for (i = 0; i < this.FilterColumns.length; ++i)
+			res.FilterColumns.push(this.FilterColumns[i].clone());
+	}
+	if (this.SortState)
+		res.SortState = this.SortState.clone();
+	return res;
+};
 /** @constructor */
 function SortState() {
 	this.Ref = null;
 	this.CaseSensitive = null;
 	this.SortConditions = null;
 }
+SortState.prototype.clone = function() {
+	var i, res = new SortState();
+	res.Ref = this.Ref;
+	res.CaseSensitive = this.CaseSensitive;
+	if (this.SortConditions) {
+		res.SortConditions = [];
+		for (i = 0; i < this.SortConditions.length; ++i)
+			res.SortConditions.push(this.SortConditions[i].clone());
+	}
+	return res;
+};
 /** @constructor */
 function TableColumn() {
 	this.Name = null;
@@ -3937,6 +3979,17 @@ function TableColumn() {
 	this.dxf = null;
 	this.CalculatedColumnFormula = null;
 }
+TableColumn.prototype.clone = function() {
+	var res = new TableColumn();
+	res.Name = this.Name;
+	res.TotalsRowLabel = this.TotalsRowLabel;
+	res.TotalsRowFunction = this.TotalsRowFunction;
+	res.TotalsRowFormula = this.TotalsRowFormula;
+	if (this.dxf)
+		res.dxf = this.dxf.clone;
+	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
+	return res;
+};
 /** @constructor */
 function TableStyleInfo() {
 	this.Name = null;
@@ -3945,6 +3998,15 @@ function TableStyleInfo() {
 	this.ShowFirstColumn = null;
 	this.ShowLastColumn = null;
 }
+TableStyleInfo.prototype.clone = function() {
+	var res = new TableStyleInfo();
+	res.Name = this.Name;
+	res.ShowColumnStripes = this.ShowColumnStripes;
+	res.ShowRowStripes = this.ShowRowStripes;
+	res.ShowFirstColumn = this.ShowFirstColumn;
+	res.ShowLastColumn = this.ShowLastColumn;
+	return res;
+};
 /** @constructor */
 function FilterColumn() {
 	this.ColId = null;
@@ -3955,12 +4017,43 @@ function FilterColumn() {
 	this.Top10 = null;
 	this.ShowButton = true;
 }
+FilterColumn.prototype.clone = function() {
+	var res = new FilterColumn();
+	res.ColId = this.ColId;
+	if (this.Filters) {
+		res.Filters = this.Filters.clone();
+	}
+	if (this.CustomFiltersObj) {
+		res.CustomFiltersObj = this.CustomFiltersObj.clone();
+	}
+	if (this.DynamicFilter) {
+		res.DynamicFilter = this.DynamicFilter.clone();
+	}
+	if (this.ColorFilter) {
+		res.ColorFilter = this.ColorFilter.clone();
+	}
+	if (this.Top10) {
+		res.Top10 = this.Top10.clone();
+	}
+	res.ShowButton = this.ShowButton;
+	return res;
+};
 /** @constructor */
 function Filters() {
 	this.Values = [];
 	this.Dates = [];
 	this.Blank = null;
 }
+Filters.prototype.clone = function() {
+	var i, res = new Filters();
+	res.Values = this.Values.slice();
+	if (this.Dates) {
+		for (i = 0; i < this.Dates.length; ++i)
+			res.Dates.push(this.Dates[i].clone());
+	}
+	res.Blank = this.Blank;
+	return res;
+};
 /** @constructor */
 function Filter() {
 	this.Val = null;
@@ -3975,27 +4068,68 @@ function DateGroupItem() {
 	this.Second = null;
 	this.Year = null;
 }
+DateGroupItem.prototype.clone = function() {
+	var res = new DateGroupItem();
+	res.DateTimeGrouping = this.DateTimeGrouping;
+	res.Day = this.Day;
+	res.Hour = this.Hour;
+	res.Minute = this.Minute;
+	res.Month = this.Month;
+	res.Second = this.Second;
+	res.Year = this.Year;
+	return res;
+};
 /** @constructor */
 function CustomFilters() {
 	this.And = null;
 	this.CustomFilters = null;
 }
+CustomFilters.prototype.clone = function() {
+	var i, res = new CustomFilters();
+	res.And = this.And;
+	if (this.CustomFilters) {
+		for (i = 0; i < this.CustomFilters.length; ++i)
+			res.CustomFilters.push(this.CustomFilters[i].clone());
+	}
+	return res;
+};
 /** @constructor */
 function CustomFilter() {
 	this.Operator = null;
 	this.Val = null;
 }
+CustomFilter.prototype.clone = function() {
+	var res = new CustomFilter();
+	res.Operator = this.Operator;
+	res.Val = this.Val;
+	return res;
+};
 /** @constructor */
 function DynamicFilter() {
 	this.Type = null;
 	this.Val = null;
 	this.MaxVal = null;
 }
+DynamicFilter.prototype.clone = function() {
+	var res = new DynamicFilter();
+	res.Type = this.Type;
+	res.Val = this.Val;
+	res.MaxVal = this.MaxVal;
+	return res;
+};
 /** @constructor */
 function ColorFilter() {
 	this.CellColor = null;
 	this.dxf = null;
 }
+ColorFilter.prototype.clone = function() {
+	var res = new ColorFilter();
+	res.CellColor = this.CellColor;
+	if (this.dxf) {
+		res.dxf = this.dxf.clone();
+	}
+	return res;
+};
 /** @constructor */
 function Top10() {
 	this.FilterVal = null;
@@ -4003,6 +4137,14 @@ function Top10() {
 	this.Top = null;
 	this.Val = null;
 }
+Top10.prototype.clone = function() {
+	var res = new Top10();
+	res.FilterVal = this.FilterVal;
+	res.Percent = this.Percent;
+	res.Top = this.Top;
+	res.Val = this.Val;
+	return res;
+};
 /** @constructor */
 function SortCondition() {
 	this.Ref = null;
@@ -4010,3 +4152,12 @@ function SortCondition() {
 	this.ConditionDescending = null;
 	this.dxf = null;
 }
+SortCondition.prototype.clone = function() {
+	var res = new SortCondition();
+	res.Ref = this.Ref;
+	res.ConditionSortBy = this.ConditionSortBy;
+	res.ConditionDescending = this.ConditionDescending;
+	if (this.dxf)
+		res.dxf = this.dxf.clone();
+	return res;
+};
