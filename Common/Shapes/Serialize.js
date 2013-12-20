@@ -367,7 +367,7 @@ function BinaryPPTYLoader()
         this.ImageMapChecker = null;
     }
     
-    this.Load2(data, presentation)
+    this.Load2 = function(data, presentation)
     {
         this.presentation = presentation;
         this.ImageMapChecker = new Object();
