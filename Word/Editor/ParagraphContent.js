@@ -601,18 +601,18 @@ ParaTextPr.prototype =
             this.Set_Position( undefined );
 
         if ( undefined != this.Value.RFonts.Ascii )
-            this.Set_RFonts_Ascii( RFonts.Ascii );
+            this.Set_RFonts_Ascii( undefined );
 
-        if ( undefined != this.Value.HAnsi )
+        if ( undefined != this.Value.RFonts.HAnsi )
             this.Set_RFonts_HAnsi( undefined );
 
-        if ( undefined != this.Value.CS )
+        if ( undefined != this.Value.RFonts.CS )
             this.Set_RFonts_CS( undefined );
 
-        if ( undefined != this.Value.EastAsia )
+        if ( undefined != this.Value.RFonts.EastAsia )
             this.Set_RFonts_EastAsia( undefined );
 
-        if ( undefined != this.Value.Hint )
+        if ( undefined != this.Value.RFonts.Hint )
             this.Set_RFonts_Hint( undefined );
     },
 
@@ -2661,7 +2661,7 @@ function ParaNumbering()
 {
     this.Type = para_Numbering;
     this.Item = undefined;
-    this.Pos  = new CParagraphRecalculatePos();
+    this.Pos  = new CParagraphContentPos();
 
     this.Internal =
     {

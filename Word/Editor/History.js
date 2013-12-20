@@ -389,8 +389,6 @@ var historyitem_SetShape = 0;
 var historyitem_SetDocContent = 1;
 var historyitem_SetLstStyle = 2;
 
-
-
 function CHistory(Document)
 {
     this.Index      = -1;

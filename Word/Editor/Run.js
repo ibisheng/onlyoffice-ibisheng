@@ -30,6 +30,8 @@ function ParaRun(Document)
     this.Lines       = new Array(); // Массив CParaRunLine
     this.StartLine   = 0;           // Строка, с которой начинается данный ран
 
+    this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -1230,6 +1232,26 @@ ParaRun.prototype =
         }
     },
 //-----------------------------------------------------------------------------------
+// Функции отрисовки
+//-----------------------------------------------------------------------------------
+    Check_CollabotativeMarks : function(Pos)
+    {
+        // TODO: Ускорить работу данной функции
+
+        var Counter = 0;
+        var CollaborativeMarksCount = this.CollaborativeMarks.length;
+        for ( var MarkPos = 0; MarkPos < CollaborativeMarksCount; MarkPos++ )
+        {
+            var CollMark = this.CollaborativeMarks[MarkPos];
+            if ( CollMark.Pos < Pos && pararun_CollaborativeMark_End === CollMark.Type )
+                Counter--;
+            else if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_Start === CollMark.Type )
+                Counter++;
+        }
+
+        return Counter;
+    },
+//-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
 //-----------------------------------------------------------------------------------
     Recalc_CompiledPr : function(RecalcMeasure)
@@ -1795,3 +1817,13 @@ CParaRunLine.prototype =
         this.Ranges[RangeIndex] = new CParaRunRange( StartPos, EndPos );
     }
 };
+
+// Метка о конце или начале изменений пришедших от других соавторов документа
+var pararun_CollaborativeMark_Start = 0x00;
+var pararun_CollaborativeMark_End   = 0x01;
+
+function CParaRunCollaborativeMark(Pos, Type)
+{
+    this.Pos  = Pos;
+    this.Type = Type;
+}
