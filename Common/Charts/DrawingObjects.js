@@ -2507,19 +2507,39 @@ function GraphicOption(ws, type, delta) {
 				if ( _this.ws ) {
 					var controller = _this.ws.objectRender.controller;
 					var selectedObjects = controller.selectedObjects;
+					
 					if ( selectedObjects.length === 1 ) {
-						var drawingObject = selectedObjects[0].drawingBase;
-						var checker = _this.ws.objectRender.getBoundsChecker(drawingObject);
-						var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
-						if ( coords ) {
-							vr.c1 = Math.max(coords.from.col, vr.c1);
-							vr.r1 = Math.max(coords.from.row, vr.r1);
-							
-							checkCol(coords.to.col + 1);
-							vr.c2 = Math.min(coords.to.col + 1, vr.c2);
-							
-							checkRow(coords.to.row + 1);
-							vr.r2 = Math.min(coords.to.row + 1, vr.r2);
+						if ( selectedObjects[0].isGroup() ) {
+							var groupSelectedObjects = selectedObjects[0].selectedObjects;
+							if ( groupSelectedObjects.length === 1 ) {
+								var checker = _this.ws.objectRender.getBoundsChecker(groupSelectedObjects[0]);
+								var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
+								if ( coords ) {
+									vr.c1 = Math.max(coords.from.col, vr.c1);
+									vr.r1 = Math.max(coords.from.row, vr.r1);
+									
+									checkCol(coords.to.col + 1);
+									vr.c2 = Math.min(coords.to.col + 1, vr.c2);
+									
+									checkRow(coords.to.row + 1);
+									vr.r2 = Math.min(coords.to.row + 1, vr.r2);
+								}
+							}
+						}
+						else {
+							var drawingObject = selectedObjects[0].drawingBase;
+							var checker = _this.ws.objectRender.getBoundsChecker(drawingObject.graphicObject);
+							var coords = _this.ws.objectRender.getBoundsCheckerCoords(checker);
+							if ( coords ) {
+								vr.c1 = Math.max(coords.from.col, vr.c1);
+								vr.r1 = Math.max(coords.from.row, vr.r1);
+								
+								checkCol(coords.to.col + 1);
+								vr.c2 = Math.min(coords.to.col + 1, vr.c2);
+								
+								checkRow(coords.to.row + 1);
+								vr.r2 = Math.min(coords.to.row + 1, vr.r2);
+							}
 						}
 					}
 				}
@@ -2711,7 +2731,7 @@ function DrawingObjects() {
 			var result = true;
 			var fvc, fvr, lvc, lvr;
 			
-			var checker = _this.getBoundsChecker(_t);
+			var checker = _this.getBoundsChecker(_t.graphicObject);
 			var coords = _this.getBoundsCheckerCoords(checker);
 			if ( coords ) {				
 				if ( scrollType ) {
@@ -2960,7 +2980,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.addToDrawingObjects();
 
 
-                var boundsChecker = _this.getBoundsChecker(drawingObject);
+                var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
@@ -2987,7 +3007,7 @@ function DrawingObjects() {
                     new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 				drawingObject.graphicObject.addToDrawingObjects();
 				
-				var boundsChecker = _this.getBoundsChecker(drawingObject);
+				var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
 			}
             if (drawingObject.graphicObject instanceof  CImageShape) {
@@ -3045,7 +3065,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.addToDrawingObjects();
 
 
-                var boundsChecker = _this.getBoundsChecker(drawingObject);
+                var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
             }
 		}
@@ -3065,7 +3085,7 @@ function DrawingObjects() {
 					drawingObject.graphicObject.draw(shapeCtx);
 					aObjects.push(drawingObject);
 					
-					var boundsChecker = _this.getBoundsChecker(drawingObject);
+					var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 					aBoundsCheckers.push(boundsChecker);
 				}
 			}
@@ -3124,8 +3144,6 @@ function DrawingObjects() {
 
     _this.OnUpdateOverlay = function(bFull) {
         
-		// TODO Сократить вызовы
-		
         var overlay = trackOverlay;
 		var ctx = overlay.m_oContext;
 		var drDoc = this.drawingDocument;
@@ -3139,16 +3157,12 @@ function DrawingObjects() {
 			shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		else {
 			for ( var i = 0; i < aObjects.length; i++ ) {
-				var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+				var boundsChecker = _this.getBoundsChecker(aObjects[i].graphicObject);
 				var _w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
 				var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
 				shapeOverlayCtx.m_oContext.clearRect( mmToPx(boundsChecker.Bounds.min_x) + scrollOffset.getX(), mmToPx(boundsChecker.Bounds.min_y) + scrollOffset.getY(), mmToPx(_w), mmToPx(_h) );
 			}
 		}
-		/*if ( !_this.selectedGraphicObjectsExists() ) {
-			worksheet.cleanSelection();
-			worksheet._drawSelectionRange();
-		}*/
 		
 		// Clip
 		_this.clipGraphicsCanvas(shapeOverlayCtx);
@@ -3294,13 +3308,13 @@ function DrawingObjects() {
 			worksheet.model.workbook.handlers.trigger(triggerName, param);
 	}
 	
-	_this.getBoundsChecker = function(drawingObject) {
-		if ( drawingObject && drawingObject.graphicObject ) {
+	_this.getBoundsChecker = function(graphicObject) {
+		if ( graphicObject ) {
 			var boundsChecker = new  CSlideBoundsChecker();
 			boundsChecker.init(1, 1, 1, 1);
-			boundsChecker.transform3(drawingObject.graphicObject.transform);
-			boundsChecker.rect(0,0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
-			drawingObject.graphicObject.draw(boundsChecker);
+			boundsChecker.transform3(graphicObject.transform);
+			boundsChecker.rect(0,0, graphicObject.extX, graphicObject.extY);
+			graphicObject.draw(boundsChecker);
 			boundsChecker.CorrectBounds();
 			
 			// Коррекция для селекта при блокировке
@@ -3338,7 +3352,7 @@ function DrawingObjects() {
 		for ( var i = 0; i < aObjects.length; i++ ) {
 			if ( !aObjects[i].inVisibleArea() )
 				continue;
-			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			var boundsChecker = _this.getBoundsChecker(aObjects[i].graphicObject);
 			aBoundsCheckers.push(boundsChecker);
 		}
 	}
@@ -3706,15 +3720,6 @@ function DrawingObjects() {
 		}
 
 		for (var i = 0; i < aObjects.length; i++) {
-			
-			/*var boundsChecker = _this.getBoundsChecker(aObjects[i]);
-			var coords = _this.getBoundsCheckerCoords(boundsChecker);
-			if ( coords ) {
-				if ( coords.to.col >= metrics.maxCol )
-					metrics.maxCol = coords.to.col + 1; // учитываем colOff
-				if ( coords.to.row >= metrics.maxRow )
-					metrics.maxRow = coords.to.row + 1; // учитываем rowOff
-			}*/
 			
 			var drawingObject = aObjects[i];
 			if ( drawingObject.to.col >= metrics.maxCol )
@@ -4598,7 +4603,7 @@ function DrawingObjects() {
 			_this.objectLocker.checkObjects( function(result) {} );
 		}
 		
-		var boundsChecker = _this.getBoundsChecker(drawingObject);
+		var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 		aBoundsCheckers.push(boundsChecker);
 		
         return ret;

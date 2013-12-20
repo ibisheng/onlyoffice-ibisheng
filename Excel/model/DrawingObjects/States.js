@@ -3209,6 +3209,7 @@ function ChartGroupState(drawingObjectsController, drawingObjects, group, chart)
 
 function ChartTextAddGroup(drawingObjectsController, drawingObjects, group, chart, textObject)
 {
+	var _this = this;
     this.id = STATES_ID_CHART_TEXT_GROUP;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -3265,7 +3266,7 @@ function ChartTextAddGroup(drawingObjectsController, drawingObjects, group, char
                 {
                     History.Create_NewPoint();
                     text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                    drawingObjects.showDrawingObjects(true);
+                    drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                     text_object.updateSelectionState(drawingObjects.drawingDocument);
                 }
             };
@@ -3574,6 +3575,7 @@ function MoveChartTitleGroup(drawingObjectsController, drawingObjects, group, ch
 
 function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObject)
 {
+	var _this = this;
     this.id = STATES_ID_TEXT_ADD_IN_GROUP;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -3635,7 +3637,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
                     {
                         History.Create_NewPoint();
                         text_object.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-                        drawingObjects.showDrawingObjects(true);
+                        drawingObjects.showDrawingObjects(false, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.AddText, 0));
                         text_object.updateSelectionState(drawingObjects.drawingDocument);
                     }
                 };
