@@ -2912,7 +2912,8 @@ function DrawingObjects() {
 	_this.init = function(currentSheet) {
 
 		var taskTimerId = setInterval(drawTaskFunction, 5);
-	
+
+        var api = window["Asc"]["editor"];
 		userId = api.User.asc_getId();
 		documentId = api.documentId;
 		worksheet = currentSheet;
@@ -2941,7 +2942,8 @@ function DrawingObjects() {
 		aObjects = [];
 		aImagesSync = [];
 		aObjectsSync = [];
-		
+
+        var theme = api.wbModel.theme;
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 			
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
@@ -2974,7 +2976,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.chart.worksheet = worksheet;
 				drawingObject.graphicObject.chart.rebuildSeries();
 				
-                drawingObject.graphicObject.init();
+                drawingObject.graphicObject.init(theme);
                 History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit2Chart, null, null,
                     new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
                 drawingObject.graphicObject.addToDrawingObjects();
@@ -2989,7 +2991,7 @@ function DrawingObjects() {
 				drawingObject.graphicObject.setDrawingObjects(_this);
                 drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
-
+                drawingObject.graphicObject.checkThemeFonts(theme);
                 if(!xfrm)
                 {
                     drawingObject.graphicObject.setXfrmObject(new CXfrm());
@@ -3041,6 +3043,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.setDrawingObjects(_this);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
+                drawingObject.graphicObject.checkThemeFonts(theme);
                 if(!xfrm)
                 {
                     drawingObject.graphicObject.setXfrmObject(new CXfrm());

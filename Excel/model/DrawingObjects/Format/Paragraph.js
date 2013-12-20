@@ -173,6 +173,57 @@ Paragraph.prototype =
         textPr.setParent(this);
     },
 
+    checkThemeFonts: function(theme)
+    {
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            var para_item = this.Content[i];
+            if(isRealObject(para_item) && para_item.Type === para_TextPr)
+            {
+                var text_pr = para_item.Value;
+                if(isRealObject(text_pr.FontFamily) && isThemeFont(text_pr.FontFamily.Name))
+                {
+                    if(theme && theme.themeElements && theme.themeElements.fontScheme)
+                        text_pr.FontFamily.Name = getFontInfo(text_pr.FontFamily.Name)(theme.themeElements.fontScheme);
+                    else
+                        text_pr.FontFamily.Name = "Arial";
+                }
+                if(isRealObject(text_pr.RFonts))
+                {
+                    if(isRealObject(text_pr.RFonts.Ascii) && isThemeFont(text_pr.RFonts.Ascii.Name))
+                    {
+                        if(theme && theme.themeElements && theme.themeElements.fontScheme)
+                            text_pr.RFonts.Ascii.Name = getFontInfo(text_pr.RFonts.Ascii.Name)(theme.themeElements.fontScheme);
+                        else
+                            text_pr.RFonts.Ascii.Name = "Arial";
+                    }
+                    if(isRealObject(text_pr.RFonts.CS) && isThemeFont(text_pr.RFonts.CS.Name))
+                    {
+                        if(theme && theme.themeElements && theme.themeElements.fontScheme)
+                            text_pr.RFonts.CS.Name = getFontInfo(text_pr.RFonts.CS.Name)(theme.themeElements.fontScheme);
+                        else
+                            text_pr.RFonts.CS.Name = "Arial";
+                    }
+                    if(isRealObject(text_pr.RFonts.EastAsia) && isThemeFont(text_pr.RFonts.EastAsia.Name))
+                    {
+                        if(theme && theme.themeElements && theme.themeElements.fontScheme)
+                            text_pr.RFonts.EastAsia.Name = getFontInfo(text_pr.RFonts.EastAsia.Name)(theme.themeElements.fontScheme);
+                        else
+                            text_pr.RFonts.EastAsia.Name = "Arial";
+                    }
+                    if(isRealObject(text_pr.RFonts.HAnsi) && isThemeFont(text_pr.RFonts.HAnsi.Name))
+                    {
+                        if(theme && theme.themeElements && theme.themeElements.fontScheme)
+                            text_pr.RFonts.HAnsi.Name = getFontInfo(text_pr.RFonts.HAnsi.Name)(theme.themeElements.fontScheme);
+                        else
+                            text_pr.RFonts.HAnsi.Name = "Arial";
+                    }
+
+                }
+            }
+        }
+    },
+
     getObjectType: function()
     {
         return CLASS_TYPE_PARAGRAPH;

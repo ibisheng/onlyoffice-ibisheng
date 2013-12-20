@@ -621,6 +621,17 @@ CGroupShape.prototype =
         }
     },
 
+    checkThemeFonts: function(theme)
+    {
+        for(var i  =0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].checkThemeFonts)
+            {
+                this.spTree[i].checkThemeFonts(theme);
+            }
+        }
+    },
+
     recalculate: function(aImages)
     {
         //if(this.recalcInfo.recalculateTransform)

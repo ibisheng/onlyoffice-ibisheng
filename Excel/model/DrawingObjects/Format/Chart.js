@@ -338,7 +338,7 @@ CChartAsGroup.prototype =
         this.spPr.xfrm = xfrm;
     },
 
-    init: function()
+    init: function(theme)
     {
         if(isRealObject(this.drawingBase))
         {
@@ -379,6 +379,7 @@ CChartAsGroup.prototype =
                     content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
+                    content.Content[i].checkThemeFonts(theme);
                 }
 				
 				this.chart.header.title = this.chartTitle.txBody.content.getTextString();
@@ -416,6 +417,7 @@ CChartAsGroup.prototype =
                     content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
+                    content.Content[i].checkThemeFonts(theme);
                 }
 				
 				this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();
@@ -458,6 +460,7 @@ CChartAsGroup.prototype =
                     content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
                     content.Content[i].setParent(content);
                     content.Content[i].setTextPr(new ParaTextPr());
+                    content.Content[i].checkThemeFonts(theme);
                 }
 				
 				this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();

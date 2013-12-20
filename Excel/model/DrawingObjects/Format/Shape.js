@@ -2925,6 +2925,18 @@ CShape.prototype =
         return this.hitInInnerArea(x, y) || this.hitInPath(x, y) || this.hitInTextRect(x, y);
     },
 
+    checkThemeFonts: function(theme)
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            var content = this.txBody.content.Content;
+            for(var i = 0; i < content.length; ++i)
+            {
+                content[i].checkThemeFonts(theme);
+            }
+        }
+    },
+
     hitInPath: function(x, y)
     {
         if(x < this.bounds.x
