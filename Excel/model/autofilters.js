@@ -57,7 +57,8 @@
 			asc_setVal: function (val) { this.val = val; },
 			asc_setVisible: function (val) { this.visible = val; }
 		};
-		
+
+		/** @constructor */
 		function formatTablePictures (options) {
 			if ( !(this instanceof formatTablePictures) ) {return new formatTablePictures(options);}
 			
@@ -1466,7 +1467,7 @@
 			//применяем сортировку из меню фильтра
 			sortColFilter: function(type, cellId, ar, isTurnOffHistory) {
 				var aWs = this._getCurrentWS();
-				var ws = this.worksheet;;
+				var ws = this.worksheet;
 				var currentFilter;
 				var curCell;
 				var sortRange;
