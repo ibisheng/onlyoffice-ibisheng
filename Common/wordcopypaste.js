@@ -5823,7 +5823,12 @@ PasteProcessor.prototype =
         }
         //��������� ����� ���������
         for(var i = 0, length = oPasteProcessor.aContent.length; i < length; ++i)
-            cell.Content.Internal_Content_Add(i + 1, oPasteProcessor.aContent[i]);
+		{
+			if(i == length - 1)
+				cell.Content.Internal_Content_Add(i + 1, oPasteProcessor.aContent[i], true);
+			else
+				cell.Content.Internal_Content_Add(i + 1, oPasteProcessor.aContent[i], false);
+		}
         //������� ��������, ������� ��������� � ������� �� ���������
         cell.Content.Internal_Content_Remove(0, 1);
     },
@@ -7113,7 +7118,12 @@ PasteProcessor.prototype =
 
             //��������� ����� ���������
             for(var i = 0, length = content.Content.length; i < length; ++i)
-                cell.Content.Internal_Content_Add(i + 1, content.Content[i]);
+			{
+				if(i == length - 1)
+					cell.Content.Internal_Content_Add(i + 1, content.Content[i], true);
+				else
+					cell.Content.Internal_Content_Add(i + 1, content.Content[i], false);
+			}
             //������� ��������, ������� ��������� � ������� �� ���������
             cell.Content.Internal_Content_Remove(0, 1);
             arrShapes2.splice(0, 1);
