@@ -656,6 +656,7 @@
 			asc_setText: function (val) { this.text = val; }
 		};
 
+		/** @constructor */
 		function asc_CPageMargins (obj) {
 			if ( !(this instanceof asc_CPageMargins) ) {
 				return new asc_CPageMargins(obj);
@@ -680,6 +681,7 @@
 			asc_setTop: function (val) { this.top = val; },
 			asc_setBottom: function (val) { this.bottom = val; }
 		};
+		/** @constructor */
 		function asc_CPageSetup (obj) {
 			if ( !(this instanceof asc_CPageSetup) ) {
 				return new asc_CPageSetup(obj);
@@ -701,6 +703,7 @@
 			asc_setWidth: function (val) { this.width = val; },
 			asc_setHeight: function (val) { this.height = val; }
 		};
+		/** @constructor */
 		function asc_CPageOptions (obj) {
 			if ( !(this instanceof asc_CPageOptions) ) {
 				return new asc_CPageOptions(obj);

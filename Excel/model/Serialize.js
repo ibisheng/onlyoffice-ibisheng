@@ -5077,6 +5077,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
+		var oBinary_TableReader;
         if ( c_oSerWorksheetsTypes.WorksheetProp == type )
         {
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
@@ -5206,7 +5207,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
 		else if ( c_oSerWorksheetsTypes.Autofilter == type )
 		{
-			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
+			oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oWorksheet.AutoFilter = new AutoFilter();
 			res = this.bcr.Read1(length, function(t,l){
 					return oBinary_TableReader.ReadAutoFilter(t,l, oWorksheet.AutoFilter);
@@ -5215,7 +5216,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if ( c_oSerWorksheetsTypes.TableParts == type )
         {
 			oWorksheet.TableParts = [];
-			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
+			oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oBinary_TableReader.Read(length, oWorksheet.TableParts);
         }
         else if ( c_oSerWorksheetsTypes.Comments == type )
