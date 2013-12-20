@@ -2565,6 +2565,7 @@ function DrawingObjects() {
 		chartRender = new ChartRender();
 	var worksheet = null;
 	
+	var isInit = false;
 	var drawingCtx = null;
 	var overlayCtx = null;
 	var shapeCtx = null;
@@ -2923,6 +2924,7 @@ function DrawingObjects() {
 		aImagesSync = [];
 		aObjectsSync = [];
 
+		isInit = false;
         var theme = api.wbModel.theme;
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 			
@@ -3047,7 +3049,6 @@ function DrawingObjects() {
                     new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
                 drawingObject.graphicObject.addToDrawingObjects();
 
-
                 var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 				aBoundsCheckers.push(boundsChecker);
             }
@@ -3087,6 +3088,7 @@ function DrawingObjects() {
 		}
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
+		isInit = true;
 	}
 
     _this.preCopy = function() {
@@ -4575,12 +4577,12 @@ function DrawingObjects() {
             ret = aObjects.length;
             aObjects.push(drawingObject);
         }
-
 		drawingObject.setGraphicObjectCoords();
 		
-		_this.showDrawingObjects(false);
+		if ( isInit )
+			_this.showDrawingObjects(false);
+			
 		_this.sendGraphicObjectProps();
-		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		
 		if ( lockByDefault ) {
