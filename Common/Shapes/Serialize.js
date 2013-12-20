@@ -366,6 +366,26 @@ function BinaryPPTYLoader()
 
         this.ImageMapChecker = null;
     }
+    
+    this.Load2(data, presentation)
+    {
+        this.presentation = presentation;
+        this.ImageMapChecker = new Object();
+        
+        this.stream = new FileStream(data, data,length);
+        this.stream.obj = null;
+        
+        this.presentation.ImageMap = new Object();
+        this.presentation.Fonts = new Array();
+        this.presentation.EmbeddedFonts = new Array();
+
+        if (presentation.globalTableStyles)
+            this.NextTableStyleId = this.presentation.globalTableStyles.length;
+
+        this.LoadDocument();
+
+        this.ImageMapChecker = null;        
+    }
 
     this.LoadDocument = function()
     {

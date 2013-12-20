@@ -1156,7 +1156,7 @@ CMetafile.prototype =
         }
         
         var _src = "";
-        if (!window.native)
+        if (!window.NATIVE_EDITOR_ENJINE)
         {
             var _img = window.editor.ImageLoader.map_image_index[img];
             if (_img == undefined || _img.Image == null)
