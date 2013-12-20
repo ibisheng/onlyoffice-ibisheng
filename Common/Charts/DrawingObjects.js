@@ -2454,6 +2454,16 @@ function GraphicOption(ws, type, delta) {
 	_this.type = type;
 	_this.delta = delta;		// Scroll offset: + Down || - Up
 	
+	function checkCol(col) {
+		while ( (col > 0) && !_this.ws.cols[col] )
+			_this.ws.expandColsOnScroll(true);
+	}
+	
+	function checkRow(row) {
+		while ( (row > 0) && !_this.ws.rows[row] )
+			_this.ws.expandRowsOnScroll(true);
+	}
+	
 	_this.isScrollType = function() {
 		return ( (_this.type === c_oAscGraphicOption.ScrollVertical) || (_this.type === c_oAscGraphicOption.ScrollHorizontal) );
 	}
@@ -2467,21 +2477,29 @@ function GraphicOption(ws, type, delta) {
 		switch (_this.type) {
 			case c_oAscGraphicOption.ScrollVertical: {
 				// Down
-				if ( _this.delta > 0 )
+				if ( _this.delta > 0 ) {
 					vr.r1 = vr.r2 - _this.delta;
+					checkRow(++vr.r2);
+				}
 				// Up
 				else
 					vr.r2 = vr.r1 - _this.delta;
+				
+				checkCol(++vr.c2);
 			}
 			break;
 			
 			case c_oAscGraphicOption.ScrollHorizontal: {
 				// Right
-				if ( _this.delta > 0 )
+				if ( _this.delta > 0 ) {
 					vr.c1 = vr.c2 - _this.delta;
+					checkCol(++vr.c2);
+				}
 				// Left
 				else
 					vr.c2 = vr.c1 - _this.delta;
+					
+				checkRow(++vr.r2);
 			}
 			break;
 			
@@ -2497,12 +2515,10 @@ function GraphicOption(ws, type, delta) {
 							vr.c1 = Math.max(coords.from.col, vr.c1);
 							vr.r1 = Math.max(coords.from.row, vr.r1);
 							
-							if ( !_this.ws.cols[coords.to.col + 1] )
-								_this.ws.expandColsOnScroll(true);
+							checkCol(coords.to.col + 1);
 							vr.c2 = Math.min(coords.to.col + 1, vr.c2);
 							
-							if ( !_this.ws.rows[coords.to.row + 1] )
-								_this.ws.expandRowsOnScroll(true);
+							checkRow(coords.to.row + 1);
 							vr.r2 = Math.min(coords.to.row + 1, vr.r2);
 						}
 					}
