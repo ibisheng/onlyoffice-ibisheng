@@ -72,7 +72,7 @@ CMathMatrix.prototype.init = function(props)
     this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
     this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
 
-    if(props.plcHide === true)
+    if(props.plcHide === true || props.plcHide === 1)
     {
         this.plcHide = true;
         this.hidePlaceholder(true);

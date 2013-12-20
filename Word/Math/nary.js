@@ -20,7 +20,7 @@ function CNary()
     this.grow = false;
     this.supHide = false;
     this.subHide = false;
-    this.limLoc = NARY_SubSup;
+    this.limLoc = NARY_UndOvr;
     CSubMathBase.call(this);
 }
 extend(CNary, CSubMathBase);

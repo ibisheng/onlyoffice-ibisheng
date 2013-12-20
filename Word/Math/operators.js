@@ -2966,7 +2966,9 @@ COperator.prototype.getChr = function()
     var chr = null; //если operator не определен, то this.code = null
 
     if(this.code !== null)
-        chr = this.typeOper == this.defaultType ? "" : String.fromCharCode(this.code);
+        chr = this.typeOper == this.defaultType ? null : String.fromCharCode(this.code);
+	if (this.operator == OPERATOR_EMPTY)
+		chr = "";
 
     return chr;
 }
@@ -3527,7 +3529,13 @@ CDelimiter.prototype.getPropsForWrite = function()
 
     props.grow = this.grow == true ? 1 : 0;
     props.column = this.nCol;
-    props.shp = this.shape;
+	
+	var shp = null
+	if ( this.shape == DELIMITER_SHAPE_MATH)
+		shp = 0;
+	else if ( this.shape == DELIMITER_SHAPE_CENTERED )
+		shp = 1;
+    props.shp = shp;
 
     props.begChr = this.begOper.getChr(); // default: PARENTHESIS_LEFT
     props.endChr = this.endOper.getChr(); // default: PARENTHESIS_RIGHT
@@ -3886,10 +3894,10 @@ CGroupCharacter.prototype.old_getGlyph = function(code, type)
 CGroupCharacter.prototype.getPropsForWrite = function()
 {
     var vertJc = null;
-    if (this.vertJc == VJUST_BOT)
-        vertJc = 0;
-    else if ( this.vertJc == VJUST_TOP)
+    if (this.vertJc == VJUST_TOP)
         vertJc = 1;
+    else 
+        vertJc = 0;
 
     var pos = null;
     if (this.loc == LOCATION_BOT)
