@@ -3903,3 +3903,110 @@ RangeDataManager.prototype = {
 		this.oDependenceManager = oDependenceManager;
 	}
 };
+
+// For Auto Filters
+/** @constructor */
+function TablePart() {
+	this.Ref = null;
+	this.HeaderRowCount = null;
+	this.TotalsRowCount = null;
+	this.DisplayName = null;
+	this.AutoFilter = null;
+	this.SortState = null;
+	this.TableColumns = null;
+	this.TableStyleInfo = null;
+}
+/** @constructor */
+function AutoFilter() {
+	this.Ref = null;
+	this.FilterColumns = null;
+	this.SortState = null;
+}
+/** @constructor */
+function SortState() {
+	this.Ref = null;
+	this.CaseSensitive = null;
+	this.SortConditions = null;
+}
+/** @constructor */
+function TableColumn() {
+	this.Name = null;
+	this.TotalsRowLabel = null;
+	this.TotalsRowFunction = null;
+	this.TotalsRowFormula = null;
+	this.dxf = null;
+	this.CalculatedColumnFormula = null;
+}
+/** @constructor */
+function TableStyleInfo() {
+	this.Name = null;
+	this.ShowColumnStripes = null;
+	this.ShowRowStripes = null;
+	this.ShowFirstColumn = null;
+	this.ShowLastColumn = null;
+}
+/** @constructor */
+function FilterColumn() {
+	this.ColId = null;
+	this.Filters = null;
+	this.CustomFiltersObj = null;
+	this.DynamicFilter = null;
+	this.ColorFilter = null;
+	this.Top10 = null;
+	this.ShowButton = true;
+}
+/** @constructor */
+function Filters() {
+	this.Values = [];
+	this.Dates = [];
+	this.Blank = null;
+}
+/** @constructor */
+function Filter() {
+	this.Val = null;
+}
+/** @constructor */
+function DateGroupItem() {
+	this.DateTimeGrouping = null;
+	this.Day = null;
+	this.Hour = null;
+	this.Minute = null;
+	this.Month = null;
+	this.Second = null;
+	this.Year = null;
+}
+/** @constructor */
+function CustomFilters() {
+	this.And = null;
+	this.CustomFilters = null;
+}
+/** @constructor */
+function CustomFilter() {
+	this.Operator = null;
+	this.Val = null;
+}
+/** @constructor */
+function DynamicFilter() {
+	this.Type = null;
+	this.Val = null;
+	this.MaxVal = null;
+}
+/** @constructor */
+function ColorFilter() {
+	this.CellColor = null;
+	this.dxf = null;
+}
+/** @constructor */
+function Top10() {
+	this.FilterVal = null;
+	this.Percent = null;
+	this.Top = null;
+	this.Val = null;
+}
+/** @constructor */
+function SortCondition() {
+	this.Ref = null;
+	this.ConditionSortBy = null;
+	this.ConditionDescending = null;
+	this.dxf = null;
+}

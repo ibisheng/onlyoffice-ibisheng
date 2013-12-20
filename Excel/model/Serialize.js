@@ -3510,7 +3510,7 @@ function Binary_TableReader(stream, ws, Dxfs)
         var oThis = this;
         if ( c_oSer_TablePart.Table == type )
         {
-			var oNewTable = new Object();
+			var oNewTable = new TablePart();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadTable(t,l, oNewTable);
 				});
@@ -3536,28 +3536,28 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oTable.DisplayName = this.stream.GetString2LE(length);
 		else if ( c_oSer_TablePart.AutoFilter == type )
 		{
-			oTable.AutoFilter = new Object();
+			oTable.AutoFilter = new AutoFilter();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadAutoFilter(t,l, oTable.AutoFilter);
 				});
 		}
 		else if ( c_oSer_TablePart.SortState == type )
 		{
-			oTable.SortState = new Object();
+			oTable.SortState = new SortState();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSortState(t,l, oTable.SortState);
 				});
 		}
 		else if ( c_oSer_TablePart.TableColumns == type )
 		{
-			oTable.TableColumns = new Array();
+			oTable.TableColumns = [];
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadTableColumns(t,l, oTable.TableColumns);
 				});
 		}
 		else if ( c_oSer_TablePart.TableStyleInfo == type )
 		{
-			oTable.TableStyleInfo = new Object();
+			oTable.TableStyleInfo = new TableStyleInfo();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadTableStyleInfo(t,l, oTable.TableStyleInfo);
 				});
@@ -3574,14 +3574,14 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oAutoFilter.Ref = this.stream.GetString2LE(length);
 		else if ( c_oSer_AutoFilter.FilterColumns == type )
 		{
-			oAutoFilter.FilterColumns = new Array();
+			oAutoFilter.FilterColumns = [];
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilterColumns(t,l, oAutoFilter.FilterColumns);
 				});
 		}
 		else if ( c_oSer_AutoFilter.SortState == type )
 		{
-			oAutoFilter.SortState = new Object();
+			oAutoFilter.SortState = new SortState();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSortState(t,l, oAutoFilter.SortState);
 				});
@@ -3589,14 +3589,14 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadFilterColumns = function(type, length, aFilterColumns)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_AutoFilter.FilterColumn == type )
 		{
-			var oFilterColumn = {ColId: null, Filters: null, CustomFiltersObj: null, DynamicFilter: null, ColorFilter: null, Top10: null, ShowButton: true};
+			var oFilterColumn = new FilterColumn();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilterColumn(t,l, oFilterColumn);
 				});
@@ -3605,7 +3605,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadFilterColumn = function(type, length, oFilterColumn)
     {
 		var res = c_oSerConstants.ReadOk;
@@ -3614,34 +3614,34 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oFilterColumn.ColId = this.stream.GetULongLE();
 		else if ( c_oSer_FilterColumn.Filters == type )
 		{
-			oFilterColumn.Filters = {Values: new Array(), Dates: new Array(), Blank: null};
+			oFilterColumn.Filters = new Filters();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilters(t,l, oFilterColumn.Filters);
 				});
 		}
 		else if ( c_oSer_FilterColumn.CustomFilters == type )
 		{
-			oFilterColumn.CustomFiltersObj = new Object();
+			oFilterColumn.CustomFiltersObj = new CustomFilters();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadCustomFilters(t,l, oFilterColumn.CustomFiltersObj);
 				});
 		}
 		else if ( c_oSer_FilterColumn.DynamicFilter == type )
 		{
-			oFilterColumn.DynamicFilter = new Object();
+			oFilterColumn.DynamicFilter = new DynamicFilter();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadDynamicFilter(t,l, oFilterColumn.DynamicFilter);
 				});
 		}else if ( c_oSer_FilterColumn.ColorFilter == type )
 		{
-			oFilterColumn.ColorFilter = new Object();
+			oFilterColumn.ColorFilter = new ColorFilter();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadColorFilter(t,l, oFilterColumn.ColorFilter);
 				});
 		}
 		else if ( c_oSer_FilterColumn.Top10 == type )
 		{
-			oFilterColumn.Top10 = new Object();
+			oFilterColumn.Top10 = new Top10();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadTop10(t,l, oFilterColumn.Top10);
 				});
@@ -3653,14 +3653,14 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadFilters = function(type, length, oFilters)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_FilterColumn.Filter == type )
 		{
-			var oFilterVal = new Object();
+			var oFilterVal = new Filter();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilter(t,l, oFilterVal);
 				});
@@ -3669,7 +3669,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 		}
 		else if ( c_oSer_FilterColumn.DateGroupItem == type )
 		{
-			var oDateGroupItem = new Object();
+			var oDateGroupItem = new DateGroupItem();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadDateGroupItem(t,l, oDateGroupItem);
 				});
@@ -3680,21 +3680,19 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadFilter = function(type, length, oFilter)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_Filter.Val == type )
 			oFilter.Val = this.stream.GetString2LE(length);
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadDateGroupItem = function(type, length, oDateGroupItem)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_DateGroupItem.DateTimeGrouping == type )
 			oDateGroupItem.DateTimeGrouping = this.stream.GetUChar();
 		else if ( c_oSer_DateGroupItem.Day == type )
@@ -3712,7 +3710,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadCustomFilters = function(type, length, oCustomFilters)
     {
 		var res = c_oSerConstants.ReadOk;
@@ -3721,22 +3719,22 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oCustomFilters.And = this.stream.GetBool();
 		else if ( c_oSer_CustomFilters.CustomFilters == type )
 		{
-			oCustomFilters.CustomFilters = new Array();
+			oCustomFilters.CustomFilters = [];
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadCustomFiltersItems(t,l, oCustomFilters.CustomFilters);
 				});
-		}	
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadCustomFiltersItems = function(type, length, aCustomFilters)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_CustomFilters.CustomFilter == type )
 		{
-			var oCustomFiltersItem = new Object();
+			var oCustomFiltersItem = new CustomFilter();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadCustomFiltersItem(t,l, oCustomFiltersItem);
 				});
@@ -3745,11 +3743,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadCustomFiltersItem = function(type, length, oCustomFiltersItem)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_CustomFilters.Operator == type )
 			oCustomFiltersItem.Operator = this.stream.GetUChar();
 		else if ( c_oSer_CustomFilters.Val == type )
@@ -3757,11 +3754,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadDynamicFilter = function(type, length, oDynamicFilter)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_DynamicFilter.Type == type )
 			oDynamicFilter.Type = this.stream.GetUChar();
 		else if ( c_oSer_DynamicFilter.Val == type )
@@ -3771,27 +3767,24 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadColorFilter = function(type, length, oColorFilter)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_ColorFilter.CellColor == type )
 			oColorFilter.CellColor = this.stream.GetBool();
 		else if ( c_oSer_ColorFilter.DxfId == type )
 		{
 			var DxfId = this.stream.GetULongLE();
-			var dxf = this.Dxfs[DxfId];
-			oColorFilter.dxf = dxf;
+			oColorFilter.dxf = this.Dxfs[DxfId];
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadTop10 = function(type, length, oTop10)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_Top10.FilterVal == type )
 			oTop10.FilterVal = this.stream.GetDoubleLE();
 		else if ( c_oSer_Top10.Percent == type )
@@ -3803,11 +3796,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadSortConditionContent = function(type, length, oSortCondition)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_SortState.ConditionRef == type )
 			oSortCondition.Ref = this.stream.GetString2LE(length);
 		else if ( c_oSer_SortState.ConditionSortBy == type )
@@ -3817,20 +3809,19 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else if ( c_oSer_SortState.ConditionDxfId == type )
 		{
 			var DxfId = this.stream.GetULongLE();
-			var dxf = this.Dxfs[DxfId];
-			oSortCondition.dxf = dxf;
+			oSortCondition.dxf = this.Dxfs[DxfId];
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadSortCondition = function(type, length, aSortConditions)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_SortState.SortCondition == type )
 		{
-			var oSortCondition = new Object();
+			var oSortCondition = new SortCondition();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadSortConditionContent(t,l, oSortCondition);
 				});
@@ -3839,7 +3830,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadSortState = function(type, length, oSortState)
     {
 		var res = c_oSerConstants.ReadOk;
@@ -3850,7 +3841,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oSortState.CaseSensitive = this.stream.GetBool();
 		else if ( c_oSer_SortState.SortConditions == type )
 		{
-			oSortState.SortConditions = new Array();
+			oSortState.SortConditions = [];
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSortCondition(t,l, oSortState.SortConditions);
 				});
@@ -3858,11 +3849,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadTableColumn = function(type, length, oTableColumn)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_TableColumns.Name == type )
 			oTableColumn.Name = this.stream.GetString2LE(length);
 		else if ( c_oSer_TableColumns.TotalsRowLabel == type )
@@ -3874,22 +3864,21 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else if ( c_oSer_TableColumns.DataDxfId == type )
 		{
 			var DxfId = this.stream.GetULongLE();
-			var dxf = this.Dxfs[DxfId];
-			oTableColumn.dxf = dxf;
+			oTableColumn.dxf = this.Dxfs[DxfId];
 		}
 		else if ( c_oSer_TableColumns.CalculatedColumnFormula == type )
 			oTableColumn.CalculatedColumnFormula = this.stream.GetString2LE(length);
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadTableColumns = function(type, length, aTableColumns)
     {
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_TableColumns.TableColumn == type )
 		{
-			var oTableColumn = new Object();
+			var oTableColumn = new TableColumn();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadTableColumn(t,l, oTableColumn);
 				});
@@ -3898,11 +3887,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	this.ReadTableStyleInfo = function(type, length, oTableStyleInfo)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if ( c_oSer_TableStyleInfo.Name == type )
 			oTableStyleInfo.Name = this.stream.GetString2LE(length);
 		else if ( c_oSer_TableStyleInfo.ShowColumnStripes == type )
@@ -3917,7 +3905,7 @@ function Binary_TableReader(stream, ws, Dxfs)
             res = c_oSerConstants.ReadUnknown;
         return res;
 	};
-};
+}
 /** @constructor */
 function Binary_SharedStringTableReader(stream, wb, aSharedStrings)
 {
@@ -5219,14 +5207,14 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if ( c_oSerWorksheetsTypes.Autofilter == type )
 		{
 			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
-			oWorksheet.AutoFilter = new Object();
+			oWorksheet.AutoFilter = new AutoFilter();
 			res = this.bcr.Read1(length, function(t,l){
 					return oBinary_TableReader.ReadAutoFilter(t,l, oWorksheet.AutoFilter);
 				});
 		}
 		else if ( c_oSerWorksheetsTypes.TableParts == type )
         {
-			oWorksheet.TableParts = new Array();
+			oWorksheet.TableParts = [];
 			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oBinary_TableReader.Read(length, oWorksheet.TableParts);
         }
