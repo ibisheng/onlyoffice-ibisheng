@@ -1427,5 +1427,4 @@ ScrollObject.prototype = {
          */
         handle( that );
     }
-
-}
+};
