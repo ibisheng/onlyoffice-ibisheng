@@ -370,19 +370,7 @@ CImageShape.prototype =
             this.recalculateBrush(aImagesSync);
             this.recalcInfo.recalculateBrush = false;
         }
-
-        try
-        {
-            var boundsChecker = new  CSlideBoundsChecker();
-            this.draw(boundsChecker);
-            boundsChecker.CorrectBounds();
-            this.bounds.x = boundsChecker.Bounds.min_x;
-            this.bounds.y = boundsChecker.Bounds.min_y;
-            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
-            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
-        }
-        catch(e)
-        {}
+        this.recalculateBounds();
     },
 
     recalculateBrush: function(aImagesSync)
@@ -464,20 +452,7 @@ CImageShape.prototype =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-
-
-        try
-        {
-            var boundsChecker = new  CSlideBoundsChecker();
-            this.draw(boundsChecker);
-            boundsChecker.CorrectBounds();
-            this.bounds.x = boundsChecker.Bounds.min_x;
-            this.bounds.y = boundsChecker.Bounds.min_y;
-            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
-            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
-        }
-        catch(e)
-        {}
+        this.recalculateBounds();
     },
 
     calculateTransformTextMatrix: function()
@@ -932,6 +907,22 @@ CImageShape.prototype =
         if(isRealObject(this.spPr.geometry))
             return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
         return false;
+    },
+
+    recalculateBounds: function()
+    {
+        try
+        {
+            var boundsChecker = new  CSlideBoundsChecker();
+            this.draw(boundsChecker);
+            boundsChecker.CorrectBounds();
+            this.bounds.x = boundsChecker.Bounds.min_x;
+            this.bounds.y = boundsChecker.Bounds.min_y;
+            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+        }
+        catch(e)
+        {}
     },
 
 

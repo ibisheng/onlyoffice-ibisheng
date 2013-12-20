@@ -1228,6 +1228,14 @@ CShape.prototype =
 			}
 		}
 
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
+        this.recalculateBounds();
+    },
+
+
+    recalculateBounds: function()
+    {
         try
         {
             var boundsChecker = new  CSlideBoundsChecker();
@@ -1240,8 +1248,6 @@ CShape.prototype =
         }
         catch(e)
         {}
-        this.calculateContent();
-        this.calculateTransformTextMatrix();
     },
 
     setDrawingDocument: function(drawingDocument)
@@ -2119,18 +2125,7 @@ CShape.prototype =
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
 
-        try
-        {
-            var boundsChecker = new  CSlideBoundsChecker();
-            this.draw(boundsChecker);
-            boundsChecker.CorrectBounds();
-            this.bounds.x = boundsChecker.Bounds.min_x;
-            this.bounds.y = boundsChecker.Bounds.min_y;
-            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
-            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
-        }
-        catch(e)
-        {}
+        this.recalculateBounds();
     },
 
     normalize: function()
