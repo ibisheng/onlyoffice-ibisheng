@@ -1988,6 +1988,18 @@ CDocumentContent.prototype =
                                 if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
                                     break;
 
+                                if ( undefined != ParaItem.Value.FontFamily )
+                                {
+                                    var FName  = ParaItem.Value.FontFamily.Name;
+                                    var FIndex = ParaItem.Value.FontFamily.Index;
+
+                                    ParaItem.Value.RFonts = new CRFonts();
+                                    ParaItem.Value.RFonts.Ascii    = { Name : FName, Index : FIndex };
+                                    ParaItem.Value.RFonts.EastAsia = { Name : FName, Index : FIndex };
+                                    ParaItem.Value.RFonts.HAnsi    = { Name : FName, Index : FIndex };
+                                    ParaItem.Value.RFonts.CS       = { Name : FName, Index : FIndex };
+                                }
+
                                 var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
                                 var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
                                 AbstrNum.Apply_TextPr( NumPr.Lvl, ParaItem.Value );
