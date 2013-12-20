@@ -51,6 +51,10 @@ function RgbColor(rgb)
 }
 RgbColor.prototype =
 {
+	clone : function()
+	{
+		return new RgbColor(this.rgb);
+	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.RgbColor;
@@ -114,6 +118,14 @@ function ThemeColor()
 }
 ThemeColor.prototype =
 {
+	clone : function()
+	{
+		var res = new ThemeColor();
+		res.rgb = this.rgb;
+		res.theme = this.theme;
+		res.tint = this.tint;
+		return res;
+	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.ThemeColor;
@@ -312,7 +324,7 @@ ColorManager.prototype =
 			}
 		}
 	}
-}
+};
 g_oColorManager = new ColorManager();
 
 /** @constructor */

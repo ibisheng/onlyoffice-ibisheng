@@ -836,6 +836,8 @@
 				var result = new asc_CSheetViewSettings();
 				result.showGridLines = this.showGridLines;
 				result.showRowColHeaders = this.showRowColHeaders;
+				if (this.pane)
+					result.pane = this.pane.clone();
 				return result;
 			},
 			isEqual: function (settings) {
@@ -881,6 +883,12 @@
 
 			return this;
 		}
+		asc_CPane.prototype.clone = function() {
+			var res = new asc_CPane();
+			res.state = this.state;
+			res.topLeftCell = this.topLeftCell;
+			return res;
+		};
 
 		function RedoObjectParam () {
 			if (!(this instanceof RedoObjectParam)) {
@@ -1052,6 +1060,23 @@
 
 			return this;
 		}
+		asc_CSheetPr.prototype.clone = function()  {
+			var res = new asc_CSheetPr();
+
+			res.CodeName = this.CodeName;
+			res.EnableFormatConditionsCalculation = this.EnableFormatConditionsCalculation;
+			res.FilterMode = this.FilterMode;
+			res.Published = this.Published;
+			res.SyncHorizontal = this.SyncHorizontal;
+			res.SyncRef = this.SyncRef;
+			res.SyncVertical = this.SyncVertical;
+			res.TransitionEntry = this.TransitionEntry;
+			res.TransitionEvaluation = this.TransitionEvaluation;
+			if (this.TabColor)
+				res.TabColor = this.TabColor.clone();
+
+			return res;
+		};
 
 		// Математическая информация о выделении
 		/** @constructor */

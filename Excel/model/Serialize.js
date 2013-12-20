@@ -5226,9 +5226,9 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
 			oConditionalFormatting = new Asc.CConditionalFormatting();
 			res = this.bcr.Read1(length, function (t, l) {
-				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting,
-					function (sRange) {return oWorksheet.getRange2(sRange);});
+				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
 			});
+			oConditionalFormatting.recalc(oWorksheet);
 			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
 		} else if (c_oSerWorksheetsTypes.SheetViews === type) {
 			res = this.bcr.Read1(length, function (t, l) {
@@ -5881,7 +5881,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadConditionalFormatting = function (type, length, oConditionalFormatting, functionGetRange2) {
+	this.ReadConditionalFormatting = function (type, length, oConditionalFormatting) {
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
 		var oConditionalFormattingRule = null;
@@ -5889,7 +5889,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			oConditionalFormatting.Pivot = this.stream.GetBool();
 		else if (c_oSer_ConditionalFormatting.SqRef === type) {
 			oConditionalFormatting.SqRef = this.stream.GetString2LE(length);
-			oConditionalFormatting.SqRefRange = functionGetRange2(oConditionalFormatting.SqRef);
 		}
 		else if (c_oSer_ConditionalFormatting.ConditionalFormattingRule === type) {
 			oConditionalFormattingRule = new Asc.CConditionalFormattingRule();
@@ -5914,8 +5913,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if (c_oSer_ConditionalFormattingRule.DxfId === type)
 		{
 			var DxfId = this.stream.GetULongLE();
-			var dxf = this.Dxfs[DxfId];
-			oConditionalFormattingRule.dxf = dxf;
+			oConditionalFormattingRule.dxf = this.Dxfs[DxfId];
 		}
 		else if (c_oSer_ConditionalFormattingRule.EqualAverage === type)
 			oConditionalFormattingRule.EqualAverage = this.stream.GetBool();

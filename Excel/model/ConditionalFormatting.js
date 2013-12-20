@@ -35,6 +35,19 @@
 
 		return this;
 	}
+	CConditionalFormatting.prototype.clone = function(ws) {
+		var i, res = new CConditionalFormatting();
+		res.Pivot = this.Pivot;
+		res.SqRef = this.SqRef;
+		for (i = 0; i < this.aRules.length; ++i)
+			res.aRules.push(this.aRules[i].clone());
+
+		res.recalc(ws);
+		return res;
+	};
+	CConditionalFormatting.prototype.recalc = function(ws) {
+		this.SqRefRange = ws.getRange2(this.SqRef);
+	};
 
 	function CConditionalFormattingRule () {
 		if ( !(this instanceof CConditionalFormattingRule) ) {
@@ -59,6 +72,27 @@
 
 		return this;
 	}
+	CConditionalFormattingRule.prototype.clone = function() {
+		var i, res = new CConditionalFormattingRule();
+		res.AboveAverage = this.AboveAverage;
+		res.Bottom = this.Bottom;
+		if (this.dxf)
+			res.dxf = this.dxf.clone();
+		res.EqualAverage = this.EqualAverage;
+		res.Operator = this.Operator;
+		res.Percent = this.Percent;
+		res.Priority = this.Priority;
+		res.Rank = this.Rank;
+		res.StdDev = this.StdDev;
+		res.StopIfTrue = this.StopIfTrue;
+		res.Text = this.Text;
+		res.TimePeriod = this.TimePeriod;
+		res.Type = this.Type;
+
+		for (i = 0; i < this.aRuleElements.length; ++i)
+			res.aRuleElements.push(this.aRuleElements[i].clone());
+		return res;
+	};
 
 	function CColorScale () {
 		if ( !(this instanceof CColorScale) ) {
@@ -70,6 +104,14 @@
 
 		return this;
 	}
+	CColorScale.prototype.clone = function() {
+		var i, res = new CColorScale();
+		for (i = 0; i < this.aCFVOs.length; ++i)
+			res.aCFVOs.push(this.aCFVOs[i].clone());
+		for (i = 0; i < this.aColors.length; ++i)
+			res.aColors.push(this.aColors[i].clone());
+		return res;
+	};
 
 	function CDataBar () {
 		if ( !(this instanceof CDataBar) ) {
@@ -85,6 +127,17 @@
 
 		return this;
 	}
+	CDataBar.prototype.clone = function() {
+		var i, res = new CDataBar();
+		res.MaxLength = this.MaxLength;
+		res.MinLength = this.MinLength;
+		res.ShowValue = this.ShowValue;
+		for (i = 0; i < this.aCFVOs.length; ++i)
+			res.aCFVOs.push(this.aCFVOs[i].clone());
+		if (this.Color)
+			res.Color = this.Color.clone();
+		return res;
+	};
 
 	function CFormulaCF () {
 		if ( !(this instanceof CFormulaCF) ) {
@@ -95,6 +148,11 @@
 
 		return this;
 	}
+	CFormulaCF.prototype.clone = function() {
+		var res = new CFormulaCF();
+		res.Text = this.Text;
+		return res;
+	};
 
 	function CIconSet () {
 		if ( !(this instanceof CIconSet) ) {
@@ -110,6 +168,16 @@
 
 		return this;
 	}
+	CIconSet.prototype.clone = function() {
+		var i, res = new CIconSet();
+		res.IconSet = this.IconSet;
+		res.Percent = this.Percent;
+		res.Reverse = this.Reverse;
+		res.ShowValue = this.ShowValue;
+		for (i = 0; i < this.aCFVOs.length; ++i)
+			res.aCFVOs.push(this.aCFVOs[i].clone());
+		return res;
+	};
 
 	function CConditionalFormatValueObject () {
 		if ( !(this instanceof CConditionalFormatValueObject) ) {
@@ -122,6 +190,13 @@
 
 		return this;
 	}
+	CConditionalFormatValueObject.prototype.clone = function() {
+		var res = new CConditionalFormatValueObject();
+		res.Gte = this.Gte;
+		res.Type = this.Type;
+		res.Val = this.Val;
+		return res;
+	};
 
 	function CGradient (c1, c2) {
 		if ( !(this instanceof CGradient) ) {

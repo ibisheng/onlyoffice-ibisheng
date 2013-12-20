@@ -2290,12 +2290,12 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	
 	this.nMaxRowId = 1;
 	this.nMaxColId = 1;
-};
+}
 Woorksheet.prototype.rebuildColors=function(){
 	this._forEachCell(function(cell){
 		cell.cleanCache();
 	});
-}
+};
 Woorksheet.prototype.generateFontMap=function(oFontMap){
 	//пробегаемся по Drawing
 	for(var i = 0, length = this.Drawings.length; i < length; ++i)
@@ -2386,7 +2386,15 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 			comment.setId();
 			oNewWs.aComments.push(comment);
 		}
-	}		
+	}
+	for (i = 0; i < this.sheetViews.length; ++i) {
+		oNewWs.sheetViews.push(this.sheetViews[i].clone());
+	}
+	for (i = 0; i < this.aConditionalFormatting.length; ++i) {
+		oNewWs.aConditionalFormatting.push(this.aConditionalFormatting[i].clone(oNewWs));
+	}
+	if (this.sheetPr)
+		oNewWs.sheetPr = this.sheetPr.clone();
 	return oNewWs;
 };
 Woorksheet.prototype.copyDrawingObjects=function(oNewWs)
@@ -4826,7 +4834,7 @@ function Range(worksheet, r1, c1, r2, c2){
 	//first last устарели, не убраны только для совместимости
 	this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
 	this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
-};
+}
 Range.prototype.clone=function(){
 	return new Range(this.worksheet, this.bbox.r1, this.bbox.c1, this.bbox.r2, this.bbox.c2);
 }
