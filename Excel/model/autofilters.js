@@ -1196,7 +1196,7 @@
 						//if (bIsActiveSheet)
 							//данные фунцкии не занимаются отрисовкой, а заполняют необходимые массивы. нужно для совместного редактировния в случае неактивного листа.
 							this._addButtonAF(newRes, bIsOpenFilter);
-							this.drawAutoF(true);
+							//this.drawAutoF(true);
 					}
 					else if(!this.allButtonAF)
 						this.allButtonAF = [];
@@ -1252,20 +1252,135 @@
 					}
 				}
 			},
+
+			drawAutoF2: function (visibleRange, offsetX, offsetY) {
+				var buttons = this.allButtonAF;
+				var ws = this.worksheet;
+				//проверяем, затрагивают ли данные кнопки визуальную область
+				if (buttons) {
+					var activeButtonFilter = [];
+					var passiveButtonFilter = [];
+					for (var i = 0; i < buttons.length; i++) {
+						if (!this._isNeedDrawButton(buttons[i], visibleRange))
+							continue;
+
+						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();
+						var col = range[0].oId.col - 1;
+						var row = range[0].oId.row - 1;
+						//считаем сдвиг для скролла
+						var width = 13;
+						var height = 13;
+						var rowHeight = ws.rows[row].height;
+						if (rowHeight < height) {
+							width = width*(rowHeight/height);
+							height = rowHeight;
+						}
+						var x1 = (ws.cols[col].left + ws.cols[col].width - width - offsetX - 0.5)*ws.getZoom();
+						var y1 = (ws.rows[row].top + ws.rows[row].height - height - offsetY - 0.5)*ws.getZoom();
+						buttons[i].x = x1;
+						buttons[i].y = y1;
+						buttons[i].x1 = ws.cols[col].left - offsetX;
+						buttons[i].y1 = ws.rows[row].top - offsetY;
+						buttons[i].width = ws.cols[col].width;
+						buttons[i].height = ws.rows[row].height;
+
+						var isSetFilter = false;
+
+						//проверяем , применен ли фильтр
+						var activeCells = this._idToRange(buttons[i].id);
+						var indexFilter = this._findArrayFromAllFilter3(activeCells,buttons[i].id);
+						if (indexFilter != undefined && indexFilter.toString().search(":") > -1) {
+							var aWs  = this._getCurrentWS();
+							var filtersOp = indexFilter.split(':');
+							var currentFilter;
+							var curFilForSort;
+							if (filtersOp[0] == 'all') {
+								currentFilter = aWs.AutoFilter;
+								curFilForSort = aWs.AutoFilter;
+							} else {
+								currentFilter = aWs.TableParts[filtersOp[0]].AutoFilter;
+								curFilForSort = aWs.TableParts[filtersOp[0]];
+							}
+							var filters;
+							if (currentFilter && currentFilter.FilterColumns) {
+								filters = currentFilter.FilterColumns;
+								for (var k= 0; k < filters.length; k++) {
+									//для мерженных головных ячеек
+									var colId = filters[k].ColId;
+									if (filters[k].ShowButton == false && currentFilter.result) {
+										for (var sb = filters[k].ColId; sb < currentFilter.result.length; sb++) {
+											if (currentFilter.result[sb].showButton != false) {
+												colId = sb;
+												break;
+											}
+										}
+									}
+									if (colId == filtersOp[1] && (filters[k].Filters != null || filters[k].CustomFiltersObj != null)) {
+										isSetFilter = true;
+										filters = filters[k];
+										break;
+									}
+								}
+							}
+							else
+								isSetFilter = false;
+
+							//добавляем какие именно строки скрыты этим фильтром
+							//применяем к заданному диапазону фильтр и смотрим какие строки им скрыты
+							var hiddenRowsObj = this._getHiddenRows(buttons[i].id,buttons[i].idNext,filters);
+							buttons[i].hiddenRows = hiddenRowsObj;
+							//изменяем result у объекта автофильтра
+							if (curFilForSort.result) {
+								for (var n = 0; n < curFilForSort.result.length; n++) {
+									if(curFilForSort.result[n].id == buttons[i].id) {
+										curFilForSort.result[n].hiddenRows = hiddenRowsObj;
+									}
+								}
+							}
+
+							if(isSetFilter)
+								activeButtonFilter[activeButtonFilter.length]  = buttons[i];
+							else
+								passiveButtonFilter[passiveButtonFilter.length] = buttons[i];
+							var sortState = undefined;
+							if(curFilForSort.SortState) {
+								if(curFilForSort.SortState.SortConditions && curFilForSort.SortState.SortConditions.length != 0 && curFilForSort.SortState.SortConditions[0].Ref.split(':')[0] ==  buttons[i].id)
+									sortState = !curFilForSort.SortState.SortConditions[0].ConditionDescending;
+							}
+							var filOptions = {
+								sortState: sortState,
+								isSetFilter: isSetFilter,
+								row: row,
+								col: col
+							};
+							if (buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top)
+								this._drawButton(x1,y1,filOptions);
+						}
+					}
+					//фильтры ставим в порядок добавления
+					for (k = 0; k < passiveButtonFilter.length + activeButtonFilter.length; k++) {
+						if(activeButtonFilter[k])
+							buttons[k] = activeButtonFilter[k];
+						else
+							buttons[k] = passiveButtonFilter[k - activeButtonFilter.length];
+					}
+				}
+			},
 			
 			//перерисовка и отрисовка кнопок(draw:)
 			drawAutoF: function(isNotDraw){
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
 				//проверяем, затрагивают ли данные кнопки визуальную область
-				if(buttons && this._isNeedDrawButton())
+				if(buttons)
 				{
 					var activeButtonFilter = [];
 					var passiveButtonFilter = [];
-					var newButtons = [];
-					var l = 0;
 					for(var i = 0; i < buttons.length; i++)
 					{
+						if (!this._isNeedDrawButton(buttons[i], ws.visibleRange))
+							continue;
+
 						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();
 						var col = range[0].oId.col - 1;
 						var row = range[0].oId.row - 1;
@@ -1296,8 +1411,6 @@
 						var indexFilter = this._findArrayFromAllFilter3(activeCells,buttons[i].id);
 						if(indexFilter != undefined && indexFilter.toString().search(":") > -1)
 						{
-							newButtons[l] = buttons[i];
-							l++;
 							var aWs  = this._getCurrentWS();
 							var filtersOp = indexFilter.split(':');
 							var currentFilter;
@@ -1385,7 +1498,6 @@
 								this._drawButton(x1,y1,filOptions)
 						}
 					}
-					this.allButtonAF = newButtons;
 					//фильтры ставим в порядок добавления
 					for(k = 0; k < passiveButtonFilter.length + activeButtonFilter.length; k++)
 					{
@@ -2641,7 +2753,7 @@
 				ws.isChanged = true;
 				this._reDrawFilters();
 				//ws.changeWorksheet("update");
-				this.drawAutoF();
+				//this.drawAutoF();
 			},
 			
 			_getAutoFilterArray: function(cell) {
@@ -5907,7 +6019,7 @@
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
 					this._reDrawFilters();
-					this.drawAutoF();
+					//this.drawAutoF();
 				}
 				else
 				{
@@ -6396,19 +6508,9 @@
 				return true;
 			},
 			
-			_isNeedDrawButton: function()
-			{
-				var ws = this.worksheet;
-				var buttons = this.allButtonAF;
-				var visibleRange = ws.visibleRange;
-				var buttonCell;
-				for(var i = 0; i < buttons.length; i++)
-				{
-					buttonRange = this._idToRange(buttons[i].id);
-					if(buttonRange.r1 >= visibleRange.r1 && buttonRange.r1 <= visibleRange.r2 && buttonRange.c1 >= visibleRange.c1 && buttonRange.c1 <= visibleRange.c2)
-						return true;
-				}
-				return false;
+			_isNeedDrawButton: function(button, visibleRange) {
+				var buttonRange = this._idToRange(button.id);
+				return (buttonRange.r1 >= visibleRange.r1 && buttonRange.r1 <= visibleRange.r2 && buttonRange.c1 >= visibleRange.c1 && buttonRange.c1 <= visibleRange.c2)
 			},
 			
 			_clearFormatTableStyle: function(range)

@@ -2879,8 +2879,9 @@
 				}
 			},
 
-			_drawSelectionElement: function (range, visibleRange, offsetX, offsetY, isDashLine,
-											 lineWidth, strokeColor, fillColor, isAllRange) {
+			_drawSelectionElement: function (visibleRange, offsetX, offsetY, args) {
+				var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3],
+					fillColor = args[4], isAllRange = args[5];
 				var ctx = this.overlayCtx, c = this.cols, r = this.rows;
 				var oIntersection = range.intersectionSimple(visibleRange);
 				if (!oIntersection)
@@ -2936,18 +2937,9 @@
 
 				ctx.closePath().stroke();
 			},
-			/**
-			 * Отрисовывает диапазон с заданными параметрами
-			 * @param range
-			 * @param isDashLine
-			 * @param lineWidth
-			 * @param strokeColor
-			 * @param fillColor
-			 * @param isAllRange
-			 * @private
-			 */
-			_drawSelectionElements: function (range, isDashLine, lineWidth, strokeColor, fillColor, isAllRange) {
-				var cFrozen = 0, rFrozen = 0,
+			/**Отрисовывает диапазон с заданными параметрами*/
+			_drawElements: function (thisArg, drawFunction) {
+				var cFrozen = 0, rFrozen = 0, args = Array.prototype.slice.call(arguments, 2),
 					c = this.cols, r = this.rows,
 					offsetX = c[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = r[this.visibleRange.r1].top - this.cellsTop;
@@ -2961,23 +2953,20 @@
 					cFrozen -= 1; rFrozen -= 1;
 					if (0 <= cFrozen && 0 <= rFrozen) {
 						oFrozenRange = new asc_Range(0, 0, cFrozen, rFrozen);
-						this._drawSelectionElement(range, oFrozenRange, c[0].left - this.cellsLeft,
-							r[0].top - this.cellsTop, isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+						drawFunction.call(thisArg, oFrozenRange, c[0].left - this.cellsLeft, r[0].top - this.cellsTop, args);
 					}
 					if (0 <= cFrozen) {
 						oFrozenRange = new asc_Range(0, this.visibleRange.r1, cFrozen, this.visibleRange.r2);
-						this._drawSelectionElement(range, oFrozenRange, c[0].left - this.cellsLeft, offsetY,
-							isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+						drawFunction.call(thisArg, oFrozenRange, c[0].left - this.cellsLeft, offsetY, args);
 					}
 					if (0 <= rFrozen) {
 						oFrozenRange = new asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, rFrozen);
-						this._drawSelectionElement(range, oFrozenRange, offsetX, r[0].top - this.cellsTop,
-							isDashLine, lineWidth, strokeColor, fillColor, isAllRange);
+						drawFunction.call(thisArg, oFrozenRange, offsetX, r[0].top - this.cellsTop, args);
 					}
 				}
 
-				this._drawSelectionElement(range, this.visibleRange, offsetX, offsetY, isDashLine,
-					lineWidth, strokeColor, fillColor, isAllRange);
+				// Можно вместо call попользовать apply, но тогда нужно каждый раз соединять массив аргументов и 3 объекта
+				drawFunction.call(thisArg, this.visibleRange, offsetX, offsetY, args);
 			},
 
 			/**
@@ -3321,13 +3310,14 @@
 						continue;
 					var oFormulaRange = arrRanges[i].clone(true);
 					strokeColor = fillColor = opt.formulaRangeBorderColor[i%lengthColors];
-					this._drawSelectionElements(oFormulaRange, isDashLine, lineWidth, strokeColor, fillColor);
+					this._drawElements(this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth,
+						strokeColor, fillColor);
 				}
 			},
 
 			_drawSelectRange: function (oSelectRange) {
 				var lineWidth = 1, isDashLine = true, strokeColor = c_oAscCoAuthoringOtherBorderColor;
-				this._drawSelectionElements(oSelectRange, isDashLine, lineWidth, strokeColor);
+				this._drawElements(this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, strokeColor);
 			},
 			
 			_drawCollaborativeElements: function (bIsDrawObjects) {
@@ -3346,7 +3336,7 @@
 						strokeColor = (c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ?
 							c_oAscCoAuthoringLockTablePropertiesBorderColor : c_oAscCoAuthoringOtherBorderColor,
 						oAllRange = asc_Range (0, 0, gc_nMaxCol0, gc_nMaxRow0);
-					this._drawSelectionElements(oAllRange, isDashLine, lineWidth, strokeColor, null, isAllRange);
+					this._drawElements(this, this._drawSelectionElement, oAllRange, isDashLine, lineWidth, strokeColor, null, isAllRange);
 				}
 			},
 
@@ -3375,12 +3365,12 @@
 
 				for (i = 0; i < arrayCells.length; ++i) {
 					oCellTmp = asc_Range (arrayCells[i].c1, arrayCells[i].r1, arrayCells[i].c2, arrayCells[i].r2);
-					this._drawSelectionElements(oCellTmp, isDashLine, lineWidth, strokeColor);
+					this._drawElements(this, this._drawSelectionElement, oCellTmp, isDashLine, lineWidth, strokeColor);
 				}
 			},
 
 			_drawGraphic: function() {
-				this.autoFilters.drawAutoF();
+				this._drawElements(this.autoFilters, this.autoFilters.drawAutoF2);
 				this.cellCommentator.drawCommentCells();
 			},
 			
