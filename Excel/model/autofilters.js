@@ -1258,8 +1258,6 @@
 				var ws = this.worksheet;
 				//проверяем, затрагивают ли данные кнопки визуальную область
 				if (buttons) {
-					var activeButtonFilter = [];
-					var passiveButtonFilter = [];
 					for (var i = 0; i < buttons.length; i++) {
 						if (!this._isNeedDrawButton(buttons[i], visibleRange))
 							continue;
