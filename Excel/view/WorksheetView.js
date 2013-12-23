@@ -307,7 +307,9 @@
 			// Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
 			this.updateZoom = false;
 
-			var cnv = $('<canvas width="2" height="2"/>')[0];
+			var cnv = document.createElement("canvas");
+			cnv.width = 2;
+			cnv.height = 2;
 			var ctx = cnv.getContext("2d");
 			ctx.clearRect(0, 0, 2, 2);
 			ctx.fillStyle = "#000";

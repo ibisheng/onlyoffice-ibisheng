@@ -410,8 +410,8 @@ function DrawingContext(settings) {
 	var ppiTest =
 			$('<div style="position: absolute; width: 10in; height:10in; visibility:hidden; padding:0;"/>')
 			.appendTo("body");
-	this.ppiX = asc_round(ppiTest[0].offsetWidth * 0.1);
-	this.ppiY = asc_round(ppiTest[0].offsetHeight * 0.1);
+	this.ppiX = asc_round(ppiTest[0] ? (ppiTest[0].offsetWidth * 0.1) : 96);
+	this.ppiY = asc_round(ppiTest[0] ? (ppiTest[0].offsetHeight * 0.1) : 96);
 	ppiTest.remove();
 
 	this._mct  = new Matrix();  // units transform
