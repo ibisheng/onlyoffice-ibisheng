@@ -12402,7 +12402,7 @@ CParaLineMetrics.prototype =
         }
         return LineGap;
     }
-}
+};
 
 function CParaLine(StartPos)
 {

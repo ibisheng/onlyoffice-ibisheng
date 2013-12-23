@@ -60,7 +60,7 @@ var c_oAscTableSelectionType =
     Row    : 1,
     Column : 2,
     Table  : 3
-}
+};
 
 var linerule_AtLeast = 0;
 var linerule_Auto    = 1;
