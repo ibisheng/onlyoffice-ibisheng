@@ -40,7 +40,6 @@
 			this.moveRangeTimerId = undefined;
 			this.moveResizeRangeTimerId = undefined;
 			this.fillHandleModeTimerId = undefined;
-			this.moveRangeId = undefined;
 			this.enableKeyEvents = true;
 			this.isSelectMode = false;
 			this.hasCursor = false;
@@ -62,7 +61,6 @@
 			this.isSelectionDialogMode = false;
 			// Режим формулы
 			this.isFormulaEditMode = false;
-			this.endWasPressed = false;
 			
 			// Обработчик кликов для граф.объектов
 			this.clickCounter = new ClickCounter();
@@ -808,9 +806,6 @@
 						if (event.ctrlKey) {
 							dr = 2.5;
 						}
-						/* else {
-							t.endWasPressed = true;
-						} */
 						break;
 
 					case 53: // make strikethrough	Ctrl + 5
@@ -1427,7 +1422,6 @@
 			/** @param event {jQuery.Event} */
 			_onMouseDblClick: function (event) {
 				var t = this;
-				var coord = t._getCoordinates(event);
 			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;
