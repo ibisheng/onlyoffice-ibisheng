@@ -16,6 +16,7 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var asc = window["Asc"];
+		var asc_applyFunction = asc.applyFunction;
 		var asc_calcnpt = asc.calcNearestPt;
 		var asc_getcvt  = asc.getCvtRatio;
 		var asc_getprop = asc.getProperty;
@@ -846,7 +847,7 @@
 						History.SetSelectionRedo(arCopy.clone());
 						History.StartTransaction();
 
-						if ($.isFunction(functionAction)) {functionAction();}
+						asc_applyFunction(functionAction);
 
 						History.EndTransaction();
 					};
@@ -8564,7 +8565,7 @@
 			_isLockedAll: function (callback) {
 				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
 					// Запрещено совместное редактирование
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					return;
 				}
 				var sheetId = this.model.getId();
@@ -8576,18 +8577,18 @@
 
 				if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					callback = undefined;
 				}
 				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 					c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/true)) {
 					// Редактируем сами
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					return;
 				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 					c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true)) {
 					// Уже ячейку кто-то редактирует
-					if ($.isFunction(callback)) {callback(false);}
+					asc_applyFunction(callback, false);
 					return;
 				}
 
@@ -8642,7 +8643,7 @@
 			_isLockedCells: function (range, subType, callback) {
 				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
 					// Запрещено совместное редактирование
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					return true;
 				}
 				var sheetId = this.model.getId();
@@ -8669,7 +8670,7 @@
 						if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 							c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 							// Уже ячейку кто-то редактирует
-							if ($.isFunction(callback)) {callback(false);}
+							asc_applyFunction(callback, false);
 							return false;
 						} else {
 							if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
@@ -8764,7 +8765,7 @@
 					if (false === isSuccess)
 						return;
 
-					if ($.isFunction(functionModelAction)) {functionModelAction();}
+					asc_applyFunction(functionModelAction);
 
 					t._initCellsArea(fullRecalc);
 					if (fullRecalc) {

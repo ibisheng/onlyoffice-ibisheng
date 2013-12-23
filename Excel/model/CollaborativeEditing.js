@@ -13,9 +13,10 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var asc				= window["Asc"];
-		var asc_lockInfo	= asc.asc_CLockInfo;
-		var asc_Range		= asc.Range;
+		var asc					= window["Asc"];
+		var asc_applyFunction	= asc.applyFunction;
+		var asc_lockInfo		= asc.asc_CLockInfo;
+		var asc_Range			= asc.Range;
 
 		/**
 		 * Отвечает за совместное редактирование
@@ -125,7 +126,7 @@
 					}
 				}
 				else {
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 
 					// Снимаем глобальный лок (для редактирования ячейки)
 					this.m_bGlobalLockEditCell = false;
@@ -151,9 +152,9 @@
 						}
 					}
 
-					if ($.isFunction(callback)) { callback(true); }
+					asc_applyFunction(callback, true);
 				} else if (result["error"]) {
-					if ($.isFunction(callback)) { callback(false); }
+					asc_applyFunction(callback, false);
 				}
 			},
 			addUnlock: function (LockClass) {

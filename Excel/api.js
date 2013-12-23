@@ -12,6 +12,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 
 		var asc = window["Asc"];
+		var asc_applyFunction = asc.applyFunction;
 		var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
 		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
 		var asc_user  = asc.asc_CUser;
@@ -1847,22 +1848,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_getIsLockObjectSheet: function (lockInfo, callback) {
 				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
 					// Запрещено совместное редактирование
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					return;
 				}
 
 				if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					callback = undefined;
 				}
 				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 					// Редактируем сами
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 					return;
 				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 					// Уже ячейку кто-то редактирует
-					if ($.isFunction(callback)) {callback(false);}
+					asc_applyFunction(callback, false);
 					return;
 				}
 

@@ -11,6 +11,7 @@
 	function ($, window, undefined) {
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+		var asc_applyFunction = asc.applyFunction;
 		var namespace = "ASC_Spreadsheet";
 
 
@@ -395,7 +396,7 @@
 								if (!t.handlers.trigger("stopCellEditing")) {return;}
 							}
 
-							if ($.isFunction(callback)) {callback();}
+							asc_applyFunction(callback);
 						});
 			},
 
@@ -502,7 +503,7 @@
 						if (d.deltaY) {
 							t.scrollVertical(d.deltaY);
 						}
-						if ($.isFunction(callback)) {callback();}
+						asc_applyFunction(callback);
 					});
 			},
 			
@@ -549,9 +550,7 @@
 						if (d.deltaY) {
 							t.scrollVertical(d.deltaY);
 						}
-						if ($.isFunction(callback)) {
-							callback();
-						}
+						asc_applyFunction(callback);
 					},
 					event.ctrlKey);
 			},
@@ -570,9 +569,7 @@
 						if (d.deltaY) {
 							t.scrollVertical(d.deltaY);
 						}
-						if ($.isFunction(callback)) {
-							callback();
-						}
+						asc_applyFunction(callback);
 					});
 			},
 			

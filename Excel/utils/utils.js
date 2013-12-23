@@ -30,6 +30,10 @@
 		/** @const */
 		var kArrayL = "array";
 
+		function applyFunction(callback) {
+			if (kFunctionL === typeof callback)
+				callback.apply(null, Array.prototype.slice.call(arguments, 1));
+		}
 
 		function typeOf(obj) {
 			if (obj === undefined) {return kUndefinedL;}
@@ -1097,6 +1101,7 @@
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
+		window["Asc"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].getProperty = getProperty;
 		window["Asc"].lastIndexOf = lastIndexOf;

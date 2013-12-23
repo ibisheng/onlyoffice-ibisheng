@@ -496,7 +496,7 @@ function asc_CCellCommentator(currentSheet) {
 
 	var _this = this;
 	var asc = window["Asc"];
-	var asc_Range = asc.Range;
+	var asc_applyFunction = asc.applyFunction;
 	var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
 	var isViewerMode =  function() { return _this.worksheet._trigger("getViewerMode"); };
 	
@@ -535,7 +535,7 @@ function asc_CCellCommentator(currentSheet) {
 
 			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
 				// Запрещено совместное редактирование
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				asc_applyFunction(callbackFunc, true);
 				return;
 			}
 
@@ -564,17 +564,17 @@ function asc_CCellCommentator(currentSheet) {
 
 			if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				asc_applyFunction(callbackFunc, true);
 				callbackFunc = undefined;
 			}
 			if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 				// Редактируем сами
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				asc_applyFunction(callbackFunc, true);
 				return;
 			}
 			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 				// Уже ячейку кто-то редактирует
-				if ($.isFunction(callbackFunc)) { callbackFunc(false); }
+				asc_applyFunction(callbackFunc, false);
 				return;
 			}
 
@@ -583,7 +583,8 @@ function asc_CCellCommentator(currentSheet) {
 				_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
 				_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
 			}
-			else if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+			else
+				asc_applyFunction(callbackFunc, true);
 		}
 	};
 	

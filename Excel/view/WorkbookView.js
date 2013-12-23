@@ -16,6 +16,7 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var asc					= window["Asc"];
+		var asc_applyFunction	= asc.applyFunction;
 		var asc_round			= asc.round;
 		var asc_typeof			= asc.typeOf;
 		var asc_FP				= asc.FontProperties;
@@ -463,7 +464,7 @@
 				var ws = this.getWorksheet(),
 				    vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined,
 				    hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
-				if ($.isFunction(callback)) {callback(vsize, hsize);}
+				asc_applyFunction(callback, vsize, hsize);
 			},
 
 			_onScrollY: function (pos) {
@@ -527,7 +528,7 @@
 					// Выделение с зажатым shift
 					this.canUpdateAfterShiftUp = true;
 				}
-				if ($.isFunction(callback)) {callback(d);}
+				asc_applyFunction(callback, d);
 			},
 
 			// Окончание выделения
@@ -586,7 +587,7 @@
 			_onSelectionActivePointChanged: function (dc, dr, callback) {
 				var ws = this.getWorksheet();
 				var d = ws.changeSelectionActivePoint(dc, dr);
-				if ($.isFunction(callback)) {callback(d);}
+				asc_applyFunction(callback, d);
 			},
 
 			_onUpdateWorksheet: function (canvasElem, x, y, ctrlKey, callback) {
@@ -661,7 +662,7 @@
 						ws.cleanHighlightedHeaders();
 					}
 				}
-				if ($.isFunction(callback)) {callback(ct);}
+				asc_applyFunction(callback, ct);
 			},
 
 			_onResizeElement: function (target, x, y) {
@@ -691,7 +692,7 @@
 			_onChangeFillHandle: function (x, y, callback) {
 				var ws = this.getWorksheet();
 				var d = ws.changeSelectionFillHandle(x, y);
-				if ($.isFunction(callback)) {callback(d);}
+				asc_applyFunction(callback, d);
 			},
 
 			// Обработка окончания автозаполнения
@@ -704,7 +705,7 @@
 			_onMoveRangeHandle: function (x, y, callback,ctrlKey) {
 				var ws = this.getWorksheet();
 				var d = ws.changeSelectionMoveRangeHandle(x, y,ctrlKey);
-				if ($.isFunction(callback)) {callback(d);}
+				asc_applyFunction(callback, d);
 			},
 
 			// Обработка окончания перемещения диапазона
@@ -719,7 +720,7 @@
 				if(res){
 					if(0 == target.targetArr)
 						ws.changeCellRange(this.cellEditor,res.ar);
-					if ($.isFunction(callback)) {callback(res.d);}
+					asc_applyFunction(callback, res.d);
 				}
 			},
 			
@@ -803,7 +804,7 @@
 				if (ct.target === "colresize" || ct.target === "rowresize") {
 					res = true;
 					ct.target === "colresize" ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
-					if ($.isFunction(callback)) {callback(res);}
+					asc_applyFunction(callback, res);
 				} else {
 					if (ct.col >=0 && ct.row >= 0) {
 						this.controller.setStrictClose( !ws._isCellEmpty(ct.col, ct.row) );
@@ -811,19 +812,21 @@
 					// Для нажатия на колонку/строку/all обрабатывать dblClick не нужно
 					if ("colheader" === ct.target || "rowheader" === ct.target || "corner" === ct.target) {
 						res = true;
-						if ($.isFunction(callback)) {callback(res);}
+						asc_applyFunction(callback, res);
 						return;
 					}
 					
 					if ( isCoord && (ws.objectRender.checkCursorDrawingObject(x, y)) ) {
 						res = true;
-						if ($.isFunction(callback)) {callback(res);}
+						asc_applyFunction(callback, res);
 						return;
 					}
 
 					// При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
 					this._onEditCell (x, y, /*isCoord*/isCoord,/*isFocus*/undefined, /*isClearCell*/undefined,
-						/*isHideCursor*/isHideCursor, /*callback*/ function (val) {if ($.isFunction(callback)) {callback(!val);}});
+						/*isHideCursor*/isHideCursor, /*callback*/ function (val) {
+							asc_applyFunction(callback, !val);
+						});
 				}
 			},
 
@@ -850,7 +853,7 @@
 						ws.setCellEditMode(false);
 						ws.setFormulaEditMode(false);
 						t.input.prop("disabled", true);
-						if ($.isFunction(callback)) {callback(false);}
+						asc_applyFunction(callback, false);
 						return;
 					}
 
@@ -858,7 +861,7 @@
 					t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
 					// Эвент на обновление состояния редактора
 					t.cellEditor._updateEditorState();
-					if ($.isFunction(callback)) {callback(true);}
+					asc_applyFunction(callback, true);
 				};
 
 				var editLockCallback = function (res) {
