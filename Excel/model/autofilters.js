@@ -1275,8 +1275,8 @@
 							width = width*(rowHeight/height);
 							height = rowHeight;
 						}
-						var x1 = (ws.cols[col].left + ws.cols[col].width - width - offsetX - 0.5)*ws.getZoom();
-						var y1 = (ws.rows[row].top + ws.rows[row].height - height - offsetY - 0.5)*ws.getZoom();
+						var x1 = ws.cols[col].left + ws.cols[col].width - width - offsetX - 0.5;
+						var y1 = ws.rows[row].top + ws.rows[row].height - height - offsetY - 0.5;
 						buttons[i].x = x1;
 						buttons[i].y = y1;
 						buttons[i].x1 = ws.cols[col].left - offsetX;
@@ -1304,7 +1304,7 @@
 							var filters;
 							if (currentFilter && currentFilter.FilterColumns) {
 								filters = currentFilter.FilterColumns;
-								for (var k= 0; k < filters.length; k++) {
+								for (var k = 0; k < filters.length; k++) {
 									//для мерженных головных ячеек
 									var colId = filters[k].ColId;
 									if (filters[k].ShowButton == false && currentFilter.result) {
@@ -1338,10 +1338,6 @@
 								}
 							}
 
-							if(isSetFilter)
-								activeButtonFilter[activeButtonFilter.length]  = buttons[i];
-							else
-								passiveButtonFilter[passiveButtonFilter.length] = buttons[i];
 							var sortState = undefined;
 							if(curFilForSort.SortState) {
 								if(curFilForSort.SortState.SortConditions && curFilForSort.SortState.SortConditions.length != 0 && curFilForSort.SortState.SortConditions[0].Ref.split(':')[0] ==  buttons[i].id)
@@ -1356,13 +1352,6 @@
 							if (buttons[i].x1 >= ws.cols[0].left && buttons[i].y1 >= ws.rows[0].top)
 								this._drawButton(x1,y1,filOptions);
 						}
-					}
-					//фильтры ставим в порядок добавления
-					for (k = 0; k < passiveButtonFilter.length + activeButtonFilter.length; k++) {
-						if(activeButtonFilter[k])
-							buttons[k] = activeButtonFilter[k];
-						else
-							buttons[k] = passiveButtonFilter[k - activeButtonFilter.length];
 					}
 				}
 			},
@@ -3080,7 +3069,7 @@
 				ws._trigger("setAutoFiltersDialog", autoFilterObject);
 			},
 			//отрисовка кнопки фильтра
-			_drawButton: function(x1,y1,options)
+			_drawButton: function(x1, y1, options)
 			{
 				var ws = this.worksheet;
 				var isSet = options.isSetFilter;
@@ -3124,9 +3113,6 @@
 					height = rowHeight;
 				}
 				//квадрат кнопки рисуем
-				var zoom = ws.getZoom();
-				var x1 = x1/zoom;
-				var y1 = y1/zoom;
 				ws.drawingCtx
 					.setFillStyle(ws.settings.cells.defaultState.background)
 					.setLineWidth(1)
