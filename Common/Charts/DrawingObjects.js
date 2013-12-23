@@ -3729,10 +3729,14 @@ function DrawingObjects() {
 				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 				
-				x = worksheet.getCellLeft(updatedRange.c1, 0) - ptToPx(offsetX);
-				y = worksheet.getCellTop(updatedRange.r1, 0) - ptToPx(offsetY);
-				w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0);
-				h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0);
+				var vr = worksheet.visibleRange;
+				var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 1;
+				var borderOffsetY = (updatedRange.r1 <= vr.r1) ? 0 : 1;
+				
+				x = ptToPx(worksheet.getCellLeft(updatedRange.c1, 1) - offsetX) - borderOffsetX;
+				y = ptToPx(worksheet.getCellTop(updatedRange.r1, 1) - offsetY) - borderOffsetY;
+				w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0) + 1;
+				h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0) + 1;
 				
 				/*canvas.m_oContext.beginPath();
 				canvas.m_oContext.strokeStyle = "#FF0000";
