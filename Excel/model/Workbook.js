@@ -4237,6 +4237,7 @@ function Cell(worksheet){
 	this.oId = null;
 	this.oFormulaExt = null;
 	this.sFormula = null;
+	this.sFormulaCA = null;
 	this.formulaParsed = null;
 }
 Cell.prototype.getStyle=function(){
@@ -4821,7 +4822,7 @@ Cell.prototype.setValueData = function(Val){
 }
 Cell.prototype.setFormulaCA = function(ca){
 	if(ca) this.sFormulaCA = true;
-	else if( this.sFormulaCA ) delete this.sFormulaCA;
+	else if( this.sFormulaCA ) this.sFormulaCA = null;
 }
 //-------------------------------------------------------------------------------------------------
 

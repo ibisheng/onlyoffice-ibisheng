@@ -2240,6 +2240,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.error = [];
     this.Formula = formula;
     this.undoParser = {formula:null,outStack:[]};
+	this.isParsed = false;
 }
 parserFormula.prototype = {
 
