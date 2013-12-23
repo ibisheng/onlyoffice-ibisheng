@@ -280,7 +280,7 @@
 			close: function (saveValue) {
 				var t = this, opt = t.options, ret = false;
 
-				if (saveValue && $.isFunction(opt.saveValueCallback)) {
+				if (saveValue && "function" === typeof opt.saveValueCallback) {
 					ret = t._wrapFragments(opt.fragments); // восстанавливаем символы \n
 					ret = opt.saveValueCallback(opt.fragments, t.textFlags, /*skip NL check*/ret);
 					if (!ret) {return false;}
