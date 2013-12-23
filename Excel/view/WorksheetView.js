@@ -2864,16 +2864,16 @@
 			},
 
 			/** Рисует закрепление областей */
-			_drawFrozenPaneLines: function (notDrawCol, notDrawRow) {
+			_drawFrozenPaneLines: function () {
 				if (this.topLeftFrozenCell) {
 					var ctx = this.drawingCtx;
 					var row = this.topLeftFrozenCell.getRow0();
 					var col = this.topLeftFrozenCell.getCol0();
 					ctx.setLineWidth(1).setStrokeStyle(this.settings.frozenColor).beginPath();
-					if (0 < row && !notDrawRow) {
+					if (0 < row) {
 						ctx.lineHor(0, this.rows[row].top - this.height_1px, ctx.getWidth());
 					}
-					if (0 < col && !notDrawCol) {
+					if (0 < col) {
 						ctx.lineVer(this.cols[col].left - this.width_1px, 0, ctx.getHeight());
 					}
 					ctx.stroke();
@@ -5015,7 +5015,8 @@
 						this._drawCells(/*drawingCtx*/undefined, range, offsetX);
 						this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
 					}
-					this._drawFrozenPaneLines(false, true);
+					// Отрисовывать нужно всегда, вдруг бордеры
+					this._drawFrozenPaneLines();
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 
@@ -5103,7 +5104,8 @@
 						this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
 						this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
 					}
-					this._drawFrozenPaneLines(true, false);
+					// Отрисовывать нужно всегда, вдруг бордеры
+					this._drawFrozenPaneLines();
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 				}
