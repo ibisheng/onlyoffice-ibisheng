@@ -565,6 +565,22 @@
 				return this.model.getSheetViewSettings();
 			},
 
+			getFrozenPaneOffset: function (noX, noY) {
+				var offsetX = 0, offsetY = 0,
+					c = this.cols, r = this.rows;
+				if (this.topLeftFrozenCell) {
+					if (!noX) {
+						var cFrozen = this.topLeftFrozenCell.getCol0();
+						offsetX = c[cFrozen].left - c[0].left;
+					}
+					if (!noY) {
+						var rFrozen = this.topLeftFrozenCell.getRow0();
+						offsetY = r[rFrozen].top - r[0].top;
+					}
+				}
+				return {offsetX: offsetX, offsetY: offsetY};
+			},
+
 
 			// mouseX - это разница стартовых координат от мыши при нажатии и границы
 			changeColumnWidth: function (col, x2, mouseX) {
@@ -575,10 +591,8 @@
 				x2 += mouseX;
 
 				var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
-				if (t.topLeftFrozenCell) {
-					var cFrozen = t.topLeftFrozenCell.getCol0();
-					offsetX -= t.cols[cFrozen].left - t.cols[0].left;
-				}
+				var offsetFrozen = t.getFrozenPaneOffset(false, true);
+				offsetX -= offsetFrozen.offsetX;
 
 				var x1 = t.cols[col].left - offsetX - this.width_1px;
 				var w = Math.max(x2 - x1, 0);
@@ -606,10 +620,8 @@
 				y2 += mouseY;
 
 				var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
-				if (t.topLeftFrozenCell) {
-					var rFrozen = t.topLeftFrozenCell.getRow0();
-					offsetY -= t.rows[rFrozen].top - t.rows[0].top;
-				}
+				var offsetFrozen = t.getFrozenPaneOffset(true, false);
+				offsetY -= offsetFrozen.offsetY;
 
 				var y1 = t.rows[row].top - offsetY - this.height_1px;
 
@@ -1398,12 +1410,9 @@
 				var vh = r[vr.r2].top + r[vr.r2].height - r[vr.r1].top;
 				var i;
 
-				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					vw += c[cFrozen].left - c[0].left;
-					vh += r[rFrozen].top - r[0].top;
-				}
+				var offsetFrozen = t.getFrozenPaneOffset();
+				vw += offsetFrozen.offsetX;
+				vh += offsetFrozen.offsetY;
 
 				if (vw < w) {
 					for (i = vr.c1 - 1; i >= 0; --i) {
@@ -3615,10 +3624,8 @@
 
 				var ctx = t.overlayCtx;
 				var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
-				if (t.topLeftFrozenCell) {
-					var cFrozen = t.topLeftFrozenCell.getCol0();
-					offsetX -= t.cols[cFrozen].left - t.cols[0].left;
-				}
+				var offsetFrozen = t.getFrozenPaneOffset(false, true);
+				offsetX -= offsetFrozen.offsetX;
 
 				var x1 = t.cols[col].left - offsetX - this.width_1px;
 				var h = ctx.getHeight();
@@ -3644,10 +3651,8 @@
 
 				var ctx = t.overlayCtx;
 				var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
-				if (t.topLeftFrozenCell) {
-					var rFrozen = t.topLeftFrozenCell.getRow0();
-					offsetY -= t.rows[rFrozen].top - t.rows[0].top;
-				}
+				var offsetFrozen = t.getFrozenPaneOffset(true, false);
+				offsetY -= offsetFrozen.offsetY;
 
 				var y1 = t.rows[row].top - offsetY - this.height_1px;
 				var w = ctx.getWidth();
@@ -4870,10 +4875,8 @@
 				var vr = this.visibleRange;
 				var c = this.cols;
 				var x = c[vr.c2].left + c[vr.c2].width;
-				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					x += c[cFrozen].left - c[0].left;
-				}
+				var offsetFrozen = this.getFrozenPaneOffset(false, true);
+				x += offsetFrozen.offsetX;
 				return x - c[vr.c1].left + this.cellsLeft < this.drawingCtx.getWidth();
 			},
 
@@ -4881,10 +4884,8 @@
 				var vr = this.visibleRange;
 				var r = this.rows;
 				var y = r[vr.r2].top + r[vr.r2].height;
-				if (this.topLeftFrozenCell) {
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					y += r[rFrozen].top - r[0].top;
-				}
+				var offsetFrozen = this.getFrozenPaneOffset(true, false);
+				y += offsetFrozen.offsetY;
 				return y - r[vr.r1].top + this.cellsTop < this.drawingCtx.getHeight();
 			},
 
@@ -5351,9 +5352,9 @@
 					var rFrozen = this.topLeftFrozenCell.getRow0();
 					widthDiff = this.cols[cFrozen].left - this.cols[0].left;
 					heightDiff = this.rows[rFrozen].top - this.rows[0].top;
-					if (x < this.cellsLeft + widthDiff && 0 !== widthDiff)
+					if (x < this.cellsLeft + widthDiff)
 						widthDiff = 0;
-					if (y < this.cellsTop + heightDiff && 0 !== heightDiff)
+					if (y < this.cellsTop + heightDiff)
 						heightDiff = 0;
 					offsetX -= widthDiff;
 					offsetY -= heightDiff;
@@ -6309,12 +6310,9 @@
 				var isInSelection = false;
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				if (this.topLeftFrozenCell) {
-					var cFrozen = this.topLeftFrozenCell.getCol0();
-					var rFrozen = this.topLeftFrozenCell.getRow0();
-					offsetX -= this.cols[cFrozen].left - this.cols[0].left;
-					offsetY -= this.rows[rFrozen].top - this.rows[0].top;
-				}
+				var offsetFrozen = this.getFrozenPaneOffset();
+				offsetX -= offsetFrozen.offsetX;
+				offsetY -= offsetFrozen.offsetY;
 
 				// Проверяем попали ли мы в выделение
 				if ((_x < this.cellsLeft || _y < this.cellsTop) && c_oAscSelectionType.RangeMax === ar.type) {
@@ -9782,14 +9780,8 @@
 
 			openCellEditor: function (editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell,
 									  isHideCursor, activeRange) {
-				var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg,
-					cFrozen, rFrozen, widthDiff = 0, heightDiff = 0;
-				if (this.topLeftFrozenCell) {
-					cFrozen = this.topLeftFrozenCell.getCol0();
-					rFrozen = this.topLeftFrozenCell.getRow0();
-					widthDiff += tc[cFrozen].left - tc[0].left;
-					heightDiff += tr[rFrozen].top - tr[0].top;
-				}
+				var t = this, vr = t.visibleRange, tc = t.cols, tr = t.rows, col, row, c, fl, mc, bg;
+				var offsetFrozen = t.getFrozenPaneOffset();
 				var ar = t.activeRange;
 				if (activeRange)
 					t.activeRange = activeRange.clone();
@@ -9798,7 +9790,7 @@
 					return false;
 
 				function getLeftSide(col) {
-					var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - widthDiff;
+					var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetFrozen.offsetX;
 					for (i = col; i >= vr.c1; --i) {
 						res.push(t.cols[i].left - offs);
 					}
@@ -9806,7 +9798,7 @@
 				}
 
 				function getRightSide(col) {
-					var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - widthDiff;
+					var i, w, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetFrozen.offsetX;
 
 					// Для замерженных ячеек, можем уйти за границу
 					if (fl.isMerged && col > vr.c2)
@@ -9823,7 +9815,7 @@
 				}
 
 				function getBottomSide(row) {
-					var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - heightDiff;
+					var i, h, res = [], offs = t.rows[vr.r1].top - t.rows[0].top - offsetFrozen.offsetY;
 
 					// Для замерженных ячеек, можем уйти за границу
 					if (fl.isMerged && row > vr.r2)
@@ -9908,8 +9900,8 @@
 				}
 					
 				editor.open({
-					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + widthDiff,
-					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + heightDiff,
+					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left + offsetFrozen.offsetX,
+					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top + offsetFrozen.offsetY,
 					leftSide: getLeftSide(!fl.isMerged ? col : mc.c1),
 					rightSide: getRightSide(!fl.isMerged ? col : mc.c2),
 					bottomSide: getBottomSide(!fl.isMerged ? row : mc.r2),
