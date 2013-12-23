@@ -51,7 +51,7 @@ CFraction.prototype.getType = function()
 {
     return this.type;
 }
-CFraction.prototype.getCenter = function()
+CFraction.prototype.old_getCenter = function()
 {
     var center;
 
@@ -71,23 +71,25 @@ CFraction.prototype.getCenter = function()
 
     return center;
 }
-CFraction.prototype.draw = function(pGraphics)
+CFraction.prototype.draw = function(x, y, pGraphics)
 {
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
-        this.drawBarFraction(pGraphics);
+        this.drawBarFraction(x, y, pGraphics);
     else if(this.type == SKEWED_FRACTION)
-        this.drawSkewedFraction(pGraphics);
+        this.drawSkewedFraction(x, y, pGraphics);
     else if(this.type == LINEAR_FRACTION)
-        this.drawLinearFraction(pGraphics);
+        this.drawLinearFraction(x, y, pGraphics);
 }
-CFraction.prototype.drawBarFraction = function(pGraphics)
+CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
     var ctrPrp = this.getCtrPrp();
     var penW = ctrPrp.FontSize* this.reduct* 25.4/96 * 0.08;
 
-    var x1 = this.pos.x,
-        x2 = this.pos.x + this.size.width,
-        y1 = y2 = this.pos.y + this.size.center - penW/2;
+    var numHeight = this.elements[0][0].size.height;
+
+    var x1 = this.pos.x + x ,
+        x2 = this.pos.x + x + this.size.width,
+        y1 = this.pos.y + y + numHeight - penW/2;
 
     if( !this.bHideBar )
     {
@@ -98,9 +100,9 @@ CFraction.prototype.drawBarFraction = function(pGraphics)
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CFraction.superclass.draw.call(this, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics);
 }
-CFraction.prototype.drawSkewedFraction = function(pGraphics)
+CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 {
     var ctrPrp = this.getCtrPrp();
 
@@ -139,11 +141,11 @@ CFraction.prototype.drawSkewedFraction = function(pGraphics)
         var x1 =  (y1 - b)/tg,
             x2 =  (y2 - b)/tg;
 
-        var xx1 = this.pos.x + x1,
-            xx2 = this.pos.x + x2;
+        var xx1 = this.pos.x + x + x1,
+            xx2 = this.pos.x + x + x2;
 
-        var yy1 = this.pos.y  + y1,
-            yy2 = this.pos.y  + y2;
+        var yy1 = this.pos.y + y + y1,
+            yy2 = this.pos.y + y + y2;
 
     }
     else
@@ -170,11 +172,11 @@ CFraction.prototype.drawSkewedFraction = function(pGraphics)
         var x1 = (y1 - b)/tg,
             x2 = (y2 - b)/tg;
 
-        var xx1 = this.pos.x + x1,
-            xx2 = this.pos.x + x2;
+        var xx1 = this.pos.x + x + x1,
+            xx2 = this.pos.x + x + x2;
 
-        var yy1 = this.pos.y + y1 ,
-            yy2 = this.pos.y + y2;
+        var yy1 = this.pos.y + y + y1 ,
+            yy2 = this.pos.y + y + y2;
 
     }
 
@@ -189,23 +191,16 @@ CFraction.prototype.drawSkewedFraction = function(pGraphics)
     pGraphics._l(xx2, yy2);
     pGraphics.ds();
 
-    CFraction.superclass.draw.call(this, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics);
 }
-CFraction.prototype.drawLinearFraction = function(pGraphics)
+CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
 {
-    var first = this.elements[0][0].size,
-        sec = this.elements[0][1].size;
-
-    var cent = first.center > sec.center ? first.center : sec.center,
-        desc1 = first.height - first.center, desc2 = sec.height - sec.center,
-        desc =  desc1 > desc2 ? desc1 : desc2;
-
     var shift = 0.1*this.dW;
 
-    var x1 = this.pos.x + this.elements[0][0].size.width + this.dW - shift,
-        y1 = this.pos.y + this.size.center - cent,
-        x2 = this.pos.x + this.elements[0][0].size.width + shift,
-        y2 = this.pos.y + this.size.center + desc;
+    var x1 = this.pos.x + x + this.elements[0][0].size.width + this.dW - shift,
+        y1 = this.pos.y + y,
+        x2 = this.pos.x + x + this.elements[0][0].size.width + shift,
+        y2 = this.pos.y + y + this.size.height;
 
     var ctrPrp = this.getCtrPrp();
     var penW = ctrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
@@ -221,7 +216,7 @@ CFraction.prototype.drawLinearFraction = function(pGraphics)
     pGraphics._l(x2, y2);
     pGraphics.ds();
 
-    CFraction.superclass.draw.call(this, pGraphics);
+    CFraction.superclass.draw.call(this, x, y, pGraphics);
 }
 CFraction.prototype.getNumerator = function()
 {
@@ -248,11 +243,23 @@ CFraction.prototype.getDenominator = function()
 CFraction.prototype.recalculateSize = function()
 {
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
-        CFraction.superclass.recalculateSize.call(this);
+        this.recalculateBarFraction();
     else if(this.type == SKEWED_FRACTION)
         this.recalculateSkewed();
     else if(this.type == LINEAR_FRACTION)
         this.recalculateLinear();
+}
+CFraction.prototype.recalculateBarFraction = function()
+{
+    var num = this.elements[0][0].size,
+        den = this.elements[1][0].size;
+
+    var width  = num.width > den.width ? num.width : den.width;
+    var height = num.height + den.height;
+    var shCenter = DIV_CENT*this.getCtrPrp().FontSize;
+    var ascent = num.height + shCenter;
+
+    this.size =  {width: width, height: height, ascent: ascent};
 }
 CFraction.prototype.recalculateSkewed = function()
 {
@@ -260,14 +267,18 @@ CFraction.prototype.recalculateSkewed = function()
     this.gapSlash = 5.011235894097222 * ctrPrp.FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var _center = this.getCenter();
+    var _ascent = this.elements[0][0].size.height + ctrPrp.FontSize*DIV_CENT;
 
-    this.size =  {width: _width, height: _height, center: _center};
+    this.size =  {width: _width, height: _height, ascent: _ascent};
 }
 CFraction.prototype.recalculateLinear = function()
 {
-    var H = this.elements[0][0].size.center + this.elements[0][1].size.height - this.elements[0][1].size.center;
-    //var txtPrp = this.getTxtPrp();
+    var AscentFirst   = this.elements[0][0].size.ascent,
+        DescentFirst  = this.elements[0][0].size.height - this.elements[0][0].size.ascent,
+        AscentSecond  = this.elements[0][1].size.ascent,
+        DescentSecond = this.elements[0][1].size.height - this.elements[0][1].size.ascent;
+
+    var H = AscentFirst + DescentSecond;
     var ctrPrp = this.getCtrPrp();
 
     var gap = 5.011235894097222*ctrPrp.FontSize/36;
@@ -285,34 +296,26 @@ CFraction.prototype.recalculateLinear = function()
     else
         this.dW = 3.4*gap;
 
-    var h1 = this.elements[0][0].size.height,
-        h2 = this.elements[0][1].size.height;
+    var ascent  = AscentFirst > AscentSecond ? AscentFirst : AscentSecond;
+    var descent = DescentFirst > DescentSecond ? DescentFirst : DescentSecond;
 
-    var c1 = this.elements[0][0].size.center,
-        c2 = this.elements[0][1].size.center;
-
-    var asc = c1 > c2 ? c1 : c2;
-    var desc = h1 - c1 > h2 - c2 ? h1- c1 : h2 - c2;
-
-    var height = asc + desc;
+    var height = ascent + descent;
 
     var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
-    var center = this.getCenter();
 
-    this.size = {height: height, width: width, center: center};
+    this.size = {height: height, width: width, ascent: ascent};
 }
 CFraction.prototype.setPosition = function(pos)
 {
     if(this.type == SKEWED_FRACTION)
     {
-        this.pos = {x: pos.x, y: pos.y - this.size.center};
+        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
         this.elements[0][0].setPosition(this.pos);
 
         var x = this.pos.x + this.elements[0][0].size.width + this.gapSlash,
-            y = this.pos.y +  this.size.center;
+            y = this.pos.y + this.elements[0][0].size.height;
 
         this.elements[0][1].setPosition({x: x, y: y});
-
     }
     else
         CFraction.superclass.setPosition.call(this, pos);
@@ -405,6 +408,7 @@ CFraction.prototype.getPropsForWrite = function()
 
 function CNumerator()
 {
+    this.gap = 0;
     CMathBase.call(this);
 }
 extend(CNumerator, CMathBase);
@@ -422,19 +426,19 @@ CNumerator.prototype.recalculateSize = function()
     var ctrPrp = this.getCtrPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
-    var gap = 7.832769097222222 * ctrPrp.FontSize/36,
+    var gapNum = 7.832769097222222 * ctrPrp.FontSize/36,
         minGap = ctrPrp.FontSize* 25.4/96 * 0.16;
 
     // var delta = 0.65*gap - Descent;
-    var delta = 0.8076354679802956*gap - Descent;
+    var delta = 0.8076354679802956*gapNum - Descent;
 
-    var GapNum = delta > minGap ? delta - 0.95*minGap: minGap;
+    this.gap = delta > minGap ? delta - 0.95*minGap: minGap;
 
     var width = arg.width;
-    var height = arg.height + GapNum;
-    var center = arg.center;
+    var height = arg.height + this.gap;
+    var ascent = arg.ascent;
 
-    this.size = {width : width, height: height, center: center};
+    this.size = {width : width, height: height, ascent: ascent};
 }
 CNumerator.prototype.findDisposition = function(mCoord)
 {
@@ -467,6 +471,7 @@ CNumerator.prototype.getCtrPrp = function()
 
 function CDenominator()
 {
+    this.gap = 0;
     CMathBase.call(this);
 }
 extend(CDenominator, CMathBase);
@@ -478,42 +483,38 @@ CDenominator.prototype.init = function()
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    /*var txtPrp = this.getTxtPrp();
-    txtPrp.FontSize *= this.Parent.reduct;*/
-
     var ctrPrp = this.getCtrPrp();
 
-    var gap = 7.832769097222222 * ctrPrp.FontSize/36,
-        Ascent = arg.center -  4.938888888888888*ctrPrp.FontSize/36,
-        minGap = ctrPrp.FontSize* 25.4/96 * 0.24;
+    var gapDen = 7.325682539682539 * ctrPrp.FontSize/36,
+        Ascent = arg.ascent -  4.938888888888888*ctrPrp.FontSize/36,
+        minGap = gapDen/3;
 
-    var delta = 0.47*gap - Ascent;
-    var GapDen = delta > minGap ? delta : minGap;
+    var delta = gapDen - Ascent;
+    this.gap = delta > minGap ? delta : minGap;
 
     var width = arg.width;
-    var height = arg.height + GapDen;
-    var center = arg.center + GapDen;
+    var height = arg.height + this.gap;
+    var ascent = arg.ascent + this.gap;
 
-    this.size = {width : width, height: height, center: center};
+    this.size = {width : width, height: height, ascent: ascent};
 }
 CDenominator.prototype.findDisposition = function(mCoord)
 {
     var arg = this.elements[0][0].size;
-    var gap = this.size.height - arg.height;
 
-    if(mCoord.y < gap)
+    if(mCoord.y < this.gap)
         mCoord.y = 0;
-    else if (mCoord.y > arg.height + gap)
+    else if (mCoord.y > arg.height + this.gap)
         mCoord.y = arg.height;
     else
-        mCoord.y -= gap;
+        mCoord.y -= this.gap;
 
     return CDenominator.superclass.findDisposition.call(this, mCoord);
 }
 CDenominator.prototype.setPosition = function(pos)
 {
     var x = pos.x;
-    var y = pos.y + this.size.height - this.elements[0][0].size.height;
+    var y = pos.y + this.gap;
 
     this.elements[0][0].setPosition({x: x, y: y});
 }

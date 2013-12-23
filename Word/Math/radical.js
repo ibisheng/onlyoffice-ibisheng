@@ -7,7 +7,7 @@ function CSignRadical()
     this.sizeTick = null;
     this.widthSlash = null;
 }
-CSignRadical.prototype.draw = function(pGraphics)
+CSignRadical.prototype.draw = function(x, y, pGraphics)
 {
     var txtPrp = this.Parent.getCtrPrp();
     //var txtPrp = this.Parent.getTxtPrp();
@@ -15,10 +15,10 @@ CSignRadical.prototype.draw = function(pGraphics)
 
     var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
-    var x1 = this.pos.x,
+    var x1 = this.pos.x + x,
         x2 = x1 + 0.25*this.widthSlash;
 
-    var y2 = this.pos.y + this.size.height -this.sizeTick.height,
+    var y2 = this.pos.y + y + this.size.height -this.sizeTick.height,
         y1 = y2 + 0.11*this.widthSlash;
 
 
@@ -27,6 +27,8 @@ CSignRadical.prototype.draw = function(pGraphics)
 
     var x3 = x2 - tX,
         y3 = y2 - tY;
+
+    var x4;
 
     /*var minHeight = plH * 1.1304931640625,
      maxHeight = plH * 7.029296875;
@@ -44,13 +46,13 @@ CSignRadical.prototype.draw = function(pGraphics)
     else
         x4 = x1 + this.widthSlash;
 
-    var y4 = this.pos.y + this.size.height - penW;
+    var y4 = this.pos.y + y + this.size.height - penW;
 
     var x5 = x1 + this.widthSlash,
-        x6 = this.pos.x + this.size.width;
+        x6 = this.pos.x + x + this.size.width;
 
-    var y5 = this.pos.y,
-        y6 = this.pos.y;
+    var y5 = this.pos.y + y,
+        y6 = this.pos.y + y;
 
     pGraphics.p_width(penW*0.8*1000);
 
@@ -223,9 +225,10 @@ CRadical.prototype.recalculateSize = function()
 
         var height = sign.height,
             width  = sign.width,
-            center = (height - arg.height)*0.6  + arg.center;
+            ascent = height - (arg.height - arg.ascent);
+            //center = (height - arg.height)*0.6  + arg.center;
 
-        this.size = {width: width, height: height, center: center};
+        this.size = {width: width, height: height, ascent: ascent};
     }
     else if(this.type == DEGREE_RADICAL)
     {
@@ -249,29 +252,33 @@ CRadical.prototype.recalculateSize = function()
         var h1 = degr.height + this.gap + hTick,
             h2 = sign.height;
 
-        var height, center;
+        var height, ascent;
 
         if(h1 > h2)
         {
             height =  h1;
-            center = h1 - h2 + (sign.height - base.height)*0.6  + base.center;
+            ascent =  height - (base.height - base.ascent);
+            //center = h1 - h2 + (sign.height - base.height)*0.6  + base.center;
         }
         else
         {
             height =  h2;
-            center = (sign.height - base.height)*0.6  + base.center;
+            ascent =  height - (base.height - base.ascent);
+            //center = (sign.height - base.height)*0.6  + base.center;
         }
 
-        this.size = {width: width, height: height, center: center};
+        this.size = {width: width, height: height, ascent: ascent};
     }
 }
 CRadical.prototype.setPosition = function(pos)
 {
+    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+
     if(this.type == SQUARE_RADICAL)
     {
-        this.pos = {x: pos.x, y: pos.y - this.size.center};
+
         this.gapLeft = this.size.width - this.elements[0][0].size.width;
-        this.gapTop = this.size.center - this.elements[0][0].size.center;
+        this.gapTop = this.size.ascent - this.elements[0][0].size.ascent;
 
         var x = this.pos.x + this.gapLeft,
             y = this.pos.y + this.gapTop;
@@ -281,8 +288,6 @@ CRadical.prototype.setPosition = function(pos)
     }
     else if(this.type == DEGREE_RADICAL)
     {
-        this.pos = {x: pos.x, y: pos.y - this.size.center};
-
         var degr = this.elements[0][0].size,
             base = this.elements[0][1].size,
             sign = this.signRadical.size;
@@ -301,7 +306,7 @@ CRadical.prototype.setPosition = function(pos)
         this.signRadical.setPosition({x: x2, y: y2});
 
         var x3 = this.pos.x + this.size.width - base.width,
-            y3 = this.pos.y + this.size.center - base.center;
+            y3 = this.pos.y + this.size.ascent - base.ascent;
 
         this.elements[0][1].setPosition({x: x3, y: y3});
     }
@@ -390,7 +395,7 @@ CRadical.prototype.findDisposition = function(mCoord)
             posCurs.y = 1;
 
             mouseCoord.x = mCoord.x - (this.size.width - base.width);
-            var topBase = this.size.center - base.center;
+            var topBase = this.size.ascent - base.ascent;
 
             if(mCoord.y < topBase)
             {
@@ -411,10 +416,10 @@ CRadical.prototype.findDisposition = function(mCoord)
 
     return disposition;
 }
-CRadical.prototype.draw = function(pGraphics)
+CRadical.prototype.draw = function(x, y, pGraphics)
 {
-    this.signRadical.draw(pGraphics);
-    CRadical.superclass.draw.call(this, pGraphics);
+    this.signRadical.draw(x, y, pGraphics);
+    CRadical.superclass.draw.call(this, x, y, pGraphics);
 }
 CRadical.prototype.getBase = function()
 {

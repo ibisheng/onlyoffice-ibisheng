@@ -38,7 +38,11 @@ CDegree.prototype.init_2 = function(props, oBase)
 CDegree.prototype.recalculateSize = function()
 {
     var Widths = this.getWidthsHeights().widths;
-    var Heights = [this.elements[0][0].size.height, this.elements[0][1].size.height];
+
+    var Heights = [];
+    Heights[0] = this.elements[0][0].size.height;
+    Heights[1] = this.elements[0][1].size.height;
+
     var _center;
 
     var middle = ((Heights[0] > Heights[1]) ? Heights[1] : Heights[0])* 2/3; /// 2/3 от высоты

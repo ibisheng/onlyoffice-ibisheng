@@ -12,23 +12,23 @@
 
 //Bugs
 
-//При добавлении в началло контента элемента , он вставляется с размером шрифта 11, посмотреть getCurrRunPrp
+// При добавлении в начало контента элемента , он вставляется с размером шрифта 11, посмотреть getCurrRunPrp
 // При удаление из начала контента элемента, у всех остальных автоматом 11 размер шрифта
 
 /// TODO
 
-//  1. properties для записи в файл
-//  2. выставить setFont для accent, group charater в случае, если придет текст
-//  3. центр => baseline
-//  4. поправить центр для delimiters (когда оператор текст)
-//  5. Поправить пересчет размера для delimiters (для скобок (control object) идет смещение для baseline)
+//  0. Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
+//  1. центр => baseline
+//  2. поправить центр для delimiters (когда оператор текст)
+//  3. Поправить пересчет размера для delimiters (для скобок (control object) идет смещение для baseline)
 //  5. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
-//  6. баг с отрисовкой кругового интеграла
-//  7. cursor_Up, cursor_Down (+ c зажитым shift)
-//  8. Merge textPrp и mathTextPrp (bold, italic)
-//  9. Поправить баги для CAccent с точками : смещение, когда идут подряд с одной точкой, двумя и тремя они перекрываются
-//  10. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
-//  11. объединение формул на remove и add
+//  6. Размер разделительной черты для линейной дроби ограничить также как и для наклонной дроби
+//  7. баг с отрисовкой кругового интеграла
+//  8. cursor_Up, cursor_Down (+ c зажитым shift)
+//  9. Merge textPrp и mathTextPrp (bold, italic)
+//  10. Поправить баги для CAccent с точками : смещение, когда идут подряд с одной точкой, двумя и тремя они перекрываются
+//  11. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
+//  12. объединение формул на remove и add
 
 //  TODO Refactoring
 //  1. CAccent ~> COperator
@@ -37,7 +37,6 @@
 
 /// TODO
 
-// !!! Проверить типы для groupCharacter, delimiters и accent
 // 1. Посмотреть стрелки и прочее для delimiters (которые используются для accent), при необходимости привести к одному типу
 // 2. Убрать ненужные(!!) setTxtPrp и getTxtPrp
 // 3. Проверить что будет, если какие-то настройки убрать/добавить из ctrPrp, влияют ли они на отрисовку управляющих элементов (например, Italic, Bold)
@@ -282,14 +281,8 @@ function CMathContent()
 
     this.content = new Array(); // array of mathElem
     this.CurPos = 0;
-    this.pos = {x:0,    y:0};
-    this.g_mContext =   null;
+    this.pos = {x:0,    y:0};   // относительная позиция
 
-    /*this.RunPrp = new CTextPr();
-    this.TxtPrp = new CTextPr();*/
-
-    //this.TxtPrp = new CMathTextPrp();
-    //this.OwnTPrp = new CMathTextPrp();
     this.Composition = null; // ссылка на общую формулу
 
     this.reduct     =   1;      // индефикатор для степени (уменьшение размера шрифта)
@@ -326,7 +319,6 @@ CMathContent.prototype =
 {
     init: function()
     {
-        this.g_mContext = new dist(0,0,0,0);
         this.content.push( new mathElem(new CEmpty(), new dist(0,0,0,0), 0) );
     },
     // переделать для селекта
@@ -4627,37 +4619,23 @@ CMathContent.prototype =
         var width      =   0 ;
         var ascent     =   0 ;
         var descent    =   0 ;
-        var center     =   0 ;
-        var height     =   0 ;
 
         for(var i = 0; i < this.content.length; i++)
         {
-            var oSize = this.content[i].value.size,
-                type = this.content[i].value.typeObj;
+            var oSize = this.content[i].value.size;
             var gps = this.content[i].g_mContext;
 
             width += oSize.width + gps.left + gps.right;
-            if(type == MATH_COMP)
-            {
-                ascent = ascent > oSize.center ? ascent : oSize.center;
-                descent =  descent < ( oSize.height - oSize.center + gps.bottom) ? (oSize.height - oSize.center + gps.bottom ) : descent;
-            }
-            else if(type == MATH_TEXT || type == MATH_PLACEHOLDER)
-            {
-                ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
-                descent =  descent < ( oSize.height - oSize.ascent + gps.bottom) ? (oSize.height - oSize.ascent + gps.bottom ) : descent;
-            }
+
+            ascent = ascent > oSize.ascent ? ascent : oSize.ascent;
+            var oDescent = oSize.height - oSize.ascent;
+            descent =  descent < oDescent ? oDescent : descent;
         }
 
-        width += this.g_mContext.left + this.g_mContext.right;
-        height = ascent + descent + this.g_mContext.top + this.g_mContext.bottom;
-        center = ascent + this.g_mContext.top;
-
-        this.size = {width: width, height: height, center: center};
+        this.size = {width: width, height: ascent + descent, ascent: ascent};
 
         this.update_widthContent(); /// !!!!
     },
-
     Resize: function(oMeasure)      // пересчитываем всю формулу
     {
         var bItalic = true;
@@ -4686,8 +4664,6 @@ CMathContent.prototype =
                 txtPrp.Italic = false;
 
                 oMeasure.SetFont(txtPrp);
-                //g_oTextMeasurer.SetFont(txtPrp);
-
             }
             else if(type == MATH_PLACEHOLDER)
             {
@@ -4701,7 +4677,7 @@ CMathContent.prototype =
                     txtPrp.Italic = false;
 
                     oMeasure.SetFont(txtPrp);
-                    //g_oTextMeasurer.SetFont(txtPrp);
+
                     this.content[i].value.Resize(oMeasure);
                 }
             }
@@ -4709,7 +4685,7 @@ CMathContent.prototype =
 
         this.recalculateSize();
     },
-    draw: function(pGraphics)
+    old_draw: function(pGraphics)
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
@@ -4748,13 +4724,51 @@ CMathContent.prototype =
             }
         }
     },
+    draw: function(x, y, pGraphics)
+    {
+        var bHidePlh = this.plhHide && this.IsPlaceholder();
+
+        if( !bHidePlh )
+        {
+            for(var i=1; i < this.content.length;i++)
+            {
+                if(this.content[i].value.typeObj == MATH_RUN_PRP)
+                {
+                    pGraphics.b_color1(0,0,0,255);
+
+                    var rPrp = new CMathTextPrp();
+                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge( this.content[i].value.getWRunPrp() );
+
+                    rPrp.Italic = false;
+                    pGraphics.SetFont(rPrp);
+                }
+                else if(this.content[i].value.typeObj == MATH_PLACEHOLDER)
+                {
+                    pGraphics.b_color1(0,0,0,255);
+
+                    var ctrPrp = this.Parent.getCtrPrp();
+
+                    var rPrp = new CMathTextPrp();
+                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(ctrPrp);
+
+                    rPrp.Italic = false;
+                    pGraphics.SetFont(rPrp);
+
+                    this.content[i].value.draw(x, y, pGraphics);
+                }
+                else
+                    this.content[i].value.draw(x, y, pGraphics);
+            }
+        }
+    },
     update_widthContent: function()
     {
         for(var i = 1; i <this.content.length; i++)
         {
             this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
         }
-
     },
     update_Cursor: function()
     {
@@ -4764,8 +4778,10 @@ CMathContent.prototype =
         rPrp.Merge(DEFAULT_RUN_PRP);
         rPrp.Merge(this.getCurrRunPrp());
 
+        var absPos = this.Composition.absPos;
+
         var sizeCursor = rPrp.FontSize*g_dKoef_pt_to_mm;
-        var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor*0.8 };
+        var position = {x: this.pos.x + absPos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + absPos.y + this.size.ascent - sizeCursor*0.8 };
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
@@ -4773,7 +4789,7 @@ CMathContent.prototype =
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 
     },
-    coordWOGaps: function( msCoord )
+    old_coordWOGaps: function( msCoord )
     {
         var x = msCoord.x;
         var y = msCoord.y;
@@ -4814,7 +4830,6 @@ CMathContent.prototype =
                     pos--;
                 else if(mouseX >= widthToEl - gps.right)
                     pos++;
-
             }
             else
             {
@@ -4841,7 +4856,7 @@ CMathContent.prototype =
 
         return pos;
     },
-    getCoordElem: function(index, mCoord)  // without gaps of Math Component ( например, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
+    old_getCoordElem: function(index, mCoord)  // without gaps of Math Component ( например, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
     {
         var widthToPrev = this.content[index-1].widthToEl;
         var widthToCur = this.content[index].widthToEl;
@@ -4862,6 +4877,34 @@ CMathContent.prototype =
             Y =  this.content[index].value.size.height;
         else
             Y = mCoord.y - (this.size.center - this.g_mContext.top - this.content[index].value.size.center);
+
+        return {x: X, y: Y};
+    },
+    getCoordElem: function(index, mCoord)  // without gaps of Math Component ( например, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
+    {
+        var widthToPrev = this.content[index-1].widthToEl;
+        var widthToCur = this.content[index].widthToEl;
+        var X;
+        var Y;
+
+        var gps = this.content[index].g_mContext;
+        if( widthToPrev <= mCoord.x && mCoord.x <=  (widthToPrev + gps.left) )
+            X = 0;
+        else if( (widthToCur - gps.right) <= mCoord.x && mCoord.x <= widthToCur )
+            X = this.content[index].value.size.width;
+        else
+            X = mCoord.x - widthToPrev - gps.left;
+
+        var Height  = this.content[index].value.size.height,
+            Ascent  = this.content[index].value.size.ascent,
+            Descent = this.content[index].value.size.height -  this.content[index].value.size.ascent;
+
+        if( mCoord.y <= (this.size.ascent - Ascent) )
+            Y = 0;
+        else if( mCoord.y >= this.size.ascent + Descent)
+            Y =  Height;
+        else
+            Y = mCoord.y - (this.size.ascent - Ascent);
 
         return {x: X, y: Y};
     },
@@ -5415,7 +5458,7 @@ CMathContent.prototype =
     {
         return false;
     },
-    setPosition: function( pos )
+    old_setPosition: function(pos)
     {
         this.pos = { x: pos.x + this.g_mContext.left, y: pos.y};
         var max_cent = this.size.center;
@@ -5439,16 +5482,16 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    new_setPosition: function( _pos )
+    setPosition: function(pos)
     {
-        this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
+        this.pos = {x: pos.x, y: pos.y};
 
-        for(var i=1; i<this.content.length;i++)
+        for(var i=1; i < this.content.length;i++)
         {
             var t =
             {
                 x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left,
-                y: this.pos.y + this.size.center
+                y: this.pos.y + this.size.ascent    //baseline
             };
 
             this.content[i].value.setPosition(t);
@@ -5479,8 +5522,11 @@ CMathContent.prototype =
         for(var j= start; j < end ; j++)
             widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
 
+        var X = this.pos.x + this.Composition.absPos.x + this.content[start-1].widthToEl,
+            Y = this.pos.y + this.Composition.absPos.y;
+
         if( widthSelect != 0)
-            editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0,this.pos.x + this.content[start-1].widthToEl, this.pos.y, widthSelect, heightSelect );
+            editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0, X, Y, widthSelect, heightSelect );
     },
     ///// properties /////
     SetDot: function(flag)
@@ -6028,8 +6074,8 @@ CMathContent.prototype =
         }
         else
         {
-            var msCoord = this.coordWOGaps({x: x, y: y});
-            var pos = this.findPosition( msCoord);
+            var msCoord = {x: x, y: y};
+            var pos = this.findPosition(msCoord);
 
             this.LogicalSelect.start = pos;
             this.LogicalSelect.end = pos;
@@ -6054,7 +6100,7 @@ CMathContent.prototype =
         }
         else
         {
-            var msCoord = this.coordWOGaps({x: x, y: y});
+            var msCoord = {x: x, y: y};
             var posEnd = this.findPosition(msCoord),
                 posStart = this.LogicalSelect.start;
 
@@ -6257,18 +6303,16 @@ CMathContent.prototype =
         }
         else
         {
-            var msCoord = this.coordWOGaps(mouseCoord);
-
             if(inside_flag == 0)
                 this.CurPos = 0;
             else if(inside_flag == 1)
                 this.CurPos = this.content.length - 1;
             else
-                this.CurPos = this.findPosition( msCoord );
+                this.CurPos = this.findPosition(mouseCoord);
 
             if( this.content[this.CurPos].value.typeObj === MATH_COMP )
             {
-                var coord = this.getCoordElem(this.CurPos, msCoord);
+                var coord = this.getCoordElem(this.CurPos, mouseCoord);
                 result = this.content[this.CurPos].value.mouseDown(coord);
             }
             else
@@ -6291,15 +6335,14 @@ CMathContent.prototype =
         }
         else
         {
-            var msCoord = this.coordWOGaps(mouseCoord);
-            var pos = this.findPosition( msCoord );
+            var pos = this.findPosition( mouseCoord );
 
             //селект внутри элемента (дроби и пр.)
             if(this.CurPos === pos && this.content[pos].value.typeObj === MATH_COMP)
             {
                 //this.setStart_Selection( pos - 1 );
                 this.setStartPos_Selection(pos - 1);
-                var coord = this.getCoordElem(this.CurPos, msCoord );
+                var coord = this.getCoordElem(this.CurPos, mouseCoord );
                 var movement = this.content[pos].value.mouseMove(coord);
 
                 if( ! movement.state )
@@ -6385,7 +6428,7 @@ CMathContent.prototype =
 function CMathComposition()
 {
     this.TEST_SELECT_ACTIVE = false;
-    this.pos = null;
+    this.absPos = null;
     this.Root = null;
 
     this.CurrentContent    = null;
@@ -6689,7 +6732,7 @@ CMathComposition.prototype =
         //this.SetReferenceComposition();
 
         this.Root.Resize(oMeasure);
-        this.Root.setPosition(this.pos);
+        this.Root.setPosition(this.absPos);
         this.UpdateCursor();
     },
     AddLetter_2: function(code)
@@ -6815,22 +6858,22 @@ CMathComposition.prototype =
             // "b_color1" for fill
             //context.b_color1(224, 238, 230, 255);
 
-            pGraphics.drawHorLine(0, this.pos.y, this.pos.x, this.pos.x + w_Box, 0.2);
-            pGraphics.drawHorLine(0, this.pos.y + h_Box, this.pos.x, this.pos.x + w_Box, 0.2);
-            pGraphics.drawVerLine(0,this.pos.x, this.pos.y, this.pos.y + h_Box, 0.2 );
-            pGraphics.drawVerLine(0,this.pos.x + w_Box, this.pos.y, this.pos.y + h_Box, 0.2 );
+            pGraphics.drawHorLine(0, this.absPos.y, this.absPos.x, this.absPos.x + w_Box, 0.2);
+            pGraphics.drawHorLine(0, this.absPos.y + h_Box, this.absPos.x, this.absPos.x + w_Box, 0.2);
+            pGraphics.drawVerLine(0,this.absPos.x, this.absPos.y, this.absPos.y + h_Box, 0.2 );
+            pGraphics.drawVerLine(0,this.absPos.x + w_Box, this.absPos.y, this.absPos.y + h_Box, 0.2 );
         }
 
         this.Root.draw(pGraphics);
     },
     UpdatePosition: function()
     {
-        this.Root.setPosition(this.pos);
+        this.Root.setPosition(this.absPos);
     },
     SetPosition: function(pos)
     {
-        this.pos = pos;
-        this.Root.setPosition(this.pos);
+        this.absPos = pos;
+        this.Root.setPosition(this.absPos);
     },
     IsRect: function(x, y)
     {
@@ -6839,14 +6882,15 @@ CMathComposition.prototype =
     },
     GetCoordComp: function(x, y)
     {
-        var _x = x - this.pos.x;
-        var _y = y - this.pos.y;
+        var _x = x - this.absPos.x;
+        var _y = y - this.absPos.y;
 
         return {x: _x, y: _y};
     },
     Resize: function(oMeasure)
     {
         this.Root.Resize(oMeasure);
+        this.Root.setPosition({x: 0, y: 0});
     },
     test_for_edit: function()
     {
@@ -6873,14 +6917,8 @@ CMathComposition.prototype =
 
     Init: function()
     {
-        // TODO
-        // переделать gaps
-        //var g_Unif = 6*g_dKoef_pix_to_mm;
-        var g_Unif = 0;
-        var gps = new dist(g_Unif, g_Unif, g_Unif, g_Unif);
-
         this.Root = new CMathContent();
-        this.Root.g_mContext = gps;
+        //this.Root.g_mContext = gps;
         this.Root.setComposition(this);
         //this.SetTestRunPrp();
         //this.Root.setTxtPrp(this.TxtPrp);
@@ -6905,12 +6943,10 @@ CMathComposition.prototype =
     // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
     Draw: function(x, y, pGraphics)
     {
+        this.absPos = {x: x, y: y - this.Root.size.ascent};
+
         if(this.Root.content.length > 1)
-        {
-            this.pos = {x: x, y: y - this.Root.size.center};
-            this.Root.setPosition({x: x, y: y - this.Root.size.center});
-            this.Root.draw(pGraphics);
-        }
+            this.Root.draw(this.absPos.x, this.absPos.y , pGraphics);
     },
     GetFirstPrp: function()
     {
@@ -6997,15 +7033,15 @@ CMathComposition.prototype =
         /*return this.Root.size;*/
 
         //
-        var sh = 0.2487852283770651*g_oTextMeasurer.GetHeight();
+        //var sh = 0.2487852283770651*g_oTextMeasurer.GetHeight();
         //
         var size =
         {
             Width:          this.Root.size.width,
             WidthVisible:   this.Root.size.width,
             Height:         this.Root.size.height,
-            Ascent:         this.Root.size.center + sh,
-            Descent:        this.Root.size.height - this.Root.size.center
+            Ascent:         this.Root.size.ascent,
+            Descent:        this.Root.size.height - this.Root.size.ascent
         };
 
         return size;
@@ -7093,7 +7129,7 @@ CMathComposition.prototype =
     },
     RecalculateComposition:  function(oMeasure, TextPr) // textPrp в тестовом режиме, просто отрисуем с ними формулу
     {
-        this.Root.Resize(oMeasure); // пересчитываем всю формулу
+        this.Resize(oMeasure); // пересчитываем всю формулу
 
         var width = this.Root.size.width,
             height = this.Root.size.height;
@@ -7102,15 +7138,15 @@ CMathComposition.prototype =
     },
     Selection_SetStart: function(X, Y, PageNum)
     {
-        var x = X - this.pos.x,
-            y = Y - this.pos.y;
+        var x = X - this.absPos.x,
+            y = Y - this.absPos.y;
 
         this.Root.selection_Start(x, y);
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {
-        var x = X - this.pos.x,
-            y = Y - this.pos.y;
+        var x = X - this.absPos.x,
+            y = Y - this.absPos.y;
 
         var result = this.Root.selection_End(x, y, MouseEvent);
         this.SelectContent = result.SelectContent;

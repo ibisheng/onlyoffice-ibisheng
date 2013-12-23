@@ -49,18 +49,18 @@ CBorderBox.prototype.init = function(props)
 }
 CBorderBox.prototype.recalculateSize = function()
 {
-    var ss = this.elements[0][0].size;
+    var base = this.elements[0][0].size;
 
-    var width = ss.width;
-    var height = ss.height;
-    var center = ss.center;
+    var width = base.width;
+    var height = base.height;
+    var ascent = base.ascent;
 
     this.gapBrd = this.getCtrPrp().FontSize*0.08104587131076388;
 
     if(this.bTop)
     {
         height += this.gapBrd;
-        center += this.gapBrd;
+        ascent += this.gapBrd;
     }
     if(this.bBot)
         height += this.gapBrd;
@@ -70,19 +70,19 @@ CBorderBox.prototype.recalculateSize = function()
     if(this.bRight)
         width += this.gapBrd;
 
-    this.size = {width : width, height: height, center: center};
+    this.size = {width : width, height: height, ascent: ascent};
 }
-CBorderBox.prototype.draw = function(pGraphics)
+CBorderBox.prototype.draw = function(x, y, pGraphics)
 {
-    this.elements[0][0].draw(pGraphics);
+    this.elements[0][0].draw(x, y, pGraphics);
     var penW = this.getCtrPrp().FontSize* 25.4/96 * 0.08 ;
 
     if(this.bTop)
     {
 
-        var x1 = this.pos.x,
-         x2 = this.pos.x + this.size.width - 25.4/96,
-         y1 = this.pos.y;
+        var x1 = this.pos.x + x,
+         x2 = this.pos.x + x + this.size.width - 25.4/96,
+         y1 = this.pos.y + y;
 
          pGraphics.p_color(0,0,0, 255);
          pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -90,9 +90,9 @@ CBorderBox.prototype.draw = function(pGraphics)
 
     if(this.bBot)
     {
-        var x1 = this.pos.x,
-            x2 = this.pos.x + this.size.width - 25.4/96,
-            y1 = this.pos.y + this.size.height - penW;
+        var x1 = this.pos.x + x,
+            x2 = this.pos.x + x + this.size.width - 25.4/96,
+            y1 = this.pos.y + y + this.size.height - penW;
 
             pGraphics.p_color(0,0,0, 255);
             pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -100,9 +100,9 @@ CBorderBox.prototype.draw = function(pGraphics)
 
     if(this.bLeft)
     {
-        var x1 = this.pos.x ,
-            y1 = this.pos.y,
-            y2 = this.pos.y + this.size.height - 25.4/96;
+        var x1 = this.pos.x + x,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - 25.4/96;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -110,9 +110,9 @@ CBorderBox.prototype.draw = function(pGraphics)
 
     if(this.bRight)
     {
-        var x1 = this.pos.x + this.size.width - penW ,
-            y1 = this.pos.y,
-            y2 = this.pos.y + this.size.height - 25.4/96 ;
+        var x1 = this.pos.x + x + this.size.width - penW ,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - 25.4/96 ;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -121,9 +121,9 @@ CBorderBox.prototype.draw = function(pGraphics)
     if(this.bLDiag)
     {
         var pW = penW*0.8;
-        var x1 = this.pos.x , y1 = this.pos.y,
+        var x1 = this.pos.x + x , y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
-            x3 = x1 + this.size.width - 25.4/96, y3 = y1 + this.size.height - pW - 25.4/96,
+            x3 = x1 + x + this.size.width - 25.4/96, y3 = y1 + this.size.height - pW - 25.4/96,
             x4 = x3, y4 = y3 + pW,
             x5 = x4 - pW, y5 = y4,
             x6 = x1, y6 = y1 + pW,
@@ -147,10 +147,10 @@ CBorderBox.prototype.draw = function(pGraphics)
     if(this.bRDiag)
     {
         var pW = penW*0.8;
-        var x1 = this.pos.x + this.size.width - pW - 25.4/96, y1 = this.pos.y,
+        var x1 = this.pos.x + x + this.size.width - pW - 25.4/96, y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
             x3 = x2, y3 = y2 + pW,
-            x4 = this.pos.x + pW, y4 = this.pos.y + this.size.height - 25.4/96,
+            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - 25.4/96,
             x5 = x4 - pW, y5 = y4,
             x6 = x5, y6 = y5 - pW,
             x7 = x1, y7 = y1;
@@ -172,9 +172,9 @@ CBorderBox.prototype.draw = function(pGraphics)
 
     if(this.bHor)
     {
-        var x1 = this.pos.x,
-            x2 = this.pos.x + this.size.width - 25.4/96,
-            y1 = this.pos.y + this.size.height/2 - penW/2;
+        var x1 = this.pos.x + x,
+            x2 = this.pos.x + x + this.size.width - 25.4/96,
+            y1 = this.pos.y + y + this.size.height/2 - penW/2;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawHorLine(0, y1, x1, x2, penW);
@@ -182,9 +182,9 @@ CBorderBox.prototype.draw = function(pGraphics)
 
     if(this.bVert)
     {
-        var x1 = this.pos.x + this.size.width/2 - penW/2,
-            y1 = this.pos.y,
-            y2 = this.pos.y + this.size.height - 25.4/96;
+        var x1 = this.pos.x + x + this.size.width/2 - penW/2,
+            y1 = this.pos.y + y,
+            y2 = this.pos.y + y + this.size.height - 25.4/96;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -193,7 +193,7 @@ CBorderBox.prototype.draw = function(pGraphics)
 }
 CBorderBox.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.center};
+    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
     var x = this.pos.x, y = this.pos.y;
 
@@ -276,7 +276,6 @@ CBorderBox.prototype.getPropsForWrite = function()
 
     return props;
 }
-
 
 function CBox()
 {
@@ -369,16 +368,16 @@ CBar.prototype.init = function(props)
 
     this.setCharacter(props, defaultProps);
 }
-CBar.prototype.getCenter = function()
+CBar.prototype.getAscent = function()
 {
-    var center;
+    var ascent;
 
     if(this.loc === LOCATION_TOP )
-        center = this.operator.size.height + this.elements[0][0].size.center;
+        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.loc === LOCATION_BOT )
-        center = this.elements[0][0].size.center;
+        ascent = this.elements[0][0].size.ascent;
 
-    return center;
+    return ascent;
 }
 CBar.prototype.getPropsForWrite = function()
 {

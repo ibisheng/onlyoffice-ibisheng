@@ -8,7 +8,8 @@
 //api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
 // возвращает название шрифта
 
-var DIV_CENT = 0.2487852283770651;
+//var DIV_CENT = 0.2487852283770651;
+var DIV_CENT = 0.1;
 
 function CMathTextPrp()
 {
@@ -153,7 +154,7 @@ CMathText.prototype =
     // descent = Symbol.Descent ( = 0)
 
     // gap = FontHeight - FontDescent - Placeholder.Height + FontDescent
-    old_recalculateSize: function()
+    old_old_recalculateSize: function()
     {
         /*var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
@@ -184,7 +185,7 @@ CMathText.prototype =
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
-    Resize: function(oMeasure)
+    old_Resize: function(oMeasure)
     {
         var letter = this.getCode();
 
@@ -202,6 +203,21 @@ CMathText.prototype =
 
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
+    },
+    Resize: function(oMeasure)
+    {
+        var letter = this.getCode();
+
+        var metricsTxt = oMeasure.Measure2Code(letter);
+        var width = metricsTxt.Width;
+
+        var ascent  =  metricsTxt.Ascent;
+        var descent = (metricsTxt.Height - metricsTxt.Ascent);
+        var height  =  ascent + descent;
+
+        var widthG   = metricsTxt.WidthG;
+
+        this.size = {width: width, widthG: widthG, height: height, ascent: ascent};
     },
     old_draw: function()
     {
@@ -251,7 +267,7 @@ CMathText.prototype =
         MathControl.pGraph.FillTextCode(xx, yy , this.getCode());
 
     },
-    draw: function(pGraphics)
+    draw: function(x, y, pGraphics)
     {
         /*var txtPrp = new CMathTextPrp();
         txtPrp.Merge(this.getTxtPrp());
@@ -260,8 +276,8 @@ CMathText.prototype =
         //pGraphics.b_color1(0,0,0,255);
         //pGraphics.SetFont(txtPrp);
 
-        var X = this.pos.x ,
-            Y = this.pos.y;
+        var X = this.pos.x + x,
+            Y = this.pos.y + y;
 
         var invert = new CMatrix();
         invert.sx = this.transform.sx;
@@ -297,7 +313,7 @@ CMathText.prototype =
 
 
         pGraphics.transform(sx, shy, shx, sy, 0, 0);
-        pGraphics.FillTextCode(xx, yy , this.getCode());
+        pGraphics.FillTextCode(xx, yy , this.getCode());    //на отрисовку символа отправляем положение baseLine
 		//pGraphics.FillTextCode(xx, yy , this.value);
 
     },
@@ -306,7 +322,7 @@ CMathText.prototype =
         if( ! this.bJDraw)                      // for text
             this.pos = {x : pos.x, y: pos.y };
         else                                    // for symbol only drawing
-            this.pos = {x: pos.x , y: pos.y + this.size.center};
+            this.pos = {x:  pos.x , y: pos.y + this.size.ascent};
     },
     new_setPosition: function(pos)
     {

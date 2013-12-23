@@ -216,7 +216,7 @@ CNary.prototype.getLowerIterator = function()
 }
 CNary.prototype.getPropsForWrite = function()
 {
-    var limloc = null;
+    var limLoc = null;
     if (this.limLoc == NARY_SubSup)
         limLoc = 0;
     else if (this.limLoc == NARY_UndOvr)
@@ -253,7 +253,7 @@ CNaryUnd.prototype.setDistance = function()
 }
 CNaryUnd.prototype.getCenter = function()
 {
-    return this.elements[0][0].size.height + this.dH + this.elements[1][0].size.center ;
+    return this.elements[0][0].size.height + this.dH + this.elements[1][0].size.ascent;
 }
 CNaryUnd.prototype.getUpperIterator = function()
 {
@@ -282,7 +282,7 @@ CNaryOvr.prototype.setDistance = function()
 }
 CNaryOvr.prototype.getCenter = function()
 {
-    return this.elements[0][0].size.center;
+    return this.elements[0][0].size.ascent;
 }
 CNaryOvr.prototype.getLowerIterator= function()
 {
@@ -314,7 +314,7 @@ CNaryUndOvr.prototype.recalculateSize = function()
     this.gapTop = zetta*0.25;
     this.gapBottom = zetta*0.1;
 
-    var center = this.elements[0][0].size.height + this.gapTop + this.elements[1][0].size.center;
+    var ascent = this.elements[0][0].size.height + this.gapTop + this.elements[1][0].size.ascent;
 
     var width = 0, height = 0;
     for(var i = 0; i < 3; i++)
@@ -325,11 +325,11 @@ CNaryUndOvr.prototype.recalculateSize = function()
 
     height += this.gapTop + this.gapBottom;
 
-    this.size = {width: width, height: height, center: center};
+    this.size = {width: width, height: height, ascent: ascent};
 }
 CNaryUndOvr.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y : pos.y - this.size.center};
+    this.pos = {x: pos.x, y : pos.y - this.size.ascent};
     var x1 = pos.x + this.align(0, 0).x,
         y1 = pos.y,
         x2 = pos.x + this.align(1,0).x,
@@ -406,14 +406,14 @@ function CNaryOperator(flip)
     this.bFlip = (flip == -1);
     this.sizeGlyph = null;
 }
-CNaryOperator.prototype.draw = function(pGraphics)
+CNaryOperator.prototype.draw = function(x, y, pGraphics)
 {
     if(this.typeObj == MATH_TEXT)
-        this.drawTextElem(pGraphics);
+        this.drawTextElem(x, y, pGraphics);
     else
-        this.drawGlyph(pGraphics);
+        this.drawGlyph(x, y, pGraphics);
 }
-CNaryOperator.prototype.drawGlyph = function(pGraphics)
+CNaryOperator.prototype.drawGlyph = function(x, y,pGraphics)
 {
     var coord = this.getCoord();
 
@@ -442,8 +442,8 @@ CNaryOperator.prototype.drawGlyph = function(pGraphics)
 
     for(var i = 0 ; i < X.length; i++)
     {
-        XX[i] = this.pos.x + X[i]*alpha;
-        YY[i] = this.pos.y + (a*Y[i]*alpha + b);
+        XX[i] = this.pos.x + x + X[i]*alpha;
+        YY[i] = this.pos.y + y + (a*Y[i]*alpha + b);
     }
 
     var intGrid = pGraphics.GetIntegerGrid();
@@ -460,7 +460,7 @@ CNaryOperator.prototype.drawGlyph = function(pGraphics)
     pGraphics.df();
     pGraphics.SetIntegerGrid(intGrid);
 }
-CNaryOperator.prototype.drawTextElem = function(pGraphics)
+CNaryOperator.prototype.drawTextElem = function(x, y, pGraphics)
 {
     pGraphics.b_color1(0,0,0,255);
     var rPrp = new CTextPr();
@@ -470,7 +470,7 @@ CNaryOperator.prototype.drawTextElem = function(pGraphics)
 
     pGraphics.SetFont(rPrp);
 
-    CNaryOperator.superclass.call.draw(this, pGraphics);
+    CNaryOperator.superclass.call.draw(this, x, y, pGraphics);
 }
 CNaryOperator.prototype.IsJustDraw = function()
 {
@@ -490,9 +490,9 @@ CNaryOperator.prototype.recalculateSize = function()
 
     var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
-        center = this.sizeGlyph.height/2;
+        ascent = this.sizeGlyph.height/2 + DIV_CENT*this.getCtrPrp().FontSize;
 
-    this.size = {height: height, width: width, center: center};
+    this.size = {height: height, width: width, ascent: ascent};
 }
 CNaryOperator.prototype.Resize = function()
 {

@@ -585,8 +585,8 @@ CMathBase.prototype =
             {
                 var size = this.elements[i][j].size;
                 Widths[j] = ( Widths[j] > size.width ) ? Widths[j] : size.width;
-                Ascents[i] = (Ascents[i] > size.center ) ? Ascents[i] : size.center;
-                Descents[i] = (Descents[i] > size.height - size.center ) ? Descents[i] : size.height - size.center;
+                Ascents[i] = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
+                Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
             }
         
         var Heights = [];
@@ -632,14 +632,14 @@ CMathBase.prototype =
 
         if(this.alignment.hgt[pos_y] == CENTER)
         {
-            var maxC = 0;
+            var maxAsc = 0;
 
             for(var j = 0; j < this.nCol; j++)
             {
-                _c = this.elements[pos_x][j].size.center;
-                maxC = ( maxC > _c ) ? maxC : _c;
+                var _ascent = this.elements[pos_x][j].size.ascent;
+                maxAsc = ( maxAsc > _ascent ) ? maxAsc : _ascent;
             }
-            _y = (maxC - this.elements[pos_x][pos_y].size.center);
+            _y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
         }
         else
         {
@@ -772,7 +772,7 @@ CMathBase.prototype =
          // -1 - в пределах границы
          // 0 - начало контента
          // 1 - конец контента
-         // 2 - выщли за границы контента по Y
+         // 2 - вышли за границы контента по Y
 
          var inside_flag = -1;
 
@@ -815,7 +815,7 @@ CMathBase.prototype =
         if(this.bMObjs === true)
             this.pos = {x: pos.x, y : pos.y};
         else
-            this.pos = {x: pos.x, y: pos.y - this.size.center}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
+            this.pos = {x: pos.x, y: pos.y - this.size.ascent}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         var maxWH = this.getWidthsHeights();
         var Widths = maxWH.widths;
@@ -834,11 +834,11 @@ CMathBase.prototype =
             h += Heights[i];
         }
     },
-    draw: function(pGraphics)
+    draw: function(x, y, pGraphics)
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].draw(pGraphics);
+                this.elements[i][j].draw(x, y, pGraphics);
     },
     remove: function(order)
     {
@@ -866,9 +866,9 @@ CMathBase.prototype =
 
         _width += this.dW*(this.nCol - 1);
 
-        var _center =  this.getCenter(_height);
+        var _ascent =  this.getAscent(_height);
 
-        this.size = {width: _width, height: _height, center: _center};
+        this.size = {width: _width, height: _height, ascent: _ascent};
     },
     /*RecalculateReverse: function(oMeasure)
     {
@@ -883,7 +883,7 @@ CMathBase.prototype =
 
         this.recalculateSize();
     },
-    getCenter: function(_height)
+    old_getCenter: function(_height)
     {
         var res = 0;
         if(this.nRow > 1)
@@ -896,6 +896,20 @@ CMathBase.prototype =
                 res = (this.elements[0][i].size.center > res) ?  this.elements[0][i].size.center : res;
         
         return res;
+    },
+    getAscent: function(_height)
+    {
+        var Ascent = 0;
+        if(this.nRow > 1)
+        {
+            Ascent = _height || this.size.height;
+            Ascent /=2;
+        }
+        else
+            for(var i=0; i< this.nCol; i++)
+                Ascent = (this.elements[0][i].size.ascent > Ascent) ?  this.elements[0][i].size.ascent : Ascent;
+
+        return Ascent;
     },
     alignHor: function(pos, coeff)
     {

@@ -2797,7 +2797,7 @@ COperator.prototype.getProps = function(props, defaultProps)
 
     return  {loc: location, type: type, code: code};
 }
-COperator.prototype.draw = function(pGraphics)
+COperator.prototype.draw = function(x, y, pGraphics)
 {
     if(this.typeOper === OPERATOR_TEXT)
     {
@@ -2813,18 +2813,17 @@ COperator.prototype.draw = function(pGraphics)
 
         ////////////////////////////////////////////////
 
-        this.operator.draw(pGraphics);
+        this.operator.draw(x, y, pGraphics);
     }
     else
     {
         if(this.type === OPER_SEPARATOR)
-            this.drawSeparator(pGraphics);
+            this.drawSeparator(x, y,pGraphics);
         else
-            this.drawOperator(pGraphics);
+            this.drawOperator(x, y, pGraphics);
     }
-
 }
-COperator.prototype.drawOperator = function(pGraphics)
+COperator.prototype.drawOperator = function( absX, absY, pGraphics)
 {
     if(this.operator !== -1)
     {
@@ -2834,14 +2833,14 @@ COperator.prototype.drawOperator = function(pGraphics)
             Y = new Array();
         for(var j = 0; j < lng; j++)
         {
-            X.push(this.pos.x + this.coordGlyph.XX[j]);
-            Y.push(this.pos.y + this.coordGlyph.YY[j]);
+            X.push(this.pos.x + absX + this.coordGlyph.XX[j]);
+            Y.push(this.pos.y + absY + this.coordGlyph.YY[j]);
         }
 
         this.operator.draw(pGraphics, X, Y);
     }
 }
-COperator.prototype.drawSeparator = function(pGraphics)
+COperator.prototype.drawSeparator = function(absX, absY, pGraphics)
 {
     if(this.operator !== -1)
     {
@@ -2853,8 +2852,8 @@ COperator.prototype.drawSeparator = function(pGraphics)
                 Y = new Array();
             for(var j = 0; j < lng; j++)
             {
-                X.push(this.pos[i].x + this.coordGlyph.XX[j]);
-                Y.push(this.pos[i].y + this.coordGlyph.YY[j]);
+                X.push(this.pos[i].x + absX + this.coordGlyph.XX[j]);
+                Y.push(this.pos[i].y + absY + this.coordGlyph.YY[j]);
             }
 
             this.operator.draw(pGraphics, X, Y);
@@ -2865,7 +2864,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 {
     if(this.operator !== -1)
     {
-        var width, height;
+        var width, height, ascent;
 
         if(this.typeOper == OPERATOR_TEXT)
         {
@@ -2884,13 +2883,13 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             {
                 height = this.operator.size.height;
                 width  = stretch > this.operator.size.width ? stretch : this.operator.size.width;
-                center = height/2;
+                ascent = height/2;
             }
             else
             {
                 width = this.operator.size.width;
                 height = stretch > this.operator.size.height ? stretch : this.operator.size.height;
-                center = this.operator.size.height/2;
+                ascent = this.operator.size.height/2;
             }
         }
         else
@@ -2914,10 +2913,10 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             }
 
             var betta = this.getCtrPrp().FontSize;
-            var center = height/2 + 0.2*betta;
+            ascent = height/2 + 0.2*betta;
         }
 
-        this.size = { width: width, height: height, center: center};
+        this.size = { width: width, height: height, ascent: ascent};
     }
 }
 COperator.prototype.setPosition = function(pos)
@@ -3230,7 +3229,7 @@ CDelimiter.prototype.old_recalculateSize = function()
 CDelimiter.prototype.Resize = function(oMeasure)
 {
     var height = 0,
-        width = 0, center = 0;
+        width = 0;
 
     var ascent = 0,
         descent = 0;
@@ -3256,8 +3255,8 @@ CDelimiter.prototype.Resize = function(oMeasure)
         {
             var content = this.elements[0][j].size;
             width += content.width;
-            ascent = content.center > ascent ? content.center : ascent;
-            descent = content.height - content.center > descent ? content.height - content.center: descent;
+            ascent = content.ascent > ascent ? content.ascent : ascent;
+            descent = content.height - content.ascent > descent ? content.height - content.ascent: descent;
         }
 
         maxH = ascent > descent ? ascent : descent;
@@ -3268,20 +3267,17 @@ CDelimiter.prototype.Resize = function(oMeasure)
             if(maxH < plH)
             {
                 height = ascent + descent;
-                center = ascent;
             }
             else
             {
                 div = ascent - plH;
-
                 height = ascent + descent + div;
-                center = ascent;
             }
         }
         else
         {
             height = 2*maxH;
-            center = height/2;
+            ascent = height/2;
         }
     }
     else
@@ -3290,12 +3286,11 @@ CDelimiter.prototype.Resize = function(oMeasure)
         {
             var content = this.elements[0][j].size;
             width += content.width;
-            ascent = content.center > ascent ? content.center : ascent;
-            descent = content.height - content.center > descent ? content.height - content.center: descent;
+            ascent = content.ascent > ascent ? content.ascent : ascent;
+            descent = content.height - content.ascent > descent ? content.height - content.ascent: descent;
         }
 
         height = ascent + descent;
-        center = ascent;
     }
 
     this.begOper.fixSize(oMeasure, height);
@@ -3303,7 +3298,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
 
     if(height < this.begOper.size.height)
     {
-        center = this.begOper.size.height - H2;
+        ascent = this.begOper.size.height - H2;
         height = this.begOper.size.height;
         //center = this.begOper.size.center;
 
@@ -3314,16 +3309,17 @@ CDelimiter.prototype.Resize = function(oMeasure)
     if(height < this.endOper.size.height)
     {
         //center += (height - this.endOper.size.height)/2;
-        center = this.endOper.size.height - H2;
+        ascent = this.endOper.size.height - H2;
         height = this.endOper.size.height;
         //center = this.endOper.size.center;
     }
 
     this.sepOper.fixSize(oMeasure, height);
     width += (this.nCol - 1)*this.sepOper.size.width;
-    if(height < this.endOper.size.height)
+    if(height < this.sepOper.size.height)
     {
         //center += (height - this.sepOper.size.height)/2;
+        ascent = this.sepOper.size.height - H2;
         height = this.sepOper.size.height;
         //center = this.sepOper.size.center;
     }
@@ -3368,7 +3364,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
      center = (center < this.sepOper.size.center) ? this.sepOper.size.center : center;
      }*/
 
-    this.size = {width: width, height: height, center: center};
+    this.size = {width: width, height: height, ascent: ascent};
 
 }
 CDelimiter.prototype.alignOperator = function(height)
@@ -3399,7 +3395,7 @@ CDelimiter.prototype.alignOperator = function(height)
 }
 CDelimiter.prototype.setPosition = function(position)
 {
-    this.pos = {x: position.x, y: position.y - this.size.center};
+    this.pos = {x: position.x, y: position.y - this.size.ascent};
 
     var x = this.pos.x,
         y = this.pos.y;
@@ -3494,20 +3490,20 @@ CDelimiter.prototype.findDisposition = function(pos)
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 
 }
-CDelimiter.prototype.draw = function(pGraphics)
+CDelimiter.prototype.draw = function(x, y, pGraphics)
 {
-    this.begOper.draw(pGraphics);
-    this.sepOper.draw(pGraphics);
-    this.endOper.draw(pGraphics);
+    this.begOper.draw(x, y, pGraphics);
+    this.sepOper.draw(x, y, pGraphics);
+    this.endOper.draw(x, y, pGraphics);
 
     for(var j = 0; j < this.nCol; j++)
-        this.elements[0][j].draw(pGraphics);
+        this.elements[0][j].draw(x, y,pGraphics);
 }
 CDelimiter.prototype.align = function(element)
 {
     var align = 0;
     if(!element.IsJustDraw())
-        align = this.size.center - element.size.center;
+        align = this.size.ascent - element.size.ascent;
     else
         align = (this.size.height - element.size.height)/2;
 
