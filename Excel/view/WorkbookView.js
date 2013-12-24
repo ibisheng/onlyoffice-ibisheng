@@ -127,7 +127,7 @@
                 style0.innerHTML = ".block_elem { position:absolute;padding:0;margin:0; }";
                 _head.appendChild(style0);
 
-                if (!window.NATIVE_EDITOR_ENJINE)
+                if (!window["NATIVE_EDITOR_ENJINE"])
                 {
 				    // create canvas
 				    var outer = this.element.find("#ws-canvas-outer");
@@ -175,7 +175,7 @@
 				// Мерить нужно только со 100% и один раз для всего документа
 				this._calcMaxDigitWidth();
 				
-				if (!window.NATIVE_EDITOR_ENJINE)
+				if (!window["NATIVE_EDITOR_ENJINE"])
 				{
 				    // initialize events controller
 				    this.controller.init(this, this.element, this.canvasOverlay, /*handlers*/{

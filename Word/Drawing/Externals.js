@@ -5,7 +5,7 @@ var bIsLocalFontsUse = false;
 
 function _is_support_cors()
 {
-    if (window.NATIVE_EDITOR_ENJINE === true)
+    if (window["NATIVE_EDITOR_ENJINE"] === true)
         return false;
         
     var xhrSupported = new XMLHttpRequest();
@@ -753,7 +753,7 @@ CFontInfo.prototype =
         else
             fontfile = font_loader.fontFiles[index];
 
-        if (window.NATIVE_EDITOR_ENJINE === undefined)
+        if (window["NATIVE_EDITOR_ENJINE"] === undefined)
         {
             if (fontfile.Status != 0 && (this.Type == FONT_TYPE_STANDART || this.Type == FONT_TYPE_ADDITIONAL) &&
                 null != _embedded_cur.map_name_cutindex && undefined !== _embedded_cur.map_name_cutindex[this.Name])
