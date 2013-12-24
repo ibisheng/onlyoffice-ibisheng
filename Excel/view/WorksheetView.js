@@ -1806,7 +1806,7 @@
 				this._fixSelectionOfMergedCells();
 				this._fixSelectionOfHiddenCells();
 				this._drawGraphic();
-				this.objectRender.showDrawingObjectsEx(true);
+				this.objectRender.showDrawingObjects(false);
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
@@ -3371,9 +3371,9 @@
 				}
 			},
 
-			_drawGraphic: function() {
+			_drawGraphic: function(updatedRange) {
 				this._drawElements(this.autoFilters, this.autoFilters.drawAutoF2);
-				this.cellCommentator.drawCommentCells();
+				this.cellCommentator.drawCommentCells(updatedRange);
 			},
 			
 			cleanSelection: function (range, isFrozen) {
@@ -5018,7 +5018,7 @@
 
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
-				this._drawGraphic();
+				this._drawGraphic(rangeGraphic);
 				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 				return this;
 			},
@@ -5105,7 +5105,7 @@
 												
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
-				this._drawGraphic();
+				this._drawGraphic(rangeGraphic);
 				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 				return this;
 			},
@@ -10001,7 +10001,7 @@
 					t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 				}
 
-				t.objectRender.rebuildChartGraphicObjects();
+				t.objectRender.rebuildChartGraphicObjects(t.activeRange.clone(true));
 				t.cellCommentator.updateCommentPosition();
 				t.draw(lockDraw);
 			},

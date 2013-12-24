@@ -2960,8 +2960,7 @@ function DrawingObjects() {
 				drawingObject.graphicObject.chart.rebuildSeries();
 				
                 drawingObject.graphicObject.init(theme);
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit2Chart, null, null,
-                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit2Chart, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
                 drawingObject.graphicObject.addToDrawingObjects();
 
 
@@ -2975,21 +2974,18 @@ function DrawingObjects() {
                 drawingObject.graphicObject.setDrawingDocument(_this.drawingDocument);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
                 drawingObject.graphicObject.checkThemeFonts(theme);
-                if(!xfrm)
+                if (!xfrm)
                 {
                     drawingObject.graphicObject.setXfrmObject(new CXfrm());
                 }
-                if(isRealObject(drawingObject.graphicObject.drawingBase))
+                if (isRealObject(drawingObject.graphicObject.drawingBase))
                 {
                     var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
                     drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
 				drawingObject.graphicObject.recalculate(aImagesSync);
-				//aObjects.push( drawingObject );
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
-                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 				drawingObject.graphicObject.addToDrawingObjects();
 				
 				var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
@@ -3003,20 +2999,18 @@ function DrawingObjects() {
                 drawingObject.graphicObject.setDrawingObjects(_this);
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
-                if(!xfrm)
+                if (!xfrm)
                 {
                     drawingObject.graphicObject.setXfrmObject(new CXfrm());
                 }
-                if(isRealObject(drawingObject.graphicObject.drawingBase))
+                if (isRealObject(drawingObject.graphicObject.drawingBase))
                 {
                     var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
                     drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
                     drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
                 }
                 drawingObject.graphicObject.recalculate(aImagesSync);
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null,
-                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
                 drawingObject.graphicObject.addToDrawingObjects();
 
             }
@@ -3027,27 +3021,18 @@ function DrawingObjects() {
                 var xfrm = drawingObject.graphicObject.spPr.xfrm;
 
                 drawingObject.graphicObject.checkThemeFonts(theme);
-                if(!xfrm)
+                if (!xfrm)
                 {
                     drawingObject.graphicObject.setXfrmObject(new CXfrm());
                 }
-                if(isRealObject(drawingObject.graphicObject.drawingBase))
-                {
-                    //var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
-                    //drawingObject.graphicObject.setXfrmObject(new CXfrm());
-                    //drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
-                    //drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
-                    //drawingObject.graphicObject.spPr.xfrm.setChildExtents(metrics.extX, metrics.extY);
-                    //drawingObject.graphicObject.spPr.xfrm.setChildOffsets(0, 0);
-                }
+                
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
                 var old_len = aImagesSync.length;
                 drawingObject.graphicObject.initCharts();
                 drawingObject.graphicObject.recalculate(aImagesSync);
-                if(aImagesSync.length > old_len)
+                if (aImagesSync.length > old_len)
                     aObjectsSync[aObjectsSync.length] = drawingObject;
-                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null,
-                    new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateAfterLoad, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
                 drawingObject.graphicObject.addToDrawingObjects();
 
                 var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
@@ -3068,7 +3053,6 @@ function DrawingObjects() {
 					drawingObject.graphicObject.recalculate();
 					drawingObject.setGraphicObjectCoords();
 					drawingObject.graphicObject.draw(shapeCtx);
-					aObjects.push(drawingObject);
 					
 					var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 					aBoundsCheckers.push(boundsChecker);
@@ -3087,6 +3071,7 @@ function DrawingObjects() {
 				window.attachEvent("onmessage", this._uploadMessage);
 			}
 		}
+		
         _this.shiftMap = {};
         worksheet.model.Drawings = aObjects;
 		isInit = true;
@@ -3491,13 +3476,12 @@ function DrawingObjects() {
 			return;
 		
 		if ( drawingCtx ) {
-			if ( clearCanvas )
+			if ( clearCanvas ) {
 				_this.clearDrawingObjects();
+				worksheet._drawGraphic();
+			}
 
 			if ( aObjects.length ) {
-			
-				worksheet._drawGraphic();
-				
 				// Clip
 				_this.clipGraphicsCanvas(shapeCtx, graphicOption);
 				
@@ -4058,12 +4042,20 @@ function DrawingObjects() {
 		}
 	}
 	
-	_this.rebuildChartGraphicObjects = function() {
+	_this.rebuildChartGraphicObjects = function(range) {
+		var bRebuild = true;
 		for (var i = 0; i < aObjects.length; i++) {
 			var graphicObject = aObjects[i].graphicObject;
 			if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
-				graphicObject.chart.rebuildSeries();
-				graphicObject.recalculate();
+				bRebuild = true;
+				if ( range ) {
+					if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
+						bRebuild = false;
+				}
+				if ( bRebuild )	{
+					graphicObject.chart.rebuildSeries();
+					graphicObject.recalculate();
+				}
 			}
 		}
 	}
@@ -4865,7 +4857,7 @@ function DrawingObjects() {
 				worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
 			}
 			else 
-				_this.showDrawingObjects(true);
+			  	_this.showDrawingObjects(true);
 		}
 	}
 	

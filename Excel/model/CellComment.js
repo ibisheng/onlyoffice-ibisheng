@@ -687,12 +687,9 @@ function asc_CCellCommentator(currentSheet) {
 		return (findCol && findRow) ? _this.asc_getComments(findCol.col, findRow.row) : [];
 	}
 
-	_this.drawCommentCells = function() {
+	_this.drawCommentCells = function(updatedRange) {
 	
-		if ( isViewerMode() )
-			return;
-
-		if (!_this.bShow)
+		if ( isViewerMode() || !_this.bShow )
 			return;
 
 		var fvr = _this.worksheet.getFirstVisibleRow();
@@ -709,6 +706,12 @@ function asc_CCellCommentator(currentSheet) {
 
 			// Get cell metrics
 			var commentCell = _this.aComments[i];
+			
+			if ( updatedRange ) {
+				if ( !((commentCell.nCol >= updatedRange.c1) && (commentCell.nCol <= updatedRange.c2) && (commentCell.nRow >= updatedRange.r1) && (commentCell.nRow <= updatedRange.r2)) )
+					continue;
+			}
+			
 			var mergedRange = _this.worksheet.model.getMergedByCell(commentCell.nRow, commentCell.nCol);
 			var drawCol = mergedRange ? mergedRange.c2 : commentCell.nCol;
 			var drawRow = mergedRange ? mergedRange.r1 : commentCell.nRow;
