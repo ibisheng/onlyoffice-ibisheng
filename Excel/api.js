@@ -1270,6 +1270,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_loadFonts: function (fonts, callback) {
+			    if (window.NATIVE_EDITOR_ENJINE)
+			        return callback();
+			        
 				this.asyncMethodCallback = callback;
 				this.FontLoader.LoadDocumentFonts2(fonts.map(function(f){return {name: f};}));
 			},
@@ -3247,7 +3250,103 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
 				}
 				return nRes;
-			}
+			},
+			
+			asc_nativeOpenFile : function(base64File)
+			{
+			    this.DocumentUrl = "TeamlabNative";
+            
+                var Asc = asc;
+                asc["editor"] = this;
+                
+                this.User = new asc_user();
+		        this.User.asc_setId("TM");
+		        this.User.asc_setUserName("native");
+                
+                this.wbModel = new Workbook(this.DocumentUrl, this.handlers, this);   
+                this.initGlobalObjects(this.wbModel);
+                
+                var oBinaryFileReader = new BinaryFileReader(this.DocumentUrl);
+                oBinaryFileReader.Read(base64File, this.wbModel);
+                
+                this._coAuthoringInit();
+                this.wb = new asc["WorkbookView"](
+					        this.wbModel,
+					        this.controller,
+					        this.handlers,
+					        window._null_object,
+					        window._null_object,
+					        this,
+					        this.collaborativeEditing,
+					        this.fontRenderingMode,
+					        this.options);
+			},
+			
+			asc_nativeCalculateFile : function()
+			{
+			},
+			
+			asc_nativeApplyChanges : function(changes)
+			{
+			    this.CoAuthoringApi.onSaveChanges(changes, false);
+                this.collaborativeEditing.applyChanges();
+			},
+			
+			asc_nativeGetFile : function()
+			{
+			    this.wb._initCommentsToSave();
+		        var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+		        return oBinaryFileWriter.Write();
+			},
+			
+			asc_nativeCheckPdfRenderer : function(_memory1, _memory2)
+			{
+			    if (undefined == _memory1.pos)
+			    {
+			        _memory1.pos            = _memory1["pos"];
+			        _memory1.Copy           = _memory1["Copy"];
+			        _memory1.ClearNoAttack  = _memory1["ClearNoAttack"];
+			        _memory1.WriteByte      = _memory1["WriteByte"];
+			        _memory1.WriteBool      = _memory1["WriteBool"];
+			        _memory1.WriteLong      = _memory1["WriteLong"];
+			        _memory1.WriteDouble    = _memory1["WriteDouble"];
+			        _memory1.WriteString    = _memory1["WriteString"];
+			        _memory1.WriteString2   = _memory1["WriteString2"];
+    			    
+			        _memory2.pos            = _memory1["pos"];
+			        _memory2.Copy           = _memory1["Copy"];
+			        _memory2.ClearNoAttack  = _memory1["ClearNoAttack"];
+			        _memory2.WriteByte      = _memory1["WriteByte"];
+			        _memory2.WriteBool      = _memory1["WriteBool"];
+			        _memory2.WriteLong      = _memory1["WriteLong"];
+			        _memory2.WriteDouble    = _memory1["WriteDouble"];
+			        _memory2.WriteString    = _memory1["WriteString"];
+			        _memory2.WriteString2   = _memory1["WriteString2"];
+			    }
+			    
+			    var _printer = new CPdfPrinter(this.wbModel.sUrlPath);
+			    _printer.DocumentRenderer.Memory				= _memory1;
+                _printer.DocumentRenderer.VectorMemoryForPrint	= _memory2;
+                return _printer;
+			},
+			
+			asc_nativeCalculate : function()
+			{
+			},
+			
+			asc_nativePrint : function(_printer, _page)
+			{
+			    var _adjustPrint = new asc_CAdjustPrint();
+                var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
+                
+                var isEndPrint = _api.wb.printSheet(_printer, _printPagesData);
+                return _printer.DocumentRenderer.Memory;
+			},
+			
+			asc_nativePrintPagesCount : function()
+			{
+			    return 1;
+			}					
 		};
 
 		function asc_ajax(obj){
@@ -3556,5 +3655,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
         prot["asc_openNewDocument"] = prot.asc_openNewDocument;
         prot["asc_loadDocumentFromDisk"] = prot. asc_loadDocumentFromDisk;
+        
+        // native
+        prot["asc_nativeOpenFile"] = prot.asc_nativeOpenFile;
+        prot["asc_nativeCalculateFile"] = prot.asc_nativeCalculateFile;
+        prot["asc_nativeApplyChanges"] = prot.asc_nativeApplyChanges;
+        prot["asc_nativeGetFile"] = prot.asc_nativeGetFile;
+        prot["asc_nativeCheckPdfRenderer"] = prot.asc_nativeCheckPdfRenderer;
+        prot["asc_nativeCalculate"] = prot.asc_nativeCalculate;
+        prot["asc_nativePrint"] = prot.asc_nativePrint;
+        prot["asc_nativePrintPagesCount"] = prot.asc_nativePrintPagesCount;
 	}
 )(jQuery, window);

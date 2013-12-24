@@ -139,3 +139,5 @@
 		prot["get_hex"]	= prot.get_hex;
 	}
 )(window);
+
+var CColor = window["CColor"];

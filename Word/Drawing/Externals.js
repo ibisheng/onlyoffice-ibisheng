@@ -216,6 +216,15 @@ function CFontFileLoader(id)
 
         xhr.send(null);
     }
+    
+    this.LoadFontNative = function()
+    {
+        var __font_data_idx = g_fonts_streams.length;
+        var _data = window["native"].GetFontBinary(this.Id);
+        g_fonts_streams[__font_data_idx] = new FT_Stream(_data, _data.length);
+        this.SetStreamIndex(__font_data_idx);
+        this.Status = 0;
+    }
 }
 
 CFontFileLoader.prototype.SetStreamIndex = function(index)

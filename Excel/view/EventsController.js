@@ -220,7 +220,10 @@
 			},
 
 			/** @param whichSB {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
-			reinitializeScroll: function (whichSB) {
+			reinitializeScroll: function (whichSB) {			    
+			    if (window.NATIVE_EDITOR_ENJINE)
+			        return;
+			
 				var self = this,
 				    opt = this.settings,
 				    ws = self.view.getWorksheet(),
