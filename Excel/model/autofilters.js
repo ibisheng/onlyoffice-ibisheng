@@ -1253,13 +1253,13 @@
 				}
 			},
 
-			drawAutoF2: function (visibleRange, offsetX, offsetY) {
+			drawAutoF2: function (updatedRange, offsetX, offsetY) {
 				var buttons = this.allButtonAF;
 				var ws = this.worksheet;
 				//проверяем, затрагивают ли данные кнопки визуальную область
 				if (buttons) {
 					for (var i = 0; i < buttons.length; i++) {
-						if (!this._isNeedDrawButton(buttons[i], visibleRange))
+						if (!this._isNeedDrawButton(buttons[i], updatedRange))
 							continue;
 
 						var range = ws.model.getCell(new CellAddress(buttons[i].id)).getCells();

@@ -3375,9 +3375,13 @@
 				}
 			},
 
-			_drawGraphic: function(updatedRange) {
-				this._drawElements(this.autoFilters, this.autoFilters.drawAutoF2);
-				this.cellCommentator.drawCommentCells(updatedRange);
+			_drawGraphic: function(updatedRange, offsetX, offsetY) {
+				if (updatedRange) {
+					this.autoFilters.drawAutoF2(updatedRange, offsetX, offsetY);
+					this.cellCommentator.drawCommentCells(updatedRange, offsetX, offsetY);
+				} else {
+					this._drawElements(this, this._drawGraphic);
+				}
 			},
 			
 			cleanSelection: function (range, isFrozen) {
@@ -4925,7 +4929,7 @@
 				var dy     = this.rows[start].top - this.rows[vr.r1].top;
 				var oldEnd = vr.r2;
 				var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
-				var diffHeight = 0;
+				var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
 				var oldVRE_isPartial;
 				var oldH = ctxH - this.cellsTop - Math.abs(dy);
 				var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
@@ -4933,6 +4937,7 @@
 				if (this.topLeftFrozenCell) {
 					cFrozen = this.topLeftFrozenCell.getCol0();
 					rFrozen = this.topLeftFrozenCell.getRow0();
+					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
 					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 					y += diffHeight;
 					if (dy > 0)
@@ -4998,16 +5003,20 @@
 							}
 						}
 					}
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 					this._drawGrid(/*drawingCtx*/ undefined, range);
 					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					this._drawGraphic(range, offsetX, offsetY);
 					if (0 < cFrozen) {
 						range.c1 = 0;
 						range.c2 = cFrozen - 1;
-						var offsetX = this.cols[0].left - this.cellsLeft;
+						offsetX = this.cols[0].left - this.cellsLeft;
 						this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
 						this._drawCells(/*drawingCtx*/undefined, range, offsetX);
 						this._drawCellsBorders(/*drawingCtx*/undefined, range, offsetX);
+						this._drawGraphic(range, offsetX, offsetY);
 					}
 					// Отрисовывать нужно всегда, вдруг бордеры
 					this._drawFrozenPaneLines();
@@ -5022,7 +5031,6 @@
 
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
-				this._drawGraphic(rangeGraphic);
 				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollVertical, rangeGraphic));
 				return this;
 			},
@@ -5049,7 +5057,7 @@
 				var ctxH    = ctx.getHeight();
 				var dx      = this.cols[start].left - this.cols[vr.c1].left;
 				var oldEnd  = vr.c2;
-				var diffWidth = 0;
+				var offsetX, offsetY, diffWidth = 0, diffHeight = 0;
 				var oldW = ctxW - this.cellsLeft - Math.abs(dx);
 				var x = this.cellsLeft + (dx > 0 && oldW > 0 ? dx : 0);
 				var y = this.headersTop;
@@ -5058,6 +5066,7 @@
 					rFrozen = this.topLeftFrozenCell.getRow0();
 					cFrozen = this.topLeftFrozenCell.getCol0();
 					diffWidth = this.cols[cFrozen].left - this.cols[0].left;
+					diffHeight = this.rows[rFrozen].top - this.rows[0].top;
 					x += diffWidth;
 					if (dx > 0)
 						oldW -= diffWidth;
@@ -5086,17 +5095,21 @@
 					var r2 = vr.r2;
 					var range = asc_Range(c1, r1, c2, r2);
 					rangeGraphic = range.clone();
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
 					this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
 					this._drawGrid(/*drawingCtx*/ undefined, range);
 					this._drawCells(/*drawingCtx*/undefined, range);
 					this._drawCellsBorders(/*drawingCtx*/undefined, range);
+					this._drawGraphic(range, offsetX, offsetY);
 					if (rFrozen) {
 						range.r1 = 0;
 						range.r2 = rFrozen - 1;
-						var offsetY = this.rows[0].top - this.cellsTop;
+						offsetY = this.rows[0].top - this.cellsTop;
 						this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
 						this._drawCells(/*drawingCtx*/undefined, range, undefined, offsetY);
 						this._drawCellsBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
+						this._drawGraphic(range, offsetX, offsetY);
 					}
 					// Отрисовывать нужно всегда, вдруг бордеры
 					this._drawFrozenPaneLines();
@@ -5109,7 +5122,6 @@
 												
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
-				this._drawGraphic(rangeGraphic);
 				this.objectRender.showDrawingObjects(false, new GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, rangeGraphic));
 				return this;
 			},
