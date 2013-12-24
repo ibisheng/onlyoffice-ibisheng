@@ -3273,7 +3273,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 oBinaryFileReader.Read(base64File, this.wbModel);
                 
                 this._coAuthoringInit();
-                this.wb = new asc["WorkbookView"](
+                this.wb = new asc.WorkbookView(
 					        this.wbModel,
 					        this.controller,
 					        this.handlers,
