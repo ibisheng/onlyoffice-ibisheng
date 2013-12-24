@@ -3428,7 +3428,33 @@ function DrawingObjects() {
 				}
 			}
 		}
+		
+		shapeOverlayCtx.updatedRect = null;
 		if ( bRedraw ) {
+			
+			var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
+			var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+			
+			if ( !worksheet.cols[selection.c2 + 1] )
+				worksheet.expandColsOnScroll(true);
+			if ( !worksheet.rows[selection.r2 + 1] )
+				worksheet.expandRowsOnScroll(true);
+			
+			var x1 = worksheet.cols[selection.c1].left - offsetX;
+			var y1 = worksheet.rows[selection.r1].top - offsetY;
+			var x2 = worksheet.cols[selection.c2 + 1].left - offsetX;
+			var y2 = worksheet.rows[selection.r2 + 1].top - offsetY;
+			var w = x2 - x1;
+			var h = y2 - y1;
+			
+			var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
+			updatedRect.x = ptToMm(x1) - pxToMm(scrollOffset.getX());
+			updatedRect.y = ptToMm(y1) - pxToMm(scrollOffset.getY());
+			updatedRect.w = ptToMm(w);
+			updatedRect.h = ptToMm(h);
+			
+			shapeOverlayCtx.updatedRect = updatedRect;
+			
 			shapeOverlayCtx.ClearMode = true;
 			for ( var i = 0; i < aObjects.length; i++ ) {
 				aObjects[i].graphicObject.draw(shapeOverlayCtx);
