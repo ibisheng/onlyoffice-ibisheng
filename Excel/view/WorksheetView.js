@@ -1081,12 +1081,8 @@
 			},
 			
 			_prepareDrawingObjects: function () {
-				if ( !this.settings.objectRender ) {
-					this.objectRender = new DrawingObjects();
-					this.objectRender.init(this);
-				}
-				else
-					this.objectRender = this.settings.objectRender;
+				this.objectRender = new DrawingObjects();
+				this.objectRender.init(this);
 			},
 			
 			_initWorksheetDefaultWidth: function () {
