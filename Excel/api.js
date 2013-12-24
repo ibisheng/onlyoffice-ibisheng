@@ -3258,6 +3258,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
             
                 var Asc = asc;
                 asc["editor"] = this;
+
+                window.g_cAscCoAuthoringUrl = "";
+                window.g_cAscSpellCheckUrl = "";
                 
                 this.User = new asc_user();
 		        this.User.asc_setId("TM");
