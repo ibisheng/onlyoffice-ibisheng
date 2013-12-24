@@ -2559,6 +2559,7 @@ function DrawingObjects() {
 	var asc = window["Asc"];
 	var api = asc["editor"];
 	var asc_Range = asc.Range;
+	var asc_applyFunction = asc.applyFunction;
 	
 	var chartRender = null;
 	if ( typeof ChartRender !== "undefined" )
@@ -2918,7 +2919,7 @@ function DrawingObjects() {
 		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
 		_this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
 				
-		_this.isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
+		_this.isViewerMode =  function() { return worksheet.handlers.trigger("getViewerMode"); };
 
 		aObjects = [];
 		aImagesSync = [];
@@ -3811,7 +3812,7 @@ function DrawingObjects() {
 				object.to.row = cellTo.row;
 				object.to.rowOff = cellTo.rowOff;
 				
-				worksheet._trigger("reinitializeScroll");
+				worksheet.handlers.trigger("reinitializeScroll");
 			}
 
 			function addImageObject(_image) {
@@ -4740,7 +4741,7 @@ function DrawingObjects() {
 				if ( isMaxCol() )
 					break;
 				worksheet.expandColsOnScroll(true);
-				worksheet._trigger("reinitializeScrollX");
+				worksheet.handlers.trigger("reinitializeScrollX");
 				foundCol = worksheet._findColUnderCursor(mmToPt(x + w) + scrollX, true);
 			}
 		}
@@ -4752,7 +4753,7 @@ function DrawingObjects() {
 				if ( isMaxRow() )
 					break;
 				worksheet.expandRowsOnScroll(true);
-				worksheet._trigger("reinitializeScrollY");
+				worksheet.handlers.trigger("reinitializeScrollY");
 				foundRow = worksheet._findRowUnderCursor(mmToPt(y + h) + scrollY, true);
 			}
 		}
@@ -4895,7 +4896,7 @@ function DrawingObjects() {
 	
 	_this.sendGraphicObjectProps = function() {
 		if ( worksheet )
-			worksheet._trigger("selectionChanged", worksheet.getSelectionInfo());
+			worksheet.handlers.trigger("selectionChanged", worksheet.getSelectionInfo());
 	}
 	
 	_this.setGraphicObjectProps = function(props) {
@@ -5385,18 +5386,20 @@ function DrawingObjects() {
 //-----------------------------------------------------------------------------------
 
 function ObjectLocker(ws) {
-	
+	var asc = window["Asc"];
+	var asc_applyFunction = asc.applyFunction;
+
 	var _t = this;
 	var aObjectId = [];
 	var worksheet = ws;
 	
 	_t.reset = function() {
 		aObjectId = [];
-	}
+	};
 	
 	_t.addObjectId = function(id) {
 		aObjectId.push(id);
-	}
+	};
 	
 	// For array of objects -=Use reset before use=-
 	_t.checkObjects = function(callback) {
@@ -5409,7 +5412,7 @@ function ObjectLocker(ws) {
 		
 		if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
 			// Запрещено совместное редактирование
-			if ($.isFunction(callback)) {callbackEx(true);}
+			asc_applyFunction(callbackEx, true);
 			return;
 		}
 		
@@ -5421,7 +5424,7 @@ function ObjectLocker(ws) {
 
 			if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				if ($.isFunction(callback)) { callbackEx(true); }
+				asc_applyFunction(callbackEx, true);
 				callback = undefined;
 			}
 			if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
@@ -5430,7 +5433,7 @@ function ObjectLocker(ws) {
 			}
 			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther) ) {
 				// Уже ячейку кто-то редактирует
-				if ($.isFunction(callback)) {callbackEx(false);}
+				asc_applyFunction(callbackEx, false);
 				return;
 			}
 			worksheet.collaborativeEditing.addCheckLock(lockInfo);
@@ -5529,7 +5532,7 @@ function CoordsManager(ws, bLog) {
 				break;
 			}
 			worksheet.expandColsOnScroll(true);
-			worksheet._trigger("reinitializeScrollX");
+			worksheet.handlers.trigger("reinitializeScrollX");
 			col = worksheet._findColUnderCursor( xPt - offsetX + delta, true );
 			if ( xPt - offsetX < 0 )
 				delta++;
@@ -5546,7 +5549,7 @@ function CoordsManager(ws, bLog) {
 				break;
 			}
 			worksheet.expandRowsOnScroll(true);
-			worksheet._trigger("reinitializeScrollY");
+			worksheet.handlers.trigger("reinitializeScrollY");
 			row = worksheet._findRowUnderCursor( yPt - offsetY + delta, true );
 			if ( yPt - offsetY < 0 )
 				delta++;
