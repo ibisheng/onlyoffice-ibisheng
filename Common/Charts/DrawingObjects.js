@@ -3493,12 +3493,27 @@ function DrawingObjects() {
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 					
-					updatedRect.x = worksheet.getCellLeft(updatedRange.c1, 3) - ptToMm(offsetX) - pxToMm(scrollOffset.getX());
-					updatedRect.y = worksheet.getCellTop(updatedRange.r1, 3) - ptToMm(offsetY) - pxToMm(scrollOffset.getY());
-					updatedRect.w = worksheet.getCellLeft(updatedRange.c2, 3) - worksheet.getCellLeft(updatedRange.c1, 3);
-					updatedRect.h = worksheet.getCellTop(updatedRange.r2, 3) - worksheet.getCellTop(updatedRange.r1, 3);
+					var x1 = worksheet.cols[updatedRange.c1].left - offsetX;
+					var y1 = worksheet.rows[updatedRange.r1].top - offsetY;
+					var x2 = worksheet.cols[updatedRange.c2].left - offsetX;
+					var y2 = worksheet.rows[updatedRange.r2].top - offsetY;
+					var w = x2 - x1;
+					var h = y2 - y1;
+					
+					updatedRect.x = ptToMm(x1) - pxToMm(scrollOffset.getX());
+					updatedRect.y = ptToMm(y1) - pxToMm(scrollOffset.getY());
+					updatedRect.w = ptToMm(w);
+					updatedRect.h = ptToMm(h);
 					
 					shapeCtx.updatedRect = updatedRect;
+					
+					if ( graphicOption.type === c_oAscGraphicOption.AddText ) {
+						drawingCtx.clearRect( x1, y1, w, h );
+						drawingCtx.setFillStyle(worksheet.settings.cells.defaultState.background).fillRect(x1, y1, w, h);
+						worksheet._drawGrid(/*drawingCtx*/undefined, updatedRange);
+						worksheet._drawCells(/*drawingCtx*/undefined, updatedRange);
+						worksheet._drawCellsBorders(/*drawingCtx*/undefined, updatedRange);
+					}
 				}
 				else
 					shapeCtx.updatedRect = null;
@@ -4576,11 +4591,11 @@ function DrawingObjects() {
         }
 		drawingObject.setGraphicObjectCoords();
 		
-		if ( isInit )
+		if ( isInit ) {
 			_this.showDrawingObjects(false);
-			
-		_this.sendGraphicObjectProps();
-		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
+			_this.sendGraphicObjectProps();
+			worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
+		}
 		
 		if ( lockByDefault ) {
 			_this.objectLocker.reset();
@@ -5334,17 +5349,17 @@ function DrawingObjects() {
 
 	function emuToPx(emu) {
 		var tmp = emu * 20 * 96 / 2.54 / 72 / 100 / 1000;
-		return Math.floor(tmp);
+		return tmp;
 	}
 
 	function pxToEmu(px) {
 		var tmp = px * 2.54 * 72 * 100 * 1000 / 20 / 96;
-		return Math.floor(tmp);
+		return tmp;
 	}
 
 	function pxToPt(val) {
-		var tmp = asc.round(val) * ascCvtRatio(0, 1);
-		return tmp > 0 ? tmp : 0;
+		var tmp = val * ascCvtRatio(0, 1);
+		return tmp;
 	}
 
 	function ptToPx(val) {

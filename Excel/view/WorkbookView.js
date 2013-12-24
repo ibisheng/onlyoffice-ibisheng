@@ -1030,7 +1030,7 @@
 				var ws = this.wsViews[i];
 				if ( !(ws instanceof asc_WSV) ) {
 					ws = this.wsViews[i] = this._createWorksheetView( wb.getWorksheet(i) );
-					ws._prepareComments();	// Вызываем тут, лист точно создан!!!
+					ws._prepareComments();
 					ws._prepareDrawingObjects();
 				}
 				return ws;

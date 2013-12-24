@@ -1048,8 +1048,8 @@ function asc_CCellCommentator(currentSheet) {
 			if ( lastComment ) {
 				var lastMetrics = _this.getCellMetrics(lastComment.nCol, lastComment.nRow);
 				if ( lastMetrics.result ) {
-					var extraOffset = 1;
-					_this.overlayCtx.clearRect(_this.pxToPt(lastMetrics.left), _this.pxToPt(lastMetrics.top), _this.pxToPt(lastMetrics.width - extraOffset), _this.pxToPt(lastMetrics.height - extraOffset));
+					var extraOffset = _this.pxToPt(1);
+					_this.overlayCtx.clearRect(lastMetrics.left, lastMetrics.top, lastMetrics.width - extraOffset, lastMetrics.height - extraOffset);
 				}
 			}
 		}
@@ -1235,13 +1235,8 @@ function asc_CCellCommentator(currentSheet) {
 			var comment = _this.asc_findComment(_this.lastSelectedId);
 			if ( comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() ) {
 				var metrics = _this.getCellMetrics(comment.asc_getCol(), comment.asc_getRow());
-				if (metrics.result) {
-					var x = _this.pxToPt(metrics.left);
-					var y = _this.pxToPt(metrics.top);
-					var w = _this.pxToPt(metrics.width);
-					var h = _this.pxToPt(metrics.height);
-					_this.overlayCtx.clearRect(x, y, w, h);
-				}
+				if (metrics.result) 
+					_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 			}
 		}
 	}
@@ -1251,8 +1246,8 @@ function asc_CCellCommentator(currentSheet) {
 	//-----------------------------------------------------------------------------------
 
 	_this.pxToPt = function(val) {
-		var tmp = Asc.round(val) * _this.ascCvtRatio(0, 1);
-		return tmp > 0 ? tmp : 0;
+		var tmp = val * _this.ascCvtRatio(0, 1);
+		return tmp;
 	}
 
 	_this.ptToPx = function(val) {
@@ -1366,20 +1361,12 @@ asc_CCellCommentator.prototype = {
 			
 			var metrics = _this.getCellMetrics(col, row);
 			if (metrics.result) {
-
-				var rangeOffset = 0;
-				var extraOffset = 1;
-								
-				var x = _this.pxToPt(metrics.left + rangeOffset);
-				var y = _this.pxToPt(metrics.top + rangeOffset);
-				var w = _this.pxToPt(metrics.width - extraOffset - rangeOffset);
-				var h = _this.pxToPt(metrics.height - extraOffset - rangeOffset);
-
+				var extraOffset = _this.pxToPt(1);
 				_this.overlayCtx.ctx.globalAlpha = 0.2;
 				_this.overlayCtx.beginPath();
-				_this.overlayCtx.clearRect(x, y, w, h);
+				_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
 				_this.overlayCtx.setFillStyle(_this.commentFillColor);
-				_this.overlayCtx.fillRect(x, y, w, h);
+				_this.overlayCtx.fillRect(metrics.left, metrics.top, metrics.width - extraOffset, metrics.height - extraOffset);
 				_this.overlayCtx.ctx.globalAlpha = 1;
 			}
 		}
