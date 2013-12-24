@@ -18,15 +18,6 @@
 		strictEqual(Asc.typeOf(new Function()), "function", "Asc.typeOf( new Function() )");
 	});
 
-	test("Asc.getProperty", function test_getProperty() {
-		strictEqual(Asc.getProperty("name"), undefined, 'Asc.getProperty("name")');
-		strictEqual(Asc.getProperty("name", {name: "Alice"}), "Alice", 'Asc.getProperty("name", {name: "Alice"})');
-		strictEqual(Asc.getProperty("name", {name: "Alice"}, {name: "Cora"}), "Alice", 'Asc.getProperty("name", {name: "Alice"}, {name: "Cora"})');
-		strictEqual(Asc.getProperty("name", {age: "18"}, {name: "Alice"}), "Alice", 'Asc.getProperty("name", {age: "18"}, {name: "Alice"})');
-		strictEqual(Asc.getProperty("name", {employee: {name: "Alice", age: "18"}}), undefined, 'Asc.getProperty("name", {employee: {name: "Alice", age: "18"}})');
-		strictEqual(Asc.getProperty("employee.name", {employee: {name: "Alice", age: "18"}}), "Alice", 'Asc.getProperty("employee.name", {employee: {name: "Alice", age: "18"}})');
-	});
-
 	test("Asc.lastIndexOf", function test_lastIndexOf() {
 		strictEqual(Asc.lastIndexOf("aabb aa bb bbaa", /a{2}/, 8), 5, 'Asc.lastIndexOf("aabb aa bb bbaa", /a{2}/, 8)');
 		strictEqual(Asc.lastIndexOf("aabb aa bb bbaa", /a{2}/, 15), 13, 'Asc.lastIndexOf("aabb aa bb bbaa", /a{2}/, 13)');

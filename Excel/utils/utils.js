@@ -41,27 +41,6 @@
 			return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
 		}
 
-		function getProperty(name) {
-			var n = name.split("."), r = undefined, i;
-
-			function find(prop, obj) {
-				if (obj === undefined || obj === null) {return undefined;}
-				var ref = obj;
-				for (var i = 0; i < prop.length; ++i) {
-					var p = ref[ prop[i] ];
-					if (p === undefined) {return undefined;}
-					ref = p;
-				}
-				return ref;
-			}
-
-			for (i = 1; i < arguments.length; ++i) {
-				if ( ( r = find(n, arguments[i]) ) !== undefined ) {break;}
-			}
-			return r;
-		}
-
-
 		function lastIndexOf(s, regExp, fromIndex) {
 			var end = fromIndex >= 0 && fromIndex <= s.length ? fromIndex : s.length;
 			for (var i = end - 1; i >= 0; --i) {
@@ -1103,7 +1082,6 @@
 		 */
 		window["Asc"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
-		window["Asc"].getProperty = getProperty;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;
 		window["Asc"].round = round;

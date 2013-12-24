@@ -19,7 +19,6 @@
 		var asc_applyFunction = asc.applyFunction;
 		var asc_calcnpt = asc.calcNearestPt;
 		var asc_getcvt  = asc.getCvtRatio;
-		var asc_getprop = asc.getProperty;
 		var asc_floor   = asc.floor;
 		var asc_ceil    = asc.ceil;
 		var asc_round   = asc.round;
@@ -395,6 +394,7 @@
 			// Auto filters
 			this.autoFilters = new asc_AF(this);
 			this.cellCommentator = new asc_CCellCommentator(this);
+			this.objectRender = null;
 
 			this._init();
 
@@ -407,22 +407,6 @@
 			constructor: WorksheetView,
 
 			defaults: WorksheetViewSettings(),
-
-			option: function (name, value) {
-				var old = asc_getprop(name, this.settings);
-				if (name !== undefined && value !== undefined) {
-					var i = name.lastIndexOf(".");
-					if (i < 0) {
-						this.settings[name] = value;
-					} else {
-						var p = asc_getprop(name.slice(0, i), this.settings);
-						if (p === undefined) {return false;}
-						p[ name.slice(i + 1) ] = value;
-					}
-					return true;
-				}
-				return old;
-			},
 
 			getVisibleRange: function () {
 				return this.visibleRange;
@@ -1083,7 +1067,7 @@
 				if ( commentList.length )
 					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
 			},
-			
+
 			_prepareDrawingObjects: function () {
 				this.objectRender = new DrawingObjects();
 				this.objectRender.init(this);
