@@ -2458,9 +2458,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getWorkbookComments: function() {
 				var _this = this, comments = [];
 				if ( _this.wb ) {
-					for (var key in _this.wb.model.aWorksheets) {
-						var wsModel = _this.wb.model.aWorksheets[key];
-						var ws = _this.wb.getWorksheet(wsModel.index);
+					for (var key in _this.wb.wsViews) {
+						var ws = _this.wb.wsViews[key];
 						if ( ws ) {
 							for (var i = 0; i < ws.cellCommentator.aComments.length; i++) {
 								var comment = ws.cellCommentator.aComments[i];

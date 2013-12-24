@@ -1074,10 +1074,14 @@
 			
 			_prepareComments: function () {
 				// Теперь получение всех комментариев через asc_getWorkbookComments
-				for (var i = 0, length = this.model.aComments.length;  i < length; ++i) {
+				var commentList = [];
+				for (var i = 0; i < this.model.aComments.length; i++) {
 					var comment = { "Id": this.model.aComments[i].asc_getId(), "Comment": this.model.aComments[i] };
 					this.cellCommentator.addCommentSerialize(comment["Comment"]);
+					commentList.push(comment);
 				}
+				if ( commentList.length )
+					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
 			},
 			
 			_prepareDrawingObjects: function () {
