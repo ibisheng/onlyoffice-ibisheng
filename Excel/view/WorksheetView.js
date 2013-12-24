@@ -3377,7 +3377,7 @@
 
 			_drawGraphic: function(updatedRange, offsetX, offsetY) {
 				if (updatedRange) {
-					this.autoFilters.drawAutoF2(updatedRange, offsetX, offsetY);
+					this.autoFilters.drawAutoF(updatedRange, offsetX, offsetY);
 					this.cellCommentator.drawCommentCells(updatedRange, offsetX, offsetY);
 				} else {
 					this._drawElements(this, this._drawGraphic);
