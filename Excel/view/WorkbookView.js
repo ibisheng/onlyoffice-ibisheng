@@ -62,7 +62,6 @@
 			this.Api					= Api;
 			this.collaborativeEditing	= collaborativeEditing;
 			this.lastSendInfoRange		= null;
-			this.lastSendInfoIsSelectOnShape = null;
 			this.canUpdateAfterShiftUp	= false;	// Нужно ли обновлять информацию после отпускания Shift
 
 			//----- declaration -----
@@ -403,23 +402,22 @@
 
 
 			_createWorksheetView: function (wsModel) {
-				var self = this,
-						opt  = $.extend(true, {}, this.settings.worksheetDefaults, {
-								"getViewerMode"				: function () { return self.controller.getViewerMode ? self.controller.getViewerMode() : true; },
-								"reinitializeScroll"		: function () {self.controller.reinitializeScroll(/*All*/);},
-								"reinitializeScrollY"		: function () {self.controller.reinitializeScroll(/*vertical*/1);},
-								"reinitializeScrollX"		: function () {self.controller.reinitializeScroll(/*horizontal*/2);},
-								"selectionChanged"			: function () {self._onWSSelectionChanged.apply(self, arguments);},
-								"selectionNameChanged"		: function () {self._onSelectionNameChanged.apply(self, arguments);},
-								"selectionMathInfoChanged"	: function () {self._onSelectionMathInfoChanged.apply(self, arguments);},
-								"onErrorEvent"				: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
-								"slowOperation"				: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
-								"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
-								"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
-								"getDCForCharts"			: function () { return self.drawingCtxCharts; },
-								"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);}
-							});
-				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
+				var self = this, opt  = $.extend(true, {}, this.settings.worksheetDefaults);
+				return new asc_WSV(wsModel, /*handlers*/{
+					"getViewerMode"				: function () { return self.controller.getViewerMode ? self.controller.getViewerMode() : true; },
+					"reinitializeScroll"		: function () {self.controller.reinitializeScroll(/*All*/);},
+					"reinitializeScrollY"		: function () {self.controller.reinitializeScroll(/*vertical*/1);},
+					"reinitializeScrollX"		: function () {self.controller.reinitializeScroll(/*horizontal*/2);},
+					"selectionChanged"			: function () {self._onWSSelectionChanged.apply(self, arguments);},
+					"selectionNameChanged"		: function () {self._onSelectionNameChanged.apply(self, arguments);},
+					"selectionMathInfoChanged"	: function () {self._onSelectionMathInfoChanged.apply(self, arguments);},
+					"onErrorEvent"				: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
+					"slowOperation"				: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
+					"setAutoFiltersDialog"  	: function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
+					"selectionRangeChanged"		: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
+					"getDCForCharts"			: function () { return self.drawingCtxCharts; },
+					"onRenameCellTextEnd"		: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);}
+				}, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 			},
 
 			_onSelectionNameChanged: function (name) {

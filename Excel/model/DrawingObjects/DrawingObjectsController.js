@@ -3427,7 +3427,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
             object.to.row = cellTo.row;
             object.to.rowOff = cellTo.rowOff;
 
-            worksheet._trigger("reinitializeScroll");
+            worksheet.handlers.trigger("reinitializeScroll");
         }
 
         function addImageObject(_image) {

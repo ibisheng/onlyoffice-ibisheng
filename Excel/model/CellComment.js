@@ -498,7 +498,7 @@ function asc_CCellCommentator(currentSheet) {
 	var asc = window["Asc"];
 	var asc_applyFunction = asc.applyFunction;
 	var asc_CCollaborativeRange = asc.asc_CCollaborativeRange;
-	var isViewerMode =  function() { return _this.worksheet._trigger("getViewerMode"); };
+	var isViewerMode =  function() { return _this.worksheet.handlers.trigger("getViewerMode"); };
 	
 	_this.worksheet = currentSheet;
 	_this.overlayCtx = currentSheet.overlayCtx;
@@ -1161,7 +1161,7 @@ function asc_CCellCommentator(currentSheet) {
 			coords.nLeft = (mergedRange ? mergedRange.c2 : comment.nCol) + 1;
 			if ( !_this.worksheet.cols[coords.nLeft] ) {
 				_this.worksheet.expandColsOnScroll(true);
-				_this.worksheet._trigger("reinitializeScrollX");
+				_this.worksheet.handlers.trigger("reinitializeScrollX");
 			}
 			
 			coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
@@ -1357,12 +1357,12 @@ asc_CCellCommentator.prototype = {
 				if ( (row < vr.r1) || (row > vr.r2) ) {
 					var offset = row - vr.r1 - Math.round(( vr.r2 - vr.r1 ) / 2);
 					_this.worksheet.scrollVertical(offset);
-					_this.worksheet._trigger("reinitializeScrollY");
+					_this.worksheet.handlers.trigger("reinitializeScrollY");
 				}
 				if ( (col < vr.c1) || (col > vr.c2) ) {
 					var offset = col - vr.c1 - Math.round(( vr.c2 - vr.c1 ) / 2);
 					_this.worksheet.scrollHorizontal(offset);
-					_this.worksheet._trigger("reinitializeScrollX");
+					_this.worksheet.handlers.trigger("reinitializeScrollX");
 				}
 			}
 			

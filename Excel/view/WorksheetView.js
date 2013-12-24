@@ -272,6 +272,7 @@
 		 * Widget for displaying and editing Worksheet object
 		 * -----------------------------------------------------------------------------
 		 * @param {Worksheet} model  Worksheet
+		 * @param {Object} handlers  Event handlers
 		 * @param {Array} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
 		 * @param {Number} maxDigitWidth    Максимальный размер цифры
@@ -281,9 +282,9 @@
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function WorksheetView(model, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
+		function WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
 			if ( !(this instanceof WorksheetView) ) {
-				return new WorksheetView(model, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings);
+				return new WorksheetView(model, handlers, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings);
 			}
 
 			this.settings = $.extend(true, {}, this.defaults, settings);
@@ -293,6 +294,8 @@
 			cells.fontSize = model.workbook.getDefaultSize();
 
 			this.vspRatio = 1.275;
+
+			this.handlers = new asc.asc_CHandlersList(handlers);
 
 			this.model = model;
 
@@ -984,7 +987,7 @@
 
 			// ToDo переделать на полную отрисовку на нашем контексте
 			getDrawingContextCharts: function () {
-				return this._trigger("getDCForCharts");
+				return this.handlers.trigger("getDCForCharts");
 			},
 
 
@@ -1000,7 +1003,7 @@
 				this._cleanCellsTextMetricsCache();
 				this._prepareCellTextMetricsCache(this.visibleRange);
 				// initializing is completed
-				this._trigger("initialized");
+				this.handlers.trigger("initialized");
 			},
 			
 			_initConditionalFormatting: function () {
@@ -3556,11 +3559,11 @@
 					// Увеличиваем, если выходим за область видимости // Critical Bug 17413
 					while ( !this.cols[activeMoveRangeClone.c2] ) {
 						this.expandColsOnScroll(true);
-						this._trigger("reinitializeScrollX");
+						this.handlers.trigger("reinitializeScrollX");
 					}
 					while ( !this.rows[activeMoveRangeClone.r2] ) {
 						this.expandRowsOnScroll(true);
-						this._trigger("reinitializeScrollY");
+						this.handlers.trigger("reinitializeScrollY");
 					}
 					
 					// Координаты для перемещения диапазона
@@ -3882,13 +3885,13 @@
                     bUpdateScrollY = this.expandRowsOnScroll(/*isNotActive*/ false, /*updateRowsCount*/ true);
                 }
                 if (bUpdateScrollX && bUpdateScrollY) {
-                    this._trigger("reinitializeScroll");
+                    this.handlers.trigger("reinitializeScroll");
                 }
                 else if (bUpdateScrollX) {
-                    this._trigger("reinitializeScrollX");
+                    this.handlers.trigger("reinitializeScrollX");
                 }
                 else if (bUpdateScrollY) {
-                    this._trigger("reinitializeScrollY");
+                    this.handlers.trigger("reinitializeScrollY");
                 }
 
                 // Range для замерженной ячейки
@@ -4745,17 +4748,6 @@
 				}
 			},
 
-
-			// ----- Events processing -----
-
-			_trigger: function (eventName) {
-				var f = this.settings[eventName];
-				return f && asc_typeof(f) === "function" ?
-						f.apply( this, Array.prototype.slice.call(arguments, 1) ) :
-						undefined;
-			},
-
-
 			// ----- Scrolling -----
 
 			_calcCellPosition: function (c, r, dc, dr) {
@@ -4891,7 +4883,7 @@
 						if (this.rows[this.rows.length - 1].height < 0.000001) {break;}
 					} while (this._isVisibleY());
 					if (!skipScrolReinit) {
-						this._trigger("reinitializeScrollY");
+						this.handlers.trigger("reinitializeScrollY");
 					}
 				}
 			},
@@ -4905,7 +4897,7 @@
 						if (this.cols[this.cols.length - 1].width < 0.000001) {break;}
 					} while (this._isVisibleX());
 					if (!skipScrolReinit) {
-						this._trigger("reinitializeScrollX");
+						this.handlers.trigger("reinitializeScrollX");
 					}
 				}
 			},
@@ -5022,11 +5014,11 @@
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 
-					if (widthChanged) {this._trigger("reinitializeScrollX");}
+					if (widthChanged) {this.handlers.trigger("reinitializeScrollX");}
 				}
 
 				if (reinitScrollY)
-					this._trigger("reinitializeScrollY");
+					this.handlers.trigger("reinitializeScrollY");
 
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
@@ -5113,7 +5105,7 @@
 				}
 
 				if (reinitScrollX)
-					this._trigger("reinitializeScrollX");
+					this.handlers.trigger("reinitializeScrollX");
 												
 				this.cellCommentator.updateCommentPosition();
 				//ToDo this.drawDepCells();
@@ -5837,7 +5829,7 @@
 					}
 					catch(e){
 						this.expandColsOnScroll(true);
-						this._trigger("reinitializeScrollX");
+						this.handlers.trigger("reinitializeScrollX");
 					}
 				}
 				if (adjustBottom) {
@@ -5846,7 +5838,7 @@
 					}
 					catch(e){
 						this.expandRowsOnScroll(true);
-						this._trigger("reinitializeScrollY");
+						this.handlers.trigger("reinitializeScrollY");
 					}
 				}
 				return {
@@ -6155,9 +6147,9 @@
 			},
 
 			_updateSelectionNameAndInfo: function () {
-				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this._trigger("selectionChanged", this.getSelectionInfo());
-				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			},
 
 			getSelectionShape: function () {
@@ -6166,9 +6158,9 @@
 			setSelectionShape: function (isSelectOnShape) {
 				this.isSelectOnShape = isSelectOnShape;
 				// отправляем евент для получения свойств картинки, шейпа или группы
-				this._trigger("selectionNameChanged", this.getSelectionName());
-				this._trigger("selectionChanged", this.getSelectionInfo());
-				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName());
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 			},
 			getActiveRangeObj: function(){
 				return this.activeRange.clone(true);
@@ -6208,9 +6200,9 @@
 				this.activeRange.normalize();
 				this._drawSelection();
 
-				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this._trigger("selectionChanged", this.getSelectionInfo());
-				this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 
 				return this._calcActiveCellOffset();
 			},
@@ -6232,9 +6224,9 @@
 
 					this._drawSelection();
 
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					this._trigger("selectionChanged", this.getSelectionInfo());
-					this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+					this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+					this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+					this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 
 					oRes = this._calcActiveCellOffset();
 				}
@@ -6268,14 +6260,14 @@
 
 				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow || isChangeSelectionShape)) {
 					if (!this.isSelectionDialogMode) {
-						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+						this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 						if (!isSelectMode) {
-							this._trigger("selectionChanged", this.getSelectionInfo());
-							this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+							this.handlers.trigger("selectionChanged", this.getSelectionInfo());
+							this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 						}
 					} else {
 						// Смена диапазона
-						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
+						this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
 				}
 
@@ -6395,14 +6387,14 @@
 
 				if (!this.isCellEditMode && !arnOld.isEqual(ar.clone(true))) {
 					if (!this.isSelectionDialogMode) {
-						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
+						this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
 						if (!isSelectMode) {
-							this._trigger("selectionChanged", this.getSelectionInfo(false));
-							this._trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
+							this.handlers.trigger("selectionChanged", this.getSelectionInfo(false));
+							this.handlers.trigger("selectionMathInfoChanged", this.getSelectionMathInfo());
 						}
 					} else {
 						// Смена диапазона
-						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
+						this.handlers.trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
 				}
 				
@@ -6442,8 +6434,8 @@
 				ret = this._calcActiveCellOffset();
 
 				// Эвент обновления
-				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-				this._trigger("selectionChanged", this.getSelectionInfo());
+				this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+				this.handlers.trigger("selectionChanged", this.getSelectionInfo());
 
 				return ret;
 			},
@@ -7019,11 +7011,11 @@
 				// Увеличиваем, если выходим за область видимости // Critical Bug 17413
 				while (!this.cols[this.activeMoveRange.c2]) {
 					this.expandColsOnScroll(true);
-					this._trigger("reinitializeScrollX");
+					this.handlers.trigger("reinitializeScrollX");
 				}
 				while (!this.rows[this.activeMoveRange.r2]) {
 					this.expandRowsOnScroll(true);
-					this._trigger("reinitializeScrollY");
+					this.handlers.trigger("reinitializeScrollY");
 				}
 
 				// Перерисовываем
@@ -7329,7 +7321,7 @@
                         case "angle": range.setAngle(val); break;
 
 						case "border":
-							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
+							if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 							// None
 							if (val.length < 1) {
 								range.setBorder(null);
@@ -7352,7 +7344,7 @@
 							range.setBorder(res);
 							break;
 						case "merge":
-							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
+							if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 							switch (val) {
 								case c_oAscMergeOptions.Unmerge:     range.unmerge(); break;
 								case c_oAscMergeOptions.MergeCenter: range.merge(val); break;
@@ -7370,13 +7362,13 @@
 							break;
 
 						case "sort":
-							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
+							if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 							var changes = range.sort(val, arn.startCol);
 							t.cellCommentator.sortComments(arn, changes);
 							break;
 
 						case "empty":
-							if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
+							if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 							/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
 							lockDraw(t.model.workbook);
 							if (val === c_oAscCleanOptions.All)
@@ -7428,7 +7420,7 @@
 							break;
 						case "paste":
 							var pasteLocal = function () {
-								if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
+								if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 								var selectData;
 								if(isLocal === 'binary')
 									selectData = t._pasteFromBinary(val);
@@ -7503,7 +7495,7 @@
 								arn.c1 = 0;
 								arn.c2 = gc_nMaxCol0;
 								if (bIsUpdate) {
-									if (callTrigger) { t._trigger("slowOperation", false); }
+									if (callTrigger) { t.handlers.trigger("slowOperation", false); }
 									t.isChanged = true;
 									t._updateCellsRange(arn, canChangeColWidth);
 									t._prepareCellTextMetricsCache(arn);
@@ -7653,7 +7645,7 @@
 					}
 
 					if (bIsUpdate) {
-						if (callTrigger) { t._trigger("slowOperation", false); }
+						if (callTrigger) { t.handlers.trigger("slowOperation", false); }
 						t.isChanged = true;
 						t._updateCellsRange(arn, canChangeColWidth);
 					}
@@ -7722,7 +7714,7 @@
 						}
 						else
 						{
-							this._trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+							this.handlers.trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 							return;
 						}
 					}
@@ -7745,7 +7737,7 @@
 									}
 									else
 									{
-										this._trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+										this.handlers.trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 										return;
 									}
 								}
@@ -7996,7 +7988,7 @@
 						}
 						else
 						{
-							this._trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+							this.handlers.trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 							return;
 						}
 					}
@@ -8019,7 +8011,7 @@
 									}
 									else
 									{
-										this._trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+										this.handlers.trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 										return;
 									}
 								}
@@ -8304,7 +8296,7 @@
 						}
 						else
 						{
-							this._trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+							this.handlers.trigger ("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 							return;
 						}
 					}
@@ -8327,7 +8319,7 @@
 									}
 									else
 									{
-										this._trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
+										this.handlers.trigger ("onErrorEvent", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
 										return;
 									}
 								}
@@ -8783,7 +8775,7 @@
 					t.objectRender.setScrollOffset();
 					t.draw();
 
-					t._trigger("reinitializeScroll");
+					t.handlers.trigger("reinitializeScroll");
 
 					if (isUpdateCols) { t._updateVisibleColsCount(); }
 					if (isUpdateRows) { t._updateVisibleRowsCount(); }
@@ -9127,7 +9119,7 @@
 				t._prepareCellTextMetricsCache(t.visibleRange);
 				t.draw(lockDraw);
 
-				t._trigger("reinitializeScroll");
+				t.handlers.trigger("reinitializeScroll");
 
 				if (isUpdateCols) { t._updateVisibleColsCount(); }
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
@@ -9364,8 +9356,8 @@
 
 				offs = this._calcActiveRangeOffset();
 				if (sc !== ar.startCol || sr !== ar.startRow) {
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					this._trigger("selectionChanged", this.getSelectionInfo());
+					this.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+					this.handlers.trigger("selectionChanged", this.getSelectionInfo());
 				}
 				return offs;
 			},
@@ -9507,7 +9499,7 @@
 				var aReplaceCells = [];
 				if (options.isReplaceAll) {
 					// На ReplaceAll ставим медленную операцию
-					t._trigger("slowOperation", true);
+					t.handlers.trigger("slowOperation", true);
 					var aReplaceCellsIndex = {};
 					var optionsFind = {text: options.findWhat, scanByRows: true, scanForward: true,
 						isMatchCase: options.isMatchCase, isWholeCell: options.isWholeCell, isNotSelect: true, activeRange: ar};
@@ -9532,7 +9524,7 @@
 
 					if (c === undefined) {
 						asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-						t._trigger("onRenameCellTextEnd", 0, 0);
+						t.handlers.trigger("onRenameCellTextEnd", 0, 0);
 						return;
 					}
 
@@ -9541,7 +9533,7 @@
 					// Попробуем сначала найти
 					if ((true === options.isWholeCell && cellValue.length !== options.findWhat.length) ||
 						0 > cellValue.search(valueForSearching)) {
-						t._trigger("onRenameCellTextEnd", 0, 0);
+						t.handlers.trigger("onRenameCellTextEnd", 0, 0);
 						return;
 					}
 
@@ -9549,7 +9541,7 @@
 				}
 
 				if (0 > aReplaceCells.length) {
-					t._trigger("onRenameCellTextEnd", 0, 0);
+					t.handlers.trigger("onRenameCellTextEnd", 0, 0);
 					return;
 				}
 				this._replaceCellsText(aReplaceCells, valueForSearching, options);
@@ -9572,10 +9564,10 @@
 					History.EndTransaction();
 					if (options.isReplaceAll) {
 						// Завершаем медленную операцию
-						t._trigger("slowOperation", false);
+						t.handlers.trigger("slowOperation", false);
 					}
 
-					t._trigger("onRenameCellTextEnd", options.countFind, options.countReplace);
+					t.handlers.trigger("onRenameCellTextEnd", options.countFind, options.countReplace);
 					return;
 				}
 
@@ -9864,13 +9856,13 @@
 						t._calcVisibleRows();
 					}
 					if (bIsUpdateX && bIsUpdateY) {
-						this._trigger("reinitializeScroll");
+						this.handlers.trigger("reinitializeScroll");
 					}
 					else if (bIsUpdateX) {
-						this._trigger("reinitializeScrollX");
+						this.handlers.trigger("reinitializeScrollX");
 					}
 					else if (bIsUpdateY) {
-						this._trigger("reinitializeScrollY");
+						this.handlers.trigger("reinitializeScrollY");
 					}
 
 					if (bIsUpdateX || bIsUpdateY) {
@@ -10007,10 +9999,10 @@
 					t.cache.reset();
 					t._cleanCellsTextMetricsCache();
 					t._prepareCellTextMetricsCache(t.visibleRange);
-					t._trigger("reinitializeScroll");
-					t._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					t._trigger("selectionChanged", t.getSelectionInfo());
-					t._trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
+					t.handlers.trigger("reinitializeScroll");
+					t.handlers.trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+					t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+					t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
 				}
 
 				t.objectRender.rebuildChartGraphicObjects();

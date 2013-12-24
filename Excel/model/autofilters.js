@@ -3064,7 +3064,7 @@
 				autoFilterObject.asc_setX(cell.x1*kF);
 				autoFilterObject.asc_setWidth(cell.width*kF);
 				autoFilterObject.asc_setHeight(cell.height*kF);
-				ws._trigger("setAutoFiltersDialog", autoFilterObject);
+				ws.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
 			},
 			//отрисовка кнопки фильтра
 			_drawButton: function(x1, y1, options)
