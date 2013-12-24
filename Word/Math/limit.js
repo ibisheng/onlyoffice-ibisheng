@@ -23,15 +23,15 @@ CLimit.prototype.init = function(props)
     else if(this.type == LIMIT_UP)
         this.addMCToContent(oIter, oBase);
 }
-CLimit.prototype.getCenter = function()
+CLimit.prototype.getAscent = function()
 {
-    var center;
+    var ascent;
     if(this.type == LIMIT_LOW)
-        center = this.elements[0][0].size.center;
+        ascent = this.elements[0][0].size.ascent;
     else if(this.type == LIMIT_UP)
-        center = this.elements[0][0].size.height + this.dH + this.elements[1][0].size.center;
+        ascent = this.elements[0][0].size.height + this.dH + this.elements[1][0].size.ascent;
 
-    return center;
+    return ascent;
 }
 CLimit.prototype.getFName = function()
 {

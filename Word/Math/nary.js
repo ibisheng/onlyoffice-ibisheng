@@ -240,7 +240,6 @@ extend(CNaryUnd, CMathBase);
 CNaryUnd.prototype.init = function(sign)
 {
     this.setDimension(2,1);
-
     var iter = new CMathContent();
     //iter.setReduct(DEGR_REDUCT);
 
@@ -251,7 +250,7 @@ CNaryUnd.prototype.setDistance = function()
     var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.25;
 }
-CNaryUnd.prototype.getCenter = function()
+CNaryUnd.prototype.getAscent = function()
 {
     return this.elements[0][0].size.height + this.dH + this.elements[1][0].size.ascent;
 }
@@ -280,7 +279,7 @@ CNaryOvr.prototype.setDistance = function()
     var zetta = this.getCtrPrp().FontSize* 25.4/96;
     this.dH = zetta*0.1;
 }
-CNaryOvr.prototype.getCenter = function()
+CNaryOvr.prototype.getAscent = function()
 {
     return this.elements[0][0].size.ascent;
 }
@@ -337,9 +336,9 @@ CNaryUndOvr.prototype.setPosition = function(pos)
         x3 = pos.x + this.align(2,0).x,
         y3 = y2 + this.elements[1][0].size.height + this.gapBottom;
 
-    this.elements[0][0].setPosition({x: x1, y :y1 });
-    this.elements[1][0].setPosition({x: x2, y :y2 });
-    this.elements[2][0].setPosition({x: x3, y :y3 });
+    this.elements[0][0].setPosition({x: x1, y :y1});
+    this.elements[1][0].setPosition({x: x2, y :y2});
+    this.elements[2][0].setPosition({x: x3, y :y3});
 }
 CNaryUndOvr.prototype.findDisposition = function(mCoord)
 {
@@ -2830,7 +2829,7 @@ function CContourIntegral()
     CNaryOperator.call(this);
 }
 extend(CContourIntegral, CNaryOperator);
-CContourIntegral.prototype.draw = function(pGraphics)
+CContourIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var circle = new CCircle();
     var coord = circle.getCoord();
@@ -2858,15 +2857,15 @@ CContourIntegral.prototype.draw = function(pGraphics)
 
     for(var i = 0; i < X.length; i++)
     {
-        X[i] = this.pos.x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + shY + Y[i]*alpha;
+        X[i] = this.pos.x + x + shX + X[i]*alpha;
+        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
     }
 
 
     for(var i = 0; i < XX.length; i++)
     {
-        XX[i] = this.pos.x + XX[i]*alpha;
-        YY[i] = this.pos.y + YY[i]*alpha;
+        XX[i] = this.pos.x + x + XX[i]*alpha;
+        YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
 
@@ -3334,7 +3333,7 @@ function CSurfaceIntegral()
     CNaryOperator.call(this);
 }
 extend(CSurfaceIntegral, CNaryOperator);
-CSurfaceIntegral.prototype.draw = function(pGraphics)
+CSurfaceIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var surf = new CSurface();
     var coord = surf.getCoord();
@@ -3364,16 +3363,15 @@ CSurfaceIntegral.prototype.draw = function(pGraphics)
 
     for(var i = 0; i < X.length; i++)
     {
-        X[i] = this.pos.x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + shY + Y[i]*alpha;
+        X[i] = this.pos.x + x + shX + X[i]*alpha;
+        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
     }
-
 
 
     for(var i = 0; i < XX.length; i++)
     {
-        XX[i] = this.pos.x + XX[i]*alpha;
-        YY[i] = this.pos.y + YY[i]*alpha;
+        XX[i] = this.pos.x + x + XX[i]*alpha;
+        YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
 
@@ -3911,7 +3909,7 @@ function CVolumeIntegral()
     CNaryOperator.call(this);
 }
 extend(CVolumeIntegral, CNaryOperator);
-CVolumeIntegral.prototype.draw = function(pGraphics)
+CVolumeIntegral.prototype.draw = function(x, y, pGraphics)
 {
     var volume = new CVolume();
     var coord = volume.getCoord();
@@ -3940,16 +3938,14 @@ CVolumeIntegral.prototype.draw = function(pGraphics)
 
     for(var i = 0; i < X.length; i++)
     {
-        X[i] = this.pos.x + shX + X[i]*alpha;
-        Y[i] = this.pos.y + shY + Y[i]*alpha;
+        X[i] = this.pos.x + x + shX + X[i]*alpha;
+        Y[i] = this.pos.y + y + shY + Y[i]*alpha;
     }
-
-
 
     for(var i = 0; i < XX.length; i++)
     {
-        XX[i] = this.pos.x + XX[i]*alpha;
-        YY[i] = this.pos.y + YY[i]*alpha;
+        XX[i] = this.pos.x + x + XX[i]*alpha;
+        YY[i] = this.pos.y + y + YY[i]*alpha;
     }
 
 

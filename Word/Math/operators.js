@@ -2877,7 +2877,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 
             oMeasure.SetFont(rPrp);
 
-            this.operator.Resize();
+            this.operator.Resize(oMeasure);
 
             if(this.operator.loc == 0 || this.operator.loc == 1)
             {
@@ -3231,7 +3231,7 @@ CDelimiter.prototype.Resize = function(oMeasure)
     var height = 0,
         width = 0;
 
-    var ascent = 0,
+    var  ascent = 0,
         descent = 0;
 
 
@@ -3246,8 +3246,6 @@ CDelimiter.prototype.Resize = function(oMeasure)
     var plH = 0.275*FontSize, // плейсхолдер
         H2 = 0.08*FontSize; // временно baseLine
 
-    // временно
-    var div = 0;
 
     if(this.shape == DELIMITER_SHAPE_CENTERED)
     {
@@ -3259,25 +3257,28 @@ CDelimiter.prototype.Resize = function(oMeasure)
             descent = content.height - content.ascent > descent ? content.height - content.ascent: descent;
         }
 
-        maxH = ascent > descent ? ascent : descent;
+        _ascent  = ascent - DIV_CENT*FontSize;
+        _descent = descent + DIV_CENT*FontSize;
+
+        maxH = _ascent > _descent ? _ascent : _descent;
 
         // для случая, когда в контенте степень и пр. элементы где нужно учитовать baseLine
-        if(descent < plH || ascent < plH)
+        if(_descent < plH || _ascent < plH)
         {
             if(maxH < plH)
             {
-                height = ascent + descent;
+                height = _ascent + _descent;
             }
             else
             {
-                div = ascent - plH;
-                height = ascent + descent + div;
+                var div = _ascent - plH;
+                height = _ascent + _descent + div;
             }
         }
         else
         {
             height = 2*maxH;
-            ascent = height/2;
+            ascent = height/2 + DIV_CENT*FontSize;
         }
     }
     else
@@ -3564,13 +3565,13 @@ CCharacter.prototype.Resize = function(oMeasure)
 
     var width  = base.size.width > this.operator.size.width ? base.size.width : this.operator.size.width,
         height = base.size.height + this.operator.size.height,
-        center = this.getCenter();
+        ascent = this.getAscent();
 
-    this.size = {height: height, width: width, center: center};
+    this.size = {height: height, width: width, ascent: ascent};
 }
 CCharacter.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.center};
+    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
     var alignOp  =  this.align(this.operator),
         alignCnt = this.align(this.elements[0][0]);
@@ -3596,10 +3597,10 @@ CCharacter.prototype.align = function(element)
 {
     return (this.size.width - element.size.width)/2;
 }
-CCharacter.prototype.draw = function(pGraphics)
+CCharacter.prototype.draw = function(x, y, pGraphics)
 {
-    this.elements[0][0].draw(pGraphics);
-    this.operator.draw(pGraphics);
+    this.elements[0][0].draw(x, y, pGraphics);
+    this.operator.draw(x, y, pGraphics);
 }
 CCharacter.prototype.findDisposition = function(pos)
 {
@@ -3712,20 +3713,22 @@ CGroupCharacter.prototype.init = function(props)
     /*if(this.operator.IsArrow())
         this.setReduct(DEGR_REDUCT);*/
 }
-CGroupCharacter.prototype.getCenter = function()
+CGroupCharacter.prototype.getAscent = function()
 {
-    var center;
+    var ascent;
+
+    var shCent = DIV_CENT*this.getCtrPrp().FontSize;
 
     if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)
-        center =  this.operator.size.height/2;
+        ascent =  this.operator.size.height/2 + shCent;
     else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_TOP )
-        center = this.operator.size.height + this.elements[0][0].size.center;
+        ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.vertJust === VJUST_TOP && this.loc === LOCATION_BOT )
-        center = this.elements[0][0].size.center;
+        ascent = this.elements[0][0].size.ascent;
     else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_BOT )
-        center = this.operator.size.height/2 + this.elements[0][0].size.height;
+        ascent = this.operator.size.height/2 + shCent + this.elements[0][0].size.height;
 
-    return center;
+    return ascent;
 }
 CGroupCharacter.prototype.old_getGlyph = function(code, type)
 {

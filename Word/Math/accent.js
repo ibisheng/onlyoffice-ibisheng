@@ -73,10 +73,10 @@ CCircumflex.prototype.fixSize = function(oMeasure, stretch, bIncl)
     this.size = {width: width, height: height};
 
 }
-CCircumflex.prototype.draw = function(pGraphics)
+CCircumflex.prototype.draw = function(x, y, pGraphics)
 {
-    var x = this.pos.x,
-        y = this.pos.y;
+    var xx = this.pos.x + x,
+        yy = this.pos.y + y;
 
     var fontSize = this.Parent.getCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
@@ -145,8 +145,8 @@ CCircumflex.prototype.draw = function(pGraphics)
 
     for(var i = 0; i < XX.length; i++)
     {
-        XX[i] = x + XX[i]*alpha ;
-        YY[i] = y + (a + b*YY[i])*alpha;
+        XX[i] = xx + XX[i]*alpha ;
+        YY[i] = yy + (a + b*YY[i])*alpha;
     }
 
     var intGrid = pGraphics.GetIntegerGrid();
@@ -204,7 +204,7 @@ CLine.prototype.fixSize = function(oMeasure, stretch)
 
     this.size = {width: width, height: height}
 }
-CLine.prototype.draw = function(pGraphics)
+CLine.prototype.draw = function(x, y, pGraphics)
 {
     var fontSize = this.Parent.getCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
@@ -217,8 +217,8 @@ CLine.prototype.draw = function(pGraphics)
 
     var shY = this.size.height * 0.15386904761904763; // чтобы линии совпадали
 
-    var x1 = this.pos.x,
-        y1 = this.pos.y + penY + shY,
+    var x1 = this.pos.x + x,
+        y1 = this.pos.y + y + penY + shY,
         x2 = x1 + this.size.width,
         y2 = y1;
 
@@ -263,7 +263,7 @@ CDoubleLine.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CDoubleLine.prototype.draw = function(pGraphics)
+CDoubleLine.prototype.draw = function(x, y, pGraphics)
 {
     var fontSize = this.Parent.getCtrPrp().FontSize;
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
@@ -272,8 +272,8 @@ CDoubleLine.prototype.draw = function(pGraphics)
     //var penY = penW/2*25.4/96; //для того чтобы линии совпадали (для одинарной и двойной черты)
     var penY = penW/2; //для того чтобы линии совпадали (для одинарной и двойной черты)
 
-    var x1 = this.pos.x,
-        y1 = this.pos.y + penY,
+    var x1 = this.pos.x + x,
+        y1 = this.pos.y + y + penY,
         x2 = x1 + this.size.width,
         y2 = y1,
         x3 = x1,
@@ -312,7 +312,7 @@ CTilde.prototype.fixSize = function()
 
     this.size = {width: width, height: height};
 }
-CTilde.prototype.draw = function(pGraphics)
+CTilde.prototype.draw = function(x, y, pGraphics)
 {
     var X = new Array(),
         Y = new Array();
@@ -355,13 +355,13 @@ CTilde.prototype.draw = function(pGraphics)
 
 
     var align = this.size.width - X[13]*alpha;
-    var x = this.pos.x + align/2,
-        y = this.pos.y;
+    var xx = this.pos.x + x + align/2,
+        yy = this.pos.y + y;
 
     for(var i = 0; i < X.length; i++)
     {
-        XX[i] = x + X[i]*alpha;
-        YY[i] = y + (Y[5] - Y[i])*alpha*0.65; // сжали !
+        XX[i] = xx + X[i]*alpha;
+        YY[i] = yy + (Y[5] - Y[i])*alpha*0.65; // сжали !
     }
 
 
@@ -425,7 +425,7 @@ CBreve.prototype.setPosition = function(pos)
 {
     this.pos = pos;
 }
-CBreve.prototype.draw = function(pGraphics)
+CBreve.prototype.draw = function(x, y, pGraphics)
 {
     var X = new Array(),
         Y = new Array();
@@ -464,8 +464,8 @@ CBreve.prototype.draw = function(pGraphics)
 
 
     var align = this.size.width - X[22]*alpha;
-    var x = this.pos.x + align/2,
-        y = this.pos.y;
+    var xx = this.pos.x + x + align/2,
+        yy = this.pos.y + y;
 
     var a, b;
     if(this.turn == TURN_0)
@@ -481,8 +481,8 @@ CBreve.prototype.draw = function(pGraphics)
 
     for(var i = 0; i < X.length; i++)
     {
-        XX[i] = x + X[i]*alpha ;
-        YY[i] = y + (a + b*Y[i])*alpha ;
+        XX[i] = xx + X[i]*alpha ;
+        YY[i] = yy + (a + b*Y[i])*alpha ;
     }
 
 
@@ -627,9 +627,9 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
 
     this.size = {width: width, height: height};
 }
-CSign.prototype.draw = function(pGraphics)
+CSign.prototype.draw = function(x, y, pGraphics)
 {
-    this.sign.draw(pGraphics);
+    this.sign.draw(x, y, pGraphics);
 }
 CSign.prototype.relate = function(parent)
 {
@@ -1172,16 +1172,16 @@ CAccent.prototype.init = function(properties)
     //this.setOperator(accent);
     this.elements[0][0].SetDot(true);
 }
-CAccent.prototype.getCenter = function()
+CAccent.prototype.getAscent = function()
 {
-    var center;
+    var ascent;
 
    if(this.loc === LOCATION_TOP )
-        center = this.operator.size.height + this.elements[0][0].size.center;
+       ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.loc === LOCATION_BOT )
-        center = this.elements[0][0].size.center;
+       ascent = this.elements[0][0].size.ascent;
 
-    return center;
+    return ascent;
 }
 CAccent.prototype.getPropsForWrite = function()
 {

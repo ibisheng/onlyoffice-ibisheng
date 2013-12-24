@@ -200,12 +200,12 @@ CMathMatrix.prototype.recalculateSize = function()
     for(var j = 0; j < this.nRow; j++)
         height += this.gaps.row[j] + metrics.ascents[j] + metrics.descents[j];
 
-    var center = 0;
+    var ascent = 0;
 
     if(this.baseJc == BASEJC_TOP)
     {
         for(var j = 0; j < this.nCol; j++)
-            center = this.elements[0][j].size.center > center ? this.elements[0][j].size.center : center;
+            ascent = this.elements[0][j].size.ascent > ascent ? this.elements[0][j].size.ascent : ascent;
     }
     else if(this.baseJc == BASEJC_BOTTOM)
     {
@@ -213,17 +213,17 @@ CMathMatrix.prototype.recalculateSize = function()
             currDsc;
         for(var j = 0; j < this.nCol; j++)
         {
-            currDsc = this.elements[this.nRow -1][j].size.height - this.elements[this.nRow -1][j].size.center;
+            currDsc = this.elements[this.nRow -1][j].size.height - this.elements[this.nRow -1][j].size.ascent;
             descent = currDsc > descent ? currDsc : descent;
 
-            center = height - descent;
+            ascent = height - descent;
         }
     }
     else /*this.baseJc == 0*/
-        center = this.getCenter(height);
+        ascent = this.getAscent(height);
         //center = height/2;
 
-    this.size = {width: width, height: height, center: center};
+    this.size = {width: width, height: height, ascent: ascent};
 
 }
 CMathMatrix.prototype.setPosition = function(pos)
@@ -231,7 +231,7 @@ CMathMatrix.prototype.setPosition = function(pos)
     if(this.bMObjs === true)
         this.pos = pos;
     else
-        this.pos = {x: pos.x, y: pos.y - this.size.center}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this.pos = {x: pos.x, y: pos.y - this.size.ascent}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     var maxWH = this.getWidthsHeights();
     var Widths = maxWH.widths;
@@ -348,8 +348,8 @@ CMathMatrix.prototype.getMetrics = function()
         {
             var size = this.elements[i][j].size;
             Widths[j] = ( Widths[j] > size.width ) ? Widths[j] : size.width;
-            Ascents[i] = (Ascents[i] > size.center ) ? Ascents[i] : size.center;
-            Descents[i] = (Descents[i] > size.height - size.center ) ? Descents[i] : size.height - size.center;
+            Ascents[i] = (Ascents[i] > size.ascent ) ? Ascents[i] : size.ascent;
+            Descents[i] = (Descents[i] > size.height - size.ascent ) ? Descents[i] : size.height - size.ascent;
         }
 
     return {ascents: Ascents, descents: Descents, widths: Widths}

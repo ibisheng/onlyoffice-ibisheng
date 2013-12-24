@@ -3,7 +3,7 @@ function CDegree()
     this.kind = MATH_DEGREE;
 
     this.type = DEGREE_SUPERSCRIPT ;
-    this.shiftDegree = 0;
+    this.upper = 0;
     this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
 
     CMathBase.call(this);
@@ -37,38 +37,82 @@ CDegree.prototype.init_2 = function(props, oBase)
 }
 CDegree.prototype.recalculateSize = function()
 {
-    var Widths = this.getWidthsHeights().widths;
-
-    var Heights = [];
-    Heights[0] = this.elements[0][0].size.height;
-    Heights[1] = this.elements[0][1].size.height;
-
-    var _center;
-
-    var middle = ((Heights[0] > Heights[1]) ? Heights[1] : Heights[0])* 2/3; /// 2/3 от высоты
-
-    var _height = Heights[0] + Heights[1] - middle;
-
-    var _width = 0;
-    for( var i = 0; i < Widths.length; i++ )
-        _width += Widths[i];
-
-    _width += this.dW;
-
     if(this.type === DEGREE_SUPERSCRIPT)
-    {
-        this.shiftDegree = 0;
-        _center = _height - (this.elements[0][0].size.height - this.elements[0][0].size.center);
-    }
+        this.recalculateSup();
     else if(this.type === DEGREE_SUBSCRIPT)
+        this.recalculateSubScript();
+}
+CDegree.prototype.recalculateSup = function()
+{
+    var base = this.elements[0][0].size,
+        iter   = this.elements[0][1].size;
+
+    var width = base.width + iter.width;
+
+    var height = 0,
+        ascent = 0;
+
+    var descIter = iter.height - iter.ascent;
+    var FontSize = this.getCtrPrp().FontSize,
+        shiftCenter = DIV_CENT*FontSize;
+
+    var upper = 0;
+
+    if(descIter + shiftCenter > 2/3*base.height)
     {
-        this.shiftDegree = _height - this.elements[0][1].size.height;
-        _center = this.elements[0][0].size.center;
+        upper = iter.height - 2/3*base.height;
+    }
+    else
+    {
+        upper = iter.ascent - shiftCenter;
     }
 
-    this.size = {width: _width,height: _height, center: _center};
+    this.upper = upper;
+
+    if(upper > 0)
+    {
+        height = this.upper + base.height;
+        ascent = this.upper + base.ascent;
+    }
+    else
+    {
+        height = base.height;
+        ascent = base.ascent;
+    }
+
+    this.size = {width: width, height: height, ascent: ascent};
 }
-CDegree.prototype.setPosition = function(_pos)
+CDegree.prototype.recalculateSubScript = function()
+{
+    var base = this.elements[0][0].size,
+        iter   = this.elements[0][1].size;
+
+    var width = base.width + iter.width;
+    var height = 0,
+        ascent = 0;
+
+    var FontSize = this.getCtrPrp().FontSize,
+        shiftCenter = 0.5*DIV_CENT*FontSize;
+    var low = 0;
+
+    if(iter.ascent - shiftCenter > 2/3*base.height)
+    {
+        low = iter.height - 2/3*base.height;
+    }
+    else
+    {
+        low = iter.height - iter.ascent + shiftCenter;
+    }
+
+    height = base.height + low;
+    ascent = base.ascent;
+
+    this.upper = -(height - iter.height);
+
+    this.size = {width: width, height: height, ascent: ascent};
+
+}
+CDegree.prototype.old_setPosition = function(_pos)
 {
     var pos = _pos;
     if(this.bMObjs === true)
@@ -79,7 +123,90 @@ CDegree.prototype.setPosition = function(_pos)
     this.elements[0][0].setPosition({x: pos.x, y: pos.y - this.elements[0][0].size.center });
     this.elements[0][1].setPosition({x: pos.x + this.elements[0][0].size.width + this.dW, y: pos.y + this.shiftDegree - this.size.center});
 }
+CDegree.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+
+    var shBase = 0,
+        shIter = 0;
+
+    if(this.upper > 0)
+        shBase = this.upper;
+    else
+        shIter = - this.upper;
+
+    this.elements[0][0].setPosition({x: this.pos.x, y: this.pos.y + shBase});
+    this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width + this.dW, y: this.pos.y + shIter});
+}
 CDegree.prototype.findDisposition = function(mCoord)
+{
+    var coordX, coordY;
+    var X, Y;
+
+    var inside_flag = -1;
+
+    var shBase = 0,
+        shIter = 0;
+
+    if(this.upper > 0)
+        shBase = this.upper;
+    else
+        shIter = - this.upper;
+
+    if( mCoord.x < this.elements[0][0].size.width)
+    {
+        if( this.elements[0][0].IsJustDraw() )
+        {
+            X = 0; Y = 1; // встаем во второй элемент
+            coordX = 0;
+            coordY = mCoord.y - shIter;
+
+            inside_flag = 0;
+        }
+        else
+        {
+            X = 0; Y = 0; // встаем в первый элемент
+            coordX =  mCoord.x;
+            coordY =  mCoord.y - shBase;
+        }
+    }
+    else if(mCoord.x < (this.elements[0][0].size.width + this.dW ))
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = 0;
+        coordY = mCoord.y - shIter;
+        inside_flag = 0;
+    }
+    else if(mCoord.x > this.size.width)
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = this.size.width;
+        coordY = mCoord.y - shIter;
+        inside_flag = 1;
+    }
+    else
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = mCoord.x - (this.elements[0][0].size.width + this.dW);
+        coordY = mCoord.y - shIter;
+    }
+
+    if(coordY < 0)
+    {
+        coordY = 0;
+        inside_flag = 2;
+    }
+    else if(coordY > this.elements[X][Y].size.height)
+    {
+        coordY = this.elements[X][Y].size.height;
+        inside_flag = 2;
+    }
+
+    var mCoord = {x: coordX, y: coordY};
+
+    return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
+}
+CDegree.prototype.old_findDisposition = function(mCoord)
 {
     var coordX, coordY;
     var X, Y;
