@@ -25,6 +25,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			/************ private!!! **************/
 			this.HtmlElementName = name;
 			this.topLineEditorName = inputName;
+			this.HtmlElement = null;
 
 			if ("function" === typeof(eventsController)) {
 				var prot = eventsController.prototype;
@@ -151,65 +152,65 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 			
 			this.TrackFile = null;
-			
-			var oThis = this;
-			if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData)) {
-				//var element = document.body;
-				var element = document.getElementById(this.HtmlElementName);
-				if(null != element)
-				{
-					element["ondragover"] = function(e) {
-						e.preventDefault();
-						if(CanDropFiles(e))
-							e.dataTransfer.dropEffect = 'copy';
-						else
-							e.dataTransfer.dropEffect = 'none';
-						return false;
-					};
-					element["ondrop"] = function(e) {
-						e.preventDefault();
-						var files = e.dataTransfer.files;
-						var nError = ValidateUploadImage(files);
-						if(c_oAscServerError.NoError == nError)
-						{
-							var worksheet = null;
-							if(null != oThis.wbModel)
-								worksheet = oThis.wbModel.getWorksheet(oThis.wbModel.getActive());
-							if(null != worksheet)
-							{
-								oThis.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-								var file = files[0];
-								var xhr = new XMLHttpRequest();
-								var fd = new FormData();
-								fd.append('file', file);
-								xhr.open('POST', g_sUploadServiceLocalUrl+'?key=' + oThis.documentId + '&sheetId=' + worksheet.getId());
-								xhr.onreadystatechange = function(){
-									if(4 == this.readyState)
-									{
-										if((this.status == 200 || this.status == 1223))
-										{
-											var frameWindow = GetUploadIFrame();
-											var content = this.responseText;
-											frameWindow.document.open();
-											frameWindow.document.write(content);
-											frameWindow.document.close();
-										}
-										else
-											oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
-										oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-									}
-								};
-								xhr.send(fd);
-							}
-						}
-						else
-							oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
-					}
-				}
-			}
+
+			this._init();
+			return this;
 		}
 
 		spreadsheet_api.prototype = {
+
+			_init: function() {
+				var t = this;
+				this.HtmlElement = document.getElementById(this.HtmlElementName);
+				// init drag&drop
+				if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != this.HtmlElement) {
+					this.HtmlElement["ondragover"] = function (e) {t._onDragOverImage(e);};
+					this.HtmlElement["ondrop"] = function (e) {t._onDropImage(e);};
+				}
+			},
+
+			_onDragOverImage: function(e) {
+				e.preventDefault();
+				if(CanDropFiles(e))
+					e.dataTransfer.dropEffect = 'copy';
+				else
+					e.dataTransfer.dropEffect = 'none';
+				return false;
+			},
+			_onDropImage: function(e) {
+				var t = this;
+				e.preventDefault();
+				var files = e.dataTransfer.files;
+				var nError = ValidateUploadImage(files);
+				if (c_oAscServerError.NoError == nError) {
+					var worksheet = null;
+					if (null != this.wbModel)
+						worksheet = this.wbModel.getWorksheet(this.wbModel.getActive());
+					if (null != worksheet) {
+						this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+						var file = files[0];
+						var xhr = new XMLHttpRequest();
+						var fd = new FormData();
+						fd.append('file', file);
+						xhr.open('POST', g_sUploadServiceLocalUrl+'?key=' + this.documentId + '&sheetId=' + worksheet.getId());
+						xhr.onreadystatechange = function() {
+							if (4 == this.readyState) {
+								if((this.status == 200 || this.status == 1223)) {
+									var frameWindow = GetUploadIFrame();
+									var content = this.responseText;
+									frameWindow.document.open();
+									frameWindow.document.write(content);
+									frameWindow.document.close();
+								} else
+									t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+								t.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+							}
+						};
+						xhr.send(fd);
+					}
+				} else
+					this.handlers.trigger("asc_onError", this.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
+			},
 		
 			asc_CheckGuiControlColors : function() {
 				// потом реализовать проверку на то, что нужно ли посылать
