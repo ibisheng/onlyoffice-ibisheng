@@ -268,8 +268,12 @@ function CEditorPage(api)
     this.checkBodySize = function()
     {
         var off = jQuery("#" + this.Name).offset();
-        this.X = off.left;
-        this.Y = off.top;
+        
+        if (off)
+        {
+            this.X = off.left;
+            this.Y = off.top;
+        }
 
         var el = document.getElementById(this.Name);
 
@@ -1961,6 +1965,9 @@ function CEditorPage(api)
 
     this.UpdateScrolls = function()
     {
+        if (window["NATIVE_EDITOR_ENJINE"])
+            return;
+    
         var settings = {
             showArrows: true,
             animateScroll: false,

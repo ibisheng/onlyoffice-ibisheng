@@ -28,6 +28,9 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 
 function asc_docs_api(name)
 {
+    var CDocsCoApi      = window["CDocsCoApi"];
+    var CSpellCheckApi  = window["CSpellCheckApi"];
+    
 	/************ private!!! **************/
     this.HtmlElementName = name;
 
@@ -201,6 +204,9 @@ function asc_docs_api(name)
     {
         window.editor = this;
         window['editor'] = window.editor;
+        
+        if (window["NATIVE_EDITOR_ENJINE"])
+            editor = window.editor;
     }
 }
 
@@ -5057,6 +5063,9 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 
 function _getFullImageSrc(src)
 {
+    if (window["NATIVE_EDITOR_ENJINE"])
+        return src;
+        
     if (0 == src.indexOf("theme"))
         return editor.ThemeLoader.ThemesUrl + src;
     if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
@@ -5193,3 +5202,109 @@ function asc_ajax(obj){
 	init(obj);
 }
 //test
+window["asc_docs_api"] = asc_docs_api;
+window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
+{
+	this.DocumentUrl = "TeamlabNative";
+
+	window.g_cAscCoAuthoringUrl = "";
+	window.g_cAscSpellCheckUrl = "";
+	
+	var asc_user = window["Asc"].asc_CUser;
+	this.User = new asc_user();
+	this.User.asc_setId("TM");
+	this.User.asc_setUserName("native");
+	
+	this.WordControl.m_bIsRuler = false;
+	this.WordControl.Init();
+	
+	this.InitEditor();
+	this.LoadedObjectDS = Common_CopyObj(this.WordControl.m_oLogicDocument.Get_Styles().Style);
+	
+	g_oIdCounter.Set_Load(true);
+
+	var _loader = new BinaryPPTYLoader();
+    _loader.Api = this;
+    _loader.Load(base64File, this.WordControl.m_oLogicDocument);
+    
+    this.LoadedObject = 1;
+    g_oIdCounter.Set_Load(false);
+}
+
+window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
+{
+    this.bNoSendComments = false;
+    this.ShowParaMarks = false;
+    
+    var presentation = this.WordControl.m_oLogicDocument;
+    presentation.RecalculateAfterOpen();
+    presentation.DrawingDocument.OnEndRecalculate();    
+}
+
+window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
+{
+    var _len = changes.length;
+	for (var i = 0; i < _len; i++)
+	{
+	    var Changes = new CCollaborativeChanges();
+        Changes.Set_Id( changes[i]["id"] );
+        Changes.Set_Data( changes[i]["data"] );
+	    CollaborativeEditing.Add_Changes( Changes );
+	}
+	CollaborativeEditing.Apply_OtherChanges();
+}
+
+window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
+{
+	var writer = new CBinaryFileWriter();
+    this.WordControl.m_oLogicDocument.CalculateComments();
+    return writer.WriteDocument(this.WordControl.m_oLogicDocument);
+}
+
+window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
+{
+	if (true)
+	{
+		// pos не должен минимизироваться!!!
+
+		_memory1.Copy           = _memory1["Copy"];
+		_memory1.ClearNoAttack  = _memory1["ClearNoAttack"];
+		_memory1.WriteByte      = _memory1["WriteByte"];
+		_memory1.WriteBool      = _memory1["WriteBool"];
+		_memory1.WriteLong      = _memory1["WriteLong"];
+		_memory1.WriteDouble    = _memory1["WriteDouble"];
+		_memory1.WriteString    = _memory1["WriteString"];
+		_memory1.WriteString2   = _memory1["WriteString2"];
+		
+		_memory2.Copy           = _memory1["Copy"];
+		_memory2.ClearNoAttack  = _memory1["ClearNoAttack"];
+		_memory2.WriteByte      = _memory1["WriteByte"];
+		_memory2.WriteBool      = _memory1["WriteBool"];
+		_memory2.WriteLong      = _memory1["WriteLong"];
+		_memory2.WriteDouble    = _memory1["WriteDouble"];
+		_memory2.WriteString    = _memory1["WriteString"];
+		_memory2.WriteString2   = _memory1["WriteString2"];
+	}
+	
+	var _printer = new CDocumentRenderer();
+	_printer.Memory				    = _memory1;
+	_printer.VectorMemoryForPrint	= _memory2;
+	return _printer;
+},
+
+window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
+{
+}
+
+window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
+{
+	var _logic_doc = this.WordControl.m_oLogicDocument;
+    _printer.BeginPage(_logic_doc.Width, _logic_doc.Height);
+    _logic_doc.DrawPage(_page, _printer);
+    _printer.EndPage();
+}
+
+window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
+{
+	return this.WordControl.m_oDrawingDocument.SlidesCount;
+}
