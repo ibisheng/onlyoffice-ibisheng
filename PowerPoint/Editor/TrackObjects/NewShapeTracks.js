@@ -107,15 +107,19 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
                 this.flipV = true;
             }
         }
-        if(!(e.CtrlKey || e.ShiftKey))
+        if(!(e.CtrlKey || e.ShiftKey) || (e.CtrlKey && !e.ShiftKey && this.isLine))
         {
+
+
+            this.extX = abs_dist_x >= MIN_SHAPE_SIZE  ? abs_dist_x : (this.isLine ? 0 : MIN_SHAPE_SIZE);
+            this.extY = abs_dist_y >= MIN_SHAPE_SIZE  ? abs_dist_y : (this.isLine ? 0 : MIN_SHAPE_SIZE);
             if(real_dist_x >= 0)
             {
                 this.x = this.startX;
             }
             else
             {
-                this.x = abs_dist_x >= MIN_SHAPE_SIZE || this.isLine ? x : this.startX - MIN_SHAPE_SIZE;
+                this.x = abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - this.extX;
             }
 
             if(real_dist_y >= 0)
@@ -124,16 +128,12 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             }
             else
             {
-                this.y = abs_dist_y >= MIN_SHAPE_SIZE || this.isLine ? y : this.startY - MIN_SHAPE_SIZE;
+                this.y = abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - this.extY;
             }
-
-            this.extX = abs_dist_x >= MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
-            this.extY = abs_dist_y >= MIN_SHAPE_SIZE ? abs_dist_y : MIN_SHAPE_SIZE;
-
         }
         else if(e.CtrlKey && !e.ShiftKey)
         {
-            if(abs_dist_x >= MIN_SHAPE_SIZE_DIV2 || this.isLine)
+            if(abs_dist_x >= MIN_SHAPE_SIZE_DIV2 )
             {
                 this.x = this.startX - abs_dist_x;
                 this.extX = 2*abs_dist_x;
@@ -144,7 +144,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
                 this.extX = MIN_SHAPE_SIZE;
             }
 
-            if(abs_dist_y >= MIN_SHAPE_SIZE_DIV2 || this.isLine)
+            if(abs_dist_y >= MIN_SHAPE_SIZE_DIV2 )
             {
                 this.y = this.startY - abs_dist_y;
                 this.extY = 2*abs_dist_y;

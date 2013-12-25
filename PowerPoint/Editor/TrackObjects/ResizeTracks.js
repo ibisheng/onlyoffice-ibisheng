@@ -215,8 +215,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
                     this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
-                    if(_real_width < 0)
+                    if(_real_width < 0 )
+                    {
                         this.resizedflipH = !this.originalFlipH;
+                    }
                     else
                         this.resizedflipH = this.originalFlipH;
                 }
@@ -230,10 +232,22 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
                 this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine  ? _abs_height : MIN_SHAPE_SIZE;
-                if(_real_height < 0)
+                if(_real_height < 0 )
+                {
                     this.resizedflipV = !this.originalFlipV;
+                    if(this.isLine && ShiftKey)
+                    {
+                        this.resizedflipH = !this.originalFlipH;
+                    }
+                }
                 else
+                {
                     this.resizedflipV = this.originalFlipV;
+                    if(this.isLine && ShiftKey && this.resizedflipH !== this.originalFlipH)
+                    {
+                        this.resizedflipV = !this.originalFlipV;
+                    }
+                }
 
 
                 _new_resize_half_width = this.resizedExtX*0.5;
@@ -271,7 +285,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     _real_height = this.usedExtY*kd2;
                     _abs_height = Math.abs(_real_height);
                     this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
-                    if(_real_height < 0)
+                    if(_real_height < 0 )
                         this.resizedflipV = !this.originalFlipV;
                     else
                         this.resizedflipV = this.originalFlipV;
@@ -280,10 +294,22 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
                 this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
-                if(_real_width < 0)
+                if(_real_width < 0 )
+                {
                     this.resizedflipH = !this.originalFlipH;
+                    if(this.isLine && ShiftKey)
+                    {
+                        this.resizedflipV = !this.originalFlipV;
+                    }
+                }
                 else
+                {
                     this.resizedflipH = this.originalFlipH;
+                    if(this.isLine && ShiftKey && this.resizedflipV !== this.originalFlipV)
+                    {
+                        this.resizedflipH = !this.originalFlipH;
+                    }
+                }
 
 
                 _new_resize_half_width = this.resizedExtX*0.5;
@@ -320,7 +346,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
                     this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
-                    if(_real_width < 0)
+                    if(_real_width < 0 )
                         this.resizedflipH = !this.originalFlipH;
                     else
                         this.resizedflipH = this.originalFlipH;
@@ -335,10 +361,22 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
                 this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
-                if(_real_height < 0)
+                if(_real_height < 0 )
+                {
                     this.resizedflipV = !this.originalFlipV;
+                    if(this.isLine && ShiftKey)
+                    {
+                        this.resizedflipH = !this.originalFlipH;
+                    }
+                }
                 else
+                {
                     this.resizedflipV = this.originalFlipV;
+                    if(this.isLine && ShiftKey && this.resizedflipH !== this.originalFlipH)
+                    {
+                        this.resizedflipV = !this.originalFlipV;
+                    }
+                }
 
                 _new_resize_half_width = this.resizedExtX*0.5;
                 _new_resize_half_height = this.resizedExtY*0.5;
@@ -374,7 +412,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     _real_height = this.usedExtY*kd1;
                     _abs_height = Math.abs(_real_height);
                     this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
-                    if(_real_height < 0)
+                    if(_real_height < 0 )
                         this.resizedflipV = !this.originalFlipV;
                     else
                         this.resizedflipV = this.originalFlipV;
@@ -389,10 +427,22 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 _real_width = this.usedExtX*kd2;
                 _abs_width = Math.abs(_real_width);
                 this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
-                if(_real_width < 0)
+                if(_real_width < 0 )
+                {
                     this.resizedflipH = !this.originalFlipH;
+                    if(this.isLine && ShiftKey)
+                    {
+                        this.resizedflipV = !this.originalFlipV;
+                    }
+                }
                 else
+                {
                     this.resizedflipH = this.originalFlipH;
+                    if(this.isLine && ShiftKey && this.resizedflipV !== this.originalFlipV)
+                    {
+                        this.resizedflipH = !this.originalFlipH;
+                    }
+                }
 
                 _new_resize_half_width = this.resizedExtX*0.5;
                 _new_resize_half_height = this.resizedExtY*0.5;
@@ -449,6 +499,11 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
     this.resizeRelativeCenter = function(kd1, kd2, ShiftKey)
     {
+        if(this.isLine)
+        {
+            this.resize(kd1, kd2, ShiftKey);
+            return;
+        }
         kd1 = 2*kd1 - 1;
         kd2 = 2*kd2 - 1;
         var _real_height, _real_width;

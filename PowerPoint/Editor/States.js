@@ -5480,7 +5480,7 @@ function DrawGroupSelection(group, drawingDocument)
     var group_selected_objects = group.selectedObjects;
     for(var i = 0; i < group_selected_objects.length; ++i)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransformMatrix(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, false, group_selected_objects[i].canRotate())
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransformMatrix(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, CheckObjectLine(group_selected_objects[i]), group_selected_objects[i].canRotate())
     }
     if(group_selected_objects.length === 1)
     {
