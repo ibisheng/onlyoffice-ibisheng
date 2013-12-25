@@ -321,7 +321,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         var shape = new CShape(null, this.drawingObjects);
         shape.setParent(drawingObjects);
         if(this.presetGeom !== "textRect")
-            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom, this.arrowsCount);
+            shape.initDefault(this.x, this.y, this.extX, this.extY, this.flipH === true, this.flipV === true, this.presetGeom, this.arrowsCount);
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
         return shape;
