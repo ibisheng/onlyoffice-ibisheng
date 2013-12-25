@@ -7607,7 +7607,7 @@
                                             t.objectRender.objectLocker.checkObjects(callbackUngroupedObjects);
 										};
 
-										api.ImageLoader.LoadDocumentImages(aImagesSync);
+										api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
 									}
 								});
 							};

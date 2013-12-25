@@ -2582,11 +2582,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asyncImagesDocumentEndLoaded: function() {
-				if ( this.wb ) {
-					var ws = this.wb.getWorksheet();
-					if ( ws.objectRender.asyncImagesDocumentEndLoaded )
-						ws.objectRender.asyncImagesDocumentEndLoaded();
-				}
 			},
 			
 			asyncImageEndLoadedBackground: function() {

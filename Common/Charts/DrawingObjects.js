@@ -3060,7 +3060,7 @@ function DrawingObjects() {
 			}
 		}	
 		
-		api.ImageLoader.LoadDocumentImages(aImagesSync);
+		api.ImageLoader.LoadDocumentImages(aImagesSync, null, _this.asyncImagesDocumentEndLoaded);
 
 		// Upload event
 		if (window.addEventListener) {

@@ -38,7 +38,7 @@
             }*/
         }
         
-        this.LoadDocumentImages = function(_images, isUrl) {
+        this.LoadDocumentImages = function(_images, isUrl, callbackEnd) {
             // сначала заполним массив
             if (this.ThemeLoader == null)
                 this.Api.asyncImagesDocumentStartLoaded();
@@ -60,7 +60,7 @@
 
             if (!this.bIsAsyncLoadDocumentImages)
             {
-                this._LoadImages();
+                this._LoadImages(callbackEnd);
             }
             else
             {
@@ -72,21 +72,29 @@
 
                 this.images_loading.splice(0, _len);
 
-                if (this.ThemeLoader == null)
-                    this.Api.asyncImagesDocumentEndLoaded();
-                else
-                    this.ThemeLoader.asyncImagesEndLoaded();
+				if (null != callbackEnd)
+					callbackEnd();
+				else {
+					if (this.ThemeLoader == null)
+						this.Api.asyncImagesDocumentEndLoaded();
+					else
+						this.ThemeLoader.asyncImagesEndLoaded();
+				}
             }
         }
 
         var oThis = this;
-        this._LoadImages = function() {
+        this._LoadImages = function(callbackEnd) {
             if (0 == this.images_loading.length)
             {
-                if (this.ThemeLoader == null)
-                    this.Api.asyncImagesDocumentEndLoaded();
-                else
-                    this.ThemeLoader.asyncImagesEndLoaded();
+				if (null != callbackEnd)
+					callbackEnd();
+				else {
+					if (this.ThemeLoader == null)
+						this.Api.asyncImagesDocumentEndLoaded();
+					else
+						this.ThemeLoader.asyncImagesEndLoaded();
+				}
 
                 return;
             }
@@ -106,7 +114,7 @@
                 }
 
                 oThis.images_loading.shift();
-                oThis._LoadImages();
+                oThis._LoadImages(callbackEnd);
             }
             oImage.Image.onerror = function(){
                 oImage.Status = ImageLoadStatus.Complete;
@@ -119,7 +127,7 @@
                 }
 
                 oThis.images_loading.shift();
-                oThis._LoadImages();
+                oThis._LoadImages(callbackEnd);
             }
             //oImage.Image.crossOrigin = 'anonymous';
             oImage.Image.src = oImage.src;
