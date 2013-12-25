@@ -988,8 +988,8 @@
 				this._prepareCellTextMetricsCache(this.visibleRange);
 				
 				// Код перенесён из getWorksheet
-				//this._prepareComments();
-				//this._prepareDrawingObjects();
+				this._prepareComments();
+				this._prepareDrawingObjects();
 				
 				// initializing is completed
 				this.handlers.trigger("initialized");

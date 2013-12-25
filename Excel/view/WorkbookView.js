@@ -1028,10 +1028,8 @@
 				var wb = this.model;
 				var i  = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
 				var ws = this.wsViews[i];
-				if ( !(ws instanceof asc_WSV) ) {
-					ws = this.wsViews[i] = this._createWorksheetView( wb.getWorksheet(i) );
-					ws._prepareComments();
-					ws._prepareDrawingObjects();
+				if (!(ws instanceof asc_WSV)) {
+					ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
 				}
 				return ws;
 			},
