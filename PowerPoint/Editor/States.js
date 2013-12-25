@@ -51,7 +51,7 @@ var STATES_ID_MOVE_INTERNAL_CHART_OBJECT_GROUP = 0x41;
 var STATES_ID_CHART_GROUP = 0x42;
 var STATES_ID_CHART_GROUP_TEXT_ADD = 0x43;
 
-
+var SNAP_DISTANCE = 1.27;
 
 function resetGroupChartSelection(state)
 {
@@ -2827,12 +2827,35 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.handleNum = this.majorObject.getNumByCardDirection(cardDirection);
     this.cardDirection = cardDirection;
 
+    var snap = this.drawingObjects.getSnapArrays();
+    this.snapX = snap.snapX;
+    this.snapY = snap.snapY;
+
     this.onMouseDown = function(e, x, y)
     {};
 
     this.onMouseMove = function(e, x, y)
     {
-        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
+        var point_x, point_y;
+        var snap_object_x = GetSnapObject([x], 0, this.snapX);
+        var snap_object_y = GetSnapObject([y], 0, this.snapY);
+        if(snap_object_x.point !== null)
+        {
+            point_x = snap_object_x.point;
+        }
+        else
+        {
+            point_x = x;
+        }
+        if(snap_object_y.point !== null)
+        {
+            point_y = snap_object_y.point;
+        }
+        else
+        {
+            point_y = y;
+        }
+        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, point_x, point_y);
         this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
         this.drawingObjects.OnUpdateOverlay();
 
@@ -3360,6 +3383,14 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     this.majorObject = majorObject;
     this.majorTrack = null;
 
+    var snap = this.drawingObjects.getSnapArrays();
+    this.snapX = snap.snapX;
+    this.snapY = snap.snapY;
+
+    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    this.trackSnapX = trackSnap.snapX;
+    this.trackSnapY = trackSnap.snapY;
+
     this.onMouseDown = function(e, x, y)
     {
 
@@ -3370,7 +3401,36 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         var dx = x - this.startX;
         var dy = y - this.startY;
         var shiftX = 0, shiftY = 0;
-        this.drawingObjectsController.trackMoveObjects(dx, dy);
+        var snapObjectX = GetSnapObject(this.trackSnapX, dx, this.snapX);
+        var snapObjectY = GetSnapObject(this.trackSnapY, dy, this.snapY);
+        if(snapObjectX.distance !== null)
+        {
+            shiftX = snapObjectX.distance;
+        }
+        if(snapObjectY.distance !== null)
+        {
+            shiftY = snapObjectY.distance;
+        }
+        var result_dx, result_dy;
+        if(!e.ShiftKey)
+        {
+            result_dx = dx + shiftX;
+            result_dy = dy + shiftY;
+        }
+        else
+        {
+            result_dx = dx + shiftX;
+            result_dy = dy + shiftY;
+            if(Math.abs(result_dx) > Math.abs(result_dy))
+            {
+                result_dy = 0;
+            }
+            else
+            {
+                result_dx = 0;
+            }
+        }
+        this.drawingObjectsController.trackMoveObjects(result_dx, result_dy);
         this.drawingObjects.OnUpdateOverlay();
     };
 
@@ -3433,6 +3493,37 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         return {objectId:this.majorObject.Id, cursorType: "move"}
     };
+}
+
+function GetSnapObject(trackSnapArr, dist, snapArr)
+{
+    var min_d = null, point = null;
+    for(var i = 0; i < trackSnapArr.length; ++i)
+    {
+        var p = trackSnapArr[i] + dist;
+        for(var j = 0; j < snapArr.length; ++j)
+        {
+            var d = snapArr[j] - p;
+            if(Math.abs(d) < SNAP_DISTANCE)
+            {
+                if(point === null)
+                {
+                    point = snapArr[j];
+                    min_d = d;
+                }
+                else
+                {
+                   if(Math.abs(d) < Math.abs(min_d))
+                   {
+                       min_d  = d;
+                       point = snapArr[j];
+                   }
+                }
+
+            }
+        }
+    }
+    return {distance: min_d, point: point};
 }
 
 
@@ -4094,6 +4185,16 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     this.rectY = rectY;
     this.rectW = rectW;
     this.rectH = rectH;
+
+
+    var snap = this.drawingObjects.getSnapArrays();
+    this.snapX = snap.snapX;
+    this.snapY = snap.snapY;
+
+    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    this.trackSnapX = trackSnap.snapX;
+    this.trackSnapY = trackSnap.snapY;
+
     this.onMouseDown = function(e, x, y)
     {
 
@@ -4103,7 +4204,37 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     {
         var dx = x - this.startX;
         var dy = y - this.startY;
-        this.drawingObjectsController.trackMoveObjects(dx, dy);
+        var shiftX = 0, shiftY = 0;
+        var snapObjectX = GetSnapObject(this.trackSnapX, dx, this.snapX);
+        var snapObjectY = GetSnapObject(this.trackSnapY, dy, this.snapY);
+        if(snapObjectX.distance !== null)
+        {
+            shiftX = snapObjectX.distance;
+        }
+        if(snapObjectY.distance !== null)
+        {
+            shiftY = snapObjectY.distance;
+        }
+        var result_dx, result_dy;
+        if(!e.ShiftKey)
+        {
+            result_dx = dx + shiftX;
+            result_dy = dy + shiftY;
+        }
+        else
+        {
+            result_dx = dx + shiftX;
+            result_dy = dy + shiftY;
+            if(Math.abs(result_dx) > Math.abs(result_dy))
+            {
+                result_dy = 0;
+            }
+            else
+            {
+                result_dx = 0;
+            }
+        }
+        this.drawingObjectsController.trackMoveObjects(result_dx, result_dy);
         this.drawingObjects.OnUpdateOverlay();
     };
 
@@ -4421,12 +4552,38 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     this.majorObject = majorObject;
     this.handleNum = handleNum;
     this.cardDirection = cardDirection;
+
+
+    var snap = this.drawingObjects.getSnapArrays();
+    this.snapX = snap.snapX;
+    this.snapY = snap.snapY;
+
+
     this.onMouseDown = function(e, x, y)
     {};
 
     this.onMouseMove = function(e, x, y)
     {
-        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
+        var point_x, point_y;
+        var snap_object_x = GetSnapObject([x], 0, this.snapX);
+        var snap_object_y = GetSnapObject([y], 0, this.snapY);
+        if(snap_object_x.point !== null)
+        {
+            point_x = snap_object_x.point;
+        }
+        else
+        {
+            point_x = x;
+        }
+        if(snap_object_y.point !== null)
+        {
+            point_y = snap_object_y.point;
+        }
+        else
+        {
+            point_y = y;
+        }
+        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, point_x, point_y);
         this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
         this.drawingObjects.OnUpdateOverlay();
     };
@@ -4589,7 +4746,8 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+
+            editor.sync_EndAddShape();
 
         }
     };
@@ -4656,7 +4814,7 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+            editor.sync_EndAddShape();
 
         }
     };
@@ -4756,7 +4914,8 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+
+            editor.sync_EndAddShape();
 
         }
     };
@@ -4874,7 +5033,8 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+
+            editor.sync_EndAddShape();
 
         }
     };
@@ -5066,7 +5226,8 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-       
+
+        editor.sync_EndAddShape();
 
 
     };
@@ -5218,7 +5379,8 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
             this.drawingObjectsController.clearTrackObjects();
             this.drawingObjects.OnUpdateOverlay();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-           
+
+            editor.sync_EndAddShape();
 
         }
     };

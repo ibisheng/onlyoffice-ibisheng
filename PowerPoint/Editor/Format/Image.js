@@ -98,6 +98,17 @@ CImageShape.prototype =
 
     },
 
+    getSnapArrays: function(snapX, snapY)
+    {
+        var transform = this.getTransformMatrix();
+        snapX.push(transform.tx);
+        snapX.push(transform.tx + this.extX*0.5);
+        snapX.push(transform.tx + this.extX);
+        snapY.push(transform.ty);
+        snapY.push(transform.ty + this.extY*0.5);
+        snapY.push(transform.ty + this.extY);
+    },
+
     getBoundsInGroup: function()
     {
         var r = isRealNumber(this.rot) ? this.rot : 0;

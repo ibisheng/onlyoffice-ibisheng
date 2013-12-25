@@ -3257,7 +3257,6 @@ CGraphicObjects.prototype = {
         }
     },
 
-
     remove: function(Count, bOnlyText, bRemoveOnlySelection)
     {
         switch (this.State.id)
@@ -3649,7 +3648,6 @@ CGraphicObjects.prototype = {
         this.State.onMouseUp(e, x, y);
     },
 
-
     onMouseUp2: function(e, x, y)
     {
         this.State.onMouseUp(e, x, y);
@@ -3671,7 +3669,6 @@ CGraphicObjects.prototype = {
     {
         this.State.updateCursorType(e, x, y);
     },
-
 
     updateSelectionState: function()
     {
@@ -3707,6 +3704,19 @@ CGraphicObjects.prototype = {
     clearTrackObjects: function()
     {
         this.arrTrackObjects.length = 0;
+    },
+
+    getSnapArraysTrackObjects: function()
+    {
+        var snapX = [], snapY = [];
+        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+        {
+            if(this.arrTrackObjects[i].originalObject && this.arrTrackObjects[i].originalObject.getSnapArrays)
+            {
+                this.arrTrackObjects[i].originalObject.getSnapArrays(snapX, snapY);
+            }
+        }
+        return {snapX: snapX, snapY: snapY};
     },
 
     addTrackObject: function(trackObject)

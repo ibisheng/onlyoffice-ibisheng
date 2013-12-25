@@ -1191,6 +1191,20 @@ Slide.prototype =
         }
     },
 
+    getSnapArrays: function()
+    {
+        var snapX = [];
+        var snapY = [];
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(this.cSld.spTree[i].getSnapArrays)
+            {
+                this.cSld.spTree[i].getSnapArrays(snapX, snapY);
+            }
+        }
+        return {snapX: snapX, snapY: snapY};
+    },
+
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_Slide);
