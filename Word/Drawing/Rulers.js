@@ -326,6 +326,9 @@ function CHorRuler()
 
     this.CreateBackground = function(cachedPage)
     {
+        if (window["NATIVE_EDITOR_ENJINE"])
+            return;
+            
         if (null == cachedPage || undefined == cachedPage)
             return;
 
@@ -1866,6 +1869,9 @@ function CVerRuler()
 
     this.CreateBackground = function(cachedPage)
     {
+        if (window["NATIVE_EDITOR_ENJINE"])
+            return;
+            
         if (null == cachedPage || undefined == cachedPage)
             return;
         

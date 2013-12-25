@@ -504,6 +504,9 @@ var DocumentPageSize = new function() {
 
 function asc_docs_api(name)
 {
+    var CDocsCoApi      = window["CDocsCoApi"];
+    var CSpellCheckApi  = window["CSpellCheckApi"];
+
     History    = new CHistory();
     g_oTableId = new CTableId();
 
@@ -697,6 +700,9 @@ function asc_docs_api(name)
     {
         window.editor = this;
         window['editor'] = window.editor;
+        
+        if (window["NATIVE_EDITOR_ENJINE"])
+            editor = window.editor;
     }
 }
 
@@ -792,7 +798,7 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)
 {
     if ( true === bUpdate )
-        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     return this.SelectedObjectsStack;
 }
@@ -7101,7 +7107,10 @@ function  _asc_scrollTo (x,y)
 }
 function _getFullImageSrc(src)
 {
-	var start = src.substring(0, 6);
+    if (window["NATIVE_EDITOR_ENJINE"])
+        return src;
+    
+  	var start = src.substring(0, 6);
     if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
     {
         if (0 == src.indexOf(editor.DocumentUrl))
@@ -9421,3 +9430,191 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
     }
 }
 
+window["asc_docs_api"] = asc_docs_api;
+window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File)
+{
+	this.DocumentUrl = "TeamlabNative";
+
+	window.g_cAscCoAuthoringUrl = "";
+	window.g_cAscSpellCheckUrl = "";
+	
+	var asc_user = window["Asc"].asc_CUser;
+	this.User = new asc_user();
+	this.User.asc_setId("TM");
+	this.User.asc_setUserName("native");
+	
+	this.WordControl.m_bIsRuler = false;
+	this.WordControl.Init();
+	
+	this.InitEditor();
+	this.DocumentType = 2;
+	this.LoadedObjectDS = Common_CopyObj(this.WordControl.m_oLogicDocument.Get_Styles().Style);
+	
+	g_oIdCounter.Set_Load(true);
+
+	var openParams = {checkFileSize: this.isMobileVersion, charCount: 0, parCount: 0};
+	var oBinaryFileReader = new BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
+	
+	if(oBinaryFileReader.Read(base64File))
+	{
+		g_oIdCounter.Set_Load(false);
+		this.LoadedObject = 1;
+
+		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+	}
+	else
+		this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+		
+	//callback
+	this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+	var sizeMM;
+	if(this.DocumentOrientation)
+		sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
+	else
+		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
+	this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
+	this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+}
+
+window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    var Document = this.WordControl.m_oLogicDocument;
+
+    if (this.isApplyChangesOnOpenEnabled)
+    {
+        this.isApplyChangesOnOpenEnabled = false;
+        if (CollaborativeEditing.m_bUse == true)
+        {
+            this.isApplyChangesOnOpen = true;
+            CollaborativeEditing.Apply_Changes();
+            CollaborativeEditing.Release_Locks();
+            return;
+        }
+    }
+
+    //Recalculate HdrFtr
+    if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
+    {
+        var Header = Document.HdrFtr.Content[0].Header;
+        if(null != Header.First)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.First } );
+        if(null != Header.Even)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Even } );
+        if(null != Header.Odd)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Header.Odd } );
+    }
+    if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Footer)
+    {
+        var Footer = Document.HdrFtr.Content[0].Footer;
+        if(null != Footer.First)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.First } );
+        if(null != Footer.Even)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Even } );
+        if(null != Footer.Odd)
+            History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : Footer.Odd } );
+    }
+
+    History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : 0, PageNum : 0 } } );
+
+    //Recalculate для Document
+    Document.CurPos.ContentPos = 0;
+
+    var hdr = Document.HdrFtr.Content[0].Header;
+    var ftr = Document.HdrFtr.Content[0].Footer;
+    var drawing_objects = Document.DrawingObjects;
+    if(hdr.First != null || ftr.First != null)
+    {
+        drawing_objects.firstPage = new HeaderFooterGraphicObjects();
+    }
+    if(hdr.Even != null || ftr.Even != null)
+    {
+        if((hdr.Even != null && hdr.Even == hdr.First) || (ftr.Even != null && ftr.Even == ftr.First))
+            drawing_objects.evenPage = drawing_objects.firstPage;
+        else
+            drawing_objects.evenPage = new HeaderFooterGraphicObjects();
+    }
+    if(hdr.Odd != null || ftr.Odd != null)
+    {
+        if((hdr.Odd != null && hdr.Odd == hdr.First) || (ftr.Odd != null && ftr.Odd == ftr.First))
+            drawing_objects.oddPage = drawing_objects.firstPage;
+        else if((hdr.Odd != null && hdr.Odd == hdr.Even)|| (ftr.Odd != null && ftr.Odd == ftr.Even))
+            drawing_objects.oddPage = drawing_objects.evenPage;
+        else
+            drawing_objects.oddPage = new HeaderFooterGraphicObjects();
+    }
+
+
+    Document.DrawingObjects.calculateAfterOpen();
+    Document.DrawingObjects.calculateAfterChangeTheme();
+
+    Document.Recalculate();
+    
+    this.ShowParaMarks = false;
+}
+
+window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
+{
+    var _len = changes.length;
+	for (var i = 0; i < _len; i++)
+	{
+	    CollaborativeEditing.Add_Changes( changes[i] );
+	}
+	CollaborativeEditing.Apply_OtherChanges();
+}
+
+window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
+{
+	var oBinaryFileWriter = new BinaryFileWriter(this.WordControl.m_oLogicDocument);
+    return oBinaryFileWriter.Write();
+}
+
+window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
+{
+	if (true)
+	{
+		// pos не должен минимизироваться!!!
+
+		_memory1.Copy           = _memory1["Copy"];
+		_memory1.ClearNoAttack  = _memory1["ClearNoAttack"];
+		_memory1.WriteByte      = _memory1["WriteByte"];
+		_memory1.WriteBool      = _memory1["WriteBool"];
+		_memory1.WriteLong      = _memory1["WriteLong"];
+		_memory1.WriteDouble    = _memory1["WriteDouble"];
+		_memory1.WriteString    = _memory1["WriteString"];
+		_memory1.WriteString2   = _memory1["WriteString2"];
+		
+		_memory2.Copy           = _memory1["Copy"];
+		_memory2.ClearNoAttack  = _memory1["ClearNoAttack"];
+		_memory2.WriteByte      = _memory1["WriteByte"];
+		_memory2.WriteBool      = _memory1["WriteBool"];
+		_memory2.WriteLong      = _memory1["WriteLong"];
+		_memory2.WriteDouble    = _memory1["WriteDouble"];
+		_memory2.WriteString    = _memory1["WriteString"];
+		_memory2.WriteString2   = _memory1["WriteString2"];
+	}
+	
+	var _printer = new CDocumentRenderer();
+	_printer.Memory				    = _memory1;
+	_printer.VectorMemoryForPrint	= _memory2;
+	return _printer;
+},
+
+window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
+{
+}
+
+window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
+{
+	var page = this.WordControl.m_oDrawingDocument.m_arrPages[_page];
+    _printer.BeginPage(page.width_mm, page.height_mm);
+    this.WordControl.m_oLogicDocument.DrawPage(_page, _printer);
+    _printer.EndPage();
+}
+
+window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
+{
+	return this.WordControl.m_oDrawingDocument.m_lPagesCount;
+}

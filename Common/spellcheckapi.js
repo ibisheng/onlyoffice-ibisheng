@@ -201,5 +201,5 @@
     };
     global["CSpellCheckApi"] = CSpellCheckApi;
 
-})(this);
+})(window);
 

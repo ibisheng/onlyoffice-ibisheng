@@ -850,5 +850,4 @@
         return this.push.apply(this, rest);
     };*/
 
-})(this);
-
+})(window);
