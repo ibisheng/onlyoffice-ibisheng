@@ -3306,7 +3306,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			{
 			    if (true)
 			    {
-			        _memory1.pos            = _memory1["pos"];
+                    // pos не должен минимизироваться!!!
+
 			        _memory1.Copy           = _memory1["Copy"];
 			        _memory1.ClearNoAttack  = _memory1["ClearNoAttack"];
 			        _memory1.WriteByte      = _memory1["WriteByte"];
@@ -3316,7 +3317,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			        _memory1.WriteString    = _memory1["WriteString"];
 			        _memory1.WriteString2   = _memory1["WriteString2"];
     			    
-			        _memory2.pos            = _memory1["pos"];
 			        _memory2.Copy           = _memory1["Copy"];
 			        _memory2.ClearNoAttack  = _memory1["ClearNoAttack"];
 			        _memory2.WriteByte      = _memory1["WriteByte"];
