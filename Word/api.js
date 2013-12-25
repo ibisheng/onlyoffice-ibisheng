@@ -9560,7 +9560,10 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
     var _len = changes.length;
 	for (var i = 0; i < _len; i++)
 	{
-	    CollaborativeEditing.Add_Changes( changes[i] );
+	    var Changes = new CCollaborativeChanges();
+        Changes.Set_Id( changes[i]["id"] );
+        Changes.Set_Data( changes[i]["data"] );
+	    CollaborativeEditing.Add_Changes( Changes );
 	}
 	CollaborativeEditing.Apply_OtherChanges();
 }
