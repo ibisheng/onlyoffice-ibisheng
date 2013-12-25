@@ -161,6 +161,8 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
     this.brush = originalObject.brush;
     this.pen = originalObject.pen;
 
+
+    this.isLine = originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
     this.overlayObject = new OverlayObject(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transform);
@@ -212,7 +214,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                     if(_real_width < 0)
                         this.resizedflipH = !this.originalFlipH;
                     else
@@ -227,7 +229,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine  ? _abs_height : MIN_SHAPE_SIZE;
                 if(_real_height < 0)
                     this.resizedflipV = !this.originalFlipV;
                 else
@@ -268,7 +270,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     kd1 = _temp;
                     _real_height = this.usedExtY*kd2;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                     if(_real_height < 0)
                         this.resizedflipV = !this.originalFlipV;
                     else
@@ -277,7 +279,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                 if(_real_width < 0)
                     this.resizedflipH = !this.originalFlipH;
                 else
@@ -317,7 +319,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                     if(_real_width < 0)
                         this.resizedflipH = !this.originalFlipH;
                     else
@@ -332,7 +334,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                 if(_real_height < 0)
                     this.resizedflipV = !this.originalFlipV;
                 else
@@ -371,7 +373,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 {
                     _real_height = this.usedExtY*kd1;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                     if(_real_height < 0)
                         this.resizedflipV = !this.originalFlipV;
                     else
@@ -386,7 +388,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
                 _real_width = this.usedExtX*kd2;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                 if(_real_width < 0)
                     this.resizedflipH = !this.originalFlipH;
                 else
@@ -475,7 +477,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             {
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                 this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
 
             }
@@ -488,7 +490,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
             _real_height = this.usedExtY*kd2;
             _abs_height = Math.abs(_real_height);
-            this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+            this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
             this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
 
 
@@ -503,13 +505,13 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                 this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
 
             }
             _real_width = this.usedExtX*kd1;
             _abs_width = Math.abs(_real_width);
-            this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+            this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
             this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
 
         }
@@ -690,6 +692,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
     this.geometry = originalObject.spPr.geometry.createDuplicate();
     this.brush = originalObject.brush;
     this.pen = originalObject.pen;
+    this.isLine = originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";
 
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
@@ -742,7 +745,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine  ? _abs_width : MIN_SHAPE_SIZE;
                     if(_real_width < 0)
                         this.resizedflipH = !this.originalFlipH;
                     else
@@ -757,7 +760,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                 if(_real_height < 0)
                     this.resizedflipV = !this.originalFlipV;
                 else
@@ -798,7 +801,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
                     kd1 = _temp;
                     _real_height = this.usedExtY*kd2;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                     if(_real_height < 0)
                         this.resizedflipV = !this.originalFlipV;
                     else
@@ -807,7 +810,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine  ? _abs_width : MIN_SHAPE_SIZE;
                 if(_real_width < 0)
                     this.resizedflipH = !this.originalFlipH;
                 else
@@ -847,7 +850,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                     if(_real_width < 0)
                         this.resizedflipH = !this.originalFlipH;
                     else
@@ -862,7 +865,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                 if(_real_height < 0)
                     this.resizedflipV = !this.originalFlipV;
                 else
@@ -901,7 +904,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
                 {
                     _real_height = this.usedExtY*kd1;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE  ? _abs_height : MIN_SHAPE_SIZE;
+                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.isLine ? _abs_height : MIN_SHAPE_SIZE;
                     if(_real_height < 0)
                         this.resizedflipV = !this.originalFlipV;
                     else
@@ -916,7 +919,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
                 _real_width = this.usedExtX*kd2;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE  ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.isLine ? _abs_width : MIN_SHAPE_SIZE;
                 if(_real_width < 0)
                     this.resizedflipH = !this.originalFlipH;
                 else

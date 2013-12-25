@@ -84,6 +84,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     pen.Fill.calculate(theme, drawingObjects, drawingObjects.Layout, drawingObjects.Layout.Master, RGBA);
     brush.calculate(theme, drawingObjects, drawingObjects.Layout, drawingObjects.Layout.Master, RGBA);
 
+    this.isLine = this.presetGeom === "line";
 
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
     this.shape = null;
@@ -93,7 +94,19 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         var abs_dist_x = Math.abs(real_dist_x);
         var real_dist_y = y - this.startY;
         var abs_dist_y = Math.abs(real_dist_y);
-
+        this.flipH = false;
+        this.flipV = false;
+        if(this.isLine)
+        {
+            if(x < this.startX)
+            {
+                this.flipH = true;
+            }
+            if(y < this.startY)
+            {
+                this.flipV = true;
+            }
+        }
         if(!(e.CtrlKey || e.ShiftKey))
         {
             if(real_dist_x >= 0)
@@ -102,7 +115,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             }
             else
             {
-                this.x = abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - MIN_SHAPE_SIZE;
+                this.x = abs_dist_x >= MIN_SHAPE_SIZE || this.isLine ? x : this.startX - MIN_SHAPE_SIZE;
             }
 
             if(real_dist_y >= 0)
@@ -111,7 +124,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             }
             else
             {
-                this.y = abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - MIN_SHAPE_SIZE;
+                this.y = abs_dist_y >= MIN_SHAPE_SIZE || this.isLine ? y : this.startY - MIN_SHAPE_SIZE;
             }
 
             this.extX = abs_dist_x >= MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
@@ -120,7 +133,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
         else if(e.CtrlKey && !e.ShiftKey)
         {
-            if(abs_dist_x >= MIN_SHAPE_SIZE_DIV2)
+            if(abs_dist_x >= MIN_SHAPE_SIZE_DIV2 || this.isLine)
             {
                 this.x = this.startX - abs_dist_x;
                 this.extX = 2*abs_dist_x;
@@ -131,7 +144,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
                 this.extX = MIN_SHAPE_SIZE;
             }
 
-            if(abs_dist_y >= MIN_SHAPE_SIZE_DIV2)
+            if(abs_dist_y >= MIN_SHAPE_SIZE_DIV2 || this.isLine)
             {
                 this.y = this.startY - abs_dist_y;
                 this.extY = 2*abs_dist_y;
@@ -144,6 +157,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
         else if(!e.CtrlKey && e.ShiftKey)
         {
+
             var new_width, new_height;
             var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
             if(abs_dist_y === 0)
@@ -204,6 +218,24 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
                 this.y = this.startY;
             else
                 this.y = this.startY - this.extY;
+
+            if(this.isLine)
+            {
+                var angle = Math.atan2(real_dist_y, real_dist_x);
+                if(angle >=0 && angle <= Math.PI/8
+                    || angle <= 0 && angle >= -Math.PI/8
+                    || angle >= 7*Math.PI/8 && angle <= Math.PI )
+                {
+                    this.extY = 0;
+                    this.y = this.startY;
+                }
+                else if(angle >= 3*Math.PI/8 && angle <= 5*Math.PI/8
+                    || angle <= -3*Math.PI/8 && angle >= -5*Math.PI/8)
+                {
+                    this.extX = 0;
+                    this.x = this.startX;
+                }
+            }
         }
         else
         {
@@ -263,7 +295,14 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
         this.overlayObject.updateExtents(this.extX, this.extY);
         this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+        var hc = this.extX * 0.5;
+        var vc = this.extY * 0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if (this.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if (this.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
     };
 
     this.ctrlDown = function()
