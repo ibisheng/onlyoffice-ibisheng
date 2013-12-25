@@ -628,7 +628,7 @@ CChartAsGroup.prototype =
                 if(typeof  this.chart.yAxis.title === "string" && this.chart.yAxis.title.length > 0)
                 {
 
-                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
                     var tx_body = new CTextBody(chart_title);
                     tx_body.setVert(90);
                     var title_str = this.chart.yAxis.title;
@@ -663,7 +663,7 @@ CChartAsGroup.prototype =
                 if(typeof  this.chart.yAxis.title === "string" && this.chart.yAxis.title.length > 0)
                 {
 
-                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+                    var chart_title = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
                     var tx_body = new CTextBody(chart_title);
                     tx_body.setVert(90);
                     var title_str = this.chart.yAxis.title;
