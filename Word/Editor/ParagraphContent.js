@@ -7666,14 +7666,14 @@ ParaPresentationNumbering.prototype =
 };
 
 // Класс ParaMath
-function ParaMath()
+function ParaMath(bAddMenu)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
     this.Type  = para_Math;
 
     this.Jc   = undefined;
-    this.Math = new CMathComposition();
+	this.Math = new CMathComposition();
     this.Math.Parent = this;
 
     this.Inline = false; // внутристроковая формула или нет (проверяемся внутри Internal_Recalculate_0)
@@ -7694,8 +7694,9 @@ function ParaMath()
     this.CurLines = 0;
     this.CurRange = 0;
 
-    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+	if (!bAddMenu)		
+		g_oTableId.Add( this, this.Id );
 
     // TODO:
     // по двойному, тройному клику селект элемента (мат. объекта/Run), формулы
@@ -7975,11 +7976,29 @@ ParaMath.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-
+		Writer.WriteLong( historyitem_type_Math );
+		
+		var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+		
+		//this.bs.WriteItem(c_oSerParType.OMathPara, function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
     },
 
     Read_FromBinary2 : function(Reader)
     {
+		var oThis = this;
+		this.boMathr = new Binary_oMathReader(Reader);
+		this.bcr = new Binary_CommonReader(Reader);
+		
+		var length = Reader.GetUChar();
+		
+		var res = false;
+		Reader.cur += 3;
+		res = this.bcr.Read1(length, function(t, l){
+			return oThis.boMathr.ReadMathOMathPara(t,l,oThis.Math);
+		});
 
     },
 

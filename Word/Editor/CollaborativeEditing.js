@@ -155,6 +155,7 @@ function CTableId()
             case historyitem_type_Style            : Element = new CStyle(); break;
             case historyitem_type_TextBody         : Element = new CTextBody(); break;
             case historyitem_type_ChartTitle       : Element = new CChartTitle(); break;
+			case historyitem_type_Math		       : Element = new ParaMath(); break;
         }
 
         Element.Read_FromBinary2(Reader);

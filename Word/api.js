@@ -7343,9 +7343,8 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
-        var MathElement = new ParaMath();
-        // TODO: в зависимости от типа Type сделать заполнение MathElement
-		
+        var bAddMenu = true;
+		var MathElement = new ParaMath(bAddMenu);		
 		var props = new Object();
 		
 		switch (Type)
@@ -9417,7 +9416,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oElem.fillPlaceholders();
 						break;
 		}
-
+		g_oTableId.Add( MathElement, MathElement.Id );
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 }

@@ -379,6 +379,7 @@ var historyitem_type_Style            = 29;
 var historyitem_type_Styles           = 30;
 var historyitem_type_TextBody         = 31;
 var historyitem_type_ChartTitle       = 32;
+var historyitem_type_Math			  = 33;
 
 
 //Типы изменений в классе CChartAsGroup
