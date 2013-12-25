@@ -21,7 +21,6 @@
         "sdk": {
             "src": [
                 "../../Common/Build/License.js",
-                "../../Common/Merge/NodejsEnv.js",
                 "../../Common/browser.js",
                 "../../Common/docscoapisettings.js",
                 "../../Common/docscoapicommon.js",
@@ -117,7 +116,6 @@
                 "../../Word/Editor/SerializeCommon.js",
                 "../../Word/apiDefines.js",
                 "../../Word/api-all.js",
-                "../../Word/merge/api_merge.js",
                 "../../Word/Build/Log/apiExport.js",
                 "../../Word/document/empty.js",
                 "../../Excel/graphics/DrawingContextWord.js"
