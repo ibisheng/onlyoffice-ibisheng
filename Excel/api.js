@@ -3277,8 +3277,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					        this.wbModel,
 					        this.controller,
 					        this.handlers,
-					        window._null_object,
-					        window._null_object,
+					        window["_null_object"],
+					        window["_null_object"],
 					        this,
 					        this.collaborativeEditing,
 					        this.fontRenderingMode,
@@ -3304,7 +3304,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_nativeCheckPdfRenderer : function(_memory1, _memory2)
 			{
-			    if (undefined == _memory1.pos)
+			    if (true)
 			    {
 			        _memory1.pos            = _memory1["pos"];
 			        _memory1.Copy           = _memory1["Copy"];
