@@ -212,19 +212,12 @@
 						.on("input."     + namespace, function () {return t._onInputTextArea.apply(t, arguments);});
 
 				// check input, it may have zero len, for mobile version
-				if (t.input) {
+				if (t.input && t.input.addEventListener) {
 					// Не поддерживаем drop на верхнюю строку
-					if (document.addEventListener) {
-						t.input.addEventListener("drop", function (e) {
-							e.preventDefault();
-							return false;
-						}, false);
-					} else {
-						t.input.attachEvent("ondrop", function (e) {
-							e.preventDefault();
-							return false;
-						});
-					}
+					t.input.addEventListener("drop", function (e) {
+						e.preventDefault();
+						return false;
+					}, false);
 				}
 			},
 

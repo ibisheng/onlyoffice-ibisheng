@@ -348,18 +348,19 @@
 				    });
     				
 
-				    $(this.input)
-						    .on("focus", function () {
-							    self.input.isFocused = true;
-							    if (self.controller.settings.isViewerMode) {
-								    return;
-							    }
-							    self.controller.setStrictClose(true);
-							    self.cellEditor.callTopLineMouseup = true;
-							    if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode) {
-								    self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
-							    }
-						    });
+					if (this.input && this.input.addEventListener) {
+						this.input.addEventListener("focus", function () {
+							self.input.isFocused = true;
+							if (self.controller.settings.isViewerMode) {
+								return;
+							}
+							self.controller.setStrictClose(true);
+							self.cellEditor.callTopLineMouseup = true;
+							if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode) {
+								self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
+							}
+						}, false);
+					}
 
 				    this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics, this.m_oFont,
 						    /*handlers*/{
