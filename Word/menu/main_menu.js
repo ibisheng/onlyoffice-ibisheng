@@ -1010,20 +1010,34 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.Document_CreateFontMap();
 
 
-            Menu_Hyperlink_Add();
+            //Menu_Hyperlink_Add();
             //editor.WordControl.m_oLogicDocument.Add_DropCap();
 
             //editor.WordControl.m_oLogicDocument.Search_Start(String);
+
+            //var Math = new ParaMath();
+            //Math.Math.test_for_edit();
+
+            //editor.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            //editor.WordControl.m_oLogicDocument.Paragraph_Add( Math );
+
+            editor.WordControl.m_oLogicDocument.LoadTestDocument();
+
+
 			break;
 		case "td_indent":
 
             //var Time = History.Get_EditingTime(10000);
             //alert("Время редактирования " + (Time / 1000) );
 
-			editor.IncreaseIndent()
+			//editor.IncreaseIndent()
+			editor.WordControl.m_oLogicDocument.Run_TestRecalculate();
+
 			break;
 		case "td_outdent":
-			editor.DecreaseIndent();
+			//editor.DecreaseIndent();
+
+			editor.WordControl.m_oLogicDocument.LoadTestDocument2();
 			break;
 		case "bulletedlist":
             if ($("#td_bulletedlist").hasClass("iconPressed")){

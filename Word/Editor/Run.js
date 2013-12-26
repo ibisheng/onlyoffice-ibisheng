@@ -15,6 +15,7 @@ function ParaRun(Document)
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
     this.CompiledPr = new CTextPr();             // Скомпилированные настройки
     this.RecalcInfo = new CParaRunRecalcInfo();  // Флаги для пересчета (там же флаг пересчета стиля)
+    this.TextRun    = false;
 
     this.TextAscent  = 0; // текстовый ascent + linegap
     this.TextDescent = 0; // текстовый descent
@@ -87,10 +88,13 @@ ParaRun.prototype =
         g_oTextMeasurer.SetTextPr( Pr );
         g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 
+        var bText   = false;
+        var bNoText = false;
+
         // Запрашиваем текущие метрики шрифта, под TextAscent мы будем понимать ascent + linegap(которые записаны в шрифте)
         this.TextHeight  = g_oTextMeasurer.GetHeight();
-        this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );;
-        this.TextAscent  = TextHeight - TextDescent;
+        this.TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
+        this.TextAscent  = this.TextHeight - this.TextDescent;
         this.TextAscent2 = g_oTextMeasurer.GetAscender();
         this.YOffset     = Pr.Position;
 
@@ -99,6 +103,11 @@ ParaRun.prototype =
         for ( var Pos = 0; Pos < ContentLength; Pos++ )
         {
             var Item = this.Content[Pos];
+
+            if ( ( para_Text === Item.Type && true !== Item.SpaceAfter ) || para_Sym === Item.Type )
+                bText = true;
+            else
+                bNoText = true;
 
             if ( para_Drawing === Item.Type )
             {
@@ -110,6 +119,12 @@ ParaRun.prototype =
             Item.Measure( g_oTextMeasurer, Pr );
         }
 
+        if ( true === bText && true !== bNoText )
+            this.TextRun = true;
+        else
+            this.TextRun = false;
+
+        this.RecalcInfo.Recalc  = true;
         this.RecalcInfo.Measure = false;
     },
 
@@ -153,235 +168,309 @@ ParaRun.prototype =
             RangeStartPos = Line.Ranges[CurRange - 1].EndPos;
         }
 
-        var ContentLen = this.Content.length;
-
-        var Pos = RangeStartPos;
-        while ( Pos < ContentLen )
+        var FastRecalc = false;
+        if ( true === this.TextRun && false === this.RecalcInfo.Recalc )
         {
-            if ( false === PRS.StartWord && true === PRS.FirstItemOnLine && Math.abs( PRS.XEnd - PRS.X ) < 0.001 && PRS.RangesCount > 0 )
+            // Отмечаем, что началось слово
+            PRS.StartWord = true;
+
+            // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
+            var RunLen = this.RecalcInfo.RunLen;
+
+            if ( true !== PRS.Word )
             {
-                PRS.NewRange = true;
-                RangeEndPos  = Pos;
-                break;
+                if ( PRS.X + PRS.SpaceLen + RunLen <= PRS.XEnd )
+                {
+                    // Отмечаем начало нового слова
+                    PRS.Set_LineBreakPos( 0 );
+                    PRS.WordLen = RunLen;
+                    PRS.Word    = true;
+                    FastRecalc  = true;
+                }
             }
-
-            var Item     = this.Content[Pos];
-            var ItemType = Item.Type;
-
-            // Проверяем, не нужно ли добавить нумерацию к данному элементу
-            if ( true === this.Internal_Recalculate_Numbering( Item, PRS, ParaPr ) )
-                RRS.Set_NumberingPos( Pos, Item );
-
-            switch( Item.Type )
+            else
             {
-                case para_Sym:
-                case para_Text:
+                if ( PRS.X + PRS.SpaceLen + PRS.WordLen + RunLen <= PRS.XEnd )
                 {
-                    // Отмечаем, что началось слово
-                    PRS.StartWord = true;
+                    PRS.WordLen += LetterLen;
+                    FastRecalc   = true;
+                }
+            }
+        }
 
-                    // Пересчитаем метрику строки относительно размера данного текста
-                    this.Internal_Recalculate_LineMetrics( PRS, ParaPr.Spacing.LineRule );
+        var ContentLen = this.Content.length;
+        if ( true === this.TextRun && true === this.RecalcInfo.Recalc )
+        {
+            var RunLen = 0;
 
-                    // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
-                    var LetterLen = Item.Width;
-                    if ( true !== PRS.Word )
-                    {
-                        // Слово только началось. Делаем следующее:
-                        // 1) Если до него на строке ничего не было и данная строка не
-                        //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
-                        // 2) В противном случае, проверяем убирается ли слово в промежутке.
+            for (var Pos = 0; Pos < ContentLen; Pos++)
+                RunLen += this.Content[Pos].Width;
 
-                        // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
-                        if ( !bFirstItemOnLine || false === Para.Internal_Check_Ranges(PRS.Line, PRS.Range) )
-                        {
-                            if ( PRS.X + PRS.SpaceLen + LetterLen > PRS.XEnd )
-                            {
-                                PRS.NewRange = true;
-                                RangeEndPos  = Pos;
-                            }
-                        }
+            this.RecalcInfo.RunLen = RunLen;
+        }
 
-                        if ( true !== PRS.NewRange )
-                        {
-                            // Отмечаем начало нового слова
-                            PRS.Set_LineBreakPos( Pos );
-                            PRS.WordLen = Item.Width;
-                            PRS.Word    = true;
-                        }
-                    }
-                    else
-                    {
-                        if ( PRS.X + PRS.SpaceLen + PRS.WordLen + LetterLen > PRS.XEnd )
-                        {
-                            if ( true === PRS.FirstItemOnLine )
-                            {
-                                // Слово оказалось единственным элементом в промежутке, и, все равно,
-                                // не умещается целиком. Делаем следующее:
-                                //
-                                // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
-                                //    текущей позиции.
-                                // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
-                                //    ставим перенос внутри строки в начале слова.
-                                // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
-                                //    строки в начале слова.
+        if ( true === FastRecalc )
+        {
+            // Пересчитаем метрику строки относительно размера данного текста
+            this.Internal_Recalculate_LineMetrics( PRS, LineRule );
 
-                                if ( false === Para.Internal_Check_Ranges(PRS.Line, PRS.Range)  )
-                                {
-                                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                                    PRS.MoveToLBP = true;
-                                    PRS.NewRange  = true;
-                                }
-                                else
-                                {
-                                    PRS.EmptyLine  = false;
-                                    PRS.X         += PRS.WordLen;
+            RangeEndPos = ContentLen;
+        }
+        else //if ( false === FastRecalc )
+        {
+            var MoveToLBP       = PRS.MoveToLBP;
+            var NewRange        = PRS.NewRange;
+            var ForceNewPage    = PRS.ForceNewPage;
+            var NewPage         = PRS.NewPage;
+            var BreakPageLine   = PRS.BreakPageLine;
+            var End             = PRS.End;
 
-                                    // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
-                                    // делим слово в данном месте
-                                    PRS.NewRange = true;
-                                    RangeEndPos  = Pos;
-                                }
-                            }
-                            else
-                            {
-                                // Слово не убирается в отрезке. Переносим слово в следующий отрезок
-                                PRS.MoveToLBP = true;
-                                PRS.NewRange  = true;
-                            }
-                        }
+            var Word            = PRS.Word;
+            var StartWord       = PRS.StartWord;
+            var FirstItemOnLine = PRS.FirstItemOnLine;
+            var EmptyLine       = PRS.EmptyLine;
 
-                        if ( true !== PRS.NewRange )
-                        {
-                            // Мы убираемся в пределах данной строки. Прибавляем ширину буквы к ширине слова
-                            PRS.WordLen += LetterLen;
+            var RangesCount     = PRS.RangesCount;
 
-                            // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if ( true === Item.SpaceAfter )
-                            {
-                                // Добавляем длину пробелов до слова и ширину самого слова.
-                                PRS.X += PRS.SpaceLen + PRS.WordLen;
+            var SpaceLen        = PRS.SpaceLen;
+            var WordLen         = PRS.WordLen;
+            var SpacesCount     = PRS.SpacesCount;
 
-                                PRS.Word            = false;
-                                PRS.FirstItemOnLine = false;
-                                PRS.EmptyLine       = false;
-                                PRS.SpaceLen        = 0;
-                                PRS.WordLen         = 0;
-                                PRS.SpacesCount     = 0;
-                            }
-                        }
-                    }
+            var X               = PRS.X;
+            var XEnd            = PRS.XEnd;
 
+            var ParaLine        = PRS.Line;
+            var ParaRange       = PRS.Range;
+
+            var LineRule = ParaPr.Spacing.LineRule;
+
+            var Pos = RangeStartPos;
+            while ( Pos < ContentLen )
+            {
+                if ( false === StartWord && true === FirstItemOnLine && Math.abs( XEnd - X ) < 0.001 && RangesCount > 0 )
+                {
+                    NewRange    = true;
+                    RangeEndPos = Pos;
                     break;
                 }
-                case para_Space:
+
+                var Item     = this.Content[Pos];
+                var ItemType = Item.Type;
+
+                // Проверяем, не нужно ли добавить нумерацию к данному элементу
+                if ( true === this.Internal_Recalculate_Numbering( Item, PRS, ParaPr ) )
+                    PRS.Set_NumberingPos( Pos, Item );
+
+                switch( Item.Type )
                 {
-                    PRS.FirstItemOnLine = false;
-
-                    if ( true === PRS.Word )
+                    case para_Sym:
+                    case para_Text:
                     {
-                        // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                        // убирается ли слово, мы это проверяем при добавленнии букв.
-                        PRS.X += PRS.SpaceLen + PRS.WordLen;
+                        // Отмечаем, что началось слово
+                        StartWord = true;
 
-                        PRS.Word        = false;
-                        PRS.EmptyLine   = false;
-                        PRS.SpaceLen    = 0;
-                        PRS.WordLen     = 0;
-                        PRS.SpacesCount = 1;
-                    }
-                    else
-                        PRS.SpacesCount++;
+                        // Пересчитаем метрику строки относительно размера данного текста
+                        this.Internal_Recalculate_LineMetrics( PRS, LineRule );
 
-                    // На пробеле не делаем перенос. Перенос строки или внутристрочный
-                    // перенос делаем при добавлении любого непробельного символа
-                    PRS.SpaceLen += Item.Width;
-
-                    break;
-                }
-                case para_Drawing:
-                {
-                    if ( true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape() )
-                    {
-                        if ( true !== Item.Is_Inline() )
-                            Item.Set_DrawingType( drawing_Inline );
-
-                        if ( true === PRS.StartWord )
-                            PRS.FirstItemOnLine = false;
-
-                        // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
-                        // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
-                        // данный элемент убирается
-                        if ( true === PRS.Word || PRS.WordLen > 0 )
+                        // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
+                        var LetterLen = Item.Width;
+                        if ( true !== Word )
                         {
-                            // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                            // убирается ли слово, мы это проверяем при добавленнии букв.
-                            PRS.X += PRS.SpaceLen + PRS.WordLen;
+                            // Слово только началось. Делаем следующее:
+                            // 1) Если до него на строке ничего не было и данная строка не
+                            //    имеет разрывов, тогда не надо проверять убирается ли слово в строке.
+                            // 2) В противном случае, проверяем убирается ли слово в промежутке.
 
-                            PRS.Word        = false;
-                            PRS.EmptyLine   = false;
-                            PRS.SpaceLen    = 0;
-                            PRS.WordLen     = 0;
-                            PRS.SpacesCount = 0;
-                        }
+                            // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
+                            if ( true !== FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) )
+                            {
+                                if ( X + SpaceLen + LetterLen > XEnd )
+                                {
+                                    NewRange    = true;
+                                    RangeEndPos = Pos;
+                                }
+                            }
 
-                        if ( PRS.X + PRS.SpaceLen + Item.Width > PRS.XEnd && ( false === PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges( PRS.Line, PRS.Range ) ) )
-                        {
-                            // Автофигура не убирается, ставим перенос перед ней
-                            PRS.NewRange = true;
-                            RangeEndPos  = Pos;
+                            if ( true !== NewRange )
+                            {
+                                // Отмечаем начало нового слова
+                                PRS.Set_LineBreakPos( Pos );
+                                WordLen = Item.Width;
+                                Word    = true;
+                            }
                         }
                         else
                         {
-                            // Обновим метрики строки
-                            if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                            if ( X + SpaceLen + WordLen + LetterLen > XEnd )
                             {
-                                if ( PRS.LineAscent < Item.Height )
-                                    PRS.LineAscent = Item.Height;
+                                if ( true === FirstItemOnLine )
+                                {
+                                    // Слово оказалось единственным элементом в промежутке, и, все равно,
+                                    // не умещается целиком. Делаем следующее:
+                                    //
+                                    // 1) Если у нас строка без вырезов, тогда ставим перенос строки на
+                                    //    текущей позиции.
+                                    // 2) Если у нас строка с вырезом, и данный вырез не последний, тогда
+                                    //    ставим перенос внутри строки в начале слова.
+                                    // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
+                                    //    строки в начале слова.
+
+                                    if ( false === Para.Internal_Check_Ranges(ParaLine, ParaRange)  )
+                                    {
+                                        // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                        MoveToLBP = true;
+                                        NewRange  = true;
+                                    }
+                                    else
+                                    {
+                                        EmptyLine   = false;
+                                        X          += WordLen;
+
+                                        // Слово не убирается в отрезке, но, поскольку, слово 1 на строке и отрезок тоже 1,
+                                        // делим слово в данном месте
+                                        NewRange    = true;
+                                        RangeEndPos = Pos;
+                                    }
+                                }
+                                else
+                                {
+                                    // Слово не убирается в отрезке. Переносим слово в следующий отрезок
+                                    MoveToLBP = true;
+                                    NewRange  = true;
+                                }
+                            }
+
+                            if ( true !== NewRange )
+                            {
+                                // Мы убираемся в пределах данной строки. Прибавляем ширину буквы к ширине слова
+                                WordLen += LetterLen;
+
+                                // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
+                                if ( true === Item.SpaceAfter )
+                                {
+                                    // Добавляем длину пробелов до слова и ширину самого слова.
+                                    X += SpaceLen + WordLen;
+
+                                    Word            = false;
+                                    FirstItemOnLine = false;
+                                    EmptyLine       = false;
+                                    SpaceLen        = 0;
+                                    WordLen         = 0;
+                                    SpacesCount     = 0;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case para_Space:
+                    {
+                        FirstItemOnLine = false;
+
+                        if ( true === Word )
+                        {
+                            // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+                            // убирается ли слово, мы это проверяем при добавленнии букв.
+                            X += SpaceLen + WordLen;
+
+                            Word        = false;
+                            EmptyLine   = false;
+                            SpaceLen    = 0;
+                            WordLen     = 0;
+                            SpacesCount = 1;
+                        }
+                        else
+                            SpacesCount++;
+
+                        // На пробеле не делаем перенос. Перенос строки или внутристрочный
+                        // перенос делаем при добавлении любого непробельного символа
+                        SpaceLen += Item.Width;
+
+                        break;
+                    }
+                    case para_Drawing:
+                    {
+                        if ( true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape() )
+                        {
+                            if ( true !== Item.Is_Inline() )
+                                Item.Set_DrawingType( drawing_Inline );
+
+                            if ( true === StartWord )
+                                FirstItemOnLine = false;
+
+                            // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
+                            // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
+                            // данный элемент убирается
+                            if ( true === Word || WordLen > 0 )
+                            {
+                                // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+                                // убирается ли слово, мы это проверяем при добавленнии букв.
+                                X += SpaceLen + WordLen;
+
+                                Word        = false;
+                                EmptyLine   = false;
+                                SpaceLen    = 0;
+                                WordLen     = 0;
+                                SpacesCount = 0;
+                            }
+
+                            if ( X + SpaceLen + Item.Width > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges( ParaLine, ParaRange ) ) )
+                            {
+                                // Автофигура не убирается, ставим перенос перед ней
+                                NewRange    = true;
+                                RangeEndPos = Pos;
                             }
                             else
                             {
-                                if ( PRS.LineAscent < Item.Height + this.YOffset )
-                                    PRS.LineAscent = Item.Height + this.YOffset;
+                                // Обновим метрики строки
+                                if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                                {
+                                    if ( PRS.LineAscent < Item.Height )
+                                        PRS.LineAscent = Item.Height;
+                                }
+                                else
+                                {
+                                    if ( PRS.LineAscent < Item.Height + this.YOffset )
+                                        PRS.LineAscent = Item.Height + this.YOffset;
 
-                                if ( PRS.LineDescent < -this.YOffset )
-                                    PRS.LineDescent = -this.YOffset;
+                                    if ( PRS.LineDescent < -this.YOffset )
+                                        PRS.LineDescent = -this.YOffset;
+                                }
+
+                                // Добавляем длину пробелов до автофигуры
+                                X += SpaceLen + Item.Width;
+
+                                FirstItemOnLine = false;
+                                EmptyLine       = false;
                             }
 
-                            // Добавляем длину пробелов до автофигуры
-                            PRS.X += PRS.SpaceLen + Item.Width;
-
-                            PRS.FirstItemOnLine = false;
-                            PRS.EmptyLine       = false;
+                            SpaceLen    = 0;
+                            SpacesCount = 0;
                         }
-
-                        PRS.SpaceLen    = 0;
-                        PRS.SpacesCount = 0;
-                    }
-                    else
-                    {
-                        // TODO: переделать здесь
-                        Para.Internal_Recalculate_1_AnchorDrawing();
-
-                        // Основная обработка происходит в Recalculate_Range_Spaces. Здесь обрабатывается единственный случай,
-                        // когда после второго пересчета с уже добавленной картинкой оказывается, что место в параграфе, где
-                        // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
-
-                        var LogicDocument  = Para.Parent;
-                        var LDRecalcInfo   = LogicDocument.RecalcInfo;
-                        var DrawingObjects = LogicDocument.DrawingObjects;
-                        var CurPage        = PRS.Page;
-
-                        if ( true === LDRecalcInfo.Check_FlowObject(Item) && true === LDRecalcInfo.Is_PageBreakBefore() )
+                        else
                         {
-                            LDRecalcInfo.Reset();
+                            // TODO: переделать здесь
+                            Para.Internal_Recalculate_1_AnchorDrawing();
 
-                            // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
-                            // если нет, тогда в начале текущей строки.
+                            // Основная обработка происходит в Recalculate_Range_Spaces. Здесь обрабатывается единственный случай,
+                            // когда после второго пересчета с уже добавленной картинкой оказывается, что место в параграфе, где
+                            // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
 
-                            if ( null != this.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage )
+                            var LogicDocument  = Para.Parent;
+                            var LDRecalcInfo   = LogicDocument.RecalcInfo;
+                            var DrawingObjects = LogicDocument.DrawingObjects;
+                            var CurPage        = PRS.Page;
+
+                            if ( true === LDRecalcInfo.Check_FlowObject(Item) && true === LDRecalcInfo.Is_PageBreakBefore() )
                             {
-                                // TODO: Переделать
+                                LDRecalcInfo.Reset();
+
+                                // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
+                                // если нет, тогда в начале текущей строки.
+
+                                if ( null != this.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage )
+                                {
+                                    // TODO: Переделать
 //                                // Мы должны из соответствующих FlowObjects удалить все Flow-объекты, идущие до этого места в параграфе
 //                                for ( var TempPos = StartPos; TempPos < Pos; TempPos++ )
 //                                {
@@ -392,25 +481,11 @@ ParaRun.prototype =
 //                                    }
 //                                }
 
-                                Para.Pages[CurPage].Set_EndLine( -1 );
-                                if ( 0 === CurLine )
-                                {
-                                    Para.Lines[-1] = new CParaLine(0);
-                                    Para.Lines[-1].Set_EndPos( -1 );
-                                }
-
-                                PRS.RecalcResult = recalcresult_NextPage;
-                                return;
-                            }
-                            else
-                            {
-                                if ( PRS.Line != Para.Pages[CurPage].FirstLine )
-                                {
-                                    this.Pages[CurPage].Set_EndLine( PRS.Line - 1 );
-                                    if ( 0 === PRS.Line )
+                                    Para.Pages[CurPage].Set_EndLine( -1 );
+                                    if ( 0 === CurLine )
                                     {
-                                        this.Lines[-1] = new CParaLine(0);
-                                        this.Lines[-1].Set_EndPos( -1 );
+                                        Para.Lines[-1] = new CParaLine(0);
+                                        Para.Lines[-1].Set_EndPos( -1 );
                                     }
 
                                     PRS.RecalcResult = recalcresult_NextPage;
@@ -418,223 +493,263 @@ ParaRun.prototype =
                                 }
                                 else
                                 {
-                                    RangeEndPos = Pos;
-                                    PRS.NewRange     = true;
-                                    PRS.ForceNewPage = true;
+                                    if ( ParaLine != Para.Pages[CurPage].FirstLine )
+                                    {
+                                        this.Pages[CurPage].Set_EndLine( ParaLine - 1 );
+                                        if ( 0 === ParaLine )
+                                        {
+                                            this.Lines[-1] = new CParaLine(0);
+                                            this.Lines[-1].Set_EndPos( -1 );
+                                        }
+
+                                        PRS.RecalcResult = recalcresult_NextPage;
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        RangeEndPos = Pos;
+                                        NewRange     = true;
+                                        ForceNewPage = true;
+                                    }
+                                }
+
+
+                                // Если до этого было слово, тогда не надо проверять убирается ли оно
+                                if ( true === Word || WordLen > 0 )
+                                {
+                                    // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+                                    // убирается ли слово, мы это проверяем при добавленнии букв.
+                                    X += SpaceLen + WordLen;
+
+                                    Word        = false;
+                                    SpaceLen    = 0;
+                                    WordLen     = 0;
+                                    SpacesCount = 0;
                                 }
                             }
-
-
-                            // Если до этого было слово, тогда не надо проверять убирается ли оно
-                            if ( true === PRS.Word || PRS.WordLen > 0 )
-                            {
-                                // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                                // убирается ли слово, мы это проверяем при добавленнии букв.
-                                PRS.X += PRS.SpaceLen + PRS.WordLen;
-
-                                PRS.Word        = false;
-                                PRS.SpaceLen    = 0;
-                                PRS.WordLen     = 0;
-                                PRS.SpacesCount = 0;
-                            }
                         }
+
+                        break;
                     }
-
-                    break;
-                }
-                case para_PageNum:
-                {
-                    // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
-                    // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
-                    // данный элемент убирается
-                    if ( true === PRS.Word || PRS.WordLen > 0 )
+                    case para_PageNum:
                     {
-                        // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                        // убирается ли слово, мы это проверяем при добавленнии букв.
-                        PRS.X += PRS.SpaceLen + PRS.WordLen;
-
-                        PRS.Word        = false;
-                        PRS.EmptyLine   = false;
-                        PRS.SpaceLen    = 0;
-                        PRS.WordLen     = 0;
-                        PRS.SpacesCount = 0;
-                    }
-
-                    // Если на строке начиналось какое-то слово, тогда данная строка уже не пустая
-                    if ( true === PRS.StartWord )
-                        PRS.FirstItemOnLine = false;
-
-                    this.Internal_Recalculate_LineMetrics( PRS, ParaPr.Spacing.LineRule );
-
-                    if ( PRS.X + PRS.SpaceLen + Item.Width > PRS.XEnd && ( false === PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges( PRS.Line, PRS.Range ) ) )
-                    {
-                        // Данный элемент не убирается, ставим перенос перед ним
-                        PRS.NewRange = true;
-                        RangeEndPos  = Pos;
-                    }
-                    else
-                    {
-                        // Добавляем длину пробелов до слова и ширину данного элемента
-                        PRS.X += PRS.SpaceLen + Item.Width;
-
-                        PRS.FirstItemOnLine = false;
-                        PRS.EmptyLine       = false;
-                    }
-
-                    PRS.SpaceLen    = 0;
-                    PRS.SpacesCount = 0;
-
-                    break;
-                }
-                case para_Tab:
-                {
-                    // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
-                    // его ширину.
-                    this.Internal_Recalculate_LastTab();
-
-                    // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
-                    // убирается ли слово, мы это проверяем при добавленнии букв.
-                    PRS.X += PRS.SpaceLen + PRS.WordLen;
-                    PRS.Word        = false;
-                    PRS.SpaceLen    = 0;
-                    PRS.WordLen     = 0;
-                    PRS.SpacesCount = 0;
-
-                    var NewX = Para.Internal_GetTabPos(X, ParaPr);
-
-                    // Если таб не левый (NewX < 0), значит он не может быть сразу рассчитан, а если левый, тогда
-                    // рассчитываем его сразу здесь
-                    if ( NewX < 0 )
-                    {
-                        PRS.LastTab.TabPos = -NewX;
-                        PRS.LastTab.Value  = Tab.Value;
-                        PRS.LastTab.X      = X;
-                        PRS.LastTab.Item   = Item;
-
-                        Item.Width        = 0;
-                        Item.WidthVisible = 0;
-                    }
-                    else
-                    {
-                        if ( NewX > PRS.XEnd && ( false === PRS.FirstItemOnLine || false === Para.Internal_Check_Ranges( PRS.Line, PRS.Range ) ) )
+                        // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
+                        // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
+                        // данный элемент убирается
+                        if ( true === Word || WordLen > 0 )
                         {
-                            PRS.WordLen = NewX - PRS.X;
+                            // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+                            // убирается ли слово, мы это проверяем при добавленнии букв.
+                            X += SpaceLen + WordLen;
 
-                            RangeEndPos  = Pos;
-                            PRS.NewRange = true;
+                            Word        = false;
+                            EmptyLine   = false;
+                            SpaceLen    = 0;
+                            WordLen     = 0;
+                            SpacesCount = 0;
+                        }
+
+                        // Если на строке начиналось какое-то слово, тогда данная строка уже не пустая
+                        if ( true === StartWord )
+                            FirstItemOnLine = false;
+
+                        this.Internal_Recalculate_LineMetrics( PRS, LineRule );
+
+                        if ( X + SpaceLen + Item.Width > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges( ParaLine, ParaRange ) ) )
+                        {
+                            // Данный элемент не убирается, ставим перенос перед ним
+                            NewRange    = true;
+                            RangeEndPos = Pos;
                         }
                         else
                         {
-                            Item.Width        = NewX - PRS.X;
-                            Item.WidthVisible = NewX - PRS.X;
+                            // Добавляем длину пробелов до слова и ширину данного элемента
+                            X += SpaceLen + Item.Width;
 
-                            PRS.X = NewX;
+                            FirstItemOnLine = false;
+                            EmptyLine       = false;
                         }
-                    }
 
-                    // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
-                    // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
-                    if ( PRS.RangesCount === CurRange )
+                        SpaceLen    = 0;
+                        SpacesCount = 0;
+
+                        break;
+                    }
+                    case para_Tab:
                     {
-                        if ( true === PRS.StartWord )
+                        // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
+                        // его ширину.
+                        this.Internal_Recalculate_LastTab(PRS);
+
+                        // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
+                        // убирается ли слово, мы это проверяем при добавленнии букв.
+                        X += SpaceLen + WordLen;
+                        Word        = false;
+                        SpaceLen    = 0;
+                        WordLen     = 0;
+                        SpacesCount = 0;
+
+                        var NewX = Para.Internal_GetTabPos(X, ParaPr);
+
+                        // Если таб не левый (NewX < 0), значит он не может быть сразу рассчитан, а если левый, тогда
+                        // рассчитываем его сразу здесь
+                        if ( NewX < 0 )
                         {
-                            PRS.FirstItemOnLine = false;
-                            PRS.EmptyLine       = false;
+                            PRS.LastTab.TabPos = -NewX;
+                            PRS.LastTab.Value  = Tab.Value;
+                            PRS.LastTab.X      = X;
+                            PRS.LastTab.Item   = Item;
+
+                            Item.Width        = 0;
+                            Item.WidthVisible = 0;
                         }
-                    }
-
-                    // Считаем, что с таба начинается слово
-                    PRS.Set_LineBreakPos( Pos );
-
-                    PRS.StartWord = true;
-                    PRS.Word      = true;
-
-                    break;
-                }
-                case para_NewLine:
-                {
-                    if ( break_Page === Item.BreakType )
-                    {
-                        // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
-                        if ( !(Para.Parent instanceof CDocument) )
+                        else
                         {
-                            this.Internal_Content_Remove( Pos );
-                            Pos--;
-                            break;
+                            if ( NewX > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges( ParaLine, ParaRange ) ) )
+                            {
+                                WordLen     = NewX - X;
+                                RangeEndPos = Pos;
+                                NewRange    = true;
+                            }
+                            else
+                            {
+                                Item.Width        = NewX - X;
+                                Item.WidthVisible = NewX - X;
+
+                                X = NewX;
+                            }
                         }
 
-                        PRS.NewPage       = true;
-                        PRS.NewRange      = true;
-                        PRS.BreakPageLine = true;
+                        // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
+                        // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
+                        if ( RangesCount === CurRange )
+                        {
+                            if ( true === StartWord )
+                            {
+                                FirstItemOnLine = false;
+                                EmptyLine       = false;
+                            }
+                        }
+
+                        // Считаем, что с таба начинается слово
+                        PRS.Set_LineBreakPos( Pos );
+
+                        StartWord = true;
+                        Word      = true;
+
+                        break;
                     }
-                    else
+                    case para_NewLine:
                     {
+                        if ( break_Page === Item.BreakType )
+                        {
+                            // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
+                            if ( !(Para.Parent instanceof CDocument) )
+                            {
+                                this.Internal_Content_Remove( Pos );
+                                Pos--;
+                                break;
+                            }
+
+                            NewPage       = true;
+                            NewRange      = true;
+                            BreakPageLine = true;
+                        }
+                        else
+                        {
+                            RangeEndPos = Pos + 1;
+
+                            NewRange  = true;
+                            EmptyLine = false;
+                        }
+
+                        X += WordLen;
+
+                        if ( true === Word )
+                        {
+                            EmptyLine   = false;
+                            Word        = false;
+                            X          += SpaceLen;
+                            SpaceLen    = 0;
+                            SpacesCount = 0;
+                        }
+
+                        break;
+                    }
+                    case para_End:
+                    {
+                        if ( true === Word )
+                        {
+                            FirstItemOnLine = false;
+                            EmptyLine       = false;
+                        }
+
+                        // false === PRS.ExtendBoundToBottom, потому что это уже делалось для PageBreak
+                        if ( false === PRS.ExtendBoundToBottom )
+                        {
+                            X += WordLen;
+
+                            if ( true === Word )
+                            {
+                                X += SpaceLen;
+                                SpaceLen    = 0;
+                                SpacesCount = 0;
+                                WordLen     = 0;
+                            }
+
+                            this.Internal_Recalculate_LastTab(PRS);
+                        }
+
+                        NewRange = true;
+                        End      = true;
+
                         RangeEndPos = Pos + 1;
 
-                        PRS.NewRange  = true;
-                        PRS.EmptyLine = false;
+                        break;
                     }
-
-                    PRS.X += PRS.WordLen;
-
-                    if ( true === PRS.Word )
-                    {
-                        PRS.EmptyLine   = false;
-                        PRS.Word        = false;
-                        PRS.X          += PRS.SpaceLen;
-                        PRS.SpaceLen    = 0;
-                        PRS.SpacesCount = 0;
-                    }
-
-                    break;
                 }
-                case para_End:
-                {
-                    if ( true === PRS.Word )
-                    {
-                        PRS.FirstItemOnLine = false;
-                        PRS.EmptyLine       = false;
-                    }
 
-                    // false === PRS.ExtendBoundToBottom, потому что это уже делалось для PageBreak
-                    if ( false === PRS.ExtendBoundToBottom )
-                    {
-                        PRS.X += PRS.WordLen;
-
-                        if ( true === PRS.Word )
-                        {
-                            PRS.X += PRS.SpaceLen;
-                            PRS.SpaceLen    = 0;
-                            PRS.SpacesCount = 0;
-                            PRS.WordLen     = 0;
-                        }
-
-                        this.Internal_Recalculate_LastTab();
-                    }
-
-                    PRS.NewRange = true;
-                    PRS.End      = true;
-
+                if ( true === NewRange )
                     break;
-                }
+
+                Pos++;
             }
 
-            if ( true === PRS.NewRange )
-                break;
+            PRS.MoveToLBP       = MoveToLBP;
+            PRS.NewRange        = NewRange;
+            PRS.ForceNewPage    = ForceNewPage;
+            PRS.NewPage         = NewPage;
+            PRS.BreakPageLine   = BreakPageLine;
+            PRS.End             = End;
 
-            Pos++;
+            PRS.Word            = Word;
+            PRS.StartWord       = StartWord;
+            PRS.FirstItemOnLine = FirstItemOnLine;
+            PRS.EmptyLine       = EmptyLine;
+
+            PRS.SpaceLen        = SpaceLen;
+            PRS.WordLen         = WordLen;
+            PRS.SpacesCount     = SpacesCount;
+
+            PRS.X               = X;
+            PRS.XEnd            = XEnd;
+
+            if ( Pos >= ContentLen )
+                RangeEndPos = Pos;
         }
 
         this.Lines[CurLine].Add_Range( PRS.Range, RangeStartPos, RangeEndPos );
+
+        this.RecalcInfo.Recalc = false;
     },
 
     Recalculate_Set_RangeEndPos : function(PRS, PRP, Depth)
     {
         var CurLine  = PRS.Line - this.StartLine;
         var CurRange = PRS.Range;
-        var CurPos   = PRP[Depth];
+        var CurPos   = PRP.Get(Depth);
 
-        this.Line[CurLine].Ranges[CurRange].EndPos = CurPos;
+        this.Lines[CurLine].Ranges[CurRange].EndPos = CurPos;
     },
 
     Recalculate_Range_Width : function(PRSC, _CurLine, CurRange)
@@ -655,7 +770,7 @@ ParaRun.prototype =
 
             switch( Item.Type )
             {
-                case para_Sym
+                case para_Sym:
                 case para_Text:
                 {
                     PRSC.Range.Letters++;
@@ -687,7 +802,7 @@ ParaRun.prototype =
                 }
                 case para_Space:
                 {
-                    if ( true === bWord )
+                    if ( true === PRSC.Word )
                     {
                         PRSC.Word        = false;
                         PRSC.SpacesCount = 1;
@@ -766,15 +881,15 @@ ParaRun.prototype =
                     else
                         PRSC.Range.SpacesSkip += PRSC.SpacesCount;
 
-                    PRS2.SpacesCount = 0;
-                    PRS2.Word        = false;
+                    PRSC.SpacesCount = 0;
+                    PRSC.Word        = false;
 
                     break;
                 }
                 case para_End:
                 {
-                    if ( true === PRS2.Word )
-                        PRS2.Range.Spaces += PRS2.SpacesCount;
+                    if ( true === PRSC.Word )
+                        PRSC.Range.Spaces += PRSC.SpacesCount;
 
                     break;
                 }
@@ -796,7 +911,7 @@ ParaRun.prototype =
             var Item = this.Content[Pos];
 
             if ( Item === NumberingItem )
-                X += PRSA.Paragraph.Numbering.WidthVisible;
+                PRSA.X += PRSA.Paragraph.Numbering.WidthVisible;
 
             switch( Item.Type )
             {
@@ -809,7 +924,7 @@ ParaRun.prototype =
                         PRSA.LettersSkip--;
                     }
                     else
-                        Item.WidthVisible = Item.Width + JustifyWord;
+                        Item.WidthVisible = Item.Width + PRSA.JustifyWord;
 
                     PRSA.X    += Item.WidthVisible;
                     PRSA.LastW = Item.WidthVisible;
@@ -1011,6 +1126,7 @@ ParaRun.prototype =
         // Если нужно добавить нумерацию и на текущем элементе ее можно добавить, тогда добавляем её
         if ( true === this.NeedAddNumbering && true === Item.Can_AddNumbering() )
         {
+            var Para = PRS.Paragraph;
             var NumberingItem = Para.Numbering;
             var NumberingType = Para.Numbering.Type;
 
@@ -1234,22 +1350,583 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
 //-----------------------------------------------------------------------------------
-    Check_CollabotativeMarks : function(Pos)
+    Draw_HighLights : function(PDSH)
     {
-        // TODO: Ускорить работу данной функции
+        var pGraphics = PDSH.Graphics;
 
-        var Counter = 0;
-        var CollaborativeMarksCount = this.CollaborativeMarks.length;
-        for ( var MarkPos = 0; MarkPos < CollaborativeMarksCount; MarkPos++ )
+        var CurLine   = PDSH.Line - this.StartLine;
+        var CurRange  = PDSH.Range;
+
+        var aHigh     = PDSH.High;
+        var aColl     = PDSH.Coll;
+        var aFind     = PDSH.Find;
+        var aComm     = PDSH.Comm;
+
+        var Range    = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        var Para     = PDSH.Paragraph;
+        var SearchResults = Para.SearchResults;
+
+        var bDrawFind = PDSH.DrawFind;
+        var bDrawColl = PDSH.DrawColl;
+        var bDrawComm = PDSH.DrawComm;
+
+        //var CurParaPos = PDSH.CurPos.Copy();
+        //var CurDepth   = CurParaPos.Add( 0 );
+
+        var X  = PDSH.X;
+        var Y0 = PDSH.Y0;
+        var Y1 = PDSH.Y1;
+
+        var bDrawComments = bDrawComm;
+        var CommentsFlag  = PDSH.CommentsFlag;
+
+        var HighLight = this.Get_CompiledPr(false).HighLight;
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
-            var CollMark = this.CollaborativeMarks[MarkPos];
-            if ( CollMark.Pos < Pos && pararun_CollaborativeMark_End === CollMark.Type )
-                Counter--;
-            else if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_Start === CollMark.Type )
-                Counter++;
+            var Item = this.Content[Pos];
+
+            //CurParaPos.Update( Pos, CurDepth );
+
+            // Определим попадание в поиск и совместное редактирование. Попадание в комментарий определять не надо,
+            // т.к. класс CParaRun попадает или не попадает в комментарий целиком.
+
+            var bDrawSearch = false;
+//            if ( true === bDrawSearch )
+//            {
+//                for ( var SId in SearchResults )
+//                {
+//                    var SResult = SearchResults[SId];
+//                    if ( CurParaPos.Compare( SResult.StartPos ) >= 0 && CurParaPos.Compare( SResult.EndPos ) <= 0 )
+//                    {
+//                        bDrawSearch = true;
+//                        break;
+//                    }
+//                }
+//            }
+
+            var nCollaborativeChanges = 0;
+            if ( true === bDrawColl )
+            {
+                var CollCount = this.CollaborativeMarks.length;
+                for ( var TempIndex = 0; TempIndex < CollCount; TempIndex++ )
+                {
+                    var CollMark = this.CollaborativeMarks[TempIndex];
+                    if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_Start === CollMark.Type  )
+                        nCollaborativeChanges++;
+                    else if ( CollMark.Pos <= Pos && pararun_CollaborativeMark_End === CollMark.Type )
+                        nCollaborativeChanges--;
+                }
+            }
+
+//            if ( 0 === CurParaPos.Compare( Para.Numbering.Pos ) )
+//            {
+//                var NumberingType = Para.Numbering.Type;
+//                var NumberingItem = Para.Numbering;
+//
+//                if ( para_Numbering === NumberingType )
+//                {
+//                    var NumPr = Pr.ParaPr.NumPr;
+//                    if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+//                    {
+//                        // Ничего не делаем
+//                    }
+//                    else
+//                    {
+//                        var Numbering = Para.Parent.Get_Numbering();
+//                        var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+//                        var NumJc     = NumLvl.Jc;
+//                        var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+//                        NumTextPr.Merge( Para.TextPr.Value );
+//                        NumTextPr.Merge( NumLvl.TextPr );
+//
+//                        var X_start = X;
+//
+//                        if ( align_Right === NumJc )
+//                            X_start = X - NumberingItem.WidthNum;
+//                        else if ( align_Center === NumJc )
+//                            X_start = X - NumberingItem.WidthNum / 2;
+//
+//                        // Если есть выделение текста, рисуем его сначала
+//                        if ( highlight_None != NumTextPr.HighLight )
+//                            aHigh.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b );
+//
+//                        if ( nCollaborativeChanges > 0 )
+//                            aColl.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, 0, 0, 0 );
+//
+//                        X += NumberingItem.WidthVisible;
+//                    }
+//                }
+//                else if ( para_PresentationNumbering === NumberingType )
+//                {
+//                    X += NumberingItem.WidthVisible;
+//                }
+//            }
+
+            switch( Item.Type )
+            {
+                case para_PageNum:
+                case para_Drawing:
+                case para_Tab:
+                case para_Text:
+                case para_Sym:
+                {
+                    if ( para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType )
+                        break;
+
+                    if ( CommentsFlag != comments_NoComment && true === bDrawComments )
+                        aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+                    else if ( highlight_None != HighLight )
+                        aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
+
+                    if ( true === bDrawSearch )
+                        aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+                    else if ( nCollaborativeChanges > 0 )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+
+                    if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
+                        X += Item.WidthVisible;
+
+                    break;
+                }
+                case para_Space:
+                {
+                    // TODO: Переделать здесь
+
+//                    // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
+//                    if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
+//                    {
+//                        if ( CommentsFlag != comments_NoComment && bDrawComments )
+//                            aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+//                        else if ( highlight_None != HighLight )
+//                            aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
+//                    }
+
+                    if ( CommentsFlag != comments_NoComment && bDrawComments )
+                        aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+                    else if ( highlight_None != HighLight )
+                        aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
+
+                    //-------------------------------------------
+
+                    if ( true === bDrawSearch )
+                        aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+                    else if ( nCollaborativeChanges > 0 )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+
+                    X += Item.WidthVisible;
+
+                    break;
+                }
+                case para_End:
+                {
+                    if ( nCollaborativeChanges > 0 )
+                        aColl.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
+
+                    X += Item.Width;
+                    break;
+                }
+                case para_NewLine:
+                {
+                    X += Item.WidthVisible;
+                    break;
+                }
+            }
         }
 
-        return Counter;
+        // Обновим позицию X
+        PDSH.X = X;
+    },
+
+    Draw_Elements : function(PDSE)
+    {
+        var CurLine  = PDSE.Line - this.StartLine;
+        var CurRange = PDSE.Range;
+
+        var Range    = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        //var CurParaPos = PDSE.CurPos.Copy();
+       // var CurDepth   = CurParaPos.Add( 0 );
+        var Para       = PDSE.Paragraph;
+
+        var pGraphics = PDSE.Graphics;
+        var AutoColor = PDSE.AutoColor;
+
+        var X = PDSE.X;
+        var Y = PDSE.Y;
+
+        var CurTextPr = this.Get_CompiledPr( false );
+        pGraphics.SetTextPr( CurTextPr );
+
+        if ( true === PDSE.VisitedHyperlink )
+            pGraphics.b_color1( 128, 0, 151, 255 );
+        else if ( true === CurTextPr.Color.Auto )
+            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+        else
+            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            var TempY = Y;
+            switch( CurTextPr.VertAlign )
+            {
+                case vertalign_SubScript:
+                {
+                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+
+                    break;
+                }
+                case vertalign_SuperScript:
+                {
+                    Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+
+                    break;
+                }
+            }
+
+            //CurParaPos.Update( Pos, CurDepth );
+
+//            if ( 0 === CurParaPos.Compare( Para.Numbering.Pos ) )
+//            {
+//                var NumberingItem = Para.Numbering;
+//                if ( para_Numbering === Para.Numbering.Type )
+//                {
+//                    var Pr = Para.Get_CompiledPr2(false);
+//                    var NumPr = Pr.ParaPr.NumPr;
+//                    if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+//                    {
+//                        // Ничего не делаем
+//                    }
+//                    else
+//                    {
+//                        var Numbering = Para.Parent.Get_Numbering();
+//                        var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+//                        var NumSuff   = NumLvl.Suff;
+//                        var NumJc     = NumLvl.Jc;
+//                        var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
+//
+//                        // Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
+//                        // символа параграфа.
+//
+//                        var TextPr_temp = Para.TextPr.Value.Copy();
+//                        TextPr_temp.Underline = undefined;
+//
+//                        NumTextPr.Merge( TextPr_temp );
+//                        NumTextPr.Merge( NumLvl.TextPr );
+//
+//                        var X_start = X;
+//
+//                        if ( align_Right === NumJc )
+//                            X_start = X - NumberingItem.WidthNum;
+//                        else if ( align_Center === NumJc )
+//                            X_start = X - NumberingItem.WidthNum / 2;
+//
+//                        if ( true === NumTextPr.Color.Auto )
+//                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+//                        else
+//                            pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+//
+//                        // Рисуется только сам символ нумерации
+//                        switch ( NumJc )
+//                        {
+//                            case align_Right:
+//                                NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr );
+//                                break;
+//
+//                            case align_Center:
+//                                NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr );
+//                                break;
+//
+//                            case align_Left:
+//                            default:
+//                                NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr );
+//                                break;
+//                        }
+//
+//                        if ( true === editor.ShowParaMarks && numbering_suff_Tab === NumSuff )
+//                        {
+//                            var TempWidth     = NumberingItem.WidthSuff;
+//                            var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10
+//
+//                            var X1 = X;
+//                            switch ( NumJc )
+//                            {
+//                                case align_Right:
+//                                    break;
+//
+//                                case align_Center:
+//                                    X1 += NumberingItem.WidthNum / 2;
+//                                    break;
+//
+//                                case align_Left:
+//                                default:
+//                                    X1 += NumberingItem.WidthNum;
+//                                    break;
+//                            }
+//
+//                            var X0 = TempWidth / 2 - TempRealWidth / 2;
+//
+//                            pGraphics.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+//
+//                            if ( X0 > 0 )
+//                                pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );
+//                            else
+//                                pGraphics.FillText2( X1, Y, String.fromCharCode( tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
+//                        }
+//
+//                        if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
+//                        {
+//                            if ( true === NumTextPr.Color.Auto )
+//                                pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+//                            else
+//                                pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+//                        }
+//
+//                        if ( true === NumTextPr.Strikeout )
+//                            pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+//
+//                        if ( true === NumTextPr.Underline )
+//                            pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+//
+//
+//                        X += NumberingItem.WidthVisible;
+//
+//                        // Восстановим настройки
+//                        pGraphics.SetTextPr( CurTextPr );
+//                        if ( true === bVisitedHyperlink )
+//                            pGraphics.b_color1( 128, 0, 151, 255 );
+//                        else if ( true === CurTextPr.Color.Auto )
+//                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+//                        else
+//                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+//                    }
+//                }
+//                else if ( para_PresentationNumbering === this.Numbering.Type )
+//                {
+//                    if ( true != Para.IsEmpty() )
+//                    {
+//                        // Найдем настройки для первого текстового элемента
+//                        var FirstTextPr = this.Internal_CalculateTextPr( this.Internal_GetStartPos() );
+//
+//                        if ( Pr.ParaPr.Ind.FirstLine < 0 )
+//                            NumberingItem.Draw( X, Y, pGraphics, FirstTextPr );
+//                        else
+//                            NumberingItem.Draw( Para.X + Pr.ParaPr.Ind.Left, Y, pGraphics, FirstTextPr );
+//                    }
+//
+//                    X += NumberingItem.WidthVisible;
+//                }
+//            }
+
+            switch( Item.Type )
+            {
+                case para_PageNum:
+                case para_Drawing:
+                case para_Tab:
+                case para_Text:
+                case para_Sym:
+                {
+                    if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
+                    {
+                        bFirstLineItem = false;
+
+                        if ( para_PageNum != Item.Type )
+                            Item.Draw( X, Y - Item.YOffset, pGraphics );
+                        else
+                            Item.Draw( X, Y - Item.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc );
+
+                        X += Item.WidthVisible;
+                    }
+
+                    // Внутри отрисовки инлайн-автофигур могут изменится цвета и шрифт, поэтому восстанавливаем настройки
+                    if ( para_Drawing === Item.Type && drawing_Inline === Item.DrawingType )
+                    {
+                        pGraphics.SetTextPr( CurTextPr );
+
+                        if ( true === CurTextPr.Color.Auto )
+                        {
+                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                            pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                        }
+                        else
+                        {
+                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                        }
+                    }
+
+                    break;
+                }
+                case para_Space:
+                {
+                    Item.Draw( X, Y - Item.YOffset, pGraphics );
+
+                    X += Item.WidthVisible;
+
+                    break;
+                }
+                case para_End:
+                {
+                    // Выставляем настройки для символа параграфа
+                    var EndTextPr = Para.Get_CompiledPr2( false).TextPr.Copy();
+                    EndTextPr.Merge( Para.TextPr.Value );
+
+                    pGraphics.SetTextPr( EndTextPr );
+
+                    if ( true === EndTextPr.Color.Auto )
+                        pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                    else
+                        pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
+
+                    bEnd = true;
+                    var bEndCell = false;
+                    if ( null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent() )
+                        bEndCell = true;
+
+                    Item.Draw( X, Y - Item.YOffset, pGraphics, bEndCell );
+                    X += Item.Width;
+
+                    break;
+                }
+                case para_NewLine:
+                {
+                    Item.Draw( X, Y - Item.YOffset, pGraphics );
+                    X += Item.WidthVisible;
+                    break;
+                }
+            }
+
+            Y = TempY;
+        }
+
+        // Обновляем позицию
+        PDSE.X = X;
+    },
+
+    Draw_Lines : function(PDSL)
+    {
+        var CurLine  = PDSL.Line - this.StartLine;
+        var CurRange = PDSL.Range;
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+
+        var X        = PDSL.X;
+        var Y        = PDSL.Baseline;
+        var UndOff   = PDSL.UnderlineOffset;
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        //var CurParaPos = PDSL.CurPos.Copy();
+        //var CurDepth   = CurParaPos.Add( 0 );
+        var Para       = PDSL.Paragraph;
+
+        var aStrikeout  = PDSL.Strikeout;
+        var aDStrikeout = PDSL.DStrikeout;
+        var aUnderline  = PDSL.Underline;
+        var aSpelling   = PDSL.Spelling;
+
+        var CurTextPr = this.Get_CompiledPr( false );
+
+        var StrikeoutY = Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27;
+        var UnderlineY = Y + UndOff;
+        var LineW      = (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm;
+
+        var AutoColor = PDSL.AutoColor;
+        var CurColor = new CDocumentColor( 0, 0, 0, false );
+        // Выставляем цвет обводки
+        if ( true === PDSL.VisitedHyperlink )
+            CurColor.Set( 128, 0, 151, 255 );
+        else if ( true === CurTextPr.Color.Auto )
+            CurColor.Set( AutoColor.r, AutoColor.g, AutoColor.b );
+        else
+            CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+           //CurParaPos.Update( Pos, CurDepth );
+            var Item = this.Content[Pos];
+
+            // TODO: Нумерация зачеркивается и подчеркивается отдельно в Draw_Elements (неплохо бы сюда перенести)
+//            if ( 0 === CurParaPos.Compare( Para.Numbering.Pos ) )
+//                X += Para.Numbering.WidthVisible;
+
+            switch( Item.Type )
+            {
+                case para_End:
+                case para_NewLine:
+                {
+                    X += Item.WidthVisible;
+
+                    break;
+                }
+
+                case para_PageNum:
+                case para_Drawing:
+                case para_Tab:
+                case para_Text:
+                case para_Sym:
+                {
+                    if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
+                    {
+                        if ( true === CurTextPr.DStrikeout )
+                            aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        else if ( true === CurTextPr.Strikeout )
+                            aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+                        if ( true === CurTextPr.Underline )
+                            aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+                        // TODO: Переделать орфографию
+                        //if ( true === CheckSpelling[Pos] )
+                        //    aSpelling.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, 0, 0, 0 );
+
+                        X += Item.WidthVisible;
+                    }
+
+                    break;
+                }
+                case para_Space:
+                {
+                    // TODO: реализовать через счетчик пробелов в начале и в конце
+//                    if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
+//                    {
+//                        if ( true === CurTextPr.DStrikeout )
+//                            aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+//                        else if ( true === CurTextPr.Strikeout )
+//                            aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+//
+//                        if ( true === CurTextPr.Underline )
+//                            aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+//                    }
+
+                    if ( true === CurTextPr.DStrikeout )
+                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                    else if ( true === CurTextPr.Strikeout )
+                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+                    if ( true === CurTextPr.Underline )
+                        aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+
+                    //-----------------------------------------------------------------------------------
+
+
+                    X += Item.WidthVisible;
+
+                    break;
+                }
+            }
+        }
+
+        // Обновляем позицию
+        PDSL.X = X;
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
@@ -1283,8 +1960,9 @@ ParaRun.prototype =
         {
             // Сюда мы никогда не должны попадать, но на всякий случай,
             // чтобы не выпадало ошибок сгенерим дефолтовые настройки
-            this.CompiledPr.Init_Default();
-            return;
+            var TextPr = new CTextPr();
+            TextPr.Init_Default();
+            return new CTextPr();
         }
 
         // Получим настройки текста, для данного параграфа
@@ -1797,6 +2475,8 @@ function CParaRunRecalcInfo()
 {
     this.TextPr  = true; // Нужно ли пересчитать скомпилированные настройки
     this.Measure = true; // Нужно ли перемерять элементы
+    this.Recalc  = true; // Нужно ли пересчитывать (только если текстовый ран)
+    this.RunLen  = 0;
 }
 
 function CParaRunRange(StartPos, EndPos)
@@ -1812,7 +2492,7 @@ function CParaRunLine()
 
 CParaRunLine.prototype =
 {
-    Add : function(RangeIndex, StartPos, EndPos)
+    Add_Range : function(RangeIndex, StartPos, EndPos)
     {
         this.Ranges[RangeIndex] = new CParaRunRange( StartPos, EndPos );
     }
