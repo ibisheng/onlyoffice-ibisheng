@@ -268,7 +268,6 @@
 					t.isCellEditMode = true;
 					var coord = t._getCoordinates(event);
 					t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, isCoord, function (resized) {
-						
 						if (resized) {
 							// Мы изменяли размеры колонки/строки, не редактируем ячейку
 							t.isCellEditMode = false;
@@ -1134,13 +1133,13 @@
 					}
 				}
 				
-				if (event.originalEvent && 2 === event.originalEvent.detail) {
+				if (2 === event.detail) {
 					// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
 					// Порядок эвентов для dblClick - http://javascript.ru/tutorial/events/mouse#dvoynoy-levyy-klik
 
 					// Проверка для IE, т.к. он присылает DblClick при сдвиге мыши...
 					if (this.mouseDownLastCord && coord.x === this.mouseDownLastCord.x && coord.y === this.mouseDownLastCord.y && 0 === event.button) {
-						// Выставляем, что мы уже сделали dblClick (иначе вдруг браузер не поддерживает свойство originalEvent.detail)
+						// Выставляем, что мы уже сделали dblClick (иначе вдруг браузер не поддерживает свойство detail)
 						this.isDblClickInMouseDown = true;
 						// Нам нужно обработать эвент браузера о dblClick (если мы редактируем ячейку, то покажем курсор, если нет - то просто ничего не произойдет)
 						this.isDoBrowserDblClick = true;
@@ -1412,12 +1411,10 @@
 
 			/** @param event {jQuery.Event} */
 			_onMouseDblClick: function (event) {
-				var t = this;
-			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;
 
-				// Браузер не поддерживает свойство originalEvent.detail (будем делать по координатам)
+				// Браузер не поддерживает свойство detail (будем делать по координатам)
 				if (false === this.isDblClickInMouseDown)
 					return this.doMouseDblClick(event, /*isHideCursor*/false, /*isCoord*/true);
 
