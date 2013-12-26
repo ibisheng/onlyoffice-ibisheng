@@ -12,8 +12,6 @@
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var asc_applyFunction = asc.applyFunction;
-		var namespace = "ASC_Spreadsheet";
-
 
 		/**
 		 * Desktop event controller for WorkbookView
@@ -115,56 +113,50 @@
 				this._createScrollBars();
 
 				// initialize events
-				$(window)
-						.on("resize."    + namespace, function () {self._onWindowResize.apply(self, arguments);})
-						.on("keydown."   + namespace, function () {return self._onWindowKeyDown.apply(self, arguments);})
-						.on("keypress."  + namespace, function () {return self._onWindowKeyPress.apply(self, arguments);})
-						.on("keyup."  + namespace, function () {return self._onWindowKeyUp.apply(self, arguments);})
-						.on("mousemove." + namespace, function () {return self._onWindowMouseMove.apply(self, arguments);})
-						.on("mouseup."   + namespace, function () {return self._onWindowMouseUp.apply(self, arguments);})
-						.on("mouseleave."+ namespace, function () {return self._onWindowMouseLeaveOut.apply(self, arguments);})
-						.on("mouseout."+ namespace, function () {return self._onWindowMouseLeaveOut.apply(self, arguments);});
+				if (window.addEventListener) {
+					window.addEventListener("resize"	, function () {self._onWindowResize.apply(self, arguments);}				, false);
+					window.addEventListener("keydown"	, function () {return self._onWindowKeyDown.apply(self, arguments);}		, false);
+					window.addEventListener("keypress"	, function () {return self._onWindowKeyPress.apply(self, arguments);}		, false);
+					window.addEventListener("keyup"		, function () {return self._onWindowKeyUp.apply(self, arguments);}			, false);
+					window.addEventListener("mousemove"	, function () {return self._onWindowMouseMove.apply(self, arguments);}		, false);
+					window.addEventListener("mouseup"	, function () {return self._onWindowMouseUp.apply(self, arguments);}		, false);
+					window.addEventListener("mouseleave", function () {return self._onWindowMouseLeaveOut.apply(self, arguments);}	, false);
+					window.addEventListener("mouseout"	, function () {return self._onWindowMouseLeaveOut.apply(self, arguments);}	, false);
+				}
 
 				// prevent changing mouse cursor when 'mousedown' is occurred
 				if (this.element.onselectstart) {
 					this.element.onselectstart = function () {return false;};
 				}
 
-				$(this.element)
-						.on("mousedown",  function () {return self._onMouseDown.apply(self, arguments);})
-						.on("mouseup",    function () {return self._onMouseUp.apply(self, arguments);})
-						.on("mousemove",  function () {return self._onMouseMove.apply(self, arguments);})
-						.on("mouseleave", function () {return self._onMouseLeave.apply(self, arguments);})
-						.on("mousewheel", function () {return self._onMouseWheel.apply(self, arguments);})
-						.on("dblclick",   function () {return self._onMouseDblClick.apply(self, arguments);});
+				if (this.element.addEventListener) {
+					this.element.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}		, false);
+					this.element.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}			, false);
+					this.element.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}		, false);
+					this.element.addEventListener("mouseleave"	, function () {return self._onMouseLeave.apply(self, arguments);}		, false);
+					this.element.addEventListener("dblclick"	, function () {return self._onMouseDblClick.apply(self, arguments);}	, false);
+
+					this.element.addEventListener("mousewheel"	, function () {return self._onMouseWheel.apply(self, arguments);}		, false);
+					// for Mozilla Firefox (можно делать проверку на window.MouseScrollEvent || window.WheelEvent для FF)
+					this.element.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
+
+					this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
+					this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
+					this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+				}
 						
 				// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
-				var oShapeCursor = $("#id_target_cursor");
-				if (oShapeCursor) {
-					oShapeCursor
-						.on("mousedown",  function () {return self._onMouseDown.apply(self, arguments);})
-						.on("mouseup",    function () {return self._onMouseUp.apply(self, arguments);})
-						.on("mousemove",  function () {return self._onMouseMove.apply(self, arguments);});
+				var oShapeCursor = document.getElementById("id_target_cursor");
+				if (null != oShapeCursor && oShapeCursor.addEventListener) {
+					oShapeCursor.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}, false);
+					oShapeCursor.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}	, false);
+					oShapeCursor.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}, false);
 				}
-
-				this.element.ontouchstart = function (e) {
-					self._onMouseDown(e.touches[0]);
-					return false;
-				};
-				this.element.ontouchmove = function (e) {
-					self._onMouseMove(e.touches[0]);
-					return false;
-				};
-				this.element.ontouchend = function (e) {
-					self._onMouseUp(e.changedTouches[0]);
-					return false;
-				};
 
 				return this;
 			},
 
 			destroy: function () {
-				$(window).off("." + namespace);
 				return this;
 			},
 
@@ -1120,7 +1112,7 @@
 					if (t.isSelectionDialogMode)
 						return;
 					//for Mac OS
-					if ( event.metaKey )
+					if (event.metaKey)
 						event.ctrlKey = true;
 					
 					this.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
@@ -1393,18 +1385,26 @@
 			},
 
 			/**
-			 * @param event {jQuery.Event}
-			 * @param delta {Number}
+			 * @param event
 			 */
-			_onMouseWheel: function (event, delta) {
+			_onMouseWheel: function (event) {
 				if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeChartsRange || this.isMoveResizeRange) {
 					return true;
 				}
+				var delta = 0;
+				if (undefined !== event.wheelDelta && 0 !== event.wheelDelta) {
+					delta = -1 * event.wheelDelta / 120;
+				} else if (undefined != event.detail && 0 !== event.detail) {
+					// FF
+					delta = event.detail / 3;
+				}
+
+
 				var self = this;
 				delta *= event.shiftKey ? 1 : this.settings.wheelScrollLines;
 				this.handlers.trigger("updateWorksheet", this.element, /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
 						function () {
-							event.shiftKey ? self.scrollHorizontal(-delta,event) : self.scrollVertical(-delta,event);
+							event.shiftKey ? self.scrollHorizontal(delta, event) : self.scrollVertical(delta, event);
 							self._onMouseMove(event);
 						});
 				return true;
