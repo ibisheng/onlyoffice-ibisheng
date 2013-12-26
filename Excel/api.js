@@ -1731,7 +1731,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wbModel,
 					this.controller,
 					this.handlers,
-					$("#" + this.HtmlElementName),
+					this.HtmlElement,
 					$("#" + this.topLineEditorName),
 					this,
 					this.collaborativeEditing,

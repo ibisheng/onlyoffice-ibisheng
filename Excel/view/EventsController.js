@@ -130,42 +130,32 @@
 					this.element.onselectstart = function () {return false;};
 				}
 
-				this.element
+				$(this.element)
 						.on("mousedown",  function () {return self._onMouseDown.apply(self, arguments);})
 						.on("mouseup",    function () {return self._onMouseUp.apply(self, arguments);})
 						.on("mousemove",  function () {return self._onMouseMove.apply(self, arguments);})
 						.on("mouseleave", function () {return self._onMouseLeave.apply(self, arguments);})
 						.on("mousewheel", function () {return self._onMouseWheel.apply(self, arguments);})
 						.on("dblclick",   function () {return self._onMouseDblClick.apply(self, arguments);});
-
-						//.on("touchstart", function () {self._onMouseDown(arguments[0].originalEvent.touches[0]);return false;})
-						//.on("touchmove", function () {self._onMouseMove(arguments[0].originalEvent.touches[0]);return false;})
-						//.on("touchend", function () {self._onMouseUp(arguments[0].originalEvent.changedTouches[0]);return false;});
 						
 				// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
 				var oShapeCursor = $("#id_target_cursor");
-				if ( oShapeCursor ) {
+				if (oShapeCursor) {
 					oShapeCursor
-						.on("mousedown",  function () {
-							return self._onMouseDown.apply(self, arguments);
-						})
-						.on("mouseup",    function () {
-							return self._onMouseUp.apply(self, arguments);
-						})
-						.on("mousemove",  function () {
-							return self._onMouseMove.apply(self, arguments);
-						});
+						.on("mousedown",  function () {return self._onMouseDown.apply(self, arguments);})
+						.on("mouseup",    function () {return self._onMouseUp.apply(self, arguments);})
+						.on("mousemove",  function () {return self._onMouseMove.apply(self, arguments);});
 				}
 
-				this.element[0].ontouchstart = function (e){
+				this.element.ontouchstart = function (e) {
 					self._onMouseDown(e.touches[0]);
 					return false;
 				};
-				this.element[0].ontouchmove = function (e){
+				this.element.ontouchmove = function (e) {
 					self._onMouseMove(e.touches[0]);
 					return false;
 				};
-				this.element[0].ontouchend = function (e){
+				this.element.ontouchend = function (e) {
 					self._onMouseUp(e.changedTouches[0]);
 					return false;
 				};
@@ -291,7 +281,7 @@
 							// Мы изменяли размеры колонки/строки, не редактируем ячейку
 							t.isCellEditMode = false;
 							// Обновим состояние курсора
-							t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
+							t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 						}
 					});
 				}, 100);
@@ -311,11 +301,12 @@
 
 			_createScrollBars: function () {
 				var self = this, opt = this.settings;
+				var widget = $(this.widget);
 
 				// vertical scroll bar
-				this.vsb = this.widget.find("#ws-v-scrollbar");
+				this.vsb = widget.find("#ws-v-scrollbar");
 				if (this.vsb.length < 1) {
-					this.vsb = $('<div id="ws-v-scrollbar"><div id="ws-v-scroll-helper"/></div>').appendTo(this.widget);
+					this.vsb = $('<div id="ws-v-scrollbar"><div id="ws-v-scroll-helper"/></div>').appendTo(widget);
 				}
 				if (!this.vsbApi) {
 					this.vsbApi = new ScrollObject( this.vsb[0].id,opt);
@@ -340,18 +331,18 @@
 				}
 
 				// horizontal scroll bar
-				this.hsb = this.widget.find("#ws-h-scrollbar");
+				this.hsb = widget.find("#ws-h-scrollbar");
 				if (this.hsb.length < 1) {
-					this.hsb = $('<div id="ws-h-scrollbar"><div id="ws-h-scroll-helper"/></div>').appendTo(this.widget);
+					this.hsb = $('<div id="ws-h-scrollbar"><div id="ws-h-scroll-helper"/></div>').appendTo(widget);
 				}
 				if (!this.hsbApi) {
 					this.hsbApi = new ScrollObject( this.hsb[0].id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
 					this.hsbApi.bind("scrollhorizontal",function(evt){
 						self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
-					})
+					});
 					this.hsbApi.bind("scrollHEnd",function(evt){
 							self.handlers.trigger("addColumn",true);
-						})
+						});
 					this.hsbApi.onLockMouse = function(){
 						$(window)
 							.on("mousemove.scroll", function (e) {
@@ -367,8 +358,8 @@
 				}
 
 				// right bottom corner
-				if (this.widget.find("#ws-scrollbar-corner").length < 1) {
-					$('<div id="ws-scrollbar-corner"/>').appendTo(this.widget);
+				if (widget.find("#ws-scrollbar-corner").length < 1) {
+					$('<div id="ws-scrollbar-corner"/>').appendTo(widget);
 				}
 			},
 
@@ -1373,11 +1364,11 @@
 
 				if (asc["editor"].isStartAddShape || graphicsInfo) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
-					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
+					t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return true;
 				}
 
-				t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
+				t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 				return true;
 			},
 
@@ -1387,7 +1378,7 @@
 				this.hasCursor = false;
 				if (!this.isSelectMode && !this.isResizeMode && !this.isMoveResizeRange) {
 					this.targetInfo = undefined;
-					this.handlers.trigger("updateWorksheet", this.element[0]);
+					this.handlers.trigger("updateWorksheet", this.element);
 				}
 				if (this.isMoveRangeMode) {
 					t.moveRangeTimerId = window.setTimeout(function(){t._moveRangeHandle2(event)},0);
@@ -1411,7 +1402,7 @@
 				}
 				var self = this;
 				delta *= event.shiftKey ? 1 : this.settings.wheelScrollLines;
-				this.handlers.trigger("updateWorksheet", this.element[0], /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
+				this.handlers.trigger("updateWorksheet", this.element, /*x*/undefined, /*y*/undefined, /*ctrlKey*/undefined,
 						function () {
 							event.shiftKey ? self.scrollHorizontal(-delta,event) : self.scrollVertical(-delta,event);
 							self._onMouseMove(event);
@@ -1439,7 +1430,7 @@
 
 			/** @param event {jQuery.Event} */
 			_getCoordinates: function (event) {
-				var offs = this.element.offset();
+				var offs = $(this.element).offset();
 				var x = event.pageX - offs.left;
 				var y = event.pageY - offs.top;
 				return {x: x, y: y};

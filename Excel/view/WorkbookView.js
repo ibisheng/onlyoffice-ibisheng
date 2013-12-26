@@ -99,7 +99,7 @@
 			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
 			
-			this.init(fontRenderingMode);
+			this._init(fontRenderingMode);
 
 			return this;
 		}
@@ -110,48 +110,45 @@
 			constructor: WorkbookView,
 
 			defaults: {
-				worksheetDefaults: {}
+				worksheetDefaults: {},
+				scroll: {
+					widthPx	: 16,
+					heightPx: 16
+				}
 			},
 
 
-			init: function (fontRenderingMode) {
+			_init: function (fontRenderingMode) {
 				var self = this;
 
 				// Init font managers rendering
 				// Изначально мы инициализируем c_oAscFontRenderingModeType.hintingAndSubpixeling
 				this.setFontRenderingMode(fontRenderingMode, /*isInit*/true);
 
+				// add style
                 var _head = document.getElementsByTagName('head')[0];
                 var style0 = document.createElement('style');
                 style0.type = 'text/css';
                 style0.innerHTML = ".block_elem { position:absolute;padding:0;margin:0; }";
                 _head.appendChild(style0);
 
-                if (!window["NATIVE_EDITOR_ENJINE"])
-                {
-				    // create canvas
-				    var outer = this.element.find("#ws-canvas-outer");
-				    if (outer.length < 1) {
-					    outer = $('<div id="ws-canvas-outer"><canvas id="ws-canvas"/><canvas id="ws-canvas-overlay"/><canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"width:2px;height:13px;display:none;z-index:1004;\"></canvas></div>')
-							    .appendTo(this.element);
-				    }
-				    this.canvas = this.element.find("#ws-canvas")
-						    .attr("width", outer.width())
-						    .attr("height", outer.height());
+                // create canvas
+				if (null != this.element) {
+					this.element.innerHTML = '<div id="ws-canvas-outer">\
+												<canvas id="ws-canvas"></canvas>\
+												<canvas id="ws-canvas-overlay"></canvas>\
+												<canvas id="id_target_cursor" class="block_elem" width="1" height="1"\
+													style="width:2px;height:13px;display:none;z-index:1004;"></canvas>\
+											</div>';
 
-				    this.canvasOverlay = this.element.find("#ws-canvas-overlay")
-						    .attr("width", outer.width())
-						    .attr("height", outer.height());
-				}
-				else
-				{
-				    this.canvas         = new Array(); this.canvas.push(document.createElement("canvas"));
-                    this.canvasOverlay  = new Array(); this.canvasOverlay.push(document.createElement("canvas"));
+					this.canvas = document.getElementById("ws-canvas");
+					this.canvasOverlay = document.getElementById("ws-canvas-overlay");
+					//this._canResize(); ToDo должно отрабатывать, но нам приходит resize сверху
 				}
 
-				this.buffers.main = asc_DC({canvas: this.canvas[0], units: 1/*pt*/,
+				this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/,
 					fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-				this.buffers.overlay = asc_DC({canvas: this.canvasOverlay[0], units: 1/*pt*/,
+				this.buffers.overlay = asc_DC({canvas: this.canvasOverlay, units: 1/*pt*/,
 					fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				this.buffers.overlay.ctx.isOverlay = true;		// Для разруливания _activateOverlayCtx / _deactivateOverlayCtx
 				
@@ -1148,26 +1145,26 @@
 				this.wsActive = -1;
 			},
 
+			_canResize: function() {
+				var oldWidth = this.canvas.width;
+				var oldHeight = this.canvas.height;
+				var width = this.element.offsetWidth - this.defaults.scroll.widthPx;
+				var height = this.element.offsetHeight - this.defaults.scroll.heightPx;
+
+				if (oldWidth === width && oldHeight === height)
+					return false;
+
+				this.canvas.width = this.canvasOverlay.width = width;
+				this.canvas.height = this.canvasOverlay.height = height;
+				return true;
+			},
+
 			/** @param event {jQuery.Event} */
 			resize: function (event) {
-				var outer = $("#ws-canvas-outer");
-
-				var oldWidth = this.canvas.attr("width");
-				var oldHeight = this.canvas.attr("width");
-				var width = outer.width();
-				var height = outer.height();
-				if (oldWidth == width && oldHeight == height)
-					return;
-
-				this.canvas
-						.attr("width", width)
-						.attr("height", height);
-				this.canvasOverlay
-						.attr("width", width)
-						.attr("height", height);
-
-				this.getWorksheet().resize();
-				this.showWorksheet(undefined, true);
+				if (this._canResize()) {
+					this.getWorksheet().resize();
+					this.showWorksheet(undefined, true);
+				}
 			},
 
 			// Получаем свойство: редактируем мы сейчас или нет

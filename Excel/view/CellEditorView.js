@@ -90,9 +90,11 @@
 
 			//---declaration---
 			this.canvasOuter = undefined;
+			this.canvasOuterStyle = undefined;
 			this.canvas = undefined;
 			this.canvasOverlay = undefined;
 			this.cursor = undefined;
+			this.cursorStyle = undefined;
 			this.cursorTID = undefined;
 			this.cursorPos = 0;
 			this.topLineIndex = 0;
@@ -126,7 +128,7 @@
 			this.isUpdateValue = true;				// Обновлять ли состояние строки при вводе в TextArea
 			//-----------------
 
-			this.init();
+			this._init();
 
 			return this;
 		}
@@ -165,37 +167,36 @@
 
             reFormula: /^([a-z_][a-z0-9_]*)/i,
 
-			init: function () {
+			_init: function () {
 				var t = this;
 				var z = parseInt(t.settings.canvasZindex);
 
-				t.canvasOuter = t.element.find("#ce-canvas-outer");
-				if (t.canvasOuter.length < 1) {
-					t.canvasOuter = $('<div id="ce-canvas-outer"/>')
-							.css("display", "none")
-							.css("z-index", z)
-							.appendTo(t.element);
-					t.canvas = $('<canvas id="ce-canvas"/>')
-							.css("z-index", z+1)
-							.appendTo(t.canvasOuter);
-					t.canvasOverlay = $('<canvas id="ce-canvas-overlay"/>')
-							.css("z-index", z+2)
-							.css("cursor", t.settings.cursorShape)
-							.appendTo(t.canvasOuter);
-					t.cursor = $('<div id="ce-cursor"/>')
-							.css("display", "none")
-							.css("z-index", z+3)
-							.appendTo(t.canvasOuter);
+				if (null != this.element) {
+					t.canvasOuter = document.createElement('div');
+					t.canvasOuter.id = "ce-canvas-outer";
+					t.canvasOuter.style.display = "none";
+					t.canvasOuter.style.zIndex = z;
+					var innerHTML = '<canvas id="ce-canvas" style="z-index: ' + (z+1) + '"></canvas>';
+					innerHTML += '<canvas id="ce-canvas-overlay" style="z-index: ' + (z+2) + '; cursor: ' + t.settings.cursorShape + '"></canvas>';
+					innerHTML += '<div id="ce-cursor" style="display: none; z-index: ' + (z+3) + '"></div>';
+					t.canvasOuter.innerHTML = innerHTML;
+					this.element.appendChild(t.canvasOuter);
+
+					t.canvasOuterStyle = t.canvasOuter.style;
+					t.canvas = document.getElementById("ce-canvas");
+					t.canvasOverlay = document.getElementById("ce-canvas-overlay");
+					t.cursor = document.getElementById("ce-cursor");
+					t.cursorStyle = t.cursor.style;
 				}
 
 				// create text render
-				t.drawingCtx = asc_DC({canvas: t.canvas[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
-				t.overlayCtx = asc_DC({canvas: t.canvasOverlay[0], units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+				t.drawingCtx = asc_DC({canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
+				t.overlayCtx = asc_DC({canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont});
 				t.textRender = asc_TR(t.drawingCtx);
 				t.textRender.setDefaultFont(t.settings.font.clone());
 
 				// bind event handlers
-				t.canvasOverlay
+				$(t.canvasOverlay)
 						.off("." + namespace)
 						.on("mousedown."  + namespace, function () {return t._onMouseDown.apply(t, arguments);})
 						.on("mouseup."    + namespace, function () {return t._onMouseUp.apply(t, arguments);})
@@ -292,7 +293,8 @@
 				t.isTopLineActive = false;
 				t.input.removeClass("focused");
 				t._hideCursor();
-				t.canvasOuter.hide();
+				// hide
+				t.canvasOuterStyle.display = "none";
 
 				t.handlers.trigger("closed");
 				return true;
@@ -966,19 +968,17 @@
 				var t = this;
 				var z = parseInt(t.settings.canvasZindex);
 
-				$(t.canvasOuter)
-						.css("display", "none")
-						.css("left", (t.left * t.kx) + "px")
-						.css("top", (t.top * t.ky) + "px")
-						.css("width", ((t.right - t.left) * t.kx - 1) + "px")
-						.css("height", ((t.bottom - t.top) * t.ky - 1) + "px")
-						.css("z-index", t.top <= 0 ? -1 : z);
+				t.canvasOuterStyle.left = (t.left * t.kx) + "px";
+				t.canvasOuterStyle.top = (t.top * t.ky) + "px";
+				t.canvasOuterStyle.width = ((t.right - t.left) * t.kx - 1) + "px";
+				t.canvasOuterStyle.height = ((t.bottom - t.top) * t.ky - 1) + "px";
+				t.canvasOuterStyle.zIndex = t.top <= 0 ? -1 : z;
 
-				$(t.canvas).add(t.canvasOverlay)
-						.attr("width", (t.right - t.left) * t.kx - 1)
-						.attr("height", (t.bottom - t.top) * t.ky - 1);
+				t.canvas.width = t.canvasOverlay.width = (t.right - t.left) * t.kx - 1;
+				t.canvas.height = t.canvasOverlay.height = (t.bottom - t.top) * t.ky - 1;
 
-				t.canvasOuter.show();
+				// show
+				t.canvasOuterStyle.display = "block";
 			},
 
 			_renderText: function (dy) {
@@ -1046,19 +1046,24 @@
 				var t = this;
 				if (true === t.options.isHideCursor || t.isTopLineActive === true) {return;}
 				window.clearInterval(t.cursorTID);
-				t.cursor.show();
-				t.cursorTID = window.setInterval(function () {t.cursor.toggle();}, t.settings.blinkInterval);
+				t.cursorStyle.display = "block";
+				t.cursorTID = window.setInterval(function () {
+					if ("block" === t.cursorStyle.display)
+						t.cursorStyle.display = "none";
+					else
+						t.cursorStyle.display = "block";
+				}, t.settings.blinkInterval);
 			},
 
 			_hideCursor: function () {
 				var t = this;
 				window.clearInterval(t.cursorTID);
-				t.cursor.hide();
+				t.cursorStyle.display = "none";
 			},
 
 			_updateCursorPosition: function (redrawText) {
 				var t = this;
-				var h = t.canvas.innerHeight();
+				var h = t.canvas.height;
 				var y = - t.textRender.calcLineOffset(t.topLineIndex);
 				var cur = t.textRender.calcCharOffset(t.cursorPos);
 				var charsCount = t.textRender.getCharsCount();
@@ -1088,10 +1093,9 @@
 
 				if (dy !== undefined || redrawText) {t._renderText(y);}
 
-				t.cursor
-						.css("left", curLeft + "px")
-						.css("top", curTop + "px")
-						.css("height", curHeight + "px");
+				t.cursorStyle.left = curLeft + "px";
+				t.cursorStyle.top = curTop + "px";
+				t.cursorStyle.height = curHeight + "px";
 
 				if (cur) {t.input.scrollTop(t.input.height() * cur.lineIndex);}
 				if (t.isTopLineActive && !t.skipTLUpdate) {t._updateTopLineCurPos();}
@@ -1952,7 +1956,7 @@
 			/** @param event {jQuery.Event} */
 			_getCoordinates: function (event) {
 				var t = this;
-				var offs = t.canvasOverlay.offset();
+				var offs = $(t.canvasOverlay).offset();
 				var x = (event.pageX - offs.left) / t.kx;
 				var y = (event.pageY - offs.top) / t.ky;
 				return {x: x, y: y};
