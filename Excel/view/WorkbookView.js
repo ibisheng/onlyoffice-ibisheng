@@ -348,9 +348,9 @@
 				    });
     				
 
-				    this.input
+				    $(this.input)
 						    .on("focus", function () {
-							    self.input.addClass("focused");
+							    self.input.isFocused = true;
 							    if (self.controller.settings.isViewerMode) {
 								    return;
 							    }
@@ -456,11 +456,8 @@
 				// При редактировании ячейки не нужно пересылать изменения
 				if (false === ws.getCellEditMode()) {
 					// Сами запретим заходить в строку формул, когда выделен shape
-					if (this.lastSendInfoRangeIsSelectOnShape)
-						this.input.prop("disabled", true);
-					else
-						this.input.prop("disabled", false);
-					this.input.val(info.text);
+					this.input.disabled = true === this.lastSendInfoRangeIsSelectOnShape;
+					this.input.value = info.text;
 				}
 				this.handlers.trigger("asc_onSelectionChanged", info);
 			},
@@ -858,12 +855,12 @@
 						t.controller.setFormulaEditMode(false);
 						ws.setCellEditMode(false);
 						ws.setFormulaEditMode(false);
-						t.input.prop("disabled", true);
+						t.input.disabled = true;
 						asc_applyFunction(callback, false);
 						return;
 					}
 
-					t.input.prop("disabled", false);
+					t.input.disabled = false;
 					t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
 					// Эвент на обновление состояния редактора
 					t.cellEditor._updateEditorState();
@@ -878,7 +875,7 @@
 						t.controller.setFormulaEditMode(false);
 						ws.setCellEditMode(false);
 						ws.setFormulaEditMode(false);
-						t.input.prop("disabled", true);
+						t.input.disabled = true;
 
 						// Выключаем lock для редактирования ячейки
 						t.collaborativeEditing.onStopEditCell();

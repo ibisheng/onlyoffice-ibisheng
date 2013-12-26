@@ -26,6 +26,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.HtmlElementName = name;
 			this.topLineEditorName = inputName;
 			this.HtmlElement = null;
+			this.topLineEditorElement = null;
 
 			if ("function" === typeof(eventsController)) {
 				var prot = eventsController.prototype;
@@ -162,6 +163,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_init: function() {
 				var t = this;
 				this.HtmlElement = document.getElementById(this.HtmlElementName);
+				this.topLineEditorElement = document.getElementById(this.topLineEditorName);
 				// init drag&drop
 				if ("undefined" != typeof(FileReader) && "undefined" != typeof(FormData) && null != this.HtmlElement) {
 					this.HtmlElement["ondragover"] = function (e) {t._onDragOverImage(e);};
@@ -1732,7 +1734,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.controller,
 					this.handlers,
 					this.HtmlElement,
-					$("#" + this.topLineEditorName),
+					this.topLineEditorElement,
 					this,
 					this.collaborativeEditing,
 					this.fontRenderingMode,

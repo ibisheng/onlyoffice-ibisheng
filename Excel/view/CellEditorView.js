@@ -204,7 +204,7 @@
 						.on("mouseleave." + namespace, function () {return t._onMouseLeave.apply(t, arguments);})
 						.on("dblclick."   + namespace, function () {return t._onMouseDblClick.apply(t, arguments);});
 
-				t.input
+				$(t.input)
 						.off("." + namespace)
 						.on("focus."     + namespace, function () {return t.isOpened ? t._topLineGotFocus.apply(t, arguments) : true;})
 						.on("mousedown." + namespace, function () {return t.isOpened ? (t.callTopLineMouseup = true, true) : true;})
@@ -212,16 +212,15 @@
 						.on("input."     + namespace, function () {return t._onInputTextArea.apply(t, arguments);});
 
 				// check input, it may have zero len, for mobile version
-				if(t.input[0])
-				{
+				if (t.input) {
 					// Не поддерживаем drop на верхнюю строку
 					if (document.addEventListener) {
-						t.input[0].addEventListener("drop", function (e) {
+						t.input.addEventListener("drop", function (e) {
 							e.preventDefault();
 							return false;
 						}, false);
 					} else {
-						t.input[0].attachEvent("ondrop", function (e) {
+						t.input.attachEvent("ondrop", function (e) {
 							e.preventDefault();
 							return false;
 						});
@@ -231,7 +230,7 @@
 
 			destroy: function() {
 				$(window).off("." + namespace);
-				this.input.off("." + namespace);
+				$(this.input).off("." + namespace);
 			},
 
 			/**
@@ -259,7 +258,7 @@
 						.on("mouseup."   + namespace, function () {return t._onWindowMouseUp.apply(t, arguments);})
 						.on("mousemove." + namespace, function () {return t._onWindowMouseMove.apply(t, arguments);});
 				t._setOptions(options);
-				t.isTopLineActive = t.input.hasClass("focused");
+				t.isTopLineActive = true === t.input.isFocused;
 				t._draw();
 				if (!(options.cursorPos >= 0)) {
 					if (options.isClearCell)
@@ -291,7 +290,7 @@
 				$(window).off("." + namespace);
 				t.input.blur();
 				t.isTopLineActive = false;
-				t.input.removeClass("focused");
+				t.input.isFocused = false;
 				t._hideCursor();
 				// hide
 				t.canvasOuterStyle.display = "none";
@@ -835,7 +834,7 @@
 				t._cleanSelection();
 				t._adjustCanvas();
 				t._renderText();
-				t.input.val( t._getFragmentsText(opt.fragments) );
+				t.input.value = t._getFragmentsText(opt.fragments);
 				t._updateCursorPosition();
 				t._showCursor();
 			},
@@ -890,7 +889,7 @@
 				var funcPos, funcName, match;
 
 				if (!t.isTopLineActive || !t.skipTLUpdate || t.undoMode) {
-					t.input.val(s);
+					t.input.value = s;
 				}
 
 				if (isFormula) {
@@ -1048,10 +1047,7 @@
 				window.clearInterval(t.cursorTID);
 				t.cursorStyle.display = "block";
 				t.cursorTID = window.setInterval(function () {
-					if ("block" === t.cursorStyle.display)
-						t.cursorStyle.display = "none";
-					else
-						t.cursorStyle.display = "block";
+					t.cursorStyle.display = ("none" === t.cursorStyle.display) ? "block" : "none";
 				}, t.settings.blinkInterval);
 			},
 
@@ -1097,7 +1093,7 @@
 				t.cursorStyle.top = curTop + "px";
 				t.cursorStyle.height = curHeight + "px";
 
-				if (cur) {t.input.scrollTop(t.input.height() * cur.lineIndex);}
+				if (cur) {t.input.scrollTop = t.input.clientHeight * cur.lineIndex;}
 				if (t.isTopLineActive && !t.skipTLUpdate) {t._updateTopLineCurPos();}
 			},
 
@@ -1152,13 +1148,13 @@
 				var isSelected = t.selectionBegin !== t.selectionEnd;
 				var b = isSelected ? t.selectionBegin : t.cursorPos;
 				var e = isSelected ? t.selectionEnd : t.cursorPos;
-				if (t.input[0].setSelectionRange) {t.input[0].setSelectionRange(Math.min(b, e), Math.max(b, e));}
+				if (t.input.setSelectionRange) {t.input.setSelectionRange(Math.min(b, e), Math.max(b, e));}
 			},
 
 			_topLineGotFocus: function () {
 				var t = this;
 				t.isTopLineActive = true;
-				t.input.addClass("focused");
+				t.input.isFocused = true;
 				t.setFocus(true);
 				t._hideCursor();
 				t._updateTopLineCurPos();
@@ -1171,8 +1167,8 @@
 				// при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
 				// поэтому выполняем обработку после обработчика системы
 				setTimeout(function () {
-					var b = t.input[0].selectionStart;
-					var e = t.input[0].selectionEnd;
+					var b = t.input.selectionStart;
+					var e = t.input.selectionEnd;
 					if (typeof b !== "undefined") {
 						if (t.cursorPos !== b) {t._moveCursor(kPosition, b);}
 						if (b !== e) {t._selectChars(kPosition, e);}
@@ -1183,7 +1179,7 @@
 			_syncEditors: function () {
 				var t = this;
 				var s1 = t._getFragmentsText(t.options.fragments);
-				var s2 = t.input.val();
+				var s2 = t.input.value;
 				var l = Math.min(s1.length, s2.length);
 				var i1 = 0, i2 = 0;
 
@@ -1611,7 +1607,7 @@
 				t.skipTLUpdate = false;
 
 				// определение ввода иероглифов
-				if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.val().length) {
+				if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.value.length) {
 					hieroglyph = true;
 				}
 
@@ -1794,7 +1790,7 @@
 							if (t.isTopLineActive) {
 								// чтобы поставить выполнение в очередь после вставки из клипборда используется двойной setTimeout
 								setTimeout(
-										function(){setTimeout(function(){t._updateTopLineCurPos(); t.input[0].focus();}, 0);},
+										function(){setTimeout(function(){t._updateTopLineCurPos(); t.input.focus();}, 0);},
 										0);
 							}
 							switch (event.which) {
@@ -1847,7 +1843,7 @@
 				if (!t.hasFocus) {t.setFocus(true);}
 
 				// определение ввода иероглифов
-				if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.val().length) {
+				if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.value.length) {
 					t._syncEditors();
 				}
 
@@ -1889,7 +1885,7 @@
 				this.setFocus(true);
 
 				t.isTopLineActive = false;
-				t.input.removeClass("focused");
+				t.input.isFocused = false;
 				t._showCursor();
 
 				if (event.which === 1) {
@@ -1947,7 +1943,7 @@
 				if (this.isUpdateValue) {
 					// Для языков с иероглифами не приходят эвенты с клавиатуры, поэтому обработаем здесь
 					this.skipTLUpdate = true;
-					this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.val());
+					this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.value);
 				}
 				this.isUpdateValue = true;
 				return true;
