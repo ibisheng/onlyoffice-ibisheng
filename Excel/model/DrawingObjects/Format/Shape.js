@@ -3310,6 +3310,7 @@ CShape.prototype =
                 this.calculateTransformTextMatrix();
                 this.recalculateBrush();
                 this.recalculatePen();
+                this.recalculateBounds();
                 break;
             }
 

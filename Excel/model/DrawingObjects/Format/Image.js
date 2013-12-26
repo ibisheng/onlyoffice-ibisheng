@@ -1182,6 +1182,7 @@ CImageShape.prototype =
                 this.calculateContent();
                 this.calculateTransformTextMatrix();
                 this.recalculateBrush();
+                this.recalculateBounds();
                 break;
             }
             case historyitem_AutoShapes_SetXfrm:
