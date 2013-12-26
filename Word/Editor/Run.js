@@ -4,6 +4,10 @@
  * Time: 18:28
  */
 
+var RunRangesCount         = 0;
+var RunRangesElementsCount = 0;
+var ParaRangesCount        = 0;
+
 function ParaRun(Document)
 {
     this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
@@ -124,14 +128,19 @@ ParaRun.prototype =
         else
             this.TextRun = false;
 
+        this.TextRun = false;
+
         this.RecalcInfo.Recalc  = true;
         this.RecalcInfo.Measure = false;
     },
 
-    Recalculate_Range : function(PRS, ParaPr)
+    Recalculate_Range : function( ParaPr)
     {
+        RunRangesCount++;
         // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
         this.Recalculate_MeasureContent();
+
+        var PRS = g_oPRSW;
 
         var CurLine  = PRS.Line - this.StartLine;
         if ( undefined === this.Lines[CurLine] )
@@ -245,8 +254,11 @@ ParaRun.prototype =
             var LineRule = ParaPr.Spacing.LineRule;
 
             var Pos = RangeStartPos;
-            while ( Pos < ContentLen )
+
+            var UpdateLineMetricsText = false;
+            for ( ; Pos < ContentLen; Pos++ )
             {
+                RunRangesElementsCount++;
                 if ( false === StartWord && true === FirstItemOnLine && Math.abs( XEnd - X ) < 0.001 && RangesCount > 0 )
                 {
                     NewRange    = true;
@@ -269,8 +281,7 @@ ParaRun.prototype =
                         // Отмечаем, что началось слово
                         StartWord = true;
 
-                        // Пересчитаем метрику строки относительно размера данного текста
-                        this.Internal_Recalculate_LineMetrics( PRS, LineRule );
+                        UpdateLineMetricsText = true;
 
                         // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                         var LetterLen = Item.Width;
@@ -711,8 +722,12 @@ ParaRun.prototype =
 
                 if ( true === NewRange )
                     break;
+            }
 
-                Pos++;
+            if ( true === UpdateLineMetricsText )
+            {
+                // Пересчитаем метрику строки относительно размера данного текста
+                this.Internal_Recalculate_LineMetrics( PRS, LineRule );
             }
 
             PRS.MoveToLBP       = MoveToLBP;
