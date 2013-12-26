@@ -453,7 +453,7 @@ DrawingContext.prototype = {
 	 */
 	getWidth: function (units) {
 		var i = units >= 0 && units <=3 ? units : this.units;
-		return this.canvas[0].width * getCvtRatio(0/*px*/, i, this.ppiX);
+		return this.canvas.width * getCvtRatio(0/*px*/, i, this.ppiX);
 	},
 
 	/**
@@ -463,7 +463,7 @@ DrawingContext.prototype = {
 	 */
 	getHeight: function (units) {
 		var i = units >= 0 && units <=3 ? units : this.units;
-		return this.canvas[0].height * getCvtRatio(0/*px*/, i, this.ppiY);
+		return this.canvas.height * getCvtRatio(0/*px*/, i, this.ppiY);
 	},
 
 	/**
@@ -471,7 +471,7 @@ DrawingContext.prototype = {
 	 * @type {Element}
 	 */
 	getCanvas: function () {
-		return this.canvas[0];
+		return this.canvas;
 	},
 
 	/**
@@ -479,10 +479,9 @@ DrawingContext.prototype = {
 	 * @param canvas
 	 */
 	setCanvas: function (canvas) {
-		var c = canvas !== undefined ? canvas : null;
-		if (c === null) {return;}
-		this.canvas = $(c);
-		this.ctx = c.getContext("2d");
+		if (null == canvas) {return;}
+		this.canvas = canvas;
+		this.ctx = this.canvas.getContext("2d");
 		if (this.ctx.mozImageSmoothingEnabled) {
 			this.ctx.mozImageSmoothingEnabled = false;
 		}
@@ -563,11 +562,11 @@ DrawingContext.prototype = {
 	resetSize: function (width, height) {
 		var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
 		    h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
-		if (w !== this.canvas[0].width) {
-			this.canvas[0].width = w;
+		if (w !== this.canvas.width) {
+			this.canvas.width = w;
 		}
-		if (h !== this.canvas[0].height) {
-			this.canvas[0].height = h;
+		if (h !== this.canvas.height) {
+			this.canvas.height = h;
 		}
 		return this;
 	},
@@ -580,11 +579,11 @@ DrawingContext.prototype = {
 	expand: function (width, height) {
 		var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
 		    h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
-		if (w > this.canvas[0].width) {
-			this.canvas[0].width = w;
+		if (w > this.canvas.width) {
+			this.canvas.width = w;
 		}
-		if (h > this.canvas[0].height) {
-			this.canvas[0].height = h;
+		if (h > this.canvas.height) {
+			this.canvas.height = h;
 		}
 		return this;
 	},
