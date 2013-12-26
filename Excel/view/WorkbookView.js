@@ -143,7 +143,7 @@
 
 					this.canvas = document.getElementById("ws-canvas");
 					this.canvasOverlay = document.getElementById("ws-canvas-overlay");
-					//this._canResize(); ToDo должно отрабатывать, но нам приходит resize сверху
+					this._canResize();
 				}
 
 				this.buffers.main = asc_DC({canvas: this.canvas, units: 1/*pt*/,
@@ -1163,6 +1163,9 @@
 			resize: function (event) {
 				if (this._canResize()) {
 					this.getWorksheet().resize();
+					this.showWorksheet(undefined, true);
+				} else {
+					// ToDo не должно происходить ничего, но нам приходит resize сверху
 					this.showWorksheet(undefined, true);
 				}
 			},
