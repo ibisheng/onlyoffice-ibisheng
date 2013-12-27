@@ -196,28 +196,23 @@
 				t.textRender.setDefaultFont(t.settings.font.clone());
 
 				// bind event handlers
-				$(t.canvasOverlay)
-						.off("." + namespace)
-						.on("mousedown."  + namespace, function () {return t._onMouseDown.apply(t, arguments);})
-						.on("mouseup."    + namespace, function () {return t._onMouseUp.apply(t, arguments);})
-						.on("mousemove."  + namespace, function () {return t._onMouseMove.apply(t, arguments);})
-						.on("mouseleave." + namespace, function () {return t._onMouseLeave.apply(t, arguments);})
-						.on("dblclick."   + namespace, function () {return t._onMouseDblClick.apply(t, arguments);});
-
-				$(t.input)
-						.off("." + namespace)
-						.on("focus."     + namespace, function () {return t.isOpened ? t._topLineGotFocus.apply(t, arguments) : true;})
-						.on("mousedown." + namespace, function () {return t.isOpened ? (t.callTopLineMouseup = true, true) : true;})
-						.on("mouseup."   + namespace, function () {return t.isOpened ? t._topLineMouseUp.apply(t, arguments) : true;})
-						.on("input."     + namespace, function () {return t._onInputTextArea.apply(t, arguments);});
+				if (t.canvasOverlay && t.canvasOverlay.addEventListener) {
+					t.canvasOverlay.addEventListener("mousedown"	, function () {return t._onMouseDown.apply(t, arguments);}		, false);
+					t.canvasOverlay.addEventListener("mouseup"		, function () {return t._onMouseUp.apply(t, arguments);}		, false);
+					t.canvasOverlay.addEventListener("mousemove"	, function () {return t._onMouseMove.apply(t, arguments);}		, false);
+					t.canvasOverlay.addEventListener("mouseleave"	, function () {return t._onMouseLeave.apply(t, arguments);}		, false);
+					t.canvasOverlay.addEventListener("dblclick"		, function () {return t._onMouseDblClick.apply(t, arguments);}	, false);
+				}
 
 				// check input, it may have zero len, for mobile version
 				if (t.input && t.input.addEventListener) {
+					t.input.addEventListener("focus"	, function () {return t.isOpened ? t._topLineGotFocus.apply(t, arguments) : true;}	, false);
+					t.input.addEventListener("mousedown", function () {return t.isOpened ? (t.callTopLineMouseup = true) : true;}			, false);
+					t.input.addEventListener("mouseup"	, function () {return t.isOpened ? t._topLineMouseUp.apply(t, arguments) : true;}	, false);
+					t.input.addEventListener("input"	, function () {return t._onInputTextArea.apply(t, arguments);}						, false);
+
 					// Не поддерживаем drop на верхнюю строку
-					t.input.addEventListener("drop", function (e) {
-						e.preventDefault();
-						return false;
-					}, false);
+					t.input.addEventListener("drop"		, function (e) {e.preventDefault(); return false;}									, false);
 				}
 			},
 
