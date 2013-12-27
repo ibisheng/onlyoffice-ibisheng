@@ -7419,12 +7419,22 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 			case 12:	props = {type:DEGREE_SubSup};
 						var oDegree = new CDegreeSubSup();
 						MathElement.CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
-						oDegree.fillPlaceholders();
+						var oSub = oDegree.getLowerIterator();
+						oSub.fillPlaceholders();
+						var oSup = oDegree.getUpperIterator();
+						oSup.fillPlaceholders();
+						var oElem = oDegree.getBase();
+						oElem.fillPlaceholders();
 						break;
 			case 13:	props = {type:DEGREE_PreSubSup};
 						var oDegree = new CDegreeSubSup();
 						MathElement.CreateDegree(oDegree, MathElement.Math.Root, props, null, null, null);
-						oDegree.fillPlaceholders();
+						var oSub = oDegree.getLowerIterator();
+						oSub.fillPlaceholders();
+						var oSup = oDegree.getUpperIterator();
+						oSup.fillPlaceholders();
+						var oElem = oDegree.getBase();
+						oElem.fillPlaceholders();
 						break;
 			case 14:	props = {type:DEGREE_SUBSCRIPT};			
 						var oDegree = new CDegree();
@@ -7526,7 +7536,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						var oDegree2 = new CDegree();
 						MathElement.CreateDegree(oDegree2, oElem, props, sBase, sSup, null);						
 						break;
-			case 24:	props = {limLoc:NARY_SubSup, subHide:true, supHide:true};
+			case 24:	props = {limLoc:NARY_UndOvr, subHide:true, supHide:true};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
@@ -7553,7 +7563,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oSup.fillPlaceholders();
 						break;
 			case 27:	var sVal = String.fromCharCode(8748);
-						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						props = {limLoc:NARY_UndOvr, subHide:true, supHide:true, chr:sVal};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
@@ -7582,7 +7592,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oSup.fillPlaceholders();
 						break;
 			case 30:	var sVal = String.fromCharCode(8749);
-						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						props = {limLoc:NARY_UndOvr, subHide:true, supHide:true, chr:sVal};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
@@ -7611,7 +7621,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oSup.fillPlaceholders();
 						break;
 			case 33:	var sVal = String.fromCharCode(8750);
-						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						props = {limLoc:NARY_UndOvr, subHide:true, supHide:true, chr:sVal};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
@@ -7640,7 +7650,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oSup.fillPlaceholders();
 						break;
 			case 36:	var sVal = String.fromCharCode(8751);
-						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						props = {limLoc:NARY_UndOvr, subHide:true, supHide:true, chr:sVal};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
@@ -7669,7 +7679,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						oSup.fillPlaceholders();
 						break;
 			case 39:	var sVal = String.fromCharCode(8752);
-						props = {limLoc:NARY_SubSup, subHide:true, supHide:true, chr:sVal};
+						props = {limLoc:NARY_UndOvr, subHide:true, supHide:true, chr:sVal};
 						var oNary = new CNary();
 						MathElement.CreateNary(oNary,MathElement.Math.Root,props,null,null,null);
 						var oElem = oNary.getBase();
