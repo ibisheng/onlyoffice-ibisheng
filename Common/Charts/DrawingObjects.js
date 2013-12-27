@@ -52,6 +52,13 @@ function getCurrentTime() {
 	return currDate.getTime();
 }
 
+function roundPlus(x, n) { //x - число, n - количество знаков 
+	if ( isNaN(x) || isNaN(n) ) return false;
+	var m = Math.pow(10,n);
+	return Math.round(x * m) / m;
+}
+
+
 //{ ASC Classes
 
 //-----------------------------------------------------------------------------------
@@ -2590,7 +2597,7 @@ function DrawingObjects() {
 	_this.asyncImageEndLoaded = null;
 	_this.asyncImagesDocumentEndLoaded = null;
 	
-	var wsCellCache = { cols: null, rows: null, isInit: false };	
+	var wsCellCache = { cols: null, rows: null, isInit: false };
 	
 	// Task timer
 	var aDrawTasks = [];
@@ -3276,19 +3283,28 @@ function DrawingObjects() {
 	
 	_this.getBoundsChecker = function(graphicObject) {
 		if ( graphicObject ) {
-			var boundsChecker = new  CSlideBoundsChecker();
-			boundsChecker.init(1, 1, 1, 1);
-			boundsChecker.transform3(graphicObject.transform);
-			boundsChecker.rect(0,0, graphicObject.extX, graphicObject.extY);
-			graphicObject.draw(boundsChecker);
-			boundsChecker.CorrectBounds();
-			
 			// Коррекция для селекта при блокировке
 			var delta = 4;
-			boundsChecker.Bounds.min_x = Math.max(1, boundsChecker.Bounds.min_x - delta);
-			boundsChecker.Bounds.min_y = Math.max(1, boundsChecker.Bounds.min_y - delta);
-			boundsChecker.Bounds.max_x += delta;
-			boundsChecker.Bounds.max_y += delta;
+			var boundsChecker = new  CSlideBoundsChecker();
+			
+			if ( graphicObject.bounds ) {
+				boundsChecker.Bounds.min_x = Math.max(1, graphicObject.bounds.x - delta);
+				boundsChecker.Bounds.min_y = Math.max(1, graphicObject.bounds.y - delta);
+				boundsChecker.Bounds.max_x = graphicObject.bounds.x + graphicObject.bounds.w + delta;
+				boundsChecker.Bounds.max_y = graphicObject.bounds.y + graphicObject.bounds.h + delta;
+			}
+			else {
+				boundsChecker.init(1, 1, 1, 1);
+				boundsChecker.transform3(graphicObject.transform);
+				boundsChecker.rect(0,0, graphicObject.extX, graphicObject.extY);
+				graphicObject.draw(boundsChecker);
+				boundsChecker.CorrectBounds();
+				boundsChecker.Bounds.min_x = Math.max(1, boundsChecker.Bounds.min_x - delta);
+				boundsChecker.Bounds.min_y = Math.max(1, boundsChecker.Bounds.min_y - delta);
+				boundsChecker.Bounds.max_x += delta;
+				boundsChecker.Bounds.max_y += delta;
+			}
+			
 			return boundsChecker;
 		}
 		return null;
@@ -3363,6 +3379,7 @@ function DrawingObjects() {
 		var bRedraw = false;
 		var selection = worksheet.activeRange.clone(true);
 		
+		// Проверка селекшена по углам
 		function isRangeInObject(range) {
 			var result = false;
 			if ( range ) {
@@ -3408,20 +3425,6 @@ function DrawingObjects() {
 					break;
 				}
 			}
-			// Проверяем по четырём точкам (x1, y1) (x2, y2) (x3, y3) (x4, y4)
- 			if ( !bRedraw ) {			
-				if (isRangeInObject(selection))
-					bRedraw = true;
-				else {
-					// Проверяем диапазоны диаграмм
-					for (var j = 0; j < worksheet.arrActiveChartsRanges.length; j++) {
-						if (isRangeInObject(selection)) {
-							bRedraw = true;
-							break;
-						}
-					}
-				}
-			}
 		}
 		
 		shapeOverlayCtx.updatedRect = null;
@@ -3455,6 +3458,14 @@ function DrawingObjects() {
 				aObjects[i].graphicObject.draw(shapeOverlayCtx);
 			}
 			shapeOverlayCtx.ClearMode = false;
+			
+			/*setTimeout(function() {
+				shapeOverlayCtx.ClearMode = true;
+				for ( var i = 0; i < aObjects.length; i++ ) {
+					aObjects[i].graphicObject.draw(shapeOverlayCtx);
+				}
+				shapeOverlayCtx.ClearMode = false;
+			}, 10);*/
 		}
 	}	
 
@@ -3464,8 +3475,7 @@ function DrawingObjects() {
 	
 	_this.showDrawingObjects = function(clearCanvas, graphicOption, printOptions) {
 	
-		var currDate = new Date();
-		var currTime = currDate.getTime();
+		var currTime = getCurrentTime();
 		if ( aDrawTasks.length ) {
 			
 			var lastTask = aDrawTasks[aDrawTasks.length - 1];
@@ -3526,6 +3536,11 @@ function DrawingObjects() {
 					updatedRect.w = ptToMm(w);
 					updatedRect.h = ptToMm(h);
 					
+					/*shapeCtx.m_oContext.beginPath();
+					shapeCtx.m_oContext.strokeStyle = "#FF0000";
+					shapeCtx.m_oContext.rect(mmToPx(updatedRect.x) + scrollOffset.getX(), mmToPx(updatedRect.y) + scrollOffset.getY(), mmToPx(updatedRect.w), mmToPx(updatedRect.h));
+					shapeCtx.m_oContext.stroke();*/
+					
 					shapeCtx.updatedRect = updatedRect;
 					
 					if ( graphicOption.type === c_oAscGraphicOption.AddText ) {
@@ -3547,8 +3562,9 @@ function DrawingObjects() {
 						drawingObject.graphicObject.syncAscChart();
 					
 					if ( !printOptions ) {
-						if ( !drawingObject.inVisibleArea(graphicOption) )
+						if ( !drawingObject.inVisibleArea(graphicOption) ) {
 							continue;
+						}
 					}
 					
 					//console.log("draw object: " + (i + 1));
@@ -3590,8 +3606,8 @@ function DrawingObjects() {
 			if ( aObjects.length ) {
 				if ( _this.controller.selectedObjects.length )
 					_this.OnUpdateOverlay();
-				else
-					_this.raiseLayerDrawingObjects();
+				//else
+				//	_this.raiseLayerDrawingObjects();
 			}
 		}
 	}
@@ -3751,13 +3767,13 @@ function DrawingObjects() {
 				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
 				
 				var vr = worksheet.visibleRange;
-				var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 1;
-				var borderOffsetY = (updatedRange.r1 <= vr.r1) ? 0 : 1;
+				var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 3;
+				var borderOffsetY = (updatedRange.r1 <= vr.r1) ? 0 : 3;
 				
 				x = ptToPx(worksheet.getCellLeft(updatedRange.c1, 1) - offsetX) - borderOffsetX;
 				y = ptToPx(worksheet.getCellTop(updatedRange.r1, 1) - offsetY) - borderOffsetY;
-				w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0) + 1;
-				h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0) + 1;
+				w = worksheet.getCellLeft(updatedRange.c2, 0) - worksheet.getCellLeft(updatedRange.c1, 0) + 3;
+				h = worksheet.getCellTop(updatedRange.r2, 0) - worksheet.getCellTop(updatedRange.r1, 0) + 3;
 				
 				/*canvas.m_oContext.beginPath();
 				canvas.m_oContext.strokeStyle = "#FF0000";
@@ -3783,9 +3799,9 @@ function DrawingObjects() {
 	
 	_this.restoreGraphicsCanvas = function(canvas) {
 		if ( canvas instanceof CGraphics ) {
-            // этот рестор нужен для восстановления сложных вложенных клипов
-            canvas.m_oContext.restore();
-
+			canvas.m_oContext.restore();
+			
+			// этот рестор нужен для восстановления сложных вложенных клипов
             canvas.m_oContext.restore();
         }
 	}
@@ -5553,7 +5569,8 @@ function CoordsManager(ws, bLog) {
 		//
 		
 		var delta = 0;
-		var col = worksheet._findColUnderCursor( xPt - offsetX, true );
+		var what = roundPlus(xPt - offsetX, 3);
+		var col = worksheet._findColUnderCursor( what, true );
 		while (col == null) {
 			if ( isMaxCol() ) {
 				col = worksheet._findColUnderCursor( worksheet.cols[gc_nMaxCol - 1].left - 1, true );
@@ -5561,8 +5578,8 @@ function CoordsManager(ws, bLog) {
 			}
 			worksheet.expandColsOnScroll(true);
 			worksheet.handlers.trigger("reinitializeScrollX");
-			col = worksheet._findColUnderCursor( xPt - offsetX + delta, true );
-			if ( xPt - offsetX < 0 )
+			col = worksheet._findColUnderCursor( what + delta, true );
+			if ( what < 0 )
 				delta++;
 		}
 		cell.col = col.col;
@@ -5570,7 +5587,8 @@ function CoordsManager(ws, bLog) {
 		cell.colOff = worksheet.objectRender.convertMetric(cell.colOffPx, 0, 3);
 
 		delta = 0;
-		var row = worksheet._findRowUnderCursor( yPt - offsetY, true );
+		what = roundPlus(yPt - offsetY, 3);
+		var row = worksheet._findRowUnderCursor( what, true );
 		while (row == null) {
 			if ( isMaxRow() ) {
 				row = worksheet._findRowUnderCursor( worksheet.rows[gc_nMaxRow - 1].top - 1, true );
@@ -5578,8 +5596,8 @@ function CoordsManager(ws, bLog) {
 			}
 			worksheet.expandRowsOnScroll(true);
 			worksheet.handlers.trigger("reinitializeScrollY");
-			row = worksheet._findRowUnderCursor( yPt - offsetY + delta, true );
-			if ( yPt - offsetY < 0 )
+			row = worksheet._findRowUnderCursor( what + delta, true );
+			if ( what < 0 )
 				delta++;
 		}
 		cell.row = row.row;
