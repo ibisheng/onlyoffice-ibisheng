@@ -1,4 +1,4 @@
-
+﻿
 function CChartAsGroup(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase && drawingBase.updateAnchorPosition ?  drawingBase : null;
@@ -758,8 +758,16 @@ CChartAsGroup.prototype =
         this.setAscChart(chart);
         this.setXfrmObject(new CXfrm());
         var xfrm = this.spPr.xfrm;
-        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
-        var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
+
+		// ToDo позицию должны выставлять сверху
+		var wsCanvas = document.getElementById("ws-canvas");
+		var width = 0, height = 0;
+		if (wsCanvas) {
+			width = wsCanvas.width;
+			height = wsCanvas.height;
+		}
+        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (width / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
+        var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (height / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
         xfrm.setPosition(chartLeft, chartTop);
         var w = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartWidth, 0, 3), h = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartHeight, 0, 3);
         if(isRealObject(options))
@@ -1972,8 +1980,17 @@ CChartAsGroup.prototype =
         }
         this.chart.Read_FromBinary2(r, false);
         this.spPr.Read_FromBinary2(r);
-        var chartLeft =this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
-        var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
+
+		// ToDo позицию должны выставлять сверху
+		var wsCanvas = document.getElementById("ws-canvas");
+		var width = 0, height = 0;
+		if (wsCanvas) {
+			width = wsCanvas.width;
+			height = wsCanvas.height;
+		}
+
+        var chartLeft =this.drawingObjects.convertMetric((width / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
+        var chartTop = this.drawingObjects.convertMetric((height / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
         this.spPr.xfrm.setPosition(chartLeft, chartTop);
         this.init();
         this.addToDrawingObjects();
