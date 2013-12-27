@@ -31,6 +31,9 @@ function SetHintsProps(bIsHinting, bIsSubpixHinting)
 
 SetHintsProps(true, true);
 
+var _canvas_tables = null;
+var _table_styles = null;
+
 function CTableMarkup(Table)
 {
     this.Internal =
@@ -1788,6 +1791,9 @@ function CDrawingDocument()
 
     this.TableStylesLastLook = null;
     this.LastParagraphMargins = null;
+
+    this.TableStylesSheckLook = null;
+    this.TableStylesSheckLookFlag = false;
 
     // параметры для SelectShow
     this.min_PageAddSelection = 100000;
@@ -4979,8 +4985,30 @@ function CDrawingDocument()
         editor.isViewMode = _oldTurn;
     }
 
+    this.StartTableStylesCheck = function()
+    {
+        this.TableStylesSheckLookFlag = true;
+    }
+
+    this.EndTableStylesCheck = function()
+    {
+        if (this.TableStylesSheckLook != null)
+        {
+            this.CheckTableStyles(this.TableStylesSheckLook);
+            this.TableStylesSheckLook = null;
+        }
+
+        this.TableStylesSheckLookFlag = false;
+    }
+
     this.CheckTableStyles = function(tableLook)
     {
+        if (this.TableStylesSheckLookFlag)
+        {
+            this.TableStylesSheckLook = tableLook;
+            return;
+        }
+
         // сначала проверим, подписан ли кто на этот евент
         // а то во вьюере не стоит ничего посылать
         if (!this.m_oWordControl.m_oApi.asc_checkNeedCallback("asc_onInitTableTemplates"))
@@ -5054,29 +5082,30 @@ function CDrawingDocument()
 
         var W = (_pageW - _x_mar - _r_mar);
         var H = (_pageH - _y_mar - _b_mar);
-        var Grid = [];
 
-        var Rows = 5;
-        var Cols = 5;
-
-        for (var i = 0; i < Cols; i++)
-            Grid[i] = W / Cols;
-
-        var _canvas = document.createElement('canvas');
-
-        if (!this.m_oWordControl.bIsRetinaSupport)
+        if (_canvas_tables == null)
         {
-            _canvas.width = TABLE_STYLE_WIDTH_PIX;
-            _canvas.height = TABLE_STYLE_HEIGHT_PIX;
+            _canvas_tables = document.createElement('canvas');
+
+            if (!this.m_oWordControl.bIsRetinaSupport)
+            {
+                _canvas_tables.width = TABLE_STYLE_WIDTH_PIX;
+                _canvas_tables.height = TABLE_STYLE_HEIGHT_PIX;
+            }
+            else
+            {
+                _canvas_tables.width = (TABLE_STYLE_WIDTH_PIX << 1);
+                _canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+            }
         }
-        else
-        {
-            _canvas.width = (TABLE_STYLE_WIDTH_PIX << 1);
-            _canvas.height = (TABLE_STYLE_HEIGHT_PIX << 1);
-        }
+
+        var _canvas = _canvas_tables;
         var ctx = _canvas.getContext('2d');
 
+        var Rows = 5;
+
         History.TurnOff();
+        g_oTableId.m_bTurnOff = true;
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
             var i = _styles[i1];
@@ -5085,11 +5114,30 @@ function CDrawingDocument()
             if (!_style || _style.Type != styletype_Table)
                 continue;
 
-            var table = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
-            table.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
+            if (_table_styles == null)
+            {
+                var Cols = 5;
 
-            for (var j = 0; j < Rows; j++)
-                table.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+                var Grid = [];
+                for (var ii = 0; ii < Cols; ii++)
+                    Grid[ii] = W / Cols;
+
+                _table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
+
+                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
+
+                for (var j = 0; j < Rows; j++)
+                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+            }
+            else
+            {
+                _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed, CellSelect: false});
+                _table_styles.Recalc_CompiledPr2();
+
+                for (var j = 0; j < Rows; j++)
+                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+            }
+
 
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
@@ -5099,12 +5147,12 @@ function CDrawingDocument()
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);
 
-            table.Recalculate_Page(0);
+            _table_styles.Recalculate_Page(0);
 
             var _old_mode = editor.isViewMode;
             editor.isViewMode = true;
             editor.isShowTableEmptyLineAttack = true;
-            table.Draw(0, graphics);
+            _table_styles.Draw(0, graphics);
             editor.isShowTableEmptyLineAttack = false;
             editor.isViewMode = _old_mode;
 
@@ -5114,6 +5162,7 @@ function CDrawingDocument()
             _styleD.Id = i;
             _dst_styles.push(_styleD);
         }
+        g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles, this.m_oWordControl.bIsRetinaSupport);
