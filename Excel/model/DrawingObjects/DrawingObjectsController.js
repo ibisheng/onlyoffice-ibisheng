@@ -798,6 +798,28 @@ DrawingObjectsController.prototype =
 
     addChartDrawingObject: function(chart, options)
     {
+        switch (chart.type)
+        {
+            case "Line":
+            {
+                switch (chart.subType)
+                {
+                    case "normal":
+                    {
+                        return CreateLineChart(chart.series, GROUPING_STANDARD);
+                    }
+                    case "stacked":
+                    {
+                        return CreateLineChart(chart.series, GROUPING_STACKED);
+                    }
+                    case "stackedPer":
+                    {
+                        return CreateLineChart(chart.series, GROUPING_PERCENT_STACKED);
+                    }
+                }
+                break;
+            }
+        }
         var chart_as_group = new CChartAsGroup(null, this.drawingObjects);
         chart_as_group.initFromChartObject(chart, options);
         this.resetSelectionState();

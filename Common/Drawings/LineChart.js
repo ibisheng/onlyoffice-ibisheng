@@ -14,7 +14,6 @@ function CLineChart()
     this.upDownBars = null;
     this.varyColors = null;
 
-
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -136,24 +135,31 @@ CLineChart.prototype =
                 this.marker = data.oldPr;
                 break
             }
-            case historyitem_LineChart_SetSer:
+            case historyitem_LineChart_AddSer:
             {
-                this.series = data.oldPr;
+                for(var i = this.series.length - 1; i > -1; --i)
+                {
+                    if(this.series[i] === data.ser)
+                    {
+                        this.series.splice(i, 1);
+                        break;
+                    }
+                }
                 break
             }
             case historyitem_LineChart_SetSmooth:
             {
-                this.axId = data.oldPr;
+                this.smooth = data.oldPr;
                 break
             }
             case historyitem_LineChart_SetUpDownBars:
             {
-                this.axId = data.oldPr;
+                this.upDownBars = data.oldPr;
                 break
             }
             case historyitem_LineChart_SetVaryColors:
             {
-                this.axId = data.oldPr;
+                this.varyColors = data.oldPr;
                 break
             }
         }
@@ -195,22 +201,22 @@ CLineChart.prototype =
             }
             case historyitem_LineChart_AddSer:
             {
-                this.series = data.newPr;
+                this.series.push(data.ser);
                 break
             }
             case historyitem_LineChart_SetSmooth:
             {
-                this.axId = data.newPr;
+                this.smooth = data.newPr;
                 break
             }
             case historyitem_LineChart_SetUpDownBars:
             {
-                this.axId = data.newPr;
+                this.upDownBars = data.newPr;
                 break
             }
             case historyitem_LineChart_SetVaryColors:
             {
-                this.axId = data.newPr;
+                this.varyColors = data.newPr;
                 break
             }
         }

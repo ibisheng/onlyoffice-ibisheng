@@ -4,7 +4,7 @@ function CBandFmt()
     this.spPr = null;
 
     this.Id = g_oIdCounter.Get_NewId();
-    g_oIdCounter.Add(this, this.Id);
+    g_oTableId.Add(this, this.Id);
 }
 
 CBandFmt.prototype =

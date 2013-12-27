@@ -19,7 +19,7 @@ function CChart()
     this.view3D = null;
 
     this.Id = g_oIdCounter.Get_NewId();
-    g_oIdCounter.Add(this, this.Id);
+    g_oTableId.Add(this, this.Id);
 }
 
 CChart.prototype =

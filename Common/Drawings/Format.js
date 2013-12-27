@@ -1492,11 +1492,11 @@ CUniColor.prototype =
             {
                 if(r.GetBool())
                 {
-                    this.Mods = = g_oTableId.Get_ById(r.GetString2());
+                    this.Mods = g_oTableId.Get_ById(r.GetString2());
                 }
                 else
                 {
-                    thos.Mods = null;
+                    this.Mods = null;
                 }
                 break;
             }
@@ -3813,7 +3813,7 @@ EndArrow.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
-    }
+    },
 
     getObjectType: function()
     {
@@ -4726,7 +4726,7 @@ DefaultShapeDefinition.prototype=
 
     Undo: function(data)
     {
-        switch()
+        switch(data.Type)
         {
         	case historyitem_DefaultShapeDefinition_SetSpPr:
         	{
@@ -4753,7 +4753,7 @@ DefaultShapeDefinition.prototype=
 
     Redo: function(data)
     {
-    	switch()
+    	switch(data.Type)
         {
         	case historyitem_DefaultShapeDefinition_SetSpPr:
         	{
@@ -6742,7 +6742,7 @@ function CSpPr()
     this.Geometry   = null;//new Geometry();
     this.Fill       = null;
     this.ln         = null;
-
+    this.parent     = null;
     this.merge = function(spPr)
     {
         /*if(spPr.xfrm != null)
@@ -7063,9 +7063,9 @@ ClrScheme.prototype =
         this.name = name;
     },
 
-    setColor: function(index, color)
+    addColor: function(index, color)
     {
-        History.Add(this, {Type: historyitem_ClrScheme_SetClr, index: index, newColor: color, oldColor: this.colors[index]});
+        History.Add(this, {Type: historyitem_ClrScheme_AddClr, index: index, newColor: color, oldColor: this.colors[index]});
         this.colors[index] = color;
     },
 
@@ -7078,7 +7078,7 @@ ClrScheme.prototype =
                 this.name = data.oldPr;
                 break;
             }
-            case historyitem_ClrScheme_SetClr:
+            case historyitem_ClrScheme_AddClr:
             {
                 this.colors[data.index] = data.oldColor;
             }
@@ -7094,7 +7094,7 @@ ClrScheme.prototype =
                 this.name = data.newPr;
                 break;
             }
-            case historyitem_ClrScheme_SetClr:
+            case historyitem_ClrScheme_AddClr:
             {
                 this.colors[data.index] = data.newColor;
             }
@@ -7111,7 +7111,7 @@ ClrScheme.prototype =
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_ClrScheme_SetClr:
+            case historyitem_ClrScheme_AddClr:
             {
                 writeLong(w, data.index);
                 writeOject(w, data.newColor);
@@ -7129,7 +7129,7 @@ ClrScheme.prototype =
                 this.name = readString(r);
                 break;
             }
-            case historyitem_ClrScheme_SetClr:
+            case historyitem_ClrScheme_AddClr:
             {
                 var index = readLong(r);
                 var color = readObject(r);
@@ -7160,6 +7160,9 @@ function ClrMap()
         }
         return _copy;
     };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 
 }
 

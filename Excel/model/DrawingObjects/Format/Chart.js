@@ -29,6 +29,13 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.invertTransform = new CMatrix();
     this.group = null;
     this.rot = 0;
+    this.bounds =
+    {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0
+    };
     this.recalculateInfo =
     {
         recalculateAll: true
@@ -45,7 +52,6 @@ function CChartAsGroup(drawingBase, drawingObjects)
         this.setAscChart(new asc_CChart());
     }
 }
-
 
 CChartAsGroup.prototype =
 {
@@ -88,6 +94,8 @@ CChartAsGroup.prototype =
             ret.push(this.vAxisTitle);
         return ret;
     },
+
+
 
     getBoundsInGroup: function()
     {
@@ -146,6 +154,22 @@ CChartAsGroup.prototype =
     recalculateColors: function()
     {
         this.recalculate();
+    },
+
+    recalculateBounds: function()
+    {
+        try
+        {
+            var boundsChecker = new  CSlideBoundsChecker();
+            this.draw(boundsChecker);
+            boundsChecker.CorrectBounds();
+            this.bounds.x = boundsChecker.Bounds.min_x;
+            this.bounds.y = boundsChecker.Bounds.min_y;
+            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+        }
+        catch(e)
+        {}
     },
 
     isChart: function()
@@ -1375,6 +1399,7 @@ CChartAsGroup.prototype =
         this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
         this.brush.fill.RasterImageId = "";
         this.updateDrawingBaseCoordinates();
+        this.recalculateBounds();
         //this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
     },
 

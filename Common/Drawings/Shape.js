@@ -1,13 +1,12 @@
-function CShape(parent)
+function CShape()
 {
-
-    this.spLocks = null;
-    this.useBgFill = null;
-    this.nvSpPr = null;
-    this.spPr = null;
-    this.style = null;
-    this.txBody = null;
+    this.nvSpPr         = null;
+    this.spPr           = null;
+    this.style          = null;
+    this.txBody         = null;
     this.textBoxContent = null;
+    this.parent         = null;//В Word - ParaDrawing, в Excell - DrawingBase, в PowerPoint - Slide;
+    this.group          = null;
 
     this.x = null;
     this.y = null;
@@ -27,11 +26,72 @@ function CShape(parent)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add( this, this.Id );
-    this.init();
 }
 
 CShape.prototype =
 {
+    Get_Id: function ()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return historyitem_type_Shape;
+    },
+
+    Write_ToBinary2: function (w)
+    {
+        w.WriteLong(historyitem_type_Shape);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function (r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    setNvSpPr: function (pr)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr });
+        this.nvSpPr = pr;
+    },
+
+    setSpPr: function (spPr)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr });
+        this.spPr = spPr;
+    },
+
+    setStyle: function (style)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetStyle, oldPr: this.style, newPr: style });
+        this.style = style;
+    },
+
+    setTxBody: function (txBody)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody });
+        this.txBody = txBody;
+    },
+
+    setTextBoxContent: function(textBoxContent)
+    {
+        History.Add(this, {Type: historyitem_ShapeSetTextBoxContent, oldPr: this.textBoxContent, newPr: textBoxContent});
+        this.textBoxContent = textBoxContent;
+    },
+
+    setParent: function (parent)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent });
+        this.parent = parent;
+    },
+
+    setGroup: function (group)
+    {
+        History.Add(this, { Type: historyitem_ShapeSetGroup, oldPr: this.group, newPr: group });
+        this.group = group;
+    },
 
 
 
@@ -78,9 +138,6 @@ CShape.prototype =
         }
     },
 
-    Get_Id: function () {
-        return this.Id;
-    },
 
     getType: function () {
         return DRAWING_OBJECT_TYPE_SHAPE;
@@ -170,7 +227,6 @@ CShape.prototype =
         }
     },
 
-
     Get_SelectedText: function (bClearText) {
         if (this.txBody) {
             return this.txBody.content.Get_SelectedText(bClearText);
@@ -201,13 +257,11 @@ CShape.prototype =
         return new CParaPr();
     },
 
-
     Paragraph_ClearFormatting: function () {
         if (this.txBody) {
             return this.txBody.content.Paragraph_ClearFormatting();
         }
     },
-
 
     initDefaultTextRect: function (x, y, extX, extY, flipH, flipV) {
         this.setXfrm(x, y, extX, extY, 0, flipH, flipV);
@@ -233,10 +287,6 @@ CShape.prototype =
     },
 
 
-    setParent: function (parent) {
-        History.Add(this, { Type: historyitem_SetShapeParent, Old: this.parent, New: parent });
-        this.parent = parent;
-    },
 
     setUniFill: function (fill) {
         this.spPr.Fill = fill;
@@ -271,11 +321,9 @@ CShape.prototype =
         return false;
     },
 
-
     isChart: function () {
         return false;
     },
-
 
     isGroup: function () {
         return false;
@@ -574,35 +622,7 @@ CShape.prototype =
         return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
     },
 
-    setNvSpPr: function (pr) {
-        History.Add(this, { Type: historyitem_SetSetNvSpPr, oldPr: this.nvSpPr, newPr: pr });
-        this.nvSpPr = pr;
-        if (this.parent && pr && pr.cNvPr && isRealNumber(pr.cNvPr.id)) {
-            if (pr.cNvPr.id > this.parent.maxId) {
-                this.parent.maxId = pr.cNvPr.id + 1;
-            }
-        }
-    },
 
-    setTextBody: function (txBody) {
-        History.Add(this, { Type: historyitem_SetTextBody, oldPr: this.txBody, newPr: txBody });
-        this.txBody = txBody;
-    },
-
-    setSpPr: function (spPr) {
-        History.Add(this, { Type: historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr });
-        this.spPr = spPr;
-    },
-
-    setStyle: function (style) {
-        History.Add(this, { Type: historyitem_SetSetStyle, oldPr: this.style, newPr: style });
-        this.style = style;
-    },
-
-    setGroup: function (group) {
-        History.Add(this, { Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group });
-        this.group = group;
-    },
 
     getPlaceholderType: function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
@@ -2345,7 +2365,6 @@ CShape.prototype =
         }
     },
 
-
     setParagraphIndent: function (val) {
         if (isRealObject(this.txBody)) {
             this.txBody.content.Set_ParagraphIndent(val);
@@ -2686,7 +2705,6 @@ CShape.prototype =
         graphics.SetIntegerGrid(true);
     },
 
-
     getRotateAngle: function (x, y) {
         var transform = this.getTransformMatrix();
         var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
@@ -2714,13 +2732,11 @@ CShape.prototype =
         return same_flip ? angle : -angle;
     },
 
-
     getFullFlipH: function () {
         if (!isRealObject(this.group))
             return this.flipH;
         return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
-
 
     getFullFlipV: function () {
         if (!isRealObject(this.group))
@@ -2801,7 +2817,6 @@ CShape.prototype =
         return this.pen;
     },
 
-
     canChangeArrows: function () {
         if (this.spPr.geometry == null) {
             return false;
@@ -2845,7 +2860,6 @@ CShape.prototype =
         }
         return null;
     },
-
 
     setVerticalAlign: function (align) {
 
@@ -3087,7 +3101,6 @@ CShape.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
-
     setLine: function (line) {
         var old_line = this.spPr.ln;
         var new_line = line;
@@ -3131,8 +3144,6 @@ CShape.prototype =
             return this.spPr.geometry.hitToAdj(t_x, t_y, this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE));
         return { hit: false, adjPolarFlag: null, adjNum: null };
     },
-
-
 
     hitToHandles: function (x, y) {
         var invert_transform = this.getInvertTransform();
@@ -3270,7 +3281,6 @@ CShape.prototype =
         }
     },
 
-
     canChangeAdjustments: function () {
         return true; //TODO
     },
@@ -3286,9 +3296,6 @@ CShape.prototype =
     createMoveTrack: function () {
         return new MoveShapeImageTrack(this);
     },
-
-
-
 
     createRotateInGroupTrack: function () {
         return new RotateTrackShapeImageInGroup(this);
@@ -3341,580 +3348,157 @@ CShape.prototype =
 
     Undo: function (data) {
 
-        switch (data.Type) {
-            case historyitem_SetShapeRot:
-            {
-                this.spPr.xfrm.rot = data.oldRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                this.spPr.xfrm.offX = data.oldOffsetX;
-                this.spPr.xfrm.offY = data.oldOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.oldExtentX;
-                this.spPr.xfrm.extY = data.oldExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.oldFlipH;
-                this.spPr.xfrm.flipV = data.oldFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if (isRealObject(data.oldFill)) {
-                    this.spPr.Fill = data.oldFill.createDuplicate();
-                }
-                else {
-                    this.spPr.Fill = null;
-                }
-
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if (isRealObject(data.oldLine)) {
-                    this.spPr.ln = data.oldLine.createDuplicate();
-                }
-                else {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if (isRealObject(data.oldGeometry)) {
-                    this.spPr.geometry = data.oldGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSetNvSpPr:
+        switch (data.Type)
+        {
+            case historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.oldPr;
                 break;
             }
-            case historyitem_SetSetSpPr:
+            case historyitem_ShapeSetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_SetSetStyle:
+            case historyitem_ShapeSetStyle:
             {
                 this.style = data.oldPr;
                 break;
             }
-            case historyitem_SetTextBody:
+            case historyitem_ShapeSetTxBody:
             {
                 this.txBody = data.oldPr;
                 break;
             }
-            case historyitem_SetSpGroup:
+            case historyitem_ShapeSetTextBoxContent:
+            {
+                this.textBoxContent = data.oldPr;
+                break;
+            }
+            case historyitem_ShapeSetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
+            case historyitem_ShapeSetGroup:
             {
                 this.group = data.oldPr;
                 break;
             }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.Old;
-                break;
-            }
-        }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        if (!this.parent) {
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
         }
     },
 
-    Redo: function (data) {
-
-        switch (data.Type) {
-            case historyitem_SetShapeRot:
-            {
-                this.spPr.xfrm.rot = data.newRot;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                this.spPr.xfrm.offX = data.newOffsetX;
-                this.spPr.xfrm.offY = data.newOffsetY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-
-            case historyitem_SetShapeExtents:
-            {
-                this.spPr.xfrm.extX = data.newExtentX;
-                this.spPr.xfrm.extY = data.newExtentY;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                this.spPr.xfrm.flipH = data.newFlipH;
-                this.spPr.xfrm.flipV = data.newFlipV;
-                this.recalcInfo.recalculateTransform = true;
-                this.recalcInfo.recalculateTransformText = true;
-                this.recalcInfo.recalculateContent = true;
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                if (isRealObject(data.newFill)) {
-                    this.spPr.Fill = data.newFill.createDuplicate();
-                }
-                this.recalcInfo.recalculateFill = true;
-                this.recalcInfo.recalculateBrush = true;
-                this.recalcInfo.recalculateTransparent = true;
-
-                break;
-            }
-            case historyitem_SetShapeSetLine:
-            {
-                if (isRealObject(data.newLine)) {
-                    this.spPr.ln = data.newLine.createDuplicate();
-                }
-                else {
-                    this.spPr.ln = null;
-                }
-
-                this.recalcInfo.recalculateLine = true;
-                this.recalcInfo.recalculatePen = true;
-                break;
-            }
-            case historyitem_SetShapeSetGeometry:
-            {
-                if (isRealObject(data.newGeometry)) {
-                    this.spPr.geometry = data.newGeometry.createDuplicate();
-                    this.spPr.geometry.Init(5, 5);
-                }
-                else {
-                    this.spPr.geometry = null;
-                }
-                this.recalcInfo.recalculateGeometry = true;
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
-                this.txBody.recalcInfo.recalculateBodyPr = true;
-                this.recalcInfo.recalculateContent = true;
-                this.recalcInfo.recalculateTransformText = true;
-                break;
-            }
-            case historyitem_SetSetNvSpPr:
+    Redo: function (data)
+    {
+        switch (data.Type)
+        {
+            case historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.newPr;
                 break;
             }
-
-            case historyitem_SetSetSpPr:
+            case historyitem_ShapeSetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_SetSetStyle:
+            case historyitem_ShapeSetStyle:
             {
                 this.style = data.newPr;
                 break;
             }
-
-            case historyitem_SetTextBody:
+            case historyitem_ShapeSetTxBody:
             {
                 this.txBody = data.newPr;
                 break;
             }
-
-            case historyitem_SetSpGroup:
+            case historyitem_ShapeSetTextBoxContent:
+            {
+                this.textBoxContent = data.newPr;
+                break;
+            }
+            case historyitem_ShapeSetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
+            case historyitem_ShapeSetGroup:
             {
                 this.group = data.newPr;
                 break;
             }
-            case historyitem_SetShapeParent:
-            {
-                this.parent = data.New;
-                break;
-            }
-        }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-        if (!this.parent) {
-            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
         }
     },
 
-    Save_Changes: function (data, w) {
-        w.WriteLong(historyitem_type_Shape);
+    Save_Changes: function (data, w)
+    {
+        w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
-        var bool;
-        switch (data.Type) {
-            case historyitem_SetShapeRot:
-            {
-                w.WriteDouble(data.newRot);
-                break;
-            }
-            case historyitem_SetShapeOffset:
-            {
-                w.WriteDouble(data.newOffsetX);
-                w.WriteDouble(data.newOffsetY);
-                w.WriteBool(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument));
-                if(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument))
-                {
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
-                }
-                break;
-            }
+        switch (data.Type)
+        {
+            case historyitem_ShapeSetNvSpPr:
+            case historyitem_ShapeSetSpPr:
+            case historyitem_ShapeSetStyle:
+            case historyitem_ShapeSetTxBody:
+            case historyitem_ShapeSetTextBoxContent:
+            case historyitem_ShapeSetParent:
+            case historyitem_ShapeSetGroup:
 
-            case historyitem_SetShapeExtents:
             {
-                w.WriteDouble(data.newExtentX);
-                w.WriteDouble(data.newExtentY);
-                w.WriteBool(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument));
-                if(isRealObject(editor)
-                    && isRealObject(editor.WordControl)
-                    && isRealObject(editor.WordControl.m_oLogicDocument))
-                {
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Width);
-                    w.WriteDouble(editor.WordControl.m_oLogicDocument.Height);
-                }
-                break;
-            }
-            case historyitem_SetShapeFlips:
-            {
-                w.WriteBool(data.newFlipH);
-                w.WriteBool(data.newFlipV);
-                break;
-            }
-            case historyitem_SetShapeSetFill:
-            {
-                w.WriteBool(isRealObject(data.newFill));
-                if (isRealObject(data.newFill)) {
-                    data.newFill.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetLine:
-            {
-                w.WriteBool(isRealObject(data.newLine));
-                if (isRealObject(data.newLine)) {
-                    data.newLine.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetShapeSetGeometry:
-            {
-                w.WriteBool(isRealObject(data.newGeometry));
-                if (isRealObject(data.newGeometry)) {
-                    data.newGeometry.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetShapeBodyPr:
-            {
-                data.newBodyPr.Write_ToBinary2(w);
-                break;
-            }
-
-            case historyitem_SetSetNvSpPr:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if (isRealObject(data.newPr)) {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetSetSpPr:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if (isRealObject(data.newPr)) {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-            case historyitem_SetSetStyle:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if (isRealObject(data.newPr)) {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-            case historyitem_SetTextBody:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if (isRealObject(data.newPr)) {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetSpGroup:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if (isRealObject(data.newPr)) {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
-                break;
-            }
-            case historyitem_SetShapeParent:
-            {
-                w.WriteBool(isRealObject(data.New));
-                if (isRealObject(data.New)) {
-                    w.WriteString2(data.New.Id);
-                }
+                writeObject(data.newPr);
                 break;
             }
         }
     },
 
-    Load_Changes: function (r) {
-        if (r.GetLong() === historyitem_type_Shape) {
-            switch (r.GetLong()) {
-                case historyitem_SetShapeRot:
+    Load_Changes: function (r)
+    {
+        if (r.GetLong() === this.getObjecType())
+        {
+            var type = r.GetLong();
+            switch (r.GetLong())
+            {
+                case historyitem_ShapeSetNvSpPr:
                 {
-                    this.spPr.xfrm.rot = r.GetDouble();
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
+                    this.nvSpPr = readObject(r);
                     break;
                 }
-                case historyitem_SetShapeOffset:
+                case historyitem_ShapeSetSpPr:
                 {
-                    this.spPr.xfrm.offX = r.GetDouble();
-                    this.spPr.xfrm.offY = r.GetDouble();
-                    if(r.GetBool())
-                    {
-                        var p_width = r.GetDouble();
-                        var p_height = r.GetDouble();
-                        if(isRealObject(editor)
-                            && isRealObject(editor.WordControl)
-                            && isRealObject(editor.WordControl.m_oLogicDocument))
-                        {
-                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
-                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
-                            this.spPr.xfrm.offX*=kw;
-                            this.spPr.xfrm.offY*=kh;
-                        }
-                    }
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
+                    this.spPr = readObject(r);
                     break;
                 }
-
-                case historyitem_SetShapeExtents:
+                case historyitem_ShapeSetStyle:
                 {
-                    this.spPr.xfrm.extX = r.GetDouble();
-                    this.spPr.xfrm.extY = r.GetDouble();
-                    if(r.GetBool())
-                    {
-                        var p_width = r.GetDouble();
-                        var p_height = r.GetDouble();
-                        if(isRealObject(editor)
-                            && isRealObject(editor.WordControl)
-                            && isRealObject(editor.WordControl.m_oLogicDocument))
-                        {
-                            var kw = editor.WordControl.m_oLogicDocument.Width / p_width;
-                            var kh = editor.WordControl.m_oLogicDocument.Height / p_height;
-                            this.spPr.xfrm.extX*=kw;
-                            this.spPr.xfrm.extY*=kh;
-                        }
-                    }
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateGeometry = true;
-
+                    this.style = readObject(r);
                     break;
                 }
-                case historyitem_SetShapeFlips:
+                case historyitem_ShapeSetTxBody:
                 {
-                    this.spPr.xfrm.flipH = r.GetBool();
-                    this.spPr.xfrm.flipV = r.GetBool();
-                    this.recalcInfo.recalculateTransform = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    this.recalcInfo.recalculateContent = true;
+                    this.txBody = readObject(r);
                     break;
                 }
-
-                case historyitem_SetShapeSetFill:
+                case historyitem_ShapeSetTextBoxContent:
                 {
-                    if (r.GetBool()) {
-                        this.spPr.Fill = new CUniFill();
-                        this.spPr.Fill.Read_FromBinary2(r);
-                    }
-                    if (this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill
-                        && typeof this.spPr.Fill.fill.RasterImageId === "string") {
-                        CollaborativeEditing.Add_NewImage(this.spPr.Fill.fill.RasterImageId);
-                    }
-                    this.recalcInfo.recalculateFill = true;
-                    this.recalcInfo.recalculateBrush = true;
-                    this.recalcInfo.recalculateTransparent = true;
+                    this.textBoxContent = readObject(r);
                     break;
                 }
-                case historyitem_SetShapeSetLine:
+                case historyitem_ShapeSetParent:
                 {
-                    if (r.GetBool()) {
-                        this.spPr.ln = new CLn();
-                        this.spPr.ln.Read_FromBinary2(r);
-                    }
-                    this.recalcInfo.recalculateLine = true;
-                    this.recalcInfo.recalculatePen = true;
+                    this.parent = readObject(r);
                     break;
                 }
-                case historyitem_SetShapeSetGeometry:
+                case historyitem_ShapeSetGroup:
                 {
-                    if (r.GetBool()) {
-                        this.spPr.geometry = new Geometry();
-                        this.spPr.geometry.Read_FromBinary2(r);
-                        this.spPr.geometry.Init(5, 5);
-                    }
-                    else {
-                        this.spPr.geometry = null;
-                    }
-                    this.recalcInfo.recalculateGeometry = true;
+                    this.group = readObject(r);
                     break;
                 }
-                case historyitem_SetShapeBodyPr:
-                {
-                    this.txBody.bodyPr = new CBodyPr();
-                    this.txBody.bodyPr.Read_FromBinary2(r);
-                    this.txBody.recalcInfo.recalculateBodyPr = true;
-                    this.recalcInfo.recalculateContent = true;
-                    this.recalcInfo.recalculateTransformText = true;
-                    break;
-                }
-
-                case historyitem_SetSetNvSpPr:
-                {
-                    if (r.GetBool()) {
-                        this.nvSpPr = new UniNvPr();
-                        this.nvSpPr.Read_FromBinary2(r);
-                    }
-                    else {
-                        this.nvSpPr = null;
-                    }
-                    break;
-                }
-                case historyitem_SetSetSpPr:
-                {
-
-                    this.spPr = new CSpPr();
-                    if (r.GetBool()) {
-                        this.spPr.Read_FromBinary2(r);
-                    }
-                    break;
-                }
-                case historyitem_SetSetStyle:
-                {
-                    if (r.GetBool()) {
-                        this.style = new CShapeStyle();
-                        this.style.Read_FromBinary2(r);
-                    }
-                    else {
-                        this.style = null;
-                    }
-                    break;
-                }
-
-                case historyitem_SetTextBody:
-                {
-                    if (r.GetBool()) {
-                        this.txBody = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    else {
-                        this.txBody = null;
-                    }
-                    break;
-                }
-                case historyitem_SetSpGroup:
-                {
-                    if (r.GetBool()) {
-                        this.group = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    else {
-                        this.group = null;
-                    }
-                    break;
-                }
-
-                case historyitem_SetShapeParent:
-                {
-                    if (r.GetBool()) {
-                        this.parent = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    break;
-                }
-
-            }
-            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-            if (!this.parent) {
-                delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
             }
         }
     },
 
-    Write_ToBinary2: function (w) {
-        w.WriteLong(historyitem_type_Shape);
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r) {
-        this.Id = r.GetString2();
-    },
-
-    Load_LinkData: function (linkData) {
-        this.parent = g_oTableId.Get_ById(linkData.parent);
+    Load_LinkData: function (linkData)
+    {
     }
 };
 

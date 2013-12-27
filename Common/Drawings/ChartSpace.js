@@ -1711,8 +1711,7 @@ CPageSetup.prototype =
     }
 };
 
-
-function CreateDefaultLineNormalChart(asc_series)
+function CreateLineChart(asc_series, type)
 {
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
@@ -1725,58 +1724,30 @@ function CreateDefaultLineNormalChart(asc_series)
     chart.setPlotArea(new CPlotArea());
     chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
-    chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
+    var disp_blanks_as;
+    if(type === GROUPING_STANDARD)
+    {
+        disp_blanks_as = DISP_BLANKS_AS_GAP;
+    }
+    else
+    {
+        disp_blanks_as = DISP_BLANKS_AS_ZERO;
+    }
+    chart.setDispBlanksAs(disp_blanks_as);
     chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CLineChart());
     plot_area.setCatAx(new CAxis());
     plot_area.setValAx(new CAxis());
-
-    var cat_ax = plot_area.catAx;
-    cat_ax.setScaling(new CScaling());
-    cat_ax.setDelete(false);
-    cat_ax.setAxPos(AX_POS_B);
-    cat_ax.setMajorTickMark(TICK_MARK_OUT);
-    cat_ax.setMinorTickMark(TICK_MARK_NONE);
-    cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrosses(CROSSES_AUTO_ZERO);
-    cat_ax.setAuto(true);
-    cat_ax.setLblAlgn(LBL_ALG_CTR);
-    cat_ax.setLblOffset(100);
-    cat_ax.setNoMultiLvlLbl(false);
-    var scaling = cat_ax.scaling;
-    scaling.setOrientation(ORIENTATION_MIN_MAX);
-
-    var val_ax = plot_area.valAx;
-    val_ax.setScaling(new CScaling());
-    val_ax.setDelete(false);
-    val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
-    val_ax.setNumFmt(new CNumFmt());
-    val_ax.setMajorTickMark(TICK_MARK_OUT);
-    val_ax.setMinorTickMark(TICK_MARK_NONE);
-    val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(cat_ax.Get_Id());
-    val_ax.setCrosses(CROSSES_AUTO_ZERO);
-    val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
-    cat_ax.setCrossAx(val_ax.Get_Id());
-    scaling = val_ax.scaling;
-    scaling.setOrientation(ORIENTATION_MIN_MAX);
-
-    var legend = chart.legend;
-    legend.setLegendPos(LEGEND_POS_R);
-    legend.setLayout(new CLayout());
-    legend.setOverlay(false);
-
     var line_chart = plot_area.chart;
-    line_chart.setGrouping(GROUPING_STANDARD);
+    line_chart.setGrouping(type);
     line_chart.setVaryColors(false);
     line_chart.setDLbls(new CDLbls());
     line_chart.setMarker(true);
     line_chart.setSmooth(false);
-    line_chart.addAxId(cat_ax.Get_Id());
-    line_chart.addAxId(val_ax.Get_Id());
+    line_chart.addAxId(plot_area.catAx.Get_Id());
+    line_chart.addAxId(plot_area.valAx.Get_Id());
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CLineSeries();
@@ -1785,8 +1756,24 @@ function CreateDefaultLineNormalChart(asc_series)
         series.setMarker(new CMarker());
         series.marker.setSymbol(SYMBOL_NONE);
         series.setSmooth(false);
+        series.setVal(new CYVal());
+        var val = series.val;
+        val.setNumRef(new CNumRef());
+        var num_ref = val.numRef;
+        num_ref.setF(asc_series[i].Val.Formula);
+        num_ref.setNumCache(new CNumLit());
+        var num_cache = num_ref.numCache;
+        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        {
+            var pt = new CNumericPoint();
+            pt.setIdx(j);
+            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+            pt.setVal(asc_series[i].Val.NumCache[j].val);
+            num_cache.addPt(pt);
+        }
+        line_chart.addSer(series);
     }
-
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
     d_lbls.setShowVal(false);
@@ -1794,68 +1781,14 @@ function CreateDefaultLineNormalChart(asc_series)
     d_lbls.setShowSerName(false);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
-
-    var print_settings = chart_space.printSettings;
-    print_settings.setHeaderFooter(new CHeaderFooterChart());
-    print_settings.setPageMargins(new CPageMarginsChart());
-    var page_margins = print_settings.pageMargins;
-    page_margins.setB(0.75);
-    page_margins.setL(0.7);
-    page_margins.setR(0.7);
-    page_margins.setT(0.75);
-    page_margins.setHeader(0.3);
-    page_margins.setFooter(0.3);
-    page_margins.setPageSetup(new CPageSetup());
-    return chart_space;
-}
-
-function CreateDefaultLineStackedChart()
-{
-    var chart_space = new CChartSpace();
-    chart_space.setDate1904(false);
-    chart_space.setLang("ru-RU");
-    chart_space.setRoundedCorners(false);
-    chart_space.setChart(new CChart());
-    chart_space.setPrintSettings(new CPrintSettings());
-
-    var chart = chart_space.chart;
-    chart.setAutoTitleDeleted(false);
-    chart.setPlotArea(new CPlotArea());
-    chart.setLegend(new CLegend());
-    chart.setPlotVisOnly(true);
-    chart.setDispBlanksAs(DISP_BLANKS_AS_ZERO);
-    chart.setShowDLblsOverMax(false);
-
-    var plot_area = chart.plotArea;
-    plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CLineChart());
-    plot_area.setCatAx(new CAxis());
-    plot_area.setValAx(new CAxis());
-
-    var line_chart = plot_area.chart;
-    line_chart.setGrouping(GROUPING_STACKED);
-    line_chart.setVaryColors(false);
-    line_chart.setDLbls(new CDLbls());
-    line_chart.setMarker(true);
-    line_chart.setSmooth(false);
-    line_chart.addAxId(plot_area.catAx);
-    line_chart.addAxId(plot_area.valAx);
-    var d_lbls = line_chart.dLbls;
-    d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
-    d_lbls.setShowPercent(false);
-    d_lbls.setShowBubbleSize(false);
-
     var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
     cat_ax.setAxPos(AX_POS_B);
     cat_ax.setMajorTickMark(TICK_MARK_OUT);
-    cat_ax.setMinorTickMark(TICK_MARK_NONE);
+    cat_ax.setMinorTickMark(TICK_MARK_OUT);
     cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    cat_ax.setCrossAx(line_chart.valAx.Get_Id());
+    cat_ax.setCrossAx(plot_area.valAx.Get_Id());
     cat_ax.setCrosses(CROSSES_AUTO_ZERO);
     cat_ax.setAuto(true);
     cat_ax.setLblAlgn(LBL_ALG_CTR);
@@ -1863,7 +1796,6 @@ function CreateDefaultLineStackedChart()
     cat_ax.setNoMultiLvlLbl(false);
     var scaling = cat_ax.scaling;
     scaling.setOrientation(ORIENTATION_MIN_MAX);
-
     var val_ax = plot_area.valAx;
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
@@ -1873,18 +1805,36 @@ function CreateDefaultLineStackedChart()
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
     val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
-    val_ax.setCrossAx(cat_ax.Get_Id());
+    val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
     scaling = val_ax.scaling;
     scaling.setOrientation(ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
-    num_fmt.setFormatCode("General");
+    var format_code;
+    if(type === GROUPING_PERCENT_STACKED)
+    {
+        format_code = "0%";
+    }
+    else
+    {
+        format_code = "General";
+    }
+    num_fmt.setFormatCode(format_code);
     num_fmt.setSourceLinked(true);
-
     var legend = chart.legend;
     legend.setLegendPos(LEGEND_POS_R);
     legend.setLayout(new CLayout());
     legend.setOverlay(false);
-    return chart_space;
+    var print_settings = chart_space.printSettings;
+    print_settings.setHeaderFooter(new CHeaderFooterChart());
+    print_settings.setPageMargins(new CPageMarginsChart());
+    print_settings.setPageSetup(new CPageSetup());
+    var page_margins = print_settings.pageMargins;
+    page_margins.setB(0.75);
+    page_margins.setL(0.7);
+    page_margins.setR(0.7);
+    page_margins.setT(0.75);
+    page_margins.setHeader(0.3);
+    page_margins.setFooter(0.3);
 }

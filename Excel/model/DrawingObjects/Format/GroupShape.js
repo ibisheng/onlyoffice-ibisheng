@@ -19,6 +19,7 @@ function CGroupShape(drawingBase, drawingObjects)
         recalculateArrGraphicObjects: true
     };
 
+
     this.x = null;
     this.y = null;
     this.x = null;
@@ -33,7 +34,13 @@ function CGroupShape(drawingBase, drawingObjects)
     this.transformText = null;
     this.invertTransformText = null;
     this.cursorTypes = [];
-
+    this.bounds =
+    {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0
+    };
     this.brush  = null;
     this.pen = null;
     this.selected = false;
@@ -80,6 +87,22 @@ CGroupShape.prototype =
         return CLASS_TYPE_GROUP;
     },
 
+
+    recalculateBounds: function()
+    {
+        try
+        {
+            var boundsChecker = new  CSlideBoundsChecker();
+            this.draw(boundsChecker);
+            boundsChecker.CorrectBounds();
+            this.bounds.x = boundsChecker.Bounds.min_x;
+            this.bounds.y = boundsChecker.Bounds.min_y;
+            this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+            this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+        }
+        catch(e)
+        {}
+    },
 
     setDrawingObjects: function(drawingObjects)
     {
@@ -642,6 +665,7 @@ CGroupShape.prototype =
         {
             this.arrGraphicObjects[i].recalculate(aImages);
         }
+        this.recalculateBounds();
     },
 
     recalculateArrGraphicObjects: function()
@@ -713,6 +737,7 @@ CGroupShape.prototype =
             if(typeof this.spTree[i].calculateTransformTextMatrix === "function")
                 this.spTree[i].calculateTransformTextMatrix();
         }
+        this.recalculateBounds();
     },
 
     setPaddings: function(paddings)

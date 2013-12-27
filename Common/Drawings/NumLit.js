@@ -1,7 +1,7 @@
 function CNumLit()
 {
     this.formatCode  = null;
-    this.pt          = null;
+    this.pts          = [];
     this.ptCount     = null;
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -37,15 +37,15 @@ CNumLit.prototype =
         this.formatCode = pr;
     },
 
-    setPt: function(pr)
+    addPt: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_SetPt, oldPr: this.pt, newPr: pr});
-        this.pt = pr;
+        History.Add(this, {Type:historyitem_NumLit_AddPt, pt: pr});
+        this.pts.push(pr);
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_SetPt, oldPr: this.pt, newPr: pr});
+        History.Add(this, {Type:historyitem_NumLit_SetPtCount, oldPr: this.pts, newPr: pr});
         this.ptCount = pr;
     },
 
@@ -59,9 +59,15 @@ CNumLit.prototype =
                 break;
             }
 
-            case historyitem_NumLit_SetPt:
+            case historyitem_NumLit_AddPt:
             {
-                this.pt = data.oldPr;
+                for(var i = this.pts.length - 1; i > -1; --i)
+                {
+                    if(this.pts[i] === data.pt)
+                    {
+                        this.pts.splice(i, 1);
+                    }
+                }
                 break;
             }
 
@@ -83,9 +89,9 @@ CNumLit.prototype =
                 break;
             }
 
-            case historyitem_NumLit_SetPt:
+            case historyitem_NumLit_AddPt:
             {
-                this.pt = data.newPr;
+                this.pts.push(data.newPr);
                 break;
             }
 
@@ -104,31 +110,19 @@ CNumLit.prototype =
         {
             case historyitem_NumLit_SetFormatCode:
             {
-                w.WriteBool(typeof data.newPr === "string");
-                if(typeof data.newPr === "string")
-                {
-                    w.WriteString2(data.newPr);
-                }
+                writeString(w, data.newPr);
                 break;
             }
 
-            case historyitem_NumLit_SetPt:
+            case historyitem_NumLit_AddPt:
             {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id());
-                }
+                writeObject(w, data.pt);
                 break;
             }
 
             case historyitem_NumLit_SetPtCount:
             {
-                w.WriteBool(isRealNumber(data.newPr));
-                if(isRealNumber(data.newPr))
-                {
-                    w.WriteLong(data.newPr);
-                }
+                writeLong(w, data.newPr);
                 break;
             }
         }
@@ -141,40 +135,23 @@ CNumLit.prototype =
         {
             case historyitem_NumLit_SetFormatCode:
             {
-                if(r.GetBool())
-                {
-                    this.formatCode = r.GetString2();
-                }
-                else
-                {
-                    this.formatCode = null;
-                }
+                this.formatCode = readString(r);
                 break;
             }
 
-            case historyitem_NumLit_SetPt:
+            case historyitem_NumLit_AddPt:
             {
-                if(r.GetBool())
+                var pt = readObject(r);
+                if(isRealObject(pt))
                 {
-                    this.pt = g_oTableId.Get_ById(r.GetString2());
-                }
-                else
-                {
-                    this.pt = null;
+                    this.pts.push(pt);
                 }
                 break;
             }
 
             case historyitem_NumLit_SetPtCount:
             {
-                if(r.GetBool())
-                {
-                    this.ptCount = r.GetLong();
-                }
-                else
-                {
-                    this.ptCount = null;
-                }
+                this.ptCount = readLong(r);
                 break;
             }
         }
