@@ -217,8 +217,6 @@
 			},
 
 			destroy: function() {
-				$(window).off("." + namespace);
-				$(this.input).off("." + namespace);
 			},
 
 			/**
@@ -1571,17 +1569,17 @@
 				t.undoMode = false;
 			},
 
+			_tryCloseEditor: function (event) {
+				if (this.close(true))
+					this.handlers.trigger("applyCloseEvent", event);
+			},
+
 
 			// Event handlers
 
 			/** @param event {jQuery.Event} */
 			_onWindowKeyDown: function (event) {
 				var t = this, kind = undefined, hieroglyph = false;
-
-				function tryCloseEditor() {
-					if (t.close(true))
-						t.handlers.trigger("applyCloseEvent", event);
-				}
 
 				if (!t.isOpened || !t.enableKeyEvents) {return true;}
 
@@ -1614,7 +1612,7 @@
 								t._addNewLine();
 							else {
 								if (false === t.handlers.trigger("isGlobalLockEditCell"))
-									tryCloseEditor()
+									t._tryCloseEditor();
 							}
 						}
 						return false;
@@ -1624,7 +1622,7 @@
 						if (hieroglyph) {t._syncEditors();}
 
 						if (false === t.handlers.trigger("isGlobalLockEditCell"))
-							tryCloseEditor();
+							t._tryCloseEditor();
 						return false;
 
 					case 8:   // "backspace"
@@ -1735,7 +1733,7 @@
 							if (hieroglyph) {t._syncEditors();}
 
 							if (false === t.handlers.trigger("isGlobalLockEditCell"))
-								tryCloseEditor();
+					 			t._tryCloseEditor();
 							return false;
 						}
 						break;*/
