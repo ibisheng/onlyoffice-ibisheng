@@ -215,13 +215,13 @@
 				if (isVert || isHoriz) {
 					this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 						if (isVert) {
-							var vsHelperH = self.vsb.outerHeight() + Math.max(vSize * opt.vscrollStep, 1);
-							self.vsb.find("#ws-v-scroll-helper").height(vsHelperH);
+							var vsHelperH = $(self.vsb).outerHeight() + Math.max(vSize * opt.vscrollStep, 1);
+							$(self.vsb).find("#ws-v-scroll-helper").height(vsHelperH);
 							self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 						}
 						if (isHoriz) {
-							var hsHelperW = self.hsb.outerWidth() + Math.max(hSize * opt.hscrollStep, 1);
-							self.hsb.find("#ws-h-scroll-helper").width(hsHelperW);
+							var hsHelperW = $(self.hsb).outerWidth() + Math.max(hSize * opt.hscrollStep, 1);
+							$(self.hsb).find("#ws-h-scroll-helper").width(hsHelperW);
 							self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 						}
 					});
@@ -288,19 +288,19 @@
 
 			_createScrollBars: function () {
 				var self = this, opt = this.settings;
-				var widget = $(this.widget);
 
 				// vertical scroll bar
-				this.vsb = widget.find("#ws-v-scrollbar");
-				if (this.vsb.length < 1) {
-					this.vsb = $('<div id="ws-v-scrollbar"><div id="ws-v-scroll-helper"/></div>').appendTo(widget);
-				}
+				this.vsb = document.createElement('div');
+				this.vsb.id = "ws-v-scrollbar";
+				this.vsb.innerHTML = '<div id="ws-v-scroll-helper"></div>';
+				this.widget.appendChild(this.vsb);
+
 				if (!this.vsbApi) {
-					this.vsbApi = new ScrollObject( this.vsb[0].id,opt);
-					this.vsbApi.bind("scrollvertical",function(evt){
+					this.vsbApi = new ScrollObject(this.vsb.id, opt);
+					this.vsbApi.bind("scrollvertical", function(evt) {
 						self.handlers.trigger("scrollY", evt.scrollPositionY / opt.vscrollStep);
 					});
-					this.vsbApi.bind("scrollVEnd",function(evt){
+					this.vsbApi.bind("scrollVEnd", function(evt) {
 						self.handlers.trigger("addRow",true);
 					});
 					this.vsbApi.onLockMouse = function(){
@@ -318,16 +318,17 @@
 				}
 
 				// horizontal scroll bar
-				this.hsb = widget.find("#ws-h-scrollbar");
-				if (this.hsb.length < 1) {
-					this.hsb = $('<div id="ws-h-scrollbar"><div id="ws-h-scroll-helper"/></div>').appendTo(widget);
-				}
+				this.hsb = document.createElement('div');
+				this.hsb.id = "ws-h-scrollbar";
+				this.hsb.innerHTML = '<div id="ws-h-scroll-helper"></div>';
+				this.widget.appendChild(this.hsb);
+
 				if (!this.hsbApi) {
-					this.hsbApi = new ScrollObject( this.hsb[0].id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
-					this.hsbApi.bind("scrollhorizontal",function(evt){
+					this.hsbApi = new ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
+					this.hsbApi.bind("scrollhorizontal",function(evt) {
 						self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
 					});
-					this.hsbApi.bind("scrollHEnd",function(evt){
+					this.hsbApi.bind("scrollHEnd",function(evt) {
 							self.handlers.trigger("addColumn",true);
 						});
 					this.hsbApi.onLockMouse = function(){
@@ -345,9 +346,9 @@
 				}
 
 				// right bottom corner
-				if (widget.find("#ws-scrollbar-corner").length < 1) {
-					$('<div id="ws-scrollbar-corner"/>').appendTo(widget);
-				}
+				var corner = document.createElement('div');
+				corner.id = "ws-scrollbar-corner";
+				this.widget.appendChild(corner);
 			},
 
 			/**
