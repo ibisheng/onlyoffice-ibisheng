@@ -1582,11 +1582,10 @@
 			/** @param event {jQuery.Event} */
 			_onWindowKeyDown: function (event) {
 				var t = this, kind = undefined, hieroglyph = false;
-				var wrap = t.textFlags.wrapText || t.textFlags.wrapOnlyNL;
 
 				function tryCloseEditor() {
-					var r = t.close(true);
-					if (r) { $(window).trigger(event); }
+					if (t.close(true))
+						t.handlers.trigger("applyCloseEvent", event);
 				}
 
 				if (!t.isOpened || !t.enableKeyEvents) {return true;}

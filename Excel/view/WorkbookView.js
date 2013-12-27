@@ -391,7 +391,8 @@
 							    "updateUndoRedoChanged"		: function (bCanUndo, bCanRedo) {
 								    self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
 								    self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-							    }
+							    },
+								"applyCloseEvent"			: function () {self.controller._onWindowKeyDown.apply(self.controller, arguments);}
 						    },
 						    /*settings*/{
 							    font: this.defaultFont
@@ -800,46 +801,40 @@
 			},
 			
 			// Double click
-			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {
-				var res = false;
+			_onMouseDblClick: function (x, y, isHideCursor, callback) {
 				var ws = this.getWorksheet();
 				var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
 				if (ct.target === "colresize" || ct.target === "rowresize") {
-					res = true;
 					ct.target === "colresize" ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
-					asc_applyFunction(callback, res);
+					asc_applyFunction(callback);
 				} else {
 					if (ct.col >=0 && ct.row >= 0) {
 						this.controller.setStrictClose( !ws._isCellEmpty(ct.col, ct.row) );
 					}
 					// Для нажатия на колонку/строку/all обрабатывать dblClick не нужно
 					if ("colheader" === ct.target || "rowheader" === ct.target || "corner" === ct.target) {
-						res = true;
-						asc_applyFunction(callback, res);
+						asc_applyFunction(callback);
 						return;
 					}
 					
-					if ( isCoord && (ws.objectRender.checkCursorDrawingObject(x, y)) ) {
-						res = true;
-						asc_applyFunction(callback, res);
+					if (ws.objectRender.checkCursorDrawingObject(x, y)) {
+						asc_applyFunction(callback);
 						return;
 					}
 
 					// При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
-					this._onEditCell (x, y, /*isCoord*/isCoord,/*isFocus*/undefined, /*isClearCell*/undefined,
-						/*isHideCursor*/isHideCursor, /*callback*/ function (val) {
-							asc_applyFunction(callback, !val);
-						});
+					this._onEditCell (x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined,
+						/*isHideCursor*/isHideCursor);
 				}
 			},
 
-			_onEditCell: function (x, y, isCoord, isFocus, isClearCell, isHideCursor, callback) {
+			_onEditCell: function (x, y, isCoord, isFocus, isClearCell, isHideCursor, callback, event) {
 				var t = this;
 
 				// Проверка глобального лока
 				if (this.collaborativeEditing.getGlobalLock())
-					return false;
+					return;
 
 				var ws = t.getWorksheet();
 				var activeCellRange = ws.getActiveCell(x, y, isCoord);
@@ -863,6 +858,14 @@
 
 					t.input.disabled = false;
 					t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+					// Эвент от предыдущего нажатия на символ или на backspace
+					if (event) {
+						if ("keydown" === event.type)
+							t.cellEditor._onWindowKeyDown(event);
+						else if ("keypress" === event.type)
+							t.cellEditor._onWindowKeyPress(event);
+					}
+
 					// Эвент на обновление состояния редактора
 					t.cellEditor._updateEditorState();
 					asc_applyFunction(callback, true);
@@ -870,7 +873,6 @@
 
 				var editLockCallback = function (res) {
 					if (!res) {
-						// ToDo Закрыть редактор
 						t.controller.setCellEditMode(false);
 						t.controller.setStrictClose(false);
 						t.controller.setFormulaEditMode(false);
@@ -895,7 +897,6 @@
 					if (ws._isLockedCells(activeCellRange, /*subType*/null, editLockCallback))
 						editFunction();
 				}
-				return true;
 			},
 
 			_onStopCellEditing: function () {

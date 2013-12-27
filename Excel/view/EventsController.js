@@ -247,7 +247,7 @@
 			},
 
 			// Будем делать dblClick как в Excel
-			doMouseDblClick: function (event, isHideCursor, isCoord) {
+			doMouseDblClick: function (event, isHideCursor) {
 				var t = this;
 
 				// Для формулы не нужно выходить из редактирования ячейки
@@ -265,15 +265,11 @@
 					return;
 				
 				setTimeout(function () {
-					t.isCellEditMode = true;
 					var coord = t._getCoordinates(event);
-					t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, isCoord, function (resized) {
-						if (resized) {
-							// Мы изменяли размеры колонки/строки, не редактируем ячейку
-							t.isCellEditMode = false;
-							// Обновим состояние курсора
-							t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
-						}
+					t.handlers.trigger("mouseDblClick", coord.x, coord.y, isHideCursor, function () {
+						// Мы изменяли размеры колонки/строки, не редактируем ячейку. Обновим состояние курсора
+						t.handlers.trigger("updateWorksheet", t.element, coord.x, coord.y, event.ctrlKey,
+							function (info) {t.targetInfo = info;});
 					});
 				}, 100);
 
@@ -657,11 +653,8 @@
 						if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
 						
 						// При backspace фокус не в редакторе (стираем содержимое)
-						t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
-							function (res) {
-								if (res)
-									$(window).trigger(event);
-							});
+						t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
+							/*isHideCursor*/undefined, /*callback*/undefined, event);
 						return true;
 
 					case 46: // Del
@@ -947,11 +940,8 @@
 				if (!t.isCellEditMode) {
 					// При нажатии символа, фокус не ставим
 					// Очищаем содержимое ячейки
-					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
-						function (res) {
-							if (res)
-								$(window).trigger(event);
-						});
+					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
+						/*isHideCursor*/undefined, /*callback*/undefined, event);
 				}
 				return true;
 			},
@@ -1143,7 +1133,7 @@
 						this.isDblClickInMouseDown = true;
 						// Нам нужно обработать эвент браузера о dblClick (если мы редактируем ячейку, то покажем курсор, если нет - то просто ничего не произойдет)
 						this.isDoBrowserDblClick = true;
-						this.doMouseDblClick(event, /*isHideCursor*/false, /*isCoord*/true);
+						this.doMouseDblClick(event, /*isHideCursor*/false);
 						// Обнуляем координаты
 						this.mouseDownLastCord = null;
 						return;
@@ -1416,7 +1406,7 @@
 
 				// Браузер не поддерживает свойство detail (будем делать по координатам)
 				if (false === this.isDblClickInMouseDown)
-					return this.doMouseDblClick(event, /*isHideCursor*/false, /*isCoord*/true);
+					return this.doMouseDblClick(event, /*isHideCursor*/false);
 
 				this.isDblClickInMouseDown = false;
 

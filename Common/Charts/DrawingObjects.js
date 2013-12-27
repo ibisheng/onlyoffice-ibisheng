@@ -3064,12 +3064,7 @@ function DrawingObjects() {
 
 		// Upload event
 		if (window.addEventListener) {
-			window.addEventListener("message", this._uploadMessage, false);
-		}
-		else {
-			if (window.attachEvent) {
-				window.attachEvent("onmessage", this._uploadMessage);
-			}
+			window.addEventListener("message", _this._uploadMessage, false);
 		}
 		
         _this.shiftMap = {};
