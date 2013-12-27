@@ -130,7 +130,6 @@
             "externs": [
                 "../../Common/Build/Externs.js",
                 "../../Excel/jquery/jquery-1.7.1.js",
-                "../../Excel/jquery/jquery.mousewheel-3.0.6.js",
                 "../../Common/3rdparty/XRegExp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
@@ -200,7 +199,6 @@
                 "files": {
                     "<%= pkg.menu_path %>/Excel/": [
                         "../../Excel/jquery/jquery-1.7.1.js",
-                        "../../Excel/jquery/jquery.mousewheel-3.0.6.js",
                         "../../Excel/css/nav-buttons.png",
                         "../../Excel/css/gradient.png"
                     ]
