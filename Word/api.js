@@ -768,6 +768,9 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 {
     if (0 != this.SelectedObjectsStack.length)
         this.SelectedObjectsStack.splice(0, this.SelectedObjectsStack.length);
+
+    if (this.WordControl && this.WordControl.m_oDrawingDocument)
+        this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
@@ -794,6 +797,9 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 		}
 	}
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
+
+    if (this.WordControl && this.WordControl.m_oDrawingDocument)
+        this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 }
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)
 {
