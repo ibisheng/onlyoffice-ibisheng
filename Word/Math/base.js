@@ -106,13 +106,6 @@ CMathBase.prototype =
 
         return ctrPrp;
     },
-    getShiftCenter: function(oMeasure, font)
-    {
-        oMeasure.SetFont(font);
-        var metrics = oMeasure.Measure2Code(8727); // "+"
-
-        return 0.6*metrics.Height;
-    },
     // для управляющих символов в приоритете GetFirstPrp
     // если первый элемент - мат объект, то берутся его CtrPrp
     getPrpToControlLetter: function()

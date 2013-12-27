@@ -277,7 +277,7 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
 
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
-    var ascent = num.height + this.getShiftCenter(oMeasure, ctrPrp);
+    var ascent = num.height + this.Composition.GetShiftCenter(oMeasure, ctrPrp);
     //var ascent = num.height;
 
     this.size =  {width: width, height: height, ascent: ascent};
@@ -288,7 +288,7 @@ CFraction.prototype.recalculateSkewed = function(oMeasure)
     this.gapSlash = 5.011235894097222 * ctrPrp.FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var _ascent = this.elements[0][0].size.height + this.getShiftCenter(oMeasure, ctrPrp);
+    var _ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, ctrPrp);
 
     this.size =  {width: _width, height: _height, ascent: _ascent};
 }

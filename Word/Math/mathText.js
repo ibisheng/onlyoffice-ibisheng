@@ -78,10 +78,10 @@ CMathText.prototype =
 {
     add: function(code)
     {
-        if(code == 42)      // "*"
-            code = 8727;
-        else if(code == 45) // "-"
-            code = 8722;
+        if(code == 0x2A)      // "*"
+            code = 0x2217;
+        else if(code == 0x2D) // "-"
+            code = 0x2212;
 
         this.value = code;
     },
@@ -144,6 +144,10 @@ CMathText.prototype =
          }*/
 
         return code;
+    },
+    getCodeChr: function()
+    {
+        return this.value;
     },
     fillPlaceholders: function()
     {

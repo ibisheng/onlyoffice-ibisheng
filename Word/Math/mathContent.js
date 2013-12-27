@@ -37,6 +37,8 @@
 //  1. CAccent ~> COperator
 //  2. COperator : объединить все классы связанные с отрисовкой и пересчетом операторов в один
 
+var TEST_VAL = 0;
+
 
 /// TODO
 
@@ -76,7 +78,7 @@ function mathElem(val)
 {
     this.value = val;
     this.widthToEl = 0; // width to this element
-    this.g_mContext =
+    this.gaps =
     {
         left: 0,
         right: 0,
@@ -4190,7 +4192,7 @@ CMathContent.prototype =
         var x = coord.x, y = coord.y;
         var bLow = false;
 
-        x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].g_mContext.right;
+        x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].gaps.right;
         y = 0;
 
         if( ! this.bRoot )
@@ -4215,7 +4217,7 @@ CMathContent.prototype =
         var x = coord.x, y = coord.y;
         var bUp = false;
 
-        x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].g_mContext.right;
+        x += this.content[this.CurPos].widthToEl - this.content[this.CurPos].value.size.width - this.content[this.CurPos].gaps.right;
         y = 0;
 
         if( ! this.bRoot )
@@ -4594,7 +4596,7 @@ CMathContent.prototype =
         for(var i=0; i< this.content.length; i++)
         {
             var Size = this.content[i].value.size;
-            var gps = this.content[i].g_mContext;
+            var gps = this.content[i].gaps;
             _width += Size.width + gps.left + gps.right;
             _descent = ( _descent < ( Size.height - Size.center + gps.bottom) ) ? ( Size.height - Size.center + gps.bottom): _descent;
             _center =  ( _center < (Size.center + gps.top) ) ? ( Size.center + gps.top) : _center;
@@ -4609,9 +4611,9 @@ CMathContent.prototype =
             _ascent = _ascent > sAscent ? _ascent : sAscent;
         }
 
-        _width += this.g_mContext.left + this.g_mContext.right;
-        _height = _center + _descent + this.g_mContext.top + this.g_mContext.bottom;
-        _center += this.g_mContext.top;
+        _width += this.gaps.left + this.gaps.right;
+        _height = _center + _descent + this.gaps.top + this.gaps.bottom;
+        _center += this.gaps.top;
 
         this.size = {width: _width, height: _height, center: _center, ascent: _ascent};
 
@@ -4626,7 +4628,7 @@ CMathContent.prototype =
         for(var i = 0; i < this.content.length; i++)
         {
             var oSize = this.content[i].value.size;
-            var gps = this.content[i].g_mContext;
+            var gps = this.content[i].gaps;
 
             width += oSize.width + gps.left + gps.right;
 
@@ -4651,6 +4653,8 @@ CMathContent.prototype =
             {
                 this.content[i].value.setMText(bItalic);
                 this.content[i].value.Resize(oMeasure);
+
+                this.checkGapsSign(oMeasure, i);
             }
             else if(type == MATH_COMP)
             {
@@ -4687,6 +4691,67 @@ CMathContent.prototype =
         }
 
         this.recalculateSize();
+    },
+    checkGapsSign: function(oMeasure, pos)
+    {
+        /*var bPlus     = this.content[pos].value.code === 0x2B,
+            bMinus    = this.content[pos].value.code === 0x2212,
+            bMult     = this.content[pos].value.code === 0x2217,
+            bDivision = this.content[pos].value.code === 0x002F;*/
+
+        var bPlus = false, bMinus = false,
+            bMult = false, bDivision = false,
+            bEqual = false;
+
+        if(this.content[pos].value.typeObj == MATH_TEXT)
+        {
+            var code = this.content[pos].value.getCodeChr();
+
+            bPlus     = code === 0x2B;
+            bMinus    = code === 0x2212;
+            bMult     = code === 0x2217;
+            bDivision = code === 0x002F;
+            bEqual    = code === 0x3D;
+        }
+
+        var leftType    = pos > 0 ? this.content[pos - 1].value.typeObj : null,
+            left2_Type  = pos - 1 > 0 ? this.content[pos - 2].value.typeObj : null,
+            left3_Type  = pos - 2 > 0 ? this.content[pos - 3].value.typeObj : null,
+            rightType   = pos < this.content.length - 1 ? this.content[pos + 1].value.typeObj : null,
+            right2_Type = pos + 1 < this.content.length - 1 ? this.content[pos + 2].value.typeObj : null;
+
+        var bLeftComp   = leftType == MATH_RUN_PRP && left2_Type == MATH_EMPTY && left3_Type == MATH_COMP,
+            bLeftLetter = leftType == MATH_TEXT || (leftType == MATH_RUN_PRP && left2_Type == MATH_TEXT);
+
+        var bRightComp   = rightType == MATH_COMP,
+            bRightLetter = rightType == MATH_TEXT || rightType == MATH_RUN_PRP && right2_Type == MATH_TEXT;
+
+        if(bPlus || bMinus || bEqual)
+        {
+            if(bLeftComp || bLeftLetter)
+            {
+                var rPrp = this.getRPrpByPosition(pos);
+                var txtPrp = new CMathTextPrp();
+                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+                txtPrp.Merge(rPrp);
+                //txtPrp.Italic = false;
+
+                this.content[pos].gaps.left = 0.6*this.Composition.GetGapSign(oMeasure, txtPrp);
+            }
+
+            if(bRightComp || bRightLetter)
+            {
+                var rPrp = this.getRPrpByPosition(pos);
+                var txtPrp = new CMathTextPrp();
+                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+                txtPrp.Merge(rPrp);
+                //txtPrp.Italic = false;
+
+                this.content[pos].gaps.right = 0.5*this.Composition.GetGapSign(oMeasure, txtPrp);
+            }
+
+        }
+
     },
     old_draw: function(pGraphics)
     {
@@ -4770,7 +4835,7 @@ CMathContent.prototype =
     {
         for(var i = 1; i <this.content.length; i++)
         {
-            this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].g_mContext.left + this.content[i].g_mContext.right;
+            this.content[i].widthToEl = this.content[i-1].widthToEl + this.content[i].value.size.width + this.content[i].gaps.left + this.content[i].gaps.right;
         }
     },
     update_Cursor: function()
@@ -4796,19 +4861,19 @@ CMathContent.prototype =
     {
         var x = msCoord.x;
         var y = msCoord.y;
-        if( 0 <= x && x <= this.g_mContext.left )
+        if( 0 <= x && x <= this.gaps.left )
             x = 0;
-        else if( (this.size.width - this.g_mContext.right) <= x && x <= this.size.width)
-            x = this.size.width - this.g_mContext.right - this.g_mContext.left;
+        else if( (this.size.width - this.gaps.right) <= x && x <= this.size.width)
+            x = this.size.width - this.gaps.right - this.gaps.left;
         else
-            x -= this.g_mContext.left;
+            x -= this.gaps.left;
 
-        if( 0 <= y && y <= this.g_mContext.top )
+        if( 0 <= y && y <= this.gaps.top )
             y = 0;
-        else if( (this.size.height - this.g_mContext.bottom) <= y && y <= this.size.height )
-            y = this.size.height - this.g_mContext.top - this.g_mContext.bottom;
+        else if( (this.size.height - this.gaps.bottom) <= y && y <= this.size.height )
+            y = this.size.height - this.gaps.top - this.gaps.bottom;
         else
-            y -= this.g_mContext.top;
+            y -= this.gaps.top;
 
         return {x: x, y: y};
     },
@@ -4821,7 +4886,7 @@ CMathContent.prototype =
         while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
             pos++;
 
-        var gps = this.content[pos].g_mContext;
+        var gps = this.content[pos].gaps;
         var width = this.content[pos].value.size.width;
         var widthToEl = this.content[pos].widthToEl;
 
@@ -4866,7 +4931,7 @@ CMathContent.prototype =
         var X;
         var Y;
 
-        var gps = this.content[index].g_mContext;
+        var gps = this.content[index].gaps;
         if( widthToPrev <= mCoord.x && mCoord.x <=  (widthToPrev + gps.left) )
             X = 0;
         else if( (widthToCur - gps.right) <= mCoord.x && mCoord.x <= widthToCur )
@@ -4874,12 +4939,12 @@ CMathContent.prototype =
         else
             X = mCoord.x - widthToPrev - gps.left;
 
-        if( mCoord.y <= (this.size.center - this.g_mContext.top - this.content[index].value.size.center) )
+        if( mCoord.y <= (this.size.center - this.gaps.top - this.content[index].value.size.center) )
             Y = 0;
-        else if( mCoord.y >= this.size.center - this.g_mContext.top +  this.content[index].value.size.height -  this.content[index].value.size.center )
+        else if( mCoord.y >= this.size.center - this.gaps.top +  this.content[index].value.size.height -  this.content[index].value.size.center )
             Y =  this.content[index].value.size.height;
         else
-            Y = mCoord.y - (this.size.center - this.g_mContext.top - this.content[index].value.size.center);
+            Y = mCoord.y - (this.size.center - this.gaps.top - this.content[index].value.size.center);
 
         return {x: X, y: Y};
     },
@@ -4890,7 +4955,7 @@ CMathContent.prototype =
         var X;
         var Y;
 
-        var gps = this.content[index].g_mContext;
+        var gps = this.content[index].gaps;
         if( widthToPrev <= mCoord.x && mCoord.x <=  (widthToPrev + gps.left) )
             X = 0;
         else if( (widthToCur - gps.right) <= mCoord.x && mCoord.x <= widthToCur )
@@ -5463,7 +5528,7 @@ CMathContent.prototype =
     },
     old_setPosition: function(pos)
     {
-        this.pos = { x: pos.x + this.g_mContext.left, y: pos.y};
+        this.pos = { x: pos.x + this.gaps.left, y: pos.y};
         var max_cent = this.size.center;
 
         //var txtPrp = this.getTxtPrp();
@@ -5478,7 +5543,7 @@ CMathContent.prototype =
 
         for(var i=1; i < this.content.length;i++)
         {
-            var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left, y: this.pos.y + max_cent };
+            var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].gaps.left, y: this.pos.y + max_cent };
             if( this.content[i].value.typeObj !== MATH_COMP )
                 t.y += baseLine;
 
@@ -5493,7 +5558,7 @@ CMathContent.prototype =
         {
             var t =
             {
-                x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left,
+                x: this.pos.x + this.content[i-1].widthToEl + this.content[i].gaps.left,
                 y: this.pos.y + this.size.ascent    //baseline
             };
 
@@ -5676,7 +5741,7 @@ CMathContent.prototype =
         {
             var txtPrp;
             if(this.bRoot)
-                txtPrp = this.Composition.DefaultTxtPrp;
+                txtPrp = this.Composition.DEFAULT_RUN_PRP;
             else
                 txtPrp = this.Parent.getCtrPrp();
 
@@ -5704,7 +5769,7 @@ CMathContent.prototype =
 
         if(this.bRoot && bEmpty)
         {
-            var rPrp = this.Composition.DefaultTxtPrp;
+            var rPrp = this.Composition.DEFAULT_RUN_PRP;
             this.addRunPrp(rPrp);
         }
         else if(bEmpty)
@@ -5775,7 +5840,7 @@ CMathContent.prototype =
 
         if(this.bRoot && bEmpty)
         {
-            var rPrp = this.Composition.DefaultTxtPrp;
+            var rPrp = this.Composition.DEFAULT_RUN_PRP;
             this.addRunPrp(rPrp);
         }
         else if(bEmpty)
@@ -6274,7 +6339,7 @@ CMathContent.prototype =
                 end   = this.RealSelect.endPos - 1;
 
             var beforeSelect = this.content[start].widthToEl,
-                afterSelect = this.content[end].widthToEl  + this.content[end].g_mContext.right;
+                afterSelect = this.content[end].widthToEl  + this.content[end].gaps.right;
 
             flag = beforeSelect <= x && x <= afterSelect;
         }
@@ -6464,6 +6529,20 @@ CMathComposition.prototype =
     TestSetFontAllSymbols: function(font)
     {
         this.Root.setFont(font);
+    },
+    GetShiftCenter: function(oMeasure, font)
+    {
+        oMeasure.SetFont(font);
+        var metrics = oMeasure.Measure2Code(8727); // "+"
+
+        return 0.6*metrics.Height;
+    },
+    GetGapSign: function(oMeasure, font)
+    {
+        oMeasure.SetFont(font);
+        var metrics = oMeasure.Measure2Code(0x2217); // "+"
+
+        return metrics.Height;
     },
     CheckTarget: function()
     {
@@ -6921,7 +7000,7 @@ CMathComposition.prototype =
     Init: function()
     {
         this.Root = new CMathContent();
-        //this.Root.g_mContext = gps;
+        //this.Root.gaps = gps;
         this.Root.setComposition(this);
         //this.SetTestRunPrp();
         //this.Root.setTxtPrp(this.TxtPrp);
@@ -6940,7 +7019,7 @@ CMathComposition.prototype =
     },*/
     GetTxtPrp: function()
     {
-        return this.DefaultTxtPrp;
+        return this.DEFAULT_RUN_PRP;
     },
     //TODO
     // position вычислить естественно до того, как придет Draw, чтобы не пришлось пересчитывать при изменении в тексте документа
@@ -7051,6 +7130,9 @@ CMathComposition.prototype =
     },
     Remove: function(order, bOnAdd)
     {
+        // test
+        TEST_VAL++;
+        //
         ////*    History    */////
         History.Create_NewPoint();
 
@@ -7310,7 +7392,7 @@ function TEST_MATH_EDIT()
 {
     //MathComposition.test_for_edit();
     MathComposition.test_for_edit();
-    MathComposition.RecalculateComposition(g_oTextMeasurer, MathComposition.DefaultTxtPrp);
+    MathComposition.RecalculateComposition(g_oTextMeasurer, MathComposition.DEFAULT_RUN_PRP);
     //MathComposition.Draw_2(x, y, )
 
 

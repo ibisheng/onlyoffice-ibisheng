@@ -52,7 +52,7 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     var descIter = iter.height - iter.ascent;
 
     var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
-    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
 
     var upper = 0;
 
@@ -93,7 +93,7 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
         shiftCenter = 0.5*DIV_CENT*FontSize;*/
 
     var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
-    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
     var low = 0;
 
     if(iter.ascent - shCenter > 2/3*base.height)
@@ -317,7 +317,7 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
         shCent = DIV_CENT*FontSize;*/
 
     var ctrPrp = this.getCtrPrp();
-    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
 
     var upDesc = upIter.height - upIter.ascent + shCenter,
         lowAsc = lowIter.ascent - shCenter;
@@ -432,7 +432,7 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
 CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
 {
     var ctrPrp = this.getCtrPrp();
-    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
 
     var width = 0, height = 0,
         ascent = 0;
