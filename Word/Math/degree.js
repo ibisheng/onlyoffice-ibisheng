@@ -20,9 +20,6 @@ CDegree.prototype.init = function(props)
 }
 CDegree.prototype.init_2 = function(props, oBase)
 {
-    /*if( typeof(props.type)!=="undefined"|| props.type !== null)
-        this.type = props.type;*/
-
     if(props.type === DEGREE_SUPERSCRIPT)
         this.type = DEGREE_SUPERSCRIPT;
     else if(props.type === DEGREE_SUBSCRIPT)
@@ -35,14 +32,14 @@ CDegree.prototype.init_2 = function(props, oBase)
 
     this.addMCToContent(oBase, oDegree);
 }
-CDegree.prototype.recalculateSize = function()
+CDegree.prototype.recalculateSize = function(oMeasure)
 {
     if(this.type === DEGREE_SUPERSCRIPT)
-        this.recalculateSup();
+        this.recalculateSup(oMeasure);
     else if(this.type === DEGREE_SUBSCRIPT)
-        this.recalculateSubScript();
+        this.recalculateSubScript(oMeasure);
 }
-CDegree.prototype.recalculateSup = function()
+CDegree.prototype.recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
@@ -53,18 +50,19 @@ CDegree.prototype.recalculateSup = function()
         ascent = 0;
 
     var descIter = iter.height - iter.ascent;
-    var FontSize = this.getCtrPrp().FontSize,
-        shiftCenter = DIV_CENT*FontSize;
+
+    var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
+    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
 
     var upper = 0;
 
-    if(descIter + shiftCenter > 2/3*base.height)
+    if(descIter + shCenter > 2/3*base.height)
     {
         upper = iter.height - 2/3*base.height;
     }
     else
     {
-        upper = iter.ascent - shiftCenter;
+        upper = iter.ascent - shCenter;
     }
 
     this.upper = upper;
@@ -82,7 +80,7 @@ CDegree.prototype.recalculateSup = function()
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CDegree.prototype.recalculateSubScript = function()
+CDegree.prototype.recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
@@ -91,17 +89,20 @@ CDegree.prototype.recalculateSubScript = function()
     var height = 0,
         ascent = 0;
 
-    var FontSize = this.getCtrPrp().FontSize,
-        shiftCenter = 0.5*DIV_CENT*FontSize;
+    /*var FontSize = this.getCtrPrp().FontSize,
+        shiftCenter = 0.5*DIV_CENT*FontSize;*/
+
+    var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
+    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
     var low = 0;
 
-    if(iter.ascent - shiftCenter > 2/3*base.height)
+    if(iter.ascent - shCenter > 2/3*base.height)
     {
         low = iter.height - 2/3*base.height;
     }
     else
     {
-        low = iter.height - iter.ascent + shiftCenter;
+        low = iter.height - iter.ascent + shCenter;
     }
 
     height = base.height + low;
@@ -125,7 +126,10 @@ CDegree.prototype.old_setPosition = function(_pos)
 }
 CDegree.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+    if(this.bMObjs === true)
+        this.pos = pos;
+    else
+        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
 
     var shBase = 0,
         shIter = 0;
@@ -292,6 +296,7 @@ CDegree.prototype.getPropsForWrite = function()
 
 function CIterators()
 {
+    this.upper = 0;
     CMathBase.call(this);
 }
 extend(CIterators, CMathBase);
@@ -300,34 +305,62 @@ CIterators.prototype.init = function()
     this.setDimension(2, 1);
     this.setContent();
 }
-CIterators.prototype.setDistance = function()
+CIterators.prototype.setDistanceIters = function(oMeasure)
 {
-    var descF = this.elements[0][0].size.height - this.elements[0][0].size.center ,
-        ascS = this.elements[1][0].size.center ;
+    /*var descF = this.elements[0][0].size.height - this.elements[0][0].size.center ,
+        ascS = this.elements[1][0].size.center;*/
+
+    var upIter  = this.elements[0][0].size,
+        lowIter = this.elements[1][0].size;
+
+    /*var FontSize = this.getCtrPrp().FontSize,
+        shCent = DIV_CENT*FontSize;*/
+
+    var ctrPrp = this.getCtrPrp();
+    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+
+    var upDesc = upIter.height - upIter.ascent + shCenter,
+        lowAsc = lowIter.ascent - shCenter;
 
     var up = 0;
     var down = 0;
-    if(this.lUp  > descF)
-        up = this.lUp - descF;
-    if( this.lD > ascS )
-        down = this.lD - ascS;
+    if(this.lUp  > upDesc)
+    {
+        up = this.lUp - upDesc;
+        this.upper = upIter.height - upDesc;
+    }
+    else
+    {
+        up = 0;
+        this.upper = upIter.height - this.lUp;
+    }
+
+
+    if( this.lD > lowAsc )
+        down = this.lD - lowAsc;
 
     this.dH = up + down;
     this.dW = 0;
-
 }
-CIterators.prototype.getCenter = function()
+/*CIterators.prototype.getAscent = function()
 {
-    var center = 0;
-    var descF = this.elements[0][0].size.height - this.elements[0][0].size.center;
+    var ascent = 0;
+    var upIter  = this.elements[0][0].size;
 
-    if( this.lUp > descF )
-        center = this.elements[0][0].size.center + this.lUp;
+    *//*var FontSize = this.getCtrPrp().FontSize,
+        shCent = DIV_CENT*FontSize;*//*
+
+    var shCenter = this.getShiftCenter();
+
+    var upDesc = upIter.height - upIter.ascent + shCent;
+
+    if(this.lUp > upDesc)
+        ascent = upIter.height - upDesc + this.lUp;
     else
-        center = this.elements[0][0].size.height;
+        ascent = upIter.height + shCent;
 
-    return center;
-}
+    return ascent;
+}*/
 CIterators.prototype.getUpperIterator = function()
 {
     return this.elements[0][0];
@@ -396,24 +429,80 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
     }
 
 }
-CDegreeSubSup.prototype.recalculateSize = function()
+CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
 {
+    var ctrPrp = this.getCtrPrp();
+    var shCenter = this.getShiftCenter(oMeasure, ctrPrp);
+
+    var width = 0, height = 0,
+        ascent = 0;
+
+    var iters, base;
+
     if(this.type == DEGREE_SubSup)
     {
-        this.elements[0][1].lUp = this.elements[0][0].size.center;
-        this.elements[0][1].lD = this.elements[0][0].size.height - this.elements[0][0].size.center;
-        this.elements[0][1].setDistance();
-        this.elements[0][1].recalculateSize();
+        iters = this.elements[0][1];
+        base  = this.elements[0][0];
+
     }
     else if(this.type == DEGREE_PreSubSup)
     {
-        this.elements[0][0].lUp = this.elements[0][1].size.center;
+        iters = this.elements[0][0];
+        base  = this.elements[0][1];
+
+        /*this.elements[0][0].lUp = this.elements[0][1].size.center;
         this.elements[0][0].lD = this.elements[0][1].size.height - this.elements[0][1].size.center;
         this.elements[0][0].setDistance();
-        this.elements[0][0].recalculateSize();
+        this.elements[0][0].recalculateSize();*/
     }
 
-    CSubMathBase.superclass.recalculateSize.call(this);
+    iters.lUp = base.size.ascent - shCenter;
+    iters.lD  = base.size.height - iters.lUp;
+    iters.setDistanceIters(oMeasure);
+    iters.recalculateSize();
+
+    width  = iters.size.width + base.size.width;
+    //height = shCenter + iters.lUp;
+    height = iters.size.height;
+
+    ascent = iters.upper + base.size.ascent;
+
+    this.size = {width: width, height: height, ascent: ascent};
+
+    //CSubMathBase.superclass.recalculateSize.call(this);
+}
+CDegreeSubSup.prototype.old_setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+
+    if(this.type == DEGREE_SubSup)
+    {
+        var iters = this.elements[0][1],
+            base  = this.elements[0][0];
+
+        var posBase  = {x: this.pos.x, y: this.pos.y + iters.upper},
+            posIters = {x: this.pos.x + base.size.width, y: this.pos.y};
+        base.setPosition(posBase);
+        iters.setPosition(posIters);
+    }
+
+}
+CDegreeSubSup.prototype.align = function(x, y)
+{
+    var _x = 0, _y = 0;
+
+    if(this.type == DEGREE_SubSup)
+    {
+        if(x == 0 && y == 0)
+            _y = this.elements[0][1].upper;
+    }
+    else
+    {
+        if(x == 0 && y == 1)
+            _y = this.elements[0][0].upper;
+    }
+
+    return {x: _x, y: _y};
 }
 CDegreeSubSup.prototype.getBase = function()
 {

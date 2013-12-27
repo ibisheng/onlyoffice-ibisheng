@@ -17,18 +17,20 @@
 
 /// TODO
 
-//  0. Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
-//  1. центр => baseline
-//  2. поправить центр для delimiters (когда оператор текст)
-//  3. поправить accent расположение глифов в случае небольшого размера шрифта (н-р, 14)
-//  5. сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
-//  6. Размер разделительной черты для линейной дроби ограничить также как и для наклонной дроби
-//  7. баг с отрисовкой кругового интеграла
-//  8. cursor_Up, cursor_Down (+ c зажитым shift)
-//  9. Merge textPrp и mathTextPrp (bold, italic)
+//  0.  Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
+//  1.  центр => baseline
+//  2.  поправить центр для delimiters (когда оператор текст)
+//  3.  поправить accent расположение глифов в случае небольшого размера шрифта (н-р, 14)
+//  5.  сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
+//  6.  Размер разделительной черты для линейной дроби ограничить также как и для наклонной дроби
+//  7.  баг с отрисовкой кругового интеграла
+//  8.  cursor_Up, cursor_Down (+ c зажитым shift)
+//  9.  Merge textPrp и mathTextPrp (bold, italic)
 //  10. Поправить баги для CAccent с точками : смещение, когда идут подряд с одной точкой, двумя и тремя они перекрываются
 //  11. Для управляющих символов запрашивать не getCtrPrp, getPrpToControlLetter (реализована, нужно только протащить для всех управляющих элементов)
 //  12. объединение формул на remove и add
+//  13. Для N-арных операторов в случае со степенью : итераторы занимают не 2/3 от основание, а примерно половину (когда один итератор сверху или снизу)
+//  14. Для дробей, n-арных операторов и пр. считать расстояние исходя из shiftCenter
 
 
 //  TODO Refactoring
@@ -51,7 +53,7 @@ var SELECT_PARENT = 0;
 var SELECT_CHILD  = 1;
 
 
-var  DEFAULT_RUN_PRP =
+/*var  DEFAULT_RUN_PRP =
 {
     FontFamily:     {Name  : "Cambria Math", Index : -1 },
     FontSize:       11,
@@ -59,7 +61,8 @@ var  DEFAULT_RUN_PRP =
     Bold:           false,
     RFonts:         {},
     Lang:           {}
-};
+};*/
+
 var StartTextElement = 0x2B1A; // Cambria Math
 
 function dist(_left, _right, _top, _bottom)
@@ -525,7 +528,6 @@ CMathContent.prototype =
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
 
             mathElem.relate(this);
-            mathElem.setTypeElement(ind);
             //mathElem.setComposition(this.Composition);
 
             var ctrPrp = new CTextPr();
@@ -544,7 +546,7 @@ CMathContent.prototype =
             }
             else //на всякий случай
             {
-                ctrPrp.Merge(DEFAULT_RUN_PRP);
+                ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
             }
 
             mathElem.setCtrPrp(ctrPrp);
@@ -4659,7 +4661,7 @@ CMathContent.prototype =
                 var runPrp = this.content[i].value.getWRunPrp();
 
                 var txtPrp = new CMathTextPrp();
-                txtPrp.Merge(DEFAULT_RUN_PRP);
+                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                 txtPrp.Merge(runPrp);
                 bItalic = txtPrp.Italic;
                 txtPrp.Italic = false;
@@ -4673,7 +4675,7 @@ CMathContent.prototype =
                     var ctrPrp = this.Parent.getCtrPrp();
 
                     var txtPrp = new CMathTextPrp();
-                    txtPrp.Merge(DEFAULT_RUN_PRP);
+                    txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     txtPrp.Merge(ctrPrp);
                     txtPrp.Italic = false;
 
@@ -4699,7 +4701,7 @@ CMathContent.prototype =
                     pGraphics.b_color1(0,0,0,255);
 
                     var rPrp = new CMathTextPrp();
-                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge( this.content[i].value.getWRunPrp() );
 
                     rPrp.Italic = false;
@@ -4712,7 +4714,7 @@ CMathContent.prototype =
                     var ctrPrp = this.Parent.getCtrPrp();
 
                     var rPrp = new CMathTextPrp();
-                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge(ctrPrp);
 
                     rPrp.Italic = false;
@@ -4738,7 +4740,7 @@ CMathContent.prototype =
                     pGraphics.b_color1(0,0,0,255);
 
                     var rPrp = new CMathTextPrp();
-                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge( this.content[i].value.getWRunPrp() );
 
                     rPrp.Italic = false;
@@ -4751,7 +4753,7 @@ CMathContent.prototype =
                     var ctrPrp = this.Parent.getCtrPrp();
 
                     var rPrp = new CMathTextPrp();
-                    rPrp.Merge(DEFAULT_RUN_PRP);
+                    rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
                     rPrp.Merge(ctrPrp);
 
                     rPrp.Italic = false;
@@ -4776,7 +4778,7 @@ CMathContent.prototype =
         //var sizeCursor = this.getRunPrp(this.CurPos).FontSize*g_dKoef_pt_to_mm;
 
         var rPrp = new CMathTextPrp();
-        rPrp.Merge(DEFAULT_RUN_PRP);
+        rPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
         rPrp.Merge(this.getCurrRunPrp());
 
         var absPos = this.Composition.absPos;
@@ -5646,7 +5648,7 @@ CMathContent.prototype =
     getFirstPrp:    function()
     {
         var txtPrp =  new CMathTextPrp();
-        txtPrp.Merge(DEFAULT_RUN_PRP);
+        txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
 
         if(this.content.length > 1)
         {
@@ -5733,7 +5735,7 @@ CMathContent.prototype =
             else if(this.content[this.CurPos - 2].value.typeObj == MATH_COMP)
                 rPrp = this.content[this.CurPos - 2].value.getCtrPrp();
             else // на всякий случай
-                rPrp = DEFAULT_RUN_PRP;
+                rPrp = this.Composition.DEFAULT_RUN_PRP;
 
             this.addRunPrp(rPrp);
         }
@@ -6435,10 +6437,10 @@ function CMathComposition()
     this.CurrentContent    = null;
     this.SelectContent     = null;
 
-    this.DefaultTxtPrp =
+    this.DEFAULT_RUN_PRP =
     {
         FontFamily:     {Name  : "Cambria Math", Index : -1 },
-        FontSize:       36,
+        FontSize:       11,
         Italic:         true,
         Bold:           false,
         RFonts:         {},
@@ -7350,3 +7352,28 @@ function TEST_UNION_CONTENT(indef)
     //oCurContent.verifyRPrp_MC_2(rPr);
 }
 
+function GetShiftCenter()
+{
+    // 1.5875 / FontSize
+    var txtPrp =
+    {
+        FontFamily:     {Name  : "Cambria Math", Index : -1 },
+        FontSize:       11,
+        Italic:         true,
+        Bold:           false,
+        RFonts:         {},
+        Lang:           {}
+    };
+
+    for(var i = 2; i < 255; i += 2)
+    {
+        txtPrp.FontSize = i;
+        g_oTextMeasurer.SetFont(txtPrp);
+        //var metricsTxt = g_oTextMeasurer.Measure2Code(StartTextElement);
+        var Height = g_oTextMeasurer.GetHeight();
+        var shift = Height / i;
+
+        //var shift = metricsTxt.Height/2 / i;
+        console.log(i + ": " + shift);
+    }
+}

@@ -93,7 +93,7 @@ CMathBase.prototype =
     getCtrPrp: function()
     {
         var ctrPrp = new CTextPr();
-        ctrPrp.Merge(DEFAULT_RUN_PRP);
+        ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
         ctrPrp.Merge(this.Composition.GetFirstPrp() );
         ctrPrp.Merge(this.CtrPrp);
         return ctrPrp;
@@ -101,10 +101,17 @@ CMathBase.prototype =
     getCtrPrpForFirst: function()
     {
         var ctrPrp = new CTextPr();
-        ctrPrp.Merge(DEFAULT_RUN_PRP);
+        ctrPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
         ctrPrp.Merge(this.CtrPrp);
 
         return ctrPrp;
+    },
+    getShiftCenter: function(oMeasure, font)
+    {
+        oMeasure.SetFont(font);
+        var metrics = oMeasure.Measure2Code(8727); // "+"
+
+        return 0.6*metrics.Height;
     },
     // для управляющих символов в приоритете GetFirstPrp
     // если первый элемент - мат объект, то берутся его CtrPrp
@@ -881,7 +888,7 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].Resize(oMeasure);
 
-        this.recalculateSize();
+        this.recalculateSize(oMeasure); // передаем oMeasure, для
     },
     old_getCenter: function(_height)
     {
@@ -986,10 +993,6 @@ CMathBase.prototype =
 
         var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
         return content;
-    },
-    setTypeElement: function(type)
-    {
-        this.typeElement = type;
     },
     ////    For Edit   /////
 

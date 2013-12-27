@@ -606,7 +606,8 @@ CSign.prototype.fixSize = function(oMeasure, stretch, bIncline)
     var ctrPrp = this.Parent.getCtrPrp();
 
     var rPrp = new CMathTextPrp();
-    rPrp.Merge(DEFAULT_RUN_PRP);
+    var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+    rPrp.Merge(defaultRPrp);
     rPrp.Merge(ctrPrp);
     rPrp.Italic = false;
 

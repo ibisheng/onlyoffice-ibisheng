@@ -9,7 +9,9 @@
 // возвращает название шрифта
 
 //var DIV_CENT = 0.2487852283770651;
-var DIV_CENT = 0.1;
+
+// /var DIV_CENT = 0.1;
+var DIV_CENT = 0.1386;
 
 function CMathTextPrp()
 {
@@ -76,11 +78,17 @@ CMathText.prototype =
 {
     add: function(code)
     {
+        if(code == 42)      // "*"
+            code = 8727;
+        else if(code == 45) // "-"
+            code = 8722;
+
         this.value = code;
     },
 	addTxt: function(txt)
 	{
-		this.value = txt.charCodeAt(0);
+		var code = txt.charCodeAt(0);
+        this.add(code);
 	},
     getCode: function()
     {

@@ -2806,7 +2806,8 @@ COperator.prototype.draw = function(x, y, pGraphics)
         var ctrPrp = this.getCtrPrp();
 
         var rPrp = new CMathTextPrp();
-        rPrp.Merge(DEFAULT_RUN_PRP);
+        var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+        rPrp.Merge(defaultRPrp);
         rPrp.Merge(ctrPrp);
         rPrp.Italic = false;
         pGraphics.SetFont(rPrp);
@@ -2871,7 +2872,8 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             var ctrPrp = this.getCtrPrp();
 
             var rPrp = new CMathTextPrp();
-            rPrp.Merge(DEFAULT_RUN_PRP);
+            var defaultRPrp = this.Parent.Composition.DEFAULT_RUN_PRP;
+            rPrp.Merge(defaultRPrp);
             rPrp.Merge(ctrPrp);
             rPrp.Italic = false;
 

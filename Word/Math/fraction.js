@@ -89,7 +89,26 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 
     var x1 = this.pos.x + x ,
         x2 = this.pos.x + x + this.size.width,
-        y1 = this.pos.y + y + numHeight - penW/2;
+        y1 = this.pos.y + y + numHeight- penW;
+
+    /*var xx1 = x1, yy1 = this.pos.y + y,
+        xx2 = xx1 + this.size.width, yy2 = yy1 + this.elements[0][0].size.height;
+
+    var xxx1 =  x1, yyy1 = this.pos.y + y + this.elements[0][0].size.height,
+        xxx2 =  xxx1 + this.size.width, yyy2 = yyy1 + this.elements[1][0].size.height;
+
+    pGraphics.p_color(255,0,0, 255);
+    pGraphics.drawHorLine(0, yy1, xx1, xx2, 0.1);
+    pGraphics.drawVerLine(0, xx2, yy1, yy2, 0.1);
+    pGraphics.drawHorLine(0, yy2, xx1, xx2, 0.1);
+    pGraphics.drawVerLine(0, xx1, yy1, yy2, 0.1);
+
+
+    pGraphics.p_color(0,255,0, 255);
+    pGraphics.drawHorLine(0, yyy1, xxx1, xxx2, 0.1);
+    pGraphics.drawVerLine(0, xxx2, yyy1, yyy2, 0.1);
+    pGraphics.drawHorLine(0, yyy2, xxx1, xxx2, 0.1);
+    pGraphics.drawVerLine(0, xxx1, yyy1, yyy2, 0.1);*/
 
     if( !this.bHideBar )
     {
@@ -240,34 +259,36 @@ CFraction.prototype.getDenominator = function()
 
     return denominator;
 }
-CFraction.prototype.recalculateSize = function()
+CFraction.prototype.recalculateSize = function(oMeasure)
 {
     if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
-        this.recalculateBarFraction();
+        this.recalculateBarFraction(oMeasure);
     else if(this.type == SKEWED_FRACTION)
-        this.recalculateSkewed();
+        this.recalculateSkewed(oMeasure);
     else if(this.type == LINEAR_FRACTION)
-        this.recalculateLinear();
+        this.recalculateLinear(oMeasure);
 }
-CFraction.prototype.recalculateBarFraction = function()
+CFraction.prototype.recalculateBarFraction = function(oMeasure)
 {
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
+    var ctrPrp =  this.getCtrPrp();
+
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
-    var shCenter = DIV_CENT*this.getCtrPrp().FontSize;
-    var ascent = num.height + shCenter;
+    var ascent = num.height + this.getShiftCenter(oMeasure, ctrPrp);
+    //var ascent = num.height;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
-CFraction.prototype.recalculateSkewed = function()
+CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
     var ctrPrp = this.getCtrPrp();
     this.gapSlash = 5.011235894097222 * ctrPrp.FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var _ascent = this.elements[0][0].size.height + ctrPrp.FontSize*DIV_CENT;
+    var _ascent = this.elements[0][0].size.height + this.getShiftCenter(oMeasure, ctrPrp);
 
     this.size =  {width: _width, height: _height, ascent: _ascent};
 }
