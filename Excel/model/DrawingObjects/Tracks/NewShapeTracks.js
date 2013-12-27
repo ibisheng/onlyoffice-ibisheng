@@ -11,6 +11,8 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.y = null;
     this.extX = null;
     this.extY = null;
+    this.flipH = null;
+    this.flipV = null;
 
     this.transform = new CMatrix();
 
@@ -144,22 +146,38 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
 
     this.lineFlag = CheckLinePreset(final_preset);
+    this.isLine = this.lineFlag;
     this.track = function(e, x, y)
     {
+        this.flipH = false;
+        this.flipV = false;
         var real_dist_x = x - this.startX;
         var abs_dist_x = Math.abs(real_dist_x);
         var real_dist_y = y - this.startY;
         var abs_dist_y = Math.abs(real_dist_y);
-
-        if(!(e.ctrlKey || e.shiftKey))
+        if(this.isLine)
         {
+            if(x < this.startX)
+            {
+                this.flipH = true;
+            }
+            if(y < this.startY)
+            {
+                this.flipV = true;
+            }
+        }
+        if(!(e.ctrlKey || e.shiftKey) || (e.CtrlKey && !e.ShiftKey && this.isLine))
+        {
+            this.extX = abs_dist_x >= MIN_SHAPE_SIZE ? abs_dist_x : (this.isLine ? 0 : MIN_SHAPE_SIZE);
+            this.extY = abs_dist_y >= MIN_SHAPE_SIZE ? abs_dist_y : (this.isLine ? 0 : MIN_SHAPE_SIZE);
+
             if(real_dist_x >= 0)
             {
                 this.x = this.startX;
             }
             else
             {
-                this.x = abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - MIN_SHAPE_SIZE;
+                this.x = abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - this.extX;
             }
 
             if(real_dist_y >= 0)
@@ -168,12 +186,8 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             }
             else
             {
-                this.y = abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - MIN_SHAPE_SIZE;
+                this.y = abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - this.extY;
             }
-
-            this.extX = abs_dist_x >= MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
-            this.extY = abs_dist_y >= MIN_SHAPE_SIZE ? abs_dist_y : MIN_SHAPE_SIZE;
-
         }
         else if(e.ctrlKey && !e.shiftKey)
         {
@@ -261,6 +275,25 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
                 this.y = this.startY;
             else
                 this.y = this.startY - this.extY;
+
+
+            if(this.isLine)
+            {
+                var angle = Math.atan2(real_dist_y, real_dist_x);
+                if(angle >=0 && angle <= Math.PI/8
+                    || angle <= 0 && angle >= -Math.PI/8
+                    || angle >= 7*Math.PI/8 && angle <= Math.PI )
+                {
+                    this.extY = 0;
+                    this.y = this.startY;
+                }
+                else if(angle >= 3*Math.PI/8 && angle <= 5*Math.PI/8
+                    || angle <= -3*Math.PI/8 && angle >= -5*Math.PI/8)
+                {
+                    this.extX = 0;
+                    this.x = this.startX;
+                }
+            }
         }
         else
         {
@@ -320,7 +353,14 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
         this.overlayObject.updateExtents(this.extX, this.extY);
         this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+        var hc = this.extX * 0.5;
+        var vc = this.extY * 0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if (this.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if (this.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
     };
 
     this.ctrlDown = function()
@@ -338,7 +378,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     {
         var shape = new CShape(null, this.drawingObjects);
         if(this.presetGeom !== "textRect")
-            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.finalPreset, this.tailEnd, this.headEnd);
+            shape.initDefault(this.x, this.y, this.extX, this.extY, this.flipH === true, this.flipV === true, this.finalPreset, this.tailEnd, this.headEnd);
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
         shape.select(this.drawingObjects.controller);
