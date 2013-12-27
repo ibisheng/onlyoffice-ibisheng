@@ -30,9 +30,11 @@
 			this.element  = undefined;
 			this.handlers = undefined;
 			this.settings = $.extend(true, {}, this.defaults);
-			this.vsb    = undefined;
-			this.vsbApi = undefined;
-			this.hsb    = undefined;
+			this.vsb	= undefined;
+			this.vsbHSt	= undefined;
+			this.vsbApi	= undefined;
+			this.hsb	= undefined;
+			this.hsbHSt	= undefined;
 			this.hsbApi = undefined;
 			this.resizeTimerId = undefined;
 			this.scrollTimerId = undefined;
@@ -215,13 +217,13 @@
 				if (isVert || isHoriz) {
 					this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 						if (isVert) {
-							var vsHelperH = $(self.vsb).outerHeight() + Math.max(vSize * opt.vscrollStep, 1);
-							$(self.vsb).find("#ws-v-scroll-helper").height(vsHelperH);
+							vSize = self.vsb.offsetHeight + Math.max(vSize * opt.vscrollStep, 1);
+							self.vsbHSt.height = vSize + "px";
 							self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 						}
 						if (isHoriz) {
-							var hsHelperW = $(self.hsb).outerWidth() + Math.max(hSize * opt.hscrollStep, 1);
-							$(self.hsb).find("#ws-h-scroll-helper").width(hsHelperW);
+							hSize = self.hsb.offsetWidth + Math.max(hSize * opt.hscrollStep, 1);
+							self.hsbHSt.width = hSize + "px";
 							self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 						}
 					});
@@ -294,6 +296,7 @@
 				this.vsb.id = "ws-v-scrollbar";
 				this.vsb.innerHTML = '<div id="ws-v-scroll-helper"></div>';
 				this.widget.appendChild(this.vsb);
+				this.vsbHSt = document.getElementById("ws-v-scroll-helper").style;
 
 				if (!this.vsbApi) {
 					this.vsbApi = new ScrollObject(this.vsb.id, opt);
@@ -322,6 +325,7 @@
 				this.hsb.id = "ws-h-scrollbar";
 				this.hsb.innerHTML = '<div id="ws-h-scroll-helper"></div>';
 				this.widget.appendChild(this.hsb);
+				this.hsbHSt = document.getElementById("ws-h-scroll-helper").style;
 
 				if (!this.hsbApi) {
 					this.hsbApi = new ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
