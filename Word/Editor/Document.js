@@ -568,6 +568,33 @@ CDocument.prototype =
 
     LoadTestDocument4 : function()
     {
+
+//        var Runs = new Array();
+//        var __count = 72000;
+//        for (var Pos = 0; Pos < __count; Pos++)
+//        {
+//            Runs[Pos] = new ParaRun(this);
+//        }
+//
+//        var __StartTime = new Date().getTime();
+//
+//        for (var Pos = 0; Pos < __count; Pos++)
+//        {
+//            var Run = Runs[Pos];
+//            Run.Lines[0] = new CParaRunLine();
+//            Run.Lines[0].Add_Range2( 0, 0, 0 );
+//        }
+//
+//        for (var Pos = 0; Pos < __count; Pos++)
+//        {
+//            var Run = Runs[Pos];
+//            //var StartPos = Run.Lines[0].Ranges[0].StartPos;
+//            //var EndPos   = Run.Lines[0].Ranges[0].EndPos;
+//        }
+//
+//        console.log("Create Time: " + ((new Date().getTime() - __StartTime) / 1000) );
+
+
         g_oIdCounter.Set_Load(true);
 
         editor.ShowParaMarks = true;
@@ -1641,8 +1668,8 @@ CDocument.prototype =
             this.Pages[PageIndex].EndPos = Count - 1;
 
             console.log("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) );
-            console.log("RangesCount: " + RunRangesCount );
-            console.log("RangesElementCount: " + RunRangesElementsCount );
+            //console.log("RangesCount: " + RunRangesCount );
+            //console.log("RangesElementCount: " + RunRangesElementsCount );
 
             RunRangesCount = 0;
             RunRangesElementsCount = 0;
@@ -1700,22 +1727,22 @@ CDocument.prototype =
                 return;
             }
 
-            this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+            //this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
 
-//            if ( _PageIndex > this.FullRecalc.StartPage + 2 )
-//            {
-//                this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
-//                /*
-//                this.FullRecalc.Id = setTimeout( function()
-//                {
-//                    var LogicDocument = editor.WordControl.m_oLogicDocument;
-//                    var FullRecalc    = LogicDocument.FullRecalc;
-//                    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
-//                }, 10 );
-//                */
-//            }
-//            else
-//                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+            if ( _PageIndex > this.FullRecalc.StartPage + 2 )
+            {
+                this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
+                /*
+                this.FullRecalc.Id = setTimeout( function()
+                {
+                    var LogicDocument = editor.WordControl.m_oLogicDocument;
+                    var FullRecalc    = LogicDocument.FullRecalc;
+                    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
+                }, 10 );
+                */
+            }
+            else
+                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
 
         }
     },
