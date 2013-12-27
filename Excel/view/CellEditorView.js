@@ -126,6 +126,13 @@
 			this.lastKeyCode = undefined;
 			this.m_nEditorState		= null;			// Состояние редактора
 			this.isUpdateValue = true;				// Обновлять ли состояние строки при вводе в TextArea
+
+			// Функции, которые будем отключать
+			this.fKeyDown		= null;
+			this.fKeyPress		= null;
+			this.fKeyUp			= null;
+			this.fKeyMouseUp	= null;
+			this.fKeyMouseMove	= null;
 			//-----------------
 
 			this._init();
@@ -214,6 +221,12 @@
 					// Не поддерживаем drop на верхнюю строку
 					t.input.addEventListener("drop"		, function (e) {e.preventDefault(); return false;}									, false);
 				}
+
+				this.fKeyDown		= function () {return t._onWindowKeyDown.apply(t, arguments);};
+				this.fKeyPress		= function () {return t._onWindowKeyPress.apply(t, arguments);};
+				this.fKeyUp			= function () {return t._onWindowKeyUp.apply(t, arguments);};
+				this.fKeyMouseUp	= function () {return t._onWindowMouseUp.apply(t, arguments);};
+				this.fKeyMouseMove	= function () {return t._onWindowMouseMove.apply(t, arguments);};
 			},
 
 			destroy: function() {
@@ -237,12 +250,13 @@
 			open: function (options) {
 				var t = this;
 				t.isOpened = true;
-				$(window)
-						.on("keydown."   + namespace, function () {return t._onWindowKeyDown.apply(t, arguments);})
-						.on("keypress."  + namespace, function () {return t._onWindowKeyPress.apply(t, arguments);})
-						.on("keyup."  + namespace, function () {return t._onWindowKeyUp.apply(t, arguments);})
-						.on("mouseup."   + namespace, function () {return t._onWindowMouseUp.apply(t, arguments);})
-						.on("mousemove." + namespace, function () {return t._onWindowMouseMove.apply(t, arguments);});
+				if (window.addEventListener) {
+					window.addEventListener("keydown"	, this.fKeyDown		, false);
+					window.addEventListener("keypress"	, this.fKeyPress	, false);
+					window.addEventListener("keyup"		, this.fKeyUp		, false);
+					window.addEventListener("mouseup"	, this.fKeyMouseUp	, false);
+					window.addEventListener("mousemove"	, this.fKeyMouseMove, false);
+				}
 				t._setOptions(options);
 				t.isTopLineActive = true === t.input.isFocused;
 				t._draw();
@@ -273,7 +287,13 @@
 				}
 
 				t.isOpened = false;
-				$(window).off("." + namespace);
+				if (window.removeEventListener) {
+					window.removeEventListener("keydown"	, this.fKeyDown		, false);
+					window.removeEventListener("keypress"	, this.fKeyPress	, false);
+					window.removeEventListener("keyup"		, this.fKeyUp		, false);
+					window.removeEventListener("mouseup"	, this.fKeyMouseUp	, false);
+					window.removeEventListener("mousemove"	, this.fKeyMouseMove, false);
+				}
 				t.input.blur();
 				t.isTopLineActive = false;
 				t.input.isFocused = false;
@@ -1612,7 +1632,7 @@
 								t._addNewLine();
 							else {
 								if (false === t.handlers.trigger("isGlobalLockEditCell"))
-									t._tryCloseEditor();
+									t._tryCloseEditor(event);
 							}
 						}
 						return false;
@@ -1622,7 +1642,7 @@
 						if (hieroglyph) {t._syncEditors();}
 
 						if (false === t.handlers.trigger("isGlobalLockEditCell"))
-							t._tryCloseEditor();
+							t._tryCloseEditor(event);
 						return false;
 
 					case 8:   // "backspace"
@@ -1733,7 +1753,7 @@
 							if (hieroglyph) {t._syncEditors();}
 
 							if (false === t.handlers.trigger("isGlobalLockEditCell"))
-					 			t._tryCloseEditor();
+					 			t._tryCloseEditor(event);
 							return false;
 						}
 						break;*/
