@@ -989,6 +989,7 @@
 						if (p.font) {
 							// change canvas font style
 							f = p.font.clone();
+							// ToDo не особо правильно работает shrink
 							if (shrink) {f.FontSize *= this.ratio;}
 
                             if (!f.isEqual(f_) || this.fontNeedUpdate) {
