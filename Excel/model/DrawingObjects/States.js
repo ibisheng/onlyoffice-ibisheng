@@ -2217,6 +2217,7 @@ function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
 
 function RotateState(drawingObjectsController, drawingObjects, majorObject)
 {
+	var _this = this;
     this.id = STATES_ID_ROTATE;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -2266,9 +2267,13 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
                 if(bLock)
                 {
                     History.Create_NewPoint();
-                    for(var i = 0; i < track_objects2.length; ++i)
+					var aId = [];
+                    for (var i = 0; i < track_objects2.length; ++i) {
                         track_objects2[i].trackEnd();
-                    drawingObjects.showDrawingObjects(true);
+						aId.push(track_objects2[i].originalObject.Id);
+					}
+                    //drawingObjects.showDrawingObjects(true);
+					drawingObjects.showDrawingObjects(true, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.ChangePosition, null, aId));
 
                 }
             };
@@ -2351,6 +2356,7 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
 
 function ResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
 {
+	var _this = this;
     this.id = STATES_ID_RESIZE;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -2395,9 +2401,13 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
                 if(bLock)
                 {
                     History.Create_NewPoint();
-                    for(var i = 0; i < track_objects2.length; ++i)
+					var aId = [];
+                    for (var i = 0; i < track_objects2.length; ++i) {
                         track_objects2[i].trackEnd();
-                    drawingObjects.showDrawingObjects(true);
+						aId.push(track_objects2[i].originalObject.Id);
+					}
+                    //drawingObjects.showDrawingObjects(true);
+					drawingObjects.showDrawingObjects(true, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.ChangePosition, null, aId));
                     drawingObjects.sendGraphicObjectProps();
 
                 }
