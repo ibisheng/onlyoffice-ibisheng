@@ -1039,6 +1039,32 @@ CAutoshapeTrack.prototype =
                     var ex2 = (x1 - x3) / _len_y;
                     var ey2 = (y1 - y3) / _len_y;
 
+                    var _bAbsX1 = Math.abs(ex1) < 0.01;
+                    var _bAbsY1 = Math.abs(ey1) < 0.01;
+                    var _bAbsX2 = Math.abs(ex2) < 0.01;
+                    var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+                    if (_bAbsX2 && _bAbsY2)
+                    {
+                        if (_bAbsX1 && _bAbsY1)
+                        {
+                            ex1 = 1;
+                            ey1 = 0;
+                            ex2 = 0;
+                            ey2 = 1;
+                        }
+                        else
+                        {
+                            ex2 = -ey1;
+                            ey2 = ex1;
+                        }
+                    }
+                    else if (_bAbsX1 && _bAbsY1)
+                    {
+                        ex1 = ey2;
+                        ey1 = -ex2;
+                    }
+
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
 
@@ -1229,6 +1255,32 @@ CAutoshapeTrack.prototype =
                     var ey1 = (y2 - y1) / _len_x;
                     var ex2 = (x1 - x3) / _len_y;
                     var ey2 = (y1 - y3) / _len_y;
+
+                    var _bAbsX1 = Math.abs(ex1) < 0.01;
+                    var _bAbsY1 = Math.abs(ey1) < 0.01;
+                    var _bAbsX2 = Math.abs(ex2) < 0.01;
+                    var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+                    if (_bAbsX2 && _bAbsY2)
+                    {
+                        if (_bAbsX1 && _bAbsY1)
+                        {
+                            ex1 = 1;
+                            ey1 = 0;
+                            ex2 = 0;
+                            ey2 = 1;
+                        }
+                        else
+                        {
+                            ex2 = -ey1;
+                            ey2 = ex1;
+                        }
+                    }
+                    else if (_bAbsX1 && _bAbsY1)
+                    {
+                        ex1 = ey2;
+                        ey1 = -ex2;
+                    }
 
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
@@ -1426,6 +1478,32 @@ CAutoshapeTrack.prototype =
                     var ey1 = (y2 - y1) / _len_x;
                     var ex2 = (x1 - x3) / _len_y;
                     var ey2 = (y1 - y3) / _len_y;
+
+                    var _bAbsX1 = Math.abs(ex1) < 0.01;
+                    var _bAbsY1 = Math.abs(ey1) < 0.01;
+                    var _bAbsX2 = Math.abs(ex2) < 0.01;
+                    var _bAbsY2 = Math.abs(ey2) < 0.01;
+
+                    if (_bAbsX2 && _bAbsY2)
+                    {
+                        if (_bAbsX1 && _bAbsY1)
+                        {
+                            ex1 = 1;
+                            ey1 = 0;
+                            ex2 = 0;
+                            ey2 = 1;
+                        }
+                        else
+                        {
+                            ex2 = -ey1;
+                            ey2 = ex1;
+                        }
+                    }
+                    else if (_bAbsX1 && _bAbsY1)
+                    {
+                        ex1 = ey2;
+                        ey1 = -ex2;
+                    }
 
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
