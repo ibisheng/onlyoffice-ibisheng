@@ -219,7 +219,8 @@ var c_oAscSelectionType = {
 var c_oAscGraphicOption = {
 	ScrollVertical			: 1,
 	ScrollHorizontal		: 2,
-	AddText					: 3
+	AddText					: 3,
+	ChangePosition			: 4
 };
 
 var c_oAscLegendMarkerType = {

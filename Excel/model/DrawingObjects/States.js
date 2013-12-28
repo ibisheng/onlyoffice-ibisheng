@@ -2853,6 +2853,7 @@ function ExtpectDoubleClickState(drawingObjectsController, drawingObjects, chart
 
 function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH, majorObject)
 {
+	var _this = this;
     this.id = STATES_ID_MOVE;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
@@ -2903,10 +2904,13 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        for(var i = 0; i < track_objects2.length; ++i)
+						var aId = [];
+                        for (var i = 0; i < track_objects2.length; ++i) {
                             track_objects2[i].trackEnd();
-                        drawingObjects.showDrawingObjects(true);
-
+							aId.push(track_objects2[i].originalObject.Id);
+						}
+                        drawingObjects.showDrawingObjects(true, new GraphicOption(_this.drawingObjects.getWorksheet(), c_oAscGraphicOption.ChangePosition, null, aId));
+						//drawingObjects.showDrawingObjects(true);
                     }
                 };
                 this.drawingObjects.objectLocker.checkObjects(callback);

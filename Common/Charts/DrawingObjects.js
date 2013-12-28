@@ -2455,11 +2455,14 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
-function GraphicOption(ws, type, range) {
+function GraphicOption(ws, type, range, aId) {
 	var _this = this;
 	_this.ws = ws;
 	_this.type = type;
 	_this.range = range;
+	_this.aId = [];
+	if ( aId && Array.isArray(aId) )
+		_this.aId = aId.concat();
 	
 	function checkCol(col) {
 		while ( (col > 0) && !_this.ws.cols[col] )
@@ -3286,6 +3289,7 @@ function DrawingObjects() {
 			// Коррекция для селекта при блокировке
 			var delta = 4;
 			var boundsChecker = new  CSlideBoundsChecker();
+			boundsChecker.objectId = graphicObject.Id;
 			
 			if ( graphicObject.bounds ) {
 				boundsChecker.Bounds.min_x = Math.max(1, graphicObject.bounds.x - delta);
@@ -3322,11 +3326,19 @@ function DrawingObjects() {
 		return null;
 	}
 	
-	_this.clearDrawingObjects = function() {
+	_this.clearDrawingObjects = function(graphicOption) {
 		
 		// Чистим предыдущие области
 		for (var i = 0; i < aBoundsCheckers.length; i++) {
-			_this.restoreSheetArea(aBoundsCheckers[i]);
+			
+			var bSkip = false;
+			if ( graphicOption && (graphicOption.type === c_oAscGraphicOption.ChangePosition) && graphicOption.aId.length ) {
+				if ( graphicOption.aId.indexOf(aBoundsCheckers[i].objectId) === -1 )
+					bSkip = true;
+			}
+			
+			if ( !bSkip )
+				_this.restoreSheetArea(aBoundsCheckers[i]);
 		}
 		aBoundsCheckers = [];
 		
@@ -3508,7 +3520,7 @@ function DrawingObjects() {
 		
 		if ( drawingCtx ) {
 			if ( clearCanvas ) {
-				_this.clearDrawingObjects();
+				_this.clearDrawingObjects(graphicOption);
 				worksheet._drawGraphic();
 			}
 
