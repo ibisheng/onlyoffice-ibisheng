@@ -18,7 +18,7 @@
 /// TODO
 
 //  0.  Пересмотреть схему для findDisposition(base.js), т.к. если нажали за границами элемента, то происходит селект, т.к. теперь на mouseDown и mouseDown одни и те же функции
-//  1.  центр => baseline
+//  1.  сделать Gaps, line 4745, checkGapsSign
 //  2.  поправить центр для delimiters (когда оператор текст)
 //  3.  поправить accent расположение глифов в случае небольшого размера шрифта (н-р, 14)
 //  5.  сделать gaps для мат. объектов, +, - в зависимости от расположения в контенте
@@ -4537,6 +4537,10 @@ CMathContent.prototype =
 
         return posChange;
     },
+    getTypeLRObj: function(order)
+    {
+
+    },
     // выставить курсор в начало конента
     cursor_MoveToStartPos: function()  //  home => cursor_MoveToStartPos
     {
@@ -4659,6 +4663,7 @@ CMathContent.prototype =
             else if(type == MATH_COMP)
             {
                 this.content[i].value.Resize(oMeasure);
+                this.checkGapsSign(oMeasure, i);
             }
             else if(type == MATH_RUN_PRP)
             {
@@ -4694,16 +4699,27 @@ CMathContent.prototype =
     },
     checkGapsSign: function(oMeasure, pos)
     {
-        /*var bPlus     = this.content[pos].value.code === 0x2B,
-            bMinus    = this.content[pos].value.code === 0x2212,
-            bMult     = this.content[pos].value.code === 0x2217,
-            bDivision = this.content[pos].value.code === 0x002F;*/
 
-        var bPlus = false, bMinus = false,
+         /*var leftType    = pos > 0 ? this.content[pos - 1].value.typeObj : null,
+         left2_Type  = pos - 1 > 0 ? this.content[pos - 2].value.typeObj : null,
+         left3_Type  = pos - 2 > 0 ? this.content[pos - 3].value.typeObj : null,
+         rightType   = pos < this.content.length - 1 ? this.content[pos + 1].value.typeObj : null,
+         right2_Type = pos + 1 < this.content.length - 1 ? this.content[pos + 2].value.typeObj : null;
+
+         var bLeftComp   = leftType == MATH_RUN_PRP && left2_Type == MATH_EMPTY && left3_Type == MATH_COMP,
+             bLeftLetter = leftType == MATH_TEXT || (leftType == MATH_RUN_PRP && left2_Type == MATH_TEXT);
+
+         var bRightComp   = rightType == MATH_COMP,
+             bRightLetter = rightType == MATH_TEXT || (rightType == MATH_RUN_PRP && right2_Type == MATH_TEXT);*/
+
+        /*var bPlus = false, bMinus = false,
             bMult = false, bDivision = false,
             bEqual = false;
 
-        if(this.content[pos].value.typeObj == MATH_TEXT)
+
+        var currType = this.content[pos].value.typeObj;
+
+        if(currType == MATH_TEXT)
         {
             var code = this.content[pos].value.getCodeChr();
 
@@ -4714,44 +4730,139 @@ CMathContent.prototype =
             bEqual    = code === 0x3D;
         }
 
-        var leftType    = pos > 0 ? this.content[pos - 1].value.typeObj : null,
-            left2_Type  = pos - 1 > 0 ? this.content[pos - 2].value.typeObj : null,
-            left3_Type  = pos - 2 > 0 ? this.content[pos - 3].value.typeObj : null,
-            rightType   = pos < this.content.length - 1 ? this.content[pos + 1].value.typeObj : null,
-            right2_Type = pos + 1 < this.content.length - 1 ? this.content[pos + 2].value.typeObj : null;
+        var bSign = (bPlus || bMinus || bEqual),
+            bComp = this.content[pos].value.typeObj == MATH_COMP;*/
 
-        var bLeftComp   = leftType == MATH_RUN_PRP && left2_Type == MATH_EMPTY && left3_Type == MATH_COMP,
-            bLeftLetter = leftType == MATH_TEXT || (leftType == MATH_RUN_PRP && left2_Type == MATH_TEXT);
+        var currType = this.content[pos].value.typeObj;
 
-        var bRightComp   = rightType == MATH_COMP,
-            bRightLetter = rightType == MATH_TEXT || rightType == MATH_RUN_PRP && right2_Type == MATH_TEXT;
+        var bTextType = currType == MATH_TEXT,
+            bCompType = currType == MATH_COMP;
 
-        if(bPlus || bMinus || bEqual)
+        // TODO
+        // сделать через geLRObj, не тип, а именно так, так как для текста надо запросить код буквы
+        // т.к. нужно правильно передать позицию , могут быть RunPrp, CEMpty и пр.
+
+        var bCurrGapObj = this.checkSignComp(pos),
+            bLeftGapObj = this.checkSignComp(pos - 1),
+            bRightGapObj = this.checkSignComp(pos + 1);
+
+
+
+        var bFirstLetter = currType == MATH_TEXT && pos == 2,
+            bFirstComp   = currType == MATH_COMP && pos == 1,
+            bLastLetter  = currType == MATH_TEXT && pos == this.content.length - 1,
+            bLastComp    = currType == MATH_COMP && pos == this.content.length - 2;
+
+        var bLeft = !bFirstLetter && !bFirstComp,
+            bRight =!bLastLetter && !bLastComp;
+
+        var bNeedGap = bLeft || bRight;
+
+        var bGap = bCurrGapObj && bNeedGap;
+
+
+        if(bGap)
         {
-            if(bLeftComp || bLeftLetter)
-            {
-                var rPrp = this.getRPrpByPosition(pos);
-                var txtPrp = new CMathTextPrp();
-                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                txtPrp.Merge(rPrp);
-                //txtPrp.Italic = false;
+            var rPrp = this.getRPrpByPosition(pos);
+            var txtPrp = new CMathTextPrp();
+            txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+            txtPrp.Merge(rPrp);
+            //txtPrp.Italic = false;
 
-                this.content[pos].gaps.left = 0.6*this.Composition.GetGapSign(oMeasure, txtPrp);
+            var gapSign = this.Composition.GetGapSign(oMeasure, txtPrp);
+
+            if(bTextType)
+            {
+                var code = this.content[pos].value.getCodeChr();
+
+                var bPlus     = code === 0x2B,
+                    bMinus    = code === 0x2212;
+
+                if(bPlus || bMinus)
+                {
+                    if(bLeft)
+                        this.content[pos].gaps.left = 0.6*gapSign;
+
+                    if(bRight)
+                        this.content[pos].gaps.right = 0.5*gapSign;
+                }
+                else
+                {
+                    if(bLeft)
+                        this.content[pos].gaps.left = 0.3*gapSign;
+
+                    if(bRight)
+                        this.content[pos].gaps.right = 0.3*gapSign;
+                }
+
+            }
+            else if(bCompType)
+            {
+                if(bLeft && bLeftGapObj)
+                    this.content[pos].gaps.left = 0.3*gapSign;
+                else
+                    this.content[pos].gaps.left = 0.5*gapSign;
+
+                if(bRight && bRightGapObj)
+                    this.content[pos].gaps.right = 0.3*gapSign;
+                else
+                    this.content[pos].gaps.right = 0.5*gapSign;
             }
 
-            if(bRightComp || bRightLetter)
+
+            /*if(bPlus || bMinus)
             {
-                var rPrp = this.getRPrpByPosition(pos);
-                var txtPrp = new CMathTextPrp();
-                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
-                txtPrp.Merge(rPrp);
-                //txtPrp.Italic = false;
+                if(bLeft)
+                    this.content[pos].gaps.left = 0.6*gapSign;
 
-                this.content[pos].gaps.right = 0.5*this.Composition.GetGapSign(oMeasure, txtPrp);
+                if(bRight)
+                    this.content[pos].gaps.right = 0.5*gapSign;
             }
+            else if(bEqual)
+            {
+                if(bLeft)
+                    this.content[pos].gaps.left = 0.3*gapSign;
 
+                if(bRight)
+                    this.content[pos].gaps.right = 0.3*gapSign;
+            }
+            else if(bComp)
+            {
+                if(bLeft && bLeftGapObj)
+                    this.content[pos].gaps.left = 0.3*gapSign;
+                else
+                    this.content[pos].gaps.left = 0.5*gapSign;
+
+                if(bRight && bRightGapObj)
+                    this.content[pos].gaps.right = 0.3*gapSign;
+                else
+                    this.content[pos].gaps.right = 0.5*gapSign;
+            }*/
         }
 
+    },
+    checkSignComp: function(pos)
+    {
+        var bPlus = false, bMinus = false,
+            bMult = false, bDivision = false,
+            bEqual = false;
+
+        var currType = pos > 0 && pos < this.content.length ? this.content[pos].value.typeObj : null;
+
+        if(currType == MATH_TEXT)
+        {
+            var code = this.content[pos].value.getCodeChr();
+
+            bPlus     = code === 0x2B;
+            bMinus    = code === 0x2212;
+            bMult     = code === 0x2217;
+            bDivision = code === 0x002F;
+            bEqual    = code === 0x3D;
+        }
+        var bSign = (bPlus || bMinus || bEqual),
+            bComp = currType == MATH_COMP;
+
+        return bSign || bComp;
     },
     old_draw: function(pGraphics)
     {

@@ -118,7 +118,6 @@ CMathText.prototype =
                 code = 0x1D6A4;
             else if(code == 0x237) // "j" without dot
                 code = 0x1D6A5;
-
         }
         /*else
          {
