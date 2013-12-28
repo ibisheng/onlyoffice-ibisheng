@@ -7,11 +7,7 @@ function ChartRender(options) {
     this.options = options;
 	
 	this.insertChart = function(chart, width, height, bChartPreview) {
-	
-		if ( bChartPreview )
-			g_bChartPreview = true;
-		else
-			g_bChartPreview = false;
+		g_bChartPreview = !!bChartPreview;
 			
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
@@ -23,10 +19,8 @@ function ChartRender(options) {
 			OfficeExcel.drawingCtxCharts = new CDrawingContextWord();
 			
 		chartCanvas = document.createElement('canvas');
-		$(chartCanvas).css('width', width);
-		$(chartCanvas).css('height', height);
-		$(chartCanvas)[0].height = height;
-		$(chartCanvas)[0].width = width;
+		chartCanvas.width = width;
+		chartCanvas.height = height;
 
 		insertChart(chart, this.options);
         var ret  = chartCanvas;
