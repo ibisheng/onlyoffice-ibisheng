@@ -234,7 +234,7 @@
 
             var text_size = this._otherProps._text_size;
 
-            for (lNum=0; lNum<labels.length; ++lNum) {
+            for (var lNum=0; lNum<labels.length; ++lNum) {
 				isFormatCellTrue = isFormatCell;
 				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[lNum])
 					isFormatCellTrue = this.arrFormatAdobeLabels[0][lNum];

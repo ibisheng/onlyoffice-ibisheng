@@ -617,7 +617,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	{
 		if(bar.type == 'hbar' && bar._otherProps._autoGrouping == 'stackedPer')
 		{
-			for (i=0; i<bar.data.length; ++i) {
+			for (var i = 0; i < bar.data.length; ++i) {
 				if (typeof(bar.data[i]) == 'object') {
 					var value = Number(OfficeExcel.array_max(bar.data[i], true));
 				} else {
@@ -981,7 +981,7 @@ function insertChart(chart, options) {
 					isNumberVal = false;
 			}
 		}
-		for(l = 0; l < series.length; ++l)
+		for(var l = 0; l < series.length; ++l)
 		{
 			var firstCol = 0;
 			var firstRow = 0;
@@ -1015,7 +1015,7 @@ function insertChart(chart, options) {
 	
 			var row = firstRow;
 			var n = 0;
-			for(col = firstCol; col < lastCol; ++col)
+			for(var col = firstCol; col < lastCol; ++col)
 			{
 				if(!curSeria[col])
 				{
@@ -1130,10 +1130,10 @@ function insertChart(chart, options) {
 			formatCellScOy = formatCell;
 			formatCell = 'General';
 			
-			for (i = 0; i < scatterArr.length; ++i) {
+			for (var i = 0; i < scatterArr.length; ++i) {
 				newArr[i] = [];
 				newAdobeLabels[i] = [];
-				for (j = 0; j < scatterArr[i].length; ++j) {
+				for (var j = 0; j < scatterArr[i].length; ++j) {
 					newArr[i][j] = [];
 					newAdobeLabels[i][j] = [];
 					newArr[i][j][0] = j+1;
@@ -1162,7 +1162,7 @@ function insertChart(chart, options) {
 		{
 			newArr[0]=[];
 			newAdobeLabels[0] = [];
-			for (j = 0; j < scatterArr[0].length; ++j) {
+			for (var j = 0; j < scatterArr[0].length; ++j) {
 				newArr[0][j] = [];
 				newAdobeLabels[0][j] = [];
 				newArr[0][j][0] = j+1;
@@ -1193,10 +1193,10 @@ function insertChart(chart, options) {
 		else
 		{
 			//принимаем первую срочку за X, остальные за y
-			for (i = 1; i < scatterArr.length; ++i) {
+			for (var i = 1; i < scatterArr.length; ++i) {
 				newArr[i-1] = [];
 				newAdobeLabels[i-1] = [];
-				for (j = 0; j < scatterArr[i].length; ++j) {
+				for (var j = 0; j < scatterArr[i].length; ++j) {
 					newArr[i-1][j] = [];
 					newAdobeLabels[i-1][j] = [];
 					newArr[i-1][j][0] = scatterArr[0][j];
@@ -1322,9 +1322,9 @@ function arrReverse(arr) {
 	if(!arr || !arr.length)
 		return;
 	var newarr = [];
-	for (i = 0; i < arr[0].length; ++i) {
+	for (var i = 0; i < arr[0].length; ++i) {
 		newarr[i] = [];
-		for (j = 0; j < arr.length; ++j) {
+		for (var j = 0; j < arr.length; ++j) {
 			newarr[i][j] = arr[j][i];
 		}
 	}

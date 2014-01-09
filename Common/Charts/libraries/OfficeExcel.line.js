@@ -321,7 +321,7 @@
                 var lineto = (this._otherProps._yaxispos == 'left' ? this._chartGutter._left : this.canvas.width - this._chartGutter._right + this._otherProps._smallyticks);
 
                 // Draw the upper halves Y tick marks
-                for (y=this._chartGutter._top; y < (this.grapharea / 2) + this._chartGutter._top; y+=interval) {
+                for (var y=this._chartGutter._top; y < (this.grapharea / 2) + this._chartGutter._top; y+=interval) {
                     this.context.moveTo((this._otherProps._yaxispos == 'left' ? this._chartGutter._left - this._otherProps._smallyticks : this.canvas.width - this._chartGutter._right), AA(this, y));
                     this.context.lineTo(lineto, AA(this, y));
                 }
@@ -509,7 +509,7 @@
 			}
 			var diffWidth;
 			var diffHeight;
-            for (i=0; i<numLabels; ++i) {
+            for (var i=0; i<numLabels; ++i) {
 
                 // Changed 8th Nov 2010 to be not reliant on the coords
                 //if (this._otherProps._labels[i] && this.coords && this.coords[i] && this.coords[i][0]) {
@@ -583,7 +583,7 @@
 
         // Loop thru each value given, plotting the line
         // (FORMERLY FIRST)
-        for (i=0; i<lineData.length; i++) {
+        for (var i=0; i<lineData.length; i++) {
 
             var data_point = lineData[i];
 

@@ -1276,7 +1276,7 @@
         var i, sum;
         var len = arr.length;
 
-        for(i=0,sum=0;i<len;sum+=arr[i++]);
+        for(var i=0,sum=0;i<len;sum+=arr[i++]);
         return sum;
     }
 
@@ -1512,7 +1512,7 @@
             // Draw the horizontal lines
             if (obj._otherProps._background_grid_hlines) {
                 height = (OfficeExcel.GetHeight(obj) - gutterBottom - gutterTop);
-                for (y = gutterTop; y <= height + gutterTop + 1; y+=obj._otherProps._background_grid_hsize) {
+                for (var y = gutterTop; y <= height + gutterTop + 1; y+=obj._otherProps._background_grid_hsize) {
 					if((y + obj._otherProps._background_grid_hsize) > (height + gutterTop + 1))
 					{
 						y = height + gutterTop;
@@ -1533,7 +1533,7 @@
             if (obj._otherProps._background_grid_vlines) {
                 // Draw the vertical lines
                 var width = (obj.canvas.width - gutterRight - gutterLeft)
-                for (x=gutterLeft; x<=width + gutterLeft + 1; x+=obj._otherProps._background_grid_vsize) {
+                for (var x=gutterLeft; x<=width + gutterLeft + 1; x+=obj._otherProps._background_grid_vsize) {
 					if((x + obj._otherProps._background_grid_vsize) > width + gutterLeft + 1)
 					{
 						x = width + gutterLeft;
@@ -1635,7 +1635,7 @@
         * Work backwards adding the thousand seperators
         */
         var foundPoint;
-        for (i=(num.length - 1),j=0; i>=0; j++,i--) {
+        for (var i=(num.length - 1),j=0; i>=0; j++,i--) {
             var character = num.charAt(i);
             
             if ( j % 3 == 0 && j != 0) {
@@ -1653,7 +1653,7 @@
         */
         var rev = output;
         output = '';
-        for (i=(rev.length - 1); i>=0; i--) {
+        for (var i=(rev.length - 1); i>=0; i--) {
             output += rev.charAt(i);
         }
 
@@ -1692,7 +1692,7 @@
         */
         obj.context.beginPath();
         
-        for (i=0; i<hbars.length; ++i) {
+        for (var i=0; i<hbars.length; ++i) {
             
             // If null is specified as the "height", set it to the upper max value
             if (hbars[i][1] == null) {

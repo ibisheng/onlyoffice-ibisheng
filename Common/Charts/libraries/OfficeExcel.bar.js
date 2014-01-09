@@ -189,7 +189,7 @@
             var yTickGap = (OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) / numYTicks;
             var xpos     = yaxispos == 'left' ? this._chartGutter._left : OfficeExcel.GetWidth(this) - this._chartGutter._right;
     
-            for (y=this._chartGutter._top,isCount = 0;
+            for (var y=this._chartGutter._top,isCount = 0;
                  xaxispos == 'center' ? y <= (OfficeExcel.GetHeight(this) - this._chartGutter._bottom) + 2 : y <= (OfficeExcel.GetHeight(this) - this._chartGutter._bottom + (xaxispos == 'top' ? 1 : 0)) + 2;
                  y += yTickGap,++isCount) {
     
@@ -304,7 +304,7 @@
 			underline: this._otherProps._labels_above_underline
 		};
 
-        for (i=0; i<this.data.length; ++i) {
+        for (var i=0; i<this.data.length; ++i) {
 
             // Work out the height
             //The width is up outside the loop
@@ -496,7 +496,7 @@
                 } else if (typeof(this.data[i]) == 'object') {
                     this.context.lineWidth = this._otherProps._linewidth;
 
-                    for (j=0; j<this.data[i].length; ++j) {
+                    for (var j=0; j<this.data[i].length; ++j) {
 
                         // Set the fill and stroke colors
                         this.context.strokeStyle = strokeStyle;
@@ -541,7 +541,7 @@
                             }
                             else
                             {*/
-                                 for (n=0; n<j; ++n) 
+                                 for (var n = 0; n < j; ++n)
                                 {
                                     if(this.min < 0 && this.max > 0)
                                     {
@@ -647,7 +647,7 @@
 			}
 			var diffWidth;
 			var diffHeight;
-            for (x=this._chartGutter._left + (xTickGap / 2); x<=OfficeExcel.GetWidth(this) - this._chartGutter._right; x+=xTickGap) {
+            for (var x=this._chartGutter._left + (xTickGap / 2); x<=OfficeExcel.GetWidth(this) - this._chartGutter._right; x+=xTickGap) {
                     if('auto' == this._otherProps._ylabels_count)
                     {
 						diffWidth = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.sin(angle*Math.PI/180))/(4) : 0;

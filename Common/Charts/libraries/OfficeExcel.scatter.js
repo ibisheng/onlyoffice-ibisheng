@@ -55,7 +55,7 @@
             this.max = this._otherProps._ymax;
         else
         {
-             for (i=0; i<this.data.length; ++i) {
+             for (var i=0; i<this.data.length; ++i) {
                 for (j=0; j<this.data[i].length; ++j) {
                     this.max = Math.max(this.max, typeof(this.data[i][j][1]) == 'object' ? OfficeExcel.array_max(this.data[i][j][1]) : Math.abs(this.data[i][j][1]));
                 }
@@ -119,7 +119,7 @@
         this.DrawLabels(xScale,isFormatCell,isformatCellScOy);
 
         i = 0;
-        for(i=0; i<this.data.length; ++i) {
+        for(var i=0; i<this.data.length; ++i) {
             this.DrawMarks(i);
 
             if(this._otherProps._type != 'burse2')
@@ -286,7 +286,7 @@
 		{
 			var numyticks = this._otherProps._numyticks;
 
-			for (y=this._chartGutter._top,countTick = 0; y <= this.canvas.height - this._chartGutter._bottom + 1 + (this._otherProps._xaxispos == 'center' ? 1 : 0) ; y+=(graphHeight / numyticks),countTick++) {
+			for (var y=this._chartGutter._top,countTick = 0; y <= this.canvas.height - this._chartGutter._bottom + 1 + (this._otherProps._xaxispos == 'center' ? 1 : 0) ; y+=(graphHeight / numyticks),countTick++) {
 
 				if(countTick == numyticks)
 					y = this.canvas.height - this._chartGutter._bottom;
@@ -564,7 +564,7 @@
             var valign = null;
             var halign = 'center';
     
-            for (i=0; i<labels.length; ++i) {
+            for (var i=0; i<labels.length; ++i) {
                 
                 if (typeof(labels[i]) == 'object') {
                 

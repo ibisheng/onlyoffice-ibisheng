@@ -35,7 +35,7 @@
         this.max    = 0;
 
 		var value = 0;
-        for (i=0; i<this.data.length; ++i) {
+        for (var i=0; i<this.data.length; ++i) {
             if (typeof(this.data[i]) == 'object') {
                 value = Number(OfficeExcel.array_max(this.data[i], true));
             } else {
@@ -161,7 +161,7 @@
 		{
 			var yTickGap = (this.canvas.height - this._chartGutter._top - this._chartGutter._bottom) / this.data.length;
 
-			for (y=this._chartGutter._top; y<=(this.canvas.height - this._chartGutter._bottom) + 1; y+=yTickGap) {
+			for (var y=this._chartGutter._top; y<=(this.canvas.height - this._chartGutter._bottom) + 1; y+=yTickGap) {
 				if('auto' == this._otherProps._ylabels_count)
 				{
 					if( (y + yTickGap) > (this.canvas.height - this._chartGutter._bottom))
@@ -185,7 +185,7 @@
 			yStart   = this.canvas.height - this._chartGutter._bottom;
 			yEnd     = (this.canvas.height - this._chartGutter._bottom) + 5;
 
-			for (x=(this.canvas.width - this._chartGutter._right), i=0; this._otherProps._yaxispos == 'center' ? x>=this._chartGutter._left : x>=this._chartGutter._left; x-=xTickGap) {
+			for (var x=(this.canvas.width - this._chartGutter._right), i=0; this._otherProps._yaxispos == 'center' ? x>=this._chartGutter._left : x>=this._chartGutter._left; x-=xTickGap) {
 
 				if (this._otherProps._yaxispos != 'center' || i != 5) {
 					this.context.moveTo(AA(this, x), yStart);
@@ -322,7 +322,7 @@
             var i=0;
             if('auto' == this._otherProps._ylabels_count)
             {
-                for (y=this._chartGutter._top + (yTickGap / 2); y<=OfficeExcel.GetHeight(this) - this._chartGutter._bottom; y+=yTickGap) {
+                for (var y=this._chartGutter._top + (yTickGap / 2); y<=OfficeExcel.GetHeight(this) - this._chartGutter._bottom; y+=yTickGap) {
                 OfficeExcel.Text(this.context, font,text_size, this.nullPositionOX  - xOffset,y,String(this._otherProps._labels[i++]),'center','right', false, null, null, bold, null,textOptions); 
             }
             }
@@ -378,7 +378,7 @@
         var graphwidth = (this.canvas.width - this._chartGutter._left - this._chartGutter._right);
         var halfwidth  = graphwidth / 2;
 
-        for (i=0; i<this.data.length; ++i) {
+        for (var i=0; i<this.data.length; ++i) {
 
             
             
@@ -474,7 +474,7 @@
                 */
                 } else if (typeof(this.data[i]) == 'object') {
 
-                    for (j=0; j<this.data[i].length; ++j) {
+                    for (var j=0; j<this.data[i].length; ++j) {
                         // Set the fill/stroke colors
                         this.context.strokeStyle = this._otherProps._strokecolor;
 						if(this._otherProps._colors[j])

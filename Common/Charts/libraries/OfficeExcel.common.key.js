@@ -51,7 +51,7 @@
         context.font = text_size + 'pt ' + obj._otherProps._text_font;
 
         // Work out the longest bit of text
-        for (i=0; i<key.length; ++i) {
+        for (var i=0; i<key.length; ++i) {
             width = Math.max(width, context.measureText(key[i]).width);
         }
         
