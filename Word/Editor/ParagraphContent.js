@@ -103,15 +103,15 @@ function ParaText(value)
 
     this.IsNBSP       = (this.Value === nbsp_string ? true : false);
 
-    this.TextAscent  = 0;
-    this.TextDescent = 0;
-    this.TextHeight  = 0;
-    this.TextAscent2 = 0;
+//    this.TextAscent  = 0;
+//    this.TextDescent = 0;
+//    this.TextHeight  = 0;
+//    this.TextAscent2 = 0;
     this.YOffset     = 0;
 
-    this.CurPage  = 0;
-    this.CurLines = 0;
-    this.CurRange = 0;
+//    this.CurPage  = 0;
+//    this.CurLines = 0;
+//    this.CurRange = 0;
 }
 ParaText.prototype =
 {
@@ -238,15 +238,15 @@ function ParaSpace(Count)
     this.Height       = 0;
     this.WidthVisible = 0;
 
-    this.TextAscent  = 0;
-    this.TextDescent = 0;
-    this.TextHeight  = 0;
-    this.TextAscent2 = 0;
+//    this.TextAscent  = 0;
+//    this.TextDescent = 0;
+//    this.TextHeight  = 0;
+//    this.TextAscent2 = 0;
     this.YOffset     = 0;
 
-    this.CurPage  = 0;
-    this.CurLines = 0;
-    this.CurRange = 0;
+//    this.CurPage  = 0;
+//    this.CurLines = 0;
+//    this.CurRange = 0;
 }
 ParaSpace.prototype =
 {
@@ -2256,11 +2256,13 @@ function ParaEnd()
 
     this.TextPr = null; // Рассчитанные настройки текста для символа конца параграфа
 
-    this.TextAscent  = 0;
-    this.TextDescent = 0;
-    this.TextHeight  = 0;
-    this.TextAscent2 = 0;
+//    this.TextAscent  = 0;
+//    this.TextDescent = 0;
+//    this.TextHeight  = 0;
+//    this.TextAscent2 = 0;
     this.YOffset     = 0;
+
+    this.Width = 0;
 }
 
 ParaEnd.prototype =

@@ -2873,7 +2873,7 @@ Paragraph.prototype =
     // Пересчет переносов строк в параграфе, с учетом возможного обтекания
     Recalculate_Page__ : function(CurPage)
     {
-        var PRS = new CParagraphRecalculateStateWrap();//g_oPRSW;
+        var PRS = g_oPRSW;
         PRS.Paragraph = this;
         PRS.Page      = CurPage;
 
@@ -2933,7 +2933,7 @@ Paragraph.prototype =
         // были заданы сверху, а если не первая, тогда координаты мы должны запросить у родительского класса.
 
         var XStart, YStart, XLimit, YLimit;
-        if ( 0 === CurPage || ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
+        if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
             XStart = this.X;
             YStart = this.Y;
@@ -3625,8 +3625,11 @@ Paragraph.prototype =
         return recalcresult_NextElement;
     },
 
-    Recalculate_Range : function(PRS, ParaPr)
+    Recalculate_Range : function(ParaPr)
     {
+        ParaRangesCount++;
+        var PRS = g_oPRSW;
+
         var CurLine     = PRS.Line;
         var CurRange    = PRS.Range;
         var CurPage     = PRS.Page;
@@ -3641,28 +3644,33 @@ Paragraph.prototype =
         else
             StartPos = this.Lines[CurLine - 1].Ranges[ this.Lines[CurLine - 1].Ranges.length - 1 ].EndPos;
 
+        var Line = this.Lines[CurLine];
+        var Range = Line.Ranges[CurRange];
+
         this.Lines[CurLine].Set_RangeStartPos( CurRange, StartPos );
+
 
         if ( 0 === CurLine && true === PRS.EmptyLine )
         {
             if ( ParaPr.Ind.FirstLine < 0 )
-                this.Lines[CurLine].Ranges[CurRange].X += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+                Range.X += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
             else
-                this.Lines[CurLine].Ranges[CurRange].X += ParaPr.Ind.FirstLine;
+                Range.X += ParaPr.Ind.FirstLine;
 
-            this.Lines[CurLine].Ranges[CurRange].FirstRange = true;
+            Range.FirstRange = true;
         }
 
         // TODO: Проверить корректность данного условия
-        if ( true === this.Lines[CurLine].Ranges[CurRange].FirstRange && 0 !== CurRange )
+        if ( true === Range.FirstRange && 0 !== CurRange )
         {
             if ( ParaPr.Ind.FirstLine < 0 )
-                Ranges[CurRange].X1 += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+                Range.X1 += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
             else
-                Ranges[CurRange].X1 += ParaPr.Ind.FirstLine;
+                Range.X1 += ParaPr.Ind.FirstLine;
         }
 
-        var X    = this.Lines[CurLine].Ranges[CurRange].X;
+
+        var X    = Range.X;
         var XEnd =  ( CurRange == RangesCount ? PRS.XLimit : PRS.Ranges[CurRange].X0 );
 
         // Обновляем состояние пересчета
@@ -3671,10 +3679,9 @@ Paragraph.prototype =
         var ContentLen = this.Content.length;
 
         var Pos = StartPos;
-        while ( Pos < ContentLen )
+        for ( ;Pos < ContentLen; Pos++ )
         {
             var Item = this.Content[Pos];
-            Item.Parent = this;
 
             if ( ( 0 === Pos && 0 === CurLine ) || Pos !== StartPos )
             {
@@ -3688,14 +3695,12 @@ Paragraph.prototype =
             }
 
             PRS.Update_CurPos( Pos, 0 );
-            Item.Recalculate_Range( PRS, ParaPr );
+            Item.Recalculate_Range(  ParaPr );
 
             if ( true === PRS.NewRange )
             {
                 break;
             }
-
-            Pos++;
         }
 
         if ( Pos >= ContentLen )
@@ -3760,7 +3765,7 @@ Paragraph.prototype =
         while ( CurRange <= RangesCount )
         {
             PRS.Range = CurRange;
-            this.Recalculate_Range( PRS, ParaPr );
+            this.Recalculate_Range( ParaPr );
 
             if ( true === PRS.ForceNewPage || true === PRS.NewPage )
                 break;
@@ -3771,6 +3776,25 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // 1. Обновляем метрики данной строки
         //-------------------------------------------------------------------------------------------------------------
+
+        // TODO: Данная часть была перенесена, необходимо проверить ее корректность
+        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+        {
+            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+            if ( PRS.LineAscent < this.TextAscent )
+                PRS.LineAscent = this.TextAscent;
+
+            if ( PRS.LineDescent < this.TextDescent )
+                PRS.LineDescent = this.TextDescent;
+        }
+        else
+        {
+            if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
+                PRS.LineAscent = this.TextAscent + this.YOffset;
+
+            if ( PRS.LineDescent < this.TextDescent - this.YOffset )
+                PRS.LineDescent = this.TextDescent - this.YOffset;
+        }
 
         // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
         // текста, на котором закончилась данная строка.
@@ -16876,29 +16900,35 @@ CParagraphRecalculateTabInfo.prototype =
 
 function CParagraphContentPos()
 {
-    // TODO: Предполагаем, что сами значения - числа.
-    this.Data  = new Array();
+    this.Data  = [0, 0, 0];
+    this.Depth = 0;
 }
 
 CParagraphContentPos.prototype =
 {
-    Add : function (PosObj)
+    Add : function (Pos)
     {
-        this.Data.push(PosObj);
+        this.Data[this.Depth] = Pos;
+        this.Depth++;
     },
 
-    Update : function(PosObj, Depth)
+    Update : function(Pos, Depth)
     {
-        this.Data[Depth] = PosObj;
+        this.Data[Depth] = Pos;
+        this.Depth = Depth + 1;
     },
 
     Set : function(OtherPos)
     {
         // Копируем позицию
-        this.Data = new Array();
-        var Len = OtherPos.Data.length;
+        var Len = OtherPos.Depth;
         for ( var Pos = 0; Pos < Len; Pos++ )
             this.Data[Pos] = OtherPos.Data[Pos];
+
+        this.Depth = OtherPos.Depth;
+
+        if ( this.Data.length > this.Depth )
+            this.Data.length = this.Depth;
     },
 
     Get : function(Depth)
@@ -16908,7 +16938,7 @@ CParagraphContentPos.prototype =
 
     Get_Depth : function()
     {
-        return this.Data.length - 1;
+        return this.Depth - 1;
     },
 
     Copy : function ()
@@ -17055,13 +17085,13 @@ CParagraphRecalculateStateWrap.prototype =
 
     Set_LineBreakPos : function(PosObj)
     {
-        this.LineBreakPos = this.CurPos.Copy();
+        this.LineBreakPos.Set( this.CurPos );
         this.LineBreakPos.Add( PosObj );
     },
 
     Set_NumberingPos : function(PosObj, Item)
     {
-        this.NumberingPos = this.CurPos.Copy();
+        this.NumberingPos.Set( this.CurPos );
         this.NumberingPos.Add( PosObj );
 
         this.Paragraph.Numbering.Pos  = this.NumberingPos;
