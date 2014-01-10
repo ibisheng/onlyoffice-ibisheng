@@ -3145,14 +3145,14 @@ function DrawingObjects() {
 		
 		worksheet._drawCollaborativeElements(false);
 		
-		for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
-			if ( _this.controller.selectedObjects[i].isChart() ) {
-				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
-				shapeOverlayCtx.ClearMode = true;
-				_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
-				shapeOverlayCtx.ClearMode = false;
-			}
-		}
+		//for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
+		//	if ( _this.controller.selectedObjects[i].isChart() ) {
+		//		_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
+		//		shapeOverlayCtx.ClearMode = true;
+		//		_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
+		//		shapeOverlayCtx.ClearMode = false;
+		//	}
+		//}
 
         if (null == drDoc.m_oDocumentRenderer)
         {
@@ -3570,8 +3570,8 @@ function DrawingObjects() {
 
 					var index = i;
 					var drawingObject = aObjects[i];
-					if ( drawingObject.graphicObject.isChart() )
-						drawingObject.graphicObject.syncAscChart();
+					//if ( drawingObject.graphicObject.isChart() )
+					//	drawingObject.graphicObject.syncAscChart();
 					
 					if ( !printOptions ) {
 						if ( !drawingObject.inVisibleArea(graphicOption) ) {
@@ -4107,21 +4107,21 @@ function DrawingObjects() {
 	}
 	
 	_this.rebuildChartGraphicObjects = function(range) {
-		var bRebuild = true;
-		for (var i = 0; i < aObjects.length; i++) {
-			var graphicObject = aObjects[i].graphicObject;
-			if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
-				bRebuild = true;
-				if ( range ) {
-					if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
-						bRebuild = false;
-				}
-				if ( bRebuild )	{
-					graphicObject.chart.rebuildSeries();
-					graphicObject.recalculate();
-				}
-			}
-		}
+		//var bRebuild = true;
+		//for (var i = 0; i < aObjects.length; i++) {
+		//	var graphicObject = aObjects[i].graphicObject;
+		//	if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
+		//		bRebuild = true;
+		//		if ( range ) {
+		//			if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
+		//				bRebuild = false;
+		//		}
+		//		if ( bRebuild )	{
+		//			graphicObject.chart.rebuildSeries();
+		//			graphicObject.recalculate();
+		//		}
+		//	}
+		//}
 	}
 	
 	_this.updateDrawingObject = function(bInsert, operType, updateRange) {
@@ -4638,13 +4638,12 @@ function DrawingObjects() {
             ret = aObjects.length;
             aObjects.push(drawingObject);
         }
-		drawingObject.setGraphicObjectCoords();
-		
-		if ( isInit ) {
-			_this.showDrawingObjects(false);
-			_this.sendGraphicObjectProps();
-			worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
-		}
+
+		//if ( isInit ) {
+		//	_this.showDrawingObjects(false);
+		//	_this.sendGraphicObjectProps();
+		//	worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
+		//}
 		
 		if ( lockByDefault ) {
 			_this.objectLocker.reset();
@@ -4652,9 +4651,9 @@ function DrawingObjects() {
 			_this.objectLocker.checkObjects( function(result) {} );
 		}
 		
-		var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-		aBoundsCheckers.push(boundsChecker);
-		
+		//var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
+		//aBoundsCheckers.push(boundsChecker);
+		//
         return ret;
 	}
 	
