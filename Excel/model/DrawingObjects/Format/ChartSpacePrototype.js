@@ -53,8 +53,6 @@ CChartSpace.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateChart = function()
 {
-
-
 };
 CChartSpace.prototype.draw = function(graphics)
 {
