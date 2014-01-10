@@ -1335,6 +1335,7 @@ function BinaryPPTYLoader()
                     {
                         if (0 == s.GetUChar())
                         {
+                            uni_color.Mods = new CColorModifiers()
                             uni_color.Mods.Mods = this.ReadColorModifiers();
                         }
                     }
@@ -2004,6 +2005,7 @@ function BinaryPPTYLoader()
                     uni_fill.fill = new CSolidFill();
                     uni_fill.fill.color = this.ReadUniColor();
 
+                    uni_fill.fill.color.Mods = new CColorModifiers();
                     var mods = uni_fill.fill.color.Mods.Mods;
                     var _len = mods.length;
                     for (var i = 0; i < _len; i++)

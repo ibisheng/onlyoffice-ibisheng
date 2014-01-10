@@ -20,6 +20,11 @@
  map_color_scheme["tx2"]     = 16;
  */
 
+//Типы изменений в классе CTheme
+var historyitem_ChangeColorScheme = 0;
+var historyitem_ChangeFontScheme = 1;
+var historyitem_ChangeFmtScheme = 2;
+
 function isRealObject(o)
 {
     return o !== null && typeof o === "object";
