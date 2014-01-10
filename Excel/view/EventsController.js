@@ -75,7 +75,10 @@
 			this.mouseDownLastCord = null;
 			//-----------------------
 
-			return this;
+            this.vsbApiLockMouse = false;
+            this.hsbApiLockMouse = false;
+
+            return this;
 		}
 
 
@@ -306,17 +309,11 @@
 					this.vsbApi.bind("scrollVEnd", function(evt) {
 						self.handlers.trigger("addRow",true);
 					});
-					this.vsbApi.onLockMouse = function(){
-						$(window)
-							.on("mousemove.scroll", function (e) {
-								return self.vsbApi.mouseDown ? self.vsbApi.evt_mousemove.call(self.vsbApi,e) : false;
-							})
-							.on("mouseup.scroll", function (e) {
-								return self.vsbApi.mouseDown ? self.vsbApi.evt_mouseup.call(self.vsbApi,e) : false;
-							});
+					this.vsbApi.onLockMouse = function(evt){
+                        self.vsbApiLockMouse = true;
 					};
 					this.vsbApi.offLockMouse = function(){
-						$(window).off(".scroll");
+                        self.vsbApiLockMouse = false;
 					};
 				}
 
@@ -336,16 +333,10 @@
 							self.handlers.trigger("addColumn",true);
 						});
 					this.hsbApi.onLockMouse = function(){
-						$(window)
-							.on("mousemove.scroll", function (e) {
-								return self.hsbApi.mouseDown ? self.hsbApi.evt_mousemove.call(self.hsbApi,e) : false;
-							})
-							.on("mouseup.scroll", function (e) {
-								return self.hsbApi.mouseDown ? self.hsbApi.evt_mouseup.call(self.hsbApi,e) : false;
-							});
+                        self.hsbApiLockMouse = true;
 					};
 					this.hsbApi.offLockMouse = function(){
-						$(window).off(".scroll");
+                        self.hsbApiLockMouse = false;
 					};
 				}
 
@@ -974,14 +965,20 @@
 					this.isResizeModeMove = true;
 					this._resizeElement(event);
 				}
+                if( this.hsbApiLockMouse )
+                    this.hsbApi.mouseDown ? this.hsbApi.evt_mousemove.call(this.hsbApi,event) : false;
+
+                else if( this.vsbApiLockMouse )
+                    this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
+
 				return true;
 			},
 
 			/** @param event {jQuery.Event} */
 			_onWindowMouseUp: function (event) {
 
-                this.vsbApi.evt_mouseup(event);
-                this.hsbApi.evt_mouseup(event);
+//                this.vsbApi.evt_mouseup(event);
+//                this.hsbApi.evt_mouseup(event);
 				// Shapes
 				var coord = this._getCoordinates(event);
 				if ( asc["editor"].isStartAddShape ) {
@@ -1023,6 +1020,12 @@
 
 				// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 				this.showCellEditorCursor();
+
+                if( this.hsbApiLockMouse )
+                    this.hsbApi.mouseDown ? this.hsbApi.evt_mouseup.call(this.hsbApi,event) : false;
+
+                else if( this.vsbApiLockMouse )
+                    this.vsbApi.mouseDown ? this.vsbApi.evt_mouseup.call(this.vsbApi,event) : false;
 
 				return true;
 			},
