@@ -465,10 +465,13 @@ CNumerator.prototype.findDisposition = function(mCoord)
 {
     var arg = this.elements[0][0].size;
 
+    var posCurs = {x: 0, y: 0};
+    var inside_flag = -1;
+
     if(mCoord.y > arg.height)
         mCoord.y = arg.height;
 
-    return CNumerator.superclass.findDisposition.call(this, mCoord);
+    return {pos: posCurs, mCoord: mCoord, inside_flag: inside_flag};
 }
 CNumerator.prototype.setPosition = function(pos)
 {
@@ -523,14 +526,21 @@ CDenominator.prototype.findDisposition = function(mCoord)
 {
     var arg = this.elements[0][0].size;
 
+    var posCurs = {x: 0, y: 0};
+    var inside_flag = -1;
+
     if(mCoord.y < this.gap)
+    {
         mCoord.y = 0;
+    }
     else if (mCoord.y > arg.height + this.gap)
+    {
         mCoord.y = arg.height;
+    }
     else
         mCoord.y -= this.gap;
 
-    return CDenominator.superclass.findDisposition.call(this, mCoord);
+    return {pos: posCurs, mCoord: mCoord, inside_flag: inside_flag};
 }
 CDenominator.prototype.setPosition = function(pos)
 {

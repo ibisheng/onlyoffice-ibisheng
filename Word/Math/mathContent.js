@@ -31,6 +31,7 @@
 //  12. объединение формул на remove и add
 //  13. Для N-арных операторов в случае со степенью : итераторы занимают не 2/3 от основание, а примерно половину (когда один итератор сверху или снизу)
 //  14. Для дробей, n-арных операторов и пр. считать расстояние исходя из shiftCenter
+//  15. Для числителя/знаменателя сделать меньшие расстояния для внутренних дробей, меньшие по размеру n-арные операторы, значок радикала
 
 
 //  TODO Refactoring
@@ -4649,6 +4650,8 @@ CMathContent.prototype =
     {
         var bItalic = true;
 
+        var posPrev  = -1;
+
         for(var i = 0; i < this.content.length; i++)
         {
             var type = this.content[i].value.typeObj;
@@ -4658,12 +4661,16 @@ CMathContent.prototype =
                 this.content[i].value.setMText(bItalic);
                 this.content[i].value.Resize(oMeasure);
 
-                this.checkGapsSign(oMeasure, i);
+                this.checkGapsSign(oMeasure, posPrev, i);
+
+                posPrev = i;
             }
             else if(type == MATH_COMP)
             {
                 this.content[i].value.Resize(oMeasure);
-                this.checkGapsSign(oMeasure, i);
+
+                this.checkGapsSign(oMeasure, posPrev, i);
+                posPrev = i;
             }
             else if(type == MATH_RUN_PRP)
             {
@@ -4697,7 +4704,7 @@ CMathContent.prototype =
 
         this.recalculateSize();
     },
-    checkGapsSign: function(oMeasure, pos)
+    old_checkGapsSign: function(oMeasure, pos)
     {
 
          /*var leftType    = pos > 0 ? this.content[pos - 1].value.typeObj : null,
@@ -4745,7 +4752,6 @@ CMathContent.prototype =
         var bCurrGapObj = this.checkSignComp(pos),
             bLeftGapObj = this.checkSignComp(pos - 1),
             bRightGapObj = this.checkSignComp(pos + 1);
-
 
 
         var bFirstLetter = currType == MATH_TEXT && pos == 2,
@@ -4841,6 +4847,68 @@ CMathContent.prototype =
         }
 
     },
+    checkGapsSign: function(oMeasure, posLeft, posCurr)
+    {
+        if(posLeft > 0 && posLeft < this.content.length)
+        {
+            var typePrev = this.content[posLeft].value.typeObj,
+                typeCurr = this.content[posCurr].value.typeObj;
+
+            var bPrevSign = this.checkSignComp(posLeft),
+                bCurrSign  = this.checkSignComp(posCurr);
+
+            var bPrevComp = typePrev === MATH_COMP,
+                bCurrComp = typeCurr === MATH_COMP;
+
+            var gapSign = 0;
+            var bNeedGap = bPrevSign || bPrevComp || bCurrSign || bCurrComp;
+
+
+            if(bPrevComp || bPrevSign)
+            {
+                var rPrp = this.getRPrpByPosition(posLeft);
+                var txtPrp = new CMathTextPrp();
+                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+                txtPrp.Merge(rPrp);
+
+                gapSign = this.Composition.GetGapSign(oMeasure, txtPrp);
+
+                var coeff = 0;
+
+                if(bCurrComp)
+                    coeff = 0.2;
+                else if(bCurrSign)
+                    coeff = 0.4;
+                else
+                    coeff = 0.4;
+
+                this.content[posLeft].gaps.right = coeff*gapSign;
+            }
+
+            if(bCurrSign || bCurrComp)
+            {
+                var rPrp = this.getRPrpByPosition(posCurr);
+                var txtPrp = new CMathTextPrp();
+                txtPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+                txtPrp.Merge(rPrp);
+
+                gapSign = this.Composition.GetGapSign(oMeasure, txtPrp);
+
+                var coeff = 0;
+
+                if(bPrevComp)
+                    coeff = 0.3;
+                else if(bCurrSign)
+                    coeff = 0.5;
+                else
+                    coeff = 0.45;
+
+                this.content[posCurr].gaps.left = coeff*gapSign;
+            }
+
+
+        }
+    },
     checkSignComp: function(pos)
     {
         var bPlus = false, bMinus = false,
@@ -4859,10 +4927,8 @@ CMathContent.prototype =
             bDivision = code === 0x002F;
             bEqual    = code === 0x3D;
         }
-        var bSign = (bPlus || bMinus || bEqual),
-            bComp = currType == MATH_COMP;
 
-        return bSign || bComp;
+        return (bPlus || bMinus || bEqual);
     },
     old_draw: function(pGraphics)
     {
@@ -6875,6 +6941,39 @@ CMathComposition.prototype =
     {
         this.TEST_SELECT_ACTIVE = false;
     },
+    TestMouseDown: function()
+    {
+        var txtPrp = this.Root.getFirstPrp();
+        txtPrp.Merge(this.DEFAULT_RUN_PRP);
+        var sh = txtPrp.FontSize*0.017;
+
+        var k = 0, m = 0;
+
+        for(var x = 0; x < this.Root.size.width; x += sh)
+        {
+            k++;
+            for(var y = 0; y < this.Root.size.height; y += sh - 0.1)
+            {
+                this.Root.selection_Start(x, y);
+
+                var result = this.Root.selection_End(x, y);
+                this.SelectContent = result.SelectContent;
+
+                if(!this.SelectContent.selectUse())
+                    this.CurrentContent = this.SelectContent;
+
+                m++;
+
+                /*if(k%10 == 0 && m%10 == 0)
+                    console.log("k: " + k, "m: " + m);*/
+
+                // x = 53.10799999999981
+                // y = 18.008999999999965
+
+            }
+
+        }
+    },
     Remove_2: function(order)
     {
         if(TEST)
@@ -7338,6 +7437,8 @@ CMathComposition.prototype =
             y = Y - this.absPos.y;
 
         this.Root.selection_Start(x, y);
+
+        //console.log("X: " + X, "Y: " + Y);
     },
     Selection_SetEnd: function(X, Y, PageNum, MouseEvent)
     {

@@ -12,8 +12,14 @@ function CBorderBox()
     this.bLDiag = false;
     this.bRDiag = false;
 
-    this.bHor = false;
-    this.bVert = false;
+    /*this.bHor = false;
+    this.bVert = false;*/
+
+    /*this.bLDiag = true;
+    this.bRDiag = true;*/
+
+    this.bHor = true;
+    this.bVert = true;
 
     CMathBase.call(this);
 }
@@ -31,7 +37,7 @@ CBorderBox.prototype.init = function(props)
         if(props.hideBot === true || props.hideBot === 1)
             this.bBot = false;
 
-        if(props.strikeBLTR === true || props.strikeBLTR === 1)
+        /*if(props.strikeBLTR === true || props.strikeBLTR === 1)
             this.bRDiag = true;
 
         if(props.strikeTLBR === true || props.strikeTLBR === 1)
@@ -41,7 +47,7 @@ CBorderBox.prototype.init = function(props)
             this.bHor = true;
 
         if(props.strikeV === true || props.strikeV === 1)
-            this.bVert = true;
+            this.bVert = true;*/
     }
 
     this.setDimension(1, 1);
@@ -81,7 +87,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     {
 
         var x1 = this.pos.x + x,
-         x2 = this.pos.x + x + this.size.width - 25.4/96,
+         //x2 = this.pos.x + x + this.size.width - 25.4/96,
+         x2 = this.pos.x + x + this.size.width - penW,
          y1 = this.pos.y + y;
 
          pGraphics.p_color(0,0,0, 255);
@@ -91,7 +98,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(this.bBot)
     {
         var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width - 25.4/96,
+            //x2 = this.pos.x + x + this.size.width - 25.4/96,
+            x2 = this.pos.x + x + this.size.width - penW,
             y1 = this.pos.y + y + this.size.height - penW;
 
             pGraphics.p_color(0,0,0, 255);
@@ -102,7 +110,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     {
         var x1 = this.pos.x + x,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - 25.4/96;
+            y2 = this.pos.y + y + this.size.height - penW;
+            //y2 = this.pos.y + y + this.size.height - 25.4/96;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -110,9 +119,10 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
 
     if(this.bRight)
     {
-        var x1 = this.pos.x + x + this.size.width - penW ,
+        var x1 = this.pos.x + x + this.size.width - penW,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - 25.4/96 ;
+            y2 = this.pos.y + y + this.size.height - penW;
+            //y2 = this.pos.y + y + this.size.height - 25.4/96 ;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);
@@ -123,7 +133,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
         var pW = penW*0.8;
         var x1 = this.pos.x + x , y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
-            x3 = x1 + x + this.size.width - 25.4/96, y3 = y1 + this.size.height - pW - 25.4/96,
+            //x3 = x1 + this.size.width - 25.4/96, y3 = y1 + this.size.height - pW - 25.4/96,
+            x3 = x1 + this.size.width - penW, y3 = y1 + this.size.height - pW - penW,
             x4 = x3, y4 = y3 + pW,
             x5 = x4 - pW, y5 = y4,
             x6 = x1, y6 = y1 + pW,
@@ -147,10 +158,12 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(this.bRDiag)
     {
         var pW = penW*0.8;
-        var x1 = this.pos.x + x + this.size.width - pW - 25.4/96, y1 = this.pos.y + y,
+        var x1 = this.pos.x + x + this.size.width - pW - penW, y1 = this.pos.y + y,
+            //x1 = this.pos.x + x + this.size.width - pW - 25.4/96, y1 = this.pos.y + y,
             x2 = x1 + pW, y2 = y1,
             x3 = x2, y3 = y2 + pW,
-            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - 25.4/96,
+            x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - penW,
+            //x4 = this.pos.x + x + pW, y4 = this.pos.y + y + this.size.height - 25.4/96,
             x5 = x4 - pW, y5 = y4,
             x6 = x5, y6 = y5 - pW,
             x7 = x1, y7 = y1;
@@ -173,7 +186,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     if(this.bHor)
     {
         var x1 = this.pos.x + x,
-            x2 = this.pos.x + x + this.size.width - 25.4/96,
+            x2 = this.pos.x + x + this.size.width - penW,
+            //x2 = this.pos.x + x + this.size.width - 25.4/96,
             y1 = this.pos.y + y + this.size.height/2 - penW/2;
 
         pGraphics.p_color(0,0,0, 255);
@@ -184,7 +198,8 @@ CBorderBox.prototype.draw = function(x, y, pGraphics)
     {
         var x1 = this.pos.x + x + this.size.width/2 - penW/2,
             y1 = this.pos.y + y,
-            y2 = this.pos.y + y + this.size.height - 25.4/96;
+            y2 = this.pos.y + y + this.size.height - penW;
+            //y2 = this.pos.y + y + this.size.height - 25.4/96;
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.drawVerLine(0, x1, y1, y2, penW);

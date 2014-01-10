@@ -691,7 +691,7 @@ CMathBase.prototype =
              {
                  _h += Heights[j];
                  _h += this.dH/2;
-                 if( mCoord.y <= _h )
+                 if( mCoord.y <= _h + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
                  {
                      posCurs.x = j;
                      break;
@@ -713,7 +713,7 @@ CMathBase.prototype =
              {
                  _w +=Widths[u];
                  _w += this.dW/2;
-                 if( mCoord.x <= _w )
+                 if( mCoord.x <= _w  + 0.000001) // если придет координата совпадающая с высотой элемента, чтобы не возникало проблем с погрешностью при сравнении
                  {
 
                      if( this.elements[posCurs.x][u].IsJustDraw() )
