@@ -707,9 +707,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						// Загружаем не обрезанные шрифты для полной версии (при редактировании)
 						if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
 							this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-							this.asyncMethodCallback = function () {};
-							var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
-							this.FontLoader.LoadDocumentFonts(fonts);
+							this.asyncMethodCallback = undefined;
+							this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
 						}
 						
 						this.isUseEmbeddedCutFonts = false;
@@ -1268,6 +1267,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 }
 			},
 
+			/**
+			 * Функция для загрузчика шрифтов (нужно ли грузить default шрифты). Для Excel всегда возвращаем false
+			 * @returns {boolean}
+			 */
 			IsNeedDefaultFonts: function () {
 				return false;
 			},
@@ -1287,8 +1290,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				// Начинаем соединение для совместного редактирования
 				this.asyncServerIdStartLoaded();
-				var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
-				this.FontLoader.LoadDocumentFonts(fonts);
+
+				this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
 
 				// Какая-то непонятная заглушка, чтобы не падало в ipad
 				if (this.isMobileVersion) {

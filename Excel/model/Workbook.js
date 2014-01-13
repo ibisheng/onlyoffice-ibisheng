@@ -1968,22 +1968,36 @@ Workbook.prototype.getUniqueSheetNameFrom=function(name, bCopy){
 		nIndex++;
 	}
 	return sNewName;
-}
-Workbook.prototype.generateFontMap=function(){
-	var oFontMap = new Object();
-	oFontMap["Calibri"] = 1;
-	oFontMap["Arial"] = 1;
+};
+Workbook.prototype._generateFontMap=function(){
+	var oFontMap = {
+		"Calibri"	: 1,
+		"Arial"		: 1
+	};
 
-	if(null != g_oDefaultFont.fn)
+	if (null != g_oDefaultFont.fn)
 		oFontMap[g_oDefaultFont.fn] = 1;
-	
-	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
+
+	for (var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].generateFontMap(oFontMap);
 	this.CellStyles.generateFontMap(oFontMap);
+
+	return oFontMap;
+};
+Workbook.prototype.generateFontMap=function(){
+	var oFontMap = this._generateFontMap();
 	
-	var aRes = new Array();
+	var aRes = [];
 	for(var i in oFontMap)
 		aRes.push(i);
+	return aRes;
+};
+Workbook.prototype.generateFontMap2=function(){
+	var oFontMap = this._generateFontMap();
+
+	var aRes = [];
+	for(var i in oFontMap)
+		aRes.push(new CFont(i, 0, "", 0));
 	return aRes;
 };
 Workbook.prototype.recalcWB = function(is3D){
