@@ -16,7 +16,25 @@
     if ( c_oSerFormat.Signature === sData.substring( 0, c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
         var wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
-        wb.initGlobalObjects();
+//        wb.initGlobalObjects();
+
+        History = new CHistory(wb);
+
+        g_oIdCounter = new CIdCounter();
+        g_oTableId = new CTableId();
+        if ( this.User )
+            g_oIdCounter.Set_UserId(this.User.asc_getId());
+
+        g_oUndoRedoCell = new UndoRedoCell(wb);
+        g_oUndoRedoWorksheet = new UndoRedoWoorksheet(wb);
+        g_oUndoRedoWorkbook = new UndoRedoWorkbook(wb);
+        g_oUndoRedoCol = new UndoRedoRowCol(wb, false);
+        g_oUndoRedoRow = new UndoRedoRowCol(wb, true);
+        g_oUndoRedoComment = new UndoRedoComment(wb);
+        g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wb);
+        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
+        g_oIdCounter.Set_Load(false);
+
         var oBinaryFileReader = new BinaryFileReader( sUrlPath );
         oBinaryFileReader.Read( sData, wb );
     }
@@ -630,7 +648,7 @@
         ws.getRange2( "A7" ).setValue( "3-Mar" );
         oParser = new parserFormula( "DATEVALUE(A7)", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 41336 );
+        strictEqual( oParser.calculate().getValue(), 41701 );
 
         oParser = new parserFormula( "DATEVALUE(\"$1,000\")", "A2", ws );
         ok( oParser.parse() );
