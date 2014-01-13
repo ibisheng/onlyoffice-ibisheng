@@ -173,6 +173,8 @@
 			this.activeRange = null;
 			this.lStorage = {};
 
+			this.fontsNew = {};
+
 			return this;
 		}
 
@@ -580,9 +582,7 @@
 			
 			pasteAsTextButton: function (callback) {
 				var t = this;
-				if(AscBrowser.isIE)
-				{
-					//t._paste(function(){t._makeCellValueFromHtml(callback)});
+				if (AscBrowser.isIE) {
 					t.elementText.style.display = "block";
 					t.elementText.value = '\xa0';
 					t.elementText.focus();
@@ -1139,7 +1139,7 @@
 			
 			_getArray: function (node, isText)
             {
-                var aResult = new Array();
+                var aResult = [];
                 var oNewItem = [];
 				var tmpBorderStyle, borderStyleName;
                 var t = this;
@@ -1150,15 +1150,13 @@
 				if(node == undefined || node == null)
 				{
 					oNewItem[0] = t._getDefaultCell();
-					oNewItem.fonts = [];
-					oNewItem.fonts[0] = 'Arial';
+					this.fontsNew['Arial'] = 1;
 				}
 				//style for text
 				else if(node.children != undefined && node.children.length == 0)
 				{
 					oNewItem[0] = t._setStylesTextPaste(node);
-					oNewItem.fonts = [];
-					oNewItem.fonts[0] = oNewItem[0].format.fn;
+					this.fontsNew[oNewItem[0].format.fn] = 1;
 				}
 				else
 				{
@@ -1505,35 +1503,24 @@
 						oBinaryFileReader.Read(base64, tempWorkbook);
 						this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
 						var pasteData = null;
-						if(tempWorkbook)
-							pasteData = tempWorkbook.aWorksheets[0]
-						if(pasteData)
-						{
+						if (tempWorkbook)
+							pasteData = tempWorkbook.aWorksheets[0];
+						if (pasteData) {
 							History.TurnOn();
 							if(pasteData.Drawings && pasteData.Drawings.length)
-								t._insertImagesFromBinary(worksheet, pasteData)
-							else
-							{
-								var newFonts = [];
+								t._insertImagesFromBinary(worksheet, pasteData);
+							else {
+								var newFonts = {};
 								pasteData.generateFontMap(newFonts);
-								var newArrFonts = [];
-								var index = 0;
-								for(var i in newFonts)
-								{
-									newArrFonts[index] = [];
-									newArrFonts[index][0] = i;
-									index++;
-								};
-								worksheet._loadFonts( newArrFonts, function() {worksheet.setSelectionInfo('paste',pasteData,false,"binary")});
+								worksheet._loadFonts(newFonts, function() {
+									worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+								});
 							}
 							window.GlobalPasteFlag = false;
 							window.GlobalPasteFlagCounter = 0;
 							return;
 						}
-					}
-					else if(base64FromWord && copyPasteFromWordUseBinary)
-					{
-						var pasteData = null;
+					} else if (base64FromWord && copyPasteFromWordUseBinary) {
 						var pasteData = this.ReadFromBinaryWord(base64FromWord);
 						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
 						pasteFromBinaryWord._paste(worksheet, pasteData);
@@ -1645,10 +1632,9 @@
 					if(max != 0)
 						range.c2 = range.c2 + max - 1;
                 }
+				this.fontsNew = {};
+
 				var cellCountAll = [];
-                var mergeArr = [];
-				var fontsNew = [];
-				
 				var rowSpanPlus = 0;
 				var tableRowCount = 0;
 				var l = 0;
@@ -1707,11 +1693,9 @@
 							}
 							tag.innerHTML = tag.innerHTML.replace(/(\n)/g, '');
 							aResult[r + tableRowCount][c] = t._getArray(tag,isText);
-							fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
 							c = range.c2;
 							cellCountAll[s] = 1;
 							s++;
-							l++;
 						}
 						else if(tag.nodeName.toLowerCase() == '#text')
 						{
@@ -1732,21 +1716,17 @@
 								var span = document.createElement('p');
 								$(span).append(tag);
 								aResult[r + tableRowCount][c] = t._getArray(span,isText);
-								fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
 								c = range.c2;
 								cellCountAll[s] = 1;
 								s++;
-								l++;
 							
 						}
                         else if(tag.nodeName.toLowerCase() == 'span' || tag.nodeName.toLowerCase() == 'a' || tag.nodeName.toLowerCase() == 'form')
 						{
 							aResult[r + tableRowCount][c] = t._getArray(tag,isText);
-							fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
 							cellCountAll[s] = 1;
 							c = range.c2;
 							s++;
-							l++;
 						}
                         else if(tag.nodeName.toLowerCase() == 'table')
                         {
@@ -1841,8 +1821,6 @@
 													if(_tBody == undefined)
 														_tBody = document.createElement('td');
 													aResult[tR][tC] = t._getArray(_tBody,isText);
-													fontsNew[l] = aResult[tR][tC][0].fonts;
-													l++;
 													if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
 													{
 														mergeArr[n++] = {
@@ -1882,8 +1860,6 @@
 												//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
 											}
 											aResult[tR][tC] = t._getArray(_tBody,isText);
-											fontsNew[l] = aResult[tR][tC][0].fonts;
-											l++;
 											if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
 											{
 												mergeArr[n++] = {
@@ -1947,8 +1923,6 @@
 								newSpan.innerText = textArr[k];
 								$(newSpan).text(textArr[k]);
 								aResult[r + tableRowCount][c] = t._getArray(newP,isText);
-								fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
-								l++;
 								if(textArr.length != 1 && (textArr.length - 1) != k)
 									r++;
 							}
@@ -1966,7 +1940,7 @@
 				var api = window["Asc"]["editor"];
 				if(!api || (api && !api.isChartEditor))
 					aResult.addImages = addImages;
-				aResult.fontsNew = fontsNew;
+				aResult.fontsNew = t.fontsNew;
 				worksheet.setSelectionInfo('paste',aResult,t);
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
@@ -2660,93 +2634,11 @@
 				}
 			},
 
-			_makeCellValueFromHtml: function (callback) {
-				if (!callback || !callback.call) {return;}
-				
-				var defaultFontName = 'Arial';
-				var t = this, i;
-				var res = [];
-				var fonts = [];
-				var reQuotedStr = /['"]([^'"]+)['"]/;
-				var reSizeStr = /\s*(\d+\.*\d*)\s*(em|ex|cm|mm|in|pt|pc|px|%)?\s*/i;
-
-				function getFontName(style) {
-					var fn = style.fontFamily.split(",")[0];
-					var m = reQuotedStr.exec(fn);
-					if (m) {fn = m[1];}
-					switch (fn.toLowerCase()) {
-						case "sans-serif": return "Arial";
-						case "serif":      return "Times";
-						case "monospace":  return "Courier";
-					}
-					return fn;
-				}
-
-				function getFontSize(style) {
-					var fs = style.fontSize.toLowerCase();
-					var m = reSizeStr.exec(fs);
-					var sz = m ? parseFloat(m[1]) : 0;
-					return m[2] === "px" ? (sz / t.ppix * 72).toFixed(1)-0 : 0;
-				}
-
-				Array.prototype.forEach.call(t.element.childNodes, function processElement(elem) {
-					if (elem.nodeType === Node.TEXT_NODE) {
-						var style = window.getComputedStyle(elem.parentNode);
-						//var fn = getFontName(style);
-						var fn = defaultFontName;
-						var fs = getFontSize(style);
-						var fb = style.fontWeight.toLowerCase();
-						var fi = style.fontStyle.toLowerCase();
-						var td = style.textDecoration.toLowerCase();
-						var va = style.verticalAlign.toLowerCase();
-						res.push({
-							/*format: {
-								fn: t._checkFonts(fn),
-								fs: fs,
-								c: style.getPropertyValue("color"),
-								b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
-								i: fi.indexOf("italic") >= 0,
-								u: td.indexOf("underline") >= 0 ? "single" : "none",
-								s: td.indexOf("line-through") >= 0,
-								va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
-							},*/
-							format: {//дефолтовые значения для вставленного текста.чтобы сделать поддержку стилей раскомментировать то, что сверху
-								fn: t._checkFonts(fn),
-								fs: fs,
-								b: false,
-								i: false,
-								u: 'none',
-								s: false,
-								va: "none"
-							},
-							text: elem.textContent});
-						if (fn !== "") {fonts.push(fn);}
-						return;
-					}
-
-					Array.prototype.forEach.call(elem.childNodes, processElement);
-					var n = elem.tagName ? elem.tagName.toUpperCase() : "";
-					if (/H\d|LABEL|LI|P|PRE|TR|DD|BR/.test(n) && res.length > 0) {
-						res[res.length - 1].text += "\n";
-					} else if (/DT/.test(n) && res.length > 0) {
-						res[res.length - 1].text += "\t";
-					}
-				});
-
-				fonts.sort();
-				for (i = 0; i < fonts.length; ) {
-					if (i+1 < fonts.length && fonts[i] === fonts[i+1]) {fonts.splice(i+1, 1); continue;}
-					++i;
-				}
-				callback(res, fonts);
-			},
-
 			_makeCellValuesHtml: function (node,isText) {
 				//if (!callback || !callback.call) {return;}
 
-				var t = this, i;
+				var t = this;
 				var res = [];
-				var fonts = [];
 				var maxSize = 100;
 				var reQuotedStr = /['"]([^'"]+)['"]/;
 				var reSizeStr = /\s*(\d+\.*\d*)\s*(em|ex|cm|mm|in|pt|pc|px|%)?\s*/i;
@@ -2781,7 +2673,7 @@
 						{
 						var parent = elem.parentNode;
 						if(elem.getAttribute != undefined && elem.getAttribute("class") == "qPrefix")
-							var parent = elem;
+							parent = elem;
 						var style = window.getComputedStyle(parent);
 						var fn = getFontName(style);
 						if(fn == '')
@@ -2859,8 +2751,9 @@
 									});
 								}
 								res.wrap = true;
-							};
-						if (fn !== "") {fonts.push(fn);}
+							}
+						if (fn !== "")
+							t.fontsNew[fn] = 1;
 						return;
 						}
 					}
@@ -2869,20 +2762,7 @@
 					else
 						Array.prototype.forEach.call(elem.childNodes, processElement);
 				});
-				fonts.sort();
-				for (i = 0; i < fonts.length; ) {
-					if (i+1 < fonts.length && fonts[i] === fonts[i+1]) {fonts.splice(i+1, 1); continue;}
-					++i;
-				}
-				res.fonts = fonts;
 				return res;
-			},
-
-			_makeRangeFromHtml: function (callback) {
-				if (!callback || !callback.call) {return;}
-				var t = this;
-				var res = {};
-				callback(res);
 			},
 			
 			_checkFonts: function (fontName) {
@@ -3158,7 +3038,7 @@
 		function pasteFromBinaryWord(clipboard, ws) {
 			if ( !(this instanceof pasteFromBinaryWord) ) {return new pasteFromBinaryWord();}
 
-			this.fontsNew = [];
+			this.fontsNew = {};
 			this.aResult = [];
 			this.clipboard = clipboard;
 			this.ws = ws;
@@ -3171,7 +3051,6 @@
 			_paste : function(worksheet, pasteData)
 			{
 				var documentContent = pasteData.DocumentContent;
-				var value2;
 				var activeRange = worksheet.activeRange.clone(true);
 				
 				if(documentContent && documentContent.length)
@@ -3180,11 +3059,10 @@
 					var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
 					this._parseChildren(coverDocument, activeRange);
 					//this.parseDocumentContent(documentContent, activeRange);
-				};
+				}
 				
 				this.aResult.fontsNew = this.fontsNew;
-				aResult = this.aResult;
-				worksheet.setSelectionInfo('paste', aResult, this);
+				worksheet.setSelectionInfo('paste', this.aResult, this);
 			},
 			
 			_parseChildren: function(children, activeRange)
@@ -3296,11 +3174,11 @@
 			_parseParagraph: function(paragraph, activeRange, row, col, rowSpan, colSpan)
 			{
 				var content = paragraph.Content;
-				var row;
+				var row, colorText, cTextPr, fontFamily = "Arial";
 				var text = null;
 				var oNewItem = [];
 
-				aResult = this.aResult;
+				var aResult = this.aResult;
 				if(row === undefined)
 				{
 					if(aResult.length == 0)
@@ -3373,9 +3251,7 @@
 							oNewItem[oNewItem.length - 1].text = text;
 						else if(text !== null && oNewItem.length == 0)
 						{
-							fontFamily = "Arial";
-							this.fontsNew[this.fontsNew.length] = []; 
-							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							this.fontsNew["Arial"] = 1;
 							colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
 							
 							var calcValue = content[n].CalcValue;
@@ -3404,8 +3280,7 @@
 							colorText = null;
 						
 						fontFamily = cTextPr.fontFamily ? fontFamily : cTextPr.RFonts.CS ? cTextPr.RFonts.CS.Name : paragraphFontFamily;
-						this.fontsNew[this.fontsNew.length] = [];
-						this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+						this.fontsNew[fontFamily] = 1;
 						
 						var verticalAlign;
 						if(cTextPr.VertAlign == 2)
@@ -3440,8 +3315,7 @@
 						if(!oNewItem.length)
 						{
 							fontFamily = paragraphFontFamily;
-							this.fontsNew[this.fontsNew.length] = []; 
-							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							this.fontsNew[fontFamily] = 1;
 							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
 							
 							oNewItem.push({
@@ -3461,7 +3335,7 @@
 							oNewItem[oNewItem.length - 1].text = text;
 						//переходим в следующую ячейку
 						if(typeof aResult[row][s + c1] == "object")
-							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem
+							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
 						else
 						{
 							aResult[row][s + c1] = [];
@@ -3477,8 +3351,7 @@
 						if(!oNewItem.length)
 						{
 							fontFamily = paragraphFontFamily;
-							this.fontsNew[this.fontsNew.length] = []; 
-							this.fontsNew[this.fontsNew.length - 1][0] = fontFamily; 
+							this.fontsNew[fontFamily] = 1;
 							colorText = colorParagraph ? colorParagraph : new RgbColor(this.clipboard._getBinaryColor("rgb(0, 0, 0)"));
 							
 							oNewItem.push({
@@ -3498,7 +3371,7 @@
 							oNewItem[oNewItem.length - 1].text = text;
 						text = "";
 						if(typeof aResult[row][s + c1] == "object")
-							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem
+							aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
 						else
 						{
 							aResult[row][s + c1] = [];

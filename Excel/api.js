@@ -1280,7 +1280,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			        return callback();
 			        
 				this.asyncMethodCallback = callback;
-				this.FontLoader.LoadDocumentFonts2(fonts.map(function(f){return {name: f};}));
+				var arrLoadFonts = [];
+				for(var i in fonts)
+					arrLoadFonts.push(new CFont(i, 0, "", 0));
+				this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
 			},
 
 			_startOpenDocument: function (response) {
@@ -2609,8 +2612,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_setCellFontName: function (fontName) {
-				var t = this;
-				t._loadFonts([fontName], function () {
+				var t = this,
+					fonts = {};
+				fonts[fontName] = 1;
+				t._loadFonts(fonts, function () {
 					var ws = t.wb.getWorksheet();
 					if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellFontName )
 						ws.objectRender.controller.setCellFontName(fontName);

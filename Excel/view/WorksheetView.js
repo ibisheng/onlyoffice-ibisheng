@@ -10121,19 +10121,9 @@
 			return this.autoFilters.getAddFormatTableOptions(ar);
 		};
 
-		WorksheetView.prototype._loadFonts = function (fontArr, callback) {
-			var originFonts = [];
-			var i, n, k = 0;
-			for (i = 0; i < fontArr.length ;++i) {
-					for (n = 0; n < fontArr[i].length; ++n) {
-						if(-1 == $.inArray(fontArr[i][n], originFonts)) {
-							originFonts[k] = fontArr[i][n];
-							k++;
-						}
-					}
-				}
+		WorksheetView.prototype._loadFonts = function (fonts, callback) {
 			var api = window["Asc"]["editor"];
-			api._loadFonts(originFonts, callback);
+			api._loadFonts(fonts, callback);
 		};
 
 		/*

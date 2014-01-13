@@ -2184,11 +2184,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 					oFontMap[aFonts[j]] = 1;
 			}
 		}
-		var aFontMap = new Array();
-		for(var i in oFontMap)
-			aFontMap.push(i);
 		
-		window["Asc"]["editor"]._loadFonts(aFontMap, function(){
+		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
 				History.Clear();
 				History.Create_NewPoint();
 				History.SetSelection(null);
