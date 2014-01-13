@@ -78,7 +78,7 @@
 		 * @param {Object} settings  See CellEditor.defaults
 		 */
 		function CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings) {
-			if ( !(this instanceof CellEditor) ) {return new CellEditor(elem, input, fmgrGraphics, handlers, settings);}
+			if ( !(this instanceof CellEditor) ) {return new CellEditor(elem, input, fmgrGraphics, oFont, handlers, settings);}
 
 			this.element = elem;
 			this.input = input;
