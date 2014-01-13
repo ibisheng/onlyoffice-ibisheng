@@ -837,10 +837,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 											}
 											else
 											{
-												oResult = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+												result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
 												oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 												if(callback)
-													callback(oResult);
+													callback(result);
 											}
 										},
 										error:function(){
