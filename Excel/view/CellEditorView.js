@@ -1769,7 +1769,7 @@
 
 					case 144://Num Lock
 					case 145://Scroll Lock
-						if ( $.browser.opera ) {
+						if (AscBrowser.isOpera) {
 							event.stopPropagation();
 							event.preventDefault();
 						}
@@ -1814,7 +1814,7 @@
 						break;
 
 					case 113: // F2
-						if( $.browser.opera ){
+						if (AscBrowser.isOpera) {
 							event.stopPropagation();
 							event.preventDefault();
 						}

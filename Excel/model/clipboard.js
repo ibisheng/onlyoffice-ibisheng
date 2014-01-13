@@ -259,7 +259,7 @@
 				if(text == false)
 					return;
 				//исключения для opera в случае копирования пустой html
-				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && $.browser['opera'])
+				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && AscBrowser.isOpera)
 					$(text).find('td')[0].innerHTML = '&nbsp;';
 				t.element.appendChild(text);
 				
@@ -273,7 +273,7 @@
 				}
 				
 
-				if($(text).find('img')[0] && $.browser['opera'])
+				if($(text).find('img')[0] && AscBrowser.isOpera)
 				{
 					$(text)[0].innerHTML = "<tr><td>&nbsp;</td></tr>";
 					if(t.copyText.isImage)
@@ -2117,7 +2117,7 @@
 				{
 					return false;
 				}	
-				if(t.copyText.text && $.browser['opera'] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
+				if(t.copyText.text && AscBrowser.isOpera && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
 					return true;
 				if($.browser['msie'] && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
 					return true;

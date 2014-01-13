@@ -632,7 +632,7 @@
 
 				case 113: // F2
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
-					if ($.browser.opera) {stop();}
+					if (AscBrowser.isOpera) {stop();}
 					// Выставляем блокировку на выход из редактора по клавишам-стрелкам
 					t.strictClose = true;
 					// При F2 выставляем фокус в редакторе
@@ -689,7 +689,7 @@
 
 				case 144: //Num Lock
 				case 145: //Scroll Lock
-					if ($.browser.opera) {stop();}
+					if (AscBrowser.isOpera) {stop();}
 					return t.__retval;
 
 				case 32: // Spacebar
