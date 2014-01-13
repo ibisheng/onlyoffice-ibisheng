@@ -38,9 +38,6 @@
 		var kCenterAlign = "center";
 
 		/** @const */
-		var namespace = "ASC_CellEditor";
-
-		/** @const */
 		var kBeginOfLine = -1;
 		/** @const */
 		var kBeginOfText = -2;
