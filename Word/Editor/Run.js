@@ -4,16 +4,13 @@
  * Time: 18:28
  */
 
-var RunRangesCount         = 0;
-var RunRangesElementsCount = 0;
-var ParaRangesCount        = 0;
-
 function ParaRun(Document,Parent)
 {
     this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
     this.Document   = Document;                  // Ссылка на верхний класс документа
     this.Parent     = Parent;                    // Ссылка на родительский класс
+    this.Paragraph  = Parent;                    // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
     this.Content    = new Array();               // Содержимое данного run
     this.State      = new CParaRunState();       // Положение курсора и селекта в данного run
@@ -39,6 +36,7 @@ function ParaRun(Document,Parent)
     this.Range = this.Lines[0].Ranges[0];
 
     this.StartLine   = 0; // Строка, с которой начинается данный ран
+    this.StartRange  = 0;
 
     this.CollaborativeMarks = new Array(); // Массив CParaRunCollaborativeMark
 
@@ -75,6 +73,390 @@ ParaRun.prototype =
     Get_Paragraph : function()
     {
         return this.Parent;
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с содержимым данного рана
+//-----------------------------------------------------------------------------------
+
+    // Добавляем элемент в текущую позицию
+    Add : function(Item)
+    {
+        this.Add_ToContent( this.State.ContentPos, Item, true );
+    },
+
+    // Добавляем элемент в позицию с сохранием в историю
+    Add_ToContent : function(Pos, Item, UpdatePosition)
+    {
+        History.Add( this, { Type : historyitem_Run_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+        this.Content.splice( Pos, 0, Item );
+
+        if ( true === UpdatePosition )
+        {
+            // Обновляем текущую позицию
+            if ( this.State.ContentPos >= Pos )
+                this.State.ContentPos++;
+
+            // Обновляем начало и конец селекта
+            if ( true === this.State.Selection.Use )
+            {
+                if ( this.State.Selection.StartPos >= Pos )
+                    this.State.Selection.StartPos++;
+
+                if ( this.State.Selection.EndPos >= Pos )
+                    this.State.Selection.EndPos++;
+            }
+
+            // Также передвинем всем метки переносов страниц и строк
+            var LinesCount = this.Lines.length;
+            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
+            {
+                var RangesCount = this.Lines[CurLine].RangesLength;
+
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    var Range = this.Lines[CurLine].Ranges[CurRange];
+
+                    if ( Range.StartPos > Pos )
+                        Range.StartPos++;
+
+                    if ( Range.EndPos > Pos )
+                        Range.EndPos++;
+                }
+            }
+
+            // TODO: Поиск, NearPos, SpellCheck
+
+//            for ( var CurSearch in this.SearchResults )
+//            {
+//                if ( this.SearchResults[CurSearch].StartPos >= Pos )
+//                    this.SearchResults[CurSearch].StartPos++;
+//
+//                if ( this.SearchResults[CurSearch].EndPos >= Pos )
+//                    this.SearchResults[CurSearch].EndPos++;
+//            }
+//
+//            for ( var Id in this.NearPosArray )
+//            {
+//                var NearPos = this.NearPosArray[Id];
+//                if ( NearPos.ContentPos >= Pos )
+//                    NearPos.ContentPos++;
+//            }
+//
+//            this.SpellChecker.Update_OnAdd( this, Pos, Item );
+        }
+
+        // Отмечаем, что надо перемерить элементы в данном ране
+        this.RecalcInfo.Measure = true;
+    },
+
+    Remove_FromContent : function(Pos, Count, UpdatePosition)
+    {
+        // Получим массив удаляемых элементов
+        var DeletedItems = this.Content.slice( Pos, Pos + Count );
+        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+
+        this.Content.splice( Pos, Count );
+
+        if ( true === UpdatePosition )
+        {
+            // Обновим текущую позицию
+            if ( this.State.ContentPos > Pos + Count )
+                this.State.ContentPos -= Count;
+            else if ( this.State.ContentPos > Pos )
+                this.State.ContentPos = Pos;
+
+            // Обновим начало и конец селекта
+            if ( true === this.Selection.Use )
+            {
+                if ( this.State.Selection.StartPos <= this.State.Selection.EndPos )
+                {
+                    if ( this.State.Selection.StartPos > Pos + Count )
+                        this.State.Selection.StartPos -= Count;
+                    else if ( this.State.Selection.StartPos > Pos )
+                        this.State.Selection.StartPos = Pos;
+
+                    if ( this.State.Selection.EndPos >= Pos + Count )
+                        this.State.Selection.EndPos -= Count;
+                    else if ( this.State.Selection.EndPos > Pos )
+                        this.State.Selection.EndPos = Math.max( 0, Pos - 1 );
+                }
+                else
+                {
+                    if ( this.State.Selection.StartPos >= Pos + Count )
+                        this.State.Selection.StartPos -= Count;
+                    else if ( this.State.Selection.StartPos > Pos )
+                        this.State.Selection.StartPos = Math.max( 0, Pos - 1 );
+
+                    if ( this.State.Selection.EndPos > Pos + Count )
+                        this.State.Selection.EndPos -= Count;
+                    else if ( this.State.Selection.EndPos > Pos )
+                        this.State.Selection.EndPos = Pos;
+                }
+            }
+
+
+            // Также передвинем всем метки переносов страниц и строк
+            var LinesCount = this.Lines.length;
+            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
+            {
+                var RangesCount = this.Lines[CurLine].RangesLength;
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    var Range = this.Lines[CurLine].Ranges[CurRange];
+
+                    if ( Range.StartPos > Pos + Count )
+                        Range.StartPos -= Count;
+                    else if ( Range.StartPos > Pos )
+                        Range.StartPos = Math.max( 0 , Pos );
+
+                    if ( Range.EndPos >= Pos + Count )
+                        Range.EndPos -= Count;
+                    else if ( Range.EndPos >= Pos )
+                        Range.EndPos = Math.max( 0 , Pos );
+                }
+            }
+
+            // TODO: Поиск, NearPos, Spelling
+
+//            for ( var Id in this.NearPosArray )
+//            {
+//                var NearPos = this.NearPosArray[Id];
+//
+//                if ( NearPos.ContentPos > Pos + Count )
+//                    NearPos.ContentPos -= Count;
+//                else if ( NearPos.ContentPos > Pos )
+//                    NearPos.ContentPos = Math.max( 0 , Pos );
+//            }
+//
+//            // Передвинем все метки слов для проверки орфографии
+//            this.SpellChecker.Update_OnRemove( this, Pos, Count );
+        }
+
+        // Отмечаем, что надо перемерить элементы в данном ране
+        this.RecalcInfo.Measure = true;
+    },
+
+    // Определим строку и отрезок текущей позиции
+    Get_CurrentParaPos : function()
+    {
+        var Pos = this.State.ContentPos;
+
+        var CurLine  = 0;
+        var CurRange = 0;
+
+        var LinesCount = this.LinesLength;
+        for ( ; CurLine < LinesCount; CurLine++ )
+        {
+            var RangesCount = this.Lines[CurLine].RangesLength;
+            for ( CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var Range = this.Lines[CurLine].Ranges[CurRange];
+                if ( Pos < Range.EndPos && Pos >= Range.StartPos )
+                    return new CParaPos( ( CurLine === 0 ? CurRange + this.StartRange : CurRange ), CurLine + this.StartLine, 0, 0 );
+            }
+        }
+
+        return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
+    },
+
+    Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
+    {
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
+        var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            // TODO: Подумать насчет нумерации
+            //if ( ItemNum === this.Numbering.Pos )
+            //    X += this.Numbering.WidthVisible;
+
+            if ( true === CurrentRun && Pos === this.State.ContentPos )
+            {
+                // Если так случилось, что у нас заданная позиция идет до позиции с нумерацией, к которой привязана нумерация,
+                // тогда добавляем ширину нумерации.
+
+                var _X = X;
+                // TODO: Подумать насчет нумерации
+                //if ( ItemNum < this.Numbering.Pos )
+                //    _X += this.Numbering.WidthVisible;
+
+                if ( true === UpdateCurPos )
+                {
+                    // Обновляем позицию курсора в параграфе
+
+                    var Para = this.Paragraph;
+
+                    Para.CurPos.X        = _X;
+                    Para.CurPos.Y        = Y;
+                    Para.CurPos.PagesPos = CurPage;
+
+                    if ( true === UpdateTarget )
+                    {
+                        var CurTextPr = this.Get_CompiledPr(false);
+                        g_oTextMeasurer.SetTextPr( CurTextPr );
+                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+                        var Height    = g_oTextMeasurer.GetHeight();
+                        var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
+                        var Ascender  = Height - Descender;
+
+                        Para.DrawingDocument.SetTargetSize( Height );
+
+                        if ( true === CurTextPr.Color.Auto )
+                        {
+                            // Выясним какая заливка у нашего текста
+                            var Pr = Para.Get_CompiledPr();
+                            var BgColor = undefined;
+                            if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+                            {
+                                BgColor = Pr.ParaPr.Shd.Color;
+                            }
+                            else
+                            {
+                                // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
+                                BgColor = Para.Parent.Get_TextBackGroundColor();
+                            }
+
+                            // Определим автоцвет относительно заливки
+                            var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+                            Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
+                        }
+                        else
+                            Para.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+
+                        var TargetY = Y - Ascender - CurTextPr.Position;
+                        switch( CurTextPr.VertAlign )
+                        {
+                            case vertalign_SubScript:
+                            {
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                                break;
+                            }
+                            case vertalign_SuperScript:
+                            {
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                                break;
+                            }
+                        }
+
+                        var Page_Abs = Para.Get_StartPage_Absolute() + CurPage;
+                        Para.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
+
+                        // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
+                        //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
+                        //       такой вариант будет смотреться плохо.
+                        if ( undefined != Para.Get_FramePr() )
+                        {
+                            var __Y0 = TargetY, __Y1 = TargetY + Height;
+                            var ___Y0 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
+                            var ___Y1 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Bottom;
+
+                            var __Y0 = Math.max( __Y0, ___Y0 );
+                            var __Y1 = Math.min( __Y1, ___Y1 );
+
+                            Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                            Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+                        }
+                    }
+                }
+
+                if ( true === ReturnTarget )
+                {
+                    var CurTextPr = this.Get_CompiledPr(false);
+                    g_oTextMeasurer.SetTextPr( CurTextPr );
+                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+                    var Height    = g_oTextMeasurer.GetHeight();
+                    var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
+                    var Ascender  = Height - Descender;
+
+                    var TargetY = Y - Ascender - CurTextPr.Position;
+
+                    switch( CurTextPr.VertAlign )
+                    {
+                        case vertalign_SubScript:
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                            break;
+                        }
+                        case vertalign_SuperScript:
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                            break;
+                        }
+                    }
+
+                    return { X : _X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+                }
+                else
+                    return { X : _X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            }
+
+            switch( Item.Type )
+            {
+                case para_Text:
+                case para_Space:
+                case para_Sym:
+                case para_PageNum:
+                case para_Tab:
+                case para_End:
+                case para_NewLine:
+                {
+                    X += Item.WidthVisible;
+                    break;
+                }
+                case para_Drawing:
+                {
+                    if ( drawing_Inline != Item.DrawingType )
+                        break;
+
+                    X += Item.WidthVisible;
+                    break;
+                }
+            }
+        }
+
+        return X;
+    },
+
+    // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
+    Is_SimpleChanges : function(Changes)
+    {
+        if ( Changes.length !== 1 )
+            return false;
+
+        var Type = Changes[0].Data.Type;
+        if ( historyitem_Run_AddItem === Type || historyitem_Run_RemoveItem === Type )
+            return true;
+
+        return false;
+    },
+
+    // Возвращаем строку и отрезок, в котором произошли простейшие изменения
+    Get_SimpleChanges_ParaPos : function(Changes)
+    {
+        var Change = Changes[0].Data;
+        var Pos    = ( Changes[0].Data.Type === historyitem_Run_AddItem ? Change.Pos : Change.StartPos );
+
+        var CurLine  = 0;
+        var CurRange = 0;
+
+        var LinesCount = this.LinesLength;
+        for ( ; CurLine < LinesCount; CurLine++ )
+        {
+            var RangesCount = this.Lines[CurLine].RangesLength;
+            for ( CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var Range = this.Lines[CurLine].Ranges[CurRange];
+                if ( Pos < Range.EndPos && Pos >= Range.StartPos )
+                    return new CParaPos( ( CurLine === 0 ? CurRange + this.StartRange : CurRange ), CurLine + this.StartLine, 0, 0 );
+            }
+        }
+
+        return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -141,7 +523,6 @@ ParaRun.prototype =
 
     Recalculate_Range : function( ParaPr)
     {
-        RunRangesCount++;
         // Сначала измеряем элементы (можно вызывать каждый раз, внутри разруливается, чтобы измерялось 1 раз)
         this.Recalculate_MeasureContent();
 
@@ -220,7 +601,6 @@ ParaRun.prototype =
         var ContentLen = this.Content.length;
         for ( ; Pos < ContentLen; Pos++ )
         {
-            RunRangesElementsCount++;
             if ( false === StartWord && true === FirstItemOnLine && Math.abs( XEnd - X ) < 0.001 && RangesCount > 0 )
             {
                 NewRange    = true;
@@ -733,6 +1113,7 @@ ParaRun.prototype =
         {
             this.Range.StartPos = RangeStartPos;
             this.Range.EndPos   = RangeEndPos;
+            this.Lines[0].RangesLength = 1;
         }
         else
             this.Lines[CurLine].Add_Range( PRS.Range, RangeStartPos, RangeEndPos );
@@ -1336,6 +1717,30 @@ ParaRun.prototype =
 
             PRS.X += TabCalcW;
         }
+    },
+
+    Refresh_RecalcData : function(Data)
+    {
+        this.Parent.Refresh_RecalcData2(0);
+    },
+
+    Save_Lines : function()
+    {
+        var Lines = new Array();
+
+        for ( var CurLine = 0; CurLine < this.LinesLength; CurLine++ )
+        {
+            Lines.push( this.Lines[CurLine].Copy() );
+        }
+
+        return { Lines : Lines, LinesLength : this.LinesLength } ;
+    },
+
+    Restore_Lines : function(SL)
+    {
+        this.Lines       = SL.Lines;
+        this.LinesLength = SL.LinesLength;
+        this.Range       = this.Lines[0].Ranges[0];
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -2444,6 +2849,19 @@ ParaRun.prototype =
         switch ( Type )
         {
         }
+    },
+
+//-----------------------------------------------------------------------------------
+// Функции для совместного редактирования
+//-----------------------------------------------------------------------------------
+    Save_Changes : function(Data, Writer)
+    {
+
+    },
+
+    Load_Changes : function(Reader)
+    {
+
     }
 
 };
@@ -2490,15 +2908,46 @@ CParaRunLine.prototype =
         {
             this.Ranges[RangeIndex] = new CParaRunRange( StartPos, EndPos );
             this.RangesLength  = RangeIndex + 1;
-            //this.Ranges.length = RangeIndex + 1;
         }
         else
         {
             this.Ranges[0].StartPos = StartPos;
             this.Ranges[0].EndPos   = EndPos;
-            //this.RangesLength  = 1;
-            this.Ranges.length = 1;
+            this.RangesLength = 1;
         }
+    },
+
+    Copy : function()
+    {
+        var NewLine = new CParaRunLine();
+
+        NewLine.RangesLength = this.RangesLength;
+
+        for ( var CurRange = 0; CurRange < this.RangesLength; CurRange++ )
+        {
+            var Range = this.Ranges[CurRange];
+            NewLine.Ranges[CurRange] = new CParaRunRange( Range.StartPos, Range.EndPos );
+        }
+
+        return NewLine;
+    },
+
+
+    Compare : function(OtherLine)
+    {
+        if ( this.RangesLength !== OtherLine.RangesLength )
+            return false;
+
+        for ( var CurRange = 0; CurRange < this.RangesLength; CurRange++ )
+        {
+            var OtherRange = OtherLine.Ranges[CurRange];
+            var ThisRange  = this.Ranges[CurRange];
+
+            if ( OtherRange.StartPos !== ThisRange.StartPos || OtherRange.EndPos !== ThisRange.EndPos )
+                return false;
+        }
+
+        return true;
     }
 
 

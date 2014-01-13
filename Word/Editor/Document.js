@@ -1089,6 +1089,27 @@ CDocument.prototype =
         // Увеличиваем номер пересчета
         this.RecalcId++;
 
+        if ( true === Debug_ParaRunMode )
+        {
+            // Проверяем можно ли сделать быстрый пересчет
+            var SimpleChanges = History.Is_SimpleChanges();
+            if ( 1 === SimpleChanges.length )
+            {
+                var Run  = SimpleChanges[0].Class;
+                var Para = Run.Paragraph;
+
+                var Res  = Para.Recalculate_Fast( SimpleChanges );
+                if ( false !== Res )
+                {
+                    // Перерисуем страницу, на которой произошли изменения
+                    this.DrawingDocument.OnRecalculatePage( 0, this.Pages[0] );
+                    this.DrawingDocument.OnEndRecalculate( false, true );
+
+                    return;
+                }
+            }
+        }
+
         // Очищаем данные пересчета
         this.RecalcInfo.Reset();
 
@@ -1096,8 +1117,6 @@ CDocument.prototype =
 
         // Получаем данные об произошедших изменениях
         var RecalcData = ( undefined === _RecalcData ? History.Get_RecalcData() : _RecalcData );
-        //var SimplePara = History.Is_SimpleChanges();
-        //SimplePara.Recalculate_Fast();
 
         // 1. Пересчитываем все автофигуры, которые нужно пересчитать. Изменения в них ни на что не влияют.
         for ( var GraphIndex = 0; GraphIndex < RecalcData.Flow.length; GraphIndex++ )
@@ -1646,9 +1665,6 @@ CDocument.prototype =
             this.Pages[PageIndex].EndPos = Count - 1;
 
             console.log("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) );
-            console.log("RangesCount: " + RunRangesCount );
-            console.log("RangesElementCount: " + RunRangesElementsCount );
-            console.log("ParaRangesCount: " + ParaRangesCount );
 
             RunRangesCount = 0;
             RunRangesElementsCount = 0;
@@ -1706,22 +1722,20 @@ CDocument.prototype =
                 return;
             }
 
-            this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
-
-//            if ( _PageIndex > this.FullRecalc.StartPage + 2 )
-//            {
-//                this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
-//                /*
-//                this.FullRecalc.Id = setTimeout( function()
-//                {
-//                    var LogicDocument = editor.WordControl.m_oLogicDocument;
-//                    var FullRecalc    = LogicDocument.FullRecalc;
-//                    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
-//                }, 10 );
-//                */
-//            }
-//            else
-//                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
+            if ( _PageIndex > this.FullRecalc.StartPage + 2 )
+            {
+                this.FullRecalc.Id = setTimeout( Document_Recalculate_Page, 20 );
+                /*
+                this.FullRecalc.Id = setTimeout( function()
+                {
+                    var LogicDocument = editor.WordControl.m_oLogicDocument;
+                    var FullRecalc    = LogicDocument.FullRecalc;
+                    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
+                }, 10 );
+                */
+            }
+            else
+                this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
 
         }
     },

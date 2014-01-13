@@ -51,6 +51,9 @@ var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем у
 var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
 var historyitem_Paragraph_Shd                       = 35; // Изменяем настройки заливки целиком
 
+var historyitem_Run_AddItem    = 1;
+var historyitem_Run_RemoveItem = 2;
+
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
 var historyitem_TextPr_Bold       =  2; // Изменяем жирность
@@ -773,11 +776,11 @@ CHistory.prototype =
                     return null;
             }
 
-            if ( Class instanceof Paragraph && Class.Is_SimpleChanges(Point.Items) )
-                return Class;
+            if ( Class instanceof ParaRun && Class.Is_SimpleChanges(Point.Items) )
+                return Point.Items;
         }
 
-        return null;
+        return [];
     },
 
     Set_Additional_ExtendDocumentToPos : function()
