@@ -247,6 +247,10 @@
 				return bRes;
 			},
 
+			isOneCell : function(){
+				return this.r1 == this.r2 && this.c1 == this.c2;
+			},
+
 			union: function (range) {
 				var s1 = this.clone(true),
 				    s2 = range instanceof Range ? range.clone(true) :
@@ -285,6 +289,23 @@
 				this.r2 += offset.offsetRow;
 				if( this.r2 < 0 )
 					this.r2 = 0;
+			},
+			
+			getName : function()
+			{
+				var sRes;
+				if(0 == this.c1 && gc_nMaxCol0 == this.c2)
+					sRes = (this.r1 + 1) + ":" + (this.r2 + 1);
+				else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
+					sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":" + g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+				else
+				{
+					if(this.isOneCell())
+						sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + (this.r1 + 1);
+					else
+						sRes = g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + (this.r1 + 1) + ":" + g_oCellAddressUtils.colnumToColstr(this.c2 + 1) + (this.r2 + 1);
+				}
+				return sRes;
 			}
 
 		};
@@ -342,7 +363,7 @@
 			var oRes = ActiveRange.superclass.intersection.apply(this, arguments);
 			if(null != oRes)
 			{
-				var oRes = new ActiveRange(oRes);
+				oRes = new ActiveRange(oRes);
 				oRes._updateAdditionalData();
 			}
 			return oRes;
@@ -403,7 +424,157 @@
 			// }
 		};
 
+		function FormulaRange(){
+			if(1 == arguments.length)
+			{
+				var range = arguments[0];
+				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+			}
+			else if(arguments.length > 1)
+				ActiveRange.superclass.constructor.apply(this, arguments);
+			else
+				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+			this.r1Abs = false;
+			this.c1Abs = false;
+			this.r2Abs = false;
+			this.c2Abs = false;
+		}
+		extendClass(FormulaRange, Range);
+		FormulaRange.prototype.clone = function(){
+			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
+			oRes.r1Abs = this.r1Abs;
+			oRes.c1Abs = this.c1Abs;
+			oRes.r2Abs = this.r2Abs;
+			oRes.c2Abs = this.c2Abs;
+			return oRes;
+		};
+		FormulaRange.prototype.intersection = function () {
+			var oRes = FormulaRange.superclass.intersection.apply(this, arguments);
+			if(null != oRes)
+				oRes = new FormulaRange(oRes);
+			return oRes;
+		};
+		FormulaRange.prototype.intersectionSimple = function () {
+			var oRes = FormulaRange.superclass.intersectionSimple.apply(this, arguments);
+			if(null != oRes)
+				oRes = new FormulaRange(oRes);
+			return oRes;
+		};
+		FormulaRange.prototype.union = function () {
+			var oRes = new FormulaRange(FormulaRange.superclass.union.apply(this, arguments));
+			return oRes;
+		};
+		FormulaRange.prototype.getName = function () {
+			var sRes = "";
+			if(0 == this.c1 && gc_nMaxCol0 == this.c2)
+			{
+				if(this.r1Abs)
+					sRes += "$";
+				sRes += (this.r1 + 1) + ":";
+				if(this.r2Abs)
+					sRes += "$";
+				sRes += (this.r2 + 1);
+			}
+			else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
+			{
+				if(this.c1Abs)
+					sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+				if(this.c2Abs)
+					sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			}
+			else
+			{
+				if(this.c1Abs)
+					sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+				if(this.r1Abs)
+					sRes += "$";
+				sRes += (this.r1 + 1);
+				if(!this.isOneCell())
+				{
+					sRes += ":";
+					if(this.c2Abs)
+						sRes += "$";
+					sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+					if(this.r2Abs)
+						sRes += "$";
+					sRes += (this.r2 + 1);
+				}
+			}
+			return sRes;
+		}
 
+		function RangeCache()
+		{
+			this.oCache = {};
+		}
+		RangeCache.prototype = {
+			getAscRange : function(sRange)
+			{
+				return this._getRange(sRange, true);
+			},
+			getFormulaRange : function(sRange)
+			{
+				return this._getRange(sRange, false);
+			},
+			_getRange : function(sRange, bAscRange)
+			{
+				var oRes = null;
+				var oCacheVal = this.oCache[sRange];
+				if(null == oCacheVal)
+				{
+					var oFirstAddr, oLastAddr;
+					var nIndex = sRange.indexOf(":");
+					if(-1 != nIndex)
+					{
+						oFirstAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(0, nIndex));
+						oLastAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(nIndex + 1));
+						if(oFirstAddr.getIsRow() && oLastAddr.getIsRow())
+						{
+							oFirstAddr.setCol(1);
+							oLastAddr.setCol(gc_nMaxCol);
+						}
+						if(oFirstAddr.getIsCol() && oLastAddr.getIsCol())
+						{
+							oFirstAddr.setRow(1);
+							oLastAddr.setRow(gc_nMaxRow);
+						}
+					}
+					else
+						oFirstAddr = oLastAddr = g_oCellAddressUtils.getCellAddress(sRange);
+					oCacheVal = {first: null, last: null, ascRange: null, formulaRange: null};
+					if(oFirstAddr.isValid() && oLastAddr.isValid())
+					{
+						oCacheVal.first = oFirstAddr;
+						oCacheVal.last = oLastAddr;
+					}
+					this.oCache[sRange] = oCacheVal;
+				}
+				if(bAscRange)
+				{
+					if(null == oCacheVal.ascRange && null != oCacheVal.first && null != oCacheVal.last)
+						oCacheVal.ascRange = new Asc.Range(oCacheVal.first.getCol0(), oCacheVal.first.getRow0(), oCacheVal.last.getCol0(), oCacheVal.last.getRow0());
+					oRes = oCacheVal.ascRange;
+				}
+				else
+				{
+					if(null == oCacheVal.formulaRange && null != oCacheVal.first && null != oCacheVal.last)
+					{
+						var oFormulaRange = new Asc.FormulaRange(oCacheVal.first.getCol0(), oCacheVal.first.getRow0(), oCacheVal.last.getCol0(), oCacheVal.last.getRow0());
+						oFormulaRange.r1Abs = oCacheVal.first.getRowAbs();
+						oFormulaRange.c1Abs = oCacheVal.first.getColAbs();
+						oFormulaRange.r2Abs = oCacheVal.last.getRowAbs();
+						oFormulaRange.c2Abs = oCacheVal.last.getColAbs();
+						oCacheVal.formulaRange = oFormulaRange;
+					}
+					oRes = oCacheVal.formulaRange;
+				}
+				return oRes;
+			}
+		}
+		var g_oRangeCache = new RangeCache();
 		/**
 		 * @constructor
 		 * @memberOf Asc
@@ -1099,6 +1270,8 @@
 
 		window["Asc"].Range = Range;
 		window["Asc"].ActiveRange = ActiveRange;
+		window["Asc"].FormulaRange = FormulaRange;
+		window["Asc"].g_oRangeCache = g_oRangeCache;
 
 		window["Asc"].HandlersList = HandlersList;
 

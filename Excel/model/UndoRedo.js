@@ -2981,10 +2981,7 @@ UndoRedoWoorksheet.prototype = {
                 var cell = ws._getCell(nRow, nCol);
                 cell.setFormula(sFormula);
                 cell.formulaParsed.setFormula(sFormula);
-                if( !arrRecalc[ws.getId()] ){
-                    arrRecalc[ws.getId()] = {};
-                }
-                arrRecalc[ws.getId()][cell.getName()] = cell.getName();
+				addToArrRecalc(ws.workbook, ws.getId(), cell.getName());
                 ws.workbook.needRecalc[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
                 if( ws.workbook.needRecalc.length < 0) ws.workbook.needRecalc.length = 0;
                 ws.workbook.needRecalc.length++;

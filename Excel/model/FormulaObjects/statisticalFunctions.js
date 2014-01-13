@@ -231,46 +231,6 @@ cFormulaFunction.Statistical = {
                 return this.value = new cError( cErrorType.wrong_value_type );
             }
 
-            function matching( x, y, oper ) {
-                var res = false, rS;
-                if ( y instanceof cString ) {
-                    rS = searchRegExp(y.toString())
-                    switch ( oper ) {
-                        case "<>":
-                            res = !rS.test( x.value );
-                            break;
-                        case "=":
-                        default:
-                            res = rS.test( x.value );
-                            break;
-                    }
-                }
-                else if ( typeof x === typeof y ) {
-                    switch ( oper ) {
-                        case "<>":
-                            res = (x.value != y.value);
-                            break;
-                        case ">":
-                            res = (x.value > y.value);
-                            break;
-                        case "<":
-                            res = (x.value < y.value);
-                            break;
-                        case ">=":
-                            res = (x.value >= y.value);
-                            break;
-                        case "<=":
-                            res = (x.value <= y.value);
-                            break;
-                        case "=":
-                        default:
-                            res = (x.value == y.value);
-                            break;
-                    }
-                }
-                return res;
-            }
-
             arg1 = arg1.toString();
             var operators = new RegExp( "^ *[<=> ]+ *" ), match = arg1.match( operators ),
                 search, oper, val;
@@ -686,46 +646,6 @@ cFormulaFunction.Statistical = {
 
             if ( !(arg1 instanceof cString) ) {
                 return this.value = new cError( cErrorType.wrong_value_type );
-            }
-
-            function matching( x, y, oper ) {
-                var res = false, rS;
-                if ( y instanceof cString ) {
-                    rS = searchRegExp(y.toString())
-                    switch ( oper ) {
-                        case "<>":
-                            res = !rS.test( x.value );
-                            break;
-                        case "=":
-                        default:
-                            res = rS.test( x.value );
-                            break;
-                    }
-                }
-                else if ( typeof x === typeof y ) {
-                    switch ( oper ) {
-                        case "<>":
-                            res = (x.value != y.value);
-                            break;
-                        case ">":
-                            res = (x.value > y.value);
-                            break;
-                        case "<":
-                            res = (x.value < y.value);
-                            break;
-                        case ">=":
-                            res = (x.value >= y.value);
-                            break;
-                        case "<=":
-                            res = (x.value <= y.value);
-                            break;
-                        case "=":
-                        default:
-                            res = (x.value == y.value);
-                            break;
-                    }
-                }
-                return res;
             }
 
             arg1 = arg1.toString();
@@ -3912,4 +3832,43 @@ cFormulaFunction.Statistical = {
         var r = new cBaseFunction( "ZTEST" );
         return r;
     }
+}
+function matching( x, y, oper ) {
+    var res = false, rS;
+    if ( y instanceof cString ) {
+        rS = searchRegExp2(x.value, y.toString())
+        switch ( oper ) {
+            case "<>":
+                res = !rS;
+                break;
+            case "=":
+            default:
+                res = rS;
+                break;
+        }
+    }
+    else if ( typeof x === typeof y ) {
+        switch ( oper ) {
+            case "<>":
+                res = (x.value != y.value);
+                break;
+            case ">":
+                res = (x.value > y.value);
+                break;
+            case "<":
+                res = (x.value < y.value);
+                break;
+            case ">=":
+                res = (x.value >= y.value);
+                break;
+            case "<=":
+                res = (x.value <= y.value);
+                break;
+            case "=":
+            default:
+                res = (x.value == y.value);
+                break;
+        }
+    }
+    return res;
 }

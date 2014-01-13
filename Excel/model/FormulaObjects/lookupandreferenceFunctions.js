@@ -458,8 +458,8 @@ cFormulaFunction.LookupAndReference = {
                 var cellName = r.getCells()[0].getName(), wsId = r.worksheet.getId();
 
                 if ( (found_operand instanceof cRef || found_operand instanceof cRef3D || found_operand instanceof cArea) && found_operand.isValid() ) {
-                    var nFrom = new Vertex( wsId, cellName.replace( /\$/g, "" ), this.wb ),
-                        nTo = new Vertex( found_operand.getWsId(), found_operand._cells.replace( /\$/g, "" ), this.wb );
+                    var nFrom = wb.dependencyFormulas.addNode( wsId, cellName ),
+                        nTo = wb.dependencyFormulas.addNode( found_operand.getWsId(), found_operand._cells );
 
                     found_operand.setNode(nTo);
 

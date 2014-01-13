@@ -500,15 +500,11 @@ function FT_Stream2(data, size)
     {
         if (this.cur + len > this.size)
             return "";
-        var t = "";
+        var a = [];
         for (var i = 0; i + 1 < len; i+=2)
-        {
-            var uni = this.data[this.cur + i];
-            uni |= this.data[this.cur + i + 1] << 8;
-            t += String.fromCharCode(uni);
-        }
+			a.push(String.fromCharCode(this.data[this.cur + i] | this.data[this.cur + i + 1] << 8));
         this.cur += len;
-        return t;
+        return a.join("");
     }
 	this.GetString = function()
     {
@@ -564,6 +560,7 @@ var gc_nMaxCol0 = gc_nMaxCol - 1;
 function CellAddressUtils(){
 	this._oCodeA = 'A'.charCodeAt();
 	this._aColnumToColstr = new Array();
+	this.oCellAddressCache = {};
 	this.colnumToColstr = function(num){
 		var sResult = this._aColnumToColstr[num];
 		if(!sResult){
@@ -592,6 +589,16 @@ function CellAddressUtils(){
 			col_num = 26 * col_num + (col_str.charCodeAt(i) - this._oCodeA + 1);
 		return col_num
 	}
+	this.getCellAddress = function(sId)
+	{
+		var oRes = this.oCellAddressCache[sId];
+		if(null == oRes)
+		{
+			oRes = new CellAddress(sId);
+			this.oCellAddressCache[sId] = oRes;
+		}
+		return oRes;
+	}
 };
 var g_oCellAddressUtils = new CellAddressUtils();
 /**
@@ -605,6 +612,10 @@ function CellAddress(){
 	this.id = null;
 	this.row = null;
 	this.col = null;
+	this.bRowAbs = false;
+	this.bColAbs = false;
+	this.bIsCol = false;
+	this.bIsRow = false;
 	this.colLetter = null;
 	if(1 == argc){
 		//Сразу пришло ID вида "A1"
@@ -649,34 +660,54 @@ CellAddress.prototype._checkCoord=function(){
 CellAddress.prototype._recalculate=function(bCoord, bId){
 	if(bCoord && this._invalidCoord){
 		this._invalidCoord = false;
+		var sId = this.id;
+		var nSymIndex = sId.indexOf("$");
+		if(-1 != nSymIndex)
+		{
+			if(0 == nSymIndex)
+			{
+				nSymIndex = sId.indexOf("$", nSymIndex + 1);
+				this.bColAbs = true;
+			}
+			if(-1 != nSymIndex)
+				this.bRowAbs = true;
+			sId = sId.replace(/\$/g,"");
+		}
 		var nIndex = 0;
-		var nIdLength = this.id.length;
-		while(this._isAlpha(this.id.charAt(nIndex)) && nIndex < nIdLength)
+		var nIdLength = sId.length;
+		while(this._isAlpha(sId.charAt(nIndex)) && nIndex < nIdLength)
 			nIndex++;
 		if(0 == nIndex){
 			//  (1,Infinity)
-			this.col = gc_nMaxCol;
+			this.bIsRow = true;
+			this.col = 1;
 			this.colLetter = g_oCellAddressUtils.colnumToColstr(this.col);
-			this.row = this.id.substring(nIndex) - 0;
-			this.id = this.colLetter + this.row;
+			this.row = sId.substring(nIndex) - 0;
+			//this.id = this.colLetter + this.row;
 		}
 		else if(nIndex == nIdLength){
 			//  (Infinity,1)
-			this.colLetter = this.id;
+			this.bIsCol = true;
+			this.colLetter = sId;
 			this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
-			this.row = gc_nMaxRow;
-			this.id = this.colLetter + this.row;
+			this.row = 1;
+			//this.id = this.colLetter + this.row;
 		}
 		else{
-			this.colLetter = this.id.substring(0, nIndex);
+			this.colLetter = sId.substring(0, nIndex);
 			this.col = g_oCellAddressUtils.colstrToColnum(this.colLetter);
-			this.row = this.id.substring(nIndex) - 0;
+			this.row = sId.substring(nIndex) - 0;
 		}
 	}
 	else if(bId && this._invalidId){
 		this._invalidId = false;
 		this.colLetter = g_oCellAddressUtils.colnumToColstr(this.col);
-		this.id = this.colLetter + this.row;
+		if(this.bIsCol)
+			this.id = this.colLetter;
+		else if(this.bIsRow)
+			this.id = this.row;
+		else
+			this.id = this.colLetter + this.row;
 	}
 };
 CellAddress.prototype.isValid=function(){
@@ -699,6 +730,14 @@ CellAddress.prototype.getRow0=function(){
 	this._recalculate(true, false);
 	return this.row - 1;
 };
+CellAddress.prototype.getRowAbs=function(){
+	this._recalculate(true, false);
+	return this.bRowAbs;
+};
+CellAddress.prototype.getIsRow=function(){
+	this._recalculate(true, false);
+	return this.bIsRow;
+};
 CellAddress.prototype.getCol=function(){
 	this._recalculate(true, false);
 	return this.col;
@@ -707,6 +746,14 @@ CellAddress.prototype.getCol0=function(){
 	//0 - based
 	this._recalculate(true, false);
 	return this.col - 1;
+};
+CellAddress.prototype.getColAbs=function(){
+	this._recalculate(true, false);
+	return this.bColAbs;
+};
+CellAddress.prototype.getIsCol=function(){
+	this._recalculate(true, false);
+	return this.bIsCol;
 };
 CellAddress.prototype.getColLetter=function(){
 	this._recalculate(false, true);

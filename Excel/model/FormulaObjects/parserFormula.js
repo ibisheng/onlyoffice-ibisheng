@@ -1550,7 +1550,7 @@ cArea.prototype.getMatrix = function () {
         if ( cell ) {
             switch ( cell.getType() ) {
                 case CellValueType.Number:
-                    arr[i - r1][j - c1] = cell.getValueWithoutFormat() == "" ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
+                    arr[i - r1][j - c1] = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
                     break;
                 case CellValueType.Bool:
                     arr[i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
@@ -1562,7 +1562,7 @@ cArea.prototype.getMatrix = function () {
                     arr[i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
                     break;
                 default:
-                    if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() != "" ) {
+                    if ( !cell.isEmptyTextString()) {
                         arr[i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
                     }
                     else
@@ -2881,23 +2881,13 @@ parserFormula.prototype = {
         }
     },
 
-    stretchArea:function ( offset, oBBox, node, wsId ) {
+    stretchArea:function ( node, sNewName ) {
+		//todo absolute
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            if ( this.outStack[i] instanceof cArea ) {
-                if ( this.outStack[i]._cells.replace( /\$/ig, "" ) == node.cellId || this.outStack[i]._cells.replace( /\$/ig, "" ) == node.newCellId ) {
-                    if ( this.outStack[i].isAbsolute ) {
-                        this._changeOffsetHelper( this.outStack[i], offset );
-                    }
-                    else {
-                        var r = this.outStack[i].getRange();
-                        r.setOffsetLast( offset );
-                        var a = r.first.getID(),
-                            b = r.last.getID();
-                        if ( a != b )
-                            this.outStack[i].value = this.outStack[i]._cells = a + ":" + b;
-                        else this.outStack[i].value = this.outStack[i]._cells = a;
-                        node.newCellId = this.outStack[i].value;
-                    }
+			var elem = this.outStack[i];
+            if ( elem instanceof cArea ) {
+                if ( elem._cells.replace( /\$/ig, "" ) == node.cellId ) {
+                    elem.value = elem._cells = sNewName;
                 }
             }
         }
@@ -3070,10 +3060,7 @@ parserFormula.prototype = {
 
     buildDependencies:function () {
 
-        var node = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb );
-
-        this.wb.dependencyFormulas.addNode2( node );
-        this.wb.dependencyFormulas.addN( this.ws.Id, this.cellId );
+        var node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId );
 
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var ref = this.outStack[i];
@@ -3091,12 +3078,11 @@ parserFormula.prototype = {
 
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-                var nFrom = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb ),
-                    nTo = new Vertex( ref.getWsId(), ref._cells.replace( /\$/g, "" ), this.wb );
+                var nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells );
 
                 ref.setNode(nTo);
 
-                this.wb.dependencyFormulas.addEdge2( nFrom, nTo );
+                this.wb.dependencyFormulas.addEdge2( node, nTo );
             }
             else if ( ref instanceof cArea3D && ref.isValid() ) {
                 var wsR = ref.wsRange();
@@ -3168,7 +3154,74 @@ function searchRegExp(str, flags){
 
     return new RegExp( vFS + "$", flags ? flags : "i" );
 }
-
+function searchRegExp2(s, mask)
+{
+	//todo протестировать
+	var bRes = true;
+	var s = s.toLowerCase();
+	var mask = mask.toLowerCase();
+	var nSIndex = 0;
+	var nMaskIndex = 0;
+	var nSLastIndex = 0;
+	var nMaskLastIndex = 0;
+	var nSLength = s.length;
+	var nMaskLength = mask.length;
+	for(; nSIndex < nSLength; nMaskIndex++, nSIndex++)
+	{
+		var cCurMask = mask[nMaskIndex];
+		if('~' == cCurMask)
+		{
+			nMaskIndex++;
+			cCurMask = mask[nMaskIndex];
+		}
+		else if('*' == cCurMask)
+			break;
+		if(cCurMask != s[nSIndex] && '?' != cCurMask)
+		{
+			bRes = false;
+			break;
+		}
+	}
+	if(bRes)
+	{
+		while(1)
+		{
+			var cCurMask = mask[nMaskIndex];
+			if(nSIndex >= nSLength)
+			{
+				while('*' == cCurMask && nMaskIndex < nMaskLength)
+				{
+					nMaskIndex++;
+					cCurMask = mask[nMaskIndex];
+				}
+				bRes = nMaskIndex >= nMaskLength;
+				break;
+			}
+			else if('*' == cCurMask)
+			{
+				nMaskIndex++;
+				if(nMaskIndex >= nMaskLength)
+				{
+					bRes = true;
+					break;
+				}
+				nSLastIndex = nSIndex + 1;
+				nMaskLastIndex = nMaskIndex;
+			}
+			else if(cCurMask != s[nSIndex] && '?' != cCurMask)
+			{
+				nMaskIndex = nMaskLastIndex;
+				nSIndex = nSLastIndex++;
+			}
+			else
+			{
+				nSIndex++;
+				nMaskIndex++;
+			}
+		}
+	}
+	return bRes;
+}
 /*
  Next code take from OpenOffice Source.
  */

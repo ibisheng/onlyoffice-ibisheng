@@ -5460,8 +5460,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
             oRow.hd = this.stream.GetBool();
         else if ( c_oSerRowTypes.Cells == type )
         {
-            if(null == oRow.Cells)
-                oRow.c = new Object();
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCells(t,l, ws, oRow.c);
                 });
@@ -5477,38 +5475,20 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         if ( c_oSerRowTypes.Cell == type )
         {
             var oNewCell = new Cell(ws);
-            var oCellVal = {val: null};
             res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCell(t,l, ws, oNewCell, oCellVal);
+                    return oThis.ReadCell(t,l, ws, oNewCell);
                 });
             if(null != oNewCell.oId)
             {
-                var nCellCol = 0;
                 //вычисляем nColsCount
-                if(null != oNewCell)
+                var nCellCol = oNewCell.oId.getCol0();
+                if(nCellCol + 1 > ws.nColsCount)
+                    ws.nColsCount = nCellCol + 1;
+                if(null != oNewCell.oValue.number && (CellValueType.String == oNewCell.oValue.type || CellValueType.Error == oNewCell.oValue.type))
                 {
-                    var nCols = oNewCell.oId.getCol();
-                    nCellCol = nCols - 1;
-                    if(nCols > ws.nColsCount)
-                        ws.nColsCount = nCols;
-                }
-                if(null != oCellVal.val)
-                {
-                    var bText = false;
-                    if(CellValueType.String == oNewCell.oValue.type || CellValueType.Error == oNewCell.oValue.type)
-                    {
-                        var ss = this.aSharedStrings[oCellVal.val];
-                        if(null != ss)
-                        {
-                            bText = true;
-							var nType = oNewCell.oValue.type;
-							oNewCell.oValue = ss.clone(oNewCell);
-							oNewCell.oValue.type = nType;
-                        }
-                    }
-                    //todo убрать to string
-                    if(false == bText)
-                        oNewCell.oValue.number = oCellVal.val;
+                    var ss = this.aSharedStrings[oNewCell.oValue.number];
+                    if(null != ss)
+						oNewCell.oValue = ss.clone(oNewCell);
                 }
                 aCells[nCellCol] = oNewCell;
             }
@@ -5517,12 +5497,12 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-    this.ReadCell = function(type, length, ws, oCell, oCellVal)
+    this.ReadCell = function(type, length, ws, oCell)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSerCellTypes.Ref == type )
-            oCell.oId = new CellAddress(this.stream.GetString2LE(length));
+            oCell.oId = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
         else if( c_oSerCellTypes.Style == type )
         {
             var nStyleIndex = this.stream.GetULongLE();
@@ -5552,9 +5532,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
                 });
         }
         else if( c_oSerCellTypes.Value == type )
-        {
-            oCellVal.val = this.stream.GetDoubleLE();
-        }
+			oCell.oValue.number = this.stream.GetDoubleLE();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;

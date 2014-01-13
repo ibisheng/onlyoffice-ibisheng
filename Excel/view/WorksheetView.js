@@ -4543,8 +4543,8 @@
 							nodeCellMetrics = { t: _t1.top, l: _t1.left, w: _t1.width, h: _t1.height, apt: _t1.top+_t1.height/2, apl: _t1.left+_t1.width/4};
 						}
 						else{
-							var _t1 = gCM(_wsV,me[id].firstCellAddress.getCol0(),me[id].firstCellAddress.getRow0()),
-							_t2 = gCM(_wsV,me[id].lastCellAddress.getCol0(),me[id].lastCellAddress.getRow0());
+							var _t1 = gCM(_wsV,me[id].getBBox().c1,me[id].getBBox().r1),
+							_t2 = gCM(_wsV,me[id].getBBox().c2,me[id].getBBox().r2);
 					
 							nodeCellMetrics = { t: _t1.top, l: _t1.left, w: _t2.left+_t2.width-_t1.left, h: _t2.top+_t2.height-_t1.top,
 												apt: _t1.top+_t1.height/2, apl:_t1.left+_t1.width/4  };
