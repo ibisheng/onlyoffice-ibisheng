@@ -1602,7 +1602,6 @@
 				
                 var aResult = new Array();
                 var range = worksheet.activeRange.clone(true);
-                var isMerge  = worksheet.model.getRange(new CellAddress(range.r1, range.c1, 0), new CellAddress(range.r2, range.c2, 0));
 				var testFragment = $.extend(true, {},node);
 				var is_chrome = AscBrowser.isChrome;
 				$(testFragment).children('br').remove();
