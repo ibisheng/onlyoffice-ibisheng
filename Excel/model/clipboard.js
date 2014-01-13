@@ -305,7 +305,7 @@
 				
 				History.TurnOn();
 				
-				if($.browser["mozilla"])
+				if(AscBrowser.isMozilla)
 					t._selectElement(t._getStylesSelect);
 				else
 					t._selectElement();
@@ -387,7 +387,7 @@
 			//****paste cells ****
 			pasteRange: function (worksheet) {
 				var t = this;
-				if($.browser["mozilla"])
+				if(AscBrowser.isMozilla)
 					t._editorPaste(worksheet,t._getStylesSelect);
 				else
 					t._editorPaste(worksheet);
@@ -462,7 +462,7 @@
 						function(node){
 							t.element.appendChild(node);
 						});
-				if($.browser["mozilla"])
+				if(AscBrowser.isMozilla)
 					t._selectElement(t._getStylesSelect);
 				else
 					t._selectElement();
@@ -552,7 +552,7 @@
 				doc.body.style.MozUserSelect = "text";
 				
 				var _interval_time = 0;
-				if($.browser["mozilla"])
+				if(AscBrowser.isMozilla)
 					_interval_time = 10;	
 				// ждем выполнения
 				window.setTimeout(
@@ -572,7 +572,7 @@
 							// for paste event
 							if(callback)
 								callback(textInsert, []);
-							if($.browser["mozilla"])
+							if(AscBrowser.isMozilla)
 								t._getStylesSelect();
 						},
 						_interval_time);
@@ -2119,7 +2119,7 @@
 				}	
 				if(t.copyText.text && AscBrowser.isOpera && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
 					return true;
-				if($.browser['msie'] && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
+				if(AscBrowser.isIE && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
 					return true;
 				if(t.copyText.text != undefined && node.text != undefined && node.text == t.copyText.text)
 				{
