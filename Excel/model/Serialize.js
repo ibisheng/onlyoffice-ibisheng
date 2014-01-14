@@ -5488,7 +5488,11 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
                 {
                     var ss = this.aSharedStrings[oNewCell.oValue.number];
                     if(null != ss)
+					{
+						var nType = oNewCell.oValue.type;
 						oNewCell.oValue = ss.clone(oNewCell);
+						oNewCell.oValue.type = nType;
+					}
                 }
                 aCells[nCellCol] = oNewCell;
             }
