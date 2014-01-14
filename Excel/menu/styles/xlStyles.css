@@ -52,7 +52,6 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 
 .toolbarImg {background-image: url("../img/MainMenu_TM.png");background-repeat: no-repeat;}
 /*.toolbarImg {background-image: url(../img/toolIcons.png);background-repeat: no-repeat;}*/
-.toolbarImg2 {background-image: url(../img/MainMenu.gif);background-repeat: no-repeat;}
 .toolbar_sep {background-position: -63px 50%;width: 2px; height: 22px; }
 .undo_act {background-position: 0px 0px; 	width: 16px; height: 16px; margin-left: 4px; margin-top: 2px;}
 .undo_pas {background-position: -203px 0px;	width: 16px; 	height: 16px; margin-left: 4px; margin-top: 2px;}
@@ -93,7 +92,6 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 .func{background-position: -1028px 50%;width: 10px;height: 16px; margin-left: 6px; margin-top: 3px;}
 .copy{background-position: -120px -44px;width: 14px;height: 15px; margin-left: 3px; margin-top: 4px;}
 .paste{background-position: -136px -44px;width: 14px;height: 14px; margin-left: 3px; margin-top: 4px;}
-.promoter{background-image: url(../img/BlackSquare.png); background-position: 0px 0px;width: 6px;height: 6px;margin-left: 1px;}
 .fmt_up{background-position: -417px 50%;width: 15px;height: 15px; margin-left: 5px; margin-top: 4px;}
 .fmt_down{background-position: -401px 50%;width: 15px;height: 15px; margin-left: 5px; margin-top: 4px;}
 .MenubarIncreaseXLS{background-position: -417px 50%;}
@@ -104,7 +102,6 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 .fmt_money{background-position: -498px 50%;width: 13px;height: 16px; margin-left: 5px; margin-top: 3px;}
 
 .brdImg {background-image: url(../img/MainMenu_TM.png);background-repeat: no-repeat;vertical-align:top;width:14px;height:14px;margin-left: 3px;margin-top: 1px;}
-.brdImg2 {background-image: url(../img/toolIcons.png);background-repeat: no-repeat;vertical-align:top;width:13px;height:13px;margin-top: 2px;}
 .brd_st0{background-position: -561px 50%;}
 .brd_st1365{background-position: -738px 50%;}
 .brd_st85{background-position: 	 -658px 50%;}
@@ -154,13 +151,10 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 #gridFooter{ left:0px; top:1000px; z-index:100;}
 #sheetContainer {margin:0;padding:0;font-family:Arial,sans-serif,sans;}
 #sheetContainer li {float:left;list-style:none outside none;}
-.sheetBar{ background: url(../img/sh_bar_bg.bmp) repeat-x top left; height:22px; vertical-align:top; font-size: 10pt; width:100%;z-index:1;}
 .sheetItem{ background-position: 0 0; height: 20px; background-repeat: repeat-x; white-space:nowrap; font-size: 10pt;cursor:pointer;-moz-user-select:none;-khtml-user-select: none;user-select: none;margin:0px 3px 0px 0;}
 .sheetHidden{visibility: hidden;width:0px;margin:0px;}
 .sheetSpacer{background-repeat: no-repeat; width:8px;min-width:8px;height:20px;}
 .shnImg { width: 15px; height: 15px; margin-top: 3px;}
-.shnAct { background: url(../img/sheetNav.png) no-repeat top left;}
-.shnPas { background: url(../img/sheetNav.png) no-repeat top left;}
 #shn-first { background-position: -119px 0;}
 #shn-last { background-position: -102px 0;}
 #shn-next { background-position: -85px 0;}
@@ -170,35 +164,16 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 #shn-next.hover{ background-position: -34px 0;cursor:pointer;}
 #shn-prev.hover{ background-position: -17px 0;cursor:pointer;}
 #shNavParent{width: 65px; min-width:65px;}
-#shNav{width: 60px; min-width:60px;background: url("../img/sh_bar_bg.bmp") repeat-x scroll left top transparent;position:relative;}
 #statusbar, #status{ width:100%;z-index:2;}
 #helper{position:absolute;top:-1000px;left:-1000px;}
-.sheetTabImageNew{background:url(../img/NewSheet.png) no-repeat scroll transparent;display:inline-block;height:13px;width:13px;margin:2px;}
 
 .iconSortASC{background-position: -242px 50%; height: 15px;margin-left: -15px;margin-right: 3px;}
 .iconSortDESC{background-position: -226px 50%;height: 15px;margin-left: -15px;margin-right: 3px;}
 #MenuCell div, #MenuRow div, #MenuColumn div{margin-left:3px;margin-right:3px;}
 
-.shspFirst.sheetSActive{background-image:url(../img/dtab_active_left.png);}
-.shspLast.sheetSActive{background-image:url(../img/dtab_active_right.png);}
-.sheetIActive{background-image:url(../img/dtab_active_mid.png);font-weight:bold;background-position: 0 -1px;background-repeat: repeat-x;}
-.shspFirst.sheetSPassive{background-position:-1px;background-image: url(../img/dtab_normal_left.png);}
-.shspLast.sheetSPassive{background-position:-1px;background-image: url(../img/dtab_normal_right.png);}
-.sheetIPassive{background-position:-1px;background-image: url(../img/dtab_normal_mid.png);background-repeat: repeat-x;}
-
-.shspFirstAndroid.sheetSActiveAndroid{background-image:url(../img/dtab_active_left_flip.png) !important;}
-.shspLastAndroid.sheetSActiveAndroid{background-image:url(../img/dtab_active_right_flip.png) !important;}
-.sheetIActiveAndroid{background-image:url(../img/dtab_active_mid_flip.png) !important;background-position: 0 -1px;background-repeat: repeat-x;}
-.shspFirstAndroid.sheetSPassiveAndroid{background-position:-1px;background-image: url(../img/dtab_normal_left_flip.png) !important;}
-.shspLastAndroid.sheetSPassiveAndroid{background-position:-1px;background-image: url(../img/dtab_normal_right_flip.png) !important;}
-.sheetIPassiveAndroid{background-position:-1px;background-image: url(../img/dtab_normal_mid_flip.png) !important;background-repeat: repeat-x;}
-
 .shspFirst{padding-left: 2px;}
 .shspLast{padding-right: 2px;}
-#newSheet .shspFirst.sheetSPassive{background-image: url(../img/dtab_green_left.png);}
-#newSheet .shspLast.sheetSPassive{background-image: url(../img/dtab_green_right.png);}
-#newSheet .sheetIPassive{background-image: url(../img/dtab_green_mid.png);background-repeat: repeat-x;}
-#fontSelect, #fontSizeSelect, #cellStyleSelect{-moz-border-radius: 0px;-webkit-border-radius: 0px;-pie-border-radius: 0px;behavior: url(../js/PIE.htc);height:21px;background-color:#fff;}
+#fontSelect, #fontSizeSelect, #cellStyleSelect{-moz-border-radius: 0px;-webkit-border-radius: 0px;height:21px;background-color:#fff;}
 #addHyperlink_url {width:427px;}
 #dialogAddHyperlink select{width:137px;}
 #addHyperlink_text{width: 280px;}
@@ -253,15 +228,6 @@ li.SubItem.hover {background-color: #4B963E;color: #FFFFFF;}
 }
 .hoverbuttonSpanClick{
 	background: url("../img/spreadsheet/fl_butt.png") no-repeat scroll right -140px transparent;
-}
-.filterObject, .filterTableObject{
-	background: url("../img/autoFilter.png") no-repeat transparent;
-	width: 12px;
-	height: 12px;
-	z-index: 1;
-	position: fixed;
-	cursor: pointer;
-	background-position: 0px 0px;
 }
 .filterObjectHover, .filterTableObjectHover{
 	background-position: -12px 0px;
@@ -413,21 +379,6 @@ li.SubItem.hover {background-color: #4B963E;color: #FFFFFF;}
 .chartRange {border: 1px solid #0000FF;position: fixed; overflow:hidden; vertical-align:bottom; padding:0px;}
 
 .clear {clear:both;}
-#dialogAddChartContainer {min-width: 650px; max-width: 650px;}
-#leftChartPanel {float:left; position:relative; width:30%;left:0px;background-color:#EEF0F2;padding-top:15px;text-align:right;min-height:265px;}
-#leftChartPanel ul, #MenuTypeChart ul {list-style: none;padding: 0;margin: 0 6px 0 7px;}
-#leftChartPanel li, #MenuTypeChart li {padding: 1px 10px 2px 0;margin-top:3px;}
-#MenuSubTypeChart ul {list-style: none;padding: 0;margin: 5px 0 0 0;}
-#MenuTypeChart li {padding-left: 12px;}
-#MenuSubTypeChart li {padding-left: 4px; padding-right: 4px; font-size: 11pt; display:inline;border: 1px solid #FFF;-moz-border-radius: 4px !important;-webkit-border-radius: 4px !important;}
-#leftChartPanel li:hover {background: url(/img/arrow_no_select_end.png) no-repeat right #BDBFBF;cursor:pointer;}
-#MenuTypeChart li:hover {background: url(/img/arrow_no_select_end_2.png) no-repeat right #BDBFBF;cursor:pointer;}
-#MenuSubTypeChart li:hover {border-color: #BFBFBF;cursor:pointer;}
-#leftChartPanel li.selected {background: url(/img/arrow_select_end.png) no-repeat right #51A043;cursor:default;}
-#MenuTypeChart li.selected {background: url(/img/arrow_select_end_2.png) no-repeat right #51A043;cursor:default;}
-#MenuSubTypeChart li.selected {background: #EEF1F3;cursor:default;border-color: #BFBFBF;}
-#centerChartPanel {margin-left:30%;position:relative; display:block;height:1%;background-color:#FAFAFA;min-height: 280px;border-left:1px solid #D2D3D4;}
-#dialogAddChart{padding: 0px;}
 .chartPanelInner{width: 300px; height: 280px; border-left: 1px solid #CCC;margin-right: 1px;background-color:#FFF;}
 .legend, .chart_elems, .chart_data {margin-left:20px;}
 .legend ul, .chart_data ul {list-style: none;margin-top: 5px;margin-left: 15px;padding: 0;}
