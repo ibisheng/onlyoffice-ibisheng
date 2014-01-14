@@ -627,14 +627,16 @@
 			var cell, cellType, isNumberFormat;
 			var result = null;
 			if (this._rangeIsSingleCell(this.activeRange)) {
-					// Для одной ячейки не стоит ничего делать
-					return result;
-				}
+				// Для одной ячейки не стоит ничего делать
+				return result;
+			}
 			var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
 			if (mergedRange && mergedRange.isEqual(this.activeRange)) {
-					// Для одной ячейки не стоит ничего делать
-					return result;
-				}
+				// Для одной ячейки не стоит ничего делать
+				return result;
+			}
+
+			function cmpNum(a, b) {return a - b;}
 
 			for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
 					for (var r = this.activeRange.r1; r <= this.activeRange.r2; ++r) {
@@ -656,13 +658,12 @@
 					}
 				}
 			if (null !== result) {
-					function cmpNum(a, b) {return a - b;}
-					// Делаем массивы уникальными и сортируем
-					$.unique(result.arrCols);
-					$.unique(result.arrRows);
-					result.arrCols = result.arrCols.sort(cmpNum);
-					result.arrRows = result.arrRows.sort(cmpNum);
-				}
+				// Делаем массивы уникальными и сортируем
+				$.unique(result.arrCols);
+				$.unique(result.arrRows);
+				result.arrCols = result.arrCols.sort(cmpNum);
+				result.arrRows = result.arrRows.sort(cmpNum);
+			}
 			return result;
 		};
 
@@ -2616,43 +2617,66 @@
 
 			// ToDo в одну функцию
 			function drawBorderHor(border, x1, y, x2) {
-					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
-						if (bc !== border.c) {
-							bc = border.c;
-							ctx.setStrokeStyle(bc);
-						}
-						ctx.setLineWidth(border.w)
-							.beginPath()
-							.lineHor(x1, y, x2)
-							.stroke();
+				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+					if (bc !== border.c) {
+						bc = border.c;
+						ctx.setStrokeStyle(bc);
 					}
+					ctx.setLineWidth(border.w)
+						.beginPath()
+						.lineHor(x1, y, x2)
+						.stroke();
 				}
+			}
 
 			function drawBorderVer(border, x1, y1, y2) {
-					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
-						if (bc !== border.c) {
-							bc = border.c;
-							ctx.setStrokeStyle(bc);
-						}
-						ctx.setLineWidth(border.w)
-							.beginPath()
-							.lineVer(x1, y1, y2)
-							.stroke();
+				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+					if (bc !== border.c) {
+						bc = border.c;
+						ctx.setStrokeStyle(bc);
 					}
+					ctx.setLineWidth(border.w)
+						.beginPath()
+						.lineVer(x1, y1, y2)
+						.stroke();
 				}
+			}
 
 			function drawDiagonal(border, x1, y1, x2, y2) {
-					if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
-						if (bc !== border.c) {
-							bc = border.c;
-							ctx.setStrokeStyle(bc);
-						}
-						ctx.setLineWidth(border.w)
-							.beginPath()
-							.lineDiag(x1, y1, x2, y2)
-							.stroke();
+				if (border.s !== c_oAscBorderStyles.None && !border.isErased) {
+					if (bc !== border.c) {
+						bc = border.c;
+						ctx.setStrokeStyle(bc);
 					}
+					ctx.setLineWidth(border.w)
+						.beginPath()
+						.lineDiag(x1, y1, x2, y2)
+						.stroke();
 				}
+			}
+
+			function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
+				if (bor.w < 1 || bor.isErased) {return;}
+
+				// ToDo переделать рассчет
+				var tbw = t._calcMaxBorderWidth(tb1, tb2); // top border width
+				var bbw = t._calcMaxBorderWidth(bb1, bb2); // bottom border width
+				var dy1 = tbw > bor.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
+				var dy2 = bbw > bor.w ? -2 : (bbw > 2 ? 1 : 0);
+
+				drawBorderVer(bor, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
+			}
+
+			function drawHorizontalBorder(bor, lb, lbOther, rb, rbOther, x1, y, x2) {
+				if (bor.w > 0) {
+					// ToDo переделать рассчет
+					var lbw = t._calcMaxBorderWidth(lb, lbOther);
+					var rbw = t._calcMaxBorderWidth(rb, rbOther);
+					var dx1 = bor.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
+					var dx2 = bor.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
+					drawBorderHor(bor, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
+				}
+			}
 
 			// set clipping rect to cells area
 			if (!drawingCtx) {
@@ -2748,29 +2772,6 @@
 							//ctx.restore();
 							// canvas context has just been restored, so destroy border color cache
 							//bc = undefined;
-						}
-
-						function drawVerticalBorder(bor, tb1, tb2, bb1, bb2, x, y1, y2) {
-							if (bor.w < 1 || bor.isErased) {return;}
-
-							// ToDo переделать рассчет
-							var tbw = t._calcMaxBorderWidth(tb1, tb2); // top border width
-							var bbw = t._calcMaxBorderWidth(bb1, bb2); // bottom border width
-							var dy1 = tbw > bor.w ? tbw - 1 : (tbw > 1 ? -1 : 0);
-							var dy2 = bbw > bor.w ? -2 : (bbw > 2 ? 1 : 0);
-
-							drawBorderVer(bor, x, y1 + (-1 + dy1) * t.height_1px, y2 + (1 + dy2) * t.height_1px);
-						}
-
-						function drawHorizontalBorder(bor, lb, lbOther, rb, rbOther, x1, y, x2) {
-							if (bor.w > 0) {
-								// ToDo переделать рассчет
-								var lbw = this._calcMaxBorderWidth(lb, lbOther);
-								var rbw = this._calcMaxBorderWidth(rb, rbOther);
-								var dx1 = bor.w > lbw ? (lbw > 1 ? -1 : 0) : (lbw > 2 ? 2 : 1);
-								var dx2 = bor.w > rbw ? (rbw > 2 ? 1 : 0) : (rbw > 1 ? -2 : -1);
-								drawBorderHor(bor, x1 + (-1 + dx1) * t.width_1px, y, x2 + (1 + dx2) * t.width_1px);
-							}
 						}
 
 						if (isFirstCol) {
@@ -7822,10 +7823,6 @@
 												arrFormula[numFor].range = range;
 												arrFormula[numFor].val = "=" + assemb;
 												numFor++;
-												delete _p_;
-											}
-											else{
-												delete _p_;
 											}
 										}
 										else
@@ -8071,7 +8068,7 @@
 								var newVal = values[r - arn.r1][c - arn.c1];
 								if(undefined !== newVal)
 								{
-									var isMerged = false;
+									var isMerged = false, mergeCheck;
 									var range = t.model.getRange3(r + autoR*plRow, c + autoC*plCol, r + autoR*plRow, c + autoC*plCol);
 									if(!isOneMerge)
 									{
@@ -8149,10 +8146,6 @@
 												arrFormula[numFor].range = range;
 												arrFormula[numFor].val = "=" + assemb;
 												numFor++;
-												delete _p_;
-											}
-											else{
-												delete _p_;
 											}
 										}
 										else if(newVal.valWithoutFormat)
@@ -8377,7 +8370,7 @@
 								
 								if(undefined !== newVal)
 								{
-									var isMerged = false;
+									var isMerged = false, mergeCheck;
 									var range = t.model.getRange3(r + autoR*plRow, c + autoC*plCol, r + autoR*plRow, c + autoC*plCol);
 									//****paste comments****
 									if(val.aComments && val.aComments.length)
@@ -8478,10 +8471,6 @@
 												arrFormula[numFor].range = range;
 												arrFormula[numFor].val = "=" + assemb;
 												numFor++;
-												delete _p_;
-											}
-											else{
-												delete _p_;
 											}
 										}
 										else if(cellValueWithoutFormat)

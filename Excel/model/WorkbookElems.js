@@ -1,4 +1,5 @@
-﻿var g_nNumsMaxId = 160;
+﻿var g_oColorManager = null;
+var g_nNumsMaxId = 160;
 var g_oDefaultXfId = null;
 var g_oDefaultFont = null;
 var g_oDefaultFill = null;

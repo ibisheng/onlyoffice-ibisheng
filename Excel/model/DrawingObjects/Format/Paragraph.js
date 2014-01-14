@@ -9598,7 +9598,7 @@ Paragraph.prototype =
             this.FontMap.NeedRecalc = false;
         }
 
-        for ( Key in this.FontMap.Map )
+        for ( var Key in this.FontMap.Map )
         {
             FontMap[Key] = this.FontMap.Map[Key];
         }

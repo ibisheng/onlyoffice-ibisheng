@@ -918,7 +918,7 @@ var DocumentPageSize = new function() {
     ];
     this.getSizeByWH = function(widthMm, heightMm)
     {
-        for( index in this.oSizes)
+        for( var index in this.oSizes)
         {
             var item = this.oSizes[index];
             if(widthMm == item.w_mm && heightMm == item.h_mm)
@@ -928,7 +928,7 @@ var DocumentPageSize = new function() {
     };
 	this.getSizeById = function(id)
     {
-        for( index in this.oSizes)
+        for( var index in this.oSizes)
         {
             var item = this.oSizes[index];
             if(id == item.id)
@@ -6107,6 +6107,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 	{
 		var numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
 		var minutesOffset = 0;
+		var struct;
 		if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(sDate))) {
             // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
             for (var i = 0, k; (k = numericKeys[i]); ++i) {
@@ -6127,7 +6128,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 
             return new Date(Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]));
         }
-		return null
+		return null;
 	};
 	this.ReadReplies = function(type, length, oCommentData)
     {

@@ -1,4 +1,3 @@
-
 function CClipManager()
 {
     this.clipRects = [];

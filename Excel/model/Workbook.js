@@ -1610,7 +1610,6 @@ Workbook.prototype.getDefinesNames = function(name, sheetId){
 	return false;
 }
 Workbook.prototype.buildDependency = function(){
-	dep = null;
 	this.dependencyFormulas.clear();
 	this.dependencyFormulas = null;
 	this.dependencyFormulas = new DependencyGraph(this);

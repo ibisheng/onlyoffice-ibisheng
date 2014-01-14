@@ -1,11 +1,6 @@
-﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {type:'common'};
+﻿    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {type:'common'};
 
     OfficeExcel.background     = {};
-
-    HALFPI = (Math.PI / 2);
-    PI     = Math.PI;
-    TWOPI  = PI * 2;
-        
     /**
     * Returns five values which are used as a nice scale
     * 
@@ -426,7 +421,7 @@
                 //поиск шага
                 if(undefined != greaterNull)
                 {
-                     var greaterNullTemp = greaterNull.toString().split('.');
+                     var greaterNullTemp = greaterNull.toString().split('.'), greaterNullNum;
                     if(0 != greaterNullTemp[0])
                         greaterNullNum = Math.pow(10, greaterNullTemp[0].toString().length - 1)
                     if(0 == greaterNullTemp[0])
@@ -1319,7 +1314,7 @@
 			context.setFont(ascFont);
 		 
 			var width;
-			var textSize;
+			var textSize, size1;
 			if(typeof text != 'string')
 				text = text.toString();
 			if(text != "")

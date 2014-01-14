@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.Line = function (chartCanvas, data)
     {
@@ -1132,8 +1132,6 @@
         var context    = this.context;
         var size       = this._otherProps._labels_above_size;
         var font       = this._otherProps._labels_above_font;
-        var units_pre  = this._otherProps._units_pre;
-        var units_post = this._otherProps._units_post;
 		var bold 	   = this._otherProps._labels_above_bold;
 		var textOptions =
 		{
@@ -1144,7 +1142,7 @@
         context.beginPath();
 		var formatLabels = []; 
         var tempData = [];
-        n = 0;
+        var n = 0;
         for (var i = 0; i < this.firstData.length; ++i) {
              for (var j = 0; j < this.firstData[i].length; ++j) {
 				if(this.catNameLabels && this.catNameLabels[i] && this.catNameLabels[i][j])

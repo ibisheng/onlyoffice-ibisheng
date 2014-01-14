@@ -372,7 +372,7 @@
 			var oRes = ActiveRange.superclass.intersectionSimple.apply(this, arguments);
 			if(null != oRes)
 			{
-				var oRes = new ActiveRange(oRes);
+				oRes = new ActiveRange(oRes);
 				oRes._updateAdditionalData();
 			}
 			return oRes;
@@ -461,8 +461,7 @@
 			return oRes;
 		};
 		FormulaRange.prototype.union = function () {
-			var oRes = new FormulaRange(FormulaRange.superclass.union.apply(this, arguments));
-			return oRes;
+			return new FormulaRange(FormulaRange.superclass.union.apply(this, arguments));
 		};
 		FormulaRange.prototype.getName = function () {
 			var sRes = "";
@@ -504,7 +503,7 @@
 				}
 			}
 			return sRes;
-		}
+		};
 
 		function RangeCache()
 		{
@@ -573,7 +572,7 @@
 				}
 				return oRes;
 			}
-		}
+		};
 		var g_oRangeCache = new RangeCache();
 		/**
 		 * @constructor
@@ -737,6 +736,7 @@
 		//-----------------------------------------------------------------
 		// События движения мыши
 		//-----------------------------------------------------------------
+		/** @constructor */
 		function asc_CMouseMoveData (obj) {
 			if ( !(this instanceof asc_CMouseMoveData) ) {
 				return new asc_CMouseMoveData(obj);
@@ -922,6 +922,7 @@
 
 			return this;
 		}
+		/** @constructor */
 		function asc_CAdjustPrint () {
 			if ( !(this instanceof asc_CAdjustPrint) ) {
 				return new asc_CAdjustPrint();
@@ -941,6 +942,7 @@
 			asc_setLayoutPageType: function (val) { this.layoutPageType = val; }
 		};
 
+		/** @constructor */
 		function asc_CLockInfo () {
 			if (!(this instanceof  asc_CLockInfo)) {
 				return new asc_CLockInfo();
@@ -952,6 +954,7 @@
 			this["rangeOrObjectId"] = null;
 		}
 
+		/** @constructor */
 		function asc_CCollaborativeRange (c1, r1, c2, r2) {
 			if (!(this instanceof asc_CCollaborativeRange)) {
 				return new asc_CCollaborativeRange(c1, r1, c2, r2);

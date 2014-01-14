@@ -278,9 +278,10 @@
                 var result;
 				var isInsertButton = true;
 				var startCell;
-				var endCell; 
+				var endCell;
 				var rangeFilter;
 				var splitRange;
+				var addNameColumn, ref;
 				if(!addFormatTableOptionsObj)
 					addNameColumn = true;
 				else if(typeof addFormatTableOptionsObj == 'object')
@@ -3472,7 +3473,7 @@
 									isInsert = false;
 									if(leng)
 									{
-										for(aF = 0; aF < this.allButtonAF.length; aF++)
+										for(var aF = 0; aF < this.allButtonAF.length; aF++)
 										{
 											//проверка на то, что эти кнопки уже имеются
 											if(this.allButtonAF[aF].id == arr.result[i].id)
@@ -6032,6 +6033,7 @@
 					var isEndWith = false;
 					var endBlockEqual = false;
 					var endSpecSymbol;
+					var isConsistBlock;
 					result = false;
 					if(type == 1)
 					{

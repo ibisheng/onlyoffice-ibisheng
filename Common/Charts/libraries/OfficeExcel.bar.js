@@ -1,4 +1,4 @@
-﻿    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+﻿    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.Bar = function (chartCanvas, data)
     {
@@ -621,7 +621,7 @@
             var barWidth = (OfficeExcel.GetWidth(this) - this._chartGutter._right - this._chartGutter._left) / labels.length;
             
             // Reset the xTickGap
-            xTickGap = (OfficeExcel.GetWidth(this) - this._chartGutter._right - this._chartGutter._left) / labels.length
+            var xTickGap = (OfficeExcel.GetWidth(this) - this._chartGutter._right - this._chartGutter._left) / labels.length
 
             // Draw the X tickmarks
             var i=0;

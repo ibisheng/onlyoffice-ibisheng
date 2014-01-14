@@ -1277,7 +1277,7 @@
 
 				var arn = ws.activeRange.clone(true);
 
-				function openEditor(res) {
+				var openEditor = function (res) {
 					if (res) {
 						// Выставляем переменные, что мы редактируем
 						t.controller.setCellEditMode(true);
@@ -1299,7 +1299,7 @@
 						ws.setCellEditMode(false);
 						ws.setFormulaEditMode(false);
 					}
-				}
+				};
 
 				var activeCellRange = ws.getActiveCell(0, 0, /*isCoord*/false);
 

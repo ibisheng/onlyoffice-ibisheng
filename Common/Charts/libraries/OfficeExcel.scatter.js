@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.Scatter = function (chartCanvas, data)
     {

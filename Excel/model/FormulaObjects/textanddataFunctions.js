@@ -293,7 +293,7 @@ cFormulaFunction.TextAndData = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             var res = roundHelper( a.getValue(), b.getValue() );
                             this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -307,7 +307,7 @@ cFormulaFunction.TextAndData = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+					var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         var res = roundHelper( a.getValue(), b.getValue() );
                         this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -320,7 +320,7 @@ cFormulaFunction.TextAndData = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+					var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         var res = roundHelper( a.getValue(), b.getValue() );
                         this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -594,7 +594,7 @@ cFormulaFunction.TextAndData = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+						var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             var res = roundHelper( a.getValue(), b.getValue() );
                             this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -608,7 +608,7 @@ cFormulaFunction.TextAndData = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+					var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         var res = roundHelper( a.getValue(), b.getValue() );
                         this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -621,7 +621,7 @@ cFormulaFunction.TextAndData = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+					var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         var res = roundHelper( a.getValue(), b.getValue() );
                         this.array[r][c] = toFix( res.toString(), arg2.toBool() );
@@ -1144,7 +1144,7 @@ cFormulaFunction.TextAndData = {
                 return this.value = arg2;
 
 
-            res = string2.substring( arg2.getValue() - 1 ).search( valueForSearching ) + arg2.getValue() - 1;
+			var res = string2.substring( arg2.getValue() - 1 ).search( valueForSearching ) + arg2.getValue() - 1;
 
             if ( res < 0 )
                 return this.value = new cError( cErrorType.wrong_value_type );

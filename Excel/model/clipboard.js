@@ -1,5 +1,4 @@
-﻿
-(	/**
+﻿(	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -126,25 +125,23 @@
 			 _utf8_decode : function (utftext) {
 			  var string = "";
 			  var i = 0;
-			  var c = c1 = c2 = 0;
+			  var c1, c2, c3;
 			 
 			  while ( i < utftext.length ) {
 			 
-			   c = utftext.charCodeAt(i);
+			   c1 = utftext.charCodeAt(i);
 			 
-			   if (c < 128) {
-				string += String.fromCharCode(c);
+			   if (c1 < 128) {
+				string += String.fromCharCode(c1);
 				i++;
-			   }
-			   else if((c > 191) && (c < 224)) {
+			   } else if((c1 > 191) && (c1 < 224)) {
 				c2 = utftext.charCodeAt(i+1);
-				string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+				string += String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
 				i += 2;
-			   }
-			   else {
+			   } else {
 				c2 = utftext.charCodeAt(i+1);
 				c3 = utftext.charCodeAt(i+2);
-				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+				string += String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
 				i += 3;
 			   }
 			 
@@ -1483,7 +1480,7 @@
 							classNode = node.children[0].children[0].children[0].getAttribute("class");
 						
 						if( classNode != null ){
-							cL = classNode.split(" ");
+							var cL = classNode.split(" ");
 							for (var i = 0; i < cL.length; i++){
 								if(cL[i].indexOf("xslData;") > -1)
 								{
@@ -3129,6 +3126,7 @@
 				var widthCell = cellTable.width;
 				var heigthCell = cellTable.height;
 				var defaultStyle = "solid";
+				var borderStyleName;
 				
 				var formatBorders = oldBorders ? oldBorders : new Border();
 				//top border for cell

@@ -1,4 +1,3 @@
-
 var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
 
@@ -143,7 +142,7 @@ function DrawingObjectsController(drawingObjects)
     this.arrTrackObjects = [];
     this.defaultColorMap = GenerateDefaultColorMap().color_map;
 	
-	var ascSelectedObjects = [];
+	this.ascSelectedObjects = [];
     this.contentChanges = new  CContentChanges();
 }
 
@@ -1317,7 +1316,7 @@ DrawingObjectsController.prototype =
 			var _this = this;
 			this.drawingObjects.objectLocker.reset();
 			
-			function callbackUngroupedObjects(result) {
+			var callbackUngroupedObjects = function (result) {
 				if ( result ) {
 					for (var j = 0; j < ungrouped_sp_tree.length; ++j) {
 						ungrouped_sp_tree[j].recalculateTransform();
@@ -1327,7 +1326,7 @@ DrawingObjectsController.prototype =
 
 					}
 				}
-			}
+			};
 			
             for(var j = 0; j < ungrouped_sp_tree.length; ++j)
             {
@@ -1668,7 +1667,7 @@ DrawingObjectsController.prototype =
 	{
 		var api = window["Asc"]["editor"];
 		var shape_props, image_props, chart_props;
-		ascSelectedObjects = [];
+		this.ascSelectedObjects = [];
 
 		// Основные свойства объекта
         if(isRealObject(this.curState.group))
@@ -1936,7 +1935,7 @@ DrawingObjectsController.prototype =
 				api.chartPreviewManager.init();
 				this.drawingObjects.callTrigger("asc_onUpdateChartStyles");
 			}
-			ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+			this.ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
 		}
 		
 		// Текстовые свойства объекта
@@ -1946,7 +1945,7 @@ DrawingObjectsController.prototype =
 			this.prepareParagraphProperties(ParaPr, TextPr);
 		}
 		
-        return ascSelectedObjects;
+        return this.ascSelectedObjects;
     },
 	
 	prepareParagraphProperties: function(ParaPr, TextPr)
@@ -1995,8 +1994,8 @@ DrawingObjectsController.prototype =
 		
 		// ParaPr.Jc
 		trigger("asc_onPrAlign", ParaPr.Jc);
-		
-		ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+
+		this.ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
 	},
 
     Get_SelectedText: function()
@@ -3437,7 +3436,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
         var _image =  asc["editor"].ImageLoader.LoadImage(imageUrl, 1);
         var isOption = options && options.cell;
 
-        function calculateObjectMetrics(object, width, height) {
+        var calculateObjectMetrics = function (object, width, height) {
             // Обработка картинок большого разрешения
             var metricCoeff = 1;
 
@@ -3468,9 +3467,9 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
             object.to.rowOff = cellTo.rowOff;
 
             worksheet.handlers.trigger("reinitializeScroll");
-        }
+        };
 
-        function addImageObject(_image) {
+        var addImageObject = function (_image) {
 
             if ( !_image.Image ) {
                 worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
@@ -3505,7 +3504,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
                 //drawingObject.graphicObject.addToDrawingObjects();
                 return drawingObject;
             }
-        }
+        };
         if (null != _image)
         {
             return addImageObject(_image);

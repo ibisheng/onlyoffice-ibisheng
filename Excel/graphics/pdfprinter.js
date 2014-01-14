@@ -370,10 +370,6 @@ CPdfPrinter.prototype =
         return this;
     },
 
-    clip : function()
-    {
-        return this;
-    },
     drawImage : function(_src, sx, sy, sw, sh, dx, dy, dw, dh, src_w, src_h)
     {
         if (this.bIsSimpleCommands)

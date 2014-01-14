@@ -875,7 +875,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = floorHelper( a.getValue(), b.getValue() )
                         }
@@ -888,7 +888,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+                    var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = floorHelper( a.getValue(), b.getValue() )
                     }
@@ -900,7 +900,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+                    var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = floorHelper( a.getValue(), b.getValue() )
                     }
@@ -1214,7 +1214,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = new cNumber( Math.log( a.getValue() ) / Math.log( b.getValue() ) );
                         }
@@ -1609,7 +1609,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = new cNumber( (b.getValue() < 0 ? -1 : 1) * ( Math.abs( a.getValue() ) % Math.abs( b.getValue() ) ) );
                         }
@@ -2304,7 +2304,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = roman( a.getValue(), b.getValue() );
                         }
@@ -2439,7 +2439,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = roundHelper( a.getValue(), b.getValue() )
                         }
@@ -2452,7 +2452,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+                    var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = roundHelper( a.getValue(), b.getValue() )
                     }
@@ -2464,7 +2464,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+                    var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = roundHelper( a.getValue(), b.getValue() )
                     }
@@ -2550,7 +2550,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = rounddownHelper( a.getValue(), b.getValue() )
                         }
@@ -2563,7 +2563,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+                    var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = rounddownHelper( a.getValue(), b.getValue() )
                     }
@@ -2575,7 +2575,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+					var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = rounddownHelper( a.getValue(), b.getValue() )
                     }
@@ -2660,7 +2660,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+						var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = roundupHelper( a.getValue(), b.getValue() )
                         }
@@ -2673,7 +2673,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+					var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = roundupHelper( a.getValue(), b.getValue() )
                     }
@@ -2685,7 +2685,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+					var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = roundupHelper( a.getValue(), b.getValue() )
                     }
@@ -3596,7 +3596,7 @@ cFormulaFunction.Mathematic = {
                 else {
                     arg0.foreach( function ( elem, r, c ) {
                         var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+						var b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
                             this.array[r][c] = truncHelper( a.getValue(), b.getValue() )
                         }
@@ -3609,7 +3609,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg0 instanceof cArray ) {
                 arg0.foreach( function ( elem, r, c ) {
                     var a = elem;
-                    b = arg1;
+					var b = arg1;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = truncHelper( a.getValue(), b.getValue() )
                     }
@@ -3621,7 +3621,7 @@ cFormulaFunction.Mathematic = {
             else if ( arg1 instanceof cArray ) {
                 arg1.foreach( function ( elem, r, c ) {
                     var a = arg0;
-                    b = elem;
+					var b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
                         this.array[r][c] = truncHelper( a.getValue(), b.getValue() )
                     }

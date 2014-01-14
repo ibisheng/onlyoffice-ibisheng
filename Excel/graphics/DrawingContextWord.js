@@ -2,7 +2,8 @@
 var g_fontManagerExcel = new CFontManager();
 g_fontManagerExcel.Initialize(true);
 
-var oldPpi = undefined;
+var oldPpi = undefined,
+	cvt = undefined;
 
 var asc_round = function round(x) {
 	var y = x + (x >= 0 ? .5 : -.4);

@@ -1932,7 +1932,7 @@ cFormulaFunction.Statistical = {
         r.setArgumentsMin( 1 );
         r.setArgumentsMax( 255 );
         r.Calculate = function ( arg ) {
-            var argI, max = Number.NEGATIVE_INFINITY;
+            var argI, argIVal, max = Number.NEGATIVE_INFINITY;
             for ( var i = 0; i < this.argumentsCurrent; i++ ) {
                 argI = arg[i], argIVal = argI.getValue();
                 if ( argI instanceof cRef || argI instanceof cRef3D ) {
@@ -2152,7 +2152,7 @@ cFormulaFunction.Statistical = {
         r.setArgumentsMin( 1 );
         r.setArgumentsMax( 255 );
         r.Calculate = function ( arg ) {
-            var argI, min = Number.POSITIVE_INFINITY;
+            var argI, argIVal, min = Number.POSITIVE_INFINITY;
             for ( var i = 0; i < this.argumentsCurrent; i++ ) {
                 argI = arg[i], argIVal = argI.getValue();
                 if ( argI instanceof cRef || argI instanceof cRef3D ) {

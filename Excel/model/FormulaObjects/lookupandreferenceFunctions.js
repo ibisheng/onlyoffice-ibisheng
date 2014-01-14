@@ -582,7 +582,7 @@ cFormulaFunction.LookupAndReference = {
                     arg2Range = arg2.getMatrix();
                 }
 
-                index = _func.binarySearch( arg0, function(){
+                var index = _func.binarySearch( arg0, function(){
                     var a = []
                     for(var i=0;i<arg1Range.length;i++){
                         a.push(arg1Range[i][0])

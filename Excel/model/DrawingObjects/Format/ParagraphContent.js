@@ -6484,15 +6484,6 @@ ParaHyperlinkStart.prototype =
         return true;
     },
 
-    Copy : function()
-    {
-        var Hyper = new ParaHyperlinkStart();
-        Hyper.Value   = this.Value;
-        Hyper.Visited = this.Visited;
-        Hyper.ToolTip = this.ToolTip;
-        return Hyper;
-    },
-
     Set_Visited : function(Value)
     {
         this.Visited = Value;

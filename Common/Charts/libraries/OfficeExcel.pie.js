@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.Pie = function (chartCanvas, data)
     {
@@ -208,7 +208,7 @@
         var labels     = this._otherProps._labels;
         var context    = this.context;
 		var bold 	   = this._otherProps._labels_above_bold;
-		var curLabel;
+		var curLabel, isFormatCellTrue;
 		var textOptions =
 		{
 			color: this._otherProps._labels_above_color,

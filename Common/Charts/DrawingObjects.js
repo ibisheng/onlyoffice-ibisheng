@@ -1,5 +1,4 @@
-﻿
-/* DrawingObjects.js
+﻿/* DrawingObjects.js
 *
 * Author: Dmitry Vikulov
 * Date:   13/08/2012
@@ -81,7 +80,7 @@ asc_CChartStyle.prototype = {
 //{ asc_CChartStyle export
 window["Asc"].asc_CChartStyle = asc_CChartStyle;
 window["Asc"]["asc_CChartStyle"] = asc_CChartStyle;
-prot = asc_CChartStyle.prototype;
+var prot = asc_CChartStyle.prototype;
 
 prot["asc_getStyle"] = prot.asc_getStyle;
 prot["asc_setStyle"] = prot.asc_setStyle;
@@ -2587,6 +2586,8 @@ function DrawingObjects() {
 	var scrollOffset = new ScrollOffset();
 	
 	var aObjects = null;
+	var aImagesSync = null;
+	var aObjectsSync = null;
 	var aBoundsCheckers = [];
 	
 	var userId = null;
@@ -3830,7 +3831,7 @@ function DrawingObjects() {
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			var isOption = options && options.cell;
 
-			function calculateObjectMetrics(object, width, height) {
+			var calculateObjectMetrics = function (object, width, height) {
 				// Обработка картинок большого разрешения
 				var metricCoeff = 1;
 				
@@ -3863,7 +3864,7 @@ function DrawingObjects() {
 				worksheet.handlers.trigger("reinitializeScroll");
 			}
 
-			function addImageObject(_image) {
+			var addImageObject = function (_image) {
 			
 				if ( !_image.Image ) {
 					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
@@ -3904,7 +3905,7 @@ function DrawingObjects() {
 				
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				worksheet.setSelectionShape(true);
-			}
+			};
 			
 			if (null != _image) {
 				addImageObject(_image);
@@ -3923,7 +3924,7 @@ function DrawingObjects() {
 		if ( imageUrl ) {
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 
-			function addImageObject(_image) {
+			var addImageObject = function (_image) {
 			
 				if ( !_image.Image ) {
 					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
@@ -3950,7 +3951,7 @@ function DrawingObjects() {
 					_this.showDrawingObjects(true);
 				}
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-			}
+			};
 			
 			if (null != _image) {
 				addImageObject(_image);
@@ -4041,7 +4042,7 @@ function DrawingObjects() {
 			// Заполняем таблицу
 			if ( graphicObject.chart.series.length ) {
 			
-				function restoreDataRange(data, bRows) {
+				var restoreDataRange = function (data, bRows) {
 					
 					if ( data && data.Formula && data.NumCache.length ) {
 						var range = convertFormula(data.Formula, worksheet);
@@ -4068,7 +4069,7 @@ function DrawingObjects() {
 							}
 						}
 					}
-				}
+				};
 			
 				for (var i = 0; i < seriesCount; i++) {
 					
@@ -4494,7 +4495,7 @@ function DrawingObjects() {
 		
 		if ( oBBoxFrom && oBBoxTo ) {
 						
-			function editChart(drawingObject) {
+			var editChart = function (drawingObject) {
 				
 				var _interval = drawingObject.graphicObject.chart.range.interval;
 				
@@ -4506,21 +4507,21 @@ function DrawingObjects() {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_RangeInterval, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(_interval, drawingObject.graphicObject.chart.range.interval)));
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObject.graphicObject.chart.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-			}
+			};
 			
 			var bRedraw = false;
 			History.Create_NewPoint();
 			History.StartTransaction();
 			
 			var chartDrawings = [];
-			function callbackCheck(result) {
+			var callbackCheck = function (result) {
 				for (var i = 0; result && (i < chartDrawings.length); i++) {
 					editChart(chartDrawings[i]);
 					bRedraw = true;
 				}
 				if ( bRedraw )
 					_this.showDrawingObjects(true);
-			}
+			};
 			
 			for (var i = 0; i < aObjects.length; i++) {
 								

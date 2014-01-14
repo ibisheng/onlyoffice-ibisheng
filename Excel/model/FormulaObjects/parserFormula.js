@@ -1173,7 +1173,6 @@ function getFormulasInfo() {
                 a = cFormulaFunction[type][f]();
                 if ( a.getInfo )
                     b.asc_addFormulaElement( new Asc.asc_CFormula( a.getInfo() ) );
-                delete a;
             }
         }
         list.push( b )

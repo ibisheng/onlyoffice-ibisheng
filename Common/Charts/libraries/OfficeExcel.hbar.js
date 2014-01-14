@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.HBar = function (chartCanvas, data)
     {
@@ -49,7 +49,7 @@
          
         //определяем куда ставить ось
         var numNull = this._otherProps._background_grid_autofit_numhlines;
-        var arrTemp = []
+        var arrTemp = [], min, max;
         if(typeof(this.data[0]) == 'object')
         {
             var arrMin = [];
@@ -179,6 +179,7 @@
 		}
 
         // Draw the X tickmarks
+		var xTickGap, yStart, yEnd;
 		if(!this._otherProps._noxaxis)
 		{
 			xTickGap = (this.canvas.width - this._chartGutter._left - this._chartGutter._right ) / (this.scale.length);
@@ -237,6 +238,7 @@
                 {
                     var arrMin = [];
                     var arrMax = [];
+					var min, max;
                     for (var j=0; j < this.data.length; j++) {
                         min = Math.min.apply(null, this.data[j]);
                         max = Math.max.apply(null, this.data[j]);
@@ -316,7 +318,7 @@
             var barHeight = (OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom ) / this._otherProps._labels.length;
             
             // Reset the xTickGap
-            yTickGap = (OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) / this._otherProps._labels.length
+            var yTickGap = (OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom) / this._otherProps._labels.length
 
             // Draw the X tickmarks
             var i=0;

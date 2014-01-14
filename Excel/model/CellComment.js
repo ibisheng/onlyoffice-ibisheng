@@ -138,7 +138,7 @@ asc_CCommentCoords.prototype = {
 }
 
 window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCommentCoords;
-prot = asc_CCommentCoords.prototype;
+var prot = asc_CCommentCoords.prototype;
 
 prot["asc_setRow"] = prot.asc_setRow;
 prot["asc_getRow"] = prot.asc_getRow;
@@ -1010,7 +1010,7 @@ function asc_CCellCommentator(currentSheet) {
 		
 		if (changes && activeRange) {
 		
-			function updateCommentsList(aComments) {
+			var updateCommentsList = function(aComments) {
 				if ( aComments.length ) {
 					History.StartTransaction();
 					
@@ -1021,7 +1021,7 @@ function asc_CCellCommentator(currentSheet) {
 					History.EndTransaction();
 					_this.drawCommentCells();
 				}
-			}
+			};
 			
 			var aChangedComments = [];
 			for (var i = 0; i < changes.places.length; i++) {
@@ -1297,7 +1297,7 @@ asc_CCellCommentator.prototype = {
 
 		if (comment) {
 			
-			function callbackFunc(result) {
+			var callbackFunc = function(result) {
 			
 				if ( !result )
 					_this.worksheet.model.workbook.handlers.trigger("asc_onLockComment", comment.asc_getId(), comment.asc_getUserId());
@@ -1321,7 +1321,7 @@ asc_CCellCommentator.prototype = {
 					_this.drawCommentCells();
 				}
 				_this.lastSelectedId = id;
-			}
+			};
 			
 			_this.isLockedComment(comment, false, callbackFunc);
 		}
@@ -1519,7 +1519,6 @@ asc_CCellCommentator.prototype = {
 								}
 
 								comment.oParent.aReplies.splice(i, 1);
-								bResult = true;
 								break;
 							}
 						}
@@ -1534,7 +1533,6 @@ asc_CCellCommentator.prototype = {
 								}
 
 								_this.aComments.splice(i, 1);
-								bResult = true;
 								break;
 							}
 						}

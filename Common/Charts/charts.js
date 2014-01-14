@@ -661,7 +661,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				tempArr[j] = bar.context.measureText(OfficeExcel.numToFormatText(tempScale[j],isFormatCell)).width
 		}
 		if((bar.type == 'hbar' && min < 0 )|| ( bar.type == 'scatter' && bar._otherProps._type != 'burse2' && minX < 0))
-			left = 0
+			left = 0;
 		else
 		{
 			left = Math.max.apply(null,tempArr) + 5;
@@ -817,7 +817,6 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	if(angleText && bar._otherProps._labels.length && angleText[0] && bar.type != 'hbar' && bar.type != 'pie' && bar.type != 'scatter')
 	{
 		var x = chartCanvas.width - (((bar._chartGutter._left + bar._chartGutter._right))/(2*bar._otherProps._labels.length)) + bar._chartGutter._left;
-		var diff = x - bar._chartGutter._left;
 		var widthDiff = angleText[0]*Math.sin(angleText.angle*Math.PI/180);
 		if(bar._chartGutter._left < widthDiff*scale)
 			bar._chartGutter._left = widthDiff;
@@ -834,7 +833,6 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 			var axisTitleProp = getMaxPropertiesText(OfficeExcel.drawingCtxCharts,font, bar._otherProps._labels);
 			bar._chartGutter._left += axisTitleProp.width - (hBarTempLeft*scale) ;
 		}
-		tempScale = bar._otherProps._labels;
 	}
 	//если очень маленький размер ширины диаграммы
 	if((bar._chartGutter._left + bar._chartGutter._right) >= (chartCanvas.width - 1))
@@ -1046,7 +1044,7 @@ function insertChart(chart, options) {
 						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 				}
 				
-				formatAdobeLabel = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
+				var formatAdobeLabel = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 				
 				var orValue = cell.val;
 				if(series[0].xVal.Formula != null && numSeries == 0 && !isNumberVal && chart.type == 'Scatter')
@@ -2355,7 +2353,7 @@ function getLevelsKey(chartCanvas, context, font, scale, widthMaxKey)
 			var keyOnOneLevel = Math.floor(bar._otherProps._key.length/tempLevel);
 			for(var i = 0; i < bar._otherProps._key.length; i++)
 			{					
-				widthText = widthMaxKey;
+				var widthText = widthMaxKey;
 				widthRow += (widthText + 2 + widthLine)*scale;
 				if(!levelKey[level])
 					levelKey[level] = [];
