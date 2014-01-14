@@ -341,7 +341,7 @@ function CHistory(workbook)
 	this.workbook = workbook;
     this.Index    = -1;
 	this.SavePoint = null;
-    this.Points   = new Array();
+    this.Points   = [];
 	this.CurPoint = null;
 	this.IsModify = false;
     this.TurnOffHistory = 0;
@@ -555,7 +555,7 @@ CHistory.prototype =
 		if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
             return;
 		this._checkCurPoint();
-        var Items = new Array();
+        var Items = [];
 		var UpdateRigions = new Object();
         var Time  = new Date().getTime();
 		var oSelectRange = this.workbook.handlers.trigger("getSelection");
@@ -725,7 +725,7 @@ CHistory.prototype =
     },
 	GetSerializeArray : function()
 	{
-		var aRes = new Array();
+		var aRes = [];
 		for(var i = 0; i <= this.Index; ++i)
 		{
 			var point = this.Points[i];

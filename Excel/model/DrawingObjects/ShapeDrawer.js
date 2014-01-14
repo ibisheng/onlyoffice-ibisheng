@@ -624,9 +624,9 @@ CShapeDrawer.prototype =
             if ((this.Ln.headEnd != null && this.Ln.headEnd.type != null) || (this.Ln.tailEnd != null && this.Ln.tailEnd.type != null))
             {
                 if (true === graphics.IsTrack)
-                    graphics.Graphics.ArrayPoints = new Array();
+                    graphics.Graphics.ArrayPoints = [];
                 else
-                    graphics.ArrayPoints = new Array();
+                    graphics.ArrayPoints = [];
             }
 
             if (this.Graphics.m_oContext != null && this.Ln.Join != null && this.Ln.Join.type != null)
@@ -766,14 +766,14 @@ CShapeDrawer.prototype =
         this.IsCurrentPathCanArrows = true;
         this.Graphics._s();
         if (this.Graphics.ArrayPoints != null)
-            this.Graphics.ArrayPoints = new Array();
+            this.Graphics.ArrayPoints = [];
     },
     _e : function()
     {
         this.IsCurrentPathCanArrows = true;
         this.Graphics._e();
         if (this.Graphics.ArrayPoints != null)
-            this.Graphics.ArrayPoints = new Array();
+            this.Graphics.ArrayPoints = [];
     },
 
     df : function(mode)

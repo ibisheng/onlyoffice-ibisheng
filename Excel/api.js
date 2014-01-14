@@ -293,7 +293,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asc_SendThemeColorScheme : function() {
-				var infos = new Array();
+				var infos = [];
 				var _index = 0;
 
 				var _c = null;

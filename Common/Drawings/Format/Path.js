@@ -19,8 +19,8 @@ function Path()
     this.pathH       = null;
     this.pathW       = null;
 
-    this.ArrPathCommandInfo = new Array();
-    this.ArrPathCommand = new Array();
+    this.ArrPathCommandInfo = [];
+    this.ArrPathCommand = [];
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);

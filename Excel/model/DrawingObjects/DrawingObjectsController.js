@@ -73,7 +73,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
     this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
     {
         // Разбиваем действие на простейшие
-        var Positions = new Array();
+        var Positions = [];
         if ( contentchanges_Add === Type )
         {
             for ( var Index = 0; Index < Count; Index++ )
@@ -94,7 +94,7 @@ function CContentChangesElement(Type, Pos, Count, Data)
 
 function CContentChanges()
 {
-    this.m_aChanges = new Array();
+    this.m_aChanges = [];
 
     this.Add = function(Changes)
     {
@@ -2583,7 +2583,7 @@ function asc_CColor() {
     this.b = 0;
     this.a = 255;
 
-    this.Mods = new Array();
+    this.Mods = [];
     this.ColorSchemeId = -1;
 }
 
@@ -2968,8 +2968,8 @@ function CreateAscFillEx(unifill) {
             {
                 if (0 == i)
                 {
-                    ret.fill.Colors = new Array();
-                    ret.fill.Positions = new Array();
+                    ret.fill.Colors = [];
+                    ret.fill.Positions = [];
                 }
 
                 ret.fill.Colors.push(CreateAscColorEx(_fill.colors[i].color));

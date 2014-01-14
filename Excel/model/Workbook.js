@@ -1061,7 +1061,7 @@ function angleInterfaceToFormat(val)
 }
 //-------------------------------------------------------------------------------------------------
 $(function(){
-	aStandartNumFormats = new Array();
+	aStandartNumFormats = [];
 	aStandartNumFormats[0] = "General";
 	aStandartNumFormats[1] = "0";
 	aStandartNumFormats[2] = "0.00";
@@ -1117,17 +1117,17 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.CellStyles = new CCellStyles();
 	this.TableStyles = new CTableStyles();
 	this.oStyleManager = new StyleManager(this);
-	this.calcChain = new Array();
-	this.aWorksheets = new Array();
+	this.calcChain = [];
+	this.aWorksheets = [];
 	this.aWorksheetsById = new Object();
 	this.cwf = {};
 	this.isNeedCacheClean = true;
 	this.startActionOn = false;
-	this.aCollaborativeActions = new Array();
+	this.aCollaborativeActions = [];
 	this.bCollaborativeChanges = false;
 	this.bUndoChanges = false;
 	this.bRedoChanges = false;
-	this.aCollaborativeChangeElements = new Array();
+	this.aCollaborativeChangeElements = [];
 };
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)
@@ -1651,7 +1651,7 @@ Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
     }
 }
 Workbook.prototype.SerializeHistory = function(){
-	var aRes = new Array();
+	var aRes = [];
 	//соединяем изменения, которые были до приема данных с теми, что получились после.
     var wsViews = this.oApi.wb.wsViews;
     for(var i in wsViews)
@@ -1665,7 +1665,7 @@ Workbook.prototype.SerializeHistory = function(){
 		var oMemory = new CMemory();
 		var oThis = this;
 		//создаем еще один элемент в undo/redo - взаимное расположение Sheet, чтобы не запутываться в add, move событиях
-		var oSheetPlaceData = new Array();
+		var oSheetPlaceData = [];
 		for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 			oSheetPlaceData.push(this.aWorksheets[i].getId());
 		aActions.push(new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, new UndoRedoData_SheetPositions(oSheetPlaceData)));
@@ -1681,7 +1681,7 @@ Workbook.prototype.SerializeHistory = function(){
 		}
 		//добавляем элемент, который содержит все используемые шрифты, чтобы их можно было загрузить в начале
 		aRes.push("0;fontmap" + this.generateFontMap().join(","));
-		this.aCollaborativeActions = new Array();
+		this.aCollaborativeActions = [];
 	}
 	return aRes;
 }
@@ -1695,7 +1695,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		this.bCollaborativeChanges = true;
 		//собираем общую длину
 		var dstLen = 0;
-		var aIndexes = new Array();
+		var aIndexes = [];
 		for(var i = 0, length = aChanges.length;i < length; ++i)
 		{
 			var sChange = aChanges[i];
@@ -1794,14 +1794,14 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
 	this.aGCells = new Object();// 0 based
-	this.aCols = new Array();// 0 based
-	this.Drawings = new Array();
-	this.TableParts = new Array();
+	this.aCols = [];// 0 based
+	this.Drawings = [];
+	this.TableParts = [];
 	this.AutoFilter = null;
 	this.oAllCol = null;
 	this.objForRebuldFormula = {};
-	this.aComments = new Array();
-	this.aCommentsCoords = new Array();
+	this.aComments = [];
+	this.aCommentsCoords = [];
 	var oThis = this;
 	this.mergeManager = new RangeDataManager(function(data, from, to){
 		if(History.Is_On() && (null != from || null != to))
@@ -2211,7 +2211,7 @@ Woorksheet.prototype.setName=function(name){
 Woorksheet.prototype.renameWsToCollaborate=function(name){
 	var lastname = this.getName();
 	//из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
-	var aFormulas = new Array();
+	var aFormulas = [];
 	//переименование для отправки изменений
 	for(var i = 0, length = this.workbook.aCollaborativeActions.length; i < length; ++i)
 	{
@@ -2319,7 +2319,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
-	var aIndexes = new Array();
+	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
 		var nIndex = i - 0;
@@ -2380,7 +2380,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 	History.TurnOff();
 	//index 0 based
-	var aIndexes = new Array();
+	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
 		var nIndex = i - 0;
@@ -2446,7 +2446,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	{
 		var nRowIndex = i - 0;
 		var row = this.aGCells[i];
-		var aIndexes = new Array();
+		var aIndexes = [];
 		for(var j in row.c)
 		{
 			var nIndex = j - 0;
@@ -2515,7 +2515,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	{
 		var nRowIndex = i - 0;
 		var row = this.aGCells[i];
-		var aIndexes = new Array();
+		var aIndexes = [];
 		for(var j in row.c)
 		{
 			var nIndex = j - 0;
@@ -3269,7 +3269,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
-			var aIndexes = new Array();
+			var aIndexes = [];
 			for(var cellInd in row.c)
 			{
 				var nIndex = cellInd - 0;
@@ -3308,7 +3308,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nTop - nBottom - 1;
-	var aIndexes = new Array();
+	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
 		var rowInd = i - 0;
@@ -3358,7 +3358,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
-			var aIndexes = new Array();
+			var aIndexes = [];
 			for(var cellInd in row.c)
 			{
 				var nIndex = cellInd - 0;
@@ -3395,7 +3395,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nBottom - nTop + 1;
-	var aIndexes = new Array();
+	var aIndexes = [];
 	for(var i in this.aGCells){
 		var rowInd = i - 0;
 		if(rowInd >= nTop)
@@ -3923,7 +3923,7 @@ Cell.prototype.setValue2=function(array){
 	var ws = this.ws;
 	var wb = this.ws.workbook;
 	var needRecalc = false;
-	var ar = new Array();
+	var ar = [];
 	var sheetId = this.ws.getId();
 	if (this.sFormula){
 		if ( this.oId.getID() in wb.cwf[ws.Id].cells){
@@ -4682,7 +4682,7 @@ Range.prototype.getName=function(){
 	return sRes;
 };
 Range.prototype.getCells=function(){
-	var aResult = new Array();
+	var aResult = [];
 	var oBBox = this.bbox;
 	if(!((0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2) || (0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)))
 	{
@@ -6752,7 +6752,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		});
 	}
 	//собираем массив обьектов для сортировки
-	var aSortElems = new Array();
+	var aSortElems = [];
 	var aHiddenRow = new Object();
 	var fAddSortElems = function(oCell, nRow0, nCol0,nRowStart0, nColStart0){
 		//не сортируем сткрытие строки
@@ -6828,7 +6828,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		return res;
 	});
 	//проверяем что это не пустая операция
-	var aSortData = new Array();
+	var aSortData = [];
 	var nHiddenCount = 0;
 	var oFromArray = new Object();
 	var nRowMax = 0;
@@ -6910,7 +6910,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		oSortedIndexes[nFrom] = nTo;
 	}
 	//сортируются только одинарные гиперссылки, все неодинарные оставляем
-	var aSortedHyperlinks = new Array();
+	var aSortedHyperlinks = [];
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
 		var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
@@ -7244,8 +7244,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	{
 		//удаляем все в области для заполнения
 		oPromoteRange.cleanAll();
-		//собираем все данные 
-		var aCells = new Array();
+		//собираем все данные
 		var bReverse = false;
 		if(nIndex < 0)
 			bReverse = true;

@@ -1354,7 +1354,7 @@ function BinarySharedStringsTableWriter(memory, oSharedStrings)
     this.WriteSharedStringsContent = function()
     {
         var oThis = this;
-		var aSharedStrings = new Array();
+		var aSharedStrings = [];
 		for(var i in this.oSharedStrings.strings)
 		{
 			var item = this.oSharedStrings.strings[i];
@@ -1472,7 +1472,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteBorders = function()
     {
         var oThis = this;
-		var aBorders = new Array();
+		var aBorders = [];
 		for(var i in this.oBorderMap)
 		{
 			var elem = this.oBorderMap[i];
@@ -1554,7 +1554,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteFills = function()
     {
         var oThis = this;
-		var aFills = new Array();
+		var aFills = [];
 		for(var i in this.oFillMap)
 		{
 			var elem = this.oFillMap[i];
@@ -1581,7 +1581,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteFonts = function()
     {
         var oThis = this;
-		var aFonts = new Array();
+		var aFonts = [];
 		for(var i in this.oFontMap)
 		{
 			var elem = this.oFontMap[i];
@@ -1682,8 +1682,6 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteNumFmts = function()
     {
         var oThis = this;
-		var index = 0;
-		var aNums = new Array();
 		for(var i in this.oNumMap)
         {
             var num = this.oNumMap[i];
@@ -1718,7 +1716,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteCellXfs = function()
     {
         var oThis = this;
-		var aXfs = new Array();
+		var aXfs = [];
 		for(var i in this.oXfsMap)
 		{
 			var elem = this.oXfsMap[i];
@@ -2341,7 +2339,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
         var oPrevCol = null;
 		var nPrevIndexStart = null;
         var nPrevIndex = null;
-		var aIndexes = new Array();
+		var aIndexes = [];
 		for(var i in aCols)
 			aIndexes.push(i - 0);
 		aIndexes.sort(fSortAscending);
@@ -2754,7 +2752,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
     {
         var oThis = this;
 		//сортируем Row по индексам
-		var aIndexes = new Array();
+		var aIndexes = [];
 		//write only active cells, if copy/paste
 		if(oThis.isCopyPaste)
 		{
@@ -2819,7 +2817,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
     this.WriteCells = function(aCells)
     {
         var oThis = this;
-		var aIndexes = new Array();
+		var aIndexes = [];
 		if(oThis.isCopyPaste)
 		{
 			for(var i = oThis.isCopyPaste.c1; i <= oThis.isCopyPaste.c2; i++)
@@ -3175,7 +3173,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			var comment = row[nCol];
 			if(null == comment)
 			{
-				comment = {data: new Array(), coord: null};
+				comment = {data: [], coord: null};
 				row[nCol] = comment;
 			}
 			comment.data.push(elem);
@@ -3201,7 +3199,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 			var comment = row[nCol];
 			if(null == comment)
 			{
-				comment = {data: new Array(), coord: null};
+				comment = {data: [], coord: null};
 				row[nCol] = comment;
 			}
 			comment.coord = elem;
@@ -3415,12 +3413,12 @@ function BinaryFileWriter(wb, isCopyPaste)
         //Workbook
         this.WriteTable(c_oSerTableTypes.Workbook, new BinaryWorkbookTableWriter(this.Memory, this.wb));
         //Worksheets
-		var aXfs = new Array();
-		var aFonts = new Array();
-		var aFills = new Array();
-		var aBorders = new Array();
-		var aNums = new Array();
-		var aDxfs = new Array();
+		var aXfs = [];
+		var aFonts = [];
+		var aFills = [];
+		var aBorders = [];
+		var aNums = [];
+		var aDxfs = [];
 		var oBinaryWorksheetsTableWriter = new BinaryWorksheetsTableWriter(this.Memory, this.wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, this.isCopyPaste);
         this.WriteTable(c_oSerTableTypes.Worksheets, oBinaryWorksheetsTableWriter);
         //OtherTable
@@ -3948,7 +3946,7 @@ function Binary_SharedStringTableReader(stream, wb, aSharedStrings)
                     return oThis.ReadRun(t,l,oRun);
                 });
             if(null == Si.multiText)
-                Si.multiText = new Array();
+                Si.multiText = [];
             Si.multiText.push(oRun);
         }
         else if ( c_oSerSharedStringTypes.Text == type )
@@ -4827,7 +4825,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
         if (c_oSer_TableStyles.TableStyle === type)
 		{
 			var oNewStyle = new CTableStyle();
-			var aElements = new Array();
+			var aElements = [];
 			res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTableCustomStyle(t,l, oNewStyle, aElements);
                 });
@@ -5028,8 +5026,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     this.aCellXfs = aCellXfs;
 	this.Dxfs = Dxfs;
     this.bcr = new Binary_CommonReader(this.stream);
-	this.aMerged = new Array();
-	this.aHyperlinks = new Array();
+	this.aMerged = [];
+	this.aHyperlinks = [];
 	this.oPPTXContentLoader = new CPPTXContentLoader();
 	this.copyPasteObj = copyPasteObj;
     this.Read = function()
@@ -5045,8 +5043,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         var oThis = this;
         if ( c_oSerWorksheetsTypes.Worksheet === type )
         {
-			this.aMerged = new Array();
-			this.aHyperlinks = new Array();
+			this.aMerged = [];
+			this.aHyperlinks = [];
             var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length, false);
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheet(t,l, oNewWorksheet);
@@ -5088,8 +5086,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         {
 			var oConditionalFormatting = null;
             if(null == oWorksheet.Cols)
-                oWorksheet.aCols = new Array();
-			var aTempCols = new Array();
+                oWorksheet.aCols = [];
+			var aTempCols = [];
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadWorksheetCols(t,l, aTempCols, oWorksheet);
                 });
@@ -5743,7 +5741,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         if ( c_oSerWorksheetsTypes.Comment == type )
         {
 			var oCommentCoords = new Asc.asc_CCommentCoords();
-			var aCommentData = new Array();
+			var aCommentData = [];
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
 				});
@@ -6276,7 +6274,7 @@ function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
 		else if ( c_oSer_OtherType.EmbeddedFonts === type )
         {
             var _count = this.stream.GetULongLE();
-			var _embedded_fonts = new Array();
+			var _embedded_fonts = [];
             for (var i = 0; i < _count; i++)
             {
                 var _at = this.stream.GetUChar();
@@ -6525,7 +6523,7 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
         if(c_oSerConstants.ReadOk != res)
             return res;
         var mtLen = this.stream.GetUChar();
-        var aSeekTable = new Array();
+        var aSeekTable = [];
         var nOtherTableOffset = null;
         var nSharedStringTableOffset = null;
 		var nStyleTableOffset = null;
@@ -6549,11 +6547,11 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
             else
                 aSeekTable.push( {type: mtiType, offset: mtiOffBits} );
         }
-        var aSharedStrings = new Array();
-        var aCellXfs = new Array();
-		var aDxfs = new Array();
+        var aSharedStrings = [];
+        var aCellXfs = [];
+		var aDxfs = [];
         var oMediaArray = new Object();
-        wb.aWorksheets = new Array();
+        wb.aWorksheets = [];
         if(null != nOtherTableOffset)
         {
             res = this.stream.Seek(nOtherTableOffset);

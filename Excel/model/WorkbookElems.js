@@ -2625,7 +2625,7 @@ function CCellValue(cell)
 	this.type = CellValueType.Number;
 	//cache
 	this.textValue = null;
-	this.aTextValue2 = new Array();
+	this.aTextValue2 = [];
 	this.textValueForEdit = null;
 	this.textValueForEdit2 = null;
 }
@@ -2697,7 +2697,7 @@ CCellValue.prototype =
 	cleanCache : function()
 	{
 		this.textValue = null;
-		this.aTextValue2 = new Array();
+		this.aTextValue2 = [];
 		this.textValueForEdit = null;
 		this.textValueForEdit2 = null;
 	},
@@ -2980,7 +2980,7 @@ CCellValue.prototype =
 	},
 	_getValue2Result : function(sText, aText)
 	{
-		var aResult = new Array();
+		var aResult = [];
 		if(null == sText && null == aText)
 			sText = "";
 		var color;
@@ -3144,10 +3144,9 @@ CCellValue.prototype =
 			//проверяем можно ли перевести массив в простую строку.
 			if(aVal.length > 0)
 			{
-				this.multiText = new Array();
+				this.multiText = [];
 				for(var i = 0, length = aVal.length; i < length; i++){
 					var item = aVal[i];
-					var format = item.format;
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
 					oNewElem.format = new Font();
@@ -3192,7 +3191,7 @@ CCellValue.prototype =
 	},
 	_cloneMultiText : function()
 	{
-		var oRes = new Array();
+		var oRes = [];
 		for(var i = 0, length = this.multiText.length; i < length; ++i)
 			oRes.push(this.multiText[i].clone());
 		return oRes;

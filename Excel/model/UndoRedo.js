@@ -264,7 +264,7 @@ UndoRedoItemSerializable.prototype = {
 					oNewValue = this.DeserializeData(oBinaryReader);
 					break;
 				case c_oUndoRedoSerializeType.Array:
-					var aNewArray = new Array();
+					var aNewArray = [];
 					var nNewLength = oBinaryReader.GetULongLE();
 					this.DeserializeDataInner(oBinaryReader, aNewArray, nNewLength, true);
 					oNewValue = aNewArray;
@@ -1676,7 +1676,7 @@ UndoRedoData_SingleProperty.prototype = {
 
 //для применения изменений
 var UndoRedoClassTypes = new function(){
-	this.aTypes = new Array();
+	this.aTypes = [];
 	this.Add = function(fCreate)
 	{
 		var nRes = this.aTypes.length;
@@ -2751,7 +2751,7 @@ UndoRedoWorkbook.prototype = {
 				}
 			}
 			//расставляем в соответствии с изменениями
-			this.wb.aWorksheets = new Array();
+			this.wb.aWorksheets = [];
 			for(var i = 0, length = Data.positions.length; i < length; ++i)
 			{
 				var sheetId = Data.positions[i];
@@ -2890,7 +2890,7 @@ UndoRedoCell.prototype = {
             cell.setAngle(Val);
         else if(historyitem_Cell_ChangeArrayValueFormat == Type)
 		{
-			cell.oValue.multiText = new Array();
+			cell.oValue.multiText = [];
 			for(var i = 0, length = Val.length; i < length; ++i)
 				cell.oValue.multiText.push(Val[i].clone());
 		}

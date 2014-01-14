@@ -219,9 +219,9 @@ function NumFormat(bAddMinusIfNes)
     this.EOF = -1;
     
     //Формат
-    this.aRawFormat = new Array();
-    this.aDecFormat = new Array();
-    this.aFracFormat = new Array();
+    this.aRawFormat = [];
+    this.aDecFormat = [];
+    this.aFracFormat = [];
     this.bDateTime = false;
 	this.bDate = false;
     this.bTime = false;//флаг, чтобы отличить формат даты с временем, от простой даты
@@ -388,7 +388,7 @@ NumFormat.prototype =
             }
             else if("/" == next)
             {
-                this._addToFormat2(new FormatObjDecimalFrac(new Array(), new Array()));
+                this._addToFormat2(new FormatObjDecimalFrac([], []));
             }
             else if("," == next)
             {
@@ -561,7 +561,7 @@ NumFormat.prototype =
                 }
                 else
                 {
-                    var aDigitArray = new Array();
+                    var aDigitArray = [];
                     for(var j = i + 1; j < nFormatLength; ++j)
                     {
                         var nextItem = this.aRawFormat[j];
@@ -1055,8 +1055,7 @@ NumFormat.prototype =
 	},
     _FormatNumber : function(number, exponent, format, nReadState)
     {
-        var aRes = new Array();
-        var aNoDisplay = new Array();
+        var aRes = [];
         var nFormatLen = format.length;
         if(nFormatLen > 0)
         {
@@ -1123,7 +1122,7 @@ NumFormat.prototype =
                         var item = aRes[i];
                         if(numFormat_Text == item.type)
                         {
-                            var aNewText = new Array();
+                            var aNewText = [];
                             var nTextLength = item.val.length;
                             for(var j = nTextLength - 1; j >= 0; --j)
                             {
@@ -1334,7 +1333,7 @@ NumFormat.prototype =
     {
         if(null == nValType)
             nValType = CellValueType.Number;
-        var res = new Array();
+        var res = [];
         var oCurText = {text: ""};
         if(true == this.valid)
         {
@@ -1364,9 +1363,9 @@ NumFormat.prototype =
                 }
                 return [{text: number}];
             }
-            var aDec = new Array();
-            var aFrac = new Array();
-            var aScientific = new Array();
+            var aDec = [];
+            var aFrac = [];
+            var aScientific = [];
             if(true == oParsedNumber.bDigit)
             {
                 aDec = this._FormatNumber(oParsedNumber.dec, oParsedNumber.exponent,  this.aDecFormat.concat(), FormatStates.Decimal);
@@ -1904,7 +1903,7 @@ function CellFormat(format)
 	this.aComporationFormats = null;
     var aFormats = format.split(";");
     var nFormatsLength = aFormats.length;
-	var aParsedFormats = new Array();
+	var aParsedFormats = [];
 	for(var i = 0; i < nFormatsLength; ++i)
 	{
 		var oNewFormat = new NumFormat(false);

@@ -1124,7 +1124,7 @@
 
 		WorkbookView.prototype.updateWorksheetByModel = function () {
 			//расставляем ws так как они идут в модели.
-			var oNewWsViews = new Array();
+			var oNewWsViews = [];
 			for(var i in this.wsViews)
 			{
 				var item = this.wsViews[i];

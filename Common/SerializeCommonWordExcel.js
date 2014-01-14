@@ -448,7 +448,7 @@ function FT_Stream2(data, size)
     {
         if (this.cur + 7 >= this.size)
             return 0;
-        var arr = new Array();
+        var arr = [];
         for(var i = 0; i < 8; ++i)
             arr.push(this.GetUChar());
         var dRes = this.doubleDecodeLE754(arr);
@@ -559,7 +559,7 @@ var gc_nMaxCol0 = gc_nMaxCol - 1;
  */
 function CellAddressUtils(){
 	this._oCodeA = 'A'.charCodeAt();
-	this._aColnumToColstr = new Array();
+	this._aColnumToColstr = [];
 	this.oCellAddressCache = {};
 	this.colnumToColstr = function(num){
 		var sResult = this._aColnumToColstr[num];
@@ -1502,7 +1502,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartType.PlotArea === type )
 		{
-			var oAxis = {CatAx: null, aValAx: new Array()};
+			var oAxis = {CatAx: null, aValAx: []};
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadPlotArea(t,l, oAxis);
 				});

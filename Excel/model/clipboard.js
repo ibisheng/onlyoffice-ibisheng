@@ -1584,7 +1584,7 @@
 					}
 				}
 				
-                var aResult = new Array();
+                var aResult = [];
                 var range = worksheet.activeRange.clone(true);
 				var testFragment = $.extend(true, {},node);
 				var is_chrome = AscBrowser.isChrome;
@@ -1667,7 +1667,7 @@
 					var firstRow = mainChildrens[r - range.r1 - countEmptyRow];
                     if(firstRow.nodeName.toLowerCase() == 'br')
                         r++;
-                    aResult[r + tableRowCount] = new Array();
+                    aResult[r + tableRowCount] = [];
                     var tag = mainChildrens[r - range.r1 - countEmptyRow];
 					if(pasteFragment.children.length == 1 && pasteFragment.children[0].nodeName.toLowerCase() == 'table')
 						aResult.isOneTable = true;
@@ -1685,7 +1685,7 @@
 									countChild++;
 									r++;
 									countEmptyRow++;
-									aResult[r + tableRowCount] = new Array();
+									aResult[r + tableRowCount] = [];
 								}
 							}
 							tag.innerHTML = tag.innerHTML.replace(/(\n)/g, '');
@@ -1707,7 +1707,7 @@
 										countChild++;
 										r++;
 										countEmptyRow++;
-										aResult[r + tableRowCount] = new Array();
+										aResult[r + tableRowCount] = [];
 									}
 								}
 								var span = document.createElement('p');
@@ -1763,7 +1763,7 @@
 							/*if(tag.children.length == 1 && tag.children[0].children.length == 1 && tag.offsetParent != null && tag.offsetParent != undefined && tag.offsetParent.children.length == 1 && $(tag).find('td')[0].rowSpan == 1 && $(tag).find('td')[0].colSpan == 1 && isMerge.hasMerged() == null && tableBody.children.length == 1 && tableBody.children[0].children != undefined && tableBody.children[0].children.length == 1)//сделать ещё для вставки из Excel
 							{
 								for (tR = startNum; tR <= range.r2; ++tR) {
-									aResult[tR] = new Array();
+									aResult[tR] = [];
 									var cNew = 0;
 									for(tC = range.c1; tC <= range.c2; ++tC) {
 										var _tBody = tableBody.children[0].children[0];
@@ -1778,7 +1778,7 @@
 							else
 							{*/
 								for (var tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
-									aResult[tR] = new Array();
+									aResult[tR] = [];
 									var cNew = 0;
 									for(var tC = range.c1; tC < range.c1 + cellCount; ++tC) {
 										
@@ -1913,7 +1913,7 @@
 								
 							for(k=0;k < textArr.length ; ++k)
 							{
-								aResult[r + tableRowCount] = new Array();
+								aResult[r + tableRowCount] = [];
 								var newP = document.createElement('p');
 								var newSpan = document.createElement('span');
 								$(newP).append(newSpan);

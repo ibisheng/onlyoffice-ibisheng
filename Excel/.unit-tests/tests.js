@@ -12,7 +12,6 @@
 		strictEqual(Asc.typeOf(new String('def')), "string", "Asc.typeOf( new String('def') )");
 
 		strictEqual(Asc.typeOf([1]), "array", "Asc.typeOf( [1] )");
-		strictEqual(Asc.typeOf(new Array(1)), "array", "Asc.typeOf( new Array([1]) )");
 
 		strictEqual(Asc.typeOf(function () {}), "function", "Asc.typeOf( function () {} )");
 		strictEqual(Asc.typeOf(new Function()), "function", "Asc.typeOf( new Function() )");

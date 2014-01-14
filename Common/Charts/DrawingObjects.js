@@ -2254,7 +2254,7 @@ prot["asc_putPos"] = prot.asc_putPos;
 //-----------------------------------------------------------------------------------
 
 function asc_CParagraphTabs(obj) {
-    this.Tabs = new Array();
+    this.Tabs = [];
 
     if ( undefined != obj ) {
         var Count = obj.Tabs.length;
@@ -5645,7 +5645,7 @@ function readFromBinaryDocContent(docContent, r)
     docContent.TurnOffInnerWrap   = r.GetBool();
     docContent.Split              = r.GetBool();
     var Count = r.GetLong();
-    docContent.Content = new Array();
+    docContent.Content = [];
     for ( var Index = 0; Index < Count; Index++ )
     {
         var p = new Paragraph(docContent.DrawingDocument, docContent, 0, 0, 0, 0, 0);
@@ -5690,7 +5690,7 @@ function readFromBinaryParagraph(p, r)
     p.TextPr = new ParaTextPr();
     //p.TextPr.readFromBinary(r);
 
-    p.Content = new Array();
+    p.Content = [];
     var Count = r.GetLong();
     for ( var Index = 0; Index < Count; Index++ )
     {

@@ -404,7 +404,7 @@ CopyProcessor.prototype =
     Commit_pPr : function(Item)
     {
         //pPr
-        var apPr = new Array();
+        var apPr = [];
         var Def_pPr = this.oDocument.Styles.Default.ParaPr;
         var Item_pPr = Item.CompiledPr.Pr.ParaPr;
         if(Item_pPr)
@@ -505,7 +505,7 @@ CopyProcessor.prototype =
             this.oTagPr = new Object();
             this.orPr = new Object();
         }
-        this.aInnerHtml = new Array();
+        this.aInnerHtml = [];
     },
     CommitSpan : function(bInitPr)
     {
@@ -535,7 +535,7 @@ CopyProcessor.prototype =
                 });
                 //����������� ����� � ���� ������
                 var sStart = "";
-                var aEnd = new Array();
+                var aEnd = [];
                 for(prop in this.oTagPr)
                 {
                     sStart += "<" + prop + ">";
@@ -1402,7 +1402,7 @@ CopyProcessor.prototype =
                     else if(table_Selection_Cell == Item.Selection.Type)
                     {
                         //������� �������� �����
-						var aSelectedRows = new Array();
+						var aSelectedRows = [];
 						var oRowElems = new Object();
 						if(Item.Selection.Data.length > 0)
 						{
@@ -2017,7 +2017,7 @@ CopyProcessor.prototype =
 
     CopyPresentationTableCells: function(oDomTarget, graphicFrame)
     {
-        var aSelectedRows = new Array();
+        var aSelectedRows = [];
         var oRowElems = new Object();
         var Item = graphicFrame.graphicObject;
         if(Item.Selection.Data.length > 0)
@@ -2170,7 +2170,7 @@ CopyProcessor.prototype =
 
     CopyPresentationTableFull: function(oDomTarget, graphicFrame)
     {
-        var aSelectedRows = new Array();
+        var aSelectedRows = [];
         var oRowElems = new Object();
         var Item = graphicFrame.graphicObject;
 
@@ -2757,7 +2757,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.bNested = bNested;//��� ���������� � ��������
     this.oFonts = new Object();
     this.oImages = new Object();
-	this.aContent = new Array();
+	this.aContent = [];
 	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
     this.bIgnoreNoBlockText = false;
@@ -3456,7 +3456,7 @@ PasteProcessor.prototype =
 			this.bIsPlainText = this._CheckIsPlainText(node);
             this._Prepeare(node,
                 function(){
-                    oThis.aContent = new Array();
+                    oThis.aContent = [];
                     //�� ����� ���������� �������� ��� ������� ��������� �������
                     oThis._Execute(node, {}, true, true, false);
 
@@ -4066,7 +4066,7 @@ PasteProcessor.prototype =
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
-                     oThis.aContent = new Array();
+                     oThis.aContent = [];
                      //�� ����� ���������� �������� ��� ������� ��������� �������
                      var arrShapes = [], arrImages = [], arrTables = [];
                     var presentation = editor.WordControl.m_oLogicDocument;
@@ -4284,7 +4284,7 @@ PasteProcessor.prototype =
             //����������� �� ��������� �������� ������ ������� � ��������.
             this._Prepeare_recursive(node, true);
 
-            var aPrepeareFonts = new Array();
+            var aPrepeareFonts = [];
             for(var font_family in this.oFonts)
             {
                 //todo ��������� �����, ������ �� ��������
@@ -4302,7 +4302,7 @@ PasteProcessor.prototype =
                     aPrepeareFonts.push(new CFont("Arial", 0, "", 0));
                 }
             }
-			var aImagesToDownload = new Array();
+			var aImagesToDownload = [];
 			for(var image in this.oImages)
             {
 				var src = this.oImages[image];
@@ -5309,7 +5309,7 @@ PasteProcessor.prototype =
         var nRowCount = 0;
         var nMinColCount = 0;
         var nMaxColCount = 0;
-        var aColsCountByRow = new Array();
+        var aColsCountByRow = [];
         var oRowSums = new Object();
         oRowSums[0] = 0;
         var dMaxSum = 0;
@@ -5430,7 +5430,7 @@ PasteProcessor.prototype =
                 bUseScaleKoef = true;
             }
             //������ Grid
-            var aGrid = new Array();
+            var aGrid = [];
             var nPrevIndex = null;
             var nPrevVal = 0;
             for(var i in oRowSums)
@@ -5458,7 +5458,7 @@ PasteProcessor.prototype =
 			var CurPage = 0;
             var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, aGrid);
 			//считаем aSumGrid
-			var aSumGrid = new Array();
+			var aSumGrid = [];
 			aSumGrid[-1] = 0;
 			var nSum = 0;
 			for(var i = 0, length = aGrid.length; i < length; ++i)
@@ -6655,7 +6655,7 @@ PasteProcessor.prototype =
         var nRowCount = 0;
         var nMinColCount = 0;
         var nMaxColCount = 0;
-        var aColsCountByRow = new Array();
+        var aColsCountByRow = [];
         var oRowSums = new Object();
         oRowSums[0] = 0;
         var dMaxSum = 0;
@@ -6776,7 +6776,7 @@ PasteProcessor.prototype =
                 bUseScaleKoef = true;
             }
             //������ Grid
-            var aGrid = new Array();
+            var aGrid = [];
             var nPrevIndex = null;
             var nPrevVal = 0;
             for(var i in oRowSums)
@@ -6813,7 +6813,7 @@ PasteProcessor.prototype =
             graphicFrame.setXfrm(dd.GetMMPerDot(node["offsetLeft"]), dd.GetMMPerDot(node["offsetTop"]), dd.GetMMPerDot(node["offsetWidth"]), dd.GetMMPerDot(node["offsetHeight"]), null, null, null);
 
             //считаем aSumGrid
-            var aSumGrid = new Array();
+            var aSumGrid = [];
             aSumGrid[-1] = 0;
             var nSum = 0;
             for(var i = 0, length = aGrid.length; i < length; ++i)

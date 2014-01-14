@@ -1918,7 +1918,7 @@ function CStyles()
     this.Default.TableCellPr.Init_Default();
 
     this.Id = 0;
-    this.Style = new Array();
+    this.Style = [];
 
     // Создадим стандартные стили
 
@@ -2595,7 +2595,7 @@ CStyles.prototype =
 
     Get_AllTableStyles : function()
     {
-        var TableStyles = new Array();
+        var TableStyles = [];
         for ( var Id in this.Style )
         {
             var Style = this.Style[Id];
@@ -5187,7 +5187,7 @@ CParaTab.prototype =
 
 function CParaTabs()
 {
-    this.Tabs = new Array();
+    this.Tabs = [];
 };
 
 CParaTabs.prototype =

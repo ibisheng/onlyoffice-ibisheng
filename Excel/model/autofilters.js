@@ -3574,7 +3574,7 @@
 						}
 					}
 					//заполняем стили
-					var aNoHiddenCol = new Array();
+					var aNoHiddenCol = [];
 					for(var i = bbox.c1; i <= bbox.c2; i++)
 					{
 						var col = ws.model._getColNoEmpty(i);
@@ -3590,7 +3590,7 @@
 						if(aNoHiddenCol[aNoHiddenCol.length - 1] != bbox.c2)
 							style.ShowLastColumn = false;
 					}
-					var aNoHiddenRow = new Array();
+					var aNoHiddenRow = [];
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
 						var row = ws.model._getRowNoEmpty(i);
