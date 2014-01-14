@@ -1926,6 +1926,8 @@ function CBinaryFileWriter()
 
     this.WriteMods = function(mods)
     {
+		if(!mods || !mods.Mods)
+			return;
         var _count = mods.Mods.length;
         if (0 == _count)
             return;
