@@ -248,7 +248,7 @@ function NullState(drawingObjectsController)
         {
             var cur_drawing_base = arr_drawing_objects[i];
             var cur_drawing = cur_drawing_base;
-            if(cur_drawing.isShape() || cur_drawing.isImage())
+            if(cur_drawing.isShape() || cur_drawing.isImage() || cur_drawing.isChart())
             {
                 result = handleShapeImage(cur_drawing, this.drawingObjectsController, e, x, y);
                 if(result)
@@ -260,12 +260,12 @@ function NullState(drawingObjectsController)
                 if(result)
                     return result;
             }
-            else if(cur_drawing.isChart())
+            /*else if(cur_drawing.isChart())
             {
                 result = handleChart(cur_drawing,  this.drawingObjectsController, e, x, y);
                 if(result)
                     return result;
-            }
+            }*/
             else if(cur_drawing.isTable && cur_drawing.isTable())
             {
                 result = handleTable(cur_drawing,  this.drawingObjectsController, e, x, y);

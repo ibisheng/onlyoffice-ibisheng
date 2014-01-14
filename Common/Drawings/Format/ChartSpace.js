@@ -2160,7 +2160,7 @@ function CreateAreaChart(asc_series, type)
             pt.setVal(asc_series[i].Val.NumCache[j].val);
             num_cache.addPt(pt);
         }
-        bar_chart.addSer(series);
+        area_chart.addSer(series);
     }
     area_chart.setDLbls(new CDLbls());
     area_chart.addAxId(plot_area.catAx);

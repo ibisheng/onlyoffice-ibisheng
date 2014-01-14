@@ -134,6 +134,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
     var chart = this.getChartSpace(asc_chart, options);
     if(chart)
     {
+		chart.setStyle(2);
         this.resetSelection();
         var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
