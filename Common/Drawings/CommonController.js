@@ -154,7 +154,7 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 DrawingObjectsController.prototype =
 {
-    handleAdjustmentHit: function(hit, selectedObject)
+    handleAdjustmentHit: function(hit, selectedObject, group)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
@@ -167,32 +167,50 @@ DrawingObjectsController.prototype =
             {
                 this.arrPreTrackObjects.push(new PolarAdjustmentTrack(selectedObject, hit.adjNum));
             }
-            this.changeCurrentState(new PreChangeAdjState(this));
+			if(!isRealObject(group))
+				this.changeCurrentState(new PreChangeAdjState(this, selectedObject));
+			else
+			{
+				this.changeCurrentState(new PreChangeAdjInGroupState(this, group));
+			}
             return true;
         }
         else
         {
-            return {objectId: selectedObject.Get_Id(), cursorType: "crosshair"};
+			if(!isRealObject(group))
+				return {objectId: selectedObject.Get_Id(), cursorType: "crosshair"};
+			else
+				return {objectId: group.Get_Id(), cursorType: "crosshair"};
         }
     },
 
-    handleHandleHit: function(hit, selectedObject)
+    handleHandleHit: function(hit, selectedObject, group)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+			var selected_objects = group ? group.selectedObjects : this.selectedObjects; 
             this.arrPreTrackObjects.length = 0;
             if(hit === 8)
             {
                 if(selectedObject.canRotate())
                 {
-                    for(var i = 0; i < this.selectedObjects.length; ++i)
+                    for(var i = 0; i < selected_objects.length; ++i)
                     {
-                        if(this.selectedObjects[i].canRotate())
+                        if(selected_objects[i].canRotate())
                         {
-                            this.arrPreTrackObjects.push(this.selectedObjects[i].createRotateTrack());
+                            this.arrPreTrackObjects.push(selected_objects[i].createRotateTrack());
                         }
                     }
-                    this.changeCurrentState(new PreRotateState(this, selectedObject));
+					if(!isRealObject(group))
+					{
+						if(this.curState.group)
+						{
+							this.curState.group.resetSelection();
+						}
+						this.changeCurrentState(new PreRotateState(this, selectedObject));
+					}
+					else
+						this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
                 }
             }
             else
@@ -200,42 +218,61 @@ DrawingObjectsController.prototype =
                 if(selectedObject.canResize())
                 {
                     var card_direction = selectedObject.getCardDirectionByNum(hit);
-                    for(var j = 0; j < this.selectedObjects.length; ++j)
+                    for(var j = 0; j < selected_objects.length; ++j)
                     {
-                        if(this.selectedObjects[j].canResize())
-                            this.arrPreTrackObjects.push(this.selectedObjects[j].createResizeTrack(card_direction));
+                        if(selected_objects[j].canResize())
+                            this.arrPreTrackObjects.push(selected_objects[j].createResizeTrack(card_direction));
                     }
-                    this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction))
-                }
+					if(!isRealObject(group))
+					{
+						if(this.curState.group)
+						{
+							this.curState.group.resetSelection();
+						}
+						this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
+					}
+					else
+						this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
+				}
             }
             return true;
         }
         else
         {
-            card_direction = selectedObject.getCardDirectionByNum(hit);
-            return {objectId: selectedObject.Get_Id(), cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            var card_direction = selectedObject.getCardDirectionByNum(hit);
+            return {objectId: group ? group.Get_Id() : selectedObject.Get_Id(), cursorType: hit === 8 ? "crosshair" : CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
         }
     },
 
-    handleMoveHit: function(object, e, x, y)
+    handleMoveHit: function(object, e, x, y, group)
     {
         if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
+			var selector = group ? group : this;
             if(object.canMove())
             {
                 this.arrPreTrackObjects.length = 0;
                 var is_selected =  object.selected;
                 if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                    this.resetSelection();
-                this.selectObject(object);
-                this.checkSelectedObjectsForMove();
-                this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+                    selector.resetSelection();
+                selector.selectObject(object);
+                this.checkSelectedObjectsForMove(group);
+				if(!isRealObject(group))
+				{
+					if(this.curState.group)
+					{
+						this.curState.group.resetSelection();
+					}
+					this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, true));
+				}
+				else
+					this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
             }
             return true;
         }
         else
         {
-            return {objectId: object.Get_Id(), cursorType: "move"};
+            return {objectId: group ? group.Get_Id() : object.Get_Id(), cursorType: "move"};
         }
     },
 
@@ -253,8 +290,24 @@ DrawingObjectsController.prototype =
 
 
     handleNoHit: function()
-    {},
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            this.resetSelectionState();
+        }
+        else
+        {
+            return null;
+        }
+    },
 
+	handleClickOnSelectedGroup: function(group, e, x, y)
+	{
+		this.changeCurrentState(new GroupState(this, group));
+		this.onMouseDown(e, x, y);
+		this.onMouseUp(e, x, y);
+	},
+	
     getSnapArraysTrackObjects: function()
     {
         var snapX = [], snapY = [];
@@ -309,7 +362,7 @@ DrawingObjectsController.prototype =
     {
         this.arrTrackObjects.push(this.arrPreTrackObjects[0]);
         this.arrPreTrackObjects.length = 0;
-        this.changeCurrentState(new ChangeAdjState(this));
+        this.changeCurrentState(new ChangeAdjState(this, this.curState.majorObject));
         this.onMouseMove(e, x, y);
     },
 
@@ -323,6 +376,7 @@ DrawingObjectsController.prototype =
     {
         var track_object = this.arrTrackObjects[0];
         var _this = this;
+		var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -331,7 +385,10 @@ DrawingObjectsController.prototype =
         }
         this.checkSelectedObjectsAndFireCallback(callback, []);
         this.arrTrackObjects.length = 0;
-        this.changeCurrentState(new NullState(this));
+		if(group)
+			this.changeCurrentState(new GroupState(this, group));
+		else
+			this.changeCurrentState(new NullState(this));
     },
 
     handleStartRotateTrack: function(e, x, y)
@@ -386,6 +443,7 @@ DrawingObjectsController.prototype =
     {
         var tracks = this.getCopyTrackArray();
         var _this = this;
+		var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -393,11 +451,93 @@ DrawingObjectsController.prototype =
             {
                 tracks[i].trackEnd();
             }
+			if(isRealObject(group))
+			{
+				group.updateCoordinatesAfterInternalResize();
+			}
             _this.startRecalculate();
         }
         this.checkSelectedObjectsAndFireCallback(callback, []);
         this.arrTrackObjects.length = 0;
-        this.changeCurrentState(new NullState(this));
+		if(!isRealObject(this.curState.group))
+			this.changeCurrentState(new NullState(this));
+		else
+			this.changeCurrentState(new GroupState(this, this.curState.group));
+	},
+
+
+    handleMoveMouseDown: function()
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {cursorType: "move", objectId: this.curState.group ? this.curState.group.Get_Id() : this.curState.majorObject.Get_Id()};
+        }
+    },
+
+
+    handleAdjMouseDown: function()
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {cursorType: "crosshair", objectId: this.curState.group ? this.curState.group.Get_Id() : this.curState.majorObject.Get_Id()};
+        }
+    },
+
+    handleRotateMouseDown: function()
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {cursorType: "crosshair", objectId: this.curState.majorObject.Get_Id()};
+        }
+    },
+
+    handleResizeMouseDown: function()
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.curState.cardDirection], objectId: this.curState.majorObject.Get_Id()};
+        }
+    },
+
+    handleStartTrackNewShape: function(persetGeom, x, y)
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            this.changeCurrentState(new BeginTrackNewShapeState(this, persetGeom, x, y));
+            return true;
+        }
+        else
+        {
+            return {cursorType: "crosshair", objectId: null/*TODO: выяснить какой Id нужен верхнему классу*/};
+        }
+    },
+
+    handleTarckNewShapeMouseDown: function()
+    {
+        if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+        {
+            return true;
+        }
+        else
+        {
+            return {cursorType: "crosshair", objectId: null/*TODO: выяснить какой Id нужен верхнему классу*/};
+        }
     },
 
     getSnapArrays: function()
@@ -430,6 +570,7 @@ DrawingObjectsController.prototype =
     {
         var tracks = this.getCopyTrackArray();
         var _this = this;
+		var group = this.curState.group;
         function callback()
         {
             History.Create_NewPoint();
@@ -437,12 +578,25 @@ DrawingObjectsController.prototype =
             {
                 tracks[i].trackEnd();
             }
+			if(isRealObject(group))
+			{
+				group.updateCoordinatesAfterInternalResize();
+			}
             _this.startRecalculate();
         }
         this.checkSelectedObjectsAndCallback(callback, []);
         this.arrTrackObjects.length = 0;
-        this.changeCurrentState(new NullState(this));
+		if(!group)
+			this.changeCurrentState(new NullState(this));
+		else
+			this.changeCurrentState(new GroupState(this, group));
     },
+	
+	handleMouseUpCtrlShiftOnSelectedObject: function(object)
+	{
+		object.deselect(this);
+		this.changeCurrentState(new NullState(this));
+	},
 
     selectObject: function(object)
     {
@@ -475,8 +629,8 @@ DrawingObjectsController.prototype =
 
     refreshContentChanges: function()
     {
-        this.contentChanges.Refresh();
-        this.contentChanges.Clear();
+        //this.contentChanges.Refresh();
+        //this.contentChanges.Clear();
     },
 
     getAllFontNames: function()
@@ -1450,11 +1604,13 @@ DrawingObjectsController.prototype =
         var count = this.selectedObjects.length;
         while(count > 0)
         {
+			var selected_object = this.selectedObjects[0];
+			var old_group = selected_object.group;
+			selected_object.group = null;
             this.selectedObjects[0].deselect(this);
+			selected_object.group = old_group;
             --count;
         }
-        this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
-        this.drawingObjects.drawingDocument.TargetEnd();
     },
 
     clearPreTrackObjects: function()
@@ -1499,6 +1655,7 @@ DrawingObjectsController.prototype =
     trackNewShape: function(e, x, y)
     {
         this.arrTrackObjects[0].track(e, x, y);
+        this.updateOverlay();
     },
 
     trackMoveObjects: function(dx, dy)
@@ -1574,8 +1731,8 @@ DrawingObjectsController.prototype =
         xfrm.setOffY(min_y);
         xfrm.setExtX(max_x-min_x);
         xfrm.setExtY(max_y-min_y);
-        xfrm.setChExtX(max_x);
-        xfrm.setChExtY(max_y);
+        xfrm.setChExtX(max_x-min_x);
+        xfrm.setChExtY(max_y-min_y);
         xfrm.setChOffX(0);
         xfrm.setChOffY(0);
         for(i = 0; i < grouped_objects.length; ++i)
@@ -1583,7 +1740,7 @@ DrawingObjectsController.prototype =
             grouped_objects[i].spPr.xfrm.setOffX(grouped_objects[i].x - min_x);
             grouped_objects[i].spPr.xfrm.setOffY(grouped_objects[i].y - min_y);
             grouped_objects[i].setGroup(group);
-            group.addToSpTree(grouped_objects[i]);
+            group.addToSpTree(group.spTree.length, grouped_objects[i]);
         }
         return group;
     },
@@ -1977,12 +2134,6 @@ DrawingObjectsController.prototype =
         }
     },
 
-    isPointInDrawingObjects: function(x, y)
-    {
-        return null;// this.curState.isPointInDrawingObjects(x, y);
-    },
-
-
     getSelectedObjects: function()
     {
         return this.selectedObjects;
@@ -2323,7 +2474,26 @@ DrawingObjectsController.prototype =
         ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
     },
 
-    Get_SelectedText: function()
+    createImage: function(rasterImageId, x, y, extX, extY)
+	{
+		var image = new CImageShape();
+		image.setSpPr(new CSpPr());
+		image.spPr.setParent(image);
+		image.spPr.setGeometry(CreateGeometry("rect"));
+		image.spPr.setXfrm(new CXfrm());
+		image.spPr.xfrm.setParent(image.spPr);
+		image.spPr.xfrm.setOffX(x);
+		image.spPr.xfrm.setOffY(y);
+		image.spPr.xfrm.setExtX(extX);
+		image.spPr.xfrm.setExtY(extY);
+		image.setBlipFill(new CBlipFill());
+		image.blipFill.setRasterImageId(rasterImageId);
+		image.blipFill.setStretch(true);
+		image.setNvPicPr(new UniNvPr());
+		return image;
+	},
+	
+	Get_SelectedText: function()
     {
         if(this.curState.textObject && this.curState.textObject.Get_SelectedText)
         {
