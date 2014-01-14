@@ -8,8 +8,10 @@ CChartSpace.prototype.setRecalculateInfo = function()
     {
         recalculateTransform: true,
         recalculateBounds:    true,
-        recalculateChart:     true
+        recalculateChart:     true,
+		recalculateStyle: true
     };
+	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -105,3 +107,78 @@ CChartSpace.prototype.hitInWorkArea = function()
     return false;
 };
 
+function CreateUnfilFromRGB(r, g, b)
+{
+	var ret =  new CUniFill();
+	ret.setFill(new CSolidFill());
+	ret.fill.setColor(new CUniColor());
+	ret.fill.color.setColor(new CRGBColor());
+	ret.fill.color.color.setColor(r, g, b);
+	return ret;
+}
+
+function CreateUnifillSolidFillSchemeColorByIndex(index)
+{
+	var ret =  new CUniFill();
+	ret.setFill(new CSolidFill());
+	ret.fill.setColor(new CUniColor());
+	ret.fill.color.setColor(new CSchemeColor());
+	ret.fill.color.color.setId(index);
+	return ret;
+}
+
+
+
+function CreateColorMapByIndex(index)
+{
+	var ret = [];
+	switch(index)
+	{
+		case 1:
+		{
+			ret.push(CreateUnfilFromRGB(85, 85, 85));
+			ret.push(CreateUnfilFromRGB(158, 158, 158));
+			ret.push(CreateUnfilFromRGB(114, 114, 114));
+			ret.push(CreateUnfilFromRGB(70, 70, 70));
+			ret.push(CreateUnfilFromRGB(131, 131, 131));
+			ret.push(CreateUnfilFromRGB(193, 193, 193));
+			break;
+		}
+		case 2:
+		{
+			for(var i = 0;  i < 6; ++i)
+			{
+				ret.push(CreateUnifillSolidFillSchemeColorByIndex(i));
+			}
+			break;
+		}
+		default:
+		{
+			ret.push(CreateUnifillSolidFillSchemeColorByIndex(index - 3));
+			break;
+		}
+	}
+	return ret;
+}
+
+CChartSpace.prototype.recalculateStyle = function()
+{
+	var is_on = History.Is_On();
+	if(is_on)
+	{
+		History.TurnOff();
+	}
+	
+	if ( styleId && (typeof(styleId) == 'number') ) {
+			if ( styleId % 8 === 0 )		
+				this.baseColors = CreateColorMapByIndex(8);
+			else
+				this.baseColors = CreateColorMapByIndex(styleId % 8);
+		}
+		else
+			this.baseColors = CreateColorMapByIndex(2);
+	if(is_on)
+	{
+		History.TurnOn();
+	}
+};

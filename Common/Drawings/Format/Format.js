@@ -1869,7 +1869,7 @@ CBlipFill.prototype =
     setRasterImageId: function(rasterImageId)
     {
         History.Add(this, {Type: historyitem_BlipFill_SetRasterImageId, oldRasterImageId: this.RasterImageId, newRasterImageId: rasterImageId});
-        this.RasterImage = rasterImageId;
+        this.RasterImageId = rasterImageId;
     },
 
     setVectorImageBin: function(vectorImageBin)
@@ -5125,7 +5125,7 @@ function NvPr()
         }
     };
     
-    this.Id = g_oTableId.Get_NewId();
+    this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 

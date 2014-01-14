@@ -36,6 +36,10 @@ function MoveShapeImageTrack(originalObject)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
         global_MatrixTransformer.RotateRadAppend(this.transform, -original.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+		if(this.originalObject.group)
+		{
+			global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
+		}
     };
 
     this.draw = function(overlay)
@@ -45,9 +49,21 @@ function MoveShapeImageTrack(originalObject)
 
     this.trackEnd = function()
     {
-        var xfrm = this.originalObject.spPr.xfrm;
-        xfrm.setOffX(this.x);
-        xfrm.setOffY(this.y);
+		var scale_scale_coefficients, ch_off_x, ch_off_y;
+		if(this.originalObject.group)
+		{
+			scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
+			ch_off_x = this.originalObject.group.spPr.xfrm.chOffX;
+			ch_off_y = this.originalObject.group.spPr.xfrm.chOffY;
+		}
+		else
+		{
+			scale_coefficients = {cx: 1, cy: 1};
+			ch_off_x = 0;
+			ch_off_y = 0;
+		}
+		this.originalObject.spPr.xfrm.setOffX(this.x/scale_coefficients.cx + ch_off_x);
+        this.originalObject.spPr.xfrm.setOffY(this.y/scale_coefficients.cy + ch_off_y);
     };
 }
 

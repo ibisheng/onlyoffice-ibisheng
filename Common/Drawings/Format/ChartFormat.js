@@ -6352,6 +6352,22 @@ CLineChart.prototype =
 };
 
 
+function CalculateSeriesPenBrush()
+{
+	var is_on = History.IS_On();
+	if(is_on)
+	{
+		History.TurnOff();
+	}
+	
+	var brush = new CUniFill();
+	
+	if(is_on)
+	{
+		History.TurnOn();
+	}
+}
+
 function CLineSeries()
 {
     this.cat           = null;
@@ -6366,6 +6382,7 @@ function CLineSeries()
     this.trendline     = null;
     this.tx            = null;
     this.val           = null;
+	
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6393,6 +6410,11 @@ CLineSeries.prototype =
     {
         this.Id = r.GetString2();
     },
+	
+	recalculateBrush: function()
+	{
+		
+	},
 
     setCat: function(pr)
     {

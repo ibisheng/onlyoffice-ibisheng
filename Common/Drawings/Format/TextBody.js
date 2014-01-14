@@ -132,19 +132,19 @@ CTextBody.prototype =
 
     setLstStyle: function(lstStyle)
     {
-        History.Add(this, {Type:historyitem_SetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        //History.Add(this, {Type:historyitem_SetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
         this.lstStyle = lstStyle;
     },
 
     setShape: function(shape)
     {
-        History.Add(this, {Type:historyitem_SetShape, oldPr: this.shape, newPr: shape});
+        //History.Add(this, {Type:historyitem_SetShape, oldPr: this.shape, newPr: shape});
         this.shape = shape;
     },
 
     setDocContent: function(docContent)
     {
-        History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
+        //History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
         this.content = docContent;
 
     },

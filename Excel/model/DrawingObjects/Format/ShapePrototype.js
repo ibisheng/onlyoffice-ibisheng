@@ -174,7 +174,8 @@ CShape.prototype.getParentObjects = function ()
     return { slide: null, layout: null, master: null, theme: window["Asc"]["editor"].wbModel.theme};
 };
 
-CShape.prototype.recalculate = function () {
+CShape.prototype.recalculate = function () 
+{
     if (this.recalcInfo.recalculateBrush) {
         this.recalculateBrush();
         this.recalcInfo.recalculateBrush = false;
@@ -210,8 +211,8 @@ CShape.prototype.recalculate = function () {
     if(this.recalcInfo.recalculateBounds)
     {
         this.recalculateBounds();
+        this.recalcInfo.recalculateBounds = false;
     }
-
 };
 CShape.prototype.recalculateBounds = function()
 {

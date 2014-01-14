@@ -86,7 +86,7 @@ Path.prototype = {
                     var Y1 = command.Y1;
                     var X2 = command.X2;
                     var Y2 = command.Y2;
-                    p.addPathCommand({id: bezier3, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
+                    p.addPathCommand({id: bezier4, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
                     break;
                 }
                 case arcTo:

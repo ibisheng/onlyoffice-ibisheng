@@ -15,14 +15,17 @@ function CGroupShape(parent)
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
-    this.transform = null;
+    this.transform = new CMatrix();
     this.invertTransform = null;
     this.brush  = null;
     this.pen = null;
+    this.scaleCoefficients = {cx: 1, cy: 1};
 
     this.selected = false;
     this.arrGraphicObjects = [];
     this.selectedObjects = [];
+
+    this.setRecalculateInfo();
     this.Lock = new CLock();
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -428,6 +431,21 @@ CGroupShape.prototype =
     {
         return null;
     },
+	
+	selectObject: function(object)
+    {
+        object.selected = true;
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            if(this.selectedObjects[i] === object)
+            {
+                break;
+            }
+        }
+        if(i === this.selectedObjects.length)
+            this.selectedObjects.push(object);
+    },
+
 
     recalculate: function()
     {
@@ -443,6 +461,11 @@ CGroupShape.prototype =
             this.recalculatePen();
             recalcInfo.recalculatePen = false;
         }
+		if(recalcInfo.recalculateScaleCoefficients)
+		{
+			this.getResultScaleCoefficients();
+			recalcInfo.recalculateScaleCoefficients = false;
+		}
 
         if(recalcInfo.recalculateTransform)
         {
@@ -453,6 +476,11 @@ CGroupShape.prototype =
             this.recalculateArrGraphicObjects();
         for(var i = 0;  i < this.spTree.length; ++i)
             this.spTree[i].recalculate();
+        if(recalcInfo.recalculateBounds)
+        {
+            this.recalculateBounds();
+            recalcInfo.recalculateBounds = false;
+        }
     },
 
     recalcTransform:function()
@@ -474,32 +502,35 @@ CGroupShape.prototype =
 
     canRotate: function()
     {
-        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+		//TODO: сделать еще проверку SpLock
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.arrGraphicObjects[i] instanceof CGraphicFrame || (typeof CChartAsGroup != "undefined" && this.arrGraphicObjects[i] instanceof CChartAsGroup))
-                return false
+            if(!this.spTree[i].canRotate || !this.spTree[i].canRotate())
+				return false;
         }
         return true;
     },
 
     canResize: function()
     {
-        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+		//TODO: сделать еще проверку SpLock
+        for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.arrGraphicObjects[i] instanceof CGraphicFrame)
+            if(!this.spTree[i].canResize || !this.spTree[i].canResize())
                 return false
         }
-        return true;//TODO
+        return true;
     },
 
     canMove: function()
     {
+		//TODO: сделать еще проверку SpLock
         return true;//TODO
     },
 
     canGroup: function()
     {
-
+		//TODO: сделать еще проверку SpLock
         return true;//TODO
     },
 
@@ -1206,10 +1237,15 @@ CGroupShape.prototype =
             new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
             new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
         }
-        this.setOffset(new_off_x, new_off_y);
-        this.setExtents(new_ext_x, new_ext_y);
-        this.setChildExtents(new_ext_x, new_ext_y);
-        this.setChildOffset(0, 0);
+		var xfrm = this.spPr.xfrm;
+		xfrm.setOffX(new_off_x);
+		xfrm.setOffY(new_off_y);
+		xfrm.setExtX(new_ext_x);
+		xfrm.setExtY(new_ext_y);
+		xfrm.setChExtX(new_ext_x);
+		xfrm.setChExtY(new_ext_y);
+		xfrm.setChOffX(0);
+		xfrm.setChOffY(0);
     },
 
     updateCoordinatesAfterInternalResize: function()
@@ -1315,12 +1351,17 @@ CGroupShape.prototype =
         pos_x = new_xc - new_hc;
         pos_y = new_yc - new_vc;
 
-        this.setOffset(pos_x, pos_y);
-        this.setExtents(Math.abs(max_x - min_x), Math.abs(max_y - min_y));
-        this.setChildExtents(Math.abs(max_x - min_x), Math.abs(max_y - min_y));
+		var xfrm = this.spPr.xfrm;
+		xfrm.setOffX(pos_x);
+		xfrm.setOffY(pos_y);
+		xfrm.setExtX(Math.abs(max_x - min_x));
+		xfrm.setExtY(Math.abs(max_y - min_y));
+		xfrm.setChExtX(Math.abs(max_x - min_x));
+		xfrm.setChExtY(Math.abs(max_y - min_y));
         for(i = 0; i < sp_tree.length; ++i)
         {
-            sp_tree[i].setOffset(sp_tree[i].spPr.xfrm.offX - x_min_clear, sp_tree[i].spPr.xfrm.offY - y_min_clear);
+			sp_tree[i].spPr.xfrm.setOffX(sp_tree[i].spPr.xfrm.offX - x_min_clear);
+			sp_tree[i].spPr.xfrm.setOffY(sp_tree[i].spPr.xfrm.offY - y_min_clear);
         }
     },
 
@@ -1364,33 +1405,6 @@ CGroupShape.prototype =
     getParentObjects: function()
     {
         var parents = {slide: null, layout: null, master: null, theme: null};
-        switch (this.parent.kind)
-        {
-            case SLIDE_KIND:
-            {
-                parents.slide = this.parent;
-                parents.layout = this.parent.Layout;
-                parents.master = this.parent.Layout.Master;
-                parents.theme = this.parent.Layout.Master.Theme;
-                parents.presentation = this.parent.Layout.Master.presentation;
-                break;
-            }
-            case LAYOUT_KIND:
-            {
-                parents.layout = this.parent;
-                parents.master = this.parent.Master;
-                parents.theme = this.parent.Master.Theme;
-                parents.presentation = this.parent.Master.presentation;
-                break;
-            }
-            case MASTER_KIND:
-            {
-                parents.master = this.parent;
-                parents.theme = this.parent.Theme;
-                parents.presentation = this.parent.presentation;
-                break;
-            }
-        }
         return parents;
     },
 
@@ -1482,20 +1496,6 @@ CGroupShape.prototype =
     },
 
 
-    hitInBoundingRect: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var x_t = invert_transform.TransformPointX(x, y);
-        var y_t = invert_transform.TransformPointY(x, y);
-
-        var _hit_context = this.getParentObjects().presentation.DrawingDocument.CanvasHitContext;
-
-        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
-    },
 
 
     createRotateTrack: function()
@@ -1525,96 +1525,6 @@ CGroupShape.prototype =
         return {hit: false, num: -1, polar: false};
     },
 
-    hitToHandles: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var t_x, t_y;
-        t_x = invert_transform.TransformPointX(x, y);
-        t_y = invert_transform.TransformPointY(x, y);
-        var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
-
-        var sqr_x = t_x*t_x, sqr_y = t_y*t_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 0;
-
-        var hc = this.extX*0.5;
-        var dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 1;
-
-        dist_x = t_x - this.extX;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 2;
-
-        var vc = this.extY*0.5;
-        var dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 3;
-
-        dist_y = t_y - this.extY;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 4;
-
-        dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 5;
-
-        dist_x = t_x;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 6;
-
-        dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 7;
-
-        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
-        dist_y = t_y + rotate_distance;
-        sqr_y = dist_y*dist_y;
-        dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 8;
-
-        return -1;
-
-    },
-
-    getRotateAngle: function(x, y)
-    {
-        var transform = this.getTransformMatrix();
-        var rotate_distance = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
-        var xc_t = transform.TransformPointX(hc, vc);
-        var yc_t = transform.TransformPointY(hc, vc);
-        var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
-        var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
-
-        var invert_transform = this.getInvertTransform();
-        var rel_x = invert_transform.TransformPointX(x, y);
-
-        var v1_x, v1_y, v2_x, v2_y;
-        v1_x = x - xc_t;
-        v1_y = y - yc_t;
-
-        v2_x = rot_x_t - xc_t;
-        v2_y = rot_y_t - yc_t;
-
-        var flip_h = this.getFullFlipH();
-        var flip_v = this.getFullFlipV();
-        var same_flip = flip_h && flip_v || !flip_h && !flip_v;
-        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
-        return same_flip ? angle : -angle;
-    },
-
-
     setNvSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
@@ -1627,11 +1537,6 @@ CGroupShape.prototype =
             }
         }
     },
-
-
-
-
-
 
     swapGraphicObject: function(idRemove, idAdd)
     {

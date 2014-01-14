@@ -2266,51 +2266,13 @@ CShape.prototype =
             new_ext_x = scale_scale_coefficients.cx * xfrm.extX;
             new_ext_y = scale_scale_coefficients.cy * xfrm.extY;
         }
-        this.setOffset(new_off_x, new_off_y);
-        this.setExtents(new_ext_x, new_ext_y);
+		var xfrm = this.spPr.xfrm;
+		xfrm.setOffX(new_off_x);
+		xfrm.setOffY(new_off_y);
+		xfrm.setExtX(new_ext_x);
+		xfrm.setExtY(new_ext_y);
     },
-
-    setRotate: function (rot) {
-        var xfrm = this.spPr.xfrm;
-        History.Add(this, { Type: historyitem_SetShapeRot, oldRot: xfrm.rot, newRot: rot });
-
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        xfrm.rot = rot;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-
-    },
-
-    setOffset: function (offX, offY) {
-        History.Add(this, { Type: historyitem_SetShapeOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY });
-        this.spPr.xfrm.offX = offX;
-        this.spPr.xfrm.offY = offY;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
-    setExtents: function (extX, extY) {
-        History.Add(this, { Type: historyitem_SetShapeExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY });
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-    setFlips: function (flipH, flipV) {
-        History.Add(this, { Type: historyitem_SetShapeFlips, oldFlipH: this.spPr.xfrm.flipH, newFlipH: flipH, oldFlipV: this.spPr.xfrm.flipV, newFlipV: flipV });
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
-        this.recalcInfo.recalculateTransform = true;
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
-
+	
     check_bounds: function (checker) {
         if (this.spPr.geometry) {
             this.spPr.geometry.check_bounds(checker);

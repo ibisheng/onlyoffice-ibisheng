@@ -3893,14 +3893,9 @@ function DrawingObjects() {
 					var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
 					var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
 					
-					// CImage
-					History.Create_NewPoint();
-					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
-					drawingObject.graphicObject.initDefault( pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y), _image.src );
-					drawingObject.graphicObject.select(_this.controller);
-					drawingObject.graphicObject.setDrawingObjects(_this);
 					
-					drawingObject.graphicObject.addToDrawingObjects();
+					// CImage
+					_this.controller.addImageFromParams(_image.src, pxToMm(coordsFrom.x), pxToMm(coordsFrom.y), pxToMm(coordsTo.x - coordsFrom.x), pxToMm(coordsTo.y - coordsFrom.y));
 				}
 				
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
@@ -4730,11 +4725,11 @@ function DrawingObjects() {
 			}
 		}
 		
-		if ( bRedraw ) {
-			worksheet._checkSelectionShape();
-			_this.sendGraphicObjectProps();
-			_this.showDrawingObjects(true);
-		}
+		//if ( bRedraw ) {
+		//	worksheet._checkSelectionShape();
+		//	_this.sendGraphicObjectProps();
+		//	_this.showDrawingObjects(true);
+		//}
 		
         return position;
 	};

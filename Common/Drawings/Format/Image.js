@@ -1,4 +1,4 @@
-function CImageShape(parent)
+function CImageShape()
 {
     this.nvPicPr  = null;
     this.spPr     = new CSpPr();
@@ -22,6 +22,8 @@ function CImageShape(parent)
 
     this.selected = false;
 
+	
+    this.setRecalculateInfo();
     this.Lock = new CLock();
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -500,7 +502,13 @@ CImageShape.prototype =
 
     recalculateBrush: function()
     {
-        this.brush = this.blipFill;
+		var is_on = History.Is_On();
+		if(is_on)
+			History.TurnOff();
+		this.brush = new CUniFill();
+		this.brush.setFill(this.blipFill);
+		if(is_on)
+			History.TurnOn();
     },
 
     recalculatePen: function()
@@ -874,48 +882,6 @@ CImageShape.prototype =
         return {x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV};
     },
 
-    recalculate: function()
-    {
-        if(this.recalcInfo.recalculateBrush)
-        {
-            this.recalculateBrush();
-            this.recalcInfo.recalculateBrush = false;
-        }
-
-        if(this.recalcInfo.recalculatePen)
-        {
-            this.recalculatePen();
-            this.recalcInfo.recalculatePen = false;
-        }
-
-        if(this.recalcInfo.recalculateTransform)
-        {
-            this.recalculateTransform();
-            this.recalcInfo.recalculateTransform = false;
-        }
-
-        if(this.recalcInfo.recalculateCursorTypes)
-        {
-            this.recalculateCursorTypes();
-            this.recalcInfo.recalculateCursorTypes = false;
-        }
-        if(this.recalcInfo.recalculateGeometry)
-        {
-            this.recalculateGeometry();
-            this.recalcInfo.recalculateGeometry = false;
-        }
-    },
-
-    setGeometry: function(geometry)
-    {
-        var old_geometry = this.spPr.geometry;
-        var new_geometry = geometry;
-        this.spPr.geometry = geometry;
-        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: new_geometry});
-        this.recalcInfo.recalculateGeometry = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
-
     draw: function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -984,130 +950,7 @@ CImageShape.prototype =
     {
     },
 
-    getCardDirectionByNum: function(num)
-    {
-        var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
-        var full_flip_h = this.getFullFlipH();
-        var full_flip_v = this.getFullFlipV();
-        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
-        if(same_flip)
-            return ((num - num_north) + CARD_DIRECTION_N + 8)%8;
-
-        return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
-    },
-
-
-    getResizeCoefficients: function(numHandle, x, y)
-    {
-        var cx, cy;
-        cx= this.extX > 0 ? this.extX : 0.01;
-        cy= this.extY > 0 ? this.extY : 0.01;
-
-        var invert_transform = this.getInvertTransform();
-        var t_x = invert_transform.TransformPointX(x, y);
-        var t_y = invert_transform.TransformPointY(x, y);
-
-        switch(numHandle)
-        {
-            case 0:
-                return {kd1: (cx-t_x)/cx, kd2: (cy-t_y)/cy};
-            case 1:
-                return {kd1: (cy-t_y)/cy, kd2: 0};
-            case 2:
-                return {kd1: (cy-t_y)/cy, kd2: t_x/cx};
-            case 3:
-                return {kd1: t_x/cx, kd2: 0};
-            case 4:
-                return {kd1: t_x/cx, kd2: t_y/cy};
-            case 5:
-                return {kd1: t_y/cy, kd2: 0};
-            case 6:
-                return {kd1: t_y/cy, kd2:(cx-t_x)/cx};
-            case 7:
-                return {kd1:(cx-t_x)/cx, kd2: 0};
-        }
-        return {kd1: 1, kd2: 1};
-    },
-
-    hitToHandles: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var t_x, t_y;
-        t_x = invert_transform.TransformPointX(x, y);
-        t_y = invert_transform.TransformPointY(x, y);
-        var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
-
-        var sqr_x = t_x*t_x, sqr_y = t_y*t_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 0;
-
-        var hc = this.extX*0.5;
-        var dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 1;
-
-        dist_x = t_x - this.extX;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 2;
-
-        var vc = this.extY*0.5;
-        var dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 3;
-
-        dist_y = t_y - this.extY;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 4;
-
-        dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 5;
-
-        dist_x = t_x;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 6;
-
-        dist_y = t_y - vc;
-        sqr_y = dist_y*dist_y;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 7;
-
-        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);;
-        dist_y = t_y + rotate_distance;
-        sqr_y = dist_y*dist_y;
-        dist_x = t_x - hc;
-        sqr_x = dist_x*dist_x;
-        if(Math.sqrt(sqr_x + sqr_y) < radius)
-            return 8;
-
-        return -1;
-
-    },
-
-
-    check_bounds: function(checker)
-    {
-        if (this.spPr.geometry)
-        {
-            this.spPr.geometry.check_bounds(checker);
-        }
-        else
-        {
-            checker._s();
-            checker._m(0, 0);
-            checker._l(this.extX, 0);
-            checker._l(this.extX, this.extY);
-            checker._l(0, this.extY);
-            checker._z();
-            checker._e();
-        }
-    },
+   
 
 
     hitToAdjustment: function()
@@ -1136,66 +979,8 @@ CImageShape.prototype =
     },
 
 
-    hitInBoundingRect: function(x, y)
-    {
-        var invert_transform = this.getInvertTransform();
-        var x_t = invert_transform.TransformPointX(x, y);
-        var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.getParentObjects().presentation.DrawingDocument.CanvasHitContext;
-
-        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) /*||
-         HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE))*/);
-    },
-
-    getNumByCardDirection: function(cardDirection)
-    {
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
-        var transform = this.getTransformMatrix();
-        var y1, y3, y5, y7;
-        y1 = transform.TransformPointY(hc, 0);
-        y3 = transform.TransformPointY(this.extX, vc);
-        y5 = transform.TransformPointY(hc, this.extY);
-        y7 = transform.TransformPointY(0, vc);
-
-        var north_number;
-        var full_flip_h = this.getFullFlipH();
-        var full_flip_v = this.getFullFlipV();
-        switch(Math.min(y1, y3, y5, y7))
-        {
-            case y1:
-            {
-                north_number = !full_flip_v ? 1 : 5;
-                break;
-            }
-            case y3:
-            {
-                north_number = !full_flip_h ? 3 : 7;
-                break;
-            }
-            case y5:
-            {
-                north_number = !full_flip_v ? 5 : 1;
-                break;
-            }
-            default:
-            {
-                north_number = !full_flip_h ? 7 : 3;
-                break;
-            }
-        }
-        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
-
-        if(same_flip)
-            return (north_number + cardDirection)%8;
-        return (north_number - cardDirection + 8)%8;
-    },
-
-
+   
     setNvSpPr: function(pr)
     {
         History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvPicPr, newPr: pr});

@@ -1,13 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/27/13
- * Time: 3:29 PM
- * To change this template use File | Settings | File Templates.
- */
-
-
-
 function OverlayObject(geometry, extX, extY, brush, pen, transform)
     //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
 {
@@ -106,10 +96,12 @@ function RotateTrackShapeImage(originalObject)
     this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
-
+	var full_flip_h = this.originalObject.getFullFlipH();
+	var full_flip_v = this.originalObject.getFullFlipV();
+    this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay)
     {
-        this.overlayObject.draw(overlay);
+        this.overlayObject.draw(overlay);	
     };
 
     this.track = function(angle, e)
@@ -147,6 +139,10 @@ function RotateTrackShapeImage(originalObject)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
         global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
         global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
+		if(this.originalObject.group)
+		{
+			global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
+		}
     };
 
     this.trackEnd = function()
@@ -154,66 +150,6 @@ function RotateTrackShapeImage(originalObject)
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }
-
-function RotateTrackShapeImageInGroup(originalObject)
-{
-    this.originalObject = originalObject;
-    this.transform = new CMatrix();
-    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
-
-    this.angle = originalObject.rot;
-    var full_flip_h = this.originalObject.getFullFlipH();
-    var full_flip_v = this.originalObject.getFullFlipV();
-    this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
-    this.draw = function(overlay)
-    {
-        this.overlayObject.draw(overlay);
-    };
-
-    this.track = function(angle, e)
-    {
-        var new_rot = this.signum*angle + this.originalObject.rot;
-        while(new_rot < 0)
-            new_rot += 2*Math.PI;
-        while(new_rot >= 2*Math.PI)
-            new_rot -= 2*Math.PI;
-
-        if(new_rot < MIN_ANGLE || new_rot > 2*Math.PI - MIN_ANGLE)
-            new_rot = 0;
-
-        if(Math.abs(new_rot-Math.PI*0.5) < MIN_ANGLE)
-            new_rot = Math.PI*0.5;
-
-        if(Math.abs(new_rot-Math.PI) < MIN_ANGLE)
-            new_rot = Math.PI;
-
-        if(Math.abs(new_rot-1.5*Math.PI) < MIN_ANGLE)
-            new_rot = 1.5*Math.PI;
-
-        if(e.ShiftKey)
-            new_rot = (Math.PI/12)*Math.floor(12*new_rot/(Math.PI));
-        this.angle = new_rot;
-
-        var hc, vc;
-        hc = this.originalObject.extX*0.5;
-        vc = this.originalObject.extY*0.5;
-        this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
-        if(this.originalObject.flipH)
-            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
-        if(this.originalObject.flipV)
-            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
-        global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.getTransformMatrix());
-    };
-
-    this.trackEnd = function()
-    {
-        this.originalObject.setRotate(this.angle);
-    }
-}
-
 
 function RotateTrackGroup(originalObject)
 {
@@ -292,6 +228,6 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
-        this.originalObject.setRotate(this.angle);
+         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }

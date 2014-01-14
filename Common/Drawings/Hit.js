@@ -2,12 +2,12 @@
 
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
-    var l = Math.min(x0, x1);
+   /* var l = Math.min(x0, x1);
     var t = Math.min(y0, y1);
     var r = Math.max(x0, x1);
     var b = Math.max(y0, y1);
     if(px < l || px > r || py < t || py > b)
-        return false;
+        return false;*/
     var tx, ty, dx, dy, d;
     tx=x1-x0;
     ty=y1-y0;

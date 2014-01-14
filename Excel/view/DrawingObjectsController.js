@@ -58,13 +58,14 @@ DrawingObjectsController.prototype.getDrawingObjects = function()
     }
     return ret;
 };
-DrawingObjectsController.prototype.checkSelectedObjectsForMove = function()
+DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 {
-    for(var i = 0; i < this.selectedObjects.length; ++i)
+	var selected_object = group ? group.selectedObjects : this.selectedObjects;
+    for(var i = 0; i < selected_object.length; ++i)
     {
-        if(this.selectedObjects[i].canMove())
+        if(selected_object[i].canMove())
         {
-            this.arrPreTrackObjects.push(this.selectedObjects[i].createMoveTrack());
+            this.arrPreTrackObjects.push(selected_object[i].createMoveTrack());
         }
     }
 };
@@ -92,11 +93,8 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.ctrlKey;
-    this.curState.onMouseDown(e, x, y);
-    if(e.ClickCount < 2)
-    {
-        this.recalculateCurPos()
-    }
+    return this.curState.onMouseDown(e, x, y);
+
 };
 
 DrawingObjectsController.prototype.onMouseMove = function(e, x, y)
@@ -113,7 +111,6 @@ DrawingObjectsController.prototype.onMouseUp = function(e, x, y)
     this.curState.onMouseUp(e, x, y);
 };
 
-
 DrawingObjectsController.prototype.createGroup = function()
 {
     History.Create_NewPoint();
@@ -124,9 +121,11 @@ DrawingObjectsController.prototype.createGroup = function()
         group_array[i].deleteDrawingBase();
     }
     this.resetSelection();
+    group.setDrawingObjects(this.drawingObjects);
     group.addToDrawingObjects();
     this.selectObject(group);
     group.addToRecalculate();
+    this.startRecalculate();
 };
 
 DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, options)
@@ -165,3 +164,35 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(asc_chart, o
         this.startRecalculate();
     }
 };
+
+DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
+{
+    this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+    var ret = this.onMouseDown(e || {}, x, y);
+    this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+    return ret;
+}
+
+DrawingObjectsController.prototype.handleDoubleClickOnChart = function(chart)
+{
+	this.changeCurrentState(new NullState());
+}
+
+DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, x, y, extX, extY)
+{
+	History.Create_NewPoint();
+    var image = this.createImage(rasterImageId, x, y, extX, extY);
+    this.resetSelection();
+    image.setDrawingObjects(this.drawingObjects);
+    image.addToDrawingObjects();
+    this.selectObject(image);
+    image.addToRecalculate();
+    this.startRecalculate();
+}
+
+
+
+function CheckRightButtonEvent(e)
+{
+	return e.button === 2;
+}
