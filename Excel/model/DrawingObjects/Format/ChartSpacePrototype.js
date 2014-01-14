@@ -119,11 +119,6 @@ CChartSpace.prototype.recalculate = function()
        this.recalculateTransform();
        this.recalcInforecalculateTransform = false;
     }
-    if(this.recalcInfo.recalculateChart)
-    {
-        this.recalculateChart();
-        this.recalcInfo.recalculateChart = false;
-    }
     if(this.recalcInfo.recalculateBounds)
     {
         this.recalculateBounds();
@@ -139,6 +134,11 @@ CChartSpace.prototype.recalculate = function()
 		this.recalculateSeriesColors();
         this.recalcInfo.recalculateBaseColors = false;
 	}
+    if(this.recalcInfo.recalculateChart)
+    {
+        this.recalculateChart();
+        this.recalcInfo.recalculateChart = false;
+    }
 };
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitInWorkArea = function()
