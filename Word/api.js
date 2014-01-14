@@ -486,7 +486,7 @@ var DocumentPageSize = new function() {
     this.sizeEpsMM = 0.5;
     this.getSize = function(widthMm, heightMm)
     {
-        for( index in this.oSizes)
+        for( var index in this.oSizes)
         {
             var item = this.oSizes[index];
             if(Math.abs(widthMm - item.w_mm) < this.sizeEpsMM && Math.abs(heightMm - item.h_mm) < this.sizeEpsMM)
@@ -4034,9 +4034,9 @@ asc_docs_api.prototype.put_AddPageBreak = function()
     }
 }
 asc_docs_api.prototype.Update_ParaInd = function( Ind ){
-	FirstLine = 0;
-	Left = 0;
-	Right = 0;
+	var FirstLine = 0,
+		Left = 0,
+		Right = 0;
 	if ( "undefined" != typeof(Ind) )
 	{
 		if("undefined" != typeof(Ind.FirstLine))
@@ -7361,7 +7361,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
         var bAddMenu = true;
 		var MathElement = new ParaMath(bAddMenu);		
 		var props = new Object();
-		
+		var oFName;
 		switch (Type)
 		{
 			case 1: 	var oFraction = new CFraction();						
@@ -8423,7 +8423,7 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						break;
 			case 126:	var oFunc = new CMathFunc();
 						MathElement.CreateElem(oFunc,MathElement.Math.Root,props);
-						oFName = oFunc.getFName();						
+						oFName = oFunc.getFName();
 						props = {sty:"p"};
 						MathElement.AddText(oFName, "sin", props);
 						var oElem = oFunc.getArgument();
@@ -8698,20 +8698,20 @@ asc_docs_api.prototype.asc_AddMath = function(Type)
 						props = {};
 						var oFuncNum = new CMathFunc();
 						MathElement.CreateElem(oFuncNum,oNum,props);
-						oFNameNum = oFuncNum.getFName();						
+						var oFNameNum = oFuncNum.getFName();
 						props = {sty:"p"};
 						MathElement.AddText(oFNameNum, "sin", props);						
-						oArgNum = oFuncNum.getArgument();
+						var oArgNum = oFuncNum.getArgument();
 						MathElement.AddText(oArgNum, argText);
 						
 						var oDen = oFraction.getDenominator();
 						props = {};
 						var oFuncDen = new CMathFunc();
 						MathElement.CreateElem(oFuncDen,oDen,props);
-						oFNameDen = oFuncDen.getFName();						
+						var oFNameDen = oFuncDen.getFName();
 						props = {sty:"p"};
 						MathElement.AddText(oFNameDen, "cos", props);						
-						oArgDen = oFuncDen.getArgument();
+						var oArgDen = oFuncDen.getArgument();
 						MathElement.AddText(oArgDen, argText);						
 						break;
 			case 153:	var sChr = String.fromCharCode(775);
