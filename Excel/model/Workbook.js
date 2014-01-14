@@ -538,8 +538,8 @@ DependencyGraph.prototype = {
 						if(null == oSheetRange.prevRange)
 						{
 							var oGetRes = nodesSheetArea.get(oSheetRange.range);
-							if(oGetRes.outer.length > 0)
-								aAllOuter = oGetRes.outer;
+							if(oGetRes.all.length > 0)
+								aAllOuter = oGetRes.all;
 						}
 						else
 						{
@@ -557,8 +557,8 @@ DependencyGraph.prototype = {
 							{
 								var bbox = aEdgeBBox[j];
 								var oGetRes = nodesSheetArea.get(bbox);
-								if(oGetRes.outer.length > 0)
-									aAllOuter = aAllOuter.concat(oGetRes.outer);
+								if(oGetRes.all.length > 0)
+									aAllOuter = aAllOuter.concat(oGetRes.all);
 							}
 						}
 						if(aAllOuter && aAllOuter.length > 0)
@@ -2846,7 +2846,9 @@ Woorksheet.prototype.getRange=function(cellAdd1, cellAdd2){
 };
 Woorksheet.prototype.getRange2=function(sRange){
 	var bbox = Asc.g_oRangeCache.getAscRange(sRange);
-	return this.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+	if(null != bbox)
+		return this.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+	return null;
 };
 Woorksheet.prototype.getRange3=function(r1, c1, r2, c2){
 	var nRowMin = r1;
@@ -3542,7 +3544,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		}
 	}
 }
-Woorksheet.prototype._ReBuildFormulas=function(){
+Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 	/*
 		Если существуют трехмерные ссылки на ячейки, то у них необходимо поменять имя листа на новое после переименования листа.
 	*/
