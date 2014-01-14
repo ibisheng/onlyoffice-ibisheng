@@ -290,7 +290,37 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			{
 				ser.brush = arrayColors[i];
 			}
+			
+			ser.pen = null;
+			if(ser.spPr && ser.spPr.ln)
+			{
+				ser.pen = ser.spPr.ln;
+				ser.pen = ser.spPr.ln.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+			}
 			ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+			var pts = ser.val.numRef.numCache.pts;
+			for(var j = 0; j < pts.length; ++j)
+			{
+				pts[j].brush = ser.brush;
+				pts[j].pen = ser.pen;
+			}
+			
+			if(Array.isArray(ser.dPt))
+			{
+				for(j = 0; j < ser.dPt.length; ++j)
+				{
+					if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+					{
+						pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+						pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					}
+					if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+					{
+						pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+						pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					}
+				}				
+			}
 		}
 	}
 	
