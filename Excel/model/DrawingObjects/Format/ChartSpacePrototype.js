@@ -282,6 +282,8 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 		for(var i = 0; i < series.length; ++i)
 		{
 			var ser = series[i];
+			ser.brush = null;
+			ser.pen = null;
 			if(ser.spPr && ser.spPr.Fill)
 			{
 				ser.brush = ser.spPr.Fill;
@@ -296,6 +298,15 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			{
 				ser.pen = ser.spPr.ln;
 				ser.pen = ser.spPr.ln.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+			}
+			else
+			{
+				if(ser instanceof CLineSeries)
+				{
+					ser.pen = new CLn();
+					ser.pen.setFill(arrayColors[i]);
+					ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+				}
 			}
 			ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 			var pts = ser.val.numRef.numCache.pts;
