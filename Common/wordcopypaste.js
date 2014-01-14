@@ -513,7 +513,7 @@ CopyProcessor.prototype =
         {
             var Run = document.createElement( "span" );
             //Run.setAttribute("xml:space", "preserve");
-            var sStyle = "";
+            var sStyle = "", prop;
             for(prop in this.orPr)
                 sStyle += prop + ":" + this.orPr[prop] + ";";
             if("" != sStyle)
@@ -801,7 +801,6 @@ CopyProcessor.prototype =
                     }
                     if(null != oHyperlink)
                     {
-                        bReset = false;
                         this.CommitSpan(false);
                         this.oCurHyperlink = oHyperlink;
                         this.oCurHyperlinkElem = document.createElement( "a" );
@@ -1013,7 +1012,6 @@ CopyProcessor.prototype =
             res += name + ":none;";
         else
         {
-            bBorder = true;
             var size = 0.5;
             var color = { r : 0, g : 0, b : 0 };
             if(null != border.Size)
@@ -3376,7 +3374,7 @@ PasteProcessor.prototype =
                     classNode = node.children[0].children[0].children[0].getAttribute("class");
 				
                 if( classNode != null ){
-                    cL = classNode.split(" ");
+                    var cL = classNode.split(" ");
                     for (var i = 0; i < cL.length; i++){
                         if(cL[i].indexOf("docData;") > -1)
                         {
@@ -4287,7 +4285,7 @@ PasteProcessor.prototype =
             this._Prepeare_recursive(node, true);
 
             var aPrepeareFonts = new Array();
-            for(font_family in this.oFonts)
+            for(var font_family in this.oFonts)
             {
                 //todo ��������� �����, ������ �� ��������
                 var oFontItem = this.oFonts[font_family];
@@ -4305,7 +4303,7 @@ PasteProcessor.prototype =
                 }
             }
 			var aImagesToDownload = new Array();
-			for(image in this.oImages)
+			for(var image in this.oImages)
             {
 				var src = this.oImages[image];
 				if(0 == src.indexOf("file:"))
@@ -4938,7 +4936,6 @@ PasteProcessor.prototype =
                 {
                     //������� ����� ������
                     NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-                    NumLvl = 0;
 
                     var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum( NumId );
                     AbstractNum.Create_Default_Bullet();
@@ -5157,7 +5154,7 @@ PasteProcessor.prototype =
                     break;
                 if(null == underline || null == Strikeout)
                 {
-                    text_decoration = tempComputedStyle.getPropertyValue( "text-decoration" );
+                    var text_decoration = tempComputedStyle.getPropertyValue( "text-decoration" );
                     if(text_decoration)
                     {
                         if(-1 != text_decoration.indexOf("underline"))
@@ -5536,7 +5533,7 @@ PasteProcessor.prototype =
 			sTableAlign = tableNode.align
         else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
         {
-            computedStyleParent = this._getComputedStyle(tableNode.parentNode);
+            var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
                 //����� ��������� -webkit-right
@@ -5609,7 +5606,7 @@ PasteProcessor.prototype =
 				if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
 					table.Set_TableInd(margin_left);
 			}
-            background_color = computedStyle.getPropertyValue( "background-color" );
+            var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
                 table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
             var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
@@ -5761,7 +5758,7 @@ PasteProcessor.prototype =
 		var computedStyle = this._getComputedStyle(node);
         if(null != computedStyle)
         {
-            background_color = computedStyle.getPropertyValue( "background-color" );
+            var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
                 var Shd = new CDocumentShd();
@@ -6843,7 +6840,7 @@ PasteProcessor.prototype =
             sTableAlign = tableNode.align
         else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
         {
-			computedStyleParent = this._getComputedStyle(tableNode.parentNode);
+			var computedStyleParent = this._getComputedStyle(tableNode.parentNode);
             if(null != computedStyleParent)
             {
                 //����� ��������� -webkit-right
@@ -6916,7 +6913,7 @@ PasteProcessor.prototype =
                 if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
                     table.Set_TableInd(margin_left);
             }
-            background_color = computedStyle.getPropertyValue( "background-color" );
+            var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
                 table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
             var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
@@ -7068,7 +7065,7 @@ PasteProcessor.prototype =
 		var computedStyle = this._getComputedStyle(node);
         if(null != computedStyle)
         {
-            background_color = computedStyle.getPropertyValue( "background-color" );
+            var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
                 var Shd = new CDocumentShd();

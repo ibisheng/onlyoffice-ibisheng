@@ -42,6 +42,6 @@ function FileHandler() {
     }
 }
 function getFile( filePath ) {
-    fh = new FileHandler()
+    var fh = new FileHandler();
     fh.get( filePath );
 }

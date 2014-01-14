@@ -1358,7 +1358,7 @@ NumFormat.prototype =
                 var sGeneral = DecodeGeneralFormat(number, nValType, dDigitsCount);
                 if(null != sGeneral)
                 {
-                    numFormat = oNumFormatCache.get(sGeneral);
+                    var numFormat = oNumFormatCache.get(sGeneral);
                     if(null != numFormat)
                         return numFormat.format(number, nValType, dDigitsCount, oAdditionalResult)
                 }
@@ -1449,7 +1449,7 @@ NumFormat.prototype =
 						var frac = oParsedNumber.frac;
 						var fracExp = -frac.toString().length;
 						if(oParsedNumber.exponent < 0)
-							fracExp -= oParsedNumber.exponent
+							fracExp -= oParsedNumber.exponent;
 						frac *= Math.pow(10, fracExp);
                         var numerator;
                         var denominator;
@@ -1470,7 +1470,7 @@ NumFormat.prototype =
                         }
                         else
                         {
-                            var d = n = frac;
+                            var d = frac, n = frac;
                             var a0 = 0, a1 = 1;
                             var b0 = 1, b1 = 0;
                             var eps = Math.pow(10, -15),
@@ -1479,7 +1479,7 @@ NumFormat.prototype =
 
                             while( (b < arr) && (delta > eps) )
                             {
-                                N = Math.floor(d);
+                                var N = Math.floor(d);
                                 a = N * a1 + a0;
                                 b = N * b1 + b0;
                                 a0 = a1;
