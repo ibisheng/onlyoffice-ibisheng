@@ -267,133 +267,15 @@ ParaRun.prototype =
         var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
         var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
 
-        for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+        var Pos = StartPos;
+        var _EndPos = ( true === CurrentRun ? Math.min( EndPos, this.State.ContentPos ) : EndPos );
+        for ( ; Pos < _EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
 
             // TODO: Подумать насчет нумерации
             //if ( ItemNum === this.Numbering.Pos )
             //    X += this.Numbering.WidthVisible;
-
-            if ( true === CurrentRun && Pos === this.State.ContentPos )
-            {
-                // Если так случилось, что у нас заданная позиция идет до позиции с нумерацией, к которой привязана нумерация,
-                // тогда добавляем ширину нумерации.
-
-                var _X = X;
-                // TODO: Подумать насчет нумерации
-                //if ( ItemNum < this.Numbering.Pos )
-                //    _X += this.Numbering.WidthVisible;
-
-                if ( true === UpdateCurPos )
-                {
-                    // Обновляем позицию курсора в параграфе
-
-                    var Para = this.Paragraph;
-
-                    Para.CurPos.X        = _X;
-                    Para.CurPos.Y        = Y;
-                    Para.CurPos.PagesPos = CurPage;
-
-                    if ( true === UpdateTarget )
-                    {
-                        var CurTextPr = this.Get_CompiledPr(false);
-                        g_oTextMeasurer.SetTextPr( CurTextPr );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
-                        var Height    = g_oTextMeasurer.GetHeight();
-                        var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
-                        var Ascender  = Height - Descender;
-
-                        Para.DrawingDocument.SetTargetSize( Height );
-
-                        if ( true === CurTextPr.Color.Auto )
-                        {
-                            // Выясним какая заливка у нашего текста
-                            var Pr = Para.Get_CompiledPr();
-                            var BgColor = undefined;
-                            if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
-                            {
-                                BgColor = Pr.ParaPr.Shd.Color;
-                            }
-                            else
-                            {
-                                // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
-                                BgColor = Para.Parent.Get_TextBackGroundColor();
-                            }
-
-                            // Определим автоцвет относительно заливки
-                            var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
-                            Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
-                        }
-                        else
-                            Para.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
-
-                        var TargetY = Y - Ascender - CurTextPr.Position;
-                        switch( CurTextPr.VertAlign )
-                        {
-                            case vertalign_SubScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                                break;
-                            }
-                            case vertalign_SuperScript:
-                            {
-                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                                break;
-                            }
-                        }
-
-                        var Page_Abs = Para.Get_StartPage_Absolute() + CurPage;
-                        Para.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
-
-                        // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
-                        //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
-                        //       такой вариант будет смотреться плохо.
-                        if ( undefined != Para.Get_FramePr() )
-                        {
-                            var __Y0 = TargetY, __Y1 = TargetY + Height;
-                            var ___Y0 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
-                            var ___Y1 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Bottom;
-
-                            var __Y0 = Math.max( __Y0, ___Y0 );
-                            var __Y1 = Math.min( __Y1, ___Y1 );
-
-                            Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
-                            Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
-                        }
-                    }
-                }
-
-                if ( true === ReturnTarget )
-                {
-                    var CurTextPr = this.Get_CompiledPr(false);
-                    g_oTextMeasurer.SetTextPr( CurTextPr );
-                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
-                    var Height    = g_oTextMeasurer.GetHeight();
-                    var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
-                    var Ascender  = Height - Descender;
-
-                    var TargetY = Y - Ascender - CurTextPr.Position;
-
-                    switch( CurTextPr.VertAlign )
-                    {
-                        case vertalign_SubScript:
-                        {
-                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
-                            break;
-                        }
-                        case vertalign_SuperScript:
-                        {
-                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
-                            break;
-                        }
-                    }
-
-                    return { X : _X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
-                }
-                else
-                    return { X : _X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
-            }
 
             switch( Item.Type )
             {
@@ -419,7 +301,127 @@ ParaRun.prototype =
             }
         }
 
-        return X;
+        if ( true === CurrentRun && Pos === this.State.ContentPos )
+        {
+            // Если так случилось, что у нас заданная позиция идет до позиции с нумерацией, к которой привязана нумерация,
+            // тогда добавляем ширину нумерации.
+
+            var _X = X;
+            // TODO: Подумать насчет нумерации
+            //if ( ItemNum < this.Numbering.Pos )
+            //    _X += this.Numbering.WidthVisible;
+
+            if ( true === UpdateCurPos )
+            {
+                // Обновляем позицию курсора в параграфе
+
+                var Para = this.Paragraph;
+
+                Para.CurPos.X        = _X;
+                Para.CurPos.Y        = Y;
+                Para.CurPos.PagesPos = CurPage;
+
+                if ( true === UpdateTarget )
+                {
+                    var CurTextPr = this.Get_CompiledPr(false);
+                    g_oTextMeasurer.SetTextPr( CurTextPr );
+                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+                    var Height    = g_oTextMeasurer.GetHeight();
+                    var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
+                    var Ascender  = Height - Descender;
+
+                    Para.DrawingDocument.SetTargetSize( Height );
+
+                    if ( true === CurTextPr.Color.Auto )
+                    {
+                        // Выясним какая заливка у нашего текста
+                        var Pr = Para.Get_CompiledPr();
+                        var BgColor = undefined;
+                        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+                        {
+                            BgColor = Pr.ParaPr.Shd.Color;
+                        }
+                        else
+                        {
+                            // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
+                            BgColor = Para.Parent.Get_TextBackGroundColor();
+                        }
+
+                        // Определим автоцвет относительно заливки
+                        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+                        Para.DrawingDocument.SetTargetColor( AutoColor.r, AutoColor.g, AutoColor.b );
+                    }
+                    else
+                        Para.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+
+                    var TargetY = Y - Ascender - CurTextPr.Position;
+                    switch( CurTextPr.VertAlign )
+                    {
+                        case vertalign_SubScript:
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                            break;
+                        }
+                        case vertalign_SuperScript:
+                        {
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                            break;
+                        }
+                    }
+
+                    var Page_Abs = Para.Get_StartPage_Absolute() + CurPage;
+                    Para.DrawingDocument.UpdateTarget( X, TargetY, Page_Abs );
+
+                    // TODO: Тут делаем, чтобы курсор не выходил за границы буквицы. На самом деле, надо делать, чтобы
+                    //       курсор не выходил за границы строки, но для этого надо делать обрезку по строкам, а без нее
+                    //       такой вариант будет смотреться плохо.
+                    if ( undefined != Para.Get_FramePr() )
+                    {
+                        var __Y0 = TargetY, __Y1 = TargetY + Height;
+                        var ___Y0 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Top;
+                        var ___Y1 = Para.Pages[CurPage].Y + Para.Lines[CurLine].Bottom;
+
+                        var __Y0 = Math.max( __Y0, ___Y0 );
+                        var __Y1 = Math.min( __Y1, ___Y1 );
+
+                        Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+                        Para.DrawingDocument.UpdateTarget( X, __Y0, Page_Abs );
+                    }
+                }
+            }
+
+            if ( true === ReturnTarget )
+            {
+                var CurTextPr = this.Get_CompiledPr(false);
+                g_oTextMeasurer.SetTextPr( CurTextPr );
+                g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
+                var Height    = g_oTextMeasurer.GetHeight();
+                var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
+                var Ascender  = Height - Descender;
+
+                var TargetY = Y - Ascender - CurTextPr.Position;
+
+                switch( CurTextPr.VertAlign )
+                {
+                    case vertalign_SubScript:
+                    {
+                        TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                        break;
+                    }
+                    case vertalign_SuperScript:
+                    {
+                        TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                        break;
+                    }
+                }
+
+                return { X : _X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            }
+            else
+                return { X : _X, Y : Y, PageNum : CurPage + Para.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+        }
+
+        return { X : X };
     },
 
     // Проверяем, произошло ли простейшее изменение (набор или удаление текста)
@@ -2322,6 +2324,304 @@ ParaRun.prototype =
 
         // Обновляем позицию
         PDSL.X = X;
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с курсором
+//-----------------------------------------------------------------------------------
+    // Находится ли курсор в начале рана
+    Cursor_Is_Start : function()
+    {
+        if ( this.State.ContentPos <= 0 )
+            return true;
+
+        return false;
+    },
+
+    Cursor_Is_End : function()
+    {
+        if ( this.State.ContentPos >= this.Content.length )
+            return true;
+
+        return false;
+    },
+
+    Cursor_MoveToStartPos : function()
+    {
+        this.State.ContentPos = 0;
+    },
+
+    Cursor_MoveToEndPos : function()
+    {
+        var CurPos = this.Content.length;
+
+        while ( CurPos > 0 )
+        {
+            if ( para_End === this.Content[CurPos - 1].Type )
+                CurPos--;
+            else
+                break;
+        }
+
+        this.State.ContentPos = CurPos;
+    },
+
+    Get_ParaContentPos : function(bSelection, bStart, ContentPos)
+    {
+        var Pos = ( true !== bSelection ? this.State.ContentPos : ( false !== bStart ? this.State.Selection.StartPos : this.State.Selection.EndPos ) );
+        ContentPos.Add( Pos );
+    },
+
+    Set_ParaContentPos : function(ContentPos, Depth, bSelection, bStart)
+    {
+        var Pos = ContentPos.Get(Depth);
+
+        if ( true === bSelection )
+        {
+            if ( true === bStart )
+            {
+                this.State.Selection.StartPos = Pos;
+            }
+            else
+            {
+                this.State.Selection.EndPos = Pos;
+            }
+        }
+        else
+        {
+            this.State.ContentPos = Pos;
+        }
+    },
+
+    Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length );
+
+        while ( true )
+        {
+            CurPos--;
+
+            var Item = this.Content[CurPos];
+            if ( CurPos < 0 || para_Drawing !== Item.Type || false !== Item.Is_Inline() )
+                break;
+        }
+
+        if ( CurPos >= 0 )
+        {
+            SearchPos.Found = true;
+            SearchPos.Pos.Update( CurPos, Depth );
+        }
+    },
+
+    Get_RightPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+
+        var Count = this.Content.length;
+        while ( true )
+        {
+            CurPos++;
+
+            // Мы встали в конец рана:
+            //   Если мы перешагнули para_End или para_Drawing Anchor, тогда возвращаем false
+            //   В противном случае true
+            if ( Count === CurPos )
+            {
+                if ( CurPos === 0 )
+                    return;
+
+                var PrevItem = this.Content[CurPos - 1];
+                if ( para_End === PrevItem.Type || (para_Drawing === PrevItem.Type && false === PrevItem.Is_Inline()) )
+                    return;
+
+                break;
+            }
+
+            var Item = this.Content[CurPos];
+            if ( CurPos > Count || (para_Drawing !== Item.Type && para_End !== Item.Type) || (para_Drawing === Item.Type && false !== Item.Is_Inline()))
+                break;
+        }
+
+        if ( CurPos <= Count )
+        {
+            SearchPos.Found = true;
+            SearchPos.Pos.Update( CurPos, Depth );
+        }
+    },
+
+    Get_WordStartPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) - 1 : this.Content.length - 1 );
+
+        if ( CurPos < 0 )
+            return;
+
+        SearchPos.Shift = true;
+
+        var NeedUpdate = false;
+
+        // На первом этапе ищем позицию первого непробельного элемента
+        if ( 0 === SearchPos.Stage )
+        {
+            while ( true )
+            {
+                var Item = this.Content[CurPos];
+                var Type = Item.Type;
+
+                var bSpace = false;
+
+                if ( para_Space === Type || para_Tab === Type || ( para_Text === Type && true === Item.Is_NBSP() ) || ( para_Drawing === Type && true !== Item.Is_Inline() ) )
+                    bSpace = true;
+
+                if ( true === bSpace )
+                {
+                    CurPos--;
+
+                    // Выходим из данного рана
+                    if ( CurPos < 0 )
+                        return;
+                }
+                else
+                {
+                    // Если мы остановились на нетекстовом элементе, тогда его и возвращаем
+                    if ( para_Text !== this.Content[CurPos].Type )
+                    {
+                        SearchPos.Pos.Update( CurPos, Depth );
+                        SearchPos.Found     = true;
+                        SearchPos.UpdatePos = true;
+                        return;
+                    }
+
+                    SearchPos.Pos.Update( CurPos, Depth );
+                    SearchPos.Stage       = 1;
+                    SearchPos.Punctuation = this.Content[CurPos].Is_Punctuation();
+                    NeedUpdate            = true;
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length );
+        }
+
+        // На втором этапе мы смотрим на каком элементе мы встали: если текст - пунктуация, тогда сдвигаемся
+        // до конца всех знаков пунктуации
+
+        while ( CurPos > 0 )
+        {
+            CurPos--;
+            var Item = this.Content[CurPos]
+            var TempType = Item.Type;
+
+            if ( para_Text !== TempType || true === Item.Is_NBSP() || ( true === SearchPos.Punctuation && true !== Item.Is_Punctuation() ) || ( false === SearchPos.Punctuation && false !== Item.Is_Punctuation() ) )
+            {
+                SearchPos.Found = true;
+                break;
+            }
+            else
+            {
+                SearchPos.Pos.Update( CurPos, Depth );
+                NeedUpdate = true;
+            }
+        }
+
+        SearchPos.UpdatePos = NeedUpdate;
+    },
+
+    Get_WordEndPos : function(SearchPos, ContentPos, Depth, UseContentPos)
+    {
+        var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+
+        var ContentLen = this.Content.length;
+        if ( CurPos >= ContentLen )
+            return;
+
+        var NeedUpdate = false;
+
+        if ( 0 === SearchPos.Stage )
+        {
+            // На первом этапе ищем первый нетекстовый ( и не таб ) элемент
+            while ( true )
+            {
+                var Item = this.Content[CurPos];
+                var Type = Item.Type;
+                var bText = false;
+
+                if ( para_Text === Type && true != Item.Is_NBSP() && ( true === SearchPos.First || ( SearchPos.Punctuation === Item.Is_Punctuation() ) ) )
+                    bText = true;
+
+                if ( true === bText )
+                {
+                    if ( true === SearchPos.First )
+                    {
+                        SearchPos.First       = false;
+                        SearchPos.Punctuation = Item.Is_Punctuation();
+                    }
+
+                    CurPos++;
+
+                    // Отмечаем, что сдвиг уже произошел
+                    SearchPos.Shift = true;
+
+                    // Выходим из рана
+                    if ( CurPos >= ContentLen )
+                        return;
+                }
+                else
+                {
+                    SearchPos.Stage = 1;
+
+                    // Первый найденный элемент не текстовый, смещаемся вперед
+                    if ( true === SearchPos.First )
+                    {
+                        // Если первый найденный элеменет - конец параграфа, тогда выходим из поиска
+                        if ( para_End === Type )
+                            return;
+
+                        CurPos++;
+
+                        // Отмечаем, что сдвиг уже произошел
+                        SearchPos.Shift = true;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        if ( CurPos >= ContentLen )
+            return;
+
+
+        // На втором этапе мы смотрим на каком элементе мы встали: если это не пробел, тогда
+        // останавливаемся здесь. В противном случае сдвигаемся вперед, пока не попали на первый
+        // не пробельный элемент.
+        if ( !(para_Space === this.Content[CurPos].Type || ( para_Text === this.Content[CurPos].Type && true === this.Content[CurPos].Is_NBSP() ) ) )
+        {
+            SearchPos.Pos.Update( CurPos, Depth );
+            SearchPos.Found     = true;
+            SearchPos.UpdatePos = true;
+        }
+        else
+        {
+            while ( CurPos < ContentLen - 1 )
+            {
+                CurPos++;
+                var Item = this.Content[CurPos]
+                var TempType = Item.Type;
+
+                if ( para_End === TempType || !( para_Space === TempType || ( para_Text === TempType && true === Item.Is_NBSP() ) ) )
+                {
+                    SearchPos.Found = true;
+                    break;
+                }
+            }
+
+            // Обновляем позицию в конце каждого рана (хуже от этого не будет)
+            SearchPos.Pos.Update( CurPos, Depth );
+            SearchPos.UpdatePos = true;
+        }
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
