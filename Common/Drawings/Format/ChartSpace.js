@@ -2019,7 +2019,7 @@ function CreateHBarChart(asc_series, type)
     plot_area.setValAx(new CAxis());
     var bar_chart = plot_area.chart;
     bar_chart.setBarDir(BAR_DIR_BAR);
-    bar_chart.setGrouping(BAR_GROUPING_CLUSTERED);
+    bar_chart.setGrouping(type);
     bar_chart.setVaryColors(false);
     for(var i = 0; i < asc_series.length; ++i)
     {
