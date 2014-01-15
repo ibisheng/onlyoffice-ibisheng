@@ -309,29 +309,71 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 				}
 			}
 			ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-			var pts = ser.val.numRef.numCache.pts;
-			for(var j = 0; j < pts.length; ++j)
-			{
-				pts[j].brush = ser.brush;
-				pts[j].pen = ser.pen;
-			}
 			
-			if(Array.isArray(ser.dPt))
-			{
-				for(j = 0; j < ser.dPt.length; ++j)
+			if(ser.val && ser.val.numRef && ser.val.numRef.numCache && ser.val.numRef.numCache.pts)
+			{	
+				var pts = ser.val.numRef.numCache.pts;
+				for(var j = 0; j < pts.length; ++j)
 				{
-					if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+					pts[j].brush = ser.brush;
+					pts[j].pen = ser.pen;
+				}
+				
+				if(Array.isArray(ser.dPt))
+				{
+					for(j = 0; j < ser.dPt.length; ++j)
 					{
-						pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-						pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					}
-					if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
-					{
-						pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-						pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					}
-				}				
+						if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+						{
+							pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+							pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+						if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+						{
+							pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+							pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+					}				
+				}
 			}
+			if(ser.xVal && ser.xVal.numRef && ser.xVal.numRef.numCache && ser.xVal.numRef.numCache.pts
+				&& ser.yVal && ser.yVal.numRef && ser.yVal.numRef.numCache && ser.yVal.numRef.numCache.pts)
+			{
+				var ptsX = ser.xVal.numRef.numCache.pts;
+				var ptsY = ser.yVal.numRef.numCache.pts;
+				for(var j = 0; j < ptsX.length; ++j)
+				{
+					ptsX[j].brush = ser.brush;
+					ptsX[j].pen = ser.pen;
+				}
+				for(var j = 0; j < ptsY.length; ++j)
+				{
+					ptsY[j].brush = ser.brush;
+					ptsY[j].pen = ser.pen;
+				}
+				if(Array.isArray(ser.dPt))
+				{
+					for(j = 0; j < ser.dPt.length; ++j)
+					{
+						if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+						{
+							ptsX[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+							ptsX[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+							ptsY[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+							ptsY[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+						if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+						{
+							ptsX[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+							ptsX[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+							ptsY[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+							ptsY[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+					}				
+				}
+			}
+		
+			
 		}
 	}
 	
