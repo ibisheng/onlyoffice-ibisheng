@@ -2338,16 +2338,16 @@ function CreateScatterChart(asc_series)
 			var x_val = series.xVal;
 			x_val.setNumRef(new CNumRef());
 			var num_ref = x_val.numRef;
-			num_ref.setF(first_ser.Val.Formula);
+			num_ref.setF(first_series.Val.Formula);
 			num_ref.setNumCache(new CNumLit());
 			var num_cache = num_ref.numCache;
-			num_cache.setPtCount(first_ser.Val.NumCache.length);
-			for(var j = 0; j < first_ser.Val.NumCache.length; ++j)
+			num_cache.setPtCount(first_series.Val.NumCache.length);
+			for(var j = 0; j < first_series.Val.NumCache.length; ++j)
 			{
 				var pt = new CNumericPoint();
 				pt.setIdx(j);
-				pt.setFormatCode(first_ser.Val.NumCache[j].numFormatStr);
-				pt.setVal(first_ser.Val.NumCache[j].val);
+				pt.setFormatCode(first_series.Val.NumCache[j].numFormatStr);
+				pt.setVal(first_series.Val.NumCache[j].val);
 				num_cache.addPt(pt);
 			}
 		}
