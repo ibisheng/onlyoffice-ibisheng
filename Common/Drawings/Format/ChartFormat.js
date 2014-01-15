@@ -213,6 +213,8 @@ function CAreaSeries()
     this.spPr           = null;
     this.trendline      = null;
 
+	this.tx  = null;
+	this.val = null; 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -278,8 +280,18 @@ CAreaSeries.prototype =
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
+    }, 
+	setTx: function(pr)
+    {
+        History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        this.tx = pr;
     },
 
+	setVal: function(pr)
+    {
+        History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        this.val = pr;
+    },
     Undo: function(data)
     {
         switch (data.Type)
