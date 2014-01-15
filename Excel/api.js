@@ -17,6 +17,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
 		var asc_user  = asc.asc_CUser;
 		var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
+		var asc_CAscLicense = asc.asc_CAscLicense;
 		var asc_CTrackFile = asc.CTrackFile;
 		var prot;
 
@@ -531,23 +532,27 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asc_getEditorPermissions : function(){
-				if (this.DocInfo && 
-					this.DocInfo["Id"] &&
-					this.DocInfo["Url"])
-				{
+				if (this.DocInfo && this.DocInfo["Id"] && this.DocInfo["Url"]) {
 					var t = this;
-					var v = {};
-					v["c"] = "getsettings";	
-					v["id"] = this.DocInfo["Id"];
-					v["format"] = this.DocInfo["Format"];
-					v["vkey"] = this.DocInfo["VKey"];
-					v["editorid"] = c_oEditorId.Excel;
-					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, v);
-				}
-				else
-				{
+					var rdata = {
+						"c"			: "getsettings",
+						"id"		: this.DocInfo["Id"],
+						"format"	: this.DocInfo["Format"],
+						"vkey"		: this.DocInfo["VKey"],
+						"editorid"	: c_oEditorId.Speadsheet
+					};
+					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, rdata);
+				} else {
 					this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
 				}
+			},
+
+			asc_getLicense : function () {
+				var t = this;
+				var rdata = {
+					"c" : "getlicense"
+				};
+				this._asc_sendCommand(function (response) {t._onGetLicense(response);}, rdata);
 			},
 			
 			asc_DownloadAs : function(typeFile){//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -1140,6 +1145,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
 			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
 			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора.
+			 * asc_onGetLicense				(license)													- эвент о лицензии.
 			 */
 
 			asc_StartAction: function (type, id) {
@@ -1324,8 +1330,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					{
 						this.TrackFile = new asc_CTrackFile(oSettings['trackingInfo']);
 						
-						this.TrackFile.setDocId(this.DocInfo.Id);
-						this.TrackFile.setUserId(this.DocInfo.UserId);
+						this.TrackFile.setDocId(this.DocInfo["Id"]);
+						this.TrackFile.setUserId(this.DocInfo["UserId"]);
 						
 						var oThis = this;
 						var _sendTrack = function(callback, url, data){
@@ -1346,6 +1352,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							
 						this.TrackFile.Start();							
 					}
+				}
+			},
+
+			_onGetLicense: function (response) {
+				if (null != response && "getlicense" == response.type){
+					var oSettings = JSON.parse(response.data);
+					var oLicense = new asc_CAscLicense(oSettings);
+
+					this.handlers.trigger("asc_onGetLicense", oLicense);
 				}
 			},
 
@@ -3459,6 +3474,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setDocInfo"] = prot.asc_setDocInfo;
 		prot["asc_setLocale"] = prot.asc_setLocale;
 		prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
+		prot["asc_getLicense"] = prot.asc_getLicense;
 		prot["asc_LoadDocument"] = prot.asc_LoadDocument;
 		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
 		prot["asc_DownloadAs"] = prot.asc_DownloadAs;

@@ -850,23 +850,29 @@ asc_docs_api.prototype.Init = function()
 }
 asc_docs_api.prototype.asc_getEditorPermissions = function()
 {
-	if(this.DocInfo && this.DocInfo.get_Id())
-	{
-		var rData = {};
-		rData["c"] = "getsettings";	
-		rData["id"] = this.DocInfo.get_Id();
-		rData["format"] = this.DocInfo.get_Format();
-		rData["vkey"] = this.DocInfo.get_VKey();
-		rData["editorid"] = c_oEditorId.Word;
+	if (this.DocInfo && this.DocInfo.get_Id()) {
+		var rData = {
+			"c"			: "getsettings",
+			"id"		: this.DocInfo.get_Id(),
+			"format"	: this.DocInfo.get_Format(),
+			"vkey"		: this.DocInfo.get_VKey(),
+			"editorid"	: c_oEditorId.Word
+		};
 		
-		sendCommand( this, this.asc_getEditorPermissionsCallback, rData );	
-	}
-	else
-	{
+		sendCommand( this, this.asc_getEditorPermissionsCallback, rData );
+	} else {
 		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
 		editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
 	}
-}
+};
+
+asc_docs_api.prototype.asc_getLicense = function () {
+	var t = this;
+	var rdata = {
+		"c" : "getlicense"
+	};
+	sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
+};
 
 asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 {				
@@ -904,6 +910,15 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		}
 	}
 }
+
+asc_docs_api.prototype._onGetLicense = function (response) {
+	if (null != response && "getlicense" == response.type){
+		var oSettings = JSON.parse(response.data);
+		var oLicense = new window["Asc"].asc_CAscLicense(oSettings);
+
+		this.asc_fireCallback("asc_onGetLicense", oLicense);
+	}
+};
 asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
 {
 	if(c_DocInfo)
