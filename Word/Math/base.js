@@ -1,7 +1,6 @@
 function CMathBase()
 {
     this.typeObj = MATH_COMP;
-    this.typeElement  = null;   // для чтения
 
     // {align: {height: alpha, width: betta}}  alpha & betta коэффициенты в интервале от 0 до 1, либо CENTER
 
@@ -9,6 +8,7 @@ function CMathBase()
 
     this.pos = null;
     this.size = null;
+    this.argSize = 0;
 
     this.CurPos_X = 0;
     this.CurPos_Y = 0;
@@ -17,7 +17,6 @@ function CMathBase()
         startX:    0,
         startY:    0
     };
-    this.reduct = 1;
 
     this.nRow = 0;
     this.nCol = 0;
@@ -65,7 +64,6 @@ CMathBase.prototype =
                 /*if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setComposition(this.Composition);*/
                 //this.elements[i][j].setTxtPrp(this.TxtPrp);
-                //this.elements[i][j].setReduct(this.reduct);
                 //this.elements[i][j].setRunPrp(this.RunPrp);
             }
         }
@@ -86,9 +84,9 @@ CMathBase.prototype =
 
     },
     ///////// RunPrp, CtrPrp
-    setCtrPrp: function(runPrp)
+    setCtrPrp: function(txtPrp)
     {
-        this.CtrPrp.Merge(runPrp); // only runPrp for paragraph
+        this.CtrPrp.Merge(txtPrp); // only runPrp for paragraph
     },
     getCtrPrp: function()
     {
@@ -126,6 +124,47 @@ CMathBase.prototype =
                 if( !this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setRPrp(rPrp);
             }
+    },
+    increaseArgSize: function()
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].increaseArgSize();
+    },
+    decreaseArgSize: function()
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].decreaseArgSize();
+    },
+    setArgSize: function(argSize)
+    {
+        var val = this.argSize + argSize;
+
+        if(val < -2)
+            this.argSize = -2;
+        else if(val > 2)
+            this.argSize = 2;
+        else
+            this.argSize = val;
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if( !this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].setArgSize(argSize);
+    },
+    mergeCtrTPrp: function()
+    {
+        var tPrp = this.getCtrPrp();
+
+        if(this.argSize == -1)
+        //tPrp.FontSize *= 0.8;
+            tPrp.FontSize *= 0.728;
+        else if(this.argSize == -2)
+        //tPrp.FontSize *= 0.65;
+            tPrp.FontSize *= 0.53;
+
+        return tPrp;
     },
     /////////
 
@@ -198,17 +237,7 @@ CMathBase.prototype =
     {
         this.RunPrp.Merge(txtPrp);
         this.setTxtPrp(txtPrp);
-    },
-    old_setReduct: function(coeff)
-    {
-        this.reduct = this.reduct*coeff;
-        for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-        {
-            if(! this.elements[i][j].IsJustDraw() )
-            this.elements[i][j].setReduct(coeff);
-        }
-     },*/
+    },*/
     fillPlaceholders: function()
     {
          for(var i=0; i < this.nRow; i++)
@@ -216,14 +245,6 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                  this.elements[i][j].fillPlaceholders();
     },
-    setReduct: function(coeff)
-    {
-        this.reduct = this.reduct*coeff;
-    },
-    /*getReduct: function()
-    {
-        return this.reduct;
-    },*/
     addMCToContent: function()
     {
         if(arguments.length == this.nRow*this.nCol)

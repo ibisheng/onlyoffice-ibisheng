@@ -28,7 +28,7 @@ CDegree.prototype.init_2 = function(props, oBase)
     this.setDimension(1, 2);
 
     var oDegree = new CMathContent();
-    oDegree.setReduct(DEGR_REDUCT);
+    oDegree.decreaseArgSize();
 
     this.addMCToContent(oBase, oDegree);
 }
@@ -51,8 +51,9 @@ CDegree.prototype.recalculateSup = function(oMeasure)
 
     var descIter = iter.height - iter.ascent;
 
-    var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var upper = 0;
 
@@ -92,8 +93,10 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     /*var FontSize = this.getCtrPrp().FontSize,
         shiftCenter = 0.5*DIV_CENT*FontSize;*/
 
-    var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    //var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     var low = 0;
 
     if(iter.ascent - shCenter > 2/3*base.height)
@@ -296,7 +299,9 @@ CDegree.prototype.getPropsForWrite = function()
 
 function CIterators()
 {
-    this.upper = 0;
+    this.lUp = 0;   // центр основания
+    this.lD = 0;    // высота - центр основания
+    this.upper = 0; // смещение сверху для позиции основания
     CMathBase.call(this);
 }
 extend(CIterators, CMathBase);
@@ -316,8 +321,10 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
     /*var FontSize = this.getCtrPrp().FontSize,
         shCent = DIV_CENT*FontSize;*/
 
-    var ctrPrp = this.getCtrPrp();
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    var mgCtrPrp = this.mergeCtrTPrp();
+    //var ctrPrp = this.getCtrPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var upDesc = upIter.height - upIter.ascent + shCenter,
         lowAsc = lowIter.ascent - shCenter;
@@ -339,7 +346,17 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
     if( this.lD > lowAsc )
         down = this.lD - lowAsc;
 
-    this.dH = up + down;
+    var minGap = 1.2*shCenter;
+
+    if( up + down < minGap)
+    {
+        this.dH = minGap;
+    }
+    else
+    {
+        this.dH = up + down;
+    }
+
     this.dW = 0;
 }
 /*CIterators.prototype.getAscent = function()
@@ -368,11 +385,6 @@ CIterators.prototype.getUpperIterator = function()
 CIterators.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
-}
-CIterators.prototype.setReduct = function(reduct)
-{
-    this.elements[0][0].setReduct(reduct);
-    this.elements[1][0].setReduct(reduct);
 }
 CIterators.prototype.getCtrPrp = function()
 {
@@ -412,7 +424,8 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
 
     var oIters = new CIterators();
     oIters.init();
-    oIters.setReduct(DEGR_REDUCT);
+    oIters.decreaseArgSize();
+
 
     oIters.lUp = 0;
     oIters.lD = 0;
@@ -431,8 +444,10 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
 }
 CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
 {
-    var ctrPrp = this.getCtrPrp();
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp) /0.6;
 
     var width = 0, height = 0,
         ascent = 0;
@@ -456,12 +471,14 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
         this.elements[0][0].recalculateSize();*/
     }
 
-    iters.lUp = base.size.ascent - shCenter;
-    iters.lD  = base.size.height - iters.lUp;
+    iters.lUp = base.size.ascent - shCenter; // center of base
+    iters.lD  = base.size.height - iters.lUp; // height - center of base
     iters.setDistanceIters(oMeasure);
     iters.recalculateSize();
 
-    width  = iters.size.width + base.size.width;
+    this.dW = 0.2*shCenter;
+
+    width  = iters.size.width + base.size.width + this.dW;
     //height = shCenter + iters.lUp;
     height = iters.size.height;
 

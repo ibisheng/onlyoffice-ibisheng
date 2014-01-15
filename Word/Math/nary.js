@@ -241,7 +241,7 @@ CNaryUnd.prototype.init = function(sign)
 {
     this.setDimension(2,1);
     var iter = new CMathContent();
-    //iter.setReduct(DEGR_REDUCT);
+    iter.decreaseArgSize();
 
     this.addMCToContent(iter, sign);
 }
@@ -268,9 +268,8 @@ extend(CNaryOvr, CMathBase);
 CNaryOvr.prototype.init = function(sign)
 {
     this.setDimension(2,1);
-
     var iter = new CMathContent();
-    //iter.setReduct(DEGR_REDUCT);
+    iter.decreaseArgSize();
 
     this.addMCToContent(sign, iter);
 }
@@ -300,10 +299,10 @@ CNaryUndOvr.prototype.init = function(sign)
     this.setDimension(3,1);
 
     var iter1 = new CMathContent();
-    //iter1.setReduct(DEGR_REDUCT);
+    iter1.decreaseArgSize();
 
     var iter2 = new CMathContent();
-    //iter2.setReduct(DEGR_REDUCT);
+    iter2.decreaseArgSize();
 
     this.addMCToContent(iter1, sign, iter2);
 }

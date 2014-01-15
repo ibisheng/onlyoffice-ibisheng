@@ -207,9 +207,8 @@ CRadical.prototype.init = function(props)
     {
         this.setDimension(1, 2);
         var oBase = new CMathContent();
-
         var oDegree = new CMathContent();
-        oDegree.setReduct(DEGR_REDUCT);
+        oDegree.decreaseArgSize();
 
         this.addMCToContent(oDegree, oBase);
     }

@@ -82,8 +82,9 @@ CFraction.prototype.draw = function(x, y, pGraphics)
 }
 CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 {
-    var ctrPrp = this.getCtrPrp();
-    var penW = ctrPrp.FontSize* this.reduct* 25.4/96 * 0.08;
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var penW = mgCtrPrp.FontSize* 25.4/96 * 0.08;
 
     var numHeight = this.elements[0][0].size.height;
 
@@ -112,7 +113,7 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 
     if( !this.bHideBar )
     {
-        pGraphics.SetFont(ctrPrp);
+        pGraphics.SetFont(mgCtrPrp);
 
         pGraphics.p_color(0,0,0, 255);
         pGraphics.b_color1(0,0,0, 255);
@@ -123,12 +124,13 @@ CFraction.prototype.drawBarFraction = function(x, y, pGraphics)
 }
 CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 {
-    var ctrPrp = this.getCtrPrp();
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
 
-    var penW = ctrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
+    var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
     var gap = this.gapSlash/2 - penW/7.5;
-    var plh = 9.877777777777776 * ctrPrp.FontSize / 36;
+    var plh = 9.877777777777776 * mgCtrPrp.FontSize / 36;
 
     var minHeight = 2*this.gapSlash,
         middleHeight = plh*4/3,
@@ -199,7 +201,7 @@ CFraction.prototype.drawSkewedFraction = function(x, y, pGraphics)
 
     }
 
-    pGraphics.SetFont(ctrPrp);
+    pGraphics.SetFont(mgCtrPrp);
 
     pGraphics.p_width(penW*1000);
 
@@ -221,10 +223,11 @@ CFraction.prototype.drawLinearFraction = function(x, y, pGraphics)
         x2 = this.pos.x + x + this.elements[0][0].size.width + shift,
         y2 = this.pos.y + y + this.size.height;
 
-    var ctrPrp = this.getCtrPrp();
-    var penW = ctrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var penW = mgCtrPrp.FontSize/12.5*g_dKoef_pix_to_mm;
 
-    pGraphics.SetFont(ctrPrp);
+    pGraphics.SetFont(mgCtrPrp);
     pGraphics.p_width(penW*1000);
 
     pGraphics.p_color(0,0,0, 255);
@@ -273,22 +276,25 @@ CFraction.prototype.recalculateBarFraction = function(oMeasure)
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
-    var ctrPrp =  this.getCtrPrp();
+    //var ctrPrp =  this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
 
     var width  = num.width > den.width ? num.width : den.width;
     var height = num.height + den.height;
-    var ascent = num.height + this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    var ascent = num.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
     //var ascent = num.height;
 
     this.size =  {width: width, height: height, ascent: ascent};
 }
 CFraction.prototype.recalculateSkewed = function(oMeasure)
 {
-    var ctrPrp = this.getCtrPrp();
-    this.gapSlash = 5.011235894097222 * ctrPrp.FontSize/36;
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    this.gapSlash = 5.011235894097222 * mgCtrPrp.FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
-    var _ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, ctrPrp);
+    var _ascent = this.elements[0][0].size.height + this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     this.size =  {width: _width, height: _height, ascent: _ascent};
 }
@@ -300,9 +306,10 @@ CFraction.prototype.recalculateLinear = function()
         DescentSecond = this.elements[0][1].size.height - this.elements[0][1].size.ascent;
 
     var H = AscentFirst + DescentSecond;
-    var ctrPrp = this.getCtrPrp();
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
 
-    var gap = 5.011235894097222*ctrPrp.FontSize/36;
+    var gap = 5.011235894097222*mgCtrPrp.FontSize/36;
 
     var H3 = gap*4.942252165543792,
         H4 = gap*7.913378248315688,
@@ -441,14 +448,13 @@ CNumerator.prototype.init = function()
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    //var txtPrp = this.getTxtPrp();
-    //txtPrp.FontSize *= this.Parent.reduct;
 
-    var ctrPrp = this.getCtrPrp();
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
-    var gapNum = 7.832769097222222 * ctrPrp.FontSize/36,
-        minGap = ctrPrp.FontSize* 25.4/96 * 0.16;
+    var gapNum = 7.832769097222222 * mgCtrPrp.FontSize/36,
+        minGap = mgCtrPrp.FontSize* 25.4/96 * 0.16;
 
     // var delta = 0.65*gap - Descent;
     var delta = 0.8076354679802956*gapNum - Descent;
@@ -484,10 +490,6 @@ CNumerator.prototype.getElement = function()
 {
     return this.elements[0][0];
 }
-CNumerator.prototype.getReduct = function()
-{
-    return this.Parent.getReduct();
-}
 CNumerator.prototype.getCtrPrp = function()
 {
     return this.Parent.getCtrPrp();
@@ -507,10 +509,11 @@ CDenominator.prototype.init = function()
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    var ctrPrp = this.getCtrPrp();
+    //var ctrPrp = this.getCtrPrp();
+    var mgCtrPrp = this.mergeCtrTPrp();
 
-    var gapDen = 7.325682539682539 * ctrPrp.FontSize/36,
-        Ascent = arg.ascent -  4.938888888888888*ctrPrp.FontSize/36,
+    var gapDen = 7.325682539682539 * mgCtrPrp.FontSize/36,
+        Ascent = arg.ascent -  4.938888888888888*mgCtrPrp.FontSize/36,
         minGap = gapDen/3;
 
     var delta = gapDen - Ascent;
@@ -552,10 +555,6 @@ CDenominator.prototype.setPosition = function(pos)
 CDenominator.prototype.getElement = function(txt)
 {
     return this.elements[0][0];
-}
-CDenominator.prototype.getReduct = function()
-{
-    return this.Parent.getReduct();
 }
 CDenominator.prototype.getCtrPrp = function()
 {

@@ -16,7 +16,7 @@ CLimit.prototype.init = function(props)
     var oBase = new CMathContent();
 
     var oIter = new CMathContent();
-    oIter.setReduct(DEGR_REDUCT);
+    oIter.decreaseArgSize();
 
     if(this.type == LIMIT_LOW)
         this.addMCToContent(oBase, oIter);
@@ -70,7 +70,6 @@ CLimit.prototype.getPropsForWrite = function()
 function CMathFunc()
 {
     this.kind = MATH_FUNCTION;
-
     CMathBase.call(this);
 }
 extend(CMathFunc, CMathBase);

@@ -324,6 +324,9 @@ CBox.prototype.init = function(props)
 
     this.setDimension(1, 1);
     this.setContent();
+
+    if(this.opEmu)
+        this.elements[0][0].decreaseArgSize();
 }
 CBox.prototype.getBase = function()
 {
