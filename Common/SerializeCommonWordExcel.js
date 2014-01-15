@@ -1284,13 +1284,13 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 	this.bcr = new Binary_CommonReader(this.stream);
 	this.chart = chart;
 	this.chartType = null;
-	this.oLegendEntries = new Object();
-	this.oSeriesByIndex = new Object();
+	this.oLegendEntries = {};
+	this.oSeriesByIndex = {};
     this.chartAsGroup = chartAsGroup;
 	this.PreRead = function()
 	{
-		this.oLegendEntries = new Object();
-		this.oSeriesByIndex = new Object();
+		this.oLegendEntries = {};
+		this.oSeriesByIndex = {};
 		this.chart.legend.bShow = false;
 	}
 	this.Read = function(length)
@@ -1633,7 +1633,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         var oThis = this;
         if ( c_oSer_ChartLegendType.Layout === type )
         {
-            var oLegendLayout = new Object();
+            var oLegendLayout = {};
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                 return oThis.ReadLegendLayout(t,l, oLegendLayout);
             });

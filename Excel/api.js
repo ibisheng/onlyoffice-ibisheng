@@ -1008,7 +1008,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb._initCommentsToSave();
 				var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
 				var data = oBinaryFileWriter.Write();
-				var oAdditionalData = new Object();
+				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
 				oAdditionalData["vkey"] = this.documentVKey;
@@ -1029,7 +1029,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_asc_downloadAs: function (sFormat, fCallback, bStart, options, sSaveKey) { //fCallback({returnCode:"", ...})
 				//sFormat: xlsx, xls, ods, csv, html
-				var oAdditionalData = new Object();
+				var oAdditionalData = {};
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
 				oAdditionalData["vkey"] = this.documentVKey;
@@ -3105,7 +3105,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     if (!window['scriptBridge']['print']) {
                         window['scriptBridge']['print'] = function() {
 
-                            var oAdditionalData = new Object();
+                            var oAdditionalData = {};
                             oAdditionalData["documentId"] = t.documentId+ "." + t.documentFormat;
                             oAdditionalData["vkey"] = t.documentVKey;
                             oAdditionalData["outputformat"] = c_oAscFileType.PDFPRINT;
@@ -3151,7 +3151,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
                     if (!window['scriptBridge']['save']) {
                         window['scriptBridge']['save'] = function(sFormat) {
-                            var oAdditionalData = new Object();
+                            var oAdditionalData = {};
                             oAdditionalData["documentId"] = t.documentId + "." + t.documentFormat;
                             oAdditionalData["vkey"] = t.documentVKey;
                             oAdditionalData["outputformat"] = sFormat;

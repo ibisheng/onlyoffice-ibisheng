@@ -2732,11 +2732,11 @@ UndoRedoWorkbook.prototype = {
 		else if(historyitem_Workbook_SheetPositions == Type)
 		{
 			//делаем вспомогательным map из sheetid
-			var oTempSheetMap = new Object();
+			var oTempSheetMap = {};
 			for(var i = 0, length = Data.positions.length; i < length; ++i)
 				oTempSheetMap[Data.positions[i]] = 1;
 			//находим sheet уникальные для данного пользователя и запоминаем перед каким sheetid они идут
-			var oUniqueSheetId = new Object();
+			var oUniqueSheetId = {};
 			var nLastId = null;
 			for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
 			{

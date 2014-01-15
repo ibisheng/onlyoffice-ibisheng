@@ -556,7 +556,7 @@ CHistory.prototype =
             return;
 		this._checkCurPoint();
         var Items = [];
-		var UpdateRigions = new Object();
+		var UpdateRigions = {};
         var Time  = new Date().getTime();
 		var oSelectRange = this.workbook.handlers.trigger("getSelection");
 		this.CurPoint = {

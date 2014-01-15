@@ -1025,7 +1025,7 @@
 			{
 				var t = this;
 				var defaultColor = 'rgb(0, 0, 0)';
-				var oNewItem = new Object();
+				var oNewItem = {};
 				oNewItem.text = $(spanObject).text().replace(/(\r|\t|\n|)/g,'');
 
 				oNewItem.format = {};
@@ -2057,7 +2057,7 @@
 				else
 					this.bInBlock = true;
 				//создаем список используемых шрифтов
-				var AllFonts = new Object();
+				var AllFonts = {};
 				this.oDocument.Numbering.Document_Get_AllFontNames(AllFonts);
 				this.oDocument.Styles.Document_Get_AllFontNames(AllFonts);
 				for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )

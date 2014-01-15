@@ -8175,7 +8175,7 @@
 									var nameFormat;
 									/*if(newVal.format.oPositiveFormat)
 									{
-										var output = new Object();
+										var output = {};
 										var bRes = newVal.format.shiftFormat(output, 0);
 										if(true == bRes)
 											nameFormat = output.format;									

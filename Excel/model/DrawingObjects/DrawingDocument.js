@@ -3790,7 +3790,7 @@ function CDrawingDocument(drawingObjects)
         {
             if (margins)
             {
-                var cachedPage = new Object();
+                var cachedPage = {};
                 cachedPage.width_mm = this.m_arrPages[this.m_lCurrentPage].width_mm;
                 cachedPage.height_mm = this.m_arrPages[this.m_lCurrentPage].height_mm;
 
@@ -3806,7 +3806,7 @@ function CDrawingDocument(drawingObjects)
                 hor_ruler.IsCanMoveMargins = false;
                 ver_ruler.IsCanMoveMargins = false;
 
-                this.LastParagraphMargins = new Object();
+                this.LastParagraphMargins = {};
                 this.LastParagraphMargins.L = margins.L;
                 this.LastParagraphMargins.T = margins.T;
                 this.LastParagraphMargins.R = margins.R;

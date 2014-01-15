@@ -857,7 +857,7 @@ NumFormat.prototype =
 	},
     _parseNumber : function(number, aDecFormat, nFracLen, nValType)
     {
-        var res = {bDigit: false, dec: 0, frac: 0, exponent: 0, exponentFrac: 0, scientific: 0, sign: SignType.Positive, date: new Object()};
+        var res = {bDigit: false, dec: 0, frac: 0, exponent: 0, exponentFrac: 0, scientific: 0, sign: SignType.Positive, date: {}};
         if(CellValueType.String != nValType)
             res.bDigit = (number == number - 0);
         if(res.bDigit)
@@ -1871,7 +1871,7 @@ NumFormat.prototype =
 };
 function NumFormatCache()
 {
-    this.oNumFormats = new Object();
+    this.oNumFormats = {};
 };
 NumFormatCache.prototype =
 {
@@ -2018,7 +2018,7 @@ function CellFormat(format)
 			this.oTextFormat = this.oPositiveFormat;
 		}
 	}
-    this.formatCache = new Object();
+    this.formatCache = {};
 };
 CellFormat.prototype =
 {
@@ -2127,13 +2127,13 @@ CellFormat.prototype =
         var cacheVal = this.formatCache[number];
         if(null == cacheVal)
         {
-            cacheVal = new Object();
+            cacheVal = {};
             this.formatCache[number] = cacheVal;
         }
         var cacheType = cacheVal[nValType];
         if(null == cacheType)
         {
-            cacheType = new Object();
+            cacheType = {};
             cacheVal[nValType] = cacheType;
         }
         cacheType[dDigitsCount] = res;
@@ -2151,7 +2151,7 @@ CellFormat.prototype =
 			bRes |= bCurRes;
 			if(null != this.oNegativeFormat && this.oPositiveFormat != this.oNegativeFormat)
 			{
-				var oTempOutput = new Object();
+				var oTempOutput = {};
 				bCurRes = this.oNegativeFormat.toString(oTempOutput, nShift);
 				if(false == bCurRes)
 					output.format += ";" + this.oNegativeFormat.formatString;
@@ -2161,7 +2161,7 @@ CellFormat.prototype =
 			}
 			if(null != this.oNullFormat && this.oPositiveFormat != this.oNullFormat)
 			{
-				var oTempOutput = new Object();
+				var oTempOutput = {};
 				bCurRes = this.oNullFormat.toString(oTempOutput, nShift);
 				if(false == bCurRes)
 					output.format += ";" + this.oNullFormat.formatString;
@@ -2171,7 +2171,7 @@ CellFormat.prototype =
 			}
 			if(null != this.oTextFormat && this.oPositiveFormat != this.oTextFormat)
 			{
-				var oTempOutput = new Object();
+				var oTempOutput = {};
 				bCurRes = this.oTextFormat.toString(oTempOutput, nShift);
 				if(false == bCurRes)
 					output.format += ";" + this.oTextFormat.formatString;
@@ -2186,7 +2186,7 @@ CellFormat.prototype =
 			output.format = "";
 			for(var i = 0; i < length; ++i)
 			{
-				var oTempOutput = new Object();
+				var oTempOutput = {};
 				var oCurFormat = this.aComporationFormats[i];
 				var bCurRes = oCurFormat.toString(oTempOutput, nShift);
 				if(0 != i)
@@ -2209,7 +2209,7 @@ CellFormat.prototype =
 		return c_oAscNumFormatType.General;
 	}
 };
-var oDecodeGeneralFormatCache = new Object();
+var oDecodeGeneralFormatCache = {};
 function DecodeGeneralFormat(val, nValType, dDigitsCount)
 {
     var cacheVal = oDecodeGeneralFormatCache[val];
@@ -2227,13 +2227,13 @@ function DecodeGeneralFormat(val, nValType, dDigitsCount)
     var cacheVal = oDecodeGeneralFormatCache[val];
     if(null == cacheVal)
     {
-        cacheVal = new Object();
+        cacheVal = {};
         oDecodeGeneralFormatCache[val] = cacheVal;
     }
     var cacheType = cacheVal[nValType];
     if(null == cacheType)
     {
-        cacheType = new Object();
+        cacheType = {};
         cacheVal[nValType] = cacheType;
     }
     cacheType[dDigitsCount] = res;
@@ -2411,7 +2411,7 @@ function DecodeGeneralFormat_Raw(val, nValType, dDigitsCount)
 }
 function GeneralEditFormatCache()
 {
-    this.oCache = new Object();
+    this.oCache = {};
 };
 GeneralEditFormatCache.prototype =
 {

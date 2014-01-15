@@ -3679,7 +3679,7 @@ CTableCellPr.prototype =
             CellPr.TableCellMar = null;
         else
         {
-            CellPr.TableCellMar = new Object();
+            CellPr.TableCellMar = {};
             CellPr.TableCellMar.Bottom = undefined != this.TableCellMar.Bottom ? this.TableCellMar.Bottom.Copy() : undefined;
             CellPr.TableCellMar.Left   = undefined != this.TableCellMar.Left   ? this.TableCellMar.Left.Copy()   : undefined;
             CellPr.TableCellMar.Right  = undefined != this.TableCellMar.Right  ? this.TableCellMar.Right.Copy()  : undefined;
@@ -3720,7 +3720,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
             this.TableCellMar.Bottom = undefined != CellPr.TableCellMar.Bottom ? CellPr.TableCellMar.Bottom.Copy() : undefined;
             this.TableCellMar.Left   = undefined != CellPr.TableCellMar.Left   ? CellPr.TableCellMar.Left.Copy()   : undefined;
             this.TableCellMar.Right  = undefined != CellPr.TableCellMar.Right  ? CellPr.TableCellMar.Right.Copy()  : undefined;
@@ -3781,7 +3781,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
 
             if ( undefined != CellPr.TableCellMar.Bottom )
                 this.TableCellMar.Bottom = new CTableMeasurement( CellPr.TableCellMar.Bottom.Type, CellPr.TableCellMar.Bottom.W );
@@ -3975,7 +3975,7 @@ CTableCellPr.prototype =
             this.TableCellMar = null;
         else if ( 128 & Flags )
         {
-            this.TableCellMar = new Object();
+            this.TableCellMar = {};
             if ( 8 & Flags )
             {
                 this.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
@@ -4449,7 +4449,7 @@ CTextPr.prototype =
 
         if ( undefined != this.FontFamily )
         {
-            TextPr.FontFamily = new Object();
+            TextPr.FontFamily = {};
             TextPr.FontFamily.Name  = this.FontFamily.Name;
             TextPr.FontFamily.Index = this.FontFamily.Index;
         }
@@ -4505,7 +4505,7 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontFamily )
         {
-            this.FontFamily = new Object();
+            this.FontFamily = {};
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
         }
@@ -4613,7 +4613,7 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontFamily )
         {
-            this.FontFamily = new Object();
+            this.FontFamily = {};
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
         }

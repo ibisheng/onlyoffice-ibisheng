@@ -1090,7 +1090,7 @@ $(function(){
 	aStandartNumFormats[47] = "mm:ss.0";
 	aStandartNumFormats[48] = "##0.0E+0";
 	aStandartNumFormats[49] = "@";
-	aStandartNumFormatsId = new Object();
+	aStandartNumFormatsId = {};
 	for(var i in aStandartNumFormats)
 	{
 		aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
@@ -1111,15 +1111,15 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.theme = null;
 	this.clrSchemeMap = null;
 	
-	this.DefinedNames = new Object();
-	this.oRealDefinedNames = new Object();
+	this.DefinedNames = {};
+	this.oRealDefinedNames = {};
 	this.oNameGenerator = new NameGenerator(this);
 	this.CellStyles = new CCellStyles();
 	this.TableStyles = new CTableStyles();
 	this.oStyleManager = new StyleManager(this);
 	this.calcChain = [];
 	this.aWorksheets = [];
-	this.aWorksheetsById = new Object();
+	this.aWorksheetsById = {};
 	this.cwf = {};
 	this.isNeedCacheClean = true;
 	this.startActionOn = false;
@@ -1712,7 +1712,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		stream.obj = pointer.obj;
 		var nCurOffset = 0;
 		//пробегаемся первый раз чтобы заполнить oFontMap
-		var oFontMap = new Object();//собираем все шрифтры со всех изменений
+		var oFontMap = {};//собираем все шрифтры со всех изменений
 		var sFontMapString = "0;fontmap";
 		for(var i = 0, length = aChanges.length; i < length; ++i)
 		{
@@ -1773,7 +1773,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
  */
 function Woorksheet(wb, _index, bAddUserId, sId){
 	this.workbook = wb;
-	this.DefinedNames = new Object();
+	this.DefinedNames = {};
 	this.sName = this.workbook.getUniqueSheetNameFrom(g_sNewSheetNamePattern, false);
 	this.bHidden = false;
 	this.dDefaultColWidth = null;
@@ -1793,7 +1793,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
-	this.aGCells = new Object();// 0 based
+	this.aGCells = {};// 0 based
 	this.aCols = [];// 0 based
 	this.Drawings = [];
 	this.TableParts = [];
@@ -4020,7 +4020,7 @@ Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 		if(null != oCurNumFormat && false == oCurNumFormat.isGeneralFormat())
 		{
 			bGeneral = false;
-			var output = new Object();
+			var output = {};
 			bRes = oCurNumFormat.shiftFormat(output, nShift);
 			if(true == bRes)
 				this.setNumFormat(output.format);
@@ -4034,7 +4034,7 @@ Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 			var oGeneral = oNumFormatCache.get(sGeneral);
 			if(null != oGeneral && false == oGeneral.isGeneralFormat())
 			{
-				var output = new Object();
+				var output = {};
 				bRes = oGeneral.shiftFormat(output, nShift);
 				if(true == bRes)
 					this.setNumFormat(output.format);
@@ -6753,7 +6753,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 	}
 	//собираем массив обьектов для сортировки
 	var aSortElems = [];
-	var aHiddenRow = new Object();
+	var aHiddenRow = {};
 	var fAddSortElems = function(oCell, nRow0, nCol0,nRowStart0, nColStart0){
 		//не сортируем сткрытие строки
 		var row = oThis.worksheet._getRowNoEmpty(nRow0);
@@ -6830,7 +6830,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 	//проверяем что это не пустая операция
 	var aSortData = [];
 	var nHiddenCount = 0;
-	var oFromArray = new Object();
+	var oFromArray = {};
 	var nRowMax = 0;
 	var nRowMin = gc_nMaxRow0;
 	var nToMax = 0;
@@ -6896,7 +6896,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 }
 Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
     var rec = {length:0};
-	var oSortedIndexes = new Object();
+	var oSortedIndexes = {};
 	for(var i = 0, length = aSortData.length; i < length; ++i)
 	{
 		var item = aSortData[i];
@@ -6940,7 +6940,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 	for(var i = nColFirst0; i <= nLastCol0; ++i)
 	{
 		//запоминаем ячейки в которые уже что-то передвинули, чтобы не потерять их
-		var oTempCellsTo = new Object();
+		var oTempCellsTo = {};
 		for(var j in oSortedIndexes)
 		{
 			var nIndexFrom = j - 0;
@@ -7861,7 +7861,7 @@ function DefinedName(){
 }
 function NameGenerator(wb){
 	this.wb = wb;
-	this.aExistNames = new Object();
+	this.aExistNames = {};
 	this.sTableNamePattern = "Table";
 	this.nTableNameMaxIndex = 0;
 };

@@ -502,8 +502,8 @@ CopyProcessor.prototype =
     {
         if(bInitPr)
         {
-            this.oTagPr = new Object();
-            this.orPr = new Object();
+            this.oTagPr = {};
+            this.orPr = {};
         }
         this.aInnerHtml = [];
     },
@@ -1111,14 +1111,14 @@ CopyProcessor.prototype =
             if(shd_Nil != tablePr.Shd.Value)
                 tcStyle += "background-color:"+this.RGBToCSS(tablePr.Shd.Color)+";";
         }
-        var oCellMar = new Object();
+        var oCellMar = {};
         if(null != cellPr && null != cellPr.TableCellMar)
             this._MergeProp(oCellMar, cellPr.TableCellMar);
         if(null != tablePr && null != tablePr.TableCellMar)
             this._MergeProp(oCellMar, tablePr.TableCellMar);
         tcStyle += this._MarginToStyle(oCellMar, "padding");
 
-        var oCellBorder = new Object();
+        var oCellBorder = {};
         if(null != cellPr && null != cellPr.TableCellBorders)
             this._MergeProp(oCellBorder, cellPr.TableCellBorders);
         if(null != tablePr && null != tablePr.TableBorders)
@@ -1403,7 +1403,7 @@ CopyProcessor.prototype =
                     {
                         //������� �������� �����
 						var aSelectedRows = [];
-						var oRowElems = new Object();
+						var oRowElems = {};
 						if(Item.Selection.Data.length > 0)
 						{
 							for(var i = 0, length = Item.Selection.Data.length; i < length; ++i)
@@ -2018,7 +2018,7 @@ CopyProcessor.prototype =
     CopyPresentationTableCells: function(oDomTarget, graphicFrame)
     {
         var aSelectedRows = [];
-        var oRowElems = new Object();
+        var oRowElems = {};
         var Item = graphicFrame.graphicObject;
         if(Item.Selection.Data.length > 0)
         {
@@ -2171,7 +2171,7 @@ CopyProcessor.prototype =
     CopyPresentationTableFull: function(oDomTarget, graphicFrame)
     {
         var aSelectedRows = [];
-        var oRowElems = new Object();
+        var oRowElems = {};
         var Item = graphicFrame.graphicObject;
 
         this.CopyTable(oDomTarget, Item, null);
@@ -2755,8 +2755,8 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.bUploadImage = bUploadImage;
     this.bUploadFonts = bUploadFonts;
     this.bNested = bNested;//��� ���������� � ��������
-    this.oFonts = new Object();
-    this.oImages = new Object();
+    this.oFonts = {};
+    this.oImages = {};
 	this.aContent = [];
 	
     //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
@@ -2783,7 +2783,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
         "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
-    this.oBorderCache = new Object();
+    this.oBorderCache = {};
 }
 PasteProcessor.prototype =
 {
@@ -3320,7 +3320,7 @@ PasteProcessor.prototype =
 		else
 			this.bInBlock = true;
 		//создаем список используемых шрифтов
-		var AllFonts = new Object();
+		var AllFonts = {};
 		this.oDocument.Numbering.Document_Get_AllFontNames(AllFonts);
 		this.oDocument.Styles.Document_Get_AllFontNames(AllFonts);
         for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
@@ -3585,7 +3585,7 @@ PasteProcessor.prototype =
                                 }
                             };
 
-                            var oPrepeareImages = new Object();
+                            var oPrepeareImages = {};
                             this.api.pre_Paste(fonts, oPrepeareImages, paste_callback);
                             return;
                         }
@@ -4035,7 +4035,7 @@ PasteProcessor.prototype =
                             var aImagesToDownload = [];
                             for(var i in images)
                                 aImagesToDownload.push(i);
-                            var oPrepeareImages = new Object();
+                            var oPrepeareImages = {};
                             if(aImagesToDownload.length > 0)
                             {
                                 var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
@@ -4311,7 +4311,7 @@ PasteProcessor.prototype =
 				else if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
 					aImagesToDownload.push(src);
 			}
-			var oPrepeareImages = new Object();
+			var oPrepeareImages = {};
 			if(aImagesToDownload.length > 0)
 			{
 				var rData = {"id":documentId, "c":"imgurls", "vkey": documentVKey, "data": JSON.stringify(aImagesToDownload)};
@@ -5310,12 +5310,12 @@ PasteProcessor.prototype =
         var nMinColCount = 0;
         var nMaxColCount = 0;
         var aColsCountByRow = [];
-        var oRowSums = new Object();
+        var oRowSums = {};
         oRowSums[0] = 0;
         var dMaxSum = 0;
         var nCurColWidth = 0;
         var nCurSum = 0;
-        var oRowSpans = new Object();
+        var oRowSpans = {};
         var fParseSpans = function()
         {
             var spans = oRowSpans[nCurColWidth];
@@ -5554,7 +5554,7 @@ PasteProcessor.prototype =
         var style = tableNode.getAttribute("style");
         if(style)
         {
-            var tblPrMso = new Object();
+            var tblPrMso = {};
             this._parseCss(style, tblPrMso);
             var spacing = tblPrMso["mso-cellspacing"];
             if(null != spacing && null != (spacing = this._ValueToMm(spacing)))
@@ -5635,7 +5635,7 @@ PasteProcessor.prototype =
         }
 
         //content
-        var oRowSpans = new Object();
+        var oRowSpans = {};
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             var tr = node.childNodes[i];
@@ -5663,7 +5663,7 @@ PasteProcessor.prototype =
         var style = node.getAttribute("style");
         if(null != style)
         {
-            var tcPr = new Object();
+            var tcPr = {};
             this._parseCss(style, tcPr);
             var margin_left = tcPr["mso-row-margin-left"];
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
@@ -6656,12 +6656,12 @@ PasteProcessor.prototype =
         var nMinColCount = 0;
         var nMaxColCount = 0;
         var aColsCountByRow = [];
-        var oRowSums = new Object();
+        var oRowSums = {};
         oRowSums[0] = 0;
         var dMaxSum = 0;
         var nCurColWidth = 0;
         var nCurSum = 0;
-        var oRowSpans = new Object();
+        var oRowSpans = {};
         var fParseSpans = function()
         {
             var spans = oRowSpans[nCurColWidth];
@@ -6861,7 +6861,7 @@ PasteProcessor.prototype =
         var style = tableNode.getAttribute("style");
         if(style)
         {
-            var tblPrMso = new Object();
+            var tblPrMso = {};
             this._parseCss(style, tblPrMso);
             var spacing = tblPrMso["mso-cellspacing"];
             if(null != spacing && null != (spacing = this._ValueToMm(spacing)))
@@ -6942,7 +6942,7 @@ PasteProcessor.prototype =
         }
 
         //content
-        var oRowSpans = new Object();
+        var oRowSpans = {};
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             var tr = node.childNodes[i];
@@ -6970,7 +6970,7 @@ PasteProcessor.prototype =
         var style = node.getAttribute("style");
         if(null != style)
         {
-            var tcPr = new Object();
+            var tcPr = {};
             this._parseCss(style, tcPr);
             var margin_left = tcPr["mso-row-margin-left"];
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))

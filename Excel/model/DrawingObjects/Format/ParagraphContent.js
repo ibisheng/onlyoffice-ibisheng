@@ -1973,7 +1973,7 @@ function ParaNewLine(BreakType)
     this.Type = para_NewLine;
     this.BreakType = BreakType;
 
-    this.Flags = new Object(); // специальные флаги для разных break
+    this.Flags = {}; // специальные флаги для разных break
 
     if ( break_Page === this.BreakType )
         this.Flags.NewLine = true;
@@ -3334,7 +3334,7 @@ ParaDrawing.prototype =
     {
         // Сначала заполняем свойства
 
-        var Props = new Object();
+        var Props = {};
         Props.Width  = this.GraphicObj.absExtX;
         Props.Height = this.GraphicObj.absExtY;
 

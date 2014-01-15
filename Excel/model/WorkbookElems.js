@@ -40,7 +40,7 @@ var map_themeExcel_to_themePresentation = {
 	10: 11,
 	11: 10
 }
-var map_themePresentation_to_themeExcel = new Object();
+var map_themePresentation_to_themeExcel = {};
 for(var i in map_themeExcel_to_themePresentation)
 	map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
 function shiftGetBBox(bbox, bHor)
@@ -304,7 +304,7 @@ ColorManager.prototype =
 		var oColorObj = this.aColors[theme];
 		if(null == oColorObj)
 		{
-			oColorObj = new Object();
+			oColorObj = {};
 			this.aColors[theme] = oColorObj;
 		}
 		var oThemeColor = oColorObj[tint];
@@ -2293,7 +2293,7 @@ function Row(worksheet)
 	this.ws = worksheet;
 	this.sm = this.ws.workbook.oStyleManager;
 	this.cs = this.ws.workbook.CellStyles;
-	this.c = new Object();
+	this.c = {};
 	this.id = this.ws.getNextRowId();
     this.r = null;
 	this.index = null;
@@ -2789,7 +2789,7 @@ CCellValue.prototype =
 					oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
 				if(false == oNumFormat.isGeneralFormat())
 				{
-					var oAdditionalResult = new Object();
+					var oAdditionalResult = {};
 					if(null != this.number)
 					{
 						aText = oNumFormat.format(this.number, this.type, dDigitsCount, oAdditionalResult);
