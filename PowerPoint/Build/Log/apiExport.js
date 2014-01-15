@@ -30,7 +30,9 @@ prop:getSelectedElements
 prop:sync_ChangeLastSelectedElement
 prop:Init
 prop:asc_getEditorPermissions
+prop:asc_getLicense
 prop:asc_getEditorPermissionsCallback
+prop:_onGetLicense
 prop:asc_setDocInfo
 prop:asc_setLocale
 prop:LoadDocument
@@ -1170,7 +1172,9 @@ asc_docs_api.prototype['getSelectedElements'] = asc_docs_api.prototype.getSelect
 asc_docs_api.prototype['sync_ChangeLastSelectedElement'] = asc_docs_api.prototype.sync_ChangeLastSelectedElement;
 asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
 asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
+asc_docs_api.prototype['asc_getLicense'] = asc_docs_api.prototype.asc_getLicense;
 asc_docs_api.prototype['asc_getEditorPermissionsCallback'] = asc_docs_api.prototype.asc_getEditorPermissionsCallback;
+asc_docs_api.prototype['_onGetLicense'] = asc_docs_api.prototype._onGetLicense;
 asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
