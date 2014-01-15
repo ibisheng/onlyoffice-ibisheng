@@ -176,7 +176,9 @@ prop:getSelectedElements
 prop:sync_ChangeLastSelectedElement
 prop:Init
 prop:asc_getEditorPermissions
+prop:asc_getLicense
 prop:asc_getEditorPermissionsCallback
+prop:_onGetLicense
 prop:asc_setDocInfo
 prop:asc_setLocale
 prop:LoadDocument
@@ -956,20 +958,6 @@ var:CErrorData
 prop:put_Value
 prop:get_Value
 ---
-var:CreateBox
----
-var:CreateNary
----
-var:CreateRadical
----
-var:CreateDegree
----
-var:CreateFraction
----
-var:CreateElem
----
-var:AddText
----
 var:CAscColorScheme
 prop:get_colors
 prop:get_name
@@ -1272,7 +1260,9 @@ asc_docs_api.prototype['getSelectedElements'] = asc_docs_api.prototype.getSelect
 asc_docs_api.prototype['sync_ChangeLastSelectedElement'] = asc_docs_api.prototype.sync_ChangeLastSelectedElement;
 asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
 asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
+asc_docs_api.prototype['asc_getLicense'] = asc_docs_api.prototype.asc_getLicense;
 asc_docs_api.prototype['asc_getEditorPermissionsCallback'] = asc_docs_api.prototype.asc_getEditorPermissionsCallback;
+asc_docs_api.prototype['_onGetLicense'] = asc_docs_api.prototype._onGetLicense;
 asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
@@ -2006,13 +1996,6 @@ window['asc_ajax'] = asc_ajax;
 window['CErrorData'] = CErrorData;
 CErrorData.prototype['put_Value'] = CErrorData.prototype.put_Value;
 CErrorData.prototype['get_Value'] = CErrorData.prototype.get_Value;
-window['CreateBox'] = CreateBox;
-window['CreateNary'] = CreateNary;
-window['CreateRadical'] = CreateRadical;
-window['CreateDegree'] = CreateDegree;
-window['CreateFraction'] = CreateFraction;
-window['CreateElem'] = CreateElem;
-window['AddText'] = AddText;
 window['CAscColorScheme'] = CAscColorScheme;
 CAscColorScheme.prototype['get_colors'] = CAscColorScheme.prototype.get_colors;
 CAscColorScheme.prototype['get_name'] = CAscColorScheme.prototype.get_name;
