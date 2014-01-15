@@ -2171,7 +2171,7 @@ function CreateAreaChart(asc_series, type)
     d_lbls.setShowSerName(false);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
-    var cat_ax = plotArea.catAx;
+    var cat_ax = plot_area.catAx;
     cat_ax.setScaling(new CScaling());
     cat_ax.setDelete(false);
     cat_ax.setAxPos(AX_POS_B);
