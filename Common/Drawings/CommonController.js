@@ -1310,6 +1310,7 @@ DrawingObjectsController.prototype =
                         return CreateBarChart(chart.series, BAR_GROUPING_PERCENT_STACKED);
                     }
                 }
+				break;
             }
             case "HBar":
             {
@@ -1330,6 +1331,38 @@ DrawingObjectsController.prototype =
                 }
                 break;
             }
+			case "Area":
+			{
+				switch(chart.subType.toLowerCase())
+				{
+					case "normal":
+                    {
+                        return CreateAreaChart(chart.series, GROUPING_STANDARD);
+                    }
+                    case "stacked":
+                    {
+                        return CreateAreaChart(chart.series, GROUPING_STACKED);
+                    }
+                    case "stackedPer":
+                    {
+                        return CreateAreaChart(chart.series, GROUPING_PERCENT_STACKED);
+                    } 
+				}
+				break;
+			}
+			case "Pie":
+			{
+				return CreatePieChart(chart.series);
+			}
+			case "Scatter":
+			{
+				return CreateScatterChart(chart.series);
+			}
+			case "Stock":
+			{
+				return CreateStockChart(chart.series);
+				break;
+			}
         }
         return null;
     },
@@ -1375,6 +1408,7 @@ DrawingObjectsController.prototype =
 
     removeCallback: function(dir)
     {
+		return;
         var state = this.curState;
         var drawingObjectsController = this;
         switch(state.id)

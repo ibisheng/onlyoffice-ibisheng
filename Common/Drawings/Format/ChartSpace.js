@@ -2143,7 +2143,6 @@ function CreateAreaChart(asc_series, type)
         var series = new CAreaSeries();
         series.setIdx(i);
         series.setOrder(i);
-        series.setInvertIfNegative(false);
         series.setVal(new CYVal());
         var val = series.val;
         val.setNumRef(new CNumRef());
@@ -2198,7 +2197,7 @@ function CreateAreaChart(asc_series, type)
     val_ax.setCrossAx(plot_area.catAx);
     val_ax.setCrosses(CROSSES_AUTO_ZERO);
     val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
-    scaling = val_ax.scaling;
+    var scaling = val_ax.scaling;
     scaling.setOrientation(ORIENTATION_MIN_MAX);
     var num_fmt = val_ax.numFmt;
     var format_code;
@@ -2231,7 +2230,207 @@ function CreateAreaChart(asc_series, type)
 }
 
 
-function CreatePieCharts(asc_series, type)
+function CreatePieChart(asc_series, type)
+{
+    var chart_space = new CChartSpace();
+    chart_space.setDate1904(false);
+    chart_space.setLang("ru-Ru");
+    chart_space.setRoundedCorners(false);
+    chart_space.setStyle(2);
+    chart_space.setChart(new CChart());
+    var chart = chart_space.chart;
+    chart.setAutoTitleDeleted(false);
+    chart.setPlotArea(new CPlotArea());
+    var plot_area = chart.plotArea;
+    plot_area.setLayout(new CLayout());
+    plot_area.setChart(new CPieChart());
+    var pie_chart = plot_area.chart;
+    pie_chart.setVaryColors(true);
+    plot_area.setCatAx(new CAxis());
+    plot_area.setValAx(new CAxis());
+    for(var i = 0; i < asc_series.length; ++i)
+    {
+        var series = new CPieSeries();
+        series.setIdx(i);
+        series.setOrder(i);
+        series.setVal(new CYVal());
+        var val = series.val;
+        val.setNumRef(new CNumRef());
+        var num_ref = val.numRef;
+        num_ref.setF(asc_series[i].Val.Formula);
+        num_ref.setNumCache(new CNumLit());
+        var num_cache = num_ref.numCache;
+        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        {
+            var pt = new CNumericPoint();
+            pt.setIdx(j);
+            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+            pt.setVal(asc_series[i].Val.NumCache[j].val);
+            num_cache.addPt(pt);
+        }
+        pie_chart.addSer(series);
+    }
+    pie_chart.setDLbls(new CDLbls());
+    pie_chart.dLbls.setShowLegendKey(false);
+    pie_chart.dLbls.setShowVal(false);
+    pie_chart.dLbls.setShowCatName(false);
+    pie_chart.dLbls.setShowSerName(false);
+    pie_chart.dLbls.setShowPercent(false);
+    pie_chart.dLbls.setShowBubbleSize(false);
+    pie_chart.dLbls.setShowLeaderLines(true);
+    pie_chart.setFirstSliceAng(false);
+
+    chart.setLegend(new CLegend());
+    var legend = chart.legend;
+    legend.setLegendPos(LEGEND_POS_R);
+    legend.setLayout(new CLayout());
+    legend.setOverlay(false);
+    chart.setPlotVisOnly(true);
+    chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
+    chart.setShowDLblsOverMax(false);
+    chart_space.setPrintSettings(new CPrintSettings());
+    var print_settings = chart_space.printSettings;
+    print_settings.setHeaderFooter(new CHeaderFooterChart());
+    print_settings.setPageMargins(new CPageMarginsChart());
+    print_settings.setPageSetup(new CPageSetup());
+    var page_margins = print_settings.pageMargins;
+    page_margins.setB(0.75);
+    page_margins.setL(0.7);
+    page_margins.setR(0.7);
+    page_margins.setT(0.75);
+    page_margins.setHeader(0.3);
+    page_margins.setFooter(0.3);
+    return chart_space;
+}
+
+
+function CreateScatterChart(asc_series)
+{
+    var chart_space = new CChartSpace();
+    chart_space.setDate1904(false);
+    chart_space.setLang("ru-Ru");
+    chart_space.setRoundedCorners(false);
+    chart_space.setStyle(2);
+    chart_space.setChart(new CChart());
+    var chart = chart_space.chart;
+    chart.setAutoTitleDeleted(false);
+    chart.setPlotArea(new CPlotArea());
+    var plot_area = chart.plotArea;
+    plot_area.setLayout(new CLayout());
+    plot_area.setChart(new CScatterChart());
+    var scatter_chart = plot_area.chart;
+    scatter_chart.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
+    scatter_chart.setVaryColors(false);
+    plot_area.setCatAx(new CAxis());
+    plot_area.setValAx(new CAxis());
+    var first_ser = asc_series[0];
+    var start_index = asc_series.length > 1 ? 1 : 0;
+    for(var i = start_index; i < asc_series.length; ++i)
+    {
+        var series = new CScatterSeries();
+        series.setIdx(i);
+        series.setOrder(i);
+        series.setXVal(new CXVal());
+        series.setYVal(new CYVal());
+        var x_val = series.xVal;
+        x_val.setNumRef(new CNumRef());
+        var num_ref = x_val.numRef;
+        num_ref.setF(first_ser.Val.Formula);
+        num_ref.setNumCache(new CNumLit());
+        var num_cache = num_ref.numCache;
+        num_cache.setPtCount(first_ser.Val.NumCache.length);
+        for(var j = 0; j < first_ser.Val.NumCache.length; ++j)
+        {
+            var pt = new CNumericPoint();
+            pt.setIdx(j);
+            pt.setFormatCode(first_ser.Val.NumCache[j].numFormatStr);
+            pt.setVal(first_ser.Val.NumCache[j].val);
+            num_cache.addPt(pt);
+        }
+
+        var y_val = series.yVal;
+        y_val.setNumRef(new CNumRef());
+        var num_ref = y_val.numRef;
+        num_ref.setF(asc_series[i].Val.Formula);
+        num_ref.setNumCache(new CNumLit());
+        var num_cache = num_ref.numCache;
+        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        {
+            var pt = new CNumericPoint();
+            pt.setIdx(j);
+            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+            pt.setVal(asc_series[i].Val.NumCache[j].val);
+            num_cache.addPt(pt);
+        }
+        scatter_chart.addSer(series);
+    }
+
+    scatter_chart.setDLbls(new CDLbls());
+    scatter_chart.addAxId(plot_area.catAx);
+    scatter_chart.addAxId(plot_area.valAx);
+    var d_lbls = scatter_chart.dLbls;
+    d_lbls.setShowLegendKey(false);
+    d_lbls.setShowVal(false);
+    d_lbls.setShowCatName(false);
+    d_lbls.setShowSerName(false);
+    d_lbls.setShowPercent(false);
+    d_lbls.setShowBubbleSize(false);
+    var cat_ax = plot_area.catAx;
+    cat_ax.setScaling(new CScaling());
+    cat_ax.setDelete(false);
+    cat_ax.setAxPos(AX_POS_B);
+    cat_ax.setMajorTickMark(TICK_MARK_OUT);
+    cat_ax.setMinorTickMark(TICK_MARK_NONE);
+    cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    cat_ax.setCrossAx(plot_area.valAx);
+    cat_ax.setCrosses(CROSSES_AUTO_ZERO);
+    cat_ax.setAuto(true);
+    cat_ax.setLblAlgn(LBL_ALG_CTR);
+    cat_ax.setLblOffset(100);
+    cat_ax.setNoMultiLvlLbl(false);
+    cat_ax.scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var val_ax = plot_area.valAx;
+    val_ax.setScaling(new CScaling());
+    val_ax.setDelete(false);
+    val_ax.setAxPos(AX_POS_L);
+    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setNumFmt(new CNumFmt());
+    val_ax.setMajorTickMark(TICK_MARK_OUT);
+    val_ax.setMinorTickMark(TICK_MARK_NONE);
+    val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    val_ax.setCrossAx(plot_area.catAx);
+    val_ax.setCrosses(CROSSES_AUTO_ZERO);
+    val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+    var scaling = val_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var num_fmt = val_ax.numFmt;
+    var format_code = "General";
+    num_fmt.setFormatCode(format_code);
+    num_fmt.setSourceLinked(true);
+    chart.setLegend(new CLegend());
+    var legend = chart.legend;
+    legend.setLegendPos(LEGEND_POS_R);
+    legend.setLayout(new CLayout());
+    legend.setOverlay(false);
+    chart_space.setPrintSettings(new CPrintSettings());
+    var print_settings = chart_space.printSettings;
+    print_settings.setHeaderFooter(new CHeaderFooterChart());
+    print_settings.setPageMargins(new CPageMarginsChart());
+    print_settings.setPageSetup(new CPageSetup());
+    var page_margins = print_settings.pageMargins;
+    page_margins.setB(0.75);
+    page_margins.setL(0.7);
+    page_margins.setR(0.7);
+    page_margins.setT(0.75);
+    page_margins.setHeader(0.3);
+    page_margins.setFooter(0.3);
+    return chart_space;
+}
+
+
+function CreateStockChart(asc_series)
 {
     var chart_space = new CChartSpace();
     chart_space.setDate1904(false);
@@ -2244,11 +2443,104 @@ function CreatePieCharts(asc_series, type)
     chart.setPlotArea(new CPlotArea());
     chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
-    chart.setDispBlanksAs(DISP_BLANKS_AS_GAP);
-    chart.setDLblsOverMax(false);
+    var disp_blanks_as;
+    disp_blanks_as = DISP_BLANKS_AS_GAP;
+    chart.setDispBlanksAs(disp_blanks_as);
+    chart.setShowDLblsOverMax(false);
     var plot_area = chart.plotArea;
     plot_area.setLayout(new CLayout());
-    plot_area.setChart(new CPieChart());
-    var pie_chart = plot_area.chart;
-    pie_chart.setVaryColors(true);
+    plot_area.setChart(new CStockChart());
+    plot_area.setCatAx(new CAxis());
+    plot_area.setValAx(new CAxis());
+    var line_chart = plot_area.chart;
+    line_chart.setGrouping(type);
+    line_chart.setVaryColors(false);
+    line_chart.setDLbls(new CDLbls());
+    line_chart.setMarker(true);
+    line_chart.setSmooth(false);
+    line_chart.addAxId(plot_area.catAx);
+    line_chart.addAxId(plot_area.valAx);
+    for(var i = 0; i < asc_series.length; ++i)
+    {
+        var series = new CLineSeries();
+        series.setIdx(i);
+        series.setOrder(i);
+        series.setMarker(new CMarker());
+        series.marker.setSymbol(SYMBOL_NONE);
+        series.setSmooth(false);
+        series.setVal(new CYVal());
+        var val = series.val;
+        val.setNumRef(new CNumRef());
+        var num_ref = val.numRef;
+        num_ref.setF(asc_series[i].Val.Formula);
+        num_ref.setNumCache(new CNumLit());
+        var num_cache = num_ref.numCache;
+        num_cache.setPtCount(asc_series[i].Val.NumCache.length);
+        for(var j = 0; j < asc_series[i].Val.NumCache.length; ++j)
+        {
+            var pt = new CNumericPoint();
+            pt.setIdx(j);
+            pt.setFormatCode(asc_series[i].Val.NumCache[j].numFormatStr);
+            pt.setVal(asc_series[i].Val.NumCache[j].val);
+            num_cache.addPt(pt);
+        }
+        line_chart.addSer(series);
+    }
+    var d_lbls = line_chart.dLbls;
+    d_lbls.setShowLegendKey(false);
+    d_lbls.setShowVal(false);
+    d_lbls.setShowCatName(false);
+    d_lbls.setShowSerName(false);
+    d_lbls.setShowPercent(false);
+    d_lbls.setShowBubbleSize(false);
+    var cat_ax = plot_area.catAx;
+    cat_ax.setScaling(new CScaling());
+    cat_ax.setDelete(false);
+    cat_ax.setAxPos(AX_POS_B);
+    cat_ax.setMajorTickMark(TICK_MARK_OUT);
+    cat_ax.setMinorTickMark(TICK_MARK_OUT);
+    cat_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    cat_ax.setCrossAx(plot_area.valAx);
+    cat_ax.setCrosses(CROSSES_AUTO_ZERO);
+    cat_ax.setAuto(true);
+    cat_ax.setLblAlgn(LBL_ALG_CTR);
+    cat_ax.setLblOffset(100);
+    cat_ax.setNoMultiLvlLbl(false);
+    var scaling = cat_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var val_ax = plot_area.valAx;
+    val_ax.setScaling(new CScaling());
+    val_ax.setDelete(false);
+    val_ax.setAxPos(AX_POS_L);
+    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setNumFmt(new CNumFmt());
+    val_ax.setMajorTickMark(TICK_MARK_OUT);
+    val_ax.setMinorTickMark(TICK_MARK_NONE);
+    val_ax.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    val_ax.setCrossAx(plot_area.catAx);
+    val_ax.setCrosses(CROSSES_AUTO_ZERO);
+    val_ax.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+    scaling = val_ax.scaling;
+    scaling.setOrientation(ORIENTATION_MIN_MAX);
+    var num_fmt = val_ax.numFmt;
+    var format_code;
+    format_code = "General";
+    num_fmt.setFormatCode(format_code);
+    num_fmt.setSourceLinked(true);
+    var legend = chart.legend;
+    legend.setLegendPos(LEGEND_POS_R);
+    legend.setLayout(new CLayout());
+    legend.setOverlay(false);
+    var print_settings = chart_space.printSettings;
+    print_settings.setHeaderFooter(new CHeaderFooterChart());
+    print_settings.setPageMargins(new CPageMarginsChart());
+    print_settings.setPageSetup(new CPageSetup());
+    var page_margins = print_settings.pageMargins;
+    page_margins.setB(0.75);
+    page_margins.setL(0.7);
+    page_margins.setR(0.7);
+    page_margins.setT(0.75);
+    page_margins.setHeader(0.3);
+    page_margins.setFooter(0.3);
+    return chart_space;
 }

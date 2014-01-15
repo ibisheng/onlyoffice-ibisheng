@@ -8676,43 +8676,43 @@ CPieSeries.prototype =
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        this.dLbls = pr;
     },
     setDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetDPt, oldPr: this.dPt, newPr:pr});
+        this.dPt = pr;
     },
     setExplosion: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetExplosion, oldPr: this.explosion, newPr:pr});
+        this.explosion = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetIdx, oldPr: this.idx, newPr:pr});
+        this.idx = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetOrder, oldPr: this.order, newPr:pr});
+        this.order = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetSpPr, oldPr: this.spPr, newPr:pr});
+        this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetTx, oldPr: this.tx, newPr:pr});
+        this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
-        this.cat = pr;
+        History.Add(this, {Type: historyitem_PieSeries_SetVal, oldPr: this.val, newPr:pr});
+        this.val = pr;
     },
 
     Undo: function(data)
