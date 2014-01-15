@@ -2324,31 +2324,34 @@ function CreateScatterChart(asc_series)
     scatter_chart.setVaryColors(false);
     plot_area.setCatAx(new CAxis());
     plot_area.setValAx(new CAxis());
-    var first_ser = asc_series[0];
+	
+	var first_series = asc_series.length > 1 ? asc_series[0] : null;
     var start_index = asc_series.length > 1 ? 1 : 0;
     for(var i = start_index; i < asc_series.length; ++i)
     {
         var series = new CScatterSeries();
         series.setIdx(i);
         series.setOrder(i);
-        series.setXVal(new CXVal());
+		if(first_series)
+		{
+			series.setXVal(new CXVal());
+			var x_val = series.xVal;
+			x_val.setNumRef(new CNumRef());
+			var num_ref = x_val.numRef;
+			num_ref.setF(first_ser.Val.Formula);
+			num_ref.setNumCache(new CNumLit());
+			var num_cache = num_ref.numCache;
+			num_cache.setPtCount(first_ser.Val.NumCache.length);
+			for(var j = 0; j < first_ser.Val.NumCache.length; ++j)
+			{
+				var pt = new CNumericPoint();
+				pt.setIdx(j);
+				pt.setFormatCode(first_ser.Val.NumCache[j].numFormatStr);
+				pt.setVal(first_ser.Val.NumCache[j].val);
+				num_cache.addPt(pt);
+			}
+		}
         series.setYVal(new CYVal());
-        var x_val = series.xVal;
-        x_val.setNumRef(new CNumRef());
-        var num_ref = x_val.numRef;
-        num_ref.setF(first_ser.Val.Formula);
-        num_ref.setNumCache(new CNumLit());
-        var num_cache = num_ref.numCache;
-        num_cache.setPtCount(first_ser.Val.NumCache.length);
-        for(var j = 0; j < first_ser.Val.NumCache.length; ++j)
-        {
-            var pt = new CNumericPoint();
-            pt.setIdx(j);
-            pt.setFormatCode(first_ser.Val.NumCache[j].numFormatStr);
-            pt.setVal(first_ser.Val.NumCache[j].val);
-            num_cache.addPt(pt);
-        }
-
         var y_val = series.yVal;
         y_val.setNumRef(new CNumRef());
         var num_ref = y_val.numRef;
@@ -2367,7 +2370,8 @@ function CreateScatterChart(asc_series)
         scatter_chart.addSer(series);
     }
 
-    scatter_chart.setDLbls(new CDLbls());
+   
+	scatter_chart.setDLbls(new CDLbls());
     scatter_chart.addAxId(plot_area.catAx);
     scatter_chart.addAxId(plot_area.valAx);
     var d_lbls = scatter_chart.dLbls;
