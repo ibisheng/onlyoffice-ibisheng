@@ -1286,7 +1286,7 @@ DrawingObjectsController.prototype =
                     {
                         return CreateLineChart(chart.series, GROUPING_STACKED);
                     }
-                    case "stackedPer":
+                    case "stackedper":
                     {
                         return CreateLineChart(chart.series, GROUPING_PERCENT_STACKED);
                     }
@@ -1305,7 +1305,7 @@ DrawingObjectsController.prototype =
                     {
                         return CreateBarChart(chart.series, BAR_GROUPING_STACKED);
                     }
-                    case "stackedPer":
+                    case "stackedper":
                     {
                         return CreateBarChart(chart.series, BAR_GROUPING_PERCENT_STACKED);
                     }
@@ -1324,7 +1324,7 @@ DrawingObjectsController.prototype =
                     {
                         return CreateHBarChart(chart.series, BAR_GROUPING_STACKED);
                     }
-                    case "stackedPer":
+                    case "stackedper":
                     {
                         return CreateHBarChart(chart.series, BAR_GROUPING_PERCENT_STACKED);
                     }
@@ -1343,7 +1343,7 @@ DrawingObjectsController.prototype =
                     {
                         return CreateAreaChart(chart.series, GROUPING_STACKED);
                     }
-                    case "stackedPer":
+                    case "stackedper":
                     {
                         return CreateAreaChart(chart.series, GROUPING_PERCENT_STACKED);
                     } 
