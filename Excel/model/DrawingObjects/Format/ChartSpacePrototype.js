@@ -84,6 +84,9 @@ CChartSpace.prototype.getParentObjects = CShape.prototype.getParentObjects;
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateChart = function()
 {
+	if(this.chartObj == null)
+		this.chartObj =  new CChartsDrawer();
+	this.chartObj.reCalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
 CChartSpace.prototype.canMove = CShape.prototype.canMove;
@@ -94,7 +97,13 @@ CChartSpace.prototype.canRotate = function()
 
 CChartSpace.prototype.draw = function(graphics)
 {
-
+	var intGrid = graphics.GetIntegerGrid();
+	graphics.SetIntegerGrid(false);
+	graphics.transform3(this.transform, false);
+	
+	this.chartObj.draw(this, graphics);
+	graphics.reset();
+	graphics.SetIntegerGrid(intGrid);
 };
 CChartSpace.prototype.recalculateBounds = function()
 {
