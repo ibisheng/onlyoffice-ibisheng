@@ -2103,8 +2103,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					return false;
 
 				var i = this.wbModel.getActive();
-				var activeName = this.wbModel.getWorksheet(i).sName;
-				var sheetId = this.wbModel.getWorksheet(i).getId();
+				var activeSheet = this.wbModel.getWorksheet(i);
+				var activeName = activeSheet.sName;
+				var sheetId = activeSheet.getId();
 				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
 				var t = this;
