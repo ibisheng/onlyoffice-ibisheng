@@ -2567,13 +2567,13 @@ function DrawingObjects() {
 	var _this = this;
 	var asc = window["Asc"];
 	var api = asc["editor"];
+	var worksheet = null;
 	var asc_Range = asc.Range;
 	var asc_applyFunction = asc.applyFunction;
 	
 	var chartRender = null;
 	if ( typeof ChartRender !== "undefined" )
 		chartRender = new ChartRender();
-	var worksheet = null;
 	
 	var isInit = false;
 	var drawingCtx = null;
@@ -2618,12 +2618,12 @@ function DrawingObjects() {
 			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
 		}
 	}
-	
+
 	//-----------------------------------------------------------------------------------
 	// Create drawing
 	//-----------------------------------------------------------------------------------
 	
-	var DrawingBase = function(ws) {
+	function DrawingBase(ws) {
 		
 		var _t = this;
 		_t.worksheet = ws;
@@ -2643,210 +2643,230 @@ function DrawingObjects() {
 			anchorUpdated: false,
 			lockState: c_oAscLockTypes.kLockTypeNone
 		};
+	}
+	
+	//{ prototype
+	DrawingBase.prototype.getAllFonts = function(AllFonts) {
+		var _t = this;
+        _t.graphicObject && _t.graphicObject.getAllFonts && _t.graphicObject.getAllFonts(AllFonts);
+    }
+	
+	DrawingBase.prototype.isImage = function() {
+		var _t = this;
+		return _t.graphicObject ? _t.graphicObject.isImage() : false;
+	}
+	
+	DrawingBase.prototype.isShape = function() {
+		var _t = this;
+		return _t.graphicObject ? _t.graphicObject.isShape() : false;
+	}
+	
+	DrawingBase.prototype.isGroup = function() {
+		var _t = this;
+		return _t.graphicObject ? _t.graphicObject.isGroup() : false;
+	}
+	
+	DrawingBase.prototype.isChart = function() {
+		var _t = this;
+		return _t.graphicObject ? _t.graphicObject.isChart() : false;
+	}
+	
+	DrawingBase.prototype.isGraphicObject = function() {
+		var _t = this;
+		return _t.graphicObject != null;
+	}
+	
+	DrawingBase.prototype.isLocked = function() {
+		var _t = this;
+		return ( (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeNone) && (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeMine) )
+	}
+	
+	DrawingBase.prototype.getWorkbook = function() {
+		var _t = this;
+		return (_t.worksheet ? _t.worksheet.model.workbook : null);
+	}
 
-        _t.getAllFonts = function(AllFonts) {
-            _t.graphicObject && _t.graphicObject.getAllFonts && _t.graphicObject.getAllFonts(AllFonts);
-        };
-
-		// Свойства
-		_t.isImage = function() {
-			return _t.graphicObject ? _t.graphicObject.isImage() : false;
-		}
+    DrawingBase.prototype.getCanvasContext = function() {
+        return _this.drawingDocument.CanvasHitContext;
+    }
+	
+	// GraphicObject: x, y, extX, extY
+	DrawingBase.prototype.getGraphicObjectMetrics = function() {
+		var _t = this;
+		var metrics = { x: 0, y: 0, extX: 0, extY: 0 };
 		
-		_t.isShape = function() {
-			return _t.graphicObject ? _t.graphicObject.isShape() : false;
-		}
+		var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
+		metrics.x = pxToMm( coordsFrom.x );
+		metrics.y = pxToMm( coordsFrom.y );
 		
-		_t.isGroup = function() {
-			return _t.graphicObject ? _t.graphicObject.isGroup() : false;
-		}
+		var coordsTo = _this.coordsManager.calculateCoords(_t.to);
+		metrics.extX = pxToMm( coordsTo.x - coordsFrom.x );
+		metrics.extY = pxToMm( coordsTo.y - coordsFrom.y );
 		
-		_t.isChart = function() {
-			return _t.graphicObject ? _t.graphicObject.isChart() : false;
-		}
+		return metrics;
+	}
+	
+	// Считаем From/To исходя из graphicObject
+	DrawingBase.prototype.setGraphicObjectCoords = function() {
+		var _t = this;
+		if ( _t.isGraphicObject() ) {
 		
-		_t.isGraphicObject = function() {
-			return _t.graphicObject != null;
-		}
-		
-		_t.isLocked = function() {
-			return ( (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeNone) && (_t.graphicObject.lockType != c_oAscLockTypes.kLockTypeMine) )
-		}
-		
-		_t.getWorkbook = function() {
-			return (_t.worksheet ? _t.worksheet.model.workbook : null);
-		}
-
-        _t.getCanvasContext = function() {
-            return _this.drawingDocument.CanvasHitContext;
-        }
-		
-		// GraphicObject: x, y, extX, extY
-		_t.getGraphicObjectMetrics = function() {
-					 
-			var metrics = { x: 0, y: 0, extX: 0, extY: 0 };
+			if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
+				return;
 			
-			var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-			metrics.x = pxToMm( coordsFrom.x );
-			metrics.y = pxToMm( coordsFrom.y );
+			var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
+			var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
 			
-			var coordsTo = _this.coordsManager.calculateCoords(_t.to);
-			metrics.extX = pxToMm( coordsTo.x - coordsFrom.x );
-			metrics.extY = pxToMm( coordsTo.y - coordsFrom.y );
+			_t.from.col = fromCell.col;
+			_t.from.colOff = fromCell.colOff;
+			_t.from.row = fromCell.row;
+			_t.from.rowOff = fromCell.rowOff;
 			
-			return metrics;
-		}
-		
-		// Считаем From/To исходя из graphicObject
-		_t.setGraphicObjectCoords = function() {
-			if ( _t.isGraphicObject() ) {
-			
-				if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
-					return;
-				
-				var fromCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x), mmToPx(_t.graphicObject.y) );
-				var toCell = _this.coordsManager.calculateCell( mmToPx(_t.graphicObject.x + _t.graphicObject.extX), mmToPx(_t.graphicObject.y + _t.graphicObject.extY) );
-				
-				_t.from.col = fromCell.col;
-				_t.from.colOff = fromCell.colOff;
-				_t.from.row = fromCell.row;
-				_t.from.rowOff = fromCell.rowOff;
-				
-				_t.to.col = toCell.col;
-				_t.to.colOff = toCell.colOff;
-				_t.to.row = toCell.row;
-				_t.to.rowOff = toCell.rowOff;
-			}
-		}
-		
-		// Проверяет выход за границы
-		_t.inVisibleArea = function(scrollType) {
-			var result = true;
-			var fvc, fvr, lvc, lvr;
-			
-			var checker = _this.getBoundsChecker(_t.graphicObject);
-			var coords = _this.getBoundsCheckerCoords(checker);
-			if ( coords ) {				
-				if ( scrollType ) {
-					var updatedRange = scrollType.getUpdatedRange();
-					fvc = updatedRange.c1;
-					fvr = updatedRange.r1;
-					lvc = updatedRange.c2;
-					lvr = updatedRange.r2;
-				}
-				else {
-					fvc = _t.worksheet.getFirstVisibleCol();
-					fvr = _t.worksheet.getFirstVisibleRow();
-					lvc = _t.worksheet.getLastVisibleCol();
-					lvr = _t.worksheet.getLastVisibleRow();
-			
-				}
-				if ( (fvr >= coords.to.row + 1) || (lvr <= coords.from.row - 1) || (fvc >= coords.to.col + 1) || (lvc <= coords.from.col - 1) )
-					result = false;
-			}
-
-			return result;
-		}
-
-		_t.updateAnchorPosition = function() {
-
-			switch (_t.Type) {
-				case c_oAscCellAnchorType.cellanchorOneCell: 
-					{
-						var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
-						var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
-
-						_t.to.col = cellTo.col;
-						_t.to.colOff = cellTo.colOff;
-						_t.to.row = cellTo.row;
-						_t.to.rowOff = cellTo.rowOff;
-					}
-					break;
-
-				case c_oAscCellAnchorType.cellanchorAbsolute: 
-					{
-						if ( _t.Pos.X < 0 )
-							_t.Pos.X = 0;
-						if ( _t.Pos.Y < 0 )
-							_t.Pos.Y = 0;
-							
-						var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
-						_t.from.col = cellFrom.col;
-						_t.from.colOff = cellFrom.colOff;
-						_t.from.row = cellFrom.row;
-						_t.from.rowOff = cellFrom.rowOff;
-
-						var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
-						_t.to.col = cellTo.col;
-						_t.to.colOff = cellTo.colOff;
-						_t.to.row = cellTo.row;
-						_t.to.rowOff = cellTo.rowOff;
-					}
-					break;
-			}
-			_t.flags.anchorUpdated = true;
-		}
-
-		// Реальное смещение по высоте
-		_t.getRealTopOffset = function() {
-			var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
-			return asc.round(val);
-		}
-
-		// Реальное смещение по ширине
-		_t.getRealLeftOffset = function() {
-			var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
-			return asc.round(val);
-		}
-
-		// Ширина по координатам
-		_t.getWidthFromTo = function() {
-			var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
-			return val;
-		}
-
-		// Высота по координатам
-		_t.getHeightFromTo = function() {
-			var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
-			return val;
-		}
-
-		// Видимое смещение объекта от первой видимой строки
-		_t.getVisibleTopOffset = function(withHeader) {
-			var headerRowOff = _t.worksheet.getCellTop(0, 0);
-			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
-			var off = _t.getRealTopOffset() - fvr;
-			var off = (off > 0) ? off : 0;
-			return withHeader ? headerRowOff + off : off;
-		}
-
-		// Видимое смещение объекта от первой видимой колонки
-		_t.getVisibleLeftOffset = function(withHeader) {
-			var headerColOff = _t.worksheet.getCellLeft(0, 0);
-			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
-			var off = _t.getRealLeftOffset() - fvc;
-			var off = (off > 0) ? off : 0;
-			return withHeader ? headerColOff + off : off;
-		}
-
-		// смещение по высоте внутри объекта
-		_t.getInnerOffsetTop = function() {
-			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
-			var off = _t.getRealTopOffset() - fvr;
-			return (off > 0) ? 0 : asc.round( Math.abs(off) );
-		}
-
-		// смещение по ширине внутри объекта
-		_t.getInnerOffsetLeft = function() {
-			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
-			var off = _t.getRealLeftOffset() - fvc;
-			return (off > 0) ? 0 : asc.round( Math.abs(off) );
-		}
-		
-		_t.getDrawingObjects = function() {	
-			return _this;
+			_t.to.col = toCell.col;
+			_t.to.colOff = toCell.colOff;
+			_t.to.row = toCell.row;
+			_t.to.rowOff = toCell.rowOff;
 		}
 	}
+	
+	// Проверяет выход за границы
+	DrawingBase.prototype.inVisibleArea = function(scrollType) {
+		var _t = this;
+		var result = true;
+		var fvc, fvr, lvc, lvr;
+		
+		var checker = _this.getBoundsChecker(_t.graphicObject);
+		var coords = _this.getBoundsCheckerCoords(checker);
+		if ( coords ) {				
+			if ( scrollType ) {
+				var updatedRange = scrollType.getUpdatedRange();
+				fvc = updatedRange.c1;
+				fvr = updatedRange.r1;
+				lvc = updatedRange.c2;
+				lvr = updatedRange.r2;
+			}
+			else {
+				fvc = _t.worksheet.getFirstVisibleCol();
+				fvr = _t.worksheet.getFirstVisibleRow();
+				lvc = _t.worksheet.getLastVisibleCol();
+				lvr = _t.worksheet.getLastVisibleRow();
+		
+			}
+			if ( (fvr >= coords.to.row + 1) || (lvr <= coords.from.row - 1) || (fvc >= coords.to.col + 1) || (lvc <= coords.from.col - 1) )
+				result = false;
+		}
+
+		return result;
+	}
+
+	DrawingBase.prototype.updateAnchorPosition = function() {
+		var _t = this;
+		switch (_t.Type) {
+			case c_oAscCellAnchorType.cellanchorOneCell: 
+				{
+					var coordsFrom = _this.coordsManager.calculateCoords(_t.from);
+					var cellTo = _this.coordsManager.calculateCell( coordsFrom.x + mmToPx(_t.ext.cx), coordsFrom.y + mmToPx(_t.ext.cy) );
+
+					_t.to.col = cellTo.col;
+					_t.to.colOff = cellTo.colOff;
+					_t.to.row = cellTo.row;
+					_t.to.rowOff = cellTo.rowOff;
+				}
+				break;
+
+			case c_oAscCellAnchorType.cellanchorAbsolute: 
+				{
+					if ( _t.Pos.X < 0 )
+						_t.Pos.X = 0;
+					if ( _t.Pos.Y < 0 )
+						_t.Pos.Y = 0;
+						
+					var cellFrom = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X), mmToPx(_t.Pos.Y) );
+					_t.from.col = cellFrom.col;
+					_t.from.colOff = cellFrom.colOff;
+					_t.from.row = cellFrom.row;
+					_t.from.rowOff = cellFrom.rowOff;
+
+					var cellTo = _this.coordsManager.calculateCell( mmToPx(_t.Pos.X + _t.ext.cx), mmToPx(_t.Pos.Y + _t.ext.cy));
+					_t.to.col = cellTo.col;
+					_t.to.colOff = cellTo.colOff;
+					_t.to.row = cellTo.row;
+					_t.to.rowOff = cellTo.rowOff;
+				}
+				break;
+		}
+		_t.flags.anchorUpdated = true;
+	}
+
+	// Реальное смещение по высоте
+	DrawingBase.prototype.getRealTopOffset = function() {
+		var _t = this;
+		var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
+		return asc.round(val);
+	}
+
+	// Реальное смещение по ширине
+	DrawingBase.prototype.getRealLeftOffset = function() {
+		var _t = this;
+		var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
+		return asc.round(val);
+	}
+
+	// Ширина по координатам
+	DrawingBase.prototype.getWidthFromTo = function() {
+		var _t = this;
+		var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
+		return val;
+	}
+
+	// Высота по координатам
+	DrawingBase.prototype.getHeightFromTo = function() {
+		var _t = this;
+		var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
+		return val;
+	}
+
+	// Видимое смещение объекта от первой видимой строки
+	DrawingBase.prototype.getVisibleTopOffset = function(withHeader) {
+		var _t = this;
+		var headerRowOff = _t.worksheet.getCellTop(0, 0);
+		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+		var off = _t.getRealTopOffset() - fvr;
+		var off = (off > 0) ? off : 0;
+		return withHeader ? headerRowOff + off : off;
+	}
+
+	// Видимое смещение объекта от первой видимой колонки
+	DrawingBase.prototype.getVisibleLeftOffset = function(withHeader) {
+		var _t = this;
+		var headerColOff = _t.worksheet.getCellLeft(0, 0);
+		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+		var off = _t.getRealLeftOffset() - fvc;
+		var off = (off > 0) ? off : 0;
+		return withHeader ? headerColOff + off : off;
+	}
+
+	// смещение по высоте внутри объекта
+	DrawingBase.prototype.getInnerOffsetTop = function() {
+		var _t = this;
+		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+		var off = _t.getRealTopOffset() - fvr;
+		return (off > 0) ? 0 : asc.round( Math.abs(off) );
+	}
+
+	// смещение по ширине внутри объекта
+	DrawingBase.prototype.getInnerOffsetLeft = function() {
+		var _t = this;
+		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+		var off = _t.getRealLeftOffset() - fvc;
+		return (off > 0) ? 0 : asc.round( Math.abs(off) );
+	}
+	
+	DrawingBase.prototype.getDrawingObjects = function() {	
+		return _this;
+	}
+	
+	//}
 	
 	//-----------------------------------------------------------------------------------
 	// Constructor
@@ -2856,27 +2876,27 @@ function DrawingObjects() {
 		return new DrawingBase(worksheet);
 	};
 
-	_this.cloneDrawingObject = function(obj) {
+	_this.cloneDrawingObject = function(object) {
 
 		var copyObject = _this.createDrawingObject();
 
-		copyObject.Type = obj.Type;
-		copyObject.Pos.X = obj.Pos.X;
-		copyObject.Pos.Y = obj.Pos.Y;
-		copyObject.ext.cx = obj.ext.cx;
-		copyObject.ext.cy = obj.ext.cy;
+		copyObject.Type = object.Type;
+		copyObject.Pos.X = object.Pos.X;
+		copyObject.Pos.Y = object.Pos.Y;
+		copyObject.ext.cx = object.ext.cx;
+		copyObject.ext.cy = object.ext.cy;
 		
-		copyObject.from.col = obj.from.col;
-		copyObject.from.colOff = obj.from.colOff;
-		copyObject.from.row = obj.from.row;
-		copyObject.from.rowOff = obj.from.rowOff;
+		copyObject.from.col = object.from.col;
+		copyObject.from.colOff = object.from.colOff;
+		copyObject.from.row = object.from.row;
+		copyObject.from.rowOff = object.from.rowOff;
 
-		copyObject.to.col = obj.to.col;
-		copyObject.to.colOff = obj.to.colOff;
-		copyObject.to.row = obj.to.row;
-		copyObject.to.rowOff = obj.to.rowOff;
+		copyObject.to.col = object.to.col;
+		copyObject.to.colOff = object.to.colOff;
+		copyObject.to.row = object.to.row;
+		copyObject.to.rowOff = object.to.rowOff;
 		
-		copyObject.graphicObject = obj.graphicObject;
+		copyObject.graphicObject = object.graphicObject;
 		
 		// Series colors
 		if ( typeof CChartAsGroup !== "undefined" && copyObject.graphicObject instanceof  CChartAsGroup ) {
@@ -2897,7 +2917,7 @@ function DrawingObjects() {
 		
 		return copyObject;
 	}
-
+	
 	//-----------------------------------------------------------------------------------
 	// Public methods
 	//-----------------------------------------------------------------------------------
@@ -3146,14 +3166,14 @@ function DrawingObjects() {
 		
 		worksheet._drawCollaborativeElements(false);
 		
-		//for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
-		//	if ( _this.controller.selectedObjects[i].isChart() ) {
-		//		_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
-		//		shapeOverlayCtx.ClearMode = true;
-		//		_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
-		//		shapeOverlayCtx.ClearMode = false;
-		//	}
-		//}
+		/*for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
+			if ( _this.controller.selectedObjects[i].isChart() ) {
+				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
+				shapeOverlayCtx.ClearMode = true;
+				_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
+				shapeOverlayCtx.ClearMode = false;
+			}
+		}*/
 
         if (null == drDoc.m_oDocumentRenderer)
         {
@@ -3337,7 +3357,6 @@ function DrawingObjects() {
 				if ( graphicOption.aId.indexOf(aBoundsCheckers[i].objectId) === -1 )
 					bSkip = true;
 			}
-			
 			if ( !bSkip )
 				_this.restoreSheetArea(aBoundsCheckers[i]);
 		}
@@ -4103,21 +4122,21 @@ function DrawingObjects() {
 	}
 	
 	_this.rebuildChartGraphicObjects = function(range) {
-		//var bRebuild = true;
-		//for (var i = 0; i < aObjects.length; i++) {
-		//	var graphicObject = aObjects[i].graphicObject;
-		//	if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
-		//		bRebuild = true;
-		//		if ( range ) {
-		//			if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
-		//				bRebuild = false;
-		//		}
-		//		if ( bRebuild )	{
-		//			graphicObject.chart.rebuildSeries();
-		//			graphicObject.recalculate();
-		//		}
-		//	}
-		//}
+		/*var bRebuild = true;
+		for (var i = 0; i < aObjects.length; i++) {
+			var graphicObject = aObjects[i].graphicObject;
+			if ( graphicObject.isChart() && graphicObject.chart.range.intervalObject ) {
+				bRebuild = true;
+				if ( range ) {
+					if ( !range.intersection(graphicObject.chart.range.intervalObject.bbox) )
+						bRebuild = false;
+				}
+				if ( bRebuild )	{
+					graphicObject.chart.rebuildSeries();
+					graphicObject.recalculate();
+				}
+			}
+		}*/
 	}
 	
 	_this.updateDrawingObject = function(bInsert, operType, updateRange) {
@@ -4635,11 +4654,11 @@ function DrawingObjects() {
             aObjects.push(drawingObject);
         }
 
-		//if ( isInit ) {
-		//	_this.showDrawingObjects(false);
-		//	_this.sendGraphicObjectProps();
-		//	worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
-		//}
+		/*if ( isInit ) {
+			_this.showDrawingObjects(false);
+			_this.sendGraphicObjectProps();
+			worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
+		}*/
 		
 		if ( lockByDefault ) {
 			_this.objectLocker.reset();
@@ -4647,9 +4666,9 @@ function DrawingObjects() {
 			_this.objectLocker.checkObjects( function(result) {} );
 		}
 		
-		//var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
-		//aBoundsCheckers.push(boundsChecker);
-		//
+		/*var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
+		aBoundsCheckers.push(boundsChecker);*/
+		
         return ret;
 	}
 	
@@ -4725,11 +4744,11 @@ function DrawingObjects() {
 			}
 		}
 		
-		//if ( bRedraw ) {
-		//	worksheet._checkSelectionShape();
-		//	_this.sendGraphicObjectProps();
-		//	_this.showDrawingObjects(true);
-		//}
+		/*if ( bRedraw ) {
+			worksheet._checkSelectionShape();
+			_this.sendGraphicObjectProps();
+			_this.showDrawingObjects(true);
+		}*/
 		
         return position;
 	};
