@@ -1013,13 +1013,13 @@ NumFormat.prototype =
         var stDate, day, month, year, dayWeek;
 		if(g_bDate1904)
 		{
-			stDate = new Date(1904,0,1,0,0,0);
+			stDate = new Date(Date.UTC(1904,0,1,0,0,0));
 			if(d.val)
-				stDate.setDate( stDate.getDate() + d.val );
-			day = stDate.getDate();
-			dayWeek = ( stDate.getDay() > 0) ? stDate.getDay() - 1 : 6;
-			month = stDate.getMonth();
-			year = stDate.getFullYear();
+				stDate.setUTCDate( stDate.getUTCDate() + d.val );
+			day = stDate.getUTCDate();
+			dayWeek = ( stDate.getUTCDay() > 0) ? stDate.getUTCDay() - 1 : 6;
+			month = stDate.getUTCMonth();
+			year = stDate.getUTCFullYear();
 		}
 		else
 		{
@@ -1032,23 +1032,23 @@ NumFormat.prototype =
 			}
 			else if(number < 60)
 			{
-				stDate = new Date(1899,11,31,0,0,0);
+				stDate = new Date(Date.UTC(1899,11,31,0,0,0));
 				if(d.val)
-					stDate.setDate( stDate.getDate() + d.val );
-				day = stDate.getDate();
-				dayWeek = ( stDate.getDay() > 0) ? stDate.getDay() - 1 : 6;
-				month = stDate.getMonth();
-				year = stDate.getFullYear();
+					stDate.setUTCDate( stDate.getUTCDate() + d.val );
+				day = stDate.getUTCDate();
+				dayWeek = ( stDate.getUTCDay() > 0) ? stDate.getUTCDay() - 1 : 6;
+				month = stDate.getUTCMonth();
+				year = stDate.getUTCFullYear();
 			}
 			else
 			{
-				stDate = new Date(1899,11,30,0,0,0);
+				stDate = new Date(Date.UTC(1899,11,30,0,0,0));
 				if(d.val)
-					stDate.setDate( stDate.getDate() + d.val );
-				day = stDate.getDate();
-				dayWeek = stDate.getDay();
-				month = stDate.getMonth();
-				year = stDate.getFullYear();
+					stDate.setUTCDate( stDate.getUTCDate() + d.val );
+				day = stDate.getUTCDate();
+				dayWeek = stDate.getUTCDay();
+				month = stDate.getUTCMonth();
+				year = stDate.getUTCFullYear();
 			}
 		}
         return {d: day, month: month, year: year, dayWeek: dayWeek, hour: h.val, min: min.val, sec: s.val, ms: ms.val, countDay: d.val };
@@ -2890,7 +2890,7 @@ FormatParser.prototype =
 				if(null != m && (null != d || null != y))
 				{
 					bDate = true;
-					var oNowDate = new Date();
+					var oNowDate;
 					if(null != d)
 						nDay = d - 0;
 					else
@@ -2899,7 +2899,10 @@ FormatParser.prototype =
 					if(null != y)
 						nYear = y - 0;
 					else
+                    {
+                        oNowDate = new Date();
 						nYear = oNowDate.getFullYear();
+                    }
 					
 					if(nYear < 30)
 						nYear = 2000 + res.y;
@@ -2912,7 +2915,7 @@ FormatParser.prototype =
 				if(null != h)
 				{
 					bTime = true;
-					var nHour = h - 0;
+					nHour = h - 0;
 					if(null != ampm)
 					{
 						if(nHour <= 23)
@@ -2941,15 +2944,15 @@ FormatParser.prototype =
 				if(true == bValidDate && (true == bDate || true == bTime))
 				{
 					if(g_bDate1904)
-						dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1904,0,1,0,0,0)).getTime()) / (86400 * 1000);
+						dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1904,0,1,0,0,0)) / (86400 * 1000);
 					else
 					{
 						if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
-							dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,30,0,0,0)).getTime()) / (86400 * 1000);
+							dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1899,11,30,0,0,0)) / (86400 * 1000);
 						else if(1900 == nYear && 2 == nMounth && 29 == nDay)
 							dValue = 60;
 						else
-							dValue = ((new Date(nYear,nMounth,nDay,nHour,nMinute,nSecond)).getTime() - (new Date(1899,11,31,0,0,0)).getTime()) / (86400 * 1000);
+							dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1899,11,31,0,0,0)) / (86400 * 1000);
 					}
 					if(dValue > 0)
 					{
