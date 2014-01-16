@@ -60,6 +60,42 @@ var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
 var MIN_ANGLE = 0.07;
 
 
+
+function ExecuteNoHistory(f, oThis, args)
+{
+	var is_on = History.Is_On();
+	if(is_on)
+	{
+		History.TurnOff();
+	}
+	var ret = f.apply(oThis, args);	
+	if(is_on)
+	{
+		History.TurnOn();
+	}
+	return ret;
+}
+
+function CreatePenBrushForChartTrack()
+{	
+	return ExecuteNoHistory(function()
+	{			
+		var brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+		brush.fill.color.setColor(new CRGBColor());
+		brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+		var pen = new CLn();
+		pen.setFill(new CUniFill());
+		pen.Fill.setFill(new CSolidFill());
+		pen.Fill.fill.setColor(new CUniColor());
+		pen.Fill.fill.color.setColor(new CRGBColor());
+		return {brush: brush, pen: pen};
+	},
+	this, []);
+}
+
 function ResizeTrackShapeImage(originalObject, cardDirection)
 {
     this.originalObject = originalObject;
@@ -157,9 +193,19 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
     this.resizedRot = originalObject.rot;
 
     this.transform = originalObject.transform.CreateDublicate();
-    this.geometry = originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Init(5, 5); return geometry})();
-    this.brush = originalObject.brush;
-    this.pen = originalObject.pen;
+    this.geometry = originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+	
+	if(!originalObject.isChart())
+	{
+		this.brush = originalObject.brush;
+		this.pen = originalObject.pen;
+	}
+	else
+	{
+		var pen_brush = CreatePenBrushForChartTrack();
+		this.brush = pen_brush.brush;
+		this.pen = pen_brush.pen;
+	}
 
 
     this.isLine = originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";

@@ -12,7 +12,19 @@ function MoveShapeImageTrack(originalObject)
     this.transform = new CMatrix();
     this.x = null;
     this.y = null;
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush, this.originalObject.pen, this.transform);
+	
+	if(!originalObject.isChart())
+	{
+		this.brush = originalObject.brush;
+		this.pen = originalObject.pen;
+	}
+	else
+	{
+		var pen_brush = CreatePenBrushForChartTrack();
+		this.brush = pen_brush.brush;
+		this.pen = pen_brush.pen;
+	}
+    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
 
 
     this.getOriginalBoundsRect = function()
@@ -73,7 +85,18 @@ function MoveShapeImageTrackInGroup(originalObject)
     this.x = null;
     this.y = null;
     this.transform = new CMatrix();
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush, this.originalObject.pen, this.transform);
+	if(!originalObject.isChart())
+	{
+		this.brush = originalObject.brush;
+		this.pen = originalObject.pen;
+	}
+	else
+	{
+		var pen_brush = CreatePenBrushForChartTrack();
+		this.brush = pen_brush.brush;
+		this.pen = pen_brush.pen;
+	}
+    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
     this.inv.tx = 0;
     this.inv.ty = 0;
@@ -192,122 +215,6 @@ function MoveGroupTrack(originalObject)
         xfrm.setOffY(this.y);
     };
 }
-
-function MoveTitleInChart(originalObject)
-{
-    this.originalObject = originalObject;
-    this.x = null;
-    this.y = null;
-    this.transform = new CMatrix();
-
-    var pen = new CLn();
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
-    pen.Fill.fill.color = new CUniColor();
-    pen.Fill.fill.color.color = new CRGBColor();
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush,/* this.originalObject.pen*/pen, this.transform);
-    this.inv = global_MatrixTransformer.Invert(originalObject.chartGroup.transform);
-    this.inv.tx = 0;
-    this.inv.ty = 0;
-    this.draw = function(overlay)
-    {
-        this.overlayObject.draw(overlay);
-    };
-
-    this.track = function(dx, dy)
-    {
-        var dx_t = this.inv.TransformPointX(dx, dy);
-        var dy_t = this.inv.TransformPointY(dx, dy);
-        this.x = this.originalObject.x + dx_t;
-        this.y = this.originalObject.y + dy_t;
-
-        if(this.x + this.originalObject.extX > this.originalObject.chartGroup.extX)
-            this.x = this.originalObject.chartGroup.extX - this.originalObject.extX;
-        if(this.x < 0)
-            this.x = 0;
-
-        if(this.y + this.originalObject.extY > this.originalObject.chartGroup.extY)
-            this.y = this.originalObject.chartGroup.extY - this.originalObject.extY;
-        if(this.y < 0)
-            this.y = 0;
-
-        this.calculateTransform();
-    };
-
-    this.getOriginalBoundsRect = function()
-    {
-        return this.originalObject.getRectBounds();
-    };
-
-    this.calculateTransform = function()
-    {
-        var t = this.transform;
-        t.Reset();
-        global_MatrixTransformer.TranslateAppend(t, -this.originalObject.extX*0.5, -this.originalObject.extY*0.5);
-        global_MatrixTransformer.TranslateAppend(t, this.x + this.originalObject.extX*0.5, this.y + this.originalObject.extY*0.5);
-        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.chartGroup.getTransformMatrix());
-    };
-
-    this.trackEnd = function()
-    {
-        this.originalObject.setPosition(this.x, this.y);
-        this.originalObject.chartGroup.recalculate();
-    }
-}
-
-function MoveTrackChart(originalObject)
-{
-    this.originalObject = originalObject;
-    this.transform = new CMatrix();
-    this.x = null;
-    this.y = null;
-    var geometry = CreateGeometry("rect");
-    geometry.Init(this.originalObject.extX, this.originalObject.extY);
-    geometry.Recalculate(this.originalObject.extX, this.originalObject.extY);
-    var brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
-    brush.fill.color.color = new CRGBColor();
-    brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
-    var pen = new CLn();
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
-    pen.Fill.fill.color = new CUniColor();
-    pen.Fill.fill.color.color = new CRGBColor();
-
-    this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, brush, pen, this.transform);
-
-
-    this.getOriginalBoundsRect = function()
-    {
-        return this.originalObject.getRectBounds();
-    };
-
-    this.track = function(dx, dy)
-    {
-        var original = this.originalObject;
-        this.x = original.x + dx;
-        this.y = original.y + dy;
-        this.transform.Reset();
-        var hc = original.extX*0.5;
-        var vc = original.extY*0.5;
-
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
-    };
-
-    this.draw = function(overlay)
-    {
-        this.overlayObject.draw(overlay);
-    };
-
-    this.trackEnd = function()
-    {
-        this.originalObject.setXfrm(this.x, this.y, null, null, null, null, null);
-    };
-}
-
 
 function MoveComment(comment)
 {

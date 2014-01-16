@@ -95,6 +95,11 @@ CChartSpace.prototype.canRotate = function()
 	return false;
 }
 
+CChartSpace.prototype.createResizeTrack = CShape.prototype.createResizeTrack;
+CChartSpace.prototype.createMoveTrack = CShape.prototype.createMoveTrack;
+CChartSpace.prototype.getAspect = CShape.prototype.getAspect;
+CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
+
 CChartSpace.prototype.draw = function(graphics)
 {
 	var intGrid = graphics.GetIntegerGrid();

@@ -2369,8 +2369,6 @@ function CreateScatterChart(asc_series)
         }
         scatter_chart.addSer(series);
     }
-
-   
 	scatter_chart.setDLbls(new CDLbls());
     scatter_chart.addAxId(plot_area.catAx);
     scatter_chart.addAxId(plot_area.valAx);
@@ -2432,7 +2430,6 @@ function CreateScatterChart(asc_series)
     page_margins.setFooter(0.3);
     return chart_space;
 }
-
 
 function CreateStockChart(asc_series)
 {
