@@ -2087,7 +2087,8 @@ drawBarChart.prototype =
 	_reCalculateBars: function (/*isSkip*/)
     {
         var xaxispos      = this.chartProp.xaxispos;
-        var width         = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right) / this.chartProp.data.length;
+		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+        var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
         var hmargin       = this.chartProp.hmargin;
 		
 		var val;
@@ -2102,9 +2103,6 @@ drawBarChart.prototype =
 		//для диаграммы с накполениями
 		var summBarVal = [];
 
-		//для цветов серий
-		var colorProps = this.cChartDrawer._getColorProps();
-
 		for (i = 0; i < this.chartProp.series.length; i++) {
 
 			var seria = this.chartProp.series[i].val.numRef.numCache.pts;
@@ -2112,7 +2110,10 @@ drawBarChart.prototype =
 			seriesHeight[i] = [];
 			for (j=0; j < seria.length; ++j) {
 				
-				individualBarWidth = (width - (2 * hmargin)) / seria.length;
+				individualBarWidth = (width - (2 * hmargin)) / this.chartProp.series.length;
+				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+					individualBarWidth = width - (2 * hmargin);
+					
 				val = parseFloat(seria[j].val);
 				if(this.chartProp.scale[0] > 0 && this.chartProp.scale[this.chartProp.scale.length - 1] > 0)
 				{
@@ -2613,7 +2614,9 @@ drawHBarChart.prototype =
 				var height = trueHeight / seria.length;
 
 				var barHeight = (height - (2 * this.chartProp.vmargin)) / this.chartProp.series.length;
-
+				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+					barHeight = height - (2 * this.chartProp.vmargin);
+				
 				var startX;
 				var startY;
 				var diffYVal = 0;
