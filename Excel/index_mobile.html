@@ -68,6 +68,8 @@
         <script type="text/javascript" src="../../common/locale.js"></script>
 
         <!-- SDK -->
+		<script type="text/javascript" src="../../../sdk/Common/AllFonts.js"></script>
+		<!--<script type="text/javascript" src="../../../sdk/Excel/sdk-all.js"></script>-->
 
         <script type="text/javascript">
             window.g_debug_mode = true;
@@ -81,13 +83,13 @@
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/charts.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/commonDefines.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/apiCommon.js"></script>
+		<script type="text/javascript" src="../../../../OfficeWeb/Common/trackFile.js"></script>
 
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/font_engine.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontFile.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontManager.js"></script>
 
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/HatchPattern.js"></script>
-		<script type="text/javascript" src="../../../../OfficeWeb/Common/AllFonts.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/Externals.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/Metafile.js"></script>
 		<!--<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/GlobalLoaders.js"></script>-->
@@ -143,10 +145,6 @@
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/Shapes/Serialize.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/Shapes/SerializeWriter.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/SerializeCommon.js"></script>
-		<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Format.js"></script>
-		<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
-		<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Geometry.js"></script>
-		<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Path.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/Math.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/ArcTo.js"></script>
 		<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/ColorArray.js"></script>
@@ -156,12 +154,7 @@
 		<script type="text/javascript" src="../../../../OfficeWeb/Common/SerializeCommonWordExcel.js"></script>
 		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.core.js"></script>
 
-		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
-		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.context.js"></script>
-		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
 		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.key.js"></script>
-		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
-		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
 
 		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bar.js"></script>
 		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.hbar.js"></script>
@@ -171,57 +164,47 @@
 		<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
 		
 		<!--for shapes-->
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Graphics.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Overlay.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Controls.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/DrawingObjectsController.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/DrawingDocument.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/States.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/GlobalLoaders.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/ShapeDrawer.js"></script>
-			
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/GroupShape.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Image.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Shape.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/TextBody.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Hit.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/States.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/AdjustmentTracks.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/ResizeTracks.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/RotateTracks.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/NewShapeTracks.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/PolyLine.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/Spline.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/TrackObjects/MoveTracks.js"></script>
+
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/ChartFormat.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/ChartSpace.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Constants.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/CreateGeometry.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Format.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Geometry.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Path.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/GroupShape.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Image.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/Shape.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/Format/TextBody.js"></script>
+		<script src="../../../../OfficeWeb/Common/Drawings/CommonController.js"></script>
+		<script src="../../../../OfficeWeb/Excel/view/DrawingObjectsController.js"></script>
+
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ShapePrototype.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ChartSpacePrototype.js"></script>
 		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Styles.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Path.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Geometry.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Paragraph.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ParagraphContent.js"></script>
 		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Numbering.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Format.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ParagraphContent.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Paragraph.js"></script>
 		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/DocumentContent.js"></script>
 		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/FontClassification.js"></script>
 
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Graphics.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Overlay.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Controls.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/DrawingDocument.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/GlobalLoaders.js"></script>
+		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/ShapeDrawer.js"></script>
 
-
-
-
-
-
-
-
-
-
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/AdjustmentTracks.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/ResizeTracks.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/RotateTracks.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/NewShapeTracks.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/PolyLine.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/Spline.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/MoveTracks.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Hit.js"></script>
 		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/GlobalCounters.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Chart.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ChartLayout.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ChartTitle.js"></script>
-		<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/ChartLegend.js"></script>
-
-
-    <!--<script type="text/javascript" src="../../../sdk/Common/docscoapisettings.js"></script>
-	<script type="text/javascript" src="../../../sdk/Excel/sdk-all.js"></script>-->
-
     </head>
     <body>
         <script type="text/javascript">
