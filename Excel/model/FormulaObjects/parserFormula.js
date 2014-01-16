@@ -2775,7 +2775,13 @@ parserFormula.prototype = {
         }
         return this;
     },
-
+	setRefError : function(wsId, cellId){
+		for ( var i = 0; i < this.outStack.length; i++ ) {
+			var node = this.outStack[i];
+            if ( node instanceof cRef || node instanceof cArea ||  node instanceof cRef3D || node instanceof cArea3D )
+				this.outStack[i] = new cError( cErrorType.bad_reference );
+		}
+	},
     /*
      Для изменения ссылок на конкретную ячейку.
      offset - на сколько сдвигаем ячейку (offset = {offsetCol:intNumber, offsetRow:intNumber})

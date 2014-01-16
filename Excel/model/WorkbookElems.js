@@ -3367,7 +3367,7 @@ TreeRB.prototype = {
 	_init : function(){
 		this.nil = new TreeRBNode();
 		this.nil.left = this.nil.right = this.nil.parent = this.nil;
-		this.nil.key = Number.MIN_VALUE;
+		this.nil.key = -Number.MAX_VALUE;
 		this.nil.red = 0;
 		this.nil.storedValue = null;
 		
@@ -3635,7 +3635,7 @@ TreeRB.prototype = {
 		return oRes;
 	},
 	getNodeAll : function(){
-		return this.enumerate(Number.MIN_VALUE, Number.MAX_VALUE);
+		return this.enumerate(-Number.MAX_VALUE, Number.MAX_VALUE);
 	}
 };
 
@@ -3646,7 +3646,7 @@ Asc.extendClass(IntervalTreeRB, TreeRB);
 IntervalTreeRB.prototype._init = function (x) {
 	this.nil = new IntervalTreeRBNode();
 	this.nil.left = this.nil.right = this.nil.parent = this.nil;
-	this.nil.key = this.nil.high = this.nil.maxHigh = Number.MIN_VALUE;
+	this.nil.key = this.nil.high = this.nil.maxHigh = -Number.MAX_VALUE;
 	this.nil.minLow = Number.MAX_VALUE;
 	this.nil.red = 0;
 	this.nil.storedValue = null;
@@ -3654,7 +3654,7 @@ IntervalTreeRB.prototype._init = function (x) {
 	this.root = new IntervalTreeRBNode();
 	this.root.left = this.nil.right = this.nil.parent = this.nil;
 	this.root.key = this.root.high = this.root.maxHigh = Number.MAX_VALUE;
-	this.root.minLow = Number.MIN_VALUE;
+	this.root.minLow = -Number.MAX_VALUE;
 	this.root.red = 0;
 	this.root.storedValue = null;
 };
@@ -3666,7 +3666,7 @@ IntervalTreeRB.prototype._fixUpMaxHigh = function (x) {
 	}
 };
 IntervalTreeRB.prototype._cleanMaxHigh = function (x) {
-	x.maxHigh = Number.MIN_VALUE;
+	x.maxHigh = -Number.MAX_VALUE;
 	x.minLow = Number.MAX_VALUE;
 };
 IntervalTreeRB.prototype._overlap = function (a1, a2, b1, b2) {
@@ -3840,8 +3840,40 @@ RangeDataManager.prototype = {
 		var bboxGet = shiftGetBBox(bbox, bHor);
 		return {bbox: bboxGet, elems: this.get(bboxGet)};
 	},
+	shiftSort : function(a, b, bAsc, bRow)
+	{
+		var nRes = 0;
+		if(null == a.to || null == b.to)
+		{
+			if(null == a.to && null == b.to)
+				nRes = 0;
+			else if(null == a.to)
+				nRes = 1;
+			else if(null == b.to)
+				nRes = -1;
+		}
+		else
+		{
+			if(bRow)
+			{
+				if(bAsc)
+					nRes = a.to.r1 - b.to.r1;
+				else
+					nRes = b.to.r1 - a.to.r1;
+			}
+			else
+			{
+				if(bAsc)
+					nRes = a.to.c1 - b.to.c1;
+				else
+					nRes = b.to.c1 - a.to.c1;
+			}
+		}
+		return nRes;
+	},
 	shift : function(bbox, bAdd, bHor, oGetRes)
 	{
+		var _this = this;
 		if(null == oGetRes)
 			oGetRes = this.shiftGet(bbox, bHor);
 		var aToChange = [];
@@ -3943,16 +3975,16 @@ RangeDataManager.prototype = {
 		if(bHor)
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return b.to.c1 - a.to.c1;});
+				aToChange.sort(function(a, b){return _this.shiftSort(a, b, false, false);});
 			else
-				aToChange.sort(function(a, b){return a.to.c1 - b.to.c1;});
+				aToChange.sort(function(a, b){return _this.shiftSort(a, b, true, false);});
 		}
 		else
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return b.to.r1 - a.to.r1;});
+				aToChange.sort(function(a, b){return _this.shiftSort(a, b, false, true);});
 			else
-				aToChange.sort(function(a, b){return a.to.r1 - b.to.r1;});
+				aToChange.sort(function(a, b){return _this.shiftSort(a, b, true, true);});
 		}
 		for(var i = 0, length = aToChange.length; i < length; ++i)
 		{
@@ -4085,7 +4117,7 @@ CellArea.prototype = {
 				else
 				{
 					var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-					if(!bboxAsc.contains(elem.col, elem.row))
+					if(!bboxAsc.containsRange(elem.bbox))
 					{
 						to = elem.bbox.clone();
 						if(bHor)
