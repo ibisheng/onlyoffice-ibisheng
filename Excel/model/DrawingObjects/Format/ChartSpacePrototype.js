@@ -387,7 +387,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 					compiled_marker.pen   = compiled_marker.spPr.ln;
 					compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 					compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					pts.compiledMarker = compiled_marker;
+					pts[j].compiledMarker = compiled_marker;
 				}
 			}
 			else
@@ -436,7 +436,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 						compiled_marker.pen   = compiled_marker.spPr.ln;
 						compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 						compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						pts.compiledMarker = compiled_marker;
+						pts[j].compiledMarker = compiled_marker;
 					}
 				}
 			}
