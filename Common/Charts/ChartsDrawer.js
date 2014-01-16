@@ -2767,15 +2767,14 @@ drawPieChart.prototype =
 		var xCenter = this.chartProp.chartGutter._left + trueWidth/2;
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
-		this.tempAngle = 0;
-        for (var i = 0,len = numCache.length; i < len; i++) {
-            
+		this.tempAngle = Math.PI/2;
+		//рисуем против часовой стрелки, поэтому цикл с конца
+        for (var i = numCache.length - 1; i >= 0; i--) {
             var angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
 			if(!this.paths.series)
 				this.paths.series = [];
             this.paths.series[i] = this._calculateSegment(angle, radius, xCenter, yCenter);
         }
-		
     },
 	
 	_calculateSegment: function (angle, radius, xCenter, yCenter)
