@@ -30,7 +30,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateBounds:    true,
         recalculateChart:     true,
 		recalculateBaseColors: true,
-		recalculateSeriesColors: true
+		recalculateSeriesColors: true,
+		recalculateMarkers: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -150,11 +151,17 @@ CChartSpace.prototype.recalculate = function()
         this.recalculateBaseColors();
         this.recalcInfo.recalculateBaseColors = false;
     }
+	if(this.recalcInfo.recalculateMarkers)
+	{
+		this.recalculateMarkers();
+        this.recalcInfo.recalculateBaseColors = false;
+	}
 	if(this.recalcInfo.recalculateSeriesColors)
 	{
 		this.recalculateSeriesColors();
         this.recalcInfo.recalculateBaseColors = false;
 	}
+	
     if(this.recalcInfo.recalculateChart)
     {
         this.recalculateChart();
@@ -267,82 +274,394 @@ CChartSpace.prototype.recalculateBaseColors = function()
 		History.TurnOn();
 	}
 };
+var MARKER_SYMBOL_TYPE = [];
+MARKER_SYMBOL_TYPE[0] = SYMBOL_DIAMOND;
+MARKER_SYMBOL_TYPE[1] = SYMBOL_SQUARE;
+MARKER_SYMBOL_TYPE[2] = SYMBOL_TRIANGLE;
+MARKER_SYMBOL_TYPE[3] = SYMBOL_X;
+MARKER_SYMBOL_TYPE[4] = SYMBOL_STAR;
+MARKER_SYMBOL_TYPE[5] = SYMBOL_CIRCLE;
+MARKER_SYMBOL_TYPE[6] = SYMBOL_PLUS;
+MARKER_SYMBOL_TYPE[7] = SYMBOL_DOT;
+MARKER_SYMBOL_TYPE[8] = SYMBOL_DASH;
 
+function GetTypeMarkerByIndex(index)
+{
+	return MARKER_SYMBOL_TYPE[index % 9];
+}
 CChartSpace.prototype.hitToAdjustment = function()
 {
 	return {hit: false};
-}
+};
+
+CChartSpace.prototype.getNeedColorCount = function()
+{
+	var b_vary_markers = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
+	var need_colors;
+	if(!b_vary_markers)
+	{
+		return this.chart.plotArea.chart.series.length;
+	}
+	else
+	{
+		if(this.chart.plotArea.chart.series[0].val)
+		{
+			return this.chart.plotArea.chart.series[0].val.numRef.numCache.pts.length;
+		}
+		else
+		{
+			if(this.chart.plotArea.chart.series[0].yVal)
+			{
+				return this.chart.plotArea.chart.series[0].yVal.numRef.numCache.pts.length;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+	}
+};
+
+CChartSpace.prototype.recalculateMarkers = function()
+{
+	ExecuteNoHistory(function()
+	{			
+		if(this.chart && this.chart.plotArea && this.chart.plotArea.chart 
+		&& ((this.chart.plotArea.chart instanceof CLineChart && this.chart.plotArea.chart.marker) 
+		|| this.chart.plotArea.chart instanceof CScatterChart) 
+		&& this.chart.plotArea.chart.series)
+		{
+			var RGBA = {R: 0, G: 0, B: 0, A: 255};
+			var need_colors = this.getNeedColorCount();
+			var countBase = this.baseColors.length;
+			var needCreate = parseInt(need_colors / countBase) + 1;
+			var arrayColors = [];
+			for (var i = 0; i < needCreate; i++) 
+			{
+				for (var j = 0; j < countBase; j++) 
+				{
+					var percent = (-70 + 140 * ((i + 1) / (needCreate + 1))) / 100.0;	
+					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], percent);
+					arrayColors.push( color );
+				}
+			}
+			var b_vary_markers = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
+			var parents = this.getParentObjects();
+			if(b_vary_markers)
+			{
+				var first_series = this.chart.plotArea.chart.series[0];
+				var pts;
+				if(first_series.val)
+				{
+					pts = first_series.val.numRef.numCache.pts;
+				}
+				else if(first_series.yVal)
+				{
+					pts = first_series.yVal.numRef.numCache.pts;
+				}
+				else
+				{
+					pts = [];
+				}
+				for(var j = 0; j < pts.length; ++j)
+				{
+					var compiled_marker = new CMarker();
+					compiled_marker.setSize(7);
+					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+					compiled_marker.setSpPr(new CSpPr());
+					compiled_marker.spPr.setLn(new CLn());
+					var ln = compiled_marker.spPr.ln;
+					ln.setW(12700);
+					ln.setFill(arrayColors[j]);
+					compiled_marker.spPr.setFill(arrayColors[j]);
+					compiled_marker.merge(first_series.marker);
+					for(var k = 0; k < first_series.dPt.length; ++k)
+					{
+						if(first_series.dPt[k].idx === pts[j].idx)
+						{
+							compiled_marker.merge(first_series.dPt[k])
+							break;
+						}
+					}
+					compiled_marker.brush = compiled_marker.spPr.Fill;
+					compiled_marker.pen   = compiled_marker.spPr.ln;
+					compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					pts.compiledMarker = compiled_marker;
+				}
+			}
+			else
+			{
+				var series = this.chart.plotArea.chart.series;
+				for(var i = 0; i < series.length; ++i)
+				{
+					var ser = series[i];
+					var pts;
+					if(ser.val)
+					{
+						pts = ser.val.numRef.numCache.pts;
+					}
+					else if(ser.yVal)
+					{
+						pts = ser.yVal.numRef.numCache.pts;
+					}
+					else
+					{
+						pts = [];
+					}
+					for(var j = 0; j < pts.length; ++pts)
+					{
+						var compiled_marker = new CMarker();
+						compiled_marker.setSize(7);
+						compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
+						compiled_marker.setSpPr(new CSpPr());
+						compiled_marker.spPr.setLn(new CLn());
+						var ln = compiled_marker.spPr.ln;
+						ln.setW(12700);
+						ln.setFill(arrayColors[i]);
+						compiled_marker.spPr.setFill(arrayColors[i]);
+						compiled_marker.merge(ser.marker);
+						if(Array.isArray(ser.dPt))
+						{
+							for(var k = 0; k < ser.dPt.length; ++k)
+							{
+								if(ser.dPt[k].idx === pts[j].idx)
+								{
+									compiled_marker.merge(ser.dPt[k])
+									break;
+								}
+							}
+						}
+						compiled_marker.brush = compiled_marker.spPr.Fill;
+						compiled_marker.pen   = compiled_marker.spPr.ln;
+						compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						pts.compiledMarker = compiled_marker;
+					}
+				}
+			}
+		}
+	},
+	this, []);
+};
+
+
 
 CChartSpace.prototype.recalculateSeriesColors = function()
 {
-	var is_on = History.Is_On();
-	if(is_on)
-	{
-		History.TurnOff();
-	}
-	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
-	{
-		var series = this.chart.plotArea.chart.series;
-		var arrayColors = [];
-		var countBase = this.baseColors.length;
-		
-		var need_colors = !(this.chart.plotArea.chart instanceof CPieChart) ? this.chart.plotArea.chart.series.length : this.chart.plotArea.chart.series[0].val.numRef.numCache.pts.length;
-		var needCreate = parseInt(need_colors / countBase) + 1;
+	ExecuteNoHistory(function()
+	{		
+		if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+		{
+			var series = this.chart.plotArea.chart.series;
+			var arrayColors = [];
+			var countBase = this.baseColors.length;
+			
+			var need_colors = this.getNeedColorCount();
+			var needCreate = parseInt(need_colors / countBase) + 1;
 
-		for (var i = 0; i < needCreate; i++) 
-		{
-			for (var j = 0; j < countBase; j++) 
+			for (var i = 0; i < needCreate; i++) 
 			{
-				var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) / 100.0;	
-				var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], percent);
-				arrayColors.push( color );
-			}
-		}
-		arrayColors.splice(need_colors, arrayColors.length - need_colors);
-		var RGBA = {R: 0, G: 0, B: 0, A:255};
-		var parents = this.getParentObjects();
-		
-		
-		for(var i = 0; i < series.length; ++i)
-		{
-			var ser = series[i];
-			if(!(this.chart.plotArea.chart instanceof CPieChart))
-			{
-				ser.brush = null;
-				ser.pen = null;
-				if(ser.spPr && ser.spPr.Fill)
+				for (var j = 0; j < countBase; j++) 
 				{
-					ser.brush = ser.spPr.Fill;
+					var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) / 100.0;	
+					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], percent);
+					arrayColors.push( color );
+				}
+			}
+			arrayColors.splice(need_colors, arrayColors.length - need_colors);
+			var RGBA = {R: 0, G: 0, B: 0, A:255};
+			var parents = this.getParentObjects();
+			
+			var b_vary_colors = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
+			var parents = this.getParentObjects();
+			
+			
+			/*
+			if(b_vary_colors)
+			{
+				var first_series = this.chart.plotArea.chart.series[0];
+				var pts;
+				if(first_series.val)
+				{
+					pts = first_series.val.numRef.numCache.pts;
+				}
+				else if(first_series.yVal)
+				{
+					pts = first_series.yVal.numRef.numCache.pts;
 				}
 				else
 				{
-					ser.brush = arrayColors[i];
+					pts = [];
 				}
 				
-				ser.pen = null;
-				if(ser.spPr && ser.spPr.ln)
+				if(first_series instanceof CLineSeries)
 				{
-					ser.pen = ser.spPr.ln;
-					ser.pen = ser.spPr.ln.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					for(var j = 0; j < pts.length; ++j)
+					{
+						var compiled_ln = new CLn();
+					}
+					ser.pen = new CLn();
+					ser.pen.setFill(arrayColors[i]);
+					ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 				}
 				else
 				{
-					if(ser instanceof CLineSeries)
+					
+				}
+				
+				
+				for(var j = 0; j < pts.length; ++j)
+				{
+					var compiled_marker = new CMarker();
+					compiled_marker.setSize(7);
+					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+					compiled_marker.setSpPr(new CSpPr());
+					compiled_marker.spPr.setLn(new CLn());
+					var ln = compiled_marker.spPr.ln;
+					ln.setW(12700);
+					ln.setFill(arrayColors[j]);
+					compiled_marker.spPr.setFill(arrayColors[j]);
+					compiled_marker.merge(first_series.marker);
+					for(var k = 0; k < first_series.dPt.length; ++k)
 					{
-						ser.pen = new CLn();
-						ser.pen.setFill(arrayColors[i]);
-						ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						if(first_series.dPt[k].idx === pts[j].idx)
+						{
+							compiled_marker.merge(first_series.dPt[k])
+							break;
+						}
+					}
+					compiled_marker.brush = brush.spPr.Fill;
+					compiled_marker.pen   = brush.spPr.ln;
+					compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					pts.compiledMarker = compiled_marker;
+				}
+			}
+			
+			
+			*/
+			for(var i = 0; i < series.length; ++i)
+			{
+				var ser = series[i];
+				if(!(this.chart.plotArea.chart instanceof CPieChart))
+				{
+					ser.brush = null;
+					ser.pen = null;
+					if(ser.spPr && ser.spPr.Fill)
+					{
+						ser.brush = ser.spPr.Fill;
+					}
+					else
+					{
+						ser.brush = arrayColors[i];
+					}
+					
+					ser.pen = null;
+					if(ser.spPr && ser.spPr.ln)
+					{
+						ser.pen = ser.spPr.ln;
+						ser.pen = ser.spPr.ln.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					}
+					else
+					{
+						if(ser instanceof CLineSeries)
+						{
+							ser.pen = new CLn();
+							ser.pen.setFill(arrayColors[i]);
+							ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+					}
+					ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					if(ser.val && ser.val.numRef && ser.val.numRef.numCache && ser.val.numRef.numCache.pts)
+					{	
+						var pts = ser.val.numRef.numCache.pts;
+						for(var j = 0; j < pts.length; ++j)
+						{
+							pts[j].brush = ser.brush;
+							pts[j].pen = ser.pen;
+						}
+						if(Array.isArray(ser.dPt))
+						{
+							for(j = 0; j < ser.dPt.length; ++j)
+							{
+								if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+								{
+									pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+									pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+								if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+								{
+									pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+									pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+							}				
+						}
+					}
+					if(ser.yVal && ser.yVal.numRef && ser.yVal.numRef.numCache && ser.yVal.numRef.numCache.pts)//Ð¢Ð¾Ñ‡ÐµÑ‡Ð½Ð°Ñ Ð´Ð¸Ð°Ð³Ñ€Ð°Ð¼Ð¼Ð°
+					{
+						var ptsY = ser.yVal.numRef.numCache.pts;
+						var ptsX;
+						if(ser.xVal && ser.xVal.numRef && ser.xVal.numRef.numCache && ser.xVal.numRef.numCache.pts)
+						{
+							ptsX = ser.xVal.numRef.numCache.pts;
+						}
+						else
+						{
+							ptsX = null;
+						}
+						
+						if(Array.isArray(ptsX))
+						{
+							for(var j = 0; j < ptsX.length; ++j)
+							{
+								ptsX[j].brush = ser.brush;
+								ptsX[j].pen = ser.pen;
+							}				
+						}
+						for(var j = 0; j < ptsY.length; ++j)
+						{
+							ptsY[j].brush = ser.brush;
+							ptsY[j].pen = ser.pen;
+						}
+						if(Array.isArray(ser.dPt))
+						{
+							for(j = 0; j < ser.dPt.length; ++j)
+							{
+								if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+								{
+									if(Array.isArray(ptsX))
+									{
+										ptsX[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+										ptsX[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+									}
+									ptsY[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
+									ptsY[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+								if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+								{
+									if(Array.isArray(ptsX))
+									{
+										ptsX[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+										ptsX[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+									}
+									ptsY[ser.dpt.idx].pen = ser.dpt.spPr.pen;
+									ptsY[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+							}				
+						}
 					}
 				}
-				ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-				if(ser.val && ser.val.numRef && ser.val.numRef.numCache && ser.val.numRef.numCache.pts)
-				{	
+				else
+				{
 					var pts = ser.val.numRef.numCache.pts;
 					for(var j = 0; j < pts.length; ++j)
 					{
-						pts[j].brush = ser.brush;
+						pts[j].brush = arrayColors[j];
+						pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 						pts[j].pen = ser.pen;
 					}
+					
 					if(Array.isArray(ser.dPt))
 					{
 						for(j = 0; j < ser.dPt.length; ++j)
@@ -360,93 +679,9 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 						}				
 					}
 				}
-				if(ser.yVal && ser.yVal.numRef && ser.yVal.numRef.numCache && ser.yVal.numRef.numCache.pts)//Òî÷å÷íàÿ äèàãðàììà
-				{
-					var ptsY = ser.yVal.numRef.numCache.pts;
-					var ptsX;
-					if(ser.xVal && ser.xVal.numRef && ser.xVal.numRef.numCache && ser.xVal.numRef.numCache.pts)
-					{
-						ptsX = ser.xVal.numRef.numCache.pts;
-					}
-					else
-					{
-						ptsX = null;
-					}
-					
-					if(Array.isArray(ptsX))
-					{
-						for(var j = 0; j < ptsX.length; ++j)
-						{
-							ptsX[j].brush = ser.brush;
-							ptsX[j].pen = ser.pen;
-						}				
-					}
-					for(var j = 0; j < ptsY.length; ++j)
-					{
-						ptsY[j].brush = ser.brush;
-						ptsY[j].pen = ser.pen;
-					}
-					if(Array.isArray(ser.dPt))
-					{
-						for(j = 0; j < ser.dPt.length; ++j)
-						{
-							if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
-							{
-								if(Array.isArray(ptsX))
-								{
-									ptsX[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-									ptsX[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-								}
-								ptsY[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-								ptsY[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-							}
-							if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
-							{
-								if(Array.isArray(ptsX))
-								{
-									ptsX[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-									ptsX[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-								}
-								ptsY[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-								ptsY[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-							}
-						}				
-					}
-				}
-			}
-			else
-			{
-				var pts = ser.val.numRef.numCache.pts;
-				for(var j = 0; j < pts.length; ++j)
-				{
-					pts[j].brush = arrayColors[j];
-					pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					pts[j].pen = ser.pen;
-				}
-				
-				if(Array.isArray(ser.dPt))
-				{
-					for(j = 0; j < ser.dPt.length; ++j)
-					{
-						if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
-						{
-							pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-							pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						}
-						if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
-						{
-							pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-							pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						}
-					}				
-				}
 			}
 		}
-	}
-	
-	if(is_on)
-	{
-		History.TurnOn();
-	}
+	}, this, []);
 };
+
 

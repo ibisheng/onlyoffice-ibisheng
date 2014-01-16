@@ -6770,7 +6770,37 @@ CMarker.prototype =
     {
         this.Id = r.GetString2();
     },
-
+	
+	merge: function(otherMarker)
+	{
+		if(isRealObject(otherMarker))
+		{
+			if(isRealNumber(otherMarker.size))
+			{
+				this.size = otherMarker.size;
+			}		
+			if(isRealNumber(otherMarker.symbol))
+			{
+				this.symbol = otherMarker.symbol;
+			}
+			if(otherMarker.spPr && (otherMarker.spPr.Fill || otherMarker.spPr.ln))
+			{
+				if(!this.spPr)
+				{
+					this.setSpPr(new CSpPr());
+				}
+				if(otherMarker.spPr.Fill)
+				{
+					this.spPr.setFill(otherMarker.spPr.Fill.createDuplicate());
+				}
+				if(otherMarker.spPr.ln)
+				{
+					this.spPr.setLn(otherMarker.spPr.ln.createDuplicate());
+				}
+			}
+		}
+	},
+	
     setSize: function(pr)
     {
         History.Add(this, {Type: historyitem_Marker_SetSize, oldPr: this.size, newPr: pr});
@@ -6809,7 +6839,7 @@ CMarker.prototype =
                 break;
             }
         }
-    } ,
+    },
 
     Redo: function(data)
     {
