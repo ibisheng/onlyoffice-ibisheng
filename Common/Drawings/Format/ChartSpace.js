@@ -1,3 +1,9 @@
+function CChartStyle()
+{
+	
+}
+
+
 function CChartSpace()
 {
     this.chart = null;

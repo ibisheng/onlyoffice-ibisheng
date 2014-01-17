@@ -111,6 +111,7 @@ CShape.prototype.addToRecalculate = function()
 CShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
+	this.recalcBounds();
     this.recalcTransformText();
     this.addToRecalculate();
 };
@@ -118,6 +119,7 @@ CShape.prototype.handleUpdateExtents = function()
 {
     this.recalcContent();
     this.recalcGeometry();
+	this.recalcBounds();
     this.addToRecalculate();
 };
 CShape.prototype.handleUpdateRot = function()

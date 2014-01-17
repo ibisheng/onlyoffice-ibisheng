@@ -78,11 +78,13 @@ CImageShape.prototype.addToRecalculate = function()
 CImageShape.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
+	this.recalcBounds();
     this.addToRecalculate();
 };
 CImageShape.prototype.handleUpdateExtents = function()
 {
     this.recalcGeometry();
+	this.recalcBounds();
     this.addToRecalculate();
 };
 CImageShape.prototype.handleUpdateRot = function()
@@ -108,6 +110,7 @@ CImageShape.prototype.handleUpdateLn = function()
 };
 CImageShape.prototype.handleUpdateGeometry = function()
 {
+	this.recalcBounds();
     this.recalcGeometry();
     this.addToRecalculate();
 };

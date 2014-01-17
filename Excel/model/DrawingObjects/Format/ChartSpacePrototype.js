@@ -61,11 +61,13 @@ CChartSpace.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CChartSpace.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
+	this.recalcBounds();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
     this.recalcChart();
+	this.recalcBounds();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
@@ -78,6 +80,7 @@ CChartSpace.prototype.handleUpdateChart = function()
     this.recalcChart();
     this.addToRecalculate();
 };
+CChartSpace.prototype.canGroup = CShape.prototype.canGroup;
 CChartSpace.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
 CChartSpace.prototype.getCanvasContext = CShape.prototype.getCanvasContext;
 CChartSpace.prototype.getHierarchy = CShape.prototype.getHierarchy;
@@ -409,7 +412,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 					{
 						pts = [];
 					}
-					for(var j = 0; j < pts.length; ++pts)
+					for(var j = 0; j < pts.length; ++j)
 					{
 						var compiled_marker = new CMarker();
 						compiled_marker.setSize(7);
