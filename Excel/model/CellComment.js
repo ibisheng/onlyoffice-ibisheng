@@ -1277,8 +1277,10 @@ asc_CCellCommentator.prototype = {
 
 	asc_showComments: function() {
 		var _this = this;
-		_this.bShow = true;
-		_this.drawCommentCells();
+		if ( !_this.bShow ) {
+			_this.bShow = true;
+			_this.drawCommentCells();
+		}
 	},
 
 	asc_hideComments: function() {
