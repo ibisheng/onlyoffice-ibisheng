@@ -37,334 +37,334 @@ function OpenColor() {
 function BinaryCommonWriter(memory)
 {
     this.memory = memory;
-    this.WriteItem = function(type, fWrite)
-    {
-        //type
-        this.memory.WriteByte(type);
-        this.WriteItemWithLength(fWrite);
-    };
-	this.WriteItemStart = function(type)
-    {
-		this.memory.WriteByte(type);
-        return this.WriteItemWithLengthStart(fWrite);
-	};
-	this.WriteItemEnd = function(nStart)
-    {
-		this.WriteItemWithLengthEnd(nStart);
-	};
-    this.WriteItemWithLength = function(fWrite)
-    {
-        var nStart = this.WriteItemWithLengthStart();
-        fWrite();
-        this.WriteItemWithLengthEnd(nStart);
-    };
-	this.WriteItemWithLengthStart = function()
-    {
-        //Запоминаем позицию чтобы в конце записать туда длину
-        var nStart = this.memory.GetCurPosition();
-        this.memory.Skip(4);
-        return nStart;
-    };
-	this.WriteItemWithLengthEnd = function(nStart)
-    {
-        //Length
-        var nEnd = this.memory.GetCurPosition();
-        this.memory.Seek(nStart);
-        this.memory.WriteLong(nEnd - nStart - 4);
-        this.memory.Seek(nEnd);
-    };
-    this.WriteBorder = function(border)
-    {
-        if(border_None != border.Value)
-        {
-            if(null != border.Color)
-                this.WriteColor(c_oSerBorderType.Color, border.Color);
-            if(null != border.Space)
-            {
-                this.memory.WriteByte(c_oSerBorderType.Space);
-                this.memory.WriteByte(c_oSerPropLenType.Double);
-                this.memory.WriteDouble(border.Space);
-            }
-            if(null != border.Size)
-            {
-                this.memory.WriteByte(c_oSerBorderType.Size);
-                this.memory.WriteByte(c_oSerPropLenType.Double);
-                this.memory.WriteDouble(border.Size);
-            }
-        }
-        if(null != border.Value)
-        {
-            this.memory.WriteByte(c_oSerBorderType.Value);
-            this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(border.Value);
-        }
-    };
-    this.WriteBorders = function(Borders)
-    {
-        var oThis = this;
-        //Left
-        if(null != Borders.Left)
-            this.WriteItem(c_oSerBordersType.left, function(){oThis.WriteBorder(Borders.Left);});
-        //Top
-        if(null != Borders.Top)
-            this.WriteItem(c_oSerBordersType.top, function(){oThis.WriteBorder(Borders.Top);});
-        //Right
-        if(null != Borders.Right)
-            this.WriteItem(c_oSerBordersType.right, function(){oThis.WriteBorder(Borders.Right);});
-        //Bottom
-        if(null != Borders.Bottom)
-            this.WriteItem(c_oSerBordersType.bottom, function(){oThis.WriteBorder(Borders.Bottom);});
-        //InsideV
-        if(null != Borders.InsideV)
-            this.WriteItem(c_oSerBordersType.insideV, function(){oThis.WriteBorder(Borders.InsideV);});
-        //InsideH
-        if(null != Borders.InsideH)
-            this.WriteItem(c_oSerBordersType.insideH, function(){oThis.WriteBorder(Borders.InsideH);});
-        //Between
-        if(null != Borders.Between)
-            this.WriteItem(c_oSerBordersType.between, function(){oThis.WriteBorder(Borders.Between);});
-    };
-    this.WriteColor = function(type, color)
-    {
-        this.memory.WriteByte(type);
-        this.memory.WriteByte(c_oSerPropLenType.Three);
-        this.memory.WriteByte(color.r);
-        this.memory.WriteByte(color.g);
-        this.memory.WriteByte(color.b);
-    };
-    this.WriteShd = function(Shd)
-    {
-        //Value
-        if(null != Shd.Value)
-        {
-            this.memory.WriteByte(c_oSerShdType.Value);
-            this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(Shd.Value);
-        }
-        //Value
-        if(null != Shd.Color)
-        {
-            this.WriteColor(c_oSerShdType.Color, Shd.Color);
-        }
-    };
-    this.WritePaddings = function(Paddings)
-    {
-        //left
-        if(null != Paddings.L)
-        {
-            this.memory.WriteByte(c_oSerPaddingType.left);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble(Paddings.L);
-        }
-        //top
-        if(null != Paddings.T)
-        {
-            this.memory.WriteByte(c_oSerPaddingType.top);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble(Paddings.T);
-        }
-        //Right
-        if(null != Paddings.R)
-        {
-            this.memory.WriteByte(c_oSerPaddingType.right);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble(Paddings.R);
-        }
-        //bottom
-        if(null != Paddings.B)
-        {
-            this.memory.WriteByte(c_oSerPaddingType.bottom);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble(Paddings.B);
-        }
-    };
-	this.WriteColorSpreadsheet = function(color)
-    {
-		if(color instanceof ThemeColor)
-		{
-			if(null != color.theme)
-			{
-				this.memory.WriteByte(c_oSer_ColorObjectType.Theme);
-				this.memory.WriteByte(c_oSerPropLenType.Byte);
-				this.memory.WriteByte(color.theme);
-			}
-			if(null != color.tint)
-			{
-				this.memory.WriteByte(c_oSer_ColorObjectType.Tint);
-				this.memory.WriteByte(c_oSerPropLenType.Double);
-				this.memory.WriteDouble2(color.tint);
-			}
-		}
-		else
-		{
-			this.memory.WriteByte(c_oSer_ColorObjectType.Rgb);
-			this.memory.WriteByte(c_oSerPropLenType.Long);
-			this.memory.WriteLong(color.getRgb());
-		}
-    };
 }
+BinaryCommonWriter.prototype.WriteItem = function(type, fWrite)
+{
+    //type
+    this.memory.WriteByte(type);
+    this.WriteItemWithLength(fWrite);
+};
+BinaryCommonWriter.prototype.WriteItemStart = function(type)
+{
+	this.memory.WriteByte(type);
+    return this.WriteItemWithLengthStart(fWrite);
+};
+BinaryCommonWriter.prototype.WriteItemEnd = function(nStart)
+{
+	this.WriteItemWithLengthEnd(nStart);
+};
+BinaryCommonWriter.prototype.WriteItemWithLength = function(fWrite)
+{
+    var nStart = this.WriteItemWithLengthStart();
+    fWrite();
+    this.WriteItemWithLengthEnd(nStart);
+};
+BinaryCommonWriter.prototype.WriteItemWithLengthStart = function()
+{
+    //Запоминаем позицию чтобы в конце записать туда длину
+    var nStart = this.memory.GetCurPosition();
+    this.memory.Skip(4);
+    return nStart;
+};
+BinaryCommonWriter.prototype.WriteItemWithLengthEnd = function(nStart)
+{
+    //Length
+    var nEnd = this.memory.GetCurPosition();
+    this.memory.Seek(nStart);
+    this.memory.WriteLong(nEnd - nStart - 4);
+    this.memory.Seek(nEnd);
+};
+BinaryCommonWriter.prototype.WriteBorder = function(border)
+{
+    if(border_None != border.Value)
+    {
+        if(null != border.Color)
+            this.WriteColor(c_oSerBorderType.Color, border.Color);
+        if(null != border.Space)
+        {
+            this.memory.WriteByte(c_oSerBorderType.Space);
+            this.memory.WriteByte(c_oSerPropLenType.Double);
+            this.memory.WriteDouble(border.Space);
+        }
+        if(null != border.Size)
+        {
+            this.memory.WriteByte(c_oSerBorderType.Size);
+            this.memory.WriteByte(c_oSerPropLenType.Double);
+            this.memory.WriteDouble(border.Size);
+        }
+    }
+    if(null != border.Value)
+    {
+        this.memory.WriteByte(c_oSerBorderType.Value);
+        this.memory.WriteByte(c_oSerPropLenType.Byte);
+        this.memory.WriteByte(border.Value);
+    }
+};
+BinaryCommonWriter.prototype.WriteBorders = function(Borders)
+{
+    var oThis = this;
+    //Left
+    if(null != Borders.Left)
+        this.WriteItem(c_oSerBordersType.left, function(){oThis.WriteBorder(Borders.Left);});
+    //Top
+    if(null != Borders.Top)
+        this.WriteItem(c_oSerBordersType.top, function(){oThis.WriteBorder(Borders.Top);});
+    //Right
+    if(null != Borders.Right)
+        this.WriteItem(c_oSerBordersType.right, function(){oThis.WriteBorder(Borders.Right);});
+    //Bottom
+    if(null != Borders.Bottom)
+        this.WriteItem(c_oSerBordersType.bottom, function(){oThis.WriteBorder(Borders.Bottom);});
+    //InsideV
+    if(null != Borders.InsideV)
+        this.WriteItem(c_oSerBordersType.insideV, function(){oThis.WriteBorder(Borders.InsideV);});
+    //InsideH
+    if(null != Borders.InsideH)
+        this.WriteItem(c_oSerBordersType.insideH, function(){oThis.WriteBorder(Borders.InsideH);});
+    //Between
+    if(null != Borders.Between)
+        this.WriteItem(c_oSerBordersType.between, function(){oThis.WriteBorder(Borders.Between);});
+};
+BinaryCommonWriter.prototype.WriteColor = function(type, color)
+{
+    this.memory.WriteByte(type);
+    this.memory.WriteByte(c_oSerPropLenType.Three);
+    this.memory.WriteByte(color.r);
+    this.memory.WriteByte(color.g);
+    this.memory.WriteByte(color.b);
+};
+BinaryCommonWriter.prototype.WriteShd = function(Shd)
+{
+    //Value
+    if(null != Shd.Value)
+    {
+        this.memory.WriteByte(c_oSerShdType.Value);
+        this.memory.WriteByte(c_oSerPropLenType.Byte);
+        this.memory.WriteByte(Shd.Value);
+    }
+    //Value
+    if(null != Shd.Color)
+    {
+        this.WriteColor(c_oSerShdType.Color, Shd.Color);
+    }
+};
+BinaryCommonWriter.prototype.WritePaddings = function(Paddings)
+{
+    //left
+    if(null != Paddings.L)
+    {
+        this.memory.WriteByte(c_oSerPaddingType.left);
+        this.memory.WriteByte(c_oSerPropLenType.Double);
+        this.memory.WriteDouble(Paddings.L);
+    }
+    //top
+    if(null != Paddings.T)
+    {
+        this.memory.WriteByte(c_oSerPaddingType.top);
+        this.memory.WriteByte(c_oSerPropLenType.Double);
+        this.memory.WriteDouble(Paddings.T);
+    }
+    //Right
+    if(null != Paddings.R)
+    {
+        this.memory.WriteByte(c_oSerPaddingType.right);
+        this.memory.WriteByte(c_oSerPropLenType.Double);
+        this.memory.WriteDouble(Paddings.R);
+    }
+    //bottom
+    if(null != Paddings.B)
+    {
+        this.memory.WriteByte(c_oSerPaddingType.bottom);
+        this.memory.WriteByte(c_oSerPropLenType.Double);
+        this.memory.WriteDouble(Paddings.B);
+    }
+};
+BinaryCommonWriter.prototype.WriteColorSpreadsheet = function(color)
+{
+	if(color instanceof ThemeColor)
+	{
+		if(null != color.theme)
+		{
+			this.memory.WriteByte(c_oSer_ColorObjectType.Theme);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(color.theme);
+		}
+		if(null != color.tint)
+		{
+			this.memory.WriteByte(c_oSer_ColorObjectType.Tint);
+			this.memory.WriteByte(c_oSerPropLenType.Double);
+			this.memory.WriteDouble2(color.tint);
+		}
+	}
+	else
+	{
+		this.memory.WriteByte(c_oSer_ColorObjectType.Rgb);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(color.getRgb());
+	}
+};
 function Binary_CommonReader(stream)
 {
     this.stream = stream;
-    
-    this.ReadTable = function(fReadContent)
-    {
-        var res = c_oSerConstants.ReadOk;
-        //stLen
-        res = this.stream.EnterFrame(4);
-        if(c_oSerConstants.ReadOk != res)
-            return res;
-        var stLen = this.stream.GetULongLE();
-        //Смотрим есть ли данные под всю таблицу в дальнейшем спокойно пользуемся get функциями
-        res = this.stream.EnterFrame(stLen);
-        if(c_oSerConstants.ReadOk != res)
-            return res;
-        return this.Read1(stLen, fReadContent);
-    };
-    this.Read1 = function(stLen, fRead)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var stCurPos = 0;
-        while(stCurPos < stLen)
-        {
-            //stItem
-            var type = this.stream.GetUChar();
-            var length = this.stream.GetULongLE();
-            res = fRead(type, length);
-            if(res === c_oSerConstants.ReadUnknown)
-            {
-                res = this.stream.Skip2(length);
-                if(c_oSerConstants.ReadOk != res)
-                    return res;
-            }
-            else if(res !== c_oSerConstants.ReadOk)
-                return res;
-            stCurPos += length + 5;
-        }
-        return res;
-    };
-    this.Read2 = function(stLen, fRead)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var stCurPos = 0;
-        while(stCurPos < stLen)
-        {
-            //stItem
-            var type = this.stream.GetUChar();
-            var lenType = this.stream.GetUChar();
-            var nCurPosShift = 2;
-            var nRealLen;
-            switch(lenType)
-            {
-                case c_oSerPropLenType.Null: nRealLen = 0;break;
-                case c_oSerPropLenType.Byte: nRealLen = 1;break;
-                case c_oSerPropLenType.Short: nRealLen = 2;break;
-                case c_oSerPropLenType.Three: nRealLen = 3;break;
-                case c_oSerPropLenType.Long:
-                case c_oSerPropLenType.Double: nRealLen = 4;break;
-                case c_oSerPropLenType.Variable:
-                    nRealLen = this.stream.GetULongLE();
-                    nCurPosShift += 4;
-                    break;
-                default:return c_oSerConstants.ErrorUnknown;
-            }
-            res = fRead(type, nRealLen);
-            if(res === c_oSerConstants.ReadUnknown)
-            {
-                res = this.stream.Skip2(nRealLen);
-                if(c_oSerConstants.ReadOk != res)
-                    return res;
-            }
-            else if(res !== c_oSerConstants.ReadOk)
-                return res;
-            stCurPos += nRealLen + nCurPosShift;
-        }
-        return res;
-    };
-	this.Read2Spreadsheet = function(stLen, fRead)
-    {
-        var res = c_oSerConstants.ReadOk;
-        var stCurPos = 0;
-        while(stCurPos < stLen)
-        {
-            //stItem
-            var type = this.stream.GetUChar();
-            var lenType = this.stream.GetUChar();
-            var nCurPosShift = 2;
-            var nRealLen;
-            switch(lenType)
-            {
-                case c_oSerPropLenType.Null: nRealLen = 0;break;
-                case c_oSerPropLenType.Byte: nRealLen = 1;break;
-                case c_oSerPropLenType.Short: nRealLen = 2;break;
-                case c_oSerPropLenType.Three: nRealLen = 3;break;
-                case c_oSerPropLenType.Long: nRealLen = 4;break;
-                case c_oSerPropLenType.Double: nRealLen = 8;break;
-                case c_oSerPropLenType.Variable:
-                    nRealLen = this.stream.GetULongLE();
-                    nCurPosShift += 4;
-                    break;
-                default:return c_oSerConstants.ErrorUnknown;
-            }
-            res = fRead(type, nRealLen);
-            if(res === c_oSerConstants.ReadUnknown)
-            {
-                res = this.stream.Skip2(nRealLen);
-                if(c_oSerConstants.ReadOk != res)
-                    return res;
-            }
-            else if(res !== c_oSerConstants.ReadOk)
-                return res;
-            stCurPos += nRealLen + nCurPosShift;
-        }
-        return res;
-    };
-    this.ReadDouble = function()
-    {
-        var dRes = 0.0;
-        dRes |= this.stream.GetUChar();
-        dRes |= this.stream.GetUChar() << 8;
-        dRes |= this.stream.GetUChar() << 16;
-        dRes |= this.stream.GetUChar() << 24;
-        dRes /= 100000;
-        return dRes;
-    }
-    this.ReadColor = function()
-    {
-        var r = this.stream.GetUChar();
-        var g = this.stream.GetUChar();
-        var b = this.stream.GetUChar()
-        return new CDocumentColor(r, g, b);
-    }
-    this.ReadShd = function(type, length, Shd)
-    {
-        var res = c_oSerConstants.ReadOk;
-        switch(type)
-        {
-            case c_oSerShdType.Value: Shd.Value = this.stream.GetUChar();break;
-            case c_oSerShdType.Color: Shd.Color = this.ReadColor();break;
-            default:
-                res = c_oSerConstants.ReadUnknown;
-                break;
-        }
-        return res;
-    };
-	this.ReadColorSpreadsheet = function(type, length, color)
-    {
-        var res = c_oSerConstants.ReadOk;
-        if ( c_oSer_ColorObjectType.Type == type )
-            color.auto = (c_oSer_ColorType.Auto == this.stream.GetUChar());
-        else if ( c_oSer_ColorObjectType.Rgb == type )
-            color.rgb = 0xffffff & this.stream.GetULongLE();
-		else if ( c_oSer_ColorObjectType.Theme == type )
-            color.theme = this.stream.GetUChar();
-		else if ( c_oSer_ColorObjectType.Tint == type )
-            color.tint = this.stream.GetDoubleLE();
-        else
-            res = c_oSerConstants.ReadUnknown;
-        return res;
-    }
 }
+
+Binary_CommonReader.prototype.ReadTable = function(fReadContent)
+{
+    var res = c_oSerConstants.ReadOk;
+    //stLen
+    res = this.stream.EnterFrame(4);
+    if(c_oSerConstants.ReadOk != res)
+        return res;
+    var stLen = this.stream.GetULongLE();
+    //Смотрим есть ли данные под всю таблицу в дальнейшем спокойно пользуемся get функциями
+    res = this.stream.EnterFrame(stLen);
+    if(c_oSerConstants.ReadOk != res)
+        return res;
+    return this.Read1(stLen, fReadContent);
+};
+Binary_CommonReader.prototype.Read1 = function(stLen, fRead)
+{
+    var res = c_oSerConstants.ReadOk;
+    var stCurPos = 0;
+    while(stCurPos < stLen)
+    {
+        //stItem
+        var type = this.stream.GetUChar();
+        var length = this.stream.GetULongLE();
+        res = fRead(type, length);
+        if(res === c_oSerConstants.ReadUnknown)
+        {
+            res = this.stream.Skip2(length);
+            if(c_oSerConstants.ReadOk != res)
+                return res;
+        }
+        else if(res !== c_oSerConstants.ReadOk)
+            return res;
+        stCurPos += length + 5;
+    }
+    return res;
+};
+Binary_CommonReader.prototype.Read2 = function(stLen, fRead)
+{
+    var res = c_oSerConstants.ReadOk;
+    var stCurPos = 0;
+    while(stCurPos < stLen)
+    {
+        //stItem
+        var type = this.stream.GetUChar();
+        var lenType = this.stream.GetUChar();
+        var nCurPosShift = 2;
+        var nRealLen;
+        switch(lenType)
+        {
+            case c_oSerPropLenType.Null: nRealLen = 0;break;
+            case c_oSerPropLenType.Byte: nRealLen = 1;break;
+            case c_oSerPropLenType.Short: nRealLen = 2;break;
+            case c_oSerPropLenType.Three: nRealLen = 3;break;
+            case c_oSerPropLenType.Long:
+            case c_oSerPropLenType.Double: nRealLen = 4;break;
+            case c_oSerPropLenType.Variable:
+                nRealLen = this.stream.GetULongLE();
+                nCurPosShift += 4;
+                break;
+            default:return c_oSerConstants.ErrorUnknown;
+        }
+        res = fRead(type, nRealLen);
+        if(res === c_oSerConstants.ReadUnknown)
+        {
+            res = this.stream.Skip2(nRealLen);
+            if(c_oSerConstants.ReadOk != res)
+                return res;
+        }
+        else if(res !== c_oSerConstants.ReadOk)
+            return res;
+        stCurPos += nRealLen + nCurPosShift;
+    }
+    return res;
+};
+Binary_CommonReader.prototype.Read2Spreadsheet = function(stLen, fRead)
+{
+    var res = c_oSerConstants.ReadOk;
+    var stCurPos = 0;
+    while(stCurPos < stLen)
+    {
+        //stItem
+        var type = this.stream.GetUChar();
+        var lenType = this.stream.GetUChar();
+        var nCurPosShift = 2;
+        var nRealLen;
+        switch(lenType)
+        {
+            case c_oSerPropLenType.Null: nRealLen = 0;break;
+            case c_oSerPropLenType.Byte: nRealLen = 1;break;
+            case c_oSerPropLenType.Short: nRealLen = 2;break;
+            case c_oSerPropLenType.Three: nRealLen = 3;break;
+            case c_oSerPropLenType.Long: nRealLen = 4;break;
+            case c_oSerPropLenType.Double: nRealLen = 8;break;
+            case c_oSerPropLenType.Variable:
+                nRealLen = this.stream.GetULongLE();
+                nCurPosShift += 4;
+                break;
+            default:return c_oSerConstants.ErrorUnknown;
+        }
+        res = fRead(type, nRealLen);
+        if(res === c_oSerConstants.ReadUnknown)
+        {
+            res = this.stream.Skip2(nRealLen);
+            if(c_oSerConstants.ReadOk != res)
+                return res;
+        }
+        else if(res !== c_oSerConstants.ReadOk)
+            return res;
+        stCurPos += nRealLen + nCurPosShift;
+    }
+    return res;
+};
+Binary_CommonReader.prototype.ReadDouble = function()
+{
+    var dRes = 0.0;
+    dRes |= this.stream.GetUChar();
+    dRes |= this.stream.GetUChar() << 8;
+    dRes |= this.stream.GetUChar() << 16;
+    dRes |= this.stream.GetUChar() << 24;
+    dRes /= 100000;
+    return dRes;
+};
+Binary_CommonReader.prototype.ReadColor = function()
+{
+    var r = this.stream.GetUChar();
+    var g = this.stream.GetUChar();
+    var b = this.stream.GetUChar()
+    return new CDocumentColor(r, g, b);
+};
+Binary_CommonReader.prototype.ReadShd = function(type, length, Shd)
+{
+    var res = c_oSerConstants.ReadOk;
+    switch(type)
+    {
+        case c_oSerShdType.Value: Shd.Value = this.stream.GetUChar();break;
+        case c_oSerShdType.Color: Shd.Color = this.ReadColor();break;
+        default:
+            res = c_oSerConstants.ReadUnknown;
+            break;
+    }
+    return res;
+};
+Binary_CommonReader.prototype.ReadColorSpreadsheet = function(type, length, color)
+{
+    var res = c_oSerConstants.ReadOk;
+    if ( c_oSer_ColorObjectType.Type == type )
+        color.auto = (c_oSer_ColorType.Auto == this.stream.GetUChar());
+    else if ( c_oSer_ColorObjectType.Rgb == type )
+        color.rgb = 0xffffff & this.stream.GetULongLE();
+	else if ( c_oSer_ColorObjectType.Theme == type )
+        color.theme = this.stream.GetUChar();
+	else if ( c_oSer_ColorObjectType.Tint == type )
+        color.tint = this.stream.GetDoubleLE();
+    else
+        res = c_oSerConstants.ReadUnknown;
+    return res;
+};
 /** @constructor */
 function FT_Stream2(data, size) {
     this.obj = null;
