@@ -2778,8 +2778,16 @@ parserFormula.prototype = {
 	setRefError : function(wsId, cellId){
 		for ( var i = 0; i < this.outStack.length; i++ ) {
 			var node = this.outStack[i];
-            if ( node instanceof cRef || node instanceof cArea ||  node instanceof cRef3D || node instanceof cArea3D )
-				this.outStack[i] = new cError( cErrorType.bad_reference );
+            if ( node instanceof cRef || node instanceof cArea ||  node instanceof cRef3D)
+			{
+				if( wsId == node.ws.getId() && cellId == node._cells)
+					this.outStack[i] = new cError( cErrorType.bad_reference );
+			}
+			else if(node instanceof cArea3D)
+			{
+				if( node.wsFrom == node.wsTo && wsId == node.wsFrom.getId() && cellId == node._cells)
+					this.outStack[i] = new cError( cErrorType.bad_reference );
+			}
 		}
 	},
     /*

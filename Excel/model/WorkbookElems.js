@@ -3986,10 +3986,13 @@ RangeDataManager.prototype = {
 			else
 				aToChange.sort(function(a, b){return _this.shiftSort(a, b, true, true);});
 		}
-		for(var i = 0, length = aToChange.length; i < length; ++i)
+		if(null != this.fChange)
 		{
-			var item = aToChange[i];
-			this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+			for(var i = 0, length = aToChange.length; i < length; ++i)
+			{
+				var item = aToChange[i];
+				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+			}
 		}
 		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
 		var fOldChange = this.fChange;
@@ -4007,6 +4010,25 @@ RangeDataManager.prototype = {
 			var item = aToChange[i];
 			if(null != item.to)
 				this.add(item.to, item.elem.data);
+		}
+		
+	},
+	move : function(from, to)
+	{
+		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+		var fOldChange = this.fChange;
+		this.fChange = null;
+		var nOffsetRow = to.r1 - from.r1;
+		var nOffsetCol = to.c1 - from.c1;
+		var oGetRes = this.get(from);
+		for(var i = 0, length = oGetRes.inner.length; i < length; i++)
+		{
+			var elem = oGetRes.inner[i];
+			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
+			if(null != fOldChange)
+				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
+			this.removeElement(elem);
+			this.add(oNewBBox, elem.data);
 		}
 		this.fChange = fOldChange;
 	},
@@ -4055,7 +4077,10 @@ CellArea.prototype = {
 		var oNewRow = oStoredNode.storedValue;
 		var oNewColNode = new TreeRBNode(col, null);
 		var oStoredColNode = oNewRow.insertOrGet(oNewColNode);
-		oNewColNode.storedValue = new RangeDataManagerElem(new Asc.Range(col, row, col, row), value);
+		var storedValue = new RangeDataManagerElem(new Asc.Range(col, row, col, row), value);
+		oNewColNode.storedValue = storedValue;
+		if(null != this.fChange)
+			this.fChange.call(this, storedValue.data, null, storedValue.bbox);
 	},
 	get : function(bbox)
 	{
@@ -4078,7 +4103,11 @@ CellArea.prototype = {
 			var row = rowElem.storedValue;
 			var cellElem = row.getElem(elem.bbox.c1);
 			if(cellElem)
+			{
 				row.deleteNode(cellElem);
+				if(null != this.fChange)
+					this.fChange.call(this, cellElem.storedValue.data, cellElem.storedValue.bbox, null);
+			}
 		}
 	},
 	shiftGet : function(bbox, bHor)
@@ -4151,10 +4180,13 @@ CellArea.prototype = {
 			else
 				aToChange.sort(function(a, b){return a.to.r1 - b.to.r1;});
 		}
-		for(var i = 0, length = aToChange.length; i < length; ++i)
+		if(null != this.fChange)
 		{
-			var item = aToChange[i];
-			this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+			for(var i = 0, length = aToChange.length; i < length; ++i)
+			{
+				var item = aToChange[i];
+				this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
+			}
 		}
 		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
 		var fOldChange = this.fChange;
@@ -4172,6 +4204,25 @@ CellArea.prototype = {
 			var item = aToChange[i];
 			if(null != item.to)
 				this.add(item.to.r1, item.to.c1, item.elem.data);
+		}
+		this.fChange = fOldChange;
+	},
+	move : function(from, to)
+	{
+		//убираем fChange, чтобы потом послать его только на одну операцию, а не 2
+		var fOldChange = this.fChange;
+		this.fChange = null;
+		var nOffsetRow = to.r1 - from.r1;
+		var nOffsetCol = to.c1 - from.c1;
+		var oGetRes = this.get(from);
+		for(var i = 0, length = oGetRes.length; i < length; i++)
+		{
+			var elem = oGetRes[i];
+			var oNewBBox = new Asc.Range(elem.bbox.c1 + nOffsetCol, elem.bbox.r1 + nOffsetRow, elem.bbox.c2 + nOffsetCol, elem.bbox.r2 + nOffsetRow);
+			if(null != fOldChange)
+				fOldChange.call(this, elem.data, elem.bbox, oNewBBox);
+			this.removeElement(elem);
+			this.add(oNewBBox.r1, oNewBBox.c1, elem.data);
 		}
 		this.fChange = fOldChange;
 	},

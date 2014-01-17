@@ -44,6 +44,7 @@ function DependencyGraph(wb) {
 	this.nodesCell = null;
 	this.nodesArea = null;
 	this.nodeslength = null;
+	this.bSetRefError = false;
 	this.clear();
 }
 DependencyGraph.prototype = {
@@ -52,6 +53,7 @@ DependencyGraph.prototype = {
 		this.nodesCell = {};
 		this.nodesArea = {};
 		this.nodeslength = 0;
+		this.bSetRefError = false;
 	},
 	nodeExist : function(node){
 		return this.nodeExist2(node.sheetId, node.cellId);
@@ -82,6 +84,7 @@ DependencyGraph.prototype = {
 		return this.addNode(node.sheetId, node.cellId);
 	},
 	addNode : function(sheetId, cellId){
+		var _this = this;
 		var nodeId = getVertexId(sheetId, cellId)
 		var oRes = this.nodesId[nodeId];
 		if(null == oRes)
@@ -93,7 +96,7 @@ DependencyGraph.prototype = {
 				var nodesSheetArea = this.nodesArea[node.sheetId];
 				if(null == nodesSheetArea)
 				{
-					nodesSheetArea = new RangeDataManager(null);
+					nodesSheetArea = new RangeDataManager(function(data, from, to){_this._changeNode(data, from, to);});
 					this.nodesArea[node.sheetId] = nodesSheetArea;
 				}
 				nodesSheetArea.add(oBBoxNode, node);
@@ -103,13 +106,11 @@ DependencyGraph.prototype = {
 				var nodesSheetCell = this.nodesCell[node.sheetId];
 				if(null == nodesSheetCell)
 				{
-					nodesSheetCell = new CellArea(null);
+					nodesSheetCell = new CellArea(function(data, from, to){_this._changeNode(data, from, to);});
 					this.nodesCell[node.sheetId] = nodesSheetCell;
 				}
 				nodesSheetCell.add(oBBoxNode.r1, oBBoxNode.c1, node);
 			}
-			this.nodesId[node.nodeId] = node;
-			this.nodeslength++;
 			oRes = node;
 		}
 		return oRes;
@@ -145,38 +146,39 @@ DependencyGraph.prototype = {
 		}
 		return arr;
 	},
-	deleteNode : function(n, bSetRefError){
-		var node = this.nodesId[n.nodeId];
-		if( node )
+	deleteNode : function(node){
+		if(node.isArea)
 		{
-			var oSlaves = node.deleteAllSlaveEdges();
-			if(bSetRefError)
-			{
-				//выставляем #REF!
-				for(var i in oSlaves)
-				{
-					var slave = oSlaves[i];
-					slave.setRefError();
-					this.wb.needRecalc[slave.nodeId] = [slave.sheetId, slave.cellId ];
-					this.wb.needRecalc.length++;
-				}
-			}
-			this.deleteMasterNodes(node.sheetId, node.cellId);
-			if(node.isArea)
-			{
-				var nodesSheetArea = this.nodesArea[node.sheetId];
-				if(nodesSheetArea)
-					nodesSheetArea.removeElement(new RangeDataManagerElem(node.getBBox(), node));
-			}
-			else
-			{
-				var nodesSheetCell = this.nodesCell[node.sheetId];
-				if(nodesSheetCell)
-					nodesSheetCell.removeElement(new RangeDataManagerElem(node.getBBox(), node));
-			}
-			delete this.nodesId[node.nodeId];
-			this.nodeslength--;
+			var nodesSheetArea = this.nodesArea[node.sheetId];
+			if(nodesSheetArea)
+				nodesSheetArea.removeElement(new RangeDataManagerElem(node.getBBox(), node));
 		}
+		else
+		{
+			var nodesSheetCell = this.nodesCell[node.sheetId];
+			if(nodesSheetCell)
+				nodesSheetCell.removeElement(new RangeDataManagerElem(node.getBBox(), node));
+		}
+	},
+	deleteNodes : function(sheetId, bbox){
+		var bSetRefErrorOld = this.bSetRefError;
+		this.bSetRefError = true;
+		var nodesSheetArea = this.nodesArea[sheetId];
+		var oGetRes;
+		if(nodesSheetArea)
+		{
+			oGetRes = nodesSheetArea.get(bbox);
+			for(var i = 0, length = oGetRes.inner.length; i < length; ++i)
+				nodesSheetArea.removeElement(oGetRes.inner[i]);
+		}
+		var nodesSheetCell = this.nodesCell[sheetId];
+		if(nodesSheetCell)
+		{
+			oGetRes = nodesSheetCell.get(bbox);
+			for(var i = 0, length = oGetRes.length; i < length; ++i)
+				nodesSheetCell.removeElement(oGetRes[i]);
+		}
+		this.bSetRefError = bSetRefErrorOld;
 	},
 	deleteMasterNodes : function(sheetId, cellId){
 		var node = this.getNode(sheetId, cellId);
@@ -189,6 +191,12 @@ DependencyGraph.prototype = {
 					this.deleteNode(nodeMaster);
 			}
 		}
+		return node;
+	},
+	deleteMasterNodes2 : function(sheetId, cellId){
+		var node = this.deleteMasterNodes(sheetId, cellId);
+		if(node && node.refCount <= 0)
+			this.deleteNode(node);
 		return node;
 	},
 	getSlaveNodes : function(sheetId, cellId){
@@ -206,114 +214,112 @@ DependencyGraph.prototype = {
 		var _this = this;
 		var bHor = 0 != offset.offsetCol;
 		var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+		var bSetRefErrorOld = this.bSetRefError;
+		this.bSetRefError = true;
+		var oShiftGetBBox = shiftGetBBox(BBox, bHor);
+		var sShiftGetBBoxName = oShiftGetBBox.getName();
+		this.wb.needRecalc.nodes[getVertexId(wsId, sShiftGetBBoxName)] = [wsId, sShiftGetBBoxName];
+		this.wb.needRecalc.length++;
 		var nodesSheetArea = this.nodesArea[wsId];
 		if(nodesSheetArea)
-		{
-			var oShiftGet = nodesSheetArea.shiftGet(BBox, bHor);
-			if(oShiftGet && oShiftGet.elems && oShiftGet.elems.outer)
-			{
-				for(var i = 0, length = oShiftGet.elems.outer.length; i < length; i++)
-				{
-					var elem = oShiftGet.elems.outer[i];
-					var node = elem.data;
-					this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-					this.wb.needRecalc.length++;
-				}
-			}
-			//временно выставляем fChange
-			nodesSheetArea.fChange = function(node, from, to){_this._moveNode(node, from, to, BBox, offset, wsId);};
-			nodesSheetArea.shift(BBox, !toDelete, bHor, oShiftGet);
-			nodesSheetArea.fChange = null;
-		}
+			nodesSheetArea.shift(BBox, !toDelete, bHor);
 		var nodesSheetCell = this.nodesCell[wsId];
 		if(nodesSheetCell)
-		{
-			nodesSheetCell.fChange = function(node, from, to){_this._moveNode(node, from, to, BBox, offset, wsId);};
 			nodesSheetCell.shift(BBox, !toDelete, bHor);
-			nodesSheetCell.fChange = null;
-		}
+		this.bSetRefError = bSetRefErrorOld;
 	},
-	_moveNode : function(node, from, to, BBox, offset, wsId)
+	_changeNode : function(node, from, to)
 	{
 		var toDelete = null == to;
-		if(toDelete)
-			this.deleteNode(node, true);
+		var toAdd = null == from;
+		var wsId = node.sheetId;
+		if(toAdd)
+		{
+			this.nodesId[node.nodeId] = node;
+			this.nodeslength++;
+		}
+		else if(toDelete)
+		{
+			var oSlaves = node.deleteAllSlaveEdges();
+			if(this.bSetRefError)
+			{
+				//выставляем #REF!
+				for(var i in oSlaves)
+				{
+					var slave = oSlaves[i];
+					slave.setRefError(wsId, node.cellId);
+				}
+			}
+			this.deleteMasterNodes(node.sheetId, node.cellId);
+			delete this.nodesId[node.nodeId];
+			this.nodeslength--;
+		}
 		else
 		{
 			var sOldnodeId = node.nodeId;
 			var sOldCellId = node.cellId;
 			if((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2))
-			{
 				node.moveStretch(to);
-				this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-				this.wb.needRecalc.length++;
-			}
 			else
-				node.move(offset, BBox, wsId, toDelete);
+				node.move({offsetCol: to.c1 - from.c1, offsetRow: to.r1 - from.r1}, wsId, toDelete);
 
 			delete this.nodesId[sOldnodeId];
 			this.nodesId[node.nodeId] = node;
-			//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move
+		}
+		//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move
+		if(!node.isArea)
+		{
 			var cwf = this.wb.cwf[wsId];
-			if(cwf && !node.isArea)
+			if(cwf)
 			{
 				var cell = node.returnCell();
 				if( cell && cell.formulaParsed )
 				{
-					delete cwf.cells[sOldCellId];
+					if(!toAdd)
+						delete cwf.cells[sOldCellId];
 					if(!toDelete)
 						cwf.cells[node.cellId] = node.cellId;
 				}
 			}
 		}
 	},
+	getCellInRange : function(sheetId, bbox){
+		var res = [], oGetRes, nodesSheetCell = this.nodesCell[sheetId];
+		if(nodesSheetCell)
+		{
+			oGetRes = nodesSheetCell.get(bbox);
+			for(var i = 0, length = oGetRes.length; i < length; i++)
+			{
+				elem = oGetRes[i];
+				res.push(elem.data);
+			}
+		}
+		return res;
+	},
+	getAreaInRange : function(sheetId, bbox){
+		var res = [], oGetRes, nodesSheetArea = this.nodesArea[sheetId];
+		if(nodesSheetArea)
+		{
+			oGetRes = nodesSheetArea.get(bbox);
+			for(var i = 0, length = oGetRes.all.length; i < length; i++)
+			{
+				elem = oGetRes.all[i];
+				res.push(elem.data);
+			}
+		}
+		return res;
+	},
+	getInRange : function(sheetId, bbox){
+		return this.getCellInRange(sheetId, bbox).concat(this.getAreaInRange(sheetId, bbox));
+	},
 	helper : function(BBoxFrom, oBBoxTo, wsId){
 		var oGetRes, node, nodesSheetCell = this.nodesCell[wsId], nodesSheetArea = this.nodesArea[wsId];
 		var offset = {offsetCol: oBBoxTo.c1 - BBoxFrom.c1, offsetRow: oBBoxTo.r1 - BBoxFrom.r1};
 		var elem, bbox;
 		if(nodesSheetCell)
-		{
-			oGetRes = nodesSheetCell.get(BBoxFrom);
-			for(var i = 0, length = oGetRes.length; i < length; i++)
-			{
-				elem = oGetRes[i];
-				bbox = elem.bbox;
-				node = elem.data;
-				nodesSheetCell.removeElement(elem);
-				this._moveNode(node, bbox, new Asc.Range(bbox.c1 + offset.offsetCol, bbox.r1 + offset.offsetRow, bbox.c2 + offset.offsetCol, bbox.r2 + offset.offsetRow), BBoxFrom, offset, wsId);
-				nodesSheetCell.add(bbox.r1 + offset.offsetRow, bbox.c1 + offset.offsetCol, elem.data);
-				this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-				this.wb.needRecalc.length++;
-			}
-		}
+			oGetRes = nodesSheetCell.move(BBoxFrom, oBBoxTo);
 		if(nodesSheetArea)
-		{
-			oGetRes = nodesSheetArea.get(BBoxFrom);
-			for(var i = 0, length = oGetRes.inner.length; i < length; i++)
-			{
-				elem = oGetRes.inner[i];
-				bbox = elem.bbox;
-				node = elem.data;
-				nodesSheetArea.removeElement(elem);
-				this._moveNode(node, bbox, new Asc.Range(bbox.c1 + offset.offsetCol, bbox.r1 + offset.offsetRow, bbox.c2 + offset.offsetCol, bbox.r2 + offset.offsetRow), BBoxFrom, offset, wsId);
-				nodesSheetArea.add(node.getBBox(), elem.data);
-				this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-				this.wb.needRecalc.length++;
-			}
-			for(var i = 0, length = oGetRes.outer.length; i < length; i++)
-			{
-				node = oGetRes.outer[i].data;
-				this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-				this.wb.needRecalc.length++;
-			}
-			oGetRes = nodesSheetArea.get(oBBoxTo);
-			for(var i = 0, length = oGetRes.outer.length; i < length; i++)
-			{
-				node = oGetRes.outer[i].data;
-				this.wb.needRecalc[node.nodeId] = [node.sheetId, node.cellId ];
-				this.wb.needRecalc.length++;
-			}
-		}
+			oGetRes = nodesSheetArea.move(BBoxFrom, oBBoxTo);
 	},
 	drawDep : function(cellId,se){
 		// ToDo неиспользуемая функция, реализовать после выпуска
@@ -480,8 +486,8 @@ DependencyGraph.prototype = {
 	},
 	removeNodeBySheetId : function(sheetId){
 		var arr = false;
-		this.wb.needRecalc = [];
-		this.wb.needRecalc.length = 0;
+		// this.wb.needRecalc = [];
+		// this.wb.needRecalc.length = 0;
 		var nodesSheet = nodes[sheetId];
 		if(nodesSheet){
 			var aNodes = nodesSheet.getAll();
@@ -492,8 +498,8 @@ DependencyGraph.prototype = {
 				for(var id2 in se){
 					if(se[id2].sheetId != sheetId){
 						if(!arr) arr = true;
-						this.wb.needRecalc[id2] = [se[id2].sheetId,se[id2].cellId];
-						this.wb.needRecalc.length++;
+						// this.wb.needRecalc[id2] = [se[id2].sheetId,se[id2].cellId];
+						// this.wb.needRecalc.length++;
 						// arr.push(se[id2]);
 					}
 				}
@@ -520,9 +526,11 @@ DependencyGraph.prototype = {
 			for(var i in aElems)
 			{
 				elem = aElems[i];
+				var sheetId = elem[0];
+				var cellId = elem[1];
 				//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
-				this._getNodeDependenceNodeToRange(elem.sheetId, Asc.g_oRangeCache.getAscRange(elem.cellId), oSheetRanges);
-				node = this.getNode(elem.sheetId, elem.cellId);
+				this._getNodeDependenceNodeToRange(sheetId, Asc.g_oRangeCache.getAscRange(cellId), oSheetRanges);
+				node = this.getNode(sheetId, cellId);
 				if(node && null == oRes.oWeightMap[node.nodeId])
 				{
 					//все node из aElems записываем в master
@@ -579,7 +587,7 @@ DependencyGraph.prototype = {
 							for(var j in aAllOuter)
 							{
 								var node = aAllOuter[j].data;
-								aElems[node.nodeId] = {sheetId: node.sheetId, cellId: node.cellId};
+								aElems[node.nodeId] = [node.sheetId, node.cellId];
 							}
 						}
 					}
@@ -619,7 +627,11 @@ DependencyGraph.prototype = {
 			else
 			{
 				if(oWeightMapElem.master && oWeightMapElem.max > 1)
-					oWeightMapElem.master = false;//если повторно пришли в master node, то не считаем ее master
+				{
+					//если повторно пришли в master node, то не считаем ее master
+					oWeightMapElem.master = false;
+					oWeightMapElem.max--;
+				}
 			}
 		}
 		if(1 == oWeightMapElem.max)
@@ -702,46 +714,70 @@ Vertex.prototype = {
 	{
 		return this.bbox;
 	},
-	setRefError : function()
+	setRefError : function(wsId, cellId)
 	{
 		var cell = this.returnCell();
 		if( cell && cell.formulaParsed )
 		{
-			cell.formulaParsed.setRefError(this.sheetId, this.cellId);
+			this.wb.dependencyFormulas.deleteMasterNodes2( wsId, cellId );
+			cell.formulaParsed.setRefError(wsId, cellId);
 			cell.setFormula(cell.formulaParsed.assemble(), true);
+			addToArrRecalc(this.wb, wsId, cellId);
+			this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+			this.wb.needRecalc.length++;
 		}
 	},
-	move : function(offset, oBBox, wsId, toDelete)
+	move : function(offset, wsId, toDelete)
 	{
+		var oNewBBox = new Asc.Range(this.bbox.c1 + offset.offsetCol, this.bbox.r1 + offset.offsetRow, this.bbox.c2 + offset.offsetCol, this.bbox.r2 + offset.offsetRow);
+		var sNewBBoxName = oNewBBox.getName();
 		var _sn = this.getSlaveEdges();
+		var cell = this.returnCell();
+		if( cell && cell.formulaParsed )
+		{
+			this.wb.dependencyFormulas.deleteMasterNodes2(wsId, this.bbox.getName());
+			addToArrRecalc(this.wb, wsId, sNewBBoxName);
+		}
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell(), cellName;
+			var slave = _sn[_id]
+			cell = slave.returnCell();
 			if( cell && cell.formulaParsed )
 			{
-				cellName = cell.getName();
-				cell.formulaParsed.shiftCells( offset, oBBox, this, wsId, toDelete);
+				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
+				cell.formulaParsed.shiftCells( offset, null, this, slave.sheetId, toDelete);
 				cell.setFormula(cell.formulaParsed.assemble(), true);
+				addToArrRecalc(this.wb, slave.sheetId, slave.cellId);
+				this.wb.needRecalc.nodes[slave.nodeId] = [slave.sheetId, slave.cellId ];
+				this.wb.needRecalc.length++;
 			}
 		}
-		this.bbox = new Asc.Range(this.bbox.c1 + offset.offsetCol, this.bbox.r1 + offset.offsetRow, this.bbox.c2 + offset.offsetCol, this.bbox.r2 + offset.offsetRow);
-		this.cellId = this.bbox.getName();
+		this.bbox = oNewBBox;
+		this.cellId = sNewBBoxName;
 		this.nodeId = getVertexId(this.sheetId, this.cellId);
+		this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+		this.wb.needRecalc.length++;
 	},
 	moveStretch : function(bboxTo)
 	{
 		var sNewName = bboxTo.getName();
 		var _sn = this.getSlaveEdges();
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell(), cellName;
+			var slave = _sn[_id];
+			var cell = slave.returnCell();
 			if( cell && cell.formulaParsed ){
-                cellName = cell.getName();
+				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
 				cell.formulaParsed.stretchArea( this, sNewName );
 				cell.setFormula(cell.formulaParsed.assemble(), true);
+				addToArrRecalc(this.wb, slave.sheetId, slave.cellId);
+				this.wb.needRecalc.nodes[slave.nodeId] = [slave.sheetId, slave.cellId ];
+				this.wb.needRecalc.length++;
 			}
 		}
 		this.bbox = bboxTo
 		this.cellId = sNewName;
 		this.nodeId = getVertexId(this.sheetId, this.cellId);
+		this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+		this.wb.needRecalc.length++;
 	},
 	//добавляем ведущую ячейку.
 	addMasterEdge : function(node){
@@ -855,16 +891,13 @@ function unLockDraw(wb){
     }
 }
 function addToArrRecalc(wb, sheetId, cellId){
-	if(!wb.isNeedCacheClean)
+	var temp = arrRecalc[sheetId];
+	if( !temp )
 	{
-		var temp = arrRecalc[sheetId];
-		if( !temp )
-		{
-			temp = {};
-			arrRecalc[sheetId] = temp;
-		}
-		temp[cellId] = cellId;
+		temp = {};
+		arrRecalc[sheetId] = temp;
 	}
+	temp[cellId] = cellId;
 }
 function buildRecalc(_wb,notrec){
 	var ws;
@@ -950,22 +983,15 @@ function helpRecalc(dep1, nR, calculatedCells, wb){
 }
 
 function sortDependency(wb){
+	if ( wb.isNeedCacheClean ){
+		buildRecalc(wb, true);
+		arrRecalc = {};
+	}
 	var nR = wb.needRecalc;
-	var elem = null;
-	var ar2 = {};
-	var sr = {};
-	if(nR && nR.length > 0)
+	if(nR && (nR.length > 0))
 	{
-		for(var i in nR)
-		{
-			if("length" != i)
-			{
-				elem = nR[i];
-				ar2[elem[0] + elem[1]] = {sheetId: elem[0], cellId: elem[1]};
-			}
-		}
 		var oCleanCellCacheArea = {};
-		var oNodeDependence = wb.dependencyFormulas.getNodeDependence(ar2);
+		var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
 		for(var i in oNodeDependence.oMasterNodes)
 		{
 			var node = oNodeDependence.oMasterNodes[i];
@@ -986,7 +1012,7 @@ function sortDependency(wb){
 			}
 		}
 	}
-	wb.needRecalc = {length: 0};
+	wb.needRecalc = {nodes: {}, length:0};
 }
 function _sortDependency(wb, node, oWeightMap, bBad, oCleanCellCacheArea){
 	if(node)
@@ -1104,7 +1130,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.oApi = oApi;
 	this.sUrlPath = sUrlPath;
 	this.handlers = eventsHandlers;
-	this.needRecalc = {length:0};
+	this.needRecalc = {nodes: {}, length:0};
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 	
@@ -1352,17 +1378,17 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 						_c.setFormula(_c.formulaParsed.moveSheet(tempW).assemble());//Перестраиваем трехмерные ссылки в формуле.
 						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
 						addToArrRecalc(this, _ws.getId(), cID);
-						this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							this.needRecalc.length++;
+						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
+						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
+							// this.needRecalc.length++;
 					}
 					else if( f.indexOf(_ws.getName()) < 0 ){
 						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
 						_ws._BuildDependencies({id:cID});
 						addToArrRecalc(this, _ws.getId(), cID);
-						this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							this.needRecalc.length++;
+						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
+						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
+							// this.needRecalc.length++;
 					}
 				}
 			}
@@ -1414,9 +1440,9 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 					if( se[id].sheetId != removedSheet[0].getId() ){
 						var _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(se[id].cellId).getCells()[0].sFormula, cID = se[id].cellId;
 						addToArrRecalc(this, _ws.getId(), cID);
-						this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							this.needRecalc.length++;
+						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
+						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
+							// this.needRecalc.length++;
 					}
 				}
 			}
@@ -2072,7 +2098,7 @@ Woorksheet.prototype.init=function(){
 					Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
 				*/
 				if(oCell.sFormula && (oCell.oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat()) ){
-					this.workbook.needRecalc[ getVertexId( this.Id, sCellId ) ] = [this.Id, sCellId];
+					this.workbook.needRecalc.nodes[ getVertexId( this.Id, sCellId ) ] = [this.Id, sCellId];
 					this.workbook.needRecalc.length++;
 				}
 				//в редакторе не работаем с расширенными формулами
@@ -2890,15 +2916,17 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 					oUndoRedoData_CellData.style = cell.xfs.clone();
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, nRow, gc_nMaxCol0, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 			}
+			if(cell.formulaParsed)
+				this.wb.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
 			
-			this.helperRebuildFormulas(cell,cell.getName(),cell.getName());
+			// this.helperRebuildFormulas(cell,cell.getName(),cell.getName());
 
-			addToArrRecalc(this.workbook, this.getId(), cell.getName());
-            if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
-                this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
-                if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
-                this.workbook.needRecalc.length++;
-            }
+			// addToArrRecalc(this.workbook, this.getId(), cell.getName());
+            // if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
+                // this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
+                // if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
+                // this.workbook.needRecalc.length++;
+            // }
 			
 			delete row.c[nCol];
 			if(row.isEmpty())
@@ -3098,11 +3126,6 @@ Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 	}
 	return res;
 }
-Woorksheet.prototype._moveRecalcGraph=function(oBBoxFrom, oBBoxTo, offset){
-    var rec = this.workbook.dependencyFormulas.helper(oBBoxFrom, oBBoxTo,this.Id);
-
-    return rec;
-}
 Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	if(oBBoxFrom.isEqual(oBBoxTo))
 		return;
@@ -3159,11 +3182,14 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
 	for(var i = 0, length = aRangesToCheck.length; i < length; i++)
 		aRangesToCheck[i].cleanAll();
+	//выставляем для slave refError
+	if(!copyRange)
+		this.workbook.dependencyFormulas.deleteNodes(this.getId(), oBBoxTo);
 	//перемещаем без истории
 	History.TurnOff();
 	//удаляем from без истории, потому что эти данные не терются а перемещаются
-	var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 ), rec = {length:0};
     if(!copyRange || (copyRange && this.workbook.bUndoChanges)){
+		var oRangeFrom = this.getRange3(oBBoxFrom.r1, oBBoxFrom.c1, oBBoxFrom.r2, oBBoxFrom.c2 )
         oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
             var row = oThis._getRowNoEmpty(nRow0);
             if(null != row)
@@ -3171,7 +3197,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
         });
     }
     if(!copyRange){
-        this._moveRecalcGraph(oBBoxFrom, oBBoxTo, offset);
+        this.workbook.dependencyFormulas.helper(oBBoxFrom, oBBoxTo,this.Id);
     }
 
     for ( var i in aTempObj.cells ) {
@@ -3186,13 +3212,13 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 
                 if ( oTempCell.sFormula ) {
                     this.workbook.cwf[this.Id].cells[oTempCell.getName()] = oTempCell.getName();
-                    rec[ oTempCell.getName() ] = [ this.Id, oTempCell.getName() ];
-                    rec.length++;
                     if(copyRange){
                         oTempCell.formulaParsed = new parserFormula( oTempCell.sFormula, oTempCell.oId.getID(), this );
                         oTempCell.formulaParsed.parse();
                         oTempCell.formulaParsed = oTempCell.formulaParsed.changeOffset(offset);
                         oTempCell.sFormula = oTempCell.formulaParsed.assemble();
+						
+						addToArrRecalc(this.workbook, this.getId(), oTempCell.getName());
                     }
                 }
             }
@@ -3231,10 +3257,20 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	if(oBBoxTo.c2 > this.nColsCount)
 		this.nColsCount = oBBoxTo.c2 + 1;
 
-
-    // this.workbook.buildDependency();
-    //this.workbook.needRecalc = rec;
-    sortDependency(this.workbook);
+	if(!copyRange){
+		var sBBoxFromName = oBBoxFrom.getName();
+		this.workbook.needRecalc.nodes[getVertexId(this.getId(), sBBoxFromName)] = [this.getId(), sBBoxFromName];
+		this.workbook.needRecalc.length++;
+	}
+	var sBBoxToName = oBBoxTo.getName();
+	this.workbook.needRecalc.nodes[getVertexId(this.getId(), sBBoxToName)] = [this.getId(), sBBoxToName];
+	this.workbook.needRecalc.length++;
+	if ( this.workbook.isNeedCacheClean ){
+		/*
+			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
+		*/
+		sortDependency(this.workbook);
+	}
     History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
 				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo), copyRange));
@@ -3752,41 +3788,25 @@ Cell.prototype.setValue=function(val,callback){
 	}
 	//удаляем старые значения
 	this.oValue.clean();
-	var needRecalc = false;
-	var ar = {};
 	var sheetId = this.ws.getId();
 	if (this.sFormula)
 	{
-		var node = wb.dependencyFormulas.deleteMasterNodes( ws.Id, this.oId.getID() );
-		if(node && node.refCount <= 0)
-			wb.dependencyFormulas.deleteNode(node);
+		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID() );
 	}
 	if( null != val && val[0] != "=" || true == numFormat.isTextFormat()){
 		if (this.sFormula){
 			if ( this.oId.getID() in wb.cwf[ws.Id].cells){
 				delete wb.cwf[ws.Id].cells[this.oId.getID()];
 			}
-			needRecalc = true;
-		}
-		else{
-			if( wb.dependencyFormulas.nodeExistWithArea( ws.Id, this.oId.getID() ) ){
-				needRecalc = true;
-			}
 		}
 	}
 	else{
 		wb.cwf[ws.Id].cells[this.oId.getID()] = this.oId.getID();
-		if(this.ws.workbook.isNeedCacheClean)
-			ar[this.oId.getID()] = this.oId.getID();
-		else
-			addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
-		needRecalc = true;
+		addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
 	}
-	if(needRecalc)
-	{
-		wb.needRecalc[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-        wb.needRecalc.length++;
-	}
+	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
+    wb.needRecalc.length++;
+	
 	this.sFormula = null;
 	this.setFormulaCA(false);
 	if(val){
@@ -3797,20 +3817,12 @@ Cell.prototype.setValue=function(val,callback){
 			this.oValue.setValue(val);
 		}
 	}
-	if ( needRecalc && this.ws.workbook.isNeedCacheClean ){
+	if ( this.ws.workbook.isNeedCacheClean ){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
-		ws._BuildDependencies(ar);
 		sortDependency(this.ws.workbook);
 	}
-	// else if( this.ws.workbook.isNeedCacheClean == false ){
-        // if( ws.workbook.dependencyFormulas.nodeExistWithArea(this.ws.getId(),this.getName()) ){
-			// addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
-            // wb.needRecalc[ getVertexId(this.ws.getId(),this.oId.getID()) ] = [ this.ws.getId(),this.oId.getID() ];
-            // wb.needRecalc.length++;
-        // }
-	// }
 	var DataNew = null;
 	if(History.Is_On())
 		DataNew = this.getValueData();
@@ -3833,34 +3845,20 @@ Cell.prototype.setValue2=function(array){
 	//удаляем сторое значение
 	var ws = this.ws;
 	var wb = this.ws.workbook;
-	var needRecalc = false;
 	var sheetId = this.ws.getId();
 	if (this.sFormula){
-		var node = wb.dependencyFormulas.deleteMasterNodes( ws.Id, this.oId.getID(), true );
-		if(node && node.refCount <= 0)
-			wb.dependencyFormulas.deleteNode(node);
+		var node = wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID(), true );
 		if ( this.oId.getID() in wb.cwf[ws.Id].cells)
 			delete wb.cwf[ws.Id].cells[this.oId.getID()];
-		needRecalc = true;
-	}
-	else{
-		if( wb.dependencyFormulas.nodeExistWithArea( ws.Id, this.oId.getID() ) ){
-			needRecalc = true;
-		}
 	}
 	this.sFormula = null;
 	this.oValue.clean();
 	this.setFormulaCA(false);
 	this.oValue.setValue2(array);
-	if (needRecalc){
-		wb.needRecalc[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-		wb.needRecalc.length++;
-		/*
-			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
-		*/
-		//this.ws._BuildDependencies(ar);
-		sortDependency(this.ws.workbook);
-	}
+	
+	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
+    wb.needRecalc.length++;
+	sortDependency(this.ws.workbook);
 	var DataNew = null;
 	if(History.Is_On())
 		DataNew = this.getValueData();
@@ -4617,7 +4615,7 @@ Range.prototype.setValue2=function(array){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
 	History.StartTransaction();
-	var wb = this.worksheet.workbook, ws = this.worksheet, needRecalc = false, ar =[];
+	var wb = this.worksheet.workbook, ws = this.worksheet, ar =[];
 	//[{"text":"qwe","format":{"b":true, "i":false, "u":"none", "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
 	var oThis = this;
 	/*
@@ -6797,7 +6795,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
 		this._sortByArray(oUndoRedoBBox, aSortData);
 	}
-    buildRecalc(this.worksheet.workbook,true);
+    buildRecalc(this.worksheet.workbook);
     unLockDraw(this.worksheet.workbook);
 	return oRes;
 }
@@ -6868,20 +6866,14 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				var lastName = oCurCell.getName();
 				oCurCell.moveVer(shift);
 				rowTo.c[i] = oCurCell;
-				var sNewName = oCurCell.getName();
 				if(oCurCell.sFormula)
 				{
+					var sNewName = oCurCell.getName();
 					oCurCell.setFormula(oCurCell.formulaParsed.changeOffset({offsetCol:0, offsetRow:shift}).assemble());//получаем новую формулу, путем сдвига входящих в нее ссылок на ячейки на offsetCol и offsetRow. не путать с shiftCells - меняет одну конкретную ячейку в формуле, changeOffset - меняет оффсет для всех входящих в формулу ячеек.
-					this.worksheet.workbook.dependencyFormulas.deleteMasterNodes( this.worksheet.Id, lastName );//разрываем ссылки между старой ячейкой и ведущими ячейками для нее.
-					delete this.worksheet.workbook.cwf[this.worksheet.Id].cells[lastName];
+					this.worksheet.workbook.dependencyFormulas.deleteMasterNodes2( this.worksheet.Id, lastName );//разрываем ссылки между старой ячейкой и ведущими ячейками для нее.
 					addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sNewName);
-                    /*this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
-                    if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-                    this.worksheet.workbook.needRecalc.length++;*/
-
-				}
-				else{
-//					sortDependency(this.worksheet, {sNewName:sNewName});
+                    this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
+                    this.worksheet.workbook.needRecalc.length++;
 				}
 			}
 			else
@@ -6890,20 +6882,13 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				{
 					//здесь достаточно простого delete, потому что на самом деле в функции ячейки только меняются местами, удаления не происходит
 					delete rowTo.c[i];
-					var sNewName = (new CellAddress(nIndexTo, i, 0)).getID();
-					addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sNewName);
-                    /*this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
-                    if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-                    this.worksheet.workbook.needRecalc.length++;*/
-//					sortDependency(this.worksheet, {sNewName:sNewName});
 				}
 			}
 		}
 	}
-//    this.worksheet.workbook.buildDependency();
-//    this.worksheet.workbook.needRecalc = rec;
 
-//    sortDependency(this.worksheet.workbook);
+	if (this.worksheet.workbook.isNeedCacheClean)
+		sortDependency(this.worksheet.workbook);
 	if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 	{
 		//восстанавливаем удаленые гиперссылки
@@ -7282,7 +7267,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 					else if(null != oFromCell)
 					{
 						//копируем полностью
-						if(!oFromCell.sFormula){
+						if(!oFromCell.formulaParsed){
 							var DataOld = oCopyCell.getValueData();
 							oCopyCell.oValue = oFromCell.oValue.clone(oCopyCell);
 							var DataNew = oCopyCell.getValueData();
@@ -7291,22 +7276,18 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 							//todo
 							// if(oCopyCell.isEmptyTextString())
 								// this.worksheet._getHyperlink().remove({r1: oCopyCell.oId.getRow0(), c1: oCopyCell.oId.getCol0(), r2: oCopyCell.oId.getRow0(), c2: oCopyCell.oId.getCol0()});
-							addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), oCopyCell.getName());
-							this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-							if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-							this.worksheet.workbook.needRecalc.length++;
 						}
 						else{
 							var assemb;
 							var _p_ = new parserFormula(oFromCell.sFormula,oCopyCell.getName(),this.worksheet);
 							if( _p_.parse() ){
 								assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble();
-								oCopyCell.setValue("="+assemb);
-								
+								var sCopyCellName = oCopyCell.getName();
+								oCopyCell.setFormula(assemb);
+								addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sCopyCellName);
+								this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sCopyCellName) ] = [ this.worksheet.getId(),sCopyCellName ];
+								this.worksheet.workbook.needRecalc.length++;
 							}
-							this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),oCopyCell.getName()) ] = [ this.worksheet.getId(),oCopyCell.getName() ];
-							if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-							this.worksheet.workbook.needRecalc.length++;
 						}
 					}
 				}

@@ -2979,12 +2979,11 @@ UndoRedoWoorksheet.prototype = {
             {
                 var sFormula = Data.sFormula
                 var cell = ws._getCell(nRow, nCol);
+				ws.workbook.dependencyFormulas.deleteMasterNodes(ws.getId(), cell.getName());
                 cell.setFormula(sFormula);
-                cell.formulaParsed.setFormula(sFormula);
 				addToArrRecalc(ws.workbook, ws.getId(), cell.getName());
-                ws.workbook.needRecalc[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
-                if( ws.workbook.needRecalc.length < 0) ws.workbook.needRecalc.length = 0;
-                ws.workbook.needRecalc.length++;
+                ws.workbook.needRecalc2.nodes[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
+                ws.workbook.needRecalc2.nodesLength++;
             }
         }
 		else if(historyitem_Worksheet_ColProp == Type)
