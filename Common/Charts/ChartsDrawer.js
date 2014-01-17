@@ -2932,10 +2932,10 @@ drawScatterChart.prototype =
 			
 			for(var k = 1; k < this.paths.series[i].length; k++)
 			{
-				markerBrush = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.brush;
-				markerPen = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.pen;
+				brush = this.chartProp.series[i].brush;
+				pen = this.chartProp.series[i].pen;
 				//draw line
-				this._drawPath(this.paths.series[i][k], markerBrush, markerPen, true);
+				this._drawPath(this.paths.series[i][k], brush, pen, true);
 				
 				//draw point
 				if(k == 1)
