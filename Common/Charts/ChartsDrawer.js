@@ -85,6 +85,10 @@ CChartsDrawer.prototype =
 	_calculateProperties: function(chartProp)
 	{
 		this.calcProp.pxToMM = 1/chartProp.convertPixToMM(1);
+		
+		this.calcProp.pathH = 1000000000;
+		this.calcProp.pathW = 1000000000;
+		
 		var typeChart = chartProp.chart.plotArea.chart.getObjectType();
 		
 		switch ( typeChart )
@@ -419,6 +423,7 @@ CChartsDrawer.prototype =
 		var min = 0; 
 		var minY = 0;
 		var maxY = 0;
+		var newArr;
 		
 		var series = chart.chart.plotArea.chart.series;
 		if(series && series.length != 0 && this.calcProp.type != 'Scatter')//берём данные из NumCache
@@ -2137,14 +2142,24 @@ drawBarChart.prototype =
 	_calculateRect : function(x, y, w, h)
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
 		
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x/pxToMm, (y - h)/pxToMm);
-		path.lnTo((x + w)/pxToMm, (y - h)/pxToMm);
-		path.lnTo((x + w)/pxToMm, y/pxToMm);
-		path.lnTo(x/pxToMm, y/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, (y - h) / pxToMm * pathH);
+		path.lnTo((x + w) / pxToMm * pathW, (y - h) / pxToMm * pathH);
+		path.lnTo((x + w) / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
 		return path;
 	}, 
@@ -2290,10 +2305,20 @@ drawLineChart.prototype =
 	_calculateLine : function(x, y, x1, y1)
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x1/pxToMm, y1/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
 		return path;
 	},
@@ -2456,13 +2481,23 @@ drawAreaChart.prototype =
 	_calculateLine : function(x, y, x1, y1)
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x1/pxToMm, y1/pxToMm);
-		path.lnTo(x1/pxToMm, this.chartProp.nullPositionOX/pxToMm);
-		path.lnTo(x/pxToMm, this.chartProp.nullPositionOX/pxToMm);
-		path.lnTo(x/pxToMm, y/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, this.chartProp.nullPositionOX / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
 		return path;
 	},
@@ -2637,14 +2672,23 @@ drawHBarChart.prototype =
 	{
 		var path  = new Path();
 		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
 		
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x/pxToMm, (y - h)/pxToMm);
-		path.lnTo((x + w)/pxToMm, (y - h)/pxToMm);
-		path.lnTo((x + w)/pxToMm, y/pxToMm);
-		path.lnTo(x/pxToMm, y/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, (y - h) / pxToMm * pathH);
+		path.lnTo((x + w) / pxToMm * pathW, (y - h) / pxToMm * pathH);
+		path.lnTo((x + w) / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
 		return path;
 	},
@@ -2663,8 +2707,6 @@ drawHBarChart.prototype =
 //*****PIE CHART*****
 function drawPieChart()
 {
-	this.pathH = 1000000000;
-	this.pathW = 1000000000;
 	this.tempAngle = null;
 	this.paths = {};
 }
@@ -2742,22 +2784,26 @@ drawPieChart.prototype =
 	_calculateArc : function(radius, stAng, swAng, xCenter, yCenter)
 	{	
 		var path  = new Path();
-		path.pathH = this.pathH;
-		path.pathW = this.pathW;
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
 		
 		var pxToMm = this.chartProp.pxToMM;
 		
 		var x0 = xCenter + radius*Math.cos(stAng);
 		var y0 = yCenter - radius*Math.sin(stAng);
 		
-		path.moveTo(xCenter/pxToMm*this.pathW, yCenter/pxToMm*this.pathH);
-		path.lnTo(x0/pxToMm*this.pathW, y0/pxToMm*this.pathH);
-		path.arcTo(radius/pxToMm*this.pathW, radius/pxToMm*this.pathH, -1*stAng*cToDeg, -1*swAng*cToDeg);
-		path.lnTo(xCenter/pxToMm*this.pathW, yCenter/pxToMm*this.pathH);
+		path.moveTo(xCenter  /pxToMm * pathW, yCenter / pxToMm * pathH);
+		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.arcTo(radius / pxToMm * pathW, radius / pxToMm * pathH, -1 * stAng*cToDeg, -1 * swAng*cToDeg);
+		path.lnTo(xCenter / pxToMm * pathW, yCenter / pxToMm * pathH);
 
-		gdLst = [];
-		gdLst["w"] = 1;
-		gdLst["h"] = 1;
 		path.recalculate(gdLst);
 		return path;	
 	},
@@ -2918,18 +2964,38 @@ drawScatterChart.prototype =
 	_calculateLine: function(x, y, x1, y1)
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x1/pxToMm, y1/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathH, y / pxToMm * pathW);
+		path.lnTo(x1 / pxToMm * pathH, y1 / pxToMm * pathW);
+		path.recalculate(gdLst);
 		
 		return path;
 	},
 	
 	_calculatePoint: function(x, y, size, symbol)
 	{
+		size = size / 0.76;
 		var halfSize = size/2;
 		var path  = new Path();
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var framePaths = null;
 		
 		var pxToMm = this.chartProp.pxToMM;
@@ -2942,77 +3008,77 @@ drawScatterChart.prototype =
 		{
 			case SYMBOL_DASH:
 			{
-				path.moveTo((x - halfSize) / pxToMm, y / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, y / pxToMm);
+				path.moveTo((x - halfSize) / pxToMm * pathW, y / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, y / pxToMm * pathW);
 				break;
 			}
 			case SYMBOL_DOT:
 			{
-				path.moveTo((x - halfSize / 2) / pxToMm, y / pxToMm);
-				path.lnTo((x + halfSize / 2) / pxToMm, y / pxToMm);
+				path.moveTo((x - halfSize / 2) / pxToMm * pathW, y / pxToMm * pathW);
+				path.lnTo((x + halfSize / 2) / pxToMm * pathW, y / pxToMm * pathW);
 				break;
 			}
 			
 			case SYMBOL_PLUS:
 			{
-				path.moveTo(x / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo(x / pxToMm, (y  - halfSize) / pxToMm);
-				path.moveTo((x - halfSize) / pxToMm, y / pxToMm);
-				path.lnTo((x  + halfSize) / pxToMm, y / pxToMm);
+				path.moveTo(x / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.moveTo((x - halfSize) / pxToMm * pathW, y / pxToMm * pathW);
+				path.lnTo((x  + halfSize) / pxToMm * pathW, y / pxToMm * pathW);
 				break;
 			}
 			
 			case SYMBOL_CIRCLE:
 			{
-				path.arcTo(halfSize / pxToMm, halfSize / pxToMm, 0, Math.PI * 2);
+				path.arcTo(halfSize / pxToMm * pathW, halfSize / pxToMm * pathW, 0, Math.PI * 2);
 				break;
 			}
 			
 			case SYMBOL_STAR:
 			{
-				path.moveTo((x - halfSize) / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, (y  - halfSize) / pxToMm);
-				path.moveTo((x + halfSize) / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo((x  - halfSize) / pxToMm, (y  - halfSize) / pxToMm);
-				path.moveTo(x / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo(x / pxToMm, (y  - halfSize) / pxToMm);
+				path.moveTo((x - halfSize) / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.moveTo((x + halfSize) / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo((x  - halfSize) / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.moveTo(x / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
 				break;
 			}
 			
 			case SYMBOL_X:
 			{
-				path.moveTo((x - halfSize) / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, (y  - halfSize) / pxToMm);
-				path.moveTo((x + halfSize) / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo((x  - halfSize) / pxToMm, (y  - halfSize) / pxToMm);
+				path.moveTo((x - halfSize) / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.moveTo((x + halfSize) / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo((x  - halfSize) / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
 				break;
 			}
 			
 			case SYMBOL_TRIANGLE:
 			{
-				path.moveTo((x - halfSize * (Math.sqrt(3)/2)) / pxToMm, (y  + halfSize * 0.5) / pxToMm);
-				path.lnTo(x / pxToMm, (y  - halfSize) / pxToMm);
-				path.lnTo((x + halfSize * (Math.sqrt(3)/2)) / pxToMm, (y  + halfSize * 0.5) / pxToMm);
-				path.lnTo((x - halfSize * Math.sqrt(3)/2) / pxToMm, (y  + halfSize * 0.5) / pxToMm);
+				path.moveTo((x - halfSize * (Math.sqrt(3)/2)) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize * (Math.sqrt(3)/2)) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
+				path.lnTo((x - halfSize * Math.sqrt(3)/2) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
 				break;
 			}
 			
 			case SYMBOL_SQUARE:
 			{
-				path.moveTo((x - halfSize) / pxToMm, (y + halfSize) / pxToMm);
-				path.lnTo((x - halfSize) / pxToMm, (y - halfSize) / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, (y - halfSize) / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, (y + halfSize) / pxToMm);
-				path.lnTo((x - halfSize) / pxToMm, (y + halfSize) / pxToMm);
+				path.moveTo((x - halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
+				path.lnTo((x - halfSize) / pxToMm * pathW, (y - halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, (y - halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
+				path.lnTo((x - halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
 			}
 			
 			case SYMBOL_DIAMOND:
 			{
-				path.moveTo((x - halfSize) / pxToMm, y / pxToMm);
-				path.lnTo(x / pxToMm, (y  - halfSize) / pxToMm);
-				path.lnTo((x + halfSize) / pxToMm, y / pxToMm);
-				path.lnTo(x / pxToMm, (y  + halfSize) / pxToMm);
-				path.lnTo((x - halfSize) / pxToMm, y / pxToMm);
+				path.moveTo((x - halfSize) / pxToMm * pathW, y / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
+				path.lnTo((x + halfSize) / pxToMm * pathW, y / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  + halfSize) / pxToMm * pathW);
+				path.lnTo((x - halfSize) / pxToMm * pathW, y / pxToMm * pathW);
 				break;
 			}
 		}
@@ -3020,16 +3086,16 @@ drawScatterChart.prototype =
 		if(symbol == "Plus" || symbol == "Star" || symbol == "X")
 		{
 			framePaths = new Path();
-			framePaths.moveTo((x - halfSize) / pxToMm, (y + halfSize) / pxToMm);
-			framePaths.lnTo((x - halfSize) / pxToMm, (y - halfSize) / pxToMm);
-			framePaths.lnTo((x + halfSize) / pxToMm, (y - halfSize) / pxToMm);
-			framePaths.lnTo((x + halfSize) / pxToMm, (y + halfSize) / pxToMm);
-			framePaths.lnTo((x - halfSize) / pxToMm, (y + halfSize) / pxToMm);
+			framePaths.moveTo((x - halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
+			framePaths.lnTo((x - halfSize) / pxToMm * pathW, (y - halfSize) / pxToMm * pathW);
+			framePaths.lnTo((x + halfSize) / pxToMm * pathW, (y - halfSize) / pxToMm * pathW);
+			framePaths.lnTo((x + halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
+			framePaths.lnTo((x - halfSize) / pxToMm * pathW, (y + halfSize) / pxToMm * pathW);
 		}
 		
-		path.recalculate([]);
+		path.recalculate(gdLst);
 		if(framePaths)
-			framePaths.recalculate([]);
+			framePaths.recalculate(gdLst);
 		result = {framePaths: framePaths, path: path};
 		
 		return result;
@@ -3111,11 +3177,21 @@ gridChart.prototype =
 	_calculateLine: function(x, y, x1, y1)
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		path.stroke = true;
 		var pxToMm = this.chartProp.pxToMM;
-		path.moveTo(x/pxToMm, y/pxToMm);
-		path.lnTo(x1/pxToMm, y1/pxToMm);
-		path.recalculate([]);
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
 		
 		return path;
 	},
@@ -3186,15 +3262,25 @@ areaChart.prototype =
 	_calculateArea: function()
 	{
 		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
 		var pxToMm = this.chartProp.pxToMM;
 		
 		path.moveTo(0, 0);
-		path.lnTo(0/pxToMm, this.chartProp.heightCanvas/pxToMm);
-		path.lnTo(this.chartProp.widthCanvas/pxToMm, this.chartProp.heightCanvas/pxToMm);
-		path.lnTo(this.chartProp.widthCanvas/pxToMm, 0/pxToMm);
+		path.lnTo(0 / pxToMm * pathW, this.chartProp.heightCanvas / pxToMm * pathH);
+		path.lnTo(this.chartProp.widthCanvas / pxToMm * pathW, this.chartProp.heightCanvas / pxToMm * pathH);
+		path.lnTo(this.chartProp.widthCanvas / pxToMm * pathW, 0 / pxToMm * pathH);
 		path.lnTo(0, 0);
 		
-		path.recalculate([]);
+		path.recalculate(gdLst);
 		this.paths = path;
 	},
 	
