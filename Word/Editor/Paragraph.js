@@ -75,6 +75,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         ContentPos  : 0,  // Ближайшая позиция в контенте (между элементами)
         ContentPos2 : -1, // Реальный элемент
         Line        : -1,
+        Range       : -1,
         RealX       : 0, // позиция курсора, без учета расположения букв
         RealY       : 0, // это актуально для клавиш вверх и вниз
         PagesPos    : 0  // позиция в массиве this.Pages
@@ -725,6 +726,13 @@ Paragraph.prototype =
     {
         // Сначала определим строку и отрезок
         var ParaPos = this.Content[this.CurPos.ContentPos].Get_CurrentParaPos();
+
+        if ( -1 !== this.CurPos.Line )
+        {
+            ParaPos.Line  = this.CurPos.Line;
+            ParaPos.Range = this.CurPos.Range;
+        }
+
         var CurLine = ParaPos.Line;
 
         // Определим страницу
@@ -739,10 +747,25 @@ Paragraph.prototype =
             }
         }
 
-        if ( -1 !== this.CurPos.Line )
+        return ParaPos;
+    },
+
+    Get_ParaPosByContentPos : function(ContentPos)
+    {
+        // Сначала определим строку и отрезок
+        var ParaPos = this.Content[ContentPos.Get(0)].Get_ParaPosByContentPos(ContentPos, 1);
+        var CurLine = ParaPos.Line;
+
+        // Определим страницу
+        var PagesCount = this.Pages.length;
+        for ( var CurPage = PagesCount - 1; CurPage >= 0; CurPage-- )
         {
-            // TODO: разобраться с Range
-            ParaPos.Line = this.CurPos.Line;
+            var Page = this.Pages[CurPage];
+            if ( CurLine >= Page.StartLine && CurLine <= Page.EndLine )
+            {
+                ParaPos.Page = CurPage;
+                return ParaPos;
+            }
         }
 
         return ParaPos;
@@ -4555,6 +4578,13 @@ Paragraph.prototype =
             var CurRange = LinePos.Range;
             var CurPage  = LinePos.Page;
 
+            // Если в текущей позиции явно указана строка
+            if ( -1 != this.CurPos.Line )
+            {
+                CurLine  = this.CurPos.Line;
+                CurRange = this.CurPos.Range;
+            }
+
             var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
             var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
 
@@ -5022,6 +5052,9 @@ Paragraph.prototype =
         if ( recalcresult_NextElement !== RecalcResultAlign )
             return false;
 
+        // Во время пересчета сбрасываем привязку курсора к строке.
+        this.CurPos.Line = -1;
+
         return true;
     },
 
@@ -5135,6 +5168,9 @@ Paragraph.prototype =
         }
         else
         {
+            // Во время пересчета сбрасываем привязку курсора к строке.
+            this.CurPos.Line = -1;
+
             var CurPage = _PageIndex - this.PageNum;
             var RecalcResult = this.Recalculate_Page__( CurPage );
 
@@ -8200,10 +8236,28 @@ Paragraph.prototype =
 
     // Корректируем позицию курсора:
     // Если курсор находится в начале какого-либо рана, тогда мы его двигаем в конец предыдущего рана
-    Correct_ContentPos : function()
+    Correct_ContentPos : function(CorrectEndLinePos)
     {
+        var Count  = this.Content.length;
         var CurPos = this.CurPos.ContentPos;
-        while ( CurPos > 0 && true === this.Content[CurPos].Cursor_Is_Start() )
+
+        // Если курсор попадает на конец строки, тогда мы его переносим в начало следующей
+        if ( true === CorrectEndLinePos && true === this.Content[CurPos].Cursor_Is_End() )
+        {
+            var _CurPos = CurPos + 1;
+
+            // Пропускаем пустые раны
+            while ( true === this.Content[_CurPos].Is_Empty(true) && _CurPos < Count )
+                _CurPos++;
+
+            if ( _CurPos < Count && true === this.Content[_CurPos].Is_StartFromNewLine() )
+            {
+                CurPos = _CurPos;
+                this.Content[CurPos].Cursor_MoveToStartPos();
+            }
+        }
+
+        while ( CurPos > 0 && true === this.Content[CurPos].Cursor_Is_NeededCorrectPos() )
         {
             CurPos--;
             this.Content[CurPos].Cursor_MoveToEndPos();
@@ -8225,7 +8279,7 @@ Paragraph.prototype =
         return ContentPos;
     },
 
-    Set_ParaContentPos : function(ContentPos, bSelection, bStart)
+    Set_ParaContentPos : function(ContentPos, bSelection, bStart, Line, CorrectEndLinePos)
     {
         var Pos = ContentPos.Get(0);
         if ( true === bSelection )
@@ -8245,8 +8299,103 @@ Paragraph.prototype =
         {
             this.CurPos.ContentPos = Pos;
             this.Content[Pos].Set_ParaContentPos( ContentPos, 1, bSelection, bStart );
-            this.Correct_ContentPos();
+            this.Correct_ContentPos(CorrectEndLinePos);
+
+            this.CurPos.Line  = Line;
+            this.CurPos.Range = 0;
         }
+    },
+
+    Get_ParaContentPosByXY : function(X, Y, PageNum, bYLine)
+    {
+        var SearchPos = new CParagraphSearchPosXY();
+
+        if ( this.Lines.length <= 0 )
+            return SearchPos;
+
+        // Определим страницу
+        var PNum = ( PageNum === -1 || undefined === PageNum ? 0 : PageNum - this.PageNum );
+
+        // Сначала определим на какую строку мы попали
+        if ( PNum >= this.Pages.length )
+        {
+            PNum   = this.Pages.length - 1;
+            bYLine = true;
+            Y      = this.Lines.length - 1;
+        }
+        else if ( PNum < 0 )
+        {
+            PNum   = 0;
+            bYLine = true;
+            Y      = 0;
+        }
+
+        var CurLine = 0;
+        if ( true === bYLine )
+            CurLine = Y;
+        else
+        {
+            CurLine  = this.Pages[PNum].FirstLine;
+
+            var bFindY   = false;
+            var CurLineY = this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
+            var LastLine = ( PNum >= this.Pages.length - 1 ? this.Lines.length - 1 : this.Pages[PNum + 1].FirstLine - 1 );
+
+            while ( !bFindY )
+            {
+                if ( Y < CurLineY )
+                    break;
+                if ( CurLine >= LastLine )
+                    break;
+
+                CurLine++;
+                CurLineY = this.Lines[CurLine].Y + this.Pages[PNum].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
+            }
+        }
+
+        // Определим отрезок, в который мы попадаем
+        var CurRange = 0;
+        var RangesCount = this.Lines[CurLine].Ranges.length;
+        for ( ; CurRange < RangesCount; CurRange++ )
+        {
+            var _Range = this.Lines[CurLine].Ranges[CurRange];
+            if ( X < _Range.XEnd )
+                break;
+        }
+
+        if ( CurRange >= RangesCount )
+            CurRange = Math.max(RangesCount - 1, 0);
+
+        // Определим уже непосредственно позицию, куда мы попадаем
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        SearchPos.CurX = Range.XVisible;
+        SearchPos.X    = X;
+
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            if ( true === Item.Get_ParaContentPosByXY( SearchPos, 1, CurLine, CurRange ) )
+                SearchPos.Pos.Update( CurPos, 0 );
+        }
+
+        // По Х попали в какой-то элемент, проверяем по Y
+        if ( true === SearchPos.InText && Y >= this.Pages[PNum].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent - 0.01 && Y <= this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap + 0.01 )
+            SearchPos.InText = true;
+        else
+            SearchPos.InText = false;
+
+        if ( SearchPos.NumberingDiffX <= SearchPos.DiffX )
+            SearchPos.Numbering = true;
+        else
+            SearchPos.Numbering = false;
+
+        SearchPos.Line = CurLine;
+
+        return SearchPos;
     },
 
     Cursor_GetPos : function()
@@ -8281,6 +8430,7 @@ Paragraph.prototype =
         }
         else
         {
+            var Result = true;
             if ( true === this.Selection.Use )
             {
 
@@ -8303,15 +8453,22 @@ Paragraph.prototype =
 
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, false, false );
-                        return true;
+                        this.Set_ParaContentPos( SearchPos.Pos, false, false, -1, true );
+                        Result = true;
                     }
                     else
                     {
-                        return false;
+                        Result = false;
                     }
                 }
             }
+
+            this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
+
+            this.CurPos.RealX = this.CurPos.X;
+            this.CurPos.RealY = this.CurPos.Y;
+
+            return Result;
         }
     },
 
@@ -8342,6 +8499,8 @@ Paragraph.prototype =
         }
         else
         {
+            var Result = true;
+
             if ( true === this.Selection.Use )
             {
 
@@ -8364,14 +8523,77 @@ Paragraph.prototype =
 
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, false, false );
-                        return true;
+                        this.Set_ParaContentPos( SearchPos.Pos, false, false, -1, true );
+                        Result = true;
                     }
                     else
                     {
-                        return false;
+                        Result = false;
                     }
                 }
+            }
+
+            this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
+
+            this.CurPos.RealX = this.CurPos.X;
+            this.CurPos.RealY = this.CurPos.Y;
+
+            return Result;
+        }
+    },
+
+    Cursor_MoveAt : function(X,Y, bLine, bDontChangeRealPos, PageNum)
+    {
+        if ( true !== Debug_ParaRunMode )
+        {
+            var TempPos = this.Internal_GetContentPosByXY( X, Y, bLine, PageNum );
+            var Pos  = TempPos.Pos;
+            var Line = TempPos.Line;
+
+            if ( undefined !== this.Content[TempPos.Pos2] && para_Math === this.Content[TempPos.Pos2].Type )
+            {
+                this.Content[TempPos.Pos2].Cursor_MoveAt( X, Y );
+                this.CurPos.ContentPos2 = TempPos.Pos2;
+            }
+            else
+                this.CurPos.ContentPos2 = -1;
+
+            if ( -1 != Pos )
+            {
+                this.Set_ContentPos( Pos, true, Line );
+            }
+
+            this.Internal_Recalculate_CurPos(Pos, false, false, false );
+
+            if ( bDontChangeRealPos != true )
+            {
+                this.CurPos.RealX = this.CurPos.X;
+                this.CurPos.RealY = this.CurPos.Y;
+            }
+
+            if ( true != bLine )
+            {
+                this.CurPos.RealX = X;
+                this.CurPos.RealY = Y;
+            }
+        }
+        else
+        {
+            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, bLine );
+
+            this.Set_ParaContentPos( SearchPosXY.Pos, false, false, SearchPosXY.Line, false );
+            this.Internal_Recalculate_CurPos(-1, false, false, false );
+
+            if ( bDontChangeRealPos != true )
+            {
+                this.CurPos.RealX = this.CurPos.X;
+                this.CurPos.RealY = this.CurPos.Y;
+            }
+
+            if ( true != bLine )
+            {
+                this.CurPos.RealX = X;
+                this.CurPos.RealY = Y;
             }
         }
     },
@@ -8503,28 +8725,149 @@ Paragraph.prototype =
         }
     },
 
+    Get_EndRangePos : function(SearchPos, ContentPos)
+    {
+        var LinePos = this.Get_ParaPosByContentPos(ContentPos);
+
+        var CurLine  = LinePos.Line;
+        var CurRange = LinePos.Range;
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        SearchPos.Line = CurLine;
+
+        // Ищем в данном отрезке
+        for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            if ( true === Item.Get_EndRangePos( CurLine, CurRange, SearchPos, 1 ) )
+                SearchPos.Pos.Update( CurPos, 0 );
+        }
+    },
+
+    Get_StartRangePos : function(SearchPos, ContentPos)
+    {
+        var LinePos = this.Get_ParaPosByContentPos(ContentPos);
+
+        var CurLine  = LinePos.Line;
+        var CurRange = LinePos.Range;
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        SearchPos.Line = CurLine;
+
+        // Ищем в данном отрезке
+        for ( var CurPos = EndPos; CurPos >= StartPos; CurPos-- )
+        {
+            var Item = this.Content[CurPos];
+
+            if ( true === Item.Get_StartRangePos( CurLine, CurRange, SearchPos, 1 ) )
+                SearchPos.Pos.Update( CurPos, 0 );
+        }
+    },
+
     Cursor_MoveUp : function(Count, AddToSelect)
     {
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
-
-        if ( this.CurPos.ContentPos < 0 )
-            return false;
-
-        if ( !Count || 0 == Count )
-            return;
-
-        var absCount = ( Count < 0 ? -Count : Count );
-
-        // Пока сделаем для Count = 1
-        var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-        var Result = true;
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === AddToSelect )
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( !Count || 0 == Count )
+                return;
+
+            var absCount = ( Count < 0 ? -Count : Count );
+
+            // Пока сделаем для Count = 1
+            var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+            var Result = true;
+            if ( true === this.Selection.Use )
             {
-                this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+                if ( true === AddToSelect )
+                {
+                    this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+
+                    // Пока сделаем для Count = 1
+                    CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealY = this.CurPos.Y;
+
+                    if ( 0 == CurLine )
+                    {
+                        // Переходим в предыдущий элеменет документа
+                        Result = false;
+                        this.Selection.EndPos = this.Internal_GetStartPos();
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
+                        this.CurPos.RealY = this.CurPos.Y;
+                        this.Selection.EndPos = this.CurPos.ContentPos;
+                    }
+
+                    if ( this.Selection.StartPos == this.Selection.EndPos )
+                    {
+                        this.Selection_Remove();
+                        this.Selection.Use = false;
+
+                        this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                        this.RecalculateCurPos();
+
+                        return Result;
+                    }
+                }
+                else
+                {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos   = this.Selection.EndPos;
+
+                    if ( StartPos > EndPos )
+                    {
+                        var Temp = EndPos;
+                        EndPos   = StartPos;
+                        StartPos = Temp;
+                    }
+
+                    this.Set_ContentPos( StartPos, true, -1 );
+                    this.CurPos.ContentPos2 = -1;
+
+                    this.Selection_Remove();
+
+                    // Пока сделаем для Count = 1
+                    CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+                    this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+
+                    if ( 0 == CurLine )
+                    {
+                        // Переходим в предыдущий элеменет документа
+                        Result = false;
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
+                        this.CurPos.RealX = this.CurPos.X;
+                        this.CurPos.RealY = this.CurPos.Y;
+                    }
+
+                }
+            }
+            else if ( true === AddToSelect )
+            {
+                this.Selection.Use = true;
+                this.Selection.StartPos = this.CurPos.ContentPos;
 
                 // Пока сделаем для Count = 1
                 CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
@@ -8558,134 +8901,168 @@ Paragraph.prototype =
             }
             else
             {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-
-                if ( StartPos > EndPos )
+                var CurPos2     = this.CurPos.ContentPos2;
+                var MathElement = this.Content[CurPos2];
+                if ( undefined !== MathElement && para_Math === MathElement.Type )
                 {
-                    var Temp = EndPos;
-                    EndPos   = StartPos;
-                    StartPos = Temp;
+                    if ( true === MathElement.Cursor_MoveUp(false) )
+                    {
+                        if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                            this.Internal_SelectMath( CurPos2 );
+
+                        return true;
+                    }
+                    else
+                    {
+                        this.CurPos.ContentPos2 = -1;
+                    }
                 }
-
-                this.Set_ContentPos( StartPos, true, -1 );
-                this.CurPos.ContentPos2 = -1;
-
-                this.Selection_Remove();
-
-                // Пока сделаем для Count = 1
-                CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-                this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
-                this.CurPos.RealX = this.CurPos.X;
-                this.CurPos.RealY = this.CurPos.Y;
 
                 if ( 0 == CurLine )
                 {
-                    // Переходим в предыдущий элеменет документа
-                    Result = false;
+                    // Возвращяем значение false, это означает, что надо перейти в
+                    // предыдущий элемент контента документа.
+                    return false;
                 }
                 else
                 {
                     this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
-                    this.CurPos.RealX = this.CurPos.X;
                     this.CurPos.RealY = this.CurPos.Y;
                 }
-
-            }
-        }
-        else if ( true === AddToSelect )
-        {
-            this.Selection.Use = true;
-            this.Selection.StartPos = this.CurPos.ContentPos;
-
-            // Пока сделаем для Count = 1
-            CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-            this.RecalculateCurPos();
-            this.CurPos.RealY = this.CurPos.Y;
-
-            if ( 0 == CurLine )
-            {
-                // Переходим в предыдущий элеменет документа
-                Result = false;
-                this.Selection.EndPos = this.Internal_GetStartPos();
-            }
-            else
-            {
-                this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
-                this.CurPos.RealY = this.CurPos.Y;
-                this.Selection.EndPos = this.CurPos.ContentPos;
             }
 
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
-                this.RecalculateCurPos();
-
-                return Result;
-            }
+            return Result;
         }
         else
         {
-            var CurPos2     = this.CurPos.ContentPos2;
-            var MathElement = this.Content[CurPos2];
-            if ( undefined !== MathElement && para_Math === MathElement.Type )
-            {
-                if ( true === MathElement.Cursor_MoveUp(false) )
-                {
-                    if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
-                        this.Internal_SelectMath( CurPos2 );
+            var LinePos = this.Get_CurrentParaPos();
+            var CurLine = LinePos.Line;
 
-                    return true;
-                }
-                else
-                {
-                    this.CurPos.ContentPos2 = -1;
-                }
-            }
-
-            if ( 0 == CurLine )
+            var Result = true;
+            if ( true === this.Selection.Use )
             {
-                // Возвращяем значение false, это означает, что надо перейти в
-                // предыдущий элемент контента документа.
-                return false;
+
             }
             else
             {
-                this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
-                this.CurPos.RealY = this.CurPos.Y;
-            }
-        }
+                if ( true === AddToSelect )
+                {
 
-        return Result;
+                }
+                else
+                {
+                    if ( 0 == CurLine )
+                    {
+                        // Возвращяем значение false, это означает, что надо перейти в
+                        // предыдущий элемент контента документа.
+                        return false;
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine - 1, true, true );
+                    }
+                }
+            }
+
+            return Result;
+        }
     },
 
     Cursor_MoveDown : function(Count, AddToSelect)
     {
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
-
-        if ( this.CurPos.ContentPos < 0 )
-            return false;
-
-        if ( !Count || 0 == Count )
-            return;
-
-        var absCount = ( Count < 0 ? -Count : Count );
-
-        // Пока сделаем для Count = 1
-        var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-        var Result = true;
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === AddToSelect )
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( !Count || 0 == Count )
+                return;
+
+            var absCount = ( Count < 0 ? -Count : Count );
+
+            // Пока сделаем для Count = 1
+            var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+            var Result = true;
+            if ( true === this.Selection.Use )
             {
-                this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+                if ( true === AddToSelect )
+                {
+                    this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+
+                    // Пока сделаем для Count = 1
+                    CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealY = this.CurPos.Y;
+
+                    if ( this.Lines.length - 1 == CurLine )
+                    {
+                        // Переходим в предыдущий элеменет документа
+                        Result = false;
+                        this.Selection.EndPos = this.Content.length - 1;
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
+                        this.CurPos.RealY = this.CurPos.Y;
+                        this.Selection.EndPos = this.CurPos.ContentPos;
+                    }
+
+                    if ( this.Selection.StartPos == this.Selection.EndPos )
+                    {
+                        this.Selection_Remove();
+                        this.Selection.Use = false;
+
+                        this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                        this.RecalculateCurPos();
+
+                        return Result;
+                    }
+                }
+                else
+                {
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos   = this.Selection.EndPos;
+
+                    if ( StartPos > EndPos )
+                    {
+                        var Temp = EndPos;
+                        EndPos   = StartPos;
+                        StartPos = Temp;
+                    }
+
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ), true, -1 );
+                    this.Selection_Remove();
+
+                    // Пока сделаем для Count = 1
+                    CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+
+                    this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+
+                    if ( this.Lines.length - 1 == CurLine )
+                    {
+                        // Переходим в предыдущий элеменет документа
+                        Result = false;
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
+                        this.CurPos.RealX = this.CurPos.X;
+                        this.CurPos.RealY = this.CurPos.Y;
+                    }
+
+                }
+            }
+            else if ( AddToSelect )
+            {
+                this.Selection.Use = true;
+                this.Selection.StartPos = this.CurPos.ContentPos;
 
                 // Пока сделаем для Count = 1
                 CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
@@ -8719,238 +9096,260 @@ Paragraph.prototype =
             }
             else
             {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-
-                if ( StartPos > EndPos )
+                var CurPos2     = this.CurPos.ContentPos2;
+                var MathElement = this.Content[CurPos2];
+                if ( undefined !== MathElement && para_Math === MathElement.Type )
                 {
-                    var Temp = EndPos;
-                    EndPos   = StartPos;
-                    StartPos = Temp;
+                    if ( true === MathElement.Cursor_MoveDown(false) )
+                    {
+                        if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
+                            this.Internal_SelectMath( CurPos2 );
+
+                        return true;
+                    }
+                    else
+                    {
+                        this.CurPos.ContentPos2 = -1;
+                    }
                 }
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ), true, -1 );
-                this.Selection_Remove();
-
-                // Пока сделаем для Count = 1
-                CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-                this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, false, false );
-                this.CurPos.RealX = this.CurPos.X;
-                this.CurPos.RealY = this.CurPos.Y;
 
                 if ( this.Lines.length - 1 == CurLine )
                 {
-                    // Переходим в предыдущий элеменет документа
-                    Result = false;
+                    // Возвращяем значение false, это означает, что надо перейти в
+                    // предыдущий элемент контента документа.
+                    return false;
                 }
                 else
                 {
                     this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
-                    this.CurPos.RealX = this.CurPos.X;
                     this.CurPos.RealY = this.CurPos.Y;
                 }
-
-            }
-        }
-        else if ( AddToSelect )
-        {
-            this.Selection.Use = true;
-            this.Selection.StartPos = this.CurPos.ContentPos;
-
-            // Пока сделаем для Count = 1
-            CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-
-            this.RecalculateCurPos();
-            this.CurPos.RealY = this.CurPos.Y;
-
-            if ( this.Lines.length - 1 == CurLine )
-            {
-                // Переходим в предыдущий элеменет документа
-                Result = false;
-                this.Selection.EndPos = this.Content.length - 1;
-            }
-            else
-            {
-                this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
-                this.CurPos.RealY = this.CurPos.Y;
-                this.Selection.EndPos = this.CurPos.ContentPos;
             }
 
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
-                this.RecalculateCurPos();
-
-                return Result;
-            }
+            return Result;
         }
         else
         {
-            var CurPos2     = this.CurPos.ContentPos2;
-            var MathElement = this.Content[CurPos2];
-            if ( undefined !== MathElement && para_Math === MathElement.Type )
-            {
-                if ( true === MathElement.Cursor_MoveDown(false) )
-                {
-                    if ( true === MathElement.Selection_IsUse() && false === MathElement.Selection_IsEmpty() )
-                        this.Internal_SelectMath( CurPos2 );
+            var LinePos = this.Get_CurrentParaPos();
+            var CurLine = LinePos.Line;
 
-                    return true;
-                }
-                else
-                {
-                    this.CurPos.ContentPos2 = -1;
-                }
-            }
-
-            if ( this.Lines.length - 1 == CurLine )
+            var Result = true;
+            if ( true === this.Selection.Use )
             {
-                // Возвращяем значение false, это означает, что надо перейти в
-                // предыдущий элемент контента документа.
-                return false;
+
             }
             else
             {
-                this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
-                this.CurPos.RealY = this.CurPos.Y;
-            }
-        }
+                if ( true === AddToSelect )
+                {
 
-        return Result;
+                }
+                else
+                {
+                    if ( this.Lines.length - 1 == CurLine )
+                    {
+                        // Возвращяем значение false, это означает, что надо перейти в
+                        // предыдущий элемент контента документа.
+                        return false;
+                    }
+                    else
+                    {
+                        this.Cursor_MoveAt( this.CurPos.RealX, CurLine + 1, true, true );
+                    }
+                }
+            }
+
+            return Result;
+        }
     },
 
     Cursor_MoveEndOfLine : function(AddToSelect)
     {
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
-
-        if ( this.CurPos.ContentPos < 0 )
-            return false;
-
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === AddToSelect )
-                this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( true === this.Selection.Use )
+            {
+                if ( true === AddToSelect )
+                    this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+                else
+                {
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, ( this.Selection.EndPos >= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos ) ) ), true, -1 );
+                    this.Selection_Remove();
+                }
+            }
+
+            var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+            var LineEndPos =  ( CurLine >= this.Lines.length - 1 ? this.Internal_GetEndPos() : this.Lines[CurLine + 1].StartPos - 1 );
+
+            if ( true === this.Selection.Use && true === AddToSelect )
+            {
+                this.Selection.EndPos = LineEndPos;
+
+                if ( this.Selection.StartPos == this.Selection.EndPos )
+                {
+                    this.Selection_Remove();
+                    this.Selection.Use = false;
+
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                    this.RecalculateCurPos();
+
+                    return;
+                }
+            }
+            else if ( AddToSelect )
+            {
+                this.Selection.StartPos = this.CurPos.ContentPos;
+                this.Selection.Use      = true;
+
+                this.Selection.EndPos = LineEndPos;
+
+                if ( this.Selection.StartPos == this.Selection.EndPos )
+                {
+                    this.Selection_Remove();
+                    this.Selection.Use = false;
+
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                    this.RecalculateCurPos();
+
+                    return;
+                }
+            }
             else
             {
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, ( this.Selection.EndPos >= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos ) ) ), true, -1 );
-                this.Selection_Remove();
-            }
-        }
+                this.Set_ContentPos( LineEndPos, true, -1 );
 
-        var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-        var LineEndPos =  ( CurLine >= this.Lines.length - 1 ? this.Internal_GetEndPos() : this.Lines[CurLine + 1].StartPos - 1 );
-
-        if ( true === this.Selection.Use && true === AddToSelect )
-        {
-            this.Selection.EndPos = LineEndPos;
-
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
                 this.RecalculateCurPos();
-
-                return;
-            }
-        }
-        else if ( AddToSelect )
-        {
-            this.Selection.StartPos = this.CurPos.ContentPos;
-            this.Selection.Use      = true;
-
-            this.Selection.EndPos = LineEndPos;
-
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
-                this.RecalculateCurPos();
-
-                return;
+                this.CurPos.RealX = this.CurPos.X;
+                this.CurPos.RealY = this.CurPos.Y;
             }
         }
         else
         {
-            this.Set_ContentPos( LineEndPos, true, -1 );
+            if ( true === this.Selection.Use )
+            {
 
-            this.RecalculateCurPos();
-            this.CurPos.RealX = this.CurPos.X;
-            this.CurPos.RealY = this.CurPos.Y;
+            }
+            else
+            {
+                if ( true === AddToSelect )
+                {
+
+                }
+                else
+                {
+                    var SearchPos  = new CParagraphSearchPos();
+                    var ContentPos = this.Get_ParaContentPos( false, false );
+
+                    this.Get_EndRangePos( SearchPos, ContentPos );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, false, SearchPos.Line, false );
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+                }
+            }
+
         }
     },
 
     Cursor_MoveStartOfLine : function(AddToSelect)
     {
-        var CursorPos_max = this.Internal_GetEndPos();
-        var CursorPos_min = this.Internal_GetStartPos();
-
-        if ( this.CurPos.ContentPos < 0 )
-            return false;
-
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === AddToSelect )
-                this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+            var CursorPos_max = this.Internal_GetEndPos();
+            var CursorPos_min = this.Internal_GetStartPos();
+
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( true === this.Selection.Use )
+            {
+                if ( true === AddToSelect )
+                    this.Set_ContentPos( this.Selection.EndPos, true, -1 );
+                else
+                {
+                    this.Set_ContentPos( ( this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ), true, -1 );
+                    this.Selection_Remove();
+                }
+            }
+
+            var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
+            var LineStartPos = this.Lines[CurLine].StartPos;
+
+            if ( true === this.Selection.Use && true === AddToSelect )
+            {
+                this.Selection.EndPos = LineStartPos;
+
+                if ( this.Selection.StartPos == this.Selection.EndPos )
+                {
+                    this.Selection_Remove();
+                    this.Selection.Use = false;
+
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                    this.RecalculateCurPos();
+
+                    return;
+                }
+            }
+            else if ( AddToSelect )
+            {
+                this.Selection.EndPos = LineStartPos;
+
+                this.Selection.StartPos = this.CurPos.ContentPos;
+                this.Selection.Use      = true;
+
+                if ( this.Selection.StartPos == this.Selection.EndPos )
+                {
+                    this.Selection_Remove();
+                    this.Selection.Use = false;
+
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
+                    this.RecalculateCurPos();
+
+                    return;
+                }
+            }
             else
             {
-                this.Set_ContentPos( ( this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ), true, -1 );
-                this.Selection_Remove();
-            }
-        }
+                this.Set_ContentPos( LineStartPos, true, -1 );
 
-        var CurLine = this.Internal_Get_ParaPos_By_Pos( this.CurPos.ContentPos).Line;
-        var LineStartPos = this.Lines[CurLine].StartPos;
-
-        if ( true === this.Selection.Use && true === AddToSelect )
-        {
-            this.Selection.EndPos = LineStartPos;
-
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
                 this.RecalculateCurPos();
+                this.CurPos.RealX = this.CurPos.X;
+                this.CurPos.RealY = this.CurPos.Y;
 
-                return;
-            }
-        }
-        else if ( AddToSelect )
-        {
-            this.Selection.EndPos = LineStartPos;
-
-            this.Selection.StartPos = this.CurPos.ContentPos;
-            this.Selection.Use      = true;
-
-            if ( this.Selection.StartPos == this.Selection.EndPos )
-            {
-                this.Selection_Remove();
-                this.Selection.Use = false;
-
-                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ), true, -1 );
-                this.RecalculateCurPos();
-
-                return;
             }
         }
         else
         {
-            this.Set_ContentPos( LineStartPos, true, -1 );
+            if ( true === this.Selection.Use )
+            {
 
-            this.RecalculateCurPos();
-            this.CurPos.RealX = this.CurPos.X;
-            this.CurPos.RealY = this.CurPos.Y;
+            }
+            else
+            {
+                if ( true === AddToSelect )
+                {
 
+                }
+                else
+                {
+                    var SearchPos  = new CParagraphSearchPos();
+                    var ContentPos = this.Get_ParaContentPos( false, false );
+
+                    this.Get_StartRangePos( SearchPos, ContentPos );
+                    this.Set_ParaContentPos( SearchPos.Pos, false, false, SearchPos.Line, false );
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+                }
+            }
         }
     },
 
@@ -9012,7 +9411,7 @@ Paragraph.prototype =
 
                 this.CurPos.ContentPos = 0;
                 this.Content[0].Cursor_MoveToStartPos();
-                this.Correct_ContentPos();
+                this.Correct_ContentPos(false);
             }
         }
     },
@@ -9075,7 +9474,7 @@ Paragraph.prototype =
 
                 this.CurPos.ContentPos = this.Content.length - 1;
                 this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
-                this.Correct_ContentPos();
+                this.Correct_ContentPos(false);
             }
         }
     },
@@ -10700,40 +11099,6 @@ Paragraph.prototype =
         }
 
         return null;
-    },
-
-    Cursor_MoveAt : function(X,Y, bLine, bDontChangeRealPos, PageNum)
-    {
-        var TempPos = this.Internal_GetContentPosByXY( X, Y, bLine, PageNum );
-        var Pos  = TempPos.Pos;
-        var Line = TempPos.Line;
-
-        if ( undefined !== this.Content[TempPos.Pos2] && para_Math === this.Content[TempPos.Pos2].Type )
-        {
-            this.Content[TempPos.Pos2].Cursor_MoveAt( X, Y );
-            this.CurPos.ContentPos2 = TempPos.Pos2;
-        }
-        else
-            this.CurPos.ContentPos2 = -1;
-
-        if ( -1 != Pos )
-        {
-            this.Set_ContentPos( Pos, true, Line );
-        }
-
-        this.Internal_Recalculate_CurPos(Pos, false, false, false );
-
-        if ( bDontChangeRealPos != true )
-        {
-            this.CurPos.RealX = this.CurPos.X;
-            this.CurPos.RealY = this.CurPos.Y;
-        }
-
-        if ( true != bLine )
-        {
-            this.CurPos.RealX = X;
-            this.CurPos.RealY = Y;
-        }
     },
 
     Selection_SetStart : function(X,Y,PageNum, bTableBorder)
@@ -17888,6 +18253,7 @@ function CParagraphSearchPos()
     this.Pos   = new CParagraphContentPos(); // Искомая позиция
     this.Found = false;                      // Нашли или нет
 
+    this.Line  = -1;
 
     this.Stage       = 0; // Номера этапов для поиска начала и конца слова
     this.Shift       = false;
@@ -17896,3 +18262,17 @@ function CParagraphSearchPos()
     this.UpdatePos   = false;
 }
 
+function CParagraphSearchPosXY()
+{
+    this.Pos = new CParagraphContentPos();
+
+    this.CurX           = 0;
+    this.X              = 0;
+    this.DiffX          = 1000000; // километра для ограничения должно хватить
+    this.NumberingDiffX = 1000000; // километра для ограничения должно хватить
+
+    this.Line      = 0;
+    this.InText    = false;
+    this.Numbering = false;
+    this.End       = false;
+}

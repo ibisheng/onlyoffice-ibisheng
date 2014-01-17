@@ -78,6 +78,41 @@ ParaRun.prototype =
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
 
+    // Проверяем пустой ли ран
+    Is_Empty : function(SkipAnchor)
+    {
+        var Count = this.Content.length;
+
+        if ( true !== SkipAnchor )
+        {
+            if ( Count > 0 )
+                return false;
+            else
+                return true;
+        }
+        else
+        {
+            for ( var CurPos = 0; CurPos < this.Content.length; CurPos++ )
+            {
+                var Item = this.Content[CurPos];
+
+                if ( para_Drawing !== Item.Type || false !== Item.Is_Inline()  )
+                    return false;
+            }
+
+            return true;
+        }
+    },
+
+    // Начинается ли данный ран с новой строки
+    Is_StartFromNewLine : function()
+    {
+        if ( this.LinesLength < 2 || 0 != this.Lines[1].Ranges[0].StartPos )
+            return false;
+
+        return true;
+    },
+
     // Добавляем элемент в текущую позицию
     Add : function(Item)
     {
@@ -259,8 +294,32 @@ ParaRun.prototype =
         return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
     },
 
+    Get_ParaPosByContentPos : function(ContentPos, Depth)
+    {
+        var Pos = ContentPos.Get(Depth);
+
+        var CurLine  = 0;
+        var CurRange = 0;
+
+        var LinesCount = this.LinesLength;
+        for ( ; CurLine < LinesCount; CurLine++ )
+        {
+            var RangesCount = this.Lines[CurLine].RangesLength;
+            for ( CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var Range = this.Lines[CurLine].Ranges[CurRange];
+                if ( Pos < Range.EndPos && Pos >= Range.StartPos )
+                    return new CParaPos( ( CurLine === 0 ? CurRange + this.StartRange : CurRange ), CurLine + this.StartLine, 0, 0 );
+            }
+        }
+
+        return new CParaPos( ( LinesCount === 1 ? this.Lines[0].RangesLength - 1 + this.StartRange : this.Lines[0].RangesLength - 1 ), LinesCount - 1 + this.StartLine, 0, 0 );
+    },
+
     Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
+        var Para = this.Paragraph;
+
         var CurLine  = _CurLine - this.StartLine;
         var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
 
@@ -314,8 +373,6 @@ ParaRun.prototype =
             if ( true === UpdateCurPos )
             {
                 // Обновляем позицию курсора в параграфе
-
-                var Para = this.Paragraph;
 
                 Para.CurPos.X        = _X;
                 Para.CurPos.Y        = Y;
@@ -2337,6 +2394,46 @@ ParaRun.prototype =
         return false;
     },
 
+    // Проверяем нужно ли поправить позицию курсора
+    Cursor_Is_NeededCorrectPos : function()
+    {
+        var NewRangeStart = false;
+        var RangeEnd      = false;
+
+        var Pos = this.State.ContentPos;
+
+        var LinesLen = this.LinesLength;
+        for ( var CurLine = 0; CurLine < LinesLen; CurLine++ )
+        {
+            var Line = this.Lines[CurLine];
+            var RangesLen = Line.RangesLength;
+            for ( var CurRange = 0; CurRange < RangesLen; CurRange++ )
+            {
+                var Range = Line.Ranges[CurRange];
+                if ( 0 !== CurLine || 0 !== CurRange )
+                {
+                    if ( Pos === Range.StartPos )
+                    {
+                        NewRangeStart = true;
+                    }
+                }
+
+                if ( Pos === Range.EndPos )
+                {
+                    RangeEnd = true;
+                }
+            }
+
+            if ( true === NewRangeStart )
+                break;
+        }
+
+        if ( true !== NewRangeStart && true !== RangeEnd && true === this.Cursor_Is_Start() )
+            return true;
+
+        return false;
+    },
+
     Cursor_Is_End : function()
     {
         if ( this.State.ContentPos >= this.Content.length )
@@ -2363,6 +2460,109 @@ ParaRun.prototype =
         }
 
         this.State.ContentPos = CurPos;
+    },
+
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange)
+    {
+        var Result = false;
+
+        var CurLine  = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+
+            var TempDx = 0;
+            var bCheck = false;
+
+            // TODO: Сделать поддержку нумерации
+
+//            if ( ItemNum === this.Numbering.Pos )
+//            {
+//                if ( para_Numbering === this.Numbering.Type )
+//                {
+//                    var NumberingItem = this.Numbering;
+//                    var NumPr = this.Numbering_Get();
+//                    var NumJc = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
+//
+//                    var NumX0 = CurX;
+//                    var NumX1 = CurX;
+//
+//                    switch( NumJc )
+//                    {
+//                        case align_Right:
+//                        {
+//                            NumX0 -= NumberingItem.WidthNum;
+//                            break;
+//                        }
+//                        case align_Center:
+//                        {
+//                            NumX0 -= NumberingItem.WidthNum / 2;
+//                            NumX1 += NumberingItem.WidthNum / 2;
+//                            break;
+//                        }
+//                        case align_Left:
+//                        default:
+//                        {
+//                            NumX1 += NumberingItem.WidthNum;
+//                            break;
+//                        }
+//                    }
+//
+//                    if ( X >= NumX0 && X <= NumX1 )
+//                        NumberingDiffX = 0;
+//                }
+//
+//                CurX += this.Numbering.WidthVisible;
+//
+//                if ( -1 != DiffPos )
+//                {
+//                    DiffX   = Math.abs( X - CurX );
+//                    DiffPos = ItemNum;
+//                }
+//            }
+
+            if ( para_Drawing != Item.Type || true === Item.Is_Inline() )
+            {
+                TempDx = Item.WidthVisible;
+            }
+
+            // Проверяем, попали ли мы в данный элемент
+            var Diff = SearchPos.X - SearchPos.CurX;
+            if ( Math.abs( Diff ) < SearchPos.DiffX + 0.001 )
+            {
+                SearchPos.DiffX = Math.abs( Diff );
+                SearchPos.Pos.Update( CurPos, Depth );
+                Result = true;
+
+                if ( Diff >= - 0.001 && Diff <= TempDx + 0.001 )
+                {
+                    SearchPos.InText = true;
+                }
+            }
+
+            // TODO: Сделать разруливование со строками
+//            if ( true != bEnd && ItemNum === this.Lines[CurLine].EndPos && X > CurX + TempDx && para_NewLine != Item.Type )
+//            {
+//                ResultLine = CurLine;
+//                DiffPos = ItemNum + 1;
+//            }
+
+            SearchPos.CurX += TempDx;
+
+            // Заглушка для знака параграфа
+            if ( para_End === Item.Type && Math.abs( SearchPos.X - SearchPos.CurX ) < SearchPos.DiffX )
+            {
+                SearchPos.End = true;
+            }
+        }
+
+        return Result;
     },
 
     Get_ParaContentPos : function(bSelection, bStart, ContentPos)
@@ -2622,6 +2822,62 @@ ParaRun.prototype =
             SearchPos.Pos.Update( CurPos, Depth );
             SearchPos.UpdatePos = true;
         }
+    },
+
+    Get_EndRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        var LastPos = -1;
+        for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
+        {
+            var Item = this.Content[CurPos];
+            if ( !((para_Drawing === Item.Type && true !== Item.Is_Inline) || para_End === Item.Type) )
+                LastPos = CurPos + 1;
+        }
+
+        // Проверяем, попал ли хоть один элемент в данный отрезок, если нет, тогда не регистрируем такой ран
+        if ( -1 !== LastPos )
+        {
+            SearchPos.Pos.Update( EndPos, Depth );
+            return true;
+        }
+        else
+            return false;
+    },
+
+    Get_StartRangePos : function(_CurLine, _CurRange, SearchPos, Depth)
+    {
+        var CurLine = _CurLine - this.StartLine;
+        var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+        var Range = this.Lines[CurLine].Ranges[CurRange];
+
+        var StartPos = Range.StartPos;
+        var EndPos   = Range.EndPos;
+
+        var FirstPos = -1;
+        for ( var CurPos = EndPos - 1; CurPos >= StartPos; CurPos-- )
+        {
+            var Item = this.Content[CurPos];
+            if ( !(para_Drawing === Item.Type && true !== Item.Is_Inline) )
+                FirstPos = CurPos;
+        }
+
+        // Проверяем, попал ли хоть один элемент в данный отрезок, если нет, тогда не регистрируем такой ран
+        if ( -1 !== FirstPos )
+        {
+            SearchPos.Pos.Update( FirstPos, Depth );
+            return true;
+        }
+        else
+            return false;
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
