@@ -2990,7 +2990,7 @@ drawScatterChart.prototype =
 		var pathH = this.chartProp.pathH;
 		var pathW = this.chartProp.pathW;
 		var gdLst = [];
-		
+
 		path.pathH = pathH;
 		path.pathW = pathW;
 		gdLst["w"] = 1;
@@ -3001,7 +3001,7 @@ drawScatterChart.prototype =
 		var pxToMm = this.chartProp.pxToMM;
 		var result;
 
-		/*var SYMBOL_NONE = 4;
+		/*
 		var SYMBOL_PICTURE = 5;*/
 
 		switch ( symbol )
@@ -3030,7 +3030,8 @@ drawScatterChart.prototype =
 			
 			case SYMBOL_CIRCLE:
 			{
-				path.arcTo(halfSize / pxToMm * pathW, halfSize / pxToMm * pathW, 0, Math.PI * 2);
+				path.moveTo((x + halfSize) / pxToMm * pathW, y / pxToMm * pathW);
+				path.arcTo(halfSize / pxToMm * pathW, halfSize / pxToMm * pathW, 0, Math.PI * 2 * cToDeg);
 				break;
 			}
 			
@@ -3056,10 +3057,10 @@ drawScatterChart.prototype =
 			
 			case SYMBOL_TRIANGLE:
 			{
-				path.moveTo((x - halfSize * (Math.sqrt(3)/2)) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
-				path.lnTo(x / pxToMm * pathW, (y  - halfSize) / pxToMm * pathW);
-				path.lnTo((x + halfSize * (Math.sqrt(3)/2)) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
-				path.lnTo((x - halfSize * Math.sqrt(3)/2) / pxToMm * pathW, (y  + halfSize * 0.5) / pxToMm * pathW);
+				path.moveTo((x - size/Math.sqrt(3)) / pxToMm * pathW, (y  + size/3) / pxToMm * pathW);
+				path.lnTo(x / pxToMm * pathW, (y  - (2/3)*size) / pxToMm * pathW);
+				path.lnTo((x + size/Math.sqrt(3)) / pxToMm * pathW, (y  + size/3) / pxToMm * pathW)
+				path.lnTo((x - size/Math.sqrt(3)) / pxToMm * pathW, (y  + size/3) / pxToMm * pathW);
 				break;
 			}
 			
