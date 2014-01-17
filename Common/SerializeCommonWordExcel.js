@@ -202,7 +202,7 @@ function BinaryCommonWriter(memory)
 			this.memory.WriteLong(color.getRgb());
 		}
     };
-};
+}
 function Binary_CommonReader(stream)
 {
     this.stream = stream;
@@ -366,190 +366,158 @@ function Binary_CommonReader(stream)
     }
 }
 /** @constructor */
-function FT_Stream2(data, size)
-{
+function FT_Stream2(data, size) {
     this.obj = null;
     this.data = data;
     this.size = size;
     this.pos = 0;
     this.cur = 0;
-
-    this.Seek = function(_pos)
-    {
-        if (_pos > this.size)
-            return c_oSerConstants.ErrorStream;
-        this.pos = _pos;
-        return c_oSerConstants.ReadOk;
-    }
-    this.Seek2 = function(_cur)
-    {
-        if (_cur > this.size)
-            return c_oSerConstants.ErrorStream;
-        this.cur = _cur;
-        return c_oSerConstants.ReadOk;
-    }
-    this.Skip = function(_skip)
-    {
-        if (_skip < 0)
-            return c_oSerConstants.ErrorStream;
-        return this.Seek(this.pos + _skip);
-    }
-    this.Skip2 = function(_skip)
-    {
-        if (_skip < 0)
-            return c_oSerConstants.ErrorStream;
-        return this.Seek2(this.cur + _skip);
-    }
-    
-    // 1 bytes
-    this.GetUChar = function()
-    {
-        if (this.cur >= this.size)
-            return 0;
-        return this.data[this.cur++];
-    }
-
-    this.GetByte = function()
-    {
-        return this.GetUChar();
-    }
-
-    this.GetBool = function()
-    {
-        var Value = this.GetUChar();
-        return ( Value == 0 ? false : true );
-    }
-
-    // 2 byte
-    this.GetUShortLE = function()
-    {
-        if (this.cur + 1 >= this.size)
-            return 0;
-        return (this.data[this.cur++] | this.data[this.cur++] << 8);
-    }
-
-    // 4 byte
-    this.GetULongLE = function()
-    {
-        if (this.cur + 3 >= this.size)
-            return 0;
-        return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16 | this.data[this.cur++] << 24);
-    }
-    this.GetLongLE = function()
-    {
-        return this.GetULongLE();
-    }
-
-    this.GetLong = function()
-    {
-        return this.GetULongLE();
-    };
-    this.GetDoubleLE = function()
-    {
-        if (this.cur + 7 >= this.size)
-            return 0;
-        var arr = [];
-        for(var i = 0; i < 8; ++i)
-            arr.push(this.GetUChar());
-        var dRes = this.doubleDecodeLE754(arr);
-        return dRes;
-    }
-    this.doubleDecodeLE754 = function(a)
-    {
-        var s, e, m, i, d, nBits, mLen, eLen, eBias, eMax;
-        var el = {len:8, mLen:52, rt:0};
-        mLen = el.mLen, eLen = el.len*8-el.mLen-1, eMax = (1<<eLen)-1, eBias = eMax>>1;
-
-        i = (el.len-1); d = -1; s = a[i]; i+=d; nBits = -7;
-        for (e = s&((1<<(-nBits))-1), s>>=(-nBits), nBits += eLen; nBits > 0; e=e*256+a[i], i+=d, nBits-=8);
-        for (m = e&((1<<(-nBits))-1), e>>=(-nBits), nBits += mLen; nBits > 0; m=m*256+a[i], i+=d, nBits-=8);
-
-        switch (e)
-        {
-            case 0:
-                // Zero, or denormalized number
-                e = 1-eBias;
-                break;
-            case eMax:
-                // NaN, or +/-Infinity
-                return m?NaN:((s?-1:1)*Infinity);
-            default:
-                // Normalized number
-                m = m + Math.pow(2, mLen);
-                e = e - eBias;
-                break;
-        }
-        return (s?-1:1) * m * Math.pow(2, e-mLen);
-    };
-    // 3 byte
-    this.GetUOffsetLE = function()
-    {
-        if (this.cur + 2 >= this.size)
-            return c_oSerConstants.ReadOk;
-        return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16);
-    }
-
-    this.GetString2 = function()
-    {
-        var Len = this.GetLong();
-        return this.GetString2LE(Len);
-    }
-
-    //String
-    this.GetString2LE = function(len)
-    {
-        if (this.cur + len > this.size)
-            return "";
-        var a = [];
-        for (var i = 0; i + 1 < len; i+=2)
-			a.push(String.fromCharCode(this.data[this.cur + i] | this.data[this.cur + i + 1] << 8));
-        this.cur += len;
-        return a.join("");
-    }
-	this.GetString = function()
-    {
-        var Len = this.GetLong();
-        if (this.cur + 2 * Len > this.size)
-            return "";
-        var t = "";
-        for (var i = 0; i + 1 < 2 * Len; i+=2)
-        {
-            var uni = this.data[this.cur + i];
-            uni |= this.data[this.cur + i + 1] << 8;
-            t += String.fromCharCode(uni);
-        }
-        this.cur += 2 * Len;
-        return t;
-	}
-    this.GetCurPos = function()
-	{
-		return this.cur;
-	}
-	this.GetSize = function()
-	{
-		return this.size;
-	}
-    this.EnterFrame = function(count)
-    {
-        if (this.size - this.pos < count)
-            return c_oSerConstants.ErrorStream;
-
-        this.cur = this.pos;
-        this.pos += count;
-        return c_oSerConstants.ReadOk;
-    }
-
-    this.GetDouble = function()
-    {
-        var dRes = 0.0;
-        dRes |= this.GetUChar();
-        dRes |= this.GetUChar() << 8;
-        dRes |= this.GetUChar() << 16;
-        dRes |= this.GetUChar() << 24;
-        dRes /= 100000;
-        return dRes;
-    }
 }
+
+FT_Stream2.prototype.Seek = function(_pos) {
+	if (_pos > this.size)
+		return c_oSerConstants.ErrorStream;
+	this.pos = _pos;
+	return c_oSerConstants.ReadOk;
+};
+FT_Stream2.prototype.Seek2 = function(_cur) {
+	if (_cur > this.size)
+		return c_oSerConstants.ErrorStream;
+	this.cur = _cur;
+	return c_oSerConstants.ReadOk;
+};
+FT_Stream2.prototype.Skip = function(_skip) {
+	if (_skip < 0)
+		return c_oSerConstants.ErrorStream;
+	return this.Seek(this.pos + _skip);
+};
+FT_Stream2.prototype.Skip2 = function(_skip) {
+	if (_skip < 0)
+		return c_oSerConstants.ErrorStream;
+	return this.Seek2(this.cur + _skip);
+};
+
+// 1 bytes
+FT_Stream2.prototype.GetUChar = function() {
+	if (this.cur >= this.size)
+		return 0;
+	return this.data[this.cur++];
+};
+FT_Stream2.prototype.GetByte = function() {
+	return this.GetUChar();
+};
+FT_Stream2.prototype.GetBool = function() {
+	var Value = this.GetUChar();
+	return ( Value == 0 ? false : true );
+};
+// 2 byte
+FT_Stream2.prototype.GetUShortLE = function() {
+	if (this.cur + 1 >= this.size)
+		return 0;
+	return (this.data[this.cur++] | this.data[this.cur++] << 8);
+};
+// 4 byte
+FT_Stream2.prototype.GetULongLE = function() {
+	if (this.cur + 3 >= this.size)
+		return 0;
+	return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16 | this.data[this.cur++] << 24);
+};
+FT_Stream2.prototype.GetLongLE = function() {
+	return this.GetULongLE();
+};
+FT_Stream2.prototype.GetLong = function() {
+	return this.GetULongLE();
+};
+FT_Stream2.prototype.GetDoubleLE = function() {
+	if (this.cur + 7 >= this.size)
+		return 0;
+	var arr = [];
+	for(var i = 0; i < 8; ++i)
+		arr.push(this.GetUChar());
+	return this.doubleDecodeLE754(arr);
+};
+FT_Stream2.prototype.doubleDecodeLE754 = function(a) {
+	var s, e, m, i, d, nBits, mLen, eLen, eBias, eMax;
+	var el = {len:8, mLen:52, rt:0};
+	mLen = el.mLen, eLen = el.len*8-el.mLen-1, eMax = (1<<eLen)-1, eBias = eMax>>1;
+
+	i = (el.len-1); d = -1; s = a[i]; i+=d; nBits = -7;
+	for (e = s&((1<<(-nBits))-1), s>>=(-nBits), nBits += eLen; nBits > 0; e=e*256+a[i], i+=d, nBits-=8);
+	for (m = e&((1<<(-nBits))-1), e>>=(-nBits), nBits += mLen; nBits > 0; m=m*256+a[i], i+=d, nBits-=8);
+
+	switch (e)
+	{
+		case 0:
+			// Zero, or denormalized number
+			e = 1-eBias;
+			break;
+		case eMax:
+			// NaN, or +/-Infinity
+			return m?NaN:((s?-1:1)*Infinity);
+		default:
+			// Normalized number
+			m = m + Math.pow(2, mLen);
+			e = e - eBias;
+			break;
+	}
+	return (s?-1:1) * m * Math.pow(2, e-mLen);
+};
+// 3 byte
+FT_Stream2.prototype.GetUOffsetLE = function() {
+	if (this.cur + 2 >= this.size)
+		return c_oSerConstants.ReadOk;
+	return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16);
+};
+FT_Stream2.prototype.GetString2 = function() {
+	var Len = this.GetLong();
+	return this.GetString2LE(Len);
+};
+//String
+FT_Stream2.prototype.GetString2LE = function(len) {
+	if (this.cur + len > this.size)
+		return "";
+	var a = [];
+	for (var i = 0; i + 1 < len; i+=2)
+		a.push(String.fromCharCode(this.data[this.cur + i] | this.data[this.cur + i + 1] << 8));
+	this.cur += len;
+	return a.join("");
+};
+FT_Stream2.prototype.GetString = function() {
+	var Len = this.GetLong();
+	if (this.cur + 2 * Len > this.size)
+		return "";
+	var t = "";
+	for (var i = 0; i + 1 < 2 * Len; i+=2) {
+		var uni = this.data[this.cur + i];
+		uni |= this.data[this.cur + i + 1] << 8;
+		t += String.fromCharCode(uni);
+	}
+	this.cur += 2 * Len;
+	return t;
+};
+FT_Stream2.prototype.GetCurPos = function() {
+	return this.cur;
+};
+FT_Stream2.prototype.GetSize = function() {
+	return this.size;
+};
+FT_Stream2.prototype.EnterFrame = function(count) {
+	if (this.size - this.pos < count)
+		return c_oSerConstants.ErrorStream;
+
+	this.cur = this.pos;
+	this.pos += count;
+	return c_oSerConstants.ReadOk;
+};
+FT_Stream2.prototype.GetDouble = function() {
+	var dRes = 0.0;
+	dRes |= this.GetUChar();
+	dRes |= this.GetUChar() << 8;
+	dRes |= this.GetUChar() << 16;
+	dRes |= this.GetUChar() << 24;
+	dRes /= 100000;
+	return dRes;
+};
 var gc_nMaxRow = 1048576;
 var gc_nMaxCol = 16384;
 var gc_nMaxRow0 = gc_nMaxRow - 1;
@@ -599,7 +567,7 @@ function CellAddressUtils(){
 		}
 		return oRes;
 	}
-};
+}
 var g_oCellAddressUtils = new CellAddressUtils();
 /**
  * @constructor
@@ -637,7 +605,7 @@ function CellAddress(){
 		this._checkCoord();
 		this._invalidId = true;
 	}
-};
+}
 CellAddress.prototype._isDigit=function(symbol){
 	return '0' <= symbol && symbol <= '9';
 };
