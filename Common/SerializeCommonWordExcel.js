@@ -958,293 +958,293 @@ function BinaryChartWriter(memory)
 {
 	this.memory = memory;
 	this.bs = new BinaryCommonWriter(this.memory);
-	this.Write = function(chartAsGroup)
-    {
-		var oThis = this;
-        this.bs.WriteItem(c_oSer_DrawingType.Chart, function(){oThis.WriteChartContent(chartAsGroup);});
-    };
-	this.WriteChartContent = function(chartAsGroup)
-    {
-        var oThis = this;
-		var chart = chartAsGroup.chart;
-		if(null != chart.legend && true == chart.legend.bShow)
-			this.bs.WriteItem(c_oSer_ChartType.Legend, function(){oThis.WriteLegend(chart.legend);});
-		if(null != chartAsGroup.chartTitle && null != chartAsGroup.chartTitle.txBody)
-			this.bs.WriteItem(c_oSer_ChartType.TitlePptx, function(){oThis.WriteTitlePptx(chartAsGroup.chartTitle.txBody, chart.header.bDefaultTitle);});
-		this.bs.WriteItem(c_oSer_ChartType.PlotArea, function(){oThis.WritePlotArea(chartAsGroup);});
-		if(null != chart.styleId)
-			this.bs.WriteItem(c_oSer_ChartType.Style, function(){oThis.memory.WriteLong(chart.styleId);});
-		if(null != chart.bShowBorder && false == chart.bShowBorder)
-		{
-			var oFill = new CUniFill();
-			oFill.fill = new CNoFill();
-			var oLn = new CLn();
-			oLn.Fill = oFill;
-			var oTempSpPr = new CSpPr();
-			oTempSpPr.ln = oLn;
-			this.bs.WriteItem(c_oSer_ChartType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
-		}
-    };
-	this.WriteLegend = function(legend)
-    {
-        var oThis = this;
-		if(null != legend.position)
-		{
-			var byteLegendPos = null;
-			switch(legend.position)
-			{
-				case c_oAscChartLegend.left: byteLegendPos = EChartLegendPos.chartlegendposLeft;break;
-				case c_oAscChartLegend.right: byteLegendPos = EChartLegendPos.chartlegendposRight;break;
-				case c_oAscChartLegend.top: byteLegendPos = EChartLegendPos.chartlegendposTop;break;
-				case c_oAscChartLegend.bottom: byteLegendPos = EChartLegendPos.chartlegendposBottom;break;
-			}
-			if(null != byteLegendPos)
-				this.bs.WriteItem(c_oSer_ChartLegendType.LegendPos, function(){oThis.memory.WriteByte(byteLegendPos);});
-		}
-		if(null != legend.bOverlay)
-			this.bs.WriteItem(c_oSer_ChartLegendType.Overlay, function(){oThis.memory.WriteBool(legend.bOverlay);});
-    };
-	this.WritePlotArea = function(chartAsGroup)
-    {
-        var oThis = this;
-		var chart = chartAsGroup.chart;
-		var xAxisTitle = chartAsGroup.hAxisTitle;
-		var yAxisTitle = chartAsGroup.vAxisTitle;
-		var xAxis = chart.xAxis;
-		var yAxis = chart.yAxis;
-		if(c_oAscChartType.hbar == chart.type)
-		{
-			var oTemp = xAxis;
-			xAxis = yAxis;
-			yAxis = oTemp;
-			oTemp = xAxisTitle;
-			xAxisTitle = yAxisTitle;
-			yAxisTitle = oTemp;
-		}
-		if(null != xAxis && null != yAxis)
-		{
-			if(c_oAscChartType.scatter == chart.type)
-				this.bs.WriteItem(c_oSer_ChartPlotAreaType.ValAx, function(){oThis.WriteCatAx(xAxisTitle, xAxis, yAxis, true);});
-			else
-				this.bs.WriteItem(c_oSer_ChartPlotAreaType.CatAx, function(){oThis.WriteCatAx(xAxisTitle, xAxis, yAxis, true);});
-			this.bs.WriteItem(c_oSer_ChartPlotAreaType.ValAx, function(){oThis.WriteCatAx(yAxisTitle, yAxis, xAxis, false);});
-		}
-		
-		this.bs.WriteItem(c_oSer_ChartPlotAreaType.BasicChart, function(){oThis.WriteBasicChart(chart);});
-    };
-	this.WriteCatAx = function(oAxisTitle, axis, axis2, bBottom)
-    {
-        var oThis = this;
-		if(null != oAxisTitle && null != oAxisTitle.txBody)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.TitlePptx, function(){oThis.WriteTitlePptx(oAxisTitle.txBody, axis.bDefaultTitle);});
-		if(null != axis2.bGrid)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.MajorGridlines, function(){oThis.memory.WriteBool(axis2.bGrid);});
-		if(null != axis.bShow)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.Delete, function(){oThis.memory.WriteBool(!axis.bShow);});
-		if(bBottom)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.AxPos, function(){oThis.memory.WriteByte(EChartAxPos.chartaxposBottom);});
-		else
-			this.bs.WriteItem(c_oSer_ChartCatAxType.AxPos, function(){oThis.memory.WriteByte(EChartAxPos.chartaxposLeft);});
-    };
-	this.WriteBasicChart = function(chart)
-    {
-        var oThis = this;
-		var byteType = null;
-		if(null != chart.type)
-		{
-			var byteSubtype = null;
-			switch(chart.type)
-			{
-				case c_oAscChartType.line: byteType = EChartBasicTypes.chartbasicLineChart;break;
-				case c_oAscChartType.bar: byteType = EChartBasicTypes.chartbasicBarChart;
-										byteSubtype = EChartBarDerection.chartbardirectionCol;
-										break;
-				case c_oAscChartType.hbar: byteType = EChartBasicTypes.chartbasicBarChart;
-										byteSubtype = EChartBarDerection.chartbardirectionBar;
-										break;
-				case c_oAscChartType.area: byteType = EChartBasicTypes.chartbasicAreaChart;break;
-				case c_oAscChartType.pie: byteType = EChartBasicTypes.chartbasicPieChart;break;
-				case c_oAscChartType.scatter: byteType = EChartBasicTypes.chartbasicScatterChart;break;
-				case c_oAscChartType.stock: byteType = EChartBasicTypes.chartbasicStockChart;break;
-			}
-			if(null != byteType)
-			{
-				this.memory.WriteByte(c_oSer_BasicChartType.Type);
-				this.memory.WriteByte(c_oSerPropLenType.Byte);
-				this.memory.WriteByte(byteType);
-				
-				if(null != byteSubtype)
-				{
-					this.memory.WriteByte(c_oSer_BasicChartType.BarDerection);
-					this.memory.WriteByte(c_oSerPropLenType.Byte);
-					this.memory.WriteByte(byteSubtype);
-				}
-			}
-		}
-		if(null != chart.subType)
-		{
-			if(EChartBasicTypes.chartbasicLineChart == byteType || EChartBasicTypes.chartbasicBarChart == byteType || EChartBasicTypes.chartbasicAreaChart == byteType)
-			{
-				var byteGrouping = null;
-				switch(chart.subType)
-				{
-					case c_oAscChartSubType.normal: byteGrouping = EChartBarGrouping.chartbargroupingStandard;break;
-					case c_oAscChartSubType.stacked: byteGrouping = EChartBarGrouping.chartbargroupingStacked;break;
-					case c_oAscChartSubType.stackedPer: byteGrouping = EChartBarGrouping.chartbargroupingPercentStacked;break;
-				}
-				if(null != byteGrouping)
-				{
-					this.memory.WriteByte(c_oSer_BasicChartType.Grouping);
-					this.memory.WriteByte(c_oSerPropLenType.Byte);
-					this.memory.WriteByte(byteGrouping);
-				}
-				if(EChartBasicTypes.chartbasicBarChart == byteType && null != byteGrouping && EChartBarGrouping.chartbargroupingStandard != byteGrouping)
-				{
-					this.memory.WriteByte(c_oSer_BasicChartType.Overlap);
-					this.memory.WriteByte(c_oSerPropLenType.Long);
-					this.memory.WriteLong(100);
-				}
-			}
-		}
-		if(null != chart.range)
-		{
-			var chartRange = chart.range;			
-			if(null != chartRange.interval && "" != chartRange.interval)
-			{
-				this.memory.WriteByte(c_oSer_BasicChartType.Series);
-				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){oThis.WriteSeries(chart);});
-			}
-		}
-		if(null != chart.bShowValue)
-		{
-			this.memory.WriteByte(c_oSer_BasicChartType.DataLabels);
-			this.memory.WriteByte(c_oSerPropLenType.Variable);
-			this.bs.WriteItemWithLength(function(){oThis.WriteDataLabels(chart);});
-		}
-    };
-	this.WriteSeries = function(chart)
-    {
-        var oThis = this;
-		for(var i = 0, length = chart.series.length; i < length; ++i)
-		{
-			var seria = chart.series[i];
-			if(null != seria)
-				this.bs.WriteItem(c_oSer_BasicChartType.Seria, function(){oThis.WriteSeria(chart, seria, i);});
-		}
-    };
-	this.WriteSeria = function(chart, seria, nIndex)
-    {
-        var oThis = this;
-		if(c_oAscChartType.scatter == chart.type && null != seria.xVal)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.xVal, function(){oThis.WriteSeriesNumCache(seria.xVal);});
-		if(null != seria.Val)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Val, function(){oThis.WriteSeriesNumCache(seria.Val);});
-		if(null != seria.TxCache)
-		{
-			var TxCache = seria.TxCache;
-			if(null != TxCache.Formula)
-			{
-				var oTempNumCache = {Formula: TxCache.Formula, NumCache: [{val: TxCache.Tx, index: 0}]};
-				this.bs.WriteItem(c_oSer_ChartSeriesType.TxRef, function(){oThis.WriteSeriesNumCache(oTempNumCache);});
-			}
-			else if(TxCache.Tx)
-			{
-				this.memory.WriteByte(c_oSer_ChartSeriesType.Tx);
-				this.memory.WriteString2(TxCache.Tx);
-			}
-		}
-		if(c_oAscChartType.line == chart.type)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Marker, function(){oThis.WriteSeriesMarkers({Symbol: EChartSymbol.chartsymbolNone});});
-		if(null != nIndex)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
-		if(null != seria.bShowValue)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.DataLabels, function(){oThis.WriteDataLabels(seria);});
-		if(null != seria.OutlineColor)
-		{
-			var oSolidFill = new CSolidFill();
-			oSolidFill.color = seria.OutlineColor;
-			var oFill = new CUniFill();
-			oFill.fill = oSolidFill;
-			var oTempSpPr = new CSpPr();
-			oTempSpPr.Fill = oFill;
-			this.bs.WriteItem(c_oSer_ChartSeriesType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
-		}
-		if(c_oAscChartType.scatter != chart.type && null != seria.Cat && (null != seria.Cat.Formula || seria.Cat.NumCache.length > 0))
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Cat, function(){oThis.WriteSeriesNumCache(seria.Cat);});
-    };
-	this.WriteSeriesNumCache = function(oCache)
-    {
-        var oThis = this;
-		if(null != oCache.Formula)
-		{
-			this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.Formula);
-			this.memory.WriteString2(oCache.Formula);
-		}
-		if(null != oCache.NumCache)
-			this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCache2, function(){oThis.WriteSeriesNumCacheValues(oCache.NumCache);});
-    };
-	this.WriteSeriesNumCacheValues = function(NumCache)
-    {
-		var oThis = this;
-		for(var i in NumCache)
-		{
-			var elem = NumCache[i];
-			var nIndex = i - 0;
-			if(null != elem)
-				this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(elem.val, nIndex);});
-		}
-	}
-	this.WriteSeriesNumCacheValue = function(val, index)
-    {
-		var oThis = this;
-		//val
-		this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.NumCacheVal);
-		this.memory.WriteString2(val.toString());
-		//index
-		this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheIndex, function(){oThis.memory.WriteLong(index);});
-	}
-	this.WriteSeriesMarkers = function(marker)
-    {
-        var oThis = this;
-		if(null != marker.Size)
-		{
-			this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Size);
-			this.memory.WriteByte(c_oSerPropLenType.Long);
-			this.memory.WriteLong(marker.Size);
-		}
-		if(null != marker.Symbol)
-		{
-			this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Symbol);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteByte(marker.Symbol);
-		}
-    };
-	this.WriteDataLabels = function(chart)
-    {
-        var oThis = this;
-		if(null != chart.bShowValue)
-		{
-			this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowVal);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(chart.bShowValue);
-		}
-		if(null != chart.bShowCatName)
-		{
-			this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowCatName);
-			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(chart.bShowCatName);
-		}
-    };
-	this.WriteTitlePptx = function(txBody, bDefault)
-	{
-		var oThis = this;
-		if(true != bDefault)
-			this.bs.WriteItem(c_oSer_ChartTitlePptxType.TxPptx, function(){window.global_pptx_content_writer.WriteTextBody(oThis.memory, txBody);});
-		else
-			this.bs.WriteItem(c_oSer_ChartTitlePptxType.TxPrPptx, function(){window.global_pptx_content_writer.WriteTextBody(oThis.memory, txBody);});
-	}
 }
+BinaryChartWriter.prototype.Write = function(chartAsGroup)
+{
+	var oThis = this;
+    this.bs.WriteItem(c_oSer_DrawingType.Chart, function(){oThis.WriteChartContent(chartAsGroup);});
+};
+BinaryChartWriter.prototype.WriteChartContent = function(chartAsGroup)
+{
+    var oThis = this;
+	var chart = chartAsGroup.chart;
+	if(null != chart.legend && true == chart.legend.bShow)
+		this.bs.WriteItem(c_oSer_ChartType.Legend, function(){oThis.WriteLegend(chart.legend);});
+	if(null != chartAsGroup.chartTitle && null != chartAsGroup.chartTitle.txBody)
+		this.bs.WriteItem(c_oSer_ChartType.TitlePptx, function(){oThis.WriteTitlePptx(chartAsGroup.chartTitle.txBody, chart.header.bDefaultTitle);});
+	this.bs.WriteItem(c_oSer_ChartType.PlotArea, function(){oThis.WritePlotArea(chartAsGroup);});
+	if(null != chart.styleId)
+		this.bs.WriteItem(c_oSer_ChartType.Style, function(){oThis.memory.WriteLong(chart.styleId);});
+	if(null != chart.bShowBorder && false == chart.bShowBorder)
+	{
+		var oFill = new CUniFill();
+		oFill.fill = new CNoFill();
+		var oLn = new CLn();
+		oLn.Fill = oFill;
+		var oTempSpPr = new CSpPr();
+		oTempSpPr.ln = oLn;
+		this.bs.WriteItem(c_oSer_ChartType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
+	}
+};
+BinaryChartWriter.prototype.WriteLegend = function(legend)
+{
+    var oThis = this;
+	if(null != legend.position)
+	{
+		var byteLegendPos = null;
+		switch(legend.position)
+		{
+			case c_oAscChartLegend.left: byteLegendPos = EChartLegendPos.chartlegendposLeft;break;
+			case c_oAscChartLegend.right: byteLegendPos = EChartLegendPos.chartlegendposRight;break;
+			case c_oAscChartLegend.top: byteLegendPos = EChartLegendPos.chartlegendposTop;break;
+			case c_oAscChartLegend.bottom: byteLegendPos = EChartLegendPos.chartlegendposBottom;break;
+		}
+		if(null != byteLegendPos)
+			this.bs.WriteItem(c_oSer_ChartLegendType.LegendPos, function(){oThis.memory.WriteByte(byteLegendPos);});
+	}
+	if(null != legend.bOverlay)
+		this.bs.WriteItem(c_oSer_ChartLegendType.Overlay, function(){oThis.memory.WriteBool(legend.bOverlay);});
+};
+BinaryChartWriter.prototype.WritePlotArea = function(chartAsGroup)
+{
+    var oThis = this;
+	var chart = chartAsGroup.chart;
+	var xAxisTitle = chartAsGroup.hAxisTitle;
+	var yAxisTitle = chartAsGroup.vAxisTitle;
+	var xAxis = chart.xAxis;
+	var yAxis = chart.yAxis;
+	if(c_oAscChartType.hbar == chart.type)
+	{
+		var oTemp = xAxis;
+		xAxis = yAxis;
+		yAxis = oTemp;
+		oTemp = xAxisTitle;
+		xAxisTitle = yAxisTitle;
+		yAxisTitle = oTemp;
+	}
+	if(null != xAxis && null != yAxis)
+	{
+		if(c_oAscChartType.scatter == chart.type)
+			this.bs.WriteItem(c_oSer_ChartPlotAreaType.ValAx, function(){oThis.WriteCatAx(xAxisTitle, xAxis, yAxis, true);});
+		else
+			this.bs.WriteItem(c_oSer_ChartPlotAreaType.CatAx, function(){oThis.WriteCatAx(xAxisTitle, xAxis, yAxis, true);});
+		this.bs.WriteItem(c_oSer_ChartPlotAreaType.ValAx, function(){oThis.WriteCatAx(yAxisTitle, yAxis, xAxis, false);});
+	}
+
+	this.bs.WriteItem(c_oSer_ChartPlotAreaType.BasicChart, function(){oThis.WriteBasicChart(chart);});
+};
+BinaryChartWriter.prototype.WriteCatAx = function(oAxisTitle, axis, axis2, bBottom)
+{
+    var oThis = this;
+	if(null != oAxisTitle && null != oAxisTitle.txBody)
+		this.bs.WriteItem(c_oSer_ChartCatAxType.TitlePptx, function(){oThis.WriteTitlePptx(oAxisTitle.txBody, axis.bDefaultTitle);});
+	if(null != axis2.bGrid)
+		this.bs.WriteItem(c_oSer_ChartCatAxType.MajorGridlines, function(){oThis.memory.WriteBool(axis2.bGrid);});
+	if(null != axis.bShow)
+		this.bs.WriteItem(c_oSer_ChartCatAxType.Delete, function(){oThis.memory.WriteBool(!axis.bShow);});
+	if(bBottom)
+		this.bs.WriteItem(c_oSer_ChartCatAxType.AxPos, function(){oThis.memory.WriteByte(EChartAxPos.chartaxposBottom);});
+	else
+		this.bs.WriteItem(c_oSer_ChartCatAxType.AxPos, function(){oThis.memory.WriteByte(EChartAxPos.chartaxposLeft);});
+};
+BinaryChartWriter.prototype.WriteBasicChart = function(chart)
+{
+    var oThis = this;
+	var byteType = null;
+	if(null != chart.type)
+	{
+		var byteSubtype = null;
+		switch(chart.type)
+		{
+			case c_oAscChartType.line: byteType = EChartBasicTypes.chartbasicLineChart;break;
+			case c_oAscChartType.bar: byteType = EChartBasicTypes.chartbasicBarChart;
+									byteSubtype = EChartBarDerection.chartbardirectionCol;
+									break;
+			case c_oAscChartType.hbar: byteType = EChartBasicTypes.chartbasicBarChart;
+									byteSubtype = EChartBarDerection.chartbardirectionBar;
+									break;
+			case c_oAscChartType.area: byteType = EChartBasicTypes.chartbasicAreaChart;break;
+			case c_oAscChartType.pie: byteType = EChartBasicTypes.chartbasicPieChart;break;
+			case c_oAscChartType.scatter: byteType = EChartBasicTypes.chartbasicScatterChart;break;
+			case c_oAscChartType.stock: byteType = EChartBasicTypes.chartbasicStockChart;break;
+		}
+		if(null != byteType)
+		{
+			this.memory.WriteByte(c_oSer_BasicChartType.Type);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(byteType);
+
+			if(null != byteSubtype)
+			{
+				this.memory.WriteByte(c_oSer_BasicChartType.BarDerection);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(byteSubtype);
+			}
+		}
+	}
+	if(null != chart.subType)
+	{
+		if(EChartBasicTypes.chartbasicLineChart == byteType || EChartBasicTypes.chartbasicBarChart == byteType || EChartBasicTypes.chartbasicAreaChart == byteType)
+		{
+			var byteGrouping = null;
+			switch(chart.subType)
+			{
+				case c_oAscChartSubType.normal: byteGrouping = EChartBarGrouping.chartbargroupingStandard;break;
+				case c_oAscChartSubType.stacked: byteGrouping = EChartBarGrouping.chartbargroupingStacked;break;
+				case c_oAscChartSubType.stackedPer: byteGrouping = EChartBarGrouping.chartbargroupingPercentStacked;break;
+			}
+			if(null != byteGrouping)
+			{
+				this.memory.WriteByte(c_oSer_BasicChartType.Grouping);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(byteGrouping);
+			}
+			if(EChartBasicTypes.chartbasicBarChart == byteType && null != byteGrouping && EChartBarGrouping.chartbargroupingStandard != byteGrouping)
+			{
+				this.memory.WriteByte(c_oSer_BasicChartType.Overlap);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(100);
+			}
+		}
+	}
+	if(null != chart.range)
+	{
+		var chartRange = chart.range;
+		if(null != chartRange.interval && "" != chartRange.interval)
+		{
+			this.memory.WriteByte(c_oSer_BasicChartType.Series);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function(){oThis.WriteSeries(chart);});
+		}
+	}
+	if(null != chart.bShowValue)
+	{
+		this.memory.WriteByte(c_oSer_BasicChartType.DataLabels);
+		this.memory.WriteByte(c_oSerPropLenType.Variable);
+		this.bs.WriteItemWithLength(function(){oThis.WriteDataLabels(chart);});
+	}
+};
+BinaryChartWriter.prototype.WriteSeries = function(chart)
+{
+    var oThis = this;
+	for(var i = 0, length = chart.series.length; i < length; ++i)
+	{
+		var seria = chart.series[i];
+		if(null != seria)
+			this.bs.WriteItem(c_oSer_BasicChartType.Seria, function(){oThis.WriteSeria(chart, seria, i);});
+	}
+};
+BinaryChartWriter.prototype.WriteSeria = function(chart, seria, nIndex)
+{
+    var oThis = this;
+	if(c_oAscChartType.scatter == chart.type && null != seria.xVal)
+		this.bs.WriteItem(c_oSer_ChartSeriesType.xVal, function(){oThis.WriteSeriesNumCache(seria.xVal);});
+	if(null != seria.Val)
+		this.bs.WriteItem(c_oSer_ChartSeriesType.Val, function(){oThis.WriteSeriesNumCache(seria.Val);});
+	if(null != seria.TxCache)
+	{
+		var TxCache = seria.TxCache;
+		if(null != TxCache.Formula)
+		{
+			var oTempNumCache = {Formula: TxCache.Formula, NumCache: [{val: TxCache.Tx, index: 0}]};
+			this.bs.WriteItem(c_oSer_ChartSeriesType.TxRef, function(){oThis.WriteSeriesNumCache(oTempNumCache);});
+		}
+		else if(TxCache.Tx)
+		{
+			this.memory.WriteByte(c_oSer_ChartSeriesType.Tx);
+			this.memory.WriteString2(TxCache.Tx);
+		}
+	}
+	if(c_oAscChartType.line == chart.type)
+		this.bs.WriteItem(c_oSer_ChartSeriesType.Marker, function(){oThis.WriteSeriesMarkers({Symbol: EChartSymbol.chartsymbolNone});});
+	if(null != nIndex)
+		this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
+	if(null != seria.bShowValue)
+		this.bs.WriteItem(c_oSer_ChartSeriesType.DataLabels, function(){oThis.WriteDataLabels(seria);});
+	if(null != seria.OutlineColor)
+	{
+		var oSolidFill = new CSolidFill();
+		oSolidFill.color = seria.OutlineColor;
+		var oFill = new CUniFill();
+		oFill.fill = oSolidFill;
+		var oTempSpPr = new CSpPr();
+		oTempSpPr.Fill = oFill;
+		this.bs.WriteItem(c_oSer_ChartSeriesType.SpPr, function(){window.global_pptx_content_writer.WriteSpPr(oThis.memory, oTempSpPr);});
+	}
+	if(c_oAscChartType.scatter != chart.type && null != seria.Cat && (null != seria.Cat.Formula || seria.Cat.NumCache.length > 0))
+		this.bs.WriteItem(c_oSer_ChartSeriesType.Cat, function(){oThis.WriteSeriesNumCache(seria.Cat);});
+};
+BinaryChartWriter.prototype.WriteSeriesNumCache = function(oCache)
+{
+    var oThis = this;
+	if(null != oCache.Formula)
+	{
+		this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.Formula);
+		this.memory.WriteString2(oCache.Formula);
+	}
+	if(null != oCache.NumCache)
+		this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCache2, function(){oThis.WriteSeriesNumCacheValues(oCache.NumCache);});
+};
+BinaryChartWriter.prototype.WriteSeriesNumCacheValues = function(NumCache)
+{
+	var oThis = this;
+	for(var i in NumCache)
+	{
+		var elem = NumCache[i];
+		var nIndex = i - 0;
+		if(null != elem)
+			this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(elem.val, nIndex);});
+	}
+};
+BinaryChartWriter.prototype.WriteSeriesNumCacheValue = function(val, index)
+{
+	var oThis = this;
+	//val
+	this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.NumCacheVal);
+	this.memory.WriteString2(val.toString());
+	//index
+	this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheIndex, function(){oThis.memory.WriteLong(index);});
+};
+BinaryChartWriter.prototype.WriteSeriesMarkers = function(marker)
+{
+    var oThis = this;
+	if(null != marker.Size)
+	{
+		this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Size);
+		this.memory.WriteByte(c_oSerPropLenType.Long);
+		this.memory.WriteLong(marker.Size);
+	}
+	if(null != marker.Symbol)
+	{
+		this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Symbol);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteByte(marker.Symbol);
+	}
+};
+BinaryChartWriter.prototype.WriteDataLabels = function(chart)
+{
+    var oThis = this;
+	if(null != chart.bShowValue)
+	{
+		this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowVal);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(chart.bShowValue);
+	}
+	if(null != chart.bShowCatName)
+	{
+		this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowCatName);
+		this.memory.WriteByte(c_oSerPropLenType.Byte);
+		this.memory.WriteBool(chart.bShowCatName);
+	}
+};
+BinaryChartWriter.prototype.WriteTitlePptx = function(txBody, bDefault)
+{
+	var oThis = this;
+	if(true != bDefault)
+		this.bs.WriteItem(c_oSer_ChartTitlePptxType.TxPptx, function(){window.global_pptx_content_writer.WriteTextBody(oThis.memory, txBody);});
+	else
+		this.bs.WriteItem(c_oSer_ChartTitlePptxType.TxPrPptx, function(){window.global_pptx_content_writer.WriteTextBody(oThis.memory, txBody);});
+};
 /** @constructor */
 function Binary_ChartReader(stream, chart, chartAsGroup)
 {
