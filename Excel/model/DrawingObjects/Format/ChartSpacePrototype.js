@@ -31,7 +31,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateChart:     true,
 		recalculateBaseColors: true,
 		recalculateSeriesColors: true,
-		recalculateMarkers: true
+		recalculateMarkers: true,
+		recalculateGridLines: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -139,37 +140,47 @@ CChartSpace.prototype.recalculateBounds = function()
 
 CChartSpace.prototype.recalculate = function()
 {
-    if(this.recalcInfo.recalculateTransform)
-    {
-       this.recalculateTransform();
-       this.recalcInforecalculateTransform = false;
-    }
-    if(this.recalcInfo.recalculateBounds)
-    {
-        this.recalculateBounds();
-        this.recalcInfo.recalculateBounds = false;
-    }
-	if(this.recalcInfo.recalculateBaseColors)
-    {
-        this.recalculateBaseColors();
-        this.recalcInfo.recalculateBaseColors = false;
-    }
-	if(this.recalcInfo.recalculateMarkers)
+
+	ExecuteNoHistory(function()
 	{
-		this.recalculateMarkers();
-        this.recalcInfo.recalculateMarkers = false;
-	}
-	if(this.recalcInfo.recalculateSeriesColors)
-	{
-		this.recalculateSeriesColors();
-        this.recalcInfo.recalculateSeriesColors = false;
-	}
-	
-    if(this.recalcInfo.recalculateChart)
-    {
-        this.recalculateChart();
-        this.recalcInfo.recalculateChart = false;
-    }
+		if(this.recalcInfo.recalculateTransform)
+		{
+		   this.recalculateTransform();
+		   this.recalcInforecalculateTransform = false;
+		}
+		if(this.recalcInfo.recalculateBounds)
+		{
+			this.recalculateBounds();
+			this.recalcInfo.recalculateBounds = false;
+		}
+		if(this.recalcInfo.recalculateBaseColors)
+		{
+			this.recalculateBaseColors();
+			this.recalcInfo.recalculateBaseColors = false;
+		}
+		if(this.recalcInfo.recalculateMarkers)
+		{
+			this.recalculateMarkers();
+			this.recalcInfo.recalculateMarkers = false;
+		}
+		if(this.recalcInfo.recalculateSeriesColors)
+		{
+			this.recalculateSeriesColors();
+			this.recalcInfo.recalculateSeriesColors = false;
+		}
+		
+		if(this.recalcInfo.recalculateGridLines)
+		{
+			this.recalculateGridLines();
+			this.recalcInfo.recalculateGridLines = false;
+		}
+		
+		if(this.recalcInfo.recalculateChart)
+		{
+			this.recalculateChart();
+			this.recalcInfo.recalculateChart = false;
+		}
+	}, this, []);
 };
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitInWorkArea = function()
@@ -334,6 +345,48 @@ function getArrayFillsFromBase(arrBaseFills, needFillsCount)
 	}
 	ret.splice(needFillsCount, ret.length - needFillsCount);
 	return ret;
+}
+
+
+CChartSpace.prototype.recalculateGridLines = function()
+{
+	if(this.chart && this.chart.plotArea)
+	{
+		function calcMajorMinorGridLines(axis, defaultStyle, subtleLine, parents)
+		{
+			function calcGridLine(defaultStyle, spPr, subtleLine, parents)
+			{
+				if(spPr)
+				{
+					var compiled_grid_lines = new CLn();
+					compiled_grid_lines.merge(subtleLine);
+					if(!compiled_grid_lines.Fill)
+					{
+						compiled_grid_lines.setFill(new CUniFill());
+					}
+					compiled_grid_lines.Fill.merge(defaultStyle);
+					compiled_grid_lines.merge(spPr.ln);	
+					compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255})
+					return compiled_grid_lines;
+				}
+				return null;
+			}
+			axis.compiledMajorGridLines = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.majorGridlines, subtleLine, parents);
+			axis.compiledMinorGridLines = calcGridLine(defaultStyle.minorGridlines, axis.minorGridlines, subtleLine, parents);
+		}
+		var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
+		var parent_objects = this.getParentObjects();
+		var RGBA = {R:0, G:0, B:0, A: 255};
+		var subtle_line;
+		if(parent_objects.theme  && parent_objects.theme.themeElements 
+					&& parent_objects.theme.themeElements.fmtScheme 
+					&& parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+		{
+			subtle_line = parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0];
+		}
+		calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
+		calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
+	}
 }
 
 CChartSpace.prototype.recalculateMarkers = function()

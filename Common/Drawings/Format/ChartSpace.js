@@ -94,6 +94,25 @@ function CChartStyleManager()
 			{
 				this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-43, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-43, 0)], 9);
 			}
+			
+			this.defaultLineStyles = [];
+			this.defaultLineStyles[0] = new ChartLineStyle(f(15, 0), f(15, 0.5), f(15, 0.75), f(15, 0), EFFECT_SUBTLE);
+			for(i = 0; i < 32; ++i)
+			{
+				this.defaultLineStyles[i] = this.defaultLineStyles[0];
+			}
+			this.defaultLineStyles[32] = new ChartLineStyle(f(8, 0), f(15, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
+			this.defaultLineStyles[33] = this.defaultLineStyles[32];
+			this.defaultLineStyles[34] = new ChartLineStyle(f(8, 0), f(15, 0.5), f(8, 0.75), f(8, -0.25), EFFECT_SUBTLE);
+			for(i = 35; i < 40; ++i)
+			{
+				this.defaultLineStyles[i] = this.defaultLineStyles[34];
+			}
+			this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0), f(15, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
+			for(var i = 41; i < 48; ++i)
+			{
+				this.defaultLineStyles[i] = this.defaultLineStyles[40];
+			}
 		},
 	this, []);
 }
@@ -107,8 +126,26 @@ CChartStyleManager.prototype =
 			return this.styles[(index - 1) % 48];
 		}
 		return this.styles[1];
+	},
+	
+	getDefaultLineStyleByIndex: function(index)
+	{
+		if(isRealNumber(index))
+		{
+			return this.defaultLineStyles[(index - 1) % 48];
+		}
+		return this.defaultLineStyles[2];
 	}
 };
+
+function ChartLineStyle(axisAndMajorGridLines, minorGridlines, chartArea, otherLines, floorChartArea)
+{
+	this.axisAndMajorGridLines = axisAndMajorGridLines;
+	this.minorGridlines = minorGridlines;
+	this.chartArea = chartArea;
+	this.otherLines = otherLines;
+	this.floorChartArea = floorChartArea;
+}
 
 function CChartStyle(effect, fill1, fill2, fill3, line1, line2, line3, line4, markerSize)
 {
