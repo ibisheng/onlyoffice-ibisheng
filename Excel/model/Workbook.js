@@ -38,127 +38,115 @@ function consolelog(text){
 }
 
 /** @constructor */
-function DependencyGraph(wb) {
-	this.wb = wb;
-	this.nodesId = null;
-	this.nodesCell = null;
-	this.nodesArea = null;
-	this.nodeslength = null;
+function DependencyGraph( wb ) {
+    this.wb = wb;
+    this.nodesId = null;
+    this.nodesCell = null;
+    this.nodesArea = null;
+    this.nodeslength = null;
 	this.bSetRefError = false;
-	this.clear();
+    this.clear();
 }
 DependencyGraph.prototype = {
-	clear : function(){
-		this.nodesId = {};
-		this.nodesCell = {};
-		this.nodesArea = {};
-		this.nodeslength = 0;
+    clear:function () {
+        this.nodesId = {};
+        this.nodesCell = {};
+        this.nodesArea = {};
+        this.nodeslength = 0;
 		this.bSetRefError = false;
-	},
-	nodeExist : function(node){
-		return this.nodeExist2(node.sheetId, node.cellId);
-	},
-	nodeExist2 : function(sheetId, cellId){
-		return null != this.getNode(sheetId, cellId);
-	},
-	nodeExistWithArea : function(sheetId, cellId){
-		var bRes = this.nodeExist2(sheetId, cellId);
-		if(!bRes)
-		{
-			var nodesSheetArea = this.nodesArea[sheetId];
-			if(null != nodesSheetArea)
-			{
-				var bbox = Asc.g_oRangeCache.getAscRange(cellId);
-				bRes = nodesSheetArea.get(bbox).all.length > 0;
-			}
-		}
-		return bRes;
-	},
-	getNode2 : function(node){
-		return this.nodesId[node.nodeId];
-	},
-	getNode : function(sheetId, cellId){
-		return this.nodesId[getVertexId(sheetId, cellId)];
-	},
-	addNode2 : function(node){
-		return this.addNode(node.sheetId, node.cellId);
-	},
-	addNode : function(sheetId, cellId){
+    },
+    nodeExist:function ( node ) {
+        return this.nodeExist2( node.sheetId, node.cellId );
+    },
+    nodeExist2:function ( sheetId, cellId ) {
+        return null != this.getNode( sheetId, cellId );
+    },
+    nodeExistWithArea:function ( sheetId, cellId ) {
+        var bRes = this.nodeExist2( sheetId, cellId );
+        if ( !bRes ) {
+            var nodesSheetArea = this.nodesArea[sheetId];
+            if ( null != nodesSheetArea ) {
+                var bbox = Asc.g_oRangeCache.getAscRange( cellId );
+                bRes = nodesSheetArea.get( bbox ).all.length > 0;
+            }
+        }
+        return bRes;
+    },
+    getNode2:function ( node ) {
+        return this.nodesId[node.nodeId];
+    },
+    getNode:function ( sheetId, cellId ) {
+        return this.nodesId[getVertexId( sheetId, cellId )];
+    },
+    addNode2:function ( node ) {
+        return this.addNode( node.sheetId, node.cellId );
+    },
+    addNode:function ( sheetId, cellId ) {
 		var _this = this;
-		var nodeId = getVertexId(sheetId, cellId)
-		var oRes = this.nodesId[nodeId];
-		if(null == oRes)
-		{
-			var node = new Vertex(sheetId, cellId, this.wb)
-			var oBBoxNode = node.getBBox();
-			if(node.isArea)
-			{
-				var nodesSheetArea = this.nodesArea[node.sheetId];
-				if(null == nodesSheetArea)
-				{
+        var nodeId = getVertexId( sheetId, cellId )
+        var oRes = this.nodesId[nodeId];
+        if ( null == oRes ) {
+            var node = new Vertex( sheetId, cellId, this.wb )
+            var oBBoxNode = node.getBBox();
+            if ( node.isArea ) {
+                var nodesSheetArea = this.nodesArea[node.sheetId];
+                if ( null == nodesSheetArea ) {
 					nodesSheetArea = new RangeDataManager(function(data, from, to){_this._changeNode(data, from, to);});
-					this.nodesArea[node.sheetId] = nodesSheetArea;
-				}
-				nodesSheetArea.add(oBBoxNode, node);
-			}
-			else
-			{
-				var nodesSheetCell = this.nodesCell[node.sheetId];
-				if(null == nodesSheetCell)
-				{
+                    this.nodesArea[node.sheetId] = nodesSheetArea;
+                }
+                nodesSheetArea.add( oBBoxNode, node );
+            }
+            else {
+                var nodesSheetCell = this.nodesCell[node.sheetId];
+                if ( null == nodesSheetCell ) {
 					nodesSheetCell = new CellArea(function(data, from, to){_this._changeNode(data, from, to);});
-					this.nodesCell[node.sheetId] = nodesSheetCell;
-				}
-				nodesSheetCell.add(oBBoxNode.r1, oBBoxNode.c1, node);
-			}
-			oRes = node;
-		}
-		return oRes;
-	},
-	addEdge2 : function(nodeFrom, nodeTo){
-		nodeFrom.addMasterEdge(nodeTo);
-		nodeTo.addSlaveEdge(nodeFrom);
-	},
-	addEdge : function(sheetIdFrom, cellIdFrom, sheetIdTo, cellIdTo){
-		var n1 = this.addNode(sheetIdFrom, cellIdFrom),
-			n2 = this.addNode(sheetIdTo, cellIdTo);
-		this.addEdge2(n1, n2);
-	},
-	getNodeBySheetId : function(sheetId){
-		var arr = [];
-		var nodesSheetCell = this.nodesCell[sheetId];
-		if(nodesSheetCell)
-		{
-			var aNodes = nodesSheetCell.getAll();
-			for(var i = 0, length = aNodes.length; i < length; i++)
-			{
-				var node = aNodes[i].data;
-				var n = node.getSlaveEdges();
-				if(n)
-				{
-					arr.push(node);
-					for(var id2 in n){
-						n[id2].weightNode++;
-						// arr.push(n[id2]);
-					}
-				}
-			}
-		}
-		return arr;
-	},
+                    this.nodesCell[node.sheetId] = nodesSheetCell;
+                }
+                nodesSheetCell.add( oBBoxNode.r1, oBBoxNode.c1, node );
+            }
+            oRes = node;
+        }
+        return oRes;
+    },
+    addEdge2:function ( nodeFrom, nodeTo ) {
+        nodeFrom.addMasterEdge( nodeTo );
+        nodeTo.addSlaveEdge( nodeFrom );
+    },
+    addEdge:function ( sheetIdFrom, cellIdFrom, sheetIdTo, cellIdTo ) {
+        var n1 = this.addNode( sheetIdFrom, cellIdFrom ),
+            n2 = this.addNode( sheetIdTo, cellIdTo );
+        this.addEdge2( n1, n2 );
+    },
+    getNodeBySheetId:function ( sheetId ) {
+        var arr = [];
+        var nodesSheetCell = this.nodesCell[sheetId];
+        if ( nodesSheetCell ) {
+            var aNodes = nodesSheetCell.getAll();
+            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
+                var node = aNodes[i].data;
+                var n = node.getSlaveEdges();
+                if ( n ) {
+                    arr.push( node );
+                    for ( var id2 in n ) {
+                        n[id2].weightNode++;
+                        // arr.push(n[id2]);
+                    }
+                }
+            }
+        }
+        return arr;
+    },
 	deleteNode : function(node){
-		if(node.isArea)
-		{
+            if ( node.isArea ) {
 			var nodesSheetArea = this.nodesArea[node.sheetId];
 			if(nodesSheetArea)
 				nodesSheetArea.removeElement(new RangeDataManagerElem(node.getBBox(), node));
 		}
-		else
-		{
+            else {
 			var nodesSheetCell = this.nodesCell[node.sheetId];
-			if(nodesSheetCell)
-				nodesSheetCell.removeElement(new RangeDataManagerElem(node.getBBox(), node));
-		}
+				if(nodesSheetCell)
+					nodesSheetCell.removeElement(new RangeDataManagerElem(node.getBBox(), node));
+			}
 	},
 	deleteNodes : function(sheetId, bbox){
 		var bSetRefErrorOld = this.bSetRefError;
@@ -170,7 +158,7 @@ DependencyGraph.prototype = {
 			oGetRes = nodesSheetArea.get(bbox);
 			for(var i = 0, length = oGetRes.inner.length; i < length; ++i)
 				nodesSheetArea.removeElement(oGetRes.inner[i]);
-		}
+        }
 		var nodesSheetCell = this.nodesCell[sheetId];
 		if(nodesSheetCell)
 		{
@@ -179,58 +167,57 @@ DependencyGraph.prototype = {
 				nodesSheetCell.removeElement(oGetRes[i]);
 		}
 		this.bSetRefError = bSetRefErrorOld;
-	},
-	deleteMasterNodes : function(sheetId, cellId){
-		var node = this.getNode(sheetId, cellId);
-		if(node)
-		{
-			var arr = node.deleteAllMasterEdges();
-			for(var i in arr){
-				var nodeMaster = arr[i];
-				if( nodeMaster.refCount <= 0 )
-					this.deleteNode(nodeMaster);
-			}
-		}
+    },
+    deleteMasterNodes:function ( sheetId, cellId ) {
+        var node = this.getNode( sheetId, cellId );
+        if ( node ) {
+            var arr = node.deleteAllMasterEdges();
+            for ( var i in arr ) {
+                var nodeMaster = arr[i];
+                if ( nodeMaster.refCount <= 0 )
+                    this.deleteNode( nodeMaster );
+            }
+        }
 		return node;
-	},
+    },
 	deleteMasterNodes2 : function(sheetId, cellId){
 		var node = this.deleteMasterNodes(sheetId, cellId);
 		if(node && node.refCount <= 0)
 			this.deleteNode(node);
 		return node;
 	},
-	getSlaveNodes : function(sheetId, cellId){
-		//todo
-		return null;
-	},
-	getMasterNodes : function(sheetId, cellId){
-		//todo
-		return null;
-	},	
-	getNodesLength : function(){
-		return this.nodeslength;
-	},
-	checkOffset : function(BBox, offset, wsId, noDelete){
-		var _this = this;
-		var bHor = 0 != offset.offsetCol;
-		var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+    getSlaveNodes:function ( sheetId, cellId ) {
+        //todo
+        return null;
+    },
+    getMasterNodes:function ( sheetId, cellId ) {
+        //todo
+        return null;
+    },
+    getNodesLength:function () {
+        return this.nodeslength;
+    },
+    checkOffset:function ( BBox, offset, wsId, noDelete ) {
+        var _this = this;
+        var bHor = 0 != offset.offsetCol;
+        var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
 		var bSetRefErrorOld = this.bSetRefError;
 		this.bSetRefError = true;
 		var oShiftGetBBox = shiftGetBBox(BBox, bHor);
 		var sShiftGetBBoxName = oShiftGetBBox.getName();
 		this.wb.needRecalc.nodes[getVertexId(wsId, sShiftGetBBoxName)] = [wsId, sShiftGetBBoxName];
 		this.wb.needRecalc.length++;
-		var nodesSheetArea = this.nodesArea[wsId];
+        var nodesSheetArea = this.nodesArea[wsId];
 		if(nodesSheetArea)
 			nodesSheetArea.shift(BBox, !toDelete, bHor);
-		var nodesSheetCell = this.nodesCell[wsId];
+        var nodesSheetCell = this.nodesCell[wsId];
 		if(nodesSheetCell)
-			nodesSheetCell.shift(BBox, !toDelete, bHor);
+            nodesSheetCell.shift( BBox, !toDelete, bHor );
 		this.bSetRefError = bSetRefErrorOld;
-	},
+    },
 	_changeNode : function(node, from, to)
 	{
-		var toDelete = null == to;
+        var toDelete = null == to;
 		var toAdd = null == from;
 		var wsId = node.sheetId;
 		if(toAdd)
@@ -254,46 +241,42 @@ DependencyGraph.prototype = {
 			delete this.nodesId[node.nodeId];
 			this.nodeslength--;
 		}
-		else
-		{
-			var sOldnodeId = node.nodeId;
-			var sOldCellId = node.cellId;
+        else {
+            var sOldnodeId = node.nodeId;
+            var sOldCellId = node.cellId;
 			if((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2))
 				node.moveStretch(to);
-			else
+            else
 				node.move({offsetCol: to.c1 - from.c1, offsetRow: to.r1 - from.r1}, wsId, toDelete);
 
-			delete this.nodesId[sOldnodeId];
-			this.nodesId[node.nodeId] = node;
+            delete this.nodesId[sOldnodeId];
+            this.nodesId[node.nodeId] = node;
 		}
 		//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move
 		if(!node.isArea)
 		{
-			var cwf = this.wb.cwf[wsId];
+            var cwf = this.wb.cwf[wsId];
 			if(cwf)
 			{
-				var cell = node.returnCell();
-				if( cell && cell.formulaParsed )
-				{
+                var cell = node.returnCell();
+                if ( cell && cell.formulaParsed ) {
 					if(!toAdd)
 						delete cwf.cells[sOldCellId];
-					if(!toDelete)
-						cwf.cells[node.cellId] = node.cellId;
-				}
-			}
-		}
-	},
+                    if ( !toDelete )
+                        cwf.cells[node.cellId] = node.cellId;
+                }
+            }
+        }
+    },
 	getCellInRange : function(sheetId, bbox){
 		var res = [], oGetRes, nodesSheetCell = this.nodesCell[sheetId];
-		if(nodesSheetCell)
-		{
+        if ( nodesSheetCell ) {
 			oGetRes = nodesSheetCell.get(bbox);
-			for(var i = 0, length = oGetRes.length; i < length; i++)
-			{
-				elem = oGetRes[i];
+            for ( var i = 0, length = oGetRes.length; i < length; i++ ) {
+                elem = oGetRes[i];
 				res.push(elem.data);
-			}
-		}
+            }
+        }
 		return res;
 	},
 	getAreaInRange : function(sheetId, bbox){
@@ -305,10 +288,10 @@ DependencyGraph.prototype = {
 			{
 				elem = oGetRes.all[i];
 				res.push(elem.data);
-			}
+            }
 		}
 		return res;
-	},
+    },
 	getInRange : function(sheetId, bbox){
 		return this.getCellInRange(sheetId, bbox).concat(this.getAreaInRange(sheetId, bbox));
 	},
@@ -321,312 +304,293 @@ DependencyGraph.prototype = {
 		if(nodesSheetArea)
 			oGetRes = nodesSheetArea.move(BBoxFrom, oBBoxTo);
 	},
-	drawDep : function(cellId,se){
-		// ToDo неиспользуемая функция, реализовать после выпуска
-		if( !cellId )
-			return;
-		var _wsV = this.wb.oApi.wb.getWorksheet(),
-			_getCellMetrics = _wsV.cellCommentator.getCellMetrics,
-			_cc = _wsV.cellCommentator,
-			ctx = _wsV.overlayCtx,
-			_wsVM = _wsV.model,
-			nodeId = getVertexId(_wsVM.getId(), cellId),
-			node = this.getNode(_wsVM.getId(), cellId),
-			cell;
-		
-			function gCM(_this,col,row){
-				var metrics = { top: 0, left: 0, width: 0, height: 0, result: false }; 	// px
+    drawDep:function ( cellId, se ) {
+        // ToDo неиспользуемая функция, реализовать после выпуска
+        if ( !cellId )
+            return;
+        var _wsV = this.wb.oApi.wb.getWorksheet(),
+            _getCellMetrics = _wsV.cellCommentator.getCellMetrics,
+            _cc = _wsV.cellCommentator,
+            ctx = _wsV.overlayCtx,
+            _wsVM = _wsV.model,
+            nodeId = getVertexId( _wsVM.getId(), cellId ),
+            node = this.getNode( _wsVM.getId(), cellId ),
+            cell;
 
-				var fvr = _this.getFirstVisibleRow();
-				var fvc = _this.getFirstVisibleCol();
-				var mergedRange = _wsVM.getMergedByCell(row, col);
+        function gCM( _this, col, row ) {
+            var metrics = { top:0, left:0, width:0, height:0, result:false }; 	// px
 
-				if (mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2)) {
+            var fvr = _this.getFirstVisibleRow();
+            var fvc = _this.getFirstVisibleCol();
+            var mergedRange = _wsVM.getMergedByCell( row, col );
 
-					var startCol = (mergedRange.c1 > fvc) ? mergedRange.c1 : fvc;
-					var startRow = (mergedRange.r1 > fvr) ? mergedRange.r1 : fvr;
+            if ( mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2) ) {
 
-					metrics.top = _this.getCellTop(startRow, 0) - _this.getCellTop(fvr, 0) + _this.getCellTop(0, 0);
-					metrics.left = _this.getCellLeft(startCol, 0) - _this.getCellLeft(fvc, 0) + _this.getCellLeft(0, 0);
+                var startCol = (mergedRange.c1 > fvc) ? mergedRange.c1 : fvc;
+                var startRow = (mergedRange.r1 > fvr) ? mergedRange.r1 : fvr;
 
-					for (var i = startCol; i <= mergedRange.c2; i++) {
-						metrics.width += _this.getColumnWidth(i, 0)
-					}
-					for (var i = startRow; i <= mergedRange.r2; i++) {
-						metrics.height += _this.getRowHeight(i, 0)
-					}
-					metrics.result = true;
-				}
-				else{
+                metrics.top = _this.getCellTop( startRow, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
+                metrics.left = _this.getCellLeft( startCol, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
 
-					metrics.top = _this.getCellTop(row, 0) - _this.getCellTop(fvr, 0) + _this.getCellTop(0, 0);
-					metrics.left = _this.getCellLeft(col, 0) - _this.getCellLeft(fvc, 0) + _this.getCellLeft(0, 0);
-					metrics.width = _this.getColumnWidth(col, 0);
-					metrics.height = _this.getRowHeight(row, 0);
-					metrics.result = true;
-				}
-		
-				return metrics;
-			}
-		
-		if( !node )
-			return;
-			
-		cell = node.returnCell();
-			
-		if( !cell )
-			return;
-			
-		var m = [cell.getCellAddress().getRow0(),cell.getCellAddress().getCol0()],
-			rc = [], me = se?node.getSlaveEdges():node.getMasterEdges();
-		
-		for( var id in me ){
-			if( me[id].sheetId != node.sheetId )
-				return;
-			
-			if( !me[id].isArea ){
-				var _t1 = gCM(_wsV,me[id].returnCell().getCellAddress().getCol0(),me[id].returnCell().getCellAddress().getRow0())
-				
-				rc.push({ t: _t1.top, l: _t1.left, w: _t1.width, h: _t1.height, apt: _t1.top+_t1.height/2, apl: _t1.left+_t1.width/4});
-			}
-			else{
-				var _t1 = gCM(_wsV,me[id].getBBox().c1,me[id].getBBox().r1),
-					_t2 = gCM(_wsV,me[id].getBBox().c2,me[id].getBBox().r2);
-					
-				rc.push({ t: _t1.top, l: _t1.left, w: _t2.left+_t2.width-_t1.left, h: _t2.top+_t2.height-_t1.top, apt: _t1.top+_t1.height/2, apl:_t1.left+_t1.width/4  });
-			}
-		}
-		
-		if( rc.length == 0 )
-			return;
+                for ( var i = startCol; i <= mergedRange.c2; i++ ) {
+                    metrics.width += _this.getColumnWidth( i, 0 )
+                }
+                for ( var i = startRow; i <= mergedRange.r2; i++ ) {
+                    metrics.height += _this.getRowHeight( i, 0 )
+                }
+                metrics.result = true;
+            }
+            else {
 
-		var color = new CColor(0, 0, 255);
-		
-		function draw_arrow(context, fromx, fromy, tox, toy) {
-			var headlen = 9;
-			var dx = tox - fromx;
-			var dy = toy - fromy;
-			var angle = Math.atan2(dy, dx), _a = Math.PI / 18;
-			// ToDo посмотреть на четкость moveTo, lineTo
-			context.save()
-				.setLineWidth(1)
-				.beginPath()
-				.moveTo(_cc.pxToPt(fromx), _cc.pxToPt(fromy))
-				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy));
-				// .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
-			context
-				.moveTo(
-					_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
-				.lineTo(_cc.pxToPt(tox), _cc.pxToPt(toy))
-				.lineTo(
-					_cc.pxToPt(tox - headlen * Math.cos(angle + _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle + _a)))
-				.lineTo(
-					_cc.pxToPt(tox - headlen * Math.cos(angle - _a)),
-					_cc.pxToPt(toy - headlen * Math.sin(angle - _a)))
-				.setStrokeStyle(color)
-				.setFillStyle(color)
-				.stroke()
-				.fill()
-				.closePath()
-				.restore();
-		}
-		
-		function h(m,rc){
-			var m = gCM(_wsV,m[1],m[0]);
-			var arrowPointTop = 10, arrowPointLeft = 10;
-			for(var i = 0; i<rc.length;i++){
-				var m2 = rc[i],
-					x1 = Math.floor(m2.apl),
-					y1 = Math.floor(m2.apt),
-					x2 = Math.floor(m.left+m.width/4),
-					y2 = Math.floor(m.top+m.height/2);
-				
-				if( x1<0 && x2<0 || y1<0 && y2<0)
-					continue;
+                metrics.top = _this.getCellTop( row, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
+                metrics.left = _this.getCellLeft( col, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
+                metrics.width = _this.getColumnWidth( col, 0 );
+                metrics.height = _this.getRowHeight( row, 0 );
+                metrics.result = true;
+            }
 
-				// ToDo посмотреть на четкость rect
-				if( m2.apl > 0 && m2.apt >0)
-					ctx.save()
-						.setLineWidth(1)
-						.setStrokeStyle(color)
-						.rect( _cc.pxToPt(m2.l),_cc.pxToPt(m2.t),_cc.pxToPt(m2.w-1),_cc.pxToPt(m2.h-1) )
-						.stroke()
-						.restore();
-				if(y1<0 && x1 != x2)
-					x1 = x1-Math.floor(Math.sqrt(((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))*y1*y1/((y2-y1)*(y2-y1)))/2)
-				if(x1<0 && y1 != y2)	
-					y1 = y1-Math.floor(Math.sqrt(((y1-y2)*(y1-y2)+(x1-x2)*(x1-x2))*x1*x1/((x2-x1)*(x2-x1)))/2)
-					
-				draw_arrow(ctx, x1<0?_wsV.getCellLeft(0, 0):x1, y1<0?_wsV.getCellTop(0, 0):y1, x2, y2);
-				
-				if( m2.apl > 0 && m2.apt >0)
-					ctx.save()
-						.beginPath()
-						.arc(_cc.pxToPt(Math.floor(m2.apl)),
-							_cc.pxToPt(Math.floor(m2.apt)),
-							3,0, 2 * Math.PI, false,-0.5,-0.5)
-						.setFillStyle(color)
-						.fill()
-						.closePath()
-						.restore();
-			}
-		}
-			
-		ctx.clear();
-		_wsV._drawSelection();	
+            return metrics;
+        }
 
-		if( se ){
-			for( var i = 0; i < rc.length; i++ )
-				h(rc[i],[m]);
-		}
-		else
-			h(m,rc);
-	},
-	removeNodeBySheetId : function(sheetId){
-		var arr = false;
+        if ( !node )
+            return;
+
+        cell = node.returnCell();
+
+        if ( !cell )
+            return;
+
+        var m = [cell.getCellAddress().getRow0(), cell.getCellAddress().getCol0()],
+            rc = [], me = se ? node.getSlaveEdges() : node.getMasterEdges();
+
+        for ( var id in me ) {
+            if ( me[id].sheetId != node.sheetId )
+                return;
+
+            if ( !me[id].isArea ) {
+                var _t1 = gCM( _wsV, me[id].returnCell().getCellAddress().getCol0(), me[id].returnCell().getCellAddress().getRow0() )
+
+                rc.push( { t:_t1.top, l:_t1.left, w:_t1.width, h:_t1.height, apt:_t1.top + _t1.height / 2, apl:_t1.left + _t1.width / 4} );
+            }
+            else {
+                var _t1 = gCM( _wsV, me[id].getBBox().c1, me[id].getBBox().r1 ),
+                    _t2 = gCM( _wsV, me[id].getBBox().c2, me[id].getBBox().r2 );
+
+                rc.push( { t:_t1.top, l:_t1.left, w:_t2.left + _t2.width - _t1.left, h:_t2.top + _t2.height - _t1.top, apt:_t1.top + _t1.height / 2, apl:_t1.left + _t1.width / 4  } );
+            }
+        }
+
+        if ( rc.length == 0 )
+            return;
+
+        var color = new CColor( 0, 0, 255 );
+
+        function draw_arrow( context, fromx, fromy, tox, toy ) {
+            var headlen = 9;
+            var dx = tox - fromx;
+            var dy = toy - fromy;
+            var angle = Math.atan2( dy, dx ), _a = Math.PI / 18;
+            // ToDo посмотреть на четкость moveTo, lineTo
+            context.save()
+                .setLineWidth( 1 )
+                .beginPath()
+                .moveTo( _cc.pxToPt( fromx ), _cc.pxToPt( fromy ) )
+                .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) );
+            // .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
+            context
+                .moveTo(
+                _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ),
+                _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) )
+                .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) )
+                .lineTo(
+                _cc.pxToPt( tox - headlen * Math.cos( angle + _a ) ),
+                _cc.pxToPt( toy - headlen * Math.sin( angle + _a ) ) )
+                .lineTo(
+                _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ),
+                _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) )
+                .setStrokeStyle( color )
+                .setFillStyle( color )
+                .stroke()
+                .fill()
+                .closePath()
+                .restore();
+        }
+
+        function h( m, rc ) {
+            var m = gCM( _wsV, m[1], m[0] );
+            var arrowPointTop = 10, arrowPointLeft = 10;
+            for ( var i = 0; i < rc.length; i++ ) {
+                var m2 = rc[i],
+                    x1 = Math.floor( m2.apl ),
+                    y1 = Math.floor( m2.apt ),
+                    x2 = Math.floor( m.left + m.width / 4 ),
+                    y2 = Math.floor( m.top + m.height / 2 );
+
+                if ( x1 < 0 && x2 < 0 || y1 < 0 && y2 < 0 )
+                    continue;
+
+                // ToDo посмотреть на четкость rect
+                if ( m2.apl > 0 && m2.apt > 0 )
+                    ctx.save()
+                        .setLineWidth( 1 )
+                        .setStrokeStyle( color )
+                        .rect( _cc.pxToPt( m2.l ), _cc.pxToPt( m2.t ), _cc.pxToPt( m2.w - 1 ), _cc.pxToPt( m2.h - 1 ) )
+                        .stroke()
+                        .restore();
+                if ( y1 < 0 && x1 != x2 )
+                    x1 = x1 - Math.floor( Math.sqrt( ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * y1 * y1 / ((y2 - y1) * (y2 - y1)) ) / 2 )
+                if ( x1 < 0 && y1 != y2 )
+                    y1 = y1 - Math.floor( Math.sqrt( ((y1 - y2) * (y1 - y2) + (x1 - x2) * (x1 - x2)) * x1 * x1 / ((x2 - x1) * (x2 - x1)) ) / 2 )
+
+                draw_arrow( ctx, x1 < 0 ? _wsV.getCellLeft( 0, 0 ) : x1, y1 < 0 ? _wsV.getCellTop( 0, 0 ) : y1, x2, y2 );
+
+                if ( m2.apl > 0 && m2.apt > 0 )
+                    ctx.save()
+                        .beginPath()
+                        .arc( _cc.pxToPt( Math.floor( m2.apl ) ),
+                        _cc.pxToPt( Math.floor( m2.apt ) ),
+                        3, 0, 2 * Math.PI, false, -0.5, -0.5 )
+                        .setFillStyle( color )
+                        .fill()
+                        .closePath()
+                        .restore();
+            }
+        }
+
+        ctx.clear();
+        _wsV._drawSelection();
+
+        if ( se ) {
+            for ( var i = 0; i < rc.length; i++ )
+                h( rc[i], [m] );
+        }
+        else
+            h( m, rc );
+    },
+    removeNodeBySheetId:function ( sheetId ) {
+        var arr = false;
 		// this.wb.needRecalc = [];
 		// this.wb.needRecalc.length = 0;
-		var nodesSheet = nodes[sheetId];
-		if(nodesSheet){
-			var aNodes = nodesSheet.getAll();
-			for(var i = 0, length = aNodes.length; i < length; i++)
-			{
-				var node = aNodes[i].data;
-				var se = node.getSlaveEdges();
-				for(var id2 in se){
-					if(se[id2].sheetId != sheetId){
-						if(!arr) arr = true;
+        var nodesSheet = nodes[sheetId];
+        if ( nodesSheet ) {
+            var aNodes = nodesSheet.getAll();
+            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
+                var node = aNodes[i].data;
+                var se = node.getSlaveEdges();
+                for ( var id2 in se ) {
+                    if ( se[id2].sheetId != sheetId ) {
+                        if ( !arr ) arr = true;
 						// this.wb.needRecalc[id2] = [se[id2].sheetId,se[id2].cellId];
 						// this.wb.needRecalc.length++;
-						// arr.push(se[id2]);
-					}
-				}
-				node.deleteAllMasterEdges();
-				node.deleteAllSlaveEdges();
-				delete nodesId[node.nodeId];
-				this.nodeslength--;
-			}
-			nodesSheet.removeAll();
-		}
-		return arr;
-	},
-	getNodeDependence : function(aElems)
-	{
-		var oRes = {oMasterNodes: {}, oMasterAreaNodes: {}, oWeightMap: {}};
-		var aWeightMapMasters = [];
-		var aWeightMapMastersNodes = [];
-		var node;
-		var elem;
-		var oSheetRanges = {};
-		var bInArea = false;
-		while(null != aElems)
-		{
-			for(var i in aElems)
-			{
-				elem = aElems[i];
+                        // arr.push(se[id2]);
+                    }
+                }
+                node.deleteAllMasterEdges();
+                node.deleteAllSlaveEdges();
+                delete nodesId[node.nodeId];
+                this.nodeslength--;
+            }
+            nodesSheet.removeAll();
+        }
+        return arr;
+    },
+    getNodeDependence:function ( aElems ) {
+        var oRes = {oMasterNodes:{}, oMasterAreaNodes:{}, oWeightMap:{}};
+        var aWeightMapMasters = [];
+        var aWeightMapMastersNodes = [];
+        var node;
+        var elem;
+        var oSheetRanges = {};
+        var bInArea = false;
+        while ( null != aElems ) {
+            for ( var i in aElems ) {
+                elem = aElems[i];
 				var sheetId = elem[0];
 				var cellId = elem[1];
 				//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
 				this._getNodeDependenceNodeToRange(sheetId, Asc.g_oRangeCache.getAscRange(cellId), oSheetRanges);
 				node = this.getNode(sheetId, cellId);
-				if(node && null == oRes.oWeightMap[node.nodeId])
-				{
-					//все node из aElems записываем в master
-					var oWeightMapElem = {cur: 0, max: 0, gray: false, bad: false, master: true, area: bInArea};
-					aWeightMapMasters.push(oWeightMapElem);
-					aWeightMapMastersNodes.push(node);
-					oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-					this._getNodeDependence(oRes, oSheetRanges, node);
-				}
-			}
-			aElems = null;
-			bInArea = true;
-			//расширяем за счет area nodes
-			for(var i in oSheetRanges)
-			{
-				var oSheetRange = oSheetRanges[i];
-				if(oSheetRange.changed)
-				{
-					oSheetRange.changed = false;
-					var nodesSheetArea = this.nodesArea[i];
-					if(null != nodesSheetArea)
-					{
-						var aAllOuter = null;
-						if(null == oSheetRange.prevRange)
-						{
-							var oGetRes = nodesSheetArea.get(oSheetRange.range);
-							if(oGetRes.all.length > 0)
-								aAllOuter = oGetRes.all;
-						}
-						else
-						{
-							var aEdgeBBox = [];
-							if(oSheetRange.range.c1 < oSheetRange.prevRange.c1)
-								aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1, oSheetRange.range.r1, oSheetRange.prevRange.c1 - 1, oSheetRange.range.r2));
-							if(oSheetRange.range.c2 > oSheetRange.prevRange.c2)
-								aEdgeBBox.push(new Asc.Range(oSheetRange.range.c2, oSheetRange.range.r1, oSheetRange.prevRange.c2 + 1, oSheetRange.range.r2));
-							if(oSheetRange.range.r1 < oSheetRange.prevRange.r1)
-								aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1 + 1, oSheetRange.range.r1, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r1 - 1));
-							if(oSheetRange.range.r2 > oSheetRange.prevRange.r2)
-								aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1 + 1, oSheetRange.range.r2, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r2 + 1));
-							aAllOuter = [];
-							for(var j = 0, length = aEdgeBBox.length; j < length; j++)
-							{
-								var bbox = aEdgeBBox[j];
-								var oGetRes = nodesSheetArea.get(bbox);
-								if(oGetRes.all.length > 0)
-									aAllOuter = aAllOuter.concat(oGetRes.all);
-							}
-						}
-						if(aAllOuter && aAllOuter.length > 0)
-						{
-							if(null == aElems)
-								aElems = [];
-							for(var j in aAllOuter)
-							{
-								var node = aAllOuter[j].data;
+                if ( node && null == oRes.oWeightMap[node.nodeId] ) {
+                    //все node из aElems записываем в master
+                    var oWeightMapElem = {cur:0, max:0, gray:false, bad:false, master:true, area:bInArea};
+                    aWeightMapMasters.push( oWeightMapElem );
+                    aWeightMapMastersNodes.push( node );
+                    oRes.oWeightMap[node.nodeId] = oWeightMapElem;
+                    this._getNodeDependence( oRes, oSheetRanges, node );
+                }
+            }
+            aElems = null;
+            bInArea = true;
+            //расширяем за счет area nodes
+            for ( var i in oSheetRanges ) {
+                var oSheetRange = oSheetRanges[i];
+                if ( oSheetRange.changed ) {
+                    oSheetRange.changed = false;
+                    var nodesSheetArea = this.nodesArea[i];
+                    if ( null != nodesSheetArea ) {
+                        var aAllOuter = null;
+                        if ( null == oSheetRange.prevRange ) {
+                            var oGetRes = nodesSheetArea.get( oSheetRange.range );
+                            if ( oGetRes.all.length > 0 )
+                                aAllOuter = oGetRes.all;
+                        }
+                        else {
+                            var aEdgeBBox = [];
+                            if ( oSheetRange.range.c1 < oSheetRange.prevRange.c1 )
+                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1, oSheetRange.range.r1, oSheetRange.prevRange.c1 - 1, oSheetRange.range.r2 ) );
+                            if ( oSheetRange.range.c2 > oSheetRange.prevRange.c2 )
+                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c2, oSheetRange.range.r1, oSheetRange.prevRange.c2 + 1, oSheetRange.range.r2 ) );
+                            if ( oSheetRange.range.r1 < oSheetRange.prevRange.r1 )
+                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1 + 1, oSheetRange.range.r1, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r1 - 1 ) );
+                            if ( oSheetRange.range.r2 > oSheetRange.prevRange.r2 )
+                                aEdgeBBox.push( new Asc.Range( oSheetRange.range.c1 + 1, oSheetRange.range.r2, oSheetRange.range.c2 - 1, oSheetRange.prevRange.r2 + 1 ) );
+                            aAllOuter = [];
+                            for ( var j = 0, length = aEdgeBBox.length; j < length; j++ ) {
+                                var bbox = aEdgeBBox[j];
+                                var oGetRes = nodesSheetArea.get( bbox );
+                                if ( oGetRes.all.length > 0 )
+                                    aAllOuter = aAllOuter.concat( oGetRes.all );
+                            }
+                        }
+                        if ( aAllOuter && aAllOuter.length > 0 ) {
+                            if ( null == aElems )
+                                aElems = [];
+                            for ( var j in aAllOuter ) {
+                                var node = aAllOuter[j].data;
 								aElems[node.nodeId] = [node.sheetId, node.cellId];
-							}
-						}
-					}
-				}
-			}
-		}
-		for(var i = 0, length = aWeightMapMasters.length; i < length; i++)
-		{
-			var oWeightMapElem = aWeightMapMasters[i];
-			//возвращаем только настощие master
-			if(oWeightMapElem.master)
-			{
-				node = aWeightMapMastersNodes[i];
-				if(oWeightMapElem.area)
-					oRes.oMasterAreaNodes[node.nodeId] = node;
-				else
-					oRes.oMasterNodes[node.nodeId] = node;
-			}
-		}
-		return oRes;
-	},
-	_getNodeDependence : function(oRes, oSheetRanges, node)
-	{
-		var bBad = false;
-		var oWeightMapElem = oRes.oWeightMap[node.nodeId];
-		if(null == oWeightMapElem)
-		{
-			oWeightMapElem = {cur: 0, max: 1, gray: false, bad: false, master: false, area: false};
-			oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-		}
-		else
-		{
-			oWeightMapElem.max++;
-			//если пришли в gray node, то это цикл
-			if(oWeightMapElem.gray)
-				bBad = oWeightMapElem.bad = true;
-			else
-			{
-				if(oWeightMapElem.master && oWeightMapElem.max > 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for ( var i = 0, length = aWeightMapMasters.length; i < length; i++ ) {
+            var oWeightMapElem = aWeightMapMasters[i];
+            //возвращаем только настощие master
+            if ( oWeightMapElem.master ) {
+                node = aWeightMapMastersNodes[i];
+                if ( oWeightMapElem.area )
+                    oRes.oMasterAreaNodes[node.nodeId] = node;
+                else
+                    oRes.oMasterNodes[node.nodeId] = node;
+            }
+        }
+        return oRes;
+    },
+    _getNodeDependence:function ( oRes, oSheetRanges, node ) {
+        var bBad = false;
+        var oWeightMapElem = oRes.oWeightMap[node.nodeId];
+        if ( null == oWeightMapElem ) {
+            oWeightMapElem = {cur:0, max:1, gray:false, bad:false, master:false, area:false};
+            oRes.oWeightMap[node.nodeId] = oWeightMapElem;
+        }
+        else {
+            oWeightMapElem.max++;
+            //если пришли в gray node, то это цикл
+            if ( oWeightMapElem.gray )
+                bBad = oWeightMapElem.bad = true;
+            else {
+                if ( oWeightMapElem.master && oWeightMapElem.max > 1 )
 				{
 					//если повторно пришли в master node, то не считаем ее master
 					oWeightMapElem.master = false;
@@ -634,45 +598,40 @@ DependencyGraph.prototype = {
 				}
 			}
 		}
-		if(1 == oWeightMapElem.max)
-			this._getNodeDependenceNodeToRange(node.sheetId, node.getBBox(), oSheetRanges);
-		if(!bBad && oWeightMapElem.max <= 1)
-		{
-			oWeightMapElem.gray = true;
-			var aNext = node.getSlaveEdges();
-			for(var i in aNext)
-			{
-				if(this._getNodeDependence(oRes, oSheetRanges, aNext[i]))
-					bBad = true;
-			}
-			oWeightMapElem.gray = false;
-			oWeightMapElem.bad = bBad;
-		}
-		return bBad;
-	},
-	_getNodeDependenceNodeToRange : function(sheetId, bbox, oSheetRanges){
-		var oSheetRange = oSheetRanges[sheetId];
-		if(null == oSheetRange)
-		{
-			oSheetRange = {range: null, changed: false, prevRange: null};
-			oSheetRanges[sheetId] = oSheetRange;
-		}
-		if(null == oSheetRange.range || !oSheetRange.range.containsRange(bbox))
-		{
-			if(null == oSheetRange.range)
-				oSheetRange.range = bbox.clone();
-			else
-			{
-				if(!oSheetRange.changed)
-					oSheetRange.prevRange = oSheetRange.range.clone();
-				oSheetRange.range.union2(bbox);
-			}
-			oSheetRange.changed = true;
-		}
-	},
-	getAll : function(){
-		return this.nodesId;
-	}
+        if ( 1 == oWeightMapElem.max )
+            this._getNodeDependenceNodeToRange( node.sheetId, node.getBBox(), oSheetRanges );
+        if ( !bBad && oWeightMapElem.max <= 1 ) {
+            oWeightMapElem.gray = true;
+            var aNext = node.getSlaveEdges();
+            for ( var i in aNext ) {
+                if ( this._getNodeDependence( oRes, oSheetRanges, aNext[i] ) )
+                    bBad = true;
+            }
+            oWeightMapElem.gray = false;
+            oWeightMapElem.bad = bBad;
+        }
+        return bBad;
+    },
+    _getNodeDependenceNodeToRange:function ( sheetId, bbox, oSheetRanges ) {
+        var oSheetRange = oSheetRanges[sheetId];
+        if ( null == oSheetRange ) {
+            oSheetRange = {range:null, changed:false, prevRange:null};
+            oSheetRanges[sheetId] = oSheetRange;
+        }
+        if ( null == oSheetRange.range || !oSheetRange.range.containsRange( bbox ) ) {
+            if ( null == oSheetRange.range )
+                oSheetRange.range = bbox.clone();
+            else {
+                if ( !oSheetRange.changed )
+                    oSheetRange.prevRange = oSheetRange.range.clone();
+                oSheetRange.range.union2( bbox );
+            }
+            oSheetRange.changed = true;
+        }
+    },
+    getAll:function () {
+        return this.nodesId;
+    }
 };
 
 /** @constructor */
@@ -684,9 +643,9 @@ function Vertex(sheetId, cellId, wb){
 	this.isArea = !this.bbox.isOneCell();
 	this.valid = true;
 	this.nodeId = getVertexId(this.sheetId, this.cellId);
-	this.wb = wb;
+		this.wb = wb;
 	this.cell = null;
-
+	
 	//вершина которую мы прошли и поставили в очередь обхода
 	this.isBlack = false;
 	
@@ -891,14 +850,14 @@ function unLockDraw(wb){
     }
 }
 function addToArrRecalc(wb, sheetId, cellId){
-	var temp = arrRecalc[sheetId];
-	if( !temp )
-	{
-		temp = {};
-		arrRecalc[sheetId] = temp;
+		var temp = arrRecalc[sheetId];
+		if( !temp )
+		{
+			temp = {};
+			arrRecalc[sheetId] = temp;
+		}
+		temp[cellId] = cellId;
 	}
-	temp[cellId] = cellId;
-}
 function buildRecalc(_wb,notrec){
 	var ws;
     if( lc > 1 ) return;
@@ -911,152 +870,71 @@ function buildRecalc(_wb,notrec){
     if(!notrec)
 	    sortDependency(_wb)
 }
-function searchCleenCacheArea(o1,o2){
-	var o3 = {};
-	for (var _item in o2){
-		if (o1 && o1.hasOwnProperty(_item)){
-			if(o1[_item].min.getRow() > o2[_item].min.getRow()) o1[_item].min = new CellAddress(o2[_item].min.getRow(),o1[_item].min.getCol());
-			if(o1[_item].min.getCol() > o2[_item].min.getCol()) o1[_item].min = new CellAddress(o1[_item].min.getRow(),o2[_item].min.getCol());
-				
-			if(o1[_item].max.getRow() < o2[_item].max.getRow()) o1[_item].max = new CellAddress(o2[_item].max.getRow(),o1[_item].max.getCol());
-			if(o1[_item].max.getCol() < o2[_item].max.getCol()) o1[_item].max = new CellAddress(o1[_item].max.getRow(),o2[_item].max.getCol());
-			
-			o3[_item] = o1[_item];
-		}
-		else{
-			o3[_item] = o2[_item];
-		}
-	}
-	for (var _item in o1){
-		if (o3 && o3.hasOwnProperty(_item)){
-			if(o1[_item].min.getRow() > o3[_item].min.getRow()) o1[_item].min = new CellAddress(o3[_item].min.getRow(),o1[_item].min.getCol());
-			if(o1[_item].min.getCol() > o3[_item].min.getCol()) o1[_item].min = new CellAddress(o1[_item].min.getRow(),o3[_item].min.getCol());
-				
-			if(o1[_item].max.getRow() < o3[_item].max.getRow()) o1[_item].max = new CellAddress(o3[_item].max.getRow(),o1[_item].max.getCol());
-			if(o1[_item].max.getCol() < o3[_item].max.getCol()) o1[_item].max = new CellAddress(o1[_item].max.getRow(),o3[_item].max.getCol());
-			
-			o3[_item] = o1[_item];
-		}
-		else{
-			o3[_item] = o1[_item];
-		}
-	}
-	
-	return o3;
-}
-function helpRecalc(dep1, nR, calculatedCells, wb){
-	var sr1, sr2;
-	for(var i = 0; i < dep1.badF.length; i++){
-		for(var j = 0; j < dep1.depF.length; j++){
-			if(dep1.badF[i] == dep1.depF[j])
-				dep1.depF.splice(j,1);
-		}
-	}
-	for(var j = 0; j < dep1.depF.length; j++){
-		if( dep1.depF[j].nodeId in nR){
-			nR[dep1.depF[j].nodeId] = undefined;
-			delete nR[dep1.depF[j].nodeId]
-			nR.length--;
-		}
-	}
-	for(var j = 0; j < dep1.badF.length; j++){
-		if( dep1.badF[j].nodeId in nR){
-			nR[dep1.badF[j].nodeId] = undefined;
-			delete nR[dep1.badF[j].nodeId]
-			nR.length--;
-		}
-	}
-	sr1 = wb.recalcDependency(dep1.badF,true);
 
-	for(var k = 0; k < dep1.depF.length; k++){
-		if(dep1.depF[k].nodeId in calculatedCells){
-			dep1.depF.splice(k,1);
-			k--;
-		}
-	}
-	sr2 = wb.recalcDependency(dep1.depF,false);
-
-	for(var k = 0; k < dep1.depF.length; k++){
-		calculatedCells[dep1.depF[k].nodeId] = dep1.depF[k].nodeId
-	}
-	return searchCleenCacheArea(sr1,sr2);
-}
-
-function sortDependency(wb){
+function sortDependency( wb ) {
 	if ( wb.isNeedCacheClean ){
 		buildRecalc(wb, true);
 		arrRecalc = {};
 	}
-	var nR = wb.needRecalc;
+    var nR = wb.needRecalc;
 	if(nR && (nR.length > 0))
 	{
-		var oCleanCellCacheArea = {};
+        var oCleanCellCacheArea = {};
 		var oNodeDependence = wb.dependencyFormulas.getNodeDependence(nR.nodes);
-		for(var i in oNodeDependence.oMasterNodes)
-		{
-			var node = oNodeDependence.oMasterNodes[i];
-			_sortDependency(wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea);
-		}
-		for(var i in oNodeDependence.oMasterAreaNodes)
-		{
-			var node = oNodeDependence.oMasterAreaNodes[i];
-			_sortDependency(wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea);
-		}
-		for(var sheetId in oCleanCellCacheArea)
-		{
-			var sheetArea = oCleanCellCacheArea[sheetId];
-			for(var rowId in sheetArea)
-			{
-				var nRow = rowId - 0;
-				wb.handlers.trigger("cleanCellCache", sheetId, new Asc.Range(0, nRow, gc_nMaxCol0, nRow), c_oAscCanChangeColWidth.numbers);
-			}
-		}
-	}
+        for ( var i in oNodeDependence.oMasterNodes ) {
+            var node = oNodeDependence.oMasterNodes[i];
+            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea );
+        }
+        for ( var i in oNodeDependence.oMasterAreaNodes ) {
+            var node = oNodeDependence.oMasterAreaNodes[i];
+            _sortDependency( wb, node, oNodeDependence.oWeightMap, false, oCleanCellCacheArea );
+        }
+        for ( var sheetId in oCleanCellCacheArea ) {
+            var sheetArea = oCleanCellCacheArea[sheetId];
+            for ( var rowId in sheetArea ) {
+                var nRow = rowId - 0;
+                wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nRow, gc_nMaxCol0, nRow ), c_oAscCanChangeColWidth.numbers );
+            }
+        }
+    }
 	wb.needRecalc = {nodes: {}, length:0};
 }
-function _sortDependency(wb, node, oWeightMap, bBad, oCleanCellCacheArea){
-	if(node)
-	{
-		var oWeightMapElem = oWeightMap[node.nodeId];
-		if(oWeightMapElem)
-		{
-			oWeightMapElem.cur++;
-			if((!oWeightMapElem.bad && oWeightMapElem.cur >= oWeightMapElem.max) || (oWeightMapElem.bad && !oWeightMapElem.gray))
-			{
-				bBad = oWeightMapElem.bad;
-				//пересчитываем функцию
-				var ws = wb.getWorksheetById(node.sheetId);
-				ws._RecalculatedFunctions( node.cellId, bBad );
-				//запоминаем области для удаления cache
-				var sheetArea = oCleanCellCacheArea[node.sheetId];
-				if(null == sheetArea)
-				{
-					sheetArea = {};
-					oCleanCellCacheArea[node.sheetId] = sheetArea;
-				}
-				var range = Asc.g_oRangeCache.getAscRange(node.cellId);
-				if(range)
-				{
-					for(var i = range.r1; i <= range.r2; i++)
-						sheetArea[i] = 1;
-				}
-				//обрабатываем child
-				oWeightMapElem.gray = true;
-				var oSlaveNodes = node.getSlaveEdges();
-				if(oSlaveNodes)
-				{
-					for(var i in oSlaveNodes)
-						_sortDependency(wb, oSlaveNodes[i], oWeightMap, bBad, oCleanCellCacheArea);
-				}
-				if(oWeightMapElem.area)
-				{
-					for(var i = 0, length = oWeightMapElem.area.length; i < length; i++)
-						_sortDependency(wb, oWeightMapElem.area[i].data, oWeightMap, bBad, oCleanCellCacheArea);
-				}
-				oWeightMapElem.gray = false;
-			}
-		}
-	}
+function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea ) {
+    if ( node ) {
+        var oWeightMapElem = oWeightMap[node.nodeId];
+        if ( oWeightMapElem ) {
+            oWeightMapElem.cur++;
+            if ( (!oWeightMapElem.bad && oWeightMapElem.cur >= oWeightMapElem.max) || (oWeightMapElem.bad && !oWeightMapElem.gray) ) {
+                bBad = oWeightMapElem.bad;
+                //пересчитываем функцию
+                var ws = wb.getWorksheetById( node.sheetId );
+                ws._RecalculatedFunctions( node.cellId, bBad );
+                //запоминаем области для удаления cache
+                var sheetArea = oCleanCellCacheArea[node.sheetId];
+                if ( null == sheetArea ) {
+                    sheetArea = {};
+                    oCleanCellCacheArea[node.sheetId] = sheetArea;
+                }
+                var range = Asc.g_oRangeCache.getAscRange( node.cellId );
+                if ( range ) {
+                    for ( var i = range.r1; i <= range.r2; i++ )
+                        sheetArea[i] = 1;
+                }
+                //обрабатываем child
+                oWeightMapElem.gray = true;
+                var oSlaveNodes = node.getSlaveEdges();
+                if ( oSlaveNodes ) {
+                    for ( var i in oSlaveNodes )
+                        _sortDependency( wb, oSlaveNodes[i], oWeightMap, bBad, oCleanCellCacheArea );
+                }
+                if ( oWeightMapElem.area ) {
+                    for ( var i = 0, length = oWeightMapElem.area.length; i < length; i++ )
+                        _sortDependency( wb, oWeightMapElem.area[i].data, oWeightMap, bBad, oCleanCellCacheArea );
+                }
+                oWeightMapElem.gray = false;
+            }
+        }
+    }
 }
 
 function angleFormatToInterface(val)
@@ -1553,13 +1431,13 @@ Workbook.prototype._generateFontMap=function(){
 		"Arial"		: 1
 	};
 
-	if (null != g_oDefaultFont.fn)
+	if(null != g_oDefaultFont.fn)
 		oFontMap[g_oDefaultFont.fn] = 1;
-
-	for (var i = 0, length = this.aWorksheets.length; i < length; ++i)
+	
+	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].generateFontMap(oFontMap);
 	this.CellStyles.generateFontMap(oFontMap);
-
+	
 	return oFontMap;
 };
 Workbook.prototype.generateFontMap=function(){
@@ -1591,11 +1469,11 @@ Workbook.prototype.recalcWB = function(is3D){
 			{
 				nR[node.nodeId] = [node.sheetId, node.cellId];
 				nR.length++;
+					}
+				}
+		sortDependency(this);
 			}
 		}
-		sortDependency(this);
-	}
-}
 Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 	if(null != sheetId)
 	{
@@ -1649,28 +1527,32 @@ Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
         var sr = {};
 
         for(var i = 0; i < f.length; i++){
-            if( f[i].cellId.indexOf(":") > -1 ) continue;
+            var sheetID = f[i].sheetId, cellID = f[i].cellId, selectedSheet;
+            if( cellID.indexOf(":") > -1 ) continue;
 
-            var l = new CellAddress(f[i].cellId);
+            var l = new CellAddress(cellID);
+            var lRow = l.getRow(), lCol = l.getCol();
 
-            if( !(f[i].sheetId in sr) ){
-                sr[f[i].sheetId] = {max:new CellAddress(f[i].cellId),min:new CellAddress(f[i].cellId)}
+            if( !(sheetID in sr) ){
+                sr[sheetID] = {max:new CellAddress(cellID),min:new CellAddress(cellID)}
             }
 
-            if ( sr[f[i].sheetId].min.getRow() > l.getRow() )
-                sr[f[i].sheetId].min = new CellAddress( l.getRow(), sr[f[i].sheetId].min.getCol() );
+            selectedSheet = sr[sheetID];
 
-            if ( sr[f[i].sheetId].min.getCol() > l.getCol() )
-                sr[f[i].sheetId].min = new CellAddress( sr[f[i].sheetId].min.getRow(), l.getCol() );
+            if ( selectedSheet.min.getRow() > lRow )
+                selectedSheet.min = new CellAddress( lRow, selectedSheet.min.getCol() );
 
-            if ( sr[f[i].sheetId].max.getRow() < l.getRow() )
-                sr[f[i].sheetId].max = new CellAddress( l.getRow(), sr[f[i].sheetId].max.getCol() );
+            if ( selectedSheet.min.getCol() > lCol )
+                selectedSheet.min = new CellAddress( selectedSheet.min.getRow(), lCol );
 
-            if ( sr[f[i].sheetId].max.getCol() < l.getCol() )
-                sr[f[i].sheetId].max = new CellAddress( sr[f[i].sheetId].max.getRow(), l.getCol() );
+            if ( selectedSheet.max.getRow() < lRow )
+                selectedSheet.max = new CellAddress( lRow, selectedSheet.max.getCol() );
+
+            if ( selectedSheet.max.getCol() < lCol )
+                selectedSheet.max = new CellAddress( selectedSheet.max.getRow(), lCol );
 
             if( !notRecalc )
-                this.getWorksheetById( f[i].sheetId )._RecalculatedFunctions( f[i].cellId, bad );
+                this.getWorksheetById( sheetID )._RecalculatedFunctions( cellID, bad );
         }
 
         return sr;
@@ -2873,7 +2755,7 @@ Woorksheet.prototype.getRange=function(cellAdd1, cellAdd2){
 Woorksheet.prototype.getRange2=function(sRange){
 	var bbox = Asc.g_oRangeCache.getAscRange(sRange);
 	if(null != bbox)
-		return this.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+	return this.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 	return null;
 };
 Woorksheet.prototype.getRange3=function(r1, c1, r2, c2){
@@ -3224,7 +3106,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
             }
         }
     }
-	
+
 	History.TurnOn();
 	if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
 	{
@@ -3269,7 +3151,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
-		sortDependency(this.workbook);
+    sortDependency(this.workbook);
 	}
     History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
@@ -3458,41 +3340,35 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 
 		if( c && c.sFormula ){
 			c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
-                c.formulaParsed.parse();
+            c.formulaParsed.parse();
 			c.formulaParsed.buildDependencies();
 		}
 	}
 }
 Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
-	var thas = this;
-	function adjustCellFormat(c, ftext) {
-		// ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже
-		var elem = null;
-		if(c.formulaParsed && c.formulaParsed.outStack)
-		{
-			for(var i = 0, length = c.formulaParsed.outStack.length; i < length; i++)
-			{
-				elem = c.formulaParsed.outStack[i];
-				if(elem instanceof cRef || elem instanceof cRef3D || elem instanceof cArea || elem instanceof cArea3D)
-				{
-					var r = elem.getRange();
-					if(elem instanceof cArea3D && r.length > 0)
-						r = r[0];
-					if(r && r.getNumFormatStr)
-					{
-						var sCurFormat = c.getNumFormatStr();
-						if( g_oDefaultNum.f == sCurFormat)
-						{
-							var sNewFormat = r.getNumFormatStr();
-							if(sCurFormat != sNewFormat)
-								c.setNumFormat(sNewFormat);
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
+    function adjustCellFormat( c ) {
+        // ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже
+        var elem = null;
+        if ( c.formulaParsed && c.formulaParsed.outStack ) {
+            for ( var i = 0, length = c.formulaParsed.outStack.length; i < length; i++ ) {
+                elem = c.formulaParsed.outStack[i];
+                if ( elem instanceof cRef || elem instanceof cRef3D || elem instanceof cArea || elem instanceof cArea3D ) {
+                    var r = elem.getRange();
+                    if ( elem instanceof cArea3D && r.length > 0 )
+                        r = r[0];
+                    if ( r && r.getNumFormatStr ) {
+                        var sCurFormat = c.getNumFormatStr();
+                        if ( g_oDefaultNum.f == sCurFormat ) {
+                            var sNewFormat = r.getNumFormatStr();
+                            if ( sCurFormat != sNewFormat )
+                                c.setNumFormat( sNewFormat );
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
 	
 	if( cell.indexOf(":")>-1 ) return;
 	
@@ -3577,7 +3453,7 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 }
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
-}
+			}
 Woorksheet.prototype.helperRebuildFormulas = function(cell,lastName){
 	if( cell.sFormula ){
 		this.workbook.cwf[this.Id].cells[lastName] = null;
@@ -3799,13 +3675,13 @@ Cell.prototype.setValue=function(val,callback){
 				delete wb.cwf[ws.Id].cells[this.oId.getID()];
 			}
 		}
-	}
+			}
 	else{
 		wb.cwf[ws.Id].cells[this.oId.getID()] = this.oId.getID();
 		addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
 	}
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-    wb.needRecalc.length++;
+        wb.needRecalc.length++;
 	
 	this.sFormula = null;
 	this.setFormulaCA(false);
@@ -3857,8 +3733,8 @@ Cell.prototype.setValue2=function(array){
 	this.oValue.setValue2(array);
 	
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
-    wb.needRecalc.length++;
-	sortDependency(this.ws.workbook);
+		wb.needRecalc.length++;
+		sortDependency(this.ws.workbook);
 	var DataNew = null;
 	if(History.Is_On())
 		DataNew = this.getValueData();
@@ -6875,7 +6751,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
                     this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
                     this.worksheet.workbook.needRecalc.length++;
 				}
-			}
+				}
 			else
 			{
 				if(null != rowTo.c[i])
@@ -7286,12 +7162,12 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 								oCopyCell.setFormula(assemb);
 								addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sCopyCellName);
 								this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sCopyCellName) ] = [ this.worksheet.getId(),sCopyCellName ];
-								this.worksheet.workbook.needRecalc.length++;
-							}
+							this.worksheet.workbook.needRecalc.length++;
 						}
 					}
 				}
             }
+		}
 		}
 		//добавляем замерженые области
 		var nShiftHorizontal = 0;

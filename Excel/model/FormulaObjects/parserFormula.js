@@ -136,6 +136,7 @@ Math.binomCoeff = function ( n, k ) {
 Math.permut = function ( n, k ) {
     return Math.floor( this.fact( n ) / this.fact( n - k ) + .5 );
 }
+
 var _func = [];//для велосипеда а-ля перегрузка функций.
 _func[cElementType.number] = [];
 _func[cElementType.string] = [];
@@ -147,86 +148,96 @@ _func[cElementType.array] = [];
 
 
 _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( arg0.getValue() > arg1.getValue() );
-        case ">=":
-            return new cBool( arg0.getValue() >= arg1.getValue() );
-        case "<":
-            return new cBool( arg0.getValue() < arg1.getValue() );
-        case "<=":
-            return new cBool( arg0.getValue() <= arg1.getValue() );
-        case "=":
-            return new cBool( arg0.getValue() == arg1.getValue() );
-        case "<>":
-            return new cBool( arg0.getValue() != arg1.getValue() );
-        case "-":
-            return new cNumber( arg0.getValue() - arg1.getValue() );
-        case "+":
-            return new cNumber( arg0.getValue() + arg1.getValue() );
-        case "/":
-            if ( arg1.getValue() != 0 )
-                return new cNumber( arg0.getValue() / arg1.getValue() );
-            else
-                return new cError( cErrorType.division_by_zero );
-        case "*":
-            return new cNumber( arg0.getValue() * arg1.getValue() );
+    if ( what == ">" ) {
+        return new cBool( arg0.getValue() > arg1.getValue() );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( arg0.getValue() >= arg1.getValue() );
+    }
+    else if ( what == "<" ) {
+        return new cBool( arg0.getValue() < arg1.getValue() );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( arg0.getValue() <= arg1.getValue() );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg0.getValue() == arg1.getValue() );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg0.getValue() != arg1.getValue() );
+    }
+    else if ( what == "-" ) {
+        return new cNumber( arg0.getValue() - arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        return new cNumber( arg0.getValue() + arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        if ( arg1.getValue() != 0 )
+            return new cNumber( arg0.getValue() / arg1.getValue() );
+        else
+            return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( arg0.getValue() * arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.number][cElementType.string] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( false );
-        case "<":
-        case "<=":
-            return new cBool( true );
-        case "=":
-            return new cBool( false );
-        case "<>":
-            return new cBool( true );
-        case "-":
-        case "+":
-        case "/":
-        case "*":
-            return new cError( cErrorType.wrong_value_type );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<" || what == "<=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( true );
+    }
+    else if ( what == "-" || what == "+" || what == "/" || what == "*" ) {
+        return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.number][cElementType.bool] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( false );
-        case "<":
-        case "<=":
-            return new cBool( true );
-        case "=":
-            return new cBool( false );
-        case "<>":
-            return new cBool( true );
-        case "-":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( arg0.getValue() - _arg.getValue() );
-        case "+":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( arg0.getValue() + _arg.getValue() );
-        case "/":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            if ( _arg.getValue() != 0 )
-                return new cNumber( arg0.getValue() / _arg.getValue() );
-            else
-                return new cError( cErrorType.division_by_zero );
-        case "*":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( arg0.getValue() * _arg.getValue() );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<" || what == "<=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( true );
+    }
+    else if ( what == "-" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( arg0.getValue() - _arg.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( arg0.getValue() + _arg.getValue() );
+    }
+    else if ( what == "/" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        if ( _arg.getValue() != 0 )
+            return new cNumber( arg0.getValue() / _arg.getValue() );
+        else
+            return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( arg0.getValue() * _arg.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -236,134 +247,150 @@ _func[cElementType.number][cElementType.error] = function ( arg0, arg1, what ) {
 };
 
 _func[cElementType.number][cElementType.empty] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( arg0.getValue() > 0 );
-        case ">=":
-            return new cBool( arg0.getValue() >= 0 );
-        case "<":
-            return new cBool( arg0.getValue() < 0 );
-        case "<=":
-            return new cBool( arg0.getValue() <= 0 );
-        case "=":
-            return new cBool( arg0.getValue() == 0 );
-        case "<>":
-            return new cBool( arg0.getValue() != 0 );
-        case "-":
-            return new cNumber( arg0.getValue() - 0 );
-        case "+":
-            return new cNumber( arg0.getValue() + 0 );
-        case "/":
-            return new cError( cErrorType.division_by_zero );
-        case "*":
-            return new cNumber( 0 );
+    if ( what == ">" ) {
+        return new cBool( arg0.getValue() > 0 );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( arg0.getValue() >= 0 );
+    }
+    else if ( what == "<" ) {
+        return new cBool( arg0.getValue() < 0 );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( arg0.getValue() <= 0 );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg0.getValue() == 0 );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg0.getValue() != 0 );
+    }
+    else if ( what == "-" ) {
+        return new cNumber( arg0.getValue() - 0 );
+    }
+    else if ( what == "+" ) {
+        return new cNumber( arg0.getValue() + 0 );
+    }
+    else if ( what == "/" ) {
+        return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 
 _func[cElementType.string][cElementType.number] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( true );
-        case "<":
-        case "<=":
-        case "=":
-            return new cBool( false );
-        case "<>":
-            return new cBool( true );
-        case "-":
-        case "+":
-        case "/":
-        case "*":
-            return new cError( cErrorType.wrong_value_type );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "<" || what == "<=" || what == "=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( true );
+    }
+    else if ( what == "-" || what == "+" || what == "/" || what == "*" ) {
+        return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( arg0.getValue() > arg1.getValue() );
-        case ">=":
-            return new cBool( arg0.getValue() >= arg1.getValue() );
-        case "<":
-            return new cBool( arg0.getValue() < arg1.getValue() );
-        case "<=":
-            return new cBool( arg0.getValue() <= arg1.getValue() );
-        case "=":
-            return new cBool( arg0.getValue() === arg1.getValue() );
-        case "<>":
-            return new cBool( arg0.getValue() !== arg1.getValue() );
-        case "-":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() - _arg1.getValue() );
-        case "+":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() + _arg1.getValue() );
-        case "/":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            if ( _arg1.getValue() != 0 )
-                return new cNumber( _arg0.getValue() / _arg1.getValue() );
-            return new cError( cErrorType.division_by_zero );
-        case "*":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() * _arg1.getValue() );
+    if ( what == ">" ) {
+        return new cBool( arg0.getValue() > arg1.getValue() );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( arg0.getValue() >= arg1.getValue() );
+    }
+    else if ( what == "<" ) {
+        return new cBool( arg0.getValue() < arg1.getValue() );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( arg0.getValue() <= arg1.getValue() );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg0.getValue() === arg1.getValue() );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg0.getValue() !== arg1.getValue() );
+    }
+    else if ( what == "-" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() - _arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() + _arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        if ( _arg1.getValue() != 0 )
+            return new cNumber( _arg0.getValue() / _arg1.getValue() );
+        return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( false );
-        case "<":
-        case "<=":
-            return new cBool( true );
-        case "=":
-            return new cBool( false );
-        case "<>":
-            return new cBool( false );
-        case "-":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() - _arg1.getValue() );
-        case "+":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() + _arg1.getValue() );
-        case "/":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            if ( _arg1.getValue() != 0 )
-                return new cNumber( _arg0.getValue() / _arg1.getValue() );
-            return new cError( cErrorType.division_by_zero );
-        case "*":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg0 instanceof cError )    return _arg0;
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() * _arg1.getValue() );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<" || what == "<=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( false );
+    }
+    else if ( what == "-" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() - _arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() + _arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        if ( _arg1.getValue() != 0 )
+            return new cNumber( _arg0.getValue() / _arg1.getValue() );
+        return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg0 instanceof cError )    return _arg0;
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -373,134 +400,152 @@ _func[cElementType.string][cElementType.error] = function ( arg0, arg1, what ) {
 };
 
 _func[cElementType.string][cElementType.empty] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( arg0.getValue().length != 0 );
-        case ">=":
-            return new cBool( arg0.getValue().length >= 0 );
-        case "<":
-            return new cBool( false );
-        case "<=":
-            return new cBool( arg0.getValue().length <= 0 );
-        case "=":
-            return new cBool( arg0.getValue().length === 0 );
-        case "<>":
-            return new cBool( arg0.getValue().length != 0 );
-        case "-":
-        case "+":
-        case "/":
-        case "*":
-            return new cError( cErrorType.wrong_value_type );
+    if ( what == ">" ) {
+        return new cBool( arg0.getValue().length != 0 );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( arg0.getValue().length >= 0 );
+    }
+    else if ( what == "<" ) {
+        return new cBool( false );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( arg0.getValue().length <= 0 );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg0.getValue().length === 0 );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg0.getValue().length != 0 );
+    }
+    else if ( what == "-" || what == "+" || what == "/" || what == "*" ) {
+        return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 
 _func[cElementType.bool][cElementType.number] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( true );
-        case "<":
-        case "<=":
-            return new cBool( false );
-        case "=":
-            return new cBool( true );
-        case "<>":
-            return new cBool( false );
-        case "-":
-            var _arg = arg0.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( _arg.getValue() - arg1.getValue() );
-        case "+":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( _arg.getValue() + arg1.getValue() );
-        case "/":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            if ( arg1.getValue() != 0 )
-                return new cNumber( _arg.getValue() / arg1.getValue() );
-            else
-                return new cError( cErrorType.division_by_zero );
-        case "*":
-            var _arg = arg1.tocNumber();
-            if ( _arg instanceof cError )    return _arg;
-            return new cNumber( _arg.getValue() * arg1.getValue() );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "<" || what == "<=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( false );
+    }
+    else if ( what == "-" ) {
+        var _arg = arg0.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( _arg.getValue() - arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( _arg.getValue() + arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        if ( arg1.getValue() != 0 )
+            return new cNumber( _arg.getValue() / arg1.getValue() );
+        else
+            return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        var _arg = arg1.tocNumber();
+        if ( _arg instanceof cError )    return _arg;
+        return new cNumber( _arg.getValue() * arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.bool][cElementType.string] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case ">=":
-            return new cBool( true );
-        case "<":
-        case "<=":
-            return new cBool( false );
-        case "=":
-            return new cBool( true );
-        case "<>":
-            return new cBool( true );
-        case "-":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() - _arg1.getValue() );
-        case "+":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() + _arg1.getValue() );
-        case "/":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg1 instanceof cError )    return _arg1;
-            if ( _arg1.getValue() != 0 )
-                return new cNumber( _arg0.getValue() / _arg1.getValue() );
-            return new cError( cErrorType.division_by_zero );
-        case "*":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            if ( _arg1 instanceof cError )    return _arg1;
-            return new cNumber( _arg0.getValue() * _arg1.getValue() );
+    if ( what == ">" || what == ">=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "<" || what == "<=" ) {
+        return new cBool( false );
+    }
+    else if ( what == "=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( true );
+    }
+    else if ( what == "-" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() - _arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() + _arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg1 instanceof cError )    return _arg1;
+        if ( _arg1.getValue() != 0 )
+            return new cNumber( _arg0.getValue() / _arg1.getValue() );
+        return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        if ( _arg1 instanceof cError )    return _arg1;
+        return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.bool][cElementType.bool] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return    new cBool( arg0.value > arg1.value );
-        case ">=":
-            return    new cBool( arg0.value >= arg1.value );
-        case "<":
-            return    new cBool( arg0.value < arg1.value );
-        case "<=":
-            return    new cBool( arg0.value <= arg1.value );
-        case "=":
-            return    new cBool( arg0.value === arg1.value );
-        case "<>":
-            return    new cBool( arg0.value !== arg1.value );
-        case "-":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            return new cNumber( _arg0.getValue() - _arg1.getValue() );
-        case "+":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            return new cNumber( _arg0.getValue() + _arg1.getValue() );
-        case "/":
-            if ( !arg1.value )
-                return new cError( cErrorType.division_by_zero );
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            return new cNumber( _arg0.getValue() / _arg1.getValue() );
-        case "*":
-            var _arg0 = arg0.tocNumber(),
-                _arg1 = arg1.tocNumber();
-            return new cNumber( _arg0.getValue() * _arg1.getValue() );
+    if ( what == ">" ) {
+        return    new cBool( arg0.value > arg1.value );
+    }
+    else if ( what == ">=" ) {
+        return    new cBool( arg0.value >= arg1.value );
+    }
+    else if ( what == "<" ) {
+        return    new cBool( arg0.value < arg1.value );
+    }
+    else if ( what == "<=" ) {
+        return    new cBool( arg0.value <= arg1.value );
+    }
+    else if ( what == "=" ) {
+        return    new cBool( arg0.value === arg1.value );
+    }
+    else if ( what == "<>" ) {
+        return    new cBool( arg0.value !== arg1.value );
+    }
+    else if ( what == "-" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        return new cNumber( _arg0.getValue() - _arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        return new cNumber( _arg0.getValue() + _arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        if ( !arg1.value )
+            return new cError( cErrorType.division_by_zero );
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        return new cNumber( _arg0.getValue() / _arg1.getValue() );
+    }
+    else if ( what == "*" ) {
+        var _arg0 = arg0.tocNumber(),
+            _arg1 = arg1.tocNumber();
+        return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -510,27 +555,35 @@ _func[cElementType.bool][cElementType.error] = function ( arg0, arg1, what ) {
 };
 
 _func[cElementType.bool][cElementType.empty] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( arg0.value > false );
-        case ">=":
-            return new cBool( arg0.value >= false );
-        case "<":
-            return new cBool( arg0.value < false );
-        case "<=":
-            return new cBool( arg0.value <= false );
-        case "=":
-            return new cBool( arg0.value === false );
-        case "<>":
-            return new cBool( arg0.value !== false );
-        case "-":
-            return new cNumber( arg0.value ? 1.0 : 0.0 - 0 );
-        case "+":
-            return new cNumber( arg0.value ? 1.0 : 0.0 + 0 );
-        case "/":
-            return new cError( cErrorType.division_by_zero );
-        case "*":
-            return new cNumber( 0 );
+    if ( what == ">" ) {
+        return new cBool( arg0.value > false );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( arg0.value >= false );
+    }
+    else if ( what == "<" ) {
+        return new cBool( arg0.value < false );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( arg0.value <= false );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg0.value === false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg0.value !== false );
+    }
+    else if ( what == "-" ) {
+        return new cNumber( arg0.value ? 1.0 : 0.0 - 0 );
+    }
+    else if ( what == "+" ) {
+        return new cNumber( arg0.value ? 1.0 : 0.0 + 0 );
+    }
+    else if ( what == "/" ) {
+        return new cError( cErrorType.division_by_zero );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -544,80 +597,98 @@ _func[cElementType.error][cElementType.number] = _func[cElementType.error][cElem
 
 
 _func[cElementType.empty][cElementType.number] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( 0 > arg1.getValue() );
-        case ">=":
-            return new cBool( 0 >= arg1.getValue() );
-        case "<":
-            return new cBool( 0 < arg1.getValue() );
-        case "<=":
-            return new cBool( 0 <= arg1.getValue() );
-        case "=":
-            return new cBool( 0 == arg1.getValue() );
-        case "<>":
-            return new cBool( 0 != arg1.getValue() );
-        case "-":
-            return new cNumber( 0 - arg1.getValue() );
-        case "+":
-            return new cNumber( 0 + arg1.getValue() );
-        case "/":
-            if ( arg1.getValue() == 0 )
-                return new cError( cErrorType.not_numeric );
-            return new cNumber( 0 );
-        case "*":
-            return new cNumber( 0 );
+    if ( what == ">" ) {
+        return new cBool( 0 > arg1.getValue() );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( 0 >= arg1.getValue() );
+    }
+    else if ( what == "<" ) {
+        return new cBool( 0 < arg1.getValue() );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( 0 <= arg1.getValue() );
+    }
+    else if ( what == "=" ) {
+        return new cBool( 0 == arg1.getValue() );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( 0 != arg1.getValue() );
+    }
+    else if ( what == "-" ) {
+        return new cNumber( 0 - arg1.getValue() );
+    }
+    else if ( what == "+" ) {
+        return new cNumber( 0 + arg1.getValue() );
+    }
+    else if ( what == "/" ) {
+        if ( arg1.getValue() == 0 )
+            return new cError( cErrorType.not_numeric );
+        return new cNumber( 0 );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.empty][cElementType.string] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( 0 > arg1.getValue().length );
-        case ">=":
-            return new cBool( 0 >= arg1.getValue().length );
-        case "<":
-            return new cBool( 0 < arg1.getValue().length );
-        case "<=":
-            return new cBool( 0 <= arg1.getValue().length );
-        case "=":
-            return new cBool( 0 === arg1.getValue().length );
-        case "<>":
-            return new cBool( 0 != arg1.getValue().length );
-        case "-":
-        case "+":
-        case "/":
-        case "*":
-            return new cError( cErrorType.wrong_value_type );
+    if ( what == ">" ) {
+        return new cBool( 0 > arg1.getValue().length );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( 0 >= arg1.getValue().length );
+    }
+    else if ( what == "<" ) {
+        return new cBool( 0 < arg1.getValue().length );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( 0 <= arg1.getValue().length );
+    }
+    else if ( what == "=" ) {
+        return new cBool( 0 === arg1.getValue().length );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( 0 != arg1.getValue().length );
+    }
+    else if ( what == "-" || what == "+" || what == "/" || what == "*" ) {
+        return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
 };
 
 _func[cElementType.empty][cElementType.bool] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-            return new cBool( false > arg1.value );
-        case ">=":
-            return new cBool( false >= arg1.value );
-        case "<":
-            return new cBool( false < arg1.value );
-        case "<=":
-            return new cBool( false <= arg1.value );
-        case "=":
-            return new cBool( arg1.value === false );
-        case "<>":
-            return new cBool( arg1.value !== false );
-        case "-":
-            return new cNumber( 0 - arg1.value ? 1.0 : 0.0 );
-        case "+":
-            return new cNumber( arg1.value ? 1.0 : 0.0 );
-        case "/":
-            if ( arg1.value )
-                return new cNumber( 0 );
-            return new cError( cErrorType.not_numeric );
-        case "*":
+    if ( what == ">" ) {
+        return new cBool( false > arg1.value );
+    }
+    else if ( what == ">=" ) {
+        return new cBool( false >= arg1.value );
+    }
+    else if ( what == "<" ) {
+        return new cBool( false < arg1.value );
+    }
+    else if ( what == "<=" ) {
+        return new cBool( false <= arg1.value );
+    }
+    else if ( what == "=" ) {
+        return new cBool( arg1.value === false );
+    }
+    else if ( what == "<>" ) {
+        return new cBool( arg1.value !== false );
+    }
+    else if ( what == "-" ) {
+        return new cNumber( 0 - arg1.value ? 1.0 : 0.0 );
+    }
+    else if ( what == "+" ) {
+        return new cNumber( arg1.value ? 1.0 : 0.0 );
+    }
+    else if ( what == "/" ) {
+        if ( arg1.value )
             return new cNumber( 0 );
+        return new cError( cErrorType.not_numeric );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -627,22 +698,20 @@ _func[cElementType.empty][cElementType.error] = function ( arg0, arg1, what ) {
 };
 
 _func[cElementType.empty][cElementType.empty] = function ( arg0, arg1, what ) {
-    switch ( what ) {
-        case ">":
-        case "<":
-        case "<>":
-            return new cBool( false );
-        case ">=":
-        case "<=":
-        case "=":
-            return new cBool( true );
-        case "-":
-        case "+":
-            return new cNumber( 0 );
-        case "/":
-            return new cError( cErrorType.not_numeric );
-        case "*":
-            return new cNumber( 0 );
+    if ( what == ">" || what == "<" || what == "<>" ) {
+        return new cBool( false );
+    }
+    else if ( what == ">=" || what == "<=" || what == "=" ) {
+        return new cBool( true );
+    }
+    else if ( what == "-" || what == "+" ) {
+        return new cNumber( 0 );
+    }
+    else if ( what == "/" ) {
+        return new cError( cErrorType.not_numeric );
+    }
+    else if ( what == "*" ) {
+        return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
 };
@@ -780,11 +849,20 @@ function checkTypeCell( val ) {
 /*Base classes for operators & functions */
 /** @constructor */
 function cBaseOperator( name, priority, argumentCount ) {
-    this.name = name ? name : "";
-    this.priority = priority !== undefined ? priority : 10;
+    if( name )
+        this.name = name;
+    else
+        this.name = "";
+    if( priority !== undefined  )
+        this.priority = priority;
+    else
+        this.priority = 10;
     this.type = cElementType.operator;
     this.isRightAssociative = false;
-    this.argumentsCurrent = argumentCount !== undefined ? argumentCount : 2;
+    if( argumentCount !== undefined )
+        this.argumentsCurrent = argumentCount;
+    else
+        this.argumentsCurrent = 2;
     this.value = null;
     this.formatType = {
         def:-1, //подразумевается формат первой ячейки входящей в формулу.
@@ -904,39 +982,253 @@ cBaseType.prototype = {
     setNode:function(node){this.node = node;}
 }
 
+function parentLeft() {
+    this.name  = "(";
+    this.type = cElementType.operator;
+    this.argumentsCurrent = 1
+};
+parentLeft.prototype.constructor = parentLeft;
+parentLeft.prototype.DecrementArguments = function () {
+    --this.argumentsCurrent;
+}
+parentLeft.prototype.IncrementArguments = function () {
+    ++this.argumentsCurrent;
+}
+parentLeft.prototype.toString = function () {
+    return this.name;
+}
+parentLeft.prototype.getArguments = function () {
+    return this.argumentsCurrent;
+}
+parentLeft.prototype.Assemble = function ( arg ) {
+    return new cString( "(" + arg + ")" );
+}
+
+function parentRight() {
+    this.name  = ")";
+    this.type = cElementType.operator;
+};
+parentRight.prototype.constructor = parentRight;
+parentRight.prototype.toString = function () {
+    return this.name;
+}
+
+function cUnarMinusOperator(){
+    cBaseOperator.apply(this, ['un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/]);
+    this.isRightAssociative = true;
+}
+cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+cUnarMinusOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0.foreach(
+            function ( arrElem, r, c ) {
+                arrElem = arrElem.tocNumber();
+                arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( -arrElem.getValue() );
+            }
+        )
+        return this.value = arg0;
+    }
+    arg0 = arg0.tocNumber();
+    return this.value = arg0 instanceof cError ? arg0 : new cNumber( -arg0.getValue() )
+}
+cUnarMinusOperator.prototype.toString = function () {        // toString function
+    return '-';
+}
+cUnarMinusOperator.prototype.Assemble = function ( arg ) {
+    return new cString( "-" + arg[0] );
+}
+
+function cUnarPlusOperator(){
+    cBaseOperator.apply(this, ['un_plus', 50, 1]);
+    this.isRightAssociative = true;
+}
+cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
+cUnarPlusOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    arg0 = arg[0].tryConvert();
+    return this.value = arg0;
+}
+cUnarPlusOperator.prototype.toString = function () {
+    return '+';
+}
+cUnarPlusOperator.prototype.Assemble = function ( arg ) {
+    return new cString( "+" + arg[0] );
+}
+
+function cPlusOperator(){
+    cBaseOperator.apply(this, ['+', 20]);
+}
+cPlusOperator.prototype = Object.create(cBaseOperator.prototype);
+cPlusOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
+}
+
+function cMinusOperator(){
+    cBaseOperator.apply(this, ['-', 20]);
+}
+cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+cMinusOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "-", arguments[1].first );
+}
+
+function cPercentOperator(){
+    cBaseOperator.apply(this, ['%', 45, 1]);
+    this.isRightAssociative = true;
+}
+cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
+cPercentOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        arg0.foreach(
+            function ( arrElem, r, c ) {
+                arrElem = arrElem.tocNumber();
+                arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( arrElem.getValue() / 100 );
+            }
+        )
+        return this.value = arg0;
+    }
+    arg0 = arg0.tocNumber();
+    this.value = arg0 instanceof cError ? arg0 : new cNumber( arg0.getValue() / 100 );
+    this.value.numFormat = 9;
+    return this.value;
+}
+cPercentOperator.prototype.Assemble = function ( arg ) {
+    return new cString( arg[0] + this.name );
+}
+
+function cPowOperator(){
+    cBaseOperator.apply(this, ['^', 40]);
+}
+cPowOperator.prototype = Object.create(cBaseOperator.prototype);
+cPowOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocNumber();
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg1 = arg1.tocNumber();
+    if ( arg0 instanceof cError ) return this.value = arg0;
+    if ( arg1 instanceof cError ) return this.value = arg1;
+
+    var _v = Math.pow( arg0.getValue(), arg1.getValue() );
+    if ( isNaN( _v ) )
+        return this.value = new cError( cErrorType.not_numeric );
+    else if ( _v === Number.POSITIVE_INFINITY )
+        return this.value = new cError( cErrorType.division_by_zero );
+    return this.value = new cNumber( _v );
+}
+
+function cMultOperator(){
+    cBaseOperator.apply(this, ['*', 30]);
+}
+cMultOperator.prototype = Object.create(cBaseOperator.prototype);
+cMultOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
+}
+
+function cDivOperator(){
+    cBaseOperator.apply(this, ['/', 30]);
+}
+cDivOperator.prototype = Object.create(cBaseOperator.prototype);
+cDivOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
+}
+
+function cConcatSTROperator(){
+    cBaseOperator.apply(this, ['&', 15]);
+}
+cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
+cConcatSTROperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0], arg1 = arg[1];
+    if ( arg0 instanceof cArea ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    arg0 = arg0.tocString();
+    if ( arg1 instanceof cArea ) {
+        arg1 = arg1.cross( arguments[1].first );
+    }
+    arg1 = arg1.tocString();
+
+    return this.value = arg0 instanceof cError ? arg0 :
+        arg1 instanceof cError ? arg1 :
+            new cString( arg0.toString().concat( arg1.toString() ) )
+}
+
+function cEqualsOperator(){
+    cBaseOperator.apply(this, ['=', 10]);
+}
+cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+cEqualsOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
+}
+
+function cNotEqualsOperator(){
+    cBaseOperator.apply(this, ['<>', 10]);
+}
+cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+cNotEqualsOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
+}
+
+function cLessOperator(){
+    cBaseOperator.apply(this, ['<', 10]);
+}
+cLessOperator.prototype = Object.create(cBaseOperator.prototype);
+cLessOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
+}
+
+function cLessOrEqualOperator(){
+    cBaseOperator.apply(this, ['<=', 10]);
+}
+cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
+}
+
+function cGreaterOperator(){
+    cBaseOperator.apply(this, ['>', 10]);
+}
+cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
+cGreaterOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
+}
+
+function cGreaterOrEqualOperator(){
+    cBaseOperator.apply(this, ['>=', 10]);
+}
+cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
+    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">=", arguments[1].first );
+}
+
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 var cFormulaOperators = {
-    '(':function () {
-        var r = {};
-        r.name = "(";
-        r.type = cElementType.operator;
-        r.argumentsCurrent = 1;
-        r.DecrementArguments = function () {
-            --this.argumentsCurrent;
-        }
-        r.IncrementArguments = function () {
-            ++this.argumentsCurrent;
-        }
-        r.toString = function () {
-            return this.name;
-        }
-        r.getArguments = function () {
-            return this.argumentsCurrent;
-        }
-        r.Assemble = function ( arg ) {
-            return new cString( "(" + arg + ")" );
-        }
-        return r;
-    },
-    ')':function () {
-        var r = {};
-        r.name = ')';
-        r.type = cElementType.operator;
-        r.toString = function () {
-            return ')';
-        }
-        return r;
-    },
+    '(':parentLeft,
+    ')':parentRight,
     '{':function () {
         var r = {};
         r.name = '{';
@@ -954,203 +1246,23 @@ var cFormulaOperators = {
         return r;
     },
     /* 50 is highest priority */
-    'un_minus':function () {
-        var r = new cBaseOperator( 'un_minus'/**name operator*/, 50/**priority of operator*/, 1/**count arguments*/ );
-        r.Calculate = function ( arg ) {    //calculate operator
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArea ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cArray ) {
-                arg0.foreach(
-                    function ( arrElem, r, c ) {
-                        arrElem = arrElem.tocNumber();
-                        arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( -arrElem.getValue() );
-                    }
-                )
-                return this.value = arg0;
-            }
-            arg0 = arg0.tocNumber();
-            return this.value = arg0 instanceof cError ? arg0 : new cNumber( -arg0.getValue() )
-        },
-        r.toString = function () {        // toString function
-            return '-';
-        }
-        r.Assemble = function ( arg ) {
-            return new cString( "-" + arg[0] );
-        }
-        r.isRightAssociative = true;
-        return r;
-    },
-    'un_plus':function () {
-        var r = new cBaseOperator( 'un_plus', 50, 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArea ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            arg0 = arg[0].tryConvert();
-            return this.value = arg0;
-        }
-        r.toString = function () {
-            return '+';
-        }
-        r.isRightAssociative = true;
-        r.Assemble = function ( arg ) {
-            return new cString( "+" + arg[0] );
-        }
-        return r;
-    },
-    '%':function () {
-        var r = new cBaseOperator( '%', 45, 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArea ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cArray ) {
-                arg0.foreach(
-                    function ( arrElem, r, c ) {
-                        arrElem = arrElem.tocNumber();
-                        arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( arrElem.getValue() / 100 );
-                    }
-                )
-                return this.value = arg0;
-            }
-            arg0 = arg0.tocNumber();
-            this.value = arg0 instanceof cError ? arg0 : new cNumber( arg0.getValue() / 100 );
-            this.value.numFormat = 9;
-            return this.value;
-        }
-        r.isRightAssociative = true;
-        r.Assemble = function ( arg ) {
-            return new cString( arg[0] + this.name );
-        }
-        return r;
-    },
-    '^':function () {
-        var r = new cBaseOperator( '^', 40 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0], arg1 = arg[1];
-            if ( arg0 instanceof cArea ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            arg0 = arg0.tocNumber();
-            if ( arg1 instanceof cArea ) {
-                arg1 = arg1.cross( arguments[1].first );
-            }
-            arg1 = arg1.tocNumber();
-            if ( arg0 instanceof cError ) return this.value = arg0;
-            if ( arg1 instanceof cError ) return this.value = arg1;
-
-            var _v = Math.pow( arg0.getValue(), arg1.getValue() );
-            if ( isNaN( _v ) )
-                return this.value = new cError( cErrorType.not_numeric );
-            else if ( _v === Number.POSITIVE_INFINITY )
-                return this.value = new cError( cErrorType.division_by_zero );
-            return this.value = new cNumber( _v );
-        }
-        return r;
-    },
-    '*':function () {
-        var r = new cBaseOperator( '*', 30 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
-        }
-        return r;
-    },
-    '/':function () {
-        var r = new cBaseOperator( '/', 30 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
-        }
-        return r;
-    },
-    '+':function () {
-        var r = new cBaseOperator( '+', 20 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
-        }
-        return r;
-    },
-    '-':function () {
-        var r = new cBaseOperator( '-', 20 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "-", arguments[1].first );
-        }
-        return r;
-    },
-    '&':function () {//concat str
-        var r = new cBaseOperator( '&', 15 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0], arg1 = arg[1];
-            if ( arg0 instanceof cArea ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            arg0 = arg0.tocString();
-            if ( arg1 instanceof cArea ) {
-                arg1 = arg1.cross( arguments[1].first );
-            }
-            arg1 = arg1.tocString();
-
-            return this.value = arg0 instanceof cError ? arg0 :
-                arg1 instanceof cError ? arg1 :
-                    new cString( arg0.toString().concat( arg1.toString() ) )
-        }
-        return r;
-    },
-    '=':function () {// equals
-        var r = new cBaseOperator( '=', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
-        }
-        return r;
-    },
-    '<>':function () {
-        var r = new cBaseOperator( '<>', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
-        }
-        return r;
-    },
-    '<':function () {
-        var r = new cBaseOperator( '<', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
-        }
-        return r;
-    },
-    '<=':function () {
-        var r = new cBaseOperator( '<=', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
-        };
-        return r;
-    },
-    '>':function () {
-        var r = new cBaseOperator( '>', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
-        };
-        return r;
-    },
-    '>=':function () {
-        var r = new cBaseOperator( '>=', 10 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-            return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">=", arguments[1].first );
-        };
-        return r;
-    }
+    'un_minus':cUnarMinusOperator,
+    'un_plus':cUnarPlusOperator,
+    '%':cPercentOperator,
+    '^':cPowOperator,
+    '*':cMultOperator,
+    '/':cDivOperator,
+    '+':cPlusOperator,
+    '-':cMinusOperator,
+    '&'://concat str
+        cConcatSTROperator,
+    '=':// equals
+        cEqualsOperator,
+    '<>':cNotEqualsOperator,
+    '<':cLessOperator,
+    '<=':cLessOrEqualOperator,
+    '>':cGreaterOperator,
+    '>=':cGreaterOrEqualOperator
     /* 10 is lowest priopity */
 };
 
@@ -1183,7 +1295,7 @@ function getFormulasInfo() {
 /*Basic types of an elements used into formulas*/
 /** @constructor */
 function cNumber( val ) {
-    cNumber.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.type = cElementType.number;
     this.value = parseFloat( val );
     if( !isNaN( this.value ) && Math.abs(this.value)!=Infinity )
@@ -1191,7 +1303,7 @@ function cNumber( val ) {
    else
         return new cError( cErrorType.not_numeric );
 }
-extend( cNumber, cBaseType );
+cNumber.prototype = Object.create(cBaseType.prototype);
 cNumber.prototype.getValue = function () {
     return this.value//.toFixed( cExcelSignificantDigits ) - 0;
 };
@@ -1207,10 +1319,10 @@ cNumber.prototype.tocBool = function () {
 
 /** @constructor */
 function cString( val ) {
-    cString.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.type = cElementType.string;
 }
-extend( cString, cBaseType );
+cString.prototype = Object.create(cBaseType.prototype);
 cString.prototype.tocNumber = function () {
     if ( this.value == "" )
         return new cEmpty();
@@ -1249,19 +1361,15 @@ cString.prototype.tryConvert = function () {
 
 /** @constructor */
 function cBool( val ) {
-    cBool.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.type = cElementType.bool;
-    var that = this;
-    switch ( val.toString().toUpperCase() ) {
-        case "TRUE":
-            this.value = true;
-            break;
-        case "FALSE":
-            this.value = false;
-            break;
-    }
+    var v = val.toString().toUpperCase();
+    if( v == "TRUE" )
+        this.value = true;
+    else
+        this.value = false;
 }
-extend( cBool, cBaseType );
+cBool.prototype = Object.create(cBaseType.prototype);
 cBool.prototype.toString = function () {
     return this.value.toString().toUpperCase();
 };
@@ -1283,89 +1391,69 @@ cBool.prototype.toBool = function () {
 
 /** @constructor */
 function cError( val ) {
-    cError.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.type = cElementType.error;
     this.errorType = -1;
 
     if ( isNaN( parseInt( val ) ) ) {
-        switch ( val ) {
-            case "#VALUE!":
-                this.errorType = cErrorType.wrong_value_type;
-                break;
-            case "#NULL!":
-                this.errorType = cErrorType.null_value;
-                break;
-            case "#DIV/0!":
-                this.errorType = cErrorType.division_by_zero;
-                break;
-            case "#REF!":
-                this.errorType = cErrorType.bad_reference;
-                break;
-            case "#NAME?":
-                this.errorType = cErrorType.wrong_name;
-                break;
-            case "#NUM!":
-                this.errorType = cErrorType.not_numeric;
-                break;
-            case "#N/A":
-                this.errorType = cErrorType.not_available;
-                break;
-            case "#UNSUPPORTED_FUNCTION!":
-                this.errorType = cErrorType.unsupported_function;
-                break;
-            case "#GETTING_DATA":
-                this.errorType = cErrorType.getting_data;
-                break;
-        }
+        if( val == "#VALUE!" ){
+			this.errorType = cErrorType.wrong_value_type;
+		}else if( val == "#NULL!" ){
+			this.errorType = cErrorType.null_value;
+		}else if( val == "#DIV/0!" ){
+			this.errorType = cErrorType.division_by_zero;
+		}else if( val == "#REF!" ){
+			this.errorType = cErrorType.bad_reference;
+		}else if( val == "#NAME?" ){
+			this.errorType = cErrorType.wrong_name;
+		}else if( val == "#NUM!" ){
+			this.errorType = cErrorType.not_numeric;
+		}else if( val == "#N/A" ){
+			this.errorType = cErrorType.not_available;
+		}else if( val == "#UNSUPPORTED_FUNCTION!" ){
+			this.errorType = cErrorType.unsupported_function;
+		}else if( val == "#GETTING_DATA" ){
+			this.errorType = cErrorType.getting_data;
+		}
         return this;
     }
-    switch ( val ) {
-        case cErrorType.null_value:
-            this.value = "#NULL!";
-            this.errorType = cErrorType.null_value;
-            break;
-        case cErrorType.division_by_zero:
-            this.value = "#DIV/0!";
-            this.errorType = cErrorType.division_by_zero;
-            break;
-        case cErrorType.wrong_value_type:
-            this.value = "#VALUE!";
-            this.errorType = cErrorType.wrong_value_type;
-            break;
-        case cErrorType.bad_reference:
-            this.value = "#REF!";
-            this.errorType = cErrorType.bad_reference;
-            break;
-        case cErrorType.wrong_name:
-            this.value = "#NAME?";
-            this.errorType = cErrorType.wrong_name;
-            break;
-        case cErrorType.not_numeric:
-            this.value = "#NUM!";
-            this.errorType = cErrorType.not_numeric;
-            break;
-        case cErrorType.not_available:
-            this.value = "#N/A";
-            this.errorType = cErrorType.not_available;
-            break;
-        case cErrorType.unsupported_function:
-            this.value = "#UNSUPPORTED_FUNCTION!";
-            this.errorType = cErrorType.unsupported_function;
-            break;
-        case cErrorType.getting_data:
-            this.value = "#GETTING_DATA";
-            this.errorType = cErrorType.getting_data;
-            break;
+    if( val == cErrorType.null_value ){
+		this.value = "#NULL!";
+		this.errorType = cErrorType.null_value;
+    }else if( val == cErrorType.division_by_zero ){
+		this.value = "#DIV/0!";
+		this.errorType = cErrorType.division_by_zero;
+    }else if( val == cErrorType.wrong_value_type ){
+		this.value = "#VALUE!";
+		this.errorType = cErrorType.wrong_value_type;
+    }else if( val == cErrorType.bad_reference ){
+		this.value = "#REF!";
+		this.errorType = cErrorType.bad_reference;
+    }else if( val == cErrorType.wrong_name ){
+		this.value = "#NAME?";
+		this.errorType = cErrorType.wrong_name;
+    }else if( val == cErrorType.not_numeric ){
+		this.value = "#NUM!";
+		this.errorType = cErrorType.not_numeric;
+    }else if( val == cErrorType.not_available ){
+		this.value = "#N/A";
+		this.errorType = cErrorType.not_available;
+    }else if( val == cErrorType.unsupported_function ){
+		this.value = "#UNSUPPORTED_FUNCTION!";
+		this.errorType = cErrorType.unsupported_function;
+    }else if( val == cErrorType.getting_data ){
+		this.value = "#GETTING_DATA";
+		this.errorType = cErrorType.getting_data;
     }
 }
-extend( cError, cBaseType );
+cError.prototype = Object.create(cBaseType.prototype);
 cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
     return this;
 };
 
 /** @constructor */
 function cArea( val, _ws ) {/*Area means "A1:E5" for example*/
-    cArea.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.ws = _ws;
     this.wb = _ws.workbook;
     this._cells = val;
@@ -1374,7 +1462,7 @@ function cArea( val, _ws ) {/*Area means "A1:E5" for example*/
     // this.range = this.wb.getWorksheetById(this.ws).getRange2(val);
     // this._valid = this.range ? true : false;
 }
-extend( cArea, cBaseType );
+cArea.prototype = Object.create(cBaseType.prototype);
 cArea.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -1383,29 +1471,31 @@ cArea.prototype.getValue = function () {
     if ( !r ) {
         _val.push( new cError( cErrorType.bad_reference ) )
     }
-    else
+    else {
         r._foreachNoEmpty( function ( _cell ) {
-            switch ( _cell.getType() ) {
-                case CellValueType.Number:
-                    _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    break;
-                case CellValueType.Bool:
-                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.Error:
-                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.String:
+            var cellType = _cell.getType();
+            if ( cellType == CellValueType.Number ) {
+                _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+            }
+            else if ( cellType == CellValueType.Bool ) {
+                _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+            }
+            else if ( cellType == CellValueType.Error ) {
+                _val.push( new cError( _cell.getValueWithoutFormat() ) );
+            }
+            else if ( cellType == CellValueType.String ) {
+                _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+            }
+            else {
+                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                    _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+                }
+                else {
                     _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                    break;
-                default:
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    }
-                    else
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                }
             }
         } );
+    }
     return _val;
 };
 cArea.prototype.getValue2 = function ( cell ) {
@@ -1413,30 +1503,32 @@ cArea.prototype.getValue2 = function ( cell ) {
     if ( !r ) {
         _val.push( new cError( cErrorType.bad_reference ) )
     }
-    else
+    else {
         r._foreachNoEmpty( function ( _cell ) {
-            if ( cell.getID() == _cell.getName() )
-                switch ( _cell.getType() ) {
-                    case CellValueType.Number:
-                        _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                        break;
-                    case CellValueType.Bool:
-                        _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                        break;
-                    case CellValueType.Error:
-                        _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                        break;
-                    case CellValueType.String:
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                        break;
-                    default:
-                        if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                            _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                        }
-                        else
-                            _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+            if ( cell.getID() == _cell.getName() ) {
+                var cellType = _cell.getType();
+                if ( cellType == CellValueType.Number ) {
+                    _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
                 }
+                else if ( cellType == CellValueType.Bool ) {
+                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+                }
+                else if ( cellType == CellValueType.Error ) {
+                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
+                }
+                else if ( cellType == CellValueType.String ) {
+                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                }
+                else {
+                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+                    }
+                    else
+                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+                }
+            }
         } );
+    }
 
     if( _val[0] == undefined || _val[0] == null )
         return new cEmpty();
@@ -1513,29 +1605,30 @@ cArea.prototype.foreach2 = function ( action ) {
         r._foreach2( function ( _cell ) {
             var val;
             if ( _cell ) {
-                switch ( _cell.getType() ) {
-                    case CellValueType.Number:
-                        _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
-                        break;
-                    case CellValueType.Bool:
-                        val = new cBool( _cell.getValueWithoutFormat() );
-                        break;
-                    case CellValueType.Error:
-                        val = new cError( _cell.getValueWithoutFormat() );
-                        break;
-                    case CellValueType.String:
-                        val = new cString( _cell.getValueWithoutFormat() );
-                        break;
-                    default:
-                        if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                            val = new cNumber( _cell.getValueWithoutFormat() )
-                        }
-                        else
-                            val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                var  cellType=_cell.getType();
+                if ( cellType == CellValueType.Number ) {
+                    _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                }
+                else if ( cellType == CellValueType.Bool ) {
+                    val = new cBool( _cell.getValueWithoutFormat() );
+                }
+                else if ( cellType == CellValueType.Error ) {
+                    val = new cError( _cell.getValueWithoutFormat() );
+                }
+                else if ( cellType == CellValueType.String ) {
+                    val = new cString( _cell.getValueWithoutFormat() );
+                }
+                else {
+                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                        val = new cNumber( _cell.getValueWithoutFormat() )
+                    }
+                    else
+                        val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
                 }
             }
-            else
-                val = new cEmpty()
+            else{
+                val = new cEmpty();
+            }
             action(val);
         } );
     }
@@ -1547,25 +1640,25 @@ cArea.prototype.getMatrix = function () {
         if ( !arr[i - r1] )
             arr[i - r1] = [];
         if ( cell ) {
-            switch ( cell.getType() ) {
-                case CellValueType.Number:
-                    arr[i - r1][j - c1] = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
-                    break;
-                case CellValueType.Bool:
-                    arr[i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
-                    break;
-                case CellValueType.Error:
-                    arr[i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
-                    break;
-                case CellValueType.String:
-                    arr[i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
-                    break;
-                default:
-                    if ( !cell.isEmptyTextString()) {
-                        arr[i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
-                    }
-                    else
-                        arr[i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
+            var cellType = cell.getType();
+            if ( cellType == CellValueType.Number ) {
+                arr[i - r1][j - c1] = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
+            }
+            else if ( cellType == CellValueType.Bool ) {
+                arr[i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
+            }
+            else if ( cellType == CellValueType.Error ) {
+                arr[i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
+            }
+            else if ( cellType == CellValueType.String ) {
+                arr[i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
+            }
+            else {
+                if ( !cell.isEmptyTextString() ) {
+                    arr[i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
+                }
+                else
+                    arr[i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
             }
         }
         else
@@ -1576,16 +1669,16 @@ cArea.prototype.getMatrix = function () {
 
 /** @constructor */
 function cRef( val, _ws ) {/*Ref means A1 for example*/
-    cRef.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this._cells = val;
     this.ws = _ws;
     this.wb = _ws.workbook;
     this.isAbsolute = false;
     this.type = cElementType.cell;
     this.range = _ws.getRange2( val );
-    this._valid = new CellAddress( val.replace( /\$/g, "" ) ).isValid();
+    this._valid = new CellAddress( val.replace( rx_space_g, "" ) ).isValid();
 }
-extend( cRef, cBaseType );
+cRef.prototype = Object.create(cBaseType.prototype);
 cRef.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -1593,21 +1686,22 @@ cRef.prototype.getValue = function () {
     if ( !this._valid ) {
         return new cError( cErrorType.bad_reference )
     }
-    switch ( this.range.getType() ) {
-        case CellValueType.Number:
-        {
-            var v = this.range.getValueWithoutFormat();
-            if ( v == "" )
-                return new cEmpty()
-            else
-                return new cNumber( "" + v );
-        }
-        case CellValueType.Bool:
-            return new cBool( "" + this.range.getValueWithoutFormat() )
-        case CellValueType.Error:
-            return new cError( "" + this.range.getValueWithoutFormat() )
-        default:
-            return checkTypeCell( "" + this.range.getValueWithoutFormat() )
+    var cellType = this.range.getType()
+    if ( cellType == CellValueType.Number ) {
+        var v = this.range.getValueWithoutFormat();
+        if ( v == "" )
+            return new cEmpty()
+        else
+            return new cNumber( "" + v );
+    }
+    else if ( cellType == CellValueType.Bool ) {
+        return new cBool( "" + this.range.getValueWithoutFormat() )
+    }
+    else if ( cellType == CellValueType.Error ) {
+        return new cError( "" + this.range.getValueWithoutFormat() )
+    }
+    else {
+        return checkTypeCell( "" + this.range.getValueWithoutFormat() )
     }
 };
 cRef.prototype.tocNumber = function () {
@@ -1638,7 +1732,7 @@ cRef.prototype.isValid = function () {
 
 /** @constructor */
 function cArea3D( val, _wsFrom, _wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-    cArea3D.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
@@ -1646,7 +1740,7 @@ function cArea3D( val, _wsFrom, _wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for e
     this.wsFrom = this._wb.getWorksheetByName( _wsFrom ).getId();
     this.wsTo = this._wb.getWorksheetByName( _wsTo ).getId();
 }
-extend( cArea3D, cBaseType );
+cArea3D.prototype = Object.create(cBaseType.prototype);
 cArea3D.prototype.wsRange = function () {
     var r = [];
     if ( !this.wsTo ) this.wsTo = this.wsFrom;
@@ -1691,25 +1785,25 @@ cArea3D.prototype.getValue = function () {
             return _val;
         }
         _r[i]._foreachNoEmpty( function ( _cell ) {
-            switch ( _cell.getType() ) {
-                case CellValueType.Number:
-                    _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    break;
-                case CellValueType.Bool:
-                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.Error:
-                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.String:
+            var cellType = _cell.getType()
+            if ( cellType == CellValueType.Number ) {
+                _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+            }
+            else if ( cellType == CellValueType.Bool ) {
+                _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+            }
+            else if ( cellType == CellValueType.Error ) {
+                _val.push( new cError( _cell.getValueWithoutFormat() ) );
+            }
+            else if ( cellType == CellValueType.String ) {
+                _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+            }
+            else {
+                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                    _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+                }
+                else
                     _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                    break;
-                default:
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    }
-                    else
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
             }
         } )
     }
@@ -1736,26 +1830,26 @@ cArea3D.prototype.getValue2 = function ( cell ) {
     }
     _r[0]._foreachNoEmpty( function ( _cell ) {
         if ( cell.getID() == _cell.getName() )
-            switch ( _cell.getType() ) {
-                case CellValueType.Number:
-                    _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    break;
-                case CellValueType.Bool:
-                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.Error:
-                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.String:
-                    _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                    break;
-                default:
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
-                    }
-                    else
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+            var cellType = _cell.getType();
+        if ( cellType == CellValueType.Number ) {
+            _cell.getValueWithoutFormat() == "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
+        }
+        else if ( cellType == CellValueType.Bool ) {
+            _val.push( new cBool( _cell.getValueWithoutFormat() ) );
+        }
+        else if ( cellType == CellValueType.Error ) {
+            _val.push( new cError( _cell.getValueWithoutFormat() ) );
+        }
+        else if ( cellType == CellValueType.String ) {
+            _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+        }
+        else {
+            if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                _val.push( new cNumber( _cell.getValueWithoutFormat() ) )
             }
+            else
+                _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
+        }
     } )
 
     if( _val[0] == undefined || _val[0] == null )
@@ -1890,25 +1984,25 @@ cArea3D.prototype.getMatrix = function () {
             if ( !arr[k][i - r1] )
                 arr[k][i - r1] = [];
             if ( cell ) {
-                switch ( cell.getType() ) {
-                    case CellValueType.Number:
-                        arr[k][i - r1][j - c1] = cell.getValueWithoutFormat() == "" ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
-                        break;
-                    case CellValueType.Bool:
-                        arr[k][i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
-                        break;
-                    case CellValueType.Error:
-                        arr[k][i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
-                        break;
-                    case CellValueType.String:
-                        arr[k][i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
-                        break;
-                    default:
-                        if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() != "" ) {
-                            arr[k][i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
-                        }
-                        else
-                            arr[k][i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
+                var cellType = cell.getType();
+                if ( cellType == CellValueType.Number ) {
+                    arr[k][i - r1][j - c1] = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
+                }
+                else if ( cellType == CellValueType.Bool ) {
+                    arr[k][i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
+                }
+                else if ( cellType == CellValueType.Error ) {
+                    arr[k][i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
+                }
+                else if ( cellType == CellValueType.String ) {
+                    arr[k][i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
+                }
+                else {
+                    if ( cell.isEmptyTextString() ) {
+                        arr[k][i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
+                    }
+                    else
+                        arr[k][i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
                 }
             }
             else
@@ -1926,25 +2020,25 @@ cArea3D.prototype.foreach2 = function ( action ) {
                 _r[i]._foreach2( function ( _cell ) {
                     var val;
                     if(_cell){
-                        switch ( _cell.getType() ) {
-                            case CellValueType.Number:
-                                _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
-                                break;
-                            case CellValueType.Bool:
-                                val = new cBool( _cell.getValueWithoutFormat() );
-                                break;
-                            case CellValueType.Error:
-                                val = new cError( _cell.getValueWithoutFormat() );
-                                break;
-                            case CellValueType.String:
-                                val = new cString( _cell.getValueWithoutFormat() );
-                                break;
-                            default:
-                                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
-                                    val = new cNumber( _cell.getValueWithoutFormat() )
-                                }
-                                else
-                                    val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                        var cellType =_cell.getType();
+                        if ( cellType == CellValueType.Number ) {
+                            _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                        }
+                        else if ( cellType == CellValueType.Bool ) {
+                            val = new cBool( _cell.getValueWithoutFormat() );
+                        }
+                        else if ( cellType == CellValueType.Error ) {
+                            val = new cError( _cell.getValueWithoutFormat() );
+                        }
+                        else if ( cellType == CellValueType.String ) {
+                            val = new cString( _cell.getValueWithoutFormat() );
+                        }
+                        else {
+                            if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                                val = new cNumber( _cell.getValueWithoutFormat() )
+                            }
+                            else
+                                val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
                         }
                     }
                     else
@@ -1957,14 +2051,14 @@ cArea3D.prototype.foreach2 = function ( action ) {
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-    cRef3D.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this._wb = wb;
     this._cells = val;
     this.isAbsolute = false;
     this.type = cElementType.cell;
     this.ws = this._wb.getWorksheetByName( _wsFrom );
 }
-extend( cRef3D, cBaseType );
+cRef3D.prototype = Object.create(cBaseType.prototype);
 cRef3D.prototype.getWsId = function () {
     return this.ws.Id;
 };
@@ -1984,23 +2078,25 @@ cRef3D.prototype.getValue = function () {
     if ( !_r ) {
         return new cError( cErrorType.bad_reference );
     }
-    switch ( _r.getType() ) {
-        case CellValueType.Number:
-        {
-            var v = _r.getValueWithoutFormat();
-            if ( v == "" )
-                return new cEmpty( "" + v );
-            else
-                return new cNumber( "" + v );
-        }
-        case CellValueType.String:
-            return new cString( "" + _r.getValueWithoutFormat() );
-        case CellValueType.Bool:
-            return new cBool( "" + _r.getValueWithoutFormat() )
-        case CellValueType.Error:
-            return new cError( "" + _r.getValueWithoutFormat() )
-        default:
-            return checkTypeCell( "" + _r.getValueWithoutFormat() )
+    var cellType = _r.getType();
+    if ( cellType == CellValueType.Number ) {
+        var v = _r.getValueWithoutFormat();
+        if ( v == "" )
+            return new cEmpty();
+        else
+            return new cNumber( "" + v );
+    }
+    else if ( cellType == CellValueType.String ) {
+        return new cString( "" + _r.getValueWithoutFormat() );
+    }
+    else if ( cellType == CellValueType.Bool ) {
+        return new cBool( "" + _r.getValueWithoutFormat() )
+    }
+    else if ( cellType == CellValueType.Error ) {
+        return new cError( "" + _r.getValueWithoutFormat() )
+    }
+    else {
+        return checkTypeCell( "" + _r.getValueWithoutFormat() )
     }
 };
 cRef3D.prototype.tocBool = function () {
@@ -2035,10 +2131,10 @@ cRef3D.prototype.getWS = function () {
 
 /** @constructor */
 function cEmpty() {
-    cEmpty.superclass.constructor.call( this, "" );
+    cBaseType.apply( this, [""] );
     this.type = cElementType.empty;
 }
-extend( cEmpty, cBaseType );
+cEmpty.prototype = Object.create(cBaseType.prototype);
 cEmpty.prototype.tocNumber = function () {
     return new cNumber( 0 );
 };
@@ -2054,11 +2150,11 @@ cEmpty.prototype.toString = function () {
 
 /** @constructor */
 function cName( val, wb ) {
-    cName.superclass.constructor.call( this, val );
+    cBaseType.apply( this, arguments );
     this.wb = wb;
     this.type = cElementType.name;
 }
-extend( cName, cBaseType );
+cName.prototype = Object.create(cBaseType.prototype);
 cName.prototype.toRef = function ( wsID ) {
     var _3DRefTmp,
         ref = this.wb.getDefinesNames( this.value, wsID ).Ref;
@@ -2081,14 +2177,14 @@ cName.prototype.toRef = function ( wsID ) {
 
 /** @constructor */
 function cArray() {
-    cArray.superclass.constructor.call( this );
+    cBaseType.apply( this, arguments );
     this.array = [];
     this.rowCount = 0;
     this.countElementInRow = [];
     this.countElement = 0;
     this.type = cElementType.array;
 }
-extend( cArray, cBaseType );
+cArray.prototype = Object.create(cBaseType.prototype);
 cArray.prototype.addRow = function () {
     this.array[this.array.length] = [];
     this.countElementInRow[this.rowCount++] = 0;
@@ -2279,11 +2375,11 @@ parserFormula.prototype = {
                 if ( operand_expected ) {
                     if ( this.operand_str == "-" ) {
                         operand_expected = true;
-                        found_operator = cFormulaOperators['un_minus']();
+                        found_operator = new cFormulaOperators['un_minus']();
                     }
                     else if ( this.operand_str == "+" ) {
                         operand_expected = true;
-                        found_operator = cFormulaOperators['un_plus']();
+                        found_operator = new cFormulaOperators['un_plus']();
                     }
                     else {
                         this.error.push( c_oAscError.ID.FrmlWrongOperator );
@@ -2295,19 +2391,19 @@ parserFormula.prototype = {
                 else if ( !operand_expected ) {
                     if ( this.operand_str == "-" ) {
                         operand_expected = true;
-                        found_operator = cFormulaOperators['-']();
+                        found_operator = new cFormulaOperators['-']();
                     }
                     else if ( this.operand_str == "+" ) {
                         operand_expected = true;
-                        found_operator = cFormulaOperators['+']();
+                        found_operator = new cFormulaOperators['+']();
                     }
                     else if ( this.operand_str == "%" ) {
                         operand_expected = false;
-                        found_operator = cFormulaOperators['%']();
+                        found_operator = new cFormulaOperators['%']();
                     }
                     else {
                         if ( this.operand_str in cFormulaOperators ) {
-                            found_operator = cFormulaOperators[this.operand_str]();
+                            found_operator = new cFormulaOperators[this.operand_str]();
                             operand_expected = true;
                         }
                         else {
@@ -2339,7 +2435,7 @@ parserFormula.prototype = {
             /* Left & Right Parentheses */
             else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
                 operand_expected = true;
-                this.elemArr.push( cFormulaOperators[this.operand_str]() );
+                this.elemArr.push( new cFormulaOperators[this.operand_str]() );
             }
 
             else if ( parserHelp.isRightParentheses.call( this, this.Formula, this.pCurrPos ) ) {
@@ -2692,7 +2788,7 @@ parserFormula.prototype = {
         return this.value;
     },
 
-    /* Метод возвращает все ссылки на ячейки которые учавствуют в формуле*/
+    /* Метод возвращает все ссылки на ячейки которые участвуют в формуле*/
     getRef:function () {
         var aOutRef = [];
         for ( var i = 0; i < this.outStack.length; i++ ) {
@@ -3161,7 +3257,7 @@ function searchRegExp(str, flags){
             return $1 ? $0 : '(.*)';
         } )
         .replace( /(~)?\?/g, function ( $0, $1 ) {
-            return $1 ? $0 : '.';
+            return $1 ? $0 : '.{1}';
         } )
         .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
 
@@ -3325,8 +3421,7 @@ function lcl_Erfc0600( x ) {
     return fVal = Math.exp( -1.0 * x * x ) * fPSum / fQSum;
 }
 
-/** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all
- x > 6.0). */
+/** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all x > 6.0). */
 function lcl_Erfc2654( x ) {
     var pn = [
             5.64189583547756078E-1,

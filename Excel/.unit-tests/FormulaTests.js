@@ -859,7 +859,7 @@
 
         oParser = new parserFormula( "SUMIF(A12:A17,\"\",C12:C17)", "A22", ws );
         ok( oParser.parse() );
-        notEqual( oParser.calculate().getValue(), 400 );
+        strictEqual( oParser.calculate().getValue(), 400 );
 
     } )
 
