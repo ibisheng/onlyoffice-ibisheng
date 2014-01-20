@@ -2881,7 +2881,7 @@ parserFormula.prototype = {
 			}
 			else if(node instanceof cArea3D)
 			{
-				if( node.wsFrom == node.wsTo && wsId == node.wsFrom.getId() && cellId == node._cells)
+				if( node.wsFrom == node.wsTo && wsId == node.wsFrom && cellId == node._cells)
 					this.outStack[i] = new cError( cErrorType.bad_reference );
 			}
 		}

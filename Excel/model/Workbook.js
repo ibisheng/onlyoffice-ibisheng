@@ -134,6 +134,21 @@ DependencyGraph.prototype = {
                 }
             }
         }
+		var nodesSheetArea = this.nodesArea[sheetId];
+        if ( nodesSheetArea ) {
+            var aNodes = nodesSheetArea.getAll();
+            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
+                var node = aNodes[i].data;
+                var n = node.getSlaveEdges();
+                if ( n ) {
+                    arr.push( node );
+                    for ( var id2 in n ) {
+                        n[id2].weightNode++;
+                        // arr.push(n[id2]);
+                    }
+                }
+            }
+        }
         return arr;
     },
 	deleteNode : function(node){
@@ -220,6 +235,7 @@ DependencyGraph.prototype = {
         var toDelete = null == to;
 		var toAdd = null == from;
 		var wsId = node.sheetId;
+		var sOldCellId = node.cellId;
 		if(toAdd)
 		{
 			this.nodesId[node.nodeId] = node;
@@ -243,7 +259,6 @@ DependencyGraph.prototype = {
 		}
         else {
             var sOldnodeId = node.nodeId;
-            var sOldCellId = node.cellId;
 			if((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2))
 				node.moveStretch(to);
             else
@@ -258,13 +273,14 @@ DependencyGraph.prototype = {
             var cwf = this.wb.cwf[wsId];
 			if(cwf)
 			{
-                var cell = node.returnCell();
-                if ( cell && cell.formulaParsed ) {
-					if(!toAdd)
-						delete cwf.cells[sOldCellId];
-                    if ( !toDelete )
-                        cwf.cells[node.cellId] = node.cellId;
-                }
+				if(!toAdd)
+					delete cwf.cells[sOldCellId];
+				if(!toDelete)
+				{
+					var cell = node.returnCell();
+					if ( cell && cell.formulaParsed )
+						cwf.cells[node.cellId] = node.cellId;
+				}
             }
         }
     },
@@ -468,31 +484,12 @@ DependencyGraph.prototype = {
             h( m, rc );
     },
     removeNodeBySheetId:function ( sheetId ) {
-        var arr = false;
-		// this.wb.needRecalc = [];
-		// this.wb.needRecalc.length = 0;
-        var nodesSheet = nodes[sheetId];
-        if ( nodesSheet ) {
-            var aNodes = nodesSheet.getAll();
-            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
-                var node = aNodes[i].data;
-                var se = node.getSlaveEdges();
-                for ( var id2 in se ) {
-                    if ( se[id2].sheetId != sheetId ) {
-                        if ( !arr ) arr = true;
-						// this.wb.needRecalc[id2] = [se[id2].sheetId,se[id2].cellId];
-						// this.wb.needRecalc.length++;
-                        // arr.push(se[id2]);
-                    }
-                }
-                node.deleteAllMasterEdges();
-                node.deleteAllSlaveEdges();
-                delete nodesId[node.nodeId];
-                this.nodeslength--;
-            }
-            nodesSheet.removeAll();
-        }
-        return arr;
+		var nodesSheetArea = this.nodesArea[sheetId];
+		if(nodesSheetArea)
+			nodesSheetArea.removeAll();
+        var nodesSheetCell = this.nodesCell[sheetId];
+		if(nodesSheetCell)
+            nodesSheetCell.removeAll();
     },
     getNodeDependence:function ( aElems ) {
         var oRes = {oMasterNodes:{}, oMasterAreaNodes:{}, oWeightMap:{}};
@@ -1295,37 +1292,31 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		return -1;
 	
 	var nNewActive = this.nActive;
-	var removedSheet = this.aWorksheets.splice(nIndex, 1);
-	if(removedSheet.length > 0)
+	var removedSheets = this.aWorksheets.splice(nIndex, 1);
+	if(removedSheets.length > 0)
 	{
+		var removedSheet = removedSheets[0];
+		var removedSheetId = removedSheet.getId();
 		History.TurnOff();
 		//по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
-		var _cwf;
-		for(var i=0; i<removedSheet.length;i++){
-			var name = removedSheet[i];
-			_cwf = this.cwf[name.getId()];
-			this.cwf[name.getId()] = null;
-			delete this.cwf[name.getId()];
-			delete this.aWorksheetsById[name.getId()];
-		}
+		var _cwf = this.cwf[removedSheet.getId()];
+		delete this.cwf[removedSheet.getId()];
+		delete this.aWorksheetsById[removedSheet.getId()];
 		
 		lockDraw(this);
-		var a = this.dependencyFormulas.getNodeBySheetId(removedSheet[0].getId());
+		var a = this.dependencyFormulas.getNodeBySheetId(removedSheet.getId());
 		for(var i=0;i<a.length;i++){
-			var se = a[i].getSlaveEdges();
+			var node = a[i];
+			var se = node.getSlaveEdges();
 			if(se){
 				for(var id in se){
-					if( se[id].sheetId != removedSheet[0].getId() ){
-						var _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(se[id].cellId).getCells()[0].sFormula, cID = se[id].cellId;
-						addToArrRecalc(this, _ws.getId(), cID);
-						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							// this.needRecalc.length++;
-					}
+					var slave = se[id];
+					if( slave.sheetId != removedSheetId )
+						slave.setRefError(removedSheetId, node.cellId);
 				}
 			}
 		}
-		this.dependencyFormulas.removeNodeBySheetId(name.getId());
+		this.dependencyFormulas.removeNodeBySheetId(removedSheet.getId());
 		var bFind = false;
 		if(nNewActive < this.aWorksheets.length)
 		{
@@ -1348,11 +1339,10 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		}
 		History.TurnOn();
 		History.Create_NewPoint();
-		var oRemovedSheet = removedSheet[0];
-		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, oRemovedSheet.getId(), oRemovedSheet, _cwf));
+		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
 		if(null != outputParams)
 		{
-			outputParams.sheet = oRemovedSheet;
+			outputParams.sheet = removedSheet;
 			outputParams.cwf = _cwf;
 		}
 		this._updateWorksheetIndexes();
@@ -2800,8 +2790,6 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 			}
 			if(cell.formulaParsed)
 				this.wb.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
-			
-			// this.helperRebuildFormulas(cell,cell.getName(),cell.getName());
 
 			// addToArrRecalc(this.workbook, this.getId(), cell.getName());
             // if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
@@ -2927,9 +2915,6 @@ Woorksheet.prototype._moveCellHor=function(nRow, nCol, dif){
 		var row = this._getRow(nRow);
 		row.c[nCol + dif] = cell;
 		delete row.c[nCol];
-		
-		this.helperRebuildFormulas(cell,lastName,cell.getName());
-		
 	}
 };
 Woorksheet.prototype._moveCellVer=function(nRow, nCol, dif){
@@ -2944,8 +2929,6 @@ Woorksheet.prototype._moveCellVer=function(nRow, nCol, dif){
 		oTargetRow.c[nCol] = cell;
 		if(oCurRow.isEmpty())
 			delete this.aGCells[nRow];
-
-		this.helperRebuildFormulas(cell,lastName,cell.getName());
 	}
 };
 Woorksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo){
@@ -3093,7 +3076,6 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                 row.c[j] = oTempCell;
 
                 if ( oTempCell.sFormula ) {
-                    this.workbook.cwf[this.Id].cells[oTempCell.getName()] = oTempCell.getName();
                     if(copyRange){
                         oTempCell.formulaParsed = new parserFormula( oTempCell.sFormula, oTempCell.oId.getID(), this );
                         oTempCell.formulaParsed.parse();
@@ -3454,12 +3436,6 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
 			}
-Woorksheet.prototype.helperRebuildFormulas = function(cell,lastName){
-	if( cell.sFormula ){
-		this.workbook.cwf[this.Id].cells[lastName] = null;
-		delete this.workbook.cwf[this.Id].cells[lastName];
-	}
-}
 Woorksheet.prototype.getAllCol = function(){
 	if(null == this.oAllCol)
 		this.oAllCol = new Col(this, g_nAllColIndex);
@@ -3666,20 +3642,9 @@ Cell.prototype.setValue=function(val,callback){
 	this.oValue.clean();
 	var sheetId = this.ws.getId();
 	if (this.sFormula)
-	{
 		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID() );
-	}
-	if( null != val && val[0] != "=" || true == numFormat.isTextFormat()){
-		if (this.sFormula){
-			if ( this.oId.getID() in wb.cwf[ws.Id].cells){
-				delete wb.cwf[ws.Id].cells[this.oId.getID()];
-			}
-		}
-			}
-	else{
-		wb.cwf[ws.Id].cells[this.oId.getID()] = this.oId.getID();
+	if( !(null != val && val[0] != "=" || true == numFormat.isTextFormat()))
 		addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
-	}
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
         wb.needRecalc.length++;
 	
@@ -3722,11 +3687,8 @@ Cell.prototype.setValue2=function(array){
 	var ws = this.ws;
 	var wb = this.ws.workbook;
 	var sheetId = this.ws.getId();
-	if (this.sFormula){
-		var node = wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID(), true );
-		if ( this.oId.getID() in wb.cwf[ws.Id].cells)
-			delete wb.cwf[ws.Id].cells[this.oId.getID()];
-	}
+	if (this.sFormula)
+		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID(), true );
 	this.sFormula = null;
 	this.oValue.clean();
 	this.setFormulaCA(false);
@@ -6762,6 +6724,16 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 			}
 		}
 	}
+	var aNodes = this.worksheet.workbook.dependencyFormulas.getInRange( this.worksheet.Id, new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2) );
+	if(aNodes && aNodes.length > 0)
+	{
+		for(var i = 0, length = aNodes.length; i < length; ++i)
+		{
+			var node = aNodes[i];
+			this.worksheet.workbook.needRecalc.nodes[ node.nodeId ] = [ node.sheetId, node.cellId ];
+			this.worksheet.workbook.needRecalc.length++;
+		}
+	}
 
 	if (this.worksheet.workbook.isNeedCacheClean)
 		sortDependency(this.worksheet.workbook);
@@ -7158,16 +7130,22 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 							var _p_ = new parserFormula(oFromCell.sFormula,oCopyCell.getName(),this.worksheet);
 							if( _p_.parse() ){
 								assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble();
-								var sCopyCellName = oCopyCell.getName();
-								oCopyCell.setFormula(assemb);
-								addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sCopyCellName);
-								this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sCopyCellName) ] = [ this.worksheet.getId(),sCopyCellName ];
-							this.worksheet.workbook.needRecalc.length++;
+								oCopyCell.setValue("="+assemb);
 						}
 					}
 				}
             }
 		}
+		}
+		var aNodes = this.worksheet.workbook.dependencyFormulas.getInRange( this.worksheet.Id, oPromoteAscRange );
+		if(aNodes && aNodes.length > 0)
+		{
+			for(var i = 0, length = aNodes.length; i < length; ++i)
+			{
+				var node = aNodes[i];
+				this.worksheet.workbook.needRecalc.nodes[ node.nodeId ] = [ node.sheetId, node.cellId ];
+				this.worksheet.workbook.needRecalc.length++;
+			}
 		}
 		//добавляем замерженые области
 		var nShiftHorizontal = 0;

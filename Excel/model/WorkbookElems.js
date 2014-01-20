@@ -3878,7 +3878,8 @@ RangeDataManager.prototype = {
 	},
 	removeAll : function()
 	{
-		//todo fChange
+		this.remove(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0));
+		//todo
 		this.oIntervalTreeRB = new IntervalTreeRB();
 	},
 	shiftGet : function(bbox, bHor)
@@ -4141,6 +4142,15 @@ CellArea.prototype = {
 		}
 		return aRes;
 	},
+	remove : function(bbox)
+	{
+		var aElems = this.get(bbox);
+		for(var i = 0, length = aElems.length; i < length; ++i)
+		{
+			var elem = aElems[i];
+			this.removeElement(elem);
+		}
+	},
 	removeElement : function(elem)
 	{
 		var rowElem = this.rows.getElem(elem.bbox.r1);
@@ -4155,6 +4165,12 @@ CellArea.prototype = {
 					this.fChange.call(this, cellElem.storedValue.data, cellElem.storedValue.bbox, null);
 			}
 		}
+	},
+	removeAll : function()
+	{
+		this.remove(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0));
+		//todo
+		this.oIntervalTreeRB = new IntervalTreeRB();
 	},
 	shiftGet : function(bbox, bHor)
 	{
