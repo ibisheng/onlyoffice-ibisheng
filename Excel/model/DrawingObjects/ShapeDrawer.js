@@ -442,6 +442,35 @@ function CShapeDrawer()
 
 CShapeDrawer.prototype =
 {
+    Clear : function()
+    {
+        this.Shape = null;
+        this.Graphics = null;
+        this.UniFill = null;
+        this.Ln = null;
+        this.Transform = null;
+
+        this.bIsTexture = false;
+        this.bIsNoFillAttack = false;
+        this.bIsNoStrokeAttack = false;
+        this.FillUniColor = null;
+        this.StrokeUniColor = null;
+        this.StrokeWidth = 0;
+
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+
+        this.OldLineJoin = null;
+        this.IsArrowsDrawing = false;
+        this.IsCurrentPathCanArrows = true;
+
+        this.bIsCheckBounds = false;
+
+        this.IsRectShape = false;
+    },
+    
     CheckPoint : function(_x,_y)
     {
         // TODO: !!!
