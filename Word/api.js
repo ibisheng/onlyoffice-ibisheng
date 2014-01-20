@@ -914,8 +914,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 asc_docs_api.prototype._onGetLicense = function (response) {
 	if (null != response && "getlicense" == response.type){
 		var oSettings = JSON.parse(response.data);
-		var oLicense = new window["Asc"].asc_CAscLicense(oSettings);
-
+		var oLicense = (null != oSettings) ? new window["Asc"].asc_CAscLicense(oSettings) : null;
 		this.asc_fireCallback("asc_onGetLicense", oLicense);
 	}
 };

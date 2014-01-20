@@ -1359,8 +1359,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onGetLicense: function (response) {
 				if (null != response && "getlicense" == response.type){
 					var oSettings = JSON.parse(response.data);
-					var oLicense = new asc_CAscLicense(oSettings);
-
+					var oLicense = (null != oSettings) ? new asc_CAscLicense(oSettings) : null;
 					this.handlers.trigger("asc_onGetLicense", oLicense);
 				}
 			},
