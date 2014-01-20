@@ -157,12 +157,12 @@ CChartSpace.prototype.recalculate = function()
 	if(this.recalcInfo.recalculateMarkers)
 	{
 		this.recalculateMarkers();
-        this.recalcInfo.recalculateBaseColors = false;
+        this.recalcInfo.recalculateMarkers = false;
 	}
 	if(this.recalcInfo.recalculateSeriesColors)
 	{
 		this.recalculateSeriesColors();
-        this.recalcInfo.recalculateBaseColors = false;
+        this.recalcInfo.recalculateSeriesColors = false;
 	}
 	
     if(this.recalcInfo.recalculateChart)
