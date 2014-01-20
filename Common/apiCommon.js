@@ -95,12 +95,12 @@
 				this.customerInfo = settings["customer_info"];
 				this.customerLogo = settings["customer_logo"];
 			} else {
-				this.customer = settings["customer"];
-				this.customerAddr = settings["customer_addr"];
-				this.customerWww = settings["customer_www"];
-				this.customerMail = settings["customer_mail"];
-				this.customerInfo = settings["customer_info"];
-				this.customerLogo = settings["customer_logo"];
+				this.customer = null;
+				this.customerAddr = null;
+				this.customerWww = null;
+				this.customerMail = null;
+				this.customerInfo = null;
+				this.customerLogo = null;
 			}
 			return this;
 		}
