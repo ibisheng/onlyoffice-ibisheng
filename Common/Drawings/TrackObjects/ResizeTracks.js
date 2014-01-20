@@ -63,7 +63,11 @@ var MIN_ANGLE = 0.07;
 
 function ExecuteNoHistory(f, oThis, args)
 {
-	var is_on = History.Is_On();
+	var is_on = (History instanceof CHistory) ? History.Is_On() : false;
+	if(!(History instanceof CHistory))
+	{
+		History = {Add: function(){}};
+	}
 	if(is_on)
 	{
 		History.TurnOff();

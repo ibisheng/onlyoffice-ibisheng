@@ -1,7 +1,141 @@
-function CChartStyle()
+var EFFECT_NONE = 0;
+var EFFECT_SUBTLE = 1;
+var EFFECT_MODERATE = 2;
+var EFFECT_INTENSE = 3;
+
+var CHART_STYLE_MANAGER = null;
+
+function CreateUnifillSolidFillSchemeColorByIndex(index)
 {
-	
+	var ret =  new CUniFill();
+	ret.setFill(new CSolidFill());
+	ret.fill.setColor(new CUniColor());
+	ret.fill.color.setColor(new CSchemeColor());
+	ret.fill.color.color.setId(index);
+	return ret;
 }
+
+function CChartStyleManager()
+{
+	this.styles = [];
+	ExecuteNoHistory(
+		function()
+		{
+			var DefaultDataPointPerDataPoint = 
+			[
+				[
+					CreateUniFillSchemeColorWidthTint(8, 0.885),
+					CreateUniFillSchemeColorWidthTint(8, 0.55),
+					CreateUniFillSchemeColorWidthTint(8, 0.78),
+					CreateUniFillSchemeColorWidthTint(8, 0.925),
+					CreateUniFillSchemeColorWidthTint(8, 0.7),
+					CreateUniFillSchemeColorWidthTint(8, 0.3)
+				],
+				[
+					CreateUniFillSchemeColorWidthTint(0, 0),
+					CreateUniFillSchemeColorWidthTint(1, 0),
+					CreateUniFillSchemeColorWidthTint(2, 0),
+					CreateUniFillSchemeColorWidthTint(3, 0),
+					CreateUniFillSchemeColorWidthTint(4, 0),
+					CreateUniFillSchemeColorWidthTint(5, 0)
+				],	
+				[
+					CreateUniFillSchemeColorWidthTint(0, -0.5),
+					CreateUniFillSchemeColorWidthTint(1, -0.5),
+					CreateUniFillSchemeColorWidthTint(2, -0.5),
+					CreateUniFillSchemeColorWidthTint(3, -0.5),
+					CreateUniFillSchemeColorWidthTint(4, -0.5),
+					CreateUniFillSchemeColorWidthTint(5, -0.5)
+				],
+				[
+					CreateUniFillSchemeColorWidthTint(8, 0.05),
+					CreateUniFillSchemeColorWidthTint(8, 0.55),
+					CreateUniFillSchemeColorWidthTint(8, 0.78),
+					CreateUniFillSchemeColorWidthTint(8, 0.15),
+					CreateUniFillSchemeColorWidthTint(8, 0.7),
+					CreateUniFillSchemeColorWidthTint(8, 0.3)
+				]
+			];
+			var s = DefaultDataPointPerDataPoint;
+			var f = CreateUniFillSchemeColorWidthTint;
+			this.styles[0] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[0], 7);
+			this.styles[1] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[1], 7);
+			for(var i = 2; i < 8; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 2,0)], EFFECT_SUBTLE, EFFECT_NONE, [], 3, [f(i - 2,0)], 7);
+			}
+			this.styles[8] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[0], 9);
+			this.styles[9] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[1], 9); 
+			for(i = 10; i < 16; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-10,0)], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, [f(i-10,0)], 9);
+			}
+			this.styles[16] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, s[0], 9);
+			this.styles[17] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE,  [], 5, s[1], 9); 
+			for(i = 18; i < 24; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-18,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, [f(i-18,0)], 9); 
+			}
+			this.styles[24] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[0], 13);
+			this.styles[25] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
+			for(i = 26; i < 32; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-27,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
+			}
+			this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
+			this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
+			for(i = 34; i < 41; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 34, 0)], EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-34, -0.5)], 5, [f(i-34, 0)], 9);
+			}
+			this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[3], EFFECT_SUBTLE, EFFECT_NONE, [], 5, s[3], 9);
+			this.styles[42] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
+			for(i = 43; i < 48; ++i)
+			{
+				this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-43, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-43, 0)], 9);
+			}
+		},
+	this, []);
+}
+
+CChartStyleManager.prototype = 
+{
+	getStyleByIndex: function(index)
+	{
+		if(isRealNumber(index))
+		{
+			return this.styles[(index - 1) % 48];
+		}
+		return this.styles[1];
+	}
+};
+
+function CChartStyle(effect, fill1, fill2, fill3, line1, line2, line3, line4, markerSize)
+{
+	this.effect = effect;
+	this.fill1 = fill1;
+	this.fill2 = fill2;
+	this.fill3 = fill3;
+	
+	this.line1 = line1;
+	this.line2 = line2;
+	this.line3 = line3;
+	this.line4 = line4;
+	
+	this.markerSize = markerSize;
+}
+
+
+function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
+{
+	return ExecuteNoHistory(
+		function(schemeColorId, tintVal)
+		{
+			return CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(schemeColorId), tintVal);
+		},
+	this, [schemeColorId, tintVal]);
+}
+
 
 
 function CChartSpace()

@@ -11129,102 +11129,110 @@ var PARRUN_TYPE_BR		= 3;
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation)
 {
-    var theme = new CTheme();
-    theme.presentation = presentation;
-    theme.themeElements.fontScheme.majorFont.latin = "Arial";
-    theme.themeElements.fontScheme.minorFont.latin = "Arial";
+	return ExecuteNoHistory(function()
+	{
+		var theme = new CTheme();
+		theme.presentation = presentation;
+		theme.themeElements.fontScheme.majorFont.latin = "Arial";
+		theme.themeElements.fontScheme.minorFont.latin = "Arial";
 
-    var scheme = theme.themeElements.clrScheme;
+		var scheme = theme.themeElements.clrScheme;
 
-    scheme.colors[8] = CreateUniColorRGB(0,0,0);
-    scheme.colors[12] = CreateUniColorRGB(255,255,255);
-    scheme.colors[9] = CreateUniColorRGB(0x1F,0x49, 0x7D);
-    scheme.colors[13] = CreateUniColorRGB(0xEE,0xEC,0xE1);
-    scheme.colors[0] = CreateUniColorRGB(0x4F, 0x81, 0xBD); //CreateUniColorRGB(0xFF, 0x81, 0xBD);//
-    scheme.colors[1] = CreateUniColorRGB(0xC0,0x50,0x4D);
-    scheme.colors[2] = CreateUniColorRGB(0x9B,0xBB,0x59);
-    scheme.colors[3] = CreateUniColorRGB(0x80,0x64,0xA2);
-    scheme.colors[4] = CreateUniColorRGB(0x4B,0xAC,0xC6);
-    scheme.colors[5] = CreateUniColorRGB(0xF7,0x96,0x46);
-    scheme.colors[11] = CreateUniColorRGB(0x00,0x00,0xFF);
-    scheme.colors[10] = CreateUniColorRGB(0x80, 0x00, 0x80);
+		scheme.colors[8] = CreateUniColorRGB(0,0,0);
+		scheme.colors[12] = CreateUniColorRGB(255,255,255);
+		scheme.colors[9] = CreateUniColorRGB(0x1F,0x49, 0x7D);
+		scheme.colors[13] = CreateUniColorRGB(0xEE,0xEC,0xE1);
+		scheme.colors[0] = CreateUniColorRGB(0x4F, 0x81, 0xBD); //CreateUniColorRGB(0xFF, 0x81, 0xBD);//
+		scheme.colors[1] = CreateUniColorRGB(0xC0,0x50,0x4D);
+		scheme.colors[2] = CreateUniColorRGB(0x9B,0xBB,0x59);
+		scheme.colors[3] = CreateUniColorRGB(0x80,0x64,0xA2);
+		scheme.colors[4] = CreateUniColorRGB(0x4B,0xAC,0xC6);
+		scheme.colors[5] = CreateUniColorRGB(0xF7,0x96,0x46);
+		scheme.colors[11] = CreateUniColorRGB(0x00,0x00,0xFF);
+		scheme.colors[10] = CreateUniColorRGB(0x80, 0x00, 0x80);
 
-    // -------------- fill styles -------------------------
-    var brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = new CSchemeColor();
-    brush.fill.color.color.id = phClr;
-    theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+		// -------------- fill styles -------------------------
+		var brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(new CSchemeColor());
+		brush.fill.color.color.setId(phClr);
+		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
 
-    brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = CreateUniColorRGB(0,0,0);;
-    theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+		brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
 
-    brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = CreateUniColorRGB(0,0,0);;
-    theme.themeElements.fmtScheme.fillStyleLst.push(brush);
-    // ----------------------------------------------------
+		brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+		theme.themeElements.fmtScheme.fillStyleLst.push(brush);
+		// ----------------------------------------------------
 
-    // -------------- back styles -------------------------
-    brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = new CSchemeColor();
-    brush.fill.color.color.id = phClr;
-    theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+		// -------------- back styles -------------------------
+		brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(new CSchemeColor());
+		brush.fill.color.color.setId(phClr);
+		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
 
-    brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = CreateUniColorRGB(0,0,0);;
-    theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+		brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
 
-    brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color = new CUniColor();
-    brush.fill.color.color = CreateUniColorRGB(0,0,0);;
-    theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
-    // ----------------------------------------------------
+		brush = new CUniFill();
+		brush.setFill(new CSolidFill());
+		brush.fill.setColor(new CUniColor());
+		brush.fill.color.setColor(CreateUniColorRGB(0,0,0));
+		theme.themeElements.fmtScheme.bgFillStyleLst.push(brush);
+		// ----------------------------------------------------
 
-    var pen = new CLn();
-    pen.w = 9525;
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
-    pen.Fill.fill.color = new CUniColor();
-    pen.Fill.fill.color.color = new CSchemeColor();
-    pen.Fill.fill.color.color.id = phClr;
-    pen.Fill.fill.color.Mods = new CColorModifiers();
-    pen.Fill.fill.color.Mods.Mods.push({name: "shade", val:95000});
-    pen.Fill.fill.color.Mods.Mods.push({name: "satMod", val:105000});
-    theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+		var pen = new CLn();
+		pen.setW(9525);
+		pen.setFill(new CUniFill());
+		pen.Fill.setFill(new CSolidFill());
+		pen.Fill.fill.setColor(new CUniColor());
+		pen.Fill.fill.color.setColor(new CSchemeColor());
+		pen.Fill.fill.color.color.setId(phClr);
+		pen.Fill.fill.color.setMods(new CColorModifiers());
+		
+		var mod = new CColorMod();
+		mod.setName("shade");
+		mod.setVal(95000);
+		pen.Fill.fill.color.Mods.addMod(mod);
+		mod = new CColorMod();
+		mod.setName("satMod");
+		mod.setVal(105000);
+		pen.Fill.fill.color.Mods.addMod(mod);
+		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
 
-    pen = new CLn();
-    pen.w = 25400;
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
+		pen = new CLn();
+		pen.setW(25400);
+		pen.setFill(new CUniFill());
+		pen.Fill.setFill(new CSolidFill());
 
-    pen.Fill.fill.color = new CUniColor();
-    pen.Fill.fill.color.color = new CSchemeColor();
-    pen.Fill.fill.color.color.id = phClr;
-    theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+		pen.Fill.fill.setColor(new CUniColor());
+		pen.Fill.fill.color.setColor(new CSchemeColor());
+		pen.Fill.fill.color.color.setId(phClr);
+		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
 
-    pen = new CLn();
-    pen.w = 38100;
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
-    pen.Fill.fill.color = new CUniColor();
-    pen.Fill.fill.color.color = new CSchemeColor();
-    pen.Fill.fill.color.color.id = phClr;
-    theme.themeElements.fmtScheme.lnStyleLst.push(pen);
-
-    theme.extraClrSchemeLst = [];
-
-    return theme;
+		pen = new CLn();
+		pen.setW(38100);
+		pen.setFill(new CUniFill());
+		pen.Fill.setFill(new CSolidFill());
+		pen.Fill.fill.setColor(new CUniColor());
+		pen.Fill.fill.color.setColor(new CSchemeColor());
+		pen.Fill.fill.color.color.setId(phClr);
+		theme.themeElements.fmtScheme.lnStyleLst.push(pen);
+		theme.extraClrSchemeLst = [];
+		return theme;
+	}, this, []);
 }
 
 function GenerateDefaultMasterSlide(theme)

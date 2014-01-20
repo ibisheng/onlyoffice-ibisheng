@@ -6795,7 +6795,11 @@ CMarker.prototype =
 				}
 				if(otherMarker.spPr.ln)
 				{
-					this.spPr.setLn(otherMarker.spPr.ln.createDuplicate());
+					if(!this.spPr.ln)
+					{
+						this.spPr.setLn(new CLn());
+					}
+					this.spPr.ln.merge(otherMarker.spPr.ln);
 				}
 			}
 		}
