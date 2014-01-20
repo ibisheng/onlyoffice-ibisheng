@@ -2982,8 +2982,8 @@ UndoRedoWoorksheet.prototype = {
 				ws.workbook.dependencyFormulas.deleteMasterNodes(ws.getId(), cell.getName());
                 cell.setFormula(sFormula);
 				addToArrRecalc(ws.workbook, ws.getId(), cell.getName());
-                ws.workbook.needRecalc2.nodes[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
-                ws.workbook.needRecalc2.nodesLength++;
+                ws.workbook.needRecalc.nodes[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
+                ws.workbook.needRecalc.length++;
             }
         }
 		else if(historyitem_Worksheet_ColProp == Type)
