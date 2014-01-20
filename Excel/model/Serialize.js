@@ -1404,7 +1404,7 @@ function BinarySharedStringsTableWriter(memory, oSharedStrings)
             this.memory.WriteString2(run.text);
 		}
     };
-};
+}
 /** @constructor */
 function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 {
@@ -2048,7 +2048,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 			this.aDxfs.push(customElement.dxf);
 		}
 	}
-};
+}
 function BinaryWorkbookTableWriter(memory, wb)
 {
     this.memory = memory;
@@ -2166,7 +2166,7 @@ function BinaryWorkbookTableWriter(memory, wb)
 		if (null != LocalSheetId)
 			this.bs.WriteItem(c_oSerDefinedNameTypes.LocalSheetId, function(){oThis.memory.WriteLong(LocalSheetId);});
     };
-};
+}
 function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, isCopyPaste)
 {
     this.memory = memory;
@@ -3356,7 +3356,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aF
 		for(var i = 0, length = aReplies.length; i < length; ++i)
 			this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
 	}
-};
+}
 /** @constructor */
 function BinaryOtherTableWriter(memory, wb)
 {
@@ -3373,7 +3373,7 @@ function BinaryOtherTableWriter(memory, wb)
         var oThis = this;
 		this.bs.WriteItem(c_oSer_OtherType.Theme, function(){window.global_pptx_content_writer.WriteTheme(oThis.memory, oThis.wb.theme);});
     };
-};
+}
 /** @constructor */
 function BinaryFileWriter(wb, isCopyPaste)
 {
@@ -3485,7 +3485,7 @@ function BinaryFileWriter(wb, isCopyPaste)
         
         this.nRealTableCount++;
     }
-};
+}
 /** @constructor */
 function Binary_TableReader(stream, ws, Dxfs)
 {
@@ -4054,7 +4054,7 @@ function Binary_SharedStringTableReader(stream, wb, aSharedStrings)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-};
+}
 /** @constructor */
 function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 {
@@ -4216,6 +4216,8 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			if(0 == this.aCellXfs.length)
 				this.oStyleManager.init(oNewXfs);
 			this.minimizeXfs(oNewXfs);
+            // При открытии стиль будет ссылкой
+            oNewXfs.isReference = true;
 			this.aCellXfs.push(oNewXfs);
         }
 		for(var i in oStyleObject.oCustomTableStyles)
@@ -4879,7 +4881,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 	this.ReadTableCustomStyleElement = function(type, length, oNewStyleElement)
     {
 		var res = c_oSerConstants.ReadOk;
-        var oThis = this;
         if (c_oSer_TableStyleElement.Type === type)
 			oNewStyleElement.Type = this.stream.GetUChar();
 		else if (c_oSer_TableStyleElement.Size === type)
@@ -4890,7 +4891,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = c_oSerConstants.ReadUnknown;
         return res;
 	}
-};
+}
 /** @constructor */
 function Binary_WorkbookTableReader(stream, oWorkbook)
 {
@@ -4961,7 +4962,7 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-    this.ReadWorkbookView = function(type, length, BookViews)
+    this.ReadWorkbookView = function(type, length)
     {
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerWorkbookViewTypes.ActiveTab == type )
@@ -5015,7 +5016,7 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-};
+}
 /** @constructor */
 function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs, oMediaArray, copyPasteObj)
 {
@@ -5512,7 +5513,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			{
 				var xfs = this.aCellXfs[nStyleIndex];
 				if(null != xfs)
-					oCell.xfs = xfs.clone();
+					oCell.xfs = xfs;  // Не делаем копию, оставляем ссылку
 			}
         }
         else if( c_oSerCellTypes.Type == type )
@@ -6149,7 +6150,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-};
+}
 /** @constructor */
 function Binary_CalcChainTableReader(stream, aCalcChain)
 {
@@ -6198,7 +6199,7 @@ function Binary_CalcChainTableReader(stream, aCalcChain)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-};
+}
 /** @constructor */
 function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
 {
@@ -6369,7 +6370,7 @@ function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-};
+}
 /** @constructor */
 function BinaryFileReader(sUrlPath, isCopyPaste)
 {
@@ -6617,7 +6618,7 @@ function BinaryFileReader(sUrlPath, isCopyPaste)
 		}
         return res;
     };
-};
+}
 function CTableStyles()
 {
 	this.DefaultTableStyle = "TableStyleMedium2";

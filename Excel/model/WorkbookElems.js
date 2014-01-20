@@ -1026,6 +1026,8 @@ function CellXfs() {
     this.align = null;
 	this.QuotePrefix = null;
 	this.XfId = null;
+    // Является ли стиль ссылкой (При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию)
+    this.isReference = false;
 }
 CellXfs.prototype =
 {
@@ -1469,6 +1471,12 @@ StyleManager.prototype =
 			g_oDefaultXfId = oDefaultXfs.XfId;
 		}
 	},
+    _prepareSetReference : function (oItemWithXfs)
+    {
+        // При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию
+        if (oItemWithXfs.xfs.isReference)
+            oItemWithXfs.xfs = oItemWithXfs.xfs.clone();
+    },
     _prepareSet : function(oItemWithXfs)
 	{
 		if(null == oItemWithXfs.xfs)
@@ -1477,7 +1485,8 @@ StyleManager.prototype =
 				oItemWithXfs.xfs = oItemWithXfs.getDefaultXfs();
 			if(null == oItemWithXfs.xfs)
 				oItemWithXfs.xfs = this.oDefaultXfs.clone();
-		}
+		} else
+            this._prepareSetReference(oItemWithXfs);
         return oItemWithXfs.xfs;
 	},
     _prepareSetFont : function(oItemWithXfs)
@@ -1507,8 +1516,10 @@ StyleManager.prototype =
 		else
 			oRes.oldVal = g_oDefaultXfId;
 		if(null == val) {
-			if(null != xfs)
+			if(null != xfs) {
+                this._prepareSetReference(oItemWithXfs);
 				xfs.XfId = g_oDefaultXfId;
+            }
 		} else {
 			xfs = this._prepareSetCellStyle(oItemWithXfs);
 			xfs.XfId = val;
@@ -1525,8 +1536,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultNum.f;
         if(null == val)
         {
-            if(null != xfs)
+            if(null != xfs) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.num = null;
+            }
         }
         else
         {
@@ -1547,8 +1560,10 @@ StyleManager.prototype =
 			oRes.oldVal = null;
         if(null == val)
         {
-            if(null != xfs)
+            if(null != xfs) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font = null;
+            }
         }
         else
         {
@@ -1570,6 +1585,7 @@ StyleManager.prototype =
         {
             if(null != xfs && null != xfs.font)
 			{
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.fn = g_oDefaultFont.fn;
 				xfs.font.scheme = EFontScheme.fontschemeNone;
 			}
@@ -1592,8 +1608,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.fs;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.fs = g_oDefaultFont.fs;
+            }
         }
         else
         {
@@ -1612,8 +1630,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.c;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.c = g_oDefaultFont.c;
+            }
         }
         else
         {
@@ -1632,8 +1652,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.b;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.b = g_oDefaultFont.b;
+            }
         }
         else
         {
@@ -1652,8 +1674,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.i;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.i = g_oDefaultFont.i;
+            }
         }
         else
         {
@@ -1672,8 +1696,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.u;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.u = g_oDefaultFont.u;
+            }
         }
         else
         {
@@ -1692,8 +1718,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.s;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.s = g_oDefaultFont.s;
+            }
         }
         else
         {
@@ -1712,8 +1740,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFont.va;
         if(null == val)
         {
-            if(null != xfs && null != xfs.font)
+            if(null != xfs && null != xfs.font) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.font.va = g_oDefaultFont.va;
+            }
         }
         else
         {
@@ -1732,8 +1762,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultAlign.ver;
         if(null == val)
         {
-            if(null != xfs && null != xfs.align)
+            if(null != xfs && null != xfs.align) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.align.ver = g_oDefaultAlign.ver;
+            }
         }
         else
         {
@@ -1752,8 +1784,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultAlign.hor;
         if(null == val)
         {
-            if(null != xfs && null != xfs.align)
+            if(null != xfs && null != xfs.align) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.align.hor = g_oDefaultAlign.hor;
+            }
         }
         else
         {
@@ -1772,8 +1806,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultFill.bg;
         if(null == val)
         {
-            if(null != xfs && null != xfs.fill)
+            if(null != xfs && null != xfs.fill) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.fill.bg = g_oDefaultFill.bg;
+            }
         }
         else
         {
@@ -1794,8 +1830,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultBorder;
         if(null == val)
         {
-            if(null != xfs && null != xfs.border)
+            if(null != xfs && null != xfs.border) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.border = val;
+            }
         }
         else
         {
@@ -1814,8 +1852,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultAlign.shrink;
         if(null == val)
         {
-            if(null != xfs && null != xfs.align)
+            if(null != xfs && null != xfs.align) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.align.shrink = g_oDefaultAlign.shrink;
+            }
         }
         else
         {
@@ -1834,8 +1874,10 @@ StyleManager.prototype =
 			oRes.oldVal = g_oDefaultAlign.wrap;
         if(null == val)
         {
-            if(null != xfs && null != xfs.align)
+            if(null != xfs && null != xfs.align) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.align.wrap = g_oDefaultAlign.wrap;
+            }
         }
         else
         {
@@ -1852,8 +1894,10 @@ StyleManager.prototype =
             oRes.oldVal = xfs.QuotePrefix;
         if(null == val)
         {
-            if(null != xfs)
+            if(null != xfs) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.QuotePrefix = val;
+            }
         }
         else
         {
@@ -1873,8 +1917,10 @@ StyleManager.prototype =
 			oRes.oldVal = angleFormatToInterface2(g_oDefaultAlign.angle);
         if(null == val)
         {
-            if(null != xfs && null != xfs.align)
+            if(null != xfs && null != xfs.align) {
+                this._prepareSetReference(oItemWithXfs);
                 xfs.align.angle = g_oDefaultAlign.angle;
+            }
         }
         else
         {
@@ -2049,7 +2095,7 @@ function Col(worksheet, index)
     this.CustomWidth = null;
     this.width = null;
     this.xfs = null;
-};
+}
 Col.prototype =
 {
 	getId : function()
