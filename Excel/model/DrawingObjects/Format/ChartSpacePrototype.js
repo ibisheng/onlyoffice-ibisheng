@@ -187,16 +187,6 @@ function CreateUnfilFromRGB(r, g, b)
 	return ret;
 }
 
-function CreateUnifillSolidFillSchemeColorByIndex(index)
-{
-	var ret =  new CUniFill();
-	ret.setFill(new CSolidFill());
-	ret.fill.setColor(new CUniColor());
-	ret.fill.color.setColor(new CSchemeColor());
-	ret.fill.color.color.setId(index);
-	return ret;
-}
-
 
 
 function CreateColorMapByIndex(index)
@@ -262,15 +252,15 @@ CChartSpace.prototype.recalculateBaseColors = function()
 	{
 		History.TurnOff();
 	}
-	
-	if ( this.style && (typeof(this.style) == 'number') ) {
-			if ( this.style % 8 === 0 )		
-				this.baseColors = CreateColorMapByIndex(8);
-			else
-				this.baseColors = CreateColorMapByIndex(this.style % 8);
-		}
+	if ( this.style && (typeof(this.style) == 'number') ) 
+	{
+		if ( this.style % 8 === 0 )		
+			this.baseColors = CreateColorMapByIndex(8);
 		else
-			this.baseColors = CreateColorMapByIndex(2);
+			this.baseColors = CreateColorMapByIndex(this.style % 8);
+	}
+	else
+		this.baseColors = CreateColorMapByIndex(2);
 	
 	if(is_on)
 	{
@@ -325,6 +315,27 @@ CChartSpace.prototype.getNeedColorCount = function()
 	}
 };
 
+
+function getArrayFillsFromBase(arrBaseFills, needFillsCount)
+{
+	var ret = [];
+	var count_base = arrBaseFills.length;
+
+	var need_create = parseInt(needFillsCount / count_base) + 1;
+
+	for (var i = 0; i < need_create; i++) 
+	{
+		for (var j = 0; j < count_base; j++) 
+		{
+			var percent = (-70 + 140 * ( (i + 1) / (need_create + 1) )) * 1000;	
+			var color = CreateUniFillSolidFillWidthTintOrShade(arrBaseFills[j], 100000 - percent);
+			ret.push( color );
+		}
+	}
+	ret.splice(needFillsCount, ret.length - needFillsCount);
+	return ret;
+}
+
 CChartSpace.prototype.recalculateMarkers = function()
 {
 	ExecuteNoHistory(function()
@@ -334,72 +345,84 @@ CChartSpace.prototype.recalculateMarkers = function()
 		|| this.chart.plotArea.chart instanceof CScatterChart) 
 		&& this.chart.plotArea.chart.series)
 		{
-			var RGBA = {R: 0, G: 0, B: 0, A: 255};
-			var need_colors = this.getNeedColorCount();
-			var countBase = this.baseColors.length;
-			var needCreate = parseInt(need_colors / countBase) + 1;
-			var arrayColors = [];
-			for (var i = 0; i < needCreate; i++) 
+			var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+			var effect_fill = chart_style.fill1;
+			var fill = chart_style.fill2;
+			var line = chart_style.line4;
+			var masrker_default_size = chart_style.markerSize;
+			var default_marker = new CMarker();
+			default_marker.setSize(masrker_default_size);
+			var parent_objects = this.getParentObjects();
+			
+			if(parent_objects.theme  && parent_objects.theme.themeElements 
+			&& parent_objects.theme.themeElements.fmtScheme 
+			&& parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
 			{
-				for (var j = 0; j < countBase; j++) 
-				{
-					var percent = (-70 + 140 * ((i + 1) / (needCreate + 1))) / 100.0;	
-					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], percent);
-					arrayColors.push( color );
-				}
+				default_marker.setSpPr(new CSpPr());
+				default_marker.spPr.setLn(new CLn());
+				default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
 			}
-			var b_vary_markers = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
-			var parents = this.getParentObjects();
-			if(b_vary_markers)
+			var RGBA = {R:0, G:0, B:0, A: 255};
+			if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
 			{
-				var first_series = this.chart.plotArea.chart.series[0];
-				var pts;
-				if(first_series.val)
+				var ser = this.chart.plotArea.chart.series;
+				if(ser.val)
 				{
-					pts = first_series.val.numRef.numCache.pts;
+					pts = ser.val.numRef.numCache.pts;
 				}
-				else if(first_series.yVal)
+				else if(ser.yVal)
 				{
-					pts = first_series.yVal.numRef.numCache.pts;
+					pts = ser.yVal.numRef.numCache.pts;
 				}
 				else
 				{
 					pts = [];
 				}
-				for(var j = 0; j < pts.length; ++j)
+				var series_marker = ser.marker;
+				
+				var brushes = getArrayFillsFromBase(fill, pts.length);
+				var pens_fills = getArrayFillsFromBase(line, pts.length);
+				var compiled_markers = [];
+				for(var i = 0;  i < pts.length; ++i)
 				{
 					var compiled_marker = new CMarker();
-					compiled_marker.setSize(7);
-					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
-					compiled_marker.setSpPr(new CSpPr());
-					compiled_marker.spPr.setLn(new CLn());
-					var ln = compiled_marker.spPr.ln;
-					ln.setW(12700);
-					ln.setFill(arrayColors[j]);
-					compiled_marker.spPr.setFill(arrayColors[j]);
-					compiled_marker.merge(first_series.marker);
-					for(var k = 0; k < first_series.dPt.length; ++k)
+					compiled_marker.merge(default_marker);
+					if(!compiled_marker.spPr)
 					{
-						if(first_series.dPt[k].idx === pts[j].idx)
+						compiled_marker.setSpPr(new CSpPr());
+					}
+					compiled_marker.spPr.setFill(brushes[i]);
+					if(!compiled_marker.spPr.ln)
+						compiled_marker.spPr.setLn(new CLn());
+					compiled_marker.spPr.ln.setFill(pens_fills[i]);
+					compiled_marker.merge(ser.marker);
+					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+					if(Array.isArray(ser.dPt))
+					{
+						for(var j = 0; j < ser.dPt.length; ++j)
 						{
-							compiled_marker.merge(first_series.dPt[k])
-							break;
+							if(ser.dPt[j].idx === pts[i].idx)
+							{
+								compiled_marker.merge(ser.dPt[j].marker);
+								break;
+							}
 						}
 					}
-					compiled_marker.brush = compiled_marker.spPr.Fill;
-					compiled_marker.pen   = compiled_marker.spPr.ln;
-					compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					pts[j].compiledMarker = compiled_marker;
+					pts[i].compiledMarker = compiled_marker;
+					pts[i].compiledMarker.pen = compiled_marker.spPr.ln;
+					pts[i].compiledMarker.brush = compiled_marker.spPr.Fill;
+					pts[i].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+					pts[i].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
 				}
 			}
 			else
 			{
 				var series = this.chart.plotArea.chart.series;
+				var brushes = getArrayFillsFromBase(fill, series.length);
+				var pens_fills = getArrayFillsFromBase(line, series.length);
 				for(var i = 0; i < series.length; ++i)
 				{
 					var ser = series[i];
-					var pts;
 					if(ser.val)
 					{
 						pts = ser.val.numRef.numCache.pts;
@@ -415,31 +438,33 @@ CChartSpace.prototype.recalculateMarkers = function()
 					for(var j = 0; j < pts.length; ++j)
 					{
 						var compiled_marker = new CMarker();
-						compiled_marker.setSize(7);
-						compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
-						compiled_marker.setSpPr(new CSpPr());
-						compiled_marker.spPr.setLn(new CLn());
-						var ln = compiled_marker.spPr.ln;
-						ln.setW(12700);
-						ln.setFill(arrayColors[i]);
-						compiled_marker.spPr.setFill(arrayColors[i]);
+						compiled_marker.merge(default_marker);
+						if(!compiled_marker.spPr)
+						{
+							compiled_marker.setSpPr(new CSpPr());
+						}
+						compiled_marker.spPr.setFill(brushes[i]);
+						if(!compiled_marker.spPr)
+							compiled_marker.spPr.setLn(new CLn());
+						compiled_marker.spPr.ln.setFill(pens_fills[i]);
 						compiled_marker.merge(ser.marker);
+						compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
 						if(Array.isArray(ser.dPt))
 						{
 							for(var k = 0; k < ser.dPt.length; ++k)
 							{
 								if(ser.dPt[k].idx === pts[j].idx)
 								{
-									compiled_marker.merge(ser.dPt[k])
+									compiled_marker.merge(ser.dPt[k].marker);
 									break;
 								}
 							}
 						}
-						compiled_marker.brush = compiled_marker.spPr.Fill;
-						compiled_marker.pen   = compiled_marker.spPr.ln;
-						compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 						pts[j].compiledMarker = compiled_marker;
+						pts[j].compiledMarker.pen = compiled_marker.spPr.ln;
+						pts[j].compiledMarker.brush = compiled_marker.spPr.Fill;
+						pts[j].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+						pts[j].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
 					}
 				}
 			}
@@ -467,8 +492,8 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			{
 				for (var j = 0; j < countBase; j++) 
 				{
-					var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) / 100.0;	
-					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], percent);
+					var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) * 1000;	
+					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], 100000 - percent);
 					arrayColors.push( color );
 				}
 			}
@@ -479,71 +504,6 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			var b_vary_colors = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
 			var parents = this.getParentObjects();
 			
-			
-			/*
-			if(b_vary_colors)
-			{
-				var first_series = this.chart.plotArea.chart.series[0];
-				var pts;
-				if(first_series.val)
-				{
-					pts = first_series.val.numRef.numCache.pts;
-				}
-				else if(first_series.yVal)
-				{
-					pts = first_series.yVal.numRef.numCache.pts;
-				}
-				else
-				{
-					pts = [];
-				}
-				
-				if(first_series instanceof CLineSeries)
-				{
-					for(var j = 0; j < pts.length; ++j)
-					{
-						var compiled_ln = new CLn();
-					}
-					ser.pen = new CLn();
-					ser.pen.setFill(arrayColors[i]);
-					ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-				}
-				else
-				{
-					
-				}
-				
-				
-				for(var j = 0; j < pts.length; ++j)
-				{
-					var compiled_marker = new CMarker();
-					compiled_marker.setSize(7);
-					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
-					compiled_marker.setSpPr(new CSpPr());
-					compiled_marker.spPr.setLn(new CLn());
-					var ln = compiled_marker.spPr.ln;
-					ln.setW(12700);
-					ln.setFill(arrayColors[j]);
-					compiled_marker.spPr.setFill(arrayColors[j]);
-					compiled_marker.merge(first_series.marker);
-					for(var k = 0; k < first_series.dPt.length; ++k)
-					{
-						if(first_series.dPt[k].idx === pts[j].idx)
-						{
-							compiled_marker.merge(first_series.dPt[k])
-							break;
-						}
-					}
-					compiled_marker.brush = brush.spPr.Fill;
-					compiled_marker.pen   = brush.spPr.ln;
-					compiled_marker.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					compiled_marker.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					pts.compiledMarker = compiled_marker;
-				}
-			}
-			
-			
-			*/
 			for(var i = 0; i < series.length; ++i)
 			{
 				var ser = series[i];
