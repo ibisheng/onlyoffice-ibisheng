@@ -418,7 +418,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 			var RGBA = {R:0, G:0, B:0, A: 255};
 			if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
 			{
-				var ser = this.chart.plotArea.chart.series;
+				var ser = this.chart.plotArea.chart.series[0];
 				if(ser.val)
 				{
 					pts = ser.val.numRef.numCache.pts;
@@ -534,165 +534,324 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 	{		
 		if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
 		{
+			var style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
 			var series = this.chart.plotArea.chart.series;
-			var arrayColors = [];
-			var countBase = this.baseColors.length;
 			
-			var need_colors = this.getNeedColorCount();
-			var needCreate = parseInt(need_colors / countBase) + 1;
-
-			for (var i = 0; i < needCreate; i++) 
+			
+			var parents = this.getParentObjects();
+			var RGBA = {R: 0, G: 0, B: 0, A: 255};
+			if(this.chart.plotArea.chart.varyColors && series.length === 1 || this.chart.plotArea.chart instanceof CPieChart)
 			{
-				for (var j = 0; j < countBase; j++) 
+				var pts;
+				var ser = series[0];
+				if(ser.val)
 				{
-					var percent = (-70 + 140 * ( (i + 1) / (needCreate + 1) )) * 1000;	
-					var color = CreateUniFillSolidFillWidthTintOrShade(this.baseColors[j], 100000 - percent);
-					arrayColors.push( color );
+					pts = ser.val.numRef.numCache.pts;
 				}
-			}
-			arrayColors.splice(need_colors, arrayColors.length - need_colors);
-			var RGBA = {R: 0, G: 0, B: 0, A:255};
-			var parents = this.getParentObjects();
-			
-			var b_vary_colors = this.chart.plotArea.chart instanceof CPieChart || (this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1); 
-			var parents = this.getParentObjects();
-			
-			for(var i = 0; i < series.length; ++i)
-			{
-				var ser = series[i];
-				if(!(this.chart.plotArea.chart instanceof CPieChart))
+				else if(ser.yVal)
 				{
-					ser.brush = null;
-					ser.pen = null;
-					if(ser.spPr && ser.spPr.Fill)
+					pts = ser.yVal.numRef.numCache.pts;
+				}
+				else
+				{
+					pts = [];
+				}
+				
+				if(!(this.chart.plotArea.chart instanceof CLineChart))
+				{
+					var base_fills = getArrayFillsFromBase(style.fill2, pts.length);
+					for(var i = 0; i < pts.length; ++i)
 					{
-						ser.brush = ser.spPr.Fill;
-					}
-					else
-					{
-						ser.brush = arrayColors[i];
-					}
-					
-					ser.pen = null;
-					if(ser.spPr && ser.spPr.ln)
-					{
-						ser.pen = ser.spPr.ln;
-						ser.pen = ser.spPr.ln.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					}
-					else
-					{
-						if(ser instanceof CLineSeries)
+						var compiled_brush = new CUniFill();
+						compiled_brush.merge(base_fills[i]);
+						if(ser.spPr && ser.spPr.Fill)
 						{
-							ser.pen = new CLn();
-							ser.pen.setFill(arrayColors[i]);
-							ser.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						}
-					}
-					ser.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-					if(ser.val && ser.val.numRef && ser.val.numRef.numCache && ser.val.numRef.numCache.pts)
-					{	
-						var pts = ser.val.numRef.numCache.pts;
-						for(var j = 0; j < pts.length; ++j)
-						{
-							pts[j].brush = ser.brush;
-							pts[j].pen = ser.pen;
+							compiled_brush.merge(ser.spPr.Fill);
 						}
 						if(Array.isArray(ser.dPt))
-						{
-							for(j = 0; j < ser.dPt.length; ++j)
+						{							
+							for(var j = 0; j < ser.dPt.length; ++j)
 							{
-								if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+								if(ser.dPt[j].idx === pts[i].idx)
 								{
-									pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-									pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+									if(ser.dPt[j].spPr)
+									{
+										compiled_brush.merge(ser.dPt[j].spPr.Fill);
+									}
+									break;
 								}
-								if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
-								{
-									pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-									pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-								}
-							}				
+							}
 						}
+						pts[i].brush = compiled_brush;
+						pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 					}
-					if(ser.yVal && ser.yVal.numRef && ser.yVal.numRef.numCache && ser.yVal.numRef.numCache.pts)//Точечная диаграмма
+					
+					if(style.line1 === EFFECT_SUBTLE)
 					{
-						var ptsY = ser.yVal.numRef.numCache.pts;
-						var ptsX;
-						if(ser.xVal && ser.xVal.numRef && ser.xVal.numRef.numCache && ser.xVal.numRef.numCache.pts)
+						var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+						
+						var base_line_fills = [];
+						if(this.style !== 34)
 						{
-							ptsX = ser.xVal.numRef.numCache.pts;
+							for(i = 0; i < pts.length; ++i)
+							{
+								var compiled_line = new CLn();
+								compiled_line.merge(default_line);
+								compiled_line.Fill.merge(style.line2[0]);
+								if(ser.spPr && spPr.ln)
+								{
+									compiled_line.merge(spPr.ln);
+								}
+								if(Array.isArray(ser.dPt))
+								{
+									for(var j = 0; j < ser.dPt.length; ++j)
+									{
+										if(ser.dPt[j].idx === pts[i].idx)
+										{
+											if(ser.dPt[j].spPr)
+											{
+												compiled_line.merge(ser.dPt[j].spPr.ln);
+											}
+											break;
+										}
+									}
+								}
+								pts[i].pen = compiled_line;
+								pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+							}
 						}
 						else
 						{
-							ptsX = null;
-						}
-						
-						if(Array.isArray(ptsX))
-						{
-							for(var j = 0; j < ptsX.length; ++j)
+							var base_line_fills = getArrayFillsFromBase(style.line2, pts.length);
+							for(i = 0; i < pts.length; ++i)
 							{
-								ptsX[j].brush = ser.brush;
-								ptsX[j].pen = ser.pen;
-							}				
-						}
-						for(var j = 0; j < ptsY.length; ++j)
-						{
-							ptsY[j].brush = ser.brush;
-							ptsY[j].pen = ser.pen;
-						}
-						if(Array.isArray(ser.dPt))
-						{
-							for(j = 0; j < ser.dPt.length; ++j)
-							{
-								if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+								var compiled_line = new CLn();
+								compiled_line.merge(default_line);
+								compiled_line.Fill.merge(base_line_fills[i]);
+								if(ser.spPr && spPr.ln)
 								{
-									if(Array.isArray(ptsX))
-									{
-										ptsX[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-										ptsX[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-									}
-									ptsY[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-									ptsY[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+									compiled_line.merge(spPr.ln);
 								}
-								if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+								if(Array.isArray(ser.dPt))
 								{
-									if(Array.isArray(ptsX))
+									for(var j = 0; j < ser.dPt.length; ++j)
 									{
-										ptsX[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-										ptsX[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+										if(ser.dPt[j].idx === pts[i].idx)
+										{
+											if(ser.dPt[j].spPr)
+											{
+												compiled_line.merge(ser.dPt[j].spPr.ln);
+											}
+											break;
+										}
 									}
-									ptsY[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-									ptsY[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
 								}
-							}				
+								pts[i].pen = compiled_line;
+								pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+							}
 						}
 					}
 				}
 				else
 				{
-					var pts = ser.val.numRef.numCache.pts;
-					for(var j = 0; j < pts.length; ++j)
+					var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+					var base_line_fills = getArrayFillsFromBase(style.line4, pts.length);
+					for(var i = 0; i < pts.length; ++i)
 					{
-						pts[j].brush = arrayColors[j];
-						pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-						pts[j].pen = ser.pen;
-					}
-					
-					if(Array.isArray(ser.dPt))
-					{
-						for(j = 0; j < ser.dPt.length; ++j)
+						var compiled_line = new CLn();
+						compiled_line.merge(default_line);
+						compiled_line.Fill.merge(base_line_fills[i]);
+						compiled_line.w *= style.line3;
+						if(ser.spPr && spPr.ln)
 						{
-							if(ser.dPt[j].spPr && ser.dpt.spPr.Fill)
+							compiled_line.merge(spPr.ln);
+						}
+						if(Array.isArray(ser.dPt))
+						{
+							for(var j = 0; j < ser.dPt.length; ++j)
 							{
-								pts[ser.dpt.idx].brush = ser.dpt.spPr.Fill;
-								pts[ser.dpt.idx].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								if(ser.dPt[j].idx === pts[i].idx)
+								{
+									if(ser.dPt[j].spPr)
+									{
+										compiled_line.merge(ser.dPt[j].spPr.ln);
+									}
+									break;
+								}
 							}
-							if(ser.dPt[j].spPr && ser.dpt.spPr.ln)
+						}
+						pts[i].brush = null;
+						pts[i].pen = compiled_line;
+						pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+					}
+				}
+			}
+			else
+			{
+				if(!(this.chart.plotArea.chart instanceof CLineChart))
+				{	
+					var base_fills = getArrayFillsFromBase(style.fill2, series.length);
+					var base_line_fills = null;
+					if(style.line1 === EFFECT_SUBTLE && this.style === 34)
+						base_line_fills	= getArrayFillsFromBase(style.line2, series.length);
+					for(var i = 0; i < series.length; ++i)
+					{
+						var ser = series[i];
+						var pts;
+						if(ser.val)
+						{
+							pts = ser.val.numRef.numCache.pts;
+						}
+						else if(ser.yVal)
+						{
+							pts = ser.yVal.numRef.numCache.pts;
+						}
+						else
+						{
+							pts = [];
+						}
+						
+						for(var j = 0; j < pts.length; ++j)
+						{
+							var compiled_brush = new CUniFill();
+							compiled_brush.merge(base_fills[i]);
+							if(ser.spPr && ser.spPr.Fill)
 							{
-								pts[ser.dpt.idx].pen = ser.dpt.spPr.pen;
-								pts[ser.dpt.idx].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								compiled_brush.merge(ser.spPr.Fill);
 							}
-						}				
+							if(Array.isArray(ser.dPt))
+							{							
+								for(var k = 0; k < ser.dPt.length; ++k)
+								{
+									if(ser.dPt[k].idx === pts[j].idx)
+									{
+										if(ser.dPt[k].spPr)
+										{
+											compiled_brush.merge(ser.dPt[k].spPr.Fill);
+										}
+										break;
+									}
+								}
+							}
+							pts[j].brush = compiled_brush;
+							pts[j].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
+						
+						
+						if(style.line1 === EFFECT_SUBTLE)
+						{
+							var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+							
+							if(this.style !== 34)
+							{
+								for(var j = 0; j < pts.length; ++j)
+								{
+									var compiled_line = new CLn();
+									compiled_line.merge(default_line);
+									compiled_line.Fill.merge(style.line2[0]);
+									if(ser.spPr && spPr.ln)
+									{
+										compiled_line.merge(spPr.ln);
+									}
+									if(Array.isArray(ser.dPt))
+									{
+										for(var k = 0; k < ser.dPt.length; ++k)
+										{
+											if(ser.dPt[k].idx === pts[j].idx)
+											{
+												if(ser.dPt[k].spPr)
+												{
+													compiled_line.merge(ser.dPt[k].spPr.ln);
+												}
+												break;
+											}
+										}
+									}
+									pts[j].pen = compiled_line;
+									pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+							}
+							else
+							{
+								for(i = 0; i < pts.length; ++i)
+								{
+									var compiled_line = new CLn();
+									compiled_line.merge(default_line);
+									compiled_line.Fill.merge(base_line_fills[i]);
+									if(ser.spPr && spPr.ln)
+									{
+										compiled_line.merge(spPr.ln);
+									}
+									if(Array.isArray(ser.dPt))
+									{
+										for(var j = 0; j < ser.dPt.length; ++j)
+										{
+											if(ser.dPt[j].idx === pts[i].idx)
+											{
+												if(ser.dPt[j].spPr)
+												{
+													compiled_line.merge(ser.dPt[j].spPr.ln);
+												}
+												break;
+											}
+										}
+									}
+									pts[i].pen = compiled_line;
+									pts[i].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					
+					var base_line_fills = getArrayFillsFromBase(style.line4, series.length);
+					for(var i = 0; i < series.length; ++i)
+					{
+						var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
+						var ser = series[i];
+						var pts;
+						if(ser.val)
+						{
+							pts = ser.val.numRef.numCache.pts;
+						}
+						else if(ser.yVal)
+						{
+							pts = ser.yVal.numRef.numCache.pts;
+						}
+						else
+						{
+							pts = [];
+						}
+						for(var j = 0; j < pts.length; ++j)
+						{
+							var compiled_line = new CLn();
+							compiled_line.merge(default_line);
+							compiled_line.Fill.merge(base_line_fills[i]);
+							compiled_line.w *= style.line3;
+							if(ser.spPr && spPr.ln)
+							{
+								compiled_line.merge(spPr.ln);
+							}
+							if(Array.isArray(ser.dPt))
+							{
+								for(var k = 0; k < ser.dPt.length; ++k)
+								{
+									if(ser.dPt[k].idx === pts[j].idx)
+									{
+										if(ser.dPt[k].spPr)
+										{
+											compiled_line.merge(ser.dPt[k].spPr.ln);
+										}
+										break;
+									}
+								}
+							}
+							pts[j].brush = null;
+							pts[j].pen = compiled_line;
+							pts[j].pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
+						}
 					}
 				}
 			}
