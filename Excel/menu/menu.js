@@ -554,7 +554,7 @@
     } else {
         api.asc_LoadDocument({
             "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
-            "Url"    : decodeURIComponent("file:///X:/AVS/Sources/TeamlabOffice/trunk/OfficeWeb/Excel/offlinedocs/test-native/"),
+            "Url"    : decodeURIComponent("file:///X:/AVS/Sources/TeamlabOffice/trunk/OfficeWeb/OfflineDocuments/Excel/test-native/"),
             "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
             "Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
             "VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
