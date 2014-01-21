@@ -78,7 +78,7 @@ CChartsDrawer.prototype =
 		
 		//отрисовываем без пересчёта
 		this.areaChart.draw(this.calcProp, cShapeDrawer);
-		this.gridChart.draw(this.calcProp, cShapeDrawer);
+		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.chart.draw(this, cShapeDrawer);
 	},
 	
@@ -165,23 +165,38 @@ CChartsDrawer.prototype =
 		if(this.calcProp.type == "Bar")
 		{
 			this.calcProp.numvlines = this.calcProp.data.length;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "HBar")
 		{
 			this.calcProp.numhlines = this.calcProp.data.length;
 			this.calcProp.numvlines = this.calcProp.scale.length - 1;
+			
+			this.calcProp.numhMinorlines = 2;
+			this.calcProp.numvMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Line")
 		{
 			this.calcProp.numvlines = this.calcProp.data[0].length;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Scatter")
 		{
 			this.calcProp.numvlines = this.calcProp.xScale.length - 1;
+			
+			this.calcProp.numvMinorlines = 5;
+			this.calcProp.numhMinorlines = 5;
 		}
 		else if(this.calcProp.type == "Area")
 		{
 			this.calcProp.numvlines = this.calcProp.data[0].length - 1;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
 		}
 
 		this.calcProp.nullPositionOX = this._getNullPosition();
@@ -2167,6 +2182,7 @@ drawBarChart.prototype =
 	_drawPaths: function(paths, brush, pen)
 	{
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		cGeometry.AddPath(paths);
 		this.cShapeDrawer.draw(cGeometry);
@@ -2328,6 +2344,7 @@ drawLineChart.prototype =
 		path.stroke = true;
 		
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		
 		cGeometry.AddPath(path);
@@ -2507,6 +2524,7 @@ drawAreaChart.prototype =
 		//path.stroke = true;
 		
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		
 		cGeometry.AddPath(path);
@@ -2696,6 +2714,7 @@ drawHBarChart.prototype =
 	_drawPath : function(path, brush, pen)
 	{
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		cGeometry.AddPath(path);
 		this.cShapeDrawer.draw(cGeometry);
@@ -2811,6 +2830,7 @@ drawPieChart.prototype =
 	_drawPath : function(path, brush, pen)
 	{
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		
 		cGeometry.AddPath(path);
@@ -3107,6 +3127,7 @@ drawScatterChart.prototype =
 		path.stroke = stroke;
 		
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
 		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
 		
 		cGeometry.AddPath(path);
@@ -3121,57 +3142,88 @@ function gridChart()
 {
 	this.chartProp = null;
 	this.cShapeDrawer = null;
+	this.chartSpace = null;
 	this.paths = {};
 }
 
 gridChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartProp, cShapeDrawer, chartSpace)
     {
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
 		
 		this._drawHorisontalLines();
 		this._drawVerticalLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
 	{
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
 		
 		this.paths = {};
-		this._calculateHorisontalLines(true);
-		this._calculateVerticalLines(true);
+		this._calculateHorisontalLines();
+		this._calculateVerticalLines();
 	},
 	
 	_calculateHorisontalLines : function()
 	{
 		var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom - this.chartProp.chartGutter._top)/(this.chartProp.numhlines);
+		var minorStep = stepY/this.chartProp.numhMinorlines;
 		var widthLine = this.chartProp.widthCanvas - (this.chartProp.chartGutter._left + this.chartProp.chartGutter._right);
 		var posX = this.chartProp.chartGutter._left;
 		var posY;
+		var posMinorY;
 		for(var i = 0; i <= this.chartProp.numhlines; i++)
 		{
 			posY = i*stepY + this.chartProp.chartGutter._top;
 			if(!this.paths.horisontalLines)
 				this.paths.horisontalLines = [];
 			this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+			
+			//промежуточные линии
+			for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+			{
+				posMinorY = posY + n*minorStep;
+				if(!this.paths.horisontalMinorLines)
+					this.paths.horisontalMinorLines = [];
+				if(!this.paths.horisontalMinorLines[i])
+					this.paths.horisontalMinorLines[i] = [];
+				
+				this.paths.horisontalMinorLines[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+			}
 		}
 	},
 	
 	_calculateVerticalLines: function()
 	{
 		var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
+		var minorStep = stepX/this.chartProp.numvMinorlines;
 		var heightLine = this.chartProp.heightCanvas - (this.chartProp.chartGutter._bottom +this.chartProp.chartGutter._top);
 		var posY = this.chartProp.chartGutter._top;
 		var posX;
+		var posMinorX;
 		for(var i = 0; i <= this.chartProp.numvlines; i++)
 		{
 			posX = i*stepX + this.chartProp.chartGutter._left;
 			if(!this.paths.verticalLines)
 				this.paths.verticalLines = [];
 			this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
+			
+			//промежуточные линии
+			for(var n = 0; n < this.chartProp.numvMinorlines; n++)
+			{
+				posMinorX = posX + n*minorStep;
+				if(!this.paths.verticalMinorLines)
+					this.paths.verticalMinorLines = [];
+				if(!this.paths.verticalMinorLines[i])
+					this.paths.verticalMinorLines[i] = [];
+				
+				this.paths.verticalMinorLines[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + heightLine);
+			}
 		}
 	},
 	
@@ -3199,33 +3251,69 @@ gridChart.prototype =
 	
 	_drawHorisontalLines: function()
 	{
-		var lineWidth = 1;
-		var color = new CUniColor().RGBA;
+		var pen;
+		var path;
 		for(var i = 0; i <= this.chartProp.numhlines; i++)
 		{
-			var path = this.paths.horisontalLines[i];
-			this._drawPath(path, lineWidth, color);
+			if(this.chartProp.type == "HBar")
+				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+			else
+				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+				
+			path = this.paths.horisontalLines[i];
+			this._drawPath(path, pen);
+			
+			//промежуточные линии
+			if(i != this.chartProp.numhlines)
+			{
+				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
+				{
+					path = this.paths.horisontalMinorLines[i][n];
+					if(this.chartProp.type == "HBar")
+						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
+					else
+						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
+					this._drawPath(path, pen);
+				}
+			}
 		}
 	},
 	
 	_drawVerticalLines: function()
 	{
-		var lineWidth = 1;
-		var color = new CUniColor().RGBA;
+		var pen, path;
 		for(var i = 0; i <= this.chartProp.numvlines; i++)
 		{
-			var path = this.paths.verticalLines[i];
-			this._drawPath(path, lineWidth, color);
+			if(this.chartProp.type == "HBar")
+				pen = this.chartSpace.chart.plotArea.valAx.compiledMajorGridLines;
+			else
+				pen = this.chartSpace.chart.plotArea.catAx.compiledMajorGridLines;
+				
+			path = this.paths.verticalLines[i];
+			this._drawPath(path, pen);
+			
+			//промежуточные линии
+			if(i != this.chartProp.numvlines)
+			{
+				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
+				{
+					path = this.paths.verticalMinorLines[i][n];
+					if(this.chartProp.type == "HBar")
+						pen = this.chartSpace.chart.plotArea.valAx.compiledMinorGridLines;
+					else
+						pen = this.chartSpace.chart.plotArea.catAx.compiledMinorGridLines;
+					this._drawPath(path, pen);
+				}
+			}
 		}	
 	},
 	
-	_drawPath: function(path, lineWidth, color)
-	{
-		this.cShapeDrawer.StrokeWidth = lineWidth/(96/25.4);
-		this.cShapeDrawer.p_width(1000 * this.cShapeDrawer.StrokeWidth);
-		this.cShapeDrawer.StrokeUniColor = color;
-		
+	_drawPath: function(path, pen)
+	{	
 		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
 		cGeometry.AddPath(path);
 		this.cShapeDrawer.draw(cGeometry);
 	}
