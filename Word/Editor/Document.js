@@ -3456,14 +3456,22 @@ CDocument.prototype =
 
                             if ( type_Paragraph == Item.GetType()  )
                             {
-                                if ( false === Item.Is_SelectionUse() )
+                                if ( true !== Debug_ParaRunMode )
                                 {
-                                    Item.CurPos.ContentPos  = Item.Content.length - 1;
-                                    Item.Selection.Use      = true;
-                                    Item.Selection.StartPos = Item.Content.length - 1;
-                                    Item.Selection.EndPos   = Item.Content.length - 1;
+                                    if ( false === Item.Is_SelectionUse() )
+                                    {
+                                        Item.CurPos.ContentPos  = Item.Content.length - 1;
+                                        Item.Selection.Use      = true;
+                                        Item.Selection.StartPos = Item.Content.length - 1;
+                                        Item.Selection.EndPos   = Item.Content.length - 1;
+                                    }
+                                    Item.Cursor_MoveLeft( 1, true, Word );
                                 }
-                                Item.Cursor_MoveLeft( 1, true, Word );
+                                else
+                                {
+                                    Item.Cursor_MoveToEndPos( true );
+                                    Item.Cursor_MoveLeft( 1, true, Word );
+                                }
                             }
                             else if ( type_Table == Item.GetType() )
                             {
@@ -3538,14 +3546,22 @@ CDocument.prototype =
 
                             if ( type_Paragraph == Item.GetType()  )
                             {
-                                if ( false === Item.Is_SelectionUse() )
+                                if ( true !== Debug_ParaRunMode )
                                 {
-                                    Item.CurPos.ContentPos  = Item.Content.length - 1;
-                                    Item.Selection.Use      = true;
-                                    Item.Selection.StartPos = Item.Content.length - 1;
-                                    Item.Selection.EndPos   = Item.Content.length - 1;
+                                    if ( false === Item.Is_SelectionUse() )
+                                    {
+                                        Item.CurPos.ContentPos  = Item.Content.length - 1;
+                                        Item.Selection.Use      = true;
+                                        Item.Selection.StartPos = Item.Content.length - 1;
+                                        Item.Selection.EndPos   = Item.Content.length - 1;
+                                    }
+                                    Item.Cursor_MoveLeft( 1, true, Word );
                                 }
-                                Item.Cursor_MoveLeft( 1, true, Word );
+                                else
+                                {
+                                    Item.Cursor_MoveToEndPos( true );
+                                    Item.Cursor_MoveLeft( 1, true, Word );
+                                }
                             }
                             else if ( type_Table == Item.GetType() )
                             {

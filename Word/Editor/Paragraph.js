@@ -8279,30 +8279,75 @@ Paragraph.prototype =
         return ContentPos;
     },
 
-    Set_ParaContentPos : function(ContentPos, bSelection, bStart, Line, CorrectEndLinePos)
+    Set_ParaContentPos : function(ContentPos, Line, CorrectEndLinePos)
     {
         var Pos = ContentPos.Get(0);
-        if ( true === bSelection )
+
+        this.CurPos.ContentPos = Pos;
+        this.Content[Pos].Set_ParaContentPos( ContentPos, 1 );
+        this.Correct_ContentPos(CorrectEndLinePos);
+
+        this.CurPos.Line  = Line;
+        this.CurPos.Range = 0;
+    },
+
+    Set_SelectionContentPos : function(StartContentPos, EndContentPos)
+    {
+        var Depth = 0;
+
+        var OldStartPos = this.Selection.StartPos;
+        var OldEndPos   = this.Selection.EndPos;
+
+        if ( OldStartPos > OldEndPos )
         {
-            if ( true === bStart )
+            OldStartPos = this.Selection.EndPos;
+            OldEndPos   = this.Selection.StartPos;
+        }
+
+        var StartPos = StartContentPos.Get( Depth );
+        var EndPos   = EndContentPos.Get(Depth);
+
+        this.Selection.StartPos = StartPos;
+        this.Selection.EndPos   = EndPos;
+
+        // Удалим отметки о старом селекте
+        if ( OldStartPos < StartPos && OldStartPos < EndPos )
+        {
+            var TempLimit = Math.min( StartPos, EndPos );
+            for ( var CurPos = OldStartPos; CurPos < TempLimit; CurPos++ )
             {
-                this.Selection.StartPos = Pos;
-                this.Content[Pos].Set_ParaContentPos( ContentPos, 1, bSelection, bStart );
-            }
-            else
-            {
-                this.Selection.EndPos = Pos;
-                this.Content[Pos].Set_ParaContentPos( ContentPos, 1, bSelection, bStart );
+                this.Content[CurPos].Selection_Remove();
             }
         }
-        else
-        {
-            this.CurPos.ContentPos = Pos;
-            this.Content[Pos].Set_ParaContentPos( ContentPos, 1, bSelection, bStart );
-            this.Correct_ContentPos(CorrectEndLinePos);
 
-            this.CurPos.Line  = Line;
-            this.CurPos.Range = 0;
+        if ( OldEndPos > StartPos && OldEndPos > EndPos )
+        {
+            var TempLimit = Math.max( StartPos, EndPos );
+            for ( var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++ )
+            {
+                this.Content[CurPos].Selection_Remove();
+            }
+        }
+
+        if ( StartPos === EndPos )
+        {
+            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, 0, 0 );
+        }
+        else if ( StartPos > EndPos )
+        {
+            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, 1 );
+            this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, -1, 0 );
+
+            for ( var CurPos = EndPos + 1; CurPos < StartPos; CurPos++ )
+                this.Content[CurPos].Select_All( -1 );
+        }
+        else// if ( StartPos < EndPos )
+        {
+            this.Content[StartPos].Set_SelectionContentPos( StartContentPos, null, Depth + 1, 0, -1 );
+            this.Content[EndPos].Set_SelectionContentPos( null, EndContentPos, Depth + 1, 1, 0 );
+
+            for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
+                this.Content[CurPos].Select_All( 1 );
         }
     },
 
@@ -8433,27 +8478,73 @@ Paragraph.prototype =
             var Result = true;
             if ( true === this.Selection.Use )
             {
+                var EndSelectionPos   = this.Get_ParaContentPos( true, false );
+                var StartSelectionPos = this.Get_ParaContentPos( true, true );
 
-            }
-            else
-            {
-                if ( true === AddToSelect )
+                if ( true !== AddToSelect )
                 {
+                    // Найдем левую точку селекта
+                    var SelectPos = StartSelectionPos;
+                    if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
+                        SelectPos = EndSelectionPos;
 
+                    this.Selection_Remove();
+                    this.Set_ParaContentPos( SelectPos, -1, true );
+
+                    Result = true;
                 }
                 else
                 {
-                    var SearchPos  = new CParagraphSearchPos();
-                    var ContentPos = this.Get_ParaContentPos( false, false );
+                    var SearchPos = new CParagraphSearchPos();
 
                     if ( true === Word )
-                        this.Get_WordStartPos( SearchPos, ContentPos );
+                        this.Get_WordStartPos( SearchPos, EndSelectionPos );
                     else
-                        this.Get_LeftPos( SearchPos, ContentPos );
+                        this.Get_LeftPos( SearchPos, EndSelectionPos );
 
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, false, false, -1, true );
+                        this.Set_SelectionContentPos( StartSelectionPos, SearchPos.Pos );
+
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                var SearchPos  = new CParagraphSearchPos();
+                var ContentPos = this.Get_ParaContentPos( false, false );
+
+                if ( true === Word )
+                    this.Get_WordStartPos( SearchPos, ContentPos );
+                else
+                    this.Get_LeftPos( SearchPos, ContentPos );
+
+                if ( true === AddToSelect )
+                {
+                    if ( true === SearchPos.Found )
+                    {
+                        // Селекта еще нет, добавляем с текущей позиции
+                        this.Selection.Use    = true;
+                        this.Set_SelectionContentPos( ContentPos, SearchPos.Pos );
+
+                        return true;
+                    }
+                    else
+                    {
+                        this.Selection.Use = false;
+                        return false;
+                    }
+                }
+                else
+                {
+                    if ( true === SearchPos.Found )
+                    {
+                        this.Set_ParaContentPos( SearchPos.Pos, -1, true );
                         Result = true;
                     }
                     else
@@ -8503,27 +8594,84 @@ Paragraph.prototype =
 
             if ( true === this.Selection.Use )
             {
+                var EndSelectionPos   = this.Get_ParaContentPos( true, false );
+                var StartSelectionPos = this.Get_ParaContentPos( true, true );
 
-            }
-            else
-            {
-                if ( true === AddToSelect )
+                if ( true !== AddToSelect )
                 {
+                    // Проверим, попал ли конец параграфа в выделение
+                    if ( true === this.Selection_CheckParaEnd() )
+                    {
+                        this.Selection_Remove();
+                        this.Cursor_MoveToEndPos( false );
+                        return false;
+                    }
+                    else
+                    {
+                        // Найдем левую точку селекта
+                        var SelectPos = EndSelectionPos;
+                        if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
+                            SelectPos = StartSelectionPos;
 
+                        this.Selection_Remove();
+
+                        this.Set_ParaContentPos( SelectPos, -1, true );
+
+                        Result = true;
+                    }
                 }
                 else
                 {
-                    var SearchPos  = new CParagraphSearchPos();
-                    var ContentPos = this.Get_ParaContentPos( false, false );
+                    var SearchPos = new CParagraphSearchPos();
 
                     if ( true === Word )
-                        this.Get_WordEndPos( SearchPos, ContentPos );
+                        this.Get_WordEndPos( SearchPos, EndSelectionPos, true );
                     else
-                        this.Get_RightPos( SearchPos, ContentPos );
+                        this.Get_RightPos( SearchPos, EndSelectionPos, true );
 
                     if ( true === SearchPos.Found )
                     {
-                        this.Set_ParaContentPos( SearchPos.Pos, false, false, -1, true );
+                        this.Set_SelectionContentPos( StartSelectionPos, SearchPos.Pos );
+
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                var SearchPos  = new CParagraphSearchPos();
+                var ContentPos = this.Get_ParaContentPos( false, false );
+
+                if ( true === Word )
+                    this.Get_WordEndPos( SearchPos, ContentPos, AddToSelect );
+                else
+                    this.Get_RightPos( SearchPos, ContentPos, AddToSelect );
+
+                if ( true === AddToSelect )
+                {
+                    if ( true === SearchPos.Found )
+                    {
+                        // Селекта еще нет, добавляем с текущей позиции
+                        this.Selection.Use    = true;
+                        this.Set_SelectionContentPos( ContentPos, SearchPos.Pos );
+
+                        return true;
+                    }
+                    else
+                    {
+                        this.Selection.Use = false;
+                        return false;
+                    }
+                }
+                else
+                {
+                    if ( true === SearchPos.Found )
+                    {
+                        this.Set_ParaContentPos( SearchPos.Pos, -1, true );
                         Result = true;
                     }
                     else
@@ -8581,7 +8729,7 @@ Paragraph.prototype =
         {
             var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, bLine );
 
-            this.Set_ParaContentPos( SearchPosXY.Pos, false, false, SearchPosXY.Line, false );
+            this.Set_ParaContentPos( SearchPosXY.Pos, SearchPosXY.Line, false );
             this.Internal_Recalculate_CurPos(-1, false, false, false );
 
             if ( bDontChangeRealPos != true )
@@ -8625,12 +8773,12 @@ Paragraph.prototype =
         return false;
     },
 
-    Get_RightPos : function(SearchPos, ContentPos)
+    Get_RightPos : function(SearchPos, ContentPos, StepEnd)
     {
         var Depth  = 0;
         var CurPos = ContentPos.Get(Depth);
 
-        this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, true);
+        this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, true, StepEnd);
         SearchPos.Pos.Update( CurPos, Depth );
 
         if ( true === SearchPos.Found )
@@ -8641,7 +8789,7 @@ Paragraph.prototype =
         var Count = this.Content.length;
         while ( CurPos < this.Content.length )
         {
-            this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false);
+            this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
             SearchPos.Pos.Update( CurPos, Depth );
 
             if ( true === SearchPos.Found )
@@ -8689,12 +8837,12 @@ Paragraph.prototype =
         }
     },
 
-    Get_WordEndPos : function(SearchPos, ContentPos)
+    Get_WordEndPos : function(SearchPos, ContentPos, StepEnd)
     {
         var Depth  = 0;
         var CurPos = ContentPos.Get(Depth);
 
-        this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, true);
+        this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, true, StepEnd);
 
         if ( true === SearchPos.UpdatePos )
             SearchPos.Pos.Update( CurPos, Depth );
@@ -8707,7 +8855,7 @@ Paragraph.prototype =
         var Count = this.Content.length;
         while ( CurPos < Count )
         {
-            this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false);
+            this.Content[CurPos].Get_WordEndPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
 
             if ( true === SearchPos.UpdatePos )
                 SearchPos.Pos.Update( CurPos, Depth );
@@ -9233,21 +9381,49 @@ Paragraph.prototype =
         {
             if ( true === this.Selection.Use )
             {
+                var EndSelectionPos   = this.Get_ParaContentPos( true, false );
+                var StartSelectionPos = this.Get_ParaContentPos( true, true );
+
+                if ( true === AddToSelect )
+                {
+                    var SearchPos = new CParagraphSearchPos();
+                    this.Get_EndRangePos( SearchPos, EndSelectionPos );
+
+                    this.Set_SelectionContentPos( StartSelectionPos, SearchPos.Pos );
+                }
+                else
+                {
+                    var RightPos = EndSelectionPos;
+                    if ( EndSelectionPos.Compare( StartSelectionPos ) < 0 )
+                        RightPos = StartSelectionPos;
+
+                    var SearchPos  = new CParagraphSearchPos();
+                    this.Get_EndRangePos( SearchPos, RightPos );
+
+                    this.Selection_Remove();
+
+                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+                }
 
             }
             else
             {
+                var SearchPos  = new CParagraphSearchPos();
+                var ContentPos = this.Get_ParaContentPos( false, false );
+                this.Get_EndRangePos( SearchPos, ContentPos );
+
                 if ( true === AddToSelect )
                 {
-
+                    this.Selection.Use = true;
+                    this.Set_SelectionContentPos( ContentPos, SearchPos.Pos );
                 }
                 else
                 {
-                    var SearchPos  = new CParagraphSearchPos();
-                    var ContentPos = this.Get_ParaContentPos( false, false );
-
-                    this.Get_EndRangePos( SearchPos, ContentPos );
-                    this.Set_ParaContentPos( SearchPos.Pos, false, false, SearchPos.Line, false );
+                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
 
                     this.RecalculateCurPos();
                     this.CurPos.RealX = this.CurPos.X;
@@ -9329,21 +9505,49 @@ Paragraph.prototype =
         {
             if ( true === this.Selection.Use )
             {
+                var EndSelectionPos   = this.Get_ParaContentPos( true, false );
+                var StartSelectionPos = this.Get_ParaContentPos( true, true );
 
-            }
-            else
-            {
                 if ( true === AddToSelect )
                 {
+                    var SearchPos = new CParagraphSearchPos();
+                    this.Get_StartRangePos( SearchPos, EndSelectionPos );
 
+                    this.Set_SelectionContentPos( StartSelectionPos, SearchPos.Pos );
                 }
                 else
                 {
-                    var SearchPos  = new CParagraphSearchPos();
-                    var ContentPos = this.Get_ParaContentPos( false, false );
+                    var LeftPos = StartSelectionPos;
+                    if ( StartSelectionPos.Compare( EndSelectionPos ) > 0 )
+                        LeftPos = EndSelectionPos;
 
-                    this.Get_StartRangePos( SearchPos, ContentPos );
-                    this.Set_ParaContentPos( SearchPos.Pos, false, false, SearchPos.Line, false );
+                    var SearchPos  = new CParagraphSearchPos();
+                    this.Get_StartRangePos( SearchPos, LeftPos );
+
+                    this.Selection_Remove();
+
+                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
+
+                    this.RecalculateCurPos();
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+                }
+            }
+            else
+            {
+                var SearchPos  = new CParagraphSearchPos();
+                var ContentPos = this.Get_ParaContentPos( false, false );
+
+                this.Get_StartRangePos( SearchPos, ContentPos );
+
+                if ( true === AddToSelect )
+                {
+                    this.Selection.Use = true;
+                    this.Set_SelectionContentPos( ContentPos, SearchPos.Pos );
+                }
+                else
+                {
+                    this.Set_ParaContentPos( SearchPos.Pos, SearchPos.Line, false );
 
                     this.RecalculateCurPos();
                     this.CurPos.RealX = this.CurPos.X;
@@ -9465,7 +9669,15 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
+                this.Selection.Use   = true;
+                this.Selection.Start = false;
 
+                this.Selection.StartPos = this.Content.length - 1;
+                this.Selection.EndPos   = this.Content.length - 1;
+
+                this.CurPos.ContentPos  = this.Content.length - 1;
+
+                this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(true);
             }
             else
             {
@@ -11335,22 +11547,62 @@ Paragraph.prototype =
     Selection_Stop : function(X,Y,PageNum, MouseEvent)
     {
         this.Selection.Start = false;
+
+        if ( true === Debug_ParaRunMode )
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            {
+                this.Content[CurPos].Selection_Stop();
+            }
+        }
     },
 
     Selection_Remove : function()
     {
-        var StartPos = this.Selection.StartPos2;
-        var EndPos   = this.Selection.EndPos2;
+        if ( true !== Debug_ParaRunMode )
+        {
+            var StartPos = this.Selection.StartPos2;
+            var EndPos   = this.Selection.EndPos2;
 
-        if ( undefined !== this.Content[StartPos] && para_Math === this.Content[StartPos].Type )
-            this.Content[StartPos].Selection_Remove();
+            if ( undefined !== this.Content[StartPos] && para_Math === this.Content[StartPos].Type )
+                this.Content[StartPos].Selection_Remove();
 
-        if ( undefined !== this.Content[EndPos] && para_Math === this.Content[EndPos].Type && StartPos != EndPos )
-            this.Content[EndPos].Selection_Remove();
+            if ( undefined !== this.Content[EndPos] && para_Math === this.Content[EndPos].Type && StartPos != EndPos )
+                this.Content[EndPos].Selection_Remove();
 
-        this.Selection.Use = false;
-        this.Selection.Flag = selectionflag_Common;
-        this.Selection_Clear();
+            this.Selection.Use = false;
+            this.Selection.Flag = selectionflag_Common;
+            this.Selection_Clear();
+        }
+        else
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
+            for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+            {
+                this.Content[CurPos].Selection_Remove();
+            }
+
+            this.Selection.Use = false;
+            this.Selection.Flag = selectionflag_Common;
+            this.Selection_Clear();
+        }
     },
 
     Selection_Clear : function()
@@ -11369,218 +11621,352 @@ Paragraph.prototype =
         if ( 0 === CurPage && this.Pages[0].EndLine < 0 )
             return;
 
-        switch ( this.Selection.Flag )
+        if ( true !== Debug_ParaRunMode )
         {
-            case selectionflag_Common:
+            switch ( this.Selection.Flag )
             {
-                // Делаем подсветку
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-
-                if ( StartPos > EndPos )
+                case selectionflag_Common:
                 {
-                    var Temp = EndPos;
-                    EndPos   = StartPos;
-                    StartPos = Temp;
-                }
+                    // Делаем подсветку
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos   = this.Selection.EndPos;
 
-                var _StartLine = this.Pages[CurPage].StartLine;
-                var _EndLine   = this.Pages[CurPage].EndLine;
-
-                if ( StartPos > this.Lines[_EndLine].EndPos + 1 || EndPos < this.Lines[_StartLine].StartPos )
-                    return;
-                else
-                {
-                    StartPos = Math.max( StartPos, this.Lines[_StartLine].StartPos );
-                    EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos + 1 : this.Content.length - 1 ) );
-                }
-
-                // Найдем линию, с которой начинается селект
-                var StartParaPos = this.Internal_Get_ParaPos_By_Pos( StartPos );
-                var CurLine  = StartParaPos.Line;
-                var CurRange = StartParaPos.Range;
-                var PNum     = StartParaPos.Page;
-
-                // Найдем начальный сдвиг в данном отрезке
-                var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                var Pos, Item;
-
-                if ( this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos )
-                    StartX += this.Numbering.WidthVisible;
-
-                for ( Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++ )
-                {
-                    Item = this.Content[Pos];
-
-                    if ( undefined != Item.WidthVisible && ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  ) )
-                        StartX += Item.WidthVisible;
-                }
-
-                if ( this.Pages[PNum].StartLine > CurLine )
-                {
-                    CurLine = this.Pages[PNum].StartLine;
-                    CurRange = 0;
-                    StartX   = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                    StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
-                }
-
-                var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                var H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                var W = 0;
-
-                // Отдельная отрисовка селекта для формул (используется только, если селект начинается с формулы
-                // или заканчивается формулой, во всех остальных случаях )
-                if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type )
-                {
-                    this.Content[this.Selection.StartPos2].Selection_Draw();
-
-                    if ( this.Selection.StartPos2 === StartPos )
+                    if ( StartPos > EndPos )
                     {
-                        StartPos++;
-                        StartX  += this.Content[this.Selection.StartPos2].WidthVisible;
+                        var Temp = EndPos;
+                        EndPos   = StartPos;
+                        StartPos = Temp;
                     }
-                    else if( this.Selection.StartPos2 === EndPos - 1 )
-                        EndPos--;
 
-                }
+                    var _StartLine = this.Pages[CurPage].StartLine;
+                    var _EndLine   = this.Pages[CurPage].EndLine;
 
-                if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && this.Selection.EndPos2 !== this.Selection.StartPos2 )
-                {
-                    this.Content[this.Selection.EndPos2].Selection_Draw();
-
-                    if ( this.Selection.EndPos2 === StartPos )
+                    if ( StartPos > this.Lines[_EndLine].EndPos + 1 || EndPos < this.Lines[_StartLine].StartPos )
+                        return;
+                    else
                     {
-                        StartPos++;
-                        StartX  += this.Content[this.Selection.EndPos2].WidthVisible;
+                        StartPos = Math.max( StartPos, this.Lines[_StartLine].StartPos );
+                        EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos + 1 : this.Content.length - 1 ) );
                     }
-                    else if( this.Selection.EndPos2 === EndPos - 1 )
-                        EndPos--;
-                }
 
+                    // Найдем линию, с которой начинается селект
+                    var StartParaPos = this.Internal_Get_ParaPos_By_Pos( StartPos );
+                    var CurLine  = StartParaPos.Line;
+                    var CurRange = StartParaPos.Range;
+                    var PNum     = StartParaPos.Page;
 
-                // Рисуем остальной селект
-                for ( Pos = StartPos; Pos < EndPos; Pos++ )
-                {
-                    Item = this.Content[Pos];
+                    // Найдем начальный сдвиг в данном отрезке
+                    var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    var Pos, Item;
 
-                    if ( undefined != Item.CurPage )
+                    if ( this.Numbering.Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos )
+                        StartX += this.Numbering.WidthVisible;
+
+                    for ( Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++ )
                     {
-                        if ( CurLine < Item.CurLine )
+                        Item = this.Content[Pos];
+
+                        if ( undefined != Item.WidthVisible && ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  ) )
+                            StartX += Item.WidthVisible;
+                    }
+
+                    if ( this.Pages[PNum].StartLine > CurLine )
+                    {
+                        CurLine = this.Pages[PNum].StartLine;
+                        CurRange = 0;
+                        StartX   = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                        StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
+                    }
+
+                    var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                    var H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                    var W = 0;
+
+                    // Отдельная отрисовка селекта для формул (используется только, если селект начинается с формулы
+                    // или заканчивается формулой, во всех остальных случаях )
+                    if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type )
+                    {
+                        this.Content[this.Selection.StartPos2].Selection_Draw();
+
+                        if ( this.Selection.StartPos2 === StartPos )
+                        {
+                            StartPos++;
+                            StartX  += this.Content[this.Selection.StartPos2].WidthVisible;
+                        }
+                        else if( this.Selection.StartPos2 === EndPos - 1 )
+                            EndPos--;
+
+                    }
+
+                    if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && this.Selection.EndPos2 !== this.Selection.StartPos2 )
+                    {
+                        this.Content[this.Selection.EndPos2].Selection_Draw();
+
+                        if ( this.Selection.EndPos2 === StartPos )
+                        {
+                            StartPos++;
+                            StartX  += this.Content[this.Selection.EndPos2].WidthVisible;
+                        }
+                        else if( this.Selection.EndPos2 === EndPos - 1 )
+                            EndPos--;
+                    }
+
+
+                    // Рисуем остальной селект
+                    for ( Pos = StartPos; Pos < EndPos; Pos++ )
+                    {
+                        Item = this.Content[Pos];
+
+                        if ( undefined != Item.CurPage )
+                        {
+                            if ( CurLine < Item.CurLine )
+                            {
+                                this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+
+                                CurLine  = Item.CurLine;
+                                CurRange = Item.CurRange;
+
+                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                                StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                                H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                                W = 0;
+                            }
+                            else if ( CurRange < Item.CurRange )
+                            {
+                                this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+
+                                CurRange = Item.CurRange;
+                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                                W = 0;
+                            }
+                        }
+
+                        if ( undefined != Item.WidthVisible )
+                        {
+                            if ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  )
+                                W += Item.WidthVisible;
+                            else
+                                Item.Draw_Selection();
+                        }
+
+                        if ( Pos == EndPos - 1 )
                         {
                             this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-
-                            CurLine  = Item.CurLine;
-                            CurRange = Item.CurRange;
-
-                            StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                            StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                            H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                            W = 0;
-                        }
-                        else if ( CurRange < Item.CurRange )
-                        {
-                            this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-
-                            CurRange = Item.CurRange;
-                            StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                            W = 0;
                         }
                     }
 
-                    if ( undefined != Item.WidthVisible )
-                    {
-                        if ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  )
-                            W += Item.WidthVisible;
-                        else
-                            Item.Draw_Selection();
-                    }
-
-                    if ( Pos == EndPos - 1 )
-                    {
-                        this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-                    }
+                    break;
                 }
+                case selectionflag_Numbering:
+                {
+                    var ParaNum = this.Numbering;
+                    var NumberingPos = this.Numbering.Pos;
+                    if ( -1 === NumberingPos )
+                        break;
 
-                break;
+                    var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
+                    if ( ParaNumPos.Page != CurPage )
+                        break;
+
+                    var CurRange = ParaNumPos.Range;
+                    var CurLine  = ParaNumPos.Line;
+
+                    var NumPr   = this.Numbering_Get();
+                    var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    var SelectW = ParaNum.WidthVisible;
+                    var NumJc   = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
+                    switch ( NumJc )
+                    {
+                        case align_Center:
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
+                            break;
+                        case align_Right:
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
+                            break;
+                        case align_Left:
+                        default:
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            SelectW = ParaNum.WidthVisible;
+                            break;
+                    }
+
+                    this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
+
+                    break;
+                }
             }
-            case selectionflag_Numbering:
+        }
+        else
+        {
+            switch ( this.Selection.Flag )
             {
-                var ParaNum = this.Numbering;
-                var NumberingPos = this.Numbering.Pos;
-                if ( -1 === NumberingPos )
-                    break;
-
-                var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
-                if ( ParaNumPos.Page != CurPage )
-                    break;
-
-                var CurRange = ParaNumPos.Range;
-                var CurLine  = ParaNumPos.Line;
-
-                var NumPr   = this.Numbering_Get();
-                var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                var SelectW = ParaNum.WidthVisible;
-                var NumJc   = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
-                switch ( NumJc )
+                case selectionflag_Common:
                 {
-                    case align_Center:
-                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
-                        SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
-                        break;
-                    case align_Right:
-                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
-                        SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
-                        break;
-                    case align_Left:
-                    default:
-                        SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                        SelectW = ParaNum.WidthVisible;
-                        break;
+                    // Делаем подсветку
+                    var StartPos = this.Selection.StartPos;
+                    var EndPos   = this.Selection.EndPos;
+
+                    if ( StartPos > EndPos )
+                    {
+                        StartPos = this.Selection.EndPos;
+                        EndPos   = this.Selection.StartPos;
+                    }
+
+                    var _StartLine = this.Pages[CurPage].StartLine;
+                    var _EndLine   = this.Pages[CurPage].EndLine;
+
+                    if ( StartPos > this.Lines[_EndLine].EndPos || EndPos < this.Lines[_StartLine].StartPos )
+                        return;
+                    else
+                    {
+                        StartPos = Math.max( StartPos, this.Lines[_StartLine].StartPos );
+                        EndPos   = Math.min( EndPos,   ( _EndLine != this.Lines.length - 1 ? this.Lines[_EndLine].EndPos : this.Content.length - 1 ) );
+                    }
+
+                    var DrawSelection = new CParagraphDrawSelectionRange();
+
+                    for ( var CurLine = _StartLine; CurLine <= _EndLine; CurLine++ )
+                    {
+                        var Line = this.Lines[CurLine];
+                        var RangesCount = Line.Ranges.length;
+
+                        // Определяем позицию и высоту строки
+                        var StartY = this.Pages[CurPage].Y      + this.Lines[CurLine].Top;
+                        var H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                        for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                        {
+                            var Range = Line.Ranges[CurRange];
+
+                            var RStartPos = Range.StartPos;
+                            var REndPos   = Range.EndPos;
+
+                            // Если пересечение пустое с селектом, тогда пропускаем данный отрезок
+                            if ( StartPos > REndPos || EndPos < RStartPos )
+                                continue;
+
+                            DrawSelection.StartX    = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            DrawSelection.W         = 0;
+                            DrawSelection.FindStart = true;
+
+                            for ( var CurPos = RStartPos; CurPos <= REndPos; CurPos++ )
+                            {
+                                var Item = this.Content[CurPos];
+                                Item.Selection_DrawRange( CurLine, CurRange, DrawSelection );
+                            }
+
+                            var StartX = DrawSelection.StartX;
+                            var W      = DrawSelection.W;
+
+                            // Отрисовываем селект
+                            if ( W > 0.001 )
+                                this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+                        }
+                    }
+
+                    break;
                 }
+                case selectionflag_Numbering:
+                {
+                    // TODO: Реализовать нумерацию
 
-                this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
+//                    var ParaNum = this.Numbering;
+//                    var NumberingPos = this.Numbering.Pos;
+//                    if ( -1 === NumberingPos )
+//                        break;
+//
+//                    var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
+//                    if ( ParaNumPos.Page != CurPage )
+//                        break;
+//
+//                    var CurRange = ParaNumPos.Range;
+//                    var CurLine  = ParaNumPos.Line;
+//
+//                    var NumPr   = this.Numbering_Get();
+//                    var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+//                    var SelectW = ParaNum.WidthVisible;
+//                    var NumJc   = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
+//                    switch ( NumJc )
+//                    {
+//                        case align_Center:
+//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
+//                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
+//                            break;
+//                        case align_Right:
+//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
+//                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
+//                            break;
+//                        case align_Left:
+//                        default:
+//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+//                            SelectW = ParaNum.WidthVisible;
+//                            break;
+//                    }
+//
+//                    this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
 
-                break;
+                    break;
+                }
             }
         }
     },
 
+    Selection_CheckParaEnd : function()
+    {
+        if ( true !== this.Selection.Use )
+            return false;
+
+        var EndPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos );
+
+        return this.Content[EndPos].Selection_CheckParaEnd();
+    },
+
     Selection_Check : function(X, Y, Page_Abs, NearPos)
     {
-        if ( NearPos !== undefined  )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( NearPos.Paragraph === this && ( ( true === this.Selection.Use && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos ) || ( true === this.ApplyToAll )  ) )
-                return true;
+            if ( NearPos !== undefined  )
+            {
+                if ( NearPos.Paragraph === this && ( ( true === this.Selection.Use && NearPos.ContentPos >= this.Selection.StartPos && NearPos.ContentPos <= this.Selection.EndPos ) || ( true === this.ApplyToAll )  ) )
+                    return true;
 
-            return false;
+                return false;
+            }
+            else
+            {
+                var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
+                if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
+                    return false;
+
+                var Start = this.Selection.StartPos;
+                var End   = this.Selection.EndPos;
+
+                if ( Start > End )
+                {
+                    Start = this.Selection.EndPos;
+                    End   = this.Selection.StartPos;
+                }
+
+                var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
+                var Pos  = ContentPos.Pos;
+                var Pos2 = ContentPos.Pos2;
+
+                if ( -1 != Pos2 && undefined !== this.Content[Pos2] && para_Math === this.Content[Pos2].Type )
+                    return this.Content[Pos2].Selection_Check( X, Y, Page_Abs );
+
+                if ( -1 != Pos && Start <= Pos && End >= Pos )
+                    return true;
+
+                return false;
+            }
         }
         else
         {
-            var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
-            if ( PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use )
-                return false;
-
-            var Start = this.Selection.StartPos;
-            var End   = this.Selection.EndPos;
-
-            if ( Start > End )
-            {
-                Start = this.Selection.EndPos;
-                End   = this.Selection.StartPos;
-            }
-
-            var ContentPos = this.Internal_GetContentPosByXY( X, Y, false, PageIndex + this.PageNum, false );
-            var Pos  = ContentPos.Pos;
-            var Pos2 = ContentPos.Pos2;
-
-            if ( -1 != Pos2 && undefined !== this.Content[Pos2] && para_Math === this.Content[Pos2].Type )
-                return this.Content[Pos2].Selection_Check( X, Y, Page_Abs );
-
-            if ( -1 != Pos && Start <= Pos && End >= Pos )
-                return true;
-
+            // TODO: реализовать Selection_Check
             return false;
         }
     },
@@ -11658,9 +12044,25 @@ Paragraph.prototype =
 
     Select_All : function()
     {
-        this.Selection.Use      = true;
-        this.Selection.StartPos = this.Internal_GetStartPos();
-        this.Selection.EndPos   = this.Content.length - 1;
+        if ( true !== Debug_ParaRunMode )
+        {
+            this.Selection.Use      = true;
+            this.Selection.StartPos = this.Internal_GetStartPos();
+            this.Selection.EndPos   = this.Content.length - 1;
+        }
+        else
+        {
+            var Count = this.Content.length;
+
+            this.Selection.Use      = true;
+            this.Selection.StartPos = 0;
+            this.Selection.EndPos   = Count - 1;
+
+            for (var CurPos = 0; CurPos < Count; CurPos++)
+            {
+                this.Content[CurPos].Select_All();
+            }
+        }
     },
 
     // Возвращаем выделенный текст
@@ -11827,44 +12229,72 @@ Paragraph.prototype =
     // Проверяем пустой ли селект
     Selection_IsEmpty : function(bCheckHidden)
     {
-        if ( undefined === bCheckHidden )
-            bCheckHidden = true;
-
-        // TODO: при добавлении новых элементов в параграф, добавить их сюда
-        if ( true === this.Selection.Use )
+        if ( true !== Debug_ParaRunMode )
         {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+            if ( undefined === bCheckHidden )
+                bCheckHidden = true;
 
-            if ( StartPos > EndPos )
+            // TODO: при добавлении новых элементов в параграф, добавить их сюда
+            if ( true === this.Selection.Use )
             {
-                var Temp = EndPos;
-                EndPos   = StartPos;
-                StartPos = Temp;
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if ( StartPos > EndPos )
+                {
+                    var Temp = EndPos;
+                    EndPos   = StartPos;
+                    StartPos = Temp;
+                }
+
+                // Проверяем начальный и конечный элемент, если это формулы, тогда надо проверить внутри них селект
+                if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+                    return false;
+
+                if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && false === this.Content[this.Selection.EndPos2].Selection_IsEmpty() )
+                    return false;
+
+                var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math];
+                if ( true === bCheckHidden )
+                    CheckArray.push( para_End );
+
+                var Pos = this.Internal_FindForward( StartPos, CheckArray );
+                if ( true != Pos.Found )
+                    return true;
+
+                if ( Pos.LetterPos >= EndPos )
+                    return true;
+
+                return false;
             }
 
-            // Проверяем начальный и конечный элемент, если это формулы, тогда надо проверить внутри них селект
-            if ( undefined != this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && false === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
-                return false;
-
-            if ( undefined != this.Content[this.Selection.EndPos2] && para_Math === this.Content[this.Selection.EndPos2].Type && false === this.Content[this.Selection.EndPos2].Selection_IsEmpty() )
-                return false;
-
-            var CheckArray = [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math];
-            if ( true === bCheckHidden )
-                CheckArray.push( para_End );
-
-            var Pos = this.Internal_FindForward( StartPos, CheckArray );
-            if ( true != Pos.Found )
-                return true;
-
-            if ( Pos.LetterPos >= EndPos )
-                return true;
-
-            return false;
+            return true;
         }
+        else
+        {
+            if ( undefined === bCheckHidden )
+                bCheckHidden = true;
 
-        return true;
+            if ( true === this.Selection.Use )
+            {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+
+                if ( StartPos > EndPos )
+                {
+                    EndPos   = this.Selection.StartPos;
+                    StartPos = this.Selection.EndPos;
+                }
+
+                for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
+                {
+                    if ( true !== this.Content[CurPos].Selection_IsEmpty(bCheckHidden) )
+                        return false;
+                }
+            }
+
+            return true;
+        }
     },
 
 //-----------------------------------------------------------------------------------
@@ -17899,9 +18329,9 @@ CParagraphContentPos.prototype =
                 continue;
             }
             else if ( this.Data[CurDepth] > Pos.Data[CurDepth] )
-                return -1;
-            else if ( this.Data[CurDepth] > Pos.Data[CurDepth] )
                 return 1;
+            else //if ( this.Data[CurDepth] < Pos.Data[CurDepth] )
+                return -1;
         }
 
         // Такого не должно быть, но на всякий случай пошлем, что позиции не совпадают
@@ -18275,4 +18705,15 @@ function CParagraphSearchPosXY()
     this.InText    = false;
     this.Numbering = false;
     this.End       = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Классы для работы с селектом
+//----------------------------------------------------------------------------------------------------------------------
+function CParagraphDrawSelectionRange()
+{
+    this.StartX    = 0;
+    this.W         = 0;
+
+    this.FindStart = true;
 }
