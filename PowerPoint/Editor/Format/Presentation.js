@@ -1272,8 +1272,6 @@ CPresentation.prototype =
         }
     },
 
-
-
     Add_FlowImage : function(W, H, Img)
     {
         this.Slides[this.CurPage].graphicObjects.Add_FlowImage(W, H, Img);
@@ -6129,6 +6127,25 @@ CPresentation.prototype =
         editor.WordControl.m_oLogicDocument.recalcMap[slide.Id] = slide;
 
     },
+	
+	moveSlides: function(slidesIndexes, pos)
+	{
+		var insert_pos = pos;
+		var removed_slides = [];
+		for(var i = slidesIndexes.length - 1; i > -1; --i)
+		{
+			removed_slides.push(this.removeSlide(slidesIndexes[i]));
+			if(slidesIndexes[i] < pos)
+			{
+				--insert_pos;
+			}
+		}
+		removed_slides.reverse();
+		for(i = 0; i < removed_slides.length; ++i)
+		{
+			this.insertSlide(insert_pos + i, removed_slides[i]);
+		}
+	},
 
 
     changeTheme2 : function(themeInfo, arrInd)

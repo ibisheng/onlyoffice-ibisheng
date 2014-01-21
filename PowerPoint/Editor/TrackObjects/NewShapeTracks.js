@@ -109,8 +109,6 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         }
         if(!(e.CtrlKey || e.ShiftKey) || (e.CtrlKey && !e.ShiftKey && this.isLine))
         {
-
-
             this.extX = abs_dist_x >= MIN_SHAPE_SIZE  ? abs_dist_x : (this.isLine ? 0 : MIN_SHAPE_SIZE);
             this.extY = abs_dist_y >= MIN_SHAPE_SIZE  ? abs_dist_y : (this.isLine ? 0 : MIN_SHAPE_SIZE);
             if(real_dist_x >= 0)

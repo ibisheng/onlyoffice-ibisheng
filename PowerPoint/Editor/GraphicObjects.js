@@ -2737,7 +2737,7 @@ CGraphicObjects.prototype = {
         {
             if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddShape, chart) === false)
             {
-                oThis.slide.addToSpTreeToPos(oThis.slide.cSld.spTree, chart);
+                oThis.slide.addToSpTreeToPos(oThis.slide.cSld.spTree.length, chart);
                 editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
                 editor.WordControl.m_oLogicDocument.Recalculate();
             }
