@@ -5837,6 +5837,11 @@ function BinaryPPTYLoader()
                 {
                     var _font_latin = this.ReadTextFontTypeface();
                     rPr.FontFamily = { Name: _font_latin, Index : -1 };
+
+                    rPr.RFonts.Ascii = { Name: _font_latin, Index : -1 };
+                    rPr.RFonts.EastAsia = { Name: _font_latin, Index : -1 };
+                    rPr.RFonts.HAnsi = { Name: _font_latin, Index : -1 };
+                    rPr.RFonts.CS = { Name: _font_latin, Index : -1 };
                     break;
                 }
                 case 4:
