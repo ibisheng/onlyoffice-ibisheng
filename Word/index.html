@@ -1,79 +1,103 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>TeamLab Documents</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta name="description" content="" />
-        <meta name="keywords" content="" />
+<head>
+    <title>TeamLab Document Editor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=IE8"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="icon" href="resources/img/favicon.ico" type="image/x-icon" />
 
-        <!-- splash -->
+    <link rel="stylesheet" type="text/css" href="../../../3rdparty/extjs/resources/css/ext-all.css">
 
-        <style type="text/css">
-            .loadmask {
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 100%;
-                overflow: hidden;
-                border: none;
-                background-color: #f4f4f4;
-                z-index: 20002;
-            }
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/load-mask.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/chat-panel.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/jquery.jscrollpane.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/asc.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/participantspanel.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchfield.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchdialog.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/about.css">
 
-            .loadmask-body {
-                position:relative;
-                top:44%;
-            }
+    <link rel="stylesheet" type="text/css" href="resources/css/de-main-colors.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-holder.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-statusinfo.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/main-menu.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-create-new.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-open-recent.css">
 
-            .loadmask-logo {
-                display: inline-block;
-                min-width: 240px;
-                vertical-align: top;
-                background-image: url('./resources/img/loading-logo.gif');
-                background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
-                background-repeat: no-repeat;
-            }
+    <!-- splash -->        
 
-            #loadmask-text {
-                color: #b2b2b2;
-                font-size: 10px;
-                font-weight: bold;
-                font-family: Arial;
-                height:14px;
-                margin-top:32px;
-                padding-left:40px;
-                text-align:left;
-                text-transform: uppercase;
-            }
-        </style>
+    <style type="text/css">
+        .loadmask {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            border: none;
+            background-color: #f4f4f4;
+            z-index: 20002;
+        }
 
-        <!-- debug -->
-        <!--<script src="http://192.168.3.97:3030/target/target-script-min.js#anonymous"></script>-->
+        .loadmask-body {
+            position:relative;
+            top:44%;
+        }
 
-        <!-- 3rdparty -->
-        <script type="text/javascript" src="../../../3rdparty/touch/sencha-touch-debug.js"></script>
-        <script type="text/javascript" src="../../../3rdparty/jquery/jquery-1.7.1.min.js"></script>
-        <script type="text/javascript" src="../../../3rdparty/sockjs/sockjs-0.3.min.js"></script>
-        <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
-        <script type="text/javascript" src="../../../3rdparty/megapixel/src/megapix-image.js"></script>
-        <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script>
+        .loadmask-logo {
+            display: inline-block;
+            min-width: 240px;
+            vertical-align: top;
+            background-image: url('./resources/img/loading-logo.gif');
+            background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
+            background-repeat: no-repeat;
+        }
 
-        <!-- Application -->
+        #loadmask-text {
+            color: #b2b2b2;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: Arial;
+            height:14px;
+            margin-top:32px;
+            padding-left:40px;
+            text-align:left;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
 
-        <!--<link rel="stylesheet" href="resources/css/application-normal.css" type="text/css"/>-->
+    <div id="loading-mask" class="loadmask">
+        <div class="loadmask-body" align="center">
+            <div class="loadmask-logo">
+                <div id="loadmask-text">LOADING APPLICATION</div>
+            </div>
+        </div>
+    </div>
 
-        <script type="text/javascript" src="../../common/Analytics.js"></script>
-        <script type="text/javascript" src="../../common/Gateway.js"></script>
-        <script type="text/javascript" src="../../common/mobile/loader.js"></script>
-        <script type="text/javascript" src="app.js"></script>
-        <script type="text/javascript" src="../../common/locale.js"></script>
+    <!-- 3rdparty -->
 
-		<!-- SDK -->
-		<script type="text/javascript" src="../../../sdk/Common/AllFonts.js"></script>
-		<!--<script type="text/javascript" src="../../../sdk/Word/sdk-all.js"></script>-->
+    <script type="text/javascript" src="../../../3rdparty/extjs/ext-debug.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/mousewheel/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jscrollpane/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/sockjs/sockjs-0.3.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script> 
+    <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
+	
+	<!-- sdk -->
+    <script type="text/javascript" src="../../../sdk/Common/docscoapisettings.js"></script>
+    <script type="text/javascript" src="../../../sdk/Common/AllFonts.js"></script>
+	<!--<script type="text/javascript" src="../../../sdk/Word/sdk-all.js"></script>-->
 
-        <script type="text/javascript" src="../../../../OfficeWeb/Common/browser.js"></script>
+    <!-- application -->
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/browser.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/editorscommon.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/downloaderfiles.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/docscoapicommon.js"></script>
@@ -190,44 +214,34 @@
 	<!--for charts-->
 	<script type="text/javascript" src="../../../../OfficeWeb/Excel/graphics/DrawingContextWord.js"></script>
 	
-    </head>
-    <body>
-        <script type="text/javascript">
-            if (!(Ext.browser.is.WebKit && (Ext.os.is.iOS || Ext.os.is.Android || Ext.os.is.Desktop))) {
-                document.write(
-                    '<div id="unsuported-view-id" class="unsuported-view"></div>'
-                );
-            } else {
-                document.write(
-                    '<div id="loading-mask" class="loadmask">' +
-                        '<div class="loadmask-body" align="center">' +
-                            '<div class="loadmask-logo">' +
-                                '<div id="loadmask-text">LOADING APPLICATION</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>');
-            }
+    <script type="text/javascript" src="../../api/documents/api.js"></script>
+    <script type="text/javascript" src="../../common/Analytics.js"></script>
+    <script type="text/javascript" src="../../common/Gateway.js"></script>
+    <script type="text/javascript" src="../../common/IrregularStack.js"></script>
+    <script type="text/javascript" src="../../common/main/loader.js"></script>
+    <script type="text/javascript" src="../../common/main/lib/component/util/MetricSettings.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="restrictions.js"></script>
+    <script type="text/javascript" src="environment.js"></script>
+    <script type="text/javascript" src="../../common/locale.js"></script>
 
-            var injectStyleElement = function(url) {
-                var style = document.createElement('link'),
-                        documentHead = typeof document != 'undefined' && (document.head || document.getElementsByTagName('head')[0]);
-
-                style.rel = 'stylesheet';
-                style.href = url;
-                style.type = 'text/css';
-
-                if (documentHead) {
-                    documentHead.appendChild(style);
-                    return true;
-                }
-
-                return false;
-            };
-
-            injectStyleElement((window.devicePixelRatio > 1)
-                ? 'resources/css/application-retina.css'
-                : 'resources/css/application-normal.css'
-            );
-        </script>
-    </body>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/mathTypes.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/print.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/mathText.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/mathContent.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/actions.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/base.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/subBase.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/fraction.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/degree.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/matrix.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/limit.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/nary.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/radical.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/operators.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/accent.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/drawingUnion.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/borderBox.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Math/test_composition.js"></script>
+</body>
 </html>
