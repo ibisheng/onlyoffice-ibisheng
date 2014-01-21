@@ -8659,6 +8659,8 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 33 ) // PgUp
         {
+            // TODO: Реализовать Ctrl + Shift + PgUp / Ctrl + PgUp / Shift + PgUp
+
             if ( true === e.AltKey )
             {
                 var MouseEvent = new CMouseEventHandler();
@@ -8750,6 +8752,8 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 34 ) // PgDn
         {
+            // TODO: Реализовать Ctrl + Shift + PgDn / Ctrl + PgDn / Shift + PgDn
+
             if ( true === e.AltKey )
             {
                 var MouseEvent = new CMouseEventHandler();
@@ -8880,6 +8884,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
+            // TODO: Реализовать Ctrl + Up/ Ctrl + Shift + Up
             // Чтобы при зажатой клавише курсор не пропадал
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();
@@ -8898,6 +8903,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 40 ) // Bottom Arrow
         {
+            // TODO: Реализовать Ctrl + Down/ Ctrl + Shift + Down
             // Чтобы при зажатой клавише курсор не пропадал
             if ( true != e.ShiftKey )
                 this.DrawingDocument.TargetStart();

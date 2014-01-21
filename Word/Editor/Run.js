@@ -2883,6 +2883,33 @@ ParaRun.prototype =
         else
             return false;
     },
+
+    Get_StartPos : function(ContentPos, Depth)
+    {
+        ContentPos.Update( 0, Depth );
+    },
+
+    Get_EndPos : function(BehindEnd, ContentPos, Depth)
+    {
+        var ContentLen = this.Content.length;
+
+        if ( true === BehindEnd )
+            ContentPos.Update( ContentLen, Depth );
+        else
+        {
+            for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+            {
+                if ( para_End === this.Content[CurPos].Type )
+                {
+                    ContentPos.Update( CurPos, Depth );
+                    return;
+                }
+            }
+
+            // Не нашли para_End
+            ContentPos.Update( ContentLen, Depth );
+        }
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с селектом
 //-----------------------------------------------------------------------------------
