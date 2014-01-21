@@ -2888,9 +2888,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return getFormulasInfo();
 			},
 
-			asc_recalc : function(){
-				this.wbModel.recalcWB();
-				// this.wb.getWorksheet().changeWorksheet("update");
+			asc_recalc : function(isRecalcWB){
+				this.wbModel.recalcWB(isRecalcWB);
 			},
 
 			asc_setFontRenderingMode: function (mode) {

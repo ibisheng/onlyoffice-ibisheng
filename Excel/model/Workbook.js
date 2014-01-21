@@ -151,6 +151,24 @@ DependencyGraph.prototype = {
         }
         return arr;
     },
+    getNodeBySheetIdAll:function ( sheetId ) {
+        var arr = [];
+        var nodesSheetCell = this.nodesCell[sheetId];
+        if ( nodesSheetCell ) {
+            var aNodes = nodesSheetCell.getAll();
+            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
+                arr.push( aNodes[i].data );
+            }
+        }
+		var nodesSheetArea = this.nodesArea[sheetId];
+        if ( nodesSheetArea ) {
+            var aNodes = nodesSheetArea.getAll();
+            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
+                arr.push( aNodes[i].data );
+            }
+        }
+        return arr;
+    },
 	deleteNode : function(node){
             if ( node.isArea ) {
 			var nodesSheetArea = this.nodesArea[node.sheetId];
@@ -863,9 +881,9 @@ function buildRecalc(_wb,notrec){
 				_rec[cellId] = cellId;
 				_wb.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId ];
 				_wb.needRecalc.length++;
-			}
-			ws._BuildDependencies(_rec);
 		}
+			ws._BuildDependencies(_rec);
+	}
 	}
     if(!notrec)
 	    sortDependency(_wb)
@@ -1449,24 +1467,21 @@ Workbook.prototype.generateFontMap2=function(){
 		aRes.push(new CFont(i, 0, "", 0));
 	return aRes;
 };
-Workbook.prototype.recalcWB = function(is3D){
+Workbook.prototype.recalcWB = function(isRecalcWB){
 	//todo
-	var dep1, thas = this, sr, sr1, sr2;
-	if( this.dependencyFormulas.getNodesLength() > 0){
-		var aNodes = this.dependencyFormulas.getAll();
-		var nR = this.needRecalc;
-		for(var i in aNodes)
-		{
-			var node = aNodes[i];
-			if(!node.isArea)
-			{
-				nR[node.nodeId] = [node.sheetId, node.cellId];
-				nR.length++;
-					}
-				}
-		sortDependency(this);
-			}
-		}
+    if ( this.dependencyFormulas.getNodesLength() > 0 ) {
+        var aNodes = isRecalcWB ? this.dependencyFormulas.getAll() : this.dependencyFormulas.getNodeBySheetIdAll(this.getWorksheet(this.getActive()).getId());
+        var nR = this.needRecalc;
+        for ( var i in aNodes ) {
+            var node = aNodes[i];
+            if ( !node.isArea ) {
+                nR.nodes[node.nodeId] = [node.sheetId, node.cellId];
+                nR.length++;
+            }
+        }
+        sortDependency( this );
+    }
+}
 Workbook.prototype.isDefinedNamesExists = function(name, sheetId){
 	if(null != sheetId)
 	{
