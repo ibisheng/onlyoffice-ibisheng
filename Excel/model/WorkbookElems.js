@@ -4058,7 +4058,7 @@ RangeDataManager.prototype = {
 			if(null != item.to)
 				this.add(item.to, item.elem.data);
 		}
-		
+		this.fChange = fOldChange;
 	},
 	move : function(from, to)
 	{

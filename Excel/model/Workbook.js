@@ -678,9 +678,7 @@ Vertex.prototype = {
 			this.wb.dependencyFormulas.deleteMasterNodes2( wsId, cellId );
 			cell.formulaParsed.setRefError(wsId, cellId);
 			cell.setFormula(cell.formulaParsed.assemble(), true);
-			addToArrRecalc(this.wb, wsId, cellId);
-			this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
-			this.wb.needRecalc.length++;
+			addToArrRecalc(wsId, cell);
 		}
 	},
 	move : function(offset, wsId, toDelete)
@@ -692,7 +690,7 @@ Vertex.prototype = {
 		if( cell && cell.formulaParsed )
 		{
 			this.wb.dependencyFormulas.deleteMasterNodes2(wsId, this.bbox.getName());
-			addToArrRecalc(this.wb, wsId, sNewBBoxName);
+			addToArrRecalc(wsId, cell);
 		}
 		for( var _id in _sn ){
 			var slave = _sn[_id]
@@ -702,9 +700,7 @@ Vertex.prototype = {
 				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
 				cell.formulaParsed.shiftCells( offset, null, this, slave.sheetId, toDelete);
 				cell.setFormula(cell.formulaParsed.assemble(), true);
-				addToArrRecalc(this.wb, slave.sheetId, slave.cellId);
-				this.wb.needRecalc.nodes[slave.nodeId] = [slave.sheetId, slave.cellId ];
-				this.wb.needRecalc.length++;
+				addToArrRecalc(slave.sheetId, cell);
 			}
 		}
 		this.bbox = oNewBBox;
@@ -724,9 +720,7 @@ Vertex.prototype = {
 				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
 				cell.formulaParsed.stretchArea( this, sNewName );
 				cell.setFormula(cell.formulaParsed.assemble(), true);
-				addToArrRecalc(this.wb, slave.sheetId, slave.cellId);
-				this.wb.needRecalc.nodes[slave.nodeId] = [slave.sheetId, slave.cellId ];
-				this.wb.needRecalc.length++;
+				addToArrRecalc(slave.sheetId, cell);
 			}
 		}
 		this.bbox = bboxTo
@@ -846,14 +840,14 @@ function unLockDraw(wb){
         arrRecalc = {};
     }
 }
-function addToArrRecalc(wb, sheetId, cellId){
+function addToArrRecalc(sheetId, cell){
 		var temp = arrRecalc[sheetId];
 		if( !temp )
 		{
-			temp = {};
+			temp = [];
 			arrRecalc[sheetId] = temp;
 		}
-		temp[cellId] = cellId;
+		temp.push(cell);
 	}
 function buildRecalc(_wb,notrec){
 	var ws;
@@ -861,7 +855,16 @@ function buildRecalc(_wb,notrec){
 	for( var id in arrRecalc ){
 		ws = _wb.getWorksheetById(id);
 		if (ws) {
-			ws._BuildDependencies(arrRecalc[id]);
+			var temp = arrRecalc[id];
+			var _rec = {};
+			for(var i = 0, length = temp.length; i < length; ++i)
+			{
+				var cellId = temp[i].oId.getID();
+				_rec[cellId] = cellId;
+				_wb.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId ];
+				_wb.needRecalc.length++;
+			}
+			ws._BuildDependencies(_rec);
 		}
 	}
     if(!notrec)
@@ -1252,7 +1255,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 						var _c = _ws.getCell2(cID).getCells()[0];
 						_c.setFormula(_c.formulaParsed.moveSheet(tempW).assemble());//Перестраиваем трехмерные ссылки в формуле.
 						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
-						addToArrRecalc(this, _ws.getId(), cID);
+						addToArrRecalc(_ws.getId(), _c);
 						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
 						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
 							// this.needRecalc.length++;
@@ -1260,7 +1263,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 					else if( f.indexOf(_ws.getName()) < 0 ){
 						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
 						_ws._BuildDependencies({id:cID});
-						addToArrRecalc(this, _ws.getId(), cID);
+						addToArrRecalc(_ws.getId(), _c);
 						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
 						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
 							// this.needRecalc.length++;
@@ -3082,7 +3085,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                         oTempCell.formulaParsed = oTempCell.formulaParsed.changeOffset(offset);
                         oTempCell.sFormula = oTempCell.formulaParsed.assemble();
 						
-						addToArrRecalc(this.workbook, this.getId(), oTempCell.getName());
+						addToArrRecalc(this.getId(), oTempCell);
                     }
                 }
             }
@@ -3644,7 +3647,7 @@ Cell.prototype.setValue=function(val,callback){
 	if (this.sFormula)
 		wb.dependencyFormulas.deleteMasterNodes2( ws.Id, this.oId.getID() );
 	if( !(null != val && val[0] != "=" || true == numFormat.isTextFormat()))
-		addToArrRecalc(this.ws.workbook, this.ws.getId(), this.oId.getID());
+		addToArrRecalc(this.ws.getId(), this);
 	wb.needRecalc.nodes[getVertexId(sheetId,this.oId.getID())] = [sheetId, this.oId.getID()];
         wb.needRecalc.length++;
 	
@@ -6709,9 +6712,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 					var sNewName = oCurCell.getName();
 					oCurCell.setFormula(oCurCell.formulaParsed.changeOffset({offsetCol:0, offsetRow:shift}).assemble());//получаем новую формулу, путем сдвига входящих в нее ссылок на ячейки на offsetCol и offsetRow. не путать с shiftCells - меняет одну конкретную ячейку в формуле, changeOffset - меняет оффсет для всех входящих в формулу ячеек.
 					this.worksheet.workbook.dependencyFormulas.deleteMasterNodes2( this.worksheet.Id, lastName );//разрываем ссылки между старой ячейкой и ведущими ячейками для нее.
-					addToArrRecalc(this.worksheet.workbook, this.worksheet.getId(), sNewName);
-                    this.worksheet.workbook.needRecalc.nodes[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
-                    this.worksheet.workbook.needRecalc.length++;
+					addToArrRecalc(this.worksheet.getId(), oCurCell);
 				}
 				}
 			else
