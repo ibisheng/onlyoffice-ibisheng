@@ -949,56 +949,69 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					type: 'POST',
 					url: url,
 					data: rdata,
-					error: function(jqXHR, textStatus, errorThrown){
-						var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-						if(callback)
-							callback(result);
+					error: function(jqXHR, textStatus, errorThrown) {
+						if (callback)
+							callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
 					},
 					success: function(msg){
-						var result;
-						if(!msg || msg.length < 1){
-							result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
-							if(callback)
-								callback(result);
-							return;
-						}
-						else{
+						if (!msg || msg.length < 1) {
+							if (callback)
+								callback({returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown});
+						} else {
 							var incomeObject = JSON.parse(msg);
-
-							if(callback)
+							if (callback)
 								callback(incomeObject);
 						}
 					},
 					dataType: "text"});
 			},
-			
+
+            _OfflineAppDocumentStartLoad: function (fCallback) {
+                var t = this, src = this.FontLoader.fontFilesPath;
+                src += window.g_offline_doc ? window.g_offline_doc : "../Excel/document/";
+
+                var scriptElem = document.createElement('script');
+                scriptElem.onload = scriptElem.onerror = function () {t._OfflineAppDocumentEndLoad(src, fCallback);};
+
+                scriptElem.setAttribute('src', src + "editor.js");
+                scriptElem.setAttribute('type','text/javascript');
+                document.getElementsByTagName('head')[0].appendChild(scriptElem);
+            },
+
+            _OfflineAppDocumentEndLoad: function (sUrlPath, fCallback) {
+                var data = getTestWorkbook();
+                var sData = data + "";
+                if (c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length)) {
+                    var wb = this.asc_OpenDocument(sUrlPath, sData);
+                    fCallback({returnCode: 0, val:wb});
+                }
+            },
 			
 			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
-				if ( this.chartEditor ) {
+				if (this.chartEditor) {
 				} else if (!this.documentId || !this.documentUrl) {
-					var data = getTestWorkbook();
-					var sData = data + "";
-					if( c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length))
-					{
-						var sUrlPath = "offlinedocs/test-workbook9/";
-						var wb = this.asc_OpenDocument(sUrlPath, sData);
-						fCallback({returnCode: 0, val:wb});
-					}
-				}
-				else {
-					if(this.documentOpenOptions && this.documentOpenOptions["isEmpty"])
-					{
+                    this._OfflineAppDocumentStartLoad(fCallback);
+				} else {
+                    var v = {
+                        "id"            : this.documentId,
+                        "format"        : this.documentFormat,
+                        "vkey"          : this.documentVKey,
+                        "editorid"      : c_oEditorId.Speadsheet,
+                        "url"           : this.documentUrl,
+                        "title"         : this.documentTitle,
+                        "embeddedfonts" : this.isUseEmbeddedCutFonts
+                    };
+					if (this.documentOpenOptions && this.documentOpenOptions["isEmpty"]) {
 						var sEmptyWorkbook = getEmptyWorkbook();
-						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"create", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": sEmptyWorkbook};
+                        v["c"] = "create";
+                        v["data"] = sEmptyWorkbook;
 						this._asc_sendCommand (fCallback, v);
 						var wb = this.asc_OpenDocument(g_sResourceServiceLocalUrl + this.documentId + "/", sEmptyWorkbook);
 						fCallback({returnCode: 0, val:wb});
-					}
-					else
-					{
+					} else {
 						// Меняем тип состояния (на открытие)
 						this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
-						var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"open", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
+                        v["c"] = "open";
 						this._asc_sendCommand (fCallback, v);
 					}
 				}
