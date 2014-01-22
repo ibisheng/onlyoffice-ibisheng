@@ -1676,7 +1676,8 @@ function CBinaryFileWriter()
 
         if (pPr !== undefined && pPr != null && pPr.Tabs !== undefined && pPr.Tabs != null)
         {
-            oThis.WriteRecordArray(7, 0, pPr.Tabs, oThis.WriteTab);
+            if (pPr.Tabs.Tabs != undefined &&  pPr.Tabs.Tabs!= null)
+                oThis.WriteRecordArray(7, 0, pPr.Tabs.Tabs, oThis.WriteTab);
         }
 
         if (tPr !== undefined && tPr != null)
@@ -1815,7 +1816,14 @@ function CBinaryFileWriter()
     this.WriteTab = function(tab)
     {
         oThis.WriteUChar(g_nodeAttributeStart);
-        oThis._WriteLimit2(0, tab.algn);
+
+        var _algn = 2;
+        if (tab.Value == tab_Center)
+            _algn = 0;
+        else if (tab.Value == tab_Right)
+            _algn = 3;
+
+        oThis._WriteLimit2(0, _algn);
 
         if (tab.Pos != undefined && tab.Pos != null)
         {

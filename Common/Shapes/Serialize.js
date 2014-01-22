@@ -6570,6 +6570,14 @@ function BinaryPPTYLoader()
                                     case 0:
                                     {
                                         _value = s.GetUChar();
+
+                                        if (_value == 0)
+                                            _value = tab_Center;
+                                        else if (_value == 3)
+                                            _value = tab_Right;
+                                        else
+                                            _value = tab_Left;
+
                                         break;
                                     }
                                     case 1:
