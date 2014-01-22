@@ -2047,6 +2047,11 @@ drawBarChart.prototype =
 			pen = seria.pen;
 
 			for (j=0; j < this.paths.series[i].length; ++j) {
+				if(seria.val.numRef.numCache.pts[j].pen)
+					pen = seria.val.numRef.numCache.pts[j].pen;
+				if(seria.val.numRef.numCache.pts[j].brush)
+					brush = seria.val.numRef.numCache.pts[j].brush;
+					
 				this._drawPaths(this.paths.series[i][j], brush, pen);
 			}
 		}
@@ -2278,6 +2283,11 @@ drawLineChart.prototype =
 			dataSeries = seria.val.numRef.numCache.pts;
 			for(var n = 1; n < dataSeries.length; n++)
 			{
+				if(seria.val.numRef.numCache.pts[n].pen)
+					pen = seria.val.numRef.numCache.pts[n].pen;
+				if(seria.val.numRef.numCache.pts[n].brush)
+					brush = seria.val.numRef.numCache.pts[n].brush;
+					
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
         }
@@ -2455,6 +2465,11 @@ drawAreaChart.prototype =
 			dataSeries = seria.val.numRef.numCache.pts;
 			for(var n = 1; n < dataSeries.length; n++)
 			{
+				if(seria.val.numRef.numCache.pts[n].pen)
+					pen = seria.val.numRef.numCache.pts[n].pen;
+				if(seria.val.numRef.numCache.pts[n].brush)
+					brush = seria.val.numRef.numCache.pts[n].brush;
+				
 				this._drawPath(this.paths.series[i][n], brush, pen);
 			}
         }
@@ -2681,6 +2696,11 @@ drawHBarChart.prototype =
 			dataSeries = this.chartProp.series[i].val.numRef.numCache.pts;
 			
 			for (j = 0; j < dataSeries.length; j++) {
+				if(seria.val.numRef.numCache.pts[j].pen)
+					pen = seria.val.numRef.numCache.pts[j].pen;
+				if(seria.val.numRef.numCache.pts[j].brush)
+					brush = seria.val.numRef.numCache.pts[j].brush;
+			
 				this._drawPath(this.paths.series[i][j], brush, pen);
 			}
 		}
@@ -2954,6 +2974,12 @@ drawScatterChart.prototype =
 			{
 				brush = this.chartProp.series[i].brush;
 				pen = this.chartProp.series[i].pen;
+				
+				if(this.chartProp.series[i].yVal.numRef.numCache.pts[k].pen)
+					pen = this.chartProp.series[i].yVal.numRef.numCache.pts[k].pen;
+				if(this.chartProp.series[i].yVal.numRef.numCache.pts[k].brush)
+					brush = this.chartProp.series[i].yVal.numRef.numCache.pts[k].brush;
+					
 				//draw line
 				this._drawPath(this.paths.series[i][k], brush, pen, true);
 				
@@ -3264,7 +3290,7 @@ gridChart.prototype =
 			this._drawPath(path, pen);
 			
 			//промежуточные линии
-			if(i != this.chartProp.numhlines)
+			if(i != this.chartProp.numhlines && this.paths.horisontalMinorLines)
 			{
 				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
 				{
@@ -3320,6 +3346,7 @@ gridChart.prototype =
 }	
 	
 
+	
 	
 //*****Area of chart*****
 function areaChart()
