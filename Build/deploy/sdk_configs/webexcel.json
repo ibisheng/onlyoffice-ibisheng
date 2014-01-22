@@ -35,7 +35,7 @@
                 "../../Excel/model/DrawingObjects/GlobalLoaders.js",
                 "../../Common/trackFile.js",
                 "../../Excel/apiDefines.js",
-                "../../Excel/offlinedocs/empty-workbook.js",
+                "../../Excel/document/empty-workbook.js",
                 "../../Excel/utils/utils.js",
                 "../../Excel/model/clipboard.js",
                 "../../Excel/model/autofilters.js",
