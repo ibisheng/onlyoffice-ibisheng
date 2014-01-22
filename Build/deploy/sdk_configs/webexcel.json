@@ -35,7 +35,6 @@
                 "../../Excel/model/DrawingObjects/GlobalLoaders.js",
                 "../../Common/trackFile.js",
                 "../../Excel/apiDefines.js",
-                "../../Excel/offlinedocs/test-workbook9/Editor.js",
                 "../../Excel/offlinedocs/empty-workbook.js",
                 "../../Excel/utils/utils.js",
                 "../../Excel/model/clipboard.js",
@@ -188,7 +187,7 @@
             },
             "doc": {
                 "files": {
-                    "<%= pkg.menu_path %>/Excel/offlinedocs/test-workbook9/": "../../Excel/offlinedocs/test-workbook9/**"
+                    "<%= pkg.menu_path %>/Excel/document/": "../../Excel/document/**"
                 }
             },
             "log": {
