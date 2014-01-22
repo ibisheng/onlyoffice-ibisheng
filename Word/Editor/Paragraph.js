@@ -9139,6 +9139,13 @@ Paragraph.prototype =
                     var LinePos = this.Get_ParaPosByContentPos( TopPos );
                     var CurLine = LinePos.Line;
 
+                    // Пересчитаем координату точки TopPos
+                    this.Set_ParaContentPos( TopPos, CurLine, false );
+
+                    this.Internal_Recalculate_CurPos(0, true, false, false );
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
+
                     this.Selection_Remove();
 
                     if ( 0 == CurLine )
@@ -9393,6 +9400,13 @@ Paragraph.prototype =
 
                     var LinePos = this.Get_ParaPosByContentPos( BottomPos );
                     var CurLine = LinePos.Line;
+
+                    // Пересчитаем координату BottomPos
+                    this.Set_ParaContentPos( BottomPos, CurLine, false );
+
+                    this.Internal_Recalculate_CurPos(0, true, false, false );
+                    this.CurPos.RealX = this.CurPos.X;
+                    this.CurPos.RealY = this.CurPos.Y;
 
                     this.Selection_Remove();
 
@@ -9752,7 +9766,19 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
+                var StartPos = null;
 
+                if ( true === this.Selection.Use )
+                    StartPos = this.Get_ParaContentPos( true, true );
+                else
+                    StartPos = this.Get_ParaContentPos( false, false );
+
+                var EndPos = this.Get_StartPos();
+
+                this.Selection.Use   = true;
+                this.Selection.Start = false;
+
+                this.Set_SelectionContentPos( StartPos, EndPos );
             }
             else
             {
@@ -9766,7 +9792,7 @@ Paragraph.prototype =
         }
     },
 
-    Cursor_MoveToEndPos : function(AddToSelect)
+    Cursor_MoveToEndPos : function(AddToSelect, StartSelectFromEnd)
     {
         if ( true !== Debug_ParaRunMode )
         {
@@ -9815,24 +9841,43 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
+                var StartPos = null;
+
+                if ( true === this.Selection.Use )
+                    StartPos = this.Get_ParaContentPos( true, true );
+                else
+                    StartPos = this.Get_ParaContentPos( false, false );
+
+                var EndPos = this.Get_EndPos(true);
+
                 this.Selection.Use   = true;
                 this.Selection.Start = false;
 
-                this.Selection.StartPos = this.Content.length - 1;
-                this.Selection.EndPos   = this.Content.length - 1;
-
-                this.CurPos.ContentPos  = this.Content.length - 1;
-
-                this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(true);
+                this.Set_SelectionContentPos( StartPos, EndPos );
             }
             else
             {
-                this.Selection.Use   = false;
-                this.Selection.Start = false;
+                if ( true === StartSelectFromEnd )
+                {
+                    this.Selection.Use   = true;
+                    this.Selection.Start = false;
 
-                this.CurPos.ContentPos = this.Content.length - 1;
-                this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
-                this.Correct_ContentPos(false);
+                    this.Selection.StartPos = this.Content.length - 1;
+                    this.Selection.EndPos   = this.Content.length - 1;
+
+                    this.CurPos.ContentPos  = this.Content.length - 1;
+
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(true);
+                }
+                else
+                {
+                    this.Selection.Use   = false;
+                    this.Selection.Start = false;
+
+                    this.CurPos.ContentPos = this.Content.length - 1;
+                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+                    this.Correct_ContentPos(false);
+                }
             }
         }
     },
@@ -12236,7 +12281,7 @@ Paragraph.prototype =
         }
     },
 
-    Select_All : function()
+    Select_All : function(Direction)
     {
         if ( true !== Debug_ParaRunMode )
         {
@@ -12249,12 +12294,21 @@ Paragraph.prototype =
             var Count = this.Content.length;
 
             this.Selection.Use      = true;
-            this.Selection.StartPos = 0;
-            this.Selection.EndPos   = Count - 1;
+
+            if ( -1 === Direction )
+            {
+                this.Selection.StartPos = Count - 1;
+                this.Selection.EndPos   = 0;
+            }
+            else
+            {
+                this.Selection.StartPos = 0;
+                this.Selection.EndPos   = Count - 1;
+            }
 
             for (var CurPos = 0; CurPos < Count; CurPos++)
             {
-                this.Content[CurPos].Select_All();
+                this.Content[CurPos].Select_All(Direction);
             }
         }
     },

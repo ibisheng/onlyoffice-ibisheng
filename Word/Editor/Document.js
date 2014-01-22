@@ -3287,8 +3287,13 @@ CDocument.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
-                        Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
+                            Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                        }
+                        else
+                            Item.Select_All( -1 );
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -3368,8 +3373,15 @@ CDocument.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
-                        Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
+                            Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                        }
+                        else
+                        {
+                            Item.Select_All( 1 );
+                        }
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -3384,7 +3396,7 @@ CDocument.prototype =
                     }
                 }
 
-                this.Content[StartPos].Cursor_MoveToEndPos(true);
+                this.Content[StartPos].Cursor_MoveToEndPos(true, false);
 
                 if ( this.Content[StartPos].GetType() === type_Paragraph  )
                     this.Content[StartPos].Selection_Internal_Update();
@@ -3469,7 +3481,7 @@ CDocument.prototype =
                                 }
                                 else
                                 {
-                                    Item.Cursor_MoveToEndPos( true );
+                                    Item.Cursor_MoveToEndPos( false, true );
                                     Item.Cursor_MoveLeft( 1, true, Word );
                                 }
                             }
@@ -3559,7 +3571,7 @@ CDocument.prototype =
                                 }
                                 else
                                 {
-                                    Item.Cursor_MoveToEndPos( true );
+                                    Item.Cursor_MoveToEndPos( false, true );
                                     Item.Cursor_MoveLeft( 1, true, Word );
                                 }
                             }
