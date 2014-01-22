@@ -8437,10 +8437,11 @@ Paragraph.prototype =
 
         // Копируем прямые настройки параграфа.
         // Копируем прямые настройки параграфа.
+		
+        Pr.ParaPr.StyleTabs = (undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs());
         Pr.ParaPr.Merge(this.Pr);
         Pr.TextPr.Merge(this.rPr);
 
-        Pr.ParaPr.StyleTabs = (undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs());
         return Pr;
     },
 
