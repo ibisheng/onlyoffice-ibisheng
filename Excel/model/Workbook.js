@@ -4904,6 +4904,8 @@ Range.prototype._setCellBorder=function(bbox, cell, oNewBorder){
 		var oCurBorder = null;
         if(null != cell.xfs && null != cell.xfs.border)
 			oCurBorder = cell.xfs.border.clone();
+		else
+			oCurBorder = g_oDefaultBorder.clone();
 		var nRow = cell.oId.getRow0();
 		var nCol = cell.oId.getCol0();
 		cell.setBorder(this._setBorderMerge(nCol == bbox.c1, nRow == bbox.r1, nCol == bbox.c2, nRow == bbox.r2, oNewBorder, oCurBorder));

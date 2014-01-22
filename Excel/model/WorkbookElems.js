@@ -1470,6 +1470,7 @@ StyleManager.prototype =
 			this.oDefaultXfs.XfId = oDefaultXfs.XfId;
 			g_oDefaultXfId = oDefaultXfs.XfId;
 		}
+		this.oDefaultXfs = oDefaultXfs;
 	},
     _prepareSetReference : function (oItemWithXfs)
     {
@@ -1493,14 +1494,14 @@ StyleManager.prototype =
 	{
 		var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.font)
-			xfs.font = new Font();
+			xfs.font = g_oDefaultFont.clone();
         return xfs;
 	},
     _prepareSetAlign : function(oItemWithXfs)
 	{
         var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.align)
-			xfs.align = new Align();
+			xfs.align = g_oDefaultAlign.clone();
         return xfs;
 	},
 	_prepareSetCellStyle : function (oItemWithXfs) {
@@ -1545,7 +1546,7 @@ StyleManager.prototype =
         {
             xfs = this._prepareSet(oItemWithXfs);
             if(null == xfs.num)
-                xfs.num = new Num();
+                xfs.num = g_oDefaultNum.clone();
             xfs.num.f = val;
         }
 		return oRes;
@@ -1815,7 +1816,7 @@ StyleManager.prototype =
         {
             xfs = this._prepareSet(oItemWithXfs);
 			if(null == xfs.fill)
-                xfs.fill = new Fill();
+                xfs.fill = g_oDefaultFill.clone();
             xfs.fill.bg = val;
         }
 		return oRes;
@@ -3195,7 +3196,7 @@ CCellValue.prototype =
 					var item = aVal[i];
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
-					oNewElem.format = new Font();
+					oNewElem.format = g_oDefaultFont.clone();
 					if(null != item.format)
 						oNewElem.format.set(item.format);
 					this.multiText.push(oNewElem);
