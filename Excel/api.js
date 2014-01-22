@@ -2690,7 +2690,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellUnderline )
 					ws.objectRender.controller.setCellUnderline(isUnderline);
 				else {
-					this.wb.setFontAttributes("u", isUnderline ? "single" : "none");
+					this.wb.setFontAttributes("u", isUnderline ? EUnderline.underlineSingle : EUnderline.underlineNone);
 					this.wb.restoreFocus();
 				}
 			},

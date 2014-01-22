@@ -1652,18 +1652,9 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
         }
         if(null != font.u)
         {
-            var nUnderline = EUnderline.underlineNone;
-            switch(font.u)
-            {
-            case "double": nUnderline = EUnderline.underlineDouble;break;
-            case "doubleAccounting": nUnderline = EUnderline.underlineDoubleAccounting;break;
-            case "none": nUnderline = EUnderline.underlineNone;break;
-            case "single": nUnderline = EUnderline.underlineSingle;break;
-            case "singleAccounting": nUnderline = EUnderline.underlineSingleAccounting;break;
-            }
             this.memory.WriteByte(c_oSerFontTypes.Underline);
             this.memory.WriteByte(c_oSerPropLenType.Byte);
-            this.memory.WriteByte(nUnderline);
+            this.memory.WriteByte(font.u);
         }
         if(null != font.va)
         {
@@ -4027,17 +4018,7 @@ function Binary_SharedStringTableReader(stream, wb, aSharedStrings)
         else if ( c_oSerFontTypes.Sz == type )
             rPr.fs = this.stream.GetDoubleLE();
         else if ( c_oSerFontTypes.Underline == type )
-        {
-            switch(this.stream.GetUChar())
-            {
-            case EUnderline.underlineDouble: rPr.u = "double";break;
-            case EUnderline.underlineDoubleAccounting: rPr.u = "doubleAccounting";break;
-            case EUnderline.underlineNone: rPr.u = "none";break;
-            case EUnderline.underlineSingle: rPr.u = "single";break;
-            case EUnderline.underlineSingleAccounting: rPr.u = "singleAccounting";break;
-            default: rPr.u = "none";break;
-            }
-        }
+            rPr.u = this.stream.GetUChar();
         else if ( c_oSerFontTypes.VertAlign == type )
         {
             switch(this.stream.GetUChar())
@@ -6231,7 +6212,7 @@ function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
 			fs : 11,
 			b : false,
 			i : false,
-			u : "none",
+			u : EUnderline.underlineNone,
 			s : false,
 			c : g_oColorManager.getThemeColor(g_nColorTextDefault),
 			va : "baseline",

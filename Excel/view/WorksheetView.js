@@ -5980,7 +5980,7 @@
 			cell_info.font.size = c.getFontsize();
 			cell_info.font.bold = c.getBold();
 			cell_info.font.italic = c.getItalic();
-			cell_info.font.underline = ("none" !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
+			cell_info.font.underline = (EUnderline.underlineNone !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
 			cell_info.font.strikeout = c.getStrikeout();
 			cell_info.font.subscript = fa === "subscript";
 			cell_info.font.superscript = fa === "superscript";

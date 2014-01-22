@@ -929,9 +929,8 @@
 					var dh = prop && prop.lm && prop.lm.bl2 > 0 ? prop.lm.bl2 - prop.lm.bl : 0;
 					var dw = self._calcCharsWidth(strBeg, end - 1);
 					var so = prop.font.Strikeout;
-					var ul = prop.font.Underline;
+					var ul = EUnderline.underlineNone !== prop.font.Underline;
 					var isSO = so === true;
-					var isUL = ul === true || !( ul === undefined || ul === false || ul.search(/\w/) < 0 || ul.search(/\s*none\s*/i) >= 0 );
 					var fsz, x2, y, lw, dy, i, b, x_, cp, w_1px, h_1px;
 
 					if (align !== "justify" || dx < 0.000001) {
@@ -951,7 +950,7 @@
 						}
 					}
 
-					if (isSO || isUL) {
+					if (isSO || ul) {
 						x2 = asc_calcnpt(x1 + dw, ppix);
 						fsz = prop.font.FontSize * self.ratio;
 						lw = asc_round(fsz * ppiy / 72 / 18) || 1;
@@ -966,7 +965,7 @@
 							y = asc_calcnpt(y1 + l.bl - prop.lm.a * 0.275, ppiy);
 							ctx.lineHor(x1, y - dy * h_1px, x2 + w_1px);
 						}
-						if (isUL) {
+						if (ul) {
 							y = asc_calcnpt(y1 + l.bl + prop.lm.d * 0.4, ppiy);
 							ctx.lineHor(x1, y + dy * h_1px, x2 + w_1px);
 						}

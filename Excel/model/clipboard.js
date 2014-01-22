@@ -1023,65 +1023,47 @@
 
 			_setStylesTextPaste: function (spanObject)
 			{
-				var t = this;
-				var defaultColor = 'rgb(0, 0, 0)';
+                var jqSpanObject = $(spanObject), fontSize;
 				var oNewItem = {};
-				oNewItem.text = $(spanObject).text().replace(/(\r|\t|\n|)/g,'');
+				oNewItem.text = jqSpanObject.text().replace(/(\r|\t|\n|)/g,'');
 
 				oNewItem.format = {};
-				oNewItem.format.fn = t._checkFonts(spanObject.style.fontFamily.replace(/'/g,"").split(',')[0]);
+				oNewItem.format.fn = this._checkFonts(spanObject.style.fontFamily.replace(/'/g,"").split(',')[0]);
 
-				if(oNewItem.format.fn == null || oNewItem.format.fn == '')
+				if (oNewItem.format.fn == null || oNewItem.format.fn == '')
 					oNewItem.format.fn = 'Calibri';
 
-				if($(spanObject).css('vertical-align')  == 'sub' || $(spanObject).css('vertical-align')  == 'super')
-				{
-					if(($(spanObject.parentNode).css('font-size')).indexOf('pt') > -1)
-						oNewItem.format.fs = parseInt($(spanObject.parentNode).css('font-size'));
+				if (jqSpanObject.css('vertical-align')  == 'sub' || jqSpanObject.css('vertical-align')  == 'super') {
+                    fontSize = $(spanObject.parentNode).css('font-size');
+					if(fontSize.indexOf('pt') > -1)
+						oNewItem.format.fs = parseInt(fontSize);
 					else
-						oNewItem.format.fs = parseInt((3/4)*Math.round(parseFloat($(spanObject.parentNode).css('font-size'))));
-				}
-				else
-				{
+						oNewItem.format.fs = parseInt((3/4)*Math.round(parseFloat(fontSize)));
+				} else {
 					if(spanObject.style.fontSize.indexOf('pt') > -1)
 						oNewItem.format.fs = parseInt(spanObject.style.fontSize);
 					else
 						oNewItem.format.fs = parseInt((3/4)*Math.round(parseFloat(spanObject.style.fontSize)));
 				}
-				if(isNaN(oNewItem.format.fs))
+				if (isNaN(oNewItem.format.fs))
 					oNewItem.format.fs = 11;
-				if($(spanObject).css('font-weight') == 'bold')
-					oNewItem.format.b = true;
-				else
-					oNewItem.format.b = false;
-
-				if($(spanObject).css('font-style') == 'italic')
-					oNewItem.format.i = true;
-				else
-					oNewItem.format.i = false;
-
-				if($(spanObject).css('text-decoration') == 'underline')
-					oNewItem.format.u = "single";
-				else
-					oNewItem.format.u = "none";
-
-				if($(spanObject).css('text-decoration') == 'line-through')
-					oNewItem.format.s = true;
-				else
-					oNewItem.format.s = false;
+                oNewItem.format.b = (jqSpanObject.css('font-weight') == 'bold');
+                oNewItem.format.i = (jqSpanObject.css('font-style') == 'italic');
+                oNewItem.format.u = (jqSpanObject.css('text-decoration') == 'underline') ?
+                    EUnderline.underlineSingle : EUnderline.underlineNone;
+                oNewItem.format.s = (jqSpanObject.css('text-decoration') == 'line-through');
 				
-				if($(spanObject).css('vertical-align') != null)
-					oNewItem.format.va = $(spanObject).css('vertical-align');
-				if( $(spanObject).css('vertical-align') == 'baseline')
+				if (jqSpanObject.css('vertical-align') != null)
+					oNewItem.format.va = jqSpanObject.css('vertical-align');
+				if (jqSpanObject.css('vertical-align') == 'baseline')
 					oNewItem.format.va = '';
 
-				oNewItem.format.c = new RgbColor(this._getBinaryColor($(spanObject).css('color')));
-				
-				if(oNewItem.format.c == '')
+				oNewItem.format.c = new RgbColor(this._getBinaryColor(jqSpanObject.css('color')));
+				if (oNewItem.format.c == '')
 					oNewItem.format.c = null;
 				
-				if($(spanObject).css('vertical-align') != null)
-					oNewItem.format.va = $(spanObject).css('vertical-align')  === 'sub' ? 'subscript' : $(spanObject).css('vertical-align') === 'super' ? 'superscript' : 'baseline';
+				if (jqSpanObject.css('vertical-align') != null)
+					oNewItem.format.va = jqSpanObject.css('vertical-align')  === 'sub' ? 'subscript' : jqSpanObject.css('vertical-align') === 'super' ? 'superscript' : 'baseline';
 					return oNewItem;
 			},
 
@@ -2169,7 +2151,7 @@
 
 				function getTextDecoration(format) {
 					var res = [];
-					if (format.u !== "none") {res.push("underline");}
+					if (EUnderline.underlineNone !== format.u) {res.push("underline");}
 					if (format.s) {res.push("line-through");}
 					return res.length > 0 ? res.join(",") : "";
 				}
@@ -2720,7 +2702,7 @@
 									c: colorText,
 									b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
 									i: fi.indexOf("italic") >= 0,
-									u: td.indexOf("underline") >= 0 ? "single" : "none",
+									u: td.indexOf("underline") >= 0 ? EUnderline.underlineSingle : EUnderline.underlineNone,
 									s: td.indexOf("line-through") >= 0,
 									va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
 								},
@@ -2739,7 +2721,7 @@
 											c: colorText,
 											b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
 											i: fi.indexOf("italic") >= 0,
-											u: td.indexOf("underline") >= 0 ? "single" : "none",
+											u: td.indexOf("underline") >= 0 ? EUnderline.underlineSingle : EUnderline.underlineNone,
 											s: td.indexOf("line-through") >= 0,
 											va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
 										},

@@ -4472,7 +4472,7 @@ Range.prototype.setValue2=function(array){
 	var oBBox = this.bbox;
 	History.StartTransaction();
 	var wb = this.worksheet.workbook, ws = this.worksheet, ar =[];
-	//[{"text":"qwe","format":{"b":true, "i":false, "u":"none", "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
+	//[{"text":"qwe","format":{"b":true, "i":false, "u":EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
 	var oThis = this;
 	/*
 		Устанавливаем значение в Range ячеек. В отличае от setValue, сюда мы попадаем только в случае ввода значения отличного от формулы. Таким образом, если в ячейке была формула, то для нее в графе очищается список ячеек от которых зависела. После чего выставляем флаг о необходимости пересчета.
@@ -4700,7 +4700,6 @@ Range.prototype.setItalic=function(val){
 };
 Range.prototype.setUnderline=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -4769,7 +4768,6 @@ Range.prototype.setFontAlign=function(val){
 };
 Range.prototype.setAlignVertical=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	if("none" == val)
 		val = null;
 	this.createCellOnRowColCross();
@@ -4794,7 +4792,6 @@ Range.prototype.setAlignVertical=function(val){
 };
 Range.prototype.setAlignHorizontal=function(val){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	this.createCellOnRowColCross();
 	var fSetProperty = this._setProperty;
 	var nRangeType = this._getRangeType();
@@ -5185,7 +5182,7 @@ Range.prototype.getValueWithFormat=function(){
 		return "";
 };
 Range.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
-	//[{"text":"qwe","format":{"b":true, "i":false, "u":"none", "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
+	//[{"text":"qwe","format":{"b":true, "i":false, "u":EUnderline.underlineNone, "s":false, "fn":"Arial", "fs": 12, "c": 0xff00ff, "va": "subscript"  }},{}...]
 	var nRow0 = this.bbox.r1;
 	var nCol0 = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
@@ -5412,7 +5409,7 @@ Range.prototype.getUnderline=function(){
 	}
     return g_oDefaultFont.u;
 };
-Range.prototype.getStrikeout=function(val){
+Range.prototype.getStrikeout=function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
@@ -6165,7 +6162,7 @@ Range.prototype._getHyperlinks=function(){
 		}
 	}
 	return result;
-}
+};
 Range.prototype.getHyperlink=function(){
 	var aHyperlinks = this._getHyperlinks();
 	if(null != aHyperlinks && aHyperlinks.length > 0)
@@ -6179,16 +6176,17 @@ Range.prototype.setHyperlinkOpen=function(val){
 	if(null != val && false == val.isValid())
 		return;
 	this.worksheet.hyperlinkManager.add(val.Ref.getBBox0(), val);
-}
+};
 Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	if(null != val && false == val.isValid())
 		return;
 	//проверяем, может эта ссылка уже существует
+    var i, length, hyp;
 	var bExist = false;
 	var aHyperlinks = this.worksheet.hyperlinkManager.get(this.bbox);
-	for(var i = 0, length = aHyperlinks.all.length; i < length; i++)
+	for(i = 0, length = aHyperlinks.all.length; i < length; i++)
 	{
-		var hyp = aHyperlinks.all[i];
+		hyp = aHyperlinks.all[i];
 		if(hyp.data.isEqual(val))
 		{
 			bExist = true;
@@ -6197,15 +6195,14 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	}
 	if(false == bExist)
 	{
-		var oThis = this;
 		History.Create_NewPoint();
 		History.StartTransaction();
 		if(false == this.worksheet.workbook.bUndoChanges && false == this.worksheet.workbook.bRedoChanges)
 		{
 			//удаляем ссылки с тем же адресом
-			for(var i = 0, length = aHyperlinks.all.length; i < length; i++)
+			for(i = 0, length = aHyperlinks.all.length; i < length; i++)
 			{
-				var hyp = aHyperlinks.all[i];
+				hyp = aHyperlinks.all[i];
 				if(hyp.bbox.isEqual(this.bbox))
 					this.worksheet.hyperlinkManager.removeElement(hyp);
 			}
@@ -6216,7 +6213,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 			var oHyperlinkFont = new Font();
 			oHyperlinkFont.fn = this.worksheet.workbook.getDefaultFont();
 			oHyperlinkFont.fs = this.worksheet.workbook.getDefaultSize();
-			oHyperlinkFont.u = "single";
+			oHyperlinkFont.u = EUnderline.underlineSingle;
 			oHyperlinkFont.c = g_oColorManager.getThemeColor(g_nColorHyperlink);
 			this.setFont(oHyperlinkFont);
 		}
@@ -6243,7 +6240,7 @@ Range.prototype.removeHyperlink=function(val){
 			this.worksheet.hyperlinkManager.remove(bbox);
 	}
 	History.EndTransaction();
-}
+};
 Range.prototype.deleteCellsShiftUp=function(){
 	return this._shiftUpDown(true);
 };
@@ -6380,7 +6377,7 @@ Range.prototype.setOffset=function(offset){//offset = {offsetCol:intNumber, offs
 		this.bbox.r2 = 0;
 	this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
 	this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
-}
+};
 Range.prototype.setOffsetFirst=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
 	this.bbox.c1 += offset.offsetCol;
 	if( this.bbox.c1 < 0 )
@@ -6389,7 +6386,7 @@ Range.prototype.setOffsetFirst=function(offset){//offset = {offsetCol:intNumber,
 	if( this.bbox.r1 < 0 )
 		this.bbox.r1 = 0;
 	this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
-}
+};
 Range.prototype.setOffsetLast=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
 	this.bbox.c2 += offset.offsetCol;
 	if( this.bbox.c2 < 0 )
@@ -6398,7 +6395,7 @@ Range.prototype.setOffsetLast=function(offset){//offset = {offsetCol:intNumber, 
 	if( this.bbox.r2 < 0 )
 		this.bbox.r2 = 0;
 	this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
-}
+};
 Range.prototype.intersect=function(range){
 	var oBBox1 = this.bbox;
 	var oBBox2 = range.bbox;
@@ -6409,18 +6406,16 @@ Range.prototype.intersect=function(range){
 	if(r1 <= r2 && c1 <= c2)
 		return this.worksheet.getRange3(r1, c1, r2, c2);
 	return null;
-}
+};
 Range.prototype.cleanCache=function(){
 	this._setPropertyNoEmpty(null,null,function(cell, nRow0, nCol0, nRowStart, nColStart){
 		cell.cleanCache();
 	});
-}
+};
 Range.prototype.cleanFormat=function(){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
 	this.unmerge();
-	var oThis = this;
 	this._setPropertyNoEmpty(function(row){
 		row.setStyle(null);
 		// if(row.isEmpty())
@@ -6435,12 +6430,10 @@ Range.prototype.cleanFormat=function(){
 			// cell.Remove();
 	});
 	History.EndTransaction();
-}
+};
 Range.prototype.cleanText=function(){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
-	var oThis = this;
 	this._setPropertyNoEmpty(null, null,
 		function(cell, nRow0, nCol0, nRowStart, nColStart){
 			cell.setValue("");
@@ -6448,10 +6441,9 @@ Range.prototype.cleanText=function(){
 				// cell.Remove();
 	});
 	History.EndTransaction();
-}
+};
 Range.prototype.cleanAll=function(){
 	History.Create_NewPoint();
-	var oBBox = this.bbox;
 	History.StartTransaction();
 	this.unmerge();
 	//удаляем только гиперссылки, которые полностью лежат в области
@@ -6472,7 +6464,7 @@ Range.prototype.cleanAll=function(){
 	});
 	buildRecalc(this.worksheet.workbook);
 	History.EndTransaction();
-}
+};
 Range.prototype.sort=function(nOption, nStartCol){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
