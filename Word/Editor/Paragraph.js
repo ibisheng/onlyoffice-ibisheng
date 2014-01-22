@@ -8351,7 +8351,7 @@ Paragraph.prototype =
         }
     },
 
-    Get_ParaContentPosByXY : function(X, Y, PageNum, bYLine)
+    Get_ParaContentPosByXY : function(X, Y, PageNum, bYLine, StepEnd)
     {
         var SearchPos = new CParagraphSearchPosXY();
 
@@ -8423,7 +8423,7 @@ Paragraph.prototype =
         {
             var Item = this.Content[CurPos];
 
-            if ( true === Item.Get_ParaContentPosByXY( SearchPos, 1, CurLine, CurRange ) )
+            if ( true === Item.Get_ParaContentPosByXY( SearchPos, 1, CurLine, CurRange, StepEnd ) )
                 SearchPos.Pos.Update( CurPos, 0 );
         }
 
@@ -8724,7 +8724,7 @@ Paragraph.prototype =
         }
         else
         {
-            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, bLine );
+            var SearchPosXY = this.Get_ParaContentPosByXY( X, Y, PageNum, bLine, false );
 
             this.Set_ParaContentPos( SearchPosXY.Pos, SearchPosXY.Line, false );
             this.Internal_Recalculate_CurPos(-1, false, false, false );
@@ -11554,27 +11554,51 @@ Paragraph.prototype =
 
     Selection_SetStart : function(X,Y,PageNum, bTableBorder)
     {
-        var Pos = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
-        if ( -1 != Pos.Pos )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === Pos.End )
-                this.Selection.Set_StartPos( Pos.Pos + 1, Pos.Pos2 );
-            else
-                this.Selection.Set_StartPos( Pos.Pos, Pos.Pos2 );
-
-            // Если мы начинаем с математического элемента, тогда у него выставляем начало селекта
-            if ( undefined !== this.Content[Pos.Pos2] && para_Math === this.Content[Pos.Pos2].Type )
+            var Pos = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
+            if ( -1 != Pos.Pos )
             {
-                this.CurPos.ContentPos2 = Pos.Pos2;
-                this.Content[Pos.Pos2].Selection_SetStart(X, Y, PageNum);
+                if ( true === Pos.End )
+                    this.Selection.Set_StartPos( Pos.Pos + 1, Pos.Pos2 );
+                else
+                    this.Selection.Set_StartPos( Pos.Pos, Pos.Pos2 );
+
+                // Если мы начинаем с математического элемента, тогда у него выставляем начало селекта
+                if ( undefined !== this.Content[Pos.Pos2] && para_Math === this.Content[Pos.Pos2].Type )
+                {
+                    this.CurPos.ContentPos2 = Pos.Pos2;
+                    this.Content[Pos.Pos2].Selection_SetStart(X, Y, PageNum);
+                }
+
+                this.Set_ContentPos( Pos.Pos, true , Pos.Line );
+
+                this.Selection.Use      = true;
+                this.Selection.Start    = true;
+                this.Selection.Flag     = selectionflag_Common;
+
             }
+        }
+        else
+        {
+            // Избавляемся от старого селекта
+            if ( true === this.Selection.Use )
+                this.Selection_Remove();
 
-            this.Set_ContentPos( Pos.Pos, true , Pos.Line );
+            // Найдем позицию в контенте, в которую мы попали (для селекта ищем и за знаком параграфа, для курсора только перед)
+            var SearchPosXY  = this.Get_ParaContentPosByXY( X, Y, PageNum, false, true );
+            var SearchPosXY2 = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
 
+            // Начинаем селект
             this.Selection.Use      = true;
             this.Selection.Start    = true;
             this.Selection.Flag     = selectionflag_Common;
 
+            // Выставим текущую позицию
+            this.Set_ParaContentPos( SearchPosXY2.Pos, SearchPosXY2.Line, true );
+
+            // Выставляем селект
+            this.Set_SelectionContentPos( SearchPosXY.Pos, SearchPosXY.Pos );
         }
     },
 
@@ -11582,191 +11606,283 @@ Paragraph.prototype =
     // Если bEnd = true, тогда это конец селекта.
     Selection_SetEnd : function(X,Y,PageNum, MouseEvent, bTableBorder)
     {
-        var PagesCount = this.Pages.length;
-        if ( false === editor.isViewMode && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
-            return this.Parent.Extend_ToPos( X, Y );
-
-        this.CurPos.RealX = X;
-        this.CurPos.RealY = Y;
-        var Temp = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
-        var Pos  = Temp.Pos;
-        if ( -1 != Pos )
+        if ( true !== Debug_ParaRunMode )
         {
-            this.Set_ContentPos( Pos, true, Temp.Line );
+            var PagesCount = this.Pages.length;
+            if ( false === editor.isViewMode && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
+                return this.Parent.Extend_ToPos( X, Y );
 
-            if ( true === Temp.End )
+            this.CurPos.RealX = X;
+            this.CurPos.RealY = Y;
+            var Temp = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
+            var Pos  = Temp.Pos;
+            if ( -1 != Pos )
             {
-                if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
-                {
-                    if ( false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
-                    {
-                        History.Create_NewPoint();
-                        History.Set_Additional_ExtendDocumentToPos();
+                this.Set_ContentPos( Pos, true, Temp.Line );
 
-                        this.Extend_ToPos( X );
-                        this.Cursor_MoveToEndPos();
-                        this.Document_SetThisElementCurrent(true);
-                        editor.WordControl.m_oLogicDocument.Recalculate();
-                        return;
+                if ( true === Temp.End )
+                {
+                    if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
+                    {
+                        if ( false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
+                        {
+                            History.Create_NewPoint();
+                            History.Set_Additional_ExtendDocumentToPos();
+
+                            this.Extend_ToPos( X );
+                            this.Cursor_MoveToEndPos();
+                            this.Document_SetThisElementCurrent(true);
+                            editor.WordControl.m_oLogicDocument.Recalculate();
+                            return;
+                        }
                     }
+
+                    this.Selection.Set_EndPos(Pos + 1, Temp.Pos2);
                 }
-
-                this.Selection.Set_EndPos(Pos + 1, Temp.Pos2);
-            }
-            else
-                this.Selection.Set_EndPos(Pos, Temp.Pos2);
+                else
+                    this.Selection.Set_EndPos(Pos, Temp.Pos2);
 
 
-            // Обработка математических элементов:
-            // 1. Проверяем конец селекта
-            //    Если мы закончили на математическом элементе, тогда смотрим на начало селекта,
-            //    если селект начался в другом элементе, тогда выставляем начало селекта в формуле
-            //    в зависимости от направления, если селект начался в этом же параграфе, тогда проверяем,
-            //    если начало селекта не тот же самый элемент, тогда выставляем начало
-            // 2. Проверяем начало селекта
-            //    Если у нас селект начался в данном параграфе, и начальный элемент -формула, и начало селекта
-            //    не совпадает с концом селекта, тогда выставляем конец селекта у данного элемента
+                // Обработка математических элементов:
+                // 1. Проверяем конец селекта
+                //    Если мы закончили на математическом элементе, тогда смотрим на начало селекта,
+                //    если селект начался в другом элементе, тогда выставляем начало селекта в формуле
+                //    в зависимости от направления, если селект начался в этом же параграфе, тогда проверяем,
+                //    если начало селекта не тот же самый элемент, тогда выставляем начало
+                // 2. Проверяем начало селекта
+                //    Если у нас селект начался в данном параграфе, и начальный элемент -формула, и начало селекта
+                //    не совпадает с концом селекта, тогда выставляем конец селекта у данного элемента
 
-            var ParentSelectDirection = this.Parent.Selection_Is_OneElement();
-            if ( undefined !== this.Content[Temp.Pos2] && para_Math === this.Content[Temp.Pos2].Type )
-            {
-                // Если у нас совпали начальная и конечная позиции, тогда не нужно указывать начало селекта, т.к. оно
-                // было определено в Selection_SetStart, но это только в случае, когда выделение внутри 1 параграфа.
-                if ( 0 === ParentSelectDirection )
+                var ParentSelectDirection = this.Parent.Selection_Is_OneElement();
+                if ( undefined !== this.Content[Temp.Pos2] && para_Math === this.Content[Temp.Pos2].Type )
                 {
-                    if ( this.Selection.EndPos2 != this.Selection.StartPos2 )
+                    // Если у нас совпали начальная и конечная позиции, тогда не нужно указывать начало селекта, т.к. оно
+                    // было определено в Selection_SetStart, но это только в случае, когда выделение внутри 1 параграфа.
+                    if ( 0 === ParentSelectDirection )
                     {
-                        if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                        if ( this.Selection.EndPos2 != this.Selection.StartPos2 )
+                        {
+                            if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                                this.Content[Temp.Pos2].Selection_Beginning(true);
+                            else
+                                this.Content[Temp.Pos2].Selection_Ending(true);
+                        }
+                    }
+                    else
+                    {
+                        if ( ParentSelectDirection > 0 )
                             this.Content[Temp.Pos2].Selection_Beginning(true);
                         else
                             this.Content[Temp.Pos2].Selection_Ending(true);
                     }
+
+                    this.Content[Temp.Pos2].Selection_SetEnd(X, Y, PageNum, MouseEvent);
                 }
-                else
+
+                if ( undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && 0 === ParentSelectDirection && this.Selection.EndPos2 != this.Selection.StartPos2 )
                 {
-                    if ( ParentSelectDirection > 0 )
-                        this.Content[Temp.Pos2].Selection_Beginning(true);
+                    if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
+                        this.Content[this.Selection.StartPos2].Selection_Ending(false);
                     else
-                        this.Content[Temp.Pos2].Selection_Ending(true);
+                        this.Content[this.Selection.StartPos2].Selection_Beginning(false);
                 }
 
-                this.Content[Temp.Pos2].Selection_SetEnd(X, Y, PageNum, MouseEvent);
-            }
-
-            if ( undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && 0 === ParentSelectDirection && this.Selection.EndPos2 != this.Selection.StartPos2 )
-            {
-                if ( this.Selection.StartPos2 < this.Selection.EndPos2 )
-                    this.Content[this.Selection.StartPos2].Selection_Ending(false);
-                else
-                    this.Content[this.Selection.StartPos2].Selection_Beginning(false);
-            }
-
-            // Если мы закончили в математическом элементе и в нем нет селекта, тогда отменяем селект совсем и ставим курсор в формуле
-            if ( g_mouse_event_type_up === MouseEvent.Type )
-            {
-                if ( this.Selection.EndPos2 === this.Selection.StartPos2 && undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && true === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
+                // Если мы закончили в математическом элементе и в нем нет селекта, тогда отменяем селект совсем и ставим курсор в формуле
+                if ( g_mouse_event_type_up === MouseEvent.Type )
                 {
-                    this.Selection_Remove();
-
-                    this.CurPos.ContentPos2 = this.Selection.EndPos2;
-                    this.Set_ContentPos( Pos, true, Temp.Line );
-
-                    this.RecalculateCurPos();
-                }
-                else
-                    this.CurPos.ContentPos2 = -1;
-            }
-
-            if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
-            {
-                var NumPr = this.Numbering_Get();
-                if ( true === Temp.Numbering && undefined != NumPr )
-                {
-                    // Ставим именно 0, а не this.Internal_GetStartPos(), чтобы при нажатии на клавишу "направо"
-                    // мы оказывались в начале параграфа.
-                    this.Set_ContentPos( 0, true, -1 );
-                    this.Parent.Document_SelectNumbering( NumPr );
-                }
-                else
-                {
-                    var Temp2 = MouseEvent.ClickCount % 2;
-
-                    if ( 1 >= MouseEvent.ClickCount )
+                    if ( this.Selection.EndPos2 === this.Selection.StartPos2 && undefined !== this.Content[this.Selection.StartPos2] && para_Math === this.Content[this.Selection.StartPos2].Type && true === this.Content[this.Selection.StartPos2].Selection_IsEmpty() )
                     {
                         this.Selection_Remove();
-                        this.Selection.Use = false;
 
+                        this.CurPos.ContentPos2 = this.Selection.EndPos2;
                         this.Set_ContentPos( Pos, true, Temp.Line );
-                        this.RecalculateCurPos();
 
-                        return;
+                        this.RecalculateCurPos();
                     }
-                    else if ( 0 == Temp2 )
+                    else
+                        this.CurPos.ContentPos2 = -1;
+                }
+
+                if ( this.Selection.EndPos == this.Selection.StartPos && g_mouse_event_type_up === MouseEvent.Type && ( this.Selection.EndPos2 != this.Selection.StartPos2 || undefined === this.Content[this.Selection.StartPos2] || para_Math !== this.Content[this.Selection.StartPos2].Type ) )
+                {
+                    var NumPr = this.Numbering_Get();
+                    if ( true === Temp.Numbering && undefined != NumPr )
                     {
-                        var oStart;
-                        if ( this.Content[Pos].Type == para_Space )
+                        // Ставим именно 0, а не this.Internal_GetStartPos(), чтобы при нажатии на клавишу "направо"
+                        // мы оказывались в начале параграфа.
+                        this.Set_ContentPos( 0, true, -1 );
+                        this.Parent.Document_SelectNumbering( NumPr );
+                    }
+                    else
+                    {
+                        var Temp2 = MouseEvent.ClickCount % 2;
+
+                        if ( 1 >= MouseEvent.ClickCount )
                         {
-                            oStart = this.Internal_FindBackward( Pos, [ para_Text, para_NewLine ] );
-                            if ( !oStart.Found )
-                                oStart.LetterPos = this.Internal_GetStartPos();
-                            else if ( oStart.Type == para_NewLine )
+                            this.Selection_Remove();
+                            this.Selection.Use = false;
+
+                            this.Set_ContentPos( Pos, true, Temp.Line );
+                            this.RecalculateCurPos();
+
+                            return;
+                        }
+                        else if ( 0 == Temp2 )
+                        {
+                            var oStart;
+                            if ( this.Content[Pos].Type == para_Space )
                             {
-                                oStart.LetterPos++; // смещаемся на начало следующей строки
+                                oStart = this.Internal_FindBackward( Pos, [ para_Text, para_NewLine ] );
+                                if ( !oStart.Found )
+                                    oStart.LetterPos = this.Internal_GetStartPos();
+                                else if ( oStart.Type == para_NewLine )
+                                {
+                                    oStart.LetterPos++; // смещаемся на начало следующей строки
+                                }
+                                else
+                                {
+                                    oStart = this.Internal_FindBackward( oStart.LetterPos, [ para_Tab, para_Space, para_NewLine ] );
+                                    if ( !oStart.Found )
+                                        oStart.LetterPos = this.Internal_GetStartPos();
+                                    else
+                                    {
+                                        oStart = this.Internal_FindForward( oStart.LetterPos, [ para_Text ] );
+                                        if ( !oStart.Found )
+                                            oStart.LetterPos = this.Internal_GetStartPos();
+                                    }
+                                }
                             }
                             else
                             {
-                                oStart = this.Internal_FindBackward( oStart.LetterPos, [ para_Tab, para_Space, para_NewLine ] );
+                                oStart = this.Internal_FindBackward( Pos, [ para_Tab, para_Space, para_NewLine ] );
                                 if ( !oStart.Found )
                                     oStart.LetterPos = this.Internal_GetStartPos();
                                 else
                                 {
-                                    oStart = this.Internal_FindForward( oStart.LetterPos, [ para_Text ] );
+                                    oStart = this.Internal_FindForward( oStart.LetterPos, [ para_Text, para_NewLine ] );
                                     if ( !oStart.Found )
                                         oStart.LetterPos = this.Internal_GetStartPos();
                                 }
                             }
-                        }
-                        else
-                        {
-                            oStart = this.Internal_FindBackward( Pos, [ para_Tab, para_Space, para_NewLine ] );
-                            if ( !oStart.Found )
-                                oStart.LetterPos = this.Internal_GetStartPos();
-                            else
-                            {
-                                oStart = this.Internal_FindForward( oStart.LetterPos, [ para_Text, para_NewLine ] );
-                                if ( !oStart.Found )
-                                    oStart.LetterPos = this.Internal_GetStartPos();
-                            }
-                        }
 
-                        var oEnd = this.Internal_FindForward( Pos, [ para_Tab, para_Space, para_NewLine ] );
-                        if ( !oEnd.Found )
-                            oEnd.LetterPos = this.Content.length - 1;
-                        else if ( oEnd.Type != para_NewLine ) // при переносе строки селектим все до переноса строки
-                        {
-                            oEnd = this.Internal_FindForward( oEnd.LetterPos, [ para_Text ] );
+                            var oEnd = this.Internal_FindForward( Pos, [ para_Tab, para_Space, para_NewLine ] );
                             if ( !oEnd.Found )
                                 oEnd.LetterPos = this.Content.length - 1;
+                            else if ( oEnd.Type != para_NewLine ) // при переносе строки селектим все до переноса строки
+                            {
+                                oEnd = this.Internal_FindForward( oEnd.LetterPos, [ para_Text ] );
+                                if ( !oEnd.Found )
+                                    oEnd.LetterPos = this.Content.length - 1;
+                            }
+                            this.Selection.StartPos = oStart.LetterPos;
+                            this.Selection.EndPos   = oEnd.LetterPos;
+                            this.Selection.Use = true;
                         }
-                        this.Selection.StartPos = oStart.LetterPos;
-                        this.Selection.EndPos   = oEnd.LetterPos;
-                        this.Selection.Use = true;
-                    }
-                    else // ( 1 == Temp2 % 3 )
-                    {
-                        // Селектим параграф целиком
-                        this.Selection.StartPos = this.Internal_GetStartPos();
-                        this.Selection.EndPos   = this.Content.length - 1;
-                        this.Selection.Use      = true;
+                        else // ( 1 == Temp2 % 3 )
+                        {
+                            // Селектим параграф целиком
+                            this.Selection.StartPos = this.Internal_GetStartPos();
+                            this.Selection.EndPos   = this.Content.length - 1;
+                            this.Selection.Use      = true;
+                        }
                     }
                 }
             }
-        }
 
-        if ( -1 === this.Selection.EndPos )
+            if ( -1 === this.Selection.EndPos )
+            {
+                //Temp = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
+                return;
+            }
+        }
+        else
         {
-            //Temp = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
-            return;
+            var PagesCount = this.Pages.length;
+
+            // TODO: Реализовать Extend_ToPos
+            //if ( false === editor.isViewMode && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
+            //    return this.Parent.Extend_ToPos( X, Y );
+
+            // Обновляем позицию курсора
+            this.CurPos.RealX = X;
+            this.CurPos.RealY = Y;
+
+            // Найдем позицию в контенте, в которую мы попали (для селекта ищем и за знаком параграфа, для курсора только перед)
+            var SearchPosXY  = this.Get_ParaContentPosByXY( X, Y, PageNum, false, true );
+            var SearchPosXY2 = this.Get_ParaContentPosByXY( X, Y, PageNum, false, false );
+
+            // Выставим в полученном месте текущую позицию курсора
+            this.Set_ParaContentPos( SearchPosXY2.Pos, SearchPosXY2.Line, true );
+
+            if ( true === SearchPosXY.End )
+            {
+                // TODO: Реализовать Extend_ToPos
+//                if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom )
+//                {
+//                    if ( false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
+//                    {
+//                        History.Create_NewPoint();
+//                        History.Set_Additional_ExtendDocumentToPos();
+//
+//                        this.Extend_ToPos( X );
+//                        this.Cursor_MoveToEndPos();
+//                        this.Document_SetThisElementCurrent(true);
+//                        editor.WordControl.m_oLogicDocument.Recalculate();
+//                        return;
+//                    }
+//                }
+            }
+
+            // Выставляем селект
+            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), SearchPosXY.Pos );
+
+            var SelectionStartPos = this.Get_ParaContentPos( true, true );
+            var SelectionEndPos   = this.Get_ParaContentPos( true, false );
+
+            if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && g_mouse_event_type_up === MouseEvent.Type )
+            {
+                var NumPr = this.Numbering_Get();
+                if ( true === SearchPosXY.Numbering && undefined != NumPr )
+                {
+                    // TODO: Разобраться с нумерацией
+
+                    // Ставим именно 0, а не this.Internal_GetStartPos(), чтобы при нажатии на клавишу "направо"
+                    // мы оказывались в начале параграфа.
+                    //this.Set_ContentPos( 0, true, -1 );
+                    //this.Parent.Document_SelectNumbering( NumPr );
+                }
+                else
+                {
+                    var ClickCounter = MouseEvent.ClickCount % 2;
+
+                    if ( 1 >= MouseEvent.ClickCount )
+                    {
+                        // Убираем селект. Позицию курсора можно не выставлять, т.к. она у нас установлена на конец селекта
+                        this.Selection_Remove();
+                    }
+                    else if ( 0 == ClickCounter )
+                    {
+                        // Выделяем слово, в котором находимся
+                        var SearchPosS = new CParagraphSearchPos();
+                        var SearchPosE = new CParagraphSearchPos();
+
+                        this.Get_WordStartPos( SearchPosS, SearchPosXY.Pos );
+                        this.Get_WordEndPos( SearchPosE, SearchPosXY.Pos );
+
+                        var StartPos = ( true === SearchPosS.Found ? SearchPosS.Pos : this.Get_StartPos() );
+                        var EndPos   = ( true === SearchPosE.Found ? SearchPosE.Pos : this.Get_EndPos(false) );
+
+                        this.Selection.Use = true;
+                        this.Set_SelectionContentPos( StartPos, EndPos );
+                    }
+                    else // ( 1 == ClickCounter % 2 )
+                    {
+                        // Выделяем весь параграф целиком
+
+                        this.Select_All( 1 );
+                    }
+                }
+            }
         }
     },
 
@@ -11838,8 +11954,9 @@ Paragraph.prototype =
                 this.Content[CurPos].Selection_Remove();
             }
 
-            this.Selection.Use = false;
-            this.Selection.Flag = selectionflag_Common;
+            this.Selection.Use   = false;
+            this.Selection.Start = false;
+            this.Selection.Flag  = selectionflag_Common;
             this.Selection_Clear();
         }
     },
@@ -12281,6 +12398,21 @@ Paragraph.prototype =
         }
     },
 
+    // Выставляем начало/конец селекта в начало/конец параграфа
+    Selection_SetBegEnd : function(StartSelection, StartPara)
+    {
+        var ContentPos = ( true === StartPara ? this.Get_StartPos() : this.Get_EndPos(true) );
+
+        if ( true === StartSelection )
+        {
+            this.Set_SelectionContentPos( ContentPos, this.Get_ParaContentPos( true, false ) );
+        }
+        else
+        {
+            this.Set_SelectionContentPos( this.Get_ParaContentPos( true, true ), ContentPos );
+        }
+    },
+
     Select_All : function(Direction)
     {
         if ( true !== Debug_ParaRunMode )
@@ -12293,23 +12425,21 @@ Paragraph.prototype =
         {
             var Count = this.Content.length;
 
-            this.Selection.Use      = true;
+            this.Selection.Use = true;
 
+            var StartPos = null, EndPos = null;
             if ( -1 === Direction )
             {
-                this.Selection.StartPos = Count - 1;
-                this.Selection.EndPos   = 0;
+                StartPos = this.Get_EndPos( true );
+                EndPos   = this.Get_StartPos();
             }
             else
             {
-                this.Selection.StartPos = 0;
-                this.Selection.EndPos   = Count - 1;
+                StartPos = this.Get_StartPos();
+                EndPos   = this.Get_EndPos( true );
             }
 
-            for (var CurPos = 0; CurPos < Count; CurPos++)
-            {
-                this.Content[CurPos].Select_All(Direction);
-            }
+            this.Set_SelectionContentPos( StartPos, EndPos );
         }
     },
 

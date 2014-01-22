@@ -2472,7 +2472,7 @@ ParaRun.prototype =
         }
     },
 
-    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange)
+    Get_ParaContentPosByXY : function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
     {
         var Result = false;
 
@@ -2488,8 +2488,6 @@ ParaRun.prototype =
             var Item = this.Content[CurPos];
 
             var TempDx = 0;
-            var bCheck = false;
-
             // TODO: Сделать поддержку нумерации
 
 //            if ( ItemNum === this.Numbering.Pos )
@@ -2556,19 +2554,23 @@ ParaRun.prototype =
                 }
             }
 
-            // TODO: Сделать разруливование со строками
-//            if ( true != bEnd && ItemNum === this.Lines[CurLine].EndPos && X > CurX + TempDx && para_NewLine != Item.Type )
-//            {
-//                ResultLine = CurLine;
-//                DiffPos = ItemNum + 1;
-//            }
-
             SearchPos.CurX += TempDx;
 
-            // Заглушка для знака параграфа
-            if ( para_End === Item.Type && Math.abs( SearchPos.X - SearchPos.CurX ) < SearchPos.DiffX )
+            // Заглушка для знака параграфа и конца строки
+            if ( Math.abs( SearchPos.X - SearchPos.CurX ) < SearchPos.DiffX )
             {
-                SearchPos.End = true;
+                if ( para_End === Item.Type )
+                {
+                    SearchPos.End = true;
+
+                    // Если мы ищем позицию для селекта, тогда нужно искать и за знаком параграфа
+                    if ( true === StepEnd )
+                        SearchPos.Pos.Update( this.Content.length, Depth );
+                }
+                else if ( CurPos === EndPos - 1 && para_NewLine != Item.Type )
+                {
+                    SearchPos.Pos.Update( EndPos, Depth );
+                }
             }
         }
 
@@ -2939,14 +2941,12 @@ ParaRun.prototype =
 
     Selection_Stop : function()
     {
-        this.State.Selection.Start = false;
     },
 
     Selection_Remove : function()
     {
         var Selection = this.State.Selection;
 
-        Selection.Start    = false;
         Selection.Use      = false;
         Selection.StartPos = 0;
         Selection.EndPos   = 0;
@@ -2956,7 +2956,6 @@ ParaRun.prototype =
     {
         var Selection = this.State.Selection;
 
-        Selection.Start    = false;
         Selection.Use      = true;
 
         if ( -1 === Direction )
@@ -3630,7 +3629,6 @@ ParaRun.prototype =
 
 function CParaRunSelection()
 {
-    this.Start    = false;
     this.Use      = false;
     this.StartPos = false;
     this.EndPos   = false;

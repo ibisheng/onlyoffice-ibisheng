@@ -7895,11 +7895,18 @@ CDocument.prototype =
             Start = this.Selection.EndPos;
         }
 
-        // Чтобы не было эффекта, когда ничего не поселекчено, а при удалении соединяются параграфы
-        if ( Direction > 0 && type_Paragraph === this.Content[Start].GetType() && true === this.Content[Start].Selection_IsEmpty() && this.Content[Start].Selection.StartPos == this.Content[Start].Content.length - 1 )
+        if ( true !== Debug_ParaRunMode )
         {
-            this.Content[Start].Selection.StartPos = this.Content[Start].Internal_GetEndPos();
-            this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
+            // Чтобы не было эффекта, когда ничего не поселекчено, а при удалении соединяются параграфы
+            if ( Direction > 0 && type_Paragraph === this.Content[Start].GetType() && true === this.Content[Start].Selection_IsEmpty() && this.Content[Start].Selection.StartPos == this.Content[Start].Content.length - 1 )
+            {
+                this.Content[Start].Selection.StartPos = this.Content[Start].Internal_GetEndPos();
+                this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
+            }
+        }
+        else
+        {
+            // TODO: Разрулить пустой селект
         }
 
         for ( var Index = Start; Index <= End; Index++ )
@@ -7914,10 +7921,17 @@ CDocument.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
-                            Item.Selection.EndPos   = Item.Content.length - 1;
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( Direction > 0 )
+                                Item.Selection.EndPos   = Item.Content.length - 1;
+                            else
+                                Item.Selection.StartPos = Item.Content.length - 1;
+                        }
                         else
-                            Item.Selection.StartPos = Item.Content.length - 1;
+                        {
+                            Item.Selection_SetBegEnd( ( Direction > 0 ? false : true ), false );
+                        }
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7939,10 +7953,18 @@ CDocument.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
-                            Item.Selection.StartPos = Item.Internal_GetStartPos();
+                        if ( true !== Debug_ParaRunMode )
+                        {
+                            if ( Direction > 0 )
+                                Item.Selection.StartPos = Item.Internal_GetStartPos();
+                            else
+                                Item.Selection.EndPos   = Item.Internal_GetStartPos();
+                        }
                         else
-                            Item.Selection.EndPos   = Item.Internal_GetStartPos();
+                        {
+                            Item.Selection_SetBegEnd( ( Direction > 0 ? true : false ), true );
+                        }
+
                     }
                     else //if ( type_Table === ItemType )
                     {
@@ -7962,15 +7984,22 @@ CDocument.prototype =
 
                     if ( type_Paragraph === ItemType )
                     {
-                        if ( Direction > 0 )
+                        if ( true !== Debug_ParaRunMode )
                         {
-                            Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
-                            Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                            if ( Direction > 0 )
+                            {
+                                Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
+                                Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
+                            }
+                            else
+                            {
+                                Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
+                                Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                            }
                         }
                         else
                         {
-                            Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
-                            Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
+                            Item.Select_All( Direction );
                         }
                     }
                     else //if ( type_Table === ItemType )
