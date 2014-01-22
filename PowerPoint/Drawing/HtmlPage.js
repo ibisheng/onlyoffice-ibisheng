@@ -923,11 +923,13 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        // пока только левые табы
-        return;
-
         var oWordControl = oThis;
         if (oWordControl.m_nTabsType == g_tabtype_left)
+        {
+            oWordControl.m_nTabsType = g_tabtype_center;
+            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px -37px";
+        }
+        else if (oWordControl.m_nTabsType == g_tabtype_center)
         {
             oWordControl.m_nTabsType = g_tabtype_right;
             oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px -18px";

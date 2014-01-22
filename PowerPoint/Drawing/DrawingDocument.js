@@ -2296,7 +2296,11 @@ function CDrawingDocument()
     {
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
 
-        var _len = ParaTabs.length;
+        var __tabs = ParaTabs.Tabs;
+        if (undefined === __tabs)
+            __tabs = ParaTabs;
+
+        var _len = __tabs.length;
         if ((Default_Tab == hor_ruler.m_dDefaultTab) && (hor_ruler.m_arrTabs.length == _len) && (_len == 0))
         {
             // потом можно и проверить сами табы
@@ -2307,9 +2311,20 @@ function CDrawingDocument()
         hor_ruler.m_arrTabs = [];
         var _ar = hor_ruler.m_arrTabs;
 
-        var _len = ParaTabs.length;
         for (var i = 0; i < _len; i++)
-            _ar[i] = new CTab(ParaTabs[i].Pos, g_tabtype_left);
+        {
+            if (__tabs[i].Value == tab_Left)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+            else if (__tabs[i].Value == tab_Center)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_center);
+            else if (__tabs[i].Value == tab_Right)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_right);
+            else
+            {
+                // не должно такого быть. но приходит
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+            }
+        }
 
         hor_ruler.CorrectTabs();
         this.m_oWordControl.UpdateHorRuler();

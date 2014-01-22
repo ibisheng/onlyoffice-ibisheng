@@ -8364,6 +8364,7 @@ Paragraph.prototype =
             TextPr.RFonts.Ascii.Name = TextPr.FontFamily.Name;
             TextPr.RFonts.CS.Name = TextPr.FontFamily.Name;
             TextPr.RFonts.HAnsi.Name = TextPr.FontFamily.Name;
+            TextPr.RFonts.EastAsia.Name = TextPr.FontFamily.Name;
             this.CompiledPr.NeedRecalc = false;
         }
 
