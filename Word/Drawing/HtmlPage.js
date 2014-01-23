@@ -2264,6 +2264,24 @@ function CEditorPage(api)
             oWordControl.bIsUseKeyPress = false;
     }
 
+    this.DisableTextEATextboxAttack = function()
+    {
+        var oWordControl = oThis;
+        if (false === oWordControl.m_oApi.bInit_word_control)
+            return;
+
+        if (oWordControl.TextBoxInputFocus)
+        {
+            oWordControl.TextBoxInputFocus = false;
+
+            CollaborativeEditing.m_bGlobalLock = false;
+            this.TextBoxInput.style.zIndex = -1;
+            this.TextBoxInput.style.top = "-1000px";
+            this.TextBoxInputFocus = false;
+            this.ReinitTB();
+        }
+    }
+
     this.onKeyUp = function(e)
     {
         global_keyboardEvent.AltKey     = false;

@@ -1821,6 +1821,8 @@ function CDrawingDocument()
         clearInterval( this.m_lTimerTargetId );
         this.m_lTimerTargetId = -1;
         this.TargetHtmlElement.style.display = "none";
+
+        this.m_oWordControl.DisableTextEATextboxAttack();
     }
     this.UpdateTargetNoAttack = function()
     {
