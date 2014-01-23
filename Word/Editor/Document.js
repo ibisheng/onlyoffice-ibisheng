@@ -1099,10 +1099,10 @@ CDocument.prototype =
                 var Para = Run.Paragraph;
 
                 var Res  = Para.Recalculate_Fast( SimpleChanges );
-                if ( false !== Res )
+                if ( -1 !== Res )
                 {
                     // Перерисуем страницу, на которой произошли изменения
-                    this.DrawingDocument.OnRecalculatePage( 0, this.Pages[0] );
+                    this.DrawingDocument.OnRecalculatePage( Res, this.Pages[Res] );
                     this.DrawingDocument.OnEndRecalculate( false, true );
 
                     return;

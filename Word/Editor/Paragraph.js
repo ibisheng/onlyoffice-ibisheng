@@ -4952,13 +4952,34 @@ Paragraph.prototype =
 
         // Не нашли нужный Run
         if ( RunPos > EndPos )
-            return false;
+            return -1;
 
         var ParaPos = Run.Get_SimpleChanges_ParaPos(SimpleChanges);
 
         var PRS = g_oPRSW;
 
         var XStart, YStart, XLimit, YLimit;
+
+
+        // Определим номер страницы
+        var CurLine  = ParaPos.Line;
+        var CurRange = ParaPos.Range;
+        var CurPage  = 0;
+
+        var PagesLen = this.Pages.length;
+        for ( var TempPage = 0; TempPage < PagesLen; TempPage++ )
+        {
+            var __Page = this.Pages[TempPage];
+            if ( CurLine <= __Page.EndLine && CurLine >= __Page.FirstLine )
+            {
+                CurPage = TempPage;
+                break;
+            }
+        }
+
+        if ( -1 === CurPage )
+            return -1;
+
         if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
             XStart = this.X;
@@ -4991,9 +5012,6 @@ Paragraph.prototype =
 
         PRS.Paragraph = Run.Paragraph;
 
-        var CurLine     = PRS.Line;
-        var CurRange    = PRS.Range;
-        var CurPage     = PRS.Page;
         var RangesCount = PRS.RangesCount;
 
         var Line = this.Lines[CurLine];
@@ -5021,11 +5039,11 @@ Paragraph.prototype =
             Item.Recalculate_Range( ParaPr );
 
             if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
-                return false;
+                return -1;
 
             // Нам нужно проверить только строку с номером CurLine
             if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine] ) )
-                return false;
+                return -1;
 
             Item.Restore_Lines( SL );
         }
@@ -5049,12 +5067,12 @@ Paragraph.prototype =
         var RecalcResultAlign = this.Recalculate_Lines_Align(PRS, CurPage, ParaPr);
 
         if ( recalcresult_NextElement !== RecalcResultAlign )
-            return false;
+            return -1;
 
         // Во время пересчета сбрасываем привязку курсора к строке.
         this.CurPos.Line = -1;
 
-        return true;
+        return this.Get_StartPage_Absolute() + CurPage;
     },
 
     Start_FromNewPage : function()
