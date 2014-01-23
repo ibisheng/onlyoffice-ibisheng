@@ -2899,7 +2899,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         {
             track_objects2.push(track_objects[i]);
         }
-        if ( !isViewMode && !asc["editor"].isChartEditor)
+        if(!isViewMode)
         {
             if(!ctrlKey)
             {
@@ -2925,7 +2925,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
                 };
                 this.drawingObjects.objectLocker.checkObjects(callback);
             }
-            else
+            else if(!asc["editor"].isChartEditor)
             {
                 this.drawingObjectsController.resetSelection();
                 History.Create_NewPoint();
