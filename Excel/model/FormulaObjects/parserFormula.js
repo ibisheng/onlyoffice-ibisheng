@@ -2659,38 +2659,38 @@ parserFormula.prototype = {
                 else if ( parserHelp.isFunc.call( this, this.Formula, this.pCurrPos ) ) {
 
                     var found_operator = null;
-                    if ( this.operand_str.toUpperCase() in cFormulaFunction.Mathematic )//mathematic
-                        found_operator = cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
+                    if ( this.operand_str.toUpperCase() in cFormulaFunction.Mathematic )//Mathematic
+                        found_operator = new cFormulaFunction.Mathematic[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Logical )//logical
-                        found_operator = cFormulaFunction.Logical[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Logical )//Logical
+                        found_operator = new cFormulaFunction.Logical[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Information )//information
-                        found_operator = cFormulaFunction.Information[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Information )//Information
+                        found_operator = new cFormulaFunction.Information[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Statistical )//statistical
-                        found_operator = cFormulaFunction.Statistical[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Statistical )//Statistical
+                        found_operator = new cFormulaFunction.Statistical[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.TextAndData )//text and data
-                        found_operator = cFormulaFunction.TextAndData[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.TextAndData )//Text and data
+                        found_operator = new cFormulaFunction.TextAndData[this.operand_str.toUpperCase()]();
 
-                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Cube )//cube
-                        found_operator = cFormulaFunction.Cube[this.operand_str.toUpperCase()]();
+                    else if ( this.operand_str.toUpperCase() in cFormulaFunction.Cube )//Cube
+                        found_operator = new cFormulaFunction.Cube[this.operand_str.toUpperCase()]();
 
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.Database )//Database
-                        found_operator = cFormulaFunction.Database[this.operand_str.toUpperCase()]();
+                        found_operator = new cFormulaFunction.Database[this.operand_str.toUpperCase()]();
 
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.DateAndTime )//Date and time
-                        found_operator = cFormulaFunction.DateAndTime[this.operand_str.toUpperCase()]();
+                        found_operator = new cFormulaFunction.DateAndTime[this.operand_str.toUpperCase()]();
 
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.Engineering )//Engineering
-                        found_operator = cFormulaFunction.Engineering[this.operand_str.toUpperCase()]();
+                        found_operator = new cFormulaFunction.Engineering[this.operand_str.toUpperCase()]();
 
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.Financial )//Financial
-                        found_operator = cFormulaFunction.Financial[this.operand_str.toUpperCase()]();
+                        found_operator = new cFormulaFunction.Financial[this.operand_str.toUpperCase()]();
 
                     else if ( this.operand_str.toUpperCase() in cFormulaFunction.LookupAndReference )//Lookup and reference
-                        found_operator = cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
+                        found_operator = new cFormulaFunction.LookupAndReference[this.operand_str.toUpperCase()]();
 
                     if ( found_operator != null && found_operator != undefined )
                         this.elemArr.push( found_operator );

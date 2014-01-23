@@ -7,32 +7,46 @@
  */
 cFormulaFunction.Cube = {
     'groupName':"Cube",
-    'CUBEKPIMEMBER':function () {
-        var r = new cBaseFunction( "CUBEKPIMEMBER" );
-        return r;
-    },
-    'CUBEMEMBER':function () {
-        var r = new cBaseFunction( "CUBEMEMBER" );
-        return r;
-    },
-    'CUBEMEMBERPROPERTY':function () {
-        var r = new cBaseFunction( "CUBEMEMBERPROPERTY" );
-        return r;
-    },
-    'CUBERANKEDMEMBER':function () {
-        var r = new cBaseFunction( "CUBERANKEDMEMBER" );
-        return r;
-    },
-    'CUBESET':function () {
-        var r = new cBaseFunction( "CUBESET" );
-        return r;
-    },
-    'CUBESETCOUNT':function () {
-        var r = new cBaseFunction( "CUBESETCOUNT" );
-        return r;
-    },
-    'CUBEVALUE':function () {
-        var r = new cBaseFunction( "CUBEVALUE" );
-        return r;
-    }
+    'CUBEKPIMEMBER':cCUBEKPIMEMBER,
+    'CUBEMEMBER':cCUBEMEMBER,
+    'CUBEMEMBERPROPERTY':cCUBEMEMBERPROPERTY,
+    'CUBERANKEDMEMBER':cCUBERANKEDMEMBER,
+    'CUBESET':cCUBESET,
+    'CUBESETCOUNT':cCUBESETCOUNT,
+    'CUBEVALUE':cCUBEVALUE
 }
+
+function cCUBEKPIMEMBER() {
+    cBaseFunction.call( this, "CUBEKPIMEMBER" );
+}
+cCUBEKPIMEMBER.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBEMEMBER() {
+    cBaseFunction.call( this, "CUBEMEMBER" );
+}
+cCUBEMEMBER.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBEMEMBERPROPERTY() {
+    cBaseFunction.call( this, "CUBEMEMBERPROPERTY" );
+}
+cCUBEMEMBERPROPERTY.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBERANKEDMEMBER() {
+    cBaseFunction.call( this, "CUBERANKEDMEMBER" );
+}
+cCUBERANKEDMEMBER.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBESET() {
+    cBaseFunction.call( this, "CUBESET" );
+}
+cCUBESET.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBESETCOUNT() {
+    cBaseFunction.call( this, "CUBESETCOUNT" );
+}
+cCUBESETCOUNT.prototype = Object.create( cBaseFunction.prototype )
+
+function cCUBEVALUE() {
+    cBaseFunction.call( this, "CUBEVALUE" );
+}
+cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype )

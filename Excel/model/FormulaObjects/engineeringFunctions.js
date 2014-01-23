@@ -7,160 +7,238 @@
  */
 cFormulaFunction.Engineering = {
     'groupName':"Engineering",
-    'BESSELI':function () {
-        var r = new cBaseFunction( "BESSELI" );
-        return r;
-    },
-    'BESSELJ':function () {
-        var r = new cBaseFunction( "BESSELJ" );
-        return r;
-    },
-    'BESSELK':function () {
-        var r = new cBaseFunction( "BESSELK" );
-        return r;
-    },
-    'BESSELY':function () {
-        var r = new cBaseFunction( "BESSELY" );
-        return r;
-    },
-    'BIN2DEC':function () {
-        var r = new cBaseFunction( "BIN2DEC" );
-        return r;
-    },
-    'BIN2HEX':function () {
-        var r = new cBaseFunction( "BIN2HEX" );
-        return r;
-    },
-    'BIN2OCT':function () {
-        var r = new cBaseFunction( "BIN2OCT" );
-        return r;
-    },
-    'COMPLEX':function () {
-        var r = new cBaseFunction( "COMPLEX" );
-        return r;
-    },
-    'CONVERT':function () {
-        var r = new cBaseFunction( "CONVERT" );
-        return r;
-    },
-    'DEC2BIN':function () {
-        var r = new cBaseFunction( "DEC2BIN" );
-        return r;
-    },
-    'DEC2HEX':function () {
-        var r = new cBaseFunction( "DEC2HEX" );
-        return r;
-    },
-    'DEC2OCT':function () {
-        var r = new cBaseFunction( "DEC2OCT" );
-        return r;
-    },
-    'DELTA':function () {
-        var r = new cBaseFunction( "DELTA" );
-        return r;
-    },
-    'ERF':function () {
-        var r = new cBaseFunction( "ERF" );
-        return r;
-    },
-    'ERFC':function () {
-        var r = new cBaseFunction( "ERFC" );
-        return r;
-    },
-    'GESTEP':function () {
-        var r = new cBaseFunction( "GESTEP" );
-        return r;
-    },
-    'HEX2BIN':function () {
-        var r = new cBaseFunction( "HEX2BIN" );
-        return r;
-    },
-    'HEX2DEC':function () {
-        var r = new cBaseFunction( "HEX2DEC" );
-        return r;
-    },
-    'HEX2OCT':function () {
-        var r = new cBaseFunction( "HEX2OCT" );
-        return r;
-    },
-    'IMABS':function () {
-        var r = new cBaseFunction( "IMABS" );
-        return r;
-    },
-    'IMAGINARY':function () {
-        var r = new cBaseFunction( "IMAGINARY" );
-        return r;
-    },
-    'IMARGUMENT':function () {
-        var r = new cBaseFunction( "IMARGUMENT" );
-        return r;
-    },
-    'IMCONJUGATE':function () {
-        var r = new cBaseFunction( "IMCONJUGATE" );
-        return r;
-    },
-    'IMCOS':function () {
-        var r = new cBaseFunction( "IMCOS" );
-        return r;
-    },
-    'IMDIV':function () {
-        var r = new cBaseFunction( "IMDIV" );
-        return r;
-    },
-    'IMEXP':function () {
-        var r = new cBaseFunction( "IMEXP" );
-        return r;
-    },
-    'IMLN':function () {
-        var r = new cBaseFunction( "IMLN" );
-        return r;
-    },
-    'IMLOG10':function () {
-        var r = new cBaseFunction( "IMLOG10" );
-        return r;
-    },
-    'IMLOG2':function () {
-        var r = new cBaseFunction( "IMLOG2" );
-        return r;
-    },
-    'IMPOWER':function () {
-        var r = new cBaseFunction( "IMPOWER" );
-        return r;
-    },
-    'IMPRODUCT':function () {
-        var r = new cBaseFunction( "IMPRODUCT" );
-        return r;
-    },
-    'IMREAL':function () {
-        var r = new cBaseFunction( "IMREAL" );
-        return r;
-    },
-    'IMSIN':function () {
-        var r = new cBaseFunction( "IMSIN" );
-        return r;
-    },
-    'IMSQRT':function () {
-        var r = new cBaseFunction( "IMSQRT" );
-        return r;
-    },
-    'IMSUB':function () {
-        var r = new cBaseFunction( "IMSUB" );
-        return r;
-    },
-    'IMSUM':function () {
-        var r = new cBaseFunction( "IMSUM" );
-        return r;
-    },
-    'OCT2BIN':function () {
-        var r = new cBaseFunction( "OCT2BIN" );
-        return r;
-    },
-    'OCT2DEC':function () {
-        var r = new cBaseFunction( "OCT2DEC" );
-        return r;
-    },
-    'OCT2HEX':function () {
-        var r = new cBaseFunction( "OCT2HEX" );
-        return r;
-    }
+    'BESSELI':cBESSELI,
+    'BESSELJ':cBESSELJ,
+    'BESSELK':cBESSELK,
+    'BESSELY':cBESSELY,
+    'BIN2DEC':cBIN2DEC,
+    'BIN2HEX':cBIN2HEX,
+    'BIN2OCT':cBIN2OCT,
+    'COMPLEX':cCOMPLEX,
+    'CONVERT':cCONVERT,
+    'DEC2BIN':cDEC2BIN,
+    'DEC2HEX':cDEC2HEX,
+    'DEC2OCT':cDEC2OCT,
+    'DELTA':cDELTA,
+    'ERF':cERF,
+    'ERFC':cERFC,
+    'GESTEP':cGESTEP,
+    'HEX2BIN':cHEX2BIN,
+    'HEX2DEC':cHEX2DEC,
+    'HEX2OCT':cHEX2OCT,
+    'IMABS':cIMABS,
+    'IMAGINARY':cIMAGINARY,
+    'IMARGUMENT':cIMARGUMENT,
+    'IMCONJUGATE':cIMCONJUGATE,
+    'IMCOS':cIMCOS,
+    'IMDIV':cIMDIV,
+    'IMEXP':cIMEXP,
+    'IMLN':cIMLN,
+    'IMLOG10':cIMLOG10,
+    'IMLOG2':cIMLOG2,
+    'IMPOWER':cIMPOWER,
+    'IMPRODUCT':cIMPRODUCT,
+    'IMREAL':cIMREAL,
+    'IMSIN':cIMSIN,
+    'IMSQRT':cIMSQRT,
+    'IMSUB':cIMSUB,
+    'IMSUM':cIMSUM,
+    'OCT2BIN':cOCT2BIN,
+    'OCT2DEC':cOCT2DEC,
+    'OCT2HEX':cOCT2HEX
 }
+
+function cBESSELI() {
+    cBaseFunction.call( this, "BESSELI" );
+}
+cBESSELI.prototype = Object.create( cBaseFunction.prototype )
+
+function cBESSELJ() {
+    cBaseFunction.call( this, "BESSELJ" );
+}
+cBESSELJ.prototype = Object.create( cBaseFunction.prototype )
+
+function cBESSELK() {
+    cBaseFunction.call( this, "BESSELK" );
+}
+cBESSELK.prototype = Object.create( cBaseFunction.prototype )
+
+function cBESSELY() {
+    cBaseFunction.call( this, "BESSELY" );
+}
+cBESSELY.prototype = Object.create( cBaseFunction.prototype )
+
+function cBIN2DEC() {
+    cBaseFunction.call( this, "BIN2DEC" );
+}
+cBIN2DEC.prototype = Object.create( cBaseFunction.prototype )
+
+function cBIN2HEX() {
+    cBaseFunction.call( this, "BIN2HEX" );
+}
+cBIN2HEX.prototype = Object.create( cBaseFunction.prototype )
+
+function cBIN2OCT() {
+    cBaseFunction.call( this, "BIN2OCT" );
+}
+cBIN2OCT.prototype = Object.create( cBaseFunction.prototype )
+
+function cCOMPLEX() {
+    cBaseFunction.call( this, "COMPLEX" );
+}
+cCOMPLEX.prototype = Object.create( cBaseFunction.prototype )
+
+function cCONVERT() {
+    cBaseFunction.call( this, "CONVERT" );
+}
+cCONVERT.prototype = Object.create( cBaseFunction.prototype )
+
+function cDEC2BIN() {
+    cBaseFunction.call( this, "DEC2BIN" );
+}
+cDEC2BIN.prototype = Object.create( cBaseFunction.prototype )
+
+function cDEC2HEX() {
+    cBaseFunction.call( this, "DEC2HEX" );
+}
+cDEC2HEX.prototype = Object.create( cBaseFunction.prototype )
+
+function cDEC2OCT() {
+    cBaseFunction.call( this, "DEC2OCT" );
+}
+cDEC2OCT.prototype = Object.create( cBaseFunction.prototype )
+
+function cDELTA() {
+    cBaseFunction.call( this, "DELTA" );
+}
+cDELTA.prototype = Object.create( cBaseFunction.prototype )
+
+function cERF() {
+    cBaseFunction.call( this, "ERF" );
+}
+cERF.prototype = Object.create( cBaseFunction.prototype )
+
+function cERFC() {
+    cBaseFunction.call( this, "ERFC" );
+}
+cERFC.prototype = Object.create( cBaseFunction.prototype )
+
+function cGESTEP() {
+    cBaseFunction.call( this, "GESTEP" );
+}
+cGESTEP.prototype = Object.create( cBaseFunction.prototype )
+
+function cHEX2BIN() {
+    cBaseFunction.call( this, "HEX2BIN" );
+}
+cHEX2BIN.prototype = Object.create( cBaseFunction.prototype )
+
+function cHEX2DEC() {
+    cBaseFunction.call( this, "HEX2DEC" );
+}
+cHEX2DEC.prototype = Object.create( cBaseFunction.prototype )
+
+function cHEX2OCT() {
+    cBaseFunction.call( this, "HEX2OCT" );
+}
+cHEX2OCT.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMABS() {
+    cBaseFunction.call( this, "IMABS" );
+}
+cIMABS.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMAGINARY() {
+    cBaseFunction.call( this, "IMAGINARY" );
+}
+cIMAGINARY.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMARGUMENT() {
+    cBaseFunction.call( this, "IMARGUMENT" );
+}
+cIMARGUMENT.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMCONJUGATE() {
+    cBaseFunction.call( this, "IMCONJUGATE" );
+}
+cIMCONJUGATE.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMCOS() {
+    cBaseFunction.call( this, "IMCOS" );
+}
+cIMCOS.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMDIV() {
+    cBaseFunction.call( this, "IMDIV" );
+}
+cIMDIV.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMEXP() {
+    cBaseFunction.call( this, "IMEXP" );
+}
+cIMEXP.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMLN() {
+    cBaseFunction.call( this, "IMLN" );
+}
+cIMLN.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMLOG10() {
+    cBaseFunction.call( this, "IMLOG10" );
+}
+cIMLOG10.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMLOG2() {
+    cBaseFunction.call( this, "IMLOG2" );
+}
+cIMLOG2.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMPOWER() {
+    cBaseFunction.call( this, "IMPOWER" );
+}
+cIMPOWER.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMPRODUCT() {
+    cBaseFunction.call( this, "IMPRODUCT" );
+}
+cIMPRODUCT.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMREAL() {
+    cBaseFunction.call( this, "IMREAL" );
+}
+cIMREAL.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMSIN() {
+    cBaseFunction.call( this, "IMSIN" );
+}
+cIMSIN.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMSQRT() {
+    cBaseFunction.call( this, "IMSQRT" );
+}
+cIMSQRT.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMSUB() {
+    cBaseFunction.call( this, "IMSUB" );
+}
+cIMSUB.prototype = Object.create( cBaseFunction.prototype )
+
+function cIMSUM() {
+    cBaseFunction.call( this, "IMSUM" );
+}
+cIMSUM.prototype = Object.create( cBaseFunction.prototype )
+
+function cOCT2BIN() {
+    cBaseFunction.call( this, "OCT2BIN" );
+}
+cOCT2BIN.prototype = Object.create( cBaseFunction.prototype )
+
+function cOCT2DEC() {
+    cBaseFunction.call( this, "OCT2DEC" );
+}
+cOCT2DEC.prototype = Object.create( cBaseFunction.prototype )
+
+function cOCT2HEX() {
+    cBaseFunction.call( this, "OCT2HEX" );
+}
+cOCT2HEX.prototype = Object.create( cBaseFunction.prototype )

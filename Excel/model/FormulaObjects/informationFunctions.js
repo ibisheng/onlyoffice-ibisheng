@@ -7,472 +7,506 @@
  */
 cFormulaFunction.Information = {
     'groupName':"Information",
-    "ERROR.TYPE":function () {
-        var r = new cBaseFunction( "ERROR.TYPE" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            function typeError( elem ) {
-                if ( !(elem instanceof cError) )
-                    return new cError( cErrorType.not_available );
-                else {
-                    switch ( elem.errorType ) {
-                        case cErrorType.null_value:
-                            return new cNumber( 1 );
-                        case cErrorType.division_by_zero:
-                            return new cNumber( 2 );
-                        case cErrorType.wrong_value_type:
-                            return new cNumber( 3 );
-                        case cErrorType.bad_reference:
-                            return new cNumber( 4 );
-                        case cErrorType.wrong_name:
-                            return new cNumber( 5 );
-                        case cErrorType.not_numeric:
-                            return new cNumber( 6 );
-                        case cErrorType.not_available:
-                            return new cNumber( 7 );
-                        case cErrorType.getting_data:
-                            return new cNumber( 8 );
-                        default:
-                            return new cError( cErrorType.not_available );
-                    }
-                }
-            }
-
-            var arg0 = arg[0];
-            if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cArray ) {
-                var ret = new cArray();
-                arg0.foreach( function ( elem, r, c ) {
-                    if ( !ret.array[r] )
-                        ret.addRow();
-                    ret.addElement( found_operand )
-                } )
-                return this.value = ret;
-            }
-            return this.value = typeError( arg0 );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISBLANK":function () {
-        var r = new cBaseFunction( "ISBLANK" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-            if ( arg0 instanceof cEmpty )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISERR":function () {
-        var r = new cBaseFunction( "ISERR" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cError && arg0.errorType != cErrorType.not_available )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISERROR":function () {
-        var r = new cBaseFunction( "ISERROR" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cError )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISEVEN":function () {
-        var r = new cBaseFunction( "ISEVEN" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-
-            var arg0 = arg0.tocNumber();
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-            else
-                return this.value = new cBool( (arg0.getValue() & 1) == 0 );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(number)"
-            };
-        }
-        return r;
-    },
-    "ISLOGICAL":function () {
-        var r = new cBaseFunction( "ISLOGICAL" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cBool )
-                return this.value = new cBool( true );
-            else return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISNA":function () {
-        var r = new cBaseFunction( "ISNA" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cError && arg0.errorType == cErrorType.not_available )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISNONTEXT":function () {
-        var r = new cBaseFunction( "ISNONTEXT" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-            if ( !(arg0 instanceof cString) )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISNUMBER":function () {
-        var r = new cBaseFunction( "ISNUMBER" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cNumber )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISODD":function () {
-        var r = new cBaseFunction( "ISODD" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-
-            var arg0 = arg0.tocNumber();
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-            else
-                return this.value = new cBool( (arg0.getValue() & 1) == 1 );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(number)"
-            };
-        }
-        return r;
-    },
-    "ISREF":function () {
-        var r = new cBaseFunction( "ISREF" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D || arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
-                return this.value = new cBool( true );
-            else return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "ISTEXT":function () {
-        var r = new cBaseFunction( "ISTEXT" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                arg0 = arg0.getElement( 0 );
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cString )
-                return this.value = new cBool( true );
-            else
-                return this.value = new cBool( false );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    },
-    "N":function () {
-        var r = new cBaseFunction( "N" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArray ) {
-                var arr = new cArray();
-                arg.foreach( function ( elem, r, c ) {
-                    if ( elem instanceof cNumber || elem instanceof cError )
-                        arr.array[r][c] = elem;
-                    else if ( elem instanceof cBool )
-                        arr.array[r][c] = elem.tocNumber();
-                    else
-                        arr.array[r][c] = new cNumber( 0 );
-                } )
-                return this.value = arr;
-            }
-            else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cNumber || arg0 instanceof cError )
-                return this.value = arg0;
-            else if ( arg0 instanceof cBool )
-                return this.value = arg0.tocNumber();
-            else
-                return this.value = new cNumber( 0 );
-
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        r.setFormat( r.formatType.noneFormat );
-        return r;
-    },
-    "NA":function () {
-        var r = new cBaseFunction( "NA" );
-        r.setArgumentsMin( 0 );
-        r.setArgumentsMax( 0 );
-        r.Calculate = function () {
-            return this.value = new cError( cErrorType.not_available );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"()"
-            };
-        }
-        return r;
-    },
-    "TYPE":function () {
-        var r = new cBaseFunction( "TYPE" );
-        r.setArgumentsMin( 1 );
-        r.setArgumentsMax( 1 );
-        r.Calculate = function ( arg ) {
-            var arg0 = arg[0];
-            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
-                arg0 = arg0.cross( arguments[1].first );
-            }
-            else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-                arg0 = arg0.getValue();
-            }
-
-            if ( arg0 instanceof cNumber )
-                return this.value = new cNumber( 1 );
-            else if ( arg0 instanceof cString )
-                return this.value = new cNumber( 2 )
-            else if ( arg0 instanceof cBool )
-                return this.value = new cNumber( 4 )
-            else if ( arg0 instanceof cError )
-                return this.value = new cNumber( 16 )
-            else
-                return this.value = new cNumber( 64 );
-        }
-        r.getInfo = function () {
-            return {
-                name:this.name,
-                args:"(value)"
-            };
-        }
-        return r;
-    }
+    'ERROR.TYPE':cERROR_TYPE,
+    'ISBLANK':cISBLANK,
+    'ISERR':cISERR,
+    'ISERROR':cISERROR,
+    'ISEVEN':cISEVEN,
+    'ISLOGICAL':cISLOGICAL,
+    'ISNA':cISNA,
+    'ISNONTEXT':cISNONTEXT,
+    'ISNUMBER':cISNUMBER,
+    'ISODD':cISODD,
+    'ISREF':cISREF,
+    'ISTEXT':cISTEXT,
+    'N':cN,
+    'NA':cNA,
+    'TYPE':cTYPE
 }
 /*
  здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.
  либо они будут реализованы с усеченным функционалом позже.
  "INFO" :function(){
- var r = new cBaseFunction("INFO");
- return r;
+ cBaseFunction.call(this,"INFO");
  },
  "CELL" :function(){
- var r = new cBaseFunction("CELL");
- return r;
+ cBaseFunction.call(this,"CELL");
  },
  */
+
+function cERROR_TYPE() {
+    cBaseFunction.call( this, "ERROR.TYPE" );
+    thisthis.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype )
+cERROR_TYPE.prototype.Calculate = function ( arg ) {
+    function typeError( elem ) {
+        if ( elem instanceof cError ) {
+            if ( elem.errorType == cErrorType.null_value ) {
+                return new cNumber( 1 );
+            }
+            else if ( elem.errorType == cErrorType.division_by_zero ) {
+                return new cNumber( 2 );
+            }
+            else if ( elem.errorType == cErrorType.wrong_value_type ) {
+                return new cNumber( 3 );
+            }
+            else if ( elem.errorType == cErrorType.bad_reference ) {
+                return new cNumber( 4 );
+            }
+            else if ( elem.errorType == cErrorType.wrong_name ) {
+                return new cNumber( 5 );
+            }
+            else if ( elem.errorType == cErrorType.not_numeric ) {
+                return new cNumber( 6 );
+            }
+            else if ( elem.errorType == cErrorType.not_available ) {
+                return new cNumber( 7 );
+            }
+            else if ( elem.errorType == cErrorType.getting_data ) {
+                return new cNumber( 8 );
+            }
+            else {
+                return new cError( cErrorType.not_available );
+            }
+        }
+        else return new cError( cErrorType.not_available );
+    }
+
+    var arg0 = arg[0];
+    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cArray ) {
+        var ret = new cArray();
+        arg0.foreach( function ( elem, r, c ) {
+            if ( !ret.array[r] )
+                ret.addRow();
+            ret.addElement( found_operand )
+        } )
+        return this.value = ret;
+    }
+    return this.value = typeError( arg0 );
+}
+cERROR_TYPE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISBLANK() {
+    cBaseFunction.call( this, "ISBLANK" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISBLANK.prototype = Object.create( cBaseFunction.prototype )
+cISBLANK.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+    if ( arg0 instanceof cEmpty )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISBLANK.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISERR() {
+    cBaseFunction.call( this, "ISERR" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISERR.prototype = Object.create( cBaseFunction.prototype )
+cISERR.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cError && arg0.errorType != cErrorType.not_available )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISERR.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISERROR() {
+    cBaseFunction.call( this, "ISERROR" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISERROR.prototype = Object.create( cBaseFunction.prototype )
+cISERROR.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cError )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISERROR.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISEVEN() {
+    cBaseFunction.call( this, "ISEVEN" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISEVEN.prototype = Object.create( cBaseFunction.prototype )
+cISEVEN.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cError )
+        return this.value = arg0;
+
+    var arg0 = arg0.tocNumber();
+    if ( arg0 instanceof cError )
+        return this.value = arg0;
+    else
+        return this.value = new cBool( (arg0.getValue() & 1) == 0 );
+}
+cISEVEN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(number)"
+    };
+}
+
+function cISLOGICAL() {
+    cBaseFunction.call( this, "ISLOGICAL" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISLOGICAL.prototype = Object.create( cBaseFunction.prototype )
+cISLOGICAL.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cBool )
+        return this.value = new cBool( true );
+    else return this.value = new cBool( false );
+}
+cISLOGICAL.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISNA() {
+    cBaseFunction.call( this, "ISNA" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISNA.prototype = Object.create( cBaseFunction.prototype )
+cISNA.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cError && arg0.errorType == cErrorType.not_available )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISNA.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISNONTEXT() {
+    cBaseFunction.call( this, "ISNONTEXT" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISNONTEXT.prototype = Object.create( cBaseFunction.prototype )
+cISNONTEXT.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+    if ( !(arg0 instanceof cString) )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISNONTEXT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISNUMBER() {
+    cBaseFunction.call( this, "ISNUMBER" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISNUMBER.prototype = Object.create( cBaseFunction.prototype )
+cISNUMBER.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cNumber )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISNUMBER.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISODD() {
+    cBaseFunction.call( this, "ISODD" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISODD.prototype = Object.create( cBaseFunction.prototype )
+cISODD.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cError )
+        return this.value = arg0;
+
+    var arg0 = arg0.tocNumber();
+    if ( arg0 instanceof cError )
+        return this.value = arg0;
+    else
+        return this.value = new cBool( (arg0.getValue() & 1) == 1 );
+}
+cISODD.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(number)"
+    };
+}
+
+function cISREF() {
+    cBaseFunction.call( this, "ISREF" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISREF.prototype = Object.create( cBaseFunction.prototype )
+cISREF.prototype.Calculate = function ( arg ) {
+    if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D || arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
+        return this.value = new cBool( true );
+    else return this.value = new cBool( false );
+}
+cISREF.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cISTEXT() {
+    cBaseFunction.call( this, "ISTEXT" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cISTEXT.prototype = Object.create( cBaseFunction.prototype )
+cISTEXT.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        arg0 = arg0.getElement( 0 );
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cString )
+        return this.value = new cBool( true );
+    else
+        return this.value = new cBool( false );
+}
+cISTEXT.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cN() {
+    cBaseFunction.call( this, "N" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+    this.setFormat( r.formatType.noneFormat );
+}
+cN.prototype = Object.create( cBaseFunction.prototype )
+cN.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArray ) {
+        var arr = new cArray();
+        arg.foreach( function ( elem, r, c ) {
+            if ( elem instanceof cNumber || elem instanceof cError )
+                arr.array[r][c] = elem;
+            else if ( elem instanceof cBool )
+                arr.array[r][c] = elem.tocNumber();
+            else
+                arr.array[r][c] = new cNumber( 0 );
+        } )
+        return this.value = arr;
+    }
+    else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cNumber || arg0 instanceof cError )
+        return this.value = arg0;
+    else if ( arg0 instanceof cBool )
+        return this.value = arg0.tocNumber();
+    else
+        return this.value = new cNumber( 0 );
+
+}
+cN.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
+
+function cNA() {
+    cBaseFunction.call( this, "NA" );
+    this.setArgumentsMin( 0 );
+    this.setArgumentsMax( 0 );
+}
+cNA.prototype = Object.create( cBaseFunction.prototype )
+cNA.prototype.Calculate = function () {
+    return this.value = new cError( cErrorType.not_available );
+}
+cNA.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"()"
+    };
+}
+
+function cTYPE() {
+    cBaseFunction.call( this, "TYPE" );
+    this.setArgumentsMin( 1 );
+    this.setArgumentsMax( 1 );
+}
+cTYPE.prototype = Object.create( cBaseFunction.prototype )
+cTYPE.prototype.Calculate = function ( arg ) {
+    var arg0 = arg[0];
+    if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+        arg0 = arg0.cross( arguments[1].first );
+    }
+    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+        arg0 = arg0.getValue();
+    }
+
+    if ( arg0 instanceof cNumber )
+        return this.value = new cNumber( 1 );
+    else if ( arg0 instanceof cString )
+        return this.value = new cNumber( 2 )
+    else if ( arg0 instanceof cBool )
+        return this.value = new cNumber( 4 )
+    else if ( arg0 instanceof cError )
+        return this.value = new cNumber( 16 )
+    else
+        return this.value = new cNumber( 64 );
+}
+cTYPE.prototype.getInfo = function () {
+    return {
+        name:this.name,
+        args:"(value)"
+    };
+}
