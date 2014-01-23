@@ -3797,10 +3797,9 @@ Paragraph.prototype =
             if ( 0 === CurLine )
             {
                 this.Lines[-1] = new CParaLine( 0 );
-                this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
             }
 
-            RecalcResult = recalcresult_NextPage;
+            PRS.RecalcResult = recalcresult_NextPage;
             return;
         }
 
