@@ -574,9 +574,19 @@
 			// Учитываем координаты точки, где мы начали изменение размера
 			x2 += mouseX;
 
-			var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
-			var offsetFrozen = t.getFrozenPaneOffset(false, true);
-			offsetX -= offsetFrozen.offsetX;
+            var offsetFrozenX = 0;
+            var c1 = t.visibleRange.c1;
+            if (this.topLeftFrozenCell) {
+                var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
+                if (0 <= cFrozen) {
+                    if (col < c1)
+                        c1 = 0;
+                    else
+                        offsetFrozenX = t.cols[cFrozen].left - t.cols[0].left;
+                }
+            }
+			var offsetX = t.cols[c1].left - t.cellsLeft;
+			offsetX -= offsetFrozenX;
 
 			var x1 = t.cols[col].left - offsetX - this.width_1px;
 			var w = Math.max(x2 - x1, 0);
@@ -584,14 +594,14 @@
 			var cw = t._charCountToModelColWidth(cc);
 
 			var onChangeWidthCallback = function (isSuccess) {
-					if (false === isSuccess)
-						return;
+				if (false === isSuccess)
+					return;
 
-					t.model.setColWidth(cw, col, col);
-					t._cleanCache(asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
-					t.changeWorksheet("update");
-					t._updateVisibleColsCount();
-				};
+				t.model.setColWidth(cw, col, col);
+				t._cleanCache(asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
+				t.changeWorksheet("update");
+				t._updateVisibleColsCount();
+			};
 			return this._isLockedAll (onChangeWidthCallback);
 		};
 
@@ -603,21 +613,31 @@
 			// Учитываем координаты точки, где мы начали изменение размера
 			y2 += mouseY;
 
-			var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
-			var offsetFrozen = t.getFrozenPaneOffset(true, false);
-			offsetY -= offsetFrozen.offsetY;
+            var offsetFrozenY = 0;
+            var r1 = t.visibleRange.r1;
+            if (this.topLeftFrozenCell) {
+                var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
+                if (0 <= rFrozen) {
+                    if (row < r1)
+                        r1 = 0;
+                    else
+                        offsetFrozenY = t.rows[rFrozen].left - t.rows[0].left;
+                }
+            }
+			var offsetY = t.rows[r1].top - t.cellsTop;
+			offsetY -= offsetFrozenY;
 
 			var y1 = t.rows[row].top - offsetY - this.height_1px;
 
 			var onChangeHeightCallback = function (isSuccess) {
-					if (false === isSuccess)
-						return;
+				if (false === isSuccess)
+					return;
 
-					t.model.setRowHeight(Math.min(t.maxRowHeight, Math.max(y2 - y1 + t.height_1px, 0)), row, row);
-					t._cleanCache(asc_Range(0, row, t.cols.length - 1, row));
-					t.changeWorksheet("update");
-					t._updateVisibleRowsCount();
-				};
+				t.model.setRowHeight(Math.min(t.maxRowHeight, Math.max(y2 - y1 + t.height_1px, 0)), row, row);
+				t._cleanCache(asc_Range(0, row, t.cols.length - 1, row));
+				t.changeWorksheet("update");
+				t._updateVisibleRowsCount();
+			};
 			return this._isLockedAll (onChangeHeightCallback);
 		};
 
