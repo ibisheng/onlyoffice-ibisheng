@@ -2831,7 +2831,7 @@
 		};
 
 		/** Рисует закрепленные области областей */
-		WorksheetView.prototype._drawFrozenPane = function () {
+		WorksheetView.prototype._drawFrozenPane = function (noCells) {
 			if (this.topLeftFrozenCell) {
 				var row = this.topLeftFrozenCell.getRow0();
 				var col = this.topLeftFrozenCell.getCol0();
@@ -2841,9 +2841,11 @@
 					offsetX = this.cols[0].left - this.cellsLeft;
 					offsetY = this.rows[0].top - this.cellsTop;
 					tmpRange = asc_Range(0, 0, col - 1, row - 1);
-					this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-					this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-					this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					if (!noCells) {
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
 				}
 				if (0 < row) {
 					row -= 1;
@@ -2851,9 +2853,11 @@
 					offsetY = this.rows[0].top - this.cellsTop;
 					tmpRange = asc_Range(this.visibleRange.c1, 0, this.visibleRange.c2, row);
 					this._drawRowHeaders(/*drawingCtx*/ undefined, 0, row, kHeaderDefault, offsetX, offsetY);
-					this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-					this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-					this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					if (!noCells) {
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
 				}
 				if (0 < col) {
 					col -= 1;
@@ -2861,9 +2865,11 @@
 					offsetY = undefined;
 					tmpRange = asc_Range(0, this.visibleRange.r1, col, this.visibleRange.r2);
 					this._drawColumnHeaders(/*drawingCtx*/ undefined, 0, col, kHeaderDefault, offsetX, offsetY);
-					this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
-					this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
-					this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					if (!noCells) {
+						this._drawGrid(/*drawingCtx*/ undefined, tmpRange, offsetX, offsetY);
+						this._drawCells(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+						this._drawCellsBorders(/*drawingCtx*/undefined, tmpRange, offsetX, offsetY);
+					}
 				}
 			}
 		};
@@ -4933,7 +4939,7 @@
 			var oldVRE_isPartial;
 			var oldH = ctxH - this.cellsTop - Math.abs(dy);
 			var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
-			var oldW, x, dx, cFrozen, rFrozen;
+			var oldW, x, dx, cFrozen = 0, rFrozen = 0;
 			if (this.topLeftFrozenCell) {
 				cFrozen = this.topLeftFrozenCell.getCol0();
 				rFrozen = this.topLeftFrozenCell.getRow0();
@@ -4961,8 +4967,14 @@
 				this._drawCorner();
 				this._cleanColumnHeadersRect();
 				this._drawColumnHeaders(/*drawingCtx*/ undefined);
+
 				dx   = this.cellsLeft - x;
 				oldW = ctxW - x - Math.abs(dx);
+
+				if (rFrozen) {
+					ctx.drawImage(ctx.getCanvas(), x, this.cellsTop, oldW, diffHeight, x + dx, this.cellsTop, oldW, diffHeight);
+				}
+				this._drawFrozenPane(true);
 			} else {
 				dx   = 0;
 				x    = this.headersLeft;
@@ -4974,7 +4986,7 @@
 			}
 			ctx.setFillStyle(this.settings.cells.defaultState.background)
 				.fillRect(this.headersLeft, y + (dy > 0 && oldH > 0 ? oldH - dy : 0),
-				          ctxW, ctxH - this.cellsTop - (oldH > 0 ? oldH : 0));
+					ctxW, ctxH - this.cellsTop - (oldH > 0 ? oldH : 0));
 
 			var rangeGraphic = null;
 			if ( !(dy > 0 && vr.r2 === oldEnd && !oldVRE_isPartial && dx === 0) ) {
