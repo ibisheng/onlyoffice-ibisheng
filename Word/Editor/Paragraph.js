@@ -4738,7 +4738,7 @@ Paragraph.prototype =
         return true;
     },
 
-    Internal_GetTabPos : function(X, ParaPr)
+    Internal_GetTabPos : function(X, ParaPr, CurPage)
     {
         var PageStart = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
         if ( undefined != this.Get_FramePr() )
@@ -4810,7 +4810,7 @@ Paragraph.prototype =
             }
         }
 
-        return NewX;
+        return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ) };
     },
 
     // Проверяем не пустые ли границы

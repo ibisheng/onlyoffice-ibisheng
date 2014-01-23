@@ -994,7 +994,8 @@ ParaRun.prototype =
                 {
                     // Сначала проверяем, если у нас уже есть таб, которым мы должны рассчитать, тогда высчитываем
                     // его ширину.
-                    this.Internal_Recalculate_LastTab(PRS);
+
+                    X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
 
                     // Добавляем длину пробелов до слова + длина самого слова. Не надо проверять
                     // убирается ли слово, мы это проверяем при добавленнии букв.
@@ -1002,16 +1003,16 @@ ParaRun.prototype =
                     Word        = false;
                     SpaceLen    = 0;
                     WordLen     = 0;
-                    //SpacesCount = 0;
 
-                    var NewX = Para.Internal_GetTabPos(X, ParaPr);
+                    var TabPos = Para.Internal_GetTabPos(X, ParaPr, PRS.CurPage);
+                    var NewX = TabPos.NewX;
 
                     // Если таб не левый (NewX < 0), значит он не может быть сразу рассчитан, а если левый, тогда
                     // рассчитываем его сразу здесь
                     if ( NewX < 0 )
                     {
                         PRS.LastTab.TabPos = -NewX;
-                        PRS.LastTab.Value  = Tab.Value;
+                        PRS.LastTab.Value  = TabPos.TabValue;
                         PRS.LastTab.X      = X;
                         PRS.LastTab.Item   = Item;
 
@@ -1112,7 +1113,7 @@ ParaRun.prototype =
                             WordLen     = 0;
                         }
 
-                        this.Internal_Recalculate_LastTab(PRS);
+                        X = this.Internal_Recalculate_LastTab(PRS.LastTab, X, XEnd, Word, WordLen, SpaceLen);
                     }
 
                     NewRange = true;
@@ -1293,7 +1294,7 @@ ParaRun.prototype =
                 case para_Tab:
                 {
                     PRSC.Range.W += Item.Width;
-                    PRSC.Range.W += PRS2.SpaceLen;
+                    PRSC.Range.W += PRSC.SpaceLen;
 
                     // Учитываем только слова и пробелы, идущие после последнего таба
 
@@ -1745,20 +1746,20 @@ ParaRun.prototype =
         }
     },
 
-    Internal_Recalculate_LastTab : function(PRS)
+    Internal_Recalculate_LastTab : function(LastTab, X, XEnd, Word, WordLen, SpaceLen)
     {
-        if ( -1 !== PRS.LastTab.Value )
+        if ( -1 !== LastTab.Value )
         {
-            var TempXPos = PRS.X;
+            var TempXPos = X;
 
-            if ( true === PRS.Word || PRS.WordLen > 0 )
-                TempXPos += PRS.SpaceLen + PRS.WordLen;
+            if ( true === Word || WordLen > 0 )
+                TempXPos += SpaceLen + WordLen;
 
-            var TabItem   = PRS.LastTab.Item;
-            var TabStartX = PRS.LastTab.X;
+            var TabItem   = LastTab.Item;
+            var TabStartX = LastTab.X;
             var TabRangeW = TempXPos - TabStartX;
-            var TabValue  = PRS.LastTab.Value;
-            var TabPos    = PRS.LastTab.TabPos;
+            var TabValue  = LastTab.Value;
+            var TabPos    = LastTab.TabPos;
 
             var TabCalcW = 0;
             if ( tab_Right === TabValue )
@@ -1766,16 +1767,18 @@ ParaRun.prototype =
             else if ( tab_Center === TabValue )
                 TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW / 2), 0 );
 
-            if ( PRS.X + TabCalcW > PRS.XEnd )
-                TabCalcW = PRS.XEnd - PRS.X;
+            if ( X + TabCalcW > XEnd )
+                TabCalcW = XEnd - X;
 
             TabItem.Width        = TabCalcW;
             TabItem.WidthVisible = TabCalcW;
 
-            PRS.LastTab.Reset();
+            LastTab.Reset();
 
-            PRS.X += TabCalcW;
+            return X + TabCalcW;
         }
+
+        return X;
     },
 
     Refresh_RecalcData : function(Data)
@@ -2192,9 +2195,9 @@ ParaRun.prototype =
                         bFirstLineItem = false;
 
                         if ( para_PageNum != Item.Type )
-                            Item.Draw( X, Y - Item.YOffset, pGraphics );
+                            Item.Draw( X, Y - this.YOffset, pGraphics );
                         else
-                            Item.Draw( X, Y - Item.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc );
+                            Item.Draw( X, Y - this.YOffset, pGraphics, Para.Get_StartPage_Absolute() + CurPage, Pr.ParaPr.Jc );
 
                         X += Item.WidthVisible;
                     }
@@ -2220,7 +2223,7 @@ ParaRun.prototype =
                 }
                 case para_Space:
                 {
-                    Item.Draw( X, Y - Item.YOffset, pGraphics );
+                    Item.Draw( X, Y - this.YOffset, pGraphics );
 
                     X += Item.WidthVisible;
 
@@ -2244,14 +2247,14 @@ ParaRun.prototype =
                     if ( null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent() )
                         bEndCell = true;
 
-                    Item.Draw( X, Y - Item.YOffset, pGraphics, bEndCell );
+                    Item.Draw( X, Y - this.YOffset, pGraphics, bEndCell );
                     X += Item.Width;
 
                     break;
                 }
                 case para_NewLine:
                 {
-                    Item.Draw( X, Y - Item.YOffset, pGraphics );
+                    Item.Draw( X, Y - this.YOffset, pGraphics );
                     X += Item.WidthVisible;
                     break;
                 }

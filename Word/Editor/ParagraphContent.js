@@ -107,7 +107,7 @@ function ParaText(value)
 //    this.TextDescent = 0;
 //    this.TextHeight  = 0;
 //    this.TextAscent2 = 0;
-    this.YOffset     = 0;
+//    this.YOffset     = 0;
 
 //    this.CurPage  = 0;
 //    this.CurLines = 0;
@@ -242,7 +242,7 @@ function ParaSpace(Count)
 //    this.TextDescent = 0;
 //    this.TextHeight  = 0;
 //    this.TextAscent2 = 0;
-    this.YOffset     = 0;
+//    this.YOffset     = 0;
 
 //    this.CurPage  = 0;
 //    this.CurLines = 0;
@@ -2260,7 +2260,7 @@ function ParaEnd()
 //    this.TextDescent = 0;
 //    this.TextHeight  = 0;
 //    this.TextAscent2 = 0;
-    this.YOffset     = 0;
+//    this.YOffset     = 0;
 
     this.Width = 0;
 }
