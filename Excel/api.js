@@ -2877,8 +2877,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_insertHyperlink: function (options) {
 				var ws = this.wb.getWorksheet();
-				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.canAddHyperlink() )
-					ws.objectRender.controller.insertHyperlink(options);
+				if ( ws.objectRender.selectedGraphicObjectsExists() ) {
+					if ( ws.objectRender.controller.canAddHyperlink() )
+						ws.objectRender.controller.insertHyperlink(options);
+				}
 				else {
 					// На всякий случай проверка (вдруг кто собирается вызвать...)
 					this.wb.closeCellEditor();
