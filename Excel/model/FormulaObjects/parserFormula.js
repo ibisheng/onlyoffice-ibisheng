@@ -1284,7 +1284,7 @@ function getFormulasInfo() {
         b = new Asc.asc_CFormulaGroup( cFormulaFunction[type]["groupName"] );
         for ( var f in cFormulaFunction[type] ) {
             if ( f != "groupName" ) {
-                a = cFormulaFunction[type][f]();
+                a = new cFormulaFunction[type][f]();
                 if ( a.getInfo )
                     b.asc_addFormulaElement( new Asc.asc_CFormula( a.getInfo() ) );
             }
