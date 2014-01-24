@@ -3764,8 +3764,8 @@ function CEditorPage(api)
         if (this.TextBoxInput == null || !this.TextBoxInputFocus)
             return;
 
-        var _left = parseInt(this.m_oDrawingDocument.TargetHtmlElement.style.left);
-        var _top = parseInt(this.m_oDrawingDocument.TargetHtmlElement.style.top);
+        var _left = this.m_oDrawingDocument.TargetHtmlElementLeft;
+        var _top = this.m_oDrawingDocument.TargetHtmlElementTop;
 
         var _h = (this.m_oDrawingDocument.m_dTargetSize * this.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
 

@@ -1739,6 +1739,8 @@ function CDrawingDocument()
     this.NeedScrollToTargetFlag = false;
 
     this.TargetHtmlElement = null;
+    this.TargetHtmlElementLeft = 0;
+    this.TargetHtmlElementTop = 0;
 
     this.m_bIsBreakRecalculate = false;
     this.m_bIsUpdateDocSize = false;
@@ -2759,18 +2761,18 @@ function CDrawingDocument()
                 ctx.stroke();
             }
 
+            oThis.TargetHtmlElementLeft = Math.min(pos1.X, pos2.X) >> 0;
+            oThis.TargetHtmlElementTop  = Math.min(pos1.Y, pos2.Y) >> 0;
             if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
             {
-                this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
-                this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
+                oThis.TargetHtmlElement.style.left = oThis.TargetHtmlElementLeft + "px";
+                oThis.TargetHtmlElement.style.top = oThis.TargetHtmlElementTop + "px";
             }
             else
             {
-                var __x =  Math.min(pos1.X, pos2.X);
-                var __y =  Math.min(pos1.Y, pos2.Y);
                 oThis.TargetHtmlElement.style.left = "0px";
                 oThis.TargetHtmlElement.style.top  = "0px";
-                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " +__x + "," + __y + ")";
+                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + oThis.TargetHtmlElementLeft + "," + oThis.TargetHtmlElementTop + ")";
             }
         }
         else
@@ -2802,16 +2804,19 @@ function CDrawingDocument()
 
             var pos = this.ConvertCoordsToCursor2(x, y, this.m_lCurrentPage);
 
+            this.TargetHtmlElementLeft = pos.X >> 0;
+            this.TargetHtmlElementTop = pos.Y >> 0;
+
             if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
             {
-                this.TargetHtmlElement.style.left = pos.X + "px";
-                this.TargetHtmlElement.style.top = pos.Y + "px";
+                this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
+                this.TargetHtmlElement.style.top = this.TargetHtmlElementTop + "px";
             }
             else
             {
                 oThis.TargetHtmlElement.style.left = "0px";
                 oThis.TargetHtmlElement.style.top  = "0px";
-                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + pos.X + "," + pos.Y + ")";
+                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + oThis.TargetHtmlElementLeft + "," + oThis.TargetHtmlElementTop + ")";
             }
 
             this.m_oWordControl.CheckTextBoxInputPos();
@@ -3154,8 +3159,10 @@ function CDrawingDocument()
             return;
         }
 
-        oThis.TargetHtmlElement.style.left = pos.X + "px";
-        oThis.TargetHtmlElement.style.top  = pos.Y + "px";
+        oThis.TargetHtmlElementLeft = pos.X >> 0;
+        oThis.TargetHtmlElementTop = pos.Y >> 0;
+        oThis.TargetHtmlElement.style.left = oThis.TargetHtmlElementLeft + "px";
+        oThis.TargetHtmlElement.style.top  = oThis.TargetHtmlElementTop + "px";
 
         this.m_oWordControl.CheckTextBoxInputPos();
     }

@@ -957,6 +957,8 @@ function CDrawingDocument()
     this.m_dTargetY = -1;
     this.m_dTargetSize = 1;
     this.TargetHtmlElement = null;
+    this.TargetHtmlElementLeft = 0;
+    this.TargetHtmlElementTop = 0;
 
     this.m_bIsSelection = false;
     this.m_bIsSearching = false;
@@ -1899,8 +1901,10 @@ function CDrawingDocument()
                 ctx.stroke();
             }
 
-            this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
-            this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
+            this.TargetHtmlElementLeft = Math.min(pos1.X, pos2.X) >> 0;
+            this.TargetHtmlElementTop = Math.min(pos1.Y, pos2.Y) >> 0;
+            this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
+            this.TargetHtmlElement.style.top = this.TargetHtmlElementTop + "px";
         }
         else
         {
@@ -1931,8 +1935,10 @@ function CDrawingDocument()
 
             var pos = this.ConvertCoordsToCursor(x, y);
 
-            this.TargetHtmlElement.style.left = pos.X + "px";
-            this.TargetHtmlElement.style.top = pos.Y + "px";
+            this.TargetHtmlElementLeft = pos.X >> 0;
+            this.TargetHtmlElementTop = pos.Y >> 0;
+            this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
+            this.TargetHtmlElement.style.top = this.TargetHtmlElementTop + "px";
 
             this.m_oWordControl.CheckTextBoxInputPos();
         }
