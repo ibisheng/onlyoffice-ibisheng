@@ -1139,5 +1139,19 @@ CMathBase.prototype =
             content = this.elements[this.CurPos_X][this.CurPos_Y].goToRightSelect(bParent);
 
         return content;
+    },
+    getGapsInside: function()
+    {
+        var kind = this.kind;
+        var gaps = {left: 0, right: 0};
+        var checkBase = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL|| kind == MATH_BOX || kind == MATH_BORDER_BOX;
+
+        if(checkBase)
+        {
+            var base = this.getBase();
+            gaps = base.getGapsInside();
+        }
+
+        return gaps;
     }
 }

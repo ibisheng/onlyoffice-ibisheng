@@ -327,7 +327,7 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
     var upDesc = upIter.height - upIter.ascent + shCenter,
-        lowAsc = lowIter.ascent - shCenter;
+        lowAsc = 1.2*(lowIter.ascent - shCenter);
 
     var up = 0;
     var down = 0;
@@ -346,7 +346,7 @@ CIterators.prototype.setDistanceIters = function(oMeasure)
     if( this.lD > lowAsc )
         down = this.lD - lowAsc;
 
-    var minGap = 1.2*shCenter;
+    var minGap = 1.1*shCenter;
 
     if( up + down < minGap)
     {
@@ -447,7 +447,8 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
     //var ctrPrp = this.getCtrPrp();
     var mgCtrPrp = this.mergeCtrTPrp();
 
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp) /0.6;
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+    shCenter *= 1.2;
 
     var width = 0, height = 0,
         ascent = 0;
@@ -476,7 +477,7 @@ CDegreeSubSup.prototype.recalculateSize = function(oMeasure)
     iters.setDistanceIters(oMeasure);
     iters.recalculateSize();
 
-    this.dW = 0.2*shCenter;
+    this.dW = 0.18*shCenter;
 
     width  = iters.size.width + base.size.width + this.dW;
     //height = shCenter + iters.lUp;
