@@ -770,7 +770,6 @@ Vertex.prototype = {
 	getSlaveEdges : function(){
 		return this.slaveEdges;
 	},
-	
 
 	getSlaveEdges2 : function(){
 		var ret = {}, count = 0;

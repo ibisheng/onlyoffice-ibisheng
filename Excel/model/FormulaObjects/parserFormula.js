@@ -2523,6 +2523,7 @@ parserFormula.prototype = {
                 }
                 this.outStack.push( p );
                 operand_expected = false;
+                wasLeftParentheses = false;
             }
 
             /*Comma & arguments union*/
