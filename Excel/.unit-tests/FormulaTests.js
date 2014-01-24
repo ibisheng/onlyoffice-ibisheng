@@ -40,9 +40,9 @@
     }
     ws = wb.getWorksheet( wb.getActive() );
 
-    QUnit.log( function ( details ) {
+    /*QUnit.log( function ( details ) {
         console.log( "Log: " + details.name + ", result - " + details.result );
-    } );
+    } );*/
 
     module( "Formula" );
 
