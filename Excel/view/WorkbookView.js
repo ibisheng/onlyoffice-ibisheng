@@ -511,10 +511,12 @@
 				}
 			}
 			var ws = this.getWorksheet(index);
-			if (state && state.selectedObjects && 0 < state.selectedObjects.length)
-				ws.setSelectionShape(true);
 			ws.objectRender.controller.setSelectionState(state);
             ws.objectRender.controller.updateSelectionState();
+			
+			// Селектим после выставления состояния
+			if (state && state.selectedObjects && 0 < state.selectedObjects.length)
+				ws.setSelectionShape(true);
 		};
 
 		WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isSelectMode, callback) {

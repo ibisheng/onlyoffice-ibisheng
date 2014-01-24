@@ -7407,7 +7407,7 @@
 						t.autoFilters._renameTableColumn(arn);
 						// Удаляем комментарии
 						t.cellCommentator.deleteCommentsRange(arn);
-						//удаляем выделенные графичекие объекты
+						// Удаляем выделенные графичекие объекты
 						t.objectRender.controller.deleteSelectedObjects();
 
 						/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
