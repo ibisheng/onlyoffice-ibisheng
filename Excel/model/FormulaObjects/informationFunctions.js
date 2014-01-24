@@ -36,7 +36,7 @@ cFormulaFunction.Information = {
 
 function cERROR_TYPE() {
     cBaseFunction.call( this, "ERROR.TYPE" );
-    thisthis.setArgumentsMin( 1 );
+    this.setArgumentsMin( 1 );
     this.setArgumentsMax( 1 );
 }
 cERROR_TYPE.prototype = Object.create( cBaseFunction.prototype )
@@ -423,7 +423,7 @@ function cN() {
     cBaseFunction.call( this, "N" );
     this.setArgumentsMin( 1 );
     this.setArgumentsMax( 1 );
-    this.setFormat( r.formatType.noneFormat );
+    this.setFormat( this.formatType.noneFormat );
 }
 cN.prototype = Object.create( cBaseFunction.prototype )
 cN.prototype.Calculate = function ( arg ) {

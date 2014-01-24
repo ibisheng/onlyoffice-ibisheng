@@ -1227,7 +1227,7 @@ cSEARCH.prototype.getInfo = function () {
 
 function cSEARCHB() {
     var r = new cFormulaFunction.TextAndData["SEARCH"]();
-    this.setName( "SEARCHB" );
+    r.setName( "SEARCHB" );
     return r;
 }
 
