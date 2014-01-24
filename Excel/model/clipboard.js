@@ -1440,7 +1440,7 @@
 							}
 							else
 							{
-								worksheet.setSelectionInfo('paste',t,false,true);
+								worksheet.paste(t ,false, true);
 								window.GlobalPasteFlag = false;
 								window.GlobalPasteFlagCounter = 0;
 								return;
@@ -1492,7 +1492,7 @@
 								var newFonts = {};
 								pasteData.generateFontMap(newFonts);
 								worksheet._loadFonts(newFonts, function() {
-									worksheet.setSelectionInfo('paste', pasteData, false, "binary");
+									worksheet.paste(pasteData, false, "binary");
 								});
 							}
 							window.GlobalPasteFlag = false;
@@ -1534,7 +1534,7 @@
 								}
 								else
 								{
-									worksheet.setSelectionInfo('paste',t,false,true);
+									worksheet.paste(t, false, true);
 									window.GlobalPasteFlag = false;
 									window.GlobalPasteFlagCounter = 0;
 									return;
@@ -1558,7 +1558,7 @@
 						}
 						else
 						{
-							worksheet.setSelectionInfo('paste',t,false,true);
+							worksheet.paste(t, false, true);
 							window.GlobalPasteFlag = false;
 							window.GlobalPasteFlagCounter = 0;
 							return;
@@ -1920,7 +1920,7 @@
 				if(!api || (api && !api.isChartEditor))
 					aResult.addImages = addImages;
 				aResult.fontsNew = t.fontsNew;
-				worksheet.setSelectionInfo('paste',aResult,t);
+				worksheet.paste(aResult, t);
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;
             },
@@ -3041,7 +3041,7 @@
 				}
 				
 				this.aResult.fontsNew = this.fontsNew;
-				worksheet.setSelectionInfo('paste', this.aResult, this);
+				worksheet.paste(this.aResult, this);
 			},
 			
 			_parseChildren: function(children, activeRange)
