@@ -913,6 +913,7 @@ function sortDependency( wb ) {
                 wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nRow, gc_nMaxCol0, nRow ), c_oAscCanChangeColWidth.numbers );
             }
         }
+		g_oVLOOKUPCache.clean();
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }

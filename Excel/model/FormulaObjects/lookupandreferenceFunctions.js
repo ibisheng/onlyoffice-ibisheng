@@ -742,6 +742,88 @@ function cTRANSPOSE() {
     cBaseFunction.call( this, "TRANSPOSE" );
 }
 cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
+function VLOOKUPCache(){
+    this.cache = {};
+}
+VLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, arg3Value){
+    var res = null;
+    var sRangeName = range.getName();
+    var cacheElem = this.cache[sRangeName];
+    if(null == cacheElem)
+    {
+        cacheElem = {foreachArray: [], results: {}};
+        range._foreachNoEmpty( /*func for cell in col*/ function(cell, r, c, r1, c1){
+            var cv = cell.getValueWithoutFormat();
+            cacheElem.foreachArray.push({cv: cv, cvType: checkTypeCell( cv ), r: r, r1: r1});
+        });
+        this.cache[sRangeName] = cacheElem;
+    }
+    var sInputKey = valueForSearching + cCharDelimiter + isValueString + cCharDelimiter + arg3Value;
+    res = cacheElem.results[sInputKey];
+    if(null == res)
+    {
+        res = this._calculate(cacheElem.foreachArray, valueForSearching, isValueString, arg3Value);
+        cacheElem.results[sInputKey] = res;
+    }
+    return res;
+};
+VLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isValueString, arg3Value){
+    var res = {min: undefined, resR: -1}, found = false, regexp = null;
+    for(var i = 0, length = cacheArray.length; i < length; i++)
+    {
+        var cache = cacheArray[i];
+        var cv = cache.cv;
+        var r = cache.r;
+        var r1 = cache.r1;
+        var cvType = cache.cvType;
+        if ( r == r1 )
+            res.min = cv;
+        else if ( res.min > cv ) {
+            res.min = cv;
+        }
+        if ( arg3Value == true ) {
+            if ( isValueString ) {
+                if ( cvType instanceof cString ) {
+                    if ( valueForSearching.localeCompare( cvType.getValue() ) == 0 ) {
+                        res.resR = r;
+                        found = true;
+                    }
+                    else if ( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ) {
+                        res.resR = r;
+                    }
+                }
+            }
+            else if ( valueForSearching == cv ) {
+                res.resR = r;
+                found = true;
+            }
+            else if ( valueForSearching > cv && !found ) {
+                res.resR = r;
+            }
+        }
+        else {
+            if ( isValueString ) {
+                if(null == regexp)
+                    regexp = searchRegExp( valueForSearching );
+                if ( regexp.test( cv ) )
+                    res.resR = r;
+            }
+            else if ( valueForSearching == cv ) {
+                res.resR = r;
+            }
+        }
+        /*if ( resR > -1 ) {
+        min = min > cv ? cv : min;
+        if ( arg3.value == false )
+        return true;
+        }*/
+    }
+    return res;
+};
+VLOOKUPCache.prototype.clean = function(){
+    this.cache = {};
+};
+var g_oVLOOKUPCache = new VLOOKUPCache();
 
 function cVLOOKUP() {
     cBaseFunction.call( this, "VLOOKUP" );
@@ -765,7 +847,6 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
 
     if ( arg0 instanceof cString ) {
         valueForSearching = arg0.getValue();
-        regexp = searchRegExp( valueForSearching );
     }
     else if ( arg0 instanceof cError )
         return this.value = arg0;
@@ -774,65 +855,33 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
     }
 
 
-    var found = false, bb,
-        f = function ( cell, r, c, r1, c1 ) {
-            if ( c == c1 ) {
-                var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell( cv );
-                if ( r == r1 )
-                    min = cv;
-                else if ( min > cv ) {
-                    min = cv;
-                }
-                if ( arg3.value == true ) {
-                    if ( arg0 instanceof cString ) {
-                        if ( cvType instanceof cString ) {
-                            if ( valueForSearching.localeCompare( cvType.getValue() ) == 0 ) {
-                                resR = r;
-                                found = true;
-                            }
-                            else if ( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ) {
-                                resR = r;
-                            }
-                        }
-                    }
-                    else if ( valueForSearching == cv ) {
-                        resR = r;
-                        found = true;
-                    }
-                    else if ( valueForSearching > cv && !found ) {
-                        resR = r;
-                    }
-                }
-                else {
-                    if ( arg0 instanceof cString ) {
-                        if ( regexp.test( cv ) )
-                            resR = r;
-                    }
-                    else if ( valueForSearching == cv ) {
-                        resR = r;
-                    }
-                }
-                /*if ( resR > -1 ) {
-                 min = min > cv ? cv : min;
-                 if ( arg3.value == false )
-                 return true;
-                 }*/
-            }
-        };
-
+    var found = false, bb, ws = arg1.getWS();
     if ( arg1 instanceof cRef || arg1 instanceof cRef3D ) {
         var range = arg1.getRange();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
-        range._foreachRowNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
+        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
+        if(oCache)
+        {
+            resR = oCache.resR;
+            min = oCache.min;
+        }
     }
     else if ( arg1 instanceof cArea ) {
         var range = arg1.getRange();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
-        range._foreachRowNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
+
+        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
+        if(oCache)
+        {
+            resR = oCache.resR;
+            min = oCache.min;
+        }
         /*var matrix = arg1.getMatrix();
 
          for(var matrixHeight = 0; matrixHeight<matrix.length; matrixHeight++){
@@ -925,10 +974,18 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
          }
          }*/
 
-        range._foreachRowNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
+        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
+        var oCache = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
+        if(oCache)
+        {
+            resR = oCache.resR;
+            min = oCache.min;
+        }
 
     }
     else if ( arg1 instanceof cArray ) {
+        if(arg0 instanceof cString)
+            regexp = searchRegExp( valueForSearching );
         arg1.foreach( function ( elem, r, c ) {
             if ( r == 0 )
                 min = elem.getValue();
