@@ -7442,199 +7442,8 @@
 						range.setCellStyle(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
 						break;
 					case "paste":
-						var pasteLocal = function () {
-								if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
-								var selectData;
-								if(isLocal === 'binary')
-									selectData = t._pasteFromBinary(val);
-								else if (isLocal === true)
-									selectData = t._pasteFromLS(val);
-								else
-									selectData = t._setInfoAfterPaste(val,onlyActive);
-
-								if (!selectData) {
-									bIsUpdate = false;
-									History.EndTransaction();
-									return;
-								}
-								t.expandColsOnScroll();
-								t.expandRowsOnScroll();
-								var arrFormula = selectData[1];
-								lockDraw(t.model.workbook);
-								for (var i = 0; i < arrFormula.length; ++i) {//!!!
-									var rangeF = arrFormula[i].range;
-									var valF = arrFormula[i].val;
-									if(rangeF.isOneCell())
-										rangeF.setValue(valF);
-									else {
-										var oBBox = rangeF.getBBox0();
-										t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
-									}
-								}
-								buildRecalc(t.model.workbook);
-								unLockDraw(t.model.workbook);
-								arn = selectData[0];
-								selectionRange = arn.clone(true);
-
-								//добавляем автофильтры и форматированные таблицы
-								if(isLocal === true && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
-								{
-									var aFilters = val.lStorage.autoFilters;
-									var range;
-									for(var aF = 0; aF < aFilters.length; aF++)
-									{
-										range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
-										if(aFilters[aF].style)
-											range.cleanFormat();
-										t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, null, null, true);
-										if(!aFilters[aF].autoFilter)
-											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
-									}
-								}
-								else if(isLocal === 'binary' && val.TableParts && val.TableParts.length)
-								{
-									var aFilters = val.TableParts;
-									var range;
-									var tablePartRange;
-									var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-									var refInsertBinary = t.autoFilters._refToRange(activeRange);
-									var diffRow;
-									var diffCol;
-									for(var aF = 0; aF < aFilters.length; aF++)
-									{
-										tablePartRange = t.autoFilters._refToRange(aFilters[aF].Ref);
-										diffRow = tablePartRange.r1 - refInsertBinary.r1;
-										diffCol = tablePartRange.c1 - refInsertBinary.c1;
-										range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
-										if(aFilters[aF].style)
-											range.cleanFormat();
-										t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true);
-										if(!aFilters[aF].AutoFilter)
-											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
-									}
-								}
-
-								// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
-								arn.c1 = 0;
-								arn.c2 = gc_nMaxCol0;
-								if (bIsUpdate) {
-									if (callTrigger) { t.handlers.trigger("slowOperation", false); }
-									t.isChanged = true;
-									t._updateCellsRange(arn, canChangeColWidth);
-									t._prepareCellTextMetricsCache(arn);
-								}
-
-								History.EndTransaction();
-								var oSelection = History.GetSelection();
-								if(null != oSelection)
-								{
-									oSelection = oSelection.clone();
-									oSelection.assign(selectionRange.c1, selectionRange.r1, selectionRange.c2, selectionRange.r2);
-									History.SetSelection(oSelection);
-									History.SetSelectionRedo(oSelection);
-								}
-							};
-
-						var pasteNoLocal = function () {
-							//загрузка шрифтов, в случае удачи на callback вставляем текст
-							t._loadFonts(val.fontsNew, function () {
-								pasteLocal();
-                                var a_drawings = [];
-								if (val.addImages && val.addImages.length != 0) {
-									var api = asc["editor"];
-									var aImagesSync = [];
-									for (var im = 0; im < val.addImages.length; im++) {
-											aImagesSync.push(val.addImages[im].tag.src);
-										}
-									t.objectRender.asyncImagesDocumentEndLoaded = function() {
-										//вставляем изображения
-										for (var im = 0; im < val.addImages.length; im++) {
-											var src = val.addImages[im].tag.src;
-											if (src) {
-												var binary_shape = val.addImages[im].tag.getAttribute("alt");
-												var sub;
-												if (typeof binary_shape === "string")
-													sub = binary_shape.substr(0, 18);
-												if (typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets")) {
-														var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
-														reader.GetLong();
-														if (isRealObject(reader))
-															reader.oImages = this.oImages;
-														var first_string = null;
-														if (reader !== null && typeof  reader === "object") {
-															first_string = sub;
-														}
-														var positionX = null;
-														var positionY = null;
-
-														if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
-															positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
-														if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
-															positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
-
-														var Drawing;
-														switch(first_string) {
-															case "TeamLabImageSheets": {
-																Drawing = new CImageShape(null, t.objectRender);
-																break;
-															}
-															case "TeamLabShapeSheets": {
-																Drawing = new CShape(null, t.objectRender);
-																break;
-															}
-															case "TeamLabGroupSheets": {
-																Drawing = new CGroupShape(null, t.objectRender);
-																break;
-															}
-															case "TeamLabChartSheets": {
-																Drawing = new CChartAsGroup(null, t.objectRender);
-																break;
-															}
-															default : {
-																Drawing = CreateImageFromBinary(src);
-																break;
-															}
-														}
-														if (positionX && positionY && t.objectRender)
-															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
-														else
-															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
-														Drawing.drawingObjects = t.objectRender;
-                                                        a_drawings.push(Drawing);
-														//Drawing.addToDrawingObjects();
-													} else if (0 != src.indexOf("file://")) {
-                                                    var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
-                                                    if(drawing && drawing.graphicObject)
-                                                        a_drawings.push(drawing.graphicObject);
-												}
-											}
-										}
-
-                                        t.objectRender.objectLocker.reset();
-
-                                        function callbackUngroupedObjects(result) {
-                                                if ( result ) {
-                                                    for (var j = 0; j < a_drawings.length; ++j) {
-                                                        a_drawings[j].recalculateTransform();
-                                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-                                                        a_drawings[j].addToDrawingObjects();
-                                                        a_drawings[j].select( t.objectRender.controller);
-                                                    }
-                                                }
-                                            }
-                                        for(var j = 0; j < a_drawings.length; ++j)
-                                        {
-                                                t.objectRender.objectLocker.addObjectId(a_drawings[j].Get_Id());
-                                            }
-                                        t.objectRender.objectLocker.checkObjects(callbackUngroupedObjects);
-									};
-
-									api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
-								}
-							});
-						};
 						// Вставляем текст из локального буфера или нет
-						isLocal ? pasteLocal() : pasteNoLocal();
+						isLocal ? t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) : t._pasteFromGlobalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive);
 						return;
 					case "hyperlink":
 						if (val && val.hyperlinkModel) {
@@ -7686,7 +7495,202 @@
 			}
 			this._isLockedCells (checkRange, /*subType*/null, onSelectionCallback);
 		};
+		
+		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
+			var callTrigger = false;
+			if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
+			var selectData;
+			var t = this;
+			if(isLocal === 'binary')
+				selectData = t._pasteFromBinary(val);
+			else if (isLocal === true)
+				selectData = t._pasteFromLS(val);
+			else
+				selectData = t._setInfoAfterPaste(val,onlyActive);
 
+			if (!selectData) {
+				bIsUpdate = false;
+				History.EndTransaction();
+				return;
+			}
+			t.expandColsOnScroll();
+			t.expandRowsOnScroll();
+			var arrFormula = selectData[1];
+			lockDraw(t.model.workbook);
+			for (var i = 0; i < arrFormula.length; ++i) {//!!!
+				var rangeF = arrFormula[i].range;
+				var valF = arrFormula[i].val;
+				if(rangeF.isOneCell())
+					rangeF.setValue(valF);
+				else {
+					var oBBox = rangeF.getBBox0();
+					t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
+				}
+			}
+			buildRecalc(t.model.workbook);
+			unLockDraw(t.model.workbook);
+			arn = selectData[0];
+			selectionRange = arn.clone(true);
+
+			//добавляем автофильтры и форматированные таблицы
+			if(isLocal === true && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
+			{
+				var aFilters = val.lStorage.autoFilters;
+				var range;
+				for(var aF = 0; aF < aFilters.length; aF++)
+				{
+					range = t.model.getRange3(aFilters[aF].range.r1 + selectionRange.r1, aFilters[aF].range.c1 + selectionRange.c1, aFilters[aF].range.r2 + selectionRange.r1, aFilters[aF].range.c2 + selectionRange.c1);
+					if(aFilters[aF].style)
+						range.cleanFormat();
+					t.autoFilters.addAutoFilter(aFilters[aF].style, range.bbox, null, null, true);
+					if(!aFilters[aF].autoFilter)
+						t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
+				}
+			}
+			else if(isLocal === 'binary' && val.TableParts && val.TableParts.length)
+			{
+				var aFilters = val.TableParts;
+				var range;
+				var tablePartRange;
+				var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
+				var refInsertBinary = t.autoFilters._refToRange(activeRange);
+				var diffRow;
+				var diffCol;
+				for(var aF = 0; aF < aFilters.length; aF++)
+				{
+					tablePartRange = t.autoFilters._refToRange(aFilters[aF].Ref);
+					diffRow = tablePartRange.r1 - refInsertBinary.r1;
+					diffCol = tablePartRange.c1 - refInsertBinary.c1;
+					range = t.model.getRange3(diffRow + selectionRange.r1, diffCol + selectionRange.c1, diffRow + selectionRange.r1 + (tablePartRange.r2 - tablePartRange.r1), diffCol + selectionRange.c1 + (tablePartRange.c2 - tablePartRange.c1));
+					if(aFilters[aF].style)
+						range.cleanFormat();
+					t.autoFilters.addAutoFilter(aFilters[aF].TableStyleInfo.Name, range.bbox, null, null, true);
+					if(!aFilters[aF].AutoFilter)
+						t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
+				}
+			}
+
+			// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
+			arn.c1 = 0;
+			arn.c2 = gc_nMaxCol0;
+			if (bIsUpdate) {
+				if (callTrigger) { t.handlers.trigger("slowOperation", false); }
+				t.isChanged = true;
+				t._updateCellsRange(arn, canChangeColWidth);
+				t._prepareCellTextMetricsCache(arn);
+			}
+
+			History.EndTransaction();
+			var oSelection = History.GetSelection();
+			if(null != oSelection)
+			{
+				oSelection = oSelection.clone();
+				oSelection.assign(selectionRange.c1, selectionRange.r1, selectionRange.c2, selectionRange.r2);
+				History.SetSelection(oSelection);
+				History.SetSelectionRedo(oSelection);
+			}
+		};
+
+		WorksheetView.prototype._pasteFromGlobalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
+			var t = this;
+			//загрузка шрифтов, в случае удачи на callback вставляем текст
+			t._loadFonts(val.fontsNew, function () {
+				t._pasteFromLocalBuff(isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth);
+				var a_drawings = [];
+				if (val.addImages && val.addImages.length != 0) {
+					var api = asc["editor"];
+					var aImagesSync = [];
+					for (var im = 0; im < val.addImages.length; im++) {
+							aImagesSync.push(val.addImages[im].tag.src);
+						}
+					t.objectRender.asyncImagesDocumentEndLoaded = function() {
+						//вставляем изображения
+						for (var im = 0; im < val.addImages.length; im++) {
+							var src = val.addImages[im].tag.src;
+							if (src) {
+								var binary_shape = val.addImages[im].tag.getAttribute("alt");
+								var sub;
+								if (typeof binary_shape === "string")
+									sub = binary_shape.substr(0, 18);
+								if (typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets")) {
+										var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
+										reader.GetLong();
+										if (isRealObject(reader))
+											reader.oImages = this.oImages;
+										var first_string = null;
+										if (reader !== null && typeof  reader === "object") {
+											first_string = sub;
+										}
+										var positionX = null;
+										var positionY = null;
+
+										if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
+											positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
+										if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
+											positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
+
+										var Drawing;
+										switch(first_string) {
+											case "TeamLabImageSheets": {
+												Drawing = new CImageShape(null, t.objectRender);
+												break;
+											}
+											case "TeamLabShapeSheets": {
+												Drawing = new CShape(null, t.objectRender);
+												break;
+											}
+											case "TeamLabGroupSheets": {
+												Drawing = new CGroupShape(null, t.objectRender);
+												break;
+											}
+											case "TeamLabChartSheets": {
+												Drawing = new CChartAsGroup(null, t.objectRender);
+												break;
+											}
+											default : {
+												Drawing = CreateImageFromBinary(src);
+												break;
+											}
+										}
+										if (positionX && positionY && t.objectRender)
+											Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
+										else
+											Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
+										Drawing.drawingObjects = t.objectRender;
+										a_drawings.push(Drawing);
+										//Drawing.addToDrawingObjects();
+									} else if (0 != src.indexOf("file://")) {
+									var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
+									if(drawing && drawing.graphicObject)
+										a_drawings.push(drawing.graphicObject);
+								}
+							}
+						}
+
+						t.objectRender.objectLocker.reset();
+
+						function callbackUngroupedObjects(result) {
+								if ( result ) {
+									for (var j = 0; j < a_drawings.length; ++j) {
+										a_drawings[j].recalculateTransform();
+										History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(a_drawings[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+										a_drawings[j].addToDrawingObjects();
+										a_drawings[j].select( t.objectRender.controller);
+									}
+								}
+							}
+						for(var j = 0; j < a_drawings.length; ++j)
+						{
+								t.objectRender.objectLocker.addObjectId(a_drawings[j].Get_Id());
+							}
+						t.objectRender.objectLocker.checkObjects(callbackUngroupedObjects);
+					};
+
+					api.ImageLoader.LoadDocumentImages(aImagesSync, null, t.objectRender.asyncImagesDocumentEndLoaded);
+				}
+			});
+		};
+		
 		WorksheetView.prototype._setInfoAfterPaste = function (values,clipboard,isCheckSelection) {
 			var t = this;
 			var arn = t.activeRange.clone(true);
