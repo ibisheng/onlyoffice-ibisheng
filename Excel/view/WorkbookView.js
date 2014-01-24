@@ -1570,6 +1570,27 @@
 			this._lockDraw = true;
 		};
 
+		WorkbookView.prototype.insertHyperlink = function (options) {
+			var ws = this.getWorksheet();
+			if ( ws.objectRender.selectedGraphicObjectsExists() ) {
+				if ( ws.objectRender.controller.canAddHyperlink() )
+					ws.objectRender.controller.insertHyperlink(options);
+			} else {
+				// На всякий случай проверка (вдруг кто собирается вызвать...)
+				this.closeCellEditor();
+				ws.setSelectionInfo("hyperlink", options);
+				this.restoreFocus();
+			}
+		};
+		WorkbookView.prototype.removeHyperlink = function () {
+			var ws = this.getWorksheet();
+			if (ws.objectRender.selectedGraphicObjectsExists())
+				ws.objectRender.controller.removeHyperlink();
+			else {
+				ws.setSelectionInfo("rh");
+			}
+		};
+
 		/*
 		 * @param {c_oAscRenderingModeType} mode Режим отрисовки
 		 * @param {Boolean} isInit инициализация или нет

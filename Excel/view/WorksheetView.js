@@ -7269,18 +7269,18 @@
 			var checkRange = null;
 			var arn = t.activeRange.clone(true);
 			if (onlyActive) {
-					checkRange = new asc_Range(arn.startCol, arn.startRow, arn.startCol, arn.startRow);
+				checkRange = new asc_Range(arn.startCol, arn.startRow, arn.startCol, arn.startRow);
+			} else {
+				if (c_oAscSelectionType.RangeMax === arn.type) {
+					checkRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+				} else if (c_oAscSelectionType.RangeCol === arn.type) {
+					checkRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+				} else if (c_oAscSelectionType.RangeRow === arn.type) {
+					checkRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
 				} else {
-					if (c_oAscSelectionType.RangeMax === arn.type) {
-						checkRange = new asc_Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-					} else if (c_oAscSelectionType.RangeCol === arn.type) {
-						checkRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
-					} else if (c_oAscSelectionType.RangeRow === arn.type) {
-						checkRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
-					} else {
-						checkRange = arn;
-					}
+					checkRange = arn;
 				}
+			}
 
 			var onSelectionCallback = function (isSuccess) {
 				if (false === isSuccess)
@@ -7291,36 +7291,36 @@
 				var bIsUpdate = true;
 
 				if (onlyActive) {
-						range = t.model.getRange3(arn.startRow, arn.startCol, arn.startRow, arn.startCol);
+					range = t.model.getRange3(arn.startRow, arn.startCol, arn.startRow, arn.startCol);
+				} else {
+					if (c_oAscSelectionType.RangeMax === arn.type) {
+						range = t.model.getRange3(/*arn.r1*/0, /*arn.c1*/0, gc_nMaxRow0, gc_nMaxCol0);
+					} else if (c_oAscSelectionType.RangeCol === arn.type) {
+						range = t.model.getRange3(/*arn.r1*/0, arn.c1, gc_nMaxRow0, arn.c2);
+					} else if (c_oAscSelectionType.RangeRow === arn.type) {
+						range = t.model.getRange3(arn.r1, /*arn.c1*/0, arn.r2, gc_nMaxCol0);
 					} else {
-						if (c_oAscSelectionType.RangeMax === arn.type) {
-							range = t.model.getRange3(/*arn.r1*/0, /*arn.c1*/0, gc_nMaxRow0, gc_nMaxCol0);
-						} else if (c_oAscSelectionType.RangeCol === arn.type) {
-							range = t.model.getRange3(/*arn.r1*/0, arn.c1, gc_nMaxRow0, arn.c2);
-						} else if (c_oAscSelectionType.RangeRow === arn.type) {
-							range = t.model.getRange3(arn.r1, /*arn.c1*/0, arn.r2, gc_nMaxCol0);
-						} else {
-							range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
-						}
+						range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
 					}
+				}
 
 				var isLargeRange = t._isLargeRange(range), callTrigger = false;
 				var res;
 				var mc, r, c, cell;
 
 				function makeBorder(b) {
-						var border = new BorderProp();
-						if (b === false) {
-							border.setStyle(c_oAscBorderStyles.None);
-						} else if (b) {
-							if (b.style !== null && b.style !== undefined) {border.setStyle(b.style);}
-							if (b.color !== null && b.color !== undefined) {
-								if(b.color instanceof CAscColor)
-									border.c = CorrectAscColor(b.color);
-							}
+					var border = new BorderProp();
+					if (b === false) {
+						border.setStyle(c_oAscBorderStyles.None);
+					} else if (b) {
+						if (b.style !== null && b.style !== undefined) {border.setStyle(b.style);}
+						if (b.color !== null && b.color !== undefined) {
+							if(b.color instanceof CAscColor)
+								border.c = CorrectAscColor(b.color);
 						}
-						return border;
 					}
+					return border;
+				}
 
 				selectionRange = arn.clone();
 				History.Create_NewPoint();
@@ -7343,14 +7343,15 @@
 					case "value":  range.setValue(val); break;
 					case "format": range.setNumFormat(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
                     case "angle": range.setAngle(val); break;
+					case "rh": /*ToDo удаление гиперссылки из range*/ break;
 
 					case "border":
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						// None
 						if (val.length < 1) {
-								range.setBorder(null);
-								break;
-							}
+							range.setBorder(null);
+							break;
+						}
 						res = new Border();
 						// Diagonal
 						res.d = makeBorder( val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU] );
@@ -7370,16 +7371,14 @@
 					case "merge":
 						if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 						switch (val) {
-								case c_oAscMergeOptions.Unmerge:     range.unmerge(); break;
-								case c_oAscMergeOptions.MergeCenter: range.merge(val); break;
-								case c_oAscMergeOptions.MergeAcross:
-									for (res = arn.r1; res <= arn.r2; ++res)
-									{
-										t.model.getRange3(res, arn.c1, res, arn.c2).merge(val);
-									}
-									break;
-								case c_oAscMergeOptions.Merge:       range.merge(val); break;
-							}
+							case c_oAscMergeOptions.Unmerge:     range.unmerge(); break;
+							case c_oAscMergeOptions.MergeCenter: range.merge(val); break;
+							case c_oAscMergeOptions.MergeAcross:
+								for (res = arn.r1; res <= arn.r2; ++res)
+									t.model.getRange3(res, arn.c1, res, arn.c2).merge(val);
+								break;
+							case c_oAscMergeOptions.Merge:       range.merge(val); break;
+						}
 						// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
 						arn.c1 = 0;
 						arn.c2 = gc_nMaxCol0;
@@ -7431,13 +7430,13 @@
 						r = mc ? mc.r1 : arn.startRow;
 						cell = t._getVisibleCell(c, r);
 						if (undefined !== cell) {
-								var oldFontSize = cell.getFontsize();
-								var newFontSize = asc_incDecFonSize(val, oldFontSize);
-								if (null !== newFontSize) {
-									range.setFontsize(newFontSize);
-									canChangeColWidth = c_oAscCanChangeColWidth.numbers;
-								}
+							var oldFontSize = cell.getFontsize();
+							var newFontSize = asc_incDecFonSize(val, oldFontSize);
+							if (null !== newFontSize) {
+								range.setFontsize(newFontSize);
+								canChangeColWidth = c_oAscCanChangeColWidth.numbers;
 							}
+						}
 						break;
 					case "style":
 						range.setCellStyle(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
@@ -7476,7 +7475,7 @@
 								unLockDraw(t.model.workbook);
 								arn = selectData[0];
 								selectionRange = arn.clone(true);
-								
+
 								//добавляем автофильтры и форматированные таблицы
 								if(isLocal === true && val.lStorage && val.lStorage.autoFilters && val.lStorage.autoFilters.length)
 								{
@@ -7498,7 +7497,7 @@
 									var range;
 									var tablePartRange;
 									var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-									var refInsertBinary = t.autoFilters._refToRange(activeRange); 
+									var refInsertBinary = t.autoFilters._refToRange(activeRange);
 									var diffRow;
 									var diffCol;
 									for(var aF = 0; aF < aFilters.length; aF++)
@@ -7514,7 +7513,7 @@
 											t.autoFilters.addAutoFilter(null, range.bbox, null, null, true);
 									}
 								}
-								
+
 								// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
 								arn.c1 = 0;
 								arn.c2 = gc_nMaxCol0;
@@ -7567,12 +7566,12 @@
 														}
 														var positionX = null;
 														var positionY = null;
-															
+
 														if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
 															positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
 														if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
 															positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
-															
+
 														var Drawing;
 														switch(first_string) {
 															case "TeamLabImageSheets": {
@@ -7639,29 +7638,29 @@
 						return;
 					case "hyperlink":
 						if (val && val.hyperlinkModel) {
-								if (c_oAscHyperlinkType.RangeLink === val.asc_getType()) {
-									var hyperlinkRangeTmp = t.model.getRange2(val.asc_getRange ());
-									if (null === hyperlinkRangeTmp) {
-										bIsUpdate = false;
-										break;
-									}
+							if (c_oAscHyperlinkType.RangeLink === val.asc_getType()) {
+								var hyperlinkRangeTmp = t.model.getRange2(val.asc_getRange ());
+								if (null === hyperlinkRangeTmp) {
+									bIsUpdate = false;
+									break;
 								}
-								val.hyperlinkModel.Ref = range;
-								range.setHyperlink(val.hyperlinkModel);
-								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-								mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
-								c = mc ? mc.c1 : arn.startCol;
-								r = mc ? mc.r1 : arn.startRow;
-								if (null !== val.asc_getText()) {
-									t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
-									// Вызываем функцию пересчета для заголовков форматированной таблицы
-									t.autoFilters._renameTableColumn(arn);
-								}
-								break;
-							} else {
-								bIsUpdate = false;
-								break;
 							}
+							val.hyperlinkModel.Ref = range;
+							range.setHyperlink(val.hyperlinkModel);
+							// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
+							mc = t.model.getMergedByCell(arn.startRow, arn.startCol);
+							c = mc ? mc.c1 : arn.startCol;
+							r = mc ? mc.r1 : arn.startRow;
+							if (null !== val.asc_getText()) {
+								t.model.getRange3(r, c, r, c).setValue(val.asc_getText());
+								// Вызываем функцию пересчета для заголовков форматированной таблицы
+								t.autoFilters._renameTableColumn(arn);
+							}
+							break;
+						} else {
+							bIsUpdate = false;
+							break;
+						}
 
 					default:
 						bIsUpdate = false;
@@ -7669,22 +7668,22 @@
 				}
 
 				if (bIsUpdate) {
-						if (callTrigger) { t.handlers.trigger("slowOperation", false); }
-						t.isChanged = true;
-						t._updateCellsRange(arn, canChangeColWidth);
-					}
+					if (callTrigger) { t.handlers.trigger("slowOperation", false); }
+					t.isChanged = true;
+					t._updateCellsRange(arn, canChangeColWidth);
+				}
 
 				History.EndTransaction();
 			};
 			if ("paste" === prop) {
-					// Для past свой диапазон
-					if(isLocal === "binary")
-						checkRange = t._pasteFromBinary(val, true);
-					else if(isLocal === true)
-						checkRange = t._pasteFromLS(val, true);
-					else
-						checkRange = t._setInfoAfterPaste(val, onlyActive, true);
-				}
+				// Для past свой диапазон
+				if(isLocal === "binary")
+					checkRange = t._pasteFromBinary(val, true);
+				else if(isLocal === true)
+					checkRange = t._pasteFromLS(val, true);
+				else
+					checkRange = t._setInfoAfterPaste(val, onlyActive, true);
+			}
 			this._isLockedCells (checkRange, /*subType*/null, onSelectionCallback);
 		};
 
