@@ -252,6 +252,84 @@ function cGETPIVOTDATA() {
 }
 cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype )
 
+function HLOOKUPCache(){
+    this.cache = {};
+}
+HLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, arg3Value){
+    var res = null;
+    var sRangeName = range.getWorksheet().getId() + cCharDelimiter + range.getName();
+    var cacheElem = this.cache[sRangeName];
+    if(null == cacheElem)
+    {
+        cacheElem = {foreachArray: [], results: {}};
+        range._foreachNoEmpty( /*func for cell in col*/ function(cell, r, c, r1, c1){
+            var cv = cell.getValueWithoutFormat();
+            cacheElem.foreachArray.push({cv: cv, cvType: checkTypeCell( cv ), c: c, c1: c1});
+        });
+        this.cache[sRangeName] = cacheElem;
+    }
+    var sInputKey = valueForSearching + cCharDelimiter + isValueString + cCharDelimiter + arg3Value;
+    res = cacheElem.results[sInputKey];
+    if(null == res)
+    {
+        res = this._calculate(cacheElem.foreachArray, valueForSearching, isValueString, arg3Value);
+        cacheElem.results[sInputKey] = res;
+    }
+    return res;
+};
+HLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isValueString, arg3Value){
+    var res = {min: undefined, resC: -1}, found = false, regexp = null;
+    for(var i = 0, length = cacheArray.length; i < length; i++)
+    {
+        var cache = cacheArray[i];
+        var cv = cache.cv;
+        var c = cache.c;
+        var c1 = cache.c1;
+        var cvType = cache.cvType;
+        if ( c == c1 )
+            res.min = cv;
+        else if ( res.min > cv ) {
+            res.min = cv;
+        }
+        if ( arg3Value == true ) {
+            if ( isValueString ) {
+                if ( cvType instanceof cString ) {
+                    if ( valueForSearching.localeCompare( cvType.getValue() ) == 0 ) {
+                        res.resC = c;
+                        found = true;
+                    }
+                    else if ( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ) {
+                        res.resC = c;
+                    }
+                }
+            }
+            else if ( valueForSearching == cv ) {
+                res.resC = c;
+                found = true;
+            }
+            else if ( valueForSearching > cv && !found ) {
+                res.resC = c;
+            }
+        }
+        else {
+            if ( isValueString ) {
+                if(null == regexp)
+                    regexp = searchRegExp( valueForSearching );
+                if ( regexp.test( cv ) )
+                    res.resC = c;
+            }
+            else if ( valueForSearching == cv ) {
+                res.resC = c;
+            }
+        }
+    }
+    return res;
+};
+HLOOKUPCache.prototype.clean = function(){
+    this.cache = {};
+};
+var g_oHLOOKUPCache = new HLOOKUPCache();
+
 function cHLOOKUP() {
     cBaseFunction.call( this, "HLOOKUP" );
     this.setArgumentsMin( 3 );
@@ -278,67 +356,37 @@ cHLOOKUP.prototype.Calculate = function ( arg ) {
         valueForSearching = arg0.getValue();
     }
 
-    var found = false, bb,
-        f = function ( cell, r, c, r1, c1 ) {
-            if ( r == r1 ) {
-                var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell( cv );
-                if ( c == c1 )
-                    min = cv;
-                else if ( min > cv ) {
-                    min = cv;
-                }
-                if ( arg3.value == true ) {
-                    if ( arg0 instanceof cString ) {
-                        if ( cvType instanceof cString ) {
-                            if ( valueForSearching.localeCompare( cvType.getValue() ) == 0 ) {
-                                resC = c;
-                                found = true;
-                            }
-                            else if ( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ) {
-                                resC = c;
-                            }
-                        }
-                    }
-                    else if ( valueForSearching == cv ) {
-                        resC = c;
-                        found = true;
-                    }
-                    else if ( valueForSearching > cv && !found ) {
-                        resC = c;
-                    }
-                }
-                else {
-                    if ( arg0 instanceof cString ) {
-                        if ( regexp.test( cv ) )
-                            resC = c;
-                    }
-                    else if ( valueForSearching == cv ) {
-                        resC = c;
-                    }
-                }
-                /*if ( resC > -1 ) {
-                 min = Math.min( min, cv );
-                 if ( arg3.value == false )
-                 return true;
-                 }*/
-            }
-        };
+    var found = false, bb;
 
     if ( arg1 instanceof cRef || arg1 instanceof cRef3D || arg1 instanceof cArea ) {
-        var range = arg1.getRange();
+        var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
             return this.value = new cError( cErrorType.bad_reference );
-
-        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
+        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
+        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
+        if(oCache)
+        {
+            resC = oCache.resC;
+            min = oCache.min;
+        }
+//        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
     }
     else if ( arg1 instanceof cArea3D ) {
-        var range = arg1.getRange()[0];
+        var range = arg1.getRange()[0], ws = arg1.getWS()
         bb = range.getBBox0();
         if ( numberRow > bb.r2 - bb.r1 )
             return this.value = new cError( cErrorType.bad_reference );
 
-        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
+        var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
+        var oCache = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg0 instanceof cString, arg3.value);
+        if(oCache)
+        {
+            resC = oCache.resC;
+            min = oCache.min;
+        }
+
+//        range._foreachColNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
     }
     else if ( arg1 instanceof cArray ) {
         arg1.foreach( function ( elem, r, c ) {
@@ -742,12 +790,13 @@ function cTRANSPOSE() {
     cBaseFunction.call( this, "TRANSPOSE" );
 }
 cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
+
 function VLOOKUPCache(){
     this.cache = {};
 }
 VLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, arg3Value){
     var res = null;
-    var sRangeName = range.getName();
+    var sRangeName = range.getWorksheet().getId() + cCharDelimiter + range.getName();
     var cacheElem = this.cache[sRangeName];
     if(null == cacheElem)
     {
@@ -855,9 +904,9 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
     }
 
 
-    var found = false, bb, ws = arg1.getWS();
+    var found = false, bb;
     if ( arg1 instanceof cRef || arg1 instanceof cRef3D ) {
-        var range = arg1.getRange();
+        var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
@@ -870,7 +919,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
         }
     }
     else if ( arg1 instanceof cArea ) {
-        var range = arg1.getRange();
+        var range = arg1.getRange(), ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );
@@ -926,7 +975,7 @@ cVLOOKUP.prototype.Calculate = function ( arg ) {
          }*/
     }
     else if ( arg1 instanceof cArea3D ) {
-        var range = arg1.getRange()[0];
+        var range = arg1.getRange()[0], ws = arg1.getWS();
         bb = range.getBBox0();
         if ( numberCol > bb.c2 - bb.c1 )
             return this.value = new cError( cErrorType.bad_reference );

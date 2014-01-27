@@ -912,6 +912,7 @@ function sortDependency( wb ) {
             }
         }
 		g_oVLOOKUPCache.clean();
+        g_oHLOOKUPCache.clean()
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }
