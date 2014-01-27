@@ -1538,7 +1538,7 @@
     } )
 
     /*
-     * Statical Function
+     * Statistical Function
      * */
     test( "Test: \"AVEDEV\"", function () {
 
@@ -2892,4 +2892,68 @@
         strictEqual( oParser.calculate().getValue(), _var( [10.5, 12.4, 19.4] ) );
 
     } )
+
+    /*
+    * Lookup and Reference
+    */
+
+    test( "Test: \"HLOOKUP\"", function () {
+
+        ws.getRange2( "A401" ).setValue( "Axles" );ws.getRange2( "B401" ).setValue( "Bearings" );ws.getRange2( "C401" ).setValue( "Bolts" );
+        ws.getRange2( "A402" ).setValue( "4" );ws.getRange2( "B402" ).setValue( "6" );ws.getRange2( "C402" ).setValue( "9" );
+        ws.getRange2( "A403" ).setValue( "5" );ws.getRange2( "B403" ).setValue( "7" );ws.getRange2( "C403" ).setValue( "10" );
+        ws.getRange2( "A404" ).setValue( "6" );ws.getRange2( "B404" ).setValue( "8" );ws.getRange2( "C404" ).setValue( "11" );
+
+
+        oParser = new parserFormula( "HLOOKUP(\"Axles\",A401:C404,2,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4 );
+
+        oParser = new parserFormula( "HLOOKUP(\"Bearings\",A401:C404,3,FALSE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 7 );
+
+        oParser = new parserFormula( "HLOOKUP(\"B\",A401:C404,3,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "HLOOKUP(\"Bolts\",A401:C404,4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 11 );
+
+        oParser = new parserFormula( "HLOOKUP(3,{1,2,3;\"a\",\"b\",\"c\";\"d\",\"e\",\"f\"},2,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "c" );
+
+    } )
+
+    test( "Test: \"VLOOKUP\"", function () {
+
+        ws.getRange2( "A501" ).setValue( "Density" );ws.getRange2( "B501" ).setValue( "Bearings" );ws.getRange2( "C501" ).setValue( "Bolts" );
+
+        ws.getRange2( "A502" ).setValue( "0.457" );ws.getRange2( "B502" ).setValue( "3.55" );ws.getRange2( "C502" ).setValue( "500" );
+        ws.getRange2( "A503" ).setValue( "0.525" );ws.getRange2( "B503" ).setValue( "3.25" );ws.getRange2( "C503" ).setValue( "400" );
+        ws.getRange2( "A504" ).setValue( "0.616" );ws.getRange2( "B504" ).setValue( "2.93" );ws.getRange2( "C504" ).setValue( "300" );
+        ws.getRange2( "A505" ).setValue( "0.675" );ws.getRange2( "B505" ).setValue( "2.75" );ws.getRange2( "C505" ).setValue( "250" );
+        ws.getRange2( "A506" ).setValue( "0.746" );ws.getRange2( "B506" ).setValue( "2.57" );ws.getRange2( "C506" ).setValue( "200" );
+        ws.getRange2( "A507" ).setValue( "0.835" );ws.getRange2( "B507" ).setValue( "2.38" );ws.getRange2( "C507" ).setValue( "15" );
+        ws.getRange2( "A508" ).setValue( "0.946" );ws.getRange2( "B508" ).setValue( "2.17" );ws.getRange2( "C508" ).setValue( "100" );
+        ws.getRange2( "A509" ).setValue( "1.09" );ws.getRange2( "B509" ).setValue( "1.95" );ws.getRange2( "C509" ).setValue( "50" );
+        ws.getRange2( "A510" ).setValue( "1.29" );ws.getRange2( "B510" ).setValue( "1.71" );ws.getRange2( "C510" ).setValue( "0" );
+
+
+        oParser = new parserFormula( "VLOOKUP(1,A502:C510,2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2.17 );
+
+        oParser = new parserFormula( "VLOOKUP(1,A502:C510,3,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 100.00 );
+
+        oParser = new parserFormula( "VLOOKUP(2,A502:C510,2,TRUE)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1.71 );
+
+    } )
+
 } );
