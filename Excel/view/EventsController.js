@@ -631,7 +631,8 @@
 			switch (event.which) {
 
 				case 113: // F2
-					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
+					var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
+					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode || graphicObjects.length) {return true;}
 					if (AscBrowser.isOpera) {stop();}
 					// Выставляем блокировку на выход из редактора по клавишам-стрелкам
 					t.strictClose = true;
