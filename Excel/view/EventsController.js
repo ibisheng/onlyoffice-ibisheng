@@ -599,8 +599,12 @@
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( graphicObjects.length && t.enableKeyEvents ) {
-				if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
-					return true;
+				t.handlers.trigger("graphicObjectWindowKeyDown", event);
+				if (t.isCellEditMode) {
+					t.handlers.trigger("stopCellEditing");
+					t.isCellEditMode = false;
+				}
+				return true;
 			}
 
 			// Двигаемся ли мы в выделенной области
@@ -910,8 +914,13 @@
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( graphicObjects.length && t.enableKeyEvents ) {
 				if (!( (event.ctrlKey || event.metaKey) && (event.which == 99 || event.which == 118) )) {		// Mozilla Firefox Fix #20080
-					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
+					if (t.handlers.trigger("graphicObjectWindowKeyPress", event)) {
+						if (t.isCellEditMode) {
+							t.handlers.trigger("stopCellEditing");
+							t.isCellEditMode = false;
+						}
 						return true;
+					}
 				}
 			}
 
