@@ -516,7 +516,6 @@ DependencyGraph.prototype = {
         var node;
         var elem;
         var oSheetRanges = {};
-        var bInArea = false;
         while ( null != aElems ) {
             for ( var i in aElems ) {
                 elem = aElems[i];
@@ -527,7 +526,7 @@ DependencyGraph.prototype = {
 				node = this.getNode(sheetId, cellId);
                 if ( node && null == oRes.oWeightMap[node.nodeId] ) {
                     //все node из aElems записываем в master
-                    var oWeightMapElem = {cur:0, max:0, gray:false, bad:false, master:true, area:bInArea};
+                    var oWeightMapElem = {cur:0, max:0, gray:false, bad:false, master:true, area:node.isArea};
                     aWeightMapMasters.push( oWeightMapElem );
                     aWeightMapMastersNodes.push( node );
                     oRes.oWeightMap[node.nodeId] = oWeightMapElem;
@@ -535,7 +534,6 @@ DependencyGraph.prototype = {
                 }
             }
             aElems = null;
-            bInArea = true;
             //расширяем за счет area nodes
             for ( var i in oSheetRanges ) {
                 var oSheetRange = oSheetRanges[i];
