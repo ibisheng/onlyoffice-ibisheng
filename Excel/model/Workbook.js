@@ -3424,6 +3424,8 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 				__cell.oValue.type = CellValueType.String;
 				__cell.oValue.text = res.getValue().toString();
 		}
+		g_oVLOOKUPCache.remove(__cell);
+		g_oHLOOKUPCache.remove(__cell);
 		__cell.setFormulaCA(res.ca);
 		if( res.numFormat !== undefined && res.numFormat >= 0){
 

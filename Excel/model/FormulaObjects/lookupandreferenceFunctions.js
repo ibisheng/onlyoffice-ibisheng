@@ -709,17 +709,19 @@ function cTRANSPOSE() {
 cTRANSPOSE.prototype = Object.create( cBaseFunction.prototype )
 
 function VHLOOKUPCache(bHor){
-    this.cache = {};
+    this.cacheId = {};
+	this.cacheRanges = {};
 	this.bHor = bHor;
 }
 VHLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, arg3Value){
     var res = null;
 	var _this = this;
-    var sRangeName = range.getWorksheet().getId() + cCharDelimiter + range.getName();
-    var cacheElem = this.cache[sRangeName];
+	var wsId = range.getWorksheet().getId();
+    var sRangeName = wsId + cCharDelimiter + range.getName();
+    var cacheElem = this.cacheId[sRangeName];
     if(null == cacheElem)
     {
-        cacheElem = {foreachArray: [], results: {}};
+        cacheElem = {id: sRangeName, foreachArray: [], results: {}};
         range._foreachNoEmpty( /*func for cell in col*/ function(cell, r, c, r1, c1){
             var cv = cell.getValueWithoutFormat();
 			if(_this.bHor)
@@ -727,7 +729,14 @@ VHLOOKUPCache.prototype.get = function(range, valueForSearching, isValueString, 
 			else
 				cacheElem.foreachArray.push({cv: cv, cvType: checkTypeCell( cv ), index: r, indexStart: r1});
         });
-        this.cache[sRangeName] = cacheElem;
+        this.cacheId[sRangeName] = cacheElem;
+		var cacheRange = this.cacheRanges[wsId];
+		if(null == cacheRange)
+		{
+			cacheRange = new RangeDataManager(null);
+			this.cacheRanges[wsId] = cacheRange;
+		}
+		cacheRange.add(range.getBBox0(), cacheElem);
     }
     var sInputKey = valueForSearching + cCharDelimiter + isValueString + cCharDelimiter + arg3Value;
     res = cacheElem.results[sInputKey];
@@ -786,8 +795,22 @@ VHLOOKUPCache.prototype._calculate = function(cacheArray, valueForSearching, isV
     }
     return res;
 };
+VHLOOKUPCache.prototype.remove = function(cell){
+	var wsId = cell.ws.getId();
+	var cacheRange = this.cacheRanges[wsId];
+	if(null != cacheRange)
+	{
+		var oGetRes = cacheRange.get(new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()));
+		for(var i = 0, length = oGetRes.all.length; i < length; ++i)
+		{
+			var elem = oGetRes.all[i];
+			elem.data.results = {};
+		}
+	}
+};
 VHLOOKUPCache.prototype.clean = function(){
-    this.cache = {};
+    this.cacheId = {};
+	this.cacheRanges = {};
 };
 var g_oVLOOKUPCache = new VHLOOKUPCache(false);
 
