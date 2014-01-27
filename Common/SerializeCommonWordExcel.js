@@ -526,16 +526,27 @@ var gc_nMaxCol0 = gc_nMaxCol - 1;
  * @constructor
  */
 function CellAddressUtils(){
-	this._oCodeA = 'A'.charCodeAt();
+	this._oCodeA = 'A'.charCodeAt(0);
 	this._aColnumToColstr = [];
 	this.oCellAddressCache = {};
+	this.colnumToColstrFromWsView = function (col) {
+		var sResult = this._aColnumToColstr[col];
+		if (null != sResult)
+			return sResult;
+
+		if(col == 0) return "";
+
+		var col0 = col - 1;
+		var text = String.fromCharCode(65 + (col0 % 26));
+		return (this._aColnumToColstr[col] = (col0 < 26 ? text : this.colnumToColstrFromWsView(Math.floor(col0 / 26)) + text));
+	};
 	this.colnumToColstr = function(num){
 		var sResult = this._aColnumToColstr[num];
 		if(!sResult){
 			// convert 1 to A, 2 to B, ..., 27 to AA etc.
 			if(num == 0) return "";
-			var val = "";
-			var sResult = "";
+			var val;
+			sResult = "";
 			var n = num - 1;
 			if (n >= 702) {
 				val = (Math.floor(n / 676) - 1) % 26;
@@ -555,8 +566,8 @@ function CellAddressUtils(){
 		var col_num = 0;
 		for (var i = 0; i < col_str.length; ++i)
 			col_num = 26 * col_num + (col_str.charCodeAt(i) - this._oCodeA + 1);
-		return col_num
-	}
+		return col_num;
+	};
 	this.getCellAddress = function(sId)
 	{
 		var oRes = this.oCellAddressCache[sId];
@@ -566,7 +577,7 @@ function CellAddressUtils(){
 			this.oCellAddressCache[sId] = oRes;
 		}
 		return oRes;
-	}
+	};
 }
 var g_oCellAddressUtils = new CellAddressUtils();
 /**

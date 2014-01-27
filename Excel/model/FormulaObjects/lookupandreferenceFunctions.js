@@ -35,13 +35,6 @@ function cADDRESS() {
 cADDRESS.prototype = Object.create( cBaseFunction.prototype )
 cADDRESS.prototype.Calculate = function ( arg ) {
 
-    function _getColumnTitle( col ) {
-        var q = col < 26 ? undefined : Asc.floor( col / 26 ) - 1;
-        var r = col % 26;
-        var text = String.fromCharCode( ("A").charCodeAt( 0 ) + r );
-        return col < 26 ? text : _getColumnTitle( q ) + text;
-    }
-
     function _getRowTitle( row ) {
         return "" + (row + 1);
     }
@@ -103,16 +96,16 @@ cADDRESS.prototype.Calculate = function ( arg ) {
     var strRef;
     switch ( refType.getValue() ) {
         case 1:
-            strRef = "$" + _getColumnTitle( colNumber.getValue() - 1 ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() - 1 ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
             break;
         case 2:
-            strRef = _getColumnTitle( colNumber.getValue() - 1 ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() - 1 ) + "$" + _getRowTitle( rowNumber.getValue() - 1 );
             break;
         case 3:
-            strRef = "$" + _getColumnTitle( colNumber.getValue() - 1 ) + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() - 1 ) + _getRowTitle( rowNumber.getValue() - 1 );
             break;
         case 4:
-            strRef = _getColumnTitle( colNumber.getValue() - 1 ) + _getRowTitle( rowNumber.getValue() - 1 );
+            strRef = g_oCellAddressUtils.colnumToColstrFromWsView( colNumber.getValue() - 1 ) + _getRowTitle( rowNumber.getValue() - 1 );
             break;
     }
 
