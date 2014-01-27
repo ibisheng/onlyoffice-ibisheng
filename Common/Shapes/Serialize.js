@@ -2005,19 +2005,28 @@ function BinaryPPTYLoader()
                     uni_fill.fill = new CSolidFill();
                     uni_fill.fill.color = this.ReadUniColor();
 
-                    uni_fill.fill.color.Mods = new CColorModifiers();
-                    var mods = uni_fill.fill.color.Mods.Mods;
-                    var _len = mods.length;
-                    for (var i = 0; i < _len; i++)
-                    {
-                        if (mods[i].name == "alpha")
-                        {
-                            uni_fill.transparent = (255 * mods[i].val / 100000) >> 0;
-                            mods.splice(i, 1);
-                            break;
-                        }
-                    }
-
+//                    uni_fill.fill.color.Mods = new CColorModifiers();
+					if(uni_fill.fill 
+					&& uni_fill.fill.color 
+					&& uni_fill.fill.color.Mods 
+					&& uni_fill.fill.color.Mods.Mods)
+					{
+						var mods = uni_fill.fill.color.Mods.Mods;
+						var _len = mods.length;
+						for (var i = 0; i < _len; i++)
+						{
+							if (mods[i].name == "alpha")
+							{
+								uni_fill.transparent = (255 * mods[i].val / 100000) >> 0;
+								mods.splice(i, 1);
+								break;
+							}
+						}
+					}
+					else
+					{
+						uni_fill.fill.color.Mods = new CColorModifiers();
+					}
                     break;
                 }
                 case FILL_TYPE_NOFILL:
