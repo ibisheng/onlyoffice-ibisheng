@@ -223,6 +223,7 @@
 						self.hsbHSt.width = hSize + "px";
 						self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 					}
+					ws.objectRender.setScrollOffset();
 				});
 			}
 
