@@ -7832,7 +7832,7 @@ function ps_unicodes_init(memory,table,num_glyphs,get_glyph_name,free_glyph_name
     {
         table.maps = null;
         if (!error)
-            error = 1;
+            error = 163;
     }
     else
     {
