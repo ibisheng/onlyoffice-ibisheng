@@ -839,51 +839,50 @@ DrawingContext.prototype = {
 		var setUpSize  = this.font.FontSize;
         return Height * setUpSize / UnitsPerEm;
     },
+
+	fillGlyph: function (pGlyph, fmgr) {
+		var nW = pGlyph.oBitmap.nWidth;
+		var nH = pGlyph.oBitmap.nHeight;
+
+		if ( !(nW > 0 && nH > 0) ) {return;}
+
+		var nX = asc_floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
+		var nY = asc_floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
+
+		var _r = this.fillColor.r;
+		var _g = this.fillColor.g;
+		var _b = this.fillColor.b;
+
+		if (window.g_isMobileVersion) {
+			// Special for iPad (5.1)
+
+			if (!_r && !_g && !_b) {
+				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
+			} else {
+				var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
+				var ctxD = canvD.getContext("2d");
+				var pixDst = ctxD.getImageData(0, 0, nW, nH);
+				var dstP = pixDst.data;
+				var data = pGlyph.oBitmap.oGlyphData.m_oContext.getImageData(0, 0, nW, nH);
+				var dataPx = data.data;
+				var cur = 0;
+				var cnt = 4 * nW * nH;
+				for (var i = 3; i < cnt; i += 4) {
+					dstP[cur++] = _r;
+					dstP[cur++] = _g;
+					dstP[cur++] = _b;
+					dstP[cur++] = dataPx[i];
+				}
+				ctxD.putImageData(pixDst, 0, 0, 0, 0, nW, nH);
+				this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
+			}
+		} else {
+			pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
+			pGlyph.oBitmap.draw(this.ctx, nX, nY);
+		}
+	},
 	
 	fillText: function (text, x, y, maxWidth, charWidths, angle) {
-		var t = this;
-		function fillGlyph(pGlyph,fmgr) {
-			var nW = pGlyph.oBitmap.nWidth;
-			var nH = pGlyph.oBitmap.nHeight;
-
-			if ( !(nW > 0 && nH > 0) ) {return;}
-
-			var nX = asc_floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
-			var nY = asc_floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
-
-			var _r = t.fillColor.r;
-			var _g = t.fillColor.g;
-			var _b = t.fillColor.b;
-
-			if (window.g_isMobileVersion) {
-				// Special for iPad (5.1)
-
-				if (!_r && !_g && !_b) {
-					this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
-				} else {
-					var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
-					var ctxD = canvD.getContext("2d");
-					var pixDst = ctxD.getImageData(0, 0, nW, nH);
-					var dstP = pixDst.data;
-					var data = pGlyph.oBitmap.oGlyphData.m_oContext.getImageData(0, 0, nW, nH);
-					var dataPx = data.data;
-					var cur = 0;
-					var cnt = 4 * nW * nH;
-					for (var i = 3; i < cnt; i += 4) {
-						dstP[cur++] = _r;
-						dstP[cur++] = _g;
-						dstP[cur++] = _b;
-						dstP[cur++] = dataPx[i];
-					}
-					ctxD.putImageData(pixDst, 0, 0, 0, 0, nW, nH);
-					this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
-				}
-			} else {
-				pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
-                pGlyph.oBitmap.draw(this.ctx, nX, nY);
-			}
-		}
-
         var manager = angle ? this.fmgrGraphics[1] : this.fmgrGraphics[0];
 
         var _x = this._mift.transformPointX(x, y);
@@ -899,7 +898,7 @@ DrawingContext.prototype = {
             var pGlyph = manager.m_oGlyphString.m_pGlyphsBuffer[0];
             if (null === pGlyph || null === pGlyph.oBitmap) {continue;}
 
-            fillGlyph.call(this, pGlyph,manager);
+            this.fillGlyph(pGlyph, manager);
         }
 
         return this;
