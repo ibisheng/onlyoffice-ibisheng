@@ -5,23 +5,6 @@ g_fontManagerExcel.Initialize(true);
 var oldPpi = undefined,
 	cvt = undefined;
 
-var asc_round = function round(x) {
-	var y = x + (x >= 0 ? .5 : -.4);
-	return y | y;
-	//return Math.round(x);
-};
-var asc_floor = function floor(x) {
-	var y = x | x;
-	y -= x < 0 && y > x ? 1 : 0;
-	return y + (x - y > kLeftLim1 ? 1 : 0); // to fix float number precision caused by binary presentation
-	//return Math.floor(x);
-};
-var asc_typeof = function typeOf(obj) {
-	if (obj === undefined) {return kUndefinedL;}
-	if (obj === null) {return kNullL;}
-	return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
-};
-
 function getCvtRatio(fromUnits, toUnits, ppi) {
 	if (ppi !== oldPpi || oldPpi === undefined) {
 		var _ppi  = 1 / ppi,
