@@ -20,17 +20,12 @@ function CNary()
     this.grow = false;
     this.supHide = false;
     this.subHide = false;
-    this.limLoc = NARY_UndOvr;
+    //this.limLoc = NARY_UndOvr;
     CSubMathBase.call(this);
 }
 extend(CNary, CSubMathBase);
 CNary.prototype.init = function(props)
 {
-    if(props.limLoc == NARY_UndOvr)
-        this.limLoc = NARY_UndOvr;
-    else if(props.limLoc  == NARY_SubSup)
-        this.limLoc = NARY_SubSup;
-
     if(props.supHide === true || props.supHide === 1)
         this.supHide = true;
 
@@ -50,6 +45,21 @@ CNary.prototype.init = function(props)
         signCode = props.chr.charCodeAt(0);
         bChr = true;
     }
+
+    if(props.limLoc == NARY_UndOvr)
+        this.limLoc = NARY_UndOvr;
+    else if(props.limLoc  == NARY_SubSup)
+        this.limLoc = NARY_SubSup;
+    else
+    {
+        var bIntegral = signCode > 0x222A && signCode < 0x2231;
+
+        if(bIntegral)
+            this.limLoc =  this.Composition.props.intLim;
+        else
+            this.limLoc = this.Composition.props.naryLim;
+    }
+
 
     if(signCode == 0x222B || props.signType == NARY_INTEGRAL)
     {

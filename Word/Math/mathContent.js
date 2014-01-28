@@ -4845,6 +4845,14 @@ CMathContent.prototype =
             right = null;
         var curr = this.content[posCurr].value;
 
+        var EQUAL   = 0x3D,
+            PLUS    = 0x2B,
+            MINUS   = 0x2212,
+            MULT    = 0x2217,
+            LESS    = 0x3C,
+            GREATER = 0x3E;
+
+
         var t = posCurr - 1;
         while( t > 0 )
         {
@@ -4870,73 +4878,121 @@ CMathContent.prototype =
         var coeffLeft = 0,
             coeffRight = 0;
 
+        var bLeft  = left !== null,
+            bRight = right !== null;
+
         var txtPrp = this.getTxtPrp(posCurr);
         var wTextRPrp = this.mergeTxtPrp(txtPrp);
+
+        var bLeftComp  = bLeft  ? left.typeObj == MATH_COMP : false,
+            bRightComp = bRight ? right.typeObj == MATH_COMP : false,
+            bLeftText  = bLeft  ? left.typeObj == MATH_TEXT : false,
+            bRightText = bRight ? right.typeObj == MATH_TEXT : false;
+
+        var currCode  = curr.typeObj == MATH_TEXT ? curr.getCodeChr() : null,
+            leftCode  = bLeftText ? left.getCodeChr() : null,
+            rightCode = bRightText ? right.getCodeChr() : null;
 
         if(curr.typeObj == MATH_TEXT)
         {
 
             //var gapSign = this.Composition.GetGapSign(oMeasure, wTextRPrp);
 
-            var code = this.content[posCurr].value.getCodeChr();
             var bSign = false;
 
-            if(code === 0x2B || code === 0x2212) // plus, minus
+            if(this.checkOperSign(currCode)) // plus, minus, greater, less
             {
                 bSign = true;
 
-                if(left !== null)
-                    coeffLeft = 0.52;
-
-                if(right !== null)
+                if(bLeft)
                 {
-                    //var a = FontSize/8*0.1;
-                    //var a = wTextRPrp.FontSize*wTextRPrp.FontSize/36*0.001;
-                    coeffRight = 0.49;
+                    if(this.checkZEROSign(leftCode))
+                        coeffLeft = 0;
+                    else if(leftCode == EQUAL)
+                        coeffLeft = 0.26;
+                    else
+                        coeffLeft = 0.52;
+                }
+
+                if(bRight)
+                {
+                    var bZero = this.checkZEROSign(rightCode);
+                    if(rightCode == EQUAL || bZero)
+                        coeffRight = 0;
+                    else
+                        coeffRight = 0.49;
                 }
             }
-            else if(code === 0x2217) // multiplication
+            else if(currCode === MULT) // multiplication
             {
                 bSign = true;
 
-                if(left !== null)
-                    coeffLeft = 0.5;
+                if(bLeft)
+                {
+                    var bZeroLeft = this.checkZEROSign(leftCode),
+                        bOperLeft = this.checkOperSign(leftCode);
 
-                if(right !== null)
-                    coeffRight = 0.49;
+                    if(leftCode == EQUAL || bOperLeft || bZeroLeft)
+                        coeffLeft = 0;
+                    else if(bLeft)
+                        coeffLeft = 0.46;
+                }
+
+                if(bRight)
+                {
+                    var bZeroRight = this.checkZEROSign(rightCode),
+                        bOperRight = this.checkOperSign(rightCode);
+
+                    if(rightCode == EQUAL || bOperRight || bZeroRight)
+                        coeffRight = 0;
+                    else if(bRight)
+                        coeffRight = 0.49;
+                }
+
             }
-            else if(code === 0x3D) // equal
+            else if(currCode === EQUAL) // equal
             {
                 bSign = true;
 
-                if(left !== null)
-                    coeffLeft = 0.7;
+                if(bLeft)
+                {
+                    var bZero = this.checkZEROSign(leftCode);
+                    if(leftCode == EQUAL || bZero)
+                        coeffLeft = 0;
+                    else if(this.checkOperSign(leftCode))
+                        coeffLeft = 0.35;
+                    else
+                        coeffLeft = 0.7;
+                }
 
-                if(right !== null)
-                    coeffRight = 0.5;
+                if(bRight)
+                {
+                    var bZero = this.checkZEROSign(rightCode);
+                    if(rightCode == EQUAL || bZero)
+                        coeffRight = 0;
+                    else if(this.checkOperSign(rightCode))
+                        coeffRight = 0.25;
+                    else
+                        coeffRight = 0.5;
+                }
             }
-
-            var bLeftComp = left !== null ? left.typeObj == MATH_COMP : false,
-                bRightComp = right !== null ? right.typeObj == MATH_COMP : false;
 
             if(bSign && bLeftComp)
             {
                 coeffLeft = coeffLeft - this.getGapsMComp(left).right;
-
             }
 
             if(bSign && bRightComp)
             {
                 coeffRight = coeffRight - this.getGapsMComp(right).left;
-
             }
         }
         else if(curr.typeObj == MATH_COMP)
         {
             var gapsMComp = this.getGapsMComp(curr);
-            if(left !== null)
+            if(bLeft)
                 coeffLeft =  gapsMComp.left;
-            if(right !== null)
+            if(bRight  && !bRightComp)
                 coeffRight = gapsMComp.right;
             /*var checkGap = this.checkGapKind(curr);
 
@@ -4963,6 +5019,20 @@ CMathContent.prototype =
                     coeffRight = 0.26;
             }*/
         }
+
+        if(bLeftText)
+        {
+            if(leftCode == 0x28 || leftCode == 0x5B || leftCode == 0x7B)
+                coeffLeft = 0;
+        }
+
+        if(bRightText)
+        {
+            if(rightCode == 0x29 || rightCode == 0x5D || rightCode == 0x7D)
+                coeffRight = 0;
+        }
+
+
         coeffLeft = Math.ceil(coeffLeft*10)/10;
         coeffRight = Math.ceil(coeffRight*10)/10;
 
@@ -4971,7 +5041,7 @@ CMathContent.prototype =
         this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
         this.content[posCurr].gaps.right = Math.ceil(coeffRight*gapSign*10)/10;
 
-        if(this.bRoot)
+        /*if(this.bRoot)
         {
             if(bSign)
             {
@@ -4989,7 +5059,7 @@ CMathContent.prototype =
                 console.log("gap left :  " + this.content[posCurr].gaps.left + ",  gap right :  " + this.content[posCurr].gaps.right);
                 console.log("");
             }
-        }
+        }*/
 
     },
     getGapsMComp: function(MComp)
@@ -5067,6 +5137,24 @@ CMathContent.prototype =
             bChildGaps = kind == MATH_DEGREE || kind == MATH_DEGREESubSup || kind == MATH_ACCENT || kind == MATH_RADICAL|| kind == MATH_BOX || kind == MATH_BORDER_BOX;
 
         return  {bEmptyGaps: bEmptyGaps, bChildGaps: bChildGaps};
+    },
+    checkZEROSign: function(code) // "*", "/", "\"
+    {
+        var MULT     = 0x2217,
+            DIVISION = 0x2F,
+            B_SLASH  = 0x5C;
+
+        return code == MULT || code == DIVISION || code == B_SLASH;
+
+    },
+    checkOperSign: function(code) // "+", "-", "<", ">"
+    {
+        var PLUS    = 0x2B,
+            MINUS   = 0x2212,
+            LESS    = 0x3C,
+            GREATER = 0x3E;
+
+        return code == PLUS || code == MINUS || code == LESS || code == GREATER;
     },
     old_checkSignComp: function(pos)
     {
@@ -5161,6 +5249,19 @@ CMathContent.prototype =
             pGraphics.drawVerLine(0, x1, y1, y2, penW);
             pGraphics.drawVerLine(0, x2, y1, y2, penW);
         }*/
+
+        if(this.bRoot)
+        {
+            var penW = 25.4/96;
+            var x1 = this.pos.x + x - penW,
+                y1 = this.pos.y + y + penW,
+                x2 = this.pos.x + x + this.size.width + penW,
+                y2 = this.pos.y + y + this.size.height - penW;
+
+            pGraphics.p_color(0,0,255, 255);
+            pGraphics.drawVerLine(0, x1, y1, y2, penW);
+            pGraphics.drawVerLine(0, x2, y1, y2, penW);
+        }
 
     },
     update_widthContent: function()
@@ -6863,9 +6964,17 @@ CMathContent.prototype =
 
 function CMathComposition()
 {
+    this.Parent = undefined;
+
     this.TEST_SELECT_ACTIVE = false;
     this.absPos = null;
     this.Root = null;
+
+    this.props =
+    {
+        naryLim:    NARY_UndOvr,
+        intLim:     NARY_SubSup
+    };
 
     this.CurrentContent    = null;
     this.SelectContent     = null;
@@ -6881,8 +6990,6 @@ function CMathComposition()
     };
 
     this.Init();
-
-    this.Parent = undefined;
 }
 CMathComposition.prototype =
 {
@@ -6897,6 +7004,36 @@ CMathComposition.prototype =
     TestSetFontAllSymbols: function(font)
     {
         this.Root.setFont(font);
+    },
+    SetProperties: function(props)
+    {
+        // defaultJc
+        // выравнивание формулы в документе
+
+        // dispDef
+        // свойство: применять/ не применять paragraph settings (в тч defaultJc)
+
+        // added to paragraph settings for margins
+        // rMargin
+        // lMargin
+
+        // mathFont возможно будет полноценно поддержан MS в будущем
+
+        // Default font for math zones
+        // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
+        // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
+        // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
+
+        // RichEdit Hot Keys
+        // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
+
+
+        if(props.naryLim == NARY_UndOvr || props.naryLim  == NARY_SubSup)
+            this.props.naryLim = props.naryLim;
+
+        if(props.intLim == NARY_UndOvr || props.intLim  == NARY_SubSup)
+            this.props.intLim = props.intLim;
+
     },
     GetShiftCenter: function(oMeasure, font)
     {
