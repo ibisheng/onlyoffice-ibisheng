@@ -233,11 +233,11 @@
 				    "updateSelectionShape":			function () {return self._onUpdateSelectionShape.apply(self, arguments);}
 			    });
 
-			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
+			    this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth, bLockDraw) {
 				    var ws = self.getWorksheetById(wsId);
 				    if (ws)
 					    ws.changeWorksheet("updateRange", {range: range,
-						    isLockDraw: wsId != self.getWorksheet(self.wsActive).model.getId(),
+						    isLockDraw: bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(),
 						    canChangeColWidth: canChangeColWidth});
 			    });
 			    this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {

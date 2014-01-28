@@ -906,10 +906,23 @@ function sortDependency( wb ) {
         }
         for ( var sheetId in oCleanCellCacheArea ) {
             var sheetArea = oCleanCellCacheArea[sheetId];
+			var nPrevRow = null;
+			// var nMinRow = Number.MAX_VALUE;
+			// var nMaxRow = 0;
             for ( var rowId in sheetArea ) {
                 var nRow = rowId - 0;
-                wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nRow, gc_nMaxCol0, nRow ), c_oAscCanChangeColWidth.numbers );
+				// if(nMinRow > nRow)
+					// nMinRow = nRow;
+				// if(nMaxRow < nRow)
+					// nMaxRow = nRow;
+				if(null != nPrevRow)
+					wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nPrevRow, gc_nMaxCol0, nPrevRow ), c_oAscCanChangeColWidth.numbers, true );
+				nPrevRow = nRow;
             }
+			if(null != nPrevRow)
+				wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nPrevRow, gc_nMaxCol0, nPrevRow ), c_oAscCanChangeColWidth.numbers );
+			// if(nMinRow < nMaxRow)
+				// wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nMinRow, gc_nMaxCol0, nMaxRow ), c_oAscCanChangeColWidth.numbers );
         }
 		g_oVLOOKUPCache.clean();
         g_oHLOOKUPCache.clean()
