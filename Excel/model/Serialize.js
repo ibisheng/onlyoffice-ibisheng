@@ -229,7 +229,8 @@ var c_oSerCellTypes =
     Style: 1,
     Type: 2,
     Value: 3,
-    Formula: 4
+    Formula: 4,
+	RefRowCol: 5
 };
 /** @enum */
 var c_oSerFormulaTypes =
@@ -5485,8 +5486,10 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-        if ( c_oSerCellTypes.Ref == type )
+		if ( c_oSerCellTypes.Ref == type )
             oCell.oId = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
+		else if ( c_oSerCellTypes.RefRowCol == type )
+			oCell.oId = new CellAddress(this.stream.GetULongLE(), this.stream.GetULongLE()); //  Ускорение открытия
         else if( c_oSerCellTypes.Style == type )
         {
             var nStyleIndex = this.stream.GetULongLE();
@@ -5505,7 +5508,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
                 case ECellTypeType.celltypeError: oCell.oValue.type = CellValueType.Error;break;
                 case ECellTypeType.celltypeNumber: oCell.oValue.type = CellValueType.Number;break;
                 case ECellTypeType.celltypeSharedString: oCell.oValue.type = CellValueType.String;break;
-            };
+            }
         }
         else if( c_oSerCellTypes.Formula == type )
         {

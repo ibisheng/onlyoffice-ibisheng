@@ -4316,10 +4316,6 @@
 		 * @return {String}
 		 */
 		WorksheetView.prototype._getColumnTitle = function (col) {
-			/*var q = col < 26 ? undefined : asc_floor(col / 26) - 1;
-			var r = col % 26;
-			var text = String.fromCharCode( ("A").charCodeAt(0) + r );
-			return col < 26 ? text : this._getColumnTitle(q) + text;*/
 			return g_oCellAddressUtils.colnumToColstrFromWsView(col + 1);
 		};
 
