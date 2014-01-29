@@ -2456,6 +2456,10 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 
 function GraphicOption(ws, type, range, aId) {
 	var _this = this;
+	
+	var asc = window["Asc"];
+	var asc_Range = asc.Range;
+	
 	_this.ws = ws;
 	_this.type = type;
 	_this.range = range;
@@ -2479,7 +2483,9 @@ function GraphicOption(ws, type, range, aId) {
 	
 	_this.getUpdatedRange = function() {
 	
-		var vr = _this.ws.visibleRange.clone();
+		var vr = new asc_Range(_this.ws.getFirstVisibleCol(true), _this.ws.getFirstVisibleRow(true), _this.ws.visibleRange.c2, _this.ws.visibleRange.r2);
+	
+		//var vr = _this.ws.visibleRange.clone();
 		if ( _this.isScrollType() && !range )
 			return vr;
 		
@@ -2552,11 +2558,11 @@ function DrawingObjects() {
 	var ScrollOffset = function() {
 		
 		this.getX = function() {
-			return -ptToPx((worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
+			return -ptToPx((worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft)) + worksheet.getCellLeft(0, 0);
 		}
 		
 		this.getY = function() {
-			return -ptToPx((worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
+			return -ptToPx((worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop)) + worksheet.getCellTop(0, 0);
 		}
 	}
 
@@ -2596,6 +2602,7 @@ function DrawingObjects() {
 	_this.zoom = { last: 1, current: 1 };
 	_this.isViewerMode = null;
 	_this.objectLocker = null;
+	_this.drawingArea = null;
 	_this.coordsManager = null;
 	_this.drawingDocument = null;
 	_this.asyncImageEndLoaded = null;
@@ -2746,8 +2753,8 @@ function DrawingObjects() {
 				lvr = updatedRange.r2;
 			}
 			else {
-				fvc = _t.worksheet.getFirstVisibleCol();
-				fvr = _t.worksheet.getFirstVisibleRow();
+				fvc = _t.worksheet.getFirstVisibleCol(true);
+				fvr = _t.worksheet.getFirstVisibleRow(true);
 				lvc = _t.worksheet.getLastVisibleCol();
 				lvr = _t.worksheet.getLastVisibleRow();
 		
@@ -2830,7 +2837,7 @@ function DrawingObjects() {
 	DrawingBase.prototype.getVisibleTopOffset = function(withHeader) {
 		var _t = this;
 		var headerRowOff = _t.worksheet.getCellTop(0, 0);
-		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(true), 0);
 		var off = _t.getRealTopOffset() - fvr;
 		var off = (off > 0) ? off : 0;
 		return withHeader ? headerRowOff + off : off;
@@ -2840,7 +2847,7 @@ function DrawingObjects() {
 	DrawingBase.prototype.getVisibleLeftOffset = function(withHeader) {
 		var _t = this;
 		var headerColOff = _t.worksheet.getCellLeft(0, 0);
-		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(true), 0);
 		var off = _t.getRealLeftOffset() - fvc;
 		var off = (off > 0) ? off : 0;
 		return withHeader ? headerColOff + off : off;
@@ -2849,7 +2856,7 @@ function DrawingObjects() {
 	// смещение по высоте внутри объекта
 	DrawingBase.prototype.getInnerOffsetTop = function() {
 		var _t = this;
-		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+		var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(true), 0);
 		var off = _t.getRealTopOffset() - fvr;
 		return (off > 0) ? 0 : asc.round( Math.abs(off) );
 	}
@@ -2857,7 +2864,7 @@ function DrawingObjects() {
 	// смещение по ширине внутри объекта
 	DrawingBase.prototype.getInnerOffsetLeft = function() {
 		var _t = this;
-		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+		var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(true), 0);
 		var off = _t.getRealLeftOffset() - fvc;
 		return (off > 0) ? 0 : asc.round( Math.abs(off) );
 	}
@@ -2944,6 +2951,8 @@ function DrawingObjects() {
 		shapeCtx.m_oAutoShapesTrack = autoShapeTrack;
 		
 		_this.objectLocker = new ObjectLocker(worksheet);
+		_this.drawingArea = new DrawingArea(worksheet);
+		_this.drawingArea.init();
 		_this.coordsManager = new CoordsManager(worksheet, true);
 		_this.drawingDocument = new CDrawingDocument(this);
 		_this.drawingDocument.AutoShapesTrack = autoShapeTrack;
@@ -3380,8 +3389,8 @@ function DrawingObjects() {
 			var r_ = range.intersection(worksheet.visibleRange);			
 			
 			if ( r_ ) {
-				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
-				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+				var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+				var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 				
 				while ( !worksheet.cols[r_.c2 + 1] ) {
 					worksheet.expandColsOnScroll(true);
@@ -3462,8 +3471,8 @@ function DrawingObjects() {
 		shapeOverlayCtx.updatedRect = null;
 		if ( bRedraw ) {
 			
-			var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
-			var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+			var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+			var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 			
 			if ( !worksheet.cols[selection.c2 + 1] )
 				worksheet.expandColsOnScroll(true);
@@ -3501,6 +3510,21 @@ function DrawingObjects() {
 		}
 	}	
 
+	_this.getFrozenOffset = function() {
+		
+		var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
+		if ( _this.worksheet.topLeftFrozenCell ) {
+			cFrozen = _this.worksheet.topLeftFrozenCell.getCol0();
+			rFrozen = _this.worksheet.topLeftFrozenCell.getRow0();
+			diffWidth = _this.worksheet.cols[cFrozen].left - _this.worksheet.cols[0].left;
+			diffHeight = _this.worksheet.rows[rFrozen].top - _this.worksheet.rows[0].top;
+			
+			offsetX = _this.worksheet.cols[_this.worksheet.visibleRange.c1].left - _this.worksheet.cellsLeft - diffWidth;
+			offsetY = _this.worksheet.rows[_this.worksheet.visibleRange.r1].top - _this.worksheet.cellsTop - diffHeight;
+		}
+		return { offsetX: offsetX, offsetY: offsetY };
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Drawing objects
 	//-----------------------------------------------------------------------------------
@@ -3553,8 +3577,8 @@ function DrawingObjects() {
 					var updatedRect = { x: 0, y: 0, w: 0, h: 0 };
 					var updatedRange = graphicOption.getUpdatedRange();
 					
-					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
-					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+					var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+					var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 					
 					var x1 = worksheet.cols[updatedRange.c1].left - offsetX;
 					var y1 = worksheet.rows[updatedRange.r1].top - offsetY;
@@ -3795,8 +3819,8 @@ function DrawingObjects() {
 			if ( graphicOption ) {
 				var updatedRange = graphicOption.getUpdatedRange();
 				
-				var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
-				var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+				var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+				var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 				
 				var vr = worksheet.visibleRange;
 				var borderOffsetX = (updatedRange.c1 <= vr.c1) ? 0 : 3;
@@ -3809,7 +3833,7 @@ function DrawingObjects() {
 				
 				/*canvas.m_oContext.beginPath();
 				canvas.m_oContext.strokeStyle = "#FF0000";
-				canvas.m_oContext.rect(x, y, w, h);
+				canvas.m_oContext.rect(x + 0.5, y + 0.5, w, h);
 				canvas.m_oContext.stroke();*/
 			}
 			else {
@@ -3858,7 +3882,7 @@ function DrawingObjects() {
 				var realTopOffset = coordsFrom.y;
 				var realLeftOffset = coordsFrom.x;
 				
-				var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 0); 	// по ширине
+				var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(true), 0); 	// по ширине
 				if (areaWidth < width) {
 					metricCoeff = width / areaWidth;
 
@@ -3866,7 +3890,7 @@ function DrawingObjects() {
 					height /= metricCoeff;
 				}
 
-				var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 0); 	// по высоте
+				var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(true), 0); 	// по высоте
 				if (areaHeight < height) {
 					metricCoeff = height / areaHeight;
 
@@ -4665,6 +4689,7 @@ function DrawingObjects() {
 			_this.objectLocker.addObjectId(drawingObject.graphicObject.Id);
 			_this.objectLocker.checkObjects( function(result) {} );
 		}
+		worksheet.setSelectionShape(true);
 		
 		/*var boundsChecker = _this.getBoundsChecker(drawingObject.graphicObject);
 		aBoundsCheckers.push(boundsChecker);*/
@@ -5027,12 +5052,14 @@ function DrawingObjects() {
 	
 	_this.graphicObjectMouseMove = function(e, x, y) {
 		e.IsLocked = e.isLocked;
+		
+		for ( var i = 0; i < _this.drawingArea.frozenPlaces.length; i++ ) {
+			_this.drawingArea.frozenPlaces[i].isPointInside(x, y);
+		}
 		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
-		if ( e.fromWindow && !CheckIdTrackState(_this.controller.curState.id) )
-			return;
 		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
@@ -5185,8 +5212,8 @@ function DrawingObjects() {
 				var BB = drawingObject.chart.range.intervalObject.getBBox0();
 				var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
 				
-				var fvr = worksheet.getFirstVisibleRow();
-				var fvc = worksheet.getFirstVisibleCol();
+				var fvr = worksheet.getFirstVisibleRow(true);
+				var fvc = worksheet.getFirstVisibleCol(true);
 				var headers = drawingObject.chart.parseSeriesHeaders();
 				
 				var bbox = BB.clone();
@@ -5582,8 +5609,8 @@ function CoordsManager(ws, bLog) {
 		var xPt = worksheet.objectRender.convertMetric(_x, 0, 1);
 		var yPt = worksheet.objectRender.convertMetric(_y, 0, 1);
 		
-		var offsetX = worksheet.cols[worksheet.visibleRange.c1].left - worksheet.cellsLeft;
-		var offsetY = worksheet.rows[worksheet.visibleRange.r1].top - worksheet.cellsTop;
+		var offsetX = worksheet.cols[worksheet.getFirstVisibleCol(true)].left - worksheet.cellsLeft;
+		var offsetY = worksheet.rows[worksheet.getFirstVisibleRow(true)].top - worksheet.cellsTop;
 		
 		/* Проверки на максимум в листе */
 		function isMaxCol() {
@@ -5649,6 +5676,321 @@ function CoordsManager(ws, bLog) {
 			coords.x = worksheet.getCellLeft(cell.col, 0) + worksheet.objectRender.convertMetric(cell.colOff, 3, 0) - worksheet.getCellLeft(0, 0);
 		}
 		return coords;
+	}
+}
+
+//-----------------------------------------------------------------------------------
+// Drawing area manager
+//-----------------------------------------------------------------------------------
+
+// Type
+var FrozenAreaType = {
+
+	Top				: "Top",
+	Bottom			: "Bottom",
+	Left			: "Left",
+	Right			: "Right",
+	Center			: "Center",		// Default without frozen places
+	
+	LeftTop			: "LeftTop",
+	RightTop		: "RightTop",
+	LeftBottom		: "LeftBottom",
+	RightBottom		: "RightBottom"
+};
+
+// Frozen place
+function FrozenPlace(ws, type) {
+	//var log = true;
+	var _this = this;
+	var asc = window["Asc"];
+	var asc_Range = asc.Range;
+	
+	_this.worksheet = ws;
+	_this.type = type;
+	_this.range = null;
+	_this.frozenCell = {
+		col: _this.worksheet.topLeftFrozenCell ? _this.worksheet.topLeftFrozenCell.getCol0() : 0,
+		row: _this.worksheet.topLeftFrozenCell ? _this.worksheet.topLeftFrozenCell.getRow0() : 0
+	};
+	_this.isValid = true;
+	
+	var convertMetrics = _this.worksheet.objectRender.convertMetric;
+	
+	switch (_this.type) {
+		
+		case FrozenAreaType.Top: {
+			if ( !_this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row);
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.Bottom: {
+			if ( !_this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(0, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.Left: {
+			if ( _this.frozenCell.col && !_this.frozenCell.row )
+				_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.Right: {
+			if ( _this.frozenCell.col && !_this.frozenCell.row )
+				_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.Center: {
+			if ( !_this.frozenCell.col && !_this.frozenCell.row )
+				_this.range = new asc_Range(0, 0, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		// Other
+		case FrozenAreaType.LeftTop: {
+			if ( _this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(0, 0, _this.frozenCell.col, _this.frozenCell.row);
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.RightTop: {
+			if ( _this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(_this.frozenCell.col, 0, _this.worksheet.getLastVisibleCol(), _this.frozenCell.row);
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.LeftBottom: {
+			if ( _this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(0, _this.frozenCell.row, _this.frozenCell.col, _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+		
+		case FrozenAreaType.RightBottom: {
+			if ( _this.frozenCell.col && _this.frozenCell.row )
+				_this.range = new asc_Range(_this.frozenCell.col, _this.frozenCell.row, _this.worksheet.getLastVisibleCol(), _this.worksheet.getLastVisibleRow());
+			else
+				_this.isValid = false;
+		}
+		break;
+	}
+	
+	// Methods
+	
+	_this.getFirstVisible = function() {
+		return { col : _this.worksheet.getFirstVisibleCol(),
+				 row : _this.worksheet.getFirstVisibleRow(),
+				 col0 : _this.worksheet.getFirstVisibleCol(true),
+				 rrow0 : _this.worksheet.getFirstVisibleRow(true) };
+	}
+	
+	_this.getRect = function() {
+		var rect = { x: 0, y: 0, w: 0, h: 0 };
+		var fv = _this.getFirstVisible();
+		
+		switch (_this.type) {
+			// Two places
+			case FrozenAreaType.Top: {
+			}
+			break;
+			case FrozenAreaType.Bottom: {
+			}
+			break;
+			case FrozenAreaType.Left: {
+			}
+			break;
+			case FrozenAreaType.Right: {
+			}
+			break;
+			
+			// Four places
+			case FrozenAreaType.LeftTop: {
+			}
+			break;
+			case FrozenAreaType.RightTop: {
+			}
+			break;
+			case FrozenAreaType.LeftBottom: {
+			}
+			break;
+			case FrozenAreaType.RightBottom: {
+			}
+			break;
+			
+			// No frozen areas
+			case FrozenAreaType.Center: {
+				/*rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
+				rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
+				rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) - rect.x;
+				rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) - rect.y;*/
+			}
+			break;
+		}
+		
+		rect.x = _this.worksheet.getCellLeft(_this.range.c1, 0);
+		rect.y = _this.worksheet.getCellTop(_this.range.r1, 0);
+		rect.w = _this.worksheet.getCellLeft(_this.range.c2, 0) - rect.x;
+		rect.h = _this.worksheet.getCellTop(_this.range.r2, 0) - rect.y;
+		
+		return rect;
+	}
+	
+	_this.isPointInside = function(x, y) {
+		var rect = _this.getRect();
+		var result = (x > rect.x ) && (y > rect.y) && (x <= rect.x + rect.w) && (y <= rect.y + rect.h);
+		if ( log && result )
+			console.log( x + "," + y + " in " +  _this.type);
+		return result;			
+	}
+	
+	_this.getVerticalScroll = function() {
+		
+		// No scroll for Top, LeftTop, RightTop
+		var fv = _this.getFirstVisible();
+		
+		switch (_this.type) {
+			// Two places
+			case FrozenAreaType.Top: {
+			}
+			break;
+			case FrozenAreaType.Bottom: {
+			}
+			break;
+			case FrozenAreaType.Left: {
+			}
+			break;
+			case FrozenAreaType.Right: {
+			}
+			break;
+			
+			// Four places
+			case FrozenAreaType.LeftTop: {
+			}
+			break;
+			case FrozenAreaType.RightTop: {
+			}
+			break;
+			case FrozenAreaType.LeftBottom: {
+			}
+			break;
+			case FrozenAreaType.RightBottom: {
+			}
+			break;
+			
+			// No frozen areas
+			case FrozenAreaType.Center: {
+				return convertMetrics( (_this.worksheet.rows[fv.row].top - _this.worksheet.cellsTop), 1, 0 ) - _this.worksheet.getCellTop(0, 0);
+			}
+			break;
+		}
+	}
+	
+	_this.getHorizontalScroll = function() {
+		
+		// No scroll for Left, LeftTop, LeftBottom
+		var fv = _this.getFirstVisible();
+		
+		switch (_this.type) {
+			// Two places
+			case FrozenAreaType.Top: {
+			}
+			break;
+			case FrozenAreaType.Bottom: {
+			}
+			break;
+			case FrozenAreaType.Left: {
+			}
+			break;
+			case FrozenAreaType.Right: {
+			}
+			break;
+			
+			// Four places
+			case FrozenAreaType.LeftTop: {
+			}
+			break;
+			case FrozenAreaType.RightTop: {
+			}
+			break;
+			case FrozenAreaType.LeftBottom: {
+			}
+			break;
+			case FrozenAreaType.RightBottom: {
+			}
+			break;
+			
+			// No frozen areas
+			case FrozenAreaType.Center: {
+				return convertMetrics( (_this.worksheet.cols[fv.col].left - _this.worksheet.cellsLeft), 1, 0 ) + _this.worksheet.getCellLeft(0, 0);
+			}
+			break;
+		}
+	}
+	
+	_this.getClipRect = function() {
+		var rect = { x: 0, y: 0, w: 0, h: 0 };
+		return rect;
+	}
+}
+
+// Container
+function DrawingArea(ws) {
+
+	var _this = this;
+	_this.worksheet = ws;
+	
+	_this.frozenPlaces = [];
+	
+	// Methods
+	_this.init = function() {
+		if ( _this.worksheet ) {
+			if ( _this.worksheet.topLeftFrozenCell ) {
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Top);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Bottom);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Left);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.Right);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+					
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftTop);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightTop);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.LeftBottom);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+				var place = new FrozenPlace(_this.worksheet, FrozenAreaType.RightBottom);
+				if ( place.isValid )
+					_this.frozenPlaces.push(place);
+			}
+			else
+				_this.frozenPlaces.push(new FrozenPlace(_this.worksheet, FrozenAreaType.Center));
+		}
 	}
 }
 

@@ -696,6 +696,7 @@ function asc_CCellCommentator(currentSheet) {
 		function getCellId(col, row) { return (col + "_" + row) };
 
 		//_this.calcCommentsCoords();
+		var frozenOffset = _this.getFrozenOffset();
 
 		for (var i = 0; i < _this.aComments.length; i++) {
 
@@ -1165,13 +1166,22 @@ function asc_CCellCommentator(currentSheet) {
 			coords.nTop = mergedRange ? mergedRange.r1 : comment.nRow;
 			coords.nLeftOffset = 0;
 			coords.nTopOffset = 0;
+			
+			var fvr = _this.worksheet.getFirstVisibleRow(true);
+			var fvc = _this.worksheet.getFirstVisibleCol(true);
+			
+			var frozenOffset = _this.getFrozenOffset();
+			if ( _this.worksheet.topLeftFrozenCell ) {
+				if ( comment.nCol >= _this.worksheet.getFirstVisibleCol(false) )
+					frozenOffset.offsetX = 0;
+				if ( comment.nRow >= _this.worksheet.getFirstVisibleRow(false) )
+					frozenOffset.offsetY = 0;
+			}
 
-			var fvr = _this.worksheet.getFirstVisibleRow();
-			var fvc = _this.worksheet.getFirstVisibleCol();
-
-			coords.dReverseLeftPX = _this.worksheet.getCellLeft(comment.nCol, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx;
-			coords.dLeftPX = _this.worksheet.getCellLeft(coords.nLeft, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx;
-			coords.dTopPX = _this.worksheet.getCellTop(coords.nTop, 0) - _this.worksheet.getCellTop(fvr, 0) + headerRowOffPx;
+			// Tooltip coords
+			coords.dReverseLeftPX = _this.worksheet.getCellLeft(comment.nCol, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx + _this.ptToPx(frozenOffset.offsetX);
+			coords.dLeftPX = _this.worksheet.getCellLeft(coords.nLeft, 0) - _this.worksheet.getCellLeft(fvc, 0) + headerColOffPx + _this.ptToPx(frozenOffset.offsetX);
+			coords.dTopPX = _this.worksheet.getCellTop(coords.nTop, 0) - _this.worksheet.getCellTop(fvr, 0) + headerRowOffPx + _this.ptToPx(frozenOffset.offsetY);
 
 			// Correction for merged cell
 			var fvrPx = _this.worksheet.getCellTop(0, 0);
@@ -1239,6 +1249,21 @@ function asc_CCellCommentator(currentSheet) {
 					_this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
 			}
 		}
+	}
+	
+	_this.getFrozenOffset = function() {
+		
+		var offsetX = 0, offsetY = 0, cFrozen = 0, rFrozen = 0, diffWidth = 0, diffHeight = 0;
+		if ( _this.worksheet.topLeftFrozenCell ) {
+			cFrozen = _this.worksheet.topLeftFrozenCell.getCol0();
+			rFrozen = _this.worksheet.topLeftFrozenCell.getRow0();
+			diffWidth = _this.worksheet.cols[cFrozen].left - _this.worksheet.cols[0].left;
+			diffHeight = _this.worksheet.rows[rFrozen].top - _this.worksheet.rows[0].top;
+			
+			offsetX = _this.worksheet.cols[_this.worksheet.visibleRange.c1].left - _this.worksheet.cellsLeft - diffWidth;
+			offsetY = _this.worksheet.rows[_this.worksheet.visibleRange.r1].top - _this.worksheet.cellsTop - diffHeight;
+		}
+		return { offsetX: offsetX, offsetY: offsetY };
 	}
 	
 	//-----------------------------------------------------------------------------------
