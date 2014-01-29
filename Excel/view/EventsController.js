@@ -992,7 +992,7 @@
 			var coord = this._getCoordinates(event);
 			
 			// Отправляем событие только вне канвы
-			if ( (( coord.x < 0 ) || (coord.y < 0) || (coord.x > this.element.width()) || (coord.y > this.element.height()))  && asc["editor"].isStartAddShape ) {
+			if ( (( coord.x < 0 ) || (coord.y < 0) || (coord.x > this.element.width) || (coord.y > this.element.height))  && asc["editor"].isStartAddShape ) {
 				this.isLocked = false;
 				event.isLocked = false;
 				event.ClickCount = this.clickCounter.clickCount;
