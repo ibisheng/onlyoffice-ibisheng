@@ -119,7 +119,7 @@ ParaText.prototype =
     {
         Context.SetFontSlot( this.FontSlot, this.FontKoef );
 
-        if ( true === this.IsNBSP && typeof (editor) !== "undefined" && editor.ShowParaMarks )
+        if ( true === this.IsNBSP && editor && editor.ShowParaMarks )
             Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
         else
             Context.FillText( X, Y, this.CalcValue );

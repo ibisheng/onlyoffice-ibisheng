@@ -12,7 +12,7 @@ var UnknownValue  = null;
 var Debug_ParaRunMode = false;
 
 // Класс Paragraph
-function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
+function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -85,8 +85,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.NeedReDraw = true;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = typeof(editor) != "undefined" && editor.isDocumentEditor && editor.WordControl.m_oLogicDocument;
-
+    this.LogicDocument = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
+	this.bFromDocument = bFromPresentation === true ? false : !!this.LogicDocument;
     this.TurnOffRecalcEvent = false;
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
@@ -5432,7 +5432,7 @@ Paragraph.prototype =
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
         // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		if(this.bFromDocument)
 		{
 			if ( locktype_None != this.Lock.Get_Type() )
 			{
@@ -5451,7 +5451,7 @@ Paragraph.prototype =
 
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)
     {
-        if ( typeof(editor) !== "undefined" && true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
+        if ( this.bFromDocument && true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
         {
             var SpecFont = { FontFamily: { Name : "Arial", Index : -1 }, FontSize : 12, Italic : false, Bold : false };
             var SpecSym = String.fromCharCode( 0x25AA );
@@ -5472,7 +5472,7 @@ Paragraph.prototype =
 
     Internal_Draw_3 : function(CurPage, pGraphics, Pr)
     {
-		if(!(typeof(editor) !== "undefined" && editor.isDocumentEditor))
+		if(!this.bFromDocument)
 			return;
         if ( true !== Debug_ParaRunMode )
         {
@@ -6738,7 +6738,7 @@ Paragraph.prototype =
                 }
 
                 // Рисуем подчеркивание орфографии
-				if(typeof (editor)  != "undefined" && editor.isDocumentEditor)
+				if(this.bFromDocument)
 				{
 					pGraphics.p_color( 255, 0, 0, 255 );
 					var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
@@ -13195,7 +13195,7 @@ Paragraph.prototype =
     // Формируем конечные свойства параграфа на основе стиля, возможной нумерации и прямых настроек.
     Internal_CompileParaPr : function()
     {
-		if(typeof (editor) != "undefined" && editor.isDocumentEditor)
+		if(this.bFromDocument)
 		{
 			var Styles     = this.Parent.Get_Styles();
 			var Numbering  = this.Parent.Get_Numbering();
