@@ -444,8 +444,8 @@ CShapeDrawer.prototype =
 {
     Clear : function()
     {
-        this.Shape = null;
-        this.Graphics = null;
+		//this.Shape = null;
+        //this.Graphics = null;
         this.UniFill = null;
         this.Ln = null;
         this.Transform = null;
