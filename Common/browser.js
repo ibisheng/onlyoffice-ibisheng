@@ -29,7 +29,7 @@ AscBrowser.isMacOs = (AscBrowser.userAgent.indexOf('mac') > -1);
 AscBrowser.isSafari = (AscBrowser.userAgent.indexOf("safari") > -1);
 
 // macOs safari detect
-AscBrowser.isSafariMacOs =  (AscBrowser.isSafari && AscBrowser.isMacOs) ? true : false;
+AscBrowser.isSafariMacOs = (AscBrowser.isSafari && AscBrowser.isMacOs);
 if (AscBrowser.isSafariMacOs)
 {
     // браузеры под мак все определяются как сафари

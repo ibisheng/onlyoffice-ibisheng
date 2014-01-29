@@ -127,6 +127,10 @@
 			if (this.element.onselectstart) {
 				this.element.onselectstart = function () {return false;};
 			}
+			if (AscBrowser.isIE || AscBrowser.isOpera) {
+				// не убирать!!! это для ие. чтобы не селектились элементы
+				document.onselectstart = function () {return false;};
+			}
 
 			if (this.element.addEventListener) {
 				this.element.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}		, false);
