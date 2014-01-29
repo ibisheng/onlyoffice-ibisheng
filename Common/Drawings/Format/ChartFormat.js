@@ -3308,6 +3308,16 @@ CDLbl.prototype =
 		
 	},
 	
+	checkNoLbl: function()
+	{
+		if(this.tx && this.tx.rich)
+			return false;
+		else
+		{
+			return !(this.showSerName || this.showCatName || this.showVal);
+		}
+	},
+	
 	recalculateTxBody: function()
 	{
 		if(this.tx && this.tx.rich)

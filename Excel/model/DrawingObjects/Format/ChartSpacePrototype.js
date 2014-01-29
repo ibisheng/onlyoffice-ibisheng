@@ -108,18 +108,16 @@ CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
 CChartSpace.prototype.draw = function(graphics)
 {
-	/*var intGrid = graphics.GetIntegerGrid();
+	var intGrid = graphics.GetIntegerGrid();
 	graphics.SetIntegerGrid(false);
 	graphics.transform3(this.transform, false);
 	
 	this.chartObj.draw(this, graphics);
 	graphics.reset();
-	graphics.SetIntegerGrid(intGrid);*/
+	graphics.SetIntegerGrid(intGrid);
 	
 	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
 	{
-		var default_lbl = new CDLbl();
-		default_lbl.initDefault();
 		var series = this.chart.plotArea.chart.series;
 		for(var i = 0; i < series.length; ++i)
 		{
@@ -905,11 +903,20 @@ CChartSpace.prototype.recalculateDLbls = function()
 				compiled_dlb.merge(ser.dLbls);
 				if(ser.dLbls)
 					compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx), true);
-				pt.compiledDlb = compiled_dlb;
-				pt.compiledDlb.chart = this;
-				pt.compiledDlb.series = ser;
-				pt.compiledDlb.pt = pt;
-				pt.compiledDlb.recalculate();
+					
+				if(compiled_dlb.checkNoLbl())
+				{
+					pt.compiledDlb = null;
+				}				
+				else
+				{
+					pt.compiledDlb = compiled_dlb;
+					pt.compiledDlb.chart = this;
+					pt.compiledDlb.series = ser;
+					pt.compiledDlb.pt = pt;
+					
+					pt.compiledDlb.recalculate();
+				}
 			}
 		}
 	}
