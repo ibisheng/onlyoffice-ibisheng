@@ -119,7 +119,7 @@ ParaText.prototype =
     {
         Context.SetFontSlot( this.FontSlot, this.FontKoef );
 
-        if ( true === this.IsNBSP && editor.ShowParaMarks )
+        if ( true === this.IsNBSP && typeof (editor) !== "undefined" && editor.ShowParaMarks )
             Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
         else
             Context.FillText( X, Y, this.CalcValue );
@@ -265,7 +265,7 @@ ParaSpace.prototype =
 
         Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
-        if ( editor.ShowParaMarks )
+        if (typeof (editor) !== "undefined" && editor.ShowParaMarks )
             Context.FillText( X, Y, sString );
     },
 
@@ -2271,7 +2271,7 @@ ParaEnd.prototype =
     {
         Context.SetFontSlot( fontslot_ASCII );
         
-        if ( editor.ShowParaMarks )
+        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
             if ( true === bEndCell )
                 Context.FillText( X, Y, String.fromCharCode( 0x00A4 ) );
@@ -2337,7 +2337,7 @@ ParaNewLine.prototype =
 {
     Draw : function(X,Y,Context)
     {
-        if ( editor.ShowParaMarks )
+        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
             switch( this.BreakType )
             {
@@ -2749,7 +2749,7 @@ ParaTab.prototype =
 {
     Draw : function(X,Y,Context)
     {
-        if ( editor.ShowParaMarks )
+        if ( typeof (editor) !== "undefined" && editor.ShowParaMarks )
         {
             var X0 = this.Width / 2 - this.RealWidth / 2;
 

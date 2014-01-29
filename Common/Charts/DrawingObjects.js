@@ -5026,6 +5026,7 @@ function DrawingObjects() {
 	}
 	
 	_this.graphicObjectMouseMove = function(e, x, y) {
+		e.IsLocked = e.isLocked;
 		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.getX()), pxToMm(y - scrollOffset.getY()) );
 	}
 	
@@ -5042,6 +5043,12 @@ function DrawingObjects() {
 	}
 	
 	_this.graphicObjectKeyPress = function(e) {
+	
+		e.KeyCode = e.keyCode;
+		e.CtrlKey = e.ctrlKey;
+		e.AltKey = e.altKey;
+		e.ShiftKey = e.shiftKey;
+		e.Which = e.which;
 		return _this.controller.onKeyPress( e );
 	}
 	

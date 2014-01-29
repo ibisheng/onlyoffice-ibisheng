@@ -105,12 +105,22 @@ function getBoundsInGroup(shape)
     }
 }
 
+
+var SHAPE_TYPE_RECALC_POSITION = 0;
+var SHAPE_TYPE_RECALC_EXTENTS = 1;
+var SHAPE_TYPE_RECALC_ROT = 2;
+var SHAPE_TYPE_RECALC_FLIP = 3;
+var SHAPE_TYPE_RECALC_FILL = 4;
+var SHAPE_TYPE_RECALC_LINE = 5;
+var SHAPE_TYPE_RECALC_GEOMETRY = 6;
+
 function CShape()
 {
     this.nvSpPr         = null;
     this.spPr           = null;
     this.style          = null;
     this.txBody         = null;
+	this.bodyPr			= null;
     this.textBoxContent = null;
     this.parent         = null;//В Word - ParaDrawing, в PowerPoint - Slide;
     this.group          = null;
@@ -189,6 +199,58 @@ CShape.prototype =
         History.Add(this, {Type: historyitem_ShapeSetTextBoxContent, oldPr: this.textBoxContent, newPr: textBoxContent});
         this.textBoxContent = textBoxContent;
     },
+	
+	setBodyPr: function(pr)
+	{
+		History.Add(this, {Type: historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
+		this.bodyPr = pr;
+	},
+	
+	createTextBody: function()
+	{
+		var tx_body = new CTextBody();
+		tx_body.setParent(this);
+		tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
+		tx_body.content.Content[0].Set_DocumentIndex(0);
+		this.setTxBody(tx_body);
+	},
+	
+	createTextBoxContent: function()
+	{
+		this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
+		this.textBoxContent.Content[0].Set_DocumentIndex(0);
+	},
+	
+	paragraphAdd: function (paraItem, bRecalculate) 
+	{
+		var content_to_add =  this.getDocContent();
+		if(content_to_add)
+		{
+			content_to_add.Paragraph_Add(paraItem, bRecalculate);
+		}
+    },
+	
+	getDocContent: function()
+	{
+		if(this.txBody)
+		{
+			return this.txBody.content;
+		}
+		else if(this.textBoxContent)
+		{
+			return this.textBoxContent;
+		}
+		return null;
+	},
+	
+	getBodyPr: function()
+	{
+		if(this.bodyPr)
+			return this.bodyPr;
+		else if(this.txBody && this.txBody.bodyPr)
+			return this.txBody.getCompiledBodyPr();
+		return null;
+	},
 
     setParent: function (parent)
     {
@@ -655,6 +717,14 @@ CShape.prototype =
         }
     },
 
+	
+	getSelectedTextInfo: function(info)
+	{
+		var content = this.getDocContent();
+		if(content)
+			content.Get_SelectedElementsInfo(info);
+	},
+	
     getCompiledLine: function () {
         if (this.recalcInfo.recalculateLine) {
             this.compiledLine = null;
@@ -744,15 +814,9 @@ CShape.prototype =
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
     },
 
-    getPhIndex: function () {
+    getPhIndex: function () 
+	{
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
-    },
-
-
-    recalculateContent: function () {
-        if (this.txBody) {
-            this.txBody.calculateContent();
-        }
     },
 
     setTextVerticalAlign: function (align) {
@@ -1460,31 +1524,40 @@ CShape.prototype =
     },
 
     Get_Styles: function (level) {
-        if (this.recalcInfo.recalculateTextStyles[level]) {
-            this.recalculateTextStyles(level);
-            this.recalcInfo.recalculateTextStyles[level] = false;
+		
+		var _level = isRealNumber(level) ? level : 0;
+        if (this.recalcInfo.recalculateTextStyles[_level]) 
+		{
+            this.recalculateTextStyles(_level);
+            this.recalcInfo.recalculateTextStyles[_level] = false;
         }
-        return this.compiledStyles[level];
+        return this.compiledStyles[_level];
     },
 
     Set_CurrentElement: function ()
     { },
 
-    recalculateTextStyles: function (level) {
+    recalculateTextStyles: function (level) 
+	{
         var parent_objects = this.getParentObjects();
         var default_style = new CStyle("defaultStyle", null, null, null);
-        if (isRealObject(parent_objects.presentation.defaultTextStyle)
-            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
+        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
+            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) 
+		{
             var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
             default_style.ParaPr = default_ppt_style.pPr.Copy();
             default_style.TextPr = default_ppt_style.rPr.Copy();
         }
 
-        var master_style = new CStyle("masterStyele", null, null, null);
-        if (isRealObject(parent_objects.master.txStyles)) {
+		var master_style;
+        if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles)) 
+		{
             var master_ppt_styles;
-            if (this.isPlaceholder()) {
-                switch (this.getPlaceholderType()) {
+			master_style = new CStyle("masterStyele", null, null, null);
+			if (this.isPlaceholder())
+			{
+                switch (this.getPlaceholderType()) 
+				{
                     case phType_ctrTitle:
                     case phType_title:
                     {
@@ -1506,11 +1579,13 @@ CShape.prototype =
                     }
                 }
             }
-            else {
+            else
+			{
                 master_ppt_styles = parent_objects.master.txStyles.otherStyle;
             }
 
-            if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels[level])) {
+            if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level])) 
+			{
                 var master_ppt_style = master_ppt_styles.levels[level];
                 master_style.ParaPr = master_ppt_style.pPr.Copy();
                 master_style.TextPr = master_ppt_style.rPr.Copy();
@@ -1519,13 +1594,15 @@ CShape.prototype =
 
         var hierarchy = this.getHierarchy();
         var hierarchy_styles = [];
-        for (var i = 0; i < hierarchy.length; ++i) {
+        for (var i = 0; i < hierarchy.length; ++i) 
+		{
             var hierarchy_shape = hierarchy[i];
             if (isRealObject(hierarchy_shape)
                 && isRealObject(hierarchy_shape.txBody)
                 && isRealObject(hierarchy_shape.txBody.lstStyle)
                 && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
-                && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level])) {
+                && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level])) 
+			{
                 var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
                 var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null);
                 hierarchy_style.ParaPr = hierarchy_ppt_style.pPr.Copy();
@@ -1535,24 +1612,37 @@ CShape.prototype =
         }
 
         var ownStyle;
-        if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle[level])) {
+        if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle[level])) 
+		{
             ownStyle = new CStyle("ownStyle", null, null, null);
             var own_ppt_style = this.txBody.lstStyle[level];
             ownStyle.ParaPr = own_ppt_style.pPr.Copy();
             ownStyle.TextPr = own_ppt_style.rPr.Copy();
         }
         var shape_text_style;
-        if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
+        if (isRealObject(this.style) && isRealObject(this.style.fontRef)) 
+		{
             shape_text_style = new CStyle("shapeTextStyle", null, null, null);
-            switch (this.style.fontRef.idx) {
+            switch (this.style.fontRef.idx) 
+			{
                 case fntStyleInd_major:
                 {
-                    shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme) };
+					var name = getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme);
+					shape_text_style.TextPr.RFonts.Ascii =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.EastAsia =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.HAnsi =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.CS =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.Hint =  { Name: name, Index: -1 };
                     break;
                 }
                 case fntStyleInd_minor:
                 {
-                    shape_text_style.TextPr.FontFamily = { Name: getFontInfo("+mn-lt")(parent_objects.theme.themeElements.fontScheme) };
+					var name = getFontInfo("+mj-lt")(parent_objects.theme.themeElements.fontScheme);
+					shape_text_style.TextPr.RFonts.Ascii =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.EastAsia =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.HAnsi =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.CS =  { Name: name, Index: -1 };
+					shape_text_style.TextPr.RFonts.Hint =  { Name: name, Index: -1 };
                     break;
                 }
                 default:
@@ -1561,85 +1651,89 @@ CShape.prototype =
                 }
             }
 
-            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
+            if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) 
+			{
                 var unifill = new CUniFill();
                 unifill.fill = new CSolidFill();
                 unifill.fill.color = this.style.fontRef.Color;
-                shape_text_style.TextPr.unifill = unifill;
-            }
-            else {
-                shape_text_style.TextPr.unifill = null;
+                shape_text_style.TextPr.Unifill = unifill;
             }
         }
         var Styles = new CStyles();
 
+		var last_style_id;
         var isPlaceholder = this.isPlaceholder();
         if (isPlaceholder) {
             if (default_style) {
-                Styles.Style[Styles.Id] = default_style;
+                Styles.Add(default_style);
                 default_style.BasedOn = null;
-                ++Styles.Id;
+				last_style_id = default_style.Id;
             }
 
             if (master_style) {
-                Styles.Style[Styles.Id] = master_style;
-                master_style.BasedOn = Styles.Id - 1;
-                ++Styles.Id;
+                Styles.Add(master_style);
+                master_style.BasedOn = last_style_id;
+				last_style_id = master_style.Id;
             }
         }
         else {
             if (master_style) {
-                Styles.Style[Styles.Id] = master_style;
+                Styles.Add(master_style);
                 master_style.BasedOn = null;
-                ++Styles.Id;
+				last_style_id = master_style.Id;
             }
 
             if (default_style) {
-                Styles.Style[Styles.Id] = default_style;
-                default_style.BasedOn = Styles.Id - 1;
-                ++Styles.Id;
+                Styles.Add(default_style);
+                default_style.BasedOn = last_style_id;
+				last_style_id = default_style.Id;
             }
         }
 
         for (var i = hierarchy_styles.length - 1; i > -1; --i) {
 
             if (hierarchy_styles[i]) {
-                Styles.Style[Styles.Id] = hierarchy_styles[i];
-                hierarchy_styles[i].BasedOn = Styles.Id - 1;
-                ++Styles.Id;
+                Styles.Add(hierarchy_styles[i]);
+                hierarchy_styles[i].BasedOn = last_style_id;
+				last_style_id = hierarchy_styles[i].Id;
             }
         }
 
         if (shape_text_style) {
-            Styles.Style[Styles.Id] = shape_text_style;
-            shape_text_style.BasedOn = Styles.Id - 1;
-            ++Styles.Id;
+            Styles.Add(shape_text_style);
+            shape_text_style.BasedOn = last_style_id;
+			last_style_id = shape_text_style.Id;
         }
-
-        this.compiledStyles[level] = Styles;
-        return Styles;
+		
+        this.compiledStyles[level] = {styles: Styles, lastId: last_style_id};
+        return this.compiledStyles[level];
     },
 
     recalculateBrush: function () {
         var compiled_style = this.getCompiledStyle();
         var RGBA = { R: 0, G: 0, B: 0, A: 255 };
         var parents = this.getParentObjects();
-        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef)) {
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef)) 
+		{
             RGBA = compiled_style.fillRef.Color.RGBA;
             this.brush = parents.theme.getFillStyle(compiled_style.fillRef.idx);
-            if (isRealObject(this.brush)) {
+            if (isRealObject(this.brush)) 
+			{
                 if (isRealObject(compiled_style.fillRef.Color.color)
                     && isRealObject(this.brush)
                     && isRealObject(this.brush.fill)
-                    && this.brush.fill.type === FILL_TYPE_SOLID) {
+                    && this.brush.fill.type === FILL_TYPE_SOLID) 
+				{
                     this.brush.fill.color = compiled_style.fillRef.Color.createDuplicate();
                 }
             }
-            else {
+            else 
+			{
                 this.brush = new CUniFill();
             }
         }
-        else {
+        else 
+		{
             this.brush = new CUniFill();
         }
 
@@ -2199,17 +2293,39 @@ CShape.prototype =
         }
     },
 
-    updateSelectionState: function () {
-        if (isRealObject(this.txBody)) {
-            this.txBody.updateSelectionState(this.parent.presentation.DrawingDocument);
-        }
-        else {
-            this.parent.presentation.DrawingDocument.UpdateTargetTransform(null);
-            this.parent.presentation.DrawingDocument.TargetEnd();
-            this.parent.presentation.DrawingDocument.SelectEnabled(false);
-            this.parent.presentation.DrawingDocument.SelectClear();
-            this.parent.presentation.DrawingDocument.SelectShow();
-        }
+    updateSelectionState: function () 
+	{
+		var drawing_document = this.getDrawingDocument();
+		if(drawing_document)
+		{
+			var content = this.getDocContent();
+			if(content)
+			{
+				if ( true === content.Is_SelectionUse() && !content.Selection_IsEmpty())
+				{
+					drawing_document.UpdateTargetTransform(this.transformText);
+					drawing_document.TargetEnd();
+					drawing_document.SelectEnabled(true);
+					drawing_document.SelectClear();
+					content.Selection_Draw_Page(0);
+					drawing_document.SelectShow();
+				}
+				else 
+				{
+					drawing_document.UpdateTargetTransform(this.transformText);
+					drawing_document.TargetShow();
+					drawing_document.SelectEnabled(false);
+				}
+			}
+			else
+			{
+				drawing_document.UpdateTargetTransform(null);
+				drawing_document.TargetEnd();
+				drawing_document.SelectEnabled(false);
+				drawing_document.SelectClear();
+				drawing_document.SelectShow();
+			}
+		}
     },
 
 
@@ -2293,19 +2409,7 @@ CShape.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
-    paragraphAdd: function (paraItem, bRecalculate) {
-        if (!isRealObject(this.txBody)) {
-            this.setTextBody(new CTextBody(this));
-            this.recalculateContent();
-
-        }
-        this.addTextFlag = true;
-        this.txBody.content.Paragraph_Add(paraItem, false);
-        //this.txBody.content.RecalculateCurPos();
-        this.recalcInfo.recalculateContent = true;
-        this.recalcInfo.recalculateTransformText = true;
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
-    },
+   
 
     addNewParagraph: function () {
         if (!isRealObject(this.txBody)) {
@@ -2715,8 +2819,8 @@ CShape.prototype =
             }
             graphics.transform3(transform_text);
             this.txBody.draw(graphics);
-            if (graphics.FreeFont !== undefined)
-                graphics.FreeFont();
+           /* if (graphics.FreeFont !== undefined)
+                graphics.FreeFont();*/
 
             /*var _masrgins = this.getMargins();
              graphics.reset();
@@ -2739,7 +2843,7 @@ CShape.prototype =
 
         graphics.SetIntegerGrid(false);
 
-        if (locktype_None != this.Lock.Get_Type())
+        if (this.Lock && locktype_None != this.Lock.Get_Type())
             graphics.DrawLockObjectRect(this.Lock.Get_Type(), 0, 0, this.extX, this.extY);
 
         graphics.reset();
@@ -3315,9 +3419,16 @@ CShape.prototype =
         }
     },
 
-    Refresh_RecalcData: function () {
-
+    Refresh_RecalcData: function (data) 
+	{	
     },
+	
+	Refresh_RecalcData2: function(pageIndex/*для текста*/)
+	{
+		this.recalcContent();
+		this.recalcTransformText();
+		this.addToRecalculate();
+	},
 
     Undo: function (data) {
 
@@ -3358,6 +3469,11 @@ CShape.prototype =
                 this.group = data.oldPr;
                 break;
             }
+			case historyitem_ShapeSetBodyPr:
+			{
+				this.bodyPr = data.oldPr;
+				break;
+			}
         }
     },
 
@@ -3400,6 +3516,11 @@ CShape.prototype =
                 this.group = data.newPr;
                 break;
             }
+			case historyitem_ShapeSetBodyPr:
+			{
+				this.bodyPr = data.newPr;
+				break;
+			}
         }
     },
 
@@ -3416,7 +3537,7 @@ CShape.prototype =
             case historyitem_ShapeSetTextBoxContent:
             case historyitem_ShapeSetParent:
             case historyitem_ShapeSetGroup:
-
+			case historyitem_ShapeSetBodyPr:
             {
                 writeObject(data.newPr);
                 break;
@@ -3466,6 +3587,11 @@ CShape.prototype =
                     this.group = readObject(r);
                     break;
                 }
+				case historyitem_ShapeSetBodyPr:
+				{
+					this.bodyPr = readObject(r);
+					break;
+				}
             }
         }
     },

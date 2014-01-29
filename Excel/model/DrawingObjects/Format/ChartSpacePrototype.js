@@ -32,7 +32,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
 		recalculateBaseColors: true,
 		recalculateSeriesColors: true,
 		recalculateMarkers: true,
-		recalculateGridLines: true
+		recalculateGridLines: true,
+		recalculateDLbls: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -107,13 +108,31 @@ CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
 CChartSpace.prototype.draw = function(graphics)
 {
-	var intGrid = graphics.GetIntegerGrid();
+	/*var intGrid = graphics.GetIntegerGrid();
 	graphics.SetIntegerGrid(false);
 	graphics.transform3(this.transform, false);
 	
 	this.chartObj.draw(this, graphics);
 	graphics.reset();
-	graphics.SetIntegerGrid(intGrid);
+	graphics.SetIntegerGrid(intGrid);*/
+	
+	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+	{
+		var default_lbl = new CDLbl();
+		default_lbl.initDefault();
+		var series = this.chart.plotArea.chart.series;
+		for(var i = 0; i < series.length; ++i)
+		{
+			var ser = series[i];
+			var pts = getPtsFromSeries(ser);
+			for(var j = 0; j < pts.length; ++j)
+			{
+				pts[j].compiledDlb.draw(graphics);
+			}
+		}
+	}
+	
+	
 };
 CChartSpace.prototype.recalculateBounds = function()
 {
@@ -140,7 +159,6 @@ CChartSpace.prototype.recalculateBounds = function()
 
 CChartSpace.prototype.recalculate = function()
 {
-
 	ExecuteNoHistory(function()
 	{
 		if(this.recalcInfo.recalculateTransform)
@@ -168,17 +186,20 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateSeriesColors();
 			this.recalcInfo.recalculateSeriesColors = false;
 		}
-		
 		if(this.recalcInfo.recalculateGridLines)
 		{
 			this.recalculateGridLines();
 			this.recalcInfo.recalculateGridLines = false;
 		}
-		
 		if(this.recalcInfo.recalculateChart)
 		{
 			this.recalculateChart();
 			this.recalcInfo.recalculateChart = false;
+		}
+		if(this.recalcInfo.recalculateDLbls)
+		{
+			this.recalculateDLbls();
+			this.recalcInfo.recalculateDLbls = false;
 		}
 	}, this, []);
 };
@@ -187,6 +208,8 @@ CChartSpace.prototype.hitInWorkArea = function()
 {
     return false;
 };
+
+
 
 function CreateUnfilFromRGB(r, g, b)
 {
@@ -278,16 +301,8 @@ CChartSpace.prototype.recalculateBaseColors = function()
 		History.TurnOn();
 	}
 };
-var MARKER_SYMBOL_TYPE = [];
-MARKER_SYMBOL_TYPE[0] = SYMBOL_DIAMOND;
-MARKER_SYMBOL_TYPE[1] = SYMBOL_SQUARE;
-MARKER_SYMBOL_TYPE[2] = SYMBOL_TRIANGLE;
-MARKER_SYMBOL_TYPE[3] = SYMBOL_X;
-MARKER_SYMBOL_TYPE[4] = SYMBOL_STAR;
-MARKER_SYMBOL_TYPE[5] = SYMBOL_CIRCLE;
-MARKER_SYMBOL_TYPE[6] = SYMBOL_PLUS;
-MARKER_SYMBOL_TYPE[7] = SYMBOL_DOT;
-MARKER_SYMBOL_TYPE[8] = SYMBOL_DASH;
+
+CChartSpace.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;
 
 function GetTypeMarkerByIndex(index)
 {
@@ -391,34 +406,89 @@ CChartSpace.prototype.recalculateGridLines = function()
 
 CChartSpace.prototype.recalculateMarkers = function()
 {
-	ExecuteNoHistory(function()
-	{			
-		if(this.chart && this.chart.plotArea && this.chart.plotArea.chart 
+	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart 
 		&& ((this.chart.plotArea.chart instanceof CLineChart && this.chart.plotArea.chart.marker) 
 		|| this.chart.plotArea.chart instanceof CScatterChart) 
 		&& this.chart.plotArea.chart.series)
+	{
+		var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
+		var effect_fill = chart_style.fill1;
+		var fill = chart_style.fill2;
+		var line = chart_style.line4;
+		var masrker_default_size = chart_style.markerSize;
+		var default_marker = new CMarker();
+		default_marker.setSize(masrker_default_size);
+		var parent_objects = this.getParentObjects();
+		
+		if(parent_objects.theme  && parent_objects.theme.themeElements 
+		&& parent_objects.theme.themeElements.fmtScheme 
+		&& parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
 		{
-			var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
-			var effect_fill = chart_style.fill1;
-			var fill = chart_style.fill2;
-			var line = chart_style.line4;
-			var masrker_default_size = chart_style.markerSize;
-			var default_marker = new CMarker();
-			default_marker.setSize(masrker_default_size);
-			var parent_objects = this.getParentObjects();
-			
-			if(parent_objects.theme  && parent_objects.theme.themeElements 
-			&& parent_objects.theme.themeElements.fmtScheme 
-			&& parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+			default_marker.setSpPr(new CSpPr());
+			default_marker.spPr.setLn(new CLn());
+			default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
+		}
+		var RGBA = {R:0, G:0, B:0, A: 255};
+		if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
+		{
+			var ser = this.chart.plotArea.chart.series[0];
+			if(ser.val)
 			{
-				default_marker.setSpPr(new CSpPr());
-				default_marker.spPr.setLn(new CLn());
-				default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
+				pts = ser.val.numRef.numCache.pts;
 			}
-			var RGBA = {R:0, G:0, B:0, A: 255};
-			if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
+			else if(ser.yVal)
 			{
-				var ser = this.chart.plotArea.chart.series[0];
+				pts = ser.yVal.numRef.numCache.pts;
+			}
+			else
+			{
+				pts = [];
+			}
+			var series_marker = ser.marker;
+			
+			var brushes = getArrayFillsFromBase(fill, pts.length);
+			var pens_fills = getArrayFillsFromBase(line, pts.length);
+			var compiled_markers = [];
+			for(var i = 0;  i < pts.length; ++i)
+			{
+				var compiled_marker = new CMarker();
+				compiled_marker.merge(default_marker);
+				if(!compiled_marker.spPr)
+				{
+					compiled_marker.setSpPr(new CSpPr());
+				}
+				compiled_marker.spPr.setFill(brushes[i]);
+				if(!compiled_marker.spPr.ln)
+					compiled_marker.spPr.setLn(new CLn());
+				compiled_marker.spPr.ln.setFill(pens_fills[i]);
+				compiled_marker.merge(ser.marker);
+				compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+				if(Array.isArray(ser.dPt))
+				{
+					for(var j = 0; j < ser.dPt.length; ++j)
+					{
+						if(ser.dPt[j].idx === pts[i].idx)
+						{
+							compiled_marker.merge(ser.dPt[j].marker);
+							break;
+						}
+					}
+				}
+				pts[i].compiledMarker = compiled_marker;
+				pts[i].compiledMarker.pen = compiled_marker.spPr.ln;
+				pts[i].compiledMarker.brush = compiled_marker.spPr.Fill;
+				pts[i].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+				pts[i].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+			}
+		}
+		else
+		{
+			var series = this.chart.plotArea.chart.series;
+			var brushes = getArrayFillsFromBase(fill, series.length);
+			var pens_fills = getArrayFillsFromBase(line, series.length);
+			for(var i = 0; i < series.length; ++i)
+			{
+				var ser = series[i];
 				if(ser.val)
 				{
 					pts = ser.val.numRef.numCache.pts;
@@ -431,12 +501,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 				{
 					pts = [];
 				}
-				var series_marker = ser.marker;
-				
-				var brushes = getArrayFillsFromBase(fill, pts.length);
-				var pens_fills = getArrayFillsFromBase(line, pts.length);
-				var compiled_markers = [];
-				for(var i = 0;  i < pts.length; ++i)
+				for(var j = 0; j < pts.length; ++j)
 				{
 					var compiled_marker = new CMarker();
 					compiled_marker.merge(default_marker);
@@ -445,88 +510,32 @@ CChartSpace.prototype.recalculateMarkers = function()
 						compiled_marker.setSpPr(new CSpPr());
 					}
 					compiled_marker.spPr.setFill(brushes[i]);
-					if(!compiled_marker.spPr.ln)
+					if(!compiled_marker.spPr)
 						compiled_marker.spPr.setLn(new CLn());
 					compiled_marker.spPr.ln.setFill(pens_fills[i]);
 					compiled_marker.merge(ser.marker);
-					compiled_marker.setSymbol(GetTypeMarkerByIndex(j));
+					compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
 					if(Array.isArray(ser.dPt))
 					{
-						for(var j = 0; j < ser.dPt.length; ++j)
+						for(var k = 0; k < ser.dPt.length; ++k)
 						{
-							if(ser.dPt[j].idx === pts[i].idx)
+							if(ser.dPt[k].idx === pts[j].idx)
 							{
-								compiled_marker.merge(ser.dPt[j].marker);
+								compiled_marker.merge(ser.dPt[k].marker);
 								break;
 							}
 						}
 					}
-					pts[i].compiledMarker = compiled_marker;
-					pts[i].compiledMarker.pen = compiled_marker.spPr.ln;
-					pts[i].compiledMarker.brush = compiled_marker.spPr.Fill;
-					pts[i].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
-					pts[i].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
-				}
-			}
-			else
-			{
-				var series = this.chart.plotArea.chart.series;
-				var brushes = getArrayFillsFromBase(fill, series.length);
-				var pens_fills = getArrayFillsFromBase(line, series.length);
-				for(var i = 0; i < series.length; ++i)
-				{
-					var ser = series[i];
-					if(ser.val)
-					{
-						pts = ser.val.numRef.numCache.pts;
-					}
-					else if(ser.yVal)
-					{
-						pts = ser.yVal.numRef.numCache.pts;
-					}
-					else
-					{
-						pts = [];
-					}
-					for(var j = 0; j < pts.length; ++j)
-					{
-						var compiled_marker = new CMarker();
-						compiled_marker.merge(default_marker);
-						if(!compiled_marker.spPr)
-						{
-							compiled_marker.setSpPr(new CSpPr());
-						}
-						compiled_marker.spPr.setFill(brushes[i]);
-						if(!compiled_marker.spPr)
-							compiled_marker.spPr.setLn(new CLn());
-						compiled_marker.spPr.ln.setFill(pens_fills[i]);
-						compiled_marker.merge(ser.marker);
-						compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
-						if(Array.isArray(ser.dPt))
-						{
-							for(var k = 0; k < ser.dPt.length; ++k)
-							{
-								if(ser.dPt[k].idx === pts[j].idx)
-								{
-									compiled_marker.merge(ser.dPt[k].marker);
-									break;
-								}
-							}
-						}
-						pts[j].compiledMarker = compiled_marker;
-						pts[j].compiledMarker.pen = compiled_marker.spPr.ln;
-						pts[j].compiledMarker.brush = compiled_marker.spPr.Fill;
-						pts[j].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
-						pts[j].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
-					}
+					pts[j].compiledMarker = compiled_marker;
+					pts[j].compiledMarker.pen = compiled_marker.spPr.ln;
+					pts[j].compiledMarker.brush = compiled_marker.spPr.Fill;
+					pts[j].compiledMarker.brush.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
+					pts[j].compiledMarker.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, RGBA);
 				}
 			}
 		}
-	},
-	this, []);
+	}
 };
-
-
 
 CChartSpace.prototype.recalculateSeriesColors = function()
 {
@@ -858,5 +867,52 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 		}
 	}, this, []);
 };
+
+function getPtsFromSeries(ser)
+{
+	if(ser)
+	{
+		if(ser.val)
+		{
+			return ser.val.numRef.numCache.pts;
+		}
+		else if(ser.yVal)
+		{
+			return ser.yVal.numRef.numCache.pts;
+		}
+	}
+	return [];
+}
+CChartSpace.prototype.recalculateDLbls = function()
+{
+	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+	{
+		var default_lbl = new CDLbl();
+		default_lbl.initDefault();
+		var series = this.chart.plotArea.chart.series;
+		for(var i = 0; i < series.length; ++i)
+		{
+			var ser = series[i];
+			var pts = getPtsFromSeries(ser);
+			for(var j = 0; j < pts.length; ++j)
+			{
+				var pt = pts[j];
+				var compiled_dlb = new CDLbl();
+				compiled_dlb.merge(default_lbl);
+				compiled_dlb.merge(this.chart.plotArea.chart.dLbls);
+				if(this.chart.plotArea.chart.dLbls)
+					compiled_dlb.merge(this.chart.plotArea.chart.dLbls.findDLblByIdx(pt.idx), false);
+				compiled_dlb.merge(ser.dLbls);
+				if(ser.dLbls)
+					compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx), true);
+				pt.compiledDlb = compiled_dlb;
+				pt.compiledDlb.chart = this;
+				pt.compiledDlb.series = ser;
+				pt.compiledDlb.pt = pt;
+				pt.compiledDlb.recalculate();
+			}
+		}
+	}
+}
 
 

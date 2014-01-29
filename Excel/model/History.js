@@ -410,7 +410,10 @@ CHistory.prototype =
         for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
         {
             var Item = Point.Items[Index];
-            Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+			if(!Item.Class.Read_FromBinary2)
+				Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+			else	
+				Item.Class.Undo(Item.Data);
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				isReInit = true;
 			if (g_oUndoRedoGraphicObjects === Item.Class)
@@ -478,7 +481,10 @@ CHistory.prototype =
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-            Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
+			if(!Item.Class.Read_FromBinary2)
+				Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
+			else
+				Item.Class.Redo(Item.Data);
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
         }
@@ -550,7 +556,25 @@ CHistory.prototype =
 		
 		this.RedoEnd(Point, oRedoObjectParam);
 	},
-    Create_NewPoint : function()
+   
+	Get_RecalcData : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+            var Point = this.CurPoint;
+
+            // Выполняем все действия в прямом порядке
+            for ( var Index = 0; Index < Point.Items.length; Index++ )
+            {
+                var Item = Point.Items[Index];
+				if(Item.Class.Refresh_RecalcData)
+					Item.Class.Refresh_RecalcData( Item.Data );
+            }
+        }
+    },
+	
+	Create_NewPoint : function()
     {
 		if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
             return;
@@ -581,15 +605,33 @@ CHistory.prototype =
         if ( null == this.CurPoint )
             return;
 		var oCurPoint = this.CurPoint;
-        var Item =
-        {
-            Class : Class,
-			Type  : Type,
-			SheetId : sheetid,
-			Range : null,
-            Data  : Data,
-			LocalChange : false
-        };
+		
+        var Item;
+		
+		if(!Class.Read_FromBinary2)
+		{
+			Item =
+			{
+				Class : Class,
+				Type  : Type,
+				SheetId : sheetid,
+				Range : null,
+				Data  : Data,
+				LocalChange : false
+			};
+		}
+		else
+		{
+			Item =
+			{
+				Class : Class,
+				Type  : Type.Type,
+				SheetId : sheetid,
+				Range : null,
+				Data  : Type,
+				LocalChange : false
+			};
+		}
 		if(null != range)
 			Item.Range = range.clone();
 		if(null != LocalChange)

@@ -2127,6 +2127,13 @@ CSlideBoundsChecker.prototype =
         this.m_oFullTransform.ty = this.m_oTransform.ty;
         global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
     },
+	
+	SetTextPr: function()
+	{},
+	
+	SetFontSlot: function()
+	{},
+	
     // path commands
     _s : function()
     {

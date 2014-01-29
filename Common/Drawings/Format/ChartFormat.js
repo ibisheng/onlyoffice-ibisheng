@@ -235,8 +235,102 @@ CAreaSeries.prototype =
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
     },
+	
+	getSeriesName: function()
+	{
+		if(this.tx)
+		{
+			if(typeof this.tx.val === "string")
+			{
+				return this.tx.val;
+			}
+			if(this.tx.strRef 
+			&& this.tx.strRef.strCache 
+			&& this.tx.strRef.strCache.pt.length > 0
+			&& this.tx.strRef.strCache.pt[0]
+			&& typeof this.tx.strRef.strCache.pt[0].val === "string")
+			{
+				return this.tx.strRef.strCache.pt[0].val;
+			}
+		}
+		return "Series " + this.idx;
+	},
+	
+	getCatName: function(idx)
+	{
+		var pts;
+		var cat;
+		if(this.cat)
+		{
+			cat = this.cat;
+		}
+		else if(this.xVal)
+		{
+			cat = this.xVal;
+		}
+		
+		if(cat)
+		{
+			if(cat && cat.strRef && cat.strRef.strCache)
+			{
+				pts = cat.strRef.strCache.pt;
+			}
+			else if(cat.numRef && cat.numRef.numCache)
+			{
+				pts = cat.numRef.numCache.pts;
+			}
+			if(Array.isArray(pts))
+			{
+				for(var i = 0; i < pts.length; ++i)
+				{
+					if(pts[i].idx === idx)
+					{
+						return pts[i].val + "";
+					}
+				}
+			}
+		}
+		return idx + "";
+	},
 
-    setCat: function(pr)
+	getValByIndex: function(idx)
+	{
+		var pts;
+		var val;
+		if(this.val)
+		{
+			val = this.val;
+		}
+		else if(this.yVal)
+		{
+			val = this.yVal;
+		}
+		
+		if(val)
+		{
+			if(val && val.strRef && val.strRef.strCache)
+			{
+				pts = val.strRef.strCache.pt;
+			}
+			else if(val.numRef && val.numRef.numCache)
+			{
+				pts = val.numRef.numCache.pts;
+			}
+			if(Array.isArray(pts))
+			{
+				for(var i = 0; i < pts.length; ++i)
+				{
+					if(pts[i].idx === idx)
+					{
+						return pts[i].val + "";
+					}
+				}
+			}
+		}
+		return "";
+	},
+	
+	setCat: function(pr)
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
@@ -1734,6 +1828,11 @@ CBarSeries.prototype =
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Get_Id());
     },
+	
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
+	
     setCat: function(pr)
     {
         History.Add(this, {Type: historyitem_BarSeries_SetCat, oldPr: this.cat, newPr: pr});
@@ -2367,6 +2466,10 @@ CBubbleSeries.prototype =
         return historyitem_type_BubbleSeries;
     },
 
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
+
     Write_ToBinary: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -2878,6 +2981,26 @@ CChartText.prototype =
     {
         return this.Id;
     },
+	
+	merge: function(tx, noCopyTextBody)
+	{
+		if(tx.rich)
+		{
+			if(noCopyTextBody === true)
+			{
+				this.setRich(tx.rich);
+			}
+			else
+			{
+				this.setRich(tx.rich.createDuplicate());
+			}
+			this.rich.setParent(this);
+		}
+		if(tx.strRef)
+		{
+			this.strRef = tx.strRef; 
+		}
+	},
 
     getObjectType: function()
     {
@@ -2989,7 +3112,7 @@ var DLBL_POS_T = 8;
 
 function CDLbl()
 {
-    this.delete = null;
+    this.bDelete = null;
     this.dLblPos = null;
     this.idx = null;
     this.layout = null;
@@ -3004,6 +3127,28 @@ function CDLbl()
     this.spPr = null;
     this.tx = null;
     this.txPr = null;
+
+	this.parent = null;
+	
+	this.recalcInfo = 
+	{
+		recalcTransform: true, 
+		recalcTranformText: true,
+		recalcStyle: true,
+		recalculateTxBody: true,
+		recalculateBrush: true,
+		recalculatePen: true
+	}
+	
+	this.chart = null;//выставляется при пересчете
+	this.series = null;//выставляется при пересчете
+
+	
+	this.txBody = null;
+	
+	this.transform = new CMatrix();
+	this.transformText = new CMatrix();
+	this.compiledStyles = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -3020,8 +3165,348 @@ CDLbl.prototype =
     {
         return historyitem_type_DLbl;
     },
+	
+	getCompiledFill: function()
+	{
+		return this.spPr && this.spPr.Fill ? this.spPr.Fill : null;
+	},
+	
+	
+	getCompiledLine: function()
+	{
+		return this.spPr && this.spPr.ln ? this.spPr.ln : null;
+	},
+	
+	getCompiledTransparent: function()
+	{
+		return this.spPr && this.spPr.Fill ? this.spPr.Fill.transparent : null;
+	},
+	
+	recalculate: function()
+	{	
+		if(this.bDelete)
+			return;
+		ExecuteNoHistory(function()
+		{
+			if(this.recalcInfo.recalculateBrush)
+			{
+				this.recalculateBrush();
+				this.recalcInfo.recalculateBrush = true;
+			}
+			if(this.recalcInfo.recalculatePen)
+			{
+				this.recalculatePen();
+				this.recalcInfo.recalculatePen = true;
+			}
+			if(this.recalcInfo.recalcStyle)
+			{
+				this.recalculateStyle();
+				this.recalcInfo.recalcStyle = false;
+			}
+			if(this.recalcInfo.recalculateTxBody)
+			{
+				this.recalculateTxBody();
+				this.recalcInfo.recalculateTxBody = false;
+			}
+			if(this.recalcInfo.recalcTransform)
+			{
+				this.recalculateTransform();
+				this.recalcInfo.recalcTransform = false;
+			}
+			if(this.recalcInfo.recalcTranformText)
+			{
+				this.recalculateTranformText();
+				this.recalcInfo.recalcTranformText = false;
+			}
+		}, this, []);
+	},
+	
+	recalculateBrush: CShape.prototype.recalculateBrush,
+	recalculatePen: CShape.prototype.recalculatePen,
+	
+	getCompiledStyle: function()
+	{
+		return null;
+	},
+	
+	getParentObjects: function()
+	{
+		return this.chart.getParentObjects;
+	},
+	
+	recalculateTransform: function()
+	{
+		this.transform.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+        if (isRealObject(this.chart)) 
+		{
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.chart.getTransformMatrix());
+        }
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+	},
+	
+	recalculateTranformText: function()
+	{
+		this.transformText.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transformText, this.x + 1, this.y + 0.5);
+        if (isRealObject(this.chart)) 
+		{
+            global_MatrixTransformer.MultiplyAppend(this.transformText, this.chart.getTransformMatrix());
+        }
+        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+	},
+	
+	recalculateStyle: function()
+	{
+		ExecuteNoHistory(function()
+		{
+			var styles = new CStyles();
+			var style = new CStyle("dataLblStyle", null, null, null);
+			var text_pr = new CTextPr();
+			text_pr.FontSize = 10;
+			var parent_objects = this.chart.getParentObjects();
+			var theme = parent_objects.theme;
+			
+			var font_name = theme.themeElements.fontScheme.minorFont.latin;
+			text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
+			text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
+			text_pr.RFonts.HAnsi    = {Name: font_name, Index: -1};
+			text_pr.RFonts.CS       = {Name: font_name, Index: -1};
+			text_pr.RFonts.Hint     = {Name: font_name, Index: -1};
+			
+			style.TextPr = text_pr;
+			if(this.chart.txPr 
+			&& this.chart.txPr.content 
+			&& this.chart.txPr.content.Content[0]
+			&& this.chart.txPr.content.Content[0].Pr
+			&& this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
+			{
+				style.TextPr.Merge(this.chart.txPr.content.Content[0].Pr.DefaultRunPr);
+			}
+			if(this.txPr 
+			&& this.txPr.content
+			&& this.txPr.content.Content[0]
+			&& this.txPr.content.Content[0].Pr
+			&& this.txPr.content.Content[0].Pr.DefaultRunPr)
+			{
+				style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
+			}
+			styles.Add(style);
+			this.compiledStyles = {lastId: style.Id, styles: styles};
+		},
+		this, []);
+	},
+	
+	Get_Styles: function(lvl)
+	{
+		if(this.recalcInfo.recalcStyle)
+		{
+			this.recalculateStyle();
+			this.recalcInfo.recalcStyle = false;
+		}
+		return this.compiledStyles;
+		
+	},
+	
+	recalculateTxBody: function()
+	{
+		if(this.tx && this.tx.rich)
+		{
+			this.txBody = this.tx.rich;
+		}
+		else
+		{
+			var tx_body = new CTextBody();
+			tx_body.setParent(this);
+			tx_body.setContent(new CDocumentContent(tx_body, this.chart.getDrawingDocument(), 0, 0, 0, 0, false, false));
+			var compiled_string = "";
+			var separator = typeof this.separator === "string" ? this.separator : ", ";
+			if(this.showSerName)
+			{
+				compiled_string += this.series.getSeriesName();
+			}
+			if(this.showCatName)
+			{
+				if(compiled_string.length > 0)
+					compiled_string += separator; 
+				compiled_string += this.series.getCatName(this.pt.idx);
+			}
+			if(this.showVal)
+			{
+				if(compiled_string.length > 0)
+					compiled_string += separator; 
+				compiled_string += this.series.getValByIndex(this.pt.idx);
+			}
+			var content = tx_body.content;
+			for(var i = 0; i < compiled_string.length; ++i)
+			{
+				var ch = compiled_string[i];
+				if (ch == '\t')
+				{
+					content.Paragraph_Add( new ParaTab(), false );
+				}
+				else if (ch == '\n')
+				{
+					content.Paragraph_Add( new ParaNewLine(break_Line), false );
+				}
+				else if (ch == '\r')
+					;
+				else if (ch != ' ')
+				{
+					content.Paragraph_Add(new ParaText(ch), false );
+				}
+				else
+				{
+					content.Paragraph_Add(new ParaSpace(1), false );
+				}
+			}
+			this.txBody = tx_body;
+		}
+		
+		if(this.txBody)
+		{
+			var max_box_width = this.chart.extX/5.1;/*получено экспериментальным путем нужно уточнить*/
+			var max_content_width = max_box_width - 1.25;/*excel слева делает отступ 1мм а справа 0.25мм*/
+			var content = this.txBody.content;
+			content.Reset(0, 0, max_content_width, 20000);
+			content.Recalculate_Page(0, true);
+			var pargs = content.Content;
+			var max_width = 0;
+			for(var i = 0; i < pargs.length; ++i)
+			{
+				var par = pargs[i];
+				for(var j = 0; j < par.Lines.length; ++j)
+				{
+					if(par.Lines[j].Ranges[0].W > max_width)
+					{
+						max_width = par.Lines[j].Ranges[0].W;
+					}
+				}
+			}
+			content.Reset(0, 0, max_width, 20000);
+			content.Recalculate_Page(0, true);
+			this.extX = max_width + 1.25;
+			this.extY = this.txBody.content.Get_SummaryHeight() + 1/*по полмиллиметра сверху и снизу отступы*/;
+			this.x = 0;
+			this.y = 0;
+		}
+	},
 
-    Write_ToBinary2: function(w)
+	initDefault: function()
+	{
+		this.setDelete(false);
+		this.setDLblPos(DLBL_POS_IN_BASE);
+		this.setIdx(null);
+		this.setLayout(null);
+		this.setNumFmt(null);
+		this.setSeparator(null);
+		this.setShowBubbleSize(false);
+		this.setShowCatName(false);
+		this.setShowLegendKey(false);
+		this.setShowPercent(false);
+		this.setShowSerName(false);
+		this.setShowVal(false);
+		this.setSpPr(null);
+		this.setTx(null);
+		this.setTxPr(null);
+	},
+	
+	merge: function(dLbl, noCopyTxBody)
+	{
+		if(!dLbl)
+			return;
+		if(dLbl.bDelete != null)
+			this.setDelete(dLbl.bDelete);
+		if(dLbl.dLblPos != null)
+			this.setDLblPos(dLbl.dLblPos);
+			
+		if(dLbl.idx != null)
+			this.setIdx(dLbl.idx);
+			
+		if(dLbl.numFmt != null)
+			this.setNumFmt(dLbl.numFmt);
+			
+		if(dLbl.showBubbleSize != null)
+			this.setShowBubbleSize(dLbl.showBubbleSize);
+			
+		if(dLbl.showCatName != null)
+			this.setShowCatName(dLbl.showCatName);
+			
+		if(dLbl.showLegendKey != null)
+			this.setShowLegendKey(dLbl.showLegendKey);
+			
+		if(dLbl.showPercent != null)
+			this.setShowPercent(dLbl.showPercent);
+			
+		if(dLbl.showSerName != null)
+			this.setShowSerName(dLbl.showSerName);
+			
+			
+		if(dLbl.showVal != null)
+			this.setShowVal(dLbl.showVal);
+		
+		if(dLbl.spPr != null)
+		{			
+			if(this.spPr == null)
+			{
+				this.setSpPr(new CSpPr());
+			}
+			if(dLbl.spPr.Fill)
+			{
+				if(this.spPr.Fill == null)
+				{
+					this.spPr.setFill(new CUniFill());
+				}
+				this.spPr.Fill.merge(dLbl.spPr.Fill);
+			}
+			if(dLbl.spPr.ln)
+			{
+				if(this.spPr.ln == null)
+				{
+					this.spPr.setLn(new CLn());
+				}
+				this.spPr.ln.merge(dLbl.spPr.ln);
+			}
+		}
+		if(dLbl.tx)
+		{
+			if(this.tx == null)
+			{
+				this.setTx(new CChartText());
+			}
+			this.tx.merge(dLbl.tx, noCopyTxBody);
+		}
+		if(dLbl.txPr)
+		{
+			if(noCopyTxBody === true)
+			{
+				this.setTxPr(dLbl.txPr);
+			}
+			else
+			{
+				this.setTxPr(dLbl.txPr.createDuplicate());
+			}
+			this.txPr.setParent(this);
+		}
+	},
+	
+    
+	draw: CShape.prototype.draw, 
+	
+	
+	isEmptyPlaceholder: function()
+	{
+		return false;
+	},
+	setPosition: function(x, y)
+	{
+		this.x = x;
+		this.y = y;
+		this.recalculateTransform();
+		this.recalculateTransformText();
+	},
+	
+	Write_ToBinary2: function(w)
     {
         w.Write_ToBinary2(this.getObjectType());
         w.WriteString2(this.Id);
@@ -3034,8 +3519,8 @@ CDLbl.prototype =
 
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetDelete, oldPr: this.delete  , newPr: pr});
-        this.delete = pr;
+        History.Add(this, {Type: historyitem_DLbl_SetDelete, oldPr: this.bDelete  , newPr: pr});
+        this.bDelete = pr;
     },
     setDLblPos: function(pr)
     {
@@ -3107,6 +3592,7 @@ CDLbl.prototype =
         History.Add(this, {Type: historyitem_DLbl_SetTxPr, oldPr: this.txPr  , newPr: pr});
         this.txPr = pr;
     },
+	
 
     Undo: function(data)
     {
@@ -3114,7 +3600,7 @@ CDLbl.prototype =
         {
             case historyitem_DLbl_SetDelete:
             {
-                this.delete = data.oldPr;
+                this.bDelete = data.oldPr;
                 break;
             }
             case historyitem_DLbl_SetDLblPos:
@@ -3196,7 +3682,7 @@ CDLbl.prototype =
         {
             case historyitem_DLbl_SetDelete:
             {
-                this.delete = data.newPr;
+                this.bDelete = data.newPr;
                 break;
             }
             case historyitem_DLbl_SetDLblPos:
@@ -3335,11 +3821,11 @@ CDLbl.prototype =
             {
                 if(r.GetBool())
                 {
-                    this.delete = r.GetBool();
+                    this.bDelete = r.GetBool();
                 }
                 else
                 {
-                    this.delete = null;
+                    this.bDelete = null;
                 }
                 break;
             }
@@ -3520,7 +4006,7 @@ CDLbl.prototype =
 function CDLbls()
 {
     this.delete          = null;
-    this.dLbl            = null;
+    this.dLbl            = [];
     this.dLblPos         = null;
     this.leaderLines     = null;
     this.numFmt          = null;
@@ -3550,6 +4036,16 @@ CDLbls.prototype =
     {
         return historyitem_type_DLbls;
     },
+	
+	findDLblByIdx: function(idx)
+	{
+		for(var i = 0; i < this.dLbl.length; ++i)
+		{
+			if(this.dLbl[i].idx === idx)
+				return this.dLbl[i];
+		}
+		return null;
+	},
 
     Write_ToBinary2: function(w)
     {
@@ -3567,10 +4063,10 @@ CDLbls.prototype =
         History.Add(this, {Type: historyitem_DLbls_SetDelete, oldPr: this.delete, newPr: pr});
         this.delete = pr;
     },
-    setDLbl: function(pr)
+    addDLbl: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetDLbl, oldPr: this.dLbl, newPr: pr});
-        this.dLbl = pr;
+        History.Add(this, {Type: historyitem_DLbls_SetDLbl, newPr: pr});
+        this.dLbl.push(pr);
     },
     setDLblPos: function(pr)
     {
@@ -3649,7 +4145,14 @@ CDLbls.prototype =
             }
             case historyitem_DLbls_SetDLbl:
             {
-                this.dLbl = data.oldPr;
+				for(var i = this.dLbl.length - 1; i > -1; --i)
+				{
+					if(this.dLbl[i] === data.newPr)
+					{
+						this.dLbl.splice(i, 1);
+						break;
+					}               
+				}
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -3731,7 +4234,7 @@ CDLbls.prototype =
             }
             case historyitem_DLbls_SetDLbl:
             {
-                this.dLbl = data.newPr;
+                this.dLbl.push(data.newPr);
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -3853,7 +4356,11 @@ CDLbls.prototype =
             }
             case historyitem_DLbls_SetDLbl:
             {
-                this.dLbl = readObject(r);
+				var d_lbl = readObject(r);
+				if(d_lbl)
+				{
+					this.dLbl.push(d_lbl);
+				}
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -3934,6 +4441,13 @@ function CDPt()
     this.marker           = null;
     this.pictureOptions   = null;
     this.spPr             = null;
+	
+	
+	this.recalcInfo = 
+	{
+		recalcLbl: true
+	}
+	this.compiledLbl = null;
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -6411,7 +6925,11 @@ CLineSeries.prototype =
     {
         return historyitem_type_LineSeries;
     },
-
+	
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
+	
     Write_ToBinary: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -6737,6 +7255,18 @@ var SYMBOL_SQUARE = 7;
 var SYMBOL_STAR = 8;
 var SYMBOL_TRIANGLE = 9;
 var SYMBOL_X = 10;
+
+
+var MARKER_SYMBOL_TYPE = [];
+MARKER_SYMBOL_TYPE[0] = SYMBOL_DIAMOND;
+MARKER_SYMBOL_TYPE[1] = SYMBOL_SQUARE;
+MARKER_SYMBOL_TYPE[2] = SYMBOL_TRIANGLE;
+MARKER_SYMBOL_TYPE[3] = SYMBOL_X;
+MARKER_SYMBOL_TYPE[4] = SYMBOL_STAR;
+MARKER_SYMBOL_TYPE[5] = SYMBOL_CIRCLE;
+MARKER_SYMBOL_TYPE[6] = SYMBOL_PLUS;
+MARKER_SYMBOL_TYPE[7] = SYMBOL_DOT;
+MARKER_SYMBOL_TYPE[8] = SYMBOL_DASH;
 
 function CMarker()
 {
@@ -8703,6 +9233,10 @@ CPieSeries.prototype =
     {
         return historyitem_type_PieSeries;
     },
+	
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
 
     Write_ToBinary: function(w)
     {
@@ -9661,6 +10195,10 @@ CRadarSeries.prototype =
         return historyitem_type_RadarSeries;
     },
 
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
+	
     Write_ToBinary2: function()
     {
         w.WriteLong(this.getObjectType());
@@ -10337,6 +10875,11 @@ CScatterSeries.prototype =
         return historyitem_type_ScatterSer;
     },
 
+	
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
+	
     Write_ToBinary2: function(w)
     {
         w.WriteLong(this.getObjectType());
@@ -10740,7 +11283,6 @@ CScatterSeries.prototype =
     }
 };
 
-
 function CTx()
 {
     this.strRef = null;
@@ -11079,7 +11621,7 @@ CStockChart.prototype =
 
 function CStrCache()
 {
-    this.pt      = null;
+    this.pt      = [];
     this.ptCount = null;
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -11109,10 +11651,10 @@ CStrCache.prototype =
         this.Id = r.GetString2();
     },
 
-    setPt: function(pr)
+    addPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrCache_Pt, oldPr: this.pt, newPr: pr});
-        this.pt = pr;
+        History.Add(this, {Type: historyitem_StrCache_Pt, newPr: pr});
+        this.pt.push(pr);
     },
 
     setPtCount: function(pr)
@@ -11127,7 +11669,14 @@ CStrCache.prototype =
         {
             case historyitem_StrCache_Pt:
             {
-                this.pt = data.oldPr;
+				for(var i = 0; i < this.pt.length; ++i)
+				{
+					if(this.pt[i] === data.newPr)
+					{
+						this.pt.splice(i, 1);
+						break;
+					}
+				}
                 break;
             }
             case historyitem_StrCache_PtCount:
@@ -11144,7 +11693,7 @@ CStrCache.prototype =
         {
             case historyitem_StrCache_Pt:
             {
-                this.pt = data.newPr;
+                this.pt.push(data.newPr);
                 break;
             }
             case historyitem_StrCache_PtCount:
@@ -11180,7 +11729,11 @@ CStrCache.prototype =
         {
             case historyitem_StrCache_Pt:
             {
-                this.pt = readObject(r);
+				var pt = readObject(r);
+				if(pt)
+				{
+					this.pt.push(pt);
+				}
                 break;
             }
             case historyitem_StrCache_PtCount:
@@ -11776,6 +12329,11 @@ CSurfaceSeries.prototype =
     {
         return historyitem_type_SurfaceSeries;
     },
+	
+	
+	getSeriesName: CAreaSeries.prototype.getSeriesName,
+	getCatName: CAreaSeries.prototype.getCatName,
+	getValByIndex: CAreaSeries.prototype.getValByIndex,
 
     Write_ToBinary: function(w)
     {

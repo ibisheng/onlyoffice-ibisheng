@@ -1993,9 +1993,9 @@ function CreateLineChart(asc_series, type)
     }
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;

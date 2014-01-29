@@ -1991,22 +1991,21 @@ function TextAddState(drawingObjectsController, textObject)
 {
     this.id = STATES_ID_TEXT_ADD;
     this.drawingObjectsController = drawingObjectsController;
-    this.drawingObjects = drawingObjects;
     this.textObject = textObject;
-    this.nullState = new NullState(drawingObjectsController, drawingObjects);
+    this.nullState = new NullState(drawingObjectsController);
 
     this.onMouseDown = function(e, x, y)
     {
         this.nullState.onMouseDown(e, x, y);
 
-        if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.textObject !== this.textObject/*|| this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP*/)
+        if(this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.curState.textObject !== this.textObject)
         {
             this.textObject.addTextFlag = false;
-            if(this.textObject instanceof CGraphicFrame)
+            /*if(this.textObject instanceof CGraphicFrame)
             {
                // this.textObject.graphicObject.Selection_Remove();
-            }
-            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+            }*/
+            this.drawingObjectsController.updateSelectionState();
 
         }
     };
@@ -2017,8 +2016,6 @@ function TextAddState(drawingObjectsController, textObject)
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.drawingObjectsController.updateSelectionState();
-            this.drawingObjectsController.slide.OnUpdateOverlay();
-            editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
     };
 

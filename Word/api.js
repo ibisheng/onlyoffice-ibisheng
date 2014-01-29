@@ -607,6 +607,7 @@ function asc_docs_api(name)
     this.SelectedObjectsStack = new Array();
 
     this.noCreatePoint = false;
+	this.isDocumentEditor = true;
 
     this.OpenDocumentProgress = new CDocOpenProgress();
     this._lastConvertProgress = 0;
@@ -635,7 +636,7 @@ function asc_docs_api(name)
 		this.chartPreviewManager = new ChartPreviewManager();
 	else
 		this.chartPreviewManager = null;
-		
+	
     this.IsLongActionCurrent = false;
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился

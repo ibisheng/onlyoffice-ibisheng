@@ -1678,21 +1678,21 @@ Binary_ChartReader.prototype.ReadLegendLayout = function(type, length, oLegendLa
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if(c_oSer_ChartLegendLayoutType.H === type)
-        oLegendLayout.H = stream.GetDoubleLE();
+        oLegendLayout.H = this.stream.GetDoubleLE();
     else if(c_oSer_ChartLegendLayoutType.HMode === type)
         oLegendLayout.HMode = this.stream.GetUChar();
     else if(c_oSer_ChartLegendLayoutType.LayoutTarget === type)
         oLegendLayout.LayoutTarget = this.stream.GetUChar();
     else if(c_oSer_ChartLegendLayoutType.W === type)
-        oLegendLayout.W = stream.GetDoubleLE();
+        oLegendLayout.W = this.stream.GetDoubleLE();
     else if(c_oSer_ChartLegendLayoutType.WMode === type)
         oLegendLayout.WMode = this.stream.GetUChar();
     else if(c_oSer_ChartLegendLayoutType.X === type)
-        oLegendLayout.X = stream.GetDoubleLE();
+        oLegendLayout.X = this.stream.GetDoubleLE();
     else if(c_oSer_ChartLegendLayoutType.XMode === type)
         oLegendLayout.XMode = this.stream.GetUChar();
     else if(c_oSer_ChartLegendLayoutType.Y === type)
-        oLegendLayout.Y = stream.GetDoubleLE();
+        oLegendLayout.Y = this.stream.GetDoubleLE();
     else if(c_oSer_ChartLegendLayoutType.YMode === type)
         oLegendLayout.YMode = this.stream.GetUChar();
     else

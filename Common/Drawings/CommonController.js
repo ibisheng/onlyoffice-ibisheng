@@ -1370,13 +1370,6 @@ DrawingObjectsController.prototype =
     changeCurrentState: function(newState)
     {
         this.curState = newState;
-        if(newState.id === STATES_ID_TEXT_ADD ||  newState.id === STATES_ID_TEXT_ADD_IN_GROUP)
-        {
-            this.drawingObjects.OnUpdateOverlay(true);
-        }
-
-        this.updateSelectionState();
-        this.recalculateCurPos();
     },
 
     recalculateCurPos: function()
@@ -1598,11 +1591,11 @@ DrawingObjectsController.prototype =
         return this.curState.onKeyDown(e);
     },
 
-    onKeyPress: function(e)
+    /*onKeyPress: function(e)
     {
         this.curState.onKeyPress(e);
         return true;
-    },
+    },*/
 
     resetSelectionState: function()
     {
@@ -2884,8 +2877,22 @@ DrawingObjectsController.prototype =
                     {
                         selected_array[sel_index].applyTextPr(paraItem, bRecalculate);
                     }
-
                 }
+				else
+				{
+					if(this.selectedObjects.length === 1 && this.selectedObjects[0].isShape())
+					{
+						var shape = this.selectedObjects[0];
+						if(!shape.textBody)
+						{
+							shape.createTextBody();
+						}
+						shape.paragraphAdd(paraItem, bRecalculate);
+						this.changeCurrentState(new TextAddState(this, shape));
+						this.updateSelectionState();
+						return;
+					}
+				}
             }
             else if(cur_state.id === STATES_ID_GROUP)
             {

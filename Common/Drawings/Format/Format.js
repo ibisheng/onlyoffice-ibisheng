@@ -159,7 +159,24 @@ function readObject(r)
     return ret;
 }
 
-
+function ExecuteNoHistory(f, oThis, args)
+{
+	var is_on = (History instanceof CHistory) ? History.Is_On() : false;
+	if(!(History instanceof CHistory))
+	{
+		History = {Add: function(){}};
+	}
+	if(is_on)
+	{
+		History.TurnOff();
+	}
+	var ret = f.apply(oThis, args);	
+	if(is_on)
+	{
+		History.TurnOn();
+	}
+	return ret;
+}
 
 
 
@@ -3356,6 +3373,17 @@ CNoFill.prototype =
     }
 }
 
+
+function CreateBlackRGBUnifill()
+{
+	var ret = new CUniFill();
+	ret.setFill(new CSolidFill());
+	ret.fill.setColor(new CUniColor());
+	ret.fill.color.setColor(new CRGBColor());
+	ret.fill.color.color.setColor(0, 0, 0);
+	return ret;
+}
+
 function CUniFill()
 {
     this.fill = null;
@@ -3386,6 +3414,11 @@ CUniFill.prototype =
         this.transparent = transparent;
     },
 
+	Set_FromObject: function(o)
+	{
+		//TODO
+	},
+	
     Undo: function(data)
     {
         switch (data.Type)
@@ -3492,6 +3525,12 @@ CUniFill.prototype =
     {
         this.Id = r.GetString2();
     },
+	
+	Write_ToBinary: function(w)
+	{},
+	
+	Read_FromBinary: function()
+	{},
 
 
 
@@ -6873,7 +6912,7 @@ function CSpPr()
 {
     this.bwMode    = 0;
 
-    this.xfrm       = null;
+    this.xfrm       = new CXfrm();//TODO: временная заглушка чтоб работало в ворде.
     this.geometry   = null;//new Geometry();
     this.Fill       = null;
     this.ln         = null;
@@ -7409,7 +7448,7 @@ function ClrMap()
         return _copy;
     };
 
-    if(typeof g_oIdCounter != "undefined" && typeof g_oTableId != "undefined")
+    if(typeof g_oIdCounter != "undefined" && typeof g_oTableId != "undefined" && g_oTableId && g_oIdCounter)
     {
         this.Id = g_oIdCounter.Get_NewId();
         g_oTableId.Add(this, this.Id);
@@ -10096,6 +10135,43 @@ CTextFit.prototype =
 
 // ----------------------------------
 
+
+var VERTICAL_ANCHOR_TYPE_BOTTOM = 0;
+var VERTICAL_ANCHOR_TYPE_CENTER = 1;
+var VERTICAL_ANCHOR_TYPE_DISTRIBUTED = 2;
+var VERTICAL_ANCHOR_TYPE_JUSTIFIED = 3;
+var VERTICAL_ANCHOR_TYPE_TOP = 4;
+
+//Overflow Types
+var nOTClip     = 0;
+var nOTEllipsis = 1;
+var nOTOwerflow = 2;
+//-----------------------------
+
+//Text Anchoring Types
+var nTextATB = 0;// (Text Anchor Enum ( Bottom ))
+var nTextATCtr = 1;// (Text Anchor Enum ( Center ))
+var nTextATDist = 2;// (Text Anchor Enum ( Distributed ))
+var nTextATJust = 3;// (Text Anchor Enum ( Justified ))
+var nTextATT = 4;// Top
+
+//Vertical Text Types
+var nVertTTeaVert          = 0; //( ( East Asian Vertical ))
+var nVertTThorz            = 1; //( ( Horizontal ))
+var nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
+var nVertTTvert            = 3; //( ( Vertical ))
+var nVertTTvert270         = 4;//( ( Vertical 270 ))
+var nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
+var nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
+//-------------------------------------------------------------------
+//Text Wrapping Types
+var nTWTNone   = 0;
+var nTWTSquare = 1;
+
+var text_fit_No         = 0;
+var text_fit_Auto       = 1;
+var text_fit_NormAuto   = 2;
+
 function CBodyPr()
 {
     this.flatTx           = null;
@@ -10121,6 +10197,13 @@ function CBodyPr()
     this.textFit          = null;
 
 
+	
+    this.setVert = function(val)
+    {
+        this.vert = val;
+    };
+
+	
     this.Write_ToBinary2 = function(w)
     {
         var flag = this.flatTx != null;
@@ -10663,6 +10746,13 @@ CTextParagraphPr.prototype =
     }
 };
 
+function CompareBullets(bullet1, bullet2)
+{
+	var ret = new CBullet();
+	//TODO: сделать сравнивание
+	return ret;
+}
+
 function CBullet()
 {
     this.bulletColor = null;
@@ -10768,7 +10858,44 @@ CBullet.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+	
+	Set_FromObject: function(obj)
+	{
+		if(obj)
+		{
+			if(obj.bulletColor)
+			{
+				this.bulletColor = new CBulletColor();
+				this.bulletColor.Set_FromObject(obj.bulletColor);
+			}
+			else
+				this.bulletColor = null;
+			
+			if(obj.bulletSize)
+			{
+				this.bulletSize = new CBulletSize();
+				this.bulletSize.Set_FromObject(obj.bulletSize);
+			}
+			else
+				this.bulletSize = null;
+				
+			if(obj.bulletTypeface)
+			{
+				this.bulletTypeface = new CBulletTypeface();
+				this.bulletTypeface.Set_FromObject(obj.bulletTypeface);
+			}
+			else
+				this.bulletTypeface = null;
+		}
+	},
+	
+	Write_ToBinary: function(w)
+	{},
+	
+	Read_FromBinary: function(r)
+	{}
+
 };
 
 var BULLET_TYPE_COLOR_NONE	= 0;
@@ -10825,7 +10952,16 @@ CBulletColor.prototype =
     Get_Id: function()
     {
         return this.Id;
-    }
+    },
+	
+	Set_FromObject: function(o)
+	{
+		this.type = o.type;
+		if(o.UniColor)
+		{
+			
+		}
+	}
 };
 
 var BULLET_TYPE_SIZE_NONE	= 0;

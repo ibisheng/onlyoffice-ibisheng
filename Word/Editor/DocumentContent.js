@@ -21,7 +21,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.Parent = Parent;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = editor.WordControl.m_oLogicDocument;
+    this.LogicDocument   = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument : null;
 
     if ( "undefined" === typeof(TurnOffInnerWrap) )
         TurnOffInnerWrap = false;
@@ -61,10 +61,10 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     };
 
     // Массив укзателей на все инлайновые графические объекты
-    this.DrawingObjects = this.LogicDocument.DrawingObjects;
+    this.DrawingObjects = this.LogicDocument ? this.LogicDocument.DrawingObjects : null;
 
-    this.Styles    = editor.WordControl.m_oLogicDocument.Get_Styles();
-    this.Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+    this.Styles    = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles() : null;
+    this.Numbering = typeof (editor) != "undefined" && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Numbering() : null;
 
     this.ClipInfo =
     {
@@ -153,7 +153,7 @@ CDocumentContent.prototype =
 
     Get_PageFields : function(PageIndex)
     {
-        if ( true === this.Parent.Is_Cell() || this.Parent instanceof WordShape )
+        if ( true === this.Parent.Is_Cell() || (typeof(WordShape) !== "undefined" && this.Parent instanceof WordShape) )
         {
             if ( PageIndex < this.Pages.length && PageIndex >= 0 )
             {
@@ -191,11 +191,14 @@ CDocumentContent.prototype =
     // что у них врапится текст не колонтитула, а документа.
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner)
     {
-        if ( undefined === Inner )
-            Inner = true;
+		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		{
+			if ( undefined === Inner )
+				Inner = true;
 
-        if ( (false === this.TurnOffInnerWrap && true === Inner) || (false === Inner) )
-            return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this );
+			if ( (false === this.TurnOffInnerWrap && true === Inner) || (false === Inner) )
+				return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this );
+		}
 
         return [];
     },
@@ -254,9 +257,12 @@ CDocumentContent.prototype =
         return NumInfo;
     },
 
-    Get_Styles : function()
+    Get_Styles : function(lvl)
     {
-        return this.Styles;
+		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+			return this.Styles;
+		else
+			return this.Parent.Get_Styles(lvl);
     },
 
     Get_TableStyleForPara : function()
@@ -454,10 +460,12 @@ CDocumentContent.prototype =
 
     Recalculate : function()
     {
-        editor.WordControl.m_oLogicDocument.bRecalcDocContent = true;
-        editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
-        editor.WordControl.m_oLogicDocument.Recalculate();
-
+		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		{
+			editor.WordControl.m_oLogicDocument.bRecalcDocContent = true;
+			editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
+			editor.WordControl.m_oLogicDocument.Recalculate();
+		}
     },
 
     Reset_RecalculateCache : function()
@@ -471,7 +479,7 @@ CDocumentContent.prototype =
 
     Recalculate_ : function(bForceRecalc, LastChangeIndex)
     {
-        if ( true === this.TurnOffRecalc || true === editor.WordControl.m_oLogicDocument.TurnOffRecalc )
+        if ( true === this.TurnOffRecalc || editor && true === editor.WordControl.m_oLogicDocument.TurnOffRecalc )
             return;
 
         if ( "undefined" === typeof(bForceRecalc) )
@@ -621,7 +629,8 @@ CDocumentContent.prototype =
             this.Pages.length = PageIndex;
             this.Pages[PageIndex] = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
-            this.LogicDocument.DrawingObjects.resetDrawingArrays( this.Get_StartPage_Absolute() + PageIndex, this);
+			if(this.LogicDocument)
+				this.LogicDocument.DrawingObjects.resetDrawingArrays( this.Get_StartPage_Absolute() + PageIndex, this);
         }
 
         var Count = this.Content.length;
@@ -674,7 +683,8 @@ CDocumentContent.prototype =
                     this.RecalcInfo.FlowObjectPage = 0;
                     this.RecalcInfo.FlowObject   = Element;
                     this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
+					if(this.DrawingObjects)
+						this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
                     RecalcResult = recalcresult_CurPage;
                 }
                 else if ( Element === this.RecalcInfo.FlowObject )
@@ -703,7 +713,8 @@ CDocumentContent.prototype =
                             RecalcResult = Element.Recalculate_Page( PageIndex );
                             if ( (( 0 === Index && 0 === PageIndex ) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage()  )
                             {
-                                this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
+								if(this.DrawingObjects)
+									this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
                                 this.RecalcInfo.FlowObjectPageBreakBefore = true;
                                 RecalcResult = recalcresult_CurPage;
                             }
@@ -724,7 +735,8 @@ CDocumentContent.prototype =
                     else
                     {
                         RecalcResult = Element.Recalculate_Page( PageIndex );
-                        this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
+						if(this.DrawingObjects)
+							this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
 
                         if ( recalcresult_NextElement === RecalcResult )
                         {

@@ -85,7 +85,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.NeedReDraw = true;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = editor.WordControl.m_oLogicDocument;
+    this.LogicDocument   = typeof(editor) != "undefined" && editor.isDocumentEditor && editor.WordControl.m_oLogicDocument;
 
     this.TurnOffRecalcEvent = false;
 
@@ -5475,23 +5475,26 @@ Paragraph.prototype =
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
         // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-        if ( locktype_None != this.Lock.Get_Type() )
-        {
-            if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
-            {
-                var X_min = -1 + Math.min( this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
-                var Y_top = this.Pages[CurPage].Bounds.Top;
-                var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
+		if(typeof(editor) !== "undefined" && editor.isDocumentEditor)
+		{
+			if ( locktype_None != this.Lock.Get_Type() )
+			{
+				if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
+				{
+					var X_min = -1 + Math.min( this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
+					var Y_top = this.Pages[CurPage].Bounds.Top;
+					var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                if ( true === editor.isCoMarksDraw || locktype_Mine != this.Lock.Get_Type() )
-                    pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
-            }
-        }
+					if ( true === editor.isCoMarksDraw || locktype_Mine != this.Lock.Get_Type() )
+						pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
+				}
+			}
+		}
     },
 
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)
     {
-        if ( true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
+        if ( typeof(editor) !== "undefined" && true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
         {
             var SpecFont = { FontFamily: { Name : "Arial", Index : -1 }, FontSize : 12, Italic : false, Bold : false };
             var SpecSym = String.fromCharCode( 0x25AA );
@@ -5512,6 +5515,8 @@ Paragraph.prototype =
 
     Internal_Draw_3 : function(CurPage, pGraphics, Pr)
     {
+		if(!(typeof(editor) !== "undefined" && editor.isDocumentEditor))
+			return;
         if ( true !== Debug_ParaRunMode )
         {
             var _Page = this.Pages[CurPage];
@@ -6776,14 +6781,17 @@ Paragraph.prototype =
                 }
 
                 // Рисуем подчеркивание орфографии
-                pGraphics.p_color( 255, 0, 0, 255 );
-                var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-                Element = aSpelling.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
-                    Element = aSpelling.Get_Next();
-                }
+				if(typeof (editor)  != "undefined" && editor.isDocumentEditor)
+				{
+					pGraphics.p_color( 255, 0, 0, 255 );
+					var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+					Element = aSpelling.Get_Next();
+					while ( null != Element )
+					{
+						pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+						Element = aSpelling.Get_Next();
+					}
+				}
             }
         }
         else
@@ -13230,65 +13238,89 @@ Paragraph.prototype =
     // Формируем конечные свойства параграфа на основе стиля, возможной нумерации и прямых настроек.
     Internal_CompileParaPr : function()
     {
-        var Styles     = this.Parent.Get_Styles();
-        var Numbering  = this.Parent.Get_Numbering();
-        var TableStyle = this.Parent.Get_TableStyleForPara();
-        var StyleId    = this.Style_Get();
+		if(typeof (editor) != "undefined" && editor.isDocumentEditor)
+		{
+			var Styles     = this.Parent.Get_Styles();
+			var Numbering  = this.Parent.Get_Numbering();
+			var TableStyle = this.Parent.Get_TableStyleForPara();
+			var StyleId    = this.Style_Get();
 
-        // Считываем свойства для текущего стиля
-        var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, TableStyle );
+			// Считываем свойства для текущего стиля
+			var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, TableStyle );
 
-        // Если в стиле была задана нумерация сохраним это в специальном поле
-        if ( undefined != Pr.ParaPr.NumPr )
-            Pr.ParaPr.StyleNumPr = Pr.ParaPr.NumPr.Copy();
+			// Если в стиле была задана нумерация сохраним это в специальном поле
+			if ( undefined != Pr.ParaPr.NumPr )
+				Pr.ParaPr.StyleNumPr = Pr.ParaPr.NumPr.Copy();
 
-        var Lvl = -1;
-        if ( undefined != this.Pr.NumPr )
-        {
-            if ( undefined != this.Pr.NumPr.NumId && 0 != this.Pr.NumPr.NumId )
-            {
-                Lvl = this.Pr.NumPr.Lvl;
+			var Lvl = -1;
+			if ( undefined != this.Pr.NumPr )
+			{
+				if ( undefined != this.Pr.NumPr.NumId && 0 != this.Pr.NumPr.NumId )
+				{
+					Lvl = this.Pr.NumPr.Lvl;
 
-                if ( Lvl >= 0 && Lvl <= 8 )
-                    Pr.ParaPr.Merge( Numbering.Get_ParaPr( this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl ) );
-                else
-                {
-                    Lvl = -1;
-                    Pr.ParaPr.NumPr = undefined;
-                }
-            }
-        }
-        else if ( undefined != Pr.ParaPr.NumPr )
-        {
-            if ( undefined != Pr.ParaPr.NumPr.NumId && 0 != Pr.ParaPr.NumPr.NumId )
-            {
-                var AbstractNum = Numbering.Get_AbstractNum( Pr.ParaPr.NumPr.NumId );
-                Lvl = AbstractNum.Get_LvlByStyle( StyleId );
-                if ( -1 != Lvl )
-                {}
-                else
-                    Pr.ParaPr.NumPr = undefined;
-            }
-        }
+					if ( Lvl >= 0 && Lvl <= 8 )
+						Pr.ParaPr.Merge( Numbering.Get_ParaPr( this.Pr.NumPr.NumId, this.Pr.NumPr.Lvl ) );
+					else
+					{
+						Lvl = -1;
+						Pr.ParaPr.NumPr = undefined;
+					}
+				}
+			}
+			else if ( undefined != Pr.ParaPr.NumPr )
+			{
+				if ( undefined != Pr.ParaPr.NumPr.NumId && 0 != Pr.ParaPr.NumPr.NumId )
+				{
+					var AbstractNum = Numbering.Get_AbstractNum( Pr.ParaPr.NumPr.NumId );
+					Lvl = AbstractNum.Get_LvlByStyle( StyleId );
+					if ( -1 != Lvl )
+					{}
+					else
+						Pr.ParaPr.NumPr = undefined;
+				}
+			}
 
-        Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
+			Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
 
-        // Копируем прямые настройки параграфа.
-        Pr.ParaPr.Merge( this.Pr );
+			// Копируем прямые настройки параграфа.
+			Pr.ParaPr.Merge( this.Pr );
 
-        if ( -1 != Lvl && undefined != Pr.ParaPr.NumPr )
-            Pr.ParaPr.NumPr.Lvl = Lvl;
+			if ( -1 != Lvl && undefined != Pr.ParaPr.NumPr )
+				Pr.ParaPr.NumPr.Lvl = Lvl;
 
-        // Настройки рамки не наследуются
-        if ( undefined === this.Pr.FramePr )
-            Pr.ParaPr.FramePr = undefined;
-        else
-            Pr.ParaPr.FramePr = this.Pr.FramePr.Copy();
+			// Настройки рамки не наследуются
+			if ( undefined === this.Pr.FramePr )
+				Pr.ParaPr.FramePr = undefined;
+			else
+				Pr.ParaPr.FramePr = this.Pr.FramePr.Copy();
 
-        return Pr;
+			return Pr;
+		}
+		else
+		{
+			return this.Internal_CompiledParaPrPresentation();
+		}
     },
+	
+	Internal_CompiledParaPrPresentation: function()
+	{
+		var styleObject = this.Parent.Get_Styles(this.Pr.Lvl);
+		var Styles     = styleObject.styles;
+		var TableStyle = this.Parent.Get_TableStyleForPara();
 
-    // Сообщаем параграфу, что ему надо будет пересчитать скомпилированный стиль
+		// Считываем свойства для текущего стиля
+		var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, TableStyle );
+
+		Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
+
+		// Копируем прямые настройки параграфа.
+		Pr.ParaPr.Merge( this.Pr );
+		if(this.Pr.DefaultRunPr)
+			Pr.TextPr.Merge( this.Pr.DefaultRunPr );
+		return Pr;
+	},
+	// Сообщаем параграфу, что ему надо будет пересчитать скомпилированный стиль
     // (Такое может случится, если у данного параграфа есть нумерация или задан стиль,
     //  которые меняются каким-то внешним образом)
     Recalc_CompileParaPr : function()

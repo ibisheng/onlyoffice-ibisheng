@@ -61,25 +61,6 @@ var MIN_ANGLE = 0.07;
 
 
 
-function ExecuteNoHistory(f, oThis, args)
-{
-	var is_on = (History instanceof CHistory) ? History.Is_On() : false;
-	if(!(History instanceof CHistory))
-	{
-		History = {Add: function(){}};
-	}
-	if(is_on)
-	{
-		History.TurnOff();
-	}
-	var ret = f.apply(oThis, args);	
-	if(is_on)
-	{
-		History.TurnOn();
-	}
-	return ret;
-}
-
 function CreatePenBrushForChartTrack()
 {	
 	return ExecuteNoHistory(function()

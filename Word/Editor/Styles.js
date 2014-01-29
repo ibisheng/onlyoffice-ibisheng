@@ -6291,6 +6291,7 @@ function CTextPr()
     this.CS         = undefined;
     this.RTL        = undefined;
     this.Lang       = new CLang();
+	this.Unifill    = undefined;
 }
 
 CTextPr.prototype =
@@ -6320,6 +6321,7 @@ CTextPr.prototype =
         this.CS         = undefined;
         this.RTL        = undefined;
         this.Lang       = new CLang();
+		this.Unifill    = undefined;
     },
 
     Copy : function()
@@ -6364,6 +6366,8 @@ CTextPr.prototype =
         TextPr.CS         = this.CS;
         TextPr.RTL        = this.RTL;
         TextPr.Lang       = this.Lang.Copy();
+		if(undefined != this.Unifill)
+			TextPr.Unifill = this.Unifill.createDuplicate();
 
         return TextPr;
     },
@@ -6441,6 +6445,9 @@ CTextPr.prototype =
             this.RTL = TextPr.RTL;
 
         this.Lang.Merge( TextPr.Lang );
+		
+		if(undefined != TextPr.Unifill)
+			this.Unifill = TextPr.Unifill.createDuplicate();
     },
 
     Init_Default : function()
@@ -6471,6 +6478,7 @@ CTextPr.prototype =
         this.CS         = false;
         this.RTL        = false;
         this.Lang.Init_Default();
+		this.Unifill    = undefined;
     },
 
     Set_FromObject : function(TextPr)
@@ -6525,7 +6533,10 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.Lang )
             this.Lang.Set_FromObject( TextPr.Lang );
-    },
+			
+		if ( undefined != TextPr.Unifill )
+            this.Unifill.Set_FromObject( TextPr.Unifill );
+	},
 
     Compare : function(TextPr)
     {
@@ -6625,7 +6636,8 @@ CTextPr.prototype =
 
         // Lang
         Result_TextPr.Lang = this.Lang.Compare( TextPr.Lang );
-
+        Result_TextPr.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
+		
         return Result_TextPr;
     },
 
@@ -6775,6 +6787,12 @@ CTextPr.prototype =
             this.Lang.Write_ToBinary( Writer );
             Flags |= 2097152;
         }
+		
+		if(undefined != this.Unifill)
+		{
+			this.Unifill.Write_ToBinary(Writer);
+			Flags |= 4194304;
+		}
         Writer.WriteBool(false);
 
         var EndPos = Writer.GetCurPosition();
@@ -6886,6 +6904,13 @@ CTextPr.prototype =
         // Lang
         if ( Flags & 2097152 )
             this.Lang.Read_FromBinary( Reader );
+			
+		// Unifill
+		if( Flags & 4194304 )
+		{
+			this.Unifill = new CUniFill()
+			this.Unifill.Read_FromBinary( Reader );
+		}
         Reader.GetBool();
     },
 
@@ -7805,6 +7830,10 @@ function CParaPr()
     this.NumPr             = undefined; // Нумерация
     this.PStyle            = undefined; // Стиль параграфа
     this.FramePr           = undefined;
+	
+	this.DefaultRunPr      = undefined;
+	this.Bullet            = undefined;
+	this.Lvl               = undefined;
 }
 
 CParaPr.prototype =
@@ -7863,6 +7892,14 @@ CParaPr.prototype =
         else
             ParaPr.FramePr = undefined;
 
+		if( undefined != this.DefaultRunPr)
+			ParaPr.DefaultRunPr = this.DefaultRunPr.Copy();
+			
+		if( undefined != this.Bullet)
+			ParaPr.Bullet = this.Bullet.Copy();
+			
+		if(undefined != this.Lvl)
+			ParaPr.Lvl = this.Lvl;
         return ParaPr;
     },
 
@@ -7939,6 +7976,19 @@ CParaPr.prototype =
             this.PStyle = ParaPr.PStyle;
 
         this.FramePr = undefined;
+		
+		if( undefined != ParaPr.DefaultRunPr )
+		{
+			if( undefined == this.DefaultRunPr )
+				this.DefaultRunPr = new CTextPr();
+			this.DefaultRunPr.Merge(ParaPr.DefaultRunPr);
+		}
+			
+		if( undefined != ParaPr.Bullet && ParaPr.Bullet.isBullet())
+			this.Bullet = ParaPr.Bullet.createDuplicate();
+		
+		if(undefined != ParaPr.Lvl)
+			this.Lvl = ParaPr.Lvl;
     },
 
     Init_Default : function()
@@ -7972,6 +8022,9 @@ CParaPr.prototype =
         this.NumPr                     = undefined;
         this.PStyle                    = undefined;
         this.FramePr                   = undefined;
+		
+		this.DefaultRunPr              = undefined;
+		this.Bullet                    = undefined;
     },
 
     Set_FromObject : function(ParaPr)
@@ -8083,6 +8136,18 @@ CParaPr.prototype =
         }
         else
             this.FramePr = undefined;
+			
+		if( undefined != ParaPr.DefaultRunPr )
+		{
+			this.DefaultRunPr = new CTextPr();
+			this.DefaultRunPr.Set_FromObject(ParaPr.DefaultRunPr);
+		}
+		
+		if( undefined != ParaPr.Bullet )
+		{
+			this.Bullet = new CBullet();
+			this.Bullet.Set_FromObject(ParaPr.Bullet);
+		}
     },
 
     Compare : function(ParaPr)
@@ -8186,7 +8251,17 @@ CParaPr.prototype =
         // FramePr
         if ( undefined != this.FramePr && undefined != ParaPr.FramePr && true === this.FramePr.Compare(ParaPr.FramePr) )
             Result_ParaPr.FramePr = this.FramePr;
-
+			
+		if(undefined != this.Bullet && undefined != ParaPr.Bullet )
+			Result_ParaPr.Bullet = CompareBullets(ParaPr.Bullet, this.Bullet);
+			
+		if(undefined != this.DefaultRunPr && undefined != ParaPr.DefaultRunPr) 
+			Result_ParaPr.DefaultRunPr = this.DefaultRunPr.Compare(ParaPr.DefaultRunPr);
+		
+		if(undefined != this.Lvl && undefined != ParPr.Lvl && ParPr.Lvl === this.Lvl)
+			Result_ParaPr.Lvl = this.Lvl;
+			
+		
         return Result_ParaPr;
     },
 
@@ -8304,6 +8379,30 @@ CParaPr.prototype =
             Flags |= 131072;
         }
 
+		if ( undefined != this.FramePr )
+        {
+            this.FramePr.Write_ToBinary( Writer );
+            Flags |= 131072;
+        }
+		
+		if(undefined != this.DefaultRunPr)
+		{
+			this.DefaultRunPr.Write_ToBinary( Writer );
+			Flags |= 232144;
+		}
+		
+		if(undefined != this.Bullet)
+		{
+			this.Bullet.Write_ToBinary( Writer );
+			Flags |= 464288;
+		}
+		
+		if(undefined != this.Lvl)
+		{
+			Writer.WriteByte(this.Lvl);
+			Flags |= 928576;
+		}
+		
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -8400,6 +8499,23 @@ CParaPr.prototype =
             this.FramePr = new CFramePr();
             this.FramePr.Read_FromBinary( Reader );
         }
+		
+		if(Flags & 232144)
+		{
+			this.DefaultRunPr = new CTextPr();
+			this.DefaultRunPr.Read_FromBinary(Reader);
+		}
+		
+		if(Flags & 464288)
+		{
+			this.Bullet = new CBullet();
+			this.Bullet.Read_FromBinary(Reader);
+		}
+		
+		if(Flags & 928576)
+		{
+			this.Lvl = Reader.GetByte();
+		}
     },
 	
 	isEqual: function(ParaPrUOld,ParaPrNew)

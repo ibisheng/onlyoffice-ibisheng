@@ -91,30 +91,25 @@ var nTWTNone   = 0;
 var nTWTSquare = 1;
 //-------------------
 
-function CTextBody(shape)
+function CTextBody()
 {
-    this.bodyPr = new CBodyPr();
-    this.lstStyle = new TextListStyle();
-
-
+    this.bodyPr = null;
+    this.lstStyle = null;
+	this.content = null;
+	this.parent = null;
+	
     this.content2 = null;
-    this.compiledBodyPr = new CBodyPr();
+    this.compiledBodyPr = null;
+	this.parent = null;
     this.recalcInfo =
     {
         recalculateBodyPr: true,
         recalculateContent2: true
     };
-
     this.textPropsForRecalc = [];
     this.bRecalculateNumbering = true;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
-
-    if(isRealObject(shape))
-    {
-        this.setShape(shape);
-        this.setDocContent(new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 0, 20000, false, false));
-    }
 }
 
 CTextBody.prototype =
@@ -124,31 +119,155 @@ CTextBody.prototype =
     {
         return this.content != null ? this.content.getSearchResults(str) : [];
     },
+	
+	createDuplicate: function()
+	{
+		var ret = new CTextBody();
+		if(this.bodyPr)
+			ret.setBodyPr(this.bodyPr.createDuplicate());
+		if(this.lstStyle)
+			ret.setLastStyle(this.lstStyle.createDuplicate());
+		if(this.content)
+			ret.setContent(this.content.Copy(ret))
+		return ret;
+	},
 
     Get_Id: function()
     {
         return this.Id;
     },
 
+	
+	setParent: function(pr)
+	{
+		History.Add(this, {Type: historyitem_TextBodySetParent, oldPr: this.parent, newPr: pr});
+		this.parent = pr;
+	},
+	
+	setBodyPr: function(pr)
+	{
+		History.Add(this, {Type: historyitem_TextBodySetBodyPr, oldPr: this.bodyPr, newPr: pr});
+		this.bodyPr = pr;
+	},
+	
+	setContent: function(pr)
+	{
+		History.Add(this, {Type: historyitem_TextBodySetContent, oldPr: this.content, newPr: pr});
+		this.content = pr;
+	},
+	
     setLstStyle: function(lstStyle)
     {
-        //History.Add(this, {Type:historyitem_SetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        History.Add(this, {Type:historyitem_TextBodySetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
         this.lstStyle = lstStyle;
     },
-
-    setShape: function(shape)
+	
+    Undo: function(data)
     {
-        //History.Add(this, {Type:historyitem_SetShape, oldPr: this.shape, newPr: shape});
-        this.shape = shape;
+        switch(data.Type)
+        {
+            case historyitem_TextBodySetParent:
+            {
+                this.parent = data.oldPr;
+                break;
+            }
+
+            case historyitem_TextBodySetBodyPr:
+            {
+                this.bodyPr = data.oldPr;
+                break;
+            }
+            case historyitem_TextBodySetContent:
+            {
+                this.content = data.oldPr;
+                break;
+            }
+			case historyitem_TextBodySetLstStyle:
+			{
+				this.lstStyle = data.oldPr;
+				break;
+			}
+        }
     },
 
-    setDocContent: function(docContent)
+    Redo: function(data)
     {
-        //History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
-        this.content = docContent;
+		switch(data.Type)
+        {
+            case historyitem_TextBodySetParent:
+            {
+                this.parent = data.newPr;
+                break;
+            }
 
+            case historyitem_TextBodySetBodyPr:
+            {
+                this.bodyPr = data.newPr;
+                break;
+            }
+            case historyitem_TextBodySetContent:
+            {
+                this.content = data.newPr;
+                break;
+            }
+			case historyitem_TextBodySetLstStyle:
+			{
+				this.lstStyle = data.newPr;
+				break;
+			}
+        }
+	},
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_TextBody);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_TextBodySetParent:
+            case historyitem_TextBodySetBodyPr:
+            case historyitem_TextBodySetContent:
+			case historyitem_TextBodySetLstStyle:
+            {
+                writeObject(w, data.newPr);
+                break;
+            }
+        }
     },
 
+    Load_Changes: function(r)
+    {
+        if(r.GetLong() === historyitem_type_TextBody)
+        {
+            var type = r.GetLong();
+            switch(type)
+			{
+				case historyitem_TextBodySetParent:
+				{
+					this.parent = readObject(r);
+					break;
+				}
+
+				case historyitem_TextBodySetBodyPr:
+				{
+					this.bodyPr = readObject(r);
+					break;
+				}
+				case historyitem_TextBodySetContent:
+				{
+					this.content = readObject(r);
+					break;
+				}
+				case historyitem_TextBodySetLstStyle:
+				{
+					this.lstStyle = readObject(r);
+					break;
+				}
+			}
+        }
+    },
+
+   	
+	
     Write_ToBinary2: function(w)
     {
         w.WriteLong(historyitem_type_TextBody);
@@ -192,23 +311,25 @@ CTextBody.prototype =
 
     recalculateBodyPr: function()
     {
-        if(this.recalcInfo.recalculateBodyPr)
-        {
-            this.compiledBodyPr.setDefault();
-            if(this.shape.isPlaceholder())
-            {
-                var hierarchy = this.shape.getHierarchy();
-                for(var i = hierarchy.length - 1; i > -1; --i)
-                {
-                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].txBody) && isRealObject(hierarchy[i].txBody.bodyPr))
-                        this.compiledBodyPr.merge(hierarchy[i].txBody.bodyPr)
-                }
-            }
-            if(isRealObject(this.bodyPr))
-            {
-                this.compiledBodyPr.merge(this.bodyPr);
-            }
-        }
+		ExecuteNoHistory(function()
+		{			
+			if(!this.compiledBodyPr)
+				this.compiledBodyPr = new CBodyPr();
+			this.compiledBodyPr.setDefault();
+			if(this.parent && this.parent.isPlaceholder && this.parent.isPlaceholder())
+			{
+				var hierarchy = this.parent.getHierarchy();
+				for(var i = hierarchy.length - 1; i > -1; --i)
+				{
+					if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].txBody) && isRealObject(hierarchy[i].txBody.bodyPr))
+						this.compiledBodyPr.merge(hierarchy[i].txBody.bodyPr)
+				}
+			}
+			if(isRealObject(this.bodyPr))
+			{
+				this.compiledBodyPr.merge(this.bodyPr);
+			}
+		}, this, []);
     },
 
     Refresh_RecalcData: function()
@@ -674,8 +795,11 @@ CTextBody.prototype =
 
     Get_StartPage_Absolute: function()
     {
-        return isRealObject(this.shape) && isRealObject(this.shape.parent) && isRealNumber(this.shape.parent.num) ? this.shape.parent.num : (this.shape.chartGroup ? this.shape.chartGroup.parent.num : 0);
+        return 0//TODO;
     },
+	
+	Get_TextBackGroundColor: function()
+	{},
 
     Is_HdrFtr: function()
     {
@@ -772,7 +896,7 @@ CTextBody.prototype =
 
     Get_Styles: function(level)
     {
-        return this.shape.Get_Styles(level);
+        return this.parent.Get_Styles(level);
     },
 
     Is_Cell: function()
@@ -873,133 +997,16 @@ CTextBody.prototype =
         }
     },
 
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SetShape:
-            {
-                this.shape = data.oldPr;
-                break;
-            }
-
-            case historyitem_SetDocContent:
-            {
-                this.content = data.oldPr;
-                break;
-            }
-            case historyitem_SetLstStyle:
-            {
-                this.lstStyle = data.oldPr;
-                break;
-            }
-
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case historyitem_SetShape:
-            {
-                this.shape = data.newPr;
-                break;
-            }
-
-            case historyitem_SetDocContent:
-            {
-                this.content = data.newPr;
-                break;
-            }
-
-            case historyitem_SetLstStyle:
-            {
-                this.lstStyle = data.newPr;
-                break;
-            }
-
-        }
-    },
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(historyitem_type_TextBody);
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case historyitem_SetShape:
-            case historyitem_SetDocContent:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    w.WriteString2(data.newPr.Get_Id())
-                }
-                break;
-            }
-
-            case historyitem_SetLstStyle:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary2(w);
-                }
-                break;
-            }
-
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() === historyitem_type_TextBody)
-        {
-            var type = r.GetLong();
-            switch(type)
-            {
-                case historyitem_SetShape:
-                {
-                    if(r.GetBool())
-                    {
-                        this.shape = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    break;
-                }
-
-                case historyitem_SetDocContent:
-                {
-                    if(r.GetBool())
-                    {
-                        this.content = g_oTableId.Get_ById(r.GetString2());
-                    }
-                    break;
-                }
-                case historyitem_SetLstStyle:
-                {
-                    if(r.GetBool())
-                    {
-                        this.lstStyle = new TextListStyle();
-                        this.lstStyle.Read_FromBinary2(r);
-                    }
-                    else
-                    {
-                        this.lstStyle = null;
-                    }
-                    break;
-                }
-
-            }
-        }
-    },
-
-    getSelectedTextHtml: function()
+	getSelectedTextHtml: function()
     {
 
     },
 
-    Refresh_RecalcData2: function()
-    {},
+    Refresh_RecalcData2: function(pageIndex)
+    {
+		this.parent && this.parent.Refresh_RecalcData2(pageIndex);
+	},
+	
     getRectWidth: function(maxWidth)
     {
         var body_pr = this.getBodyPr();
