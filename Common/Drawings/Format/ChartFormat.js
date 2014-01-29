@@ -3393,6 +3393,7 @@ CDLbl.prototype =
 					}
 				}
 			}
+			max_width+=1;
 			content.Reset(0, 0, max_width, 20000);
 			content.Recalculate_Page(0, true);
 			this.extX = max_width + 1.25;
