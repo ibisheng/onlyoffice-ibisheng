@@ -2662,8 +2662,12 @@ ParaEmpty.prototype =
 function ParaNumbering()
 {
     this.Type = para_Numbering;
-    this.Item = undefined;
-    this.Pos  = new CParagraphContentPos();
+
+    this.Item = null; // Элемент в ране, к которому привязана нумерация
+    this.Run  = null; // Ран, к которому привязана нумерация
+
+    this.Line  = 0;
+    this.Range = 0;
 
     this.Internal =
     {

@@ -386,7 +386,7 @@ CHistory.prototype =
                 var Item = Point.Items[Index];
 
                 if ( Class !== Item.Class )
-                    return null;
+                    return [];
             }
 
             if ( Class instanceof ParaRun && Class.Is_SimpleChanges(Point.Items) )

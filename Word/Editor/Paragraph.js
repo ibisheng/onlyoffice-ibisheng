@@ -3706,26 +3706,17 @@ Paragraph.prototype =
 
         this.Lines[CurLine].Set_RangeStartPos( CurRange, StartPos );
 
-
-        if ( 0 === CurLine && true === PRS.EmptyLine )
+        if ( 0 !== CurRange && 0 === CurLine && true === PRS.EmptyLine )
         {
             if ( ParaPr.Ind.FirstLine < 0 )
+            {
                 Range.X += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+            }
             else
+            {
                 Range.X += ParaPr.Ind.FirstLine;
-
-            Range.FirstRange = true;
+            }
         }
-
-        // TODO: Проверить корректность данного условия
-        if ( true === Range.FirstRange && 0 !== CurRange )
-        {
-            if ( ParaPr.Ind.FirstLine < 0 )
-                Range.X1 += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
-            else
-                Range.X1 += ParaPr.Ind.FirstLine;
-        }
-
 
         var X    = Range.X;
         var XEnd =  ( CurRange == RangesCount ? PRS.XLimit : PRS.Ranges[CurRange].X0 );
@@ -3742,13 +3733,7 @@ Paragraph.prototype =
 
             if ( ( 0 === Pos && 0 === CurLine ) || Pos !== StartPos )
             {
-                Item.Recalculate_Reset( CurLine );
-
-                // TODO: пересмотреть работу с нумерацией
-                if ( 0 === Pos && 0 === CurLine )
-                    Item.NeedAddNumbering = true;
-                else if ( Pos > 1 )
-                    Item.NeedAddNumbering = this.Content[Pos - 1].NeedAddNumbering;
+                Item.Recalculate_Reset( CurLine, ( 0 === Pos && 0 === CurLine ? null : this.Content[Pos - 1].Get_RecalcInfo() ) );
             }
 
             PRS.Update_CurPos( Pos, 0 );
@@ -3832,25 +3817,6 @@ Paragraph.prototype =
         //-------------------------------------------------------------------------------------------------------------
         // 1. Обновляем метрики данной строки
         //-------------------------------------------------------------------------------------------------------------
-
-        // TODO: Данная часть была перенесена, необходимо проверить ее корректность
-        if ( linerule_Exact === ParaPr.Spacing.LineRule )
-        {
-            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
-            if ( PRS.LineAscent < this.TextAscent )
-                PRS.LineAscent = this.TextAscent;
-
-            if ( PRS.LineDescent < this.TextDescent )
-                PRS.LineDescent = this.TextDescent;
-        }
-        else
-        {
-            if ( PRS.LineAscent < this.TextAscent + this.YOffset  )
-                PRS.LineAscent = this.TextAscent + this.YOffset;
-
-            if ( PRS.LineDescent < this.TextDescent - this.YOffset )
-                PRS.LineDescent = this.TextDescent - this.YOffset;
-        }
 
         // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
         // текста, на котором закончилась данная строка.
@@ -4756,7 +4722,7 @@ Paragraph.prototype =
 
             if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
             {
-                TabsPos.push( PageStart.X + ParaPr.Ind.Left );
+                TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left) );
                 bCheckLeft = false;
             }
 
@@ -4765,7 +4731,7 @@ Paragraph.prototype =
         }
 
         if ( true === bCheckLeft )
-            TabsPos.push( PageStart.X + ParaPr.Ind.Left );
+            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left) );
 
         TabsCount = TabsPos.length;
 
@@ -4781,7 +4747,7 @@ Paragraph.prototype =
             }
         }
 
-        var NewX = null;
+        var NewX = 0;
 
         // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
         if ( null === Tab )
@@ -4797,16 +4763,7 @@ Paragraph.prototype =
         }
         else
         {
-            // Если таб левый, тогда мы сразу смещаемся к нему
-            if ( tab_Left === Tab.Value )
-            {
-                NewX = Tab.Pos + PageStart.X;
-            }
-            else
-            {
-                // Ставим отрицательно значение, чтобы дать понять, что данный таб не левый
-                NewX = -(Tab.Pos + PageStart.X)
-            }
+            NewX = Tab.Pos + PageStart.X;
         }
 
         return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ) };
@@ -7783,6 +7740,7 @@ Paragraph.prototype =
                 case para_PageNum:
                 case para_Tab:
                 case para_Drawing:
+                case para_NewLine:
                 {
                     // Элементы данного типа добавляем во внутренний элемент
                     this.Content[this.CurPos.ContentPos].Add( Item );
@@ -8457,11 +8415,6 @@ Paragraph.prototype =
             SearchPos.InText = true;
         else
             SearchPos.InText = false;
-
-        if ( SearchPos.NumberingDiffX <= SearchPos.DiffX )
-            SearchPos.Numbering = true;
-        else
-            SearchPos.Numbering = false;
 
         SearchPos.Line = CurLine;
 
@@ -10235,7 +10188,7 @@ Paragraph.prototype =
             }
             else
             {
-                // TODO: Надо перейти в предыдущий элемент документа
+                // Надо перейти в предыдущий элемент документа
                 return false;
             }
 
@@ -10261,7 +10214,7 @@ Paragraph.prototype =
             else
             {
                 this.Selection.Use = false;
-                // TODO: Надо перейти в предыдущий элемент документа
+                // Надо перейти в предыдущий элемент документа
                 return false;
             }
         }
@@ -10539,7 +10492,7 @@ Paragraph.prototype =
             }
             else
             {
-                // TODO: Надо перейти в предыдущий элемент документа
+                // Надо перейти в предыдущий элемент документа
                 return false;
             }
         }
@@ -10564,7 +10517,7 @@ Paragraph.prototype =
             else
             {
                 this.Selection.Use = false;
-                // TODO: Надо перейти в предыдущий элемент документа
+                // Надо перейти в предыдущий элемент документа
                 return false;
             }
         }
@@ -10615,7 +10568,7 @@ Paragraph.prototype =
             }
             else
             {
-                // TODO: Надо перейти в следующий элемент документа
+                // Надо перейти в следующий элемент документа
                 return false;
             }
 
@@ -11869,12 +11822,11 @@ Paragraph.prototype =
                 var NumPr = this.Numbering_Get();
                 if ( true === SearchPosXY.Numbering && undefined != NumPr )
                 {
-                    // TODO: Разобраться с нумерацией
+                    // Передвигаем курсор в начало параграфа
+                    this.Set_ParaContentPos(this.Get_StartPos(), -1, true);
 
-                    // Ставим именно 0, а не this.Internal_GetStartPos(), чтобы при нажатии на клавишу "направо"
-                    // мы оказывались в начале параграфа.
-                    //this.Set_ContentPos( 0, true, -1 );
-                    //this.Parent.Document_SelectNumbering( NumPr );
+                    // Производим выделение нумерации
+                    this.Parent.Document_SelectNumbering( NumPr );
                 }
                 else
                 {
@@ -12253,42 +12205,47 @@ Paragraph.prototype =
                 }
                 case selectionflag_Numbering:
                 {
-                    // TODO: Реализовать нумерацию
+                    var ParaNum = this.Numbering;
+                    var NumberingRun = ParaNum.Run;
 
-//                    var ParaNum = this.Numbering;
-//                    var NumberingPos = this.Numbering.Pos;
-//                    if ( -1 === NumberingPos )
-//                        break;
-//
-//                    var ParaNumPos = this.Internal_Get_ParaPos_By_Pos(NumberingPos);
-//                    if ( ParaNumPos.Page != CurPage )
-//                        break;
-//
-//                    var CurRange = ParaNumPos.Range;
-//                    var CurLine  = ParaNumPos.Line;
-//
-//                    var NumPr   = this.Numbering_Get();
-//                    var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-//                    var SelectW = ParaNum.WidthVisible;
-//                    var NumJc   = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
-//                    switch ( NumJc )
-//                    {
-//                        case align_Center:
-//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
-//                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
-//                            break;
-//                        case align_Right:
-//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
-//                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
-//                            break;
-//                        case align_Left:
-//                        default:
-//                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-//                            SelectW = ParaNum.WidthVisible;
-//                            break;
-//                    }
-//
-//                    this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[CurLine].Top + this.Pages[CurPage].Y, SelectW, this.Lines[CurLine].Bottom - this.Lines[CurLine].Top);
+                    if ( null === NumberingRun )
+                        break;
+
+                    var CurLine  = ParaNum.Line;
+                    var CurRange = ParaNum.Range;
+
+                    var SelectY = this.Lines[CurLine].Top + this.Pages[CurPage].Y;
+                    var SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                    var SelectW = ParaNum.WidthVisible;
+                    var SelectH = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                    var NumPr   = this.Numbering_Get();
+                    var NumJc   = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
+
+                    switch ( NumJc )
+                    {
+                        case align_Center:
+                        {
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
+                            break;
+                        }
+                        case align_Right:
+                        {
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible - ParaNum.WidthNum;
+                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
+                            break;
+                        }
+                        case align_Left:
+                        default:
+                        {
+                            SelectX = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                            SelectW = ParaNum.WidthVisible;
+                            break;
+                        }
+                    }
+
+                    this.DrawingDocument.AddPageSelection( Page_abs, SelectX, SelectY, SelectW, SelectH );
 
                     break;
                 }
@@ -18124,10 +18081,10 @@ CParaLineMetrics.prototype =
             this.Descent = Descent;
 
         if ( this.Ascent < this.TextAscent )
-            this.TextAscent = this.Ascent;
+            this.Ascent = this.TextAscent;
 
         if ( this.Descent < this.TextDescent )
-            this.TextDescent = this.Descent;
+            this.Descent = this.TextDescent;
 
         this.LineGap = this.Recalculate_LineGap( ParaPr, this.TextAscent, this.TextDescent );
     },
