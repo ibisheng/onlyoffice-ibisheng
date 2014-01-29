@@ -609,7 +609,6 @@
 					t.handlers.trigger("stopCellEditing");
 					t.isCellEditMode = false;
 				}
-				return true;
 			}
 
 			// Двигаемся ли мы в выделенной области
@@ -988,10 +987,15 @@
 
 //            this.vsbApi.evt_mouseup(event);
 //            this.hsbApi.evt_mouseup(event);
+
 			// Shapes
 			var coord = this._getCoordinates(event);
-			if ( asc["editor"].isStartAddShape ) {
-				event.fromWindow = true;
+			
+			// Отправляем событие только вне канвы
+			if ( (( coord.x < 0 ) || (coord.y < 0) || (coord.x > this.element.width()) || (coord.y > this.element.height()))  && asc["editor"].isStartAddShape ) {
+				this.isLocked = false;
+				event.isLocked = false;
+				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
 				return true;
