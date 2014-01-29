@@ -7594,63 +7594,62 @@
 						//вставляем изображения
 						for (var im = 0; im < val.addImages.length; im++) {
 							var src = val.addImages[im].tag.src;
-							if (src) {
-								var binary_shape = val.addImages[im].tag.getAttribute("alt");
-								var sub;
-								if (typeof binary_shape === "string")
-									sub = binary_shape.substr(0, 18);
-								if (typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets")) {
-										var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
-										reader.GetLong();
-										if (isRealObject(reader))
-											reader.oImages = this.oImages;
-										var first_string = null;
-										if (reader !== null && typeof  reader === "object") {
-											first_string = sub;
-										}
-										var positionX = null;
-										var positionY = null;
 
-										if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
-											positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
-										if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
-											positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
+							var binary_shape = val.addImages[im].tag.getAttribute("alt");
+							var sub;
+							if (typeof binary_shape === "string")
+								sub = binary_shape.substr(0, 18);
+							if (typeof binary_shape === "string" &&( sub === "TeamLabShapeSheets" || sub === "TeamLabImageSheets" || sub === "TeamLabChartSheets" || sub === "TeamLabGroupSheets")) {
+									var reader = CreateBinaryReader(binary_shape, 18, binary_shape.length);
+									reader.GetLong();
+									if (isRealObject(reader))
+										reader.oImages = this.oImages;
+									var first_string = null;
+									if (reader !== null && typeof  reader === "object") {
+										first_string = sub;
+									}
+									var positionX = null;
+									var positionY = null;
 
-										var Drawing;
-										switch(first_string) {
-											case "TeamLabImageSheets": {
-												Drawing = new CImageShape(null, t.objectRender);
-												break;
-											}
-											case "TeamLabShapeSheets": {
-												Drawing = new CShape(null, t.objectRender);
-												break;
-											}
-											case "TeamLabGroupSheets": {
-												Drawing = new CGroupShape(null, t.objectRender);
-												break;
-											}
-											case "TeamLabChartSheets": {
-												Drawing = new CChartAsGroup(null, t.objectRender);
-												break;
-											}
-											default : {
-												Drawing = CreateImageFromBinary(src);
-												break;
-											}
+									if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
+										positionX = t.cols[val.addImages[im].curCell.col].left - t.getCellLeft(0, 1);
+									if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
+										positionY = t.rows[val.addImages[im].curCell.row].top - t.getCellTop(0, 1);
+
+									var Drawing;
+									switch(first_string) {
+										case "TeamLabImageSheets": {
+											Drawing = new CImageShape(null, t.objectRender);
+											break;
 										}
-										if (positionX && positionY && t.objectRender)
-											Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
-										else
-											Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
-										Drawing.drawingObjects = t.objectRender;
-										a_drawings.push(Drawing);
-										//Drawing.addToDrawingObjects();
-									} else if (0 != src.indexOf("file://")) {
-									var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
-									if(drawing && drawing.graphicObject)
-										a_drawings.push(drawing.graphicObject);
-								}
+										case "TeamLabShapeSheets": {
+											Drawing = new CShape(null, t.objectRender);
+											break;
+										}
+										case "TeamLabGroupSheets": {
+											Drawing = new CGroupShape(null, t.objectRender);
+											break;
+										}
+										case "TeamLabChartSheets": {
+											Drawing = new CChartAsGroup(null, t.objectRender);
+											break;
+										}
+										default : {
+											Drawing = CreateImageFromBinary(src);
+											break;
+										}
+									}
+									if (positionX && positionY && t.objectRender)
+										Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
+									else
+										Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
+									Drawing.drawingObjects = t.objectRender;
+									a_drawings.push(Drawing);
+									//Drawing.addToDrawingObjects();
+								} else if (src && 0 != src.indexOf("file://")) {
+								var drawing = CreateImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height },  t.objectRender);
+								if(drawing && drawing.graphicObject)
+									a_drawings.push(drawing.graphicObject);
 							}
 						}
 
