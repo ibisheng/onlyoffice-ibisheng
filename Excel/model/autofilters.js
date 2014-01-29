@@ -534,7 +534,6 @@
 											arn.r2 = arn.r2 - 1;
 											ws.setSelection(arn,true);
 										}
-										// ToDo - Возможно стоит обновить от 0 до gc_nMaxCol0 ?
 										rangeFilter =  new Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
 										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 									}
@@ -555,7 +554,6 @@
 									t._addHistoryObj(changesElemHistory, historyitem_AutoFilter_Add,
 										{activeCells: activeCells, lTable: lTable});
 									if (bIsActiveSheet && !bIsOpenFilter) {
-										// ToDo нужно обновлять не весь видимый диапазон, а только диапазон фильтра
 										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 									}
 									History.EndTransaction();
@@ -863,7 +861,6 @@
 								arn.r2 = arn.r2 - 1;
 								ws.setSelection(arn,true);
 							}
-							// ToDo - Возможно стоит обновить от 0 до gc_nMaxCol0 ?
 							// ToDo - и еще это обновление стоит после switch, в котором тоже происходит обновление - возможно будет 2 раза
 							rangeFilter =  new Asc.Range(arn.c1, arn.r1, arn.c2, arn.r2);
 							ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);

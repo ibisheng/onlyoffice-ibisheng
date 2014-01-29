@@ -6940,9 +6940,6 @@
 					t.activeFillHandle = null;
 					t.fillHandleDirection = -1;
 
-					// Обновляем все данные строки (т.к. могли быть ячейки, в которые не убрался текст, выровненные по левому и по правому краю, которые нужно перерисовать)
-					arn.c1 = 0;
-					arn.c2 = gc_nMaxCol0;
 					// Обновляем выделенные ячейки
 					t.isChanged = true;
 					t._updateCellsRange(arn);
@@ -7366,9 +7363,6 @@
 								break;
 							case c_oAscMergeOptions.Merge:       range.merge(val); break;
 						}
-						// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
-						arn.c1 = 0;
-						arn.c2 = gc_nMaxCol0;
 						break;
 
 					case "sort":
@@ -7400,10 +7394,6 @@
 						/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 						buildRecalc(t.model.workbook);
 						unLockDraw(t.model.workbook);
-
-						// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
-						arn.c1 = t.visibleRange.c1;
-						arn.c2 = t.visibleRange.c2;
 						break;
 
 					case "changeDigNum":
@@ -7560,9 +7550,6 @@
 				}
 			}
 
-			// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
-			arn.c1 = 0;
-			arn.c2 = gc_nMaxCol0;
 			if (bIsUpdate) {
 				if (callTrigger) { t.handlers.trigger("slowOperation", false); }
 				t.isChanged = true;
@@ -9905,8 +9892,7 @@
 				isClearCell: isClearCell,
 				isHideCursor: isHideCursor,
 				saveValueCallback: function (val, flags, skipNLCheck) {
-					// ToDo уйти от обновления всей строки
-					var oCellEdit = fl.isMerged ? new asc_Range(0, mc.r1, gc_nMaxCol0, mc.r1) : new asc_Range(0, row, gc_nMaxCol0, row);
+					var oCellEdit = fl.isMerged ? new asc_Range(mc.c1, mc.r1, mc.c1, mc.r1) : new asc_Range(col, row, col, row);
 					return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
 				}
 			});
@@ -9958,6 +9944,7 @@
 				return;
 			}
 
+			var cto;
 			for (r = range.r1; r <= range.r2; ++r) {
 				if (t.height_1px > t.rows[r].height) {continue;}
 				for (c = range.c1; c <= range.c2; ++c) {
@@ -9967,6 +9954,18 @@
 				for (h = -1, d = t.defaultRowDescender, c = 0; c < t.cols.length; ++c) {
 					ct = t._getCellTextCache(c, r, true);
 					if (!ct) {continue;}
+
+					/**
+					 * Пробегаемся по строке и смотрим не продолжается ли ячейка на соседние.
+					 * С помощью этой правки уйдем от обновления всей строки при каких-либо действиях
+					 */
+					if ((c < range.c1 || c > range.c2) && (0 !== ct.sideL || 0 !== ct.sideR)) {
+						cto = t._calcCellTextOffset(c, r, ct.cellHA, ct.metrics.width);
+						ct.cellW = cto.maxWidth;
+						ct.sideL = cto.leftSide;
+						ct.sideR = cto.rightSide;
+					}
+
 					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 					if (!ct.flags.isMerged) {
 						bUpdateRowHeight = true;
