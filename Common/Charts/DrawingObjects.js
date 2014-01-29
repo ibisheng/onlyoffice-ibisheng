@@ -5700,7 +5700,7 @@ var FrozenAreaType = {
 
 // Frozen place
 function FrozenPlace(ws, type) {
-	//var log = true;
+	var log = false;
 	var _this = this;
 	var asc = window["Asc"];
 	var asc_Range = asc.Range;
