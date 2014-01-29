@@ -3215,7 +3215,7 @@ CDLbl.prototype =
 			}
 			if(this.recalcInfo.recalcTranformText)
 			{
-				this.recalculateTranformText();
+				this.recalculateTransformText();
 				this.recalcInfo.recalcTranformText = false;
 			}
 		}, this, []);
@@ -3245,7 +3245,7 @@ CDLbl.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
 	},
 	
-	recalculateTranformText: function()
+	recalculateTransformText: function()
 	{
 		this.transformText.Reset();
         global_MatrixTransformer.TranslateAppend(this.transformText, this.x + 1, this.y + 0.5);
