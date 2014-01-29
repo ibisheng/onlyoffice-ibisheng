@@ -1728,6 +1728,7 @@
 					mainChildrens = pasteFragment.children;
 				}
 				
+				var onlyImages = null;
 				var addImages = null;
 				var imCount = 0;
 				//пробегаемся по html
@@ -1761,6 +1762,8 @@
 							c = range.c2;
 							cellCountAll[s] = 1;
 							s++;
+							
+							onlyImages = false;
 						}
 						else if(tag.nodeName.toLowerCase() == '#text')
 						{
@@ -1784,6 +1787,8 @@
 								c = range.c2;
 								cellCountAll[s] = 1;
 								s++;
+								
+								onlyImages = false;
 							
 						}
                         else if(tag.nodeName.toLowerCase() == 'span' || tag.nodeName.toLowerCase() == 'a' || tag.nodeName.toLowerCase() == 'form')
@@ -1792,6 +1797,8 @@
 							cellCountAll[s] = 1;
 							c = range.c2;
 							s++;
+							
+							onlyImages = false;
 						}
                         else if(tag.nodeName.toLowerCase() == 'table')
                         {
@@ -1945,6 +1952,7 @@
 									tableRowCount += tableBody.children.length -1;
 								break;
 							//}
+							onlyImages = false;
                             
                         }
 						else if(tag.nodeName.toLowerCase() == 'img')
@@ -1962,6 +1970,9 @@
 							};
 							imCount++;
 							c = range.c2;
+							
+							if(onlyImages !== false)
+								onlyImages = true;
 						}
                         else
 						{
@@ -1994,6 +2005,8 @@
 							c = range.c2;
 							cellCountAll[s] = 1;
 							s++;
+							
+							onlyImages = false;
 						}
                     }
                 }
@@ -2006,6 +2019,8 @@
 				if(!api || (api && !api.isChartEditor))
 					aResult.addImages = addImages;
 				aResult.fontsNew = t.fontsNew;
+				
+				aResult.onlyImages = onlyImages;
 				worksheet.setSelectionInfo('paste',aResult,t);
 				window.GlobalPasteFlagCounter = 0;
 				window.GlobalPasteFlag = false;

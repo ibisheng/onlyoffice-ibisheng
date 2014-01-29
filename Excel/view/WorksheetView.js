@@ -7480,7 +7480,10 @@
 				else
 					checkRange = t._setInfoAfterPaste(val, onlyActive, true);
 			}
-			this._isLockedCells (checkRange, /*subType*/null, onSelectionCallback);
+			if("paste" === prop && val.onlyImages === true)
+				onSelectionCallback();
+			else
+				this._isLockedCells (checkRange, /*subType*/null, onSelectionCallback);
 		};
 		
 		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
