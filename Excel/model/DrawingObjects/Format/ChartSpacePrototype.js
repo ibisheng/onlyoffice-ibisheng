@@ -58,18 +58,25 @@ CChartSpace.prototype.recalcSeriesColors = function()
 {
     this.recalcInfo.recalculateSeriesColors = true;
 };
+
+CChartSpace.prototype.recalcDLbls = function()
+{
+    this.recalcInfo.recalculateDLbls = true;
+};
 CChartSpace.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
 CChartSpace.prototype.handleUpdatePosition = function()
 {
     this.recalcTransform();
 	this.recalcBounds();
+	this.recalcDLbls();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateExtents = function()
 {
     this.recalcChart();
 	this.recalcBounds();
+	this.recalcDLbls();
     this.addToRecalculate();
 };
 CChartSpace.prototype.handleUpdateFlip = function()
@@ -108,14 +115,14 @@ CChartSpace.prototype.getRectBounds = CShape.prototype.getRectBounds;
 
 CChartSpace.prototype.draw = function(graphics)
 {
-	var intGrid = graphics.GetIntegerGrid();
+	/*var intGrid = graphics.GetIntegerGrid();
 	graphics.SetIntegerGrid(false);
 	graphics.transform3(this.transform, false);
 	
 	this.chartObj.draw(this, graphics);
 	graphics.reset();
 	graphics.SetIntegerGrid(intGrid);
-	
+	*/
 	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
 	{
 		var series = this.chart.plotArea.chart.series;
@@ -125,7 +132,8 @@ CChartSpace.prototype.draw = function(graphics)
 			var pts = getPtsFromSeries(ser);
 			for(var j = 0; j < pts.length; ++j)
 			{
-				pts[j].compiledDlb.draw(graphics);
+				if(pts[j].compiledDlb)
+					pts[j].compiledDlb.draw(graphics);
 			}
 		}
 	}
