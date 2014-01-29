@@ -9962,7 +9962,7 @@
 					if (t.width_1px > t.cols[c].width) {continue;}
 					c = t._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
 				}
-				for (h = t.defaultRowHeight, d = t.defaultRowDescender, c = 0; c < t.cols.length; ++c) {
+				for (h = -1, d = t.defaultRowDescender, c = 0; c < t.cols.length; ++c) {
 					ct = t._getCellTextCache(c, r, true);
 					if (!ct) {continue;}
 					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
@@ -9980,6 +9980,8 @@
 						d = Math.max(d, ct.metrics.height - ct.metrics.baseline);
 					}
 				}
+				if (-1 === h)
+					h = t.defaultRowHeight;
 				if (Math.abs(h - t.rows[r].height) > 0.000001 && !t.rows[r].isCustomHeight) {
 					t.rows[r].heightReal = t.rows[r].height = Math.min(h, t.maxRowHeight);
 					if (!t.rows[r].isDefaultHeight) {
