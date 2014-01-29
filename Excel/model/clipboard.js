@@ -318,7 +318,14 @@
 					this.element.appendChild(this._makeTableNode(range, worksheet));
 					
 					var t = this, selection, rangeToSelect;
-
+					
+					if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+						}
+					}
+					
 					if (window.getSelection) {// all browsers, except IE before version 9
 						selection = window.getSelection();
 						rangeToSelect = doc.createRange();
@@ -350,6 +357,14 @@
 						doc.body.style["-o-user-select"] = "none";
 						doc.body.style["user-select"] = "none";
 						doc.body.style["-webkit-user-select"] = "none";
+						
+						if (window.USER_AGENT_IE)
+						{
+							// не убирать!!! это для ие. чтобы не селектились элементы
+							document.onselectstart= function() {
+								return false;
+							}
+						}
 					},
 					0);
 					return true;
@@ -402,7 +417,14 @@
 					delete document.body.style["-o-user-select"];
 					delete document.body.style["user-select"];
 					document.body.style["-webkit-user-select"] = "text";
-				
+					
+					if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+						}
+					}
+		
 					var pastebin = t._editorPasteGetElem(worksheet,true);
 					
 					pastebin.style.display  = "block";
@@ -425,6 +447,14 @@
 					document.body.style["-o-user-select"] = "none";
 					document.body.style["user-select"] = "none";
 					document.body.style["-webkit-user-select"] = "none";
+					
+					 if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+							return false;
+						}
+					}
 					
 					t._editorPasteExec(worksheet,pastebin)
 					return true;
@@ -488,7 +518,14 @@
 								t.element.appendChild(node);
 							});
 					var t = this, selection, rangeToSelect;
-
+					
+					if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+						}
+					}
+		
 					if (window.getSelection) {// all browsers, except IE before version 9
 						selection = window.getSelection();
 						rangeToSelect = doc.createRange();
@@ -520,6 +557,15 @@
 								doc.body.style["-o-user-select"] = "none";
 								doc.body.style["user-select"] = "none";
 								doc.body.style["-webkit-user-select"] = "none";
+								
+								if (window.USER_AGENT_IE)
+								{
+									// не убирать!!! это для ие. чтобы не селектились элементы
+									document.onselectstart= function() {
+										return false;
+									}
+								}
+		
 								// for paste event
 							},
 							0);
@@ -550,6 +596,13 @@
 				doc.body.style["-webkit-user-select"] = "text";
 				doc.body.style.MozUserSelect = "text";
 				
+				 if (window.USER_AGENT_IE)
+				{
+					// не убирать!!! это для ие. чтобы не селектились элементы
+					document.onselectstart= function() {
+					}
+				}
+		
 				var _interval_time = 0;
 				if(AscBrowser.isMozilla)
 					_interval_time = 10;	
@@ -563,6 +616,15 @@
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
+							
+							if (window.USER_AGENT_IE)
+							{
+								// не убирать!!! это для ие. чтобы не селектились элементы
+								document.onselectstart= function() {
+									return false;
+								}
+							}
+							
 							t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 							var textInsert = t.elementText.value;
 							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
@@ -592,7 +654,15 @@
 					delete doc.body.style["user-select"];
 					doc.body.style["-webkit-user-select"] = "text";
 					doc.body.style.MozUserSelect = "text";
-							
+					
+					 if (window.USER_AGENT_IE)
+					{
+						// не убирать!!! это для ие. чтобы не селектились элементы
+						document.onselectstart= function() {
+						}
+					}
+					
+					
 					document.execCommand('paste');
 					// ждем выполнения
 					window.setTimeout(
@@ -605,6 +675,15 @@
 								doc.body.style["user-select"] = "none";
 								doc.body.style["-webkit-user-select"] = "none";
 								t.elementText.style.display = "none";
+								
+								if (window.USER_AGENT_IE)
+								{
+									// не убирать!!! это для ие. чтобы не селектились элементы
+									document.onselectstart= function() {
+										return false;
+									}
+								}
+								
 								// for paste event
 								callback(t.elementText.value, []);
 							},
@@ -661,7 +740,14 @@
                 delete document.body.style["-o-user-select"];
                 delete document.body.style["user-select"];
                 document.body.style["-webkit-user-select"] = "text";
-
+				
+				if (window.USER_AGENT_IE)
+				{
+					// не убирать!!! это для ие. чтобы не селектились элементы
+					document.onselectstart= function() {
+					}
+				}
+				
                 var Text;
                 var pastebin = t._editorPasteGetElem(worksheet,true);
                 pastebin.style.display  = "block";
@@ -720,13 +806,13 @@
 					document.body.style["user-select"] = "none";
 					document.body.style["-webkit-user-select"] = "none";
 
-					/*if (window.USER_AGENT_IE)
+					if (window.USER_AGENT_IE)
 					{
 						// не убирать!!! это для ие. чтобы не селектились элементы
 						document.onselectstart= function() {
 							return false;
 						}
-					}*/
+					}
 
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
@@ -2101,7 +2187,13 @@
 			
 			_selectElement: function (callback) {
 				var t = this, selection, rangeToSelect;
-
+				
+				if (window.USER_AGENT_IE)
+				{
+					// не убирать!!! это для ие. чтобы не селектились элементы
+					document.onselectstart= function() {
+					}
+				}
 				if (window.getSelection) {// all browsers, except IE before version 9
 					selection = window.getSelection();
 					rangeToSelect = doc.createRange();
@@ -2140,6 +2232,14 @@
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
+							
+							if (window.USER_AGENT_IE)
+							{
+								// не убирать!!! это для ие. чтобы не селектились элементы
+								document.onselectstart= function() {
+									return false;
+								}
+							}
 							// for paste event
 							if (callback && callback.call) {callback();}
 						},
