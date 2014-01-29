@@ -1156,10 +1156,13 @@
 					return;
 				}
 			}
-			if (event.preventDefault)
-				event.preventDefault();
-			else
-				event.returnValue = false;
+			// Для IE preventDefault делать не нужно
+			if (!(AscBrowser.isIE || AscBrowser.isOpera)) {
+				if (event.preventDefault)
+					event.preventDefault();
+				else
+					event.returnValue = false;
+			}
 
 			// Запоминаем координаты нажатия
 			this.mouseDownLastCord = coord;
