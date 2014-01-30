@@ -65,9 +65,9 @@ CChartsDrawer.prototype =
 		this.chart = newChart;
 		
 		//делаем полный пресчёт
-		this.gridChart.reCalculate(this.calcProp);
+		this.gridChart.reCalculate(this.calcProp, null, this);
 		this.areaChart.reCalculate(this.calcProp);
-		this.chart.reCalculate(this);
+		this.chart.reCalculate(this, chartProp);
 	},
 	
 	draw : function(chartProp, graphics)
@@ -79,7 +79,7 @@ CChartsDrawer.prototype =
 		//отрисовываем без пересчёта
 		this.areaChart.draw(this.calcProp, cShapeDrawer);
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
-		this.chart.draw(this, cShapeDrawer);
+		this.chart.draw(this, cShapeDrawer, chartProp);
 	},
 	
 	_calculateProperties: function(chartProp)
@@ -2003,7 +2003,39 @@ CChartsDrawer.prototype =
             newarr.push(arr[i]);
         }
         return newarr;
-    }
+    },
+	
+	_convert3DTo2D: function(x, y, z, p, q, r)
+	{
+		var convertMatrix = [[1, 0, 0, p], [0, 1, 0, q], [0, 0, 0, r], [0, 0, 0, 1]];
+		
+		var qC = x * convertMatrix[0][3] + y * convertMatrix[1][3] + z * convertMatrix[2][3] + 1;
+		var newX = (x * convertMatrix[0][0] + y * convertMatrix[1][0] + z1 * convertMatrix[2][0] - 0)/(qC);
+		var newY = (x * convertMatrix[0][1] + y * convertMatrix[1][1] + z1 * convertMatrix[2][1] - 0)/(qC);
+		return {x: newX, y: newY};
+	},
+	
+	_turnCoords: function(x, y, z, angleOX, angleOY, angleOZ)
+	{
+		var newX, newY, newZ;
+		
+		//around OY
+		newX = x * Math.cos(angleOY) - z * Math.sin(angleOY);
+		newY = y;
+		newZ = x * Math.sin(angleOY) + z * Math.cos(angleOY);
+		
+		//around OX
+		newX = newX;
+		newY = newY * Math.cos(angleOX) + newZ * Math.sin(angleOX);
+		newZ = newZ * Math.cos(angleOX) - newY * Math.sin(angleOX);
+		
+		//around OZ
+		newX = newX * Math.cos(angleOZ) + newY * Math.sin(angleOZ);
+		newY = newY * Math.cos(angleOZ) - newX * Math.sin(angleOZ);
+		newZ = newZ;
+		
+		return {x: newX,y: newY,z: newZ};
+	}
 }
 
 
@@ -2202,6 +2234,7 @@ function drawLineChart()
 	this.chartProp = null;
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
+	this.cChartSpace = null;
 	this.paths = {};
 }
 
@@ -2215,12 +2248,12 @@ drawLineChart.prototype =
 		this._drawLines();
 	},
 	
-	reCalculate : function(chartProp, cShapeDrawer)
+	reCalculate : function(chartProp, cChartSpace)
     {
 		this.paths = {};
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
-		this.cShapeDrawer = cShapeDrawer;
+		this.cChartSpace = cChartSpace;
 		this._calculateLines();
 	},
 	
@@ -2265,8 +2298,75 @@ drawLineChart.prototype =
 					this.paths.series[i] = []
 				
 				this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
+				
+				//caclculate dataLablels
+				this._calculateDLbl(dataSeries[n - 1], x, y);
+				if(n == dataSeries.length - 1)
+					this._calculateDLbl(dataSeries[n], x1, y1);
 			}
 		}
+	},
+	
+	_calculateDLbl: function(point, x, y)
+	{
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX = x / pxToMm - width/2;
+		var centerY = y / pxToMm - height/2;
+		
+		//TODO высчитать позиции, как в екселе
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerY = centerY + height/2;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				centerX = centerX - height/2;
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				centerX = centerX + height/2;
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				centerY = centerY - height/2;
+				break;
+			}
+		}
+		
+		point.compiledDlb.setPosition(centerX, centerY);
 	},
 	
 	_drawLines: function (isRedraw/*isSkip*/)
