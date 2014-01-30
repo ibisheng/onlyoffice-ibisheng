@@ -9768,7 +9768,8 @@
 			function getLeftSide(col) {
 				var i, res = [], offs = t.cols[vr.c1].left - t.cols[0].left - offsetFrozen.offsetX;
 				for (i = col; i >= vr.c1; --i) {
-					res.push(t.cols[i].left - offs);
+					if (t.width_1px < t.cols[i].width)
+						res.push(t.cols[i].left - offs);
 				}
 				return res;
 			}
@@ -9781,7 +9782,9 @@
 					col = vr.c2;
 
 				for (i = col; i <= vr.c2; ++i) {
-					res.push(t.cols[i].left + t.cols[i].width - offs);
+					w = t.cols[i].width;
+					if (t.width_1px < w)
+						res.push(t.cols[i].left + w - offs);
 				}
 				w = t.drawingCtx.getWidth();
 				if (res[res.length - 1] > w) {
@@ -9798,7 +9801,9 @@
 					row = vr.r2;
 
 				for (i = row; i <= vr.r2; ++i) {
-					res.push(t.rows[i].top + t.rows[i].height - offs);
+					h = t.rows[i].height;
+					if (t.height_1px < h)
+						res.push(t.rows[i].top + h - offs);
 				}
 				h = t.drawingCtx.getHeight();
 				if (res[res.length - 1] > h) {

@@ -645,10 +645,6 @@
 				t.kx = asc_getcvt(u, 0/*px*/, ctx.getPPIX());
 				t.ky = asc_getcvt(u, 0/*px*/, ctx.getPPIY());
 
-				$.unique(opt.leftSide);
-				$.unique(opt.rightSide);
-				$.unique(opt.bottomSide);
-
 				opt.leftSide.sort(cmpNumRev);
 				opt.rightSide.sort(cmpNum);
 				opt.bottomSide.sort(cmpNum);
