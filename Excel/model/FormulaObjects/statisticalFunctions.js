@@ -1871,7 +1871,7 @@ cLARGE.prototype.Calculate = function ( arg ) {
             return -(a - b)
         } )
 
-        if ( k.getValue() >= tA.length || k.getValue() <= 0 )
+        if ( k.getValue() > tA.length || k.getValue() <= 0 )
             return new cError( cErrorType.not_available );
         else
             return new cNumber( tA[k.getValue() - 1] );
@@ -3693,7 +3693,7 @@ cSMALL.prototype.Calculate = function ( arg ) {
             return a - b
         } )
 
-        if ( k.getValue() >= tA.length || k.getValue() <= 0 )
+        if ( k.getValue() > tA.length || k.getValue() <= 0 )
             return new cError( cErrorType.not_available );
         else
             return new cNumber( tA[k.getValue() - 1] );
