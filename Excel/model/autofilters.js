@@ -5039,7 +5039,7 @@
 			},
 
 			// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
-			_reDrawFilters: function(turnOffHistory)
+			_reDrawFilters: function(turnOffHistory, isNUpdate)
 			{
 				if(turnOffHistory)
 					History.TurnOff();
@@ -5053,7 +5053,8 @@
 						this._setColorStyleTable(ref[0], ref[1], aWs.TableParts[tP])
 					}
 				}
-				ws._updateCellsRange(ws.visibleRange, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
+				if(!isNUpdate)
+					ws._updateCellsRange(ws.visibleRange, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 				if(turnOffHistory)
 					History.TurnOn();
 			},
@@ -5856,7 +5857,7 @@
 						if(!data)
 							this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
 					}
-					this._reDrawFilters();
+					this._reDrawFilters(null, true);
 				}
 				else
 				{
