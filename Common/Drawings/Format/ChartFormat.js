@@ -3267,6 +3267,12 @@ CDLbl.prototype =
 			var parent_objects = this.chart.getParentObjects();
 			var theme = parent_objects.theme;
 			
+			var para_pr = new CParaPr();
+			para_pr.Spacing.Before = 0.0;
+			para_pr.Spacing.After = 0.0;
+			para_pr.Spacing.Line = 1;
+			para_pr.Spacing.LineRule = linerule_Auto;
+			style.ParaPr = para_pr;
 			var font_name = theme.themeElements.fontScheme.minorFont.latin;
 			text_pr.RFonts.Ascii    = {Name: font_name, Index: -1};
 			text_pr.RFonts.EastAsia = {Name: font_name, Index: -1};
@@ -3305,7 +3311,6 @@ CDLbl.prototype =
 			this.recalcInfo.recalcStyle = false;
 		}
 		return this.compiledStyles;
-		
 	},
 	
 	checkNoLbl: function()
@@ -3604,7 +3609,6 @@ CDLbl.prototype =
         this.txPr = pr;
     },
 	
-
     Undo: function(data)
     {
         switch(data.Type)
