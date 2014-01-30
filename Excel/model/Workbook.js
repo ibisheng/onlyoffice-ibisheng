@@ -906,23 +906,16 @@ function sortDependency( wb ) {
         }
         for ( var sheetId in oCleanCellCacheArea ) {
             var sheetArea = oCleanCellCacheArea[sheetId];
-			var nPrevRow = null;
-			// var nMinRow = Number.MAX_VALUE;
-			// var nMaxRow = 0;
-            for ( var rowId in sheetArea ) {
-                var nRow = rowId - 0;
-				// if(nMinRow > nRow)
-					// nMinRow = nRow;
-				// if(nMaxRow < nRow)
-					// nMaxRow = nRow;
-				if(null != nPrevRow)
-					wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nPrevRow, gc_nMaxCol0, nPrevRow ), c_oAscCanChangeColWidth.numbers, true );
-				nPrevRow = nRow;
+			var nPrevCellId = null;
+			var nMinRow = Number.MAX_VALUE;
+			var nMaxRow = 0;
+            for ( var cellId in sheetArea ) {
+				if(null != nPrevCellId)
+					wb.handlers.trigger( "cleanCellCache", sheetId, sheetArea[nPrevCellId], c_oAscCanChangeColWidth.numbers, true );
+				nPrevCellId = cellId;
             }
-			if(null != nPrevRow)
-				wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nPrevRow, gc_nMaxCol0, nPrevRow ), c_oAscCanChangeColWidth.numbers );
-			// if(nMinRow < nMaxRow)
-				// wb.handlers.trigger( "cleanCellCache", sheetId, new Asc.Range( 0, nMinRow, gc_nMaxCol0, nMaxRow ), c_oAscCanChangeColWidth.numbers );
+			if(null != nPrevCellId)
+				wb.handlers.trigger( "cleanCellCache", sheetId, sheetArea[nPrevCellId], c_oAscCanChangeColWidth.numbers );
         }
 		g_oVLOOKUPCache.clean();
         g_oHLOOKUPCache.clean()
@@ -945,11 +938,8 @@ function _sortDependency( wb, node, oWeightMap, bBad, oCleanCellCacheArea ) {
                     sheetArea = {};
                     oCleanCellCacheArea[node.sheetId] = sheetArea;
                 }
-                var range = Asc.g_oRangeCache.getAscRange( node.cellId );
-                if ( range ) {
-                    for ( var i = range.r1; i <= range.r2; i++ )
-                        sheetArea[i] = 1;
-                }
+				if(!node.isArea)
+					sheetArea[node.cellId] = node.getBBox();
                 //обрабатываем child
                 oWeightMapElem.gray = true;
                 var oSlaveNodes = node.getSlaveEdges();
