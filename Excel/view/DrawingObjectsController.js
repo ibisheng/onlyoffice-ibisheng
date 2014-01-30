@@ -1,7 +1,8 @@
+var editor = window["Asc"]["editor"];
+
 DrawingObjectsController.prototype.getTheme = function()
 {
     return window["Asc"]["editor"].wbModel.theme;
-
 };
 DrawingObjectsController.prototype.getSlide = function()
 {
