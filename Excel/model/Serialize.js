@@ -5513,7 +5513,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         else if( c_oSerCellTypes.Formula == type )
         {
             if(null == oCell.oFormulaExt)
-                oCell.oFormulaExt = {aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, si: null, t: null, v: null};
+                oCell.oFormulaExt = {aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadFormula(t,l, oCell.oFormulaExt);
                 });
