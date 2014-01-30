@@ -6280,8 +6280,8 @@
 						this._openHiddenRows(findFilters[i]);
 					}
 				}
-				this._reDrawFilters();
 			},
+			
 			//открываем строки скрытые данным фильтром
 			_openHiddenRows: function(filter)
 			{
