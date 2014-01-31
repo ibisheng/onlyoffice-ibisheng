@@ -1,3 +1,5 @@
+п»ї"use strict";
+
 function CAreaChart()
 {
     this.axId         = [];
@@ -3140,8 +3142,8 @@ function CDLbl()
 		recalculatePen: true
 	}
 	
-	this.chart = null;//выставляется при пересчете
-	this.series = null;//выставляется при пересчете
+	this.chart = null;//РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ РїСЂРё РїРµСЂРµСЃС‡РµС‚Рµ
+	this.series = null;//РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ РїСЂРё РїРµСЂРµСЃС‡РµС‚Рµ
 
 	
 	this.txBody = null;
@@ -3380,8 +3382,8 @@ CDLbl.prototype =
 		
 		if(this.txBody)
 		{
-			var max_box_width = this.chart.extX/5.1;/*получено экспериментальным путем нужно уточнить*/
-			var max_content_width = max_box_width - 1.25;/*excel слева делает отступ 1мм а справа 0.25мм*/
+			var max_box_width = this.chart.extX/5.1;/*РїРѕР»СѓС‡РµРЅРѕ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅС‹Рј РїСѓС‚РµРј РЅСѓР¶РЅРѕ СѓС‚РѕС‡РЅРёС‚СЊ*/
+			var max_content_width = max_box_width - 1.25;/*excel СЃР»РµРІР° РґРµР»Р°РµС‚ РѕС‚СЃС‚СѓРї 1РјРј Р° СЃРїСЂР°РІР° 0.25РјРј*/
 			var content = this.txBody.content;
 			content.Reset(0, 0, max_content_width, 20000);
 			content.Recalculate_Page(0, true);
@@ -3402,7 +3404,7 @@ CDLbl.prototype =
 			content.Reset(0, 0, max_width, 20000);
 			content.Recalculate_Page(0, true);
 			this.extX = max_width + 1.25;
-			this.extY = this.txBody.content.Get_SummaryHeight() + 1/*по полмиллиметра сверху и снизу отступы*/;
+			this.extY = this.txBody.content.Get_SummaryHeight() + 1/*РїРѕ РїРѕР»РјРёР»Р»РёРјРµС‚СЂР° СЃРІРµСЂС…Сѓ Рё СЃРЅРёР·Сѓ РѕС‚СЃС‚СѓРїС‹*/;
 			this.x = 0;
 			this.y = 0;
 		}

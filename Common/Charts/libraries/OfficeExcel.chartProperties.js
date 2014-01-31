@@ -1,3 +1,5 @@
+"use strict";
+
 if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
 OfficeExcel.Gutter = function()

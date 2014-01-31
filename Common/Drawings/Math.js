@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created by JetBrains WebStorm.
  * User: Sergey.Luzyanin

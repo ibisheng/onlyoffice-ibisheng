@@ -1,4 +1,6 @@
-﻿(	/**
+﻿"use strict";
+
+(	/**
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */

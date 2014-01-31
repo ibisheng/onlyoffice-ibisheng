@@ -1,3 +1,5 @@
+"use strict";
+
 var ArcToCurvers = null;
 var ArcToOnCanvas = null;
 var HitToArc = null;

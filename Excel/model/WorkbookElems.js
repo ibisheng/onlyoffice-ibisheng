@@ -41,10 +41,12 @@ var map_themeExcel_to_themePresentation = {
 	9: 5,
 	10: 11,
 	11: 10
-}
+};
 var map_themePresentation_to_themeExcel = {};
-for(var i in map_themeExcel_to_themePresentation)
-	map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
+(function(){
+	for(var i in map_themeExcel_to_themePresentation)
+		map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
+})();
 function shiftGetBBox(bbox, bHor)
 {
 	var bboxGet = null;

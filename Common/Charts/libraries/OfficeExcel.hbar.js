@@ -1,4 +1,6 @@
-    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
+"use strict";
+
+if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {};
 
     OfficeExcel.HBar = function (chartCanvas, data)
     {

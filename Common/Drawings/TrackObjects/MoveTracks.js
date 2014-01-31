@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created with JetBrains WebStorm.
  * User: Sergey.Luzyanin
@@ -61,7 +63,7 @@ function MoveShapeImageTrack(originalObject)
 
     this.trackEnd = function()
     {
-		var scale_scale_coefficients, ch_off_x, ch_off_y;
+		var scale_coefficients, ch_off_x, ch_off_y;
 		if(this.originalObject.group)
 		{
 			scale_coefficients = this.originalObject.group.getResultScaleCoefficients();

@@ -1,3 +1,5 @@
+"use strict";
+
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
 var contentchanges_Add    = 1;
@@ -1822,7 +1824,7 @@ DrawingObjectsController.prototype =
             var _this = this;
             this.drawingObjects.objectLocker.reset();
 
-            function callbackUngroupedObjects(result) {
+            var callbackUngroupedObjects = function (result) {
                 if ( result ) {
                     for (var j = 0; j < ungrouped_sp_tree.length; ++j) {
                         ungrouped_sp_tree[j].recalculateTransform();
@@ -2170,7 +2172,7 @@ DrawingObjectsController.prototype =
     {
         var api = window["Asc"]["editor"];
         var shape_props, image_props, chart_props;
-        ascSelectedObjects = [];
+        var ascSelectedObjects = [];
 
         // Основные свойства объекта
         if(isRealObject(this.curState.group))
@@ -3971,7 +3973,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
         var _image =  asc["editor"].ImageLoader.LoadImage(imageUrl, 1);
         var isOption = options && options.cell;
 
-        function calculateObjectMetrics(object, width, height) {
+        var calculateObjectMetrics = function (object, width, height) {
             // Обработка картинок большого разрешения
             var metricCoeff = 1;
 
@@ -4004,7 +4006,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
             worksheet.handlers.trigger("reinitializeScroll");
         }
 
-        function addImageObject(_image) {
+        var addImageObject = function (_image) {
 
             if ( !_image.Image ) {
                 worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);

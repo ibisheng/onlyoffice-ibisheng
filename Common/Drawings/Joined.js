@@ -1,3 +1,5 @@
+"use strict";
+
 var min_distance_joined=2;
 function JoinedH(shape1, shape2)
 {

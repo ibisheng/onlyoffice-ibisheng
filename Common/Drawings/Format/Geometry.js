@@ -1,3 +1,4 @@
+"use strict";
 
 var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_PLUS_MINUS = 1,

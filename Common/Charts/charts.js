@@ -1,4 +1,6 @@
-﻿var bar;
+﻿"use strict";
+
+var bar;
 var chartCanvas = null;
 var g_bChartPreview = false;
 

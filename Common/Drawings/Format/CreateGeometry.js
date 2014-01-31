@@ -1,3 +1,5 @@
+"use strict";
+
 function CreateGeometry(prst){
     var f = new Geometry();
     switch(prst){

@@ -1,4 +1,6 @@
-﻿/* spellCheckLanguages.js
+﻿"use strict";
+
+/* spellCheckLanguages.js
  *
  * Author: Alexander.Trofimov
  * Date: 24.06.13

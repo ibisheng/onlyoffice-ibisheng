@@ -1,3 +1,4 @@
+"use strict";
 
 function hitToHandles(x, y, object)
 {
@@ -852,16 +853,6 @@ CShape.prototype =
             }
         }
     },
-
-    setBodyPr: function (bodyPr) {
-        var old_body_pr = this.txBody.bodyPr;
-        this.txBody.bodyPr = bodyPr;
-        var new_body_pr = this.txBody.bodyPr.createDuplicate();
-        History.Add(this, { Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr });
-        this.txBody.recalcInfo.recalculateBodyPr = true;
-    },
-
-
 
     recalculateTransformText: function () {
         if (this.txBody === null)
@@ -3039,7 +3030,6 @@ CShape.prototype =
             case "lineWithArrow":
             {
                 _final_preset = "line";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
                 }
@@ -3055,7 +3045,6 @@ CShape.prototype =
             case "lineWithTwoArrows":
             {
                 _final_preset = "line";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
 
@@ -3077,7 +3066,6 @@ CShape.prototype =
             case "bentConnector5WithArrow":
             {
                 _final_preset = "bentConnector5";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
 
@@ -3094,7 +3082,6 @@ CShape.prototype =
             case "bentConnector5WithTwoArrows":
             {
                 _final_preset = "bentConnector5";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
 
@@ -3116,7 +3103,6 @@ CShape.prototype =
             case "curvedConnector3WithArrow":
             {
                 _final_preset = "curvedConnector3";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
 
@@ -3133,7 +3119,6 @@ CShape.prototype =
             case "curvedConnector3WithTwoArrows":
             {
                 _final_preset = "curvedConnector3";
-                _arrow_flag = true;
                 if (_old_line == null) {
                     _new_line = new CLn();
 

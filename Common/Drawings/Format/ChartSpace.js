@@ -1,3 +1,5 @@
+"use strict";
+
 var EFFECT_NONE = 0;
 var EFFECT_SUBTLE = 1;
 var EFFECT_MODERATE = 2;

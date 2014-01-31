@@ -1,4 +1,6 @@
-﻿function CDocumentReaderMode()
+﻿"use strict";
+
+function CDocumentReaderMode()
 {
     this.DefaultFontSize = 12;
 

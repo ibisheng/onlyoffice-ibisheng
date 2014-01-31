@@ -1,4 +1,6 @@
-    OfficeExcel.DrawKey = function (obj, key, colors)
+"use strict";
+
+OfficeExcel.DrawKey = function (obj, key, colors)
     {
         var context = obj.context;
         context.lineWidth = 1;

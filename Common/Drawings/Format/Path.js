@@ -1,3 +1,5 @@
+"use strict";
+
 var moveTo=0,
     lineTo=1,
     arcTo=2,

@@ -1,3 +1,5 @@
+п»ї"use strict";
+
 function CGroupShape(parent)
 {
 
@@ -502,7 +504,7 @@ CGroupShape.prototype =
 
     canRotate: function()
     {
-		//TODO: сделать еще проверку SpLock
+		//TODO: СЃРґРµР»Р°С‚СЊ РµС‰Рµ РїСЂРѕРІРµСЂРєСѓ SpLock
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(!this.spTree[i].canRotate || !this.spTree[i].canRotate())
@@ -513,7 +515,7 @@ CGroupShape.prototype =
 
     canResize: function()
     {
-		//TODO: сделать еще проверку SpLock
+		//TODO: СЃРґРµР»Р°С‚СЊ РµС‰Рµ РїСЂРѕРІРµСЂРєСѓ SpLock
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(!this.spTree[i].canResize || !this.spTree[i].canResize())
@@ -524,13 +526,13 @@ CGroupShape.prototype =
 
     canMove: function()
     {
-		//TODO: сделать еще проверку SpLock
+		//TODO: СЃРґРµР»Р°С‚СЊ РµС‰Рµ РїСЂРѕРІРµСЂРєСѓ SpLock
         return true;//TODO
     },
 
     canGroup: function()
     {
-		//TODO: сделать еще проверку SpLock
+		//TODO: СЃРґРµР»Р°С‚СЊ РµС‰Рµ РїСЂРѕРІРµСЂРєСѓ SpLock
         return true;//TODO
     },
 

@@ -1,4 +1,6 @@
-﻿    if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {type:'common'};
+﻿"use strict";
+
+if (typeof(window["OfficeExcel"]) == 'undefined') window["OfficeExcel"] = {type:'common'};
 
     OfficeExcel.background     = {};
     /**

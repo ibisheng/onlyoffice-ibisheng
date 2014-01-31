@@ -1,4 +1,6 @@
-﻿var AscBrowser = {
+﻿"use strict";
+
+var AscBrowser = {
     userAgent : "",
     isIE : false,
     isMacOs : false,

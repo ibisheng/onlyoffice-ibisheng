@@ -1,3 +1,5 @@
+"use strict";
+
 function FileHandler() {
 
     this.get = function ( file ) {

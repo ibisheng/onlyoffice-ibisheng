@@ -1,3 +1,5 @@
+"use strict";
+
 var numFormat_Text = 0;
 var numFormat_TextPlaceholder = 1;
 var numFormat_Bracket = 2;

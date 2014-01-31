@@ -1,3 +1,5 @@
+"use strict";
+
 // COLOR -----------------------
 /*
  var map_color_scheme = {};
@@ -4984,7 +4986,7 @@ CNvPr.prototype =
     	this.name = name;
     },
      
-    setName: function(isHidden)
+    setIsHidden: function(isHidden)
     {
     	History.Add(this, {Type: historyitem_CNvPr_SetIsHidden, oldIsHidden: this.isHidden, newIsHidden: isHidden});
     	this.isHidden = isHidden;
@@ -7568,7 +7570,7 @@ ExtraClrScheme.prototype =
         this.clrScheme = pr;
     },
 
-    setClrScheme: function(pr)
+    setClrMap: function(pr)
     {
         History.Add(this, {Type: historyitem_ExtraClrScheme_SetClrMap, oldPr: this.clrMap, newPr: pr});
         this.clrMap = pr;
@@ -8390,8 +8392,8 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
+			var _cur_slide =_slides[_slide_index];
+            var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
                 _cur_slide.recalcAllColors();
@@ -8430,8 +8432,8 @@ function CTheme()
         var _slide_count = _slides.length;
         for(var _slide_index = 0; _slide_index < _slide_count; ++_slide_index)
         {
-            _cur_slide =_slides[_slide_index];
-            _cur_theme = _cur_slide.Layout.Master.Theme;
+			var _cur_slide =_slides[_slide_index];
+			var _cur_theme = _cur_slide.Layout.Master.Theme;
             if(_cur_theme === this)
             {
                 _cur_slide.recalcAllColors();
@@ -8480,7 +8482,8 @@ function CTheme()
     {
         if(r.GetLong() === historyitem_type_Theme)
         {
-            var type = r.GetLong();
+			var _cur_slide, _cur_theme;
+			var type = r.GetLong();
             switch(type)
             {
                 case historyitem_ChangeColorScheme:

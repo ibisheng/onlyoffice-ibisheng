@@ -1,3 +1,5 @@
+"use strict";
+
 var STATES_ID_NULL = 0x00;
 var STATES_ID_PRE_ROTATE = 0x01;
 var STATES_ID_ROTATE = 0x02;
@@ -2840,7 +2842,7 @@ function MoveState(drawingObjectsController,  startX, startY, rectX, rectY, rect
     this.snapX = snap.snapX;
     this.snapY = snap.snapY;
 
-    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    var trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
     this.trackSnapX = trackSnap.snapX;
     this.trackSnapY = trackSnap.snapY;
 
@@ -3576,7 +3578,7 @@ function MoveInGroupState(drawingObjectsController, group, startX, startY, rectX
     this.snapX = snap.snapX;
     this.snapY = snap.snapY;
 
-    trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
+    var trackSnap = this.drawingObjectsController.getSnapArraysTrackObjects();
     this.trackSnapX = trackSnap.snapX;
     this.trackSnapY = trackSnap.snapY;
 

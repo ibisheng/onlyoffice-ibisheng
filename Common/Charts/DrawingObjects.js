@@ -1,4 +1,6 @@
-﻿/* DrawingObjects.js
+﻿"use strict";
+
+/* DrawingObjects.js
 *
 * Author: Dmitry Vikulov
 * Date:   13/08/2012

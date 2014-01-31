@@ -1,3 +1,5 @@
+п»ї"use strict";
+
 var historyitem_ColorMod_SetName = 2001;
 var historyitem_ColorMod_SetVal = 2002;
 var historyitem_ColorModifiers_AddColorMod = 2003;
@@ -682,94 +684,94 @@ var historyitem_type_TextBody = 1109;
 
 
 
-// Типы изменений в классе CDocument
-var historyitem_Document_AddItem     = 1; // Добавляем элемент в документ
-var historyitem_Document_RemoveItem  = 2; // Удаляем элемент из документа
-var historyitem_Document_Margin      = 3; // Меняем маргины(поля) документа
-var historyitem_Document_PageSize    = 4; // Меняем размер страницы у документа
-var historyitem_Document_Orientation = 5; // Меняем ориентацию страниц у документа
-var historyitem_Document_DefaultTab  = 6; // Меняем таб по умолчанию
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CDocument
+var historyitem_Document_AddItem     = 1; // Р”РѕР±Р°РІР»СЏРµРј СЌР»РµРјРµРЅС‚ РІ РґРѕРєСѓРјРµРЅС‚
+var historyitem_Document_RemoveItem  = 2; // РЈРґР°Р»СЏРµРј СЌР»РµРјРµРЅС‚ РёР· РґРѕРєСѓРјРµРЅС‚Р°
+var historyitem_Document_Margin      = 3; // РњРµРЅСЏРµРј РјР°СЂРіРёРЅС‹(РїРѕР»СЏ) РґРѕРєСѓРјРµРЅС‚Р°
+var historyitem_Document_PageSize    = 4; // РњРµРЅСЏРµРј СЂР°Р·РјРµСЂ СЃС‚СЂР°РЅРёС†С‹ Сѓ РґРѕРєСѓРјРµРЅС‚Р°
+var historyitem_Document_Orientation = 5; // РњРµРЅСЏРµРј РѕСЂРёРµРЅС‚Р°С†РёСЋ СЃС‚СЂР°РЅРёС† Сѓ РґРѕРєСѓРјРµРЅС‚Р°
+var historyitem_Document_DefaultTab  = 6; // РњРµРЅСЏРµРј С‚Р°Р± РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-// Типы изменений в классе Paragraph
-var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
-var historyitem_Paragraph_RemoveItem                =  2; // Удаляем элемент из параграфа
-var historyitem_Paragraph_Numbering                 =  3; // Добавляем/Убираем/Изменяем нумерацию у параграфа
-var historyitem_Paragraph_Align                     =  4; // Изменяем прилегание параграфа
-var historyitem_Paragraph_Ind_First                 =  5; // Изменяем отспут первой строки
-var historyitem_Paragraph_Ind_Right                 =  6; // Изменяем правый отступ
-var historyitem_Paragraph_Ind_Left                  =  7; // Изменяем левый отступ
-var historyitem_Paragraph_ContextualSpacing         =  8; // Изменяем свойство contextualSpacing
-var historyitem_Paragraph_KeepLines                 =  9; // Изменяем свойство KeepLines
-var historyitem_Paragraph_KeepNext                  = 10; // Изменяем свойство KeepNext
-var historyitem_Paragraph_PageBreakBefore           = 11; // Изменяем свойство PageBreakBefore
-var historyitem_Paragraph_Spacing_Line              = 12; // Изменяем свойство Spacing.Line
-var historyitem_Paragraph_Spacing_LineRule          = 13; // Изменяем свойство Spacing.LineRule
-var historyitem_Paragraph_Spacing_Before            = 14; // Изменяем свойство Spacing.Before
-var historyitem_Paragraph_Spacing_After             = 15; // Изменяем свойство Spacing.After
-var historyitem_Paragraph_Spacing_AfterAutoSpacing  = 16; // Изменяем свойство Spacing.AfterAutoSpacing
-var historyitem_Paragraph_Spacing_BeforeAutoSpacing = 17; // Изменяем свойство Spacing.BeforeAutoSpacing
-var historyitem_Paragraph_Shd_Value                 = 18; // Изменяем свойство Shd.Value
-var historyitem_Paragraph_Shd_Color                 = 19; // Изменяем свойство Shd.Color
-var historyitem_Paragraph_WidowControl              = 20; // Изменяем свойство WidowControl
-var historyitem_Paragraph_Tabs                      = 21; // Изменяем табы у параграфа
-var historyitem_Paragraph_PStyle                    = 22; // Изменяем стиль параграфа
-var historyitem_Paragraph_DocNext                   = 23; // Изменяем указатель на следующий объект
-var historyitem_Paragraph_DocPrev                   = 24; // Изменяем указатель на предыдущий объект
-var historyitem_Paragraph_Parent                    = 25; // Изменяем указатель на родительский объект
-var historyitem_Paragraph_Borders_Between           = 26; // Изменяем промежуточную границу
-var historyitem_Paragraph_Borders_Bottom            = 27; // Изменяем верхнюю границу
-var historyitem_Paragraph_Borders_Left              = 28; // Изменяем левую границу
-var historyitem_Paragraph_Borders_Right             = 29; // Изменяем правую границу
-var historyitem_Paragraph_Borders_Top               = 30; // Изменяем нижнюю границу
-var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
-var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
-var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
-var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
-var historyitem_Paragraph_Shd                       = 35; // Изменяем настройки заливки целиком
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ Paragraph
+var historyitem_Paragraph_AddItem                   =  1; // Р”РѕР±Р°РІР»СЏРµРј СЌР»РµРјРµРЅС‚ РІ РїР°СЂР°РіСЂР°С„
+var historyitem_Paragraph_RemoveItem                =  2; // РЈРґР°Р»СЏРµРј СЌР»РµРјРµРЅС‚ РёР· РїР°СЂР°РіСЂР°С„Р°
+var historyitem_Paragraph_Numbering                 =  3; // Р”РѕР±Р°РІР»СЏРµРј/РЈР±РёСЂР°РµРј/РР·РјРµРЅСЏРµРј РЅСѓРјРµСЂР°С†РёСЋ Сѓ РїР°СЂР°РіСЂР°С„Р°
+var historyitem_Paragraph_Align                     =  4; // РР·РјРµРЅСЏРµРј РїСЂРёР»РµРіР°РЅРёРµ РїР°СЂР°РіСЂР°С„Р°
+var historyitem_Paragraph_Ind_First                 =  5; // РР·РјРµРЅСЏРµРј РѕС‚СЃРїСѓС‚ РїРµСЂРІРѕР№ СЃС‚СЂРѕРєРё
+var historyitem_Paragraph_Ind_Right                 =  6; // РР·РјРµРЅСЏРµРј РїСЂР°РІС‹Р№ РѕС‚СЃС‚СѓРї
+var historyitem_Paragraph_Ind_Left                  =  7; // РР·РјРµРЅСЏРµРј Р»РµРІС‹Р№ РѕС‚СЃС‚СѓРї
+var historyitem_Paragraph_ContextualSpacing         =  8; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ contextualSpacing
+var historyitem_Paragraph_KeepLines                 =  9; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ KeepLines
+var historyitem_Paragraph_KeepNext                  = 10; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ KeepNext
+var historyitem_Paragraph_PageBreakBefore           = 11; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ PageBreakBefore
+var historyitem_Paragraph_Spacing_Line              = 12; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.Line
+var historyitem_Paragraph_Spacing_LineRule          = 13; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.LineRule
+var historyitem_Paragraph_Spacing_Before            = 14; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.Before
+var historyitem_Paragraph_Spacing_After             = 15; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.After
+var historyitem_Paragraph_Spacing_AfterAutoSpacing  = 16; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.AfterAutoSpacing
+var historyitem_Paragraph_Spacing_BeforeAutoSpacing = 17; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Spacing.BeforeAutoSpacing
+var historyitem_Paragraph_Shd_Value                 = 18; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Shd.Value
+var historyitem_Paragraph_Shd_Color                 = 19; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Shd.Color
+var historyitem_Paragraph_WidowControl              = 20; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ WidowControl
+var historyitem_Paragraph_Tabs                      = 21; // РР·РјРµРЅСЏРµРј С‚Р°Р±С‹ Сѓ РїР°СЂР°РіСЂР°С„Р°
+var historyitem_Paragraph_PStyle                    = 22; // РР·РјРµРЅСЏРµРј СЃС‚РёР»СЊ РїР°СЂР°РіСЂР°С„Р°
+var historyitem_Paragraph_DocNext                   = 23; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РѕР±СЉРµРєС‚
+var historyitem_Paragraph_DocPrev                   = 24; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґС‹РґСѓС‰РёР№ РѕР±СЉРµРєС‚
+var historyitem_Paragraph_Parent                    = 25; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
+var historyitem_Paragraph_Borders_Between           = 26; // РР·РјРµРЅСЏРµРј РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅСѓСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Paragraph_Borders_Bottom            = 27; // РР·РјРµРЅСЏРµРј РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Paragraph_Borders_Left              = 28; // РР·РјРµРЅСЏРµРј Р»РµРІСѓСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Paragraph_Borders_Right             = 29; // РР·РјРµРЅСЏРµРј РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Paragraph_Borders_Top               = 30; // РР·РјРµРЅСЏРµРј РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Paragraph_Pr                        = 31; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІР° РїРѕР»РЅРѕСЃС‚СЊСЋ
+var historyitem_Paragraph_PresentationPr_Bullet     = 32; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІР° РЅСѓРјРµСЂР°С†РёРё Сѓ РїР°СЂР°РіСЂР°С„Р° РІ РїСЂРµР·РµРЅС‚Р°С†РёРё
+var historyitem_Paragraph_PresentationPr_Level      = 33; // РР·РјРµРЅСЏРµРј СѓСЂРѕРІРµРЅСЊ РїР°СЂР°РіСЂР°С„Р° РІ РїСЂРµР·РµРЅС‚Р°С†РёСЏС…
+var historyitem_Paragraph_FramePr                   = 34; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё СЂР°РјРєРё
+var historyitem_Paragraph_Shd                       = 35; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё Р·Р°Р»РёРІРєРё С†РµР»РёРєРѕРј
 
 var historyitem_Run_AddItem    = 1;
 var historyitem_Run_RemoveItem = 2;
 
-// Типы изменений в классе ParaTextPr
-var historyitem_TextPr_Change     =  1; // Изменяем настройку
-var historyitem_TextPr_Bold       =  2; // Изменяем жирность
-var historyitem_TextPr_Italic     =  3; // Изменяем наклонность
-var historyitem_TextPr_Strikeout  =  4; // Изменяем зачеркивание текста
-var historyitem_TextPr_Underline  =  5; // Изменяем подчеркивание текста
-var historyitem_TextPr_FontFamily =  6; // Изменяем имя шрифта
-var historyitem_TextPr_FontSize   =  7; // Изменяем размер шрифта
-var historyitem_TextPr_Color      =  8; // Изменяем цвет текста
-var historyitem_TextPr_VertAlign  =  9; // Изменяем вертикальное прилегание
-var historyitem_TextPr_HighLight  = 10; // Изменяем выделение текста
-var historyitem_TextPr_RStyle     = 11; // Изменяем стиль текста
-var historyitem_TextPr_Spacing    = 12; // Изменяем расстояние между символами
-var historyitem_TextPr_DStrikeout = 13; // Изменяем двойное зачеркивание
-var historyitem_TextPr_Caps       = 14; // Изменяем все буквы на прописные
-var historyitem_TextPr_SmallCaps  = 15; // Изменяем все буквы на малые прописные
-var historyitem_TextPr_Position   = 16; // Изменяем вертикальное положение
-var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
-var historyitem_TextPr_RFonts     = 18; // Изменяем настройки шрифтов
-var historyitem_TextPr_Lang       = 19; // Изменяем настройку языка
-var historyitem_TextPr_RFonts_Ascii    = 20; // Изменяем настройки шрифтов
-var historyitem_TextPr_RFonts_HAnsi    = 21; // Изменяем настройки шрифтов
-var historyitem_TextPr_RFonts_CS       = 22; // Изменяем настройки шрифтов
-var historyitem_TextPr_RFonts_EastAsia = 23; // Изменяем настройки шрифтов
-var historyitem_TextPr_RFonts_Hint     = 24; // Изменяем настройки шрифтов
-var historyitem_TextPr_Lang_Bidi       = 25; // Изменяем настройку языка
-var historyitem_TextPr_Lang_EastAsia   = 26; // Изменяем настройку языка
-var historyitem_TextPr_Lang_Val        = 27; // Изменяем настройку языка
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ ParaTextPr
+var historyitem_TextPr_Change     =  1; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєСѓ
+var historyitem_TextPr_Bold       =  2; // РР·РјРµРЅСЏРµРј Р¶РёСЂРЅРѕСЃС‚СЊ
+var historyitem_TextPr_Italic     =  3; // РР·РјРµРЅСЏРµРј РЅР°РєР»РѕРЅРЅРѕСЃС‚СЊ
+var historyitem_TextPr_Strikeout  =  4; // РР·РјРµРЅСЏРµРј Р·Р°С‡РµСЂРєРёРІР°РЅРёРµ С‚РµРєСЃС‚Р°
+var historyitem_TextPr_Underline  =  5; // РР·РјРµРЅСЏРµРј РїРѕРґС‡РµСЂРєРёРІР°РЅРёРµ С‚РµРєСЃС‚Р°
+var historyitem_TextPr_FontFamily =  6; // РР·РјРµРЅСЏРµРј РёРјСЏ С€СЂРёС„С‚Р°
+var historyitem_TextPr_FontSize   =  7; // РР·РјРµРЅСЏРµРј СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р°
+var historyitem_TextPr_Color      =  8; // РР·РјРµРЅСЏРµРј С†РІРµС‚ С‚РµРєСЃС‚Р°
+var historyitem_TextPr_VertAlign  =  9; // РР·РјРµРЅСЏРµРј РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РїСЂРёР»РµРіР°РЅРёРµ
+var historyitem_TextPr_HighLight  = 10; // РР·РјРµРЅСЏРµРј РІС‹РґРµР»РµРЅРёРµ С‚РµРєСЃС‚Р°
+var historyitem_TextPr_RStyle     = 11; // РР·РјРµРЅСЏРµРј СЃС‚РёР»СЊ С‚РµРєСЃС‚Р°
+var historyitem_TextPr_Spacing    = 12; // РР·РјРµРЅСЏРµРј СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ СЃРёРјРІРѕР»Р°РјРё
+var historyitem_TextPr_DStrikeout = 13; // РР·РјРµРЅСЏРµРј РґРІРѕР№РЅРѕРµ Р·Р°С‡РµСЂРєРёРІР°РЅРёРµ
+var historyitem_TextPr_Caps       = 14; // РР·РјРµРЅСЏРµРј РІСЃРµ Р±СѓРєРІС‹ РЅР° РїСЂРѕРїРёСЃРЅС‹Рµ
+var historyitem_TextPr_SmallCaps  = 15; // РР·РјРµРЅСЏРµРј РІСЃРµ Р±СѓРєРІС‹ РЅР° РјР°Р»С‹Рµ РїСЂРѕРїРёСЃРЅС‹Рµ
+var historyitem_TextPr_Position   = 16; // РР·РјРµРЅСЏРµРј РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
+var historyitem_TextPr_Value      = 17; // РР·РјРµРЅСЏРµРј С†РµР»РёРєРѕРј РІСЃРµ РЅР°СЃС‚СЂРѕР№РєРё
+var historyitem_TextPr_RFonts     = 18; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_Lang       = 19; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєСѓ СЏР·С‹РєР°
+var historyitem_TextPr_RFonts_Ascii    = 20; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_RFonts_HAnsi    = 21; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_RFonts_CS       = 22; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_RFonts_EastAsia = 23; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_RFonts_Hint     = 24; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С€СЂРёС„С‚РѕРІ
+var historyitem_TextPr_Lang_Bidi       = 25; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєСѓ СЏР·С‹РєР°
+var historyitem_TextPr_Lang_EastAsia   = 26; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєСѓ СЏР·С‹РєР°
+var historyitem_TextPr_Lang_Val        = 27; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєСѓ СЏР·С‹РєР°
 
-// Типы изменений в классе ParaDrawing
-var historyitem_Drawing_Size              = 1; // Изменяем размер картинки
-var historyitem_Drawing_Url               = 2; // Изменяем адрес картинку (т.е. меняем само изображение)
-var historyitem_Drawing_DrawingType       = 3; // Изменяем тип объекта (anchor/inline)
-var historyitem_Drawing_WrappingType      = 4; // Изменяем тип обтекания
-var historyitem_Drawing_Distance          = 5; // Изменяем расстояние до окружающего текста
-var historyitem_Drawing_AllowOverlap      = 6; // Изменяем возможность перекрытия плавающих картинок
-var historyitem_Drawing_PositionH         = 7; // Изменяем привязку по горизонтали
-var historyitem_Drawing_PositionV         = 8; // Изменяем привязку по вертикали
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ ParaDrawing
+var historyitem_Drawing_Size              = 1; // РР·РјРµРЅСЏРµРј СЂР°Р·РјРµСЂ РєР°СЂС‚РёРЅРєРё
+var historyitem_Drawing_Url               = 2; // РР·РјРµРЅСЏРµРј Р°РґСЂРµСЃ РєР°СЂС‚РёРЅРєСѓ (С‚.Рµ. РјРµРЅСЏРµРј СЃР°РјРѕ РёР·РѕР±СЂР°Р¶РµРЅРёРµ)
+var historyitem_Drawing_DrawingType       = 3; // РР·РјРµРЅСЏРµРј С‚РёРї РѕР±СЉРµРєС‚Р° (anchor/inline)
+var historyitem_Drawing_WrappingType      = 4; // РР·РјРµРЅСЏРµРј С‚РёРї РѕР±С‚РµРєР°РЅРёСЏ
+var historyitem_Drawing_Distance          = 5; // РР·РјРµРЅСЏРµРј СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ РѕРєСЂСѓР¶Р°СЋС‰РµРіРѕ С‚РµРєСЃС‚Р°
+var historyitem_Drawing_AllowOverlap      = 6; // РР·РјРµРЅСЏРµРј РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїРµСЂРµРєСЂС‹С‚РёСЏ РїР»Р°РІР°СЋС‰РёС… РєР°СЂС‚РёРЅРѕРє
+var historyitem_Drawing_PositionH         = 7; // РР·РјРµРЅСЏРµРј РїСЂРёРІСЏР·РєСѓ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+var historyitem_Drawing_PositionV         = 8; // РР·РјРµРЅСЏРµРј РїСЂРёРІСЏР·РєСѓ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
 var historyitem_Drawing_AbsoluteTransform = 9;
-var historyitem_Drawing_BehindDoc         = 10; // Изменяем положение объекта (за/перед текстом)
+var historyitem_Drawing_BehindDoc         = 10; // РР·РјРµРЅСЏРµРј РїРѕР»РѕР¶РµРЅРёРµ РѕР±СЉРµРєС‚Р° (Р·Р°/РїРµСЂРµРґ С‚РµРєСЃС‚РѕРј)
 var historyitem_Drawing_SetZIndex         = 11;
 var historyitem_Drawing_SetGraphicObject  = 12;
 var historyitem_CalculateAfterPaste       = 13;
@@ -781,123 +783,123 @@ var historyitem_SetWrapPolygon            = 16;
 
 
 
-// Типы изменений в классе CDrawingObjects
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CDrawingObjects
 var historyitem_DrawingObjects_AddItem    = 1;
 var historyitem_DrawingObjects_RemoveItem = 2;
 
-// Типы изменений в классе FlowObjects
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ FlowObjects
 var historyitem_FlowObjects_AddItem    = 1;
 var historyitem_FlowObjects_RemoveItem = 2;
 
-// Типы изменений в классе FlowImage
-var historyitem_FlowImage_Position = 1; // Изменяем позицию картинки
-var historyitem_FlowImage_Size     = 2; // Изменяем размер картинки
-var historyitem_FlowImage_Paddings = 3; // Изменяем отступы от картинки
-var historyitem_FlowImage_PageNum  = 4; // Изменяем номер страницы картинки
-var historyitem_FlowImage_Url      = 5; // Изменяем адрес картинку (т.е. меняем само изображение)
-var historyitem_FlowImage_Parent   = 6; // Изменяем указатель на родительский объект
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ FlowImage
+var historyitem_FlowImage_Position = 1; // РР·РјРµРЅСЏРµРј РїРѕР·РёС†РёСЋ РєР°СЂС‚РёРЅРєРё
+var historyitem_FlowImage_Size     = 2; // РР·РјРµРЅСЏРµРј СЂР°Р·РјРµСЂ РєР°СЂС‚РёРЅРєРё
+var historyitem_FlowImage_Paddings = 3; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРїС‹ РѕС‚ РєР°СЂС‚РёРЅРєРё
+var historyitem_FlowImage_PageNum  = 4; // РР·РјРµРЅСЏРµРј РЅРѕРјРµСЂ СЃС‚СЂР°РЅРёС†С‹ РєР°СЂС‚РёРЅРєРё
+var historyitem_FlowImage_Url      = 5; // РР·РјРµРЅСЏРµРј Р°РґСЂРµСЃ РєР°СЂС‚РёРЅРєСѓ (С‚.Рµ. РјРµРЅСЏРµРј СЃР°РјРѕ РёР·РѕР±СЂР°Р¶РµРЅРёРµ)
+var historyitem_FlowImage_Parent   = 6; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
 
-// Типы изменений в классе CTable
-var historyitem_Table_DocNext               =  1; // Изменяем указатель на следующий объект
-var historyitem_Table_DocPrev               =  2; // Изменяем указатель на предыдущий объект
-var historyitem_Table_Parent                =  3; // Изменяем указатель на родительский объект
-var historyitem_Table_TableW                =  4; // Изменяем ширину таблицы
-var historyitem_Table_TableCellMar          =  5; // Изменяем отступы(по умолчанию) внутри ячеек
-var historyitem_Table_TableAlign            =  6; // Изменяем прилегание(для inline таблиц)
-var historyitem_Table_TableInd              =  7; // Изменяем отступ(для inline таблиц)
-var historyitem_Table_TableBorder_Left      =  8; // Изменяем левую границу таблицы
-var historyitem_Table_TableBorder_Top       =  9; // Изменяем верхнюю границу таблицы
-var historyitem_Table_TableBorder_Right     = 10; // Изменяем правую границу таблицы
-var historyitem_Table_TableBorder_Bottom    = 11; // Изменяем нижнюю границу таблицы
-var historyitem_Table_TableBorder_InsideH   = 12; // Изменяем внутренюю горизонтальную границу
-var historyitem_Table_TableBorder_InsideV   = 13; // Изменяем внутренюю вертикальную границу
-var historyitem_Table_TableShd              = 14; // Изменяем заливку таблицы
-var historyitem_Table_Inline                = 15; // Изменяем свойствой inline
-var historyitem_Table_AddRow                = 16; // Добавляем строку в таблицу
-var historyitem_Table_RemoveRow             = 17; // Удаляем строку из таблицы
-var historyitem_Table_TableGrid             = 18; // Изменяем сетку колонок
-var historyitem_Table_TableLook             = 19; // Изменяем тип условного форматирования таблицы
-var historyitem_Table_TableStyleRowBandSize = 20; // Изменяем количество строк в группе
-var historyitem_Table_TableStyleColBandSize = 21; // Изменяем количество колонок в группе
-var historyitem_Table_TableStyle            = 22; // Изменяем стиль таблицы
-var historyitem_Table_AllowOverlap          = 23; // Изменяем возможность перекрытия плавающих таблиц
-var historyitem_Table_PositionH             = 24; // Изменяем привязку по горизонтали
-var historyitem_Table_PositionV             = 25; // Изменяем привязку по вертикали
-var historyitem_Table_Distance              = 26; // Изменяем расстояние до окружающего текста
-var historyitem_Table_Pr                    = 27; // Изменяем настройки таблицы целиком
-var historyitem_Table_TableLayout           = 28; // Изменяем настройки рассчета ширины колонок
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CTable
+var historyitem_Table_DocNext               =  1; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РѕР±СЉРµРєС‚
+var historyitem_Table_DocPrev               =  2; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґС‹РґСѓС‰РёР№ РѕР±СЉРµРєС‚
+var historyitem_Table_Parent                =  3; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
+var historyitem_Table_TableW                =  4; // РР·РјРµРЅСЏРµРј С€РёСЂРёРЅСѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableCellMar          =  5; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРїС‹(РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ) РІРЅСѓС‚СЂРё СЏС‡РµРµРє
+var historyitem_Table_TableAlign            =  6; // РР·РјРµРЅСЏРµРј РїСЂРёР»РµРіР°РЅРёРµ(РґР»СЏ inline С‚Р°Р±Р»РёС†)
+var historyitem_Table_TableInd              =  7; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРї(РґР»СЏ inline С‚Р°Р±Р»РёС†)
+var historyitem_Table_TableBorder_Left      =  8; // РР·РјРµРЅСЏРµРј Р»РµРІСѓСЋ РіСЂР°РЅРёС†Сѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableBorder_Top       =  9; // РР·РјРµРЅСЏРµРј РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableBorder_Right     = 10; // РР·РјРµРЅСЏРµРј РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableBorder_Bottom    = 11; // РР·РјРµРЅСЏРµРј РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableBorder_InsideH   = 12; // РР·РјРµРЅСЏРµРј РІРЅСѓС‚СЂРµРЅСЋСЋ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅСѓСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Table_TableBorder_InsideV   = 13; // РР·РјРµРЅСЏРµРј РІРЅСѓС‚СЂРµРЅСЋСЋ РІРµСЂС‚РёРєР°Р»СЊРЅСѓСЋ РіСЂР°РЅРёС†Сѓ
+var historyitem_Table_TableShd              = 14; // РР·РјРµРЅСЏРµРј Р·Р°Р»РёРІРєСѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_Inline                = 15; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕР№ inline
+var historyitem_Table_AddRow                = 16; // Р”РѕР±Р°РІР»СЏРµРј СЃС‚СЂРѕРєСѓ РІ С‚Р°Р±Р»РёС†Сѓ
+var historyitem_Table_RemoveRow             = 17; // РЈРґР°Р»СЏРµРј СЃС‚СЂРѕРєСѓ РёР· С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableGrid             = 18; // РР·РјРµРЅСЏРµРј СЃРµС‚РєСѓ РєРѕР»РѕРЅРѕРє
+var historyitem_Table_TableLook             = 19; // РР·РјРµРЅСЏРµРј С‚РёРї СѓСЃР»РѕРІРЅРѕРіРѕ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_TableStyleRowBandSize = 20; // РР·РјРµРЅСЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє РІ РіСЂСѓРїРїРµ
+var historyitem_Table_TableStyleColBandSize = 21; // РР·РјРµРЅСЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕР»РѕРЅРѕРє РІ РіСЂСѓРїРїРµ
+var historyitem_Table_TableStyle            = 22; // РР·РјРµРЅСЏРµРј СЃС‚РёР»СЊ С‚Р°Р±Р»РёС†С‹
+var historyitem_Table_AllowOverlap          = 23; // РР·РјРµРЅСЏРµРј РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїРµСЂРµРєСЂС‹С‚РёСЏ РїР»Р°РІР°СЋС‰РёС… С‚Р°Р±Р»РёС†
+var historyitem_Table_PositionH             = 24; // РР·РјРµРЅСЏРµРј РїСЂРёРІСЏР·РєСѓ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё
+var historyitem_Table_PositionV             = 25; // РР·РјРµРЅСЏРµРј РїСЂРёРІСЏР·РєСѓ РїРѕ РІРµСЂС‚РёРєР°Р»Рё
+var historyitem_Table_Distance              = 26; // РР·РјРµРЅСЏРµРј СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ РѕРєСЂСѓР¶Р°СЋС‰РµРіРѕ С‚РµРєСЃС‚Р°
+var historyitem_Table_Pr                    = 27; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С‚Р°Р±Р»РёС†С‹ С†РµР»РёРєРѕРј
+var historyitem_Table_TableLayout           = 28; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё СЂР°СЃСЃС‡РµС‚Р° С€РёСЂРёРЅС‹ РєРѕР»РѕРЅРѕРє
 
-// Типы изменений в классе CTableRow
-var historyitem_TableRow_Before      = 1; // Изменяем свойство Before
-var historyitem_TableRow_After       = 2; // Изменяем свойство After
-var historyitem_TableRow_CellSpacing = 3; // Изменяем свойство CellSpacing
-var historyitem_TableRow_Height      = 4; // Изменяем свойство Height
-var historyitem_TableRow_AddCell     = 5; // Добавляем ячейку
-var historyitem_TableRow_RemoveCell  = 6; // Удаляем ячейку
-var historyitem_TableRow_TableHeader = 7; // Изменяем свойство TableHeader
-var historyitem_TableRow_Pr          = 8; // Изменяем настройки строки целиком
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CTableRow
+var historyitem_TableRow_Before      = 1; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Before
+var historyitem_TableRow_After       = 2; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ After
+var historyitem_TableRow_CellSpacing = 3; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ CellSpacing
+var historyitem_TableRow_Height      = 4; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ Height
+var historyitem_TableRow_AddCell     = 5; // Р”РѕР±Р°РІР»СЏРµРј СЏС‡РµР№РєСѓ
+var historyitem_TableRow_RemoveCell  = 6; // РЈРґР°Р»СЏРµРј СЏС‡РµР№РєСѓ
+var historyitem_TableRow_TableHeader = 7; // РР·РјРµРЅСЏРµРј СЃРІРѕР№СЃС‚РІРѕ TableHeader
+var historyitem_TableRow_Pr          = 8; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё СЃС‚СЂРѕРєРё С†РµР»РёРєРѕРј
 
-// Типы изменений в классе CTableCell
-var historyitem_TableCell_GridSpan      =  1; // Изменяем горизонтальное объединение
-var historyitem_TableCell_Margins       =  2; // Изменяем отступы
-var historyitem_TableCell_Shd           =  3; // Изменяем заливку
-var historyitem_TableCell_VMerge        =  4; // Изменяем вертикальное объединение
-var historyitem_TableCell_Border_Left   =  5; // Изменяем левую границу ячейки
-var historyitem_TableCell_Border_Right  =  6; // Изменяем правую границу ячейки
-var historyitem_TableCell_Border_Top    =  7; // Изменяем верхнюю границу ячейки
-var historyitem_TableCell_Border_Bottom =  8; // Изменяем нижнюю границу ячейки
-var historyitem_TableCell_VAlign        =  9; // Изменяем вертикальное выравнивание ячейки
-var historyitem_TableCell_W             = 10; // Изменяем ширину ячейки
-var historyitem_TableCell_Pr            = 11; // Изменяем настройки целиком
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CTableCell
+var historyitem_TableCell_GridSpan      =  1; // РР·РјРµРЅСЏРµРј РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРµ РѕР±СЉРµРґРёРЅРµРЅРёРµ
+var historyitem_TableCell_Margins       =  2; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРїС‹
+var historyitem_TableCell_Shd           =  3; // РР·РјРµРЅСЏРµРј Р·Р°Р»РёРІРєСѓ
+var historyitem_TableCell_VMerge        =  4; // РР·РјРµРЅСЏРµРј РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РѕР±СЉРµРґРёРЅРµРЅРёРµ
+var historyitem_TableCell_Border_Left   =  5; // РР·РјРµРЅСЏРµРј Р»РµРІСѓСЋ РіСЂР°РЅРёС†Сѓ СЏС‡РµР№РєРё
+var historyitem_TableCell_Border_Right  =  6; // РР·РјРµРЅСЏРµРј РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ СЏС‡РµР№РєРё
+var historyitem_TableCell_Border_Top    =  7; // РР·РјРµРЅСЏРµРј РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ СЏС‡РµР№РєРё
+var historyitem_TableCell_Border_Bottom =  8; // РР·РјРµРЅСЏРµРј РЅРёР¶РЅСЋСЋ РіСЂР°РЅРёС†Сѓ СЏС‡РµР№РєРё
+var historyitem_TableCell_VAlign        =  9; // РР·РјРµРЅСЏРµРј РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РІС‹СЂР°РІРЅРёРІР°РЅРёРµ СЏС‡РµР№РєРё
+var historyitem_TableCell_W             = 10; // РР·РјРµРЅСЏРµРј С€РёСЂРёРЅСѓ СЏС‡РµР№РєРё
+var historyitem_TableCell_Pr            = 11; // РР·РјРµРЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё С†РµР»РёРєРѕРј
 
-// Типы изменений в классе CDocumentContent
-var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
-var historyitem_DocumentContent_RemoveItem  = 2; // Удаляем элемент из документа
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CDocumentContent
+var historyitem_DocumentContent_AddItem     = 1; // Р”РѕР±Р°РІР»СЏРµРј СЌР»РµРјРµРЅС‚ РІ РґРѕРєСѓРјРµРЅС‚
+var historyitem_DocumentContent_RemoveItem  = 2; // РЈРґР°Р»СЏРµРј СЌР»РµРјРµРЅС‚ РёР· РґРѕРєСѓРјРµРЅС‚Р°
 
-// Типы изменений в классе CFlowTable
-var historyitem_FlowTable_Position = 1; // Изменяем позиции
-var historyitem_FlowTable_Paddings = 2; // Изменяем отступов
-var historyitem_FlowTable_PageNum  = 3; // Изменяем номер страницы у таблицы
-var historyitem_FlowTable_Parent   = 4; // Изменяем указатель на родительский объект
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CFlowTable
+var historyitem_FlowTable_Position = 1; // РР·РјРµРЅСЏРµРј РїРѕР·РёС†РёРё
+var historyitem_FlowTable_Paddings = 2; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРїРѕРІ
+var historyitem_FlowTable_PageNum  = 3; // РР·РјРµРЅСЏРµРј РЅРѕРјРµСЂ СЃС‚СЂР°РЅРёС†С‹ Сѓ С‚Р°Р±Р»РёС†С‹
+var historyitem_FlowTable_Parent   = 4; // РР·РјРµРЅСЏРµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ РѕР±СЉРµРєС‚
 
-// Типы изменений в классе CHeaderFooterController
-var historyitem_HdrFtrController_AddItem    = 1; // Добавляем колонтитул
-var historyitem_HdrFtrController_RemoveItem = 2; // Удаляем колонтитул
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CHeaderFooterController
+var historyitem_HdrFtrController_AddItem    = 1; // Р”РѕР±Р°РІР»СЏРµРј РєРѕР»РѕРЅС‚РёС‚СѓР»
+var historyitem_HdrFtrController_RemoveItem = 2; // РЈРґР°Р»СЏРµРј РєРѕР»РѕРЅС‚РёС‚СѓР»
 
-// Типы изменений в классе CHeaderFooter
-var historyitem_HdrFtr_BoundY2 = 1; // Изменяем отступ колонтитула (для верхнего от верха,  для нижнего от низа)
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CHeaderFooter
+var historyitem_HdrFtr_BoundY2 = 1; // РР·РјРµРЅСЏРµРј РѕС‚СЃС‚СѓРї РєРѕР»РѕРЅС‚РёС‚СѓР»Р° (РґР»СЏ РІРµСЂС…РЅРµРіРѕ РѕС‚ РІРµСЂС…Р°,  РґР»СЏ РЅРёР¶РЅРµРіРѕ РѕС‚ РЅРёР·Р°)
 
-// Типы изменений в классе CAbstractNum
-var historyitem_AbstractNum_LvlChange    = 1; // Изменили заданный уровень
-var historyitem_AbstractNum_TextPrChange = 2; // Изменили текстовую настройку у заданного уровня
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CAbstractNum
+var historyitem_AbstractNum_LvlChange    = 1; // РР·РјРµРЅРёР»Рё Р·Р°РґР°РЅРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ
+var historyitem_AbstractNum_TextPrChange = 2; // РР·РјРµРЅРёР»Рё С‚РµРєСЃС‚РѕРІСѓСЋ РЅР°СЃС‚СЂРѕР№РєСѓ Сѓ Р·Р°РґР°РЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ
 
-// Типы изменений в классе CTableId
-var historyitem_TableId_Add   = 1; // Добавили новую ссылку в глобальную таблицу
-var historyitem_TableId_Reset = 2; // Изменили Id ссылки
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CTableId
+var historyitem_TableId_Add   = 1; // Р”РѕР±Р°РІРёР»Рё РЅРѕРІСѓСЋ СЃСЃС‹Р»РєСѓ РІ РіР»РѕР±Р°Р»СЊРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ
+var historyitem_TableId_Reset = 2; // РР·РјРµРЅРёР»Рё Id СЃСЃС‹Р»РєРё
 
-// Типы изменений в классе CComments
-var historyitem_Comments_Add    = 1; // Добавили новый комментарий
-var historyitem_Comments_Remove = 2; // Удалили комментарий
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CComments
+var historyitem_Comments_Add    = 1; // Р”РѕР±Р°РІРёР»Рё РЅРѕРІС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№
+var historyitem_Comments_Remove = 2; // РЈРґР°Р»РёР»Рё РєРѕРјРјРµРЅС‚Р°СЂРёР№
 
-// Типы изменений в классе СComment
-var historyitem_Comment_Change   = 1; // Изменили комментарий
-var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ РЎComment
+var historyitem_Comment_Change   = 1; // РР·РјРµРЅРёР»Рё РєРѕРјРјРµРЅС‚Р°СЂРёР№
+var historyitem_Comment_TypeInfo = 2; // РР·РјРµРЅРёР»Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С‚РёРїРµ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 
-// Типы изменений в классе CParaHyperlinkStart
-var historyitem_Hyperlink_Value   = 1; // Изменяем значение гиперссылки
-var historyitem_Hyperlink_ToolTip = 2; // Изменяем подсказку гиперссылки
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CParaHyperlinkStart
+var historyitem_Hyperlink_Value   = 1; // РР·РјРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёРµ РіРёРїРµСЂСЃСЃС‹Р»РєРё
+var historyitem_Hyperlink_ToolTip = 2; // РР·РјРµРЅСЏРµРј РїРѕРґСЃРєР°Р·РєСѓ РіРёРїРµСЂСЃСЃС‹Р»РєРё
 
-//Типы изменений в классе CGraphicObjects
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CGraphicObjects
 var historyitem_AddNewGraphicObject = 0;
 var historyitem_RemoveGraphicObject = 1;
 
 
-//Типы изменений в классе CGeometry
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CGeometry
 var historyitem_SetGuideValue = 0;
 var historyitem_SetAdjustmentValue = 1;
 
 
-//Типы изменений в классе WordShape
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ WordShape
 var historyitem_SetAbsoluteTransform = 0;
 var historyitem_SetXfrmShape = 1;
 var historyitem_SetRotate = 2;
@@ -954,11 +956,11 @@ var historyitem_AutoShapes_UpdateParentWidthHeight = 52;
 
 
 
-//Типы изменений в классе GraphicObjects
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ GraphicObjects
 var historyitem_AddHdrFtrGrObjects = 0;
 var historyitem_ChangeColorScheme = 1;
 
-//Типы изменений в классе HeaderFooterGraphicObjects
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ HeaderFooterGraphicObjects
 var historyitem_AddHdr = 0;
 var historyitem_AddFtr = 1;
 var historyitem_RemoveHdr = 2;
@@ -966,65 +968,65 @@ var historyitem_RemoveFtr = 3;
 
 
 
-//Типы изменений в классе WordGroupShapes
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ WordGroupShapes
 var historyitem_InternalChanges = 6;
 var historyitem_GroupRecalculate = 32;
 
 
 
-//Типы изменений в классе WrapPolygon
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ WrapPolygon
 var historyitem_AddNewPoint = 0;
 var historyitem_RemovePoint = 1;
 var historyitem_MovePoint   = 2;
 var historyitem_UpdateWrapSizes = 3;
 var historyitem_ChangePolygon = 4;
 
-// Типы изменений в классе CStyle
-var historyitem_Style_TextPr          = 1;  // Изменяем TextPr
-var historyitem_Style_ParaPr          = 2;  // Изменяем ParaPr
-var historyitem_Style_TablePr         = 3;  // Изменяем TablePr
-var historyitem_Style_TableRowPr      = 4;  // Изменяем TableRowPr
-var historyitem_Style_TableCellPr     = 5;  // Изменяем TableCellPr
-var historyitem_Style_TableBand1Horz  = 6;  // Изменяем TableBand1Horz
-var historyitem_Style_TableBand1Vert  = 7;  // Изменяем TableBand1Vert
-var historyitem_Style_TableBand2Horz  = 8;  // Изменяем TableBand2Horz
-var historyitem_Style_TableBand2Vert  = 9;  // Изменяем TableBand2Vert
-var historyitem_Style_TableFirstCol   = 10; // Изменяем TableFirstCol
-var historyitem_Style_TableFirstRow   = 11; // Изменяем TableFirstRow
-var historyitem_Style_TableLastCol    = 12; // Изменяем TableLastCol
-var historyitem_Style_TableLastRow    = 13; // Изменяем TableLastRow
-var historyitem_Style_TableTLCell     = 14; // Изменяем TableTLCell
-var historyitem_Style_TableTRCell     = 15; // Изменяем TableTRCell
-var historyitem_Style_TableBLCell     = 16; // Изменяем TableBLCell
-var historyitem_Style_TableBRCell     = 17; // Изменяем TableBRCell
-var historyitem_Style_TableWholeTable = 18; // Изменяем TableWholeTable
-var historyitem_Style_Name            = 101; // Изменяем Name
-var historyitem_Style_BasedOn         = 102; // Изменяем BasedOn
-var historyitem_Style_Next            = 103; // Изменяем Next
-var historyitem_Style_Type            = 104; // Изменяем Type
-var historyitem_Style_QFormat         = 105; // Изменяем QFormat
-var historyitem_Style_UiPriority      = 106; // Изменяем UiPriority
-var historyitem_Style_Hidden          = 107; // Изменяем Hidden
-var historyitem_Style_SemiHidden      = 108; // Изменяем SemiHidden
-var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CStyle
+var historyitem_Style_TextPr          = 1;  // РР·РјРµРЅСЏРµРј TextPr
+var historyitem_Style_ParaPr          = 2;  // РР·РјРµРЅСЏРµРј ParaPr
+var historyitem_Style_TablePr         = 3;  // РР·РјРµРЅСЏРµРј TablePr
+var historyitem_Style_TableRowPr      = 4;  // РР·РјРµРЅСЏРµРј TableRowPr
+var historyitem_Style_TableCellPr     = 5;  // РР·РјРµРЅСЏРµРј TableCellPr
+var historyitem_Style_TableBand1Horz  = 6;  // РР·РјРµРЅСЏРµРј TableBand1Horz
+var historyitem_Style_TableBand1Vert  = 7;  // РР·РјРµРЅСЏРµРј TableBand1Vert
+var historyitem_Style_TableBand2Horz  = 8;  // РР·РјРµРЅСЏРµРј TableBand2Horz
+var historyitem_Style_TableBand2Vert  = 9;  // РР·РјРµРЅСЏРµРј TableBand2Vert
+var historyitem_Style_TableFirstCol   = 10; // РР·РјРµРЅСЏРµРј TableFirstCol
+var historyitem_Style_TableFirstRow   = 11; // РР·РјРµРЅСЏРµРј TableFirstRow
+var historyitem_Style_TableLastCol    = 12; // РР·РјРµРЅСЏРµРј TableLastCol
+var historyitem_Style_TableLastRow    = 13; // РР·РјРµРЅСЏРµРј TableLastRow
+var historyitem_Style_TableTLCell     = 14; // РР·РјРµРЅСЏРµРј TableTLCell
+var historyitem_Style_TableTRCell     = 15; // РР·РјРµРЅСЏРµРј TableTRCell
+var historyitem_Style_TableBLCell     = 16; // РР·РјРµРЅСЏРµРј TableBLCell
+var historyitem_Style_TableBRCell     = 17; // РР·РјРµРЅСЏРµРј TableBRCell
+var historyitem_Style_TableWholeTable = 18; // РР·РјРµРЅСЏРµРј TableWholeTable
+var historyitem_Style_Name            = 101; // РР·РјРµРЅСЏРµРј Name
+var historyitem_Style_BasedOn         = 102; // РР·РјРµРЅСЏРµРј BasedOn
+var historyitem_Style_Next            = 103; // РР·РјРµРЅСЏРµРј Next
+var historyitem_Style_Type            = 104; // РР·РјРµРЅСЏРµРј Type
+var historyitem_Style_QFormat         = 105; // РР·РјРµРЅСЏРµРј QFormat
+var historyitem_Style_UiPriority      = 106; // РР·РјРµРЅСЏРµРј UiPriority
+var historyitem_Style_Hidden          = 107; // РР·РјРµРЅСЏРµРј Hidden
+var historyitem_Style_SemiHidden      = 108; // РР·РјРµРЅСЏРµРј SemiHidden
+var historyitem_Style_UnhideWhenUsed  = 109; // РР·РјРµРЅСЏРµРј UnhideWhenUsed
 
-// Типы изменений в классе CStyles
-var historyitem_Styles_Add    = 1; // Добавляем стиль
-var historyitem_Styles_Remove = 2; // Удаляем стиль
+// РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CStyles
+var historyitem_Styles_Add    = 1; // Р”РѕР±Р°РІР»СЏРµРј СЃС‚РёР»СЊ
+var historyitem_Styles_Remove = 2; // РЈРґР°Р»СЏРµРј СЃС‚РёР»СЊ
 
-// Тип класса, к которому относится данный элемент истории
+// РўРёРї РєР»Р°СЃСЃР°, Рє РєРѕС‚РѕСЂРѕРјСѓ РѕС‚РЅРѕСЃРёС‚СЃСЏ РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚ РёСЃС‚РѕСЂРёРё
 var historyitem_State_Unknown         = 0;
 var historyitem_State_Document        = 1;
 var historyitem_State_DocumentContent = 2;
 var historyitem_State_Paragraph       = 3;
 var historyitem_State_Table           = 4;
 
-// Типы произошедших изменений
-var historyrecalctype_Inline = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
-var historyrecalctype_Flow   = 1; // Изменения произошли в "плавающем" объекте
-var historyrecalctype_HdrFtr = 2; // Изменения произошли в колонтитуле
+// РўРёРїС‹ РїСЂРѕРёР·РѕС€РµРґС€РёС… РёР·РјРµРЅРµРЅРёР№
+var historyrecalctype_Inline = 0; // РР·РјРµРЅРµРЅРёСЏ РїСЂРѕРёР·РѕС€Р»Рё РІ РѕР±С‹С‡РЅРѕРј С‚РµРєСЃС‚Рµ (СЃ РІРµСЂС…РЅРёРј РєР»Р°СЃСЃРѕРј CDocument)
+var historyrecalctype_Flow   = 1; // РР·РјРµРЅРµРЅРёСЏ РїСЂРѕРёР·РѕС€Р»Рё РІ "РїР»Р°РІР°СЋС‰РµРј" РѕР±СЉРµРєС‚Рµ
+var historyrecalctype_HdrFtr = 2; // РР·РјРµРЅРµРЅРёСЏ РїСЂРѕРёР·РѕС€Р»Рё РІ РєРѕР»РѕРЅС‚РёС‚СѓР»Рµ
 
-// Типы классов, в которых происходили изменения (типы нужны для совместного редактирования)
+// РўРёРїС‹ РєР»Р°СЃСЃРѕРІ, РІ РєРѕС‚РѕСЂС‹С… РїСЂРѕРёСЃС…РѕРґРёР»Рё РёР·РјРµРЅРµРЅРёСЏ (С‚РёРїС‹ РЅСѓР¶РЅС‹ РґР»СЏ СЃРѕРІРјРµСЃС‚РЅРѕРіРѕ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ)
 var historyitem_type_Unknown          =  0;
 var historyitem_type_TableId          =  1;
 var historyitem_type_Document         =  2;
@@ -1061,10 +1063,10 @@ var historyitem_type_ChartTitle       = 32;
 var historyitem_type_Math			  = 33;
 
 
-//Типы изменений в классе CChartAsGroup
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ CChartAsGroup
 var historyitem_SetCahrtLayout = 1000;
 
-//Типы изменений в классе TexBody
+//РўРёРїС‹ РёР·РјРµРЅРµРЅРёР№ РІ РєР»Р°СЃСЃРµ TexBody
 var historyitem_SetShape = 0;
 var historyitem_SetDocContent = 1;
 var historyitem_SetLstStyle = 2;

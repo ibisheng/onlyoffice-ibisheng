@@ -1,3 +1,5 @@
+"use strict";
+
 (
 	/**
 	 * @param {window} window

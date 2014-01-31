@@ -1,3 +1,5 @@
+"use strict";
+
 var K=1/4;
 
 var mt=0, lt=1, cb=2, cl=3;
