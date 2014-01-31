@@ -82,6 +82,24 @@ CChartsDrawer.prototype =
 		this.chart.draw(this, cShapeDrawer, chartProp);
 	},
 	
+	reCalculatePositionText : function(type, chartSpace, ser, val)
+	{
+		var pos;
+		switch ( type )
+		{
+			case "dlbl":
+			{
+				pos = this._calculatePositionDlbl(chartSpace, ser, val);
+			}
+		}
+		return {x: pos.x, y : pos.y};
+	},
+	
+	_calculatePositionDlbl: function(chartSpace, ser, val)
+	{	
+		this.chart._calculateDLbl(chartSpace, ser, val);
+	},
+	
 	_calculateProperties: function(chartProp)
 	{
 		this.calcProp.pxToMM = 1/chartProp.convertPixToMM(1);
@@ -2300,29 +2318,43 @@ drawLineChart.prototype =
 				this.paths.series[i][n] = this._calculateLine(x, y, x1, y1);
 				
 				//caclculate dataLablels
-				this._calculateDLbl(dataSeries[n - 1], x, y);
+				/*posDlbl = this._calculateDLbl(dataSeries[n - 1], x, y);
+				dataSeries[n - 1].compiledDlb.setPosition(posDlbl.x, posDlbl.y);
 				if(n == dataSeries.length - 1)
-					this._calculateDLbl(dataSeries[n], x1, y1);
+				{
+					posDlbl = this._calculateDLbl(dataSeries[n], x1, y1);
+					dataSeries[n].compiledDlb.setPosition(posDlbl.x, posDlbl.y);
+				}*/
 			}
 		}
 	},
 	
-	_calculateDLbl: function(point, x, y)
+	_calculateDLbl: function(chartSpace, ser, val)
 	{
+		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var path;
+		if(ser == this.paths.series[ser].length - 1)
+			path = this.paths.series[ser][val].ArrPathCommand[1];
+		else
+			path = this.paths.series[ser][val].ArrPathCommand[0];
+		var x = path.x;
+		var y = path.y;
+		
 		var pxToMm = this.chartProp.pxToMM;
+		var constMargin = 5 / pxToMm;
 		
 		var width = point.compiledDlb.extX;
 		var height = point.compiledDlb.extY;
 		
-		var centerX = x / pxToMm - width/2;
-		var centerY = y / pxToMm - height/2;
+		var centerX = x - width/2;
+		var centerY = y - height/2;
 		
 		//TODO высчитать позиции, как в екселе
 		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_B:
 			{
-				centerY = centerY + height/2;
+				centerY = centerY + height/2 + constMargin;
 				break;
 			}
 			case DLBL_POS_BEST_FIT:
@@ -2346,7 +2378,7 @@ drawLineChart.prototype =
 			}
 			case DLBL_POS_L:
 			{
-				centerX = centerX - height/2;
+				centerX = centerX - height/2 - constMargin;
 				break;
 			}
 			case DLBL_POS_OUT_END:
@@ -2356,17 +2388,16 @@ drawLineChart.prototype =
 			}
 			case DLBL_POS_R:
 			{
-				centerX = centerX + height/2;
+				centerX = centerX + height/2 + constMargin;
 				break;
 			}
 			case DLBL_POS_T:
 			{
-				centerY = centerY - height/2;
+				centerY = centerY - height/2 - constMargin;
 				break;
 			}
 		}
-		
-		point.compiledDlb.setPosition(centerX, centerY);
+		return {x: centerX, y: centerY};
 	},
 	
 	_drawLines: function (isRedraw/*isSkip*/)
