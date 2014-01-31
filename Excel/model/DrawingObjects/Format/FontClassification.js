@@ -1,3 +1,5 @@
+"use strict";
+
 var fontslot_ASCII    = 0x00;
 var fontslot_EastAsia = 0x01;
 var fontslot_CS       = 0x02;

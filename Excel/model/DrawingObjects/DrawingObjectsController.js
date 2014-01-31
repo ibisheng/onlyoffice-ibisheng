@@ -1,3 +1,5 @@
+"use strict";
+
 var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
 

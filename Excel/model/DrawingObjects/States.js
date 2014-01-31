@@ -1,3 +1,5 @@
+"use strict";
+
 var STATES_ID_NULL = 0x00;
 var STATES_ID_PRE_ROTATE = 0x01;
 var STATES_ID_ROTATE = 0x02;

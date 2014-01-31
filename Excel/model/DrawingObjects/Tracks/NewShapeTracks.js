@@ -1,3 +1,5 @@
+"use strict";
+
 function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 {
     this.drawingObjects = drawingObjects;

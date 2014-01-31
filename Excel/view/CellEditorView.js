@@ -1,4 +1,6 @@
-﻿/* CellEditorView.js
+﻿"use strict";
+
+/* CellEditorView.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   May 30, 2012

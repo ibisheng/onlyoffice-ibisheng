@@ -1,4 +1,6 @@
-﻿// Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
+﻿"use strict";
+
+// Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 var c_oAscError = {
 	Level: {
 		Critical:-1,

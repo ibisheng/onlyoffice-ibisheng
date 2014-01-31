@@ -1,4 +1,6 @@
-﻿/** @enum */
+﻿"use strict";
+
+/** @enum */
 var c_oSerFormat = {
     Version:2, //1.0.0.2
     Signature: "XLSY"

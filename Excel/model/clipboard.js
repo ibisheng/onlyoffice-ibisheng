@@ -1,4 +1,6 @@
-﻿(	/**
+﻿"use strict";
+
+(	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined

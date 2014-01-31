@@ -1,3 +1,5 @@
+"use strict";
+
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)

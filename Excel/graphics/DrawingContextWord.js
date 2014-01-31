@@ -1,3 +1,5 @@
+"use strict";
+
 // когда перейдем на автофигуры - нужно убрать этот класс нафик
 var g_fontManagerExcel = new CFontManager();
 g_fontManagerExcel.Initialize(true);

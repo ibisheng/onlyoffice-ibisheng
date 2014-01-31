@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov

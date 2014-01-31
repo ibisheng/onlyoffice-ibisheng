@@ -1,4 +1,6 @@
-﻿/* CellTextRender.js
+﻿"use strict";
+
+/* CellTextRender.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   May 31, 2012

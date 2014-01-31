@@ -1,4 +1,6 @@
-﻿/* WorkbookView.js
+﻿"use strict";
+
+/* WorkbookView.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Jan 27, 2012

@@ -1,3 +1,5 @@
+"use strict";
+
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
     if ( isRealObject(drawingObjects) && drawingObjects.getWorksheet() )

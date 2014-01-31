@@ -1,3 +1,5 @@
+"use strict";
+
 /* HandlerList.js
  *
  * Author: Alexey.Golubev@avsmedia.net

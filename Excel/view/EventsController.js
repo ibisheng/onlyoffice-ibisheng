@@ -1,4 +1,6 @@
-﻿/* EventsController.js
+﻿"use strict";
+
+/* EventsController.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   May 16, 2012

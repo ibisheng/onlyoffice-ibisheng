@@ -1,4 +1,6 @@
-﻿/* CellComment.js
+﻿"use strict";
+
+/* CellComment.js
 *
 * Author: Dmitry Vikulov
 * Date:   06/02/2013

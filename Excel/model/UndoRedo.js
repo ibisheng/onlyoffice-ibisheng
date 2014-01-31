@@ -1,4 +1,6 @@
-﻿var c_oUndoRedoSerializeType =
+﻿"use strict";
+
+var c_oUndoRedoSerializeType =
 {
     Null:0,
     Byte:1,

@@ -1,4 +1,6 @@
-﻿/** @enum */
+﻿"use strict";
+
+/** @enum */
 var cElementType = {
     number:0,
     string:1,

@@ -1,4 +1,6 @@
-﻿var g_oColorManager = null;
+﻿"use strict";
+
+var g_oColorManager = null;
 var g_nNumsMaxId = 160;
 var g_oDefaultXfId = null;
 var g_oDefaultFont = null;

@@ -1,3 +1,5 @@
+"use strict";
+
 var editor = window["Asc"]["editor"];
 
 DrawingObjectsController.prototype.getTheme = function()

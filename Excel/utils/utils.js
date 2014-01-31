@@ -1,4 +1,6 @@
-﻿/* Utils.js
+﻿"use strict";
+
+/* Utils.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Jan 25, 2012

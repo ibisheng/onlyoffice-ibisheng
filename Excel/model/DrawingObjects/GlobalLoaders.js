@@ -1,3 +1,5 @@
+"use strict";
+
 (function(document) {
 
 	var ImageLoadStatus = {

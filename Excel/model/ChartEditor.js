@@ -1,4 +1,6 @@
-﻿/* ChartEditor.js
+﻿"use strict";
+
+/* ChartEditor.js
  *
  * Author: Dmitry Vikulov
  * Date:   13/12/2012

@@ -1,4 +1,6 @@
-﻿var gUndoInsDelCellsFlag = true;
+﻿"use strict";
+
+var gUndoInsDelCellsFlag = true;
 (	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
@@ -6311,6 +6313,7 @@
 			_isEmptyRange: function(activeCells, isAllAutoFilter)
 			{
 				var ws = this.worksheet;
+				var cell;
 				//в данном случае проверяем близлежащие ячейки
 				if(isAllAutoFilter && activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)
 				{

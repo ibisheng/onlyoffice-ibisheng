@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Created with JetBrains WebStorm.
  * User: Dmitry.Shahtanov
@@ -417,7 +419,7 @@ cATANH.prototype.getInfo = function () {
 }
 
 function cCEILING() {
-    cBaseFunction( this, "CEILING" );
+    cBaseFunction.call( this, "CEILING" );
     this.setArgumentsMin( 2 );
     this.setArgumentsMax( 2 );
 }

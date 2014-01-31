@@ -1,3 +1,5 @@
+"use strict";
+
 /*function PointToSegmentDistance( px, py, x0, y0, x1, y1)
 {
     var vx = x1 - x0;

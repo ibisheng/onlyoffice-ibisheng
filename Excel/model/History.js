@@ -1,3 +1,5 @@
+"use strict";
+
 var historyitem_Unknown = 0;
 
 var historyitem_Workbook_SheetAdd = 1;

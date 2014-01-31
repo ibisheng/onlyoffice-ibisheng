@@ -1,4 +1,6 @@
-﻿/* DrawingContext.js
+﻿"use strict";
+
+/* DrawingContext.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011

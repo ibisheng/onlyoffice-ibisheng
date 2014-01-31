@@ -1,3 +1,5 @@
+"use strict";
+
 CChartSpace.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
@@ -373,7 +375,7 @@ CChartSpace.prototype.recalculateGridLines = function()
 {
 	if(this.chart && this.chart.plotArea)
 	{
-		function calcMajorMinorGridLines(axis, defaultStyle, subtleLine, parents)
+		var calcMajorMinorGridLines = function (axis, defaultStyle, subtleLine, parents)
 		{
 			function calcGridLine(defaultStyle, spPr, subtleLine, parents)
 			{
@@ -437,7 +439,7 @@ CChartSpace.prototype.recalculateMarkers = function()
 		var RGBA = {R:0, G:0, B:0, A: 255};
 		if(this.chart.plotArea.chart.varyColors && this.chart.plotArea.chart.series.length === 1)
 		{
-			var ser = this.chart.plotArea.chart.series[0];
+			var ser = this.chart.plotArea.chart.series[0], pts;
 			if(ser.val)
 			{
 				pts = ser.val.numRef.numCache.pts;

@@ -1,4 +1,6 @@
-﻿/* WorksheetView.js
+﻿"use strict";
+
+/* WorksheetView.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
@@ -4701,8 +4703,8 @@
 		};
 
 		/**
-		 * @param {TextMetrics} tm
-		 * @return {TextMetrics}
+		 * @param {Asc.TextMetrics} tm
+		 * @return {Asc.TextMetrics}
 		 */
 		WorksheetView.prototype._roundTextMetrics = function (tm) {
 			tm.width    = asc_calcnpt( tm.width, this._getPPIX() );

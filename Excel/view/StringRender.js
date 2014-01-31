@@ -1,4 +1,6 @@
-﻿/* StringRender.js
+﻿"use strict";
+
+/* StringRender.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Dec 12, 2011

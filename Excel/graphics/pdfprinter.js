@@ -1,4 +1,6 @@
-﻿function _rect()
+﻿"use strict";
+
+function _rect()
 {
     this.x = 0;
     this.y = 0;

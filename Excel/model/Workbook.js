@@ -1,3 +1,5 @@
+"use strict";
+
 var d1,d2,d3;
 var g_nHSLMaxValue = 240;
 var g_nVerticalTextAngle = 255;
@@ -307,8 +309,7 @@ DependencyGraph.prototype = {
         if ( nodesSheetCell ) {
 			oGetRes = nodesSheetCell.get(bbox);
             for ( var i = 0, length = oGetRes.length; i < length; i++ ) {
-                elem = oGetRes[i];
-				res.push(elem.data);
+				res.push(oGetRes[i].data);
             }
         }
 		return res;
@@ -320,8 +321,7 @@ DependencyGraph.prototype = {
 			oGetRes = nodesSheetArea.get(bbox);
 			for(var i = 0, length = oGetRes.all.length; i < length; i++)
 			{
-				elem = oGetRes.all[i];
-				res.push(elem.data);
+				res.push(oGetRes.all[i].data);
             }
 		}
 		return res;

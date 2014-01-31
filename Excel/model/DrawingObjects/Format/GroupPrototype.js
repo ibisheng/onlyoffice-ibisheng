@@ -1,4 +1,6 @@
-﻿CGroupShape.prototype.addToRecalculate = function()
+﻿"use strict";
+
+CGroupShape.prototype.addToRecalculate = function()
 {
     if(this.drawingObjects && this.drawingObjects.controller)
     {

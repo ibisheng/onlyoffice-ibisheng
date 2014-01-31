@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * Author: Alexander.Trofimov
  * Date: 30.10.12
