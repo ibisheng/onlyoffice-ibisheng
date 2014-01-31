@@ -2095,12 +2095,12 @@ drawBarChart.prototype =
 	_DrawBars: function()
 	{
 		var brush, pen, seria;
-		for (i = 0; i < this.paths.series.length; i++) {
+		for (var i = 0; i < this.paths.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 
-			for (j=0; j < this.paths.series[i].length; ++j) {
+			for (var j = 0; j < this.paths.series[i].length; j++) {
 				if(seria.val.numRef.numCache.pts[j].pen)
 					pen = seria.val.numRef.numCache.pts[j].pen;
 				if(seria.val.numRef.numCache.pts[j].brush)
@@ -2130,12 +2130,12 @@ drawBarChart.prototype =
 		//для диаграммы с накполениями
 		var summBarVal = [];
 
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 
 			var seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			
 			seriesHeight[i] = [];
-			for (j=0; j < seria.length; ++j) {
+			for (var j = 0; j < seria.length; j++) {
 				
 				individualBarWidth = (width - (2 * hmargin)) / this.chartProp.series.length;
 				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
@@ -2212,6 +2212,80 @@ drawBarChart.prototype =
         }
     },
 	
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var path = this.paths.series[ser][val].ArrPathCommand;
+			
+		var x = path[0].X;
+		var y = path[0].Y;
+		
+		var h = path[0].Y - path[1].Y;
+		var w = path[2].X - path[1].X;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX, centerY;
+				
+		//TODO высчитать позиции, как в екселе
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y;
+				if(point.val > 0)
+					centerY = y - height;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y - h/2 - height/2;
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				//TODO высчитать позиции, как в екселе
+				centerX = x + w/2 - width/2;
+				centerY = y - h/2 - height/2;
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y - h;
+				if(point.val < 0)
+					centerY = centerY - height;	
+				break;
+			}
+		}
+		return {x: centerX, y: centerY};
+	},
 	
 	_calculateRect : function(x, y, w, h)
 	{
