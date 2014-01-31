@@ -1,3 +1,5 @@
+п»ї"use strict";
+
 //*****MAIN*****
 function CChartsDrawer()
 {
@@ -17,10 +19,10 @@ CChartsDrawer.prototype =
 		this.calcProp = {};
 		this._calculateProperties(chartProp);
 
-		//создаём область
+		//СЃРѕР·РґР°С‘Рј РѕР±Р»Р°СЃС‚СЊ
 		this.areaChart = new areaChart();
 		
-		//создаём сетку
+		//СЃРѕР·РґР°С‘Рј СЃРµС‚РєСѓ
 		this.gridChart = new gridChart();
 		
 		//draw chart
@@ -64,7 +66,7 @@ CChartsDrawer.prototype =
 		}
 		this.chart = newChart;
 		
-		//делаем полный пресчёт
+		//РґРµР»Р°РµРј РїРѕР»РЅС‹Р№ РїСЂРµСЃС‡С‘С‚
 		this.gridChart.reCalculate(this.calcProp, null, this);
 		this.areaChart.reCalculate(this.calcProp);
 		this.chart.reCalculate(this, chartProp);
@@ -76,7 +78,7 @@ CChartsDrawer.prototype =
 		cShapeDrawer.Graphics = graphics;
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
 		
-		//отрисовываем без пересчёта
+		//РѕС‚СЂРёСЃРѕРІС‹РІР°РµРј Р±РµР· РїРµСЂРµСЃС‡С‘С‚Р°
 		this.areaChart.draw(this.calcProp, cShapeDrawer);
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.chart.draw(this, cShapeDrawer, chartProp);
@@ -151,17 +153,17 @@ CChartsDrawer.prototype =
 		this.calcProp.xaxispos = null;
 		this.calcProp.yaxispos = null;
 		
-		//рассчёт данных и ещё некоторых параметров(this.calcProp./min/max/ymax/ymin/data)
+		//СЂР°СЃСЃС‡С‘С‚ РґР°РЅРЅС‹С… Рё РµС‰С‘ РЅРµРєРѕС‚РѕСЂС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ(this.calcProp./min/max/ymax/ymin/data)
 		this._calculateData(chartProp);
 		
-		//пересчёт данных для накопительных диаграмм
+		//РїРµСЂРµСЃС‡С‘С‚ РґР°РЅРЅС‹С… РґР»СЏ РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹С… РґРёР°РіСЂР°РјРј
 		if(this.calcProp.subType == 'stackedPer' || this.calcProp.subType == 'stacked')
 			this._calculateStackedData();
 			
 		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
 		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
 		
-		//считаем маргины
+		//СЃС‡РёС‚Р°РµРј РјР°СЂРіРёРЅС‹
 		this._calculateMarginsChart();
 		
 		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
@@ -172,7 +174,7 @@ CChartsDrawer.prototype =
 		//***series***
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
 		
-		//находим значния для осей
+		//РЅР°С…РѕРґРёРј Р·РЅР°С‡РЅРёСЏ РґР»СЏ РѕСЃРµР№
 		this.calcProp.scale = this._getScale(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);	
 		if(this.calcProp.type == "Scatter")
 			this.calcProp.xScale = this._getScale(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);
@@ -304,7 +306,7 @@ CChartsDrawer.prototype =
 			}
 			else if (this.calcProp.subType == 'stackedPer') {
 				var sumMax = [];
-				//находим суммы для нормированной диаграммы
+				//РЅР°С…РѕРґРёРј СЃСѓРјРјС‹ РґР»СЏ РЅРѕСЂРјРёСЂРѕРІР°РЅРЅРѕР№ РґРёР°РіСЂР°РјРјС‹
 				for (var j = 0; j < (this.calcProp.data.length); j++) {
 					sumMax[j] = 0;
 					for (var i = 0; i < this.calcProp.data[j].length; i++) {
@@ -437,8 +439,8 @@ CChartsDrawer.prototype =
 		var arrFormatAdobeLabels = [];
 		var catNameLabels = [];
 		
-		//просматриваем bShowValue для каждой из серий 
-		//TODO позже отрисовывать значения для каждой серии индивидуально
+		//РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРј bShowValue РґР»СЏ РєР°Р¶РґРѕР№ РёР· СЃРµСЂРёР№ 
+		//TODO РїРѕР·Р¶Рµ РѕС‚СЂРёСЃРѕРІС‹РІР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ РєР°Р¶РґРѕР№ СЃРµСЂРёРё РёРЅРґРёРІРёРґСѓР°Р»СЊРЅРѕ
 		/*if ( !chart.bShowValue ) {
 			for (var n = 0; n < chart.series.length; n++) {
 				if ( chart.series[n].bShowValue ) {
@@ -459,7 +461,7 @@ CChartsDrawer.prototype =
 		var newArr;
 		
 		var series = chart.chart.plotArea.chart.series;
-		if(series && series.length != 0 && this.calcProp.type != 'Scatter')//берём данные из NumCache
+		if(series && series.length != 0 && this.calcProp.type != 'Scatter')//Р±РµСЂС‘Рј РґР°РЅРЅС‹Рµ РёР· NumCache
 		{
 			isSeries = true;
 			/*chart.reSeries = chart.series;
@@ -938,7 +940,7 @@ CChartsDrawer.prototype =
 			var newMin = min;
 			var newMax  = max;
 			
-			//находим максимум после преобразования
+			//РЅР°С…РѕРґРёРј РјР°РєСЃРёРјСѓРј РїРѕСЃР»Рµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 			if('Bar' != mainObj.type)
 			{
 				 if(typeof(arrNew[0]) == 'object')
@@ -971,21 +973,21 @@ CChartsDrawer.prototype =
 			}
 			var massRes = [];
 			
-			//шаг нужно высчитывать
+			//С€Р°Рі РЅСѓР¶РЅРѕ РІС‹СЃС‡РёС‚С‹РІР°С‚СЊ
 			var step = 10;
 			if(((newMax - newMin)/10) > 11 )
 				step = 20;
 			if('Bar' == mainObj.type  && max > 0 && min < 0)
 				step = 20;
 			var maxValue = 100;
-			//находим максимум
+			//РЅР°С…РѕРґРёРј РјР°РєСЃРёРјСѓРј
 			for (var i=0; i < 11; i++) {
 				if(newMax < 100 - step*i && newMax > 100 - step*(i+1))
 					maxValue = 100 - step*i;
 			}
 			if(maxValue > 100)
 				maxValue = 100;
-			//получаем массив
+			//РїРѕР»СѓС‡Р°РµРј РјР°СЃСЃРёРІ
 			if(max <= 0 && min < 0)
 			{
 				if('Bar' == mainObj.type)
@@ -1051,7 +1053,7 @@ CChartsDrawer.prototype =
 			var max1;
 			var arr = [];
 
-			//находим минимальное значение
+			//РЅР°С…РѕРґРёРј РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 			var min;
 			var trueOX = false;
 			if('HBar' == mainObj.type)
@@ -1079,7 +1081,7 @@ CChartsDrawer.prototype =
 				//max = maxVal;
 			}
 			
-			//в этом случае определяем значения для оси OX(max == true)
+			//РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РѕРїСЂРµРґРµР»СЏРµРј Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ РѕСЃРё OX(max == true)
 			if(mainObj.type == 'Stock')
 			{
 				var arrTemp = []
@@ -1152,7 +1154,7 @@ CChartsDrawer.prototype =
 					return [0.2,0.4,0.6,0.8,1,1.2];
 			}
 					
-			//подготовительная работы для дальнейшего вычисления шага
+			//РїРѕРґРіРѕС‚РѕРІРёС‚РµР»СЊРЅР°СЏ СЂР°Р±РѕС‚С‹ РґР»СЏ РґР°Р»СЊРЅРµР№С€РµРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ С€Р°РіР°
 			if(max >= 0 && min >= 0)
 			{
 				 if(max == min)
@@ -1252,7 +1254,7 @@ CChartsDrawer.prototype =
 			
 			
 			
-			//приводим к первому порядку для дальнейших вычислений
+			//РїСЂРёРІРѕРґРёРј Рє РїРµСЂРІРѕРјСѓ РїРѕСЂСЏРґРєСѓ РґР»СЏ РґР°Р»СЊРЅРµР№С€РёС… РІС‹С‡РёСЃР»РµРЅРёР№
 			var secPart = max.toString().split('.');
 			var numPow = 1;
 			if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
@@ -1300,7 +1302,7 @@ CChartsDrawer.prototype =
 			}
 			
 			
-			//поиск шага
+			//РїРѕРёСЃРє С€Р°РіР°
 			if(undefined != greaterNull)
 			{
 				 var greaterNullTemp = greaterNull.toString().split('.');
@@ -1341,11 +1343,11 @@ CChartsDrawer.prototype =
 			}
 			
 			arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-			//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+			//РµСЃР»Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РёР· РґР°РЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°, РјРµРЅСЏРµРј РґРёР°РїР°Р·РѕРЅ РїРѕ РѕСЃРё OY
 			var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-			//массив диапазонов
+			//РјР°СЃСЃРёРІ РґРёР°РїР°Р·РѕРЅРѕРІ
 			var arrDiffVal1 = [0,0.2,0.5,1,2]
-			if(axisXMin == 0 && undefined == greaterNull)//если разница между min и max такая, что не нужно масштабировать
+			if(axisXMin == 0 && undefined == greaterNull)//РµСЃР»Рё СЂР°Р·РЅРёС†Р° РјРµР¶РґСѓ min Рё max С‚Р°РєР°СЏ, С‡С‚Рѕ РЅРµ РЅСѓР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ
 			{
 				var trueDiff = 1;
 				for (var i=0; i<arr.length; i++) {
@@ -1356,7 +1358,7 @@ CChartsDrawer.prototype =
 						var diff = max1/10;
 						trueDiff = diff;
 						var maxVal;
-						//проверяем есть ли переход в следующий диапазон
+						//РїСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё РїРµСЂРµС…РѕРґ РІ СЃР»РµРґСѓСЋС‰РёР№ РґРёР°РїР°Р·РѕРЅ
 						if(max > arrMaxVal[i+1])
 						{
 							trueDiff = arrDiffVal1[i+1]
@@ -1384,7 +1386,7 @@ CChartsDrawer.prototype =
 				}
 			}
 			
-			//находим истинные min и max
+			//РЅР°С…РѕРґРёРј РёСЃС‚РёРЅРЅС‹Рµ min Рё max
 			var testDiff;
 			var axisXMinTest;
 			if(axisXMin == 0)
@@ -1421,7 +1423,7 @@ CChartsDrawer.prototype =
 
 			
 			
-			//возвращаем массив
+			//РІРѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ
 			var varMin = axisXMinTest*numPowOY;
 			var massRes = [];
 			var tempKoff = 100000000000;
@@ -1571,14 +1573,14 @@ CChartsDrawer.prototype =
 		{
 			var max1;
 			var arr = [];
-			//находим минимальное значение
+			//РЅР°С…РѕРґРёРј РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 			var min;
 			var max;
 			if('Bar' == mainObj.type || 'HBar' == mainObj.type)
 			{
 				if(mainObj.subType == 'stacked')
 				{
-					//суммируем отрицательные и положительные значения
+					//СЃСѓРјРјРёСЂСѓРµРј РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ Рё РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
 					if(typeof(mainObj.data[0]) == 'object')
 					{
 						var arrMin = [];
@@ -1716,7 +1718,7 @@ CChartsDrawer.prototype =
 			}
 			
 			
-			//приведение к первому порядку для дальнейших вычислений
+			//РїСЂРёРІРµРґРµРЅРёРµ Рє РїРµСЂРІРѕРјСѓ РїРѕСЂСЏРґРєСѓ РґР»СЏ РґР°Р»СЊРЅРµР№С€РёС… РІС‹С‡РёСЃР»РµРЅРёР№
 			var secPart = max.toString().split('.');
 			var numPow = 1;
 			if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
@@ -1766,7 +1768,7 @@ CChartsDrawer.prototype =
 			}
 			
 			
-			//поиск шага
+			//РїРѕРёСЃРє С€Р°РіР°
 			if(undefined != greaterNull)
 			{
 				 var greaterNullTemp = greaterNull.toString().split('.');
@@ -1799,11 +1801,11 @@ CChartsDrawer.prototype =
 			}
 			
 			arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-			//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+			//РµСЃР»Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РёР· РґР°РЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°, РјРµРЅСЏРµРј РґРёР°РїР°Р·РѕРЅ РїРѕ РѕСЃРё OY
 			var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-			//массив диапазонов
+			//РјР°СЃСЃРёРІ РґРёР°РїР°Р·РѕРЅРѕРІ
 			var arrDiffVal1 = [0,0.2,0.5,1,2]
-			if(axisXMin == 0)//если разница между min и max такая, что не нужно масштабировать
+			if(axisXMin == 0)//РµСЃР»Рё СЂР°Р·РЅРёС†Р° РјРµР¶РґСѓ min Рё max С‚Р°РєР°СЏ, С‡С‚Рѕ РЅРµ РЅСѓР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ
 			{
 				var trueDiff = 1;
 				for (var i=0; i<arr.length; i++) {
@@ -1814,7 +1816,7 @@ CChartsDrawer.prototype =
 						var diff = max1/10;
 						trueDiff = diff;
 						var maxVal;
-						//проверяем есть ли переход в следующий диапазон
+						//РїСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё РїРµСЂРµС…РѕРґ РІ СЃР»РµРґСѓСЋС‰РёР№ РґРёР°РїР°Р·РѕРЅ
 						if(max > arrMaxVal[i+1])
 						{
 							trueDiff = arrDiffVal1[i+1]
@@ -1829,7 +1831,7 @@ CChartsDrawer.prototype =
 			
 			
 			
-			//находим истинные min и max
+			//РЅР°С…РѕРґРёРј РёСЃС‚РёРЅРЅС‹Рµ min Рё max
 			var testDiff;
 			var axisXMinTest;
 			if(axisXMin == 0)
@@ -1894,7 +1896,7 @@ CChartsDrawer.prototype =
 
 			
 			
-			//возвращаем массив
+			//РІРѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ
 			var varMin = axisXMinTest*numPowOY;
 			var massRes = [];
 			
@@ -2123,7 +2125,7 @@ drawBarChart.prototype =
 		
 		var seriesHeight = [];
 		var diffYVal;
-		//для диаграммы с накполениями
+		//РґР»СЏ РґРёР°РіСЂР°РјРјС‹ СЃ РЅР°РєРїРѕР»РµРЅРёСЏРјРё
 		var summBarVal = [];
 
 		for (i = 0; i < this.chartProp.series.length; i++) {
@@ -2148,7 +2150,7 @@ drawBarChart.prototype =
 				else
 					height = (val / (this.chartProp.max - this.chartProp.min)) * this.chartProp.trueHeight;
 				
-				//обработка для диаграмм с накоплениями
+				//РѕР±СЂР°Р±РѕС‚РєР° РґР»СЏ РґРёР°РіСЂР°РјРј СЃ РЅР°РєРѕРїР»РµРЅРёСЏРјРё
 				if(this.chartProp.subType == "stacked")
 				{
 					startX = (j * width) + this.chartProp.chartGutter._left + hmargin;
@@ -2300,7 +2302,7 @@ drawLineChart.prototype =
 		
 			for(var n = 1; n < dataSeries.length; n++)
 			{
-				//рассчитываем значения				
+				//СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј Р·РЅР°С‡РµРЅРёСЏ				
 				prevVal = this._getYVal(n - 1, i) - min;
 				val = this._getYVal(n, i) - min;
 				
@@ -2349,7 +2351,7 @@ drawLineChart.prototype =
 		var centerX = x - width/2;
 		var centerY = y - height/2;
 		
-		//TODO высчитать позиции, как в екселе
+		//TODO РІС‹СЃС‡РёС‚Р°С‚СЊ РїРѕР·РёС†РёРё, РєР°Рє РІ РµРєСЃРµР»Рµ
 		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_B:
@@ -2542,7 +2544,7 @@ drawAreaChart.prototype =
 		var seria;
 		for (i = 0; i < this.chartProp.series.length; i++) {
 			
-			//в случае накопительных дигарамм, рисуем в обратном порядке
+			//РІ СЃР»СѓС‡Р°Рµ РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹С… РґРёРіР°СЂР°РјРј, СЂРёСЃСѓРµРј РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ
 			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
 				seria = this.chartProp.series[this.chartProp.series.length - 1 - i];
 			else
@@ -2552,7 +2554,7 @@ drawAreaChart.prototype =
 			var y, y1, x, x1, val, prevVal, tempVal;
 			for(var n = 1; n < dataSeries.length; n++)
 			{
-				//рассчитываем значения				
+				//СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј Р·РЅР°С‡РµРЅРёСЏ				
 				prevVal = this._getYVal(n - 1, i) - min;
 				val = this._getYVal(n, i) - min;
 				
@@ -2574,17 +2576,17 @@ drawAreaChart.prototype =
 	
 	_drawLines: function (/*isSkip*/)
     {
-		//для цветов серий
+		//РґР»СЏ С†РІРµС‚РѕРІ СЃРµСЂРёР№
 		var colorProps = this.cChartDrawer._getColorProps();
 		
-		//ширина линии
+		//С€РёСЂРёРЅР° Р»РёРЅРёРё
 		var brush;
 		var FillUniColor;
 		var pen;
 		var y, y1, x, x1, val, prevVal, tempVal;
 		for (i = 0; i < this.chartProp.series.length; i++) {
 			
-			//в случае накопительных дигарамм, рисуем в обратном порядке
+			//РІ СЃР»СѓС‡Р°Рµ РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹С… РґРёРіР°СЂР°РјРј, СЂРёСЃСѓРµРј РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ
 			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
 				seria = this.chartProp.series[this.chartProp.series.length - 1 - i];
 			else
@@ -2768,7 +2770,7 @@ drawHBarChart.prototype =
 				var startY;
 				var diffYVal = 0;
 				
-				//для накопительных диаграмм
+				//РґР»СЏ РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹С… РґРёР°РіСЂР°РјРј
 				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
 				{
 					diffYVal = 0;
@@ -2928,7 +2930,7 @@ drawPieChart.prototype =
 		var yCenter = this.chartProp.chartGutter._top + trueHeight/2;
 		
 		this.tempAngle = Math.PI/2;
-		//рисуем против часовой стрелки, поэтому цикл с конца
+		//СЂРёСЃСѓРµРј РїСЂРѕС‚РёРІ С‡Р°СЃРѕРІРѕР№ СЃС‚СЂРµР»РєРё, РїРѕСЌС‚РѕРјСѓ С†РёРєР» СЃ РєРѕРЅС†Р°
         for (var i = numCache.length - 1; i >= 0; i--) {
             var angle = Math.abs((parseFloat(numCache[i].val / sumData)) * (Math.PI * 2));
 			if(!this.paths.series)
@@ -3341,7 +3343,7 @@ gridChart.prototype =
 				this.paths.horisontalLines = [];
 			this.paths.horisontalLines[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
 			
-			//промежуточные линии
+			//РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ Р»РёРЅРёРё
 			for(var n = 0; n < this.chartProp.numhMinorlines; n++)
 			{
 				posMinorY = posY + n*minorStep;
@@ -3370,7 +3372,7 @@ gridChart.prototype =
 				this.paths.verticalLines = [];
 			this.paths.verticalLines[i] = this._calculateLine(posX, posY, posX, posY + heightLine);
 			
-			//промежуточные линии
+			//РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ Р»РёРЅРёРё
 			for(var n = 0; n < this.chartProp.numvMinorlines; n++)
 			{
 				posMinorX = posX + n*minorStep;
@@ -3420,7 +3422,7 @@ gridChart.prototype =
 			path = this.paths.horisontalLines[i];
 			this._drawPath(path, pen);
 			
-			//промежуточные линии
+			//РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ Р»РёРЅРёРё
 			if(i != this.chartProp.numhlines && this.paths.horisontalMinorLines)
 			{
 				for(var n = 0; n < this.paths.horisontalMinorLines[i].length ; n++)
@@ -3449,7 +3451,7 @@ gridChart.prototype =
 			path = this.paths.verticalLines[i];
 			this._drawPath(path, pen);
 			
-			//промежуточные линии
+			//РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅС‹Рµ Р»РёРЅРёРё
 			if(i != this.chartProp.numvlines)
 			{
 				for(var n = 0; n < this.paths.verticalMinorLines[i].length ; n++)
