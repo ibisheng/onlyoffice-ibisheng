@@ -2113,9 +2113,9 @@ function CreateBarChart(asc_series, type)
     bar_chart.addAxId(plot_area.valAx);
     var d_lbls = bar_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
@@ -2227,9 +2227,9 @@ function CreateHBarChart(asc_series, type)
     bar_chart.setDLbls(new CDLbls());
     var d_lbls = bar_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     bar_chart.setGapWidth(150);
@@ -2345,9 +2345,9 @@ function CreateAreaChart(asc_series, type)
     area_chart.addAxId(plot_area.valAx);
     var d_lbls = area_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
@@ -2452,9 +2452,9 @@ function CreatePieChart(asc_series, type)
     }
     pie_chart.setDLbls(new CDLbls());
     pie_chart.dLbls.setShowLegendKey(false);
-    pie_chart.dLbls.setShowVal(false);
-    pie_chart.dLbls.setShowCatName(false);
-    pie_chart.dLbls.setShowSerName(false);
+    pie_chart.dLbls.setShowVal(true);
+    pie_chart.dLbls.setShowCatName(true);
+    pie_chart.dLbls.setShowSerName(true);
     pie_chart.dLbls.setShowPercent(false);
     pie_chart.dLbls.setShowBubbleSize(false);
     pie_chart.dLbls.setShowLeaderLines(true);
@@ -2553,9 +2553,9 @@ function CreateScatterChart(asc_series)
     scatter_chart.addAxId(plot_area.valAx);
     var d_lbls = scatter_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
@@ -2668,9 +2668,9 @@ function CreateStockChart(asc_series)
     }
     var d_lbls = line_chart.dLbls;
     d_lbls.setShowLegendKey(false);
-    d_lbls.setShowVal(false);
-    d_lbls.setShowCatName(false);
-    d_lbls.setShowSerName(false);
+    d_lbls.setShowVal(true);
+    d_lbls.setShowCatName(true);
+    d_lbls.setShowSerName(true);
     d_lbls.setShowPercent(false);
     d_lbls.setShowBubbleSize(false);
     var cat_ax = plot_area.catAx;
