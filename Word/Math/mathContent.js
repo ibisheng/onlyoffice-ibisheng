@@ -5067,30 +5067,33 @@ CMathContent.prototype =
         var kind = MComp.kind;
         var checkGap = this.checkGapKind(kind);
 
-        var coeffLeft = 0,
-            coeffRight = 0;
+        var bNeedGap = !checkGap.bEmptyGaps && !checkGap.bChildGaps;
 
-        if(checkGap.bEmptyGaps)
-        {
-            coeffLeft = 0.05;
-        }
-        else if(checkGap.bChildGaps)
-        {
-            var gaps = MComp.getGapsInside();
+        var coeffLeft  = 0.001,
+            coeffRight = 0; // for checkGap.bEmptyGaps
 
-             coeffLeft = gaps.left;
-             coeffRight = gaps.right;
+        if(checkGap.bChildGaps)
+        {
+            if(kind == MATH_DEGREE || kind == MATH_DEGREESubSup)
+            {
+                coeffLeft  = 0.0;
+                coeffRight = 0.15;
+            }
+
+             var gapsChild = MComp.getGapsInside();
+
+             coeffLeft  = coeffLeft  < gapsChild.left  ? gapsChild.left  : coeffLeft;
+             coeffRight = coeffRight < gapsChild.right ? gapsChild.right : coeffRight;
         }
-        else
+        else if(bNeedGap)
         {
             coeffLeft = 0.4;
             coeffRight = 0.26;
         }
 
         return {left: coeffLeft, right: coeffRight};
-
     },
-    getGapsInside: function()
+    getGapsInside: function() // учитываем gaps внутренних объектов
     {
         var bFirstComp = this.content[1].value.typeObj == MATH_COMP,
             bLastComp = false;
@@ -5103,7 +5106,7 @@ CMathContent.prototype =
             bLastComp = this.content[posLComp].value.typeObj == MATH_COMP;
         }
 
-        var gaps = {left: 0.05, right: 0};
+        var gaps = {left: 0, right: 0};
 
         var checkGap;
 
@@ -5182,7 +5185,7 @@ CMathContent.prototype =
         var bHidePlh = this.plhHide && this.IsPlaceholder();
 
         // TEST
-        //var bOnlySimpleObjs = true;
+        var bOnlySimpleObjs = true;
 
         if( !bHidePlh )
         {
@@ -5216,10 +5219,12 @@ CMathContent.prototype =
                 else
                     this.content[i].value.draw(x, y, pGraphics);
 
-                /*if(this.content[i].value.typeObj == MATH_COMP)
+
+
+                if(this.content[i].value.typeObj == MATH_COMP)
                 {
                     bOnlySimpleObjs = false;
-                }*/
+                }
 
                 /*if(this.content[i].value.typeObj == MATH_COMP)
                 {
@@ -5237,20 +5242,7 @@ CMathContent.prototype =
         }
 
         /// TEST
-        /*if(bOnlySimpleObjs)
-        {
-            var penW = 25.4/96;
-            var x1 = this.pos.x + x - penW,
-                y1 = this.pos.y + y + penW,
-                x2 = this.pos.x + x + this.size.width + penW,
-                y2 = this.pos.y + y + this.size.height - penW;
-
-            pGraphics.p_color(0,0,255, 255);
-            pGraphics.drawVerLine(0, x1, y1, y2, penW);
-            pGraphics.drawVerLine(0, x2, y1, y2, penW);
-        }*/
-
-        if(this.bRoot)
+        if(!bOnlySimpleObjs)
         {
             var penW = 25.4/96;
             var x1 = this.pos.x + x - penW,
@@ -5262,6 +5254,19 @@ CMathContent.prototype =
             pGraphics.drawVerLine(0, x1, y1, y2, penW);
             pGraphics.drawVerLine(0, x2, y1, y2, penW);
         }
+
+        /*if(this.bRoot)
+        {
+            var penW = 25.4/96;
+            var x1 = this.pos.x + x - penW,
+                y1 = this.pos.y + y + penW,
+                x2 = this.pos.x + x + this.size.width + penW,
+                y2 = this.pos.y + y + this.size.height - penW;
+
+            pGraphics.p_color(0,0,255, 255);
+            pGraphics.drawVerLine(0, x1, y1, y2, penW);
+            pGraphics.drawVerLine(0, x2, y1, y2, penW);
+        }*/
 
     },
     update_widthContent: function()
@@ -6073,7 +6078,7 @@ CMathContent.prototype =
         this.content.push(element);
         this.CurPos++;
     },*/
-    old_readContent: function()             // for "read"
+    old_readContent: function()          // for "read"
     {
         var result = new Array();
 
@@ -6175,14 +6180,36 @@ CMathContent.prototype =
         tPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
         tPrp.Merge(txtPrp);
 
+        var FSize = tPrp.FontSize;
+
         if(this.argSize == -1)
-            //tPrp.FontSize *= 0.8;
-            tPrp.FontSize *= 0.728;
-            //tPrp.FontSize *= 0.65;
+        {
+            // aa: 0.0013  bb: 0.66  cc: 0.5 
+            FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
+            //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
+            tPrp.FontSize = FSize;
+        }
         else if(this.argSize == -2)
             //tPrp.FontSize *= 0.65;
             tPrp.FontSize *= 0.53;
             //tPrp.FontSize *= 0.473;
+
+        return tPrp;
+    },
+    old_mergeTxtPrp: function(txtPrp)
+    {
+        var tPrp = new CTextPr();
+        tPrp.Merge(this.Composition.DEFAULT_RUN_PRP);
+        tPrp.Merge(txtPrp);
+
+        if(this.argSize == -1)
+        //tPrp.FontSize *= 0.8;
+            tPrp.FontSize *= 0.728;
+        //tPrp.FontSize *= 0.65;
+        else if(this.argSize == -2)
+        //tPrp.FontSize *= 0.65;
+            tPrp.FontSize *= 0.53;
+        //tPrp.FontSize *= 0.473;
 
         return tPrp;
     },
@@ -6973,7 +7000,10 @@ function CMathComposition()
     this.props =
     {
         naryLim:    NARY_UndOvr,
-        intLim:     NARY_SubSup
+        intLim:     NARY_SubSup,
+        brkBin:     BREAK_BEFORE,
+        brkSubBin:  BREAK_MIN_MIN,
+        smallFrac:  false
     };
 
     this.CurrentContent    = null;
@@ -7017,11 +7047,13 @@ CMathComposition.prototype =
         // rMargin
         // lMargin
 
-        // mathFont возможно будет полноценно поддержан MS в будущем
+        // mathFont: в качестве font поддерживается только Cambria Math
+        // остальные шрифты  возможно будут поддержаны MS в будущем
 
         // Default font for math zones
         // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
         // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
+
         // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
 
         // RichEdit Hot Keys
@@ -7033,6 +7065,18 @@ CMathComposition.prototype =
 
         if(props.intLim == NARY_UndOvr || props.intLim  == NARY_SubSup)
             this.props.intLim = props.intLim;
+
+        if(props.brkBin == BREAK_BEFORE || props.brkBin == BREAK_AFTER || props.brkBin == BREAK_REPEAT)
+            this.props.brkBin = props.brkBin;
+
+        // for minus operator
+        // when brkBin is set to repeat
+        if(props.brkSubBin == BREAK_MIN_MIN || props.brkSubBin == BREAK_PLUS_MIN || props.brkSubBin == BREAK_MIN_PLUS)
+            this.props.brkSubBin = props.brkSubBin;
+
+        // в случае если smallFrac = true,
+        if(props.smallFrac == true || props.smallFrac == false)
+            this.props.smallFrac = props.smallFrac;
 
     },
     GetShiftCenter: function(oMeasure, font)
@@ -8004,4 +8048,71 @@ function GetShiftCenter()
         //var shift = metricsTxt.Height/2 / i;
         console.log(i + ": " + shift);
     }
+}
+
+function TEST_COEFF_ITERATORS()
+{
+    // a*36*36 + b*36 + c = 0.728*tPrp.FontSize = 26
+    // a*14*14 + b*14 + c = 9
+    // a*72*72 + b*72 + c = 55
+
+
+
+    //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
+
+    var x1 = 36, x2 = 14, x3 = 72;
+    var d1 = 26, d2 = 10, d3 = 55;
+
+    // || x1*x1   x1  1 ||
+    // || x2*x2   x2  1 ||
+    // || x3*x3   x3  1 ||
+
+
+
+    var D  = x1*x1*x2 + x1*x3*x3 + x2*x2*x3 - x3*x3*x2 - x3*x1*x1 - x2*x2*x1,
+        Da = d1*x2    + x1*d3    + d2*x3    - d3*x2    - x3*d1    - d2*x1,
+        Db = x1*x1*d2 + d1*x3*x3 + x2*x2*d3 - x3*x3*d2 - d3*x1*x1 - x2*x2*d1,
+        Dc = x1*x1*x2*d3 + x1*x3*x3*d2 + x2*x2*x3*d1 - x3*x3*x2*d1 - x3*x1*x1*d2 - x2*x2*x1*d3;
+
+    var a = Da/D,
+        b = Db/D,
+        c = Dc/D;
+
+    console.log("a: " + a + "  b: " + b + "  c: " + c);
+    
+    var check1 = a*x1*x1 + b*x1 + c - d1,
+        check2 = a*x2*x2 + b*x2 + c - d2,
+        check3 = a*x3*x3 + b*x3 + c - d3;
+
+    console.log("check1: " + check1);
+    console.log("check2: " + check2);
+    console.log("check3: " + check3);
+
+    var aa = Math.round(a*10000)/10000;
+
+    var dd1 = d1 - a*x1*x1,
+        dd2 = d2 - a*x2*x2;
+
+    var DD  = x1 - x2,
+        Dbb = dd1 - dd2,
+        Dcc = x1*dd2 - x2*dd1;
+
+    var bb = Dbb/DD,
+        cc = Dcc/DD;
+
+    bb = Math.round(bb*100)/100;
+    cc = Math.round(cc*100)/100;
+
+    console.log("aa: " + aa + "  bb: " + bb + "  cc: " + cc);
+
+    var check11 = aa*x1*x1 + bb*x1 + cc - d1,
+        check22 = aa*x2*x2 + bb*x2 + cc - d2,
+        check33 = aa*x3*x3 + bb*x3 + cc - d3;
+
+    console.log("check11: " + check11);
+    console.log("check22: " + check22);
+    console.log("check33: " + check33);
+
+
+
 }

@@ -143,3 +143,12 @@ var MATH_COMP                   =  2;
 var MATH_EMPTY                  =  3;
 var MATH_PLACEHOLDER            =  4;
 
+
+////////////////////////////////////////
+var BREAK_BEFORE              =  0;
+var BREAK_AFTER               =  1;
+var BREAK_REPEAT              =  2;
+
+var BREAK_MIN_MIN             =  0;
+var BREAK_PLUS_MIN            =  1;
+var BREAK_MIN_PLUS            =  2;
