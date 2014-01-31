@@ -2794,7 +2794,7 @@ drawHBarChart.prototype =
 		var trueHeight = this.chartProp.trueHeight;
 		
 		var seriesHeight = [];
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			var width;
 			var summBarVal = [];
 			seriesHeight[i] = [];
@@ -2805,7 +2805,7 @@ drawHBarChart.prototype =
 			
 			var seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			
-			for (j = 0; j < seria.length; j++) {
+			for (var j = 0; j < seria.length; j++) {
 
 				var width;
 				var val = parseFloat(seria[j].val);
@@ -2900,13 +2900,13 @@ drawHBarChart.prototype =
 		var lineWidth;
 		var dataSeries;
 		var seria;
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
 			dataSeries = this.chartProp.series[i].val.numRef.numCache.pts;
 			
-			for (j = 0; j < dataSeries.length; j++) {
+			for (var j = 0; j < dataSeries.length; j++) {
 				if(seria.val.numRef.numCache.pts[j].pen)
 					pen = seria.val.numRef.numCache.pts[j].pen;
 				if(seria.val.numRef.numCache.pts[j].brush)
