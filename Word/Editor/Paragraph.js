@@ -349,6 +349,29 @@ Paragraph.prototype =
         OtherParagraph.Style_Add( this.Style_Get(), true );
     },
 
+    Split_Element_ByPos : function(SplitType, ContentPos)
+    {
+        // SplitType
+        // 0 - только ран разбиваем
+
+        var CurPos = ContentPos.Get(0);
+        var Element = this.Content[CurPos];
+
+        if ( 0 === SplitType )
+        {
+            var Result = Element.Split_Element_ByPos( SplitType, ContentPos, 1 );
+
+            if ( para_Run === Element.Type )
+            {
+                this.Content[CurPos].Split_Element_ByPos( ContentPos, 1 );
+            }
+        }
+        else
+        {
+
+        }
+    },
+
     // Добавляем элемент в содержимое параграфа. (Здесь передвигаются все позиции
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
     Internal_Content_Add : function (Pos, Item, bCorrectPos)
@@ -419,6 +442,15 @@ Paragraph.prototype =
         {
             History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
             this.Content.splice( Pos, 0, Item );
+
+            if ( this.CurPos.ContentPos >= Pos )
+                this.CurPos.ContentPos++;
+
+            if ( this.Selection.StartPos >= Pos )
+                this.Selection.StartPos++;
+
+            if ( this.Selection.EndPos >= Pos )
+                this.Selection.EndPos++;
         }
     },
 
@@ -477,90 +509,108 @@ Paragraph.prototype =
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
     Internal_Content_Remove : function (Pos, bCorrectPos)
     {
-        var Item = this.Content[Pos];
-        if ( true === Item.Is_RealContent() )
+        if ( true !== Debug_ParaRunMode )
         {
-            var ClearPos = this.Internal_Get_ClearPos( Pos );
-            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
-        }
+            var Item = this.Content[Pos];
+            if ( true === Item.Is_RealContent() )
+            {
+                var ClearPos = this.Internal_Get_ClearPos( Pos );
+                History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
+            }
 
-        if ( this.Selection.StartPos <= this.Selection.EndPos )
-        {
-            if ( this.Selection.StartPos > Pos )
-                this.Selection.StartPos--;
+            if ( this.Selection.StartPos <= this.Selection.EndPos )
+            {
+                if ( this.Selection.StartPos > Pos )
+                    this.Selection.StartPos--;
 
-            if ( this.Selection.EndPos > Pos )
-                this.Selection.EndPos--;
+                if ( this.Selection.EndPos > Pos )
+                    this.Selection.EndPos--;
+            }
+            else
+            {
+                if ( this.Selection.StartPos > Pos )
+                    this.Selection.StartPos--;
+
+                if ( this.Selection.EndPos > Pos )
+                    this.Selection.EndPos--;
+            }
+
+            if ( this.Numbering.Pos > Pos )
+                this.Numbering.Pos--;
+
+            // Также передвинем всем метки переносов страниц и строк
+            var LinesCount = this.Lines.length;
+            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
+            {
+                if ( this.Lines[CurLine].StartPos > Pos )
+                    this.Lines[CurLine].StartPos--;
+
+                if ( this.Lines[CurLine].EndPos >= Pos )
+                    this.Lines[CurLine].EndPos--;
+
+                var RangesCount = this.Lines[CurLine].Ranges.length;
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
+                        this.Lines[CurLine].Ranges[CurRange].StartPos--;
+                }
+            }
+
+            // TODO: Как только мы избавимся от ParaNumbering в контенте параграфа, можно будет здесь такую обработку убрать
+            //       и делать ее конкретно на Replace
+            // Передвинем все метки поиска
+            for ( var CurSearch in this.SearchResults )
+            {
+                if ( this.SearchResults[CurSearch].StartPos > Pos )
+                    this.SearchResults[CurSearch].StartPos--;
+
+                if ( this.SearchResults[CurSearch].EndPos > Pos )
+                    this.SearchResults[CurSearch].EndPos--;
+            }
+
+            for ( var Id in this.NearPosArray )
+            {
+                var NearPos = this.NearPosArray[Id];
+                if ( NearPos.ContentPos > Pos )
+                    NearPos.ContentPos--;
+            }
+
+            this.Content.splice( Pos, 1 );
+
+            if ( this.CurPos.ContentPos > Pos )
+                this.Set_ContentPos( this.CurPos.ContentPos - 1, bCorrectPos );
+
+            // Комментарий удаляем после, чтобы не нарушить позиции
+            if ( true === this.DeleteCommentOnRemove && ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) )
+            {
+                // Удаляем комментарий, если у него было удалено начало или конец
+
+                if ( para_CommentStart === Item.Type )
+                    editor.WordControl.m_oLogicDocument.Comments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
+                else
+                    editor.WordControl.m_oLogicDocument.Comments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
+
+                editor.WordControl.m_oLogicDocument.Remove_Comment( Item.Id, true );
+            }
+
+            // Передвинем все метки слов для проверки орфографии
+            this.SpellChecker.Update_OnRemove( this, Pos, 1 );
         }
         else
         {
+            var Item = this.Content[Pos];
+            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+            this.Content.splice( Pos, 1 );
+
             if ( this.Selection.StartPos > Pos )
                 this.Selection.StartPos--;
 
             if ( this.Selection.EndPos > Pos )
                 this.Selection.EndPos--;
+
+            if ( this.CurPos.ContentPos > Pos )
+                this.CurPos.ContentPos--;
         }
-
-        if ( this.Numbering.Pos > Pos )
-            this.Numbering.Pos--;
-
-        // Также передвинем всем метки переносов страниц и строк
-        var LinesCount = this.Lines.length;
-        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-        {
-            if ( this.Lines[CurLine].StartPos > Pos )
-                this.Lines[CurLine].StartPos--;
-
-            if ( this.Lines[CurLine].EndPos >= Pos )
-                this.Lines[CurLine].EndPos--;
-
-            var RangesCount = this.Lines[CurLine].Ranges.length;
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-            {
-                if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
-                    this.Lines[CurLine].Ranges[CurRange].StartPos--;
-            }
-        }
-
-        // TODO: Как только мы избавимся от ParaNumbering в контенте параграфа, можно будет здесь такую обработку убрать
-        //       и делать ее конкретно на Replace
-        // Передвинем все метки поиска
-        for ( var CurSearch in this.SearchResults )
-        {
-            if ( this.SearchResults[CurSearch].StartPos > Pos )
-                this.SearchResults[CurSearch].StartPos--;
-
-            if ( this.SearchResults[CurSearch].EndPos > Pos )
-                this.SearchResults[CurSearch].EndPos--;
-        }
-
-        for ( var Id in this.NearPosArray )
-        {
-            var NearPos = this.NearPosArray[Id];
-            if ( NearPos.ContentPos > Pos )
-                NearPos.ContentPos--;
-        }
-
-        this.Content.splice( Pos, 1 );
-
-        if ( this.CurPos.ContentPos > Pos )
-            this.Set_ContentPos( this.CurPos.ContentPos - 1, bCorrectPos );
-
-        // Комментарий удаляем после, чтобы не нарушить позиции
-        if ( true === this.DeleteCommentOnRemove && ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) )
-        {
-            // Удаляем комментарий, если у него было удалено начало или конец
-
-            if ( para_CommentStart === Item.Type )
-                editor.WordControl.m_oLogicDocument.Comments.Set_StartInfo( Item.Id, 0, 0, 0, 0, null );
-            else
-                editor.WordControl.m_oLogicDocument.Comments.Set_EndInfo( Item.Id, 0, 0, 0, 0, null );
-
-            editor.WordControl.m_oLogicDocument.Remove_Comment( Item.Id, true );
-        }
-
-        // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnRemove( this, Pos, 1 );
     },
 
     // Удаляем несколько элементов
@@ -7749,7 +7799,94 @@ Paragraph.prototype =
                 }
                 case para_TextPr:
                 {
-                    // TODO: Сделать добавление TextPr
+                    var TextPr = Item.Value;
+
+                    if ( undefined != TextPr.FontFamily )
+                    {
+                        var FName  = TextPr.FontFamily.Name;
+                        var FIndex = TextPr.FontFamily.Index;
+
+                        TextPr.RFonts = new CRFonts();
+                        TextPr.RFonts.Ascii    = { Name : FName, Index : FIndex };
+                        TextPr.RFonts.EastAsia = { Name : FName, Index : FIndex };
+                        TextPr.RFonts.HAnsi    = { Name : FName, Index : FIndex };
+                        TextPr.RFonts.CS       = { Name : FName, Index : FIndex };
+                    }
+
+                    // Удалим все лишние пустые раны из параграфа
+                    this.Remove_EmptyRuns();
+
+                    if ( true === this.ApplyToAll )
+                    {
+                        // Применяем настройки ко всем элементам параграфа
+                        var ContentLen = this.Content.length;
+
+                        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+                        {
+                            this.Content[CurPos].Apply_TextPr( TextPr );
+                        }
+
+                        // Выставляем настройки для символа параграфа
+                        this.TextPr.Apply_TextPr( TextPr );
+                    }
+                    else
+                    {
+                        if ( true === this.Selection.Use )
+                        {
+                            this.Apply_TextPr(TextPr);
+                        }
+                        else
+                        {
+                            var CurParaPos = this.Get_ParaContentPos( false, false );
+                            var CurPos = CurParaPos.Get(0);
+
+                            // Сначала посмотрим на элемент слева и справа(текущий)
+                            var SearchLPos = new CParagraphSearchPos();
+                            this.Get_LeftPos( SearchLPos, CurParaPos );
+
+                            var RItem = this.Get_RunElementByPos( CurParaPos );
+                            var LItem = ( false === SearchLPos.Found ? null : this.Get_RunElementByPos( SearchLPos.Pos ) );
+
+                            // 1. Если мы находимся в конце параграфа, тогда применяем заданную настройку к знаку параграфа
+                            //    и добавляем пустой ран с заданными настройками.
+                            // 2. Если мы находимся в середине слова (справа и слева текстовый элемент, причем оба не пунктуация),
+                            //    тогда меняем настройки для данного слова.
+                            // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
+                            //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
+
+                            if ( null === RItem || para_End === RItem.Type )
+                            {
+                                this.Apply_TextPr( TextPr );
+                                this.TextPr.Apply_TextPr( TextPr );
+                            }
+                            else if ( null !== RItem && null !== LItem && para_Text === RItem.Type && para_Text === LItem.Type && false === RItem.Is_Punctuation() && false === LItem.Is_Punctuation() )
+                            {
+                                var SearchSPos = new CParagraphSearchPos();
+                                var SearchEPos = new CParagraphSearchPos();
+
+                                this.Get_WordStartPos( SearchSPos, CurParaPos );
+                                this.Get_WordEndPos( SearchEPos, CurParaPos );
+
+                                // Такого быть не должно, т.к. мы уже проверили, что справа и слева точно есть текст
+                                if ( true !== SearchSPos.Found || true !== SearchEPos.Found )
+                                    return;
+
+                                // Выставим временно селект от начала и до конца слова
+                                this.Selection.Use = true;
+                                this.Set_SelectionContentPos( SearchSPos.Pos, SearchEPos.Pos );
+
+                                this.Apply_TextPr( TextPr );
+
+                                // Убираем селект
+                                this.Selection_Remove();
+                            }
+                            else
+                            {
+                                this.Apply_TextPr( TextPr );
+                            }
+                        }
+                    }
+
                     break;
                 }
                 case para_HyperlinkStart:
@@ -8719,6 +8856,29 @@ Paragraph.prototype =
                 this.CurPos.RealY = Y;
             }
         }
+    },
+
+    // Получаем по заданной позиции элемент текста
+    Get_RunElementByPos : function(ContentPos)
+    {
+        var CurPos = ContentPos.Get(0);
+        var ContentLen = this.Content.length;
+
+        // Сначала ищем в текущем элементе
+        var Element = this.Content[CurPos].Get_RunElementByPos( ContentPos, 1 );
+
+        // Если заданная позиция была последней в текущем элементе, то ищем в следующем
+        while ( null === Element )
+        {
+            CurPos++;
+
+            if ( CurPos >= ContentLen )
+                break;
+
+            Element = this.Content[CurPos].Get_RunElementByPos();
+        }
+
+        return Element;
     },
 
     Get_LeftPos : function(SearchPos, ContentPos)
@@ -10591,8 +10751,6 @@ Paragraph.prototype =
 
     Internal_AddTextPr : function(TextPr)
     {
-        this.Internal_Clear_EmptyTextPr();
-
         if ( undefined != TextPr.FontFamily )
         {
             var FName  = TextPr.FontFamily.Name;
@@ -10605,151 +10763,280 @@ Paragraph.prototype =
             TextPr.RFonts.CS       = { Name : FName, Index : FIndex };
         }
 
-        if ( true === this.ApplyToAll )
+        if ( true !== Debug_ParaRunMode )
         {
-            this.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
+            this.Internal_Clear_EmptyTextPr();
 
-            // Внутри каждого TextPr меняем те настройки, которые пришли в TextPr. Например,
-            // у нас изменен только размер шрифта, то изменяем запись о размере шрифта.
-            for ( var Pos = 0; Pos < this.Content.length; Pos++ )
+            if ( true === this.ApplyToAll )
             {
-                if ( this.Content[Pos].Type == para_TextPr )
-                    this.Content[Pos].Apply_TextPr( TextPr );
+                this.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
+
+                // Внутри каждого TextPr меняем те настройки, которые пришли в TextPr. Например,
+                // у нас изменен только размер шрифта, то изменяем запись о размере шрифта.
+                for ( var Pos = 0; Pos < this.Content.length; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                        this.Content[Pos].Apply_TextPr( TextPr );
+                }
+
+                // Выставляем настройки для символа параграфа
+                this.TextPr.Apply_TextPr( TextPr );
+
+                return;
             }
 
-            // Выставляем настройки для символа параграфа
-            this.TextPr.Apply_TextPr( TextPr );
+            // найдем текущую позицию
+            var Line   = this.Content;
+            var CurPos = this.CurPos.ContentPos;
+            if ( true === this.Selection.Use )
+            {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
 
-            return;
+                if ( StartPos > EndPos )
+                {
+                    var Temp = EndPos;
+                    EndPos   = StartPos;
+                    StartPos = Temp;
+                }
+
+                // Если селект продолжается до конца параграфа, не ставим отметку в конце
+                var LastPos = this.Internal_GetEndPos();
+                var bEnd = false;
+                if ( EndPos > LastPos )
+                {
+                    EndPos = LastPos;
+                    bEnd = true;
+                }
+
+                // Рассчитываем шрифт, который используется после слова
+                var TextPr_end   = this.Internal_GetTextPr( EndPos );
+                var TextPr_start = this.Internal_GetTextPr( StartPos );
+                TextPr_start.Merge( TextPr );
+
+                this.Internal_Content_Add( StartPos, new ParaTextPr( TextPr_start ) );
+                if ( false === bEnd )
+                    this.Internal_Content_Add( EndPos + 1, new ParaTextPr( TextPr_end ) );
+                else
+                {
+                    // Выставляем настройки для символа параграфа
+                    this.TextPr.Apply_TextPr( TextPr );
+                }
+
+                // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
+                // меняются сейчас. Например, у нас изменен только размер шрифта, то удаляем запись о размере шрифта.
+                for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                    {
+                        this.Content[Pos].Apply_TextPr( TextPr );
+                    }
+                }
+
+                return;
+            }
+
+            // При изменении шрифта ведем себе следующим образом:
+            // 1. Если мы в конце параграфа, тогда добавляем запись о шрифте (применимо к знаку конца параграфа)
+            // 2. Если справа или слева стоит пробел (начало параграфа или перенос строки(командный)), тогда ставим метку со шрифтом и фокусим канву.
+            // 3. Если мы посередине слова, тогда меняем шрифт для данного слова
+
+            var oEnd   = this.Internal_FindForward ( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_End, para_NewLine] );
+            var oStart = this.Internal_FindBackward( CurPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+            var CurType = this.Content[CurPos].Type;
+
+            if ( !oEnd.Found )
+                return;
+
+            if ( para_End == oEnd.Type )
+            {
+                // Вставляем запись о новых настройках перед концом параграфа, а текущую позицию выставляем на конец параграфа
+                var Pos = oEnd.LetterPos;
+
+                var TextPr_start = this.Internal_GetTextPr( Pos );
+                TextPr_start.Merge( TextPr );
+
+                this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
+                this.Set_ContentPos( Pos + 1, false, -1 );
+
+                if ( true === this.IsEmpty() && undefined === this.Numbering_Get() )
+                {
+                    // Выставляем настройки для символа параграфа
+                    this.TextPr.Apply_TextPr( TextPr );
+                }
+            }
+            else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
+            {
+                var TextPr_old = this.Internal_GetTextPr( CurPos );
+                var TextPr_new = TextPr_old.Copy();
+                TextPr_new.Merge( TextPr );
+
+                this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
+                this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
+
+                this.Set_ContentPos( CurPos + 1, false, -1 );
+                this.RecalculateCurPos();
+            }
+            else
+            {
+                // Мы находимся посередине слова. В начале слова ставим запись о новом шрифте,
+                // а в конце слова старый шрифт. Кроме этого, надо удалить все записи о шрифте внутри слова.
+
+                // Найдем начало слова
+                var oWordStart = this.Internal_FindBackward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_NewLine] );
+                if ( !oWordStart.Found )
+                    oWordStart = this.Internal_FindForward( 0, [para_Text] );
+                else
+                    oWordStart.LetterPos++;
+
+                var oWordEnd   = this.Internal_FindForward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_End, para_NewLine] );
+
+                if ( !oWordStart.Found || !oWordEnd.Found )
+                    return;
+
+                // Рассчитываем настройки, которые используются после слова
+                var TextPr_end   = this.Internal_GetTextPr( oWordEnd.LetterPos );
+                var TextPr_start = this.Internal_GetTextPr( oWordStart.LetterPos );
+                TextPr_start.Merge( TextPr );
+
+                this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
+                this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
+
+                this.Set_ContentPos( CurPos + 1, false, -1 );
+
+                // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
+                // меняются сейчас. Например, у нас изменен только размер шрифта, то удаляем запись о размере шрифта.
+                for ( var Pos = oWordStart.LetterPos + 1; Pos < oWordEnd.LetterPos; Pos++ )
+                {
+                    if ( this.Content[Pos].Type == para_TextPr )
+                        this.Content[Pos].Apply_TextPr( TextPr );
+                }
+            }
         }
+    },
 
-        // найдем текущую позицию
-        var Line   = this.Content;
-        var CurPos = this.CurPos.ContentPos;
+    Remove_EmptyRuns : function()
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            var Element = this.Content[CurPos];
+
+            if ( para_Run === Element.Type )
+            {
+                if ( CurPos !== this.CurPos.ContentPos && true === Element.Is_Empty(false) )
+                {
+                    this.Internal_Content_Remove( CurPos );
+                    CurPos--;
+                    ContentLen--;
+                }
+            }
+            else
+                Element.Remove_EmptyRuns();
+        }
+    },
+
+    Apply_TextPr : function(TextPr)
+    {
+        // Данная функция работает по следующему принципу: если задано выделение, тогда применяем настройки к
+        // выделенной части, а если выделения нет, тогда в текущее положение вставляем пустой ран с заданными настройками
+        // и переносим курсор в данный ран.
+
         if ( true === this.Selection.Use )
         {
             var StartPos = this.Selection.StartPos;
             var EndPos   = this.Selection.EndPos;
 
-            if ( StartPos > EndPos )
+            if ( StartPos === EndPos )
             {
-                var Temp = EndPos;
-                EndPos   = StartPos;
-                StartPos = Temp;
-            }
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr );
 
-            // Если селект продолжается до конца параграфа, не ставим отметку в конце
-            var LastPos = this.Internal_GetEndPos();
-            var bEnd = false;
-            if ( EndPos > LastPos )
-            {
-                EndPos = LastPos;
-                bEnd = true;
-            }
-
-            // Рассчитываем шрифт, который используется после слова
-            var TextPr_end   = this.Internal_GetTextPr( EndPos );
-            var TextPr_start = this.Internal_GetTextPr( StartPos );
-            TextPr_start.Merge( TextPr );
-
-            this.Internal_Content_Add( StartPos, new ParaTextPr( TextPr_start ) );
-            if ( false === bEnd )
-                this.Internal_Content_Add( EndPos + 1, new ParaTextPr( TextPr_end ) );
-            else
-            {
-                // Выставляем настройки для символа параграфа
-                this.TextPr.Apply_TextPr( TextPr );
-            }
-
-            // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
-            // меняются сейчас. Например, у нас изменен только размер шрифта, то удаляем запись о размере шрифта.
-            for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
-            {
-                if ( this.Content[Pos].Type == para_TextPr )
+                if ( para_Run === this.Content[EndPos].Type )
                 {
-                    this.Content[Pos].Apply_TextPr( TextPr );
+                    var CenterRunPos = this.Internal_ReplaceRun( EndPos, NewElements );
+
+                    // TODO: разобраться здесь получше, как правильно обновлять позицию
+                    if ( StartPos === this.CurPos.ContentPos )
+                        this.CurPos.ContentPos = CenterRunPos;
+
+                    // Подправим селект
+                    this.Selection.StartPos = CenterRunPos;
+                    this.Selection.EndPos   = CenterRunPos;
+
                 }
             }
-
-            return;
-        }
-
-        // При изменении шрифта ведем себе следующим образом:
-        // 1. Если мы в конце параграфа, тогда добавляем запись о шрифте (применимо к знаку конца параграфа)
-        // 2. Если справа или слева стоит пробел (начало параграфа или перенос строки(командный)), тогда ставим метку со шрифтом и фокусим канву.
-        // 3. Если мы посередине слова, тогда меняем шрифт для данного слова
-
-        var oEnd   = this.Internal_FindForward ( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_End, para_NewLine] );
-        var oStart = this.Internal_FindBackward( CurPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
-        var CurType = this.Content[CurPos].Type;
-
-        if ( !oEnd.Found )
-            return;
-
-        if ( para_End == oEnd.Type )
-        {
-            // Вставляем запись о новых настройках перед концом параграфа, а текущую позицию выставляем на конец параграфа
-            var Pos = oEnd.LetterPos;
-
-            var TextPr_start = this.Internal_GetTextPr( Pos );
-            TextPr_start.Merge( TextPr );
-
-            this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
-            this.Set_ContentPos( Pos + 1, false, -1 );
-
-            if ( true === this.IsEmpty() && undefined === this.Numbering_Get() )
+            else
             {
-                // Выставляем настройки для символа параграфа
-                this.TextPr.Apply_TextPr( TextPr );
+                var Direction = 1;
+                if ( StartPos > EndPos )
+                {
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos = Temp;
+
+                    Direction = -1;
+                }
+
+                for ( var CurPos = StartPos + 1; CurPos < EndPos; CurPos++ )
+                {
+                    this.Content[CurPos].Apply_TextPr( TextPr );
+                }
+
+
+                var NewElements = this.Content[EndPos].Apply_TextPr( TextPr );
+                if ( para_Run === this.Content[EndPos].Type )
+                    this.Internal_ReplaceRun( EndPos, NewElements );
+
+                var NewElements = this.Content[StartPos].Apply_TextPr( TextPr );
+                if ( para_Run === this.Content[StartPos].Type )
+                    this.Internal_ReplaceRun( StartPos, NewElements );
+
+                // Заметим, что здесь не нужно подправлять метки выделения, за счет того, что EndPos - StartPos > 1 и
+                // сами метки подправляются в функиях Internal_Content_Add.
             }
-        }
-        else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
-        {
-            var TextPr_old = this.Internal_GetTextPr( CurPos );
-            var TextPr_new = TextPr_old.Copy();
-            TextPr_new.Merge( TextPr );
-
-            this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
-            this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
-
-            this.Set_ContentPos( CurPos + 1, false, -1 );
-            this.RecalculateCurPos();
         }
         else
         {
-            // Мы находимся посередине слова. В начале слова ставим запись о новом шрифте,
-            // а в конце слова старый шрифт. Кроме этого, надо удалить все записи о шрифте внутри слова.
+            var Pos = this.CurPos.ContentPos;
+            var Element = this.Content[Pos];
+            var NewElements = Element.Apply_TextPr( TextPr );
 
-            // Найдем начало слова
-            var oWordStart = this.Internal_FindBackward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_NewLine] );
-            if ( !oWordStart.Found )
-                oWordStart = this.Internal_FindForward( 0, [para_Text] );
-            else
-                oWordStart.LetterPos++;
-
-            var oWordEnd   = this.Internal_FindForward( CurPos, [para_PageNum, para_Drawing, para_Tab, para_Space, para_End, para_NewLine] );
-
-            if ( !oWordStart.Found || !oWordEnd.Found )
-                return;
-
-            // Рассчитываем настройки, которые используются после слова
-            var TextPr_end   = this.Internal_GetTextPr( oWordEnd.LetterPos );
-            var TextPr_start = this.Internal_GetTextPr( oWordStart.LetterPos );
-            TextPr_start.Merge( TextPr );
-
-            this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
-            this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
-
-            this.Set_ContentPos( CurPos + 1, false, -1 );
-
-            // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
-            // меняются сейчас. Например, у нас изменен только размер шрифта, то удаляем запись о размере шрифта.
-            for ( var Pos = oWordStart.LetterPos + 1; Pos < oWordEnd.LetterPos; Pos++ )
+            if ( para_Run === Element.Type )
             {
-                if ( this.Content[Pos].Type == para_TextPr )
-                    this.Content[Pos].Apply_TextPr( TextPr );
+                var CenterRunPos = this.Internal_ReplaceRun( Pos, NewElements );
+                this.CurPos.ContentPos = CenterRunPos;
+                this.CurPos.Line       = -1;
             }
         }
+    },
+
+    Internal_ReplaceRun : function(Pos, NewRuns)
+    {
+        // По логике, можно удалить Run, стоящий в позиции Pos и добавить все раны, которые не null в массиве NewRuns.
+        // Но, согласно работе ParaRun.Apply_TextPr, в массиве всегда идет ровно 3 рана (возможно null). Второй ран
+        // всегда не null. Первый не null ран и есть ран, идущий в позиции Pos.
+
+        var LRun = NewRuns[0];
+        var CRun = NewRuns[1];
+        var RRun = NewRuns[2];
+
+        // CRun - всегда не null
+        var CenterRunPos = Pos;
+
+        if ( null !== LRun )
+        {
+            this.Internal_Content_Add( Pos + 1, CRun );
+            CenterRunPos = Pos + 1;
+        }
+        else
+        {
+            // Если LRun - null, значит CRun - это и есть тот ран который стоит уже в позиции Pos
+        }
+
+        if ( null !== RRun )
+            this.Internal_Content_Add( CenterRunPos + 1, RRun );
+
+        return CenterRunPos;
     },
 
     Internal_AddHyperlink : function(Hyperlink_start)
@@ -18658,6 +18945,11 @@ CParagraphContentPos.prototype =
     {
         this.Data[Depth] = Pos;
         this.Depth = Depth + 1;
+    },
+
+    Update2 : function(Pos, Depth)
+    {
+        this.Data[Depth] = Pos;
     },
 
     Set : function(OtherPos)

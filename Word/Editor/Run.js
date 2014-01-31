@@ -121,7 +121,7 @@ ParaRun.prototype =
     // Добавляем элемент в позицию с сохранием в историю
     Add_ToContent : function(Pos, Item, UpdatePosition)
     {
-        History.Add( this, { Type : historyitem_Run_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+        History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
 
         if ( true === UpdatePosition )
@@ -200,7 +200,7 @@ ParaRun.prototype =
                 this.State.ContentPos = Pos;
 
             // Обновим начало и конец селекта
-            if ( true === this.Selection.Use )
+            if ( true === this.State.Selection.Use )
             {
                 if ( this.State.Selection.StartPos <= this.State.Selection.EndPos )
                 {
@@ -265,6 +265,17 @@ ParaRun.prototype =
 //            // Передвинем все метки слов для проверки орфографии
 //            this.SpellChecker.Update_OnRemove( this, Pos, Count );
         }
+
+        // Отмечаем, что надо перемерить элементы в данном ране
+        this.RecalcInfo.Measure = true;
+    },
+
+    Concat_ToContent : function(NewItems)
+    {
+        var StartPos = this.Content.length;
+        this.Content = this.Content.concat( NewItems );
+
+        History.Add( this, { Type : historyitem_ParaRun_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : NewItems } );
 
         // Отмечаем, что надо перемерить элементы в данном ране
         this.RecalcInfo.Measure = true;
@@ -483,7 +494,7 @@ ParaRun.prototype =
             return false;
 
         var Type = Changes[0].Data.Type;
-        if ( historyitem_Run_AddItem === Type || historyitem_Run_RemoveItem === Type )
+        if ( historyitem_ParaRun_AddItem === Type || historyitem_ParaRun_RemoveItem === Type )
             return true;
 
         return false;
@@ -493,7 +504,7 @@ ParaRun.prototype =
     Get_SimpleChanges_ParaPos : function(Changes)
     {
         var Change = Changes[0].Data;
-        var Pos    = ( Changes[0].Data.Type === historyitem_Run_AddItem ? Change.Pos : Change.StartPos );
+        var Pos    = ( Changes[0].Data.Type === historyitem_ParaRun_AddItem ? Change.Pos : Change.StartPos );
 
         var CurLine  = 0;
         var CurRange = 0;
@@ -511,6 +522,23 @@ ParaRun.prototype =
         }
 
         return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
+    },
+
+    Split : function (ContentPos, Depth)
+    {
+        var CurPos = ContentPos.Get(Depth);
+
+        // Создаем новый ран
+        var NewRun = new ParaRun(this.Document, this.Parent);
+
+        // Копируем настройки
+        NewRun.Set_Pr( this.Pr.Copy() );
+
+        // Разделяем содержимое по ранам
+        NewRun.Concat_ToContent( this.Content.slice(CurPos) );
+        this.Remove_FromContent( CurPos, this.Content.length - CurPos, true );
+
+        return NewRun;
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -2376,6 +2404,9 @@ ParaRun.prototype =
     // Проверяем нужно ли поправить позицию курсора
     Cursor_Is_NeededCorrectPos : function()
     {
+        if ( true === this.Is_Empty(false) )
+            return true;
+
         var NewRangeStart = false;
         var RangeEnd      = false;
 
@@ -2564,6 +2595,27 @@ ParaRun.prototype =
     {
         var Pos = ContentPos.Get(Depth);
         this.State.ContentPos = Pos;
+    },
+
+    Get_RunElementByPos : function(ContentPos, Depth)
+    {
+        if ( undefined !== ContentPos )
+        {
+            var CurPos = ContentPos.Get(Depth);
+            var ContentLen = this.Content.length;
+
+            if ( CurPos >= this.Content.length || CurPos < 0 )
+                return null;
+
+            return this.Content[CurPos];
+        }
+        else
+        {
+            if ( this.Content.length > 0 )
+                return this.Content[0];
+            else
+                return null;
+        }
     },
 
     Get_LeftPos : function(SearchPos, ContentPos, Depth, UseContentPos)
@@ -3133,10 +3185,141 @@ ParaRun.prototype =
     Set_Pr : function(TextPr)
     {
         var OldValue = this.Pr;
-        this.Pr = Value;
+        this.Pr = TextPr;
 
-        History.Add( this, { Type : historyitem_ParaRun_TextPr, New : Value, Old : OldValue } );
+        History.Add( this, { Type : historyitem_ParaRun_TextPr, New : TextPr, Old : OldValue } );
         this.Recalc_CompiledPr(true);
+    },
+
+    Apply_TextPr : function(TextPr)
+    {
+        var Result = [];
+        var LRun = this, CRun = null, RRun = null;
+
+        if ( true === this.State.Selection.Use )
+        {
+            var StartPos = this.State.Selection.StartPos;
+            var EndPos   = this.State.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos = Temp;
+            }
+
+            // Если выделено не до конца, тогда разделяем по последней точке
+            if ( EndPos < this.Content.length )
+            {
+                RRun = LRun.Split_Run( EndPos );
+            }
+
+            // Если выделено не с начала, тогда делим по начальной точке
+            if ( StartPos > 0 )
+            {
+                CRun = LRun.Split_Run( StartPos );
+            }
+            else
+            {
+                CRun = LRun;
+                LRun = null;
+            }
+
+            if ( null !== LRun )
+                LRun.Selection_Remove();
+
+            CRun.Select_All();
+            CRun.Apply_Pr( TextPr );
+
+            if ( null !== RRun )
+                RRun.Selection_Remove();
+        }
+        else
+        {
+            var CurPos = this.State.ContentPos;
+
+            // Если выделено не до конца, тогда разделяем по последней точке
+            if ( CurPos < this.Content.length )
+            {
+                RRun = LRun.Split_Run( CurPos );
+            }
+
+            if ( CurPos > 0 )
+            {
+                CRun = LRun.Split_Run( CurPos );
+            }
+            else
+            {
+                CRun = LRun;
+                LRun = null;
+            }
+
+            if ( null !== LRun )
+                LRun.Selection_Remove();
+
+            CRun.Selection_Remove();
+            CRun.Cursor_MoveToStartPos();
+            CRun.Apply_Pr( TextPr );
+
+            if ( null !== RRun )
+                RRun.Selection_Remove();
+        }
+
+        Result.push( LRun );
+        Result.push( CRun );
+        Result.push( RRun );
+
+        return Result;
+    },
+
+    Split_Run : function(Pos)
+    {
+        // Создаем новый ран
+        var NewRun = new ParaRun(this.Document, this.Parent);
+
+        // Копируем настройки
+        NewRun.Set_Pr( this.Pr.Copy() );
+
+        var OldCrPos = this.State.ContentPos;
+        var OldSSPos = this.State.Selection.StartPos;
+        var OldSEPos = this.State.Selection.EndPos;
+
+        // Разделяем содержимое по ранам
+        NewRun.Concat_ToContent( this.Content.slice(Pos) );
+        this.Remove_FromContent( Pos, this.Content.length - Pos, true );
+
+        // Подправим точки селекта и текущей позиции
+        if ( OldCrPos >= Pos )
+        {
+            NewRun.State.ContentPos = OldCrPos - Pos;
+            this.State.ContentPos   = this.Content.length;
+        }
+        else
+        {
+            NewRun.State.ContentPos = 0;
+        }
+
+        if ( OldSSPos >= Pos )
+        {
+            NewRun.State.Selection.StartPos = OldSSPos - Pos;
+            this.State.Selection.StartPos   = this.Content.length;
+        }
+        else
+        {
+            NewRun.State.Selection.StartPos = 0;
+        }
+
+        if ( OldSEPos >= Pos )
+        {
+            NewRun.State.Selection.EndPos = OldSEPos - Pos;
+            this.State.Selection.EndPos   = this.Content.length;
+        }
+        else
+        {
+            NewRun.State.Selection.EndPos = 0;
+        }
+
+        return NewRun;
     },
 
     // В данной функции мы применяем приходящие настройки поверх старых, т.е. старые не удаляем
@@ -3188,7 +3371,7 @@ ParaRun.prototype =
             this.Set_RFonts2( TextPr.RFonts );
 
         if ( undefined != TextPr.Lang )
-            this.Set_Lang( TextPr.Lang );
+            this.Set_Lang2( TextPr.Lang );
     },
 
     Set_Bold : function(Value)
@@ -3538,8 +3721,23 @@ ParaRun.prototype =
         if ( undefined != Value )
             this.Pr.Lang.Set_FromObject( Value );
 
-        History.Add( this, { Type : historyitem_ParaRun_Lang, New : NewValue, Old : OldValue } );
+        History.Add( this, { Type : historyitem_ParaRun_Lang, New : this.Pr.Lang, Old : OldValue } );
         this.Recalc_CompiledPr(false);
+    },
+
+    Set_Lang2 : function(Lang)
+    {
+        if ( undefined != Lang )
+        {
+            if ( undefined != Lang.Bidi )
+                this.Set_Lang_Bidi( Lang.Bidi );
+
+            if ( undefined != Lang.EastAsia )
+                this.Set_Lang_EastAsia( Lang.EastAsia );
+
+            if ( undefined != Lang.Val )
+                this.Set_Lang_Val( Lang.Val );
+        }
     },
 
     Set_Lang_Bidi : function(Value)
@@ -3610,8 +3808,28 @@ ParaRun.prototype =
     Load_Changes : function(Reader)
     {
 
-    }
+    },
 
+    Write_ToBinary2 : function(Writer)
+    {
+
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+
+    },
+
+
+    Write_ToBinary : function(Writer)
+    {
+        // TODO: Скорее всего надо будет убрать эти функции
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // TODO: Скорее всего надо будет убрать эти функции
+    },
 };
 
 function CParaRunSelection()
