@@ -99,7 +99,7 @@ CChartsDrawer.prototype =
 	
 	_calculatePositionDlbl: function(chartSpace, ser, val)
 	{	
-		this.chart._calculateDLbl(chartSpace, ser, val);
+		return this.chart._calculateDLbl(chartSpace, ser, val);
 	},
 	
 	_calculateProperties: function(chartProp)
@@ -2300,19 +2300,19 @@ drawLineChart.prototype =
 			
 			var dataSeries = seria.val.numRef.numCache.pts;
 			
-			var y, y1, x, x1, val, prevVal, tempVal;
+			var y, y1, x, x1, val, nextVal, tempVal;
 		
-			for(var n = 1; n < dataSeries.length; n++)
+			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
 				//рассчитываем значения				
-				prevVal = this._getYVal(n - 1, i) - min;
 				val = this._getYVal(n, i) - min;
+				nextVal = this._getYVal(n + 1, i) - min;
 				
-				y  = trueHeight - (prevVal)*koffY + this.chartProp.chartGutter._top;
-				y1 = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
+				y  = trueHeight - (val)*koffY + this.chartProp.chartGutter._top;
+				y1 = trueHeight - (nextVal)*koffY + this.chartProp.chartGutter._top;
 				
-				x  = this.chartProp.chartGutter._left + (n - 1)*koffX + koffX/2; 
-				x1 = this.chartProp.chartGutter._left + n*koffX + koffX/2;
+				x  = this.chartProp.chartGutter._left + (n)*koffX + koffX/2; 
+				x1 = this.chartProp.chartGutter._left + (n + 1)*koffX + koffX/2;
 				
 				if(!this.paths.series)
 					this.paths.series = [];
@@ -2337,12 +2337,14 @@ drawLineChart.prototype =
 	{
 		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
 		var path;
-		if(ser == this.paths.series[ser].length - 1)
-			path = this.paths.series[ser][val].ArrPathCommand[1];
+		
+		if(val == this.chartProp.series[ser].val.numRef.numCache.pts.length - 1)
+			path = this.paths.series[ser][val - 1].ArrPathCommand[1];
 		else
 			path = this.paths.series[ser][val].ArrPathCommand[0];
-		var x = path.x;
-		var y = path.y;
+			
+		var x = path.X;
+		var y = path.Y;
 		
 		var pxToMm = this.chartProp.pxToMM;
 		var constMargin = 5 / pxToMm;
@@ -2416,7 +2418,7 @@ drawLineChart.prototype =
 			pen = seria.pen;
 			
 			dataSeries = seria.val.numRef.numCache.pts;
-			for(var n = 1; n < dataSeries.length; n++)
+			for(var n = 0; n < dataSeries.length - 1; n++)
 			{
 				if(seria.val.numRef.numCache.pts[n].pen)
 					pen = seria.val.numRef.numCache.pts[n].pen;
