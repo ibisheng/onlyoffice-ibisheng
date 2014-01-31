@@ -604,11 +604,13 @@
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 			if ( graphicObjects.length && t.enableKeyEvents ) {
-				t.handlers.trigger("graphicObjectWindowKeyDown", event);
+				var result = t.handlers.trigger("graphicObjectWindowKeyDown", event);
 				if (t.isCellEditMode) {
 					t.handlers.trigger("stopCellEditing");
 					t.isCellEditMode = false;
 				}
+				if (result)
+					return result;
 			}
 
 			// Двигаемся ли мы в выделенной области

@@ -5521,7 +5521,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
                     }
                 }
-                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
             case STATES_ID_GROUP:
@@ -5583,7 +5583,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         group.select(drawingObjectsController);
                     }
                 }
-                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
         }
