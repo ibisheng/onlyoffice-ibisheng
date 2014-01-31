@@ -1,4 +1,4 @@
-п»ї"use strict";
+"use strict";
 
 function CAreaChart()
 {
@@ -3132,6 +3132,9 @@ function CDLbl()
 
 	this.parent = null;
 	
+	this.anchorX = null;
+	this.anchorY = null;
+	
 	this.recalcInfo = 
 	{
 		recalcTransform: true, 
@@ -3142,8 +3145,14 @@ function CDLbl()
 		recalculatePen: true
 	}
 	
-	this.chart = null;//РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ РїСЂРё РїРµСЂРµСЃС‡РµС‚Рµ
-	this.series = null;//РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ РїСЂРё РїРµСЂРµСЃС‡РµС‚Рµ
+	this.chart = null;//выставляется при пересчете
+	this.series = null;//выставляется при пересчете
+	
+	this.x = 0;
+	this.y = 0;
+	this.calcX = null;
+	this.calcY = null;
+	
 
 	
 	this.txBody = null;
@@ -3220,6 +3229,10 @@ CDLbl.prototype =
 				this.recalculateTransformText();
 				this.recalcInfo.recalcTranformText = false;
 			}
+			if(this.chart)
+			{
+				this.chart.addToSetPosition(this);
+			}
 		}, this, []);
 	},
 	
@@ -3238,8 +3251,32 @@ CDLbl.prototype =
 	
 	recalculateTransform: function()
 	{
+		if(this.layout && this.layout.manualLayout)
+		{
+			if(typeof this.layout.manualLayout.x === "number")
+			{
+				this.calcX = this.chart.extX*this.layout.x + this.x;
+			}
+			else
+			{
+				this.calcX = this.x;
+			}
+			if(typeof this.layout.manualLayout.y === "number")
+			{
+				this.calcY = this.chart.extY*this.layout.y + this.y;
+			}
+			else
+			{
+				this.calcY = this.y;
+			}
+		}
+		else
+		{
+			this.calcX = this.x;
+			this.calcY = this.y;
+		}
 		this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.calcX, this.calcY);
         if (isRealObject(this.chart)) 
 		{
             global_MatrixTransformer.MultiplyAppend(this.transform, this.chart.getTransformMatrix());
@@ -3250,7 +3287,7 @@ CDLbl.prototype =
 	recalculateTransformText: function()
 	{
 		this.transformText.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transformText, this.x + 1, this.y + 0.5);
+        global_MatrixTransformer.TranslateAppend(this.transformText, this.calcX + 1, this.calcY + 0.5);
         if (isRealObject(this.chart)) 
 		{
             global_MatrixTransformer.MultiplyAppend(this.transformText, this.chart.getTransformMatrix());
@@ -3382,8 +3419,8 @@ CDLbl.prototype =
 		
 		if(this.txBody)
 		{
-			var max_box_width = this.chart.extX/5.1;/*РїРѕР»СѓС‡РµРЅРѕ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅС‹Рј РїСѓС‚РµРј РЅСѓР¶РЅРѕ СѓС‚РѕС‡РЅРёС‚СЊ*/
-			var max_content_width = max_box_width - 1.25;/*excel СЃР»РµРІР° РґРµР»Р°РµС‚ РѕС‚СЃС‚СѓРї 1РјРј Р° СЃРїСЂР°РІР° 0.25РјРј*/
+			var max_box_width = this.chart.extX/5.1;/*получено экспериментальным путем нужно уточнить*/
+			var max_content_width = max_box_width - 1.25;/*excel слева делает отступ 1мм а справа 0.25мм*/
 			var content = this.txBody.content;
 			content.Reset(0, 0, max_content_width, 20000);
 			content.Recalculate_Page(0, true);
@@ -3404,7 +3441,7 @@ CDLbl.prototype =
 			content.Reset(0, 0, max_width, 20000);
 			content.Recalculate_Page(0, true);
 			this.extX = max_width + 1.25;
-			this.extY = this.txBody.content.Get_SummaryHeight() + 1/*РїРѕ РїРѕР»РјРёР»Р»РёРјРµС‚СЂР° СЃРІРµСЂС…Сѓ Рё СЃРЅРёР·Сѓ РѕС‚СЃС‚СѓРїС‹*/;
+			this.extY = this.txBody.content.Get_SummaryHeight() + 1/*по полмиллиметра сверху и снизу отступы*/;
 			this.x = 0;
 			this.y = 0;
 		}

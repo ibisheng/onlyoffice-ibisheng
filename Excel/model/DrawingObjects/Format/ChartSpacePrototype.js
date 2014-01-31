@@ -35,7 +35,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
 		recalculateSeriesColors: true,
 		recalculateMarkers: true,
 		recalculateGridLines: true,
-		recalculateDLbls: true
+		recalculateDLbls: true,
+		dataLbls:[]
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -65,6 +66,12 @@ CChartSpace.prototype.recalcDLbls = function()
 {
     this.recalcInfo.recalculateDLbls = true;
 };
+
+CChartSpace.prototype.addToSetPosition = function(dLbl)
+{
+	this.recalcInfo.dataLbls.push(dLbl);
+};
+
 CChartSpace.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
 CChartSpace.prototype.handleUpdatePosition = function()
@@ -109,6 +116,8 @@ CChartSpace.prototype.canRotate = function()
 {
 	return false;
 }
+
+
 
 CChartSpace.prototype.createResizeTrack = CShape.prototype.createResizeTrack;
 CChartSpace.prototype.createMoveTrack = CShape.prototype.createMoveTrack;
@@ -199,16 +208,22 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateGridLines();
 			this.recalcInfo.recalculateGridLines = false;
 		}
-		if(this.recalcInfo.recalculateChart)
-		{
-			this.recalculateChart();
-			this.recalcInfo.recalculateChart = false;
-		}
 		if(this.recalcInfo.recalculateDLbls)
 		{
 			this.recalculateDLbls();
 			this.recalcInfo.recalculateDLbls = false;
 		}
+		if(this.recalcInfo.recalculateChart)
+		{
+			this.recalculateChart();
+			this.recalcInfo.recalculateChart = false;
+		}
+		for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
+		{
+			var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx);
+			this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+		}
+		this.recalcInfo.dataLbls.length = 0;
 	}, this, []);
 };
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
@@ -924,7 +939,6 @@ CChartSpace.prototype.recalculateDLbls = function()
 					pt.compiledDlb.chart = this;
 					pt.compiledDlb.series = ser;
 					pt.compiledDlb.pt = pt;
-					
 					pt.compiledDlb.recalculate();
 				}
 			}
