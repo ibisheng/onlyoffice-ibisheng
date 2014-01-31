@@ -407,6 +407,8 @@ CChartsDrawer.prototype =
 	{
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
+        var theme, colorMap, RGBA;
+
 		if(api_sheet)
 		{
 			var wb = api_sheet.wbModel;
@@ -458,7 +460,7 @@ CChartsDrawer.prototype =
 		var min = 0; 
 		var minY = 0;
 		var maxY = 0;
-		var newArr;
+		var newArr, formatAdobeLabel;
 		
 		var series = chart.chart.plotArea.chart.series;
 		if(series && series.length != 0 && this.calcProp.type != 'Scatter')//берём данные из NumCache
@@ -895,7 +897,7 @@ CChartsDrawer.prototype =
         var original_max = max;
 
         var mainObj = obj;
-
+        var greaterNullNum;
  
 		if(( 'Bar' == mainObj.type || 'Line' == mainObj.type || 'Area' == mainObj.type) && mainObj.subType == 'stackedPer')
 		{
@@ -2583,7 +2585,7 @@ drawAreaChart.prototype =
 		var brush;
 		var FillUniColor;
 		var pen;
-		var y, y1, x, x1, val, prevVal, tempVal;
+		var seria, dataSeries;
 		for (i = 0; i < this.chartProp.series.length; i++) {
 			
 			//в случае накопительных дигарамм, рисуем в обратном порядке
@@ -3039,7 +3041,7 @@ drawScatterChart.prototype =
 		var koffX = trueWidth/digHeightOx;
 		var koffY = trueHeight/digHeightOy;	
 		
-		var seria, yVal, xVal, points;
+		var seria, yVal, xVal, points, x, x1, y, y1;
 		for(var i = 0; i < this.chartProp.series.length; i++)
 		{
 			seria = this.chartProp.series[i];
@@ -3541,7 +3543,7 @@ areaChart.prototype =
 		FillUniColor.G = 255;
 		FillUniColor.B = 255;
 		
-		lineWidth = 1;
+		var lineWidth = 1;
 		this._drawPath(this.paths, lineWidth, StrokeUniColor, FillUniColor);
 	},
 	
