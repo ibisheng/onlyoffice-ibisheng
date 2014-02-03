@@ -7326,21 +7326,153 @@ Paragraph.prototype =
         }
         else
         {
+            // TODO: Разобраться с гиперссылками, комментариями при удалении
+
+            var Direction = nCount;
+            var Result = true;
+
             if ( true === this.Selection.Use )
             {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
 
+                if ( StartPos > EndPos )
+                {
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                // Сразу проверим последний элемент на попадание ParaEnd в селект
+                if ( EndPos === this.Content.length - 1 && true === this.Content[EndPos].Selection_CheckParaEnd() )
+                    Result = false;
+
+                if ( StartPos === EndPos )
+                {
+                    this.Content[StartPos].Remove(nCount, bOnAddText);
+
+                    // Мы не удаляем последний элемент с ParaEnd
+                    if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty(false) )
+                    {
+                        this.Internal_Content_Remove( StartPos );
+
+                        this.CurPos.ContentPos = StartPos;
+                        this.Content[StartPos].Cursor_MoveToStartPos();
+                    }
+                }
+                else
+                {
+                    this.Content[EndPos].Remove(nCount, bOnAddText);
+
+                    // Мы не удаляем последний элемент с ParaEnd
+                    if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty(false) )
+                    {
+                        this.Internal_Content_Remove( EndPos );
+
+                        this.CurPos.ContentPos = EndPos;
+                        this.Content[EndPos].Cursor_MoveToStartPos();
+                    }
+
+                    for ( var CurPos = EndPos - 1; CurPos > StartPos; CurPos-- )
+                    {
+                        this.Internal_Content_Remove( CurPos );
+                    }
+
+                    this.Content[StartPos].Remove(nCount, bOnAddText);
+
+                    // Мы не удаляем последний элемент с ParaEnd
+                    if ( true === this.Content[StartPos].Is_Empty(false) )
+                        this.Internal_Content_Remove( StartPos );
+                }
             }
             else
             {
                 var ContentPos = this.CurPos.ContentPos;
 
-                if ( false === this.Content[ContentPos].Remove(nCount, bOnAddText) )
+                while ( false === this.Content[ContentPos].Remove( Direction, bOnAddText ) )
                 {
+                    if ( Direction < 0 )
+                        ContentPos--;
+                    else
+                        ContentPos++;
+
+                    if ( ContentPos < 0 || ContentPos >= this.Content.length )
+                        break;
+
+                    if ( Direction < 0 )
+                        this.Content[ContentPos].Cursor_MoveToEndPos(false);
+                    else
+                        this.Content[ContentPos].Cursor_MoveToStartPos();
 
                 }
 
-                return true;
+                if ( ContentPos < 0 || ContentPos >= this.Content.length )
+                    Result = false;
+                else
+                {
+                    if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty(false) )
+                    {
+                        this.Internal_Content_Remove( ContentPos );
+
+                        this.CurPos.ContentPos = ContentPos;
+                        this.Content[ContentPos].Cursor_MoveToStartPos();
+                    }
+                    else
+                    {
+                        this.CurPos.ContentPos = ContentPos;
+                    }
+                }
+
+                if ( Direction < 0 && false === Result )
+                {
+                    // Мы стоим в начале параграфа и пытаемся удалить элемент влево. Действуем следующим образом:
+                    // 1. Если у нас параграф с нумерацией, тогда удаляем нумерацию, но при этом сохраняем
+                    //    значения отступов так как это делается в Word. (аналогично работаем с нумерацией в презентациях)
+                    // 2. Если у нас отступ первой строки ненулевой, тогда:
+                    //    2.1 Если он положительный делаем его нулевым.
+                    //    2.2 Если он отрицательный сдвигаем левый отступ на значение отступа первой строки,
+                    //        а сам отступ первой строки делаем нулевым.
+                    // 3. Если у нас ненулевой левый отступ, делаем его нулевым
+                    // 4. Если ничего из предыдущего не случается, тогда говорим родительскому классу, что удаление
+                    //    не было выполнено.
+
+                    Result = true;
+
+                    var Pr = this.Get_CompiledPr2(false).ParaPr;
+                    if ( undefined != this.Numbering_Get() )
+                    {
+                        this.Numbering_Remove();
+                        this.Set_Ind( { FirstLine : 0, Left : Math.max( Pr.Ind.Left, Pr.Ind.Left + Pr.Ind.FirstLine ) }, false );
+                    }
+                    else if ( numbering_presentationnumfrmt_None != this.PresentationPr.Bullet.Get_Type() )
+                    {
+                        this.Remove_PresentationNumbering();
+                    }
+                    else if ( align_Right === Pr.Jc )
+                    {
+                        this.Set_Align( align_Center );
+                    }
+                    else if ( align_Center === Pr.Jc )
+                    {
+                        this.Set_Align( align_Left );
+                    }
+                    else if ( Math.abs(Pr.Ind.FirstLine) > 0.001 )
+                    {
+                        if ( Pr.Ind.FirstLine > 0 )
+                            this.Set_Ind( { FirstLine : 0 }, false );
+                        else
+                            this.Set_Ind( { Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0 }, false );
+                    }
+                    else if ( Math.abs(Pr.Ind.Left) > 0.001 )
+                    {
+                        this.Set_Ind( { Left : 0 }, false );
+                    }
+                    else
+                        Result = false;
+                }
             }
+
+            return Result;
         }
     },
 

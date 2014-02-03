@@ -118,6 +118,78 @@ ParaRun.prototype =
         this.Add_ToContent( this.State.ContentPos, Item, true );
     },
 
+    Remove : function(Direction, bOnAddText)
+    {
+        var Selection = this.State.Selection;
+
+        if ( true === Selection.Use )
+        {
+            var StartPos = Selection.StartPos;
+            var EndPos   = Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                var Temp = StartPos;
+                StartPos = EndPos;
+                EndPos   = Temp;
+            }
+
+            // Если в выделение попадает ParaEnd, тогда удаляем все кроме этого элемента
+            if ( true === this.Selection_CheckParaEnd() )
+            {
+                for ( var CurPos = EndPos - 1; CurPos >= StartPos; CurPos-- )
+                {
+                    if ( para_End !== this.Content[CurPos].Type )
+                        this.Remove_FromContent( CurPos, 1 );
+                }
+            }
+            else
+            {
+                this.Remove_FromContent( StartPos, EndPos - StartPos, true );
+            }
+
+            this.Selection_Remove();
+            this.State.ContentPos = StartPos;
+        }
+        else
+        {
+            var CurPos = this.State.ContentPos;
+
+            if ( Direction < 0 )
+            {
+                if ( CurPos <= 0 )
+                    return false;
+
+                // Проверяем, возможно предыдущий элемент - инлайн картинка, тогда мы его не удаляем, а выделяем как картинку
+                if ( para_Drawing == this.Content[CurPos - 1].Type && true === this.Content[CurPos - 1].Is_Inline() )
+                {
+                    return this.Paragraph.Parent.Select_DrawingObject( this.Content[CurPos - 1].Get_Id() );
+                }
+
+                this.Remove_FromContent( CurPos - 1, 1 );
+
+                this.State.ContentPos = CurPos - 1;
+            }
+            else
+            {
+                if ( CurPos >= this.Content.length || para_End === this.Content[CurPos].Type )
+                    return false;
+
+                // Проверяем, возможно следующий элемент - инлайн картинка, тогда мы его не удаляем, а выделяем как картинку
+                if ( para_Drawing == this.Content[CurPos].Type && true === this.Content[CurPos].Is_Inline() )
+                {
+                    return this.Paragraph.Parent.Select_DrawingObject( this.Content[CurPos].Get_Id() );
+                }
+
+                this.Remove_FromContent( CurPos, 1 );
+
+                this.State.ContentPos = CurPos;
+            }
+        }
+
+        return true;
+    },
+
     // Добавляем элемент в позицию с сохранием в историю
     Add_ToContent : function(Pos, Item, UpdatePosition)
     {
