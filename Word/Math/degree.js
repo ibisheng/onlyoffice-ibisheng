@@ -47,8 +47,6 @@ CDegree.prototype.recalculateSup = function(oMeasure)
     var mgCtrPrp = this.mergeCtrTPrp();
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    //this.dW = 0.216*shCenter;
-
     var height = 0,
         ascent = 0;
 
@@ -78,15 +76,6 @@ CDegree.prototype.recalculateSup = function(oMeasure)
         ascent = base.ascent;
     }
 
-    this.dW = 0.2*shCenter;
-
-    /*var smallAsc = mgCtrPrp.FontSize*0.23;
-
-    if(base.ascent < smallAsc)
-        this.dW = 0.3*shCenter;
-    else
-        this.dW = 0.15*shCenter;*/
-
     var width = base.width + iter.width + this.dW;
 
     this.size = {width: width, height: height, ascent: ascent};
@@ -104,8 +93,6 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     var mgCtrPrp = this.mergeCtrTPrp();
     var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
 
-    //this.dW = 0.216*shCenter;
-    this.dW = 0;
     var width = base.width + iter.width + this.dW;
 
     var low = 0;
@@ -306,6 +293,19 @@ CDegree.prototype.getPropsForWrite = function()
     props.alnScr = this.alnScr;
 
     return props;
+}
+CDegree.prototype.setDistance = function()
+{
+    var mgCtrPrp = this.mergeCtrTPrp();
+
+    if(this.IsPlhIterator())
+        this.dW = 0.008*mgCtrPrp.FontSize;
+    else
+        this.dW = 0.02*mgCtrPrp.FontSize;
+}
+CDegree.prototype.IsPlhIterator = function()
+{
+    return this.elements[0][1].IsPlaceholder();
 }
 
 function CIterators()

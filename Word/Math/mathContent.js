@@ -4978,14 +4978,14 @@ CMathContent.prototype =
             }
 
             if(bSign && bLeftComp)
-            {
                 coeffLeft = coeffLeft - this.getGapsMComp(left).right;
-            }
 
             if(bSign && bRightComp)
-            {
                 coeffRight = coeffRight - this.getGapsMComp(right).left;
-            }
+
+            coeffLeft = Math.ceil(coeffLeft*10)/10;
+            coeffRight = Math.ceil(coeffRight*10)/10;
+
         }
         else if(curr.typeObj == MATH_COMP)
         {
@@ -5033,9 +5033,6 @@ CMathContent.prototype =
         }
 
 
-        coeffLeft = Math.ceil(coeffLeft*10)/10;
-        coeffRight = Math.ceil(coeffRight*10)/10;
-
         var gapSign = 0.1513*wTextRPrp.FontSize;
 
         this.content[posCurr].gaps.left  = Math.ceil(coeffLeft*gapSign*10)/10; // если ни один случай не выполнился, выставляем "нулевые" gaps (default): необходимо, если что-то удалили и объект стал первый или последним в контенте
@@ -5072,12 +5069,18 @@ CMathContent.prototype =
         var coeffLeft  = 0.001,
             coeffRight = 0; // for checkGap.bEmptyGaps
 
+        var bDegree = kind == MATH_DEGREE || kind == MATH_DEGREESubSup;
+
         if(checkGap.bChildGaps)
         {
-            if(kind == MATH_DEGREE || kind == MATH_DEGREESubSup)
+            if(bDegree)
             {
-                coeffLeft  = 0.0;
-                coeffRight = 0.15;
+                coeffLeft  = 0.03;
+
+                if(MComp.IsPlhIterator())
+                    coeffRight = 0.12;
+                else
+                    coeffRight = 0.16;
             }
 
              var gapsChild = MComp.getGapsInside();
@@ -5088,7 +5091,8 @@ CMathContent.prototype =
         else if(bNeedGap)
         {
             coeffLeft = 0.4;
-            coeffRight = 0.26;
+            //coeffRight = 0.26;
+            coeffRight = 0.3;
         }
 
         return {left: coeffLeft, right: coeffRight};
@@ -6184,8 +6188,10 @@ CMathContent.prototype =
 
         if(this.argSize == -1)
         {
-            // aa: 0.0013  bb: 0.66  cc: 0.5 
-            FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
+            // aa: 0.0013  bb: 0.66  cc: 0.5
+            //aa: 0.0009  bb: 0.68  cc: 0.26
+            FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
+            //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
             //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
             tPrp.FontSize = FSize;
         }
@@ -8061,7 +8067,7 @@ function TEST_COEFF_ITERATORS()
     //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
 
     var x1 = 36, x2 = 14, x3 = 72;
-    var d1 = 26, d2 = 10, d3 = 55;
+    var d1 = 26, d2 = 10, d3 = 54;
 
     // || x1*x1   x1  1 ||
     // || x2*x2   x2  1 ||
