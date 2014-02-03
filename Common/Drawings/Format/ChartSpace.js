@@ -1944,6 +1944,7 @@ function CreateLineChart(asc_series, type)
     chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
     chart.setTitle(new CTitle());
+    chart.title.setOverlay(false);
     var disp_blanks_as;
     if(type === GROUPING_STANDARD)
     {

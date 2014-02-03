@@ -251,6 +251,24 @@ CChartSpace.prototype.recalculate = function()
 			this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
 		}
 		this.recalcInfo.dataLbls.length = 0;
+
+        if(this.chart && this.chart.title)
+        {
+            var pos = this.chartObj.reCalculatePositionText("title", this, this.chart.title);
+            this.chart.title.setPosition(pos.x, pos.y);
+        }
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+        {
+            var pos = this.chartObj.reCalculatePositionText("valAx", this, this.chart.plotArea.valAx.title);
+            this.chart.plotArea.valAx.title.setPosition(pos.x, pos.y);
+        }
+        if(this.chart && this.chart.plotArea && this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
+        {
+            var pos = this.chartObj.reCalculatePositionText("catAx", this, this.chart.plotArea.catAx.title);
+            this.chart.plotArea.catAx.title.setPosition(pos.x, pos.y);
+        }
+        this.recalcInfo.axisLabels.length = 0;
+
 	}, this, []);
 };
 
