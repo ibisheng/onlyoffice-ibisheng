@@ -104,7 +104,7 @@ CChartsDrawer.prototype =
 	
 	_calculateProperties: function(chartProp)
 	{
-		this.calcProp.pxToMM = 1/chartProp.convertPixToMM(1);
+		this.calcProp.pxToMM = 1 / chartProp.convertPixToMM(1);
 		
 		this.calcProp.pathH = 1000000000;
 		this.calcProp.pathW = 1000000000;
@@ -3215,6 +3215,62 @@ drawPieChart.prototype =
 
 		path.recalculate(gdLst);
 		return path;	
+	},
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		var pxToMm = this.chartProp.pxToMM;
+		var path = this.paths.series[val].ArrPathCommand;
+		var centerX = path[0].X;
+		var centerY = path[0].Y;
+		
+		var radius = path[2].hR;
+		var stAng = path[2].stAng;
+		var swAng = path[2].swAng;
+		
+		var point = this.chartProp.series[0].val.numRef.numCache.pts[val];
+		
+		var constMargin = 5 / pxToMm;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		//TODO высчитать позиции, как в екселе +  ограничения
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				/*centerX = centerX + radius * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+				centerY = centerY - radius * Math.sin(-1 * stAng - swAng / 2) - height / 2;*/
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+		}
+		if(centerX < 0)
+			centerX = 0;
+		
+		return {x: centerX, y: centerY};
 	},
 	
 	_drawPath : function(path, brush, pen)
