@@ -2917,6 +2917,89 @@ drawHBarChart.prototype =
 		}
     },
 	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		var path = this.paths.series[ser][val].ArrPathCommand;
+			
+		var x = path[0].X;
+		var y = path[0].Y;
+		
+		var h = path[0].Y - path[1].Y;
+		var w = path[2].X - path[1].X;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX, centerY;
+				
+		//TODO высчитать позиции, как в екселе
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y;
+				if( point.val > 0 )
+					centerY = y - height;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y - h/2 - height/2;
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				centerX = x;
+				centerY = y - h/2 - height/2;
+				if( point.val < 0 )
+					centerX = x + w - width;
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				centerX = x + w - width;
+				centerY = y - h/2 - height/2;
+				if( point.val < 0 )
+					centerX = x;
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				centerX = x + w;
+				centerY = y - h/2 - height/2;
+				if( point.val < 0 )
+					centerX = x - width;
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				break;
+			}
+		}
+		
+		if(centerX < 0)
+			centerX = 0;
+			
+		return {x: centerX, y: centerY};
+	},
+	
 	_calculateRect : function(x, y, w, h)
 	{
 		var path  = new Path();
