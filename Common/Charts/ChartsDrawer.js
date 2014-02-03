@@ -894,7 +894,7 @@ CChartsDrawer.prototype =
 		
 		//left margin = vertical axis(if min x == 0) + vertical title + width of legend;
 		this.calcProp.chartGutter._left = standartMargin;
-		if(chartSpace.chart.plotArea.valAx.title != undefined)
+		if(chartSpace.chart.plotArea.valAx.title != null)
 			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.title.extX * pxToMM;
 		
 		//right margin = legend;
@@ -902,12 +902,12 @@ CChartsDrawer.prototype =
 		
 		//top margin = legend + title;
 		this.calcProp.chartGutter._top = standartMargin;
-		if(chartSpace.chart.title.extY !== undefined)
+		if(chartSpace.chart.title !== null)
 			this.calcProp.chartGutter._top += chartSpace.chart.title.extY * pxToMM;
 		
 		//bottom margin = legend + horizontal title +  horizontal axis(if min y == 0);
 		this.calcProp.chartGutter._bottom = standartMargin;
-		if(chartSpace.chart.plotArea.catAx.title != undefined)
+		if(chartSpace.chart.plotArea.catAx.title != null)
 			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.title.extY * pxToMM;
 	},
 	
