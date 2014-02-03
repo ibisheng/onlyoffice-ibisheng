@@ -36,7 +36,9 @@ CChartSpace.prototype.setRecalculateInfo = function()
 		recalculateMarkers: true,
 		recalculateGridLines: true,
 		recalculateDLbls: true,
-		dataLbls:[]
+        recalculateAxisLabels: true,
+		dataLbls:[],
+        axisLabels: []
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -69,7 +71,10 @@ CChartSpace.prototype.recalcDLbls = function()
 
 CChartSpace.prototype.addToSetPosition = function(dLbl)
 {
-	this.recalcInfo.dataLbls.push(dLbl);
+    if(dLbl instanceof CDLbl)
+	    this.recalcInfo.dataLbls.push(dLbl);
+    else if(dLbl instanceof CTitle)
+        this.recalcInfo.axisLabels.push(dLbl);
 };
 
 CChartSpace.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
@@ -115,7 +120,7 @@ CChartSpace.prototype.canMove = CShape.prototype.canMove;
 CChartSpace.prototype.canRotate = function()
 {
 	return false;
-}
+};
 
 
 
@@ -133,23 +138,40 @@ CChartSpace.prototype.draw = function(graphics)
 	this.chartObj.draw(this, graphics);
 	graphics.reset();
 	graphics.SetIntegerGrid(intGrid);
-	
-	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
-	{
-		var series = this.chart.plotArea.chart.series;
-		for(var i = 0; i < series.length; ++i)
-		{
-			var ser = series[i];
-			var pts = getPtsFromSeries(ser);
-			for(var j = 0; j < pts.length; ++j)
-			{
-				if(pts[j].compiledDlb)
-					pts[j].compiledDlb.draw(graphics);
-			}
-		}
-	}
-	
-	
+
+    if(this.chart)
+    {
+        if(this.chart.plotArea)
+        {
+            if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+            {
+                var series = this.chart.plotArea.chart.series;
+                for(var i = 0; i < series.length; ++i)
+                {
+                    var ser = series[i];
+                    var pts = getPtsFromSeries(ser);
+                    for(var j = 0; j < pts.length; ++j)
+                    {
+                        if(pts[j].compiledDlb)
+                            pts[j].compiledDlb.draw(graphics);
+                    }
+                }
+            }
+            if(this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
+            {
+                this.chart.plotArea.catAx.title.draw(graphics);
+            }
+            if(this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+            {
+                this.chart.plotArea.valAx.title.draw(graphics);
+            }
+        }
+        if(this.chart.title)
+        {
+            this.chart.title.draw(graphics);
+        }
+    }
+
 };
 CChartSpace.prototype.recalculateBounds = function()
 {
@@ -213,6 +235,11 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateDLbls();
 			this.recalcInfo.recalculateDLbls = false;
 		}
+        if(this.recalcInfo.recalculateAxisLabels)
+        {
+            this.recalculateAxisLabels();
+            this.recalcInfo.recalculateAxisLabels = false;
+        }
 		if(this.recalcInfo.recalculateChart)
 		{
 			this.recalculateChart();
@@ -225,6 +252,34 @@ CChartSpace.prototype.recalculate = function()
 		}
 		this.recalcInfo.dataLbls.length = 0;
 	}, this, []);
+};
+
+CChartSpace.prototype.recalculateAxisLabels = function()
+{
+    if(this.chart && this.chart.title)
+    {
+        var title = this.chart.title;
+        title.parent = this.chart;
+        title.chart = this;
+        title.recalculate();
+    }
+    if(this.chart && this.chart.plotArea)
+    {
+        if(this.chart.plotArea.catAx && this.chart.plotArea.catAx.title)
+        {
+            var title = this.chart.plotArea.catAx.title;
+            title.parent = this.chart.plotArea.catAx;
+            title.chart = this;
+            title.recalculate();
+        }
+        if(this.chart.plotArea.valAx && this.chart.plotArea.valAx.title)
+        {
+            var title = this.chart.plotArea.valAx.title;
+            title.parent = this.chart.plotArea.valAx;
+            title.chart = this;
+            title.recalculate();
+        }
+    }
 };
 CChartSpace.prototype.deselect = CShape.prototype.deselect;
 CChartSpace.prototype.hitInWorkArea = function()
@@ -411,7 +466,7 @@ CChartSpace.prototype.recalculateGridLines = function()
 			}
 			axis.compiledMajorGridLines = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.majorGridlines, subtleLine, parents);
 			axis.compiledMinorGridLines = calcGridLine(defaultStyle.minorGridlines, axis.minorGridlines, subtleLine, parents);
-		}
+		};
 		var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
 		var parent_objects = this.getParentObjects();
 		var RGBA = {R:0, G:0, B:0, A: 255};
@@ -425,7 +480,7 @@ CChartSpace.prototype.recalculateGridLines = function()
 		calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
 		calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
 	}
-}
+};
 
 CChartSpace.prototype.recalculateMarkers = function()
 {
@@ -944,6 +999,6 @@ CChartSpace.prototype.recalculateDLbls = function()
 			}
 		}
 	}
-}
+};
 
 

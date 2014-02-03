@@ -1943,6 +1943,7 @@ function CreateLineChart(asc_series, type)
     chart.setPlotArea(new CPlotArea());
     chart.setLegend(new CLegend());
     chart.setPlotVisOnly(true);
+    chart.setTitle(new CTitle());
     var disp_blanks_as;
     if(type === GROUPING_STANDARD)
     {
@@ -1958,7 +1959,13 @@ function CreateLineChart(asc_series, type)
     plot_area.setLayout(new CLayout());
     plot_area.setChart(new CLineChart());
     plot_area.setCatAx(new CAxis());
+    plot_area.catAx.setTitle(new CTitle());
     plot_area.setValAx(new CAxis());
+    plot_area.valAx.setTitle(new CTitle());
+    var title = plot_area.valAx.title;
+    title.setTxPr(new CTextBody());
+    title.txPr.setBodyPr(new CBodyPr());
+    title.txPr.bodyPr.setVert(nVertTTvert);
     var line_chart = plot_area.chart;
     line_chart.setGrouping(type);
     line_chart.setVaryColors(false);
