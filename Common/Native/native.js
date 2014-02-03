@@ -212,7 +212,6 @@ document.body = _null_object;
 var native = CreateNativeEngine();
 window.native = native;
 window["native"] = native;
-window.native.v6a = window.native.GetFontBinary;
 
 function GetNativeEngine()
 {
