@@ -2458,7 +2458,7 @@ drawLineChart.prototype =
 			}
 			case DLBL_POS_L:
 			{
-				centerX = centerX - height/2 - constMargin;
+				centerX = centerX - width/2 - constMargin;
 				break;
 			}
 			case DLBL_POS_OUT_END:
@@ -2468,7 +2468,7 @@ drawLineChart.prototype =
 			}
 			case DLBL_POS_R:
 			{
-				centerX = centerX + height/2 + constMargin;
+				centerX = centerX + width/2 + constMargin;
 				break;
 			}
 			case DLBL_POS_T:
@@ -3221,36 +3221,54 @@ drawScatterChart.prototype =
 				points[n] = {x: xVal, y: yVal}
 			}
 			
-			for(var k = 1; k < points.length; k++)
+			for(var k = 0; k < points.length; k++)
 			{
-				if(minOy >= 0 && maxOy > 0)
+				if(k == points.length - 1)
 				{
-					y  = trueHeight - (points[k-1].y - Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
-					y1 = trueHeight - (points[k].y - Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					if(minOy >= 0 && maxOy > 0)
+					{
+						y  = trueHeight - (points[k].y - Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					}
+					else
+					{
+						y  = trueHeight - (points[k].y + Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					}
+					
+					x  = (points[k].x + Math.abs(minOx))*koffX + this.chartProp.chartGutter._left;
+					
+					this.paths.points[i][k] = this._calculatePoint(x, y, seria.yVal.numRef.numCache.pts[k].compiledMarker.size, seria.yVal.numRef.numCache.pts[k].compiledMarker.symbol);
 				}
 				else
 				{
-					y  = trueHeight - (points[k-1].y + Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
-					y1 = trueHeight - (points[k].y + Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					if(minOy >= 0 && maxOy > 0)
+					{
+						y  = trueHeight - (points[k].y - Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+						y1 = trueHeight - (points[k + 1].y - Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					}
+					else
+					{
+						y  = trueHeight - (points[k].y + Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+						y1 = trueHeight - (points[k + 1].y + Math.abs(minOy))*koffY + this.chartProp.chartGutter._top;
+					}
+					
+					x  = (points[k].x + Math.abs(minOx))*koffX + this.chartProp.chartGutter._left;
+					x1 = (points[k + 1].x + Math.abs(minOx))*koffX + this.chartProp.chartGutter._left;
+					
+					if(!this.paths.series)
+						this.paths.series = [];
+					if(!this.paths.series[i])
+						this.paths.series[i] = [];
+					
+					if(!this.paths.points)
+						this.paths.points = [];
+					if(!this.paths.points[i])
+						this.paths.points[i] = [];
+						
+					this.paths.series[i][k] = this._calculateLine(x, y, x1, y1);
+					
+					this.paths.points[i][k] = this._calculatePoint(x, y, seria.yVal.numRef.numCache.pts[k].compiledMarker.size, seria.yVal.numRef.numCache.pts[k].compiledMarker.symbol);
 				}
 				
-				x  = (points[k-1].x + Math.abs(minOx))*koffX + this.chartProp.chartGutter._left;
-				x1 = (points[k].x + Math.abs(minOx))*koffX + this.chartProp.chartGutter._left;
-				
-				if(!this.paths.series)
-					this.paths.series = [];
-				if(!this.paths.series[i])
-					this.paths.series[i] = [];
-				
-				if(!this.paths.points)
-					this.paths.points = [];
-				if(!this.paths.points[i])
-					this.paths.points[i] = [];
-					
-				this.paths.series[i][k] = this._calculateLine(x, y, x1, y1);
-				if(k == 1)
-					this.paths.points[i][0] = this._calculatePoint(x, y, seria.yVal.numRef.numCache.pts[0].compiledMarker.size, seria.yVal.numRef.numCache.pts[0].compiledMarker.symbol);
-				this.paths.points[i][k] = this._calculatePoint(x1, y1, seria.yVal.numRef.numCache.pts[k].compiledMarker.size, seria.yVal.numRef.numCache.pts[k].compiledMarker.symbol);
 			}
 		}
     },
@@ -3264,7 +3282,8 @@ drawScatterChart.prototype =
 			brush = seria.brush;
 			pen = seria.pen;
 			
-			for(var k = 1; k < this.paths.series[i].length; k++)
+			//draw line
+			for(var k = 0; k < this.paths.series[i].length; k++)
 			{
 				brush = this.chartProp.series[i].brush;
 				pen = this.chartProp.series[i].pen;
@@ -3276,19 +3295,11 @@ drawScatterChart.prototype =
 					
 				//draw line
 				this._drawPath(this.paths.series[i][k], brush, pen, true);
-				
-				//draw point
-				if(k == 1)
-				{
-					markerBrush = this.chartProp.series[i].yVal.numRef.numCache.pts[0].compiledMarker.brush;
-					markerPen = this.chartProp.series[i].yVal.numRef.numCache.pts[0].compiledMarker.pen;
-					
-					//frame of point
-					if(this.paths.points[i][0].framePaths)
-						this._drawPath(this.paths.points[i][0].framePaths, markerBrush, markerPen, false);
-					//point	
-					this._drawPath(this.paths.points[i][0].path, markerBrush, markerPen, true);
-				}
+			}
+			
+			//draw point
+			for(var k = 0; k < this.paths.points[i].length; k++)
+			{	
 				markerBrush = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.brush;
 				markerPen = this.chartProp.series[i].yVal.numRef.numCache.pts[k].compiledMarker.pen;
 				
@@ -3440,6 +3451,79 @@ drawScatterChart.prototype =
 		result = {framePaths: framePaths, path: path};
 		
 		return result;
+	},
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		var point = this.chartProp.series[ser - 1].yVal.numRef.numCache.pts[val];
+		var path;
+		
+		if(val == this.chartProp.series[ser - 1].yVal.numRef.numCache.pts.length - 1)
+			path = this.paths.series[ser - 1][val - 1].ArrPathCommand[1];
+		else
+			path = this.paths.series[ser - 1][val].ArrPathCommand[0];
+			
+		var x = path.X;
+		var y = path.Y;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		var constMargin = 5 / pxToMm;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX = x - width/2;
+		var centerY = y - height/2;
+		
+		//TODO высчитать позиции, как в екселе + ограничения за пределы экрана
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerY = centerY + height/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				break;
+			}
+			case DLBL_POS_IN_BASE:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_IN_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				centerX = centerX - width/2 - constMargin;
+				break;
+			}
+			case DLBL_POS_OUT_END:
+			{
+				//centerY = centerY + 27 / pxToMm;
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				centerX = centerX + width/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				centerY = centerY - height/2 - constMargin;
+				break;
+			}
+		}
+		return {x: centerX, y: centerY};
 	},
 	
 	_drawPath: function(path, brush, pen, stroke)
