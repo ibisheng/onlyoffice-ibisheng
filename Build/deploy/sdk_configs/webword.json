@@ -106,7 +106,7 @@
                 "../../Word/Drawing/Metafile.js",
                 "../../Word/Drawing/DrawingDocument.js",
                 "../../Word/Drawing/GraphicsEvents.js",
-                "../../Word/Drawing/scrolls/iscroll.js",
+                "../../Common/Scrolls/iscroll.js",
                 "../../Word/Drawing/WorkEvents.js",
                 "../../Word/Drawing/Controls.js",
                 "../../Word/Drawing/Rulers.js",
