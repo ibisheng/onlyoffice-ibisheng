@@ -449,7 +449,7 @@
 				info = ws.getSelectionInfo();
 			}
 			// При редактировании ячейки не нужно пересылать изменения
-			if (false === ws.getCellEditMode()) {
+			if (this.input && false === ws.getCellEditMode()) {
 				// Сами запретим заходить в строку формул, когда выделен shape
 				this.input.disabled = true === this.lastSendInfoRangeIsSelectOnShape;
 				this.input.value = info.text;
