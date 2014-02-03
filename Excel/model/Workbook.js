@@ -2400,7 +2400,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		{
 			var oOldProps = col.getWidthProp();
 			if(false == Asc.isEqual(oOldProps, oDefColPr))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(i, false, oOldProps, oDefColPr));
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(i, 0, i, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(i, false, oOldProps, oDefColPr));
 			col.setStyle(null);
 		}
 	}
@@ -2415,7 +2415,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	return true;
 };
 Woorksheet.prototype.insertColsBefore=function(index, count){
@@ -2806,7 +2806,7 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 				var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 				if(null != cell.xfs)
 					oUndoRedoData_CellData.style = cell.xfs.clone();
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, nRow, gc_nMaxCol0, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 			}
 			if(cell.formulaParsed)
 				this.wb.dependencyFormulas.deleteMasterNodes2( this.getId(), cell.getName() );
