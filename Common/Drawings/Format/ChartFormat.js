@@ -13069,6 +13069,8 @@ CTitle.prototype =
         this.Id = r.GetString2();
     },
 
+    setPosition: CDLbl.prototype.setPosition,
+
     getMaxWidth: function(bodyPr)
     {
         switch (bodyPr.vert)
