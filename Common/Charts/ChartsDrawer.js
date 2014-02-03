@@ -92,6 +92,22 @@ CChartsDrawer.prototype =
 			case "dlbl":
 			{
 				pos = this._calculatePositionDlbl(chartSpace, ser, val);
+				break;
+			}
+			case "title":
+			{
+				pos = this._calculatePositionTitle(chartSpace);
+				break;
+			}
+			case "valAx":
+			{
+				pos = this._calculatePositionValAx(chartSpace);
+				break;
+			}
+			case "catAx":
+			{
+				pos = this._calculatePositionCatAx(chartSpace);
+				break;
 			}
 		}
 		return {x: pos.x, y : pos.y};
@@ -100,6 +116,45 @@ CChartsDrawer.prototype =
 	_calculatePositionDlbl: function(chartSpace, ser, val)
 	{	
 		return this.chart._calculateDLbl(chartSpace, ser, val);
+	},
+	
+	_calculatePositionTitle: function(chartSpace)
+	{	
+		var widthGraph = chartSpace.extX;
+		var heightGraph = chartSpace.extY;
+		
+		var widthTitle = chartSpace.chart.title.extX;
+		var heightTitle = chartSpace.chart.title.extY;
+		var standartMargin = 13;
+		
+		var y = standartMargin / this.calcProp.pxToMM;
+		var x = widthGraph / 2 - widthTitle / 2;
+		
+		return {x: x, y: y}
+	},
+	
+	_calculatePositionValAx: function(chartSpace)
+	{	
+		var widthTitle = chartSpace.chart.plotArea.valAx.title.extX;
+		var heightTitle = chartSpace.chart.plotArea.valAx.title.extY;
+		var standartMargin = 13;
+		
+		var y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightTitle / 2;
+		var x = standartMargin / this.calcProp.pxToMM;
+		
+		return {x: x, y: y}
+	},
+	
+	_calculatePositionCatAx: function(chartSpace)
+	{	
+		var widthTitle = chartSpace.chart.plotArea.catAx.title.extX;
+		var heightTitle = chartSpace.chart.plotArea.catAx.title.extY;
+		var standartMargin = 13;
+		
+		var y = (this.calcProp.heightCanvas - standartMargin) / this.calcProp.pxToMM -  heightTitle;
+		var x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthTitle / 2;
+		
+		return {x: x, y: y}
 	},
 	
 	_calculateProperties: function(chartProp)
@@ -164,7 +219,7 @@ CChartsDrawer.prototype =
 		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
 		
 		//считаем маргины
-		this._calculateMarginsChart();
+		this._calculateMarginsChart(chartProp);
 		
 		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
 		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
@@ -831,16 +886,29 @@ CChartsDrawer.prototype =
 			this.calcProp.hmargin = 0;
 	},
 	
-	_calculateMarginsChart: function() {
+	_calculateMarginsChart: function(chartSpace) {
 		this.calcProp.chartGutter = {};
+		
+		var pxToMM = this.calcProp.pxToMM;
+		var standartMargin = 13;
+		
 		//left margin = vertical axis(if min x == 0) + vertical title + width of legend;
-		this.calcProp.chartGutter._left = 13;
+		this.calcProp.chartGutter._left = standartMargin;
+		if(chartSpace.chart.plotArea.valAx.title != undefined)
+			this.calcProp.chartGutter._left += chartSpace.chart.plotArea.valAx.title.extX * pxToMM;
+		
 		//right margin = legend;
-		this.calcProp.chartGutter._right = 13;
-		//right margin = legend + title;
-		this.calcProp.chartGutter._top = 13;
-		//right margin = legend + horizontal title +  horizontal axis(if min y == 0);
-		this.calcProp.chartGutter._bottom = 13;
+		this.calcProp.chartGutter._right = standartMargin;
+		
+		//top margin = legend + title;
+		this.calcProp.chartGutter._top = standartMargin;
+		if(chartSpace.chart.title.extY !== undefined)
+			this.calcProp.chartGutter._top += chartSpace.chart.title.extY * pxToMM;
+		
+		//bottom margin = legend + horizontal title +  horizontal axis(if min y == 0);
+		this.calcProp.chartGutter._bottom = standartMargin;
+		if(chartSpace.chart.plotArea.catAx.title != undefined)
+			this.calcProp.chartGutter._bottom += chartSpace.chart.plotArea.catAx.title.extY * pxToMM;
 	},
 	
 	_getNullPosition: function()
