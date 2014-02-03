@@ -214,6 +214,11 @@ window.native = native;
 window["native"] = native;
 window.native.v6a = window.native.GetFontBinary;
 
+function GetNativeEngine()
+{
+	return window.native;
+}
+
 var native_renderer = null;
 var _api = null;
 var Asc = null;
@@ -231,6 +236,25 @@ function NativeOpenFile()
         Asc = window["Asc"];    
         _api = new window["Asc"]["spreadsheet_api"];
         var doc_bin = window.native.GetFileString(g_file_path);
+        _api.asc_nativeOpenFile(doc_bin);
+    }
+}
+
+function NativeOpenFile2()
+{
+	window.g_file_path = "native_open_file";
+	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+    var doc_bin = window.native.GetFileString(window.g_file_path);
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
+    {
+        _api = new window["asc_docs_api"]("");       
+        _api.asc_nativeOpenFile(doc_bin);
+    }
+    else
+    {
+        Asc = window["Asc"];    
+        _api = new window["Asc"]["spreadsheet_api"];
+        var doc_bin = window.native.GetFileString(window.g_file_path);
         _api.asc_nativeOpenFile(doc_bin);
     }
 }
@@ -329,3 +353,6 @@ window.clearTimeout = clearTimeout;
 window.setTimeout = setTimeout;
 window.clearInterval = clearInterval;
 window.setInterval = setInterval;
+
+window["OfficeExcel"] = {type:'common'};
+var OfficeExcel = window["OfficeExcel"];
