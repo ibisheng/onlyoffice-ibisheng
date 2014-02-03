@@ -31,19 +31,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.HtmlElement = null;
 			this.topLineEditorElement = null;
 
-			if ("function" === typeof(eventsController)) {
-				var prot = eventsController.prototype;
-				prot.init = prot["init"];
-				prot.destroy = prot["destroy"];
-				prot.enableKeyEventsHandler = prot["enableKeyEventsHandler"];
-				prot.reinitializeScroll = prot["reinitializeScroll"];
-				prot.scrollVertical = prot["scrollVertical"];
-				prot.scrollHorizontal = prot["scrollHorizontal"];
+			this.isViewerMode = false;
+			this.controller = null;		// Создадим позднее, т.к. не знаем мобильная версия или нет
 
-				this.controller = new eventsController();
-			} else {
-				this.controller	= new asc.asc_CEventsController();
-			}
+//			if ("function" === typeof(eventsController)) {
+//				var prot = eventsController.prototype;
+//				prot.init = prot["init"];
+//				prot.destroy = prot["destroy"];
+//				prot.enableKeyEventsHandler = prot["enableKeyEventsHandler"];
+//				prot.reinitializeScroll = prot["reinitializeScroll"];
+//				prot.scrollVertical = prot["scrollVertical"];
+//				prot.scrollHorizontal = prot["scrollHorizontal"];
+
+//				this.controller = new eventsController();
+//			} else {
+//				this.controller	= new asc.asc_CEventsController();
+//			}
 
 			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
 			this.options = options;
@@ -76,7 +79,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentFormatSave = c_oAscFileType.XLSX;
 			this.documentFormatSaveCsvCodepage = 65001;//utf8
 			this.documentFormatSaveCsvDelimiter = c_oAscCsvDelimiter.Comma;
-			this.cCharDelimiter = String.fromCharCode(5);
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 			this.DocInfo = null;
@@ -428,7 +430,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			asc_LoadDocument: function (c_DocInfo) {
 				var t = this;
-				
+
 				this.asc_setDocInfo(c_DocInfo);
 				
 				if(this.DocInfo){
@@ -504,6 +506,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_OpenDocument: function(url, data)
 			{
+				this._initEventController();
+
 				var wb = new Workbook(url, this.handlers, this);
 				this.initGlobalObjects(wb);
 				this.wbModel = wb;
@@ -532,6 +536,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wbModel);
 				g_oIdCounter.Set_Load(false);
 				CHART_STYLE_MANAGER = new CChartStyleManager();
+			},
+
+			_initEventController: function () {
+				if (this.isMobileVersion)
+					this.controller = new asc.asc_CEventsController(); //ToDo mobile
+				else
+					this.controller	= new asc.asc_CEventsController();
+				this.controller.setViewerMode(this.isViewerMode);
 			},
 			
 			asc_getEditorPermissions : function(){
@@ -703,35 +715,37 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_getViewerMode: function () {
-				return this.controller.getViewerMode ? this.controller.getViewerMode() : true;
+				return this.isViewerMode;
 			},
 
 			asc_setViewerMode: function (isViewerMode) {
-				if (this.controller.setViewerMode) {
+				this.isViewerMode = isViewerMode;
+				// Если нет controller-а, мы выставим позднее режим
+				if (null !== this.controller)
 					this.controller.setViewerMode(isViewerMode);
-					if (this.collaborativeEditing)
-						this.collaborativeEditing.setViewerMode(isViewerMode);
-					if (false === isViewerMode) {
-						// Загружаем не обрезанные шрифты для полной версии (при редактировании)
-						if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
-							this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-							this.asyncMethodCallback = undefined;
-							this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
-						}
-						
-						this.isUseEmbeddedCutFonts = false;
+				if (this.collaborativeEditing)
+					this.collaborativeEditing.setViewerMode(isViewerMode);
 
-						// Отправка стилей
-						this._sendWorkbookStyles();
-						if ( this.wb )
-							this.wb._initCommentsToSave();
+				if (false === isViewerMode) {
+					// Загружаем не обрезанные шрифты для полной версии (при редактировании)
+					if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
+						this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
+						this.asyncMethodCallback = undefined;
+						this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
+					}
 
-						if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
-							// Принимаем чужие изменения
-							this.collaborativeEditing.applyChanges();
-							// Пересылаем свои изменения
-							this.collaborativeEditing.sendChanges();
-						}
+					this.isUseEmbeddedCutFonts = false;
+
+					// Отправка стилей
+					this._sendWorkbookStyles();
+					if ( this.wb )
+						this.wb._initCommentsToSave();
+
+					if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
+						// Принимаем чужие изменения
+						this.collaborativeEditing.applyChanges();
+						// Пересылаем свои изменения
+						this.collaborativeEditing.sendChanges();
 					}
 				}
 			},
@@ -1218,7 +1232,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_getController: function() {
-				return this.controller;
+				//return this.controller;
+				return null;
 			},
 
 			// Посылает эвент о том, что обновились листы
@@ -3011,7 +3026,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.objectRender.controller.applyColorScheme();
 
 				// На view-режиме не нужно отправлять стили
-				if (this.controller.getViewerMode && true !== this.controller.getViewerMode()) {
+				if (true !== this.asc_getViewerMode()) {
 					// Отправка стилей
 					this._sendWorkbookStyles();
 				}
@@ -3020,8 +3035,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.chartStyleManager.init();
 					this.chartPreviewManager.init();
 					this.handlers.trigger("asc_onUpdateChartStyles");
-					
-					var ws = this.wb.getWorksheet();
+
 					// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 					// ToDo - и еще, в _reDrawFilters делается отрисовка + в drawWS делается отрисовка
 					ws.autoFilters._reDrawFilters(true);
@@ -3282,8 +3296,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_nativeOpenFile : function(base64File)
 			{
 			    this.DocumentUrl = "TeamlabNative";
-            
-                var Asc = asc;
+
                 asc["editor"] = this;
 
                 window.g_cAscCoAuthoringUrl = "";
