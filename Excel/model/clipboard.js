@@ -3741,11 +3741,12 @@ function Editor_CopyPaste_Create(api)
 	ElemToSelect["onbeforecut"] = function(e){
 		if(!api.isCellEdited)
 		{
-			api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+			var ws = api.wb.getWorksheet();
+			api.wb.clipboard.copyRange(ws.getSelectedRange(), ws);
 			if(isNeedEmptyAfterCut)
 			{
 				isNeedEmptyAfterCut = false;
-				api.wb.getWorksheet().setSelectionInfo("empty", c_oAscCleanOptions.All);
+				ws.emptySelection(c_oAscCleanOptions.All);
 			}
 			else
 				isNeedEmptyAfterCut = true;		

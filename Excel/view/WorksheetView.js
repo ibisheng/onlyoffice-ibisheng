@@ -7248,6 +7248,14 @@
 			this._isLockedCells ([arnFrom, arnTo], null, onApplyMoveRangeHandleCallback);
 		};
 
+		WorksheetView.prototype.emptySelection = function (options) {
+			// Удаляем выделенные графичекие объекты
+			if (this.objectRender.selectedGraphicObjectsExists())
+				this.objectRender.controller.deleteSelectedObjects();
+			else
+				this.setSelectionInfo("empty", options);
+		};
+
 		WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive, isLocal) {
 			// Проверка глобального лока
 			if (this.collaborativeEditing.getGlobalLock())
@@ -7390,8 +7398,6 @@
 						t.autoFilters._renameTableColumn(arn);
 						// Удаляем комментарии
 						t.cellCommentator.deleteCommentsRange(arn);
-						// Удаляем выделенные графичекие объекты
-						t.objectRender.controller.deleteSelectedObjects();
 
 						/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 						buildRecalc(t.model.workbook);

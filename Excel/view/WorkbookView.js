@@ -190,7 +190,7 @@
 				    "moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
 				    "editCell":          function () {self._onEditCell.apply(self, arguments);},
 				    "stopCellEditing":   function () {return self._onStopCellEditing.apply(self, arguments);},
-				    "emptyCell":				function () {self._onEmptyCell.apply(self, arguments);},
+				    "empty":					function () {self._onEmpty.apply(self, arguments);},
 				    "canEnterCellRange":		function () {
 															    self.cellEditor.setFocus(false);
 															    var ret = self.cellEditor.canEnterCellRange();
@@ -198,9 +198,7 @@
 															    return ret;
 														    },
 				    "enterCellRange":			function () {self.cellEditor.setFocus(false); self.getWorksheet().enterCellRange(self.cellEditor);},
-				    "changeCellRange":			function(){
-					    self.getWorksheet().changeCellRange(self.cellEditor)
-				    },
+				    "changeCellRange":			function () {self.getWorksheet().changeCellRange(self.cellEditor)},
 				    "copy":						function () {self.copyToClipboard.apply(self, arguments);},
 				    "paste":					function () {self.pasteFromClipboard.apply(self, arguments);},
 				    "cut":						function () {self.cutToClipboard.apply(self, arguments);},
@@ -916,8 +914,8 @@
 			History._sendCanUndoRedo();
 		};
 
-		WorkbookView.prototype._onEmptyCell = function () {
-			this.getWorksheet().setSelectionInfo("empty", c_oAscCleanOptions.Text);
+		WorkbookView.prototype._onEmpty = function () {
+			this.getWorksheet().emptySelection(c_oAscCleanOptions.Text);
 		};
 
 		WorkbookView.prototype._onAddColumn = function (isNotActive) {
@@ -1380,7 +1378,7 @@
 					return;
 
 				t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
-				ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
+				ws.emptySelection(c_oAscCleanOptions.All);
 			} else if(!window.USER_AGENT_SAFARI_MACOS){
 				v = t.cellEditor.cutSelection();
 				if (v) {t.clipboard.copyCellValue(v);}
@@ -1393,7 +1391,7 @@
 				ws = t.getWorksheet();
 				var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws, true);
 				if(result)
-					ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
+					ws.emptySelection(c_oAscCleanOptions.All);
 				return result;
 			} else {
 				v = t.cellEditor.cutSelection();
@@ -1436,7 +1434,7 @@
 
 		WorkbookView.prototype.emptyCells = function (options) {
 			if (!this.controller.isCellEditMode) {
-				this.getWorksheet().setSelectionInfo("empty", options);
+				this.getWorksheet().emptySelection(options);
 				this.restoreFocus();
 			} else {
 				this.cellEditor.empty(options);

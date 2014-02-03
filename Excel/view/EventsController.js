@@ -663,7 +663,7 @@
 				case 46: // Del
 					if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
 					// Удаляем содержимое
-					t.handlers.trigger("emptyCell");
+					t.handlers.trigger("empty");
 					return true;
 
 				case 9: // tab
