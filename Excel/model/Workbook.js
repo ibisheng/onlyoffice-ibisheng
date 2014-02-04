@@ -2426,7 +2426,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 	History.TurnOff();
 	//index 0 based
 	for(var i in this.aGCells)
@@ -2532,7 +2532,7 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 			col.hd = null;
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(col, 0, col, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxCol0 == stop)
@@ -2576,7 +2576,7 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 			}
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
+				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(col, 0, col, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
 	};
 	if(0 != start && gc_nMaxCol0 == stop)
@@ -2622,7 +2622,7 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		col.width = width;
 		var oNewProps = col.getWidthProp();
 		if(false == oOldProps.isEqual(oNewProps))
-			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(col, 0, col, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 	};
 	if(0 != start && gc_nMaxCol0 == stop)
 	{
@@ -2986,7 +2986,7 @@ Woorksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo
 	else
 		aRangesToCheck.push(this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2));
 	return aRangesToCheck;
-}
+};
 Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 	var res = 0;
 	if(oBBoxFrom.isEqual(oBBoxTo))
@@ -3010,7 +3010,7 @@ Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 			return res;
 	}
 	return res;
-}
+};
 Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	if(oBBoxFrom.isEqual(oBBoxTo))
 		return;
@@ -3155,12 +3155,13 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		*/
     sortDependency(this.workbook);
 	}
+	// ToDo возможно нужно уменьшить диапазон обновления
     History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
 				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo), copyRange));
 	History.EndTransaction();
 	return true;
-}
+};
 Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	lockDraw(this.workbook);
 	//todo удаление когда есть замерженые ячейки
@@ -3202,7 +3203,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, oBBox.r1), new UndoRedoData_BBox(oBBox));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	lockDraw(this.workbook);
@@ -3248,10 +3249,10 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, oBBox.r1), new UndoRedoData_BBox(oBBox));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
 	History.TurnOff();
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
@@ -3291,7 +3292,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	lockDraw(this.workbook);
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 	History.TurnOff();
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
@@ -3330,7 +3331,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
-}
+};
 Woorksheet.prototype._BuildDependencies=function(cellRange){
 	/*
 		Построение графа зависимостей.
@@ -3595,7 +3596,7 @@ Cell.prototype.isEmpty=function(){
 };
 Cell.prototype.isFormula=function(){
 	return this.sFormula ? true : false;
-}
+};
 Cell.prototype.Remove=function(){
 	this.ws._removeCell(null, null, this);
 };
@@ -3604,7 +3605,7 @@ Cell.prototype.getName=function(){
 };
 Cell.prototype.cleanCache=function(){
 	this.oValue.cleanCache();
-}
+};
 Cell.prototype.setFormula=function(val, bAddToHistory){
 	if(bAddToHistory)
 	{
@@ -3612,7 +3613,7 @@ Cell.prototype.setFormula=function(val, bAddToHistory){
 	}
 	this.sFormula = val;
 	this.oValue.cleanCache();
-}
+};
 Cell.prototype.setValue=function(val,callback){
 	var ret = true;
 	var DataOld = null;
@@ -3690,7 +3691,7 @@ Cell.prototype.setValue=function(val,callback){
 	if(History.Is_On())
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
-		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
 	//todo не должны удаляться ссылки, если сделать merge ее части.
 	if(this.isEmptyTextString())
 	{
@@ -3723,7 +3724,7 @@ Cell.prototype.setValue2=function(array){
 	if(History.Is_On())
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
-		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
+		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), DataOld, DataNew));
 	//todo не должны удаляться ссылки, если сделать merge ее части.
 	if(this.isEmptyTextString())
 	{
@@ -3742,7 +3743,7 @@ Cell.prototype.setCellStyle=function(val){
 	var oRes = this.sm.setCellStyle(this, newVal);
 	if(History.Is_On()) {
 		var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
-		History.Add(g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldStyleName, val));
+		History.Add(g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldStyleName, val));
 
 		// Выставляем стиль
 		var oStyle = this.cs.getStyleByXfId(oRes.newVal);
@@ -3767,7 +3768,7 @@ Cell.prototype.setNumFormat=function(val){
     else
         oRes = this.sm.setNumFormat(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3822,7 +3823,7 @@ Cell.prototype.setFont=function(val, bModifyValue){
 			if(History.Is_On())
 			{
 				var newVal = this.getValueData();
-				History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
+				History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
 			}
 		}
 	}
@@ -3835,7 +3836,7 @@ Cell.prototype.setFont=function(val, bModifyValue){
 		var newVal = null;
 		if(null != oRes.newVal)
 			newVal = oRes.newVal.clone();
-        History.Add(g_oUndoRedoCell, historyitem_Cell_SetFont, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_SetFont, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
 	}
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
@@ -3844,7 +3845,7 @@ Cell.prototype.setFontname=function(val){
 	this.oValue.setFontname(val);
 	var oRes = this.sm.setFontname(this, val);
 	if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		History.Add(g_oUndoRedoCell, historyitem_Cell_Fontname, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+		History.Add(g_oUndoRedoCell, historyitem_Cell_Fontname, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3852,7 +3853,7 @@ Cell.prototype.setFontsize=function(val){
 	this.oValue.setFontsize(val);
 	var oRes = this.sm.setFontsize(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontsize, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontsize, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3860,7 +3861,7 @@ Cell.prototype.setFontcolor=function(val){
 	this.oValue.setFontcolor(val);
 	var oRes = this.sm.setFontcolor(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontcolor, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontcolor, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3868,7 +3869,7 @@ Cell.prototype.setBold=function(val){
 	this.oValue.setBold(val);
 	var oRes = this.sm.setBold(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Bold, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Bold, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3876,7 +3877,7 @@ Cell.prototype.setItalic=function(val){
 	this.oValue.setItalic(val);
 	var oRes = this.sm.setItalic(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Italic, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Italic, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3884,7 +3885,7 @@ Cell.prototype.setUnderline=function(val){
 	this.oValue.setUnderline(val);
 	var oRes = this.sm.setUnderline(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Underline, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Underline, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3892,7 +3893,7 @@ Cell.prototype.setStrikeout=function(val){
 	this.oValue.setStrikeout(val);
 	var oRes = this.sm.setStrikeout(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Strikeout, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Strikeout, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 };
@@ -3900,26 +3901,26 @@ Cell.prototype.setFontAlign=function(val){
 	this.oValue.setFontAlign(val);
 	var oRes = this.sm.setFontAlign(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
 }
 Cell.prototype.setAlignVertical=function(val){
 	var oRes = this.sm.setAlignVertical(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignVertical, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignVertical, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setAlignHorizontal=function(val){
 	var oRes = this.sm.setAlignHorizontal(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignHorizontal, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignHorizontal, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setFill=function(val){
 	var oRes = this.sm.setFill(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fill, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Fill, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setBorder=function(val){
@@ -3931,50 +3932,50 @@ Cell.prototype.setBorder=function(val){
 		var newVal = null;
 		if(null != oRes.newVal)
 			newVal = oRes.newVal.clone();
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Border, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Border, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
 	}
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setShrinkToFit=function(val){
 	var oRes = this.sm.setShrinkToFit(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_ShrinkToFit, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_ShrinkToFit, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setWrap=function(val){
 	var oRes = this.sm.setWrap(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Wrap, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Wrap, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;
 };
 Cell.prototype.setAngle=function(val){
     var oRes = this.sm.setAngle(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
     this.bNeedCompileXfs = true;
 };
 Cell.prototype.setVerticalText=function(val){
     var oRes = this.sm.setVerticalText(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
     this.bNeedCompileXfs = true;
 };
 Cell.prototype.setQuotePrefix=function(val){
 	var oRes = this.sm.setQuotePrefix(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_SetQuotePrefix, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
+        History.Add(g_oUndoRedoCell, historyitem_Cell_SetQuotePrefix, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.oValue.cleanCache();
 };
 Cell.prototype.setConditionalFormattingStyle=function(xfs){
 	this.conditionalFormattingXfs = xfs;
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
-}
+};
 Cell.prototype.setTableStyle=function(xfs){
 	this.tableXfs = xfs;
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
-}
+};
 Cell.prototype.setStyle=function(xfs){
 	var oldVal = this.xfs;
 	var newVal = null;
@@ -3992,7 +3993,7 @@ Cell.prototype.setStyle=function(xfs){
 			oldVal = oldVal.clone();
 		if(null != newVal)
 			newVal = newVal.clone();
-		History.Add(g_oUndoRedoCell, historyitem_Cell_SetStyle, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
+		History.Add(g_oUndoRedoCell, historyitem_Cell_SetStyle, this.ws.getId(), new Asc.Range(this.oId.getCol0(), this.oId.getRow0(), this.oId.getCol0(), this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldVal, newVal));
 	}
 	// if(this.isEmpty())
 		// this.Remove();
@@ -6652,7 +6653,7 @@ Range.prototype.sort=function(nOption, nStartCol){
     buildRecalc(this.worksheet.workbook);
     unLockDraw(this.worksheet.workbook);
 	return oRes;
-}
+};
 Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
     var rec = {length:0};
 	var oSortedIndexes = {};
@@ -6835,7 +6836,7 @@ Range.prototype._isSameSizeMerged=function(bbox, aMerged){
 		}
 	}
 	return oRes;
-}
+};
 Range.prototype._canPromote=function(oPromoteRange, nWidth, nHeight, bVertical, nIndex){
 	var oRes = {oMergedFrom: null, oMergedTo: null};
 	//если надо только удалить внутреннее содержимое не смотрим на замерженость
@@ -6867,7 +6868,7 @@ Range.prototype._canPromote=function(oPromoteRange, nWidth, nHeight, bVertical, 
 		}
 	}
 	return oRes;
-}
+};
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
@@ -7134,7 +7135,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 							oCopyCell.oValue = oFromCell.oValue.clone(oCopyCell);
 							var DataNew = oCopyCell.getValueData();
 							if(false == DataOld.isEqual(DataNew))
-								History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.worksheet.getId(), new Asc.Range(0, oCopyCell.oId.getRow0(), gc_nMaxCol0, oCopyCell.oId.getRow0()), new UndoRedoData_CellSimpleData(oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), DataOld, DataNew));
+								History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.worksheet.getId(), new Asc.Range(oCopyCell.oId.getCol0(), oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), oCopyCell.oId.getRow0()), new UndoRedoData_CellSimpleData(oCopyCell.oId.getRow0(), oCopyCell.oId.getCol0(), DataOld, DataNew));
 							//todo
 							// if(oCopyCell.isEmptyTextString())
 								// this.worksheet._getHyperlink().remove({r1: oCopyCell.oId.getRow0(), c1: oCopyCell.oId.getCol0(), r2: oCopyCell.oId.getRow0(), c2: oCopyCell.oId.getCol0()});
