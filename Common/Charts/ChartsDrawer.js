@@ -230,9 +230,9 @@ CChartsDrawer.prototype =
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
 		
 		//находим значния для осей
-		this.calcProp.scale = this._getScale(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);	
+		this.calcProp.scale = this._getAxisData(false, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);	
 		if(this.calcProp.type == "Scatter")
-			this.calcProp.xScale = this._getScale(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);
+			this.calcProp.xScale = this._getAxisData(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);
 		
 		
 		//count line of chart grid
@@ -456,30 +456,6 @@ CChartsDrawer.prototype =
 			}
 		}
 		return summ;
-	},
-
-	_getColorProps: function()
-	{
-		var api_doc = window["editor"];
-		var api_sheet = window["Asc"]["editor"];
-        var theme, colorMap, RGBA;
-
-		if(api_sheet)
-		{
-			var wb = api_sheet.wbModel;
-			theme = wb.theme;
-			colorMap = GenerateDefaultColorMap().color_map;
-			RGBA = {R: 0, G: 0, B: 0, A: 255};
-		}
-		else if (api_doc)
-		{
-			theme  = api_doc.WordControl.m_oLogicDocument.theme;
-			colorMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
-			RGBA = {R: 0, G: 0, B: 0, A: 255};
-			if(colorMap==null)
-				colorMap = GenerateDefaultColorMap().color_map;
-		}
-		return {theme : theme, colorMap: colorMap, RGBA: RGBA};
 	},
 	
 	_calculateData: function(chart) {
@@ -960,184 +936,719 @@ CChartsDrawer.prototype =
 		return result;
 	},
 	
-	_getScale: function (max, obj, minVal, maxVal,yminVal,ymaxVal)
+	_getAxisData: function (max, mainObj, minVal, maxVal, yminVal, ymaxVal)
     {
-        var original_max = max;
-
-        var mainObj = obj;
         var greaterNullNum;
- 
+		
 		if(( 'Bar' == mainObj.type || 'Line' == mainObj.type || 'Area' == mainObj.type) && mainObj.subType == 'stackedPer')
+			return this._getLineAreaBarPercentAxisData(max, mainObj, minVal, maxVal, yminVal, ymaxVal);
+		else if('Scatter' == mainObj.type || 'HBar' == mainObj.type)
+			return this._getScatterHbarAxisData(max, mainObj, minVal, maxVal, yminVal, ymaxVal);
+		else
+			return this._getAnotherChartAxisData(max, mainObj, minVal, maxVal, yminVal, ymaxVal);
+	},
+	
+	_getLineAreaBarPercentAxisData : function(max, mainObj, minVal, maxVal, yminVal, ymaxVal)
+	{
+		//*** LINE / BAR / AREA + 100% ****
+		var arrNew =  mainObj.data;
+		var newMin, newMax, massRes, min;
+		
+		if(typeof(arrNew[0]) == 'object')
 		{
-			var arrNew =  mainObj.data;
- 
-			if(typeof(arrNew[0]) == 'object')
+			var arrMin = [];
+			var arrMax = [];
+			for (var j=0; j < arrNew.length; j++) {
+				newMax = 0;
+				newMin = 0;
+				if('Bar' == mainObj.type)
+				{
+					for (var i=0; i<arrNew[j].length; i++) {
+						if(arrNew[j][i] > 0)
+							newMax += arrNew[j][i]
+						else
+							newMin += arrNew[j][i]
+					}
+					arrMin[j] = newMin;
+					arrMax[j] = newMax;
+				}
+				else
+				{
+					min = Math.min.apply(null, arrNew[j]);
+					max = Math.max.apply(null, arrNew[j]);
+					arrMin[j] = min;
+					arrMax[j] = max;
+				}
+			   
+			}
+			min = Math.min.apply(null, arrMin);
+			max = Math.max.apply(null, arrMax);
+		}
+		else
+		{
+			min = minVal;
+			max = maxVal;
+		}
+
+		newMin = min;
+		newMax  = max;
+		
+		//находим максимум после преобразования
+		if('Bar' != mainObj.type)
+		{
+			 if(typeof(arrNew[0]) == 'object')
 			{
 				var arrMin = [];
 				var arrMax = [];
 				for (var j=0; j < arrNew.length; j++) {
-					var newMax = 0;
-					var newMin = 0;
-					if('Bar' == mainObj.type)
+					newMin = Math.min.apply(null, arrNew[j]);
+					newMax = Math.max.apply(null, arrNew[j]);
+					arrMin[j] = newMin;
+					arrMax[j] = newMax;
+				}
+				newMin = Math.min.apply(null, arrMin);
+				newMax = Math.max.apply(null, arrMax);
+			}
+			else
+			{
+				newMin = Math.min.apply(null, arrNew);
+				newMax = Math.max.apply(null, arrNew);
+			}
+		}
+	   
+		if(max <= 0 && min < 0)
+		{
+			var tempVal = Math.abs(newMax)
+			newMax = Math.abs(newMin);
+			newMin = tempVal;
+		}
+		massRes = [];
+		
+		//шаг нужно высчитывать
+		var step = 10;
+		if(((newMax - newMin)/10) > 11 )
+			step = 20;
+		if('Bar' == mainObj.type  && max > 0 && min < 0)
+			step = 20;
+		var maxValue = 100;
+		//находим максимум
+		for (var i=0; i < 11; i++) {
+			if(newMax < 100 - step*i && newMax > 100 - step*(i+1))
+				maxValue = 100 - step*i;
+		}
+		if(maxValue > 100)
+			maxValue = 100;
+		//получаем массив
+		if(max <= 0 && min < 0)
+		{
+			if('Bar' == mainObj.type)
+			{
+				for (var j=0; j < 11; j++) {
+					massRes[j] = (maxValue - step*j);
+					if(massRes[j] == 0)
 					{
-						for (var i=0; i<arrNew[j].length; i++) {
-							if(arrNew[j][i] > 0)
-								newMax += arrNew[j][i]
-							else
-								newMin += arrNew[j][i]
-						}
-						arrMin[j] = newMin;
-						arrMax[j] = newMax;
+						break;
 					}
-					else
+				}
+				mainObj.xaxispos = 'top';
+				massRes = this._array_reverse(massRes);
+				mainObj.ymax = massRes[massRes.length - 1];
+				mainObj.ymin = 0;
+			}
+			else
+			{
+				for (var j=0; j < 11; j++) {
+					massRes[j] = -(maxValue - step*j);
+					if(massRes[j] == 0)
 					{
-						min = Math.min.apply(null, arrNew[j]);
-						max = Math.max.apply(null, arrNew[j]);
-						arrMin[j] = min;
-						arrMax[j] = max;
+						break;
 					}
-				   
+				}
+				mainObj.ymax = 0;
+				mainObj.ymin = this._array_exp(massRes[0] - step);
+			}
+			
+		}
+		else if(max > 0 && min > 0)
+		{
+			for (var j=0; j < 11; j++) {
+				massRes[j] = maxValue - step*j;
+				if(massRes[j] == 0)
+				{
+					massRes = this._array_reverse(massRes);
+					break;
+				}
+			}
+			mainObj.ymax = this._array_exp(maxValue);
+			mainObj.ymin = this._array_exp(massRes[0] - step);
+		}
+		else
+		{
+			 for (var j=0; j < 11; j++) {
+				massRes[j] = maxValue - step*j;
+				if(massRes[j] <= newMin)
+				{
+					massRes = this._array_reverse(massRes);
+					break;
+				}
+			}
+			mainObj.ymax = this._array_exp(maxValue);
+			mainObj.ymin = massRes[0] - step;
+		}
+	   
+		return this._array_exp(massRes);
+	},
+	
+	_getScatterHbarAxisData : function(max, mainObj, minVal, maxVal, yminVal, ymaxVal)
+	{
+		//*** SCATTER / HBAR ****
+		var max1, min, greaterNullNum;
+		var arr = [];
+
+		//находим минимальное значение
+		var min;
+		var trueOX = false;
+		if('HBar' == mainObj.type)
+		{
+			trueOX = true;
+			if(typeof(mainObj.data[0]) == 'object')
+			{
+				var arrMin = [];
+				var arrMax = [];
+				for (var j=0; j < mainObj.data.length; j++) {
+					min = Math.min.apply(null, mainObj.data[j]);
+					max = Math.max.apply(null, mainObj.data[j]);
+					arrMin[j] = min;
+					arrMax[j] = max;
 				}
 				min = Math.min.apply(null, arrMin);
 				max = Math.max.apply(null, arrMax);
 			}
 			else
 			{
-				min = minVal;
-				max = maxVal;
+				min = Math.min.apply(null, mainObj.data);
+				max = Math.max.apply(null, mainObj.data);
 			}
-
-			var newMin = min;
-			var newMax  = max;
-			
-			//находим максимум после преобразования
-			if('Bar' != mainObj.type)
-			{
-				 if(typeof(arrNew[0]) == 'object')
+		}
+		
+		//в этом случае определяем значения для оси OX(max == true)
+		if(mainObj.type == 'Stock')
+		{
+			var arrTemp = []
+			var k = 0;
+			for (var j=0; j < mainObj.data[0].length; j++) {
+				for (var i=0; i<5; i++)
 				{
-					var arrMin = [];
-					var arrMax = [];
-					for (var j=0; j < arrNew.length; j++) {
-						newMin = Math.min.apply(null, arrNew[j]);
-						newMax = Math.max.apply(null, arrNew[j]);
-						arrMin[j] = newMin;
-						arrMax[j] = newMax;
-					}
-					newMin = Math.min.apply(null, arrMin);
-					newMax = Math.max.apply(null, arrMax);
-				}
-				else
-				{
-					newMin = Math.min.apply(null, arrNew);
-					newMax = Math.max.apply(null, arrNew);
+					arrTemp[k] = mainObj.data[0][j][1][i];
+					k++;
 				}
 			}
-		   
-			
-			
-			if(max <= 0 && min < 0)
+			min = Math.min.apply(null, arrTemp);
+			max = Math.max.apply(null, arrTemp);
+			if(min == max && max == 0)
 			{
-				var tempVal = Math.abs(newMax)
-				newMax = Math.abs(newMin);
-				newMin = tempVal;
+				mainObj._otherProps._ymax = 1;
+				mainObj._otherProps._ymin = 0;
+				return [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 			}
-			var massRes = [];
 			
-			//шаг нужно высчитывать
-			var step = 10;
-			if(((newMax - newMin)/10) > 11 )
-				step = 20;
-			if('Bar' == mainObj.type  && max > 0 && min < 0)
-				step = 20;
-			var maxValue = 100;
-			//находим максимум
-			for (var i=0; i < 11; i++) {
-				if(newMax < 100 - step*i && newMax > 100 - step*(i+1))
-					maxValue = 100 - step*i;
-			}
-			if(maxValue > 100)
-				maxValue = 100;
-			//получаем массив
-			if(max <= 0 && min < 0)
+			if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
+				return [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		}
+		if('Scatter' == mainObj.type)
+		{
+			if(undefined != max && true == max)
 			{
-				if('Bar' == mainObj.type)
-				{
-					for (var j=0; j < 11; j++) {
-						massRes[j] = (maxValue - step*j);
-						if(massRes[j] == 0)
-						{
-							break;
-						}
-					}
-					mainObj.xaxispos = 'top';
-					massRes = this._array_reverse(massRes);
-					mainObj.ymax = massRes[massRes.length - 1];
-					mainObj.ymin = 0;
-				}
-				else
-				{
-					for (var j=0; j < 11; j++) {
-						massRes[j] = -(maxValue - step*j);
-						if(massRes[j] == 0)
-						{
-							break;
-						}
-					}
-					mainObj.ymax = 0;
-					mainObj.ymin = this._array_exp(massRes[0] - step);
-				}
-				
-			}
-			else if(max > 0 && min > 0)
-			{
-				for (var j=0; j < 11; j++) {
-					massRes[j] = maxValue - step*j;
-					if(massRes[j] == 0)
-					{
-						massRes = this._array_reverse(massRes);
-						break;
-					}
-				}
-				mainObj.ymax = this._array_exp(maxValue);
-				mainObj.ymin = this._array_exp(massRes[0] - step);
+				min  = minVal;
+				max  =  maxVal;
+				trueOX = true;
 			}
 			else
 			{
-				 for (var j=0; j < 11; j++) {
-					massRes[j] = maxValue - step*j;
-					if(massRes[j] <= newMin)
+				min = yminVal;
+				max = ymaxVal;
+			}
+			if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
+				return [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		}
+
+		var degreeNum = 1;
+		var maxString = max.toExponential();
+		var minString = min.toExponential();
+		var floatKoff = 1000000000000;
+		if(maxString.search('e-') != -1 || minString.search('e-') != -1)
+		{
+			var partMin  = minString.split('e-');
+			var partMax  = maxString.split('e-');
+			if(partMin[1] != undefined)
+				degreeNum = Math.pow(10, partMin[1])
+			if(partMax[1] != undefined && ((parseFloat(partMin[1]) < parseFloat(partMax[1])) || partMin[1] == undefined))
+				degreeNum = Math.pow(10, partMax[1])	
+			max = this._round_val(max*degreeNum);
+			min = this._round_val(min*degreeNum);
+		}
+		
+		var axisXMax;
+		var axisXMin;
+		var stepOY;
+		var checkInput = false;
+		var greaterNull;
+		var chackBelowNull = false;
+		var checkIsMaxMin = false;
+		var arrForRealDiff = [];
+		if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
+		{
+			if( mainObj.subType == 'stackedPer')
+				return [20, 40, 60, 80, 100];
+			else
+				return [0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		}
+				
+		//подготовительная работы для дальнейшего вычисления шага
+		if(max >= 0 && min >= 0)
+		{
+			 if(max == min)
+			{
+				checkIsMaxMin = true;
+				min = 0;
+			}
+				
+			var diffPerMaxMin = ((max - min)/max)*100;
+			 axisXMax =  max + 0.05 * (max - min);
+			stepOY = (max-min)/4;
+			if(16.667 > diffPerMaxMin)
+			{
+				if(trueOX)
+				{
+					axisXMin = min;
+					greaterNull = (max - min)/4;
+					arrForRealDiff = [1.59595959, 3.18181818, 7.954545454];
+				}
+				else
+				{
+					axisXMin = min;
+					greaterNull = (max - min)/6;
+					arrForRealDiff = [1.51515151, 3.03030303, 7.57575757];
+				}
+			}
+			else
+			{
+				if(trueOX)
+				{
+					greaterNull = max/4;
+					arrForRealDiff = [1.66666666, 3.33333333, 8.33333333];
+					axisXMin = 0;
+				}
+				else
+				{
+					axisXMin = 0;
+				}
+			}
+		}
+		else if(max <= 0 && min <= 0)
+		{
+			if(max == min)
+			{
+				checkIsMaxMin = true;
+				max = 0;
+			}
+			var tempMax = max;
+			if(!trueOX)
+				mainObj.xaxispos = 'top';
+			else
+				mainObj.yaxispos = 'right';
+			max = Math.abs(min);
+			min = Math.abs(tempMax);
+			checkInput = true;
+			var diffPerMaxMin = Math.abs(((max - min)/max))*100;
+			axisXMax =  max;
+			stepOY = (max-min)/4;
+			chackBelowNull = true;
+			if(16.667 > diffPerMaxMin)
+			{
+				axisXMin = min;
+				greaterNull = Math.abs((Math.abs(max) - Math.abs(min)))/6;
+				arrForRealDiff = [1.51515151, 3.03030303, 7.57575757];
+			}
+			else
+			{
+				if(trueOX)
+				{
+					greaterNull = max/4;
+					arrForRealDiff = [1.66666666, 3.33333333, 8.33333333];
+					axisXMin = 0;
+				}
+				else
+				{
+					axisXMin = 0;
+				}
+			}
+		}
+		else if(max > 0 && min < 0)
+		{
+			stepOY = (max + Math.abs(min))/4;
+			axisXMax = max;
+			axisXMin = min;
+			if(trueOX)
+			{
+				greaterNull = (Math.abs(max) + Math.abs(min))/4;
+				arrForRealDiff = [1.59090909, 3.18181818, 7.954545454]
+			}
+			else
+			{
+				greaterNull = Math.abs((Math.abs(max) + Math.abs(min)))/6;
+				arrForRealDiff = [1.51515151, 3.03030303, 7.57575757]
+			}
+		}
+		
+		
+		
+		
+		//приводим к первому порядку для дальнейших вычислений
+		var secPart = max.toString().split('.');
+		var numPow = 1;
+		if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+		{
+			var expNum = secPart[1].toString().split('e+');
+			numPow = Math.pow(10, expNum[1]);
+		}
+		else if(0 != secPart[0])
+			numPow = Math.pow(10, secPart[0].toString().length - 1)
+		max = max/numPow;
+		if(0 == max.toString().split('.')[0])
+		{
+			var tempMax = max;
+			var num = -1;
+			while(0 == tempMax.toString().split('.')[0])
+			{
+				tempMax = max;
+				numPow = Math.pow(10, num);
+				tempMax = tempMax/numPow;
+				num--;
+			}
+			max = tempMax;
+		}
+		
+		
+		var stepOYPart = stepOY.toString().split('.');
+		var numPowOY;
+		var tempVal;
+		
+		if(0 != stepOYPart[0])
+			numPowOY = Math.pow(10, stepOYPart[0].toString().length - 1)
+		if(10 == stepOYPart[0])
+			numPowOY = 1;
+		if(0 == stepOYPart[0])
+		{
+			var tempMax = stepOY;
+			var num = -1;
+			while(0 == tempMax.toString().split('.')[0])
+			{
+				tempMax = stepOY;
+				numPowOY = Math.pow(10, num);
+				tempMax = tempMax/numPowOY;
+				num--;
+			}
+		}
+		
+		
+		//поиск шага
+		if(undefined != greaterNull)
+		{
+			 var greaterNullTemp = greaterNull.toString().split('.');
+			if(0 != greaterNullTemp[0])
+				greaterNullNum = Math.pow(10, greaterNullTemp[0].toString().length - 1)
+			if(0 == greaterNullTemp[0])
+			{
+				var tempMax = greaterNull;
+				var num = -1;
+				while(0 == tempMax.toString().split('.')[0])
+				{
+					tempMax = greaterNull;
+					greaterNullNum = Math.pow(10, num);
+					tempMax = tempMax/greaterNullNum;
+					num--;
+				}
+			}
+			else if(greaterNull.toString().indexOf("e+") > -1)
+			{
+				var splitString = greaterNull.toString().split("e+");
+				if(splitString[1])
+					greaterNullNum = Math.pow(10, parseFloat(splitString[1]));
+			}
+			
+			greaterNull = greaterNull/greaterNullNum;
+
+				 if(1 < greaterNull && arrForRealDiff[0] >= greaterNull)
+					greaterNull = 1;
+				else if(arrForRealDiff[0] < greaterNull && arrForRealDiff[1] >= greaterNull)
+					greaterNull = 2;
+				else if(arrForRealDiff[1] < greaterNull && arrForRealDiff[2] >= greaterNull)
+					greaterNull = 5;
+				else if(arrForRealDiff[2] < greaterNull && 10 >= greaterNull)
+					greaterNull = 10;
+		   
+			greaterNull = greaterNull*greaterNullNum;
+			stepOY = greaterNull;
+		}
+		
+		arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
+		//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+		var arrMaxVal = [0, 0.952380952, 1.904761904, 4.76190476, 9.523809523]
+		//массив диапазонов
+		var arrDiffVal1 = [0, 0.2, 0.5, 1, 2]
+		if(axisXMin == 0 && undefined == greaterNull)//если разница между min и max такая, что не нужно масштабировать
+		{
+			var trueDiff = 1;
+			for (var i=0; i<arr.length; i++) {
+				if( max >= arr[i] && max <= arr[i+1])
+				{
+					var max1 = arr[i+1];
+					var trueMax;
+					var diff = max1/10;
+					trueDiff = diff;
+					var maxVal;
+					//проверяем есть ли переход в следующий диапазон
+					if(max > arrMaxVal[i+1])
 					{
-						massRes = this._array_reverse(massRes);
-						break;
+						trueDiff = arrDiffVal1[i+1]
 					}
 				}
-				mainObj.ymax = this._array_exp(maxValue);
-				mainObj.ymin = massRes[0] - step;
 			}
-		   
-
-			return this._array_exp(massRes);
+			stepOY = trueDiff*numPow;
 		}
-		else if('Scatter' == mainObj.type || 'HBar' == mainObj.type)
+		
+		if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
 		{
-			var max1;
-			var arr = [];
-
-			//находим минимальное значение
-			var min;
-			var trueOX = false;
-			if('HBar' == mainObj.type)
+			if(axisXMin < 0 && axisXMax > 0)
 			{
-				trueOX = true;
+				var summVal = Math.abs(axisXMin) + Math.abs(axisXMax)
+				if(summVal <= 100)
+					stepOY  = 10;
+				else if(summVal > 100 && summVal <= 139)
+					stepOY  = 20;
+				else
+					stepOY  = 50;
+			}
+			else
+			{
+				stepOY  = 20;
+			}
+		}
+		
+		//находим истинные min и max
+		var testDiff;
+		var axisXMinTest;
+		if(axisXMin == 0)
+		{
+			testDiff = stepOY/numPow;
+			axisXMinTest = axisXMin/numPow
+		}
+		else
+		{
+			testDiff = stepOY/numPowOY;
+			axisXMinTest = axisXMin/numPowOY;
+		}
+		var tempNum;
+		var countAfterPoint = 1;
+		
+		if(undefined != axisXMinTest.toString().split('.')[1])
+		{
+			countAfterPoint = Math.pow(10, axisXMinTest.toString().split('.')[1].toString().length - 1)
+		}
+		
+		if(1 == testDiff)
+			tempNum = testDiff/4;
+		else if(2 == testDiff)
+			tempNum = testDiff/4;
+		else if(5 == testDiff)
+			tempNum = testDiff/10;
+		else if(10 == testDiff)
+			tempNum = testDiff/20;
+		axisXMinTest = Math.floor(axisXMinTest);
+		while(0 != axisXMinTest%testDiff)
+		{
+			axisXMinTest = axisXMinTest - tempNum;
+		}
+
+		
+		
+		//возвращаем массив
+		var varMin = axisXMinTest*numPowOY;
+		var massRes = [];
+		var tempKoff = 100000000000;
+		varMin = this._round_val(varMin);
+
+
+		var lengthNum;
+		if(!trueOX)
+		{
+			
+			if(chackBelowNull)
+			{
+				if(min == varMin && !checkIsMaxMin && min != 0 )
+					varMin = varMin - stepOY ;
+				varMin = varMin/degreeNum;
+				stepOY = stepOY/degreeNum;
+				axisXMax = axisXMax/degreeNum;
+				max = max/degreeNum;
+				if(undefined != varMin.toString().split('.')[1])
+					lengthNum = varMin.toString().split('.')[1].length;
+				for (var k=0; k <= 11; k++) {
+					massRes[k] = this._round_val(varMin + (k)*(stepOY));
+					if(massRes[k] > axisXMax)
+					{
+						break;
+					}
+				
+				}
+				if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
+					massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
+				
+				mainObj.ymax = -massRes[0];
+				mainObj.ymin = -massRes[massRes.length - 1];
+				//mainObj.max = -massRes[0];
+			}
+			else
+			{
+				if(min == varMin && !checkIsMaxMin)
+					varMin = varMin - stepOY ;
+				if(undefined != varMin.toString().split('.')[1])
+					lengthNum = varMin.toString().split('.')[1].length;
+				
+				 varMin = varMin/degreeNum;
+				stepOY = stepOY/degreeNum;
+				axisXMax = axisXMax/degreeNum;
+				max = max/degreeNum;
+				
+				if(min == 0 && (mainObj.type == 'Stock' || mainObj.type == 'Scatter'))
+					varMin = 0;
+				if(max == 0 && mainObj.type == 'Stock')
+					axisXMax = 0 + stepOY;
+				for (var k=0; k <= 11; k++) {
+					massRes[k] = this._round_val(varMin + (k)*(stepOY));
+					if(massRes[k] > axisXMax)
+					{
+						break;
+					}
+				
+				}
+				if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
+					massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
+				//mainObj.max =  massRes[massRes.length - 1];
+				mainObj.ymax = massRes[massRes.length - 1];
+				mainObj.ymin = massRes[0];
+			}
+		}
+		else
+		{
+			if(chackBelowNull)
+			{
+				if(min == varMin && !checkIsMaxMin && min != 0)
+					varMin = varMin - stepOY ; 
+				if(undefined != varMin.toString().split('.')[1])
+					lengthNum = varMin.toString().split('.')[1].length;
+				varMin = varMin/degreeNum;
+				stepOY = stepOY/degreeNum;
+				axisXMax = axisXMax/degreeNum;	
+				max = max/degreeNum;
+				for (var k=0; k <= 11; k++) {
+					massRes[k] = this._round_val(varMin + (k)*(stepOY));
+					if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
+					{
+						if(massRes[k] >= axisXMax)
+						{
+							break;
+						}
+					}
+					else
+					{
+						if(massRes[k] > axisXMax)
+						{
+							break;
+						}
+					}
+				
+				}
+				if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
+					massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
+				
+				mainObj.xmax = -massRes[0];
+				mainObj.xmin = -massRes[massRes.length - 1];
+			}
+			else
+			{
+				if(min == varMin && !checkIsMaxMin &&  'HBar' != mainObj.type && mainObj.subType != 'stackedPer')
+					varMin = varMin - stepOY ;
+				if(undefined != varMin.toString().split('.')[1])
+					lengthNum = varMin.toString().split('.')[1].length; 
+				
+				 varMin = varMin/degreeNum;
+				stepOY = stepOY/degreeNum;
+				axisXMax = axisXMax/degreeNum;
+				max = max/degreeNum;
+				for (var k=0; k <= 11; k++) {
+					massRes[k] = this._round_val(parseFloat(varMin + (k)*(stepOY)));
+					if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
+					{
+						if(massRes[k] >= axisXMax || massRes[k] >= 100)
+						{
+							break;
+						}
+					}
+					else
+					{
+						if(massRes[k] > axisXMax)
+						{
+							break;
+						}
+					}
+				}
+				
+				if(massRes[massRes.length - 1] == max && !checkIsMaxMin && !('HBar' == mainObj.type && mainObj.subType == 'stackedPer'))
+					massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
+				
+				mainObj.xmax = massRes[massRes.length - 1];
+				mainObj.xmin = massRes[0];
+				mainObj.xmax = massRes[massRes.length - 1];
+			}
+		}
+		if('hbar' == mainObj.type)
+		{
+			massRes.splice(0,1);
+		}
+		return this._array_exp(massRes);
+	},
+		
+	_getAnotherChartAxisData : function(max, mainObj, minVal, maxVal, yminVal, ymaxVal)
+	{
+		//***ANOTHER CHARTS***
+		var max1;
+		var arr = [];
+		//находим минимальное значение
+		var min, max, greaterNullNum;
+		if('Bar' == mainObj.type)
+		{
+			if(mainObj.subType == 'stacked')
+			{
+				//суммируем отрицательные и положительные значения
 				if(typeof(mainObj.data[0]) == 'object')
 				{
 					var arrMin = [];
 					var arrMax = [];
 					for (var j=0; j < mainObj.data.length; j++) {
-						min = Math.min.apply(null, mainObj.data[j]);
-						max = Math.max.apply(null, mainObj.data[j]);
-						arrMin[j] = min;
-						arrMax[j] = max;
+						var allHeightAbNull = 0;
+						var allHeightLessNull = 0;
+						for (var i=0; i < mainObj.data[j].length; i++) 
+							{
+								
+								if(mainObj.data[j][i] > 0)
+									allHeightAbNull += mainObj.data[j][i];
+								else
+									allHeightLessNull += mainObj.data[j][i];
+							}
+							arrMin[j] = allHeightLessNull;
+							arrMax[j] = allHeightAbNull;
 					}
 					min = Math.min.apply(null, arrMin);
 					max = Math.max.apply(null, arrMax);
@@ -1147,880 +1658,344 @@ CChartsDrawer.prototype =
 					min = Math.min.apply(null, mainObj.data);
 					max = Math.max.apply(null, mainObj.data);
 				}
-				//min = minVal;
-				//max = maxVal;
-			}
-			
-			//в этом случае определяем значения для оси OX(max == true)
-			if(mainObj.type == 'Stock')
-			{
-				var arrTemp = []
-				var k = 0;
-				for (var j=0; j < mainObj.data[0].length; j++) {
-					for (var i=0; i<5; i++)
-					{
-						arrTemp[k] = mainObj.data[0][j][1][i];
-						k++;
-					}
-				}
-				min = Math.min.apply(null, arrTemp);
-				max = Math.max.apply(null, arrTemp);
-				if(min == max && max == 0)
-				{
-					mainObj._otherProps._ymax = 1;
-					mainObj._otherProps._ymin = 0;
-					return [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-				}
-				
-				if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
-					return [0,0.2,0.4,0.6,0.8,1,1.2];
-			}
-			if('Scatter' == mainObj.type)
-			{
-				if(undefined != max && true == max)
-				{
-					min  = minVal;
-					max  =  maxVal;
-					trueOX = true;
-				}
-				else
-				{
-					min = yminVal;
-					max = ymaxVal;
-				}
-				if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
-					return [0,0.2,0.4,0.6,0.8,1,1.2];
-			}
-
-			var degreeNum = 1;
-			var maxString = max.toExponential();
-			var minString = min.toExponential();
-			var floatKoff = 1000000000000;
-			if(maxString.search('e-') != -1 || minString.search('e-') != -1)
-			{
-				var partMin  = minString.split('e-');
-				var partMax  = maxString.split('e-');
-				if(partMin[1] != undefined)
-					degreeNum = Math.pow(10, partMin[1])
-				if(partMax[1] != undefined && ((parseFloat(partMin[1]) < parseFloat(partMax[1])) || partMin[1] == undefined))
-					degreeNum = Math.pow(10, partMax[1])	
-				max = this._round_val(max*degreeNum);
-				min = this._round_val(min*degreeNum);
-			}
-			
-			var axisXMax;
-			var axisXMin;
-			var stepOY;
-			var checkInput = false;
-			var greaterNull;
-			var chackBelowNull = false;
-			var checkIsMaxMin = false;
-			var arrForRealDiff = [];
-			if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
-			{
-				if( mainObj.subType == 'stackedPer')
-					return [20,40,60,80,100];
-				else
-					return [0.2,0.4,0.6,0.8,1,1.2];
-			}
-					
-			//подготовительная работы для дальнейшего вычисления шага
-			if(max >= 0 && min >= 0)
-			{
-				 if(max == min)
-				{
-					checkIsMaxMin = true;
-					min = 0;
-				}
-					
-				var diffPerMaxMin = ((max - min)/max)*100;
-				 axisXMax =  max + 0.05 * (max - min);
-				stepOY = (max-min)/4;
-				if(16.667 > diffPerMaxMin)
-				{
-					if(trueOX)
-					{
-						axisXMin = min;
-						greaterNull = (max - min)/4;
-						arrForRealDiff = [1.59595959,3.18181818,7.954545454];
-					}
-					else
-					{
-						axisXMin = min;
-						greaterNull = (max - min)/6;
-						arrForRealDiff = [1.51515151,3.03030303,7.57575757];
-					}
-				}
-				else
-				{
-					if(trueOX)
-					{
-						greaterNull = max/4;
-						arrForRealDiff = [1.66666666,3.33333333,8.33333333];
-						axisXMin = 0;
-					}
-					else
-					{
-						axisXMin = 0;
-					}
-				}
-			}
-			else if(max <= 0 && min <= 0)
-			{
-				if(max == min)
-				{
-					checkIsMaxMin = true;
-					max = 0;
-				}
-				var tempMax = max;
-				if(!trueOX)
-					mainObj.xaxispos = 'top';
-				else
-					mainObj.yaxispos = 'right';
-				max = Math.abs(min);
-				min = Math.abs(tempMax);
-				checkInput = true;
-				var diffPerMaxMin = Math.abs(((max - min)/max))*100;
-				axisXMax =  max;
-				stepOY = (max-min)/4;
-				chackBelowNull = true;
-				if(16.667 > diffPerMaxMin)
-				{
-					axisXMin = min;
-					greaterNull = Math.abs((Math.abs(max) - Math.abs(min)))/6;
-					arrForRealDiff = [1.51515151,3.03030303,7.57575757];
-				}
-				else
-				{
-					if(trueOX)
-					{
-						greaterNull = max/4;
-						arrForRealDiff = [1.66666666,3.33333333,8.33333333];
-						axisXMin = 0;
-					}
-					else
-					{
-						axisXMin = 0;
-					}
-				}
-			}
-			else if(max > 0 && min < 0)
-			{
-				stepOY = (max + Math.abs(min))/4;
-				axisXMax = max;
-				axisXMin = min;
-				if(trueOX)
-				{
-					greaterNull = (Math.abs(max) + Math.abs(min))/4;
-					arrForRealDiff = [1.59090909,3.18181818,7.954545454]
-				}
-				else
-				{
-					greaterNull = Math.abs((Math.abs(max) + Math.abs(min)))/6;
-					arrForRealDiff = [1.51515151,3.03030303,7.57575757]
-				}
-			}
-			
-			
-			
-			
-			//приводим к первому порядку для дальнейших вычислений
-			var secPart = max.toString().split('.');
-			var numPow = 1;
-			if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
-			{
-				var expNum = secPart[1].toString().split('e+');
-				numPow = Math.pow(10, expNum[1]);
-			}
-			else if(0 != secPart[0])
-				numPow = Math.pow(10, secPart[0].toString().length - 1)
-			max = max/numPow;
-			if(0 == max.toString().split('.')[0])
-			{
-				var tempMax = max;
-				var num = -1;
-				while(0 == tempMax.toString().split('.')[0])
-				{
-					tempMax = max;
-					numPow = Math.pow(10, num);
-					tempMax = tempMax/numPow;
-					num--;
-				}
-				max = tempMax;
-			}
-			
-			
-			var stepOYPart = stepOY.toString().split('.');
-			var numPowOY;
-			var tempVal;
-			
-			if(0 != stepOYPart[0])
-				numPowOY = Math.pow(10, stepOYPart[0].toString().length - 1)
-			if(10 == stepOYPart[0])
-				numPowOY = 1;
-			if(0 == stepOYPart[0])
-			{
-				var tempMax = stepOY;
-				var num = -1;
-				while(0 == tempMax.toString().split('.')[0])
-				{
-					tempMax = stepOY;
-					numPowOY = Math.pow(10, num);
-					tempMax = tempMax/numPowOY;
-					num--;
-				}
-			}
-			
-			
-			//поиск шага
-			if(undefined != greaterNull)
-			{
-				 var greaterNullTemp = greaterNull.toString().split('.');
-				if(0 != greaterNullTemp[0])
-					greaterNullNum = Math.pow(10, greaterNullTemp[0].toString().length - 1)
-				if(0 == greaterNullTemp[0])
-				{
-					var tempMax = greaterNull;
-					var num = -1;
-					while(0 == tempMax.toString().split('.')[0])
-					{
-						tempMax = greaterNull;
-						greaterNullNum = Math.pow(10, num);
-						tempMax = tempMax/greaterNullNum;
-						num--;
-					}
-				}
-				else if(greaterNull.toString().indexOf("e+") > -1)
-				{
-					var splitString = greaterNull.toString().split("e+");
-					if(splitString[1])
-						greaterNullNum = Math.pow(10, parseFloat(splitString[1]));
-				}
-				
-				greaterNull = greaterNull/greaterNullNum;
-
-					 if(1 < greaterNull && arrForRealDiff[0] >= greaterNull)
-						greaterNull = 1;
-					else if(arrForRealDiff[0] < greaterNull && arrForRealDiff[1] >= greaterNull)
-						greaterNull = 2;
-					else if(arrForRealDiff[1] < greaterNull && arrForRealDiff[2] >= greaterNull)
-						greaterNull = 5;
-					else if(arrForRealDiff[2] < greaterNull && 10 >= greaterNull)
-						greaterNull = 10;
-			   
-				greaterNull = greaterNull*greaterNullNum;
-				stepOY = greaterNull;
-			}
-			
-			arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-			//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
-			var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-			//массив диапазонов
-			var arrDiffVal1 = [0,0.2,0.5,1,2]
-			if(axisXMin == 0 && undefined == greaterNull)//если разница между min и max такая, что не нужно масштабировать
-			{
-				var trueDiff = 1;
-				for (var i=0; i<arr.length; i++) {
-					if( max >= arr[i] && max <= arr[i+1])
-					{
-						var max1 = arr[i+1];
-						var trueMax;
-						var diff = max1/10;
-						trueDiff = diff;
-						var maxVal;
-						//проверяем есть ли переход в следующий диапазон
-						if(max > arrMaxVal[i+1])
-						{
-							trueDiff = arrDiffVal1[i+1]
-						}
-					}
-				}
-				stepOY = trueDiff*numPow;
-			}
-			
-			if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
-			{
-				if(axisXMin < 0 && axisXMax > 0)
-				{
-					var summVal = Math.abs(axisXMin) + Math.abs(axisXMax)
-					if(summVal <= 100)
-						stepOY  = 10;
-					else if(summVal > 100 && summVal <= 139)
-						stepOY  = 20;
-					else
-						stepOY  = 50;
-				}
-				else
-				{
-					stepOY  = 20;
-				}
-			}
-			
-			//находим истинные min и max
-			var testDiff;
-			var axisXMinTest;
-			if(axisXMin == 0)
-			{
-				testDiff = stepOY/numPow;
-				axisXMinTest = axisXMin/numPow
 			}
 			else
 			{
-				testDiff = stepOY/numPowOY;
-				axisXMinTest = axisXMin/numPowOY;
+				min = minVal;
+				max = maxVal;
 			}
-			var tempNum;
-			var countAfterPoint = 1;
-			
-			if(undefined != axisXMinTest.toString().split('.')[1])
-			{
-				countAfterPoint = Math.pow(10, axisXMinTest.toString().split('.')[1].toString().length - 1)
-			}
-			
-			if(1 == testDiff)
-				tempNum = testDiff/4;
-			else if(2 == testDiff)
-				tempNum = testDiff/4;
-			else if(5 == testDiff)
-				tempNum = testDiff/10;
-			else if(10 == testDiff)
-				tempNum = testDiff/20;
-			axisXMinTest = Math.floor(axisXMinTest);
-			while(0 != axisXMinTest%testDiff)
-			{
-				axisXMinTest = axisXMinTest - tempNum;
-			}
-
-			
-			
-			//возвращаем массив
-			var varMin = axisXMinTest*numPowOY;
-			var massRes = [];
-			var tempKoff = 100000000000;
-			varMin = this._round_val(varMin);
-
-
-			var lengthNum;
-			if(!trueOX)
-			{
-				
-				if(chackBelowNull)
-				{
-					if(min == varMin && !checkIsMaxMin && min != 0 )
-						varMin = varMin - stepOY ;
-					varMin = varMin/degreeNum;
-					stepOY = stepOY/degreeNum;
-					axisXMax = axisXMax/degreeNum;
-					max = max/degreeNum;
-					if(undefined != varMin.toString().split('.')[1])
-						lengthNum = varMin.toString().split('.')[1].length;
-					for (var k=0; k <= 11; k++) {
-						massRes[k] = this._round_val(varMin + (k)*(stepOY));
-						if(massRes[k] > axisXMax)
-						{
-							break;
-						}
-					
-					}
-					if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
-						massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
-					
-					mainObj.ymax = -massRes[0];
-					mainObj.ymin = -massRes[massRes.length - 1];
-					//mainObj.max = -massRes[0];
-				}
-				else
-				{
-					if(min == varMin && !checkIsMaxMin)
-						varMin = varMin - stepOY ;
-					if(undefined != varMin.toString().split('.')[1])
-						lengthNum = varMin.toString().split('.')[1].length;
-					
-					 varMin = varMin/degreeNum;
-					stepOY = stepOY/degreeNum;
-					axisXMax = axisXMax/degreeNum;
-					max = max/degreeNum;
-					
-					if(min == 0 && (mainObj.type == 'Stock' || mainObj.type == 'Scatter'))
-						varMin = 0;
-					if(max == 0 && mainObj.type == 'Stock')
-						axisXMax = 0 + stepOY;
-					for (var k=0; k <= 11; k++) {
-						massRes[k] = this._round_val(varMin + (k)*(stepOY));
-						if(massRes[k] > axisXMax)
-						{
-							break;
-						}
-					
-					}
-					if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
-						massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
-					//mainObj.max =  massRes[massRes.length - 1];
-					mainObj.ymax = massRes[massRes.length - 1];
-					mainObj.ymin = massRes[0];
-				}
-			}
-			else
-			{
-				if(chackBelowNull)
-				{
-					if(min == varMin && !checkIsMaxMin && min != 0)
-						varMin = varMin - stepOY ; 
-					if(undefined != varMin.toString().split('.')[1])
-						lengthNum = varMin.toString().split('.')[1].length;
-					varMin = varMin/degreeNum;
-					stepOY = stepOY/degreeNum;
-					axisXMax = axisXMax/degreeNum;	
-					max = max/degreeNum;
-					for (var k=0; k <= 11; k++) {
-						massRes[k] = this._round_val(varMin + (k)*(stepOY));
-						if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
-						{
-							if(massRes[k] >= axisXMax)
-							{
-								break;
-							}
-						}
-						else
-						{
-							if(massRes[k] > axisXMax)
-							{
-								break;
-							}
-						}
-					
-					}
-					if(massRes[massRes.length - 1] == max && !checkIsMaxMin)
-						massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
-					
-					mainObj.xmax = -massRes[0];
-					mainObj.xmin = -massRes[massRes.length - 1];
-				}
-				else
-				{
-					if(min == varMin && !checkIsMaxMin &&  'HBar' != mainObj.type && mainObj.subType != 'stackedPer')
-						varMin = varMin - stepOY ;
-					if(undefined != varMin.toString().split('.')[1])
-						lengthNum = varMin.toString().split('.')[1].length; 
-					
-					 varMin = varMin/degreeNum;
-					stepOY = stepOY/degreeNum;
-					axisXMax = axisXMax/degreeNum;
-					max = max/degreeNum;
-					for (var k=0; k <= 11; k++) {
-						massRes[k] = this._round_val(parseFloat(varMin + (k)*(stepOY)));
-						if('HBar' == mainObj.type && mainObj.subType == 'stackedPer')
-						{
-							if(massRes[k] >= axisXMax || massRes[k] >= 100)
-							{
-								break;
-							}
-						}
-						else
-						{
-							if(massRes[k] > axisXMax)
-							{
-								break;
-							}
-						}
-					}
-					
-					if(massRes[massRes.length - 1] == max && !checkIsMaxMin && !('HBar' == mainObj.type && mainObj.subType == 'stackedPer'))
-						massRes[massRes.length] = massRes[massRes.length - 1] + stepOY;
-					
-					mainObj.xmax = massRes[massRes.length - 1];
-					mainObj.xmin = massRes[0];
-					mainObj.xmax = massRes[massRes.length - 1];
-				}
-			}
-			if('hbar' == mainObj.type)
-			{
-				massRes.splice(0,1);
-			}
-			return this._array_exp(massRes);
 		}
 		else
 		{
-			var max1;
-			var arr = [];
-			//находим минимальное значение
-			var min;
-			var max;
-			if('Bar' == mainObj.type || 'HBar' == mainObj.type)
+			if(('Line' == mainObj.type && mainObj.subType == 'stacked' ) || 'Line' != mainObj.type )
 			{
-				if(mainObj.subType == 'stacked')
-				{
-					//суммируем отрицательные и положительные значения
-					if(typeof(mainObj.data[0]) == 'object')
-					{
-						var arrMin = [];
-						var arrMax = [];
-						for (var j=0; j < mainObj.data.length; j++) {
-							var allHeightAbNull = 0;
-							var allHeightLessNull = 0;
-							for (var i=0; i < mainObj.data[j].length; i++) 
-								{
-									
-									if(mainObj.data[j][i] > 0)
-										allHeightAbNull += mainObj.data[j][i];
-									else
-										allHeightLessNull += mainObj.data[j][i];
-								}
-								arrMin[j] = allHeightLessNull;
-								arrMax[j] = allHeightAbNull;
-						}
-						min = Math.min.apply(null, arrMin);
-						max = Math.max.apply(null, arrMax);
-					}
-					else
-					{
-						min = Math.min.apply(null, mainObj.data);
-						max = Math.max.apply(null, mainObj.data);
-					}
-				}
-				else
-				{
-					min = minVal;
-					max = maxVal;
-				}
+				var arrMin = [];
+				var arrMax = [];
+				for (var j=0; j<mainObj.data.length; j++) {
+					min = Math.min.apply(null, mainObj.data[j]);
+					max = Math.max.apply(null, mainObj.data[j]);
+					arrMin[j] = min;
+					arrMax[j] = max;
+				}	
+				min = Math.min.apply(null, arrMin);
+				max = Math.max.apply(null, arrMax);
 			}
 			else
-			{
-				if(('Line' == mainObj.type && mainObj.subType == 'stacked' ) || 'Line' != mainObj.type )
-				{
-					var arrMin = [];
-					var arrMax = [];
-					for (var j=0; j<mainObj.data.length; j++) {
-						min = Math.min.apply(null, mainObj.data[j]);
-						max = Math.max.apply(null, mainObj.data[j]);
-						arrMin[j] = min;
-						arrMax[j] = max;
-					}	
-					min = Math.min.apply(null, arrMin);
-					max = Math.max.apply(null, arrMax);
-				}
-				else
-				{	
-					min = minVal;
-					max = maxVal;
-				}
+			{	
+				min = minVal;
+				max = maxVal;
 			}
-			
-			if(max == min)
-			{
-				if(max > 0)
-					min = 0;
-				else if(max < 0)
-					max = 0;
-			}
-			
-			var degreeNum = 1;
-			var maxString = max.toExponential();
-			var minString = min.toExponential();
-			var floatKoff = 10000000000;
-			if(maxString.search('e-') != -1 || minString.search('e-') != -1)
-			{
-				var partMin  = minString.split('e-');
-				var partMax  = maxString.split('e-');
-				if(partMin[1] != undefined)
-					degreeNum = Math.pow(10, partMin[1])
-				if(partMax[1] != undefined && (parseFloat(partMin[1]) < parseFloat(partMax[1])))
-					degreeNum = Math.pow(10, partMax[1])	
-				max = this._round_val(max*degreeNum);
-				min = this._round_val(min*degreeNum);
-			}
-			
-			
-			var axisXMax;
-			var axisXMin;
-			var stepOY;
-			var checkInput = false;
-			var greaterNull;
-			var firstMax = max;
-			var firstMin = min;
-			
-			
-			var arrForRealDiff = [];
-			if(max >= 0 && min >= 0)
-			{
-				var diffPerMaxMin = ((max - min)/max)*100;
-				 axisXMax =  max + 0.05 * (max - min);
-				stepOY = (max-min)/4;
-				if(16.667 > diffPerMaxMin)
-				{
-					axisXMin = min - ((max - min) / 2);
-					greaterNull = (max - min)/4;
-					arrForRealDiff = [1.5873,3.1745,7.93651]
-				}
-				else
-				{
-					axisXMin = 0;
-				}
-			}
-			else if(max <= 0 && min <= 0)
-			{
-				var tempMax = max;
-				mainObj.xaxispos = 'top';
-				max = Math.abs(min);
-				min = Math.abs(tempMax);
-				checkInput = true;
-				var diffPerMaxMin = ((max - min)/max)*100;
-				 axisXMax =  max + 0.05 * (max - min);
-				stepOY = (max-min)/4;
-				if(16.667 > diffPerMaxMin)
-				{
-					axisXMin = min - ((max - min) / 2);
-					greaterNull = (max - min)/4;
-					arrForRealDiff = [1.5873,3.1745,7.93651]
-				}
-				else
-				{
-					axisXMin = 0;
-				}
-			}
-			else if(max > 0 && min < 0)
-			{
-				stepOY = (max + Math.abs(min))/4;
-				axisXMax = max + 0.05 * (max - min);
-				axisXMin = min + 0.05 * (min - max);
-				greaterNull = (Math.abs(max) + Math.abs(min))/6;
-				arrForRealDiff = [1.51515151,3.03030303,7.57575757]
-			}
-			
-			
-			//приведение к первому порядку для дальнейших вычислений
-			var secPart = max.toString().split('.');
-			var numPow = 1;
-			if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
-			{
-				var expNum = secPart[1].toString().split('e+');
-				numPow = Math.pow(10, expNum[1]);
-			}
-			else if(0 != secPart[0])
-				numPow = Math.pow(10, secPart[0].toString().length - 1)
-			max = max/numPow;
-			if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
-					return [0.2,0.4,0.6,0.8,1,1.2];
-			if(0 == max.toString().split('.')[0])
-			{
-				var tempMax = max;
-				var num = -1;
-				while(0 == tempMax.toString().split('.')[0])
-				{
-					tempMax = max;
-					numPow = Math.pow(10, num);
-					tempMax = tempMax/numPow;
-					num--;
-				}
-				max = tempMax;
-			}
-			
-			
-			var stepOYPart = stepOY.toString().split('.');
-			var numPowOY;
-			var tempVal;
-			
-			if(0 != stepOYPart[0])
-				numPowOY = Math.pow(10, stepOYPart[0].toString().length - 1)
-			if(10 == stepOYPart[0])
-				numPowOY = 1;
-			if(0 == stepOYPart[0])
-			{
-				var tempMax = stepOY;
-				var num = -1;
-				while(0 == tempMax.toString().split('.')[0])
-				{
-					tempMax = stepOY;
-					numPowOY = Math.pow(10, num);
-					tempMax = tempMax/numPowOY;
-					num--;
-				}
-			}
-			
-			
-			//поиск шага
-			if(undefined != greaterNull)
-			{
-				 var greaterNullTemp = greaterNull.toString().split('.');
-				if(0 != greaterNullTemp[0])
-					greaterNullNum = Math.pow(10, greaterNullTemp[0].toString().length - 1)
-				if(0 == greaterNullTemp[0])
-				{
-					var tempMax = greaterNull;
-					var num = -1;
-					while(0 == tempMax.toString().split('.')[0])
-					{
-						tempMax = greaterNull;
-						greaterNullNum = Math.pow(10, num);
-						tempMax = tempMax/greaterNullNum;
-						num--;
-					}
-				}
-				
-				greaterNull = greaterNull/greaterNullNum;
-				if(1 < greaterNull && arrForRealDiff[0] >= greaterNull)
-					greaterNull = 1;
-				else if(arrForRealDiff[0] < greaterNull && arrForRealDiff[1] >= greaterNull)
-					greaterNull = 2;
-				else if(arrForRealDiff[1] < greaterNull && arrForRealDiff[2] >= greaterNull)
-					greaterNull = 5;
-				else if(arrForRealDiff[2] < greaterNull && 10 >= greaterNull)
-					greaterNull = 10;
-				greaterNull = greaterNull*greaterNullNum;
-				stepOY = greaterNull;
-			}
-			
-			arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-			//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
-			var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-			//массив диапазонов
-			var arrDiffVal1 = [0,0.2,0.5,1,2]
-			if(axisXMin == 0)//если разница между min и max такая, что не нужно масштабировать
-			{
-				var trueDiff = 1;
-				for (var i=0; i<arr.length; i++) {
-					if( max >= arr[i] && max <= arr[i+1])
-					{
-						var max1 = arr[i+1];
-						var trueMax;
-						var diff = max1/10;
-						trueDiff = diff;
-						var maxVal;
-						//проверяем есть ли переход в следующий диапазон
-						if(max > arrMaxVal[i+1])
-						{
-							trueDiff = arrDiffVal1[i+1]
-						}
-					}
-				}
-				stepOY = trueDiff*numPow;
-			}
-			
-			
-			stepOY = this._round_val(stepOY);
-			
-			
-			
-			//находим истинные min и max
-			var testDiff;
-			var axisXMinTest;
-			if(axisXMin == 0)
-			{
-				testDiff = stepOY/numPow;
-				axisXMinTest = axisXMin/numPow
-			}
-			else
-			{
-				testDiff = stepOY/numPowOY;
-				axisXMinTest = axisXMin/numPowOY;
-			}
-			var tempNum;
-			var countAfterPoint = 1;
-			
-			if(undefined != axisXMinTest.toString().split('.')[1])
-			{
-				countAfterPoint = Math.pow(10, axisXMinTest.toString().split('.')[1].toString().length - 1)
-			}
-			var floatKoff = 10000000000;
-			if(0.5 == testDiff)
-				tempNum = testDiff/5;
-			else if(1 == testDiff)
-				tempNum = testDiff/4;
-			else if(2 == testDiff)
-				tempNum = testDiff/4;
-			else if(5 == testDiff)
-				tempNum = testDiff/10;
-			else
-				tempNum = testDiff/20;
-			if(testDiff != 0.5)
-				axisXMinTest = Math.floor(axisXMinTest);
-			else
-			{
-				axisXMinTest = Math.round(axisXMinTest*100)/100;
-				if(axisXMinTest.toString().split('.')[1] != undefined)
-				{
-					var lengthAfterPoint = axisXMinTest.toString().split('.')[1].length;
-					var l = 0;
-					while(axisXMinTest.toString().split('.')[1].length != 1)
-					{
-						axisXMinTest = axisXMinTest - Math.pow(10,-(lengthAfterPoint));
-						if(l > 9)
-						{
-							axisXMinTest = Math.floor(axisXMinTest);
-							break;
-						}
-						l++;
-					}
-				}
-				
-			}
-				
-			while(0 != axisXMinTest%testDiff)
-			{
-				axisXMinTest = axisXMinTest - tempNum;
-				if(testDiff == 0.5)
-				{
-					axisXMinTest = this._round_val(axisXMinTest);
-				}
-			}
-
-			
-			
-			//возвращаем массив
-			var varMin = axisXMinTest*numPowOY;
-			var massRes = [];
-			
-			var tempKoff = 100000000000000;
-			varMin = this._round_val(varMin);
-			if(undefined != varMin.toString().split('.')[1])
-				lengthNum = varMin.toString().split('.')[1].length;
-
-			if('Line' == mainObj.type && max > 0 && min < 0)
-			{
-				//varMin  = varMin + stepOY;
-				varMin = varMin/degreeNum;
-				stepOY = stepOY/degreeNum;
-				axisXMax = axisXMax/degreeNum;
-				for (var k=0; k <= 11; k++) {
-					massRes[k] = this._round_val((parseFloat(varMin + (k)*(stepOY))));
-					if(massRes[k] > axisXMax)
-					{
-						break;
-					}
-			
-				}
-			}
-			else
-			{
-				varMin = varMin/degreeNum;
-				stepOY = stepOY/degreeNum;
-				axisXMax = axisXMax/degreeNum;
-				 for (var k=0; k <= 11; k++) {
-					massRes[k] = this._round_val((varMin + (k)*(stepOY)));
-					if(massRes[k] > axisXMax)
-					{
-						break;
-					}
-			
-				}
-			}
-			if('HBar' == mainObj.type)
-			{
-				 mainObj.xmin = massRes[0] - stepOY;
-				 mainObj.xmax = massRes[massRes.length - 1];
-			}
-			else if('line' == mainObj.type && max > 0 && min < 0)
-			{
-				mainObj.ymax = massRes[massRes.length - 1];
-				mainObj.ymin = this._round_val(this._array_exp(massRes[0] - stepOY));
-			}
-			else
-			{
-				mainObj.ymax = massRes[massRes.length - 1];
-				mainObj.ymin = this._round_val(this._array_exp(massRes[0] - stepOY));
-			}
-			return this._array_exp(massRes);
 		}
+		
+		if(max == min)
+		{
+			if(max > 0)
+				min = 0;
+			else if(max < 0)
+				max = 0;
+		}
+		
+		var degreeNum = 1;
+		var maxString = max.toExponential();
+		var minString = min.toExponential();
+		var floatKoff = 10000000000;
+		if(maxString.search('e-') != -1 || minString.search('e-') != -1)
+		{
+			var partMin  = minString.split('e-');
+			var partMax  = maxString.split('e-');
+			if(partMin[1] != undefined)
+				degreeNum = Math.pow(10, partMin[1])
+			if(partMax[1] != undefined && (parseFloat(partMin[1]) < parseFloat(partMax[1])))
+				degreeNum = Math.pow(10, partMax[1])	
+			max = this._round_val(max*degreeNum);
+			min = this._round_val(min*degreeNum);
+		}
+		
+		
+		var axisXMax;
+		var axisXMin;
+		var stepOY;
+		var checkInput = false;
+		var greaterNull;
+		var firstMax = max;
+		var firstMin = min;
+		
+		
+		var arrForRealDiff = [];
+		if(max >= 0 && min >= 0)
+		{
+			var diffPerMaxMin = ((max - min)/max)*100;
+			 axisXMax =  max + 0.05 * (max - min);
+			stepOY = (max-min)/4;
+			if(16.667 > diffPerMaxMin)
+			{
+				axisXMin = min - ((max - min) / 2);
+				greaterNull = (max - min)/4;
+				arrForRealDiff = [1.5873, 3.1745, 7.93651]
+			}
+			else
+			{
+				axisXMin = 0;
+			}
+		}
+		else if(max <= 0 && min <= 0)
+		{
+			var tempMax = max;
+			mainObj.xaxispos = 'top';
+			max = Math.abs(min);
+			min = Math.abs(tempMax);
+			checkInput = true;
+			var diffPerMaxMin = ((max - min)/max)*100;
+			 axisXMax =  max + 0.05 * (max - min);
+			stepOY = (max-min)/4;
+			if(16.667 > diffPerMaxMin)
+			{
+				axisXMin = min - ((max - min) / 2);
+				greaterNull = (max - min)/4;
+				arrForRealDiff = [1.5873, 3.1745, 7.93651]
+			}
+			else
+			{
+				axisXMin = 0;
+			}
+		}
+		else if(max > 0 && min < 0)
+		{
+			stepOY = (max + Math.abs(min))/4;
+			axisXMax = max + 0.05 * (max - min);
+			axisXMin = min + 0.05 * (min - max);
+			greaterNull = (Math.abs(max) + Math.abs(min))/6;
+			arrForRealDiff = [1.51515151, 3.03030303, 7.57575757]
+		}
+		
+		
+		//приведение к первому порядку для дальнейших вычислений
+		var secPart = max.toString().split('.');
+		var numPow = 1;
+		if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+		{
+			var expNum = secPart[1].toString().split('e+');
+			numPow = Math.pow(10, expNum[1]);
+		}
+		else if(0 != secPart[0])
+			numPow = Math.pow(10, secPart[0].toString().length - 1)
+		max = max/numPow;
+		if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
+				return [0.2, 0.4, 0.6, 0.8, 1, 1.2];
+		if(0 == max.toString().split('.')[0])
+		{
+			var tempMax = max;
+			var num = -1;
+			while(0 == tempMax.toString().split('.')[0])
+			{
+				tempMax = max;
+				numPow = Math.pow(10, num);
+				tempMax = tempMax/numPow;
+				num--;
+			}
+			max = tempMax;
+		}
+		
+		
+		var stepOYPart = stepOY.toString().split('.');
+		var numPowOY;
+		var tempVal;
+		
+		if(0 != stepOYPart[0])
+			numPowOY = Math.pow(10, stepOYPart[0].toString().length - 1)
+		if(10 == stepOYPart[0])
+			numPowOY = 1;
+		if(0 == stepOYPart[0])
+		{
+			var tempMax = stepOY;
+			var num = -1;
+			while(0 == tempMax.toString().split('.')[0])
+			{
+				tempMax = stepOY;
+				numPowOY = Math.pow(10, num);
+				tempMax = tempMax/numPowOY;
+				num--;
+			}
+		}
+		
+		
+		//поиск шага
+		if(undefined != greaterNull)
+		{
+			 var greaterNullTemp = greaterNull.toString().split('.');
+			if(0 != greaterNullTemp[0])
+				greaterNullNum = Math.pow(10, greaterNullTemp[0].toString().length - 1)
+			if(0 == greaterNullTemp[0])
+			{
+				var tempMax = greaterNull;
+				var num = -1;
+				while(0 == tempMax.toString().split('.')[0])
+				{
+					tempMax = greaterNull;
+					greaterNullNum = Math.pow(10, num);
+					tempMax = tempMax/greaterNullNum;
+					num--;
+				}
+			}
+			
+			greaterNull = greaterNull/greaterNullNum;
+			if(1 < greaterNull && arrForRealDiff[0] >= greaterNull)
+				greaterNull = 1;
+			else if(arrForRealDiff[0] < greaterNull && arrForRealDiff[1] >= greaterNull)
+				greaterNull = 2;
+			else if(arrForRealDiff[1] < greaterNull && arrForRealDiff[2] >= greaterNull)
+				greaterNull = 5;
+			else if(arrForRealDiff[2] < greaterNull && 10 >= greaterNull)
+				greaterNull = 10;
+			greaterNull = greaterNull*greaterNullNum;
+			stepOY = greaterNull;
+		}
+		
+		arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
+		//если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+		var arrMaxVal = [0, 0.952380952, 1.904761904, 4.76190476, 9.523809523]
+		//массив диапазонов
+		var arrDiffVal1 = [0,0.2,0.5,1,2]
+		if(axisXMin == 0)//если разница между min и max такая, что не нужно масштабировать
+		{
+			var trueDiff = 1;
+			for (var i=0; i<arr.length; i++) {
+				if( max >= arr[i] && max <= arr[i+1])
+				{
+					var max1 = arr[i+1];
+					var trueMax;
+					var diff = max1/10;
+					trueDiff = diff;
+					var maxVal;
+					//проверяем есть ли переход в следующий диапазон
+					if(max > arrMaxVal[i+1])
+					{
+						trueDiff = arrDiffVal1[i+1]
+					}
+				}
+			}
+			stepOY = trueDiff*numPow;
+		}
+		
+		
+		stepOY = this._round_val(stepOY);
+		
+		
+		
+		//находим истинные min и max
+		var testDiff;
+		var axisXMinTest;
+		if(axisXMin == 0)
+		{
+			testDiff = stepOY/numPow;
+			axisXMinTest = axisXMin/numPow
+		}
+		else
+		{
+			testDiff = stepOY/numPowOY;
+			axisXMinTest = axisXMin/numPowOY;
+		}
+		var tempNum;
+		var countAfterPoint = 1;
+		
+		if(undefined != axisXMinTest.toString().split('.')[1])
+		{
+			countAfterPoint = Math.pow(10, axisXMinTest.toString().split('.')[1].toString().length - 1)
+		}
+		var floatKoff = 10000000000;
+		if(0.5 == testDiff)
+			tempNum = testDiff/5;
+		else if(1 == testDiff)
+			tempNum = testDiff/4;
+		else if(2 == testDiff)
+			tempNum = testDiff/4;
+		else if(5 == testDiff)
+			tempNum = testDiff/10;
+		else
+			tempNum = testDiff/20;
+		if(testDiff != 0.5)
+			axisXMinTest = Math.floor(axisXMinTest);
+		else
+		{
+			axisXMinTest = Math.round(axisXMinTest*100)/100;
+			if(axisXMinTest.toString().split('.')[1] != undefined)
+			{
+				var lengthAfterPoint = axisXMinTest.toString().split('.')[1].length;
+				var l = 0;
+				while(axisXMinTest.toString().split('.')[1].length != 1)
+				{
+					axisXMinTest = axisXMinTest - Math.pow(10,-(lengthAfterPoint));
+					if(l > 9)
+					{
+						axisXMinTest = Math.floor(axisXMinTest);
+						break;
+					}
+					l++;
+				}
+			}
+			
+		}
+			
+		while(0 != axisXMinTest%testDiff)
+		{
+			axisXMinTest = axisXMinTest - tempNum;
+			if(testDiff == 0.5)
+			{
+				axisXMinTest = this._round_val(axisXMinTest);
+			}
+		}
+
+		
+		
+		//возвращаем массив
+		var varMin = axisXMinTest*numPowOY;
+		var massRes = [];
+		
+		var tempKoff = 100000000000000;
+		varMin = this._round_val(varMin);
+		if(undefined != varMin.toString().split('.')[1])
+			lengthNum = varMin.toString().split('.')[1].length;
+
+		if('Line' == mainObj.type && max > 0 && min < 0)
+		{
+			varMin = varMin/degreeNum;
+			stepOY = stepOY/degreeNum;
+			axisXMax = axisXMax/degreeNum;
+			for (var k=0; k <= 11; k++) {
+				massRes[k] = this._round_val((parseFloat(varMin + (k)*(stepOY))));
+				if(massRes[k] > axisXMax)
+				{
+					break;
+				}
+		
+			}
+		}
+		else
+		{
+			varMin = varMin/degreeNum;
+			stepOY = stepOY/degreeNum;
+			axisXMax = axisXMax/degreeNum;
+			 for (var k=0; k <= 11; k++) {
+				massRes[k] = this._round_val((varMin + (k)*(stepOY)));
+				if(massRes[k] > axisXMax)
+				{
+					break;
+				}
+		
+			}
+		}
+		
+		if('line' == mainObj.type && max > 0 && min < 0)
+		{
+			mainObj.ymax = massRes[massRes.length - 1];
+			mainObj.ymin = this._round_val(this._array_exp(massRes[0] - stepOY));
+		}
+		else
+		{
+			mainObj.ymax = massRes[massRes.length - 1];
+			mainObj.ymin = this._round_val(this._array_exp(massRes[0] - stepOY));
+		}
+		return this._array_exp(massRes);
 	},
 	
 	_round_val: function (num)
@@ -2798,9 +2773,6 @@ drawAreaChart.prototype =
 	
 	_drawLines: function (/*isSkip*/)
     {
-		//для цветов серий
-		var colorProps = this.cChartDrawer._getColorProps();
-		
 		//ширина линии
 		var brush;
 		var FillUniColor;
