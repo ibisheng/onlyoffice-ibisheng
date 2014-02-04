@@ -241,6 +241,9 @@ function NativeOpenFile()
 
 function NativeOpenFile2()
 {
+	g_oTextMeasurer = new CTextMeasurerWrapper();
+	g_oTextMeasurer.Init();
+
 	window.g_file_path = "native_open_file";
 	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
     var doc_bin = window.native.GetFileString(window.g_file_path);
@@ -355,3 +358,7 @@ window.setInterval = setInterval;
 
 window["OfficeExcel"] = {type:'common'};
 var OfficeExcel = window["OfficeExcel"];
+
+var console = {
+	log : function(param) { window.native.ConsoleLog(param); }
+};
