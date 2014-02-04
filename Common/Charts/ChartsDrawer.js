@@ -4012,7 +4012,7 @@ areaChart.prototype =
 	
 	_drawArea: function()
 	{
-		var StrokeUniColor = new CUniColor().RGBA;
+		var StrokeUniColor = null;
 		var FillUniColor = new CUniColor().RGBA;
 		FillUniColor.R = 255;
 		FillUniColor.G = 255;
