@@ -3,7 +3,8 @@ function CDegree()
     this.kind = MATH_DEGREE;
 
     this.type = DEGREE_SUPERSCRIPT ;
-    this.upper = 0;
+    this.upBase = 0; // отступ сверху для основания
+    this.upIter = 0; // отступ сверху для итератора
     this.alnScr = false;  // не выровнены, итераторы идут в соответствии с наклоном буквы/мат. объекта
 
     CMathBase.call(this);
@@ -39,7 +40,7 @@ CDegree.prototype.recalculateSize = function(oMeasure)
     else if(this.type === DEGREE_SUBSCRIPT)
         this.recalculateSubScript(oMeasure);
 }
-CDegree.prototype.recalculateSup = function(oMeasure)
+CDegree.prototype.old__recalculateSup = function(oMeasure)
 {
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
@@ -80,6 +81,37 @@ CDegree.prototype.recalculateSup = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 }
+CDegree.prototype.recalculateSup = function(oMeasure)
+{
+    var base = this.elements[0][0].size,
+        iter   = this.elements[0][1].size;
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+
+    this.upBase = 0;
+    this.upIter = 0;
+
+    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
+
+    if(bBaseOnlyText)
+    {
+        var TxtAsc =  1.786*shCenter;
+        if(TxtAsc + iter.ascent> base.ascent)
+            this.upBase = TxtAsc + iter.ascent - base.ascent;
+        else
+            this.upIter = base.ascent - TxtAsc - iter.ascent;
+    }
+    else
+        this.upBase = iter.ascent - 1.2*shCenter;
+
+    var height = this.upBase + base.height;
+    var ascent = this.upBase + base.ascent;
+
+    var width = base.width + iter.width + this.dW;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
 CDegree.prototype.recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
@@ -114,7 +146,7 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
     this.size = {width: width, height: height, ascent: ascent};
 
 }
-CDegree.prototype.old_setPosition = function(_pos)
+CDegree.prototype.old_old_setPosition = function(_pos)
 {
     var pos = _pos;
     if(this.bMObjs === true)
@@ -125,7 +157,7 @@ CDegree.prototype.old_setPosition = function(_pos)
     this.elements[0][0].setPosition({x: pos.x, y: pos.y - this.elements[0][0].size.center });
     this.elements[0][1].setPosition({x: pos.x + this.elements[0][0].size.width + this.dW, y: pos.y + this.shiftDegree - this.size.center});
 }
-CDegree.prototype.setPosition = function(pos)
+CDegree.prototype.old_setPosition = function(pos)
 {
     if(this.bMObjs === true)
         this.pos = pos;
@@ -143,7 +175,17 @@ CDegree.prototype.setPosition = function(pos)
     this.elements[0][0].setPosition({x: this.pos.x, y: this.pos.y + shBase});
     this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width + this.dW, y: this.pos.y + shIter});
 }
-CDegree.prototype.findDisposition = function(mCoord)
+CDegree.prototype.setPosition = function(pos)
+{
+    if(this.bMObjs === true)
+        this.pos = pos;
+    else
+        this.pos = {x: pos.x, y: pos.y - this.size.ascent};
+
+    this.elements[0][0].setPosition({x: this.pos.x, y: this.pos.y + this.upBase});
+    this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width + this.dW, y: this.pos.y + this.upIter});
+}
+CDegree.prototype.old_findDisposition = function(mCoord)
 {
     var coordX, coordY;
     var X, Y;
@@ -194,6 +236,66 @@ CDegree.prototype.findDisposition = function(mCoord)
         X = 0; Y = 1; // встаем во второй элемент
         coordX = mCoord.x - (this.elements[0][0].size.width + this.dW);
         coordY = mCoord.y - shIter;
+    }
+
+    if(coordY < 0)
+    {
+        coordY = 0;
+        inside_flag = 2;
+    }
+    else if(coordY > this.elements[X][Y].size.height)
+    {
+        coordY = this.elements[X][Y].size.height;
+        inside_flag = 2;
+    }
+
+    var mCoord = {x: coordX, y: coordY};
+
+    return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
+}
+CDegree.prototype.findDisposition = function(mCoord)
+{
+    var coordX, coordY;
+    var X, Y;
+
+    var inside_flag = -1;
+
+    if( mCoord.x < this.elements[0][0].size.width)
+    {
+        if( this.elements[0][0].IsJustDraw() )
+        {
+            X = 0; Y = 1; // встаем во второй элемент
+            coordX = 0;
+            coordY = mCoord.y - this.upIter;
+
+            inside_flag = 0;
+        }
+        else
+        {
+            X = 0; Y = 0; // встаем в первый элемент
+            coordX =  mCoord.x;
+            coordY =  mCoord.y - this.upBase;
+        }
+    }
+    else if(mCoord.x < (this.elements[0][0].size.width + this.dW ))
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = 0;
+        coordY = mCoord.y - this.upIter;
+        inside_flag = 0;
+    }
+    else if(mCoord.x > this.size.width)
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = this.size.width;
+        coordY = mCoord.y - this.upIter;
+        inside_flag = 1;
+    }
+    else
+    {
+        X = 0; Y = 1; // встаем во второй элемент
+        coordX = mCoord.x - (this.elements[0][0].size.width + this.dW);
+        coordY = mCoord.y - this.upIter;
     }
 
     if(coordY < 0)

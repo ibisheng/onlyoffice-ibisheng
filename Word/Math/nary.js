@@ -518,6 +518,10 @@ CNaryOperator.prototype.setReferenceComposition = function(Compos)
 {
     this.Composition = Compos;
 }
+CNaryOperator.prototype.IsOnlyText = function()
+{
+    return false;
+}
 
 function CSigma()
 {

@@ -5069,7 +5069,8 @@ CMathContent.prototype =
         var coeffLeft  = 0.001,
             coeffRight = 0; // for checkGap.bEmptyGaps
 
-        var bDegree = kind == MATH_DEGREE || kind == MATH_DEGREESubSup;
+        //var bDegree = kind == MATH_DEGREE || kind == MATH_DEGREESubSup;
+        var bDegree = kind == MATH_DEGREE;
 
         if(checkGap.bChildGaps)
         {
@@ -5163,6 +5164,20 @@ CMathContent.prototype =
 
         return code == PLUS || code == MINUS || code == LESS || code == GREATER;
     },
+    IsOnlyText: function()
+    {
+        var bOnlyText = true;
+        for(var i = 0; i < this.content.length; i++)
+        {
+            if(this.content[i].value.typeObj == MATH_COMP)
+            {
+                bOnlyText = false;
+                break;
+            }
+        }
+
+        return bOnlyText;
+    },
     old_checkSignComp: function(pos)
     {
         var bPlus = false, bMinus = false,
@@ -5187,9 +5202,6 @@ CMathContent.prototype =
     draw: function(x, y, pGraphics)
     {
         var bHidePlh = this.plhHide && this.IsPlaceholder();
-
-        // TEST
-        var bOnlySimpleObjs = true;
 
         if( !bHidePlh )
         {
@@ -5225,11 +5237,6 @@ CMathContent.prototype =
 
 
 
-                if(this.content[i].value.typeObj == MATH_COMP)
-                {
-                    bOnlySimpleObjs = false;
-                }
-
                 /*if(this.content[i].value.typeObj == MATH_COMP)
                 {
                     var penW = 25.4/96;
@@ -5246,7 +5253,7 @@ CMathContent.prototype =
         }
 
         /// TEST
-        if(!bOnlySimpleObjs)
+        if(!this.IsOnlyText())
         {
             var penW = 25.4/96;
             var x1 = this.pos.x + x - penW,
@@ -6193,12 +6200,18 @@ CMathContent.prototype =
             FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
             //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
             //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
-            tPrp.FontSize = FSize;
         }
         else if(this.argSize == -2)
-            //tPrp.FontSize *= 0.65;
-            tPrp.FontSize *= 0.53;
+        {
+            // aa: -0.0004  bb: 0.66  cc: 0.87
+            // aa: -0.0014  bb: 0.71  cc: 0.39
+            // aa: 0  bb: 0.63  cc: 1.11
+            //FSize = 0.63*FSize + 1.11;
+            FSize = -0.0004*FSize*FSize + 0.66*FSize + 0.87;
             //tPrp.FontSize *= 0.473;
+        }
+
+        tPrp.FontSize = FSize;
 
         return tPrp;
     },
@@ -8066,8 +8079,15 @@ function TEST_COEFF_ITERATORS()
 
     //FSize = 0.0006*FSize*FSize + 0.743*FSize - 1.53;
 
+
+    // argSize = -1
+    //var x1 = 36, x2 = 14, x3 = 72;
+    //var d1 = 26, d2 = 10, d3 = 54; // если еще подгонять, то можно d3 = 53,52 взять
+
+
     var x1 = 36, x2 = 14, x3 = 72;
-    var d1 = 26, d2 = 10, d3 = 54;
+    var d1 = 24, d2 = 10, d3 = 47;
+
 
     // || x1*x1   x1  1 ||
     // || x2*x2   x2  1 ||
