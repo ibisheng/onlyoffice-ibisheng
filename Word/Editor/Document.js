@@ -2958,8 +2958,17 @@ CDocument.prototype =
                         if ( type_Paragraph == StartType && type_Paragraph == EndType && true === bOnTextAdd )
                         {
                             // Встаем в конец параграфа и удаляем 1 элемент (чтобы соединить параграфы)
-                            this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
-                            this.Remove( 1, true );
+
+                            if ( true !== Debug_ParaRunMode )
+                            {
+                                this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
+                                this.Remove( 1, true );
+                            }
+                            else
+                            {
+                                this.Content[StartPos].Cursor_MoveToEndPos(false, false);
+                                this.Remove( 1, true );
+                            }
                         }
                         else
                         {
@@ -2987,7 +2996,11 @@ CDocument.prototype =
                             {
                                 // Встаем в конец параграфа
                                 this.CurPos.ContentPos = StartPos;
-                                this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
+
+                                if ( true !== Debug_ParaRunMode )
+                                    this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
+                                else
+                                    this.Content[StartPos].Cursor_MoveToEndPos( false, false );
                             }
                             else if ( type_Table == StartType )
                             {
@@ -3036,7 +3049,11 @@ CDocument.prototype =
                             {
                                 // Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
                                 this.CurPos.ContentPos = this.Content.length - 1;
-                                this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
+
+                                if ( true !== Debug_ParaRunMode )
+                                    this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
+                                else
+                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos( false, false );
                             }
                             else
                             {
@@ -3073,7 +3090,11 @@ CDocument.prototype =
                                 {
                                     // Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
                                     this.CurPos.ContentPos = this.Content.length - 1;
-                                    this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
+
+                                    if ( true !== Debug_ParaRunMode )
+                                        this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
+                                    else
+                                        this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos( false, false );
                                 }
                                 else
                                 {

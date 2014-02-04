@@ -485,24 +485,43 @@ Paragraph.prototype =
     // Добавляем несколько элементов в конец параграфа.
     Internal_Content_Concat : function(Items)
     {
-        // Добавляем только постоянные элементы параграфа
-        var NewItems = new Array();
-        var ItemsCount = Items.length;
-        for ( var Index = 0; Index < ItemsCount; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            if ( true === Items[Index].Is_RealContent() )
-                NewItems.push( Items[Index] );
+            // Добавляем только постоянные элементы параграфа
+            var NewItems = new Array();
+            var ItemsCount = Items.length;
+            for ( var Index = 0; Index < ItemsCount; Index++ )
+            {
+                if ( true === Items[Index].Is_RealContent() )
+                    NewItems.push( Items[Index] );
+            }
+
+            if ( NewItems.length <= 0 )
+                return;
+
+            var StartPos = this.Content.length;
+            this.Content = this.Content.concat( NewItems );
+
+            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : this.Internal_Get_ClearPos( StartPos ), EndPos : this.Internal_Get_ClearPos( this.Content.length - 1 ), Items : NewItems } );
+
+            this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
         }
+        else
+        {
+            var StartPos = this.Content.length;
+            this.Content = this.Content.concat( Items );
 
-        if ( NewItems.length <= 0 )
-            return;
+            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
 
-        var StartPos = this.Content.length;
-        this.Content = this.Content.concat( NewItems );
+            // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
+            for ( var CurPos = StartPos; CurPos < this.Content.length; CurPos++ )
+            {
+                this.Content[CurPos].Reset_Parent( this, this );
+                this.Content[CurPos].Reset_RecalcInfo();
+            }
 
-        History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : this.Internal_Get_ClearPos( StartPos ), EndPos : this.Internal_Get_ClearPos( this.Content.length - 1 ), Items : NewItems } );
-
-        this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
+            // TODO: Разобраться с орфографией
+        }
     },
 
     // Удаляем элемент из содержимого параграфа. (Здесь передвигаются все позиции
@@ -4963,14 +4982,67 @@ Paragraph.prototype =
 
         var ParaPos = Run.Get_SimpleChanges_ParaPos(SimpleChanges);
 
+        var Line  = ParaPos.Line;
+        var Range = ParaPos.Range;
+
+        // Мы должны пересчитать как минимум 3 отрезка: текущий, предыдущий и следующий, потому что при удалении элемента
+        // или добавлении пробела первое слово в данном отрезке может убраться в предыдущем отрезке, и кроме того при
+        // удалении возможен вариант, когда мы неправильно определили отрезок (т.е. более ранний взяли)
+
+        if ( Range > 0 || Line > 0 )
+        {
+            var PrevLine  = Line;
+            var PrevRange = 0;
+
+            if ( Range > 0 )
+                PrevRange = Range - 1;
+            else
+            {
+                PrevLine  = Line - 1;
+                PrevRange = this.Lines[PrevLine].Ranges.length - 1;
+            }
+
+            if ( -1 === this.Recalculate_Fast_Range(PrevLine, PrevRange) )
+                return -1;
+        }
+
+        var Result = this.Recalculate_Fast_Range( Line, Range );
+        if ( -1 === Result )
+            return -1;
+
+        if ( Range < this.Lines[Line].Ranges.length - 1 || Line < this.Lines.length - 1 )
+        {
+            var NextLine  = Line;
+            var NextRange = 0;
+
+            if ( Range < this.Lines[Line].Ranges.length - 1 )
+                NextRange = Range + 1;
+            else
+            {
+                NextLine  = Line + 1;
+                NextRange = 0;
+            }
+
+            if ( -1 === this.Recalculate_Fast_Range(NextLine, NextRange) )
+                return -1;
+        }
+
+
+        // Во время пересчета сбрасываем привязку курсора к строке.
+        this.CurPos.Line = -1;
+
+        return Result;
+    },
+
+    Recalculate_Fast_Range : function(_Line, _Range)
+    {
         var PRS = g_oPRSW;
 
         var XStart, YStart, XLimit, YLimit;
 
-
         // Определим номер страницы
-        var CurLine  = ParaPos.Line;
-        var CurRange = ParaPos.Range;
+        var CurLine  = _Line;
+        var CurRange = _Range;
         var CurPage  = 0;
 
         var PagesLen = this.Pages.length;
@@ -4985,7 +5057,7 @@ Paragraph.prototype =
         }
 
         if ( -1 === CurPage )
-            return -1;
+            return false;
 
         if ( 0 === CurPage )//|| ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument ) )
         {
@@ -5013,15 +5085,15 @@ Paragraph.prototype =
         PRS.Reset_Line();
 
         PRS.Page  = 0;
-        PRS.Line  = ParaPos.Line;
-        PRS.Range = ParaPos.Range;
+        PRS.Line  = _Line;
+        PRS.Range = _Range;
 
 
-        PRS.Paragraph = Run.Paragraph;
+        PRS.Paragraph = this;
 
         var RangesCount = PRS.RangesCount;
 
-        var Line = this.Lines[CurLine];
+        var Line  = this.Lines[CurLine];
         var Range = Line.Ranges[CurRange];
 
         var StartPos = Range.StartPos;
@@ -5047,6 +5119,11 @@ Paragraph.prototype =
 
             if ( ( true === PRS.NewRange && Pos !== EndPos ) || ( Pos === EndPos && true !== PRS.NewRange ) )
                 return -1;
+            else if ( Pos === EndPos && true === PRS.NewRange && true === PRS.MoveToLBP )
+            {
+                Item.Recalculate_Set_RangeEndPos(PRS, PRS.LineBreakPos, 1);
+            }
+
 
             // Нам нужно проверить только строку с номером CurLine
             if ( false === SavedLines[CurLine - Item.StartLine].Compare( Item.Lines[CurLine - Item.StartLine] ) )
@@ -5075,9 +5152,6 @@ Paragraph.prototype =
 
         if ( recalcresult_NextElement !== RecalcResultAlign )
             return -1;
-
-        // Во время пересчета сбрасываем привязку курсора к строке.
-        this.CurPos.Line = -1;
 
         return this.Get_StartPage_Absolute() + CurPage;
     },
@@ -7352,7 +7426,7 @@ Paragraph.prototype =
                     this.Content[StartPos].Remove(nCount, bOnAddText);
 
                     // Мы не удаляем последний элемент с ParaEnd
-                    if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty(false) )
+                    if ( StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( StartPos );
 
@@ -7365,7 +7439,7 @@ Paragraph.prototype =
                     this.Content[EndPos].Remove(nCount, bOnAddText);
 
                     // Мы не удаляем последний элемент с ParaEnd
-                    if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty(false) )
+                    if ( EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( EndPos );
 
@@ -7381,7 +7455,7 @@ Paragraph.prototype =
                     this.Content[StartPos].Remove(nCount, bOnAddText);
 
                     // Мы не удаляем последний элемент с ParaEnd
-                    if ( true === this.Content[StartPos].Is_Empty(false) )
+                    if ( true === this.Content[StartPos].Is_Empty() )
                         this.Internal_Content_Remove( StartPos );
                 }
             }
@@ -7410,7 +7484,7 @@ Paragraph.prototype =
                     Result = false;
                 else
                 {
-                    if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty(false) )
+                    if ( ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() )
                     {
                         this.Internal_Content_Remove( ContentPos );
 
@@ -7473,6 +7547,19 @@ Paragraph.prototype =
             }
 
             return Result;
+        }
+    },
+
+    Remove_ParaEnd : function()
+    {
+        var ContentLen = this.Content.length;
+        for ( var CurPos = ContentLen - 1; CurPos >= 0; CurPos-- )
+        {
+            var Element = this.Content[CurPos];
+
+            // Предполагаем, что para_End лежит только в ране, который лежит только на самом верхнем уровне
+            if ( para_Run === Element.Type && true === Element.Remove_ParaEnd() )
+                return;
         }
     },
 
@@ -8499,7 +8586,7 @@ Paragraph.prototype =
             var _CurPos = CurPos + 1;
 
             // Пропускаем пустые раны
-            while ( true === this.Content[_CurPos].Is_Empty(true) && _CurPos < Count )
+            while ( true === this.Content[_CurPos].Is_Empty( { SkipAnchor : true } ) && _CurPos < Count )
                 _CurPos++;
 
             if ( _CurPos < Count && true === this.Content[_CurPos].Is_StartFromNewLine() )
@@ -11056,7 +11143,7 @@ Paragraph.prototype =
 
             if ( para_Run === Element.Type )
             {
-                if ( CurPos !== this.CurPos.ContentPos && true === Element.Is_Empty(false) )
+                if ( CurPos !== this.CurPos.ContentPos && true === Element.Is_Empty() )
                 {
                     this.Internal_Content_Remove( CurPos );
                     CurPos--;
@@ -12979,8 +13066,22 @@ Paragraph.prototype =
     // Проверяем пустой ли параграф
     IsEmpty : function()
     {
-        var Pos = this.Internal_FindForward( 0, [para_Tab, para_Drawing, para_PageNum, para_Text, para_Space, para_NewLine, para_Math] );
-        return ( Pos.Found === true ? false : true );
+        if ( true !== Debug_ParaRunMode )
+        {
+            var Pos = this.Internal_FindForward( 0, [para_Tab, para_Drawing, para_PageNum, para_Text, para_Space, para_NewLine, para_Math] );
+            return ( Pos.Found === true ? false : true );
+        }
+        else
+        {
+            var ContentLen = this.Content.length;
+            for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+            {
+                if ( false === this.Content[CurPos].Is_Empty( { SkipEnd : true } ) )
+                    return false;
+            }
+
+            return true;
+        }
     },
 
     // Проверяем, попали ли мы в текст
@@ -15990,17 +16091,30 @@ Paragraph.prototype =
     // Присоединяем контент параграфа Para к текущему параграфу
     Concat : function(Para)
     {
-        this.DeleteCommentOnRemove = false;
-        this.Internal_Content_Remove2( this.Content.length - 2, 2 );
-        this.DeleteCommentOnRemove = true;
+        if ( true !== Debug_ParaRunMode )
+        {
+            this.DeleteCommentOnRemove = false;
+            this.Internal_Content_Remove2( this.Content.length - 2, 2 );
+            this.DeleteCommentOnRemove = true;
 
-        // Убираем нумерацию, если она была у следующего параграфа
-        Para.Numbering_Remove();
-        Para.Remove_PresentationNumbering();
+            // Убираем нумерацию, если она была у следующего параграфа
+            Para.Numbering_Remove();
+            Para.Remove_PresentationNumbering();
 
-        this.Internal_Content_Concat( Para.Content );
+            this.Internal_Content_Concat( Para.Content );
 
-        this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+        }
+        else
+        {
+            // TODO: разобраться с комментариями
+
+            // Убираем метку конца параграфа у данного параграфа
+            this.Remove_ParaEnd();
+
+            // Добавляем содержимое второго параграфа к первому
+            this.Internal_Content_Concat( Para.Content );
+        }
     },
 
     // Копируем настройки параграфа и последние текстовые настройки в новый параграф

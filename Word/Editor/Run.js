@@ -73,16 +73,25 @@ ParaRun.prototype =
     {
         return this.Parent;
     },
+
+    Reset_Parent : function(Parent, Paragraph)
+    {
+        this.Parent    = Parent;
+        this.Paragraph = Paragraph;
+    },
 //-----------------------------------------------------------------------------------
 // Функции для работы с содержимым данного рана
 //-----------------------------------------------------------------------------------
 
     // Проверяем пустой ли ран
-    Is_Empty : function(SkipAnchor)
+    Is_Empty : function(Props)
     {
+        var SkipAnchor = (undefined !== Props ? Props.SkipAnchor : false);
+        var SkipEnd    = (undefined !== Props ? Props.SkipEnd    : false);
+
         var Count = this.Content.length;
 
-        if ( true !== SkipAnchor )
+        if ( true !== SkipAnchor && true !== SkipEnd )
         {
             if ( Count > 0 )
                 return false;
@@ -95,7 +104,7 @@ ParaRun.prototype =
             {
                 var Item = this.Content[CurPos];
 
-                if ( para_Drawing !== Item.Type || false !== Item.Is_Inline()  )
+                if ( ( true !== SkipAnchor || para_Drawing !== Item.Type || false !== Item.Is_Inline() ) && ( true !== SkipEnd || para_End !== Item.Type ) )
                     return false;
             }
 
@@ -140,7 +149,7 @@ ParaRun.prototype =
                 for ( var CurPos = EndPos - 1; CurPos >= StartPos; CurPos-- )
                 {
                     if ( para_End !== this.Content[CurPos].Type )
-                        this.Remove_FromContent( CurPos, 1 );
+                        this.Remove_FromContent( CurPos, 1, true );
                 }
             }
             else
@@ -166,7 +175,7 @@ ParaRun.prototype =
                     return this.Paragraph.Parent.Select_DrawingObject( this.Content[CurPos - 1].Get_Id() );
                 }
 
-                this.Remove_FromContent( CurPos - 1, 1 );
+                this.Remove_FromContent( CurPos - 1, 1, true );
 
                 this.State.ContentPos = CurPos - 1;
             }
@@ -181,11 +190,33 @@ ParaRun.prototype =
                     return this.Paragraph.Parent.Select_DrawingObject( this.Content[CurPos].Get_Id() );
                 }
 
-                this.Remove_FromContent( CurPos, 1 );
+                this.Remove_FromContent( CurPos, 1, true );
 
                 this.State.ContentPos = CurPos;
             }
         }
+
+        return true;
+    },
+
+    Remove_ParaEnd : function()
+    {
+        var Pos = -1;
+
+        var ContentLen = this.Content.length;
+        for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
+        {
+            if ( para_End === this.Content[CurPos].Type )
+            {
+                Pos = CurPos;
+                break;
+            }
+        }
+
+        if ( -1 === Pos )
+            return false;
+
+        this.Remove_FromContent( Pos, ContentLen - Pos );
 
         return true;
     },
@@ -227,6 +258,12 @@ ParaRun.prototype =
 
                     if ( Range.EndPos > Pos )
                         Range.EndPos++;
+                }
+
+                // Особый случай, когда мы добавляем элемент в самый последний ран
+                if ( Pos === this.Content.length - 1 )
+                {
+                    this.Lines[CurLine].Ranges[RangesCount - 1].EndPos++;
                 }
             }
 
@@ -576,7 +613,9 @@ ParaRun.prototype =
     Get_SimpleChanges_ParaPos : function(Changes)
     {
         var Change = Changes[0].Data;
-        var Pos    = ( Changes[0].Data.Type === historyitem_ParaRun_AddItem ? Change.Pos : Change.StartPos );
+        var Type   = Changes[0].Data.Type;
+        //var Pos    = ( Changes[0].Data.Type === historyitem_ParaRun_AddItem ? Change.Pos : Change.StartPos );
+        var Pos    = Change.Pos;
 
         var CurLine  = 0;
         var CurRange = 0;
@@ -588,7 +627,7 @@ ParaRun.prototype =
             for ( CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
                 var Range = this.Lines[CurLine].Ranges[CurRange];
-                if ( Pos < Range.EndPos && Pos >= Range.StartPos )
+                if  ( ( historyitem_ParaRun_AddItem === Type && Pos < Range.EndPos && Pos >= Range.StartPos ) || ( ( historyitem_ParaRun_RemoveItem === Type && Pos <= Range.EndPos && Pos >= Range.StartPos ) ) )
                     return new CParaPos( ( CurLine === 0 ? CurRange + this.StartRange : CurRange ), CurLine + this.StartLine, 0, 0 );
             }
         }
@@ -1879,6 +1918,11 @@ ParaRun.prototype =
     Get_RecalcInfo : function()
     {
         return this.RecalcInfo;
+    },
+
+    Reset_RecalcInfo : function()
+    {
+        this.RecalcInfo.Reset();
     },
 //-----------------------------------------------------------------------------------
 // Функции отрисовки
@@ -3932,6 +3976,13 @@ function CParaRunRecalcInfo()
 
 CParaRunRecalcInfo.prototype =
 {
+    Reset : function()
+    {
+        this.TextPr  = true;
+        this.Measure = true;
+        this.Recalc  = true;
+        this.RunLen  = 0;
+    }
 
 };
 
