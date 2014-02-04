@@ -159,6 +159,67 @@ CChartsDrawer.prototype =
 	
 	_calculateProperties: function(chartProp)
 	{
+		this.preCalculateData(chartProp);
+		
+		//считаем маргины
+		this._calculateMarginsChart(chartProp);
+		
+		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
+		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
+		
+		this._calculateWidthChart();
+		
+		
+		//count line of chart grid
+		this.calcProp.numhlines = this.calcProp.scale.length - 1;
+		if(this.calcProp.type == "Bar")
+		{
+			this.calcProp.numvlines = this.calcProp.data.length;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
+		}
+		else if(this.calcProp.type == "HBar")
+		{
+			this.calcProp.numhlines = this.calcProp.data.length;
+			this.calcProp.numvlines = this.calcProp.scale.length - 1;
+			
+			this.calcProp.numhMinorlines = 2;
+			this.calcProp.numvMinorlines = 5;
+		}
+		else if(this.calcProp.type == "Line")
+		{
+			this.calcProp.numvlines = this.calcProp.data[0].length;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
+		}
+		else if(this.calcProp.type == "Scatter")
+		{
+			this.calcProp.numvlines = this.calcProp.xScale.length - 1;
+			
+			this.calcProp.numvMinorlines = 5;
+			this.calcProp.numhMinorlines = 5;
+		}
+		else if(this.calcProp.type == "Area")
+		{
+			this.calcProp.numvlines = this.calcProp.data[0].length - 1;
+			
+			this.calcProp.numvMinorlines = 2;
+			this.calcProp.numhMinorlines = 5;
+		}
+
+		this.calcProp.nullPositionOX = this._getNullPosition();
+	
+		if(this.calcProp.type == "Bar")
+		{
+			this.calcProp.max = this.calcProp.scale[this.calcProp.scale.length -1];
+			this.calcProp.min = this.calcProp.scale[0];
+		}
+	},
+	
+	preCalculateData: function(chartProp)
+	{
 		this.calcProp.pxToMM = 1 / chartProp.convertPixToMM(1);
 		
 		this.calcProp.pathH = 1000000000;
@@ -214,17 +275,6 @@ CChartsDrawer.prototype =
 		//пересчёт данных для накопительных диаграмм
 		if(this.calcProp.subType == 'stackedPer' || this.calcProp.subType == 'stacked')
 			this._calculateStackedData();
-			
-		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
-		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
-		
-		//считаем маргины
-		this._calculateMarginsChart(chartProp);
-		
-		this.calcProp.trueWidth = this.calcProp.widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
-		this.calcProp.trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
-		
-		this._calculateWidthChart();
 		
 		//***series***
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
@@ -234,53 +284,8 @@ CChartsDrawer.prototype =
 		if(this.calcProp.type == "Scatter")
 			this.calcProp.xScale = this._getAxisData(true, this.calcProp, this.calcProp.min, this.calcProp.max, this.calcProp.ymin, this.calcProp.ymax);
 		
-		
-		//count line of chart grid
-		this.calcProp.numhlines = this.calcProp.scale.length - 1;
-		if(this.calcProp.type == "Bar")
-		{
-			this.calcProp.numvlines = this.calcProp.data.length;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
-		}
-		else if(this.calcProp.type == "HBar")
-		{
-			this.calcProp.numhlines = this.calcProp.data.length;
-			this.calcProp.numvlines = this.calcProp.scale.length - 1;
-			
-			this.calcProp.numhMinorlines = 2;
-			this.calcProp.numvMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Line")
-		{
-			this.calcProp.numvlines = this.calcProp.data[0].length;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Scatter")
-		{
-			this.calcProp.numvlines = this.calcProp.xScale.length - 1;
-			
-			this.calcProp.numvMinorlines = 5;
-			this.calcProp.numhMinorlines = 5;
-		}
-		else if(this.calcProp.type == "Area")
-		{
-			this.calcProp.numvlines = this.calcProp.data[0].length - 1;
-			
-			this.calcProp.numvMinorlines = 2;
-			this.calcProp.numhMinorlines = 5;
-		}
-
-		this.calcProp.nullPositionOX = this._getNullPosition();
-	
-		if(this.calcProp.type == "Bar")
-		{
-			this.calcProp.max = this.calcProp.scale[this.calcProp.scale.length -1];
-			this.calcProp.min = this.calcProp.scale[0];
-		}
+		this.calcProp.widthCanvas = chartProp.extX*this.calcProp.pxToMM;
+		this.calcProp.heightCanvas = chartProp.extY*this.calcProp.pxToMM;
 	},
 	
 	_calculateStackedData: function()
