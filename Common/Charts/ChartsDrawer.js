@@ -159,7 +159,8 @@ CChartsDrawer.prototype =
 	
 	_calculateProperties: function(chartProp)
 	{
-		this.preCalculateData(chartProp);
+		if(!this.calcProp.scale)
+			this.preCalculateData(chartProp);
 		
 		//считаем маргины
 		this._calculateMarginsChart(chartProp);
@@ -2279,17 +2280,8 @@ drawBarChart.prototype =
 		
 		var centerX, centerY;
 				
-		//TODO высчитать позиции, как в екселе
-		switch ( point.compiledDlb.dLblPos )
+		switch ( DLBL_POS_IN_END )
 		{
-			case DLBL_POS_B:
-			{
-				centerX = x + w/2 - width/2;
-				centerY = y;
-				if(point.val > 0)
-					centerY = y - height;
-				break;
-			}
 			case DLBL_POS_BEST_FIT:
 			{
 				break;
@@ -2302,28 +2294,13 @@ drawBarChart.prototype =
 			}
 			case DLBL_POS_IN_BASE:
 			{
-				//TODO высчитать позиции, как в екселе
 				centerX = x + w/2 - width/2;
-				centerY = y - h/2 - height/2;
+				centerY = y;
+				if(point.val > 0)
+					centerY = y - height;
 				break;
 			}
 			case DLBL_POS_IN_END:
-			{
-				break;
-			}
-			case DLBL_POS_L:
-			{
-				break;
-			}
-			case DLBL_POS_OUT_END:
-			{
-				break;
-			}
-			case DLBL_POS_R:
-			{
-				break;
-			}
-			case DLBL_POS_T:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y - h;
@@ -2331,7 +2308,25 @@ drawBarChart.prototype =
 					centerY = centerY - height;	
 				break;
 			}
+			case DLBL_POS_OUT_END:
+			{
+				centerX = x + w/2 - width/2;
+				centerY = y - h - height;
+				if(point.val < 0)
+					centerY = centerY + height;	
+				break;
+			}
 		}
+		if(centerX < 0)
+			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+		
 		return {x: centerX, y: centerY};
 	},
 	
@@ -2477,7 +2472,6 @@ drawLineChart.prototype =
 		var centerX = x - width/2;
 		var centerY = y - height/2;
 		
-		//TODO высчитать позиции, как в екселе
 		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_B:
@@ -2487,31 +2481,15 @@ drawLineChart.prototype =
 			}
 			case DLBL_POS_BEST_FIT:
 			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_CTR:
 			{
 				break;
 			}
-			case DLBL_POS_IN_BASE:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
-			case DLBL_POS_IN_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
 			case DLBL_POS_L:
 			{
 				centerX = centerX - width/2 - constMargin;
-				break;
-			}
-			case DLBL_POS_OUT_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_R:
@@ -2525,6 +2503,17 @@ drawLineChart.prototype =
 				break;
 			}
 		}
+		
+		if(centerX < 0)
+			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+			
 		return {x: centerX, y: centerY};
 	},
 	
@@ -2722,7 +2711,6 @@ drawAreaChart.prototype =
 		var centerX = x - width/2;
 		var centerY = y - height/2;
 		
-		//TODO высчитать позиции, как в екселе +  ограничения
 		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_B:
@@ -2732,31 +2720,15 @@ drawAreaChart.prototype =
 			}
 			case DLBL_POS_BEST_FIT:
 			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_CTR:
 			{
 				break;
 			}
-			case DLBL_POS_IN_BASE:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
-			case DLBL_POS_IN_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
 			case DLBL_POS_L:
 			{
 				centerX = centerX - width/2 - constMargin;
-				break;
-			}
-			case DLBL_POS_OUT_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_R:
@@ -2770,9 +2742,17 @@ drawAreaChart.prototype =
 				break;
 			}
 		}
+		
 		if(centerX < 0)
 			centerX = 0;
-		
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+			
 		return {x: centerX, y: centerY};
 	},
 	
@@ -3056,17 +3036,8 @@ drawHBarChart.prototype =
 		
 		var centerX, centerY;
 				
-		//TODO высчитать позиции, как в екселе
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
-			{
-				centerX = x + w/2 - width/2;
-				centerY = y;
-				if( point.val > 0 )
-					centerY = y - height;
-				break;
-			}
 			case DLBL_POS_BEST_FIT:
 			{
 				break;
@@ -3093,10 +3064,6 @@ drawHBarChart.prototype =
 					centerX = x;
 				break;
 			}
-			case DLBL_POS_L:
-			{
-				break;
-			}
 			case DLBL_POS_OUT_END:
 			{
 				centerX = x + w;
@@ -3105,18 +3072,17 @@ drawHBarChart.prototype =
 					centerX = x - width;
 				break;
 			}
-			case DLBL_POS_R:
-			{
-				break;
-			}
-			case DLBL_POS_T:
-			{
-				break;
-			}
 		}
 		
 		if(centerX < 0)
 			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
 			
 		return {x: centerX, y: centerY};
 	},
@@ -3652,7 +3618,6 @@ drawScatterChart.prototype =
 		var centerX = x - width/2;
 		var centerY = y - height/2;
 		
-		//TODO высчитать позиции, как в екселе + ограничения за пределы экрана
 		switch ( point.compiledDlb.dLblPos )
 		{
 			case DLBL_POS_B:
@@ -3669,24 +3634,9 @@ drawScatterChart.prototype =
 			{
 				break;
 			}
-			case DLBL_POS_IN_BASE:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
-			case DLBL_POS_IN_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
-				break;
-			}
 			case DLBL_POS_L:
 			{
 				centerX = centerX - width/2 - constMargin;
-				break;
-			}
-			case DLBL_POS_OUT_END:
-			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_R:
@@ -3700,6 +3650,17 @@ drawScatterChart.prototype =
 				break;
 			}
 		}
+		
+		if(centerX < 0)
+			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+		
 		return {x: centerX, y: centerY};
 	},
 	
