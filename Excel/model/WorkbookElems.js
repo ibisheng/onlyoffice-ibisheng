@@ -2188,7 +2188,7 @@ Col.prototype =
 				oldVal = oldVal.clone();
 			if(null != newVal)
 				newVal = newVal.clone();
-			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetStyle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetStyle, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setCellStyle : function(val)
@@ -2197,7 +2197,7 @@ Col.prototype =
 		var oRes = this.sm.setCellStyle(this, newVal);
 		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
-			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetCellStyle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
+			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetCellStyle, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
@@ -2215,7 +2215,7 @@ Col.prototype =
 	{
 		var oRes = this.sm.setNumFormat(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_NumFormat, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_NumFormat, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2228,74 +2228,74 @@ Col.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_SetFont, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_SetFont, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setFontname : function(val)
 	{
 		var oRes = this.sm.setFontname(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontname, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontname, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontsize : function(val)
 	{
 		var oRes = this.sm.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontsize, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontsize, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontcolor : function(val)
 	{
 		var oRes = this.sm.setFontcolor(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontcolor, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontcolor, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setBold : function(val)
 	{
 		var oRes = this.sm.setBold(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Bold, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Bold, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setItalic : function(val)
 	{
 		var oRes = this.sm.setItalic(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Italic, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Italic, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setUnderline : function(val)
 	{
 		var oRes = this.sm.setUnderline(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Underline, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Underline, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setStrikeout : function(val)
 	{
 		var oRes = this.sm.setStrikeout(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Strikeout, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Strikeout, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontAlign : function(val)
 	{
 		var oRes = this.sm.setFontAlign(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_FontAlign, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_FontAlign, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setAlignVertical : function(val)
 	{
 		var oRes = this.sm.setAlignVertical(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignVertical, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignVertical, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setAlignHorizontal : function(val)
 	{
 		var oRes = this.sm.setAlignHorizontal(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignHorizontal, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignHorizontal, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFill : function(val)
 	{
 		var oRes = this.sm.setFill(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fill, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fill, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setBorder : function(val)
 	{
@@ -2308,32 +2308,32 @@ Col.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Border, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Border, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setShrinkToFit : function(val)
 	{
 		var oRes = this.sm.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_ShrinkToFit, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_ShrinkToFit, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setWrap : function(val)
 	{
 		var oRes = this.sm.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Wrap, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Wrap, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
     setAngle : function(val)
     {
         var oRes = this.sm.setAngle(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
     },
 	setVerticalText : function(val)
 	{
         var oRes = this.sm.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), new Asc.Range(this.index, 0, this.index, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	}
 };
 /**
@@ -2617,7 +2617,7 @@ function CCellValueMultiText()
 	};
 	this.text = null;
 	this.format = null;
-};
+}
 CCellValueMultiText.prototype = 
 {
 	isEqual : function(val)
@@ -3308,12 +3308,12 @@ CCellValue.prototype =
 				if(this.miminizeMultiText(false))
 				{
 					var DataNew = cell.getValueData();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(0, cell.oId.getRow0(), gc_nMaxCol0, cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(),cell.oId.getCol0(), backupObj, DataNew));
+					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(),cell.oId.getCol0(), backupObj, DataNew));
 				}
 				else
 				{
 					var DataNew = this._cloneMultiText();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(0, cell.oId.getRow0(), gc_nMaxCol0, cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(), cell.oId.getCol0(), backupObj.value.multiText, DataNew));
+					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.oId.getCol0(), cell.oId.getRow0(), cell.oId.getCol0(), cell.oId.getRow0()), new UndoRedoData_CellSimpleData(cell.oId.getRow0(), cell.oId.getCol0(), backupObj.value.multiText, DataNew));
 				}
 			}
 			bRes = true;
