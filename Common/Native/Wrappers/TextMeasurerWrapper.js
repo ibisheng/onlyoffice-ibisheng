@@ -19,7 +19,7 @@ CTextMeasurerWrapper.prototype =
 {
     Init : function()
     {
-        this.Measurer.Initialize(window.native);
+        this.Measurer["Initialize"](window.native);
     },
 
     SetFont : function(font)
@@ -60,7 +60,7 @@ CTextMeasurerWrapper.prototype =
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            var _bounds = this.Measurer.LoadFont(_info.Path, _info.FaceIndex, _lastSetUp.SetUpSize, flag);
+            var _bounds = this.Measurer["LoadFont"](_info.Path, _info.FaceIndex, _lastSetUp.SetUpSize, flag);
 
             this.UnitsPerEm = _bounds[3];
             var dKoef = g_dKoef_pt_to_mm * _lastSetUp.SetUpSize / this.UnitsPerEm;
@@ -171,7 +171,7 @@ CTextMeasurerWrapper.prototype =
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            var _bounds = this.Measurer.LoadFont(_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
+            var _bounds = this.Measurer["LoadFont"](_info.Path, _info.FaceIndex, _lastFont.SetUpSize, flag);
 
             this.UnitsPerEm = _bounds[3];
             var dKoef = g_dKoef_pt_to_mm * _lastFont.SetUpSize / this.UnitsPerEm;
@@ -193,24 +193,24 @@ CTextMeasurerWrapper.prototype =
 
     Measure : function(text)
     {
-        var _width = this.Measurer.MeasureChar(text.charCodeAt(0));
+        var _width = this.Measurer["MeasureChar"](text.charCodeAt(0));
         return { Width : _width, Height : 0 };
     },
     Measure2 : function(text)
     {
-        var _bounds = this.Measurer.GetDrawingBox(text.charCodeAt(0));
+        var _bounds = this.Measurer["GetDrawingBox"](text.charCodeAt(0));
 
         return { Width : _bounds[0], Ascent : _bounds[4], Height : (_bounds[4] - _bounds[3]), WidthG: (_bounds[2] - _bounds[1]) };
     },
 
     MeasureCode : function(lUnicode)
     {
-        var _width = this.Measurer.MeasureChar(lUnicode);
+        var _width = this.Measurer["MeasureChar"](lUnicode);
         return { Width : _width, Height : 0 };
     },
     Measure2Code : function(lUnicode)
     {
-        var _bounds = this.Measurer.GetDrawingBox(lUnicode);
+        var _bounds = this.Measurer["GetDrawingBox"](lUnicode);
 
         return { Width : _bounds[0], Ascent : _bounds[4], Height : (_bounds[4] - _bounds[3]), WidthG: (_bounds[2] - _bounds[1]) };
     },
@@ -371,6 +371,5 @@ CTextMeasurerWrapper.prototype =
             SrcBold     : bSrcBold,
             SrcItalic   : bSrcItalic
         };
-
     }
 };
