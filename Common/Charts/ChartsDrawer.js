@@ -7,7 +7,7 @@ function CChartsDrawer()
 	
 	this.calcProp = null;
 	
-	this.areaChart = null;
+	this.allAreaChart = null;
 	this.gridChart = null;
 	this.chart = null;
 }
@@ -19,6 +19,9 @@ CChartsDrawer.prototype =
 		this.calcProp = {};
 		this._calculateProperties(chartProp);
 
+		//создаём область
+		this.allAreaChart = new allAreaChart();
+		
 		//создаём область
 		this.areaChart = new areaChart();
 		
@@ -67,8 +70,9 @@ CChartsDrawer.prototype =
 		this.chart = newChart;
 		
 		//делаем полный пресчёт
+		this.areaChart.reCalculate(this.calcProp, null, this);
 		this.gridChart.reCalculate(this.calcProp, null, this);
-		this.areaChart.reCalculate(this.calcProp);
+		this.allAreaChart.reCalculate(this.calcProp);
 		this.chart.reCalculate(this, chartProp);
 	},
 	
@@ -79,6 +83,7 @@ CChartsDrawer.prototype =
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
 		
 		//отрисовываем без пересчёта
+		this.allAreaChart.draw(this.calcProp, cShapeDrawer);
 		this.areaChart.draw(this.calcProp, cShapeDrawer);
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.chart.draw(this, cShapeDrawer, chartProp);
@@ -3627,7 +3632,6 @@ drawScatterChart.prototype =
 			}
 			case DLBL_POS_BEST_FIT:
 			{
-				//centerY = centerY + 27 / pxToMm;
 				break;
 			}
 			case DLBL_POS_CTR:
@@ -3864,15 +3868,15 @@ gridChart.prototype =
 
 	
 	
-//*****Area of chart*****
-function areaChart()
+//*****all area of chart*****
+function allAreaChart()
 {
 	this.chartProp = null;
 	this.cShapeDrawer = null;
 	this.paths = null;
 }
 
-areaChart.prototype =
+allAreaChart.prototype =
 {
     draw : function(chartProp, cShapeDrawer)
     {
@@ -3928,7 +3932,7 @@ areaChart.prototype =
 		this._drawPath(this.paths, lineWidth, StrokeUniColor, FillUniColor);
 	},
 	
-	_drawPath: function(path, lineWidth,StrokeUniColor, FillUniColor)
+	_drawPath: function(path, lineWidth, StrokeUniColor, FillUniColor)
 	{
 		if(StrokeUniColor)
 		{
@@ -3946,6 +3950,95 @@ areaChart.prototype =
 	}
 }	
 	
+//*****Area of chart*****
+function areaChart()
+{
+	this.chartProp = null;
+	this.cShapeDrawer = null;
+	this.paths = null;
+}
+
+areaChart.prototype =
+{
+    draw : function(chartProp, cShapeDrawer)
+    {
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		
+		this._drawArea();
+	},
+	
+	reCalculate: function(chartProp, cShapeDrawer)
+	{
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		
+		this.paths = null;
+		this._calculateArea();
+	},
+	
+	_calculateArea: function()
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		
+		var widthGraph = this.chartProp.widthCanvas;
+		var heightGraph = this.chartProp.heightCanvas;
+		var leftMargin = this.chartProp.chartGutter._left;
+		var rightMargin = this.chartProp.chartGutter._right;
+		var topMargin = this.chartProp.chartGutter._top;
+		var bottomMargin = this.chartProp.chartGutter._bottom;
+		
+		
+		path.moveTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
+		path.lnTo((widthGraph - rightMargin)  / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
+		path.lnTo((widthGraph - rightMargin) / pxToMm * pathW, topMargin / pxToMm * pathH);
+		path.lnTo(leftMargin / pxToMm * pathW, topMargin / pxToMm * pathH);
+		path.moveTo(leftMargin / pxToMm * pathW, (heightGraph - bottomMargin) / pxToMm * pathH);
+		
+		path.recalculate(gdLst);
+		this.paths = path;
+	},
+	
+	_drawArea: function()
+	{
+		var StrokeUniColor = new CUniColor().RGBA;
+		var FillUniColor = new CUniColor().RGBA;
+		FillUniColor.R = 255;
+		FillUniColor.G = 255;
+		FillUniColor.B = 255;
+		
+		var lineWidth = 1;
+		this._drawPath(this.paths, lineWidth, StrokeUniColor, FillUniColor);
+	},
+	
+	_drawPath: function(path, lineWidth, StrokeUniColor, FillUniColor)
+	{
+		if(StrokeUniColor)
+		{
+			path.stroke = true;
+			this.cShapeDrawer.StrokeWidth = lineWidth/(96/25.4);
+			this.cShapeDrawer.p_width(1000 * this.cShapeDrawer.StrokeWidth);
+			this.cShapeDrawer.StrokeUniColor = StrokeUniColor;
+		}
+		
+		this.cShapeDrawer.FillUniColor = FillUniColor;
+		
+		var cGeometry = new CGeometry2();
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	}
+}	
 	
 //****another functions and classes***
 function CGeometry2()
