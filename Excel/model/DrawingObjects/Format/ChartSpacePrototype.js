@@ -38,7 +38,10 @@ CChartSpace.prototype.setRecalculateInfo = function()
 		recalculateDLbls: true,
         recalculateAxisLabels: true,
 		dataLbls:[],
-        axisLabels: []
+        axisLabels: [],
+        recalculateAxisVal: true,
+        recalculateAxisCat: true ,
+        recalculateAxisTickMark: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -203,7 +206,7 @@ CChartSpace.prototype.recalculate = function()
 		if(this.recalcInfo.recalculateTransform)
 		{
 		   this.recalculateTransform();
-		   this.recalcInforecalculateTransform = false;
+		   this.recalcInfo.recalculateTransform = false;
 		}
 		if(this.recalcInfo.recalculateBounds)
 		{
@@ -230,6 +233,11 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateGridLines();
 			this.recalcInfo.recalculateGridLines = false;
 		}
+        if(this.recalcInfo.recalculateAxisTickMark)
+        {
+            this.recalculateAxisTickMark();
+            this.recalcInfo.recalculateAxisTickMark = true;
+        }
 		if(this.recalcInfo.recalculateDLbls)
 		{
 			this.recalculateDLbls();
@@ -245,10 +253,19 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateChart();
 			this.recalcInfo.recalculateChart = false;
 		}
+        if(this.recalcInfo.recalculateAxisVal)
+        {
+            this.recalculateAxisVal();
+            this.recalcInfo.recalculateAxisVal = false;
+        }
+
 		for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
 		{
-			var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx);
-			this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+            if(this.recalcInfo.dataLbls[i].series && this.recalcInfo.dataLbls[i].pt)
+            {
+                var pos = this.chartObj.reCalculatePositionText("dlbl", this, this.recalcInfo.dataLbls[i].series.idx, this.recalcInfo.dataLbls[i].pt.idx);
+                this.recalcInfo.dataLbls[i].setPosition(pos.x, pos.y);
+            }
 		}
 		this.recalcInfo.dataLbls.length = 0;
 
@@ -477,7 +494,7 @@ CChartSpace.prototype.recalculateGridLines = function()
 					}
 					compiled_grid_lines.Fill.merge(defaultStyle);
 					compiled_grid_lines.merge(spPr.ln);	
-					compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255})
+					compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
 					return compiled_grid_lines;
 				}
 				return null;
@@ -1018,5 +1035,143 @@ CChartSpace.prototype.recalculateDLbls = function()
 		}
 	}
 };
+
+CChartSpace.prototype.getValAxisValues = function()
+{
+    if(!this.chartObj)
+    {
+        this.chartObj = new CChartsDrawer()
+    }
+    this.chartObj.preCalculateData(this);
+    var ret = [];
+    ret = ret.concat(this.chartObj.calcProp);
+    return ret;
+};
+
+
+CChartSpace.prototype.recalculateValAxLine = function()
+{};
+
+CChartSpace.prototype.recalculateAxisVal = function()
+{
+    if(this.chart && this.chart.plotArea && this.chart.plotArea.valAx)
+    {
+        var val_ax = this.chart.plotArea.valAx;
+        val_ax.axisLabels = [];
+        var arr_val =  this.getValAxisValues();
+        var i;
+        for(i = 0; i < arr_val.length; ++i)
+        {
+            var dlbl = new CDLbl();
+            dlbl.parent = val_ax;
+            dlbl.chart = this;
+            dlbl.spPr = val_ax.spPr;
+            dlbl.txPr = val_ax.txPr;
+            dlbl.tx = new CChartText();
+            dlbl.tx.rich = CreateTextBodyFromString(arr_val[i]+"", this.getDrawingDocument(), dlbl);
+            dlbl.recalculate();
+            val_ax.axisLabels.push(dlbl);
+        }
+    }
+};
+
+CChartSpace.prototype.recalculateAxisTickMark = function()
+{
+    if(this.chart && this.chart.plotArea)
+    {
+        var calcMajorMinorGridLines = function (axis, defaultStyle, subtleLine, parents)
+        {
+            function calcGridLine(defaultStyle, spPr, subtleLine, parents)
+            {
+                var compiled_grid_lines = new CLn();
+                compiled_grid_lines.merge(subtleLine);
+
+                if(!compiled_grid_lines.Fill)
+
+                {
+                    compiled_grid_lines.setFill(new CUniFill());
+                }
+                compiled_grid_lines.Fill.merge(defaultStyle);
+                if(spPr)
+                {
+                    compiled_grid_lines.merge(spPr.ln);
+                }
+                compiled_grid_lines.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+                return compiled_grid_lines;
+            }
+            axis.compiledLn = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.spPr, subtleLine, parents);
+            axis.compiledTickMarkLn = axis.compiledLn.createDuplicate();
+            if(isRealNumber(axis.compiledTickMarkLn.w))
+                axis.compiledTickMarkLn.w/=2;
+            axis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255})
+        };
+        var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.style);
+        var parent_objects = this.getParentObjects();
+        var RGBA = {R:0, G:0, B:0, A: 255};
+        var subtle_line;
+        if(parent_objects.theme  && parent_objects.theme.themeElements
+            && parent_objects.theme.themeElements.fmtScheme
+            && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+        {
+            subtle_line = parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0];
+        }
+        if(this.chart.plotArea.valAx)
+            calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
+        if(this.chart.plotArea.catAx)
+            calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
+    }
+};
+
+CChartSpace.prototype.recalculateAxisCat = function()
+{
+
+};
+
+CChartSpace.prototype.recalculateChartBrush = function()
+{
+    var default_brush;
+    if(this.style >=1 && this.style <=32)
+        default_brush = CreateUnifillSolidFillSchemeColor(6, 0);
+    else if(this.style >=33 && this.style <= 40)
+        default_brush = CreateUnifillSolidFillSchemeColor(12, 0);
+    else
+        default_brush = CreateUnifillSolidFillSchemeColor(8, 0);
+
+    if(this.spPr && this.spPr.Fill)
+    {
+        default_brush.merge(this.spPr.Fill);
+    }
+    var parents = this.getParentObjects();
+    default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    this.brush = default_brush;
+
+};
+
+CChartSpace.prototype.recalculateChartPen = function()
+{
+    var parent_objects = this.getParentObjects();
+    var default_line = new CLn();
+    if(parent_objects.theme  && parent_objects.theme.themeElements
+        && parent_objects.theme.themeElements.fmtScheme
+        && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
+    {
+        default_line.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
+    }
+    default_line.setFill(new CUniFill());
+    default_line.Fill.setFill(new CSolidFill());
+    default_line.Fill.fill.setColor(new CUniColor());
+    default_line.Fill.fill.color.setColor(new CSchemeColor());
+};
+
+function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
+{
+    var unifill = new CUniFill();
+    unifill.setFill(new CSolidFill());
+    unifill.fill.setColor(new CUniColor());
+    unifill.fill.color.setColor(new CSchemeColor());
+    unifill.fill.color.color.setId(colorId);
+    return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
+}
+
 
 

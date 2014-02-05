@@ -834,6 +834,15 @@ CAxis.prototype =
         this.txPr = pr;
     },
 
+
+    getParentObjects: function()
+    {
+        return this.parent && this.parent.getParentObjects ? this.parent.getParentObjects() : null;
+    },
+
+    recalculateBrush: CDLbl.prototype.recalculateBrush,
+    recalculatePen: CDLbl.prototype.recalculatePen,
+
     Undo: function(data)
     {
         switch (data.Type)
@@ -3810,35 +3819,7 @@ CDLbl.prototype =
 		}
 		else
 		{
-			var tx_body = new CTextBody();
-			tx_body.setParent(this);
-            tx_body.setBodyPr(new CBodyPr());
-			tx_body.setContent(new CDocumentContent(tx_body, this.chart.getDrawingDocument(), 0, 0, 0, 0, false, false));
-			var compiled_string = this.getDefaultTextForTxBody();
-			var content = tx_body.content;
-			for(var i = 0; i < compiled_string.length; ++i)
-			{
-				var ch = compiled_string[i];
-				if (ch == '\t')
-				{
-					content.Paragraph_Add( new ParaTab(), false );
-				}
-				else if (ch == '\n')
-				{
-					content.Paragraph_Add( new ParaNewLine(break_Line), false );
-				}
-				else if (ch == '\r')
-					;
-				else if (ch != ' ')
-				{
-					content.Paragraph_Add(new ParaText(ch), false );
-				}
-				else
-				{
-					content.Paragraph_Add(new ParaSpace(1), false );
-				}
-			}
-			this.txBody = tx_body;
+			this.txBody = CreateTextBodyFromString(this.getDefaultTextForTxBody(), this.chart.getDrawingDocument(), this);
 		}
 	},
 
@@ -14836,3 +14817,36 @@ CView3d.prototype =
         }
     }
 };
+
+function CreateTextBodyFromString(str, drawingDocument, parent)
+{
+    var tx_body = new CTextBody();
+    tx_body.setParent(parent);
+    tx_body.setBodyPr(new CBodyPr());
+    tx_body.setContent(new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false));
+    var content = tx_body.content;
+    for(var i = 0; i < str.length; ++i)
+    {
+        var ch = str[i];
+        if (ch == '\t')
+        {
+            content.Paragraph_Add( new ParaTab(), false );
+        }
+        else if (ch == '\n')
+        {
+            content.Paragraph_Add( new ParaNewLine(break_Line), false );
+        }
+        else if (ch == '\r')
+            ;
+        else if (ch != ' ')
+        {
+            content.Paragraph_Add(new ParaText(ch), false );
+        }
+        else
+        {
+            content.Paragraph_Add(new ParaSpace(1), false );
+        }
+    }
+    return tx_body;
+
+}
