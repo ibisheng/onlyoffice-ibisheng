@@ -56,6 +56,37 @@ function shiftGetBBox(bbox, bHor)
 		bboxGet = Asc.Range(bbox.c1, bbox.r1, bbox.c2, gc_nMaxRow0);
 	return bboxGet;
 }
+function shiftSort(a, b, bAsc, bRow)
+{
+	var nRes = 0;
+	if(null == a.to || null == b.to)
+	{
+		if(null == a.to && null == b.to)
+			nRes = 0;
+		else if(null == a.to)
+			nRes = 1;
+		else if(null == b.to)
+			nRes = -1;
+	}
+	else
+	{
+		if(bRow)
+		{
+			if(bAsc)
+				nRes = a.to.r1 - b.to.r1;
+			else
+				nRes = b.to.r1 - a.to.r1;
+		}
+		else
+		{
+			if(bAsc)
+				nRes = a.to.c1 - b.to.c1;
+			else
+				nRes = b.to.c1 - a.to.c1;
+		}
+	}
+	return nRes;
+}
 function RgbColor(rgb)
 {
 	this.Properties = {
@@ -3896,37 +3927,6 @@ RangeDataManager.prototype = {
 		var bboxGet = shiftGetBBox(bbox, bHor);
 		return {bbox: bboxGet, elems: this.get(bboxGet)};
 	},
-	shiftSort : function(a, b, bAsc, bRow)
-	{
-		var nRes = 0;
-		if(null == a.to || null == b.to)
-		{
-			if(null == a.to && null == b.to)
-				nRes = 0;
-			else if(null == a.to)
-				nRes = 1;
-			else if(null == b.to)
-				nRes = -1;
-		}
-		else
-		{
-			if(bRow)
-			{
-				if(bAsc)
-					nRes = a.to.r1 - b.to.r1;
-				else
-					nRes = b.to.r1 - a.to.r1;
-			}
-			else
-			{
-				if(bAsc)
-					nRes = a.to.c1 - b.to.c1;
-				else
-					nRes = b.to.c1 - a.to.c1;
-			}
-		}
-		return nRes;
-	},
 	shift : function(bbox, bAdd, bHor, oGetRes)
 	{
 		var _this = this;
@@ -4031,16 +4031,16 @@ RangeDataManager.prototype = {
 		if(bHor)
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return _this.shiftSort(a, b, false, false);});
+				aToChange.sort(function(a, b){return shiftSort(a, b, false, false);});
 			else
-				aToChange.sort(function(a, b){return _this.shiftSort(a, b, true, false);});
+				aToChange.sort(function(a, b){return shiftSort(a, b, true, false);});
 		}
 		else
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return _this.shiftSort(a, b, false, true);});
+				aToChange.sort(function(a, b){return shiftSort(a, b, false, true);});
 			else
-				aToChange.sort(function(a, b){return _this.shiftSort(a, b, true, true);});
+				aToChange.sort(function(a, b){return shiftSort(a, b, true, true);});
 		}
 		if(null != this.fChange)
 		{
@@ -4240,16 +4240,16 @@ CellArea.prototype = {
 		if(bHor)
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return b.to.c1 - a.to.c1;});
+				aToChange.sort(function(a, b){return shiftSort(a, b, false, false);});
 			else
-				aToChange.sort(function(a, b){return a.to.c1 - b.to.c1;});
+				aToChange.sort(function(a, b){return shiftSort(a, b, true, false);});
 		}
 		else
 		{
 			if(bAdd)
-				aToChange.sort(function(a, b){return b.to.r1 - a.to.r1;});
+				aToChange.sort(function(a, b){return shiftSort(a, b, false, true);});
 			else
-				aToChange.sort(function(a, b){return a.to.r1 - b.to.r1;});
+				aToChange.sort(function(a, b){return shiftSort(a, b, true, true);});
 		}
 		if(null != this.fChange)
 		{

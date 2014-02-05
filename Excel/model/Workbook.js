@@ -676,14 +676,14 @@ Vertex.prototype = {
 	{
 		return this.bbox;
 	},
-	setFormula : function(sFormula, bAddToHistory, bAddNeedRecal)
+	setFormula : function(sFormula, bAddToHistory, bAddNeedRecalc)
 	{
 		var cell = this.returnCell();
 		if(null != sFormula)
 			cell.setFormula(sFormula, bAddToHistory);
 		this.wb.dependencyFormulas.deleteMasterNodes2( this.sheetId, this.cellId );
 		addToArrRecalc(this.sheetId, cell);
-		if(bAddNeedRecal)
+		if(bAddNeedRecalc)
 		{
 			this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
 			this.wb.needRecalc.length++;
@@ -694,10 +694,8 @@ Vertex.prototype = {
 		var cell = this.returnCell();
 		if( cell && cell.formulaParsed )
 		{
-			this.wb.dependencyFormulas.deleteMasterNodes2( wsId, cellId );
 			cell.formulaParsed.setRefError(wsId, cellId);
-			cell.setFormula(cell.formulaParsed.assemble(), true);
-			addToArrRecalc(wsId, cell);
+			this.setFormula(cell.formulaParsed.assemble(), true, false);
 		}
 	},
 	move : function(offset, wsId, toDelete)
@@ -716,10 +714,8 @@ Vertex.prototype = {
 			cell = slave.returnCell();
 			if( cell && cell.formulaParsed )
 			{
-				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
 				cell.formulaParsed.shiftCells( offset, null, this, slave.sheetId, toDelete);
-				cell.setFormula(cell.formulaParsed.assemble(), true);
-				addToArrRecalc(slave.sheetId, cell);
+				slave.setFormula(cell.formulaParsed.assemble(), true, false);
 			}
 		}
 		this.bbox = oNewBBox;
@@ -736,10 +732,8 @@ Vertex.prototype = {
 			var slave = _sn[_id];
 			var cell = slave.returnCell();
 			if( cell && cell.formulaParsed ){
-				this.wb.dependencyFormulas.deleteMasterNodes2( slave.sheetId, slave.cellId );
 				cell.formulaParsed.stretchArea( this, sNewName );
-				cell.setFormula(cell.formulaParsed.assemble(), true);
-				addToArrRecalc(slave.sheetId, cell);
+				slave.setFormula(cell.formulaParsed.assemble(), true, false);
 			}
 		}
 		this.bbox = bboxTo
