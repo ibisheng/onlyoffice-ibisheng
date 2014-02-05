@@ -607,7 +607,7 @@
 			}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( graphicObjects.length && t.enableKeyEvents ) {
+			if ( !t.isLocked && graphicObjects.length && t.enableKeyEvents ) {
 				var result = t.handlers.trigger("graphicObjectWindowKeyDown", event);
 				if (t.isCellEditMode) {
 					t.handlers.trigger("stopCellEditing");
@@ -922,7 +922,7 @@
 			if (t.settings.isViewerMode || t.isSelectionDialogMode) {return true;}
 
 			var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-			if ( graphicObjects.length && t.enableKeyEvents ) {
+			if ( !t.isLocked && graphicObjects.length && t.enableKeyEvents ) {
 				if (!( (event.ctrlKey || event.metaKey) && (event.which == 99 || event.which == 118 || event.which == 120) )) {		// Mozilla Firefox Fix #20080 (Ctrl+C, Ctrl+V, Ctrl+X)
 					if (t.handlers.trigger("graphicObjectWindowKeyPress", event)) {
 						if (t.isCellEditMode) {
