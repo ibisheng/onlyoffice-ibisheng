@@ -65,6 +65,8 @@
 			this.targetInfo = undefined;
 			this.isResizeMode = false;
 			this.isResizeModeMove = false;
+			// Выставляем при клике в объект(_onMouseDown)
+			this.isGraphicMode = false;
 			
 			// Режим автозаполнения
 			this.isFillHandleMode = false;
@@ -972,6 +974,9 @@
 
 		/** @param event {jQuery.Event} */
 		asc_CEventsController.prototype._onWindowMouseMove = function (event) {
+			var t = this;
+			var coord = t._getCoordinates(event);
+				
 			if (this.isSelectMode && !this.hasCursor) {this._changeSelection2(event);}
 			if (this.isResizeMode && !this.hasCursor) {
 				this.isResizeModeMove = true;
@@ -982,6 +987,10 @@
 
             else if( this.vsbApiLockMouse )
                 this.vsbApi.mouseDown ? this.vsbApi.evt_mousemove.call(this.vsbApi,event) : false;
+				
+			event.isLocked = t.isLocked;
+			if (asc["editor"].isStartAddShape && t.isGraphicMode)
+				t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 
 			return true;
 		};
@@ -996,9 +1005,10 @@
 			var coord = this._getCoordinates(event);
 			
 			// Отправляем событие только вне канвы
-			if ( (( coord.x < 0 ) || (coord.y < 0) || (coord.x > this.element.width) || (coord.y > this.element.height))  && asc["editor"].isStartAddShape ) {
+			if ( this.isGraphicMode  && asc["editor"].isStartAddShape ) {
 				this.isLocked = false;
 				event.isLocked = false;
+				this.isGraphicMode = false;
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
@@ -1125,6 +1135,9 @@
 				// При выборе диапазона не нужно выделять автофигуру
 				if (t.isSelectionDialogMode)
 					return;
+				if ( t.isCellEditMode )
+					t.handlers.trigger("stopCellEditing");
+					
 				//for Mac OS
 				if (event.metaKey)
 					event.ctrlKey = true;
@@ -1137,9 +1150,7 @@
 
 				asc["editor"].isStartAddShape = true;
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
-
-				if ( t.isCellEditMode )
-					t.handlers.trigger("stopCellEditing");
+				t.isGraphicMode = true;
 
 				if (asc["editor"].isStartAddShape) {
 					// SelectionChanged
@@ -1289,6 +1300,7 @@
 				event.ClickCount = this.clickCounter.clickCount;
 				this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 				this._changeSelectionDone(event);
+				this.isGraphicMode = false;
 				return true;
 			}
 
