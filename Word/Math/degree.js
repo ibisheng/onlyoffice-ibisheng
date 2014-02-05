@@ -81,44 +81,13 @@ CDegree.prototype.old__recalculateSup = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 }
-CDegree.prototype.recalculateSup = function(oMeasure)
-{
-    var base = this.elements[0][0].size,
-        iter   = this.elements[0][1].size;
-
-    var mgCtrPrp = this.mergeCtrTPrp();
-    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
-
-    this.upBase = 0;
-    this.upIter = 0;
-
-    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
-
-    if(bBaseOnlyText)
-    {
-        var TxtAsc =  1.786*shCenter;
-        if(TxtAsc + iter.ascent> base.ascent)
-            this.upBase = TxtAsc + iter.ascent - base.ascent;
-        else
-            this.upIter = base.ascent - TxtAsc - iter.ascent;
-    }
-    else
-        this.upBase = iter.ascent - 1.2*shCenter;
-
-    var height = this.upBase + base.height;
-    var ascent = this.upBase + base.ascent;
-
-    var width = base.width + iter.width + this.dW;
-
-    this.size = {width: width, height: height, ascent: ascent};
-}
-CDegree.prototype.recalculateSubScript = function(oMeasure)
+CDegree.prototype.old_recalculateSubScript = function(oMeasure)
 {
     var base = this.elements[0][0].size,
         iter   = this.elements[0][1].size;
 
     /*var FontSize = this.getCtrPrp().FontSize,
-        shiftCenter = 0.5*DIV_CENT*FontSize;*/
+     shiftCenter = 0.5*DIV_CENT*FontSize;*/
 
     //var ctrPrp = this.getCtrPrp(); // выставить потом размер шрифта для итератора
 
@@ -145,6 +114,80 @@ CDegree.prototype.recalculateSubScript = function(oMeasure)
 
     this.size = {width: width, height: height, ascent: ascent};
 
+}
+CDegree.prototype.recalculateSup = function(oMeasure)
+{
+    var base = this.elements[0][0].size,
+        iter   = this.elements[0][1].size;
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+
+    this.upBase = 0;
+    this.upIter = 0;
+
+    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
+
+    if(bBaseOnlyText)
+    {
+        var UpBaseline =  1.786*shCenter; // baseline итератора
+        if(UpBaseline + iter.ascent> base.ascent)
+            this.upBase = UpBaseline + iter.ascent - base.ascent;
+        else
+            this.upIter = base.ascent - UpBaseline - iter.ascent;
+    }
+    else
+    {
+        this.upBase = iter.ascent - 1.2*shCenter;
+
+        if(iter.height - this.upBase > 0.5*base.ascent)
+            this.upBase = iter.height - 0.5*base.ascent;
+    }
+
+    var height = this.upBase + base.height;
+    var ascent = this.upBase + base.ascent;
+
+    // only for supScript
+    if(this.IsPlhIterator())
+        this.dW = 0.008*mgCtrPrp.FontSize;
+    else
+        this.dW = 0.01*mgCtrPrp.FontSize;
+
+    var width = base.width + iter.width + this.dW;
+
+    this.size = {width: width, height: height, ascent: ascent};
+}
+CDegree.prototype.recalculateSubScript = function(oMeasure)
+{
+    var base = this.elements[0][0].size,
+        iter   = this.elements[0][1].size;
+
+    var mgCtrPrp = this.mergeCtrTPrp();
+    var shCenter = this.Composition.GetShiftCenter(oMeasure, mgCtrPrp);
+
+    var width = base.width + iter.width + this.dW;
+
+    var bBaseOnlyText = this.elements[0][0].IsOnlyText();
+
+    if(bBaseOnlyText)
+    {
+        this.upIter = base.ascent + 0.9*shCenter - iter.ascent;
+
+        if(base.ascent/2 > this.upIter)
+            this.upIter = base.ascent/2;
+    }
+    else
+    {
+        this.upIter = base.height + 0.9*shCenter - iter.ascent;
+
+        if(base.ascent - shCenter > this.upIter)
+            this.upIter = base.height - base.ascent + shCenter;
+    }
+
+    var height = this.upIter + iter.height;
+    var ascent = base.ascent;
+
+    this.size = {width: width, height: height, ascent: ascent};
 }
 CDegree.prototype.old_old_setPosition = function(_pos)
 {
@@ -395,15 +438,6 @@ CDegree.prototype.getPropsForWrite = function()
     props.alnScr = this.alnScr;
 
     return props;
-}
-CDegree.prototype.setDistance = function()
-{
-    var mgCtrPrp = this.mergeCtrTPrp();
-
-    if(this.IsPlhIterator())
-        this.dW = 0.008*mgCtrPrp.FontSize;
-    else
-        this.dW = 0.02*mgCtrPrp.FontSize;
 }
 CDegree.prototype.IsPlhIterator = function()
 {

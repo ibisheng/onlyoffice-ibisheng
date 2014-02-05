@@ -4448,7 +4448,6 @@ CMathContent.prototype =
 
         return {state: state, SelectContent: SelectContent }; //для CMathContent state всегда true
     },
-
     old_changePosForMove: function(pos, order)
     {
         var posChange = -1;
@@ -4487,7 +4486,6 @@ CMathContent.prototype =
 
         return posChange;
     },
-
     /*
         курсор стоит перед RunPrp, в случае если после них идет текст,
         в случае с мат. объектом логическое положение курсора после RunPrp (аналогично и для начала формулы) = >
@@ -4893,11 +4891,17 @@ CMathContent.prototype =
             leftCode  = bLeftText ? left.getCodeChr() : null,
             rightCode = bRightText ? right.getCodeChr() : null;
 
+        var gapLeftComp = 0,
+            gapRightComp = 0;
+
+        if(bLeftComp)
+            gapLeftComp = this.getGapsMComp(left).right;
+
+        if(bRightComp)
+            gapRightComp = this.getGapsMComp(right).left;
+
         if(curr.typeObj == MATH_TEXT)
         {
-
-            //var gapSign = this.Composition.GetGapSign(oMeasure, wTextRPrp);
-
             var bSign = false;
 
             if(this.checkOperSign(currCode)) // plus, minus, greater, less
@@ -4978,10 +4982,10 @@ CMathContent.prototype =
             }
 
             if(bSign && bLeftComp)
-                coeffLeft = coeffLeft - this.getGapsMComp(left).right;
+                coeffLeft = coeffLeft - gapLeftComp;
 
             if(bSign && bRightComp)
-                coeffRight = coeffRight - this.getGapsMComp(right).left;
+                coeffRight = coeffRight - gapRightComp;
 
             coeffLeft = Math.ceil(coeffLeft*10)/10;
             coeffRight = Math.ceil(coeffRight*10)/10;
@@ -4989,35 +4993,29 @@ CMathContent.prototype =
         }
         else if(curr.typeObj == MATH_COMP)
         {
-            var gapsMComp = this.getGapsMComp(curr);
+            var currGaps = this.getGapsMComp(curr);
             if(bLeft)
-                coeffLeft =  gapsMComp.left;
-            if(bRight  && !bRightComp)
-                coeffRight = gapsMComp.right;
-            /*var checkGap = this.checkGapKind(curr);
-
-            if(checkGap.bEmptyGaps)
             {
-                if(left !== null)
-                    coeffLeft = 0.1;
+                coeffLeft =  currGaps.left;
+
+                if(bLeftComp)
+                {
+                    if(gapLeftComp/2 < coeffLeft)
+                        coeffLeft = gapLeftComp/2;
+                }
             }
-            else if(checkGap.bChildGaps)
+            if(bRight)
             {
-                var gaps = curr.getGapsInside();
+                coeffRight = currGaps.right;
 
-                if(left !== null)
-                    coeffLeft = gaps.left;
-                if(right !== null)
-                    coeffRight = gaps.right;
+                if(bRightComp)
+                {
+                    if(coeffRight/2 > gapRightComp )
+                        coeffRight -= gapRightComp;
+                    else
+                        coeffRight /=2;
+                }
             }
-            else
-            {
-                if(left !== null)
-                    coeffLeft = 0.4;
-
-                if(right !== null)
-                    coeffRight = 0.26;
-            }*/
         }
 
         if(bLeftText)
@@ -5235,8 +5233,6 @@ CMathContent.prototype =
                 else
                     this.content[i].value.draw(x, y, pGraphics);
 
-
-
                 /*if(this.content[i].value.typeObj == MATH_COMP)
                 {
                     var penW = 25.4/96;
@@ -5253,7 +5249,7 @@ CMathContent.prototype =
         }
 
         /// TEST
-        if(!this.IsOnlyText())
+        /*if(!this.IsOnlyText())
         {
             var penW = 25.4/96;
             var x1 = this.pos.x + x - penW,
@@ -5264,7 +5260,7 @@ CMathContent.prototype =
             pGraphics.p_color(0,0,255, 255);
             pGraphics.drawVerLine(0, x1, y1, y2, penW);
             pGraphics.drawVerLine(0, x2, y1, y2, penW);
-        }
+        }*/
 
         /*if(this.bRoot)
         {
@@ -6195,7 +6191,7 @@ CMathContent.prototype =
 
         if(this.argSize == -1)
         {
-            // aa: 0.0013  bb: 0.66  cc: 0.5
+            //aa: 0.0013  bb: 0.66  cc: 0.5
             //aa: 0.0009  bb: 0.68  cc: 0.26
             FSize = 0.0009*FSize*FSize + 0.68*FSize + 0.26;
             //FSize = 0.001*FSize*FSize + 0.723*FSize - 1.318;
