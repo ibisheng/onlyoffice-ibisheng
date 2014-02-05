@@ -28,6 +28,11 @@ CChartsDrawer.prototype =
 		//создаём сетку
 		this.gridChart = new gridChart();
 		
+		//ось категорий
+		this.catAxisChart = new catAxisChart();
+		//ось значений
+		this.valAxisChart = new valAxisChart();
+		
 		//draw chart
 		var newChart;
 		switch ( this.calcProp.type )
@@ -73,6 +78,9 @@ CChartsDrawer.prototype =
 		this.areaChart.reCalculate(this.calcProp, null, this);
 		this.gridChart.reCalculate(this.calcProp, null, this);
 		this.allAreaChart.reCalculate(this.calcProp);
+		this.catAxisChart.reCalculate(this.calcProp, null, chartProp);
+		this.valAxisChart.reCalculate(this.calcProp, null, chartProp);
+		
 		this.chart.reCalculate(this, chartProp);
 	},
 	
@@ -85,6 +93,8 @@ CChartsDrawer.prototype =
 		//отрисовываем без пересчёта
 		this.allAreaChart.draw(this.calcProp, cShapeDrawer);
 		this.areaChart.draw(this.calcProp, cShapeDrawer);
+		this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
+		this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.chart.draw(this, cShapeDrawer, chartProp);
 	},
@@ -3866,7 +3876,459 @@ gridChart.prototype =
 }	
 	
 
+//*****Category axis*****
+function catAxisChart()
+{
+	this.chartProp = null;
+	this.cShapeDrawer = null;
+	this.chartSpace = null;
+	this.paths = {};
+}
+
+catAxisChart.prototype =
+{
+    draw : function(chartProp, cShapeDrawer, chartSpace)
+    {
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
+		
+		this._drawAxis();
+		this._drawTickMark();
+	},
 	
+	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	{
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
+		
+		this.paths = {};
+		this._calculateAxis();
+		this._calculateTickMark();
+	},
+	
+	_calculateAxis : function()
+	{
+		var nullPos = this.chartProp.nullPositionOX;
+		if(this.chartProp.type == "HBar")
+		{	
+			this.paths.axisLine = this._calculateLine( nullPos, this.chartProp.chartGutter._top, nullPos, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom);
+		}
+		else
+		{
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, nullPos, this.chartProp.widthCanvas - this.chartProp.chartGutter._right, nullPos );
+		}
+	},
+	
+	_calculateTickMark : function()
+	{
+		var widthLine, widthMinorLine;
+		switch ( this.chartSpace.chart.plotArea.catAx.majorTickMark )
+		{
+			case TICK_MARK_CROSS:
+			{
+				break;
+			}
+			case TICK_MARK_IN:
+			{
+				widthLine = -3;
+				break;
+			}
+			case TICK_MARK_NONE:
+			{
+				widthLine = 0;
+				break;
+			}
+			case TICK_MARK_OUT:
+			{
+				widthLine = 3;
+				break;
+			}
+		};
+		
+		switch ( this.chartSpace.chart.plotArea.catAx.minorTickMark )
+		{
+			case TICK_MARK_CROSS:
+			{
+				break;
+			}
+			case TICK_MARK_IN:
+			{
+				widthMinorLine = -3;
+				break;
+			}
+			case TICK_MARK_NONE:
+			{
+				widthMinorLine = 0;
+				break;
+			}
+			case TICK_MARK_OUT:
+			{
+				widthMinorLine = 3;
+				break;
+			}
+		};
+		
+		if(!(widthLine === 0 && widthMinorLine === 0))
+		{
+			if(this.chartProp.type == "HBar")
+			{
+				var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom)/(this.chartProp.numhlines);
+				var minorStep = stepX / this.chartProp.numvMinorlines;
+				
+				var posX = this.chartProp.nullPositionOX;
+				var posY;
+				var posMinorY;
+				for(var i = 0; i <= this.chartProp.numvlines; i++)
+				{
+					posY = i*stepY + this.chartProp.chartGutter._top;
+					if(!this.paths.tickMarks)
+						this.paths.tickMarks = [];
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+					
+					//промежуточные линии
+					if(widthMinorLine !== 0)
+					{
+						for(var n = 0; n < this.chartProp.numvMinorlines; n++)
+						{
+							posMinorY = posY + n * minorStep;
+							if(!this.paths.minorTickMarks)
+								this.paths.minorTickMarks = [];
+							if(!this.paths.minorTickMarks[i])
+								this.paths.minorTickMarks[i] = [];
+							
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+						}
+					}
+				}
+			}
+			else
+			{
+				var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
+				var minorStep = stepX/this.chartProp.numvMinorlines;
+				
+				var posY = this.chartProp.nullPositionOX;
+				var posX;
+				var posMinorX;
+				for(var i = 0; i <= this.chartProp.numvlines; i++)
+				{
+					posX = i*stepX + this.chartProp.chartGutter._left;
+					if(!this.paths.tickMarks)
+						this.paths.tickMarks = [];
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine);
+					
+					//промежуточные линии
+					if(widthMinorLine !== 0)
+					{
+						for(var n = 0; n < this.chartProp.numvMinorlines; n++)
+						{
+							posMinorX = posX + n * minorStep;
+							if(!this.paths.minorTickMarks)
+								this.paths.minorTickMarks = [];
+							if(!this.paths.minorTickMarks[i])
+								this.paths.minorTickMarks[i] = [];
+							
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthLine);
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	_calculateLine: function(x, y, x1, y1)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_drawAxis: function()
+	{
+		var pen;
+		var path;
+	
+		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
+		path = this.paths.axisLine;
+		this._drawPath(path, pen);
+	},
+	
+	_drawTickMark: function()
+	{
+		var pen, path;
+		for(var i = 0; i < this.paths.tickMarks.length; i++)
+		{
+			pen = this.chartSpace.chart.plotArea.catAx.compiledTickMarkLn;
+				
+			path = this.paths.tickMarks[i];
+			this._drawPath(path, pen);
+			
+			//промежуточные линии
+			if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
+			{
+				for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
+				{
+					path = this.paths.minorTickMarks[i][n];
+					this._drawPath(path, pen);
+				}
+			}
+		}	
+	},
+	
+	_drawPath: function(path, pen)
+	{	
+		path.stroke = true;
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	}
+}	
+
+
+//*****value axis*****
+function valAxisChart()
+{
+	this.chartProp = null;
+	this.cShapeDrawer = null;
+	this.chartSpace = null;
+	this.paths = {};
+}
+
+valAxisChart.prototype =
+{
+    draw : function(chartProp, cShapeDrawer, chartSpace)
+    {
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
+		
+		this._drawAxis();
+		this._drawTickMark();
+	},
+	
+	reCalculate : function(chartProp, cShapeDrawer, chartSpace)
+	{
+		this.chartProp = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
+		
+		this.paths = {};
+		this._calculateAxis();
+		this._calculateTickMark();
+	},
+	
+	_calculateAxis : function()
+	{
+		if(this.chartProp.type == "HBar")
+		{	
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom, this.chartProp.widthCanvas - this.chartProp.chartGutter._right, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
+		}
+		else
+		{
+			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, this.chartProp.chartGutter._left, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
+		}
+	},
+	
+	_calculateTickMark : function()
+	{
+		var widthLine, widthMinorLine;
+		switch ( this.chartSpace.chart.plotArea.valAx.majorTickMark )
+		{
+			case TICK_MARK_CROSS:
+			{
+				break;
+			}
+			case TICK_MARK_IN:
+			{
+				widthLine = -3;
+				break;
+			}
+			case TICK_MARK_NONE:
+			{
+				widthLine = 0;
+				break;
+			}
+			case TICK_MARK_OUT:
+			{
+				widthLine = 3;
+				break;
+			}
+		};
+		
+		switch ( this.chartSpace.chart.plotArea.valAx.minorTickMark )
+		{
+			case TICK_MARK_CROSS:
+			{
+				break;
+			}
+			case TICK_MARK_IN:
+			{
+				widthMinorLine = -3;
+				break;
+			}
+			case TICK_MARK_NONE:
+			{
+				widthMinorLine = 0;
+				break;
+			}
+			case TICK_MARK_OUT:
+			{
+				widthMinorLine = 3;
+				break;
+			}
+		};
+		
+		if(!(widthLine === 0 && widthMinorLine === 0))
+		{
+			if(this.chartProp.type == "HBar")
+			{
+				var stepX = (this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right)/(this.chartProp.numvlines);
+				var minorStep = stepX / this.chartProp.numhMinorlines;
+				
+				//в зависимости от того, наружу или внутрь они направлены
+				var posY = this.chartProp.nullPositionOX;
+				var posX;
+				var posMinorX;
+				for(var i = 0; i <= this.chartProp.numhlines; i++)
+				{
+					posX = i*stepX + this.chartProp.chartGutter._left;
+					if(!this.paths.tickMarks)
+						this.paths.tickMarks = [];
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX, posY + widthLine);
+					
+					//промежуточные линии
+					if(widthMinorLine !== 0)
+					{
+						for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+						{
+							posMinorX = posX + n * minorStep;
+							if(!this.paths.minorTickMarks)
+								this.paths.minorTickMarks = [];
+							if(!this.paths.minorTickMarks[i])
+								this.paths.minorTickMarks[i] = [];
+							
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posMinorX, posY, posMinorX, posY + widthLine);
+						}
+					}
+				}
+			}
+			else
+			{
+				var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom)/(this.chartProp.numhlines);
+				var minorStep = stepX / this.chartProp.numhMinorlines;
+				
+				var posX = this.chartProp.nullPositionOX;
+				var posY;
+				var posMinorY;
+				for(var i = 0; i <= this.chartProp.numhlines; i++)
+				{
+					posY = i*stepY + this.chartProp.chartGutter._top;
+					if(!this.paths.tickMarks)
+						this.paths.tickMarks = [];
+					this.paths.tickMarks[i] = this._calculateLine(posX, posY, posX + widthLine, posY);
+					
+					//промежуточные линии
+					if(widthMinorLine !== 0)
+					{
+						for(var n = 0; n < this.chartProp.numhMinorlines; n++)
+						{
+							posMinorY = posY + n * minorStep;
+							if(!this.paths.minorTickMarks)
+								this.paths.minorTickMarks = [];
+							if(!this.paths.minorTickMarks[i])
+								this.paths.minorTickMarks[i] = [];
+							
+							this.paths.minorTickMarks[i][n] = this._calculateLine(posX, posMinorY, posX + widthLine, posMinorY);
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	_calculateLine: function(x, y, x1, y1)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_drawAxis: function()
+	{
+		var pen;
+		var path;
+	
+		pen = this.chartSpace.chart.plotArea.catAx.compiledLn;	
+		path = this.paths.axisLine;
+		this._drawPath(path, pen);
+	},
+	
+	_drawTickMark: function()
+	{
+		var pen, path;
+		for(var i = 0; i < this.paths.tickMarks.length; i++)
+		{
+			pen = this.chartSpace.chart.plotArea.valAx.compiledTickMarkLn;
+				
+			path = this.paths.tickMarks[i];
+			this._drawPath(path, pen);
+			
+			//промежуточные линии
+			if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
+			{
+				for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
+				{
+					path = this.paths.minorTickMarks[i][n];
+					this._drawPath(path, pen);
+				}
+			}
+		}	
+	},
+	
+	_drawPath: function(path, pen)
+	{	
+		path.stroke = true;
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	}
+}	
+
 	
 //*****all area of chart*****
 function allAreaChart()
