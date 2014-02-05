@@ -4083,8 +4083,10 @@ function Range(worksheet, r1, c1, r2, c2){
 	this.first = new CellAddress(this.bbox.r1, this.bbox.c1, 0);
 	this.last = new CellAddress(this.bbox.r2, this.bbox.c2, 0);
 }
-Range.prototype.clone=function(){
-	return new Range(this.worksheet, this.bbox.r1, this.bbox.c1, this.bbox.r2, this.bbox.c2);
+Range.prototype.clone=function(oNewWs){
+	if(!oNewWs)
+		oNewWs = this.worksheet;
+	return new Range(oNewWs, this.bbox.r1, this.bbox.c1, this.bbox.r2, this.bbox.c2);
 }
 Range.prototype.getFirst=function(){
 	return this.first;

@@ -1993,10 +1993,10 @@ function Hyperlink () {
 	this.bVisited = false;
 }
 Hyperlink.prototype = {
-	clone : function () {
+	clone : function (oNewWs) {
 		var oNewHyp = new Hyperlink();
 		if (null !== this.Ref)
-			oNewHyp.Ref = this.Ref.clone();
+			oNewHyp.Ref = this.Ref.clone(oNewWs);
 		if (null !== this.getLocation())
 			oNewHyp.setLocation(this.getLocation());
 		if (null !== this.LocationSheet)
