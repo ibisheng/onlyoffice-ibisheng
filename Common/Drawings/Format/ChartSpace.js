@@ -1945,6 +1945,12 @@ function CreateLineChart(asc_series, type)
     chart.setPlotVisOnly(true);
     chart.setTitle(new CTitle());
     chart.title.setOverlay(false);
+    chart.title.setSpPr(new CSpPr());
+    chart.title.spPr.setFill(new CUniFill());
+    chart.title.spPr.Fill.setFill(new CSolidFill());
+    chart.title.spPr.Fill.fill.setColor(new CUniColor());
+    chart.title.spPr.Fill.fill.color.setColor(new CSchemeColor());
+    chart.title.spPr.Fill.fill.color.color.setId(0);
     var disp_blanks_as;
     if(type === GROUPING_STANDARD)
     {
@@ -2641,11 +2647,7 @@ function CreateStockChart(asc_series)
     plot_area.setCatAx(new CAxis());
     plot_area.setValAx(new CAxis());
     var line_chart = plot_area.chart;
-    line_chart.setGrouping(type);
-    line_chart.setVaryColors(false);
     line_chart.setDLbls(new CDLbls());
-    line_chart.setMarker(true);
-    line_chart.setSmooth(false);
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
     for(var i = 0; i < asc_series.length; ++i)
