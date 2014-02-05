@@ -224,8 +224,15 @@ CChartsDrawer.prototype =
 			this.calcProp.numvMinorlines = 2;
 			this.calcProp.numhMinorlines = 5;
 		}
-
-		this.calcProp.nullPositionOX = this._getNullPosition();
+		
+		if(this.calcProp.type != "Scatter")
+			this.calcProp.nullPositionOX = this._getNullPosition();
+		else
+		{
+			var scatterNullPos = this._getScatterNullPosition();
+			this.calcProp.nullPositionOX = scatterNullPos.x;
+			this.calcProp.nullPositionOY = scatterNullPos.y;
+		}
 	
 		if(this.calcProp.type == "Bar")
 		{
@@ -955,6 +962,30 @@ CChartsDrawer.prototype =
 			result = this.calcProp.heightCanvas - this.calcProp.chartGutter._bottom - nullPosition;
 			
 		return result;
+	},
+	
+	_getScatterNullPosition: function()
+	{
+		var x, y;
+		//OY
+		for(var i = 0; i < this.calcProp.xScale.length; i++)
+		{
+			if(this.calcProp.xScale[i] == 0)
+			{
+				y = this.calcProp.chartGutter._left + i * (this.calcProp.trueWidth / (this.calcProp.xScale.length - 1));
+				break;
+			}
+		}
+		//OX
+		for(var i = 0; i < this.calcProp.scale.length; i++)
+		{
+			if(this.calcProp.scale[i] == 0)
+			{
+				x = this.calcProp.heightCanvas - (this.calcProp.chartGutter._bottom + i * (this.calcProp.trueHeight / (this.calcProp.scale.length - 1)));
+				break;
+			}
+		}
+		return {x: x, y: y};
 	},
 	
 	_getAxisData: function (max, mainObj, minVal, maxVal, yminVal, ymaxVal)
@@ -4137,13 +4168,14 @@ valAxisChart.prototype =
 	
 	_calculateAxis : function()
 	{
+		var nullPoisition = this.chartProp.nullPositionOY ? this.chartProp.nullPositionOY : this.chartProp.chartGutter._left;
 		if(this.chartProp.type == "HBar")
 		{	
 			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom, this.chartProp.widthCanvas - this.chartProp.chartGutter._right, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
 		}
 		else
 		{
-			this.paths.axisLine = this._calculateLine( this.chartProp.chartGutter._left, this.chartProp.chartGutter._top, this.chartProp.chartGutter._left, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
+			this.paths.axisLine = this._calculateLine( nullPoisition, this.chartProp.chartGutter._top, nullPoisition, this.chartProp.heightCanvas - this.chartProp.chartGutter._bottom );
 		}
 	},
 	
@@ -4235,7 +4267,8 @@ valAxisChart.prototype =
 				var stepY = (this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom)/(this.chartProp.numhlines);
 				var minorStep = stepX / this.chartProp.numhMinorlines;
 				
-				var posX = this.chartProp.nullPositionOX;
+				var posX = this.chartProp.nullPositionOY ? this.chartProp.nullPositionOY : this.chartProp.chartGutter._left;
+
 				var posY;
 				var posMinorY;
 				for(var i = 0; i <= this.chartProp.numhlines; i++)
