@@ -1888,25 +1888,6 @@ cArea3D.prototype.changeSheet = function ( lastName, newName ) {
         this.wsTo = this._wb.getWorksheetByName( newName ).getId();
     }
 };
-cArea3D.prototype.moveSheet = function ( tempW ) {
-    if ( this.wsFrom == this.wsTo ) {
-        return;
-    }
-    else if ( this.wsFrom == tempW.wFId ) {
-        var newWsFromIndex = this._wb.getWorksheetById( this.wsFrom ).getIndex(),
-            wsToIndex = this._wb.getWorksheetById( this.wsTo ).getIndex();
-        if ( newWsFromIndex > wsToIndex ) {
-            this.wsFrom = this._wb.getWorksheet( tempW.wFI ).getId();
-        }
-    }
-    else if ( this.wsTo == tempW.wFId ) {
-        var newWsToIndex = this._wb.getWorksheetById( this.wsTo ).getIndex(),
-            wsFromIndex = this._wb.getWorksheetById( this.wsFrom ).getIndex();
-        if ( newWsToIndex < wsFromIndex ) {
-            this.wsTo = this._wb.getWorksheet( tempW.wFI ).getId();
-        }
-    }
-};
 cArea3D.prototype.toString = function () {
     var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName();
     var wsTo = this._wb.getWorksheetById( this.wsTo ).getName();
@@ -3187,15 +3168,92 @@ parserFormula.prototype = {
             }
         }
     },
-
-    moveSheet:function ( tempW ) {
+	insertSheet:function ( index ) {
+		var bRes = false;
         for ( var i = 0; i < this.outStack.length; i++ ) {
-            if ( this.outStack[i] instanceof cArea3D ) {
-                this.outStack[i].moveSheet( tempW );
+			var elem = this.outStack[i];
+            if ( elem instanceof cArea3D ) {
+				var wsTo = this.wb.getWorksheetById(elem.wsTo);
+				var wsToIndex = wsTo.getIndex();
+				var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
+				var wsFromIndex = wsFrom.getIndex();
+				if(wsFromIndex <= index && index <= wsToIndex)
+					bRes = true;
             }
         }
-        return this;
+        return bRes;
     },
+    moveSheet:function ( tempW ) {
+		var nRes = 0;
+        for ( var i = 0; i < this.outStack.length; i++ ) {
+			var elem = this.outStack[i];
+            if ( elem instanceof cArea3D ) {
+				var wsTo = this.wb.getWorksheetById(elem.wsTo);
+				var wsToIndex = wsTo.getIndex();
+				var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
+				var wsFromIndex = wsFrom.getIndex();
+				if(wsFromIndex <= tempW.wFI && tempW.wFI <= wsToIndex && 0 == nRes)
+					nRes = 1;
+				if(elem.wsFrom == tempW.wFId)
+				{
+					if(tempW.wTI > wsToIndex)
+					{
+						nRes = 2;
+						var wsNext = this.wb.getWorksheet(wsFromIndex + 1);
+						if(wsNext)
+							this.outStack[i].changeSheet( tempW.wFN, wsNext.getName() );
+						else
+							this.outStack[i] = new cError( cErrorType.bad_reference );
+					}
+				}
+				else if(elem.wsTo == tempW.wFId)
+				{
+					if(tempW.wTI <= wsFromIndex)
+					{
+						nRes = 2;
+						var wsPrev = this.wb.getWorksheet(wsToIndex - 1);
+						if(wsPrev)
+							this.outStack[i].changeSheet( tempW.wFN, wsPrev.getName() );
+						else
+							this.outStack[i] = new cError( cErrorType.bad_reference );
+					}
+				}
+            }
+        }
+        return nRes;
+    },
+	
+	removeSheet:function(sheetId){
+		var bRes = false;
+		var ws = this.wb.getWorksheetById(sheetId);
+		if(ws)
+		{
+			var wsIndex = ws.getIndex();
+			var wsPrev = null;
+			if(wsIndex > 0)
+				wsPrev = this.wb.getWorksheet(wsIndex - 1);
+			var wsNext = null;
+			if(wsIndex < this.wb.getWorksheetCount() - 1)
+				wsNext = this.wb.getWorksheet(wsIndex + 1);
+			for ( var i = 0; i < this.outStack.length; i++ ) {
+				var elem = this.outStack[i];
+				if ( elem instanceof cArea3D )
+				{
+					bRes = true;
+					if(elem.wsFrom == sheetId)
+					{
+						if(elem.wsTo != sheetId && null != wsNext)
+							this.outStack[i].changeSheet( ws.getName(), wsNext.getName() );
+						else
+							this.outStack[i] = new cError( cErrorType.bad_reference );
+					}
+					else if(elem.wsTo == sheetId && null != wsPrev)
+						this.outStack[i].changeSheet( ws.getName(), wsPrev.getName() );
+				}
+			}
+		}
+		return bRes;
+	},
 
     buildDependencies:function () {
 

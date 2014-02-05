@@ -2980,12 +2980,13 @@ UndoRedoWoorksheet.prototype = {
             if(bUndo)
             {
                 var sFormula = Data.sFormula
-                var cell = ws._getCell(nRow, nCol);
-				ws.workbook.dependencyFormulas.deleteMasterNodes(ws.getId(), cell.getName());
-                cell.setFormula(sFormula);
-				addToArrRecalc(ws.workbook, ws.getId(), cell.getName());
-                ws.workbook.needRecalc.nodes[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
-                ws.workbook.needRecalc.length++;
+                var cell = ws._getCellNoEmpty(nRow, nCol);
+				if(cell)
+				{
+					var node = ws.workbook.dependencyFormulas.getNode(ws.getId(), cell.getName());
+					if(node)
+						node.setFormula(Data.sFormula, false, true);
+				}
             }
         }
 		else if(historyitem_Worksheet_ColProp == Type)

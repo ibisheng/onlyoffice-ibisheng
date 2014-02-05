@@ -129,10 +129,6 @@ DependencyGraph.prototype = {
                 var n = node.getSlaveEdges();
                 if ( n ) {
                     arr.push( node );
-                    for ( var id2 in n ) {
-                        n[id2].weightNode++;
-                        // arr.push(n[id2]);
-                    }
                 }
             }
         }
@@ -144,10 +140,6 @@ DependencyGraph.prototype = {
                 var n = node.getSlaveEdges();
                 if ( n ) {
                     arr.push( node );
-                    for ( var id2 in n ) {
-                        n[id2].weightNode++;
-                        // arr.push(n[id2]);
-                    }
                 }
             }
         }
@@ -675,8 +667,6 @@ function Vertex(sheetId, cellId, wb){
 	this.slaveEdges = null;
 	
 	this.refCount = 0;
-	
-	this.weightNode = 0;
 }
 Vertex.prototype = {	
 	
@@ -685,6 +675,19 @@ Vertex.prototype = {
 	getBBox : function()
 	{
 		return this.bbox;
+	},
+	setFormula : function(sFormula, bAddToHistory, bAddNeedRecal)
+	{
+		var cell = this.returnCell();
+		if(null != sFormula)
+			cell.setFormula(sFormula, bAddToHistory);
+		this.wb.dependencyFormulas.deleteMasterNodes2( this.sheetId, this.cellId );
+		addToArrRecalc(this.sheetId, cell);
+		if(bAddNeedRecal)
+		{
+			this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
+			this.wb.needRecalc.length++;
+		}
 	},
 	setRefError : function(wsId, cellId)
 	{
@@ -1122,6 +1125,7 @@ Workbook.prototype.getWorksheetCount=function(){
 	return this.aWorksheets.length;
 };
 Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
+	History.Create_NewPoint();
 	History.TurnOff();
     var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, true, sId);
 	if(null != sName)
@@ -1141,45 +1145,15 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	this.aWorksheetsById[oNewWorksheet.getId()] = oNewWorksheet;
 	this._updateWorksheetIndexes();
 	this.setActive(oNewWorksheet.index);
-	if( indexBefore > 0 && indexBefore < this.aWorksheets.length-1 ){
-		var sheetStart = this.getWorksheet(indexBefore-1).getId(),
-			sheetStop  = this.getWorksheet(indexBefore+1).getId(),
-			nodesSheetStart = this.dependencyFormulas.getNodeBySheetId(sheetStart),
-			nodesSheetStop = this.dependencyFormulas.getNodeBySheetId(sheetStop),
-			arr = {};
-			
-		for( var i = 0; i < nodesSheetStart.length; i++ ){
-			var n = nodesSheetStart[i].getSlaveEdges();
-			for( var id in n ){
-				if( n[id].weightNode == 2 ){
-					arr[n[id].nodeId] = n[id];
-				}
-				n[id].weightNode = 0;
-			}
-		}
-		
-		for( var i = 0; i < nodesSheetStop.length; i++ ){
-			var n = nodesSheetStop[i].getSlaveEdges();
-			for( var id in n ){
-				if( n[id].weightNode == 2 ){
-					arr[n[id].nodeId] = n[id];
-				}
-				n[id].weightNode = 0;
-			}
-		}
-		
-		for( var id in arr ){
-			arr[id].cell.formulaParsed.buildDependencies();
-		}
-	}
 	History.TurnOn();
-	History.Create_NewPoint();
+	this._insertWorksheetFormula(oNewWorksheet.index);
 	History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(indexBefore, oNewWorksheet.getName(), null, oNewWorksheet.getId()));
 	return oNewWorksheet.index;
 };
 Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
+		History.Create_NewPoint();
 		History.TurnOff();
 		var wsFrom = this.aWorksheets[index];
 		var nameSheet = wsFrom.getName();
@@ -1201,19 +1175,22 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		}
 		this.aWorksheetsById[newSheet.getId()] = newSheet;
 		this._updateWorksheetIndexes();
-
+		History.TurnOn();
+		this._insertWorksheetFormula(insertBefore);
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
 		if ( this.cwf[wsFrom.getId()] ){
-			this.cwf[newSheet.getId()] = { cells:{} };
-			for( var id in this.cwf[wsFrom.getId()].cells ){
-				this.cwf[newSheet.getId()].cells[id] = this.cwf[wsFrom.getId()].cells[id];
+			var cwf = { cells:{} };
+			var newSheetId = newSheet.getId();
+			var cwfFrom = this.cwf[wsFrom.getId()];
+			this.cwf[newSheetId] = cwf;
+			for( var id in cwfFrom.cells ){
+				cwf.cells[id] = cwfFrom.cells[id];
+				this.needRecalc.nodes[getVertexId(newSheetId, id)] = [newSheetId, id];
+				this.needRecalc.length++;
 			}
-
-			//очищаем и создаем новый граф зависимостей
-			this.buildDependency();
+			newSheet._BuildDependencies(cwf.cells);
 		}
-		History.TurnOn();
-		History.Create_NewPoint();
+		sortDependency(this);
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
         if(!(bFromRedo === true))
         {
@@ -1232,68 +1209,82 @@ Workbook.prototype.insertWorksheet=function(index, sheet, cwf){
 	}
 	this.aWorksheetsById[sheet.getId()] = sheet;
 	this._updateWorksheetIndexes();
-	
+	this._insertWorksheetFormula(index);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
-	//очищаем и создаем новый граф зависимостей
-	this.buildDependency();
+	sheet._BuildDependencies(cwf.cells);
+	sortDependency(this);
+}
+Workbook.prototype._insertWorksheetFormula=function(index){
+	if( index > 0 && index < this.aWorksheets.length - 1 ){
+		var oWsTo = this.aWorksheets[index - 1];
+		var nodesSheetTo = this.dependencyFormulas.getNodeBySheetId(oWsTo.getId());
+		for( var i = 0; i < nodesSheetTo.length; i++ ){
+			var se = nodesSheetTo[i].getSlaveEdges();
+			if(se)
+			{
+				for( var id in se ){
+					var slave = se[id];
+					var cell = slave.returnCell();
+					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
+					{
+						if(cell.formulaParsed.insertSheet(index))
+							slave.setFormula(null, false, true);
+					}
+				}
+			}
+		}
+	}
 }
 Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 	if(indexFrom >= 0 && indexFrom < this.aWorksheets.length &&
 		indexTo >= 0 && indexTo < this.aWorksheets.length){
+		History.Create_NewPoint();
 		History.TurnOff();
+		var oWsFrom = this.aWorksheets[indexFrom];
 		var oWsTo = this.aWorksheets[indexTo];
 		var tempW = {
-					wFN: this.aWorksheets[indexFrom].getName(),
+					wFN: oWsFrom.getName(),
 					wFI: indexFrom,
-					wFId: this.aWorksheets[indexFrom].getId(),
+					wFId: oWsFrom.getId(),
 					wTN: oWsTo.getName(),
 					wTI: indexTo,
 					wTId: oWsTo.getId()
 				}
-				
-		var movedSheet = this.aWorksheets.splice(indexFrom,1);
-		this.aWorksheets.splice(indexTo,0,movedSheet[0])
-		this._updateWorksheetIndexes();
-
+		//переводим обратно в индекс sheet перед которым надо вставить
+		if(tempW.wFI < tempW.wTI)
+			tempW.wTI++;
 		/*
 			Формулы:
 				перестройка графа для трехмерных формул вида Sheet1:Sheet3!A1:A3, Sheet1:Sheet3!A1.
 				пересчет трехмерных формул, перестройка формул при изменении положения листа: Sheet1, Sheet2, Sheet3, Sheet4 - Sheet1:Sheet4!A1 -> Sheet4, Sheet1, Sheet2, Sheet3 - Sheet1:Sheet3!A1;
 		*/
 		lockDraw(this);
-		var a = this.dependencyFormulas.getNodeBySheetId(movedSheet[0].getId());
+		var a = this.dependencyFormulas.getNodeBySheetId(tempW.wFId);
 		for(var i=0;i<a.length;i++){
 			var se = a[i].getSlaveEdges();
 			if(se){
 				for(var id in se){
-					var cID = se[id].cellId, _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(cID).getCells()[0].sFormula;
-                    if( f == null || f == undefined ){
-                        continue;
-                    }
-					if( f.indexOf(tempW.wFN+":") > 0 || f.indexOf(":"+tempW.wFN) > 0 ){
-						var _c = _ws.getCell2(cID).getCells()[0];
-						_c.setFormula(_c.formulaParsed.moveSheet(tempW).assemble());//Перестраиваем трехмерные ссылки в формуле.
-						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
-						addToArrRecalc(_ws.getId(), _c);
-						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							// this.needRecalc.length++;
-					}
-					else if( f.indexOf(_ws.getName()) < 0 ){
-						this.dependencyFormulas.deleteMasterNodes(_ws.Id, cID);
-						_ws._BuildDependencies({id:cID});
-						addToArrRecalc(_ws.getId(), _c);
-						// this.needRecalc[ getVertexId(_ws.getId(),cID) ] = [ _ws.getId(),cID ];
-						// if( this.needRecalc.length < 0) this.needRecalc.length = 0;
-							// this.needRecalc.length++;
+					var slave = se[id];
+					var cell = slave.returnCell();
+					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
+					{
+						var nMoveRes = cell.formulaParsed.moveSheet(tempW, true);
+						if(2 == nMoveRes)
+							slave.setFormula(cell.formulaParsed.assemble(), true, true);
+						else if(1 == nMoveRes)
+							slave.setFormula(null, false, true);
 					}
 				}
 			}
 		}
-		
 		History.TurnOn();
-		History.Create_NewPoint();
+		var movedSheet = this.aWorksheets.splice(indexFrom, 1);
+		this.aWorksheets.splice(indexTo, 0, movedSheet[0])
+		this._updateWorksheetIndexes();
+		
+		this._insertWorksheetFormula(tempW.wTI);
+		
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
 		buildRecalc(this);
 		unLockDraw(this);
@@ -1314,32 +1305,39 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 	if(bEmpty)
 		return -1;
 	
-	var nNewActive = this.nActive;
-	var removedSheets = this.aWorksheets.splice(nIndex, 1);
-	if(removedSheets.length > 0)
+	var removedSheet = this.getWorksheet(nIndex);
+	if(removedSheet)
 	{
-		var removedSheet = removedSheets[0];
+		History.Create_NewPoint();
 		var removedSheetId = removedSheet.getId();
-		History.TurnOff();
-		//по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
-		var _cwf = this.cwf[removedSheet.getId()];
-		delete this.cwf[removedSheet.getId()];
-		delete this.aWorksheetsById[removedSheet.getId()];
-		
 		lockDraw(this);
-		var a = this.dependencyFormulas.getNodeBySheetId(removedSheet.getId());
-		for(var i=0;i<a.length;i++){
+		var a = this.dependencyFormulas.getNodeBySheetId(removedSheetId);
+		for(var i = 0; i < a.length; i++)
+		{
 			var node = a[i];
 			var se = node.getSlaveEdges();
 			if(se){
 				for(var id in se){
 					var slave = se[id];
-					if( slave.sheetId != removedSheetId )
-						slave.setRefError(removedSheetId, node.cellId);
+					var cell = slave.returnCell();
+					if( cell && cell.formulaParsed && cell.formulaParsed.is3D )
+					{
+						if(cell.formulaParsed.removeSheet(removedSheetId))
+							slave.setFormula(cell.formulaParsed.assemble(), true, true);
+					}
 				}
 			}
 		}
-		this.dependencyFormulas.removeNodeBySheetId(removedSheet.getId());
+		this.dependencyFormulas.removeNodeBySheetId(removedSheetId);
+		History.TurnOff();
+		var nNewActive = this.nActive;
+		this.aWorksheets.splice(nIndex, 1);
+		//по всем удаленным листам пробегаемся и удаляем из workbook.cwf (cwf - cells with forluma) элементы с названием соответствующего листа.
+		var _cwf = this.cwf[removedSheetId];
+		delete this.cwf[removedSheetId];
+		delete this.aWorksheetsById[removedSheetId];
+		
+
 		var bFind = false;
 		if(nNewActive < this.aWorksheets.length)
 		{
@@ -1361,7 +1359,6 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 				}
 		}
 		History.TurnOn();
-		History.Create_NewPoint();
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
 		if(null != outputParams)
 		{
@@ -1830,11 +1827,11 @@ Woorksheet.prototype.clone=function(sNewId, bFromRedo){
 	if(this.AutoFilter)
 		oNewWs.AutoFilter = this.AutoFilter.clone();
 	for(i in this.aCols)
-		oNewWs.aCols[i] = this.aCols[i].clone();
+		oNewWs.aCols[i] = this.aCols[i].clone(oNewWs);
 	if(null != this.oAllCol)
-		oNewWs.oAllCol = this.oAllCol.clone();
+		oNewWs.oAllCol = this.oAllCol.clone(oNewWs);
 	for(i in this.aGCells)
-		oNewWs.aGCells[i] = this.aGCells[i].clone();
+		oNewWs.aGCells[i] = this.aGCells[i].clone(oNewWs);
 	var aMerged = this.mergeManager.getAll();
 	for(i in aMerged)
 	{
@@ -3563,8 +3560,10 @@ Cell.prototype.compileXfs=function(){
 		}
 	}
 };
-Cell.prototype.clone=function(){
-	var oNewCell = new Cell(this.ws);
+Cell.prototype.clone=function(oNewWs){
+    if(!oNewWs)
+        oNewWs = this.ws;
+	var oNewCell = new Cell(oNewWs);
 	oNewCell.oId = new CellAddress(this.oId.getRow(), this.oId.getCol());
 	if(null != this.xfs)
 		oNewCell.xfs = this.xfs.clone();

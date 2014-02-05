@@ -2131,9 +2131,11 @@ Col.prototype =
 	{
 		this.ws._removeCol(this.index);
 	},
-	clone : function()
+	clone : function(oNewWs)
     {
-        var oNewCol = new Col(this.ws, this.index);
+        if(!oNewWs)
+            oNewWs = this.ws;
+        var oNewCol = new Col(oNewWs, this.index);
         if(null != this.BestFit)
             oNewCol.BestFit = this.BestFit;
         if(null != this.hd)
@@ -2390,9 +2392,11 @@ Row.prototype =
 	{
 		this.ws._removeRow(this.index);
 	},
-	clone : function()
+	clone : function(oNewWs)
 	{
-		var oNewRow = new Row(this.ws);
+        if(!oNewWs)
+            oNewWs = this.ws;
+        var oNewRow = new Row(oNewWs);
 		oNewRow.r = this.r;
 		if(null != this.xfs)
 			oNewRow.xfs = this.xfs.clone();
@@ -2403,7 +2407,7 @@ Row.prototype =
 		if(null != this.hd)
 			oNewRow.hd = this.hd;
 		for(var i in this.c)
-			oNewRow.c[i] = this.c[i].clone();
+			oNewRow.c[i] = this.c[i].clone(oNewWs);
 		return oNewRow;
 	},
 	getDefaultXfs : function()
