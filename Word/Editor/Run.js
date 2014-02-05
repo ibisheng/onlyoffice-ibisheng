@@ -1950,6 +1950,8 @@ ParaRun.prototype =
             // т.к. класс CParaRun попадает или не попадает в комментарий целиком.
 
             var bDrawSearch = false;
+
+            // TODO: Переделать поиск
 //            if ( true === bDrawSearch )
 //            {
 //                for ( var SId in SearchResults )
@@ -2005,23 +2007,16 @@ ParaRun.prototype =
                 }
                 case para_Space:
                 {
-                    // TODO: Переделать здесь
+                    // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
+                    if ( PDSH.Spaces > 0 )
+                    {
+                        if ( CommentsFlag != comments_NoComment && bDrawComments )
+                            aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
+                        else if ( highlight_None != HighLight )
+                            aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
 
-//                    // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-//                    if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
-//                    {
-//                        if ( CommentsFlag != comments_NoComment && bDrawComments )
-//                            aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
-//                        else if ( highlight_None != HighLight )
-//                            aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
-//                    }
-
-                    if ( CommentsFlag != comments_NoComment && bDrawComments )
-                        aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
-                    else if ( highlight_None != HighLight )
-                        aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, HighLight.r, HighLight.g, HighLight.b );
-
-                    //-------------------------------------------
+                        PDSH.Spaces--;
+                    }
 
                     if ( true === bDrawSearch )
                         aFind.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0  );
@@ -2213,6 +2208,7 @@ ParaRun.prototype =
 
         var AutoColor = PDSL.AutoColor;
         var CurColor = new CDocumentColor( 0, 0, 0, false );
+
         // Выставляем цвет обводки
         if ( true === PDSL.VisitedHyperlink )
             CurColor.Set( 128, 0, 151, 255 );
@@ -2262,28 +2258,19 @@ ParaRun.prototype =
                 }
                 case para_Space:
                 {
-                    // TODO: реализовать через счетчик пробелов в начале и в конце
-//                    if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
-//                    {
-//                        if ( true === CurTextPr.DStrikeout )
-//                            aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
-//                        else if ( true === CurTextPr.Strikeout )
-//                            aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
-//
-//                        if ( true === CurTextPr.Underline )
-//                            aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
-//                    }
+                    // Пробелы, идущие в конце строки, не подчеркиваем и не зачеркиваем
+                    if ( PDSL.Spaces > 0 )
+                    {
+                        if ( true === CurTextPr.DStrikeout )
+                            aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        else if ( true === CurTextPr.Strikeout )
+                            aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
 
-                    if ( true === CurTextPr.DStrikeout )
-                        aDStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
-                    else if ( true === CurTextPr.Strikeout )
-                        aStrikeout.Add( StrikeoutY, StrikeoutY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
+                        if ( true === CurTextPr.Underline )
+                            aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
 
-                    if ( true === CurTextPr.Underline )
-                        aUnderline.Add( UnderlineY, UnderlineY, X, X + Item.WidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b );
-
-                    //-----------------------------------------------------------------------------------
-
+                        PDSL.Spaces--;
+                    }
 
                     X += Item.WidthVisible;
 

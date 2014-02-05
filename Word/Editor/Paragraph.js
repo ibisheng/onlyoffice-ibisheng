@@ -6112,7 +6112,7 @@ Paragraph.prototype =
                     // сохраним позиции начала и конца продолжительных одинаковых настроек
                     // выделения, совместного редактирования и поиска соответственно.
 
-                    PDSH.Reset_Range( CurPage, CurLine, CurRange, X, Y0, Y1 );
+                    PDSH.Reset_Range( CurPage, CurLine, CurRange, X, Y0, Y1, _Range.SpacesSkip + _Range.Spaces );
 
                     if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
                     {
@@ -7098,7 +7098,7 @@ Paragraph.prototype =
                     var Range = Line.Ranges[CurRange];
                     var X = Range.XVisible;
 
-                    PDSL.Reset_Range( CurRange, X );
+                    PDSL.Reset_Range( CurRange, X, Range.SpacesSkip + Range.Spaces );
 
                     var StartPos = Range.StartPos;
                     var EndPos   = Range.EndPos;
@@ -19849,6 +19849,8 @@ function CParagraphDrawStateHightlights()
     this.X  = 0;
     this.Y0 = 0;
     this.Y1 = 0;
+
+    this.Spaces = 0;
 }
 
 CParagraphDrawStateHightlights.prototype =
@@ -19866,7 +19868,7 @@ CParagraphDrawStateHightlights.prototype =
         this.CurPos = new CParagraphContentPos();
     },
 
-    Reset_Range : function(Page, Line, Range, X, Y0, Y1)
+    Reset_Range : function(Page, Line, Range, X, Y0, Y1, SpacesCount)
     {
         this.Page  = Page;
         this.Line  = Line;
@@ -19880,6 +19882,8 @@ CParagraphDrawStateHightlights.prototype =
         this.X  = X;
         this.Y0 = Y0;
         this.Y1 = Y1;
+
+        this.Spaces = SpacesCount;
     }
 };
 
@@ -19947,6 +19951,7 @@ function CParagraphDrawStateLines()
     this.X               = 0;
     this.BaseLine        = 0;
     this.UnderlineOffset = 0;
+    this.Spaces          = 0;
 }
 
 CParagraphDrawStateLines.prototype =
@@ -19976,14 +19981,12 @@ CParagraphDrawStateLines.prototype =
         this.Spelling.Clear();
     },
 
-    Reset_Range : function(Range, X)
+    Reset_Range : function(Range, X, Spaces)
     {
-        this.Range = Range;
-
-        this.X     = X;
+        this.Range  = Range;
+        this.X      = X;
+        this.Spaces = Spaces;
     }
-
-
 };
 
 var g_oPDSH = new CParagraphDrawStateHightlights();
