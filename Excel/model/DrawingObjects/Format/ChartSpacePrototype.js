@@ -41,7 +41,11 @@ CChartSpace.prototype.setRecalculateInfo = function()
         axisLabels: [],
         recalculateAxisVal: true,
         recalculateAxisCat: true ,
-        recalculateAxisTickMark: true
+        recalculateAxisTickMark: true,
+        recalculateBrush: true,
+        recalculatePen: true,
+        recalculatePlotAreaBrush: true,
+        recalculatePlotAreaPen: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -243,6 +247,29 @@ CChartSpace.prototype.recalculate = function()
 			this.recalculateDLbls();
 			this.recalcInfo.recalculateDLbls = false;
 		}
+
+        if(this.recalcInfo.recalculateBrush)
+        {
+            this.recalculateChartBrush();
+            this.recalcInfo.recalculateBrush = false;
+        }
+
+        if(this.recalcInfo.recalculatePen)
+        {
+            this.recalculateChartPen();
+            this.recalcInfo.recalculatePen = false;
+        }
+
+        if(this.recalcInfo.recalculatePlotAreaBrush)
+        {
+            this.recalculatePlotAreaChartBrush();
+            this.recalcInfo.recalculatePlotAreaBrush = false;
+        }
+        if(this.recalcInfo.recalculatePlotAreaPen)
+        {
+            this.recalculatePlotAreaChartPen();
+            this.recalcInfo.recalculatePlotAreaPen = false;
+        }
         if(this.recalcInfo.recalculateAxisLabels)
         {
             this.recalculateAxisLabels();
@@ -1157,10 +1184,62 @@ CChartSpace.prototype.recalculateChartPen = function()
     {
         default_line.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
     }
-    default_line.setFill(new CUniFill());
-    default_line.Fill.setFill(new CSolidFill());
-    default_line.Fill.fill.setColor(new CUniColor());
-    default_line.Fill.fill.color.setColor(new CSchemeColor());
+
+    var fill;
+    if(this.style >= 1 && this.style <= 32)
+        fill = CreateUnifillSolidFillSchemeColor(15, 75000);
+    else if(this.style >= 33 && this.style <= 40)
+        fill = CreateUnifillSolidFillSchemeColor(8, 75000);
+    else
+        fill = CreateUnifillSolidFillSchemeColor(12, 0);
+    default_line.setFill(fill);
+    if(this.spPr && this.spPr.ln)
+        default_line.merge(this.spPr.ln);
+    var parents = this.getParentObjects();
+    default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+    this.pen = default_line;
+};
+
+CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
+{
+    if(this.chart && this.chart.plotArea)
+    {
+        var plot_area = this.chart.plotArea;
+        var default_brush;
+        if(this.style >=1 && this.style <=32)
+            default_brush = CreateUnifillSolidFillSchemeColor(6, 0);
+        else if(this.style >=33 && this.style <= 34)
+            default_brush = CreateUnifillSolidFillSchemeColor(8, 20000);
+        else if(this.style >=35 && this.style <=40)
+            default_brush = CreateUnifillSolidFillSchemeColor(this.style - 35, 0);
+        else
+            default_brush = CreateUnifillSolidFillSchemeColor(8, 95000);
+
+        if(plot_area.spPr && plot_area.spPr.Fill)
+        {
+            default_brush.merge(this.spPr.Fill);
+        }
+        var parents = this.getParentObjects();
+        default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+        plot_area.brush = default_brush;
+    }
+};
+
+CChartSpace.prototype.recalculatePlotAreaChartPen = function()
+{
+    if(this.chart && this.chart.plotArea)
+    {
+        if(this.chart.plotArea.spPr && this.chart.plotArea.spPr.ln)
+        {
+            this.chart.plotArea.pen = this.chart.plotArea.spPr.ln;
+            var parents = this.getParentObjects();
+            this.chart.plotArea.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+        }
+        else
+        {
+           this.chart.plotArea.pen = null;
+        }
+    }
 };
 
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
