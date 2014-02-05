@@ -438,7 +438,6 @@ ParaRun.prototype =
     Recalculate_CurPos : function(X, Y, CurrentRun, _CurRange, _CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
         var Para = this.Paragraph;
-        var NumberingItem = Para.Numbering.Item;
 
         var CurLine  = _CurLine - this.StartLine;
         var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
@@ -451,9 +450,6 @@ ParaRun.prototype =
         for ( ; Pos < _EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
-
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumberingItem )
-                X += Para.Numbering.WidthVisible;
 
             switch( Item.Type )
             {
@@ -478,10 +474,6 @@ ParaRun.prototype =
                 }
             }
         }
-
-        // Если следующий элемент именно тот, к которому привязана нумерация, тогда добавляем сдвиг нумерации
-        if ( true === this.RecalcInfo.NumberingUse && _EndPos < this.Content.length && this.Content[_EndPos] === NumberingItem )
-            X += Para.Numbering.WidthVisible;
 
         if ( true === CurrentRun && Pos === this.State.ContentPos )
         {
@@ -614,7 +606,6 @@ ParaRun.prototype =
     {
         var Change = Changes[0].Data;
         var Type   = Changes[0].Data.Type;
-        //var Pos    = ( Changes[0].Data.Type === historyitem_ParaRun_AddItem ? Change.Pos : Change.StartPos );
         var Pos    = Change.Pos;
 
         var CurLine  = 0;
@@ -1347,14 +1338,9 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        var NumberingItem = PRSC.Paragraph.Numbering.Item;
-
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
-
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumberingItem )
-                PRSC.Range.W += PRSC.Paragraph.Numbering.WidthVisible;
 
             switch( Item.Type )
             {
@@ -1490,14 +1476,9 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        var NumberingItem = PRSA.Paragraph.Numbering.Item;
-
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
             var Item = this.Content[Pos];
-
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumberingItem )
-                PRSA.X += PRSA.Paragraph.Numbering.WidthVisible;
 
             switch( Item.Type )
             {
@@ -1950,9 +1931,6 @@ ParaRun.prototype =
         var bDrawColl = PDSH.DrawColl;
         var bDrawComm = PDSH.DrawComm;
 
-        //var CurParaPos = PDSH.CurPos.Copy();
-        //var CurDepth   = CurParaPos.Add( 0 );
-
         var X  = PDSH.X;
         var Y0 = PDSH.Y0;
         var Y1 = PDSH.Y1;
@@ -1998,50 +1976,6 @@ ParaRun.prototype =
                         nCollaborativeChanges--;
                 }
             }
-
-//            if ( 0 === CurParaPos.Compare( Para.Numbering.Pos ) )
-//            {
-//                var NumberingType = Para.Numbering.Type;
-//                var NumberingItem = Para.Numbering;
-//
-//                if ( para_Numbering === NumberingType )
-//                {
-//                    var NumPr = Pr.ParaPr.NumPr;
-//                    if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-//                    {
-//                        // Ничего не делаем
-//                    }
-//                    else
-//                    {
-//                        var Numbering = Para.Parent.Get_Numbering();
-//                        var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-//                        var NumJc     = NumLvl.Jc;
-//                        var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-//                        NumTextPr.Merge( Para.TextPr.Value );
-//                        NumTextPr.Merge( NumLvl.TextPr );
-//
-//                        var X_start = X;
-//
-//                        if ( align_Right === NumJc )
-//                            X_start = X - NumberingItem.WidthNum;
-//                        else if ( align_Center === NumJc )
-//                            X_start = X - NumberingItem.WidthNum / 2;
-//
-//                        // Если есть выделение текста, рисуем его сначала
-//                        if ( highlight_None != NumTextPr.HighLight )
-//                            aHigh.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b );
-//
-//                        if ( nCollaborativeChanges > 0 )
-//                            aColl.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, 0, 0, 0 );
-//
-//                        X += NumberingItem.WidthVisible;
-//                    }
-//                }
-//                else if ( para_PresentationNumbering === NumberingType )
-//                {
-//                    X += NumberingItem.WidthVisible;
-//                }
-//            }
 
             switch( Item.Type )
             {
@@ -2127,11 +2061,7 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        //var CurParaPos = PDSE.CurPos.Copy();
-       // var CurDepth   = CurParaPos.Add( 0 );
-        var Para       = PDSE.Paragraph;
-        var NumItem    = PDSE.Paragraph.Numbering.Item;
-
+        var Para      = PDSE.Paragraph;
         var pGraphics = PDSE.Graphics;
         var AutoColor = PDSE.AutoColor;
 
@@ -2167,138 +2097,6 @@ ParaRun.prototype =
 
                     break;
                 }
-            }
-
-            //CurParaPos.Update( Pos, CurDepth );
-
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumItem )
-            {
-                var NumberingItem = Para.Numbering;
-                if ( para_Numbering === Para.Numbering.Type )
-                {
-                    var Pr = Para.Get_CompiledPr2(false);
-                    var NumPr = Pr.ParaPr.NumPr;
-                    if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-                    {
-                        // Ничего не делаем
-                    }
-                    else
-                    {
-                        var Numbering = Para.Parent.Get_Numbering();
-                        var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-                        var NumSuff   = NumLvl.Suff;
-                        var NumJc     = NumLvl.Jc;
-                        var NumTextPr = Para.Get_CompiledPr2(false).TextPr.Copy();
-
-                        // Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
-                        // символа параграфа.
-
-                        var TextPr_temp = Para.TextPr.Value.Copy();
-                        TextPr_temp.Underline = undefined;
-
-                        NumTextPr.Merge( TextPr_temp );
-                        NumTextPr.Merge( NumLvl.TextPr );
-
-                        var X_start = X;
-
-                        if ( align_Right === NumJc )
-                            X_start = X - NumberingItem.WidthNum;
-                        else if ( align_Center === NumJc )
-                            X_start = X - NumberingItem.WidthNum / 2;
-
-                        if ( true === NumTextPr.Color.Auto )
-                            pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                        else
-                            pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
-
-                        // Рисуется только сам символ нумерации
-                        switch ( NumJc )
-                        {
-                            case align_Right:
-                                NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr );
-                                break;
-
-                            case align_Center:
-                                NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr );
-                                break;
-
-                            case align_Left:
-                            default:
-                                NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr );
-                                break;
-                        }
-
-                        if ( true === editor.ShowParaMarks && numbering_suff_Tab === NumSuff )
-                        {
-                            var TempWidth     = NumberingItem.WidthSuff;
-                            var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10
-
-                            var X1 = X;
-                            switch ( NumJc )
-                            {
-                                case align_Right:
-                                    break;
-
-                                case align_Center:
-                                    X1 += NumberingItem.WidthNum / 2;
-                                    break;
-
-                                case align_Left:
-                                default:
-                                    X1 += NumberingItem.WidthNum;
-                                    break;
-                            }
-
-                            var X0 = TempWidth / 2 - TempRealWidth / 2;
-
-                            pGraphics.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
-
-                            if ( X0 > 0 )
-                                pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );
-                            else
-                                pGraphics.FillText2( X1, Y, String.fromCharCode( tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
-                        }
-
-                        if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
-                        {
-                            if ( true === NumTextPr.Color.Auto )
-                                pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                            else
-                                pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
-                        }
-
-                        if ( true === NumTextPr.Strikeout )
-                            pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
-
-                        if ( true === NumTextPr.Underline )
-                            pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
-
-
-                        X += NumberingItem.WidthVisible;
-                    }
-                }
-                else if ( para_PresentationNumbering === this.Numbering.Type )
-                {
-                    if ( true != Para.IsEmpty() )
-                    {
-                        if ( Pr.ParaPr.Ind.FirstLine < 0 )
-                            NumberingItem.Draw( X, Y, pGraphics, CurTextPr );
-                        else
-                            NumberingItem.Draw( Para.X + Pr.ParaPr.Ind.Left, Y, pGraphics, CurTextPr );
-                    }
-
-                    X += NumberingItem.WidthVisible;
-                }
-
-                // Восстановим настройки
-                pGraphics.SetTextPr( CurTextPr );
-
-                if ( true === PDSE.VisitedHyperlink )
-                    pGraphics.b_color1( 128, 0, 151, 255 );
-                else if ( true === CurTextPr.Color.Auto )
-                    pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
-                else
-                    pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
             }
 
             switch( Item.Type )
@@ -2400,10 +2198,7 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        //var CurParaPos = PDSL.CurPos.Copy();
-        //var CurDepth   = CurParaPos.Add( 0 );
         var Para       = PDSL.Paragraph;
-        var NumItem    = PDSL.Paragraph.Numbering.Item;
 
         var aStrikeout  = PDSL.Strikeout;
         var aDStrikeout = PDSL.DStrikeout;
@@ -2428,12 +2223,7 @@ ParaRun.prototype =
 
         for ( var Pos = StartPos; Pos < EndPos; Pos++ )
         {
-           //CurParaPos.Update( Pos, CurDepth );
             var Item = this.Content[Pos];
-
-            // TODO: Нумерация зачеркивается и подчеркивается отдельно в Draw_Elements (неплохо бы сюда перенести)
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumItem )
-                X += Para.Numbering.WidthVisible;
 
             switch( Item.Type )
             {
@@ -2609,55 +2399,11 @@ ParaRun.prototype =
         var StartPos = Range.StartPos;
         var EndPos   = Range.EndPos;
 
-        var NumberingItem = this.Paragraph.Numbering;
-        var NumItem       = NumberingItem.Item;
-
         for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
 
             var TempDx = 0;
-
-            // Проверим попадание в нумерацию
-            if ( true === this.RecalcInfo.NumberingUse && Item === NumItem )
-            {
-                var NumPr = this.Paragraph.Numbering_Get();
-                if ( para_Numbering === NumberingItem.Type && undefined !== NumPr )
-                {
-                    var NumJc = this.Paragraph.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
-
-                    var NumX0 = SearchPos.CurX;
-                    var NumX1 = SearchPos.CurX;
-
-                    switch( NumJc )
-                    {
-                        case align_Right:
-                        {
-                            NumX0 -= NumberingItem.WidthNum;
-                            break;
-                        }
-                        case align_Center:
-                        {
-                            NumX0 -= NumberingItem.WidthNum / 2;
-                            NumX1 += NumberingItem.WidthNum / 2;
-                            break;
-                        }
-                        case align_Left:
-                        default:
-                        {
-                            NumX1 += NumberingItem.WidthNum;
-                            break;
-                        }
-                    }
-
-                    if ( SearchPos.X >= NumX0 && SearchPos.X <= NumX1 )
-                    {
-                        SearchPos.Numbering = true;
-                    }
-                }
-
-                SearchPos.CurX += NumberingItem.WidthVisible;
-            }
 
             if ( para_Drawing != Item.Type || true === Item.Is_Inline() )
             {
@@ -3137,20 +2883,10 @@ ParaRun.prototype =
 
         var FindStart = SelectionDraw.FindStart;
 
-        var NumItem = ( true === this.RecalcInfo.NumberingUse ? this.Paragraph.Numbering.Item : null );
-
         for ( var CurPos = StartPos; CurPos < EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
             var DrawSelection = false;
-
-            if ( NumItem === Item )
-            {
-                if ( true === FindStart )
-                    SelectionDraw.StartX += this.Paragraph.Numbering.WidthVisible;
-                else // Такого не должно быть
-                    SelectionDraw.W += this.Paragraph.Numbering.WidthVisible;
-            }
 
             if ( true === FindStart )
             {
@@ -3242,6 +2978,11 @@ ParaRun.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с настройками текста свойств
 //-----------------------------------------------------------------------------------
+    Get_TextPr : function()
+    {
+        return this.Pr.Copy();
+    },
+
     Recalc_CompiledPr : function(RecalcMeasure)
     {
         this.RecalcInfo.TextPr  = true;
@@ -3349,6 +3090,17 @@ ParaRun.prototype =
 
             if ( null !== RRun )
                 RRun.Selection_Remove();
+
+            // Дополнительно проверим, если у нас para_End лежит в данном ране и попадает в выделение, тогда
+            // применим заданные настроки к символу конца параграфа
+
+            // TODO: Возможно, стоит на этапе пересчета запонимать, лежит ли para_End в данном ране. Чтобы в каждом
+            //       ране потом не бегать каждый раз по всему массиву в поисках para_End.
+
+            if ( true === this.Selection_CheckParaEnd() )
+            {
+                this.Paragraph.TextPr.Apply_TextPr( TextPr );
+            }
         }
         else
         {
@@ -3946,6 +3698,12 @@ ParaRun.prototype =
     {
         // TODO: Скорее всего надо будет убрать эти функции
     },
+
+    Is_RealContent : function()
+    {
+        // TODO: Скорее всего надо будет убрать эти функции
+        return true;
+    }
 };
 
 function CParaRunSelection()

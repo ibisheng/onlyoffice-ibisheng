@@ -63,8 +63,19 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     // Добавляем в контент элемент "конец параграфа"
     this.Content = new Array();
-    this.Content[0] = new ParaEnd();
-    this.Content[1] = new ParaEmpty();
+
+    if ( true !== Debug_ParaRunMode )
+    {
+        this.Content[0] = new ParaEnd();
+        this.Content[1] = new ParaEmpty();
+    }
+    else
+    {
+        var EndRun = new ParaRun(editor, this);
+        EndRun.Content[0] = new ParaEnd();
+
+        this.Content[0] = EndRun;
+    }
 
     this.Numbering = new ParaNumbering();
 
@@ -451,6 +462,8 @@ Paragraph.prototype =
 
             if ( this.Selection.EndPos >= Pos )
                 this.Selection.EndPos++;
+
+            Item.Reset_Parent( this, this );
         }
     },
 
@@ -635,133 +648,145 @@ Paragraph.prototype =
     // Удаляем несколько элементов
     Internal_Content_Remove2 : function(Pos, Count)
     {
-        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var CommentsToDelete = new Object();
-        for ( var Index = Pos; Index < Pos + Count; Index++ )
+        if ( true !== Debug_ParaRunMode )
         {
-            var ItemType = this.Content[Index].Type;
-            if ( true === this.DeleteCommentOnRemove && (para_CommentStart === ItemType || para_CommentEnd === ItemType) )
+            var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+            var CommentsToDelete = new Object();
+            for ( var Index = Pos; Index < Pos + Count; Index++ )
             {
-                if ( para_CommentStart === ItemType )
-                    DocumentComments.Set_StartInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
-                else
-                    DocumentComments.Set_EndInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
+                var ItemType = this.Content[Index].Type;
+                if ( true === this.DeleteCommentOnRemove && (para_CommentStart === ItemType || para_CommentEnd === ItemType) )
+                {
+                    if ( para_CommentStart === ItemType )
+                        DocumentComments.Set_StartInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
+                    else
+                        DocumentComments.Set_EndInfo( this.Content[Index].Id, 0, 0, 0, 0, null );
 
-                CommentsToDelete[this.Content[Index].Id] = 1;
+                    CommentsToDelete[this.Content[Index].Id] = 1;
+                }
             }
-        }
 
-        var LastArray = this.Content.slice( Pos, Pos + Count );
+            var LastArray = this.Content.slice( Pos, Pos + Count );
 
-        // Добавляем только постоянные элементы параграфа
-        var LastItems = new Array();
-        var ItemsCount = LastArray.length;
-        for ( var Index = 0; Index < ItemsCount; Index++ )
-        {
-            if ( true === LastArray[Index].Is_RealContent() )
-                LastItems.push( LastArray[Index] );
-        }
+            // Добавляем только постоянные элементы параграфа
+            var LastItems = new Array();
+            var ItemsCount = LastArray.length;
+            for ( var Index = 0; Index < ItemsCount; Index++ )
+            {
+                if ( true === LastArray[Index].Is_RealContent() )
+                    LastItems.push( LastArray[Index] );
+            }
 
-        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : this.Internal_Get_ClearPos( Pos ), EndPos : this.Internal_Get_ClearPos(Pos + Count - 1), Items : LastItems } );
+            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : this.Internal_Get_ClearPos( Pos ), EndPos : this.Internal_Get_ClearPos(Pos + Count - 1), Items : LastItems } );
 
-        if ( this.CurPos.ContentPos > Pos )
-        {
-            if ( this.CurPos.ContentPos > Pos + Count )
-                this.Set_ContentPos( this.CurPos.ContentPos - Count, true, -1 );
+            if ( this.CurPos.ContentPos > Pos )
+            {
+                if ( this.CurPos.ContentPos > Pos + Count )
+                    this.Set_ContentPos( this.CurPos.ContentPos - Count, true, -1 );
+                else
+                    this.Set_ContentPos( Pos, true, -1 );
+            }
+
+            if ( this.Selection.StartPos <= this.Selection.EndPos )
+            {
+                if ( this.Selection.StartPos > Pos )
+                {
+                    if ( this.Selection.StartPos > Pos + Count )
+                        this.Selection.StartPos -= Count;
+                    else
+                        this.Selection.StartPos = Pos;
+                }
+
+                if ( this.Selection.EndPos > Pos )
+                {
+                    if ( this.Selection.EndPos >= Pos + Count )
+                        this.Selection.EndPos -= Count;
+                    else
+                        this.Selection.EndPos = Math.max( 0, Pos - 1 );
+                }
+            }
             else
-                this.Set_ContentPos( Pos, true, -1 );
-        }
-
-        if ( this.Selection.StartPos <= this.Selection.EndPos )
-        {
-            if ( this.Selection.StartPos > Pos )
             {
-                if ( this.Selection.StartPos > Pos + Count )
-                    this.Selection.StartPos -= Count;
-                else
-                    this.Selection.StartPos = Pos;
+                if ( this.Selection.StartPos > Pos )
+                {
+                    if ( this.Selection.StartPos >= Pos + Count )
+                        this.Selection.StartPos -= Count;
+                    else
+                        this.Selection.StartPos = Math.max( 0, Pos - 1 );
+                }
+
+                if ( this.Selection.EndPos > Pos )
+                {
+                    if ( this.Selection.EndPos > Pos + Count )
+                        this.Selection.EndPos -= Count;
+                    else
+                        this.Selection.EndPos = Pos;
+                }
             }
 
-            if ( this.Selection.EndPos > Pos )
+            // Также передвинем всем метки переносов страниц и строк
+            var LinesCount = this.Lines.length;
+            for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
             {
-                if ( this.Selection.EndPos >= Pos + Count )
-                    this.Selection.EndPos -= Count;
-                else
-                    this.Selection.EndPos = Math.max( 0, Pos - 1 );
+                if ( this.Lines[CurLine].StartPos > Pos )
+                {
+                    if ( this.Lines[CurLine].StartPos > Pos + Count )
+                        this.Lines[CurLine].StartPos -= Count;
+                    else
+                        this.Lines[CurLine].StartPos = Math.max( 0 , Pos );
+                }
+
+                if ( this.Lines[CurLine].EndPos >= Pos )
+                {
+                    if ( this.Lines[CurLine].EndPos >= Pos + Count )
+                        this.Lines[CurLine].EndPos -= Count;
+                    else
+                        this.Lines[CurLine].EndPos = Math.max( 0 , Pos );
+                }
+
+                var RangesCount = this.Lines[CurLine].Ranges.length;
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
+                    {
+                        if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos + Count )
+                            this.Lines[CurLine].Ranges[CurRange].StartPos -= Count;
+                        else
+                            this.Lines[CurLine].Ranges[CurRange].StartPos = Math.max( 0 , Pos );
+                    }
+                }
             }
+
+            for ( var Id in this.NearPosArray )
+            {
+                var NearPos = this.NearPosArray[Id];
+
+                if ( NearPos.ContentPos > Pos + Count )
+                    NearPos.ContentPos -= Count;
+                else if ( NearPos.ContentPos > Pos )
+                    NearPos.ContentPos = Math.max( 0 , Pos );
+            }
+
+            this.Content.splice( Pos, Count );
+
+            // Комментарии удаляем после, чтобы не нарушить позиции
+            for ( var Id in CommentsToDelete )
+            {
+                editor.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
+            }
+
+            // Передвинем все метки слов для проверки орфографии
+            this.SpellChecker.Update_OnRemove( this, Pos, Count );
         }
         else
         {
-            if ( this.Selection.StartPos > Pos )
-            {
-                if ( this.Selection.StartPos >= Pos + Count )
-                    this.Selection.StartPos -= Count;
-                else
-                    this.Selection.StartPos = Math.max( 0, Pos - 1 );
-            }
+            // TODO: Реализовать по нормальному данную функцию
 
-            if ( this.Selection.EndPos > Pos )
+            for ( var Temp = 0; Temp < Count; Temp++ )
             {
-                if ( this.Selection.EndPos > Pos + Count )
-                    this.Selection.EndPos -= Count;
-                else
-                    this.Selection.EndPos = Pos;
+                this.Internal_Content_Remove( Pos, true );
             }
         }
-
-        // Также передвинем всем метки переносов страниц и строк
-        var LinesCount = this.Lines.length;
-        for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
-        {
-            if ( this.Lines[CurLine].StartPos > Pos )
-            {
-                if ( this.Lines[CurLine].StartPos > Pos + Count )
-                    this.Lines[CurLine].StartPos -= Count;
-                else
-                    this.Lines[CurLine].StartPos = Math.max( 0 , Pos );
-            }
-
-            if ( this.Lines[CurLine].EndPos >= Pos )
-            {
-                if ( this.Lines[CurLine].EndPos >= Pos + Count )
-                    this.Lines[CurLine].EndPos -= Count;
-                else
-                    this.Lines[CurLine].EndPos = Math.max( 0 , Pos );
-            }
-
-            var RangesCount = this.Lines[CurLine].Ranges.length;
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
-            {
-                if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos )
-                {
-                    if ( this.Lines[CurLine].Ranges[CurRange].StartPos > Pos + Count )
-                        this.Lines[CurLine].Ranges[CurRange].StartPos -= Count;
-                    else
-                        this.Lines[CurLine].Ranges[CurRange].StartPos = Math.max( 0 , Pos );
-                }
-            }
-        }
-
-        for ( var Id in this.NearPosArray )
-        {
-            var NearPos = this.NearPosArray[Id];
-
-            if ( NearPos.ContentPos > Pos + Count )
-                NearPos.ContentPos -= Count;
-            else if ( NearPos.ContentPos > Pos )
-                NearPos.ContentPos = Math.max( 0 , Pos );
-        }
-
-        this.Content.splice( Pos, Count );
-
-        // Комментарии удаляем после, чтобы не нарушить позиции
-        for ( var Id in CommentsToDelete )
-        {
-            editor.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
-        }
-
-        // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnRemove( this, Pos, Count );
     },
 
     Internal_Check_EmptyHyperlink : function(Pos)
@@ -4332,6 +4357,9 @@ Paragraph.prototype =
 
                 PRSC.Reset( this, Range );
 
+                if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+                    PRSC.Range.W += this.Numbering.WidthVisible;
+
                 for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
                     var Item = this.Content[Pos];
@@ -4468,6 +4496,9 @@ Paragraph.prototype =
 
                 var StartPos = Range.StartPos;
                 var EndPos   = Range.EndPos;
+
+                if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+                    PRSA.X += this.Numbering.WidthVisible;
 
                 for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
@@ -4624,6 +4655,9 @@ Paragraph.prototype =
 
             var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
             var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
+
+            if ( true === this.Numbering.Check_Range( CurRange, CurLine ) )
+                X += this.Numbering.WidthVisible;
 
             for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
             {
@@ -5140,6 +5174,9 @@ Paragraph.prototype =
 
         Range.Reset_Width();
         PRSC.Reset( this, Range );
+
+        if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+            PRSC.Range.W += this.Numbering.WidthVisible;
 
         for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
         {
@@ -6077,6 +6114,43 @@ Paragraph.prototype =
 
                     PDSH.Reset_Range( CurPage, CurLine, CurRange, X, Y0, Y1 );
 
+                    if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+                    {
+                        var NumberingType = this.Numbering.Type;
+                        var NumberingItem = this.Numbering;
+
+                        if ( para_Numbering === NumberingType )
+                        {
+                            var NumPr = Pr.ParaPr.NumPr;
+                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+                            {
+                                // Ничего не делаем
+                            }
+                            else
+                            {
+                                var Numbering = this.Parent.Get_Numbering();
+                                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+                                var NumJc     = NumLvl.Jc;
+                                var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+                                NumTextPr.Merge( this.TextPr.Value );
+                                NumTextPr.Merge( NumLvl.TextPr );
+
+                                var X_start = X;
+
+                                if ( align_Right === NumJc )
+                                    X_start = X - NumberingItem.WidthNum;
+                                else if ( align_Center === NumJc )
+                                    X_start = X - NumberingItem.WidthNum / 2;
+
+                                // Если есть выделение текста, рисуем его сначала
+                                if ( highlight_None != NumTextPr.HighLight )
+                                    PDSH.High.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b );
+                            }
+                        }
+
+                        PDSH.X += this.Numbering.WidthVisible;
+                    }
+
                     for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                     {
                         var Item = this.Content[Pos];
@@ -6633,6 +6707,123 @@ Paragraph.prototype =
                     var StartPos = Range.StartPos;
                     var EndPos   = Range.EndPos;
 
+                    // Отрисовка нумерации
+                    if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+                    {
+                        var NumberingItem = this.Numbering;
+                        if ( para_Numbering === NumberingItem.Type )
+                        {
+                            var NumPr = Pr.ParaPr.NumPr;
+                            if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
+                            {
+                                // Ничего не делаем
+                            }
+                            else
+                            {
+                                var Numbering = this.Parent.Get_Numbering();
+                                var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
+                                var NumSuff   = NumLvl.Suff;
+                                var NumJc     = NumLvl.Jc;
+                                var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+
+                                // Word не рисует подчеркивание у символа списка, если оно пришло из настроек для
+                                // символа параграфа.
+
+                                var TextPr_temp = this.TextPr.Value.Copy();
+                                TextPr_temp.Underline = undefined;
+
+                                NumTextPr.Merge( TextPr_temp );
+                                NumTextPr.Merge( NumLvl.TextPr );
+
+                                var X_start = X;
+
+                                if ( align_Right === NumJc )
+                                    X_start = X - NumberingItem.WidthNum;
+                                else if ( align_Center === NumJc )
+                                    X_start = X - NumberingItem.WidthNum / 2;
+
+                                if ( true === NumTextPr.Color.Auto )
+                                    pGraphics.b_color1( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                else
+                                    pGraphics.b_color1( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+
+                                // Рисуется только сам символ нумерации
+                                switch ( NumJc )
+                                {
+                                    case align_Right:
+                                        NumberingItem.Draw( X - NumberingItem.WidthNum, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                        break;
+
+                                    case align_Center:
+                                        NumberingItem.Draw( X - NumberingItem.WidthNum / 2, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                        break;
+
+                                    case align_Left:
+                                    default:
+                                        NumberingItem.Draw( X, Y, pGraphics, Numbering, NumTextPr, NumPr );
+                                        break;
+                                }
+
+                                if ( true === editor.ShowParaMarks && numbering_suff_Tab === NumSuff )
+                                {
+                                    var TempWidth     = NumberingItem.WidthSuff;
+                                    var TempRealWidth = 3.143; // ширина символа "стрелка влево" в шрифте Wingding3,10
+
+                                    var X1 = X;
+                                    switch ( NumJc )
+                                    {
+                                        case align_Right:
+                                            break;
+
+                                        case align_Center:
+                                            X1 += NumberingItem.WidthNum / 2;
+                                            break;
+
+                                        case align_Left:
+                                        default:
+                                            X1 += NumberingItem.WidthNum;
+                                            break;
+                                    }
+
+                                    var X0 = TempWidth / 2 - TempRealWidth / 2;
+
+                                    pGraphics.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
+
+                                    if ( X0 > 0 )
+                                        pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );
+                                    else
+                                        pGraphics.FillText2( X1, Y, String.fromCharCode( tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
+                                }
+
+                                if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
+                                {
+                                    if ( true === NumTextPr.Color.Auto )
+                                        pGraphics.p_color( AutoColor.r, AutoColor.g, AutoColor.b, 255);
+                                    else
+                                        pGraphics.p_color( NumTextPr.Color.r, NumTextPr.Color.g, NumTextPr.Color.b, 255 );
+                                }
+
+                                if ( true === NumTextPr.Strikeout )
+                                    pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+
+                                if ( true === NumTextPr.Underline )
+                                    pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
+                            }
+                        }
+                        else if ( para_PresentationNumbering === this.Numbering.Type )
+                        {
+                            if ( true != this.IsEmpty() )
+                            {
+                                if ( Pr.ParaPr.Ind.FirstLine < 0 )
+                                    NumberingItem.Draw( X, Y, pGraphics, CurTextPr );
+                                else
+                                    NumberingItem.Draw( this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, CurTextPr );
+                            }
+                        }
+
+                        PDSE.X += NumberingItem.WidthVisible;
+                    }
+
                     for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                     {
                         var Item = this.Content[Pos];
@@ -6911,6 +7102,10 @@ Paragraph.prototype =
 
                     var StartPos = Range.StartPos;
                     var EndPos   = Range.EndPos;
+
+                    // TODO: Нумерация подчеркивается и зачеркивается в Draw_Elements, неплохо бы сюда перенести
+                    if ( true === this.Numbering.Check_Range( CurRange, CurLine ) )
+                        PDSL.X += this.Numbering.WidthVisible;
 
                     for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                     {
@@ -7837,6 +8032,15 @@ Paragraph.prototype =
         return { LetterPos : LetterPos, Found : bFound, Type : Type };
     },
 
+    Get_TextPr : function(_ContentPos)
+    {
+        var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
+
+        var CurPos = ContentPos.Get(0);
+
+        return this.Content[CurPos].Get_TextPr( ContentPos, 1 );
+    },
+
     Internal_CalculateTextPr : function (LetterPos, StartPr)
     {
         var Pr;
@@ -8757,6 +8961,47 @@ Paragraph.prototype =
 
         SearchPos.CurX = Range.XVisible;
         SearchPos.X    = X;
+
+        // Проверим попадание в нумерацию
+        if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
+        {
+            var NumPr = this.Numbering_Get();
+            if ( para_Numbering === this.Numbering.Type && undefined !== NumPr )
+            {
+                var NumJc = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
+
+                var NumX0 = SearchPos.CurX;
+                var NumX1 = SearchPos.CurX;
+
+                switch( NumJc )
+                {
+                    case align_Right:
+                    {
+                        NumX0 -= this.Numbering.WidthNum;
+                        break;
+                    }
+                    case align_Center:
+                    {
+                        NumX0 -= this.Numbering.WidthNum / 2;
+                        NumX1 += this.Numbering.WidthNum / 2;
+                        break;
+                    }
+                    case align_Left:
+                    default:
+                    {
+                        NumX1 += this.Numbering.WidthNum;
+                        break;
+                    }
+                }
+
+                if ( SearchPos.X >= NumX0 && SearchPos.X <= NumX1 )
+                {
+                    SearchPos.Numbering = true;
+                }
+            }
+
+            SearchPos.CurX += this.Numbering.WidthVisible;
+        }
 
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
@@ -12437,9 +12682,11 @@ Paragraph.prototype =
                 this.Content[CurPos].Selection_Remove();
             }
 
-            this.Selection.Use   = false;
-            this.Selection.Start = false;
-            this.Selection.Flag  = selectionflag_Common;
+            this.Selection.Use      = false;
+            this.Selection.Start    = false;
+            this.Selection.Flag     = selectionflag_Common;
+            this.Selection.StartPos = 0;
+            this.Selection.EndPos   = 0;
             this.Selection_Clear();
         }
     },
@@ -12691,6 +12938,9 @@ Paragraph.prototype =
                             DrawSelection.StartX    = this.Lines[CurLine].Ranges[CurRange].XVisible;
                             DrawSelection.W         = 0;
                             DrawSelection.FindStart = true;
+
+                            if ( CurLine === this.Numbering.Line && CurRange === this.Numbering.Range )
+                                DrawSelection.StartX += this.Numbering.WidthVisible;
 
                             for ( var CurPos = RStartPos; CurPos <= REndPos; CurPos++ )
                             {
@@ -13997,30 +14247,66 @@ Paragraph.prototype =
     },
 
     // Проверяем находится ли курсор в конце параграфа
-    Cursor_IsEnd : function(ContentPos)
+    Cursor_IsEnd : function(_ContentPos)
     {
-        if ( undefined === ContentPos )
-            ContentPos = this.CurPos.ContentPos;
+        if ( true !== Debug_ParaRunMode )
+        {
+            if ( undefined === ContentPos )
+                ContentPos = this.CurPos.ContentPos;
 
-        var oPos = this.Internal_FindForward( ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
+            var oPos = this.Internal_FindForward( ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
 
-        if ( true === oPos.Found )
-            return false;
+            if ( true === oPos.Found )
+                return false;
+            else
+                return true;
+        }
         else
-            return true;
+        {
+            // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
+            // мы стоим в конце параграфа.
+
+            var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
+            var SearchPos  = new CParagraphSearchPos();
+
+            this.Get_RightPos( SearchPos, ContentPos, false );
+
+            if ( true === SearchPos.Found )
+                return false;
+            else
+                return true;
+        }
     },
 
     // Проверяем находится ли курсор в начале параграфа
-    Cursor_IsStart : function(ContentPos)
+    Cursor_IsStart : function(_ContentPos)
     {
-        if ( undefined === ContentPos )
-            ContentPos = this.CurPos.ContentPos;
+        if ( true !== Debug_ParaRunMode )
+        {
+            if ( undefined === ContentPos )
+                ContentPos = this.CurPos.ContentPos;
 
-        var oPos = this.Internal_FindBackward( ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
-        if ( true === oPos.Found )
-            return false;
+            var oPos = this.Internal_FindBackward( ContentPos - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_Math] );
+            if ( true === oPos.Found )
+                return false;
+            else
+                return true;
+        }
         else
-            return true;
+        {
+            // Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
+            // мы стоим в конце параграфа.
+
+            var ContentPos = ( undefined === _ContentPos ? this.Get_ParaContentPos( false, false ) : _ContentPos );
+            var SearchPos  = new CParagraphSearchPos();
+
+            this.Get_LeftPos( SearchPos, ContentPos );
+
+            if ( true === SearchPos.Found )
+                return false;
+            else
+                return true;
+        }
     },
 
     // Проверим, начинается ли выделение с начала параграфа
@@ -16041,51 +16327,108 @@ Paragraph.prototype =
     // Разделяем данный параграф
     Split : function(NewParagraph, Pos)
     {
-        if ( "undefined" === typeof(Pos) || null === Pos )
-            Pos = this.CurPos.ContentPos;
-
-        // Копируем контент, начиная с текущей позиции в параграфе до конца параграфа,
-        // в новый параграф (первым элементом выставляем настройки текста, рассчитанные
-        // для текущей позиции). Проверим, находится ли данная позиция внутри гиперссылки,
-        // если да, тогда в текущем параграфе закрываем гиперссылку, а в новом создаем ее копию.
-
-        var Hyperlink = this.Check_Hyperlink2( Pos, false );
-
-        var TextPr = this.Internal_CalculateTextPr( Pos );
-
-        NewParagraph.DeleteCommentOnRemove = false;
-        NewParagraph.Internal_Content_Remove2(0, NewParagraph.Content.length);
-        NewParagraph.Internal_Content_Concat( this.Content.slice( Pos ) );
-        NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
-        NewParagraph.Set_ContentPos( 0 );
-        NewParagraph.DeleteCommentOnRemove = true;
-
-        NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
-
-        if ( null != Hyperlink )
-            NewParagraph.Internal_Content_Add( 1, Hyperlink.Copy() );
-
-        // Удаляем все элементы после текущей позиции и добавляем признак окончания параграфа.
-        this.DeleteCommentOnRemove = false;
-        this.Internal_Content_Remove2( Pos, this.Content.length - Pos );
-        this.Internal_Remove_CollaborativeMarks(false);
-        this.DeleteCommentOnRemove = true;
-
-        if ( null != Hyperlink )
+        if ( true !== Debug_ParaRunMode )
         {
-            // Добавляем конец гиперссылки и пустые текстовые настройки
-            this.Internal_Content_Add( this.Content.length, new ParaHyperlinkEnd() );
-            this.Internal_Content_Add( this.Content.length, new ParaTextPr() );
+            if ( "undefined" === typeof(Pos) || null === Pos )
+                Pos = this.CurPos.ContentPos;
+
+            // Копируем контент, начиная с текущей позиции в параграфе до конца параграфа,
+            // в новый параграф (первым элементом выставляем настройки текста, рассчитанные
+            // для текущей позиции). Проверим, находится ли данная позиция внутри гиперссылки,
+            // если да, тогда в текущем параграфе закрываем гиперссылку, а в новом создаем ее копию.
+
+            var Hyperlink = this.Check_Hyperlink2( Pos, false );
+
+            var TextPr = this.Internal_CalculateTextPr( Pos );
+
+            NewParagraph.DeleteCommentOnRemove = false;
+            NewParagraph.Internal_Content_Remove2(0, NewParagraph.Content.length);
+            NewParagraph.Internal_Content_Concat( this.Content.slice( Pos ) );
+            NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
+            NewParagraph.Set_ContentPos( 0 );
+            NewParagraph.DeleteCommentOnRemove = true;
+
+            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+
+            if ( null != Hyperlink )
+                NewParagraph.Internal_Content_Add( 1, Hyperlink.Copy() );
+
+            // Удаляем все элементы после текущей позиции и добавляем признак окончания параграфа.
+            this.DeleteCommentOnRemove = false;
+            this.Internal_Content_Remove2( Pos, this.Content.length - Pos );
+            this.Internal_Remove_CollaborativeMarks(false);
+            this.DeleteCommentOnRemove = true;
+
+            if ( null != Hyperlink )
+            {
+                // Добавляем конец гиперссылки и пустые текстовые настройки
+                this.Internal_Content_Add( this.Content.length, new ParaHyperlinkEnd() );
+                this.Internal_Content_Add( this.Content.length, new ParaTextPr() );
+            }
+
+            this.Internal_Content_Add( this.Content.length, new ParaEnd() );
+            this.Internal_Content_Add( this.Content.length, new ParaEmpty() );
+
+            // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
+            this.CopyPr( NewParagraph );
+
+            this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            NewParagraph.RecalcInfo.Set_Type_0(pararecalc_0_All);
         }
+        else
+        {
+            // TODO: Обработать здесь гиперссылки и комментарии
 
-        this.Internal_Content_Add( this.Content.length, new ParaEnd() );
-        this.Internal_Content_Add( this.Content.length, new ParaEmpty() );
 
-        // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
-        this.CopyPr( NewParagraph );
+            // Обнулим селект и курсор
+            this.Selection_Remove();
+            NewParagraph.Selection_Remove();
 
-        this.RecalcInfo.Set_Type_0(pararecalc_0_All);
-        NewParagraph.RecalcInfo.Set_Type_0(pararecalc_0_All);
+            // Переносим контент, идущий с текущей позиции в параграфе и до конца параграфа,
+            // в новый параграф.
+
+            var ContentPos = this.Get_ParaContentPos(false, false);
+            var CurPos = ContentPos.Get(0);
+
+            var TextPr = this.Get_TextPr(ContentPos);
+
+            // Разделяем текущий элемент (возвращается правая, отделившаяся часть, если она null, тогда заменяем
+            // ее на пустой ран с заданными настройками).
+            var NewElement = this.Content[CurPos].Split( ContentPos, 1 );
+
+            if ( null === NewElement )
+            {
+                NewElement = new ParaRun( this.LogicDocument, NewParagraph );
+                NewElement.Set_Pr( TextPr.Copy() );
+            }
+
+            // Теперь делим наш параграф на три части:
+            // 1. До элемента с номером CurPos включительно (оставляем эту часть в исходном параграфе)
+            // 2. После элемента с номером CurPos (добавляем эту часть в новый параграф)
+            // 3. Новый элемент, полученный после разделения элемента с номером CurPos, который мы
+            //    добавляем в начало нового параграфа.
+
+            var NewContent = this.Content.slice( CurPos + 1 );
+            this.Internal_Content_Remove2( CurPos + 1, this.Content.length - CurPos - 1 );
+
+            // В старый параграф добавим ран с концом параграфа
+            var EndRun = new ParaRun( this.LogicDocument, this );
+            EndRun.Content[0] = new ParaEnd();
+
+            this.Internal_Content_Add( this.Content.length, EndRun );
+
+            // Очищаем новый параграф и добавляем в него Right элемент и NewContent
+            NewParagraph.Internal_Content_Remove2( 0, NewParagraph.Content.length );
+            NewParagraph.Internal_Content_Concat( NewContent );
+            NewParagraph.Internal_Content_Add( 0, NewElement );
+
+            // Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
+            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+            this.CopyPr( NewParagraph );
+
+            this.Cursor_MoveToEndPos( false, false );
+            NewParagraph.Cursor_MoveToStartPos( false );
+        }
     },
 
     // Присоединяем контент параграфа Para к текущему параграфу
@@ -16120,14 +16463,33 @@ Paragraph.prototype =
     // Копируем настройки параграфа и последние текстовые настройки в новый параграф
     Continue : function(NewParagraph)
     {
-        // Копируем настройки параграфа
-        this.CopyPr( NewParagraph );
+        if ( true !== Debug_ParaRunMode )
+        {
+            // Копируем настройки параграфа
+            this.CopyPr( NewParagraph );
 
-        // Копируем последние настройки текста
-        var TextPr = this.Internal_CalculateTextPr( this.Internal_GetEndPos() );
+            // Копируем последние настройки текста
+            var TextPr = this.Internal_CalculateTextPr( this.Internal_GetEndPos() );
 
-        NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
-        NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+            NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
+            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+        }
+        else
+        {
+            // Копируем настройки параграфа
+            this.CopyPr( NewParagraph );
+
+            // Копируем последние настройки текста
+            var TextPr = this.Get_TextPr();
+            var NewRun = new ParaRun( this.LogicDocument, NewParagraph );
+            NewRun.Set_Pr( TextPr );
+
+            NewParagraph.Internal_Content_Add( 0, NewRun );
+            NewParagraph.Cursor_MoveToStartPos( false );
+
+            // Копируем настройки знака конца параграфа
+            NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+        }
     },
 
 //-----------------------------------------------------------------------------------

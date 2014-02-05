@@ -2703,6 +2703,14 @@ ParaNumbering.prototype =
         this.Height       = Temp.Ascent; // Это не вся высота, а только высота над BaseLine
     },
 
+    Check_Range : function(Range, Line)
+    {
+        if ( null !== this.Item && null !== this.Run && Range === this.Range && Line === this.Line )
+            return true;
+
+        return false;
+    },
+
     Is_RealContent : function()
     {
         return true;
