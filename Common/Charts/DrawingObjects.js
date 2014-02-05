@@ -3863,6 +3863,63 @@ function DrawingObjects() {
             canvas.m_oContext.restore();
         }
 	}
+
+	_this._drawWorksheetLayer = function (range, offsetLeft, offsetTop) {
+		worksheet._drawGrid(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
+		worksheet._drawCells(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
+		worksheet._drawCellsBorders(/*drawingCtx*/undefined, range, offsetLeft, offsetTop);
+	};
+	_this.drawWorksheetLayer = function (range) {
+		var c1, c2, r1, r2, tmpRange;
+		var vr = worksheet.getVisibleRange();
+		var oFrozenCell = worksheet.getFrozenCell();
+		if (null !== oFrozenCell) {
+			// Отрисовка диапазона, входящего в фиксированную область
+			var cFrozen = oFrozenCell.getCol0();
+			var rFrozen = oFrozenCell.getRow0();
+
+			var offsetX, offsetY;
+
+			if (range.c1 < cFrozen && range.r1 < rFrozen) {
+				// Левый угол
+				offsetX = worksheet.cols[0].left - worksheet.cellsLeft;
+				offsetY = worksheet.rows[0].top - worksheet.cellsTop;
+				c1 = Math.max(0, range.c1);
+				c2 = Math.min(cFrozen - 1, range.c2);
+				r1 = Math.max(0, range.r1);
+				r2 = Math.min(rFrozen - 1, range.r2);
+				tmpRange = asc_Range(c1, r1, c2, r2);
+				_this._drawWorksheetLayer(tmpRange, offsetX, offsetY);
+			}
+			if (range.c1 < cFrozen) {
+				offsetX = worksheet.cols[0].left - worksheet.cellsLeft;
+				offsetY = undefined;
+				c1 = Math.max(0, range.c1);
+				c2 = Math.min(cFrozen - 1, range.c2);
+				r1 = Math.max(range.r1, vr.r1);
+				r2 = Math.min(range.r2, vr.r2);
+				tmpRange = asc_Range(c1, r1, c2, r2);
+				_this._drawWorksheetLayer(tmpRange, offsetX, offsetY);
+			}
+			if (0 < rFrozen) {
+				offsetX = undefined;
+				offsetY = worksheet.rows[0].top - worksheet.cellsTop;
+				c1 = Math.max(range.c1, vr.c1);
+				c2 = Math.min(range.c2, vr.c2);
+				r1 = Math.max(0, range.r1);
+				r2 = Math.min(rFrozen - 1, range.r2);
+				tmpRange = asc_Range(c1, r1, c2, r2);
+				_this._drawWorksheetLayer(tmpRange, offsetX, offsetY);
+			}
+		}
+
+		c1 = Math.max(range.c1, vr.c1);
+		c2 = Math.min(range.c2, vr.c2);
+		r1 = Math.max(range.r1, vr.r1);
+		r2 = Math.min(range.r2, vr.r2);
+		tmpRange = asc_Range(c1, r1, c2, r2);
+		_this._drawWorksheetLayer(tmpRange);
+	};
 	
 	//-----------------------------------------------------------------------------------
 	// For object type
