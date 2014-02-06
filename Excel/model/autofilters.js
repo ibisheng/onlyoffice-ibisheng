@@ -202,7 +202,7 @@ var gUndoInsDelCellsFlag = true;
 			this.range = null;
 			this.isTitle = null;
 			return this;
-		};
+		}
 
 		AddFormatTableOptions.prototype = {
 			constructor: AddFormatTableOptions,
@@ -265,7 +265,7 @@ var gUndoInsDelCellsFlag = true;
 				var ws = this.worksheet;
 				var bIsActiveSheet = this._isActiveSheet();
 				var bIsOpenFilter = undefined !== openFilter;
-				var activeCells = Asc.clone(ar);
+				var activeCells = null === ar ? null : ar.clone(); // ToDo Слишком много клонирования, это долгая операция
 				var aWs = this._getCurrentWS();
 				var paramsForCallBack;
 				var paramsForCallBackAdd;
@@ -455,7 +455,7 @@ var gUndoInsDelCellsFlag = true;
 										j++;
 										
 									}
-									var cloneAC = Asc.clone(activeCells);
+									var cloneAC = activeCells.clone();
 									
 									if(addNameColumn)
 									{
@@ -536,8 +536,7 @@ var gUndoInsDelCellsFlag = true;
 											arn.r2 = arn.r2 - 1;
 											ws.setSelection(arn,true);
 										}
-										rangeFilter =  new Asc.Range(activeCells.c1, activeCells.r1, activeCells.c2, activeCells.r2);
-										ws._updateCellsRange(rangeFilter, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
+										ws._updateCellsRange(activeCells, /*canChangeColWidth*/ c_oAscCanChangeColWidth.none);
 									}
 									History.EndTransaction();
 									if(isTurnOffHistory)
@@ -562,7 +561,6 @@ var gUndoInsDelCellsFlag = true;
 									if(isTurnOffHistory)
 										History.TurnOn();
 									return true;
-									break
 								}
 								case 'setStyleTableForAutoFilter':
 								{
@@ -634,7 +632,6 @@ var gUndoInsDelCellsFlag = true;
 										for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
 										{
 											var cell = new CellAddress(mainAdjacentCells.r1, col, 0);
-											var strNum = null;
 											var range = ws.model.getCell(cell);
 											var strNum = "Column" + (col - mainAdjacentCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
@@ -674,7 +671,6 @@ var gUndoInsDelCellsFlag = true;
 										for(col = activeCells.c1; col <= activeCells.c2; col++)
 										{
 											var cell = new CellAddress(activeCells.r1, col, 0);
-											var strNum = null;
 											var range = ws.model.getCell(cell);
 											var strNum = "Column" + (col - activeCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
@@ -702,7 +698,7 @@ var gUndoInsDelCellsFlag = true;
 								{
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 									return;
-								};
+								}
 								result = [];
 								//в случае если добавляем фильтр общий, то откидываем пустую строку или столбец в конце
 								var isEndRowEmpty = true;
@@ -782,7 +778,7 @@ var gUndoInsDelCellsFlag = true;
 								{
 									ws.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError, c_oAscError.Level.NoCritical);
 									return;
-								};
+								}
 								var n = 0;
 								result = [];
 								for(col = activeCells.c1; col <= activeCells.c2; col++)
@@ -4450,11 +4446,9 @@ var gUndoInsDelCellsFlag = true;
 			{
 				History.TurnOff();
 				var aWs = this._getCurrentWS();
-				var bUndoChanges = this.worksheet.model.workbook.bUndoChanges;
 				if(aWs.AutoFilter)
 				{
 					var ref = aWs.AutoFilter.Ref.split(':');
-					var doNotChangesHeadString = false;
 					var options = {
 						ref:ref,
 						val:val,
@@ -5533,7 +5527,7 @@ var gUndoInsDelCellsFlag = true;
 
 				if(redoObject)
 				{
-					oHistoryObject.activeCells			= Asc.clone(redoObject.activeCells);
+					oHistoryObject.activeCells			= redoObject.activeCells.clone();	// ToDo Слишком много клонирования, это долгая операция
 					oHistoryObject.lTable				= redoObject.lTable;
 					oHistoryObject.type					= redoObject.type;
 					oHistoryObject.cellId				= redoObject.cellId;
@@ -5544,7 +5538,7 @@ var gUndoInsDelCellsFlag = true;
 				}
 				else
 				{
-					oHistoryObject.activeCells			= Asc.clone(ws.activeRange);
+					oHistoryObject.activeCells			= ws.activeRange.clone();
 					type = null;
 				}
 				
