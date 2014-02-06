@@ -3766,40 +3766,6 @@ drawStockChart.prototype =
 	
 	_calculateLines: function ()
 	{	
-		var tempSeries = [];
-		for (var i = 0; i < 4; i++) {
-			if(i == 0 && this.chartProp.series[0])
-				tempSeries[i] = this.chartProp.series[0];
-			else if(i == 1)
-			{
-				if(this.chartProp.series[1])
-					tempSeries[i] = this.chartProp.series[1];
-				else
-					tempSeries[i] = this.chartProp.series[0];
-			}
-			else if(i == 2)
-			{
-				if(this.chartProp.series[2])
-					tempSeries[i] = this.chartProp.series[2];
-				else if(this.chartProp.series[1])
-					tempSeries[i] = this.chartProp.series[1];
-				else if(this.chartProp.series[0])
-					tempSeries[i] = this.chartProp.series[0];
-			}
-			else if(i == 3)
-			{
-				if(this.chartProp.series[3])
-					tempSeries[i] = this.chartProp.series[3];
-				else if(this.chartProp.series[2])
-					tempSeries[i] = this.chartProp.series[2];
-				else if(this.chartProp.series[1])
-					tempSeries[i] = this.chartProp.series[1];
-				else if(this.chartProp.series[0])
-					tempSeries[i] = this.chartProp.series[0];
-			}
-		};
-		
-		
 		var trueWidth = this.chartProp.trueWidth;
 		var trueHeight = this.chartProp.trueHeight;
 		var min = this.chartProp.scale[0];
@@ -3807,19 +3773,34 @@ drawStockChart.prototype =
 			
 		var digHeight = Math.abs(max - min);
 		
-		if(this.chartProp.min < 0 && this.chartProp.max <= 0 && this.chartProp.subType != "stackedPer")
+		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
 			min = -1*max;
 
-		var koffX = trueWidth / tempSeries[0].val.numRef.numCache.pts.length;
+		var koffX = trueWidth / this.chartProp.series[0].val.numRef.numCache.pts.length;
 		var koffY = trueHeight / digHeight;
 		var widthBar = koffX / (1 + this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth / 100);
 		
 		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4;
-		for (var i = 0; i < tempSeries[0].val.numRef.numCache.pts.length; i++) {
-			val1 = tempSeries[0].val.numRef.numCache.pts[i].val;
-			val2 = tempSeries[1].val.numRef.numCache.pts[i].val;
-			val3 = tempSeries[2].val.numRef.numCache.pts[i].val;
-			val4 = tempSeries[3].val.numRef.numCache.pts[i].val;
+		for (var i = 0; i < this.chartProp.series[0].val.numRef.numCache.pts.length; i++) {
+			
+			val1 = this.chartProp.series[0].val.numRef.numCache.pts[i].val;
+			val4 = this.chartProp.series[this.chartProp.series.length - 1].val.numRef.numCache.pts[i].val;
+			
+			for(var k = 1; k < this.chartProp.series.length - 1; k++)
+			{
+				if(k == 1)
+				{
+					val2 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+					val3 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+				}
+				else
+				{
+					if(parseFloat(val2) > parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[i].val))	
+						val2 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+					if(parseFloat(val3) < parseFloat(this.chartProp.series[k].val.numRef.numCache.pts[i].val))	
+						val3 = this.chartProp.series[k].val.numRef.numCache.pts[i].val;
+				}
+			}
 			
 			if(!this.paths.values)
 					this.paths.values = [];
@@ -3827,10 +3808,10 @@ drawStockChart.prototype =
 				this.paths.values[i] = {};
 			
 			xVal = this.chartProp.chartGutter._left + (i)*koffX + koffX/2;
-			yVal1 = trueHeight - (val1)*koffY + this.chartProp.chartGutter._top;
-			yVal2 = trueHeight - (val2)*koffY + this.chartProp.chartGutter._top;
-			yVal3 = trueHeight - (val3)*koffY + this.chartProp.chartGutter._top;
-			yVal4 = trueHeight - (val4)*koffY + this.chartProp.chartGutter._top;
+			yVal1 = trueHeight - (val1 - min)*koffY + this.chartProp.chartGutter._top;
+			yVal2 = trueHeight - (val2 - min)*koffY + this.chartProp.chartGutter._top;
+			yVal3 = trueHeight - (val3 - min)*koffY + this.chartProp.chartGutter._top;
+			yVal4 = trueHeight - (val4 - min)*koffY + this.chartProp.chartGutter._top;
 			
 			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
 			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
@@ -3894,7 +3875,74 @@ drawStockChart.prototype =
 	
 	_calculateDLbl: function(chartSpace, ser, val)
 	{
-		return {x: 0, y: 0};
+		var pxToMm = this.chartProp.pxToMM;
+		var min = this.chartProp.scale[0];
+		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
+
+		
+		var digHeight = Math.abs(max - min);
+		
+		if(this.chartProp.min < 0 && this.chartProp.max <= 0)
+			min = -1*max;
+
+		var koffX = this.chartProp.trueWidth / this.chartProp.series[0].val.numRef.numCache.pts.length;
+		var koffY = this.chartProp.trueHeight / digHeight;
+		
+		var point = this.chartProp.series[ser].val.numRef.numCache.pts[val];
+		
+		var x = this.chartProp.chartGutter._left + (val)*koffX + koffX/2;
+		var y = this.chartProp.trueHeight - (point.val - min)*koffY + this.chartProp.chartGutter._top;
+		
+		var width = point.compiledDlb.extX;
+		var height = point.compiledDlb.extY;
+		
+		var centerX = x / pxToMm - width/2;
+		var centerY = y / pxToMm - height/2;
+		var constMargin = 5 / pxToMm;
+		
+		switch ( point.compiledDlb.dLblPos )
+		{
+			case DLBL_POS_B:
+			{
+				centerY = centerY + height/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_BEST_FIT:
+			{
+				break;
+			}
+			case DLBL_POS_CTR:
+			{
+				break;
+			}
+			case DLBL_POS_L:
+			{
+				centerX = centerX - width/2 - constMargin;
+				break;
+			}
+			case DLBL_POS_R:
+			{
+				centerX = centerX + width/2 + constMargin;
+				break;
+			}
+			case DLBL_POS_T:
+			{
+				centerY = centerY - height/2 - constMargin;
+				break;
+			}
+		}
+		
+		if(centerX < 0)
+			centerX = 0;
+		if(centerX + width > this.chartProp.widthCanvas / pxToMm)
+			centerX = this.chartProp.widthCanvas / pxToMm - width;
+			
+		if(centerY < 0)
+			centerY = 0;
+		if(centerY + height > this.chartProp.heightCanvas / pxToMm)
+			centerY = this.chartProp.heightCanvas / pxToMm - height;
+			
+		return {x: centerX, y: centerY};
 	},
 	
 	_calculateUpDownBars: function(x, y, x1, y1, width)
