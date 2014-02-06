@@ -32,7 +32,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.topLineEditorElement = null;
 
 			this.isViewerMode = false;
-			this.controller = null;		// Создадим позднее, т.к. не знаем мобильная версия или нет
 
 //			if ("function" === typeof(eventsController)) {
 //				var prot = eventsController.prototype;
@@ -42,10 +41,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 //				prot.reinitializeScroll = prot["reinitializeScroll"];
 //				prot.scrollVertical = prot["scrollVertical"];
 //				prot.scrollHorizontal = prot["scrollHorizontal"];
-
+//
 //				this.controller = new eventsController();
 //			} else {
-//				this.controller	= new asc.asc_CEventsController();
+				this.controller	= new asc.asc_CEventsController();
 //			}
 
 			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
@@ -506,7 +505,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_OpenDocument: function(url, data)
 			{
-				this._initEventController();
+//				this._initEventController();
 
 				var wb = new Workbook(url, this.handlers, this);
 				this.initGlobalObjects(wb);
@@ -721,8 +720,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_setViewerMode: function (isViewerMode) {
 				this.isViewerMode = isViewerMode;
 				// Если нет controller-а, мы выставим позднее режим
-				if (null !== this.controller)
-					this.controller.setViewerMode(isViewerMode);
+//				if (null !== this.controller)
+//					this.controller.setViewerMode(isViewerMode);
 				if (this.collaborativeEditing)
 					this.collaborativeEditing.setViewerMode(isViewerMode);
 
@@ -1232,8 +1231,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_getController: function() {
-				//return this.controller;
-				return null;
+				return this.controller;
+//				return null;
 			},
 
 			// Посылает эвент о том, что обновились листы

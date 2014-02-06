@@ -93,6 +93,7 @@
             this.vsbApiLockMouse = false;
             this.hsbApiLockMouse = false;
 
+
             return this;
 		}
 
@@ -112,7 +113,23 @@
 			this.element  = canvasElem;
 			this.handlers = new asc.asc_CHandlersList(handlers);
 			this.settings = $.extend(true, {}, this.settings, settings);
+            if( this.view.Api.isMobileVersion ){
+                var __hasTouch = 'ontouchstart' in window;
 
+                if (__hasTouch)
+                {
+                    this.element.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
+                    this.element.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
+                    this.element.addEventListener("touchend"	, function (e) {self._onTouchEnd(e); return false;}	, false);
+                }
+                else{
+                    this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
+                    this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
+                    this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+                }
+//                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
+                return;
+            }
 			this._createScrollBars();
 
 			// initialize events
@@ -147,20 +164,23 @@
 				// for Mozilla Firefox (можно делать проверку на window.MouseScrollEvent || window.WheelEvent для FF)
 				this.element.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
 
-				this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
-				this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-				this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+                if(!this.view.Api.isMobileVersion){
+                    this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
+                    this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
+                    this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
+                }
+
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
 			var oShapeCursor = document.getElementById("id_target_cursor");
-			if (null != oShapeCursor && oShapeCursor.addEventListener) {
+			if (null != oShapeCursor && oShapeCursor.addEventListener && !this.view.Api.isMobileVersion) {
 				oShapeCursor.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}, false);
 				oShapeCursor.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}	, false);
 				oShapeCursor.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}, false);
 			}
 
-			return this;
+    		return this;
 		};
 
 		asc_CEventsController.prototype.destroy = function () {
@@ -223,11 +243,13 @@
 				this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 					if (isVert) {
 						vSize = self.vsb.offsetHeight + Math.max(vSize * opt.vscrollStep, 1);
-						self.vsbHSt.height = vSize + "px";
+//                        this.m_dScrollY_max = vSize;
+    					self.vsbHSt.height = vSize + "px";
 						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 					}
 					if (isHoriz) {
 						hSize = self.hsb.offsetWidth + Math.max(hSize * opt.hscrollStep, 1);
+//                        this.m_dScrollX_max = hSize ;
 						self.hsbHSt.width = hSize + "px";
 						self.hsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleCol(/*allowPane*/true));
 					}
@@ -1393,7 +1415,7 @@
 			return true;
 		};
 
-		/** @param event {jQuery.Event} */
+    /** @param event {jQuery.Event} */
 		asc_CEventsController.prototype._onMouseLeave = function (event) {
 			var t = this;
 			this.hasCursor = false;
@@ -1463,11 +1485,21 @@
 			return {x: x, y: y};
 		};
 
+        asc_CEventsController.prototype._onTouchStart = function (event){
+            this.view.MobileTouchManager.onTouchStart(event);
+        }
+        asc_CEventsController.prototype._onTouchMove = function (event){
+            var n = new Date().getTime()
+            this.view.MobileTouchManager.onTouchMove(event);
+        }
+        asc_CEventsController.prototype._onTouchEnd = function (event){
+            this.view.MobileTouchManager.onTouchEnd(event);
+        }
 
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
+        /*
+         * Export
+         * -----------------------------------------------------------------------------
+         */
 		window["Asc"]["asc_CEventsController"] = window["Asc"].asc_CEventsController = asc_CEventsController;
 
 

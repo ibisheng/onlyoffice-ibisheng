@@ -108,7 +108,14 @@
 			this.maxDigitWidth = 0;
 			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
-			
+
+            this.m_dScrollY         = 0;
+            this.m_dScrollX         = 0;
+            this.m_dScrollY_max     = 1;
+            this.m_dScrollX_max     = 1;
+
+            this.MobileTouchManager = null;
+
 			this._init(fontRenderingMode);
 
 			return this;
@@ -394,6 +401,11 @@
 
 			this.clipboard.Api = this.Api;
 			this.clipboard.init();
+
+            if (this.Api.isMobileVersion){
+                this.MobileTouchManager = new CMobileTouchManager();
+                this.MobileTouchManager.Init(this);
+            }
 			return this;
 		};
 
@@ -462,20 +474,36 @@
 			var ws = this.getWorksheet(),
 			    vsize = !whichSB || whichSB === 1 ? ws.getVerticalScrollRange() : undefined,
 			    hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
-			asc_applyFunction(callback, vsize, hsize);
+
+            if( vsize != undefined )
+                this.m_dScrollY_max = /*this.canvas.offsetHeight +*/ Math.max(this.controller.settings.vscrollStep * vsize, 1);
+            if( hsize != undefined )
+                this.m_dScrollX_max = /*this.canvas.offsetWidth +*/ Math.max(this.controller.settings.hscrollStep * hsize, 1);
+
+            if(this.Api.isMobileVersion){
+                this.MobileTouchManager.Resize();
+                return;
+            }
+            asc_applyFunction(callback, vsize, hsize);
 		};
 
 		WorkbookView.prototype._onScrollY = function (pos) {
+            console.log("_onScrollY " + pos)
+//            document.getElementById("cv1" ).value = "_onScrollY " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleRow(/*allowPane*/true));
+            console.log("deltaY " + delta)
 			if (delta !== 0) {
 				ws.scrollVertical(delta, this.cellEditor);
 			}
 		};
 
 		WorkbookView.prototype._onScrollX = function (pos) {
+            console.log("_onScrollX " + pos)
+//            document.getElementById("cv1" ).value = "_onScrollX " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleCol(/*allowPane*/true));
+            console.log("deltaX " + delta)
 			if (delta !== 0) {
 				ws.scrollHorizontal(delta, this.cellEditor);
 			}
@@ -1144,8 +1172,8 @@
 		WorkbookView.prototype._canResize = function () {
 			var oldWidth = this.canvas.width;
 			var oldHeight = this.canvas.height;
-			var width = this.element.offsetWidth - this.defaults.scroll.widthPx;
-			var height = this.element.offsetHeight - this.defaults.scroll.heightPx;
+			var width = this.element.offsetWidth - (this.Api.isMobileVersion ? 0 : this.defaults.scroll.widthPx);
+			var height = this.element.offsetHeight - (this.Api.isMobileVersion ? 0 : this.defaults.scroll.heightPx);
 
 			if (oldWidth === width && oldHeight === height)
 				return false;
