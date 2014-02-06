@@ -209,7 +209,7 @@ CChartsDrawer.prototype =
 			this.calcProp.numhMinorlines = 2;
 			this.calcProp.numvMinorlines = 5;
 		}
-		else if(this.calcProp.type == "Line")
+		else if(this.calcProp.type == "Line" || this.calcProp.type == "Stock")
 		{
 			this.calcProp.numvlines = this.calcProp.data[0].length;
 			
@@ -3746,11 +3746,12 @@ function drawStockChart()
 
 drawStockChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartProp, cShapeDrawer, chartSpace)
     {
 		this.chartProp = chartProp.calcProp;
 		this.cChartDrawer = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.cChartSpace = chartSpace;
 		this._drawLines();
 	},
 	
@@ -3811,7 +3812,7 @@ drawStockChart.prototype =
 
 		var koffX = trueWidth / tempSeries[0].val.numRef.numCache.pts.length;
 		var koffY = trueHeight / digHeight;
-		var widthBar = 40;
+		var widthBar = koffX / (1 + this.cChartSpace.chart.plotArea.chart.upDownBars.gapWidth / 100);
 		
 		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4;
 		for (var i = 0; i < tempSeries[0].val.numRef.numCache.pts.length; i++) {
@@ -3834,7 +3835,10 @@ drawStockChart.prototype =
 			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
 			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
 			
-			this.paths.values[i].upDownBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
+			if(parseFloat(val1) > parseFloat(val4))
+				this.paths.values[i].downBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
+			else
+				this.paths.values[i].upBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
 		}
 	},
 	
@@ -3845,15 +3849,25 @@ drawStockChart.prototype =
 		var dataSeries;
 		var seria;
 		for (var i = 0; i < this.chartProp.series[0].val.numRef.numCache.pts.length; i++) {
-			seria = this.chartProp.series[0].val.numRef.numCache.pts[i];
-			brush = seria.brush;
-			pen = seria.pen;
+
+			pen = this.cChartSpace.chart.plotArea.chart.calculatedHiLowLines;
 				
 			this._drawPath(this.paths.values[i].lowLines, brush, pen);
 			
 			this._drawPath(this.paths.values[i].highLines, brush, pen);
 			
-			this._drawPath(this.paths.values[i].upDownBars, brush, pen);
+			if(this.paths.values[i].downBars)
+			{
+				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsBrush;
+				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.downBarsPen;
+				this._drawPath(this.paths.values[i].downBars, brush, pen);
+			}
+			else
+			{
+				brush = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsBrush;
+				pen = this.cChartSpace.chart.plotArea.chart.upDownBars.upBarsPen;
+				this._drawPath(this.paths.values[i].upBars, brush, pen);
+			}
         }
     },
 	
