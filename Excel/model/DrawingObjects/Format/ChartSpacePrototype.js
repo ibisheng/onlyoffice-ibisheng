@@ -46,7 +46,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculatePen: true,
         recalculatePlotAreaBrush: true,
         recalculatePlotAreaPen: true,
-        recalculateHiLowLines: true
+        recalculateHiLowLines: true,
+        recalculateUpDownBars: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -275,6 +276,11 @@ CChartSpace.prototype.recalculate = function()
         {
             this.recalculatePlotAreaChartPen();
             this.recalcInfo.recalculatePlotAreaPen = false;
+        }
+        if(this.recalcInfo.recalculateUpDownBars)
+        {
+            this.recalculateUpDownBars();
+            this.recalcInfo.recalculateUpDownBars = false;
         }
         if(this.recalcInfo.recalculateAxisLabels)
         {
@@ -1274,6 +1280,140 @@ CChartSpace.prototype.recalculatePlotAreaChartPen = function()
     }
 };
 
+CChartSpace.prototype.recalculateUpDownBars = function()
+{
+    if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.upDownBars)
+    {
+        var bars = this.chart.plotArea.chart.upDownBars;
+        var up_bars = bars.upBars;
+        var down_bars = bars.downBars;
+        var parents = this.getParentObjects();
+        bars.upBarsBrush = null;
+        bars.upBarsPen = null;
+        bars.downBarsBrush = null;
+        bars.downBarsPen = null;
+        if(up_bars || down_bars)
+        {
+            var default_bar_line = new CLn();
+            if(parents.theme  && parents.theme.themeElements
+                && parents.theme.themeElements.fmtScheme
+                && parents.theme.themeElements.fmtScheme.lnStyleLst)
+            {
+                default_bar_line.merge(parents.theme.themeElements.fmtScheme.lnStyleLst[0]);
+            }
+            if(this.style >= 1 && this.style <= 16)
+                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
+            else if(this.style >= 17 && this.style <= 32 ||
+                    this.style >= 41 && this.style <= 48)
+                default_bar_line = CreateNoFillLine();
+            else if(this.style === 33 || this.style === 34)
+                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
+            else if(this.style >= 35 && this.style <= 40)
+                default_bar_line.setFill(CreateUnifillSolidFillSchemeColor(this.style - 35, -25000));
+        }
+        if(up_bars)
+        {
+            var default_up_bars_fill;
+            if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 25000);
+            }
+            else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(8, 5000);
+            }
+            else if(this.style >= 3 && this.style <= 8)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, 25000);
+            }
+            else if(this.style >= 11 && this.style <= 16)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, 25000);
+            }
+            else if(this.style >=19 && this.style <= 24)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, 25000);
+            }
+            else if(this.style >= 27 && this.style <= 32 )
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, 25000);
+            }
+            else if(this.style >= 33 && this.style <= 40 || this.style === 42)
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(12, 0);
+            }
+            else
+            {
+                default_up_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, 25000);
+            }
+            if(up_bars.Fill)
+            {
+                default_up_bars_fill.merge(up_bars.Fill);
+            }
+            default_up_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+            this.chart.plotArea.chart.upDownBars.upBarsBrush = default_up_bars_fill;
+            var up_bars_line = default_bar_line.createDuplicate();
+            if(up_bars.ln)
+                up_bars_line.merge(up_bars.ln);
+            up_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+            this.chart.plotArea.chart.upDownBars.upBarsPen = up_bars_line;
+
+        }
+        if(down_bars)
+        {
+            var default_down_bars_fill;
+            if(this.style === 1 || this.style === 9 || this.style === 17 || this.style === 25 || this.style === 41 || this.style === 33)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 85000);
+            }
+            else if(this.style === 2 || this.style === 10 || this.style === 18 || this.style === 26 || this.style === 34)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 95000);
+            }
+            else if(this.style >= 3 && this.style <= 8)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 3, -25000);
+            }
+            else if(this.style >= 11 && this.style <= 16)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 11, -25000);
+            }
+            else if(this.style >=19 && this.style <= 24)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 19, -25000);
+            }
+            else if(this.style >= 27 && this.style <= 32 )
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -25000);
+            }
+
+            else if(this.style >= 35 && this.style <= 40)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -25000);
+            }
+            else if(this.style === 42)
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(8, 0);
+            }
+            else
+            {
+                default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 43, -25000);
+            }
+            if(down_bars.Fill)
+            {
+                default_down_bars_fill.merge(down_bars.Fill);
+            }
+            default_down_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+            this.chart.plotArea.chart.upDownBars.downBarsFill = default_up_bars_fill;
+            var down_bars_line = default_bar_line.createDuplicate();
+            if(down_bars.ln)
+                down_bars_line.merge(down_bars.ln);
+            down_bars_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
+            this.chart.plotArea.chart.upDownBars.downBarsPen = down_bars_line;
+        }
+    }
+};
+
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {
     var unifill = new CUniFill();
@@ -1284,5 +1424,18 @@ function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
     return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
 }
 
+function CreateNoFillLine()
+{
+    var ret = new CLn();
+    ret.setFill(CreateNoFillUniFill());
+    return ret;
+}
+
+function CreateNoFillUniFill()
+{
+    var ret = new CUniFill();
+    ret.setFill(new CNoFill());
+    return ret;
+}
 
 
