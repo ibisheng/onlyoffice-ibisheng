@@ -97,8 +97,8 @@ CChartsDrawer.prototype =
 		this.calcProp.series = chartProp.chart.plotArea.chart.series;
 		
 		//отрисовываем без пересчёта
-		this.allAreaChart.draw(this.calcProp, cShapeDrawer);
-		this.areaChart.draw(this.calcProp, cShapeDrawer);
+		this.allAreaChart.draw(this.calcProp, cShapeDrawer, chartProp);
+		this.areaChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.catAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.valAxisChart.draw(this.calcProp, cShapeDrawer, chartProp);
 		this.gridChart.draw(this.calcProp, cShapeDrawer, chartProp);
@@ -4567,15 +4567,18 @@ function allAreaChart()
 {
 	this.chartProp = null;
 	this.cShapeDrawer = null;
+	this.chartSpace = null;
+	
 	this.paths = null;
 }
 
 allAreaChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartProp, cShapeDrawer, chartSpace)
     {
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
 		
 		this._drawArea();
 	},
@@ -4616,30 +4619,18 @@ allAreaChart.prototype =
 	
 	_drawArea: function()
 	{
-		var StrokeUniColor = new CUniColor().RGBA;
-		var FillUniColor = new CUniColor().RGBA;
-		FillUniColor.R = 255;
-		FillUniColor.G = 255;
-		FillUniColor.B = 255;
-		
-		var lineWidth = 1;
-		this._drawPath(this.paths, lineWidth, StrokeUniColor, FillUniColor);
+		var pen = this.chartSpace.pen;
+		var brush = this.chartSpace.brush;
+		this._drawPaths(this.paths, brush, pen);
 	},
 	
-	_drawPath: function(path, lineWidth, StrokeUniColor, FillUniColor)
+	_drawPaths: function(paths, brush, pen)
 	{
-		if(StrokeUniColor)
-		{
-			path.stroke = true;
-			this.cShapeDrawer.StrokeWidth = lineWidth/(96/25.4);
-			this.cShapeDrawer.p_width(1000 * this.cShapeDrawer.StrokeWidth);
-			this.cShapeDrawer.StrokeUniColor = StrokeUniColor;
-		}
-		
-		this.cShapeDrawer.FillUniColor = FillUniColor;
-		
+		paths.stroke = true;
 		var cGeometry = new CGeometry2();
-		cGeometry.AddPath(path);
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		cGeometry.AddPath(paths);
 		this.cShapeDrawer.draw(cGeometry);
 	}
 }	
@@ -4649,15 +4640,18 @@ function areaChart()
 {
 	this.chartProp = null;
 	this.cShapeDrawer = null;
+	this.chartSpace = null;
+	
 	this.paths = null;
 }
 
 areaChart.prototype =
 {
-    draw : function(chartProp, cShapeDrawer)
+    draw : function(chartProp, cShapeDrawer, chartSpace)
     {
 		this.chartProp = chartProp;
 		this.cShapeDrawer = cShapeDrawer;
+		this.chartSpace = chartSpace;
 		
 		this._drawArea();
 	},
@@ -4706,30 +4700,18 @@ areaChart.prototype =
 	
 	_drawArea: function()
 	{
-		var StrokeUniColor = null;
-		var FillUniColor = new CUniColor().RGBA;
-		FillUniColor.R = 255;
-		FillUniColor.G = 255;
-		FillUniColor.B = 255;
-		
-		var lineWidth = 1;
-		this._drawPath(this.paths, lineWidth, StrokeUniColor, FillUniColor);
+		var pen = this.chartSpace.chart.plotArea.pen;
+		var brush = this.chartSpace.chart.plotArea.brush;
+		this._drawPaths(this.paths, brush, pen);
 	},
 	
-	_drawPath: function(path, lineWidth, StrokeUniColor, FillUniColor)
+	_drawPaths: function(paths, brush, pen)
 	{
-		if(StrokeUniColor)
-		{
-			path.stroke = true;
-			this.cShapeDrawer.StrokeWidth = lineWidth/(96/25.4);
-			this.cShapeDrawer.p_width(1000 * this.cShapeDrawer.StrokeWidth);
-			this.cShapeDrawer.StrokeUniColor = StrokeUniColor;
-		}
-		
-		this.cShapeDrawer.FillUniColor = FillUniColor;
-		
+		paths.stroke = true;
 		var cGeometry = new CGeometry2();
-		cGeometry.AddPath(path);
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		cGeometry.AddPath(paths);
 		this.cShapeDrawer.draw(cGeometry);
 	}
 }	
