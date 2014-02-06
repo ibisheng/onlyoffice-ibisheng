@@ -3892,7 +3892,7 @@ function DrawingObjects() {
 				tmpRange = asc_Range(c1, r1, c2, r2);
 				_this._drawWorksheetLayer(tmpRange, offsetX, offsetY);
 			}
-			if (range.c1 < cFrozen) {
+			if (range.c1 < cFrozen && range.r2 > vr.r1) {
 				offsetX = worksheet.cols[0].left - worksheet.cellsLeft;
 				offsetY = undefined;
 				c1 = Math.max(0, range.c1);
@@ -3902,7 +3902,7 @@ function DrawingObjects() {
 				tmpRange = asc_Range(c1, r1, c2, r2);
 				_this._drawWorksheetLayer(tmpRange, offsetX, offsetY);
 			}
-			if (0 < rFrozen) {
+			if (range.r1 < rFrozen && range.c2 > vr.c1) {
 				offsetX = undefined;
 				offsetY = worksheet.rows[0].top - worksheet.cellsTop;
 				c1 = Math.max(range.c1, vr.c1);
@@ -3920,6 +3920,8 @@ function DrawingObjects() {
 		r2 = Math.min(range.r2, vr.r2);
 		tmpRange = asc_Range(c1, r1, c2, r2);
 		_this._drawWorksheetLayer(tmpRange);
+
+		worksheet._drawFrozenPaneLines();
 	};
 	
 	//-----------------------------------------------------------------------------------
