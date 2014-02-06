@@ -163,18 +163,11 @@
 				this.element.addEventListener("mousewheel"	, function () {return self._onMouseWheel.apply(self, arguments);}		, false);
 				// for Mozilla Firefox (можно делать проверку на window.MouseScrollEvent || window.WheelEvent для FF)
 				this.element.addEventListener("DOMMouseScroll", function () {return self._onMouseWheel.apply(self, arguments);}		, false);
-
-                if(!this.view.Api.isMobileVersion){
-                    this.element.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
-                    this.element.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-                    this.element.addEventListener("touchend"	, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
-                }
-
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
 			var oShapeCursor = document.getElementById("id_target_cursor");
-			if (null != oShapeCursor && oShapeCursor.addEventListener && !this.view.Api.isMobileVersion) {
+			if (null != oShapeCursor && oShapeCursor.addEventListener) {
 				oShapeCursor.addEventListener("mousedown"	, function () {return self._onMouseDown.apply(self, arguments);}, false);
 				oShapeCursor.addEventListener("mouseup"		, function () {return self._onMouseUp.apply(self, arguments);}	, false);
 				oShapeCursor.addEventListener("mousemove"	, function () {return self._onMouseMove.apply(self, arguments);}, false);
@@ -1415,7 +1408,7 @@
 			return true;
 		};
 
-    /** @param event {jQuery.Event} */
+    	/** @param event {jQuery.Event} */
 		asc_CEventsController.prototype._onMouseLeave = function (event) {
 			var t = this;
 			this.hasCursor = false;
@@ -1487,14 +1480,14 @@
 
         asc_CEventsController.prototype._onTouchStart = function (event){
             this.view.MobileTouchManager.onTouchStart(event);
-        }
+        };
         asc_CEventsController.prototype._onTouchMove = function (event){
-            var n = new Date().getTime()
+            var n = new Date().getTime();
             this.view.MobileTouchManager.onTouchMove(event);
-        }
+        };
         asc_CEventsController.prototype._onTouchEnd = function (event){
             this.view.MobileTouchManager.onTouchEnd(event);
-        }
+        };
 
         /*
          * Export

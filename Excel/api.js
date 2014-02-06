@@ -31,21 +31,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.HtmlElement = null;
 			this.topLineEditorElement = null;
 
-			this.isViewerMode = false;
-
-//			if ("function" === typeof(eventsController)) {
-//				var prot = eventsController.prototype;
-//				prot.init = prot["init"];
-//				prot.destroy = prot["destroy"];
-//				prot.enableKeyEventsHandler = prot["enableKeyEventsHandler"];
-//				prot.reinitializeScroll = prot["reinitializeScroll"];
-//				prot.scrollVertical = prot["scrollVertical"];
-//				prot.scrollHorizontal = prot["scrollHorizontal"];
-//
-//				this.controller = new eventsController();
-//			} else {
-				this.controller	= new asc.asc_CEventsController();
-//			}
+			this.controller	= new asc.asc_CEventsController();
 
 			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
 			this.options = options;
@@ -505,8 +491,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_OpenDocument: function(url, data)
 			{
-//				this._initEventController();
-
 				var wb = new Workbook(url, this.handlers, this);
 				this.initGlobalObjects(wb);
 				this.wbModel = wb;
@@ -535,14 +519,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wbModel);
 				g_oIdCounter.Set_Load(false);
 				CHART_STYLE_MANAGER = new CChartStyleManager();
-			},
-
-			_initEventController: function () {
-				if (this.isMobileVersion)
-					this.controller = new asc.asc_CEventsController(); //ToDo mobile
-				else
-					this.controller	= new asc.asc_CEventsController();
-				this.controller.setViewerMode(this.isViewerMode);
 			},
 			
 			asc_getEditorPermissions : function(){
@@ -714,14 +690,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_getViewerMode: function () {
-				return this.isViewerMode;
+				return this.controller.getViewerMode();
 			},
 
 			asc_setViewerMode: function (isViewerMode) {
-				this.isViewerMode = isViewerMode;
-				// Если нет controller-а, мы выставим позднее режим
-//				if (null !== this.controller)
-//					this.controller.setViewerMode(isViewerMode);
+				this.controller.setViewerMode(isViewerMode);
 				if (this.collaborativeEditing)
 					this.collaborativeEditing.setViewerMode(isViewerMode);
 

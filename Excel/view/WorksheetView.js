@@ -404,6 +404,10 @@
 			return this;
 		}
 
+		WorksheetView.prototype.getFrozenCell = function () {
+			return this.topLeftFrozenCell;
+		};
+
 		WorksheetView.prototype.getVisibleRange = function () {
 			return this.visibleRange;
 		};
@@ -2414,7 +2418,7 @@
             var textY = this._calcTextVertPos(y1, y2, bl, ct.metrics, ct.cellVA);
             var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
-            var xb1, yb1, wb, hb, bound, colLeft, colRight, i;
+            var xb1, yb1, wb, hb, colLeft, colRight, i;
             var txtRotX, txtRotW, clipUse = false;
 
             if (drawingCtx) {
@@ -7485,10 +7489,10 @@
 		};
 		
 		WorksheetView.prototype._pasteFromLocalBuff = function (isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth, onlyActive) {
+			var t = this;
 			var callTrigger = false;
 			if (isLargeRange) { callTrigger = true; t.handlers.trigger("slowOperation", true); }
 			var selectData;
-			var t = this;
 			if(isLocal === 'binary')
 				selectData = t._pasteFromBinary(val);
 			else if (isLocal === true)
@@ -8246,9 +8250,6 @@
 			var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
 			var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
 
-			var diffRow = arn.r1 - activeCellsPasteFragment.r1;
-			var diffCol = arn.c1 - activeCellsPasteFragment.c1;
-
 			var isMultiple = false;
 			var firstCell = t.model.getRange3(arn.r1, arn.c1, arn.r1, arn.c1);
 			var isMergedFirstCell = firstCell.hasMerged();
@@ -8383,8 +8384,6 @@
 							var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
 							newVal = val.getCell( new CellAddress(pasteRow, pasteCol, 0));
 
-							var startCell = val.getCell( new CellAddress(activeCellsPasteFragment.r1, activeCellsPasteFragment.c1, 0));
-
 							curMerge = newVal.hasMerged();
 
 							if(undefined !== newVal)
@@ -8475,7 +8474,6 @@
 									if(numFormula == null)
 										numFormula = 0;
 									var numStyle = 0;
-									var cellValueWithoutFormat;
 									if(skipFormat != null && noSkipVal!= null)
 										numStyle = noSkipVal;
 									if(newVal.getFormula()){
@@ -8492,8 +8490,6 @@
 											numFor++;
 										}
 									}
-									else if(cellValueWithoutFormat)
-										range.setValue(cellValueWithoutFormat);
 									else
 										range.setValue(value2[numStyle].text);
 
@@ -10060,7 +10056,7 @@
 					}
 					s = "";
 					sa.forEach(function(e,i){
-						s += (i!=0?":":"")
+						s += (i!=0?":":"");
 						s += e;
 					})
 				}

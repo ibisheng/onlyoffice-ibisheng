@@ -488,22 +488,22 @@
 		};
 
 		WorkbookView.prototype._onScrollY = function (pos) {
-            console.log("_onScrollY " + pos)
+//            console.log("_onScrollY " + pos)
 //            document.getElementById("cv1" ).value = "_onScrollY " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleRow(/*allowPane*/true));
-            console.log("deltaY " + delta)
+//            console.log("deltaY " + delta)
 			if (delta !== 0) {
 				ws.scrollVertical(delta, this.cellEditor);
 			}
 		};
 
 		WorkbookView.prototype._onScrollX = function (pos) {
-            console.log("_onScrollX " + pos)
+//            console.log("_onScrollX " + pos)
 //            document.getElementById("cv1" ).value = "_onScrollX " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleCol(/*allowPane*/true));
-            console.log("deltaX " + delta)
+//            console.log("deltaX " + delta)
 			if (delta !== 0) {
 				ws.scrollHorizontal(delta, this.cellEditor);
 			}
