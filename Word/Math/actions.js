@@ -418,9 +418,6 @@ CControlComposition.prototype =
         this.Content[this.CurPos].UpdateCursor();
     }
 }
-var MathControl = new CControlComposition();
-MathControl.AddComposition();
-MathControl.SetPosition({x: 27.5 - 6, y: 25.3 });
 
 var inherit = function(obj, extObj)
 {
@@ -1144,9 +1141,6 @@ function Create_Structures()
     }
 
 }
-
-var MathComposition = new CMathComposition();
-MathComposition.SetPosition({x: 27.5 - 6, y: 25.3 });
 
 function MathRecalculate()
 {

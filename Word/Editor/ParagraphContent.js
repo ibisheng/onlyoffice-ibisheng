@@ -8000,6 +8000,25 @@ ParaMath.prototype =
 		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteOMathPara(oThis.Math);});
     },
 
+	/*Write_ElemToBinary2 : function(Writer, elem)
+    {
+		var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+		
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteArgNodes(elem);});
+    },*/
+	
+	//добавление формулы в формулу
+	Write_MathElemToBinary : function(Writer, elem)
+	{
+		var oThis = this;
+		this.bs = new BinaryCommonWriter(Writer);
+		this.boMaths = new Binary_oMathWriter(Writer);
+		
+		this.bs.WriteItemWithLength ( function(){oThis.boMaths.WriteMathElem(elem);});
+	},
+	
     Read_FromBinary2 : function(Reader)
     {
 		var oThis = this;
@@ -8013,8 +8032,40 @@ ParaMath.prototype =
 		res = this.bcr.Read1(length, function(t, l){
 			return oThis.boMathr.ReadMathOMathPara(t,l,oThis.Math);
 		});
-
-    },
+	},
+	
+	/*Read_ElemFromBinary2 : function(Reader, elem)
+    {
+		var oThis = this;
+		this.boMathr = new Binary_oMathReader(Reader);
+		this.bcr = new Binary_CommonReader(Reader);
+		
+		var length = Reader.GetUChar();
+		
+		var res = false;
+		Reader.cur += 3;
+		res = this.bcr.Read1(length, function(t, l){
+			return oThis.boMathr.ReadMathArg(t,l,elem);
+		});
+	},*/
+	
+	Read_MathElemFromBinary : function(Reader)
+    {
+		var oThis = this;
+		this.boMathr = new Binary_oMathReader(Reader);
+		this.bcr = new Binary_CommonReader(Reader);
+		
+		var length = Reader.GetUChar();		
+		var res = false;
+		Reader.cur += 3;
+		
+		var obj = null;
+		var elem = null;
+		res = this.bcr.Read1(length, function(t, l){
+			elem = oThis.boMathr.ReadMathArg(t,l,obj);
+		});
+		return elem;
+	},
 
     Save_Changes : function(Data, Writer)
     {
@@ -8023,6 +8074,7 @@ ParaMath.prototype =
 
     Load_Changes : function(Reader)
     {
+		this.Math.CurrentContent.Load_Changes(Reader);
     }
 };
 
