@@ -2650,6 +2650,7 @@ function CreateStockChart(asc_series)
     line_chart.setDLbls(new CDLbls());
     line_chart.addAxId(plot_area.catAx);
     line_chart.addAxId(plot_area.valAx);
+    line_chart.setHiLowLines(new CSpPr());
     for(var i = 0; i < asc_series.length; ++i)
     {
         var series = new CLineSeries();

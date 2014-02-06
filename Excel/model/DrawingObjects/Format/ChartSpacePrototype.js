@@ -45,7 +45,8 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateBrush: true,
         recalculatePen: true,
         recalculatePlotAreaBrush: true,
-        recalculatePlotAreaPen: true
+        recalculatePlotAreaPen: true,
+        recalculateHiLowLines: true
     };
 	this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
@@ -260,6 +261,11 @@ CChartSpace.prototype.recalculate = function()
             this.recalcInfo.recalculatePen = false;
         }
 
+        if(this.recalcInfo.recalculateHiLowLines)
+        {
+            this.recalculateHiLowLines();
+            this.recalcInfo.recalculateHiLowLines = false;
+        }
         if(this.recalcInfo.recalculatePlotAreaBrush)
         {
             this.recalculatePlotAreaChartBrush();
@@ -285,6 +291,7 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateAxisVal();
             this.recalcInfo.recalculateAxisVal = false;
         }
+
 
 		for(var i = 0; i < this.recalcInfo.dataLbls.length; ++i)
 		{
@@ -548,7 +555,8 @@ CChartSpace.prototype.recalculateMarkers = function()
 {
 	if(this.chart && this.chart.plotArea && this.chart.plotArea.chart 
 		&& ((this.chart.plotArea.chart instanceof CLineChart && this.chart.plotArea.chart.marker) 
-		|| this.chart.plotArea.chart instanceof CScatterChart) 
+		|| this.chart.plotArea.chart instanceof CScatterChart
+        || this.chart.plotArea.chart instanceof CStockChart)
 		&& this.chart.plotArea.chart.series)
 	{
 		var chart_style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
@@ -837,7 +845,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			}
 			else
 			{
-				if(!(this.chart.plotArea.chart instanceof CLineChart))
+				if(!(this.chart.plotArea.chart instanceof CLineChart || this.chart.plotArea.chart instanceof  CScatterChart))
 				{	
 					var base_fills = getArrayFillsFromBase(style.fill2, series.length);
 					var base_line_fills = null;
@@ -1006,6 +1014,30 @@ CChartSpace.prototype.recalculateSeriesColors = function()
 			}
 		}
 	}, this, []);
+};
+
+CChartSpace.prototype.recalculateHiLowLines = function()
+{
+    if(this.chart && this.chart.plotArea && (this.chart.plotArea.chart instanceof CStockChart || this.chart.plotArea.chart instanceof CLineChart) && this.chart.plotArea.chart.hiLowLines)
+    {
+        var parents = this.getParentObjects();
+        var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0].createDuplicate();
+        if(this.style >=1 && this.style <= 32)
+            default_line.setFill(CreateUnifillSolidFillSchemeColor(15, 0));
+        else if(this.style >= 33 && this.style <= 34)
+            default_line.setFill(CreateUnifillSolidFillSchemeColor(8, 0));
+        else if(this.style >= 35 && this.style <= 40)
+            default_line.setFill(CreateUnifillSolidFillSchemeColor(8, -25000));
+        else
+            default_line.setFill(CreateUnifillSolidFillSchemeColor(12, 0));
+        default_line.merge(this.chart.plotArea.chart.hiLowLines.ln);
+        this.chart.plotArea.chart.calculatedHiLowLines = default_line;
+        default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
+    }
+    else
+    {
+        this.chart.plotArea.chart.calculatedHiLowLines = null;
+    }
 };
 
 function getPtsFromSeries(ser)
