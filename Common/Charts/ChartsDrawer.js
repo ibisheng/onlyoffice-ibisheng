@@ -2222,11 +2222,16 @@ drawBarChart.prototype =
         var xaxispos      = this.chartProp.xaxispos;
 		var widthGraph    = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
         var width         = widthGraph / this.chartProp.series[0].val.numRef.numCache.pts.length;
-        var hmargin       = this.chartProp.hmargin;
 		
 		var val;
 		var paths;
-		var individualBarWidth;
+		
+		var individualBarWidth = width / (this.chartProp.series.length + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+			individualBarWidth = width / (1 + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+		
+		var hmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * individualBarWidth) / 2;
+		
 		var height;
 		var startX;
 		var startY;
@@ -2242,11 +2247,6 @@ drawBarChart.prototype =
 			
 			seriesHeight[i] = [];
 			for (var j = 0; j < seria.length; j++) {
-				
-				individualBarWidth = (width - (2 * hmargin)) / this.chartProp.series.length;
-				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-					individualBarWidth = width - (2 * hmargin);
-					
 				val = parseFloat(seria[j].val);
 				if(this.chartProp.scale[0] > 0 && this.chartProp.scale[this.chartProp.scale.length - 1] > 0)
 				{
