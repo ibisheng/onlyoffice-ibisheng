@@ -1386,7 +1386,6 @@ CChartSpace.prototype.recalculateUpDownBars = function()
             {
                 default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 27, -25000);
             }
-
             else if(this.style >= 35 && this.style <= 40)
             {
                 default_down_bars_fill = CreateUnifillSolidFillSchemeColor(this.style - 35, -25000);
@@ -1404,7 +1403,7 @@ CChartSpace.prototype.recalculateUpDownBars = function()
                 default_down_bars_fill.merge(down_bars.Fill);
             }
             default_down_bars_fill.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
-            this.chart.plotArea.chart.upDownBars.downBarsFill = default_up_bars_fill;
+            this.chart.plotArea.chart.upDownBars.downBarsBrush = default_up_bars_fill;
             var down_bars_line = default_bar_line.createDuplicate();
             if(down_bars.ln)
                 down_bars_line.merge(down_bars.ln);
