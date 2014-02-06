@@ -71,6 +71,12 @@ CChartsDrawer.prototype =
 				newChart = new drawAreaChart();
 				break;
 			}
+			
+			case "Stock":
+			{
+				newChart = new drawStockChart();
+				break;
+			}
 		}
 		this.chart = newChart;
 		
@@ -278,6 +284,11 @@ CChartsDrawer.prototype =
 			case historyitem_type_ScatterChart:
 			{
 				this.calcProp.type = "Scatter";
+				break;
+			}
+			case historyitem_type_StockChart:
+			{
+				this.calcProp.type = "Stock";
 				break;
 			}
 		};
@@ -2457,7 +2468,7 @@ drawLineChart.prototype =
 		var koffX = trueWidth/this.chartProp.numvlines;
 		var koffY = trueHeight/digHeight;
 		
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 		
 			var seria = this.chartProp.series[i];
 			
@@ -2569,7 +2580,7 @@ drawLineChart.prototype =
 		var pen;
 		var dataSeries;
 		var seria;
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
 			brush = seria.brush;
 			pen = seria.pen;
@@ -2703,7 +2714,7 @@ drawAreaChart.prototype =
 		var koffY = trueHeight/digHeight;	
 		
 		var seria;
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			
 			//в случае накопительных дигарамм, рисуем в обратном порядке
 			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
@@ -2809,7 +2820,7 @@ drawAreaChart.prototype =
 		var FillUniColor;
 		var pen;
 		var seria, dataSeries;
-		for (i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) {
 			
 			//в случае накопительных дигарамм, рисуем в обратном порядке
 			if(this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked")
@@ -3723,6 +3734,191 @@ drawScatterChart.prototype =
 };
 
 
+//*****Stock CHART*****
+function drawStockChart()
+{
+	this.chartProp = null;
+	this.cChartDrawer = null;
+	this.cShapeDrawer = null;
+	this.cChartSpace = null;
+	this.paths = {};
+}
+
+drawStockChart.prototype =
+{
+    draw : function(chartProp, cShapeDrawer)
+    {
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cShapeDrawer = cShapeDrawer;
+		this._drawLines();
+	},
+	
+	reCalculate : function(chartProp, cChartSpace)
+    {
+		this.paths = {};
+		this.chartProp = chartProp.calcProp;
+		this.cChartDrawer = chartProp;
+		this.cChartSpace = cChartSpace;
+		this._calculateLines();
+	},
+	
+	_calculateLines: function ()
+	{	
+		var tempSeries = [];
+		for (var i = 0; i < 4; i++) {
+			if(i == 0 && this.chartProp.series[0])
+				tempSeries[i] = this.chartProp.series[0];
+			else if(i == 1)
+			{
+				if(this.chartProp.series[1])
+					tempSeries[i] = this.chartProp.series[1];
+				else
+					tempSeries[i] = this.chartProp.series[0];
+			}
+			else if(i == 2)
+			{
+				if(this.chartProp.series[2])
+					tempSeries[i] = this.chartProp.series[2];
+				else if(this.chartProp.series[1])
+					tempSeries[i] = this.chartProp.series[1];
+				else if(this.chartProp.series[0])
+					tempSeries[i] = this.chartProp.series[0];
+			}
+			else if(i == 3)
+			{
+				if(this.chartProp.series[3])
+					tempSeries[i] = this.chartProp.series[3];
+				else if(this.chartProp.series[2])
+					tempSeries[i] = this.chartProp.series[2];
+				else if(this.chartProp.series[1])
+					tempSeries[i] = this.chartProp.series[1];
+				else if(this.chartProp.series[0])
+					tempSeries[i] = this.chartProp.series[0];
+			}
+		};
+		
+		
+		var trueWidth = this.chartProp.trueWidth;
+		var trueHeight = this.chartProp.trueHeight;
+		var min = this.chartProp.scale[0];
+		var max = this.chartProp.scale[this.chartProp.scale.length - 1];
+			
+		var digHeight = Math.abs(max - min);
+		
+		if(this.chartProp.min < 0 && this.chartProp.max <= 0 && this.chartProp.subType != "stackedPer")
+			min = -1*max;
+
+		var koffX = trueWidth / tempSeries[0].val.numRef.numCache.pts.length;
+		var koffY = trueHeight / digHeight;
+		var widthBar = 40;
+		
+		var val1, val2, val3, val4, xVal, yVal1, yVal2, yVal3, yVal4;
+		for (var i = 0; i < tempSeries[0].val.numRef.numCache.pts.length; i++) {
+			val1 = tempSeries[0].val.numRef.numCache.pts[i].val;
+			val2 = tempSeries[1].val.numRef.numCache.pts[i].val;
+			val3 = tempSeries[2].val.numRef.numCache.pts[i].val;
+			val4 = tempSeries[3].val.numRef.numCache.pts[i].val;
+			
+			if(!this.paths.values)
+					this.paths.values = [];
+			if(!this.paths.values[i])
+				this.paths.values[i] = {};
+			
+			xVal = this.chartProp.chartGutter._left + (i)*koffX + koffX/2;
+			yVal1 = trueHeight - (val1)*koffY + this.chartProp.chartGutter._top;
+			yVal2 = trueHeight - (val2)*koffY + this.chartProp.chartGutter._top;
+			yVal3 = trueHeight - (val3)*koffY + this.chartProp.chartGutter._top;
+			yVal4 = trueHeight - (val4)*koffY + this.chartProp.chartGutter._top;
+			
+			this.paths.values[i].lowLines = this._calculateLine(xVal, yVal2, xVal, yVal1);
+			this.paths.values[i].highLines = this._calculateLine(xVal, yVal4, xVal, yVal3);
+			
+			this.paths.values[i].upDownBars = this._calculateUpDownBars(xVal, yVal1, xVal, yVal4, widthBar);
+		}
+	},
+	
+	_drawLines: function (isRedraw/*isSkip*/)
+    {
+		var brush;
+		var pen;
+		var dataSeries;
+		var seria;
+		for (var i = 0; i < this.chartProp.series[0].val.numRef.numCache.pts.length; i++) {
+			seria = this.chartProp.series[0].val.numRef.numCache.pts[i];
+			brush = seria.brush;
+			pen = seria.pen;
+				
+			this._drawPath(this.paths.values[i].lowLines, brush, pen);
+			
+			this._drawPath(this.paths.values[i].highLines, brush, pen);
+			
+			this._drawPath(this.paths.values[i].upDownBars, brush, pen);
+        }
+    },
+	
+	_calculateLine : function(x, y, x1, y1)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		path.moveTo(x / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_calculateDLbl: function(chartSpace, ser, val)
+	{
+		return {x: 0, y: 0};
+	},
+	
+	_calculateUpDownBars: function(x, y, x1, y1, width)
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		var pxToMm = this.chartProp.pxToMM;
+		path.moveTo((x - width/2) / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo((x - width/2) / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo((x + width/2) / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo((x + width/2) / pxToMm * pathW, y / pxToMm * pathH);
+		path.lnTo((x - width/2) / pxToMm * pathW, y / pxToMm * pathH);
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_drawPath : function(path, brush, pen)
+	{
+		path.stroke = true;
+		
+		var cGeometry = new CGeometry2();
+		this.cShapeDrawer.Clear();
+		this.cShapeDrawer.fromShape2({brush: brush, pen: pen} ,this.cShapeDrawer.Graphics, cGeometry);
+		
+		cGeometry.AddPath(path);
+		this.cShapeDrawer.draw(cGeometry);
+	}
+};
 
 //*****GRID*****
 function gridChart()
@@ -4102,23 +4298,26 @@ catAxisChart.prototype =
 	_drawTickMark: function()
 	{
 		var pen, path;
-		for(var i = 0; i < this.paths.tickMarks.length; i++)
+		if(this.paths.tickMarks)
 		{
-			pen = this.chartSpace.chart.plotArea.catAx.compiledTickMarkLn;
-				
-			path = this.paths.tickMarks[i];
-			this._drawPath(path, pen);
-			
-			//промежуточные линии
-			if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
+			for(var i = 0; i < this.paths.tickMarks.length; i++)
 			{
-				for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
+				pen = this.chartSpace.chart.plotArea.catAx.compiledTickMarkLn;
+					
+				path = this.paths.tickMarks[i];
+				this._drawPath(path, pen);
+				
+				//промежуточные линии
+				if(i != this.chartProp.numvlines && this.paths.minorTickMarks)
 				{
-					path = this.paths.minorTickMarks[i][n];
-					this._drawPath(path, pen);
+					for(var n = 0; n < this.paths.minorTickMarks[i].length ; n++)
+					{
+						path = this.paths.minorTickMarks[i][n];
+						this._drawPath(path, pen);
+					}
 				}
-			}
-		}	
+			}	
+		}
 	},
 	
 	_drawPath: function(path, pen)
