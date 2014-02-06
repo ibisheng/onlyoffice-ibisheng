@@ -3918,8 +3918,10 @@ function DrawingObjects() {
 		c2 = Math.min(range.c2, vr.c2);
 		r1 = Math.max(range.r1, vr.r1);
 		r2 = Math.min(range.r2, vr.r2);
-		tmpRange = asc_Range(c1, r1, c2, r2);
-		_this._drawWorksheetLayer(tmpRange);
+		if (c1 <= c2 && r1 <= r2) {
+			tmpRange = asc_Range(c1, r1, c2, r2);
+			_this._drawWorksheetLayer(tmpRange);
+		}
 
 		worksheet._drawFrozenPaneLines();
 	};
