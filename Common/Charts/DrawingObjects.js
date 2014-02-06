@@ -3291,9 +3291,10 @@ function DrawingObjects() {
 						var sheetId = null;
 						if (null != data["input"])
 							sheetId = data["input"]["sheetId"];
-						var url = data["url"];
+						var urls = data["urls"];
 						
-						if (sheetId == worksheet.model.getId()) {
+						if (urls && urls.length > 0 && sheetId == worksheet.model.getId()) {
+							var url = urls[0];
 							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
 								_this.editImageDrawingObject(url);
 							else

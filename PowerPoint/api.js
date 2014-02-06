@@ -171,10 +171,10 @@ function asc_docs_api(name)
 				if(c_oAscServerError.NoError == nError)
 				{
 					oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-					var file = files[0];
 					var xhr = new XMLHttpRequest();
 					var fd = new FormData();
-					fd.append('file', file);
+					for(var i = 0, length = files.length; i < length; i++)
+						fd.append('file[' + i + ']', files[i]);
 					xhr.open('POST', g_sUploadServiceLocalUrl+'?key='+documentId);
 					xhr.onreadystatechange = function(){
 						if(4 == this.readyState)
@@ -4558,15 +4558,19 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 	if (null != event && null != event.data)
     {
 		var data = JSON.parse(event.data);
-		if(null != data && null != data.type)
+		if(null != data && null != data["type"])
 		{
-			if(PostMessageType.UploadImage == data.type)
+			if(PostMessageType.UploadImage == data["type"])
 			{
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				if(c_oAscServerError.NoError == data.error)
-					this.AddImageUrl(data.url);
+				if(c_oAscServerError.NoError == data["error"])
+				{
+					var urls = data["urls"];
+					if(urls && urls.length > 0)
+						this.AddImageUrl(urls[0]);
+				}
 				else
-					this.sync_ErrorCallback(_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
+					this.sync_ErrorCallback(_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
 			}
 		}
 	}

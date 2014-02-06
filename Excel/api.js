@@ -180,10 +180,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						worksheet = this.wbModel.getWorksheet(this.wbModel.getActive());
 					if (null != worksheet) {
 						this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-						var file = files[0];
 						var xhr = new XMLHttpRequest();
 						var fd = new FormData();
-						fd.append('file', file);
+						for(var i = 0, length = files.length; i < length; i++)
+							fd.append('file[' + i + ']', files[i]);
 						xhr.open('POST', g_sUploadServiceLocalUrl+'?key=' + this.documentId + '&sheetId=' + worksheet.getId());
 						xhr.onreadystatechange = function() {
 							if (4 == this.readyState) {
