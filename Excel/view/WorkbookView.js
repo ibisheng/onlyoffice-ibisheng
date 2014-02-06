@@ -481,31 +481,25 @@
                 this.m_dScrollX_max = /*this.canvas.offsetWidth +*/ Math.max(this.controller.settings.hscrollStep * hsize, 1);
 
             if(this.Api.isMobileVersion){
-                this.MobileTouchManager.Resize();
+
                 return;
             }
             asc_applyFunction(callback, vsize, hsize);
 		};
 
 		WorkbookView.prototype._onScrollY = function (pos) {
-//            console.log("_onScrollY " + pos)
-//            document.getElementById("cv1" ).value = "_onScrollY " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleRow(/*allowPane*/true));
-//            console.log("deltaY " + delta)
 			if (delta !== 0) {
-				ws.scrollVertical(delta, this.cellEditor);
+				ws.scrollVertical(delta, this.cellEditor,this.Api.isMobileVersion);
 			}
 		};
 
 		WorkbookView.prototype._onScrollX = function (pos) {
-//            console.log("_onScrollX " + pos)
-//            document.getElementById("cv1" ).value = "_onScrollX " + pos;
 			var ws = this.getWorksheet();
 			var delta = asc_round(pos - ws.getFirstVisibleCol(/*allowPane*/true));
-//            console.log("deltaX " + delta)
 			if (delta !== 0) {
-				ws.scrollHorizontal(delta, this.cellEditor);
+				ws.scrollHorizontal(delta, this.cellEditor, this.Api.isMobileVersion);
 			}
 		};
 
@@ -1098,6 +1092,8 @@
 			this._onWSSelectionChanged(ws.getSelectionInfo());
 			this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
 			this.controller.reinitializeScroll();
+            if(this.Api.isMobileVersion)
+                this.MobileTouchManager.Resize();
 			// Zoom теперь на каждом листе одинаковый, не отправляем смену
 			return this;
 		};
@@ -1188,6 +1184,7 @@
 			if (this._canResize()) {
 				this.getWorksheet().resize();
 				this.showWorksheet(undefined, true);
+
 			} else {
 				// ToDo не должно происходить ничего, но нам приходит resize сверху
 				this.showWorksheet(undefined, true);

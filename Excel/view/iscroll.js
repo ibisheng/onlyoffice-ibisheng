@@ -297,9 +297,6 @@
                     that.vScrollbarIndicator = bar;
                 }
 
-//                var percentInViewV = (m.abs(that.maxScrollY) + that.vScrollbarWrapper.clientHeight ) / that.vScrollbarWrapper.clientHeight;
-//                that.vScrollbarIndicatorSize  = m.max(Math.ceil( 1 / percentInViewV * that.vScrollbarWrapper.clientHeight ),8)
-
                 that.vScrollbarSize = that.vScrollbarWrapper.clientHeight;
                 that.vScrollbarIndicatorSize = m.max( m.round( that.vScrollbarSize * that.vScrollbarSize / that.scrollerH ), 8 );
                 that.vScrollbarIndicator.style.height = that.vScrollbarIndicatorSize + 'px';
@@ -320,9 +317,6 @@
 
         _pos:function ( x, y, isAnim ) {
             if ( this.zoomed ) return;
-
-            console.log("this.maxScrollY " + this.maxScrollY);
-            console.log("this.maxScrollX " + this.maxScrollX);
 
             x = this.hScroll ? x : 0;
             y = this.vScroll ? y : 0;

@@ -4878,7 +4878,7 @@
 			return y - r[vr.r1].top + this.cellsTop < this.drawingCtx.getHeight();
 		};
 
-		WorksheetView.prototype._updateVisibleRowsCount = function (skipScrolReinit) {
+		WorksheetView.prototype._updateVisibleRowsCount = function (skipScrollReinit,isMobile) {
 			this._calcVisibleRows();
 			if (this._isVisibleY()) {
 				do {  // Добавим еще строки, чтоб не было видно фон под таблицей
@@ -4886,13 +4886,13 @@
 					this._calcVisibleRows();
 					if (this.rows[this.rows.length - 1].height < 0.000001) {break;}
 				} while (this._isVisibleY());
-				if (!skipScrolReinit) {
+				if (!skipScrollReinit) {
 					this.handlers.trigger("reinitializeScrollY");
 				}
 			}
 		};
 
-		WorksheetView.prototype._updateVisibleColsCount = function (skipScrolReinit) {
+		WorksheetView.prototype._updateVisibleColsCount = function (skipScrollReinit,isMobile) {
 			this._calcVisibleColumns();
 			if (this._isVisibleX()) {
 				do {  // Добавим еще столбцы, чтоб не было видно фон под таблицей
@@ -4900,13 +4900,13 @@
 					this._calcVisibleColumns();
 					if (this.cols[this.cols.length - 1].width < 0.000001) {break;}
 				} while (this._isVisibleX());
-				if (!skipScrolReinit) {
+				if (!skipScrollReinit) {
 					this.handlers.trigger("reinitializeScrollX");
 				}
 			}
 		};
 
-		WorksheetView.prototype.scrollVertical = function (delta, editor) {
+		WorksheetView.prototype.scrollVertical = function (delta, editor, isMobile) {
 			var vr = this.visibleRange;
 			var start = this._calcCellPosition(vr.c1, vr.r1, 0, delta).row;
 			var fixStartRow = asc_Range(vr.c1, start, vr.c2, start);
@@ -4948,7 +4948,7 @@
 			if (this.isCellEditMode && editor) {editor.move(0, -dy);}
 
 			vr.r1 = start;
-			this._updateVisibleRowsCount();
+			this._updateVisibleRowsCount(false,isMobile);
 
 			this.objectRender.setScrollOffset();
 
@@ -5041,7 +5041,7 @@
 			return this;
 		};
 
-		WorksheetView.prototype.scrollHorizontal = function (delta, editor) {
+		WorksheetView.prototype.scrollHorizontal = function (delta, editor, isMobile) {
 			var vr = this.visibleRange;
 			var start = this._calcCellPosition(vr.c1, vr.r1, delta, 0).col;
 			var fixStartCol = asc_Range(start, vr.r1, start, vr.r2);
@@ -5082,7 +5082,7 @@
 			if (this.isCellEditMode && editor) {editor.move(-dx, 0);}
 
 			vr.c1 = start;
-			this._updateVisibleColsCount();
+            this._updateVisibleColsCount(false,isMobile);
 
 			this.objectRender.setScrollOffset();
 
