@@ -113,6 +113,7 @@
 			this.element  = canvasElem;
 			this.handlers = new asc.asc_CHandlersList(handlers);
 			this.settings = $.extend(true, {}, this.settings, settings);
+            this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
                 var __hasTouch = 'ontouchstart' in window;
 
