@@ -406,6 +406,8 @@ function DrawingContext(settings) {
 	if ( !(this instanceof DrawingContext) ) {
 		return new DrawingContext(settings);
 	}
+	this.canvas = null;
+	this.ctx = null;
 
 	this.setCanvas(settings.canvas);
 
@@ -593,6 +595,9 @@ DrawingContext.prototype = {
 	 */
 	initContextSmoothing: function () {
 		var ctx = this.ctx;
+		if (null === ctx)
+			return;
+
 		// Не убирать. Баг на android при scroll!!!
 		if (ctx.imageSmoothingEnabled)
 			ctx.imageSmoothingEnabled = false;
