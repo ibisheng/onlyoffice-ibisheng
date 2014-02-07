@@ -4,6 +4,7 @@ var ASC_DOCS_API_DEBUG = true;
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 var documentId = undefined;
+var documentUserId = undefined;
 var documentUrl = 'null';
 var documentTitle = 'null';
 var documentTitleWithoutExtention = 'null';
@@ -855,6 +856,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 		var rData = {
 			"c"			: "getsettings",
 			"id"		: this.DocInfo.get_Id(),
+			"userid"	: this.DocInfo.get_UserId(),
 			"format"	: this.DocInfo.get_Format(),
 			"vkey"		: this.DocInfo.get_VKey(),
 			"editorid"	: c_oEditorId.Word
@@ -870,7 +872,9 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 asc_docs_api.prototype.asc_getLicense = function () {
 	var t = this;
 	var rdata = {
-		"c" : "getlicense"
+		"c" 		: "getlicense",
+		"id"		: this.DocInfo.get_Id(),
+		"userid"	: this.DocInfo.get_UserId()
 	};
 	sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
 };
@@ -936,6 +940,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 
 	if(this.DocInfo){
 		documentId = this.DocInfo.get_Id();
+		documentUserId = this.DocInfo.get_UserId();
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
@@ -995,7 +1000,18 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		var oOpenOptions = this.DocInfo.get_Options();
 		if(oOpenOptions && oOpenOptions["isEmpty"])
 		{
-			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"create", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "data": g_sEmpty_bin};
+			var rData = {
+				"c": "create",
+				"id": documentId,
+				"userid": documentUserId,
+				"format": documentFormat,
+				"vkey": documentVKey,
+				"editorid": c_oEditorId.Word,
+				"url": documentUrl,
+				"title": documentTitle,
+				"embeddedfonts": this.isUseEmbeddedCutFonts,
+				"data": g_sEmpty_bin};
+				
 			sendCommand( oThis, function(){}, rData );
 			editor.OpenDocument2(g_sResourceServiceLocalUrl + documentId + "/", g_sEmpty_bin);
 			if(this.InterfaceLocale)
@@ -1008,7 +1024,17 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		else
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"open", "url": documentUrl, "title": documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
+			var rData = {
+				"id": documentId,
+				"userid": documentUserId,
+				"format": documentFormat,
+				"vkey": documentVKey,
+				"editorid": c_oEditorId.Word,
+				"c": "open",
+				"url": documentUrl,
+				"title": documentTitle,
+				"embeddedfonts": this.isUseEmbeddedCutFonts};
+				
 			sendCommand( oThis, function(){}, rData );
 		}
 		this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
@@ -2550,7 +2576,13 @@ asc_docs_api.prototype.asc_Print = function()
 		var editor = this;
 		if(null == this.WordControl.m_oLogicDocument)
 		{
-			var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"savefromorigin"};
+			var rData = {
+				"id":documentId,
+				"userid": documentUserId,
+				"vkey": documentVKey,
+				"format": documentFormat,
+				"c":"savefromorigin"};
+				
 			sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject["type"])
 					editor.processSavedFile(incomeObject["data"], false);
@@ -2678,6 +2710,7 @@ function OnSave_Callback(e)
             var oAdditionalData = new Object();
 			oAdditionalData["c"] = "save";
 			oAdditionalData["id"] = documentId;
+			oAdditionalData["userid"] = documentUserId;
             oAdditionalData["vkey"] = documentVKey;
             oAdditionalData["outputformat"] = documentFormatSave;
 			if(c_oAscFileType.TXT == documentFormatSaveTxtCodepage)
@@ -2750,7 +2783,13 @@ asc_docs_api.prototype.Help = function(){
 
 }
 asc_docs_api.prototype.ClearCache = function(){
-	var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"cc"};
+	var rData = {
+		"id":documentId,
+		"userid": documentUserId,
+		"vkey": documentVKey,
+		"format": documentFormat,
+		"c":"cc"};
+
 	sendCommand(editor, function(){}, rData);
 }
 
@@ -4973,7 +5012,13 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 		}
 		else
 		{
-			var rData = {"id":documentId, "vkey": documentVKey, "c":"imgurl", "data": url};
+			var rData = {
+				"id": documentId,
+				"userid": documentUserId,
+				"vkey": documentVKey,
+				"c": "imgurl",
+				"data": url};
+
 			var oThis = this;
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			sendCommand( oThis, function(incomeObject){
@@ -7003,7 +7048,18 @@ function sendCommand(editor, fCallback, rdata){
                 break;
 				case "needparams":
 					//todo dialog
-					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"reopen", "url": documentUrl, "title": documentTitle, "codepage": documentFormatSaveTxtCodepage, "embeddedfonts": editor.isUseEmbeddedCutFonts};
+					var rData = {
+						"id":documentId,
+						"userid": documentUserId,
+						"format": documentFormat,
+						"vkey": documentVKey,
+						"editorid": c_oEditorId.Word,
+						"c":"reopen",
+						"url": documentUrl,
+						"title": documentTitle,
+						"codepage": documentFormatSaveTxtCodepage,
+						"embeddedfonts": editor.isUseEmbeddedCutFonts};
+						
                     sendCommand(editor, fCallback,  rData)
                 break;
                 case "waitopen":
@@ -7012,7 +7068,14 @@ function sendCommand(editor, fCallback, rdata){
                         editor._lastConvertProgress = incomeObject["data"] / 2;
                         editor.sync_SendProgress(editor._lastConvertProgress);
                     }
-					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"chopen"};
+					var rData = {
+						"id": documentId,
+						"userid": documentUserId,
+						"format": documentFormat,
+						"vkey": documentVKey,
+						"editorid": c_oEditorId.Word,
+						"c": "chopen"};
+						
                     setTimeout( function(){sendCommand(editor, fCallback,  rData)}, 3000);
                 break;
 				case "changes":
@@ -7030,7 +7093,14 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 				{
-					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject["data"]};
+					var rData = {
+						"id":documentId,
+						"userid": documentUserId,
+						"vkey": documentVKey,
+						"title": documentTitleWithoutExtention,
+						"c": "chsave",
+						"data": incomeObject["data"]};
+
                     setTimeout( function(){sendCommand(editor, fCallback, rData)}, 3000);
 				}
                 break;
@@ -7082,6 +7152,7 @@ function _downloadAs(editor, filetype, fCallback, bStart, sSaveKey)
 	var oAdditionalData = new Object();
 	oAdditionalData["c"] = "save";
 	oAdditionalData["id"] = documentId;
+	oAdditionalData["userid"] = documentUserId;
 	oAdditionalData["vkey"] = documentVKey;
 	oAdditionalData["outputformat"] = filetype;
 	if(null != sSaveKey)
