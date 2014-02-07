@@ -483,10 +483,17 @@ DrawingContext.prototype = {
 	setCanvas: function (canvas) {
 		if (null == canvas) {return;}
 		this.canvas = canvas;
-		this.ctx = this.canvas.getContext("2d");
-		if (this.ctx.mozImageSmoothingEnabled) {
-			this.ctx.mozImageSmoothingEnabled = false;
-		}
+		var ctx = this.ctx = this.canvas.getContext("2d");
+
+		// Не убирать. Баг на android при scroll!!!
+		if (ctx.imageSmoothingEnabled)
+			ctx.imageSmoothingEnabled = false;
+		if (ctx.mozImageSmoothingEnabled)
+			ctx.mozImageSmoothingEnabled = false;
+		if (ctx.oImageSmoothingEnabled)
+			ctx.oImageSmoothingEnabled = false;
+		if (ctx.webkitImageSmoothingEnabled)
+			ctx.webkitImageSmoothingEnabled = false;
 	},
 
 	/**
