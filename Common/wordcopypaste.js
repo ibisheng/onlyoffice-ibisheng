@@ -352,7 +352,7 @@ function CopyProcessor(api, ElemToSelect)
     this.fontsArray = api.FontLoader.fontInfos;
     this.ElemToSelect = ElemToSelect;
     this.Ul = document.createElement( "ul" );
-    this.Ol = document.createElement( "ul" );
+    this.Ol = document.createElement( "ol" );
     this.oTagPr;
     this.orPr;
     this.aInnerHtml;
