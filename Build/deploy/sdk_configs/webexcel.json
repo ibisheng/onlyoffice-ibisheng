@@ -63,6 +63,8 @@
                 "../../Excel/model/History.js",
                 "../../Excel/model/UndoRedo.js",
                 "../../Excel/model/CellComment.js",
+				"../../Excel/view/mobileTouch.js",
+				"../../Excel/view/iscroll.js",
                 "../../Excel/view/StringRender.js",
                 "../../Excel/view/CellTextRender.js",
                 "../../Excel/view/CellEditorView.js",
