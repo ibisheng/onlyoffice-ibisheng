@@ -487,7 +487,7 @@ CopyProcessor.prototype =
             if(null != Item_pPr.Brd)
             {
                 apPr.push("border:none");
-                var borderStyle = this._BordersToStyle(Item_pPr.Brd, "mso-", "-alt");
+                var borderStyle = this._BordersToStyle(Item_pPr.Brd, false, true, "mso-", "-alt");
                 if(null != borderStyle)
                 {
                     var nborderStyleLength = borderStyle.length;
@@ -1042,7 +1042,7 @@ CopyProcessor.prototype =
         res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
         return res;
     },
-    _BordersToStyle : function(borders, mso, alt)
+    _BordersToStyle : function(borders, bUseInner, bUseBetween, mso, alt)
     {
         var res = "";
         if(null == mso)
@@ -1057,12 +1057,18 @@ CopyProcessor.prototype =
             res += this._BorderToStyle(borders.Right, mso + "border-right" + alt);
         if(null != borders.Bottom)
             res += this._BorderToStyle(borders.Bottom, mso + "border-bottom" + alt);
-        if(null != borders.InsideV)
-            res += this._BorderToStyle(borders.InsideV, "mso-border-insidev");
-        if(null != borders.InsideH)
-            res += this._BorderToStyle(borders.InsideH, "mso-border-insideh");
-        if(null != borders.Between)
-            res += this._BorderToStyle(borders.Between, "mso-border-between");
+		if(bUseInner)
+		{
+			if(null != borders.InsideV)
+				res += this._BorderToStyle(borders.InsideV, "mso-border-insidev");
+			if(null != borders.InsideH)
+				res += this._BorderToStyle(borders.InsideH, "mso-border-insideh");
+		}
+		if(bUseBetween)
+		{
+			if(null != borders.Between)
+				res += this._BorderToStyle(borders.Between, "mso-border-between");
+		}
         return res;
     },
     _MergeProp : function(elem1, elem2)
@@ -1125,7 +1131,7 @@ CopyProcessor.prototype =
             this._MergeProp(oCellBorder, cellPr.TableCellBorders);
         if(null != tablePr && null != tablePr.TableBorders)
             this._MergeProp(oCellBorder, tablePr.TableBorders);
-        tcStyle += this._BordersToStyle(oCellBorder);
+        tcStyle += this._BordersToStyle(oCellBorder, false, false);
 
         if("" != tcStyle)
             tc.setAttribute("style", tcStyle);
@@ -1295,7 +1301,7 @@ CopyProcessor.prototype =
             if(null != Pr.TableCellMar)
                 tblStyle += this._MarginToStyle(Pr.TableCellMar, "mso-padding-alt");
             if(null != Pr.TableBorders)
-                tblStyle += this._BordersToStyle(Pr.TableBorders);
+                tblStyle += this._BordersToStyle(Pr.TableBorders, true, false);
         }
         //���� cellSpacing
         var bAddSpacing = false;
