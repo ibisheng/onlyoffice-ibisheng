@@ -394,11 +394,13 @@ CopyProcessor.prototype =
     {
         if(this.Ul.childNodes.length > 0)
         {
+			this.Ul.style.paddingLeft = "40px";
             oDomTarget.appendChild( this.Ul );
             this.Ul = document.createElement( "ul" );
         }
         if(this.Ol.childNodes.length > 0)
         {
+			this.Ol.style.paddingLeft = "40px";
             oDomTarget.appendChild( this.Ol );
             this.Ol = document.createElement( "ol" );
         }
