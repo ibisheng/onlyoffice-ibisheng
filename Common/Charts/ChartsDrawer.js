@@ -905,11 +905,11 @@ CChartsDrawer.prototype =
 	{
 		this._calculateMarginsChart(chartSpace);
 		
-		var widthCanvas = chartSpace.extX*this.calcProp.pxToMM;
-		var heightCanvas = chartSpace.extY*this.calcProp.pxToMM;
+		var widthCanvas = chartSpace.extX;
+		var heightCanvas = chartSpace.extY;
 		
-		var w = widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
-		var h = heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
+		var w = widthCanvas - (this.calcProp.chartGutter._left - this.calcProp.chartGutter._right) / this.calcProp.pxToMM;
+		var h = heightCanvas - (this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom) / this.calcProp.pxToMM;
 		
 		return {w: w, h: h};
 	},
