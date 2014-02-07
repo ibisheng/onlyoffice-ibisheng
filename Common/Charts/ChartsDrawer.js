@@ -901,6 +901,19 @@ CChartsDrawer.prototype =
 			this.calcProp.hmargin = 0;
 	},
 	
+	calculateSizePlotArea : function(chartSpace)
+	{
+		this._calculateMarginsChart(chartSpace);
+		
+		var widthCanvas = chartSpace.extX*this.calcProp.pxToMM;
+		var heightCanvas = chartSpace.extY*this.calcProp.pxToMM;
+		
+		var w = widthCanvas - this.calcProp.chartGutter._left - this.calcProp.chartGutter._right;
+		var h = heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
+		
+		return {w: w, h: h};
+	},
+	
 	_calculateMarginsChart: function(chartSpace) {
 		this.calcProp.chartGutter = {};
 		
@@ -2961,6 +2974,12 @@ drawHBarChart.prototype =
 			var tempMin = this.chartProp.xmin;
 			var height  = trueHeight / this.chartProp.data.length;
 			
+			var barHeight = height / (this.chartProp.series.length + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+			if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
+				barHeight = height / (1 + this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100);
+			
+			var vmargin = (this.cShapeDrawer.chart.plotArea.chart.gapWidth / 100 * barHeight) / 2;
+			
 			var seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			
 			for (var j = 0; j < seria.length; j++) {
@@ -2994,13 +3013,11 @@ drawHBarChart.prototype =
 					width = trueWidth - ((val - tempMin) / (tempMax - tempMin)) * (trueWidth);
 				else
 					width = ((val < 0 ? (val + tempMin): val - tempMin) / (tempMax - tempMin)) * (trueWidth);
-				
+			
 
-				var height = trueHeight / seria.length;
-
-				var barHeight = (height - (2 * this.chartProp.vmargin)) / this.chartProp.series.length;
+				/*var barHeight = (height - (2 * this.chartProp.vmargin)) / this.chartProp.series.length;
 				if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-					barHeight = height - (2 * this.chartProp.vmargin);
+					barHeight = height - (2 * this.chartProp.vmargin);*/
 				
 				var startX;
 				var startY;
@@ -3016,13 +3033,13 @@ drawHBarChart.prototype =
 							diffYVal += seriesHeight[k][j];
 					}
 					seriesHeight[i][j] = width;
-					startY = trueHeight  + this.chartProp.chartGutter._top - this.chartProp.vmargin - (j * height);
+					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height);
 					
 					if(tempMax <=0 && tempMin < 0)
 						diffYVal = -1*diffYVal;
 				}
 				else
-					startY = trueHeight  + this.chartProp.chartGutter._top - this.chartProp.vmargin - (j * height + i * barHeight);
+					startY = trueHeight  + this.chartProp.chartGutter._top - vmargin - (j * height + i * barHeight);
 				
 				if(tempMin < 0 && tempMax < 0)
 					startX = this.chartProp.nullPositionOX - width;
