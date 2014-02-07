@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (function (global) {
     'use strict';
@@ -58,6 +58,10 @@
 	CDocsCoApi.prototype.set_url = function (url) {
 		if (this._CoAuthoringApi)
 			this._CoAuthoringApi.set_url(url);
+	};
+	
+	CDocsCoApi.prototype.get_onlineWork = function () {
+		return this._onlineWork;
 	};
 
 	CDocsCoApi.prototype.get_state = function () {
