@@ -737,9 +737,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 asc_docs_api.prototype.asc_getLicense = function () {
 	var t = this;
 	var rdata = {
-		"c" : "getlicense",
-		"id"		: this.DocInfo.get_Id(),
-		"userid"	: this.DocInfo.get_UserId()
+		"c" : "getlicense"
 	};
 	sendCommand(this, function (response) {t._onGetLicense(response);}, rdata);
 };

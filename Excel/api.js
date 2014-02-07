@@ -543,9 +543,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getLicense : function () {
 				var t = this;
 				var rdata = {
-					"c": "getlicense",
-					"id": this.DocInfo["Id"],
-					"userid": this.DocInfo["UserId"]
+					"c": "getlicense"
 				};
 				this._asc_sendCommand(function (response) {t._onGetLicense(response);}, rdata);
 			},
