@@ -1186,9 +1186,12 @@
 			this.canvas.height = this.canvasOverlay.height = this.canvasGraphic.height = this.canvasGraphicOverlay.height = height;
 
 			// При смене ориентации у планшета, сбрасываются флаги у canvas!
-			this.drawingCtx.initContextSmoothing();
-			this.overlayCtx.initContextSmoothing();
-			this.drawingCtxCharts.initContextSmoothing();
+			if ( this.drawingCtx )
+				this.drawingCtx.initContextSmoothing();
+			if ( this.overlayCtx )
+				this.overlayCtx.initContextSmoothing();
+			if ( this.drawingCtxCharts )
+				this.drawingCtxCharts.initContextSmoothing();
 			return true;
 		};
 
