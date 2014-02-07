@@ -1424,6 +1424,12 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	if (isDocumentSaved) {
 		// Запускаем таймер автосохранения
 		this.autoSaveInit();
+		//если нет совместного редактирования, надо всегда чистить кешированную копию файла, иначе будет всегда одна версия файла.
+		if(!this.CoAuthoringApi.get_onlineWork())
+		{
+			var rData = {"id": documentId, "vkey": documentVKey, "format": documentFormat, "c":"cc"};
+			sendCommand(this, function(){}, rData);
+		}
 	} else {
 		this.CoAuthoringApi.disconnect();
 	}
