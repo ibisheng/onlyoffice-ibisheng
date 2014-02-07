@@ -476,14 +476,10 @@
 			    hsize = !whichSB || whichSB === 2 ? ws.getHorizontalScrollRange() : undefined;
 
             if( vsize != undefined )
-                this.m_dScrollY_max = /*this.canvas.offsetHeight +*/ Math.max(this.controller.settings.vscrollStep * vsize, 1);
+                this.m_dScrollY_max = Math.max(this.controller.settings.vscrollStep * (vsize + 1), 1);
             if( hsize != undefined )
-                this.m_dScrollX_max = /*this.canvas.offsetWidth +*/ Math.max(this.controller.settings.hscrollStep * hsize, 1);
+                this.m_dScrollX_max = Math.max(this.controller.settings.hscrollStep * (hsize + 1), 1);
 
-            if(this.Api.isMobileVersion){
-
-                return;
-            }
             asc_applyFunction(callback, vsize, hsize);
 		};
 

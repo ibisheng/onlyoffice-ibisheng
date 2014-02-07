@@ -67,13 +67,7 @@ function CMobileTouchManager()
 CMobileTouchManager.prototype = {
     Init : function(ctrl)
     {
-
-
-        /*this.HtmlPage = ctrl;
-        this.LogicDocument = ctrl.m_oLogicDocument;
-        this.DrawingDocument = ctrl.m_oDrawingDocument;*/
-
-        this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:false,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
+        this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
             param.api.MobileTouchManager.OnScrollAnimationEnd();
         } }*/);
 //        LoadMobileImages();

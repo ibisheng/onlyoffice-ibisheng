@@ -130,7 +130,6 @@
 //                this.element.addEventListener("dblclick"	, function () {alert("123");/*return self._onMouseDblClick.apply(self, arguments);*/}	, false);
                 return;
             }
-			this._createScrollBars();
 
 			// initialize events
 			if (window.addEventListener) {
@@ -358,10 +357,20 @@
 				};
 			}
 
-			// right bottom corner
-			var corner = document.createElement('div');
-			corner.id = "ws-scrollbar-corner";
-			this.widget.appendChild(corner);
+            if(!this.view.Api.isMobileVersion){
+                // right bottom corner
+                var corner = document.createElement('div');
+                corner.id = "ws-scrollbar-corner";
+                this.widget.appendChild(corner);
+            }
+            else{
+                this.hsb.style.zIndex = -10;
+                this.hsb.style.right = 0;
+                this.vsb.style.zIndex = -10;
+                this.vsb.style.bottom = 0;
+            }
+
+
 		};
 
 		/**

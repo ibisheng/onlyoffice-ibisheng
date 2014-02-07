@@ -82,11 +82,6 @@
             var that = this,
                 i;
 
-            var o = {m_oMainView:{},m_oEditor:{},m_oScrollVerApi:{}}
-            o.m_oMainView.HtmlElement = o.m_oEditor.HtmlElement = api.canvasOverlay;
-            o.m_dDocumentWidth = api.canvas.width;
-            o.m_dDocumentHeight = api.canvas.height;
-
             that.api = api;
             that.wrapper = api.element;
             that.wrapper.style.overflow = 'hidden';
@@ -301,7 +296,7 @@
                 that.vScrollbarIndicatorSize = m.max( m.round( that.vScrollbarSize * that.vScrollbarSize / that.scrollerH ), 8 );
                 that.vScrollbarIndicator.style.height = that.vScrollbarIndicatorSize + 'px';
                 that.vScrollbarMaxScroll = that.vScrollbarSize - that.vScrollbarIndicatorSize;
-                that.vScrollbarProp = that.vScrollbarSize / that.maxScrollY;
+                that.vScrollbarProp = that.vScrollbarMaxScroll/that.maxScrollY;
 
                 // Reset position
                 that._scrollbarPos( dir, true );
@@ -333,10 +328,10 @@
 
             if ( this.api.ReaderModeDiv == null ) {
                 if ( this.hScroll ) {
-                    this.api._onScrollX( -this.x );
+                    this.api._onScrollX( -this.x/this.api.controller.settings.vscrollStep );
                 }
                 if ( this.vScroll ) {
-                    this.api._onScrollY( -this.y );
+                    this.api._onScrollY( -this.y/this.api.controller.settings.hscrollStep );
                 }
             }
             else if ( this.scroller ) {
@@ -492,6 +487,7 @@
                 newY = that.y + deltaY,
                 c1, c2, scale,
                 timestamp = e.timeStamp || Date.now();
+
 
             if ( that.options.onBeforeScrollMove ) that.options.onBeforeScrollMove.call( that, e );
 
@@ -974,9 +970,6 @@
             that.scrollerH = m.round( _elem.offsetHeight + that.minScrollY );
             that.maxScrollX = that.wrapperW - that.scrollerW;
             that.maxScrollY = that.wrapperH - that.scrollerH + that.minScrollY;
-
-            console.log("that.maxScrollY " + that.maxScrollY);
-            console.log("that.maxScrollX " + that.maxScrollX);
 
             that._scrollbar( 'h' );
             that._scrollbar( 'v' );
